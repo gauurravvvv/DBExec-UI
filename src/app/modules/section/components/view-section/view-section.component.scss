@@ -1,20 +1,16 @@
 // Premium Design Variables - Using Global Theme
-$radius-lg: 16px;
-$radius-md: 12px;
-$radius-sm: 8px;
-
 .view-category-wrapper {
   height: 100%;
 
   .view-category-container {
     background: var(--card-background);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     height: 100%;
     display: flex;
     flex-direction: column;
 
     .page-header {
-      padding: 20px;
+      padding: var(--space-7);
       border-bottom: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
@@ -23,12 +19,12 @@ $radius-sm: 8px;
       border-radius: 8px 8px 0 0;
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: var(--z-elevated);
 
       .left-section {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: var(--space-5);
 
         button {
           min-width: 0;
@@ -52,8 +48,8 @@ $radius-sm: 8px;
           display: flex !important;
           align-items: center !important;
           justify-content: center !important;
-          padding: 0 !important;
-          transition: all 0.2s ease !important;
+          padding: var(--space-0) !important;
+          transition: all var(--motion-base) ease !important;
 
           &:hover {
             background: var(--hover-background) !important;
@@ -62,7 +58,7 @@ $radius-sm: 8px;
         }
 
         h2 {
-          margin: 0;
+          margin: var(--space-0);
           font-size: var(--fs-h1);
           font-weight: var(--fw-semibold);
           color: var(--text-color);
@@ -71,19 +67,19 @@ $radius-sm: 8px;
 
       .header-actions {
         display: flex;
-        gap: 10px;
+        gap: var(--space-5);
         align-items: center;
 
         button {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
+          gap: var(--space-4);
           padding: 8px 18px;
-          border-radius: $radius-sm;
+          border-radius: var(--radius-sm);
           font-weight: var(--fw-semibold);
           font-size: var(--fs-body);
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all var(--motion-base) ease;
           border: none;
         }
 
@@ -115,7 +111,7 @@ $radius-sm: 8px;
       flex: 1;
       overflow-y: auto;
       padding-right: 10px;
-      padding: 30px;
+      padding: var(--space-9);
 
       &::-webkit-scrollbar {
         width: 8px;
@@ -124,12 +120,12 @@ $radius-sm: 8px;
 
       &::-webkit-scrollbar-track {
         background: transparent;
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
       }
 
       &::-webkit-scrollbar-thumb {
         background: var(--border-color);
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
 
         &:hover {
           background: var(--secondary-color);
@@ -139,14 +135,14 @@ $radius-sm: 8px;
       .details-grid {
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: var(--space-8);
 
         .info-section {
           background: var(--card-background);
           border: 1px solid var(--border-color);
-          border-radius: 8px;
-          padding: 20px;
-          transition: all 0.2s ease;
+          border-radius: var(--radius-md);
+          padding: var(--space-7);
+          transition: all var(--motion-base) ease;
 
           &:hover {
             box-shadow: 0 2px 8px var(--shadow-color);
@@ -169,7 +165,7 @@ $radius-sm: 8px;
               margin-left: 8px;
               background: var(--hover-background);
               padding: 2px 8px;
-              border-radius: 12px;
+              border-radius: var(--radius-lg);
               font-size: var(--fs-label);
               color: var(--text-color);
               opacity: 0.7;
@@ -179,7 +175,7 @@ $radius-sm: 8px;
           .info-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            gap: var(--space-7);
 
             .info-item {
               label {
@@ -191,7 +187,7 @@ $radius-sm: 8px;
               }
 
               p {
-                margin: 0;
+                margin: var(--space-0);
                 font-size: var(--fs-h3);
                 color: var(--text-color);
               }
@@ -212,18 +208,18 @@ $radius-sm: 8px;
         .fields-list {
           display: flex;
           flex-wrap: wrap;
-          gap: 12px;
+          gap: var(--space-5);
 
           .field-item {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--space-4);
             padding: 8px 12px;
             background: var(--hover-background);
-            border-radius: 6px;
+            border-radius: var(--radius-sm);
             font-size: var(--fs-body);
             color: var(--text-color);
-            transition: all 0.2s ease;
+            transition: all var(--motion-base) ease;
 
             &:hover {
               background: var(--hover-background);
@@ -244,7 +240,7 @@ $radius-sm: 8px;
           .no-data {
             width: 100%;
             text-align: center;
-            padding: 20px;
+            padding: var(--space-7);
             color: var(--text-color);
             opacity: 0.7;
           }
@@ -256,7 +252,7 @@ $radius-sm: 8px;
 
 .status-badge {
   padding: 4px 8px;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   font-size: var(--fs-control);
   font-weight: var(--fw-medium);
   display: inline-block;
@@ -319,7 +315,7 @@ h3 {
     margin-left: 8px;
     background: var(--hover-background);
     padding: 2px 8px;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     font-size: var(--fs-label);
     color: var(--secondary-color);
   }
@@ -344,7 +340,7 @@ h3 {
 
 .field-item {
   background: var(--secondary-background);
-  transition: all 0.2s ease;
+  transition: all var(--motion-base) ease;
 
   &:hover {
     background: var(--hover-background);
@@ -357,7 +353,7 @@ h3 {
 }
 
 .info-section {
-  transition: all 0.2s ease;
+  transition: all var(--motion-base) ease;
 
   &:hover {
     box-shadow: var(--shadow-sm);
@@ -366,7 +362,7 @@ h3 {
 
 .action-buttons {
   display: flex;
-  gap: 12px;
+  gap: var(--space-5);
 }
 
 .confirmation-popup {
@@ -380,14 +376,14 @@ h3 {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-overlay);
   animation: fadeIn 0.2s ease-out;
 
   .popup-content {
     background: var(--card-background);
     width: 90%;
     max-width: 420px;
-    border-radius: $radius-lg;
+    border-radius: var(--radius-lg);
     box-shadow:
       0 20px 25px -5px var(--shadow-color),
       0 8px 10px -6px var(--shadow-color);
@@ -404,7 +400,7 @@ h3 {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1rem;
+      gap: var(--space-6);
 
       .popup-icon {
         width: 48px;
@@ -419,7 +415,7 @@ h3 {
       }
 
       h3 {
-        margin: 0;
+        margin: var(--space-0);
         font-size: var(--fs-h1);
         font-weight: var(--fw-semibold);
         color: var(--text-color);
@@ -440,18 +436,18 @@ h3 {
 
       .delete-info-list {
         background: var(--hover-background);
-        border-radius: $radius-md;
-        padding: 1rem;
+        border-radius: var(--radius-md);
+        padding: var(--space-6);
         list-style: none;
-        margin: 0;
+        margin: var(--space-0);
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        gap: var(--space-5);
 
         li {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
+          gap: var(--space-5);
           color: var(--text-color);
           font-size: var(--fs-body);
           font-weight: var(--fw-medium);
@@ -488,13 +484,13 @@ h3 {
           width: 100%;
           padding: 0.65rem 0.75rem;
           border: 1px solid var(--border-color);
-          border-radius: $radius-sm;
+          border-radius: var(--radius-sm);
           background: var(--card-background);
           color: var(--text-color);
           font-size: var(--fs-control);
           font-family: inherit;
           resize: vertical;
-          transition: border-color 0.2s;
+          transition: border-color var(--motion-base);
 
           &::placeholder {
             color: var(--secondary-color);
@@ -525,19 +521,19 @@ h3 {
       background: var(--hover-background);
       border-top: 1px solid var(--border-color);
       display: flex;
-      gap: 0.75rem;
+      gap: var(--space-5);
       justify-content: flex-end;
 
       button {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: var(--space-4);
         padding: 0.65rem 1.25rem;
-        border-radius: $radius-sm;
+        border-radius: var(--radius-sm);
         font-weight: var(--fw-semibold);
         font-size: var(--fs-body);
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all var(--motion-base);
         border: 1px solid transparent;
 
         &.btn-cancel {

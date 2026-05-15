@@ -3,11 +3,11 @@
 
   .add-admin-container {
     background: var(--card-background);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 24px;
+    padding: var(--space-8);
 
     .page-header {
       display: flex;
@@ -17,15 +17,15 @@
       position: sticky;
       top: 0;
       background: var(--card-background);
-      z-index: 1;
+      z-index: var(--z-base);
 
       .left-section {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        gap: var(--space-6);
 
         .back-button {
-          padding: 0 !important;
+          padding: var(--space-0) !important;
           width: 36px;
           height: 36px;
           border-radius: 50% !important;
@@ -36,7 +36,7 @@
           color: var(--text-color) !important;
           min-width: 0;
           border: none !important;
-          transition: all 0.2s ease;
+          transition: all var(--motion-base) ease;
 
           &:hover {
             background: var(--hover-background) !important;
@@ -48,7 +48,7 @@
         }
 
         h2 {
-          margin: 0;
+          margin: var(--space-0);
           font-size: var(--fs-h1);
           font-weight: var(--fw-semibold);
           color: var(--text-color);
@@ -57,14 +57,14 @@
 
       .action-buttons {
         display: flex;
-        gap: 12px;
+        gap: var(--space-5);
 
         .btn-cancel {
           background: var(--card-background) !important;
           border: 1px solid var(--border-color) !important;
           color: var(--text-color) !important;
           padding: 0.65rem 1.25rem;
-          border-radius: 6px !important;
+          border-radius: var(--radius-sm) !important;
           font-weight: var(--fw-semibold);
           box-shadow: var(--shadow-sm);
 
@@ -85,10 +85,10 @@
           color: white !important;
           border: none !important;
           padding: 0.65rem 1.25rem;
-          border-radius: 6px !important;
+          border-radius: var(--radius-sm) !important;
           font-weight: var(--fw-semibold);
           box-shadow: 0 4px 10px var(--primary-color-transparent);
-          transition: all 0.2s ease;
+          transition: all var(--motion-base) ease;
 
           &:hover:not(:disabled) {
             opacity: 1;
@@ -124,12 +124,12 @@
 
       &::-webkit-scrollbar-track {
         background: transparent;
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
       }
 
       &::-webkit-scrollbar-thumb {
         background: var(--border-color);
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
 
         &:hover {
           background: var(--secondary-color);
@@ -143,7 +143,7 @@
       .form-grid {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 20px;
+        gap: var(--space-7);
         width: 50%;
         align-content: flex-start;
 
@@ -180,16 +180,16 @@
     .btn-add-condition {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: var(--space-3);
       padding: 5px 12px;
       background: transparent;
       border: 1px solid var(--primary-color);
       color: var(--primary-color);
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
       font-size: var(--fs-control);
       font-weight: var(--fw-semibold);
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all var(--motion-base) ease;
 
       &:hover {
         background: var(--primary-color-transparent);
@@ -208,16 +208,16 @@
     margin-bottom: 10px;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: var(--space-3);
   }
 
   .condition-row {
-    padding: 14px;
+    padding: var(--space-5);
     background: var(--hover-background);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     margin-bottom: 8px;
-    transition: border-color 0.2s ease;
+    transition: border-color var(--motion-base) ease;
 
     &:hover {
       border-color: var(--primary-color-transparent);
@@ -226,12 +226,12 @@
     .condition-fields {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: var(--space-5);
 
       .condition-top-row {
         display: grid;
         grid-template-columns: 1fr 130px 36px;
-        gap: 8px;
+        gap: var(--space-4);
         align-items: flex-start;
 
         @media (max-width: 768px) {
@@ -254,9 +254,9 @@
     background: transparent;
     border: 1px solid var(--border-color);
     color: var(--secondary-color);
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--motion-base) ease;
     margin-top: 2px;
     flex-shrink: 0;
 
@@ -279,15 +279,15 @@
 
 @media (max-width: 576px) {
   .add-admin-wrapper {
-    padding: 10px;
+    padding: var(--space-5);
 
     .add-admin-container {
-      padding: 15px;
+      padding: var(--space-6);
 
       .page-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 16px;
+        gap: var(--space-6);
 
         .action-buttons {
           width: 100%;
@@ -305,7 +305,7 @@
       background: transparent !important;
       border: none !important;
       color: var(--text-color) !important;
-      padding: 0.5rem !important;
+      padding: var(--space-4) !important;
 
       &:hover {
         background: var(--hover-background) !important;

@@ -174,6 +174,20 @@ export class SidebarComponent implements OnInit {
     return this.router.url.includes(route);
   }
 
+  /**
+   * True when any descendant route under this item matches the current URL.
+   * Used to reflect "you are here" on the parent's collapsed-mode icon pill
+   * when the submenu itself isn't visible.
+   */
+  hasActiveDescendant(item: MenuItem): boolean {
+    if (!item.subPermissions?.length) return false;
+    for (const child of item.subPermissions) {
+      if (this.isRouteActive(child.route)) return true;
+      if (this.hasActiveDescendant(child)) return true;
+    }
+    return false;
+  }
+
   getIndentation(level: number): string {
     const baseIndentation = 16;
     return `${level * baseIndentation}px`;

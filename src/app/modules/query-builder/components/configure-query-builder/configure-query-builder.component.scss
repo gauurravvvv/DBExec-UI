@@ -3,11 +3,11 @@
 
   .add-admin-container {
     background: var(--card-background);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 24px;
+    padding: var(--space-8);
 
     .page-header {
       display: flex;
@@ -17,7 +17,7 @@
       position: sticky;
       top: 0;
       background: var(--card-background);
-      z-index: 1;
+      z-index: var(--z-base);
 
       .left-section {
         display: flex;
@@ -28,7 +28,7 @@
         }
 
         h2 {
-          margin: 0;
+          margin: var(--space-0);
           font-size: var(--fs-h1);
           font-weight: var(--fw-semibold);
           color: var(--text-color);
@@ -38,7 +38,7 @@
       .action-buttons {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: var(--space-5);
 
         ::ng-deep {
           .p-button {
@@ -69,7 +69,7 @@
       .sidebar {
         width: 250px;
         background-color: var(--card-background);
-        transition: all 0.3s ease;
+        transition: all var(--motion-slow) ease;
         height: 100%;
         border-right: 2px solid var(--border-color);
         display: flex;
@@ -80,7 +80,7 @@
 
           .sidebar-content {
             position: relative;
-            padding: 0;
+            padding: var(--space-0);
             height: 100%;
 
             h3,
@@ -115,7 +115,7 @@
 
             h3 {
               color: var(--text-color);
-              margin: 0;
+              margin: var(--space-0);
               font-size: var(--fs-h3);
               font-weight: var(--fw-semibold);
               text-align: center;
@@ -125,7 +125,7 @@
           .tab-cards-container {
             flex: 1;
             overflow-y: auto;
-            padding: 16px;
+            padding: var(--space-6);
 
             // Custom scrollbar styling
             &::-webkit-scrollbar {
@@ -135,12 +135,12 @@
 
             &::-webkit-scrollbar-track {
               background: transparent;
-              border-radius: 4px;
+              border-radius: var(--radius-xs);
             }
 
             &::-webkit-scrollbar-thumb {
               background: var(--border-color);
-              border-radius: 4px;
+              border-radius: var(--radius-xs);
 
               &:hover {
                 background: var(--secondary-color);
@@ -154,15 +154,15 @@
             .tab-cards {
               display: flex;
               flex-direction: column;
-              gap: 8px;
+              gap: var(--space-4);
 
               .tab-card {
                 background: var(--card-background);
                 border: 1px solid var(--border-color);
-                border-radius: 4px;
+                border-radius: var(--radius-xs);
                 padding: 10px 12px;
                 cursor: pointer;
-                transition: all 0.2s ease;
+                transition: all var(--motion-base) ease;
 
                 &.disabled {
                   opacity: 0.6;
@@ -184,7 +184,7 @@
                 .tab-info {
                   display: flex;
                   align-items: center;
-                  gap: 4px;
+                  gap: var(--space-2);
                   white-space: nowrap;
                   overflow: hidden;
                   text-overflow: ellipsis;
@@ -210,7 +210,7 @@
           }
 
           .sidebar-footer {
-            padding: 16px;
+            padding: var(--space-6);
             border-top: 1px solid var(--border-color);
             flex-shrink: 0;
             background: var(--card-background);
@@ -218,10 +218,10 @@
             .helper-note {
               display: flex;
               align-items: center;
-              gap: 8px;
+              gap: var(--space-4);
               padding: 8px 12px;
               background: var(--surface-ground);
-              border-radius: 4px;
+              border-radius: var(--radius-xs);
 
               i {
                 color: var(--primary-color);
@@ -255,7 +255,7 @@
           align-items: center;
           justify-content: center;
           color: var(--text-color);
-          transition: color 0.2s ease;
+          transition: color var(--motion-base) ease;
 
           &:hover {
             color: var(--secondary-color);
@@ -269,7 +269,7 @@
 
       .main-content {
         flex: 1;
-        padding: 12px;
+        padding: var(--space-5);
         overflow-y: auto;
         background: var(--surface-ground);
         display: flex;
@@ -284,12 +284,12 @@
 
         &::-webkit-scrollbar-track {
           background: transparent;
-          border-radius: 4px;
+          border-radius: var(--radius-xs);
         }
 
         &::-webkit-scrollbar-thumb {
           background: var(--border-color);
-          border-radius: 4px;
+          border-radius: var(--radius-xs);
 
           &:hover {
             background: var(--secondary-color);
@@ -333,7 +333,7 @@
             .switch-control {
               display: flex;
               align-items: center;
-              gap: 8px;
+              gap: var(--space-4);
 
               span {
                 color: var(--text-color);
@@ -353,11 +353,11 @@
           align-items: center;
           justify-content: center;
           background: var(--surface-ground);
-          z-index: 1;
+          z-index: var(--z-base);
 
           .empty-state-content {
             text-align: center;
-            padding: 24px;
+            padding: var(--space-8);
 
             i {
               font-size: var(--fs-h1);
@@ -377,7 +377,7 @@
             p {
               color: var(--secondary-color);
               font-size: var(--fs-body);
-              margin: 0;
+              margin: var(--space-0);
               opacity: 0.7;
             }
           }
@@ -409,12 +409,12 @@
 
                 &::-webkit-scrollbar-track {
                   background: transparent;
-                  border-radius: 4px;
+                  border-radius: var(--radius-xs);
                 }
 
                 &::-webkit-scrollbar-thumb {
                   background: var(--border-color);
-                  border-radius: 4px;
+                  border-radius: var(--radius-xs);
 
                   &:hover {
                     background: var(--secondary-color);
@@ -428,7 +428,7 @@
                 .p-tabview-nav-btn {
                   position: absolute;
                   top: 0;
-                  z-index: 2;
+                  z-index: var(--z-base);
                   height: 100%;
                   display: flex;
                   align-items: center;
@@ -458,9 +458,9 @@
                   min-width: min-content;
                   border: none;
                   background: transparent;
-                  padding: 0;
+                  padding: var(--space-0);
                   position: relative;
-                  z-index: 1;
+                  z-index: var(--z-base);
 
                   li {
                     flex: 0 0 auto;
@@ -477,12 +477,12 @@
               .p-tabview-nav {
                 border: none;
                 background: transparent;
-                padding: 0;
+                padding: var(--space-0);
                 position: relative;
-                z-index: 1;
+                z-index: var(--z-base);
 
                 .p-tabview-ink-bar {
-                  z-index: 1;
+                  z-index: var(--z-base);
                   display: block;
                   position: absolute;
                   bottom: 0;
@@ -505,11 +505,11 @@
                     font-weight: var(--fw-medium);
                     font-size: var(--fs-body);
                     color: var(--text-color);
-                    transition: all 0.2s;
+                    transition: all var(--motion-base);
                     position: relative;
                     display: inline-flex;
                     align-items: center;
-                    gap: 12px;
+                    gap: var(--space-5);
                     height: 40px;
                     max-width: 200px;
 
@@ -539,7 +539,7 @@
                       border-radius: 50%;
                       color: var(--text-color);
                       opacity: 0.5;
-                      transition: all 0.2s;
+                      transition: all var(--motion-base);
                       cursor: pointer;
                       margin-left: 4px;
 
@@ -601,12 +601,12 @@
 
                 &::-webkit-scrollbar-track {
                   background: transparent;
-                  border-radius: 4px;
+                  border-radius: var(--radius-xs);
                 }
 
                 &::-webkit-scrollbar-thumb {
                   background: var(--border-color);
-                  border-radius: 4px;
+                  border-radius: var(--radius-xs);
 
                   &:hover {
                     background: var(--secondary-color);
@@ -633,7 +633,7 @@
 
                     p {
                       color: var(--text-secondary-color);
-                      margin: 0;
+                      margin: var(--space-0);
                       line-height: 1.4;
                       font-size: var(--fs-control);
                     }
@@ -642,11 +642,11 @@
                   .tab-header-content {
                     display: flex;
                     align-items: center;
-                    gap: 0;
+                    gap: var(--space-0);
                     cursor: default;
                     padding: 4px 8px;
-                    border-radius: 4px;
-                    transition: all 0.2s ease;
+                    border-radius: var(--radius-xs);
+                    transition: all var(--motion-base) ease;
                     user-select: none;
                     position: relative;
                     background: var(--card-background);
@@ -671,7 +671,7 @@
                       opacity: 0.5;
                       background: var(--surface-hover);
                       cursor: move;
-                      z-index: 2;
+                      z-index: var(--z-base);
                       box-shadow: 0 4px 8px var(--shadow-color);
                       transform: scale(1.02);
                     }
@@ -699,19 +699,19 @@
                       white-space: nowrap;
                       overflow: hidden;
                       text-overflow: ellipsis;
-                      margin: 0;
+                      margin: var(--space-0);
                     }
 
                     .tab-close {
                       margin-left: auto;
                       cursor: pointer;
                       opacity: 0.5;
-                      transition: all 0.2s ease;
-                      padding: 4px;
+                      transition: all var(--motion-base) ease;
+                      padding: var(--space-2);
                       display: flex;
                       align-items: center;
                       justify-content: center;
-                      border-radius: 4px;
+                      border-radius: var(--radius-xs);
 
                       &:hover {
                         opacity: 1;
@@ -725,17 +725,17 @@
               ::ng-deep {
                 .p-accordion {
                   .p-accordion-header {
-                    margin: 0;
+                    margin: var(--space-0);
 
                     .p-accordion-header-link {
                       background: var(--card-background);
                       border: 1px solid var(--border-color);
                       color: var(--text-color);
-                      padding: 1rem;
+                      padding: var(--space-6);
                       font-weight: var(--fw-medium);
-                      border-radius: 4px;
-                      transition: all 0.2s;
-                      gap: 8px;
+                      border-radius: var(--radius-xs);
+                      transition: all var(--motion-base);
+                      gap: var(--space-4);
                       display: flex;
                       align-items: center;
 
@@ -753,15 +753,15 @@
                         align-items: center;
                         justify-content: space-between;
                         width: 100%;
-                        gap: 1rem;
+                        gap: var(--space-6);
                         position: relative;
-                        transition: all 0.2s ease;
+                        transition: all var(--motion-base) ease;
 
                         &.dragging {
                           opacity: 0.5;
                           background: var(--surface-hover);
                           cursor: move;
-                          z-index: 1;
+                          z-index: var(--z-base);
                         }
 
                         &.drag-enter {
@@ -780,7 +780,7 @@
                         .header-content {
                           display: flex;
                           align-items: center;
-                          gap: 8px;
+                          gap: var(--space-4);
                           flex: 1;
                           min-width: 0;
 
@@ -819,11 +819,11 @@
                         .header-actions {
                           display: flex;
                           align-items: center;
-                          gap: 1rem;
+                          gap: var(--space-6);
 
                           .group-bullets {
                             display: flex;
-                            gap: 0.5rem;
+                            gap: var(--space-4);
                             align-items: center;
                             padding-right: 0.5rem;
                             border-right: 1px solid var(--border-color);
@@ -832,7 +832,7 @@
                               width: 12px;
                               height: 12px;
                               border-radius: 50%;
-                              transition: all 0.15s ease;
+                              transition: all var(--motion-fast) ease;
                               cursor: pointer;
                               opacity: 0.7;
 
@@ -899,7 +899,7 @@
                           .select-all-checkbox {
                             display: flex;
                             align-items: center;
-                            gap: 0.5rem;
+                            gap: var(--space-4);
                             padding-left: 0.5rem;
 
                             .select-all-label {
@@ -915,8 +915,8 @@
                         order: 1;
                         font-size: var(--fs-h3);
                         color: var(--text-color);
-                        margin: 0;
-                        transition: transform 0.2s;
+                        margin: var(--space-0);
+                        transition: transform var(--motion-base);
                       }
                     }
 
@@ -934,11 +934,11 @@
                     background: var(--card-background);
                     border: 1px solid var(--border-color);
                     border-top: 0;
-                    padding: 1rem !important;
+                    padding: var(--space-6) !important;
                     color: var(--text-color);
                     border-bottom-left-radius: 4px;
                     border-bottom-right-radius: 4px;
-                    margin: 0;
+                    margin: var(--space-0);
                     position: relative;
 
                     &:before {
@@ -956,13 +956,13 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        gap: 8px;
-                        padding: 1.5rem;
+                        gap: var(--space-4);
+                        padding: var(--space-8);
                         text-align: center;
                         color: var(--text-color);
                         opacity: 0.7;
                         background: var(--surface-ground);
-                        border-radius: 4px;
+                        border-radius: var(--radius-xs);
 
                         i {
                           font-size: var(--fs-h2);
@@ -979,7 +979,7 @@
                         .prompts-grid {
                           display: grid !important;
                           grid-template-columns: repeat(4, 1fr) !important;
-                          gap: 1rem !important;
+                          gap: var(--space-6) !important;
                           width: 100% !important;
 
                           @media screen and (max-width: 1399px) {
@@ -999,9 +999,9 @@
                             box-sizing: border-box !important;
                             background: var(--card-background);
                             border: 1px solid var(--border-color);
-                            border-radius: 6px;
-                            padding: 1rem;
-                            transition: all 0.2s ease;
+                            border-radius: var(--radius-sm);
+                            padding: var(--space-6);
+                            transition: all var(--motion-base) ease;
                             cursor: pointer;
                             position: relative;
                             display: flex !important;
@@ -1017,13 +1017,13 @@
                               position: absolute;
                               top: 0.75rem;
                               right: 0.75rem;
-                              z-index: 1;
+                              z-index: var(--z-base);
                             }
 
                             .prompt-header {
                               display: flex;
                               flex-direction: column;
-                              gap: 0.25rem;
+                              gap: var(--space-2);
                               padding-right: 2rem;
                               width: 100% !important;
 
@@ -1076,7 +1076,7 @@
       background: transparent !important;
       border: none !important;
       color: var(--text-color) !important;
-      padding: 0.5rem !important;
+      padding: var(--space-4) !important;
 
       &:hover {
         background: var(--hover-background) !important;
@@ -1118,11 +1118,11 @@
     height: 1.5rem !important;
     display: flex !important;
     align-items: center !important;
-    margin: 0 !important;
+    margin: var(--space-0) !important;
 
     .p-inputswitch-slider {
       background: var(--border-color) !important;
-      border-radius: 30px !important;
+      border-radius: var(--radius-pill) !important;
 
       &:before {
         background: var(--card-background) !important;
@@ -1131,7 +1131,7 @@
         left: 0.25rem !important;
         margin-top: -0.5rem !important;
         border-radius: 50% !important;
-        transition: all 0.2s ease !important;
+        transition: all var(--motion-base) ease !important;
       }
     }
 
@@ -1198,7 +1198,7 @@
     .p-dropdown-header {
       background: var(--hover-background) !important;
       border-bottom: 1px solid var(--border-color) !important;
-      padding: 0.5rem !important;
+      padding: var(--space-4) !important;
 
       .p-dropdown-filter {
         background: var(--card-background) !important;
@@ -1233,12 +1233,12 @@
 
       &::-webkit-scrollbar-track {
         background: var(--card-background);
-        border-radius: 3px;
+        border-radius: var(--radius-xs);
       }
 
       &::-webkit-scrollbar-thumb {
         background: var(--border-color);
-        border-radius: 3px;
+        border-radius: var(--radius-xs);
 
         &:hover {
           background: var(--secondary-color);
@@ -1278,8 +1278,8 @@
     max-width: 250px;
     background: var(--card-background);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
-    box-shadow: 0 2px 4px var(--shadow-color);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
 
     .p-tooltip-text {
       background: var(--card-background);
@@ -1303,14 +1303,14 @@
     .p-tabview-nav {
       li {
         margin-right: 4px;
-        transition: all 0.2s ease;
+        transition: all var(--motion-base) ease;
 
         .p-tabview-nav-link {
           background: transparent;
-          transition: all 0.2s ease;
+          transition: all var(--motion-base) ease;
           border: none;
-          border-radius: 4px;
-          padding: 0;
+          border-radius: var(--radius-xs);
+          padding: var(--space-0);
           height: auto;
 
           &:focus {
@@ -1340,15 +1340,15 @@
 
 @media (max-width: 576px) {
   .add-admin-wrapper {
-    padding: 10px;
+    padding: var(--space-5);
 
     .add-admin-container {
-      padding: 15px;
+      padding: var(--space-6);
 
       .page-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 16px;
+        gap: var(--space-6);
 
         .action-buttons {
           width: 100%;
@@ -1365,7 +1365,7 @@
       .admin-form {
         .form-container {
           flex-direction: column;
-          gap: 20px;
+          gap: var(--space-7);
 
           .left-column,
           .right-column {
@@ -1380,9 +1380,9 @@
 .prompt-card {
   background: var(--card-background);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 1rem;
-  transition: all 0.2s ease;
+  border-radius: var(--radius-sm);
+  padding: var(--space-6);
+  transition: all var(--motion-base) ease;
   cursor: pointer;
   position: relative;
   margin-top: 12px;
@@ -1397,7 +1397,7 @@
     opacity: 0.5;
     background: var(--surface-hover);
     cursor: move;
-    z-index: 2;
+    z-index: var(--z-base);
     box-shadow: 0 8px 16px var(--shadow-color);
   }
 
@@ -1411,13 +1411,13 @@
     position: absolute;
     top: 0.75rem;
     right: 0.75rem;
-    z-index: 1;
+    z-index: var(--z-base);
   }
 
   .prompt-header {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-4);
     padding-right: 2rem;
     width: 100%;
 
@@ -1486,8 +1486,8 @@
     height: 8px;
     border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.3);
-    transition: all 0.2s ease;
-    z-index: 2;
+    transition: all var(--motion-base) ease;
+    z-index: var(--z-base);
     cursor: pointer;
 
     &:hover {
@@ -1515,9 +1515,9 @@
 .prompts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1.25rem;
+  gap: var(--space-7);
   width: 100%;
-  padding: 0.5rem;
+  padding: var(--space-4);
   padding-top: 0.25rem;
 
   @media screen and (max-width: 1399px) {
@@ -1543,12 +1543,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-overlay);
 
   .popup-content {
     background: var(--card-background);
-    padding: 20px;
-    border-radius: 8px;
+    padding: var(--space-7);
+    border-radius: var(--radius-md);
     box-shadow: 0 2px 10px var(--shadow-color);
     width: 400px;
     max-width: 90%;
@@ -1567,11 +1567,11 @@
     .popup-actions {
       display: flex;
       justify-content: flex-end;
-      gap: 10px;
+      gap: var(--space-5);
 
       button {
         padding: 8px 20px;
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
         border: none;
         cursor: pointer;
 
@@ -1612,20 +1612,20 @@
 .section-group-info {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-4);
   padding: 0.5rem 0;
   margin-bottom: 0.5rem;
 
   .group-bullets {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--space-4);
     align-items: center;
 
     .group-bullet {
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      transition: all 0.15s ease;
+      transition: all var(--motion-fast) ease;
       cursor: pointer;
       opacity: 0.7;
 
@@ -1704,19 +1704,19 @@
   .p-button-rounded {
     width: 2rem;
     height: 2rem;
-    padding: 0;
+    padding: var(--space-0);
     display: flex;
     align-items: center;
     justify-content: center;
 
     .pi {
       font-size: var(--fs-h3);
-      margin: 0;
+      margin: var(--space-0);
     }
 
     &:hover {
       transform: scale(1.1);
-      transition: transform 0.2s ease;
+      transition: transform var(--motion-base) ease;
     }
   }
 }

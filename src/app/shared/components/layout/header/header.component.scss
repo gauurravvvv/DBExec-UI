@@ -4,7 +4,7 @@
 
 .header {
   position: relative;
-  z-index: 1000;
+  z-index: var(--z-overlay);
   height: 56px;
   padding: 0 1rem;
   display: flex;
@@ -25,12 +25,12 @@
 .logo-container {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-4);
   padding: 6px 10px;
   text-decoration: none;
   user-select: none;
-  border-radius: 8px;
-  transition: background-color 0.15s ease;
+  border-radius: var(--radius-md);
+  transition: background-color var(--motion-fast) ease;
 
   &:hover {
     background: var(--hover-background);
@@ -89,7 +89,7 @@
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-2);
 }
 
 .header-divider {
@@ -104,16 +104,16 @@
 .search-trigger {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-4);
   padding: 0 10px 0 12px;
   height: 32px;
   min-width: 220px;
   background: var(--hover-background);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   margin-right: 8px;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition: border-color var(--motion-fast) ease, background-color var(--motion-fast) ease;
 
   &:hover {
     border-color: var(--primary-color);
@@ -136,7 +136,7 @@
     font-size: var(--fs-micro);
     background: var(--card-background);
     padding: 2px 6px;
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     color: var(--secondary-color);
     font-family: var(--font-mono);
     border: 1px solid var(--border-color);
@@ -156,14 +156,14 @@
   justify-content: center;
   border: none;
   background: transparent;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   color: var(--secondary-color);
-  transition: all 0.2s ease;
+  transition: all var(--motion-base) ease;
 
   i {
     font-size: var(--fs-h3);
-    transition: color 0.2s ease;
+    transition: color var(--motion-base) ease;
     pointer-events: none;
   }
 
@@ -206,11 +206,11 @@
   .profile-trigger {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-5);
     padding: 5px 10px 5px 5px;
-    border-radius: 40px;
+    border-radius: var(--radius-pill);
     border: 1px solid transparent;
-    transition: all 0.2s ease;
+    transition: all var(--motion-base) ease;
 
     &:hover {
       background: var(--hover-background);
@@ -253,7 +253,7 @@
     .chevron {
       font-size: var(--fs-micro);
       color: var(--secondary-color);
-      transition: transform 0.2s ease;
+      transition: transform var(--motion-base) ease;
 
       &.open {
         transform: rotate(180deg);
@@ -268,16 +268,16 @@
     width: 220px;
     background: var(--card-background);
     border: 1px solid var(--border-color);
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
-    padding: 0.5rem;
+    padding: var(--space-4);
     animation: menu-drop 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: 1001;
+    z-index: var(--z-overlay);
 
     .menu-header {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: var(--space-5);
       padding: 10px 10px 12px;
 
       .menu-avatar {
@@ -306,7 +306,7 @@
         font-size: var(--fs-micro);
         font-weight: var(--fw-semibold);
         padding: 1px 7px;
-        border-radius: 20px;
+        border-radius: var(--radius-2xl);
         background: rgba(var(--primary-color-rgb), 0.12);
         color: var(--primary-color);
         text-transform: capitalize;
@@ -321,21 +321,21 @@
 
     ul {
       list-style: none;
-      padding: 0;
-      margin: 0;
+      padding: var(--space-0);
+      margin: var(--space-0);
     }
 
     .menu-item {
       a {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: var(--space-5);
         padding: 9px 12px;
-        border-radius: 8px;
+        border-radius: var(--radius-md);
         color: var(--text-color);
         text-decoration: none;
         font-size: var(--fs-body);
-        transition: background 0.15s ease;
+        transition: background var(--motion-fast) ease;
         cursor: pointer;
 
         i {
@@ -374,14 +374,14 @@
   width: 340px;
   background: var(--card-background);
   border: 1px solid var(--border-color);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   opacity: 0;
   visibility: hidden;
   transform: translateY(-8px) scale(0.98);
   transform-origin: top right;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  z-index: 1001;
+  transition: all var(--motion-base) cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: var(--z-overlay);
   overflow: hidden;
 
   &.show {
@@ -398,7 +398,7 @@
     border-bottom: 1px solid var(--border-color);
 
     h3 {
-      margin: 0;
+      margin: var(--space-0);
       font-size: var(--fs-h3);
       font-weight: var(--fw-semibold);
       color: var(--text-color);
@@ -411,7 +411,7 @@
       font-size: var(--fs-label);
       font-weight: var(--fw-medium);
       padding: 4px 8px !important;
-      border-radius: 6px !important;
+      border-radius: var(--radius-sm) !important;
       cursor: pointer;
 
       &:hover {
@@ -432,16 +432,16 @@
     }
     &::-webkit-scrollbar-thumb {
       background: var(--border-color);
-      border-radius: 2px;
+      border-radius: var(--radius-xs);
     }
 
     .notification-item {
       display: flex;
       align-items: flex-start;
-      gap: 12px;
+      gap: var(--space-5);
       padding: 12px 16px;
       border-bottom: 1px solid var(--border-color);
-      transition: background 0.15s ease;
+      transition: background var(--motion-fast) ease;
       cursor: pointer;
       position: relative;
 
@@ -476,7 +476,7 @@
         flex-shrink: 0;
         width: 34px;
         height: 34px;
-        border-radius: 10px;
+        border-radius: var(--radius-md);
         background: var(--hover-background);
         display: flex;
         align-items: center;
@@ -495,7 +495,7 @@
         padding-right: 20px;
 
         .message {
-          margin: 0;
+          margin: var(--space-0);
           font-size: var(--fs-control);
           line-height: 1.5;
           color: var(--text-color);
@@ -528,8 +528,8 @@
         cursor: pointer;
         opacity: 0;
         transition:
-          opacity 0.15s,
-          color 0.15s;
+          opacity var(--motion-fast),
+          color var(--motion-fast);
         color: var(--secondary-color);
 
         i {
@@ -564,7 +564,7 @@
     }
 
     p {
-      margin: 0;
+      margin: var(--space-0);
       font-size: var(--fs-body);
     }
   }
@@ -634,17 +634,17 @@
 
   .banner-content {
     position: relative;
-    z-index: 1;
+    z-index: var(--z-base);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: var(--space-6);
     width: 100%;
 
     .banner-text-wrapper {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: var(--space-5);
 
       .banner-label {
         font-size: var(--fs-micro);
@@ -652,10 +652,10 @@
         letter-spacing: 1.5px;
         background: rgba(255, 255, 255, 0.18);
         padding: 3px 8px;
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
         white-space: nowrap;
         cursor: pointer;
-        transition: background 0.2s;
+        transition: background var(--motion-base);
 
         &:hover {
           background: rgba(255, 255, 255, 0.3);
@@ -688,7 +688,7 @@
     .banner-controls {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: var(--space-2);
 
       .banner-nav-btn {
         background: rgba(255, 255, 255, 0.15);
@@ -701,7 +701,7 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        transition: background 0.2s;
+        transition: background var(--motion-base);
 
         &:hover {
           background: rgba(255, 255, 255, 0.3);
@@ -724,13 +724,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1100;
+  z-index: var(--z-modal);
   animation: popupFadeIn 0.15s ease-out;
 }
 
 .announcement-popup {
   background: var(--card-background);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   width: 100%;
   max-width: 420px;
   box-shadow: var(--shadow-xl);
@@ -785,9 +785,9 @@
       .do-not-show {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: var(--space-4);
         cursor: pointer;
-        margin: 0;
+        margin: var(--space-0);
 
         span {
           font-size: var(--fs-control);
@@ -801,11 +801,11 @@
         color: var(--secondary-color);
         border: 1px solid var(--border-color);
         padding: 7px 20px;
-        border-radius: 8px;
+        border-radius: var(--radius-md);
         font-weight: var(--fw-medium);
         font-size: var(--fs-control);
         cursor: pointer;
-        transition: all 0.15s ease;
+        transition: all var(--motion-fast) ease;
 
         &:hover {
           background: var(--hover-background);

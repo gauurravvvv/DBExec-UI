@@ -10,11 +10,11 @@
 
     .add-admin-container {
       background: var(--card-background);
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       height: 100%;
       display: flex;
       flex-direction: column;
-      padding: 24px;
+      padding: var(--space-8);
 
       .page-header {
         display: flex;
@@ -23,7 +23,7 @@
         margin-bottom: 12px;
         position: relative;
         background: var(--card-background);
-        z-index: 10;
+        z-index: var(--z-elevated);
 
         .left-section {
           display: flex;
@@ -34,7 +34,7 @@
           }
 
           h2 {
-            margin: 0;
+            margin: var(--space-0);
             font-size: var(--fs-h1);
             font-weight: var(--fw-semibold);
             color: var(--text-color);
@@ -43,34 +43,34 @@
 
         .action-buttons {
           display: flex;
-          gap: 12px;
+          gap: var(--space-5);
           align-items: center;
 
           button {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--space-4);
             padding: 0.6rem 1.25rem;
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             font-weight: var(--fw-semibold);
             font-size: var(--fs-body);
             border: none;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all var(--motion-base) ease;
 
             i {
               font-size: var(--fs-body);
             }
 
             &.btn-icon {
-              padding: 0.5rem;
+              padding: var(--space-4);
               width: 36px;
               height: 36px;
               justify-content: center;
               background: var(--card-background);
               border: 1px solid var(--border-color);
               color: var(--text-color);
-              border-radius: 8px;
+              border-radius: var(--radius-md);
               opacity: 0.7;
 
               &:hover {
@@ -142,7 +142,7 @@
 
           .structure-nav-wrapper {
             position: relative;
-            z-index: 10;
+            z-index: var(--z-elevated);
 
             .structure-tree-dropdown {
               position: absolute;
@@ -151,9 +151,9 @@
               width: 360px;
               background: var(--card-background);
               border: 1px solid var(--border-color);
-              border-radius: 8px;
+              border-radius: var(--radius-md);
               box-shadow: 0 8px 24px var(--shadow-color);
-              z-index: 1001;
+              z-index: var(--z-overlay);
               display: flex;
               flex-direction: column;
               max-height: 420px;
@@ -174,7 +174,7 @@
 
                 &::-webkit-scrollbar-thumb {
                   background: var(--border-color);
-                  border-radius: 3px;
+                  border-radius: var(--radius-xs);
                 }
 
                 scrollbar-width: thin;
@@ -185,7 +185,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                gap: 8px;
+                gap: var(--space-4);
                 padding: 24px 16px;
                 color: var(--text-color);
                 opacity: 0.5;
@@ -206,8 +206,8 @@
         display: flex;
         flex-direction: column;
         background: var(--surface-ground);
-        border-radius: 8px;
-        padding: 16px;
+        border-radius: var(--radius-md);
+        padding: var(--space-6);
         overflow: hidden;
 
         // p-tabview host element must participate in flex layout
@@ -226,12 +226,12 @@
 
         &::-webkit-scrollbar-track {
           background: transparent;
-          border-radius: 4px;
+          border-radius: var(--radius-xs);
         }
 
         &::-webkit-scrollbar-thumb {
           background: var(--border-color);
-          border-radius: 4px;
+          border-radius: var(--radius-xs);
 
           &:hover {
             background: var(--secondary-color);
@@ -245,7 +245,7 @@
         .tab-skeleton-container {
           .tab-skeleton-header {
             display: flex;
-            gap: 8px;
+            gap: var(--space-4);
             padding-bottom: 16px;
             border-bottom: 1px solid var(--border-color);
           }
@@ -283,9 +283,9 @@
 
         // Tab content placeholder
         .tab-content-placeholder {
-          padding: 24px;
+          padding: var(--space-8);
           background: var(--card-background);
-          border-radius: 8px;
+          border-radius: var(--radius-md);
 
           p {
             margin: 0 0 8px 0;
@@ -331,12 +331,12 @@
 
         &::-webkit-scrollbar-track {
           background: transparent;
-          border-radius: 4px;
+          border-radius: var(--radius-xs);
         }
 
         &::-webkit-scrollbar-thumb {
           background: var(--border-color);
-          border-radius: 4px;
+          border-radius: var(--radius-xs);
 
           &:hover {
             background: var(--secondary-color);
@@ -350,7 +350,7 @@
         .p-tabview-nav-btn {
           position: absolute;
           top: 0;
-          z-index: 2;
+          z-index: var(--z-base);
           height: 100%;
           display: flex;
           align-items: center;
@@ -380,12 +380,12 @@
         min-width: min-content;
         border: none;
         background: transparent;
-        padding: 0;
+        padding: var(--space-0);
         position: relative;
-        z-index: 1;
+        z-index: var(--z-base);
 
         .p-tabview-ink-bar {
-          z-index: 1;
+          z-index: var(--z-base);
           display: block;
           position: absolute;
           bottom: 0;
@@ -409,11 +409,11 @@
             font-weight: var(--fw-medium);
             font-size: var(--fs-body);
             color: var(--text-color);
-            transition: all 0.2s;
+            transition: all var(--motion-base);
             position: relative;
             display: inline-flex;
             align-items: center;
-            gap: 12px;
+            gap: var(--space-5);
             height: 40px;
             max-width: 200px;
             white-space: nowrap;
@@ -474,12 +474,12 @@
 
         &::-webkit-scrollbar-track {
           background: transparent;
-          border-radius: 4px;
+          border-radius: var(--radius-xs);
         }
 
         &::-webkit-scrollbar-thumb {
           background: var(--border-color);
-          border-radius: 4px;
+          border-radius: var(--radius-xs);
 
           &:hover {
             background: var(--secondary-color);
@@ -496,7 +496,7 @@
 
         .tab-content {
           position: relative;
-          border-radius: 6px;
+          border-radius: var(--radius-sm);
 
           &--highlight {
             animation: tabGlow 2.5s ease-out;
@@ -517,7 +517,7 @@
               );
               animation: shimmerSweep 0.8s ease-out 0.1s;
               pointer-events: none;
-              z-index: 2;
+              z-index: var(--z-base);
             }
           }
         }
@@ -543,7 +543,7 @@
       background: transparent !important;
       border: none !important;
       color: var(--text-color) !important;
-      padding: 0.5rem !important;
+      padding: var(--space-4) !important;
 
       &:hover {
         background: var(--hover-background) !important;
@@ -587,7 +587,7 @@
   .section-skeleton-container {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-5);
     padding: 8px 0;
   }
 
@@ -596,17 +596,17 @@
   // =========================================
   .p-accordion {
     .p-accordion-header {
-      margin: 0 !important;
+      margin: var(--space-0) !important;
 
       .p-accordion-header-link {
         background: var(--card-background) !important;
         border: 1px solid var(--border-color) !important;
         color: var(--text-color) !important;
-        padding: 1rem !important;
+        padding: var(--space-6) !important;
         font-weight: var(--fw-medium) !important;
-        border-radius: 4px !important;
-        transition: all 0.2s !important;
-        gap: 8px !important;
+        border-radius: var(--radius-xs) !important;
+        transition: all var(--motion-base) !important;
+        gap: var(--space-4) !important;
         display: flex !important;
         align-items: center !important;
 
@@ -624,8 +624,8 @@
           order: 1 !important;
           font-size: var(--fs-h3) !important;
           color: var(--text-color) !important;
-          margin: 0 !important;
-          transition: transform 0.2s !important;
+          margin: var(--space-0) !important;
+          transition: transform var(--motion-base) !important;
         }
 
         // Header text styling
@@ -663,11 +663,11 @@
       background: var(--card-background) !important;
       border: 1px solid var(--border-color) !important;
       border-top: 0 !important;
-      padding: 1rem !important;
+      padding: var(--space-6) !important;
       color: var(--text-color) !important;
       border-bottom-left-radius: 4px !important;
       border-bottom-right-radius: 4px !important;
-      margin: 0 !important;
+      margin: var(--space-0) !important;
       position: relative;
 
       &:before {
@@ -713,7 +713,7 @@
           );
           animation: shimmerSweep 0.8s ease-out 0.1s;
           pointer-events: none;
-          z-index: 2;
+          z-index: var(--z-base);
         }
       }
     }
@@ -737,7 +737,7 @@
   .prompt-form-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
+    gap: var(--space-6);
     padding: 8px 0;
 
     @media (max-width: 1400px) {
@@ -756,7 +756,7 @@
       min-width: 0;
       overflow: hidden;
       position: relative;
-      padding: 8px;
+      padding: var(--space-4);
 
       &--full {
         grid-column: 1 / -1;
@@ -772,12 +772,12 @@
         right: 2px;
         font-size: var(--fs-label);
         color: var(--primary-color);
-        z-index: 1;
+        z-index: var(--z-base);
         opacity: 0.7;
       }
 
       &--highlight {
-        border-radius: 8px;
+        border-radius: var(--radius-md);
         animation: promptGlow 2s ease-out;
         position: relative;
         overflow: hidden;
@@ -797,7 +797,7 @@
           );
           animation: shimmerSweep 0.8s ease-out 0.1s;
           pointer-events: none;
-          z-index: 2;
+          z-index: var(--z-base);
         }
       }
     }
@@ -835,13 +835,13 @@
   .prompt-skeleton-container {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--space-6);
     padding: 8px 0;
 
     .prompt-skeleton-row {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: var(--space-3);
     }
   }
 
@@ -850,7 +850,7 @@
     &.p-tree {
       background: transparent !important;
       border: none !important;
-      padding: 0 !important;
+      padding: var(--space-0) !important;
 
       .p-tree-filter-container {
         display: block;
@@ -866,12 +866,12 @@
           width: 100% !important;
           padding: 8px 10px !important;
           border: 1px solid var(--border-color) !important;
-          border-radius: 6px !important;
+          border-radius: var(--radius-sm) !important;
           background: var(--surface-ground) !important;
           color: var(--text-color) !important;
           font-size: var(--fs-control) !important;
           outline: none !important;
-          transition: border-color 0.2s !important;
+          transition: border-color var(--motion-base) !important;
           box-sizing: border-box;
 
           &:focus {
@@ -890,13 +890,13 @@
         padding: 0 4px;
 
         .p-treenode {
-          padding: 0;
+          padding: var(--space-0);
 
           .p-treenode-content {
             padding: 6px 10px;
-            border-radius: 6px;
-            transition: all 0.15s;
-            gap: 6px;
+            border-radius: var(--radius-sm);
+            transition: all var(--motion-fast);
+            gap: var(--space-3);
 
             &:hover {
               background: var(--hover-background) !important;
@@ -990,11 +990,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-overlay);
 
   .popup-content {
     background: var(--card-background);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     box-shadow: 0 8px 30px var(--shadow-color);
     display: flex;
     flex-direction: column;
@@ -1006,7 +1006,7 @@
 
       h3 {
         color: var(--text-color);
-        margin: 0;
+        margin: var(--space-0);
         font-size: var(--fs-h2);
         font-weight: var(--fw-semibold);
       }
@@ -1023,7 +1023,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.2s;
+        transition: all var(--motion-base);
 
         &:hover {
           background: var(--hover-background);
@@ -1039,7 +1039,7 @@
     .empty-state-inline {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--space-4);
       padding: 32px 16px;
       color: var(--text-color);
       opacity: 0.6;
@@ -1054,21 +1054,21 @@
     .popup-actions {
       display: flex;
       justify-content: flex-end;
-      gap: 12px;
+      gap: var(--space-5);
       padding-top: 16px;
       border-top: 1px solid var(--border-color);
 
       button {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: var(--space-4);
         padding: 0.6rem 1.25rem;
-        border-radius: 8px;
+        border-radius: var(--radius-md);
         font-weight: var(--fw-semibold);
         font-size: var(--fs-body);
         border: none;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all var(--motion-base) ease;
 
         i {
           font-size: var(--fs-body);
@@ -1147,7 +1147,7 @@
     width: 560px;
     max-width: 90%;
     max-height: 80vh;
-    padding: 24px;
+    padding: var(--space-8);
 
     .popup-header-row {
       margin-bottom: 16px;
@@ -1191,7 +1191,7 @@
       .values-list {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: var(--space-4);
 
         .value-row {
           display: flex;
@@ -1199,14 +1199,14 @@
           align-items: flex-start;
           padding: 10px 12px;
           background: var(--surface-ground);
-          border-radius: 6px;
+          border-radius: var(--radius-sm);
           border: 1px solid var(--border-color);
-          gap: 16px;
+          gap: var(--space-6);
 
           .value-label {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: var(--space-1);
             min-width: 0;
 
             .value-prompt-name {
@@ -1243,7 +1243,7 @@
   .execute-error {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-4);
     padding: 10px 24px;
     color: var(--error-color);
     font-size: var(--fs-control);
@@ -1257,7 +1257,7 @@
     width: 720px;
     max-width: 92%;
     max-height: 85vh;
-    padding: 0;
+    padding: var(--space-0);
 
     .popup-header-row {
       padding: 20px 24px 16px;
@@ -1278,7 +1278,7 @@
 
     .popup-actions {
       padding: 16px 24px;
-      margin: 0;
+      margin: var(--space-0);
     }
 
     // Override panel padding for dialog context
@@ -1296,7 +1296,7 @@
         align-items: baseline;
         padding: 8px 0;
         border-bottom: 1px solid var(--border-color);
-        gap: 16px;
+        gap: var(--space-6);
 
         &:last-child {
           border-bottom: none;
@@ -1339,18 +1339,18 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-overlay);
 
   .popup-content {
     background: var(--card-background);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     box-shadow: 0 8px 30px var(--shadow-color);
     display: flex;
     flex-direction: column;
     width: 800px;
     max-width: 92%;
     max-height: 85vh;
-    padding: 0;
+    padding: var(--space-0);
 
     .popup-header-row {
       display: flex;
@@ -1361,7 +1361,7 @@
 
       h3 {
         color: var(--text-color);
-        margin: 0;
+        margin: var(--space-0);
         font-size: var(--fs-h2);
         font-weight: var(--fw-semibold);
       }
@@ -1378,7 +1378,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.2s;
+        transition: all var(--motion-base);
 
         &:hover {
           background: var(--hover-background);
@@ -1418,16 +1418,16 @@
           .btn-copy {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: var(--space-3);
             padding: 4px 12px;
-            border-radius: 6px;
+            border-radius: var(--radius-sm);
             border: 1px solid var(--border-color);
             background: var(--card-background);
             color: var(--text-color);
             font-size: var(--fs-label);
             font-weight: var(--fw-medium);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all var(--motion-base);
 
             &:hover {
               background: var(--hover-background);
@@ -1444,8 +1444,8 @@
         .sql-code {
           background: var(--surface-ground);
           border: 1px solid var(--border-color);
-          border-radius: 8px;
-          padding: 16px;
+          border-radius: var(--radius-md);
+          padding: var(--space-6);
           font-family: var(--font-mono);
           font-size: var(--fs-control);
           line-height: 1.6;
@@ -1453,7 +1453,7 @@
           overflow-x: auto;
           white-space: pre-wrap;
           word-break: break-word;
-          margin: 0;
+          margin: var(--space-0);
 
           &::-webkit-scrollbar {
             height: 6px;
@@ -1465,7 +1465,7 @@
 
           &::-webkit-scrollbar-thumb {
             background: var(--border-color);
-            border-radius: 3px;
+            border-radius: var(--radius-xs);
           }
         }
       }
@@ -1473,12 +1473,12 @@
       .sql-components {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: var(--space-5);
 
         .sql-component-row {
           display: flex;
           align-items: flex-start;
-          gap: 12px;
+          gap: var(--space-5);
           padding: 8px 0;
           border-bottom: 1px solid var(--border-color);
 
@@ -1503,7 +1503,7 @@
             color: var(--text-color);
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: var(--space-3);
             align-items: flex-start;
 
             .component-tag {
@@ -1511,7 +1511,7 @@
               padding: 3px 10px;
               background: var(--surface-ground);
               border: 1px solid var(--border-color);
-              border-radius: 4px;
+              border-radius: var(--radius-xs);
               font-size: var(--fs-label);
               font-family: var(--font-mono);
             }
@@ -1523,21 +1523,21 @@
     .popup-actions {
       display: flex;
       justify-content: flex-end;
-      gap: 12px;
+      gap: var(--space-5);
       padding: 16px 24px;
       border-top: 1px solid var(--border-color);
 
       button {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: var(--space-4);
         padding: 0.6rem 1.25rem;
-        border-radius: 8px;
+        border-radius: var(--radius-md);
         font-weight: var(--fw-semibold);
         font-size: var(--fs-body);
         border: none;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all var(--motion-base) ease;
 
         i {
           font-size: var(--fs-body);
@@ -1592,7 +1592,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1001;
+  z-index: var(--z-overlay);
   animation: resultsFadeIn 0.2s ease-out;
 
   @keyframes resultsFadeIn {
@@ -1607,7 +1607,7 @@
 
 .results-popup-container {
   background: var(--card-background);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   box-shadow:
     var(--shadow-xl),
     0 0 0 1px var(--border-color);
@@ -1648,7 +1648,7 @@
   .popup-header-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-5);
 
     > i {
       font-size: var(--fs-h2);
@@ -1667,7 +1667,7 @@
       padding: 4px 10px;
       background-color: var(--card-background);
       border: 1px solid var(--border-color);
-      border-radius: 99px;
+      border-radius: var(--radius-pill);
       font-weight: var(--fw-medium);
     }
   }
@@ -1675,12 +1675,12 @@
   .popup-header-right {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-4);
 
     .clear-filters-btn {
       font-size: var(--fs-control);
       padding: 0.4rem 0.8rem;
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
     }
 
     .p-button {
@@ -1705,7 +1705,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 32px;
+    padding: var(--space-9);
     text-align: center;
 
     .error-icon-wrapper {
@@ -1737,7 +1737,7 @@
       background: var(--hover-background);
       border: 1px solid var(--border-color);
       border-left: 4px solid var(--error-color);
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       padding: 16px 20px;
       margin-bottom: 16px;
       text-align: left;
@@ -1755,7 +1755,7 @@
     .error-meta {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: var(--space-3);
       color: var(--secondary-color);
       font-size: var(--fs-control);
 
@@ -1770,7 +1770,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 32px;
+    padding: var(--space-9);
     text-align: center;
 
     .success-icon-wrapper {
@@ -1807,7 +1807,7 @@
     .success-meta {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: var(--space-3);
       color: var(--secondary-color);
       font-size: var(--fs-control);
 
@@ -1822,7 +1822,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 32px;
+    padding: var(--space-9);
     text-align: center;
 
     .empty-icon-wrapper {
@@ -1885,7 +1885,7 @@
       .th-content {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: var(--space-4);
       }
 
       &:first-child {
@@ -1903,7 +1903,7 @@
 
     .p-datatable-tbody > tr {
       background: var(--card-background);
-      transition: all 0.15s ease;
+      transition: all var(--motion-fast) ease;
       border-bottom: 1px solid var(--border-color);
 
       td {
@@ -1948,7 +1948,7 @@
     .p-column-filter {
       font-size: var(--fs-control);
       padding: 0.4rem 0.6rem;
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
       border: 1px solid var(--border-color);
       background: var(--card-background);
       color: var(--text-color);
@@ -1976,7 +1976,7 @@
         overflow: visible;
 
         .p-dropdown-panel {
-          z-index: 1100 !important;
+          z-index: var(--z-modal) !important;
         }
       }
     }

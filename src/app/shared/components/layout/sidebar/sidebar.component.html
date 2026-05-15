@@ -38,6 +38,7 @@
             class="nav-link expandable"
             (click)="toggleSubmenuAndExpand(item)"
             [class.expanded]="item.isExpanded"
+            [class.has-active-child]="hasActiveDescendant(item)"
             [pTooltip]="!isExpanded ? ('SIDEBAR.' + item.value | translate) : null"
             tooltipPosition="right"
           >
@@ -83,6 +84,7 @@
                 class="submenu-link"
                 (click)="toggleSubmenuAndExpand(subItem)"
                 [class.expanded]="subItem.isExpanded"
+                [class.has-active-child]="hasActiveDescendant(subItem)"
               >
                 <div class="link-content">
                   <i [class]="subItem.icon"></i>
@@ -139,6 +141,7 @@
         class="submenu-link"
         (click)="toggleSubmenuAndExpand(nestedItem)"
         [class.expanded]="nestedItem.isExpanded"
+        [class.has-active-child]="hasActiveDescendant(nestedItem)"
       >
         <div class="link-content">
           <i [class]="nestedItem.icon"></i>

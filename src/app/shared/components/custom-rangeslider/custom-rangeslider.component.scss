@@ -1,7 +1,7 @@
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-3);
 
   .normal-label {
     font-size: var(--fs-control);
@@ -23,7 +23,7 @@
 .slider-value-labels {
   display: flex;
   justify-content: center;
-  gap: 4px;
+  gap: var(--space-2);
   font-size: var(--fs-control);
   font-weight: var(--fw-medium);
   color: var(--text-color);
@@ -40,7 +40,7 @@
 
 :host ::ng-deep .p-slider {
   background: var(--border-color) !important;
-  border-radius: 6px !important;
+  border-radius: var(--radius-sm) !important;
 
   .p-slider-range {
     background: var(--primary-color) !important;
@@ -50,7 +50,7 @@
     border-color: var(--primary-color) !important;
     background: var(--card-background) !important;
     box-shadow: var(--shadow-sm);
-    transition: all 0.2s ease;
+    transition: all var(--motion-base) ease;
 
     &:hover {
       background: var(--primary-color) !important;

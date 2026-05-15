@@ -1,8 +1,4 @@
 // Premium Design Variables - Using Global Theme
-$radius-lg: 16px;
-$radius-md: 12px;
-$radius-sm: 8px;
-
 // Mixins should be at the top of the file
 @mixin custom-scrollbar {
   &::-webkit-scrollbar {
@@ -11,12 +7,12 @@ $radius-sm: 8px;
 
   &::-webkit-scrollbar-track {
     background: transparent;
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
   }
 
   &::-webkit-scrollbar-thumb {
     background: var(--border-color);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
 
     &:hover {
       background: var(--secondary-color);
@@ -27,13 +23,13 @@ $radius-sm: 8px;
 @mixin table-header {
   display: grid;
   grid-template-columns: 1fr 120px;
-  gap: 1rem;
+  gap: var(--space-6);
   padding: 0.75rem 1rem;
   background: var(--hover-background);
   border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: var(--z-base);
 
   .header {
     font-weight: var(--fw-semibold);
@@ -48,7 +44,7 @@ $radius-sm: 8px;
   height: 400px; // Fixed height for all tables
   overflow-y: auto;
   border: 1px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: var(--card-background);
   @include custom-scrollbar;
 }
@@ -70,11 +66,11 @@ $radius-sm: 8px;
 
 @mixin card-style {
   background: var(--card-background);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all var(--motion-slow) ease;
 
   &:hover {
     box-shadow: var(--shadow-md);
@@ -96,8 +92,8 @@ $radius-sm: 8px;
 .view-datasource-wrapper {
   height: 100%;
   background-color: var(--card-background);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px var(--shadow-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
 
@@ -107,7 +103,7 @@ $radius-sm: 8px;
     flex-direction: column;
 
     .page-header {
-      padding: 20px;
+      padding: var(--space-7);
       border-bottom: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
@@ -116,15 +112,15 @@ $radius-sm: 8px;
       border-radius: 8px 8px 0 0;
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: var(--z-elevated);
 
       .left-section {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: var(--space-5);
 
         h2 {
-          margin: 0;
+          margin: var(--space-0);
           color: var(--text-color);
         }
 
@@ -146,19 +142,19 @@ $radius-sm: 8px;
 
       .header-actions {
         display: flex;
-        gap: 12px;
+        gap: var(--space-5);
 
         button {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
+          gap: var(--space-4);
           padding: 0.6rem 1.25rem;
-          border-radius: 8px;
+          border-radius: var(--radius-md);
           font-weight: var(--fw-semibold);
           font-size: var(--fs-body);
           border: none;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all var(--motion-base) ease;
 
           i {
             font-size: var(--fs-body);
@@ -219,7 +215,7 @@ $radius-sm: 8px;
     .content-section {
       flex: 1;
       overflow-y: auto;
-      padding: 1.5rem;
+      padding: var(--space-8);
       background: var(--hover-background);
       @include custom-scrollbar;
 
@@ -228,8 +224,8 @@ $radius-sm: 8px;
         justify-content: space-between;
         align-items: center;
         background: var(--card-background);
-        border-radius: 8px;
-        padding: 1.5rem;
+        border-radius: var(--radius-md);
+        padding: var(--space-8);
         margin-bottom: 1.5rem;
         border: 1px solid var(--border-color);
         box-shadow: var(--shadow-sm);
@@ -238,12 +234,12 @@ $radius-sm: 8px;
         .db-identity-content {
           display: flex;
           align-items: center;
-          gap: 1.5rem;
+          gap: var(--space-8);
 
           .db-logo {
             width: 60px;
             height: 60px;
-            border-radius: 12px;
+            border-radius: var(--radius-lg);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -274,7 +270,7 @@ $radius-sm: 8px;
 
           .db-details {
             h3 {
-              margin: 0;
+              margin: var(--space-0);
               font-size: var(--fs-h1);
               color: var(--text-color);
               font-weight: var(--fw-semibold);
@@ -282,7 +278,7 @@ $radius-sm: 8px;
 
             .db-metadata {
               display: flex;
-              gap: 1rem;
+              gap: var(--space-6);
               margin-top: 0.5rem;
               align-items: center;
 
@@ -290,7 +286,7 @@ $radius-sm: 8px;
                 background: var(--primary-color-transparent);
                 color: var(--primary-color);
                 padding: 0.3rem 0.75rem;
-                border-radius: 4px;
+                border-radius: var(--radius-xs);
                 font-size: var(--fs-control);
                 font-weight: var(--fw-medium);
               }
@@ -303,7 +299,7 @@ $radius-sm: 8px;
 
               .db-status {
                 padding: 0.3rem 0.75rem;
-                border-radius: 4px;
+                border-radius: var(--radius-xs);
                 font-size: var(--fs-control);
                 font-weight: var(--fw-medium);
 
@@ -323,14 +319,14 @@ $radius-sm: 8px;
 
         .db-actions {
           display: flex;
-          gap: 0.75rem;
+          gap: var(--space-5);
         }
       }
 
       .quick-stats {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 1rem;
+        gap: var(--space-6);
         margin-bottom: 1.5rem;
 
         @media (max-width: 1400px) {
@@ -343,20 +339,20 @@ $radius-sm: 8px;
 
         @media (max-width: 640px) {
           grid-template-columns: 1fr;
-          gap: 0.75rem;
+          gap: var(--space-5);
         }
 
         .stat-card {
           @include card-style;
-          padding: 1.25rem;
+          padding: var(--space-7);
           display: flex;
           align-items: center;
-          gap: 1rem;
+          gap: var(--space-6);
           min-height: 100px;
 
           @media (max-width: 640px) {
-            padding: 1rem;
-            gap: 0.75rem;
+            padding: var(--space-6);
+            gap: var(--space-5);
             min-height: 80px;
           }
 
@@ -440,7 +436,7 @@ $radius-sm: 8px;
         .p-tabview-panels {
           background: var(--card-background);
           border-radius: 0 0 8px 8px;
-          padding: 1.5rem;
+          padding: var(--space-8);
           border: 1px solid var(--border-color);
           border-top: none;
         }
@@ -457,14 +453,14 @@ $radius-sm: 8px;
         margin-bottom: 1rem;
 
         h4 {
-          margin: 0;
+          margin: var(--space-0);
           font-size: var(--fs-h3);
           font-weight: var(--fw-medium);
         }
 
         .chart-actions {
           display: flex;
-          gap: 0.25rem;
+          gap: var(--space-2);
         }
       }
 
@@ -473,7 +469,7 @@ $radius-sm: 8px;
         justify-content: center;
         align-items: center;
         height: 100%;
-        padding: 1.5rem;
+        padding: var(--space-8);
 
         .chart-container {
           width: 100%;
@@ -533,8 +529,8 @@ $radius-sm: 8px;
       .db-config-details {
         background: var(--card-background);
         border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 1.25rem;
+        border-radius: var(--radius-md);
+        padding: var(--space-7);
         margin-bottom: 1.5rem;
 
         h4 {
@@ -553,7 +549,7 @@ $radius-sm: 8px;
         .config-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 1.5rem;
+          gap: var(--space-8);
 
           .config-item {
             label {
@@ -565,7 +561,7 @@ $radius-sm: 8px;
             }
 
             p {
-              margin: 0;
+              margin: var(--space-0);
               font-size: var(--fs-h3);
               color: var(--text-color);
               font-weight: var(--fw-medium);
@@ -578,7 +574,7 @@ $radius-sm: 8px;
 
             .config-badge {
               padding: 0.25rem 0.5rem;
-              border-radius: 4px;
+              border-radius: var(--radius-xs);
               font-size: var(--fs-control);
               font-weight: var(--fw-medium);
               background-color: var(--hover-background);
@@ -612,9 +608,9 @@ $radius-sm: 8px;
                 border: 1px solid var(--border-color) !important;
                 color: var(--text-color) !important;
                 padding: 0.75rem 1rem 0.75rem 2.5rem;
-                border-radius: 6px;
+                border-radius: var(--radius-sm);
                 font-size: var(--fs-body);
-                transition: all 0.2s ease;
+                transition: all var(--motion-base) ease;
 
                 &::placeholder {
                   color: var(--text-color) !important;
@@ -638,14 +634,14 @@ $radius-sm: 8px;
         .schemas-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-          gap: 1rem;
+          gap: var(--space-6);
 
           .schema-card {
             background: var(--card-background);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1.25rem;
-            transition: all 0.2s ease;
+            border-radius: var(--radius-md);
+            padding: var(--space-7);
+            transition: all var(--motion-base) ease;
             cursor: pointer;
             position: relative;
             overflow: hidden;
@@ -687,21 +683,21 @@ $radius-sm: 8px;
             .schema-progress {
               height: 6px;
               background: var(--hover-background);
-              border-radius: 3px;
+              border-radius: var(--radius-xs);
               margin-bottom: 1rem;
               overflow: hidden;
 
               .progress-bar {
                 height: 100%;
                 background: var(--primary-color);
-                border-radius: 3px;
+                border-radius: var(--radius-xs);
               }
             }
 
             .schema-stats {
               display: grid;
               grid-template-columns: repeat(3, 1fr);
-              gap: 0.5rem;
+              gap: var(--space-4);
               margin-bottom: 1rem;
 
               .stat {
@@ -725,7 +721,7 @@ $radius-sm: 8px;
             .schema-actions {
               display: flex;
               justify-content: flex-end;
-              gap: 0.5rem;
+              gap: var(--space-4);
             }
           }
         }
@@ -754,9 +750,9 @@ $radius-sm: 8px;
                 border: 1px solid var(--border-color) !important;
                 color: var(--text-color) !important;
                 padding: 0.75rem 1rem 0.75rem 2.5rem;
-                border-radius: 6px;
+                border-radius: var(--radius-sm);
                 font-size: var(--fs-body);
-                transition: all 0.2s ease;
+                transition: all var(--motion-base) ease;
 
                 &::placeholder {
                   color: var(--text-color) !important;
@@ -780,7 +776,7 @@ $radius-sm: 8px;
         .table-list {
           ::ng-deep {
             .p-datatable {
-              border-radius: 8px;
+              border-radius: var(--radius-md);
               overflow: hidden;
 
               .p-datatable-header,
@@ -818,13 +814,13 @@ $radius-sm: 8px;
               .schema-badge {
                 background: var(--hover-background);
                 padding: 0.25rem 0.5rem;
-                border-radius: 4px;
+                border-radius: var(--radius-xs);
                 font-size: var(--fs-control);
               }
 
               .table-actions {
                 display: flex;
-                gap: 0.5rem;
+                gap: var(--space-4);
               }
             }
           }
@@ -837,8 +833,8 @@ $radius-sm: 8px;
           margin-bottom: 1.5rem;
           background: var(--card-background);
           border: 1px solid var(--border-color);
-          border-radius: 8px;
-          padding: 1.25rem;
+          border-radius: var(--radius-md);
+          padding: var(--space-7);
 
           .editor-header {
             display: flex;
@@ -847,14 +843,14 @@ $radius-sm: 8px;
             margin-bottom: 1rem;
 
             h4 {
-              margin: 0;
+              margin: var(--space-0);
               font-size: var(--fs-h3);
               font-weight: var(--fw-medium);
             }
 
             .editor-actions {
               display: flex;
-              gap: 0.75rem;
+              gap: var(--space-5);
             }
           }
 
@@ -865,8 +861,8 @@ $radius-sm: 8px;
               background: var(--hover-background);
               color: var(--text-color);
               border-color: var(--border-color);
-              border-radius: 4px;
-              padding: 0.75rem;
+              border-radius: var(--radius-xs);
+              padding: var(--space-5);
               resize: vertical;
 
               &:focus {
@@ -880,8 +876,8 @@ $radius-sm: 8px;
         .query-results-section {
           background: var(--card-background);
           border: 1px solid var(--border-color);
-          border-radius: 8px;
-          padding: 1.25rem;
+          border-radius: var(--radius-md);
+          padding: var(--space-7);
 
           h4 {
             margin: 0 0 1rem;
@@ -896,7 +892,7 @@ $radius-sm: 8px;
 
               th,
               td {
-                padding: 0.75rem;
+                padding: var(--space-5);
                 text-align: left;
                 border-bottom: 1px solid var(--border-color);
               }
@@ -917,7 +913,7 @@ $radius-sm: 8px;
 
               .query-status {
                 padding: 0.25rem 0.5rem;
-                border-radius: 4px;
+                border-radius: var(--radius-xs);
                 font-size: var(--fs-control);
 
                 &.success {
@@ -938,7 +934,7 @@ $radius-sm: 8px;
 
               .no-data {
                 text-align: center;
-                padding: 2rem;
+                padding: var(--space-9);
                 color: var(--text-color);
                 opacity: 0.7;
               }
@@ -951,27 +947,27 @@ $radius-sm: 8px;
       .main-content {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
+        gap: var(--space-8);
 
         @media (max-width: 1400px) {
           grid-template-columns: 1fr 1fr;
-          gap: 1.25rem;
+          gap: var(--space-7);
         }
 
         @media (max-width: 1200px) {
           grid-template-columns: 1fr;
-          gap: 1rem;
+          gap: var(--space-6);
         }
 
         @media (max-width: 640px) {
-          gap: 0.75rem;
+          gap: var(--space-5);
         }
 
         .left-column,
         .right-column {
           display: flex;
           flex-direction: column;
-          gap: 1.5rem;
+          gap: var(--space-8);
         }
 
         // Info Card Styles - Fixed dimensions with scroll
@@ -1016,7 +1012,7 @@ $radius-sm: 8px;
           &:has(.config-grid) {
             background: var(--card-background);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: var(--radius-md);
 
             .card-header {
               display: flex;
@@ -1027,10 +1023,10 @@ $radius-sm: 8px;
 
               h3 {
                 color: var(--text-color);
-                margin: 0;
+                margin: var(--space-0);
                 display: flex;
                 align-items: center;
-                gap: 8px;
+                gap: var(--space-4);
                 font-size: var(--fs-h2);
                 font-weight: var(--fw-medium);
 
@@ -1042,18 +1038,18 @@ $radius-sm: 8px;
             }
 
             .card-content {
-              padding: 1.5rem;
+              padding: var(--space-8);
 
               .config-grid {
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
+                gap: var(--space-7);
 
                 .config-item {
                   label {
                     display: flex;
                     align-items: center;
-                    gap: 8px;
+                    gap: var(--space-4);
                     color: var(--secondary-color);
                     margin-bottom: 5px;
                     font-size: var(--fs-body);
@@ -1063,17 +1059,17 @@ $radius-sm: 8px;
                     display: block;
                     font-size: var(--fs-h2);
                     color: var(--text-color);
-                    margin: 0;
+                    margin: var(--space-0);
 
                     &.with-badge {
                       display: flex;
                       align-items: center;
-                      gap: 8px;
+                      gap: var(--space-4);
 
                       .config-badge {
                         display: inline-block;
                         padding: 0.3rem 0.6rem;
-                        border-radius: 4px;
+                        border-radius: var(--radius-xs);
                         font-size: var(--fs-body);
                         font-weight: var(--fw-medium);
                         background: var(--primary-color-transparent);
@@ -1084,7 +1080,7 @@ $radius-sm: 8px;
                     .status-badge {
                       display: inline-block;
                       padding: 0.3rem 0.6rem;
-                      border-radius: 4px;
+                      border-radius: var(--radius-xs);
                       font-size: var(--fs-body);
                       font-weight: var(--fw-medium);
 
@@ -1105,7 +1101,7 @@ $radius-sm: 8px;
           }
 
           .card-header {
-            padding: 1.25rem;
+            padding: var(--space-7);
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
@@ -1113,12 +1109,12 @@ $radius-sm: 8px;
             flex-shrink: 0; // Prevent header from shrinking
 
             h3 {
-              margin: 0;
+              margin: var(--space-0);
               font-size: var(--fs-h2);
               color: var(--text-color);
               display: flex;
               align-items: center;
-              gap: 0.5rem;
+              gap: var(--space-4);
 
               i {
                 color: var(--primary-color);
@@ -1127,7 +1123,7 @@ $radius-sm: 8px;
 
             .card-actions {
               display: flex;
-              gap: 0.5rem;
+              gap: var(--space-4);
             }
 
             .search-box {
@@ -1146,9 +1142,9 @@ $radius-sm: 8px;
                   border: 1px solid var(--border-color) !important;
                   color: var(--text-color) !important;
                   padding: 0.75rem 1rem 0.75rem 2.5rem;
-                  border-radius: 6px;
+                  border-radius: var(--radius-sm);
                   font-size: var(--fs-body);
-                  transition: all 0.2s ease;
+                  transition: all var(--motion-base) ease;
 
                   &::placeholder {
                     color: var(--text-color) !important;
@@ -1170,7 +1166,7 @@ $radius-sm: 8px;
           }
 
           .card-content {
-            padding: 1.25rem;
+            padding: var(--space-7);
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
@@ -1179,13 +1175,13 @@ $radius-sm: 8px;
             min-height: 0; // Important for flexbox overflow
 
             @media (max-width: 640px) {
-              padding: 1rem;
+              padding: var(--space-6);
             }
 
             .config-grid {
               display: grid;
               grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-              gap: 1.25rem;
+              gap: var(--space-7);
 
               .config-item {
                 label {
@@ -1197,7 +1193,7 @@ $radius-sm: 8px;
                 }
 
                 p {
-                  margin: 0;
+                  margin: var(--space-0);
                   font-size: var(--fs-h3);
                   color: var(--text-color);
                   font-weight: var(--fw-medium);
@@ -1209,7 +1205,7 @@ $radius-sm: 8px;
             .charts-grid {
               display: grid;
               grid-template-columns: 1fr;
-              gap: 1.5rem;
+              gap: var(--space-8);
 
               .chart-container {
                 h4 {
@@ -1237,17 +1233,17 @@ $radius-sm: 8px;
             .schema-list {
               display: flex;
               flex-direction: column;
-              gap: 1rem;
+              gap: var(--space-6);
 
               @media (max-width: 640px) {
-                gap: 0.75rem;
+                gap: var(--space-5);
               }
 
               .schema-item {
                 background: var(--hover-background);
-                border-radius: 8px;
+                border-radius: var(--radius-md);
                 border: 1px solid var(--border-color);
-                transition: all 0.3s ease;
+                transition: all var(--motion-slow) ease;
                 overflow: visible; // Allow expanded content to show
 
                 &:hover {
@@ -1260,16 +1256,16 @@ $radius-sm: 8px;
                 }
 
                 .schema-header {
-                  padding: 1rem;
+                  padding: var(--space-6);
                   display: flex;
                   align-items: center;
-                  gap: 0.75rem;
+                  gap: var(--space-5);
                   cursor: pointer;
                   flex-wrap: wrap;
 
                   @media (max-width: 640px) {
-                    padding: 0.875rem;
-                    gap: 0.5rem;
+                    padding: var(--space-5);
+                    gap: var(--space-4);
                   }
 
                   i {
@@ -1279,7 +1275,7 @@ $radius-sm: 8px;
                       margin-left: auto;
                       color: var(--text-color);
                       opacity: 0.6;
-                      transition: transform 0.3s ease;
+                      transition: transform var(--motion-slow) ease;
                     }
                   }
 
@@ -1320,7 +1316,7 @@ $radius-sm: 8px;
                   background: var(--card-background);
                   border-top: 1px solid var(--border-color);
                   flex-wrap: wrap;
-                  gap: 0.5rem;
+                  gap: var(--space-4);
 
                   @media (max-width: 640px) {
                     padding: 0.625rem 0.875rem;
@@ -1366,16 +1362,16 @@ $radius-sm: 8px;
                     }
 
                     .table-item {
-                      padding: 0.75rem;
-                      border-radius: 4px;
+                      padding: var(--space-5);
+                      border-radius: var(--radius-xs);
                       display: grid;
                       grid-template-columns: 1fr auto;
                       align-items: center;
-                      gap: 1rem;
+                      gap: var(--space-6);
 
                       @media (max-width: 768px) {
                         grid-template-columns: 1fr;
-                        gap: 0.5rem;
+                        gap: var(--space-4);
                       }
 
                       &:hover {
@@ -1386,13 +1382,13 @@ $radius-sm: 8px;
                         color: var(--text-color);
                         display: flex;
                         align-items: center;
-                        gap: 0.5rem;
+                        gap: var(--space-4);
                         min-width: 0;
                         overflow: hidden;
                         cursor: pointer;
-                        transition: all 0.2s ease;
+                        transition: all var(--motion-base) ease;
                         padding: 0.25rem 0.5rem;
-                        border-radius: 4px;
+                        border-radius: var(--radius-xs);
                         margin-right: 0.5rem;
 
                         &:hover {
@@ -1409,7 +1405,7 @@ $radius-sm: 8px;
                           color: var(--primary-color);
                           font-size: var(--fs-control);
                           flex-shrink: 0;
-                          transition: transform 0.2s ease;
+                          transition: transform var(--motion-base) ease;
                         }
 
                         span {
@@ -1422,7 +1418,7 @@ $radius-sm: 8px;
                       .table-info {
                         display: grid;
                         grid-template-columns: repeat(3, 1fr);
-                        gap: 0.5rem;
+                        gap: var(--space-4);
                         font-size: var(--fs-control);
                         min-width: 320px;
 
@@ -1447,7 +1443,7 @@ $radius-sm: 8px;
                           white-space: nowrap;
                           padding: 0.3rem 0.5rem;
                           background: var(--card-background);
-                          border-radius: 4px;
+                          border-radius: var(--radius-xs);
                           border: 1px solid var(--border-color);
                           text-align: center;
                           min-width: 0;
@@ -1466,7 +1462,7 @@ $radius-sm: 8px;
                     }
 
                     .no-tables {
-                      padding: 1rem;
+                      padding: var(--space-6);
                       text-align: center;
                       color: var(--text-color);
                       opacity: 0.6;
@@ -1481,15 +1477,15 @@ $radius-sm: 8px;
             .top-tables {
               display: flex;
               flex-direction: column;
-              gap: 1rem;
+              gap: var(--space-6);
 
               @media (max-width: 640px) {
-                gap: 0.75rem;
+                gap: var(--space-5);
               }
 
               .table-item {
                 background: var(--hover-background);
-                border-radius: 8px;
+                border-radius: var(--radius-md);
                 overflow: hidden;
                 border: 1px solid var(--border-color);
 
@@ -1503,7 +1499,7 @@ $radius-sm: 8px;
                   @media (max-width: 640px) {
                     padding: 0.75rem 0.875rem;
                     flex-wrap: wrap;
-                    gap: 0.5rem;
+                    gap: var(--space-4);
                     min-height: 48px;
                   }
 
@@ -1530,7 +1526,7 @@ $radius-sm: 8px;
 
                   .table-stats {
                     display: flex;
-                    gap: 0.5rem;
+                    gap: var(--space-4);
                     align-items: center;
                     flex-shrink: 0;
 
@@ -1581,7 +1577,7 @@ $radius-sm: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-overlay);
   animation: fadeIn 0.2s ease-out;
 
   @keyframes fadeIn {
@@ -1595,8 +1591,8 @@ $radius-sm: 8px;
 
   .popup-content {
     background: var(--card-background);
-    padding: 2rem;
-    border-radius: $radius-lg;
+    padding: var(--space-9);
+    border-radius: var(--radius-lg);
     box-shadow:
       var(--shadow-xl),
       0 0 0 1px var(--border-color);
@@ -1624,7 +1620,7 @@ $radius-sm: 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1rem;
+      gap: var(--space-6);
 
       .popup-icon {
         width: 56px;
@@ -1666,7 +1662,7 @@ $radius-sm: 8px;
       }
 
       h3 {
-        margin: 0;
+        margin: var(--space-0);
         color: var(--text-color);
         font-size: var(--fs-h1);
         font-weight: var(--fw-semibold);
@@ -1680,12 +1676,12 @@ $radius-sm: 8px;
       .db-info-badge {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: var(--space-4);
         background: var(--hover-background);
         color: var(--primary-color);
         border: 1px solid var(--border-color);
         padding: 8px 14px;
-        border-radius: 20px;
+        border-radius: var(--radius-2xl);
         font-size: var(--fs-control);
         font-weight: var(--fw-semibold);
         margin-bottom: 1rem;
@@ -1705,16 +1701,16 @@ $radius-sm: 8px;
 
       .delete-info-list {
         list-style: none;
-        padding: 0;
-        margin: 0;
+        padding: var(--space-0);
+        margin: var(--space-0);
         background: var(--hover-background);
-        border-radius: $radius-sm;
+        border-radius: var(--radius-sm);
         padding: 0.75rem 1rem;
 
         li {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: var(--space-5);
           padding: 0.5rem 0;
           color: var(--secondary-color);
           font-size: var(--fs-control);
@@ -1753,13 +1749,13 @@ $radius-sm: 8px;
           width: 100%;
           padding: 0.65rem 0.75rem;
           border: 1px solid var(--border-color);
-          border-radius: $radius-sm;
+          border-radius: var(--radius-sm);
           background: var(--card-background);
           color: var(--text-color);
           font-size: var(--fs-control);
           font-family: inherit;
           resize: vertical;
-          transition: border-color 0.2s;
+          transition: border-color var(--motion-base);
 
           &::placeholder {
             color: var(--secondary-color);
@@ -1787,20 +1783,20 @@ $radius-sm: 8px;
     // Actions
     .popup-actions {
       display: flex;
-      gap: 0.75rem;
+      gap: var(--space-5);
       justify-content: flex-end;
 
       button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: var(--space-3);
         padding: 0.75rem 1.5rem;
-        border-radius: $radius-md;
+        border-radius: var(--radius-md);
         border: none;
         font-weight: var(--fw-semibold);
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all var(--motion-base) ease;
         font-size: var(--fs-body);
 
         i {
@@ -1902,7 +1898,7 @@ $radius-sm: 8px;
   justify-content: center;
   align-items: center;
   height: 100%;
-  padding: 1.5rem;
+  padding: var(--space-8);
 
   .chart-container {
     width: 100%;
@@ -2026,8 +2022,8 @@ $radius-sm: 8px;
     h3 {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      margin: 0;
+      gap: var(--space-4);
+      margin: var(--space-0);
 
       i {
         color: var(--primary-color);
@@ -2039,10 +2035,10 @@ $radius-sm: 8px;
       border: none;
       color: var(--text-color);
       cursor: pointer;
-      padding: 0.25rem;
+      padding: var(--space-2);
       font-size: var(--fs-h2);
       opacity: 0.6;
-      transition: opacity 0.2s;
+      transition: opacity var(--motion-base);
 
       &:hover {
         opacity: 1;
@@ -2080,7 +2076,7 @@ $radius-sm: 8px;
 
         p {
           color: var(--text-color);
-          margin: 0;
+          margin: var(--space-0);
           font-size: var(--fs-h3);
         }
       }
@@ -2088,7 +2084,7 @@ $radius-sm: 8px;
       .stats-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
+        gap: var(--space-6);
 
         @media (max-width: 480px) {
           grid-template-columns: 1fr;
@@ -2096,14 +2092,14 @@ $radius-sm: 8px;
 
         .stat-item {
           background: var(--hover-background);
-          padding: 0.75rem;
-          border-radius: 8px;
+          padding: var(--space-5);
+          border-radius: var(--radius-md);
           border: 1px solid var(--border-color);
 
           label {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: var(--space-4);
             color: var(--secondary-color);
             font-size: var(--fs-control);
             margin-bottom: 0.5rem;
@@ -2117,15 +2113,15 @@ $radius-sm: 8px;
             color: var(--text-color);
             font-size: var(--fs-h2);
             font-weight: var(--fw-medium);
-            margin: 0;
+            margin: var(--space-0);
           }
         }
       }
 
       .size-breakdown {
         background: var(--hover-background);
-        border-radius: 8px;
-        padding: 1rem;
+        border-radius: var(--radius-md);
+        padding: var(--space-6);
         border: 1px solid var(--border-color);
 
         .size-item {
@@ -2155,7 +2151,7 @@ $radius-sm: 8px;
         max-height: 300px;
         overflow-y: auto;
         background: var(--hover-background);
-        border-radius: 8px;
+        border-radius: var(--radius-md);
         border: 1px solid var(--border-color);
         @include custom-scrollbar;
 
@@ -2165,11 +2161,11 @@ $radius-sm: 8px;
           align-items: center;
           padding: 0.75rem 1rem;
           border-bottom: 1px solid var(--border-color);
-          gap: 1rem;
+          gap: var(--space-6);
 
           @media (max-width: 640px) {
             grid-template-columns: 1fr;
-            gap: 0.5rem;
+            gap: var(--space-4);
           }
 
           &:last-child {
@@ -2185,7 +2181,7 @@ $radius-sm: 8px;
             font-weight: var(--fw-medium);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: var(--space-4);
             min-width: 0;
             overflow: hidden;
 
@@ -2208,7 +2204,7 @@ $radius-sm: 8px;
             font-family: var(--font-mono);
             background: var(--card-background);
             padding: 0.2rem 0.5rem;
-            border-radius: 4px;
+            border-radius: var(--radius-xs);
             border: 1px solid var(--border-color);
             text-align: center;
             overflow: hidden;
@@ -2219,7 +2215,7 @@ $radius-sm: 8px;
           .column-nullable {
             font-size: var(--fs-control);
             padding: 0.2rem 0.5rem;
-            border-radius: 4px;
+            border-radius: var(--radius-xs);
             background: var(--error-background);
             color: var(--error-color);
             text-align: center;
@@ -2241,7 +2237,7 @@ $radius-sm: 8px;
     .btn-confirm {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: var(--space-4);
 
       i {
         font-size: var(--fs-body);

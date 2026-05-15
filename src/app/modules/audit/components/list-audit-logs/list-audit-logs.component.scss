@@ -1,12 +1,8 @@
-$radius-lg: 16px;
-$radius-md: 12px;
-$radius-sm: 8px;
-
 :host {
   display: block;
   height: 100%;
   background-color: var(--background-color);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
 }
 
 .dataset-page-wrapper {
@@ -14,7 +10,7 @@ $radius-sm: 8px;
   flex-direction: column;
   height: 100%;
   width: 100%;
-  padding: 0;
+  padding: var(--space-0);
 
   .dataset-content-container {
     flex: 1;
@@ -24,7 +20,7 @@ $radius-sm: 8px;
     max-width: 100%;
     margin: 0 auto;
     width: 100%;
-    gap: 1.5rem;
+    gap: var(--space-8);
   }
 }
 
@@ -45,7 +41,7 @@ $radius-sm: 8px;
     .subtitle {
       font-size: var(--fs-h3);
       color: var(--text-color-secondary);
-      margin: 0;
+      margin: var(--space-0);
       font-weight: var(--fw-regular);
     }
   }
@@ -53,7 +49,7 @@ $radius-sm: 8px;
 
 .content-card {
   background: var(--card-background);
-  border-radius: $radius-lg;
+  border-radius: var(--radius-lg);
   box-shadow:
     0 4px 6px -1px var(--shadow-color),
     0 2px 4px -1px var(--shadow-color);
@@ -70,14 +66,14 @@ $radius-sm: 8px;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: var(--space-6);
     background: var(--card-background);
 
     .toolbar-left,
     .toolbar-right {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: var(--space-6);
     }
 
     .dropdown-field {
@@ -85,7 +81,7 @@ $radius-sm: 8px;
     }
 
     .modern-button {
-      border-radius: $radius-sm !important;
+      border-radius: var(--radius-sm) !important;
       font-weight: var(--fw-semibold);
       padding: 0.65rem 1.25rem;
 
@@ -129,7 +125,7 @@ $radius-sm: 8px;
         .th-content {
           display: flex;
           align-items: center;
-          gap: 0.4rem;
+          gap: var(--space-3);
           line-height: 1;
         }
 
@@ -140,18 +136,18 @@ $radius-sm: 8px;
         &.sortable-th {
           cursor: pointer;
           user-select: none;
-          transition: background-color 0.15s ease, color 0.15s ease;
+          transition: background-color var(--motion-fast) ease, color var(--motion-fast) ease;
 
           &:hover { background: var(--border-color); .sort-indicator .pi { color: var(--primary-color); } }
           &.is-sorted { color: var(--primary-color); background: var(--primary-color-transparent); .sort-indicator .pi { color: var(--primary-color); } }
           &:focus-visible { outline: 2px solid var(--primary-color); outline-offset: -2px; }
 
           .sort-indicator {
-            display: inline-flex; align-items: center; gap: 0.25rem; margin-left: 0.35rem;
-            .pi { font-size: var(--fs-label); color: var(--secondary-color); transition: color 0.15s ease; }
+            display: inline-flex; align-items: center; gap: var(--space-2); margin-left: 0.35rem;
+            .pi { font-size: var(--fs-label); color: var(--secondary-color); transition: color var(--motion-fast) ease; }
             .sort-badge {
               display: inline-flex; align-items: center; justify-content: center;
-              min-width: 1rem; height: 1rem; padding: 0 0.25rem; border-radius: 999px;
+              min-width: 1rem; height: 1rem; padding: 0 0.25rem; border-radius: var(--radius-pill);
               background: var(--primary-color); color: var(--primary-text);
               font-size: var(--fs-micro); font-weight: var(--fw-semibold); line-height: 1;
             }
@@ -180,7 +176,7 @@ $radius-sm: 8px;
           width: 100%;
 
           .form-field {
-            gap: 0;
+            gap: var(--space-0);
           }
 
           .p-dropdown,
@@ -194,7 +190,7 @@ $radius-sm: 8px;
       // Body rows
       .p-datatable-tbody > tr {
         background: var(--card-background);
-        transition: all 0.15s ease;
+        transition: all var(--motion-fast) ease;
         border-bottom: 1px solid var(--border-color);
 
         td {
@@ -259,7 +255,7 @@ $radius-sm: 8px;
       .version-badge {
         display: inline-block;
         padding: 3px 10px;
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
         font-size: var(--fs-label);
         font-weight: var(--fw-semibold);
         font-family: var(--font-mono);
@@ -270,7 +266,7 @@ $radius-sm: 8px;
       .action-badge {
         display: inline-block;
         padding: 3px 10px;
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
         font-size: var(--fs-label);
         font-weight: var(--fw-semibold);
         text-transform: uppercase;
@@ -304,8 +300,8 @@ $radius-sm: 8px;
 
       // Status Pill — success/fail
       .status-pill {
-        display: inline-flex; align-items: center; gap: 0.45rem;
-        padding: 0.25rem 0.65rem; border-radius: 999px;
+        display: inline-flex; align-items: center; gap: var(--space-3);
+        padding: 0.25rem 0.65rem; border-radius: var(--radius-pill);
         font-size: var(--fs-control); font-weight: var(--fw-semibold); line-height: 1.2;
         white-space: nowrap; border: 1px solid transparent;
 
@@ -328,7 +324,7 @@ $radius-sm: 8px;
         .p-paginator-prev,
         .p-paginator-first,
         .p-paginator-last {
-          border-radius: 6px;
+          border-radius: var(--radius-sm);
           color: var(--secondary-color);
           min-width: 2rem;
           height: 2rem;
@@ -360,7 +356,7 @@ td.empty-message-cell {
 
   .empty-state {
     display: flex; flex-direction: column; align-items: center;
-    gap: 0.65rem; max-width: 28rem; margin: 0 auto;
+    gap: var(--space-5); max-width: 28rem; margin: 0 auto;
 
     .empty-icon {
       width: 56px; height: 56px; border-radius: 50%;
@@ -388,7 +384,7 @@ td.empty-message-cell {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-overlay);
   animation: fadeIn 0.2s ease-out;
 
   @keyframes fadeIn {
@@ -402,7 +398,7 @@ td.empty-message-cell {
 
   .popup-content {
     background: var(--card-background);
-    border-radius: $radius-lg;
+    border-radius: var(--radius-lg);
     box-shadow:
       var(--shadow-xl),
       0 0 0 1px var(--border-color);
@@ -431,19 +427,19 @@ td.empty-message-cell {
     justify-content: space-between;
     padding: 1.25rem 1.5rem;
     border-bottom: 1px solid var(--border-color);
-    gap: 1rem;
+    gap: var(--space-6);
 
     .popup-title-area {
       display: flex;
       align-items: flex-start;
-      gap: 0.85rem;
+      gap: var(--space-5);
       min-width: 0;
     }
 
     .popup-icon {
       width: 40px;
       height: 40px;
-      border-radius: 10px;
+      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -495,11 +491,11 @@ td.empty-message-cell {
       .popup-badges {
         display: flex;
         align-items: center;
-        gap: 0.4rem;
+        gap: var(--space-3);
 
         .action-badge {
           padding: 2px 8px;
-          border-radius: 4px;
+          border-radius: var(--radius-xs);
           font-size: var(--fs-micro);
           font-weight: var(--fw-semibold);
           text-transform: uppercase;
@@ -508,7 +504,7 @@ td.empty-message-cell {
 
         .version-badge {
           padding: 1px 6px;
-          border-radius: 4px;
+          border-radius: var(--radius-xs);
           font-size: var(--fs-micro);
           font-weight: var(--fw-semibold);
           font-family: var(--font-mono);
@@ -519,7 +515,7 @@ td.empty-message-cell {
 
         .module-badge {
           padding: 2px 8px;
-          border-radius: 4px;
+          border-radius: var(--radius-xs);
           font-size: var(--fs-micro);
           font-weight: var(--fw-semibold);
           text-transform: capitalize;
@@ -537,12 +533,12 @@ td.empty-message-cell {
       color: var(--text-color-secondary);
       width: 32px;
       height: 32px;
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      transition: all 0.15s ease;
+      transition: all var(--motion-fast) ease;
       &:hover {
         background: var(--hover-background);
         color: var(--text-color);
@@ -587,7 +583,7 @@ td.empty-message-cell {
       color: var(--text-color);
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: var(--space-3);
 
       &.capitalize {
         text-transform: capitalize;
@@ -632,7 +628,7 @@ td.empty-message-cell {
   .section-header {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-4);
     padding: 0.85rem 1.5rem 0.4rem;
 
     i {
@@ -650,7 +646,7 @@ td.empty-message-cell {
   }
 
   .justification-detail {
-    margin: 0;
+    margin: var(--space-0);
     padding: 0.4rem 1.5rem 1rem;
     font-size: var(--fs-body);
     color: var(--text-color);
@@ -658,7 +654,7 @@ td.empty-message-cell {
     white-space: pre-wrap;
     background: var(--hover-background);
     margin: 0 1rem 0.75rem;
-    border-radius: $radius-sm;
+    border-radius: var(--radius-sm);
     padding: 0.75rem 1rem;
   }
 

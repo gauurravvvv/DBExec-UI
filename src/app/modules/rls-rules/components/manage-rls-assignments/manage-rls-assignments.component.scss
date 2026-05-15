@@ -9,7 +9,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-overlay);
   animation: fadeIn 0.2s ease-out;
 
   @keyframes fadeIn {
@@ -23,8 +23,8 @@
 
   .popup-content {
     background: var(--card-background);
-    padding: 2rem;
-    border-radius: 12px;
+    padding: var(--space-9);
+    border-radius: var(--radius-lg);
     box-shadow:
       var(--shadow-xl),
       0 0 0 1px var(--border-color);
@@ -68,7 +68,7 @@
     }
 
     h3 {
-      margin: 0;
+      margin: var(--space-0);
       color: var(--text-color);
       font-size: var(--fs-h1);
       font-weight: var(--fw-semibold);
@@ -90,22 +90,22 @@
     .add-assignment-form {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: var(--space-5);
 
       .btn-add-assignment {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: var(--space-3);
         padding: 10px 16px;
         background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
         color: var(--primary-text);
         border: none;
-        border-radius: 8px;
+        border-radius: var(--radius-md);
         font-size: var(--fs-body);
         font-weight: var(--fw-semibold);
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all var(--motion-base) ease;
         box-shadow: 0 4px 10px var(--primary-color-transparent);
 
         &:hover:not(:disabled) {
@@ -143,14 +143,14 @@
       margin-bottom: 12px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--space-4);
 
       .count-badge {
         background: var(--hover-background);
         border: 1px solid var(--border-color);
         color: var(--text-color);
         padding: 2px 8px;
-        border-radius: 10px;
+        border-radius: var(--radius-md);
         font-size: var(--fs-label);
         font-weight: var(--fw-semibold);
         text-transform: none;
@@ -162,7 +162,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: var(--space-5);
       padding: 20px 0;
       color: var(--secondary-color);
       font-size: var(--fs-body);
@@ -186,7 +186,7 @@
       }
 
       p {
-        margin: 0;
+        margin: var(--space-0);
         font-size: var(--fs-control);
         line-height: 1.5;
       }
@@ -195,18 +195,18 @@
     .assignment-list {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: var(--space-3);
     }
 
     .assignment-row {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: var(--space-5);
       padding: 10px 12px;
       background: var(--hover-background);
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       border: 1px solid var(--border-color);
-      transition: all 0.15s ease;
+      transition: all var(--motion-fast) ease;
 
       &:hover {
         border-color: var(--primary-color-transparent);
@@ -246,13 +246,13 @@
         height: 28px;
         border: 1px solid transparent;
         background: transparent;
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
         color: var(--secondary-color);
-        transition: all 0.15s ease;
+        transition: all var(--motion-fast) ease;
         flex-shrink: 0;
 
         &:hover {
@@ -270,20 +270,20 @@
 
   .popup-actions {
     display: flex;
-    gap: 0.75rem;
+    gap: var(--space-5);
     justify-content: center;
 
     button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: var(--space-3);
       padding: 0.75rem 1.5rem;
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       border: none;
       font-weight: var(--fw-semibold);
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all var(--motion-base) ease;
       font-size: var(--fs-body);
 
       i {

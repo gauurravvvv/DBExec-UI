@@ -1,7 +1,7 @@
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-3);
 
   .normal-label {
     font-size: var(--fs-control);
@@ -27,7 +27,7 @@
     background: var(--hover-background) !important;
     border: 1px solid var(--border-color) !important;
     color: var(--text-color) !important;
-    border-radius: 6px !important;
+    border-radius: var(--radius-sm) !important;
     font-size: var(--fs-h3);
     padding: 0.625rem 1rem;
 
@@ -45,7 +45,7 @@
     background: var(--hover-background) !important;
     border: 1px solid var(--border-color) !important;
     color: var(--secondary-color) !important;
-    transition: all 0.2s ease;
+    transition: all var(--motion-base) ease;
 
     &:hover {
       border-color: var(--primary-color) !important;

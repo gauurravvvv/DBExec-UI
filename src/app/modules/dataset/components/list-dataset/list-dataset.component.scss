@@ -1,13 +1,9 @@
 // Premium Design Variables - Using Global Theme
-$radius-lg: 16px;
-$radius-md: 12px;
-$radius-sm: 8px;
-
 :host {
   display: block;
   height: 100%;
   background-color: var(--background-color);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
 }
 
 .dataset-page-wrapper {
@@ -15,7 +11,7 @@ $radius-sm: 8px;
   flex-direction: column;
   height: 100%;
   width: 100%;
-  padding: 0;
+  padding: var(--space-0);
 
   .dataset-content-container {
     flex: 1;
@@ -25,7 +21,7 @@ $radius-sm: 8px;
     max-width: 100%;
     margin: 0 auto;
     width: 100%;
-    gap: 1.5rem;
+    gap: var(--space-8);
   }
 }
 
@@ -47,7 +43,7 @@ $radius-sm: 8px;
     .subtitle {
       font-size: var(--fs-h3);
       color: var(--text-color-secondary);
-      margin: 0;
+      margin: var(--space-0);
       font-weight: var(--fw-regular);
     }
   }
@@ -56,7 +52,7 @@ $radius-sm: 8px;
 // 2. Content Card & Toolbar
 .content-card {
   background: var(--card-background);
-  border-radius: $radius-lg;
+  border-radius: var(--radius-lg);
   box-shadow:
     0 4px 6px -1px var(--shadow-color),
     0 2px 4px -1px var(--shadow-color);
@@ -73,14 +69,14 @@ $radius-sm: 8px;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: var(--space-6);
     background: var(--card-background);
 
     .toolbar-left,
     .toolbar-right {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: var(--space-6);
     }
 
     // Search Input
@@ -91,13 +87,13 @@ $radius-sm: 8px;
       }
 
       .modern-search {
-        border-radius: $radius-sm;
+        border-radius: var(--radius-sm);
         border: 1px solid var(--border-color);
         padding: 0.65rem 1rem 0.65rem 2.5rem;
         width: 280px;
         font-size: var(--fs-body);
         background: var(--hover-background);
-        transition: all 0.2s;
+        transition: all var(--motion-base);
         color: var(--text-color);
 
         &:focus {
@@ -114,7 +110,7 @@ $radius-sm: 8px;
 
     // Modern Button
     .modern-button {
-      border-radius: $radius-sm !important;
+      border-radius: var(--radius-sm) !important;
       font-weight: var(--fw-semibold);
       padding: 0.65rem 1.25rem;
 
@@ -123,7 +119,7 @@ $radius-sm: 8px;
         color: var(--primary-text);
         border: none;
         box-shadow: 0 4px 10px var(--primary-color-transparent);
-        transition: all 0.2s ease;
+        transition: all var(--motion-base) ease;
 
         &:hover {
           opacity: 1;
@@ -159,7 +155,7 @@ $radius-sm: 8px;
         color: white !important;
         border: none !important;
         font-weight: var(--fw-semibold);
-        transition: all 0.2s ease;
+        transition: all var(--motion-base) ease;
 
         &:hover {
           opacity: 1;
@@ -173,12 +169,12 @@ $radius-sm: 8px;
       }
 
       .p-splitbutton-defaultbutton {
-        border-radius: $radius-sm 0 0 $radius-sm !important;
+        border-radius: var(--radius-sm) 0 0 var(--radius-sm) !important;
         box-shadow: 0 4px 10px var(--primary-color-transparent);
       }
 
       .p-splitbutton-menubutton {
-        border-radius: 0 $radius-sm $radius-sm 0 !important;
+        border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
         border-left: 1px solid var(--border-strong) !important;
       }
     }
@@ -218,7 +214,7 @@ $radius-sm: 8px;
         .th-content {
           display: flex;
           align-items: center;
-          gap: 0.4rem;
+          gap: var(--space-3);
           line-height: 1;
 
           &.centered-header { justify-content: center; }
@@ -232,18 +228,18 @@ $radius-sm: 8px;
         &.sortable-th {
           cursor: pointer;
           user-select: none;
-          transition: background-color 0.15s ease, color 0.15s ease;
+          transition: background-color var(--motion-fast) ease, color var(--motion-fast) ease;
 
           &:hover { background: var(--border-color); .sort-indicator .pi { color: var(--primary-color); } }
           &.is-sorted { color: var(--primary-color); background: var(--primary-color-transparent); .sort-indicator .pi { color: var(--primary-color); } }
           &:focus-visible { outline: 2px solid var(--primary-color); outline-offset: -2px; }
 
           .sort-indicator {
-            display: inline-flex; align-items: center; gap: 0.25rem; margin-left: 0.35rem;
-            .pi { font-size: var(--fs-label); color: var(--secondary-color); transition: color 0.15s ease; }
+            display: inline-flex; align-items: center; gap: var(--space-2); margin-left: 0.35rem;
+            .pi { font-size: var(--fs-label); color: var(--secondary-color); transition: color var(--motion-fast) ease; }
             .sort-badge {
               display: inline-flex; align-items: center; justify-content: center;
-              min-width: 1rem; height: 1rem; padding: 0 0.25rem; border-radius: 999px;
+              min-width: 1rem; height: 1rem; padding: 0 0.25rem; border-radius: var(--radius-pill);
               background: var(--primary-color); color: var(--primary-text);
               font-size: var(--fs-micro); font-weight: var(--fw-semibold); line-height: 1;
             }
@@ -272,7 +268,7 @@ $radius-sm: 8px;
           width: 100%;
 
           .form-field {
-            gap: 0;
+            gap: var(--space-0);
           }
 
           .p-dropdown,
@@ -286,7 +282,7 @@ $radius-sm: 8px;
       // Body Rows
       .p-datatable-tbody > tr {
         background: var(--card-background);
-        transition: background-color 0.15s ease, box-shadow 0.15s ease;
+        transition: background-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease;
         border-bottom: 1px solid var(--border-color);
         position: relative;
 
@@ -322,7 +318,7 @@ $radius-sm: 8px;
         color: var(--text-color); font-weight: var(--fw-semibold); font-size: var(--fs-h3);
         text-decoration: none; display: block; white-space: nowrap;
         overflow: hidden; text-overflow: ellipsis; max-width: 100%;
-        border-radius: 4px; padding: 2px 0;
+        border-radius: var(--radius-xs); padding: 2px 0;
 
         &:hover { color: var(--primary-color); }
         &:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
@@ -348,7 +344,7 @@ $radius-sm: 8px;
         background-color: var(--hover-background);
         color: var(--secondary-color);
         padding: 2px 8px;
-        border-radius: 99px;
+        border-radius: var(--radius-pill);
         font-size: var(--fs-control);
         display: inline-block;
         max-width: 100%;
@@ -358,8 +354,8 @@ $radius-sm: 8px;
       }
 
       .status-pill {
-        display: inline-flex; align-items: center; gap: 0.45rem;
-        padding: 0.25rem 0.65rem; border-radius: 999px;
+        display: inline-flex; align-items: center; gap: var(--space-3);
+        padding: 0.25rem 0.65rem; border-radius: var(--radius-pill);
         font-size: var(--fs-control); font-weight: var(--fw-semibold); line-height: 1.2;
         white-space: nowrap; border: 1px solid transparent;
 
@@ -375,8 +371,8 @@ $radius-sm: 8px;
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        gap: 0.5rem;
-        transition: opacity 0.2s;
+        gap: var(--space-4);
+        transition: opacity var(--motion-base);
 
         .icon-btn {
           width: 32px;
@@ -386,10 +382,10 @@ $radius-sm: 8px;
           justify-content: center;
           border: 1px solid transparent;
           background: transparent;
-          border-radius: 6px;
+          border-radius: var(--radius-sm);
           color: var(--secondary-color);
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all var(--motion-base);
 
           &:hover {
             background: var(--hover-background);
@@ -421,7 +417,7 @@ $radius-sm: 8px;
         border-top: 1px solid var(--border-color);
         justify-content: flex-end;
         padding: 0.85rem 1.5rem;
-        gap: 0.25rem;
+        gap: var(--space-2);
 
         .p-paginator-current { color: var(--secondary-color); font-size: var(--fs-control); font-weight: var(--fw-medium); margin-right: 0.75rem; }
 
@@ -430,20 +426,20 @@ $radius-sm: 8px;
         .p-paginator-prev,
         .p-paginator-first,
         .p-paginator-last {
-          border-radius: 6px;
+          border-radius: var(--radius-sm);
           color: var(--secondary-color);
           min-width: 2.25rem;
           height: 2.25rem;
           margin: 0 0.125rem;
           font-weight: var(--fw-medium);
-          transition: background-color 0.15s ease, color 0.15s ease;
+          transition: background-color var(--motion-fast) ease, color var(--motion-fast) ease;
 
           &:hover { background: var(--hover-background); color: var(--text-color); }
           &:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 1px; }
           &.p-highlight { background: var(--primary-color); color: var(--primary-text); }
         }
 
-        .p-dropdown { height: 2.25rem; border-radius: 6px; }
+        .p-dropdown { height: 2.25rem; border-radius: var(--radius-sm); }
       }
     }
   }
@@ -461,7 +457,7 @@ td.empty-message-cell {
 
   .empty-state {
     display: flex; flex-direction: column; align-items: center;
-    gap: 0.65rem; max-width: 28rem; margin: 0 auto;
+    gap: var(--space-5); max-width: 28rem; margin: 0 auto;
 
     .empty-icon {
       width: 56px; height: 56px; border-radius: 50%;
@@ -488,14 +484,14 @@ td.empty-message-cell {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-overlay);
   animation: fadeIn 0.2s ease-out;
 
   .popup-content {
     background: var(--card-background);
     width: 90%;
     max-width: 420px;
-    border-radius: $radius-lg;
+    border-radius: var(--radius-lg);
     box-shadow:
       0 20px 25px -5px var(--shadow-color),
       0 8px 10px -6px var(--shadow-color);
@@ -512,7 +508,7 @@ td.empty-message-cell {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1rem;
+      gap: var(--space-6);
 
       .popup-icon {
         width: 48px;
@@ -527,7 +523,7 @@ td.empty-message-cell {
       }
 
       h3 {
-        margin: 0;
+        margin: var(--space-0);
         font-size: var(--fs-h1);
         font-weight: var(--fw-semibold);
         color: var(--text-color);
@@ -548,18 +544,18 @@ td.empty-message-cell {
 
       .delete-info-list {
         background: var(--hover-background);
-        border-radius: $radius-md;
-        padding: 1rem;
+        border-radius: var(--radius-md);
+        padding: var(--space-6);
         list-style: none;
-        margin: 0;
+        margin: var(--space-0);
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        gap: var(--space-5);
 
         li {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
+          gap: var(--space-5);
           color: var(--text-color);
           font-size: var(--fs-body);
           font-weight: var(--fw-medium);
@@ -596,13 +592,13 @@ td.empty-message-cell {
           width: 100%;
           padding: 0.65rem 0.75rem;
           border: 1px solid var(--border-color);
-          border-radius: $radius-sm;
+          border-radius: var(--radius-sm);
           background: var(--card-background);
           color: var(--text-color);
           font-size: var(--fs-control);
           font-family: inherit;
           resize: vertical;
-          transition: border-color 0.2s;
+          transition: border-color var(--motion-base);
 
           &::placeholder {
             color: var(--secondary-color);
@@ -633,19 +629,19 @@ td.empty-message-cell {
       background: var(--hover-background);
       border-top: 1px solid var(--border-color);
       display: flex;
-      gap: 0.75rem;
+      gap: var(--space-5);
       justify-content: flex-end;
 
       button {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: var(--space-4);
         padding: 0.65rem 1.25rem;
-        border-radius: $radius-sm;
+        border-radius: var(--radius-sm);
         font-weight: var(--fw-semibold);
         font-size: var(--fs-body);
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all var(--motion-base);
         border: 1px solid transparent;
 
         &.btn-cancel {
@@ -715,7 +711,7 @@ td.empty-message-cell {
   justify-content: center;
   align-items: flex-start;
   padding-top: 12vh;
-  z-index: 1001;
+  z-index: var(--z-overlay);
   animation: fadeIn 0.15s ease-out;
 }
 
@@ -724,7 +720,7 @@ td.empty-message-cell {
   width: 90%;
   max-width: 540px;
   max-height: calc(88vh - 12vh);
-  border-radius: $radius-md;
+  border-radius: var(--radius-md);
   box-shadow:
     var(--shadow-xl),
     0 0 0 1px var(--border-color);
@@ -737,7 +733,7 @@ td.empty-message-cell {
   .cmd-search {
     display: flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: var(--space-5);
     padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--border-color);
 
@@ -754,7 +750,7 @@ td.empty-message-cell {
       font-size: var(--fs-h3);
       color: var(--text-color);
       outline: none;
-      padding: 0;
+      padding: var(--space-0);
 
       &::placeholder {
         color: var(--secondary-color);
@@ -767,7 +763,7 @@ td.empty-message-cell {
       color: var(--secondary-color);
       background: var(--hover-background);
       padding: 0.1rem 0.45rem;
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
       flex-shrink: 0;
     }
 
@@ -784,11 +780,11 @@ td.empty-message-cell {
       background: var(--hover-background);
       border: 1px solid var(--border-color);
       padding: 0.15rem 0.4rem;
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
       cursor: pointer;
       flex-shrink: 0;
       font-family: inherit;
-      transition: all 0.15s;
+      transition: all var(--motion-fast);
 
       &:hover {
         background: var(--card-background);
@@ -808,7 +804,7 @@ td.empty-message-cell {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.6rem;
+      gap: var(--space-4);
       padding: 2rem 1rem;
       color: var(--secondary-color);
       font-size: var(--fs-control);
@@ -823,10 +819,10 @@ td.empty-message-cell {
   .cmd-row {
     display: flex;
     align-items: center;
-    gap: 0.7rem;
+    gap: var(--space-5);
     padding: 0.55rem 1rem;
     cursor: pointer;
-    transition: background 0.1s;
+    transition: background var(--motion-fast);
 
     &:hover,
     &.active {
@@ -848,7 +844,7 @@ td.empty-message-cell {
       height: 30px;
       background: var(--primary-color-transparent);
       color: var(--primary-color);
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -870,7 +866,7 @@ td.empty-message-cell {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        transition: color 0.1s;
+        transition: color var(--motion-fast);
       }
 
       .cmd-row-desc {
@@ -888,7 +884,7 @@ td.empty-message-cell {
       text-transform: uppercase;
       letter-spacing: 0.02em;
       padding: 0.15rem 0.4rem;
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
       flex-shrink: 0;
 
       &.active {
@@ -907,7 +903,7 @@ td.empty-message-cell {
       font-size: var(--fs-micro);
       opacity: 0;
       flex-shrink: 0;
-      transition: opacity 0.1s;
+      transition: opacity var(--motion-fast);
     }
   }
 
@@ -915,7 +911,7 @@ td.empty-message-cell {
   .cmd-footer {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: var(--space-6);
     padding: 0.5rem 1rem;
     border-top: 1px solid var(--border-color);
     background: var(--hover-background);
@@ -934,7 +930,7 @@ td.empty-message-cell {
         background: var(--card-background);
         border: 1px solid var(--border-color);
         padding: 0.1rem 0.35rem;
-        border-radius: 3px;
+        border-radius: var(--radius-xs);
         min-width: 18px;
         text-align: center;
       }
@@ -957,15 +953,15 @@ td.empty-message-cell {
 ::ng-deep .action-menu-panel {
   &.p-overlaypanel {
     border: 1px solid var(--border-color);
-    border-radius: $radius-sm;
+    border-radius: var(--radius-sm);
     box-shadow:
       0 4px 12px var(--shadow-color),
       0 1px 3px var(--shadow-color);
     background: var(--card-background);
-    padding: 0;
+    padding: var(--space-0);
 
     .p-overlaypanel-content {
-      padding: 0;
+      padding: var(--space-0);
     }
 
     &::before,
@@ -981,12 +977,12 @@ td.empty-message-cell {
   .action-menu-item {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: var(--space-4);
     width: 100%;
     padding: 0.55rem 0.75rem;
     border: none;
     background: transparent;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     transition: background 0.12s ease;
     text-align: left;

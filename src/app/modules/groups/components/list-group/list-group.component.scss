@@ -1,13 +1,9 @@
 // Premium Design Variables - Using Global Theme
-$radius-lg: 16px;
-$radius-md: 12px;
-$radius-sm: 8px;
-
 :host {
   display: block;
   height: 100%;
   background-color: var(--background-color);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
 }
 
 .dataset-page-wrapper {
@@ -15,7 +11,7 @@ $radius-sm: 8px;
   flex-direction: column;
   height: 100%;
   width: 100%;
-  padding: 0;
+  padding: var(--space-0);
 
   .dataset-content-container {
     flex: 1;
@@ -25,7 +21,7 @@ $radius-sm: 8px;
     max-width: 100%;
     margin: 0 auto;
     width: 100%;
-    gap: 1.5rem;
+    gap: var(--space-8);
   }
 }
 
@@ -47,7 +43,7 @@ $radius-sm: 8px;
     .subtitle {
       font-size: var(--fs-h3);
       color: var(--text-color-secondary);
-      margin: 0;
+      margin: var(--space-0);
       font-weight: var(--fw-regular);
     }
   }
@@ -56,7 +52,7 @@ $radius-sm: 8px;
 // 2. Content Card & Toolbar
 .content-card {
   background: var(--card-background);
-  border-radius: $radius-lg;
+  border-radius: var(--radius-lg);
   box-shadow:
     0 4px 6px -1px var(--shadow-color),
     0 2px 4px -1px var(--shadow-color);
@@ -73,14 +69,14 @@ $radius-sm: 8px;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: var(--space-6);
     background: var(--card-background);
 
     .toolbar-left,
     .toolbar-right {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: var(--space-6);
     }
 
     // Search Input
@@ -91,13 +87,13 @@ $radius-sm: 8px;
       }
 
       .modern-search {
-        border-radius: $radius-sm;
+        border-radius: var(--radius-sm);
         border: 1px solid var(--border-color);
         padding: 0.65rem 1rem 0.65rem 2.5rem;
         width: 280px;
         font-size: var(--fs-body);
         background: var(--hover-background);
-        transition: all 0.2s;
+        transition: all var(--motion-base);
         color: var(--text-color);
 
         &:focus {
@@ -114,7 +110,7 @@ $radius-sm: 8px;
 
     // Modern Button
     .modern-button {
-      border-radius: 6px !important;
+      border-radius: var(--radius-sm) !important;
       font-weight: var(--fw-semibold);
       padding: 0.65rem 1.25rem;
 
@@ -123,7 +119,7 @@ $radius-sm: 8px;
         border: none !important;
         color: white !important;
         box-shadow: 0 4px 10px var(--primary-color-transparent);
-        transition: all 0.2s ease;
+        transition: all var(--motion-base) ease;
 
         &:hover {
           transform: translateY(-1px);
@@ -182,7 +178,7 @@ $radius-sm: 8px;
         .th-content {
           display: flex;
           align-items: center;
-          gap: 0.4rem;
+          gap: var(--space-3);
           line-height: 1;
 
           &.actions-th {
@@ -205,7 +201,7 @@ $radius-sm: 8px;
         &.sortable-th {
           cursor: pointer;
           user-select: none;
-          transition: background-color 0.15s ease, color 0.15s ease;
+          transition: background-color var(--motion-fast) ease, color var(--motion-fast) ease;
 
           &:hover {
             background: var(--border-color);
@@ -232,13 +228,13 @@ $radius-sm: 8px;
           .sort-indicator {
             display: inline-flex;
             align-items: center;
-            gap: 0.25rem;
+            gap: var(--space-2);
             margin-left: 0.35rem;
 
             .pi {
               font-size: var(--fs-label);
               color: var(--secondary-color);
-              transition: color 0.15s ease;
+              transition: color var(--motion-fast) ease;
             }
 
             .sort-badge {
@@ -248,7 +244,7 @@ $radius-sm: 8px;
               min-width: 1rem;
               height: 1rem;
               padding: 0 0.25rem;
-              border-radius: 999px;
+              border-radius: var(--radius-pill);
               background: var(--primary-color);
               color: var(--primary-text);
               font-size: var(--fs-micro);
@@ -280,7 +276,7 @@ $radius-sm: 8px;
           width: 100%;
 
           .form-field {
-            gap: 0;
+            gap: var(--space-0);
           }
 
           .p-dropdown,
@@ -294,7 +290,7 @@ $radius-sm: 8px;
       // Body Rows
       .p-datatable-tbody > tr {
         background: var(--card-background);
-        transition: background-color 0.15s ease, box-shadow 0.15s ease;
+        transition: background-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease;
         border-bottom: 1px solid var(--border-color);
         position: relative;
 
@@ -349,7 +345,7 @@ $radius-sm: 8px;
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 100%;
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
         padding: 2px 0;
 
         &:hover {
@@ -389,7 +385,7 @@ $radius-sm: 8px;
         background-color: var(--hover-background);
         color: var(--secondary-color);
         padding: 2px 8px;
-        border-radius: 99px;
+        border-radius: var(--radius-pill);
         font-size: var(--fs-control);
         display: inline-block;
         max-width: 100%;
@@ -402,9 +398,9 @@ $radius-sm: 8px;
       .status-pill {
         display: inline-flex;
         align-items: center;
-        gap: 0.45rem;
+        gap: var(--space-3);
         padding: 0.25rem 0.65rem;
-        border-radius: 999px;
+        border-radius: var(--radius-pill);
         font-size: var(--fs-control);
         font-weight: var(--fw-semibold);
         line-height: 1.2;
@@ -441,8 +437,8 @@ $radius-sm: 8px;
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        gap: 0.5rem;
-        transition: opacity 0.2s;
+        gap: var(--space-4);
+        transition: opacity var(--motion-base);
 
         .icon-btn {
           width: 32px;
@@ -452,10 +448,10 @@ $radius-sm: 8px;
           justify-content: center;
           border: 1px solid transparent;
           background: transparent;
-          border-radius: 6px;
+          border-radius: var(--radius-sm);
           color: var(--secondary-color);
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all var(--motion-base);
 
           &:hover {
             background: var(--hover-background);
@@ -495,7 +491,7 @@ $radius-sm: 8px;
         border-top: 1px solid var(--border-color);
         justify-content: flex-end;
         padding: 0.85rem 1.5rem;
-        gap: 0.25rem;
+        gap: var(--space-2);
 
         .p-paginator-current {
           color: var(--secondary-color);
@@ -509,13 +505,13 @@ $radius-sm: 8px;
         .p-paginator-prev,
         .p-paginator-first,
         .p-paginator-last {
-          border-radius: 6px;
+          border-radius: var(--radius-sm);
           color: var(--secondary-color);
           min-width: 2.25rem;
           height: 2.25rem;
           margin: 0 0.125rem;
           font-weight: var(--fw-medium);
-          transition: background-color 0.15s ease, color 0.15s ease;
+          transition: background-color var(--motion-fast) ease, color var(--motion-fast) ease;
 
           &:hover {
             background: var(--hover-background);
@@ -535,7 +531,7 @@ $radius-sm: 8px;
 
         .p-dropdown {
           height: 2.25rem;
-          border-radius: 6px;
+          border-radius: var(--radius-sm);
         }
       }
     }
@@ -558,7 +554,7 @@ td.empty-message-cell {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.65rem;
+    gap: var(--space-5);
     max-width: 28rem;
     margin: 0 auto;
 
@@ -605,7 +601,7 @@ td.empty-message-cell {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-overlay);
   animation: fadeIn 0.2s ease-out;
 
   @keyframes fadeIn {
@@ -619,8 +615,8 @@ td.empty-message-cell {
 
   .popup-content {
     background: var(--card-background);
-    padding: 2rem;
-    border-radius: $radius-lg;
+    padding: var(--space-9);
+    border-radius: var(--radius-lg);
     box-shadow:
       var(--shadow-xl),
       0 0 0 1px var(--border-color);
@@ -647,7 +643,7 @@ td.empty-message-cell {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1rem;
+      gap: var(--space-6);
 
       .popup-icon {
         width: 48px;
@@ -662,7 +658,7 @@ td.empty-message-cell {
       }
 
       h3 {
-        margin: 0;
+        margin: var(--space-0);
         font-size: var(--fs-h1);
         font-weight: var(--fw-semibold);
         color: var(--text-color);
@@ -676,12 +672,12 @@ td.empty-message-cell {
       .info-badge {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: var(--space-4);
         background: var(--hover-background);
         color: var(--primary-color);
         border: 1px solid var(--border-color);
         padding: 8px 14px;
-        border-radius: 20px;
+        border-radius: var(--radius-2xl);
         font-size: var(--fs-control);
         font-weight: var(--fw-semibold);
         margin-bottom: 1rem;
@@ -702,14 +698,14 @@ td.empty-message-cell {
       .delete-info-list {
         list-style: none;
         padding: 0.75rem 1rem;
-        margin: 0;
+        margin: var(--space-0);
         background: var(--hover-background);
-        border-radius: $radius-sm;
+        border-radius: var(--radius-sm);
 
         li {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: var(--space-5);
           padding: 0.5rem 0;
           color: var(--secondary-color);
           font-size: var(--fs-control);
@@ -747,13 +743,13 @@ td.empty-message-cell {
           width: 100%;
           padding: 0.65rem 0.75rem;
           border: 1px solid var(--border-color);
-          border-radius: $radius-sm;
+          border-radius: var(--radius-sm);
           background: var(--card-background);
           color: var(--text-color);
           font-size: var(--fs-control);
           font-family: inherit;
           resize: vertical;
-          transition: border-color 0.2s;
+          transition: border-color var(--motion-base);
 
           &::placeholder {
             color: var(--secondary-color);
@@ -780,20 +776,20 @@ td.empty-message-cell {
 
     .popup-actions {
       display: flex;
-      gap: 0.75rem;
+      gap: var(--space-5);
       justify-content: center;
 
       button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: var(--space-3);
         padding: 0.75rem 1.5rem;
-        border-radius: $radius-md;
+        border-radius: var(--radius-md);
         border: none;
         font-weight: var(--fw-semibold);
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all var(--motion-base) ease;
         font-size: var(--fs-body);
 
         i {

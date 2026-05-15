@@ -1,12 +1,8 @@
 // Premium Design Variables - Using Global Theme
-$radius-lg: 16px;
-$radius-md: 12px;
-$radius-sm: 8px;
-
 .view-admin-wrapper {
   background-color: var(--card-background);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px var(--shadow-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -17,7 +13,7 @@ $radius-sm: 8px;
     flex-direction: column;
 
     .page-header {
-      padding: 20px;
+      padding: var(--space-7);
       border-bottom: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
@@ -26,15 +22,15 @@ $radius-sm: 8px;
       border-radius: 8px 8px 0 0;
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: var(--z-elevated);
 
       .left-section {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: var(--space-5);
 
         h2 {
-          margin: 0;
+          margin: var(--space-0);
           color: var(--text-color);
         }
 
@@ -42,7 +38,7 @@ $radius-sm: 8px;
           min-width: 0rem;
 
           &.back-button {
-            padding: 0 !important;
+            padding: var(--space-0) !important;
             width: 36px;
             height: 36px;
             border-radius: 50% !important;
@@ -52,7 +48,7 @@ $radius-sm: 8px;
             background: transparent !important;
             color: var(--text-color) !important;
             border: none !important;
-            transition: all 0.2s ease;
+            transition: all var(--motion-base) ease;
 
             &:hover {
               background: var(--hover-background) !important;
@@ -67,18 +63,18 @@ $radius-sm: 8px;
 
       .header-actions {
         display: flex;
-        gap: 12px;
+        gap: var(--space-5);
 
         button {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
+          gap: var(--space-4);
           padding: 0.6rem 1.25rem;
-          border-radius: 6px;
+          border-radius: var(--radius-sm);
           font-weight: var(--fw-semibold);
           font-size: var(--fs-body);
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all var(--motion-base) ease;
           border: none;
         }
 
@@ -130,7 +126,7 @@ $radius-sm: 8px;
     }
 
     .profile-container {
-      padding: 30px;
+      padding: var(--space-9);
       overflow-y: auto;
       flex: 1;
       height: calc(100% - 80px); // Subtract header height
@@ -141,12 +137,12 @@ $radius-sm: 8px;
 
       &::-webkit-scrollbar-track {
         background: var(--card-background);
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
       }
 
       &::-webkit-scrollbar-thumb {
         background: var(--border-color);
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
 
         &:hover {
           background: var(--secondary-color);
@@ -156,14 +152,14 @@ $radius-sm: 8px;
       .details-grid {
         display: flex;
         flex-direction: column;
-        gap: 40px;
+        gap: var(--space-10);
         height: 100%;
 
         .first-row,
         .second-row {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
-          gap: 30px;
+          gap: var(--space-9);
         }
       }
 
@@ -172,7 +168,7 @@ $radius-sm: 8px;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 20px;
+        padding: var(--space-7);
 
         .avatar-circle {
           width: 120px;
@@ -195,15 +191,15 @@ $radius-sm: 8px;
 
         .admin-username {
           color: var(--secondary-color);
-          margin: 0;
+          margin: var(--space-0);
           text-align: center;
         }
       }
 
       .detail-group {
         background: var(--card-background);
-        padding: 20px;
-        border-radius: 8px;
+        padding: var(--space-7);
+        border-radius: var(--radius-md);
         height: fit-content;
 
         h4 {
@@ -223,7 +219,7 @@ $radius-sm: 8px;
           .label {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--space-4);
             color: var(--secondary-color);
             margin-bottom: 5px;
 
@@ -242,7 +238,7 @@ $radius-sm: 8px;
             .status-badge {
               display: inline-block;
               padding: 0.3rem 0.6rem;
-              border-radius: 4px;
+              border-radius: var(--radius-xs);
               font-size: var(--fs-body);
               font-weight: var(--fw-medium);
               background-color: var(--error-color);
@@ -267,17 +263,17 @@ $radius-sm: 8px;
             .btn-unlock-inline {
               display: inline-flex;
               align-items: center;
-              gap: 4px;
+              gap: var(--space-2);
               margin-left: 8px;
               padding: 4px 10px;
-              border-radius: 4px;
+              border-radius: var(--radius-xs);
               border: 1px solid var(--warning-bg);
               background: var(--warning-bg);
               color: var(--warning-color);
               font-size: var(--fs-control);
               font-weight: var(--fw-semibold);
               cursor: pointer;
-              transition: all 0.2s;
+              transition: all var(--motion-base);
 
               &:hover {
                 background: var(--warning-bg);
@@ -299,7 +295,7 @@ $radius-sm: 8px;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: var(--space-7);
 
     .avatar-circle {
       width: 120px;
@@ -321,15 +317,15 @@ $radius-sm: 8px;
 
     .admin-username {
       color: var(--secondary-color);
-      margin: 0;
+      margin: var(--space-0);
       text-align: center;
     }
   }
 
   .detail-group {
     background: var(--secondary-background);
-    padding: 20px;
-    border-radius: 8px;
+    padding: var(--space-7);
+    border-radius: var(--radius-md);
 
     h4 {
       color: var(--text-color);
@@ -348,7 +344,7 @@ $radius-sm: 8px;
       .label {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: var(--space-4);
         color: var(--secondary-color);
         margin-bottom: 5px;
 
@@ -366,7 +362,7 @@ $radius-sm: 8px;
         .status-badge {
           display: inline-block;
           padding: 0.3rem 0.6rem;
-          border-radius: 4px;
+          border-radius: var(--radius-xs);
           font-size: var(--fs-body);
           font-weight: var(--fw-medium);
           background-color: var(--error-color);
@@ -411,7 +407,7 @@ $radius-sm: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-overlay);
   animation: fadeIn 0.2s ease-out;
 
   @keyframes fadeIn {
@@ -425,8 +421,8 @@ $radius-sm: 8px;
 
   .popup-content {
     background: var(--card-background);
-    padding: 2rem;
-    border-radius: $radius-lg;
+    padding: var(--space-9);
+    border-radius: var(--radius-lg);
     box-shadow:
       var(--shadow-xl),
       0 0 0 1px var(--border-color);
@@ -466,7 +462,7 @@ $radius-sm: 8px;
       }
 
       h3 {
-        margin: 0;
+        margin: var(--space-0);
         color: var(--text-color);
         font-size: var(--fs-h1);
         font-weight: var(--fw-semibold);
@@ -488,14 +484,14 @@ $radius-sm: 8px;
       .delete-info-list {
         list-style: none;
         padding: 0.75rem 1rem;
-        margin: 0;
+        margin: var(--space-0);
         background: var(--hover-background);
-        border-radius: $radius-sm;
+        border-radius: var(--radius-sm);
 
         li {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: var(--space-5);
           padding: 0.5rem 0;
           color: var(--secondary-color);
           font-size: var(--fs-control);
@@ -533,13 +529,13 @@ $radius-sm: 8px;
           width: 100%;
           padding: 0.65rem 0.75rem;
           border: 1px solid var(--border-color);
-          border-radius: $radius-sm;
+          border-radius: var(--radius-sm);
           background: var(--card-background);
           color: var(--text-color);
           font-size: var(--fs-control);
           font-family: inherit;
           resize: vertical;
-          transition: border-color 0.2s;
+          transition: border-color var(--motion-base);
 
           &::placeholder {
             color: var(--secondary-color);
@@ -566,20 +562,20 @@ $radius-sm: 8px;
 
     .popup-actions {
       display: flex;
-      gap: 0.75rem;
+      gap: var(--space-5);
       justify-content: center;
 
       button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: var(--space-3);
         padding: 0.75rem 1.5rem;
-        border-radius: $radius-md;
+        border-radius: var(--radius-md);
         border: none;
         font-weight: var(--fw-semibold);
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all var(--motion-base) ease;
         font-size: var(--fs-body);
 
         i {
