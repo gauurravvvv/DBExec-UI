@@ -40,6 +40,8 @@ export const USER = {
   DELETE: '/user/delete/',
   BULK_DELETE: '/user/delete/bulk/',
   ADD: '/user/add',
+  BULK_ADD_VALIDATE: '/user/bulk-add/validate',
+  BULK_ADD_COMMIT: '/user/bulk-add/commit',
   VIEW: '/user/get/',
   UPDATE: '/user/update',
   UPDATE_PASSWORD: '/user/update/password',

@@ -14,7 +14,7 @@ import { MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { ANALYSES, DATASET } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -545,11 +545,14 @@ export class ListDatasetComponent implements OnInit {
     if (!this.selectedOrg || !this.selectedDatasource) return;
 
     this.loadingQueryBuilders = true;
+    // Command-palette popup: search is debounced + server-side, so the user
+    // narrows results by typing. Capped to 50 per page; if there are more,
+    // they can refine the query rather than scroll a huge list.
     const params: any = {
       orgId: this.selectedOrg,
       datasourceId: this.selectedDatasource,
       page: 1,
-      limit: MAX_LIMIT,
+      limit: 50,
     };
 
     const term = this.qbSearchTerm.trim();

@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ConnectionService } from 'src/app/modules/connection/services/connection.service';
@@ -38,6 +38,8 @@ export class GrantAccessComponent implements OnInit {
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
   connections: any[] = [];
+  preloadedConnections: any[] | null = null;
+  preloadedConnectionsTotal: number | null = null;
   groups: any[] = [];
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
@@ -73,7 +75,10 @@ export class GrantAccessComponent implements OnInit {
     const organisationId = this.globalService.getTokenDetails('organisationId');
 
     this.accessForm = this.fb.group({
-      organisation: [isSystemAdmin ? null : organisationId, Validators.required],
+      organisation: [
+        isSystemAdmin ? null : organisationId,
+        Validators.required,
+      ],
       datasource: [null, Validators.required],
       connection: [null, Validators.required],
       users: [[]],
@@ -111,8 +116,7 @@ export class GrantAccessComponent implements OnInit {
     const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
-      const res: any =
-        await this.organisationService.listOrganisation(params);
+      const res: any = await this.organisationService.listOrganisation(params);
       if (this.globalService.handleSuccessService(res, false)) {
         return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
       }
@@ -151,18 +155,26 @@ export class GrantAccessComponent implements OnInit {
     const orgId = this.accessForm.get('organisation')?.value;
     const datasourceId = this.accessForm.get('datasource')?.value;
     if (!orgId || !datasourceId) return;
+    // Connection dropdown is datasource-scoped — clear preload so it re-fetches
+    // under the newly selected scope on next open.
+    this.preloadedConnections = null;
+    this.preloadedConnectionsTotal = null;
     const params = {
       orgId,
       datasourceId,
       page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
+      limit: 10,
     };
 
     this.connectionService
       .listConnection(params)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.connections = [...(response.data.connections || [])];
+          const items = response?.data?.connections ?? [];
+          this.connections = items;
+          this.preloadedConnections = items;
+          this.preloadedConnectionsTotal =
+            response?.data?.count ?? items.length;
         } else {
           this.connections = [];
         }
@@ -173,6 +185,38 @@ export class GrantAccessComponent implements OnInit {
         this.cdr.markForCheck();
       });
   }
+
+  /**
+   * Fetcher for the server-mode connection dropdown. Connections are
+   * datasource-scoped, so gated on org + datasource.
+   */
+  loadConnectionsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const orgId = this.accessForm.get('organisation')?.value;
+    const datasourceId = this.accessForm.get('datasource')?.value;
+    if (!orgId || !datasourceId) return { items: [], total: 0 };
+    const params: any = { orgId, datasourceId, page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.connectionService.listConnection(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return {
+          items: res?.data?.connections ?? [],
+          total: res?.data?.count ?? 0,
+        };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
 
   loadDatasources() {
     const orgId = this.accessForm.get('organisation')?.value;
@@ -194,7 +238,8 @@ export class GrantAccessComponent implements OnInit {
         if (this.globalService.handleSuccessService(response, false)) {
           const items = response?.data?.datasources ?? [];
           this.preloadedDatasources = items;
-          this.preloadedDatasourcesTotal = response?.data?.count ?? items.length;
+          this.preloadedDatasourcesTotal =
+            response?.data?.count ?? items.length;
           this.datasources = [...items];
         } else {
           this.datasources = [];
@@ -248,7 +293,10 @@ export class GrantAccessComponent implements OnInit {
           this.onCancel();
         }
       } catch (error) {
-        console.error(this.translate.instant('ACCESS.ERROR_GRANTING_ACCESS'), error);
+        console.error(
+          this.translate.instant('ACCESS.ERROR_GRANTING_ACCESS'),
+          error,
+        );
       }
     }
   }
@@ -258,7 +306,6 @@ export class GrantAccessComponent implements OnInit {
 
     const role = this.globalService.getTokenDetails('role');
     const isSystemAdmin = role === ROLES.SYSTEM_ADMIN;
-    const isOrgAdmin = role === ROLES.ORG_ADMIN;
     const organisationId = this.globalService.getTokenDetails('organisationId');
 
     // Reset the form
@@ -282,10 +329,12 @@ export class GrantAccessComponent implements OnInit {
       this.preloadedDatasources = null;
       this.preloadedDatasourcesTotal = null;
       this.connections = [];
+      this.preloadedConnections = null;
+      this.preloadedConnectionsTotal = null;
       this.groups = [];
       this.users = [];
       // Keep organisations array intact (don't clear it)
-    } else if (isOrgAdmin) {
+    } else {
       // For ORG_ADMIN: Set organisation from token, clear datasources and connections
       this.accessForm.patchValue(
         {
@@ -303,6 +352,8 @@ export class GrantAccessComponent implements OnInit {
       this.preloadedDatasources = null;
       this.preloadedDatasourcesTotal = null;
       this.connections = [];
+      this.preloadedConnections = null;
+      this.preloadedConnectionsTotal = null;
       this.groups = [];
       this.users = [];
     }

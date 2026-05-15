@@ -9,7 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DEFAULT_PAGE } from 'src/app/constants';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { PROMPT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -49,8 +49,6 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
   tabs: any[] = [];
   preloadedTabs: any[] | null = null;
   preloadedTabsTotal: number | null = null;
-  preloadedSections: any[] | null = null;
-  preloadedSectionsTotal: number | null = null;
   hasDuplicates: boolean = false;
   duplicateRows: { [key: string]: Array<[number, number]> } = {};
   isNewlyAdded: boolean = false;
@@ -426,8 +424,6 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
     this.preloadedTabs = null;
     this.preloadedTabsTotal = null;
     this.sections = [];
-    this.preloadedSections = null;
-    this.preloadedSectionsTotal = null;
     this.hasDuplicates = false;
     this.duplicateRows = {};
 
@@ -450,12 +446,10 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
     this.selectedTab = null;
     this.preloadedDatasources = null;
     this.preloadedDatasourcesTotal = null;
-    // Tabs/sections depend on org+datasource — clear stale preloads so the
-    // dropdowns re-fetch under the new org scope on next open.
+    // Tab dropdown depends on org+datasource — clear stale preload so it
+    // re-fetches under the new org scope on next open.
     this.preloadedTabs = null;
     this.preloadedTabsTotal = null;
-    this.preloadedSections = null;
-    this.preloadedSectionsTotal = null;
 
     const datasourceControl = this.sectionForm.get('datasource');
     const tabControl = this.sectionForm.get('tab');
@@ -537,8 +531,6 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
       // re-fetches against the new datasource on next open.
       this.preloadedTabs = null;
       this.preloadedTabsTotal = null;
-      this.preloadedSections = null;
-      this.preloadedSectionsTotal = null;
 
       this.clearAllSectionGroups();
       this.loadTabs();
@@ -550,9 +542,6 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
       this.selectedTab = {
         id: event.value,
       };
-      // Sections are scoped to tab — drop stale preload.
-      this.preloadedSections = null;
-      this.preloadedSectionsTotal = null;
       this.clearAllSectionGroups();
       this.loadSections();
     }
@@ -621,48 +610,6 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
       });
   }
 
-  /**
-   * Fetcher for the server-mode section dropdown. Sections are tab-scoped, so
-   * gated on org + datasource + tab.
-   */
-  loadSectionsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    if (
-      !this.selectedOrg?.id ||
-      !this.selectedDatasource?.id ||
-      !this.selectedTab?.id
-    ) {
-      return { items: [], total: 0 };
-    }
-    const params: any = {
-      orgId: this.selectedOrg.id,
-      datasourceId: this.selectedDatasource.id,
-      tabId: this.selectedTab.id,
-      page,
-      limit,
-    };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.sectionService.listSection(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return {
-          items: res?.data?.sections ?? [],
-          total: res?.data?.count ?? 0,
-        };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
   loadSections() {
     // Fix #3: Add null check to prevent crash
     if (!this.selectedOrg || !this.selectedDatasource || !this.selectedTab) {
@@ -670,21 +617,22 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
       return;
     }
 
+    // Section dropdowns inside the FormArray rely on cross-row dedup via
+    // getAvailableSections(), which needs the full list in memory. Server-mode
+    // pagination would hide rows the dedup needs to consider, so this loader
+    // stays on MAX_LIMIT and the dropdown stays client-side.
     const params = {
       orgId: this.selectedOrg.id,
       datasourceId: this.selectedDatasource.id,
       tabId: this.selectedTab.id,
       page: DEFAULT_PAGE,
-      limit: 10,
+      limit: MAX_LIMIT,
     };
     this.sectionService
       .listSection(params)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          const items = response?.data?.sections ?? [];
-          this.sections = items;
-          this.preloadedSections = items;
-          this.preloadedSectionsTotal = response?.data?.count ?? items.length;
+          this.sections = [...response.data.sections];
           if (this.sectionGroups.length === 0) {
             this.addSectionGroup();
           }

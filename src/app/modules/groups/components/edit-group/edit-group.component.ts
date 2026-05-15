@@ -9,7 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { GROUP } from 'src/app/constants/routes';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
@@ -29,6 +29,8 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
 
   groupForm!: FormGroup;
   users: any[] = [];
+  preloadedUsers: any[] | null = null;
+  preloadedUsersTotal: number | null = null;
   isFormDirty = false;
   showSaveConfirm = false;
   saveJustification = '';
@@ -104,7 +106,7 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
     this.loadUsers({
       orgId: groupData.organisationId,
       page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
+      limit: 10,
     });
 
     const userIds = (groupData.userGroups || []).map(
@@ -135,12 +137,60 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
     this.cdr.markForCheck();
   }
 
+  /**
+   * Fetcher for server-mode users multiselect. The orgId is locked to the
+   * group's org for the lifetime of an edit (group cannot be reassigned to a
+   * different org), so we read it from this.orgId directly.
+   */
+  loadUsersPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const orgId = this.orgId;
+    if (!orgId) return { items: [], total: 0 };
+    const params: any = { orgId, page, limit };
+    if (search) params.filter = JSON.stringify({ username: search });
+    try {
+      const res: any = await this.userService.listUser(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        const users = (res?.data?.users || []).filter(
+          (u: any) => u.status === 1,
+        );
+        return { items: users, total: res?.data?.count ?? users.length };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
+  /**
+   * Single-user resolver for stored userIds that aren't in the dropdown's
+   * first page. Called once per missing ID by app-custom-multiselect.
+   */
+  resolveSelectedUser = async (id: string): Promise<any> => {
+    if (!this.orgId) return null;
+    try {
+      const res: any = await this.userService.viewOrgUser(this.orgId, id);
+      return res?.data ?? null;
+    } catch {
+      return null;
+    }
+  };
+
   loadUsers(params: any): void {
     this.userService.listUser(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.users = (response.data.users || []).filter(
-          (u: any) => u.status === 1,
-        );
+        const all = response?.data?.users || [];
+        const active = all.filter((u: any) => u.status === 1);
+        this.users = active;
+        this.preloadedUsers = active;
+        this.preloadedUsersTotal = response?.data?.count ?? active.length;
       }
       this.cdr.markForCheck();
     });

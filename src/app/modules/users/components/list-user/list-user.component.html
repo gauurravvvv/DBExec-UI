@@ -54,6 +54,15 @@
             class="p-button-outlined p-button-danger modern-button mr-2"
           ></button>
 
+          <!-- Bulk Add Button — routes to the bulk-add page -->
+          <button
+            pButton
+            [label]="'USER.BULK_ADD_BTN' | translate"
+            icon="pi pi-upload"
+            (click)="onOpenBulkAdd()"
+            class="p-button-outlined modern-button mr-2"
+          ></button>
+
           <!-- Add Button -->
           <button
             pButton
@@ -525,3 +534,4 @@
     </div>
   </div>
 </div>
+

@@ -120,7 +120,12 @@
           <label>{{ 'USER.GROUPS' | translate }} <span class="required">*</span></label>
           <app-custom-multiselect
             formControlName="groupIds"
-            [options]="groups"
+            [serverMode]="true"
+            [fetcher]="loadGroupsPage"
+            [resolveSelected]="resolveSelectedGroup"
+            [pageSize]="10"
+            [preloadedItems]="preloadedGroups"
+            [preloadedTotal]="preloadedGroupsTotal"
             optionLabel="name"
             optionValue="id"
             [placeholder]="'USER.SELECT_GROUPS' | translate"

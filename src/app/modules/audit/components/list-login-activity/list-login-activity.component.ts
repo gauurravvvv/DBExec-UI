@@ -10,7 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants/global';
+import { DEFAULT_PAGE } from 'src/app/constants/global';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
@@ -41,6 +41,8 @@ export class ListLoginActivityComponent implements OnInit {
   isSystemAdmin = false;
   organisations: any[] = [];
   organisationOptions: any[] = [];
+  preloadedOrgs: any[] | null = null;
+  preloadedOrgsTotal: number | null = null;
   today = new Date();
 
   filterValues: any = {
@@ -87,18 +89,52 @@ export class ListLoginActivityComponent implements OnInit {
       });
   }
 
+  /**
+   * Fetcher for the server-mode organisation filter dropdown. Filters out the
+   * default-internal org so it never shows up in the activity filter.
+   */
+  loadOrgsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any =
+        await this.organisationService.listOrganisation(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        const all = res?.data?.orgs ?? [];
+        const items = all.filter((org: any) => org.isDefault !== 1);
+        return { items, total: res?.data?.count ?? items.length };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadOrganisations() {
     this.organisationService
-      .listOrganisation({ page: DEFAULT_PAGE, limit: MAX_LIMIT })
+      .listOrganisation({ page: DEFAULT_PAGE, limit: 10 })
       .then((res: any) => {
         if (this.globalService.handleSuccessService(res, false)) {
-          this.organisations = res.data.orgs || [];
-          this.organisationOptions = this.organisations
-            .filter((org: any) => org.isDefault !== 1)
-            .map((org: any) => ({
-              label: org.name,
-              value: org.id,
-            }));
+          this.organisations = res?.data?.orgs ?? [];
+          const items = this.organisations.filter(
+            (org: any) => org.isDefault !== 1,
+          );
+          this.preloadedOrgs = items;
+          this.preloadedOrgsTotal = res?.data?.count ?? items.length;
+          // Legacy label/value list kept for any callers (e.g. exportActivity
+          // resolves the selected org's display name from this list).
+          this.organisationOptions = items.map((org: any) => ({
+            label: org.name,
+            value: org.id,
+          }));
         }
       })
       .catch(() => {});

@@ -90,13 +90,18 @@
         >
         </app-custom-input>
 
-        <!-- Tab dropdown -->
+        <!-- Tab dropdown — server-driven -->
         <div class="form-field">
           <app-custom-dropdown
             formControlName="tab"
             [label]="'COMMON.TAB' | translate"
             [placeholder]="'COMMON.SELECT_TAB' | translate"
-            [options]="tabs"
+            [serverMode]="true"
+            [fetcher]="loadTabsPage"
+            [pageSize]="10"
+            [preloadedItems]="preloadedTabs"
+            [preloadedTotal]="preloadedTabsTotal"
+            [resolveSelected]="resolveSelectedTab"
             optionLabel="name"
             optionValue="id"
             [filter]="true"

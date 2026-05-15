@@ -10,7 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { SECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -41,6 +41,8 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
   selectedDatasourceName: string = '';
   sectionData: any;
   tabs: any[] = [];
+  preloadedTabs: any[] | null = null;
+  preloadedTabsTotal: number | null = null;
   isCancelClicked = false;
   showSaveConfirm = false;
   saveJustification = '';
@@ -136,19 +138,70 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
       });
   }
 
+  /**
+   * Fetcher for the server-mode tab dropdown. Tabs are datasource-scoped, and
+   * here both org + datasource are fixed by the section being edited.
+   */
+  loadTabsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    if (!this.sectionData?.organisationId || !this.sectionData?.datasourceId) {
+      return { items: [], total: 0 };
+    }
+    const params: any = {
+      orgId: this.sectionData.organisationId,
+      datasourceId: this.sectionData.datasourceId,
+      page,
+      limit,
+    };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.tabService.listTab(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return { items: res?.data?.tabs ?? [], total: res?.data?.count ?? 0 };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
+  /**
+   * Resolves the section's currently-stored tabId so the dropdown can render
+   * the label even when that tab isn't in the visible page.
+   */
+  resolveSelectedTab = async (id: string): Promise<any> => {
+    try {
+      const orgId = this.sectionData?.organisationId || this.orgId;
+      const res: any = await this.tabService.viewTab(orgId, id);
+      return res?.data ?? null;
+    } catch {
+      return null;
+    }
+  };
+
   loadTabData() {
     if (!this.sectionData) return;
     const param = {
       orgId: this.sectionData.organisationId,
       datasourceId: this.sectionData.datasourceId,
       page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
+      limit: 10,
     };
     this.tabService
       .listTab(param)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.tabs = [...(response.data.tabs ?? response.data ?? [])];
+          const items = response?.data?.tabs ?? response?.data ?? [];
+          this.tabs = items;
+          this.preloadedTabs = items;
+          this.preloadedTabsTotal = response?.data?.count ?? items.length;
         }
         this.cdr.markForCheck();
       })

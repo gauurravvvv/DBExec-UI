@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { USER } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -30,6 +30,8 @@ export class AddUserComponent implements OnInit, HasUnsavedChanges {
   preloadedOrgs: any[] | null = null;
   preloadedOrgsTotal: number | null = null;
   groups: any[] = [];
+  preloadedGroups: any[] | null = null;
+  preloadedGroupsTotal: number | null = null;
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
 
@@ -150,15 +152,51 @@ export class AddUserComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
+  /**
+   * Fetcher for the server-mode group multiselect. Gates on the currently
+   * selected org in the form (group list is org-scoped).
+   */
+  loadGroupsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const orgId =
+      this.userForm?.get('organisation')?.value ||
+      this.globalService.getTokenDetails('organisationId');
+    if (!orgId) return { items: [], total: 0 };
+    const params: any = { orgId, page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.groupService.listGroups(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        const groups = (res?.data?.groups || []).filter(
+          (g: any) => g.status === 1,
+        );
+        return { items: groups, total: res?.data?.count ?? groups.length };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadGroups(orgId: string) {
     if (!orgId) return;
     this.groupService
-      .listGroups({ orgId, page: DEFAULT_PAGE, limit: MAX_LIMIT })
+      .listGroups({ orgId, page: DEFAULT_PAGE, limit: 10 })
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.groups = (response.data.groups || []).filter(
-            (g: any) => g.status === 1,
-          );
+          const all = response?.data?.groups || [];
+          const active = all.filter((g: any) => g.status === 1);
+          this.groups = active;
+          this.preloadedGroups = active;
+          this.preloadedGroupsTotal =
+            response?.data?.count ?? active.length;
         }
         this.cdr.markForCheck();
       });
@@ -166,6 +204,8 @@ export class AddUserComponent implements OnInit, HasUnsavedChanges {
 
   onOrganisationChange(orgId: string) {
     this.groups = [];
+    this.preloadedGroups = null;
+    this.preloadedGroupsTotal = null;
     this.userForm.patchValue({ groupIds: [] });
     if (orgId) {
       this.loadGroups(orgId);

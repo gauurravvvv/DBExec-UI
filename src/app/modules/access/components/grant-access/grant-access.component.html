@@ -83,12 +83,16 @@
         >
         </app-custom-dropdown>
 
-        <!-- Connection Dropdown -->
+        <!-- Connection Dropdown — server-driven -->
         <app-custom-dropdown
           formControlName="connection"
           [label]="'COMMON.CONNECTION' | translate"
           [placeholder]="'ACCESS.SELECT_CONNECTION' | translate"
-          [options]="connections"
+          [serverMode]="true"
+          [fetcher]="loadConnectionsPage"
+          [pageSize]="10"
+          [preloadedItems]="preloadedConnections"
+          [preloadedTotal]="preloadedConnectionsTotal"
           optionLabel="name"
           optionValue="id"
           [filter]="true"
