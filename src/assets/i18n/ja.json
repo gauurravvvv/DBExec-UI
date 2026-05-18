@@ -1157,7 +1157,8 @@
     "FORGOT_PASSWORD": "パスワードを忘れた",
     "RESET_PASSWORD": "パスワードのリセット",
     "SET_PASSWORD": "パスワード設定",
-    "CLI_AUTH": "CLI認証"
+    "CLI_AUTH": "CLI認証",
+    "NOT_FOUND": "ページが見つかりません"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "データソース管理体験を\n向上させましょう",

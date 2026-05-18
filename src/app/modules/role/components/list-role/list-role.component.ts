@@ -228,7 +228,7 @@ export class ListRoleComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([ROLE.EDIT, this.selectedOrgId, id]);
+    this.router.navigate([ROLE.edit(this.selectedOrgId, id)]);
   }
 
   confirmDelete(id: string) {

@@ -5,17 +5,18 @@ import { EditAnalysesComponent } from './components/edit-analyses/edit-analyses.
 import { ListAnalysesComponent } from './components/list-analyses/list-analyses.component';
 import { ViewAnalysesComponent } from './components/view-analyses/view-analyses.component';
 
+// REST-shaped routes:
+//   ''                 -> list
+//   ':orgId/:id'       -> detail (view)
+//   ':orgId/:id/edit'  -> edit
 const routes: Routes = [
+  { path: '', component: ListAnalysesComponent },
+  { path: ':orgId/:id', component: ViewAnalysesComponent },
   {
-    path: '',
-    component: ListAnalysesComponent,
-  },
-  {
-    path: 'edit/:orgId/:id',
+    path: ':orgId/:id/edit',
     component: EditAnalysesComponent,
     canDeactivate: [unsavedChangesGuard],
   },
-  { path: 'view/:orgId/:id', component: ViewAnalysesComponent },
 ];
 
 @NgModule({

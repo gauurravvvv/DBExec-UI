@@ -30,7 +30,7 @@ const routes: Routes = [
         data: { title: 'PAGE_TITLES.HOME' },
       },
       {
-        path: 'system-admin',
+        path: 'admins',
         loadChildren: () =>
           import('./modules/system-admin/system-admin.module').then(
             m => m.SystemAdminModule,
@@ -39,7 +39,7 @@ const routes: Routes = [
         data: { roles: ['SYSTEM-ADMIN'], title: 'PAGE_TITLES.SYSTEM_ADMINS' },
       },
       {
-        path: 'organisation',
+        path: 'organisations',
         loadChildren: () =>
           import('./modules/organisation/organisation.module').then(
             m => m.OrganisationModule,
@@ -55,7 +55,7 @@ const routes: Routes = [
         data: { permission: PERMISSIONS.USER_MANAGEMENT, title: 'PAGE_TITLES.USERS' },
       },
       {
-        path: 'group',
+        path: 'groups',
         loadChildren: () =>
           import('./modules/groups/group.module').then(m => m.GroupModule),
         canActivate: [roleGuard],
@@ -79,7 +79,7 @@ const routes: Routes = [
       },
       // Permission-gated
       {
-        path: 'datasource',
+        path: 'datasources',
         loadChildren: () =>
           import('./modules/datasource/datasource.module').then(
             m => m.DatasourceModule,
@@ -97,14 +97,14 @@ const routes: Routes = [
         data: { permission: PERMISSIONS.DB_CONNECTIONS, title: 'PAGE_TITLES.CONNECTIONS' },
       },
       {
-        path: 'role',
+        path: 'roles',
         loadChildren: () =>
           import('./modules/role/role.module').then(m => m.RoleModule),
         canActivate: [roleGuard],
         data: { permission: PERMISSIONS.ROLE_MANAGEMENT, title: 'PAGE_TITLES.ROLES' },
       },
       {
-        path: 'dataset',
+        path: 'datasets',
         loadChildren: () =>
           import('./modules/dataset/dataset.module').then(m => m.DatasetModule),
         canActivate: [roleGuard],
@@ -120,7 +120,7 @@ const routes: Routes = [
         data: { permission: PERMISSIONS.ANALYSES, title: 'PAGE_TITLES.ANALYSES' },
       },
       {
-        path: 'dashboard',
+        path: 'dashboards',
         loadChildren: () =>
           import('./modules/dashboard/dashboard.module').then(
             m => m.DashboardModule,
@@ -129,28 +129,28 @@ const routes: Routes = [
         data: { permission: PERMISSIONS.DASHBOARD, title: 'PAGE_TITLES.DASHBOARDS' },
       },
       {
-        path: 'tab',
+        path: 'tabs',
         loadChildren: () =>
           import('./modules/tab/tab.module').then(m => m.TabModule),
         canActivate: [roleGuard],
         data: { permission: PERMISSIONS.QB_TAB, title: 'PAGE_TITLES.TABS' },
       },
       {
-        path: 'section',
+        path: 'sections',
         loadChildren: () =>
           import('./modules/section/section.module').then(m => m.SectionModule),
         canActivate: [roleGuard],
         data: { permission: PERMISSIONS.QB_SECTION, title: 'PAGE_TITLES.SECTIONS' },
       },
       {
-        path: 'prompt',
+        path: 'prompts',
         loadChildren: () =>
           import('./modules/prompt/prompt.module').then(m => m.PromptModule),
         canActivate: [roleGuard],
         data: { permission: PERMISSIONS.QB_PROMPT, title: 'PAGE_TITLES.PROMPTS' },
       },
       {
-        path: 'query-builder',
+        path: 'query-builders',
         loadChildren: () =>
           import('./modules/query-builder/query-builder.module').then(
             m => m.QueryBuilderModule,
@@ -159,14 +159,14 @@ const routes: Routes = [
         data: { permission: PERMISSIONS.QB_SCREEN, title: 'PAGE_TITLES.QUERY_BUILDERS' },
       },
       {
-        path: 'audit-logs',
+        path: 'audit',
         loadChildren: () =>
           import('./modules/audit/audit.module').then(m => m.AuditModule),
         canActivate: [roleGuard],
         data: { permission: PERMISSIONS.AUDIT_LOGS, title: 'PAGE_TITLES.AUDIT_LOGS' },
       },
       {
-        path: 'login-activity',
+        path: 'audit/logins',
         loadChildren: () =>
           import('./modules/audit/login-activity.module').then(
             m => m.LoginActivityModule,
@@ -178,7 +178,7 @@ const routes: Routes = [
         },
       },
       {
-        path: 'app-settings',
+        path: 'settings',
         loadChildren: () =>
           import('./modules/app-settings/app-settings.module').then(
             m => m.AppSettingsModule,
@@ -196,11 +196,22 @@ const routes: Routes = [
           import('./modules/profile/profile.module').then(m => m.ProfileModule),
         data: { title: 'PAGE_TITLES.MY_PROFILE' },
       },
+      {
+        path: 'not-found',
+        loadComponent: () =>
+          import('./shared/components/not-found/not-found.component').then(
+            m => m.NotFoundComponent,
+          ),
+        data: { title: 'PAGE_TITLES.NOT_FOUND' },
+      },
     ],
   },
+  // Anything unknown lands on a real 404 page rather than silently
+  // bouncing to /login. Inside the authenticated shell so the user
+  // keeps the sidebar/topbar and can navigate away cleanly.
   {
     path: '**',
-    redirectTo: 'login',
+    redirectTo: 'app/not-found',
   },
 ];
 

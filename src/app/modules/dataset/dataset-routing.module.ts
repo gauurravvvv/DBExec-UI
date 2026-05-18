@@ -12,16 +12,16 @@ const routes: Routes = [
     component: ListDatasetComponent,
   },
   {
-    path: 'add',
+    path: 'new',
     component: AddDatasetComponent,
     canDeactivate: [unsavedChangesGuard],
   },
   {
-    path: 'edit/:orgId/:id',
+    path: ':orgId/:id/edit',
     component: EditDatasetComponent,
     canDeactivate: [unsavedChangesGuard],
   },
-  { path: 'view/:orgId/:id', component: ViewDatasetComponent },
+  { path: ':orgId/:id', component: ViewDatasetComponent },
 ];
 
 @NgModule({

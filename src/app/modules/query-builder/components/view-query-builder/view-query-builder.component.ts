@@ -479,7 +479,7 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
   }
 
   onEdit(): void {
-    this.router.navigate([QUERY_BUILDER.EDIT, this.orgId, this.queryBuilderId]);
+    this.router.navigate([QUERY_BUILDER.edit(this.orgId, this.queryBuilderId)]);
   }
 
   onConfigure(): void {

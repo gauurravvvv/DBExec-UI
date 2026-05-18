@@ -1157,7 +1157,8 @@
     "FORGOT_PASSWORD": "Wachtwoord vergeten",
     "RESET_PASSWORD": "Wachtwoord resetten",
     "SET_PASSWORD": "Wachtwoord instellen",
-    "CLI_AUTH": "CLI-authenticatie"
+    "CLI_AUTH": "CLI-authenticatie",
+    "NOT_FOUND": "Pagina niet gevonden"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Verbeter uw ervaring met\ngegevensbronbeheer",

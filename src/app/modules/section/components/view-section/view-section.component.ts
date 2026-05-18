@@ -59,7 +59,7 @@ export class ViewSectionComponent implements OnInit {
   }
 
   onEdit() {
-    this.router.navigate([SECTION.EDIT, this.orgId, this.sectionId]);
+    this.router.navigate([SECTION.edit(this.orgId, this.sectionId)]);
   }
 
   goBack() {

@@ -12,13 +12,13 @@ const routes: Routes = [
     component: ListConnectionComponent,
   },
   {
-    path: 'add',
+    path: 'new',
     component: AddConnectionComponent,
     canDeactivate: [unsavedChangesGuard],
   },
-  { path: 'view/:orgId/:id', component: ViewConnectionComponent },
+  { path: ':orgId/:id', component: ViewConnectionComponent },
   {
-    path: 'edit/:orgId/:id',
+    path: ':orgId/:id/edit',
     component: EditConnectionComponent,
     canDeactivate: [unsavedChangesGuard],
   },

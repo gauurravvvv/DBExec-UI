@@ -418,7 +418,7 @@ export class ListTabComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([TAB.EDIT, this.selectedOrg, id]);
+    this.router.navigate([TAB.edit(this.selectedOrg, id)]);
   }
 
   confirmDelete(id: string) {
@@ -506,6 +506,6 @@ export class ListTabComponent implements OnInit {
   }
 
   onEditTab(tab: any) {
-    this.router.navigate([TAB.EDIT, this.selectedOrg, tab.id]);
+    this.router.navigate([TAB.edit(this.selectedOrg, tab.id)]);
   }
 }

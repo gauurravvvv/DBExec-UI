@@ -12,13 +12,13 @@ const routes: Routes = [
     component: ListRoleComponent,
   },
   {
-    path: 'add',
+    path: 'new',
     component: AddRoleComponent,
     canDeactivate: [unsavedChangesGuard],
   },
-  { path: 'view/:orgId/:id', component: ViewRoleComponent },
+  { path: ':orgId/:id', component: ViewRoleComponent },
   {
-    path: 'edit/:orgId/:id',
+    path: ':orgId/:id/edit',
     component: EditRoleComponent,
     canDeactivate: [unsavedChangesGuard],
   },

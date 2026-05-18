@@ -17,7 +17,7 @@ import { Store } from '@ngrx/store';
 import { MessageService } from 'primeng/api';
 import { Observable, Subject, TimeoutError } from 'rxjs';
 import { debounceTime, first, timeout } from 'rxjs/operators';
-import { DATASET } from 'src/app/constants/routes';
+import { DATASET, QUERY_BUILDER } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -1276,10 +1276,11 @@ export class EditDatasetComponent
           if (dataset.type === 2 && dataset.queryBuilderId) {
             this.router.navigate(
               [
-                '/app/query-builder/execute',
-                dataset.organisationId,
-                dataset.datasourceId,
-                dataset.queryBuilderId,
+                QUERY_BUILDER.run(
+                  dataset.organisationId,
+                  dataset.datasourceId,
+                  dataset.queryBuilderId,
+                ),
               ],
               {
                 queryParams: {

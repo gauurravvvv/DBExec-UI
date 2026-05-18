@@ -19,7 +19,7 @@
         <button
           class="btn-primary"
           [disabled]="adminId == loggedInUserId"
-          [routerLink]="['/app/system-admin/edit', adminId]"
+          [routerLink]="['/app/admins', adminId, 'edit']"
         >
           <i class="pi pi-pencil"></i>
           {{ 'COMMON.EDIT' | translate }}

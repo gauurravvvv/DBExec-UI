@@ -13,7 +13,7 @@ const routes: Routes = [
     component: ListUserComponent,
   },
   {
-    path: 'add',
+    path: 'new',
     component: AddUserComponent,
     canDeactivate: [unsavedChangesGuard],
   },
@@ -21,9 +21,9 @@ const routes: Routes = [
     path: 'bulk-add',
     component: BulkAddUserComponent,
   },
-  { path: 'view/:orgId/:id', component: ViewUserComponent },
+  { path: ':orgId/:id', component: ViewUserComponent },
   {
-    path: 'edit/:orgId/:id',
+    path: ':orgId/:id/edit',
     component: EditUserComponent,
     canDeactivate: [unsavedChangesGuard],
   },

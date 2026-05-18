@@ -463,11 +463,11 @@ export class ListAnalysesComponent implements OnInit {
   }
 
   onView(id: string) {
-    this.router.navigate([ANALYSES.VIEW, this.selectedOrg, id]);
+    this.router.navigate([ANALYSES.view(this.selectedOrg, id)]);
   }
 
   onEdit(id: string) {
-    this.router.navigate([ANALYSES.EDIT, this.selectedOrg, id]);
+    this.router.navigate([ANALYSES.edit(this.selectedOrg, id)]);
   }
 
   confirmDelete(id: string) {

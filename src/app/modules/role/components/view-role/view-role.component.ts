@@ -54,7 +54,7 @@ export class ViewRoleComponent implements OnInit {
   }
 
   onEdit() {
-    this.router.navigate([ROLE.EDIT, this.orgId, this.roleId]);
+    this.router.navigate([ROLE.edit(this.orgId, this.roleId)]);
   }
 
   goBack() {

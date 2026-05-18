@@ -1157,7 +1157,8 @@
     "FORGOT_PASSWORD": "Password dimenticata",
     "RESET_PASSWORD": "Reimposta password",
     "SET_PASSWORD": "Imposta password",
-    "CLI_AUTH": "Autenticazione CLI"
+    "CLI_AUTH": "Autenticazione CLI",
+    "NOT_FOUND": "Pagina non trovata"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Migliora la tua esperienza\ndi gestione delle sorgenti dati",

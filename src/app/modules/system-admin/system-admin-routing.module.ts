@@ -12,13 +12,13 @@ const routes: Routes = [
     component: ListSystemAdminComponent,
   },
   {
-    path: 'add',
+    path: 'new',
     component: AddSystemAdminComponent,
     canDeactivate: [unsavedChangesGuard],
   },
-  { path: 'view/:id', component: ViewSystemAdminComponent },
+  { path: ':id', component: ViewSystemAdminComponent },
   {
-    path: 'edit/:id',
+    path: ':id/edit',
     component: EditSystemAdminComponent,
     canDeactivate: [unsavedChangesGuard],
   },

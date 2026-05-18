@@ -43,7 +43,7 @@ export class ViewGroupComponent implements OnInit {
   }
 
   onEdit() {
-    this.router.navigate([GROUP.EDIT, this.orgId, this.groupId], {
+    this.router.navigate([GROUP.edit(this.orgId, this.groupId)], {
       queryParams: {
         orgId: this.orgId,
         adminId: this.groupId,

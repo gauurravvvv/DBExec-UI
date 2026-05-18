@@ -65,14 +65,18 @@
 // alone carries the page, motion is not needed and ages better.
 .auth-page {
   position: relative;
-  min-height: 100vh;
+  // Lock the page to exactly the viewport height (dvh handles mobile
+  // browser chrome correctly). Combined with flex on the body row, the
+  // shell fits the viewport without a default scrollbar — content
+  // inside the card scrolls instead when needed.
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   font-family: var(--font-ui);
   font-size: var(--fs-body);
   line-height: var(--lh-normal);
   color: var(--text-color);
-  overflow-x: hidden;
+  overflow: hidden;
   isolation: isolate;
 
   background: linear-gradient(135deg, #f6faff 0%, #fbfdff 100%);
@@ -143,6 +147,13 @@
 // ─── Main content ─────────────────────────────────────────────────────────
 .auth-main {
   flex: 1 1 auto;
+  // min-height: 0 lets this flex child shrink below its content size,
+  // which is the standard fix for "scrollbar appears because flex
+  // children refuse to compress". overflow-y: auto keeps content
+  // accessible on tiny viewports without ever pushing the page taller
+  // than the viewport.
+  min-height: 0;
+  overflow-y: auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -306,7 +317,9 @@
     text-align: center;
     font-family: var(--font-ui);
     font-size: clamp(var(--fs-h1), calc(var(--fs-h1) + 0.5vw), 1.5rem);
-    font-weight: var(--fw-semibold);
+    // Match the hero headline's weight so both halves of the page
+    // read with the same typographic emphasis.
+    font-weight: var(--fw-bold);
     color: var(--auth-heading-color);
     line-height: var(--lh-tight);
     letter-spacing: var(--ls-tight);

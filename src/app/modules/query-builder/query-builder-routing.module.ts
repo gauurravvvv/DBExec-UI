@@ -14,22 +14,25 @@ const routes: Routes = [
     component: ListQueryBuilderComponent,
   },
   {
-    path: 'add',
+    path: 'new',
     component: AddQueryBuilderComponent,
     canDeactivate: [unsavedChangesGuard],
   },
-  { path: 'view/:orgId/:id', component: ViewQueryBuilderComponent },
+  { path: ':orgId/:id', component: ViewQueryBuilderComponent },
   {
-    path: 'edit/:orgId/:id',
+    path: ':orgId/:id/edit',
     component: EditQueryBuilderComponent,
     canDeactivate: [unsavedChangesGuard],
   },
+  // Action sub-routes nested under the resource — RESTful action shape.
+  // Carrying :dbId in the URL is intentional: the QB is scoped to a
+  // specific database within an org, and the page needs both.
   {
-    path: 'config/:orgId/:dbId/:id',
+    path: ':orgId/:dbId/:id/configure',
     component: ConfigureQueryBuilderComponent,
   },
   {
-    path: 'execute/:orgId/:dbId/:queryBuilderId',
+    path: ':orgId/:dbId/:queryBuilderId/run',
     component: ExecuteQueryBuilderComponent,
   },
 ];

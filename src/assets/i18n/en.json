@@ -1194,7 +1194,8 @@
     "FORGOT_PASSWORD": "Forgot Password",
     "RESET_PASSWORD": "Reset Password",
     "SET_PASSWORD": "Set Password",
-    "CLI_AUTH": "CLI Authentication"
+    "CLI_AUTH": "CLI Authentication",
+    "NOT_FOUND": "Page Not Found"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Elevate Your Datasource\nManagement Experience",

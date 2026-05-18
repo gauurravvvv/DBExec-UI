@@ -363,7 +363,7 @@ export class ListDashboardComponent implements OnInit {
   }
 
   onView(id: string) {
-    this.router.navigate([DB_ROUTES.VIEW, this.selectedOrg, id]);
+    this.router.navigate([DB_ROUTES.view(this.selectedOrg, id)]);
   }
 
   confirmDelete(id: string) {

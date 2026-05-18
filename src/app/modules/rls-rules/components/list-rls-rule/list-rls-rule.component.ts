@@ -312,7 +312,7 @@ export class ListRlsRuleComponent implements OnInit {
   }
 
   onEdit(rule: any) {
-    this.router.navigate([RLS_RULE.EDIT, this.selectedOrg, rule.id]);
+    this.router.navigate([RLS_RULE.edit(this.selectedOrg, rule.id)]);
   }
 
   trackByIndex(index: number): number {

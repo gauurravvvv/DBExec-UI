@@ -405,7 +405,7 @@ export class ListUserComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([USER.EDIT, this.selectedOrg, id]);
+    this.router.navigate([USER.edit(this.selectedOrg, id)]);
   }
 
   confirmDelete(id: string) {

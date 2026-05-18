@@ -12,13 +12,13 @@ const routes: Routes = [
     component: ListTabComponent,
   },
   {
-    path: 'add',
+    path: 'new',
     component: AddTabComponent,
     canDeactivate: [unsavedChangesGuard],
   },
-  { path: 'view/:orgId/:id', component: ViewTabComponent },
+  { path: ':orgId/:id', component: ViewTabComponent },
   {
-    path: 'edit/:orgId/:id',
+    path: ':orgId/:id/edit',
     component: EditTabComponent,
     canDeactivate: [unsavedChangesGuard],
   },

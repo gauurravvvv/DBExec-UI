@@ -430,7 +430,7 @@ export class ListQueryBuilderComponent implements OnInit {
 
   // Not used but kept for reference if direct edit without object is needed
   onEdit(id: string) {
-    this.router.navigate([QUERY_BUILDER.EDIT, this.selectedOrg, id]);
+    this.router.navigate([QUERY_BUILDER.edit(this.selectedOrg, id)]);
   }
 
   confirmDelete(id: string) {
@@ -508,11 +508,7 @@ export class ListQueryBuilderComponent implements OnInit {
   }
 
   onEditQueryBuilder(queryBuilder: any) {
-    this.router.navigate([
-      QUERY_BUILDER.EDIT,
-      this.selectedOrg,
-      queryBuilder.id,
-    ]);
+    this.router.navigate([QUERY_BUILDER.edit(this.selectedOrg, queryBuilder.id,)]);
   }
 
   onConfig(id: string) {
@@ -526,10 +522,7 @@ export class ListQueryBuilderComponent implements OnInit {
 
   onExecute(id: string) {
     this.router.navigate([
-      '/app/query-builder/execute',
-      this.selectedOrg,
-      this.selectedDatasource,
-      id,
+      QUERY_BUILDER.run(this.selectedOrg, this.selectedDatasource, id),
     ]);
   }
 }

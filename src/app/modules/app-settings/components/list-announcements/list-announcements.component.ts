@@ -300,11 +300,11 @@ export class ListAnnouncementsComponent implements OnInit {
   }
 
   onView(id: string): void {
-    this.router.navigate([ANNOUNCEMENT.VIEW, this.selectedOrg, id]);
+    this.router.navigate([ANNOUNCEMENT.view(this.selectedOrg, id)]);
   }
 
   onEdit(id: string): void {
-    this.router.navigate([ANNOUNCEMENT.EDIT, this.selectedOrg, id]);
+    this.router.navigate([ANNOUNCEMENT.edit(this.selectedOrg, id)]);
   }
 
   confirmDelete(id: string): void {

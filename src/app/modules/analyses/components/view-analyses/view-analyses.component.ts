@@ -176,7 +176,7 @@ export class ViewAnalysesComponent implements OnInit {
   }
 
   onEdit(): void {
-    this.router.navigate([ANALYSES.EDIT, this.orgId, this.analysisId]);
+    this.router.navigate([ANALYSES.edit(this.orgId, this.analysisId)]);
   }
 
   onDelete(): void {
@@ -241,7 +241,7 @@ export class ViewAnalysesComponent implements OnInit {
         if (this.globalService.handleSuccessService(response)) {
           this.showPublishDialog = false;
           this.publishForm = { name: '', description: '' };
-          this.router.navigate([DB_ROUTES.VIEW, this.orgId, response.data.id]);
+          this.router.navigate([DB_ROUTES.view(this.orgId, response.data.id)]);
         }
         this.cdr.markForCheck();
       })

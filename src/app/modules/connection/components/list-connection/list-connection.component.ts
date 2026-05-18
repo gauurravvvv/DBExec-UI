@@ -349,7 +349,7 @@ export class ListConnectionComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([CONNECTION.EDIT, this.selectedOrg, id]);
+    this.router.navigate([CONNECTION.edit(this.selectedOrg, id)]);
   }
 
   confirmDelete(id: string) {

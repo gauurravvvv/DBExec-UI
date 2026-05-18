@@ -196,7 +196,7 @@ export class ListOrganisationComponent implements OnInit {
   }
 
   onEdit(org: any) {
-    this.router.navigate([ORGANISATION.EDIT + '/' + org.id]);
+    this.router.navigate([ORGANISATION.edit(org.id)]);
   }
 
   confirmDelete(orgId: string) {

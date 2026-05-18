@@ -1,6 +1,6 @@
 <app-auth-shell
-  cardTitle="Welcome back"
-  cardSubtitle="Continue to DBExec"
+  cardTitle="Log in"
+  cardSubtitle="Sign in to your DBExec account"
 >
   <form
     id="auth-form"
@@ -10,14 +10,14 @@
     novalidate
   >
     <div class="auth-form__field">
-      <label class="auth-visually-hidden" for="auth-account">Account</label>
+      <label class="auth-visually-hidden" for="auth-account">Organisation</label>
       <app-custom-input
         inputId="auth-account"
         formControlName="organisation"
-        placeholder="Account"
-        icon="pi-desktop"
+        placeholder="Organisation"
+        icon="pi-building"
         autocomplete="organization"
-        ariaLabel="Account"
+        ariaLabel="Organisation"
         [showError]="
           !!(
             loginForm.get('organisation')?.invalid &&

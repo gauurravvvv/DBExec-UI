@@ -13,17 +13,17 @@ const routes: Routes = [
     component: ListPromptComponent,
   },
   {
-    path: 'add',
+    path: 'new',
     component: AddPromptComponent,
     canDeactivate: [unsavedChangesGuard],
   },
-  { path: 'view/:orgId/:id', component: ViewPromptComponent },
+  { path: ':orgId/:id', component: ViewPromptComponent },
   {
-    path: 'edit/:orgId/:id',
+    path: ':orgId/:id/edit',
     component: EditPromptComponent,
     canDeactivate: [unsavedChangesGuard],
   },
-  { path: 'config/:orgId/:id', component: ConfigPromptComponent },
+  { path: ':orgId/:id/configure', component: ConfigPromptComponent },
 ];
 
 @NgModule({

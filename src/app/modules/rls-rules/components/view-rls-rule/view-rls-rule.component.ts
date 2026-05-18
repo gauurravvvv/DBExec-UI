@@ -55,7 +55,7 @@ export class ViewRlsRuleComponent implements OnInit {
   }
 
   onEdit() {
-    this.router.navigate([RLS_RULE.EDIT, this.orgId, this.ruleId]);
+    this.router.navigate([RLS_RULE.edit(this.orgId, this.ruleId)]);
   }
 
   goBack() {

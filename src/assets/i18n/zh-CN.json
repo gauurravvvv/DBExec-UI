@@ -1157,7 +1157,8 @@
     "FORGOT_PASSWORD": "忘记密码",
     "RESET_PASSWORD": "重置密码",
     "SET_PASSWORD": "设置密码",
-    "CLI_AUTH": "CLI认证"
+    "CLI_AUTH": "CLI认证",
+    "NOT_FOUND": "页面未找到"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "提升您的数据源\n管理体验",

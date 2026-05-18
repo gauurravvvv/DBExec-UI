@@ -9,13 +9,13 @@ import { ViewRlsRuleComponent } from './components/view-rls-rule/view-rls-rule.c
 const routes: Routes = [
   { path: '', component: ListRlsRuleComponent },
   {
-    path: 'add',
+    path: 'new',
     component: AddRlsRuleComponent,
     canDeactivate: [unsavedChangesGuard],
   },
-  { path: 'view/:orgId/:id', component: ViewRlsRuleComponent },
+  { path: ':orgId/:id', component: ViewRlsRuleComponent },
   {
-    path: 'edit/:orgId/:id',
+    path: ':orgId/:id/edit',
     component: EditRlsRuleComponent,
     canDeactivate: [unsavedChangesGuard],
   },

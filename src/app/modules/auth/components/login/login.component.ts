@@ -125,7 +125,7 @@ export class LoginComponent implements OnInit {
     if (!control?.errors?.['required']) return '';
     switch (fieldName) {
       case 'organisation':
-        return 'Account is required';
+        return 'Organisation is required';
       case 'username':
         return 'Username is required';
       case 'password':

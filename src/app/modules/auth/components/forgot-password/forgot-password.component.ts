@@ -55,7 +55,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     if (control.errors['required']) {
       switch (fieldName) {
         case 'organisation':
-          return 'Account is required';
+          return 'Organisation is required';
         case 'username':
           return 'Username is required';
         case 'email':

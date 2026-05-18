@@ -14,18 +14,18 @@ const routes: Routes = [
     data: { title: 'Announcements' },
   },
   {
-    path: 'announcements/add',
+    path: 'announcements/new',
     component: AddAnnouncementComponent,
     canDeactivate: [unsavedChangesGuard],
-    data: { title: 'Add Announcement' },
+    data: { title: 'New Announcement' },
   },
   {
-    path: 'announcements/view/:orgId/:id',
+    path: 'announcements/:orgId/:id',
     component: ViewAnnouncementComponent,
     data: { title: 'Announcement Details' },
   },
   {
-    path: 'announcements/edit/:orgId/:id',
+    path: 'announcements/:orgId/:id/edit',
     component: EditAnnouncementComponent,
     canDeactivate: [unsavedChangesGuard],
     data: { title: 'Edit Announcement' },

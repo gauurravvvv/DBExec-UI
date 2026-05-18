@@ -153,7 +153,7 @@ export class ListSystemAdminComponent implements OnInit {
   }
 
   onEdit(adminId: string): void {
-    this.router.navigate([SYSTEM_ADMIN.EDIT + '/' + adminId]);
+    this.router.navigate([SYSTEM_ADMIN.edit(adminId)]);
   }
 
   confirmDelete(adminId: string) {

@@ -55,7 +55,7 @@ export class ViewAnnouncementComponent implements OnInit {
   }
 
   onEdit(): void {
-    this.router.navigate([ANNOUNCEMENT.EDIT, this.orgId, this.announcementId]);
+    this.router.navigate([ANNOUNCEMENT.edit(this.orgId, this.announcementId)]);
   }
 
   goBack(): void {

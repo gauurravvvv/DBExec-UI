@@ -12,13 +12,13 @@ const routes: Routes = [
     component: ListSectionComponent,
   },
   {
-    path: 'add',
+    path: 'new',
     component: AddSectionComponent,
     canDeactivate: [unsavedChangesGuard],
   },
-  { path: 'view/:orgId/:id', component: ViewSectionComponent },
+  { path: ':orgId/:id', component: ViewSectionComponent },
   {
-    path: 'edit/:orgId/:id',
+    path: ':orgId/:id/edit',
     component: EditSectionComponent,
     canDeactivate: [unsavedChangesGuard],
   },

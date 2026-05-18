@@ -414,7 +414,7 @@ export class ListSectionComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([SECTION.EDIT, this.selectedOrg, id]);
+    this.router.navigate([SECTION.edit(this.selectedOrg, id)]);
   }
 
   confirmDelete(id: string) {
@@ -496,6 +496,6 @@ export class ListSectionComponent implements OnInit {
   }
 
   onEditSection(section: any) {
-    this.router.navigate([SECTION.EDIT, this.selectedOrg, section.id]);
+    this.router.navigate([SECTION.edit(this.selectedOrg, section.id)]);
   }
 }

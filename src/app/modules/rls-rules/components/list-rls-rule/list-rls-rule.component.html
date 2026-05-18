@@ -159,7 +159,7 @@
               <td pFrozenColumn>
                 <a
                   class="dataset-name-link"
-                  [routerLink]="['/app/rls-rules/view', selectedOrg, rule.id]"
+                  [routerLink]="['/app/rls-rules', selectedOrg, rule.id]"
                 >
                   {{ rule.name }}
                 </a>
@@ -211,7 +211,7 @@
                 <div class="row-actions">
                   <button
                     class="icon-btn edit-btn"
-                    [routerLink]="['/app/rls-rules/view', selectedOrg, rule.id]"
+                    [routerLink]="['/app/rls-rules', selectedOrg, rule.id]"
                     [pTooltip]="'COMMON.VIEW' | translate"
                     tooltipPosition="bottom"
                   >

@@ -5,7 +5,7 @@ import { ViewDashboardComponent } from './components/view-dashboard/view-dashboa
 
 const routes: Routes = [
   { path: '', component: ListDashboardComponent },
-  { path: 'view/:orgId/:id', component: ViewDashboardComponent },
+  { path: ':orgId/:id', component: ViewDashboardComponent },
 ];
 
 @NgModule({

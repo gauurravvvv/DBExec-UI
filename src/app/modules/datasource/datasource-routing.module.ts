@@ -6,22 +6,22 @@ import { EditDatasourceComponent } from './components/edit-datasource/edit-datas
 import { ListDatasourceComponent } from './components/list-datasource/list-datasource.component';
 import { ViewDatasourceComponent } from './components/view-datasource/view-datasource.component';
 
+// REST-shaped routes. Static segments (`new`) come BEFORE
+// `:orgId/:id` so the router doesn't capture the word "new" as an
+// orgId param.
 const routes: Routes = [
+  { path: '', component: ListDatasourceComponent },
   {
-    path: '',
-    component: ListDatasourceComponent,
-  },
-  {
-    path: 'add',
+    path: 'new',
     component: AddDatasourceComponent,
     canDeactivate: [unsavedChangesGuard],
   },
+  { path: ':orgId/:id', component: ViewDatasourceComponent },
   {
-    path: 'edit/:orgId/:id',
+    path: ':orgId/:id/edit',
     component: EditDatasourceComponent,
     canDeactivate: [unsavedChangesGuard],
   },
-  { path: 'view/:orgId/:id', component: ViewDatasourceComponent },
 ];
 
 @NgModule({

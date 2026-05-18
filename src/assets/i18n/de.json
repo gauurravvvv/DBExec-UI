@@ -1157,7 +1157,8 @@
     "FORGOT_PASSWORD": "Passwort vergessen",
     "RESET_PASSWORD": "Passwort zurücksetzen",
     "SET_PASSWORD": "Passwort festlegen",
-    "CLI_AUTH": "CLI-Authentifizierung"
+    "CLI_AUTH": "CLI-Authentifizierung",
+    "NOT_FOUND": "Seite nicht gefunden"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Verbessern Sie Ihr Datenquellen-\nManagement-Erlebnis",

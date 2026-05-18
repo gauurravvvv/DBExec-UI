@@ -1157,7 +1157,8 @@
     "FORGOT_PASSWORD": "Esqueci a senha",
     "RESET_PASSWORD": "Redefinir senha",
     "SET_PASSWORD": "Definir senha",
-    "CLI_AUTH": "Autenticação CLI"
+    "CLI_AUTH": "Autenticação CLI",
+    "NOT_FOUND": "Página não encontrada"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Eleve sua experiência de\ngerenciamento de fontes de dados",

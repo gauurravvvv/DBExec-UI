@@ -21,6 +21,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TreeNode } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { DATASET, QUERY_BUILDER } from 'src/app/constants/routes';
 
 import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -701,7 +702,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
           if (this.globalService.handleSuccessService(response, true)) {
             this.saveForm.reset();
             this.showSaveDialog = false;
-            this.router.navigate(['/app/dataset']);
+            this.router.navigate([DATASET.LIST]);
           }
         })
         .catch(() => {
@@ -716,7 +717,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
           if (this.globalService.handleSuccessService(response, true)) {
             this.saveForm.reset();
             this.showSaveDialog = false;
-            this.router.navigate(['/app/dataset']);
+            this.router.navigate([DATASET.LIST]);
           }
         })
         .catch(() => {
@@ -1267,7 +1268,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
   }
 
   onBack(): void {
-    this.router.navigate(['/app/query-builder']);
+    this.router.navigate([QUERY_BUILDER.LIST]);
   }
 
   onReset(): void {

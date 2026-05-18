@@ -266,7 +266,7 @@ export class ListDatasourceComponent implements OnInit {
   }
 
   onEdit(db: any) {
-    this.router.navigate([DATASOURCE.EDIT, db.organisationId, db.id]);
+    this.router.navigate([DATASOURCE.edit(db.organisationId, db.id)]);
   }
 
   confirmDelete(datasource: any): void {

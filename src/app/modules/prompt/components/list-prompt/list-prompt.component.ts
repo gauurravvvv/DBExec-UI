@@ -438,7 +438,7 @@ export class ListPromptComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([PROMPT.EDIT, this.selectedOrg, id]);
+    this.router.navigate([PROMPT.edit(this.selectedOrg, id)]);
   }
 
   onConfig(id: string) {

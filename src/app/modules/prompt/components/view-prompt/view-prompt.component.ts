@@ -56,7 +56,7 @@ export class ViewPromptComponent implements OnInit {
   }
 
   onEdit() {
-    this.router.navigate([PROMPT.EDIT, this.orgId, this.promptId]);
+    this.router.navigate([PROMPT.edit(this.orgId, this.promptId)]);
   }
 
   goBack() {

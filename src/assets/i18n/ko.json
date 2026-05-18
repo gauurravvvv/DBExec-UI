@@ -1157,7 +1157,8 @@
     "FORGOT_PASSWORD": "비밀번호 찾기",
     "RESET_PASSWORD": "비밀번호 재설정",
     "SET_PASSWORD": "비밀번호 설정",
-    "CLI_AUTH": "CLI 인증"
+    "CLI_AUTH": "CLI 인증",
+    "NOT_FOUND": "페이지를 찾을 수 없습니다"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "데이터 소스\n관리 경험을 향상시키세요",

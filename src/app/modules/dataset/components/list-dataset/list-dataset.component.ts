@@ -15,7 +15,7 @@ import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { DEFAULT_PAGE } from 'src/app/constants';
-import { ANALYSES, DATASET } from 'src/app/constants/routes';
+import { ANALYSES, DATASET, QUERY_BUILDER } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { AnalysisFormData } from 'src/app/modules/analyses/components/save-analyses-dialog/save-analyses-dialog.component';
@@ -585,15 +585,16 @@ export class ListDatasetComponent implements OnInit {
   onQueryBuilderSelect(queryBuilder: any) {
     this.showQueryBuilderPopup = false;
     this.router.navigate([
-      '/app/query-builder/execute',
-      this.selectedOrg,
-      this.selectedDatasource,
-      queryBuilder.id,
+      QUERY_BUILDER.run(
+        this.selectedOrg,
+        this.selectedDatasource,
+        queryBuilder.id,
+      ),
     ]);
   }
 
   onEdit(id: string) {
-    this.router.navigate([DATASET.EDIT, this.selectedOrg, id]);
+    this.router.navigate([DATASET.edit(this.selectedOrg, id)]);
   }
 
   useAsAnalysis(id: string) {

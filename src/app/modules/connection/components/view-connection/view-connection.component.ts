@@ -46,7 +46,7 @@ export class ViewConnectionComponent implements OnInit {
   }
 
   onEdit() {
-    this.router.navigate([CONNECTION.EDIT, this.orgId, this.connectionId]);
+    this.router.navigate([CONNECTION.edit(this.orgId, this.connectionId)]);
   }
 
   goBack() {

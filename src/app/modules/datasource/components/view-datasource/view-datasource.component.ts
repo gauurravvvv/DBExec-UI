@@ -373,7 +373,7 @@ export class ViewDatasourceComponent implements OnInit {
   }
 
   onEdit(): void {
-    this.router.navigate([DATASOURCE.EDIT, this.orgId, this.dbData.id]);
+    this.router.navigate([DATASOURCE.edit(this.orgId, this.dbData.id)]);
   }
 
   confirmDelete(): void {

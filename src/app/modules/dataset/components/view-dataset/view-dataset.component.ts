@@ -5,7 +5,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DATASET } from 'src/app/constants/routes';
+import { DATASET, QUERY_BUILDER } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../services/dataset.service';
 
@@ -195,10 +195,11 @@ export class ViewDatasetComponent implements OnInit {
       // Type 2 (Prompt-based): navigate to execute-query-builder in edit mode
       this.router.navigate(
         [
-          '/app/query-builder/execute',
-          this.datasetData.organisationId,
-          this.datasetData.datasourceId,
-          this.datasetData.queryBuilderId,
+          QUERY_BUILDER.run(
+            this.datasetData.organisationId,
+            this.datasetData.datasourceId,
+            this.datasetData.queryBuilderId,
+          ),
         ],
         {
           queryParams: {
@@ -209,11 +210,7 @@ export class ViewDatasetComponent implements OnInit {
       );
     } else {
       // Type 1 (SQL-based): navigate to standard edit
-      this.router.navigate([
-        DATASET.EDIT,
-        this.datasetData.organisationId,
-        this.datasetData.id,
-      ]);
+      this.router.navigate([DATASET.edit(this.datasetData.organisationId, this.datasetData.id,)]);
     }
   }
 
