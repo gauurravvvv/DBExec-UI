@@ -30,11 +30,6 @@
   text-decoration: none;
   user-select: none;
   border-radius: var(--radius-md);
-  transition: background-color var(--motion-fast) ease;
-
-  &:hover {
-    background: var(--hover-background);
-  }
 
   .logo-icon {
     width: 24px;

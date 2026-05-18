@@ -4,7 +4,9 @@
   <header class="auth-topbar">
     <a class="auth-topbar__brand" routerLink="/" aria-label="DBExec home">
       <i class="ci ci-app-icon auth-topbar__mark" aria-hidden="true"></i>
-      <span class="auth-topbar__wordmark">DBExec</span>
+      <span class="auth-topbar__wordmark"
+        >DB<span class="auth-topbar__highlight">Exec</span></span
+      >
     </a>
   </header>
 
@@ -43,10 +45,6 @@
   </main>
 
   <footer class="auth-footer">
-    <div class="auth-footer__brand">
-      <i class="ci ci-app-icon auth-footer__mark" aria-hidden="true"></i>
-      <span>DBExec</span>
-    </div>
     <p class="auth-footer__copyright">
       DBExec {{ environment.appVersion }} &middot; &copy; {{ year }} &middot;
       All rights reserved.

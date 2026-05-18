@@ -39,18 +39,14 @@
 
   .header-content {
     h2 {
-      font-size: var(--fs-h1);
+      // Title carries the header on its own (no subtitle). Clamp
+      // sits between 1.25rem and 1.375rem — lands ~22px at typical
+      // desktop widths.
+      font-size: clamp(1.25rem, 1.05rem + 0.4vw, 1.375rem);
       font-weight: var(--fw-semibold);
       color: var(--text-color);
       letter-spacing: -0.025em;
-      margin: 0 0 0.5rem 0;
-    }
-
-    .subtitle {
-      font-size: var(--fs-h3);
-      color: var(--text-color-secondary);
-      margin: var(--space-0);
-      font-weight: var(--fw-regular);
+      margin: 0;
     }
   }
   flex-wrap: wrap;
