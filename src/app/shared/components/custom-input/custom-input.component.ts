@@ -38,6 +38,11 @@ export class CustomInputComponent implements ControlValueAccessor {
   @Input() styleClass = '';
   @Input() hint = '';
   @Input() tooltip = '';
+  // Native attributes forwarded to the underlying <input>. Default '' so
+  // existing call sites are unaffected.
+  @Input() autocomplete = '';
+  @Input() inputId = '';
+  @Input() ariaLabel = '';
 
   value = '';
   disabled = false;

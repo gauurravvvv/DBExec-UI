@@ -15,15 +15,21 @@ import {
   isLines3dChartType,
   isPolygons3dChartType,
   isSankeyChartType,
+  isTableChartType,
 } from '../../constants/charts.constants';
 import { Visual } from '../../models';
 
 @Component({
   selector: 'app-chart-renderer',
   templateUrl: './chart-renderer.component.html',
-  // No styleUrls — see visuals-chart-sidebar for context. The chart
-  // wrappers (`.visual-card`, `.maximized-visual-body`) live in the
-  // parent template and are styled there.
+  // styleUrls is REQUIRED: the host element defaults to display:
+  // inline (zero height) without it, so the downstream
+  // <app-echart-visual> computes height: 100% against zero and the
+  // chart visually collapses. The wrapper styles (.visual-card,
+  // .maximized-visual-body) still live in the parent template, but
+  // the chart-renderer host itself must be a flex item that fills
+  // its parent slot — see the .scss for details.
+  styleUrls: ['./chart-renderer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChartRendererComponent implements OnChanges {
@@ -44,6 +50,7 @@ export class ChartRendererComponent implements OnChanges {
   chartConfigRef: any = {};
 
   isCardChartType = isCardChartType;
+  isTableChartType = isTableChartType;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visual'] || changes['configVersion']) {
@@ -79,6 +86,11 @@ export class ChartRendererComponent implements OnChanges {
   getDisplayData(visual: Visual): any {
     if (visual?.chartData?.length) {
       return visual.chartData;
+    }
+    // Tables never show dummy/sample rows — render the real (possibly
+    // empty) dataset so the user sees the actual state of their data.
+    if (isTableChartType(visual?.chartType ?? '')) {
+      return [];
     }
     return getDummyData(visual?.chartType ?? '');
   }

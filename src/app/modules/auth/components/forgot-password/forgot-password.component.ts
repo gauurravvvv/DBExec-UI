@@ -7,8 +7,6 @@ import {
 } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { FORGOT_PASSWORD_PAGE_OPTIONS } from 'src/app/constants/global';
-import { REGEX } from 'src/app/constants/regex.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
 
@@ -20,8 +18,6 @@ import { LoginService } from 'src/app/core/services/login.service';
 })
 export class ForgotPasswordComponent implements OnInit, OnDestroy {
   forgotPasswordForm: FormGroup;
-  showPassword = false;
-  features = FORGOT_PASSWORD_PAGE_OPTIONS;
   loading = signal(false);
   error = signal('');
 
@@ -37,11 +33,8 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     private globalService: GlobalService,
   ) {
     this.forgotPasswordForm = this.fb.group({
-      organisation: [
-        '',
-        [Validators.required, Validators.pattern(REGEX.orgName)],
-      ],
-      username: ['', [Validators.required, Validators.pattern(REGEX.username)]],
+      organisation: ['', [Validators.required]],
+      username: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
     });
   }
@@ -62,23 +55,13 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     if (control.errors['required']) {
       switch (fieldName) {
         case 'organisation':
-          return 'Organisation is required';
+          return 'Account is required';
         case 'username':
           return 'Username is required';
         case 'email':
           return 'Email is required';
         default:
           return 'This field is required';
-      }
-    }
-    if (control.errors['pattern']) {
-      switch (fieldName) {
-        case 'organisation':
-          return 'Organisation name must start with a letter or number';
-        case 'username':
-          return 'Username must start with a letter and contain only letters, numbers, dots, underscores or hyphens';
-        default:
-          return 'Invalid format';
       }
     }
     if (control.errors['email']) return 'Please enter a valid email address';

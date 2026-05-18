@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  HostListener,
   inject,
   OnInit,
   QueryList,
@@ -17,7 +18,6 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RESET_PASSWORD_PAGE_OPTIONS } from 'src/app/constants/global';
 import { AUTH } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
@@ -33,10 +33,10 @@ export class ResetPasswordComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   resetPasswordForm: FormGroup;
-  showPassword = false;
-  features = RESET_PASSWORD_PAGE_OPTIONS;
   loading = signal(false);
   error = signal('');
+  capsLockOn = signal(false);
+  passwordFocused = signal(false);
   userId!: string;
   orgId!: string;
 
@@ -214,10 +214,22 @@ export class ResetPasswordComponent implements OnInit {
     return '';
   }
 
-  togglePassword(event: Event, id: string) {
-    event.stopPropagation();
-    this.showPassword = !this.showPassword;
-    const input = document.getElementById(id) as HTMLInputElement;
-    input.type = this.showPassword ? 'text' : 'password';
+  @HostListener('document:keydown', ['$event'])
+  @HostListener('document:keyup', ['$event'])
+  onKeyEvent(event: KeyboardEvent): void {
+    if (!this.passwordFocused()) return;
+    const next = !!event.getModifierState?.('CapsLock');
+    if (next !== this.capsLockOn()) {
+      this.capsLockOn.set(next);
+    }
+  }
+
+  onPasswordFocus(): void {
+    this.passwordFocused.set(true);
+  }
+
+  onPasswordBlur(): void {
+    this.passwordFocused.set(false);
+    this.capsLockOn.set(false);
   }
 }

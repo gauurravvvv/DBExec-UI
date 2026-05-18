@@ -1,7 +1,12 @@
 <div class="echart-visual-container">
+  <!-- GL gate: hide the chart until echarts-gl has loaded (no-op for
+       non-GL charts). Without this gate, GL chart types render before
+       their series classes are registered and ECharts throws. -->
   <div
+    *ngIf="glReady; else glLoading"
     echarts
     [options]="chartOption"
+    [merge]="mergeOption"
     [autoResize]="true"
     class="echart-canvas"
     [style.width.px]="chartWidth ? chartWidth - 10 : null"
@@ -9,4 +14,9 @@
     (chartInit)="onChartInit($event)"
     (chartClick)="onChartClick($event)"
   ></div>
+  <ng-template #glLoading>
+    <div class="echart-gl-loading">
+      <i class="pi pi-spin pi-spinner"></i>
+    </div>
+  </ng-template>
 </div>

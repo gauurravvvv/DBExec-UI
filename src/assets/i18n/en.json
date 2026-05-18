@@ -154,7 +154,8 @@
     "LOCK": "Lock",
     "INCLUDE_ALL": "Include All",
     "CONFIRM": "Confirm",
-    "COPY_TO_CLIPBOARD": "Copy to clipboard"
+    "COPY_TO_CLIPBOARD": "Copy to clipboard",
+    "BACK": "Back"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "First name is required",
@@ -795,7 +796,7 @@
     "CHART_TYPE": "Chart Type",
     "CHARTS": "Charts",
     "CLICK_FIELD_FROM_LEFT_PANEL": "Pick a field from the Data panel on the left.",
-    "CLICK_TO_CONFIGURE": "Click to configure chart properties",
+    "CLICK_TO_CONFIGURE": "Pick one from the Visuals panel to get started",
     "CLICK_TO_SELECT_FIELD": "Click to select field",
     "CLOCKWISE": "Clockwise",
     "COLOR_SCHEME": "Color Scheme",
@@ -1127,7 +1128,15 @@
     "DEFAULT_20_PERCENT": "20%",
     "DEFAULT_30_PERCENT": "30%",
     "DEFAULT_90_PERCENT": "90%",
-    "EXAMPLE_50_PERCENT": "e.g. 50%"
+    "EXAMPLE_50_PERCENT": "e.g. 50%",
+    "FIELDS": "Fields",
+    "TABLE_OPTIONS": "Table options",
+    "TABLE_COMPACT": "Compact density",
+    "TABLE_STRIPED": "Striped rows",
+    "TABLE_SHOW_ROW_NUMBERS": "Show row numbers",
+    "TABLE_COLUMNS": "Columns",
+    "TABLE_NO_MAPPING_HINT": "Click fields in the dataset list to add them as table columns.",
+    "TABLE_PICK_COLUMNS_PROMPT": "Click fields from the sidebar to add them as columns"
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",

@@ -73,8 +73,11 @@ export const DATE_FORMAT_OPTIONS = [
 @Component({
   selector: 'app-filter-dialog',
   templateUrl: './filter-dialog.component.html',
-  // No styleUrls — see visuals-chart-sidebar for context. The filter
-  // dialog form selectors live in the parent edit-analyses stylesheet.
+  // Each child component owns its own stylesheet. The dialog renders
+  // through PrimeNG's overlay (attached to <body>), so the SCSS uses
+  // :host ::ng-deep scoped to .filter-config-dialog to reach the
+  // overlay DOM without leaking to other dialogs.
+  styleUrls: ['./filter-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FilterDialogComponent implements OnChanges {

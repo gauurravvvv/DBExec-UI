@@ -153,7 +153,8 @@
     "LOCK": "Lock",
     "INCLUDE_ALL": "Include All",
     "CONFIRM": "Confirm",
-    "COPY_TO_CLIPBOARD": "Copy to clipboard"
+    "COPY_TO_CLIPBOARD": "Copy to clipboard",
+    "BACK": "Retour"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Le prénom est requis",
@@ -758,7 +759,7 @@
     "CHART_TYPE": "Type de graphique",
     "CHARTS": "Graphiques",
     "CLICK_FIELD_FROM_LEFT_PANEL": "Cliquez sur un champ du panneau de gauche",
-    "CLICK_TO_CONFIGURE": "Cliquez pour configurer les propriétés du graphique",
+    "CLICK_TO_CONFIGURE": "Choisissez-en un depuis le panneau Visuels",
     "CLICK_TO_SELECT_FIELD": "Cliquez pour sélectionner un champ",
     "CLOCKWISE": "Sens horaire",
     "COLOR_SCHEME": "Schéma de couleurs",
@@ -1090,7 +1091,15 @@
     "DEFAULT_20_PERCENT": "20%",
     "DEFAULT_30_PERCENT": "30%",
     "DEFAULT_90_PERCENT": "90%",
-    "EXAMPLE_50_PERCENT": "ex. 50%"
+    "EXAMPLE_50_PERCENT": "ex. 50%",
+    "FIELDS": "Champs",
+    "TABLE_OPTIONS": "Options du tableau",
+    "TABLE_COMPACT": "Densité compacte",
+    "TABLE_STRIPED": "Lignes alternées",
+    "TABLE_SHOW_ROW_NUMBERS": "Afficher les numéros de ligne",
+    "TABLE_COLUMNS": "Colonnes",
+    "TABLE_NO_MAPPING_HINT": "Cliquez sur les champs du dataset pour les ajouter comme colonnes du tableau.",
+    "TABLE_PICK_COLUMNS_PROMPT": "Cliquez sur les champs dans la barre laterale pour les ajouter en colonnes"
   },
   "DASHBOARD": {
     "TITLE": "Tableaux de bord",

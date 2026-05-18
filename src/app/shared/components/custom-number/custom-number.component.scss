@@ -22,34 +22,86 @@
 
 :host ::ng-deep .p-inputnumber {
   width: 100%;
+  display: inline-flex;
+  align-items: stretch;
 
   .p-inputtext {
-    background: var(--hover-background) !important;
+    background: var(--card-background) !important;
     border: 1px solid var(--border-color) !important;
     color: var(--text-color) !important;
     border-radius: var(--radius-sm) !important;
-    font-size: var(--fs-h3);
-    padding: 0.625rem 1rem;
+    font-size: var(--fs-body);
+    height: 32px;
+    padding: 0 10px;
+    line-height: 1.2;
 
-    &::placeholder {
-      color: var(--secondary-color) !important;
-    }
-
+    &::placeholder { color: var(--text-muted) !important; }
     &:focus {
       border-color: var(--primary-color) !important;
       box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.15) !important;
     }
   }
 
-  .p-button {
-    background: var(--hover-background) !important;
-    border: 1px solid var(--border-color) !important;
-    color: var(--secondary-color) !important;
-    transition: all var(--motion-base) ease;
+  // Horizontal layout (default in compact contexts): +/- buttons sit
+  // inline on each side of the input at the same height as the input.
+  &.p-inputnumber-buttons-horizontal {
+    .p-button {
+      width: 28px;
+      height: 32px;
+      padding: 0;
+      background: var(--card-background) !important;
+      border: 1px solid var(--border-color) !important;
+      color: var(--text-muted) !important;
+      border-radius: 0 !important;
+      transition:
+        color var(--motion-fast) ease,
+        background var(--motion-fast) ease;
 
-    &:hover {
-      border-color: var(--primary-color) !important;
-      color: var(--primary-color) !important;
+      .pi { font-size: 11px; }
+
+      &:hover:not(:disabled) {
+        color: var(--primary-color) !important;
+        background: var(--hover-background) !important;
+        border-color: var(--border-color) !important;
+      }
+
+      // Round the outer edges only
+      &.p-inputnumber-button-down {
+        border-radius: var(--radius-sm) 0 0 var(--radius-sm) !important;
+        border-right: none !important;
+      }
+      &.p-inputnumber-button-up {
+        border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
+        border-left: none !important;
+      }
+    }
+
+    .p-inputtext {
+      border-radius: 0 !important;
+      border-left: none !important;
+      border-right: none !important;
+    }
+  }
+
+  // Stacked layout (opt-in): keep PrimeNG default vertical stack but
+  // compact it to match our 32px input height.
+  &.p-inputnumber-buttons-stacked {
+    .p-inputnumber-button-group {
+      .p-button {
+        width: 22px;
+        height: 16px;
+        padding: 0;
+        background: var(--card-background) !important;
+        border: 1px solid var(--border-color) !important;
+        color: var(--text-muted) !important;
+
+        .pi { font-size: 9px; }
+
+        &:hover:not(:disabled) {
+          color: var(--primary-color) !important;
+          background: var(--hover-background) !important;
+        }
+      }
     }
   }
 }

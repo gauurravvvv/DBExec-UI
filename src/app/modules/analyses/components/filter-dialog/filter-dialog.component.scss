@@ -1,0 +1,187 @@
+// The dialog renders via PrimeNG's overlay (attached to <body>),
+// outside this component's emulated-encapsulation root. To reach
+// the dialog content from here, ::ng-deep is required. Scoped to
+// .filter-config-dialog so this rule only matches our specific
+// dialog and doesn't leak into other PrimeNG dialogs.
+:host ::ng-deep {
+  .filter-config-dialog {
+    .p-dialog {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 20px 60px var(--overlay-background);
+    }
+
+    .p-dialog-header {
+      background: var(--card-background);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1.25rem 1.5rem;
+
+      .p-dialog-title {
+        font-weight: var(--fw-semibold);
+        font-size: var(--fs-h2);
+        color: var(--text-color);
+      }
+
+      .p-dialog-header-icon {
+        color: var(--secondary-color);
+
+        &:hover {
+          color: var(--text-color);
+          background: var(--hover-background);
+        }
+      }
+    }
+
+    .p-dialog-content {
+      padding: var(--space-8);
+      background: var(--card-background);
+      overflow: visible;
+    }
+
+    .p-dialog-footer {
+      padding: 1rem 1.5rem;
+      background: var(--hover-background);
+      border-top: 1px solid var(--border-color);
+    }
+
+    // PrimeNG dialog button styles bleed into calendar trigger
+    // icons — restore the muted look.
+    .p-datepicker-trigger,
+    .p-calendar .p-button {
+      background: var(--hover-background) !important;
+      color: var(--secondary-color) !important;
+      border-color: var(--border-color) !important;
+
+      .pi {
+        color: var(--secondary-color) !important;
+      }
+
+      &:hover {
+        color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+
+        .pi {
+          color: var(--primary-color) !important;
+        }
+      }
+    }
+
+    // Inner form layout — fields rendered inside the dialog content.
+    .filter-dialog-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-7);
+    }
+
+    .filter-dialog-field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+
+      label {
+        font-size: var(--fs-body);
+        font-weight: var(--fw-medium);
+        color: var(--text-color);
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+
+        i {
+          font-size: var(--fs-control);
+          color: var(--primary-color);
+        }
+
+        .required {
+          color: var(--error-color);
+          margin-left: -2px;
+        }
+      }
+
+      .field-hint {
+        font-size: var(--fs-label);
+        color: var(--secondary-color);
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        opacity: 0.8;
+
+        i {
+          font-size: var(--fs-micro);
+        }
+      }
+    }
+
+    .filter-dialog-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-6);
+    }
+
+    .filter-dialog-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-6);
+      padding: 14px 16px;
+      background: var(--hover-background);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+
+    .dialog-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-5);
+
+      button {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-4);
+        padding: 0.6rem 1.25rem;
+        border-radius: var(--radius-md);
+        font-weight: var(--fw-semibold);
+        font-size: var(--fs-body);
+        border: none;
+        cursor: pointer;
+        transition: all var(--motion-base) ease;
+
+        i {
+          font-size: var(--fs-body);
+        }
+
+        &.btn-cancel {
+          background: var(--card-background);
+          border: 1px solid var(--border-color);
+          color: var(--text-color);
+          box-shadow: var(--shadow-sm);
+
+          &:hover {
+            background: var(--hover-background);
+            transform: translateY(-1px);
+          }
+        }
+
+        &.btn-primary {
+          background: linear-gradient(
+            135deg,
+            var(--primary-color),
+            var(--primary-hover)
+          );
+          color: var(--primary-text);
+          box-shadow: 0 4px 10px var(--primary-color-transparent);
+
+          &:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+          }
+        }
+      }
+    }
+  }
+}

@@ -55,6 +55,7 @@ import {
   isScatterGlChartType,
   isSunburstChartType,
   isSurfaceChartType,
+  isTableChartType,
   isThemeRiverChartType,
   isTreeChartType,
   isTreeMapChartType,
@@ -100,15 +101,109 @@ import { Visual } from '../../models';
 @Component({
   selector: 'app-visual-config-sidebar',
   templateUrl: './visual-config-sidebar.component.html',
-  // No styleUrls — see visuals-chart-sidebar for context. Parent
-  // edit-analyses owns the styling and skipping the stylesheet here
-  // keeps the child encapsulation-free so parent selectors match.
+  // styleUrls is REQUIRED. The previous decomposition commit assumed
+  // the parent edit-analyses could style the inner .config-sidebar
+  // markup, but Angular view-encapsulation scopes parent CSS to the
+  // parent template only — child markup is unstyled. The child must
+  // own its own visual chrome.
+  styleUrls: ['./visual-config-sidebar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VisualConfigSidebarComponent implements DoCheck {
   @Input() focusedVisual!: Visual;
+  /**
+   * All dataset + analysis fields for the current analysis. Used by the
+   * Table visual's column picker so the user can choose which fields
+   * to display even before any data has flowed through (chartData would
+   * otherwise be empty on first paint).
+   */
+  @Input() allFields: any[] = [];
   @Output() close = new EventEmitter<void>();
   @Output() configChanged = new EventEmitter<void>();
+
+  /**
+   * Available column names for the Table visual's column-visibility
+   * picker. Sources, in priority order:
+   *   1. The analysis's allFields list — present from the moment the
+   *      sidebar opens, so the picker shows up immediately.
+   *   2. Keys of the first chartData row — fallback for the case where
+   *      allFields isn't populated (e.g. an isolated render path).
+   * Returns [] only when neither source has any fields.
+   */
+  get tableAvailableColumns(): string[] {
+    if (!this.focusedVisual) return [];
+    if (Array.isArray(this.allFields) && this.allFields.length > 0) {
+      // Prefer columnToUse (the actual row key) — falling back to
+      // columnToView and finally the raw value for malformed entries.
+      const cols = this.allFields
+        .map((f: any) => f?.columnToUse ?? f?.columnToView ?? f)
+        .filter((v: any) => typeof v === 'string' && v.length > 0);
+      if (cols.length > 0) return cols as string[];
+    }
+    const rows = this.focusedVisual.chartData;
+    if (!Array.isArray(rows) || rows.length === 0) return [];
+    const first = rows[0];
+    if (!first || typeof first !== 'object') return [];
+    return Object.keys(first);
+  }
+
+  /**
+   * Look up a friendly display label for a column key from allFields.
+   * Falls back to the humanised raw key when the field isn't found.
+   */
+  tableColumnLabel(col: string): string {
+    const match = this.allFields?.find(
+      (f: any) => f?.columnToUse === col || f?.columnToView === col,
+    );
+    return match?.columnToView || this.humaniseFieldName(col);
+  }
+
+  /**
+   * Whether a given column is currently visible (not in the hidden
+   * list). Used by the Properties sidebar's per-column toggle.
+   */
+  isTableColumnVisible(col: string): boolean {
+    const hidden = this.focusedVisual?.config?.tableHiddenColumns;
+    if (!Array.isArray(hidden)) return true;
+    return !hidden.includes(col);
+  }
+
+  /**
+   * Toggle a single column's visibility. Stores the hidden list on
+   * the visual config so the change persists with the analysis.
+   * Re-assigns the array reference so OnPush downstream picks it up.
+   */
+  setTableColumnVisible(col: string, visible: boolean): void {
+    if (!this.focusedVisual?.config) return;
+    const cfg = this.focusedVisual.config;
+    const hidden: string[] = Array.isArray(cfg.tableHiddenColumns)
+      ? [...cfg.tableHiddenColumns]
+      : [];
+    const idx = hidden.indexOf(col);
+    if (visible && idx >= 0) {
+      hidden.splice(idx, 1);
+    } else if (!visible && idx < 0) {
+      hidden.push(col);
+    } else {
+      return; // no change
+    }
+    cfg.tableHiddenColumns = hidden;
+  }
+
+  /** Format a raw field key as a humanised label for display. */
+  humaniseFieldName(key: string): string {
+    return key
+      .replace(/[_-]+/g, ' ')
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/^./, c => c.toUpperCase());
+  }
+
+  /** trackBy for *ngFor over string arrays (column names). */
+  trackByValue(_: number, value: string): string {
+    return value;
+  }
 
   /**
    * JSON snapshot of focusedVisual + config used to detect ANY mutation —
@@ -180,6 +275,7 @@ export class VisualConfigSidebarComponent implements DoCheck {
   isWaterfallChartType = isWaterfallChartType;
   isGraphChartType = isGraphChartType;
   isTreeChartType = isTreeChartType;
+  isTableChartType = isTableChartType;
   isThemeRiverChartType = isThemeRiverChartType;
   isPictorialBarChartType = isPictorialBarChartType;
   isPolarBarChartType = isPolarBarChartType;

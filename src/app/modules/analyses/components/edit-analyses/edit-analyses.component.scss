@@ -686,6 +686,46 @@
     cursor: pointer;
   }
 
+  // Table mode: field cards become click-to-toggle for column visibility.
+  // Shown columns get a subtle primary tint + checkmark badge; hidden
+  // columns are de-emphasised so the user can see at a glance which
+  // fields are currently rendered.
+  .fields-list.table-mode {
+    .field-card {
+      position: relative;
+      cursor: pointer;
+      transition: opacity var(--motion-base) ease,
+        background-color var(--motion-base) ease,
+        border-color var(--motion-base) ease;
+
+      &.field-shown {
+        border-color: var(--primary-color);
+        background-color: rgba(var(--primary-color-rgb), 0.08);
+
+        &::after {
+          content: '✓';
+          position: absolute;
+          right: 8px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: var(--primary-color);
+          font-weight: 700;
+          font-size: 12px;
+        }
+
+        &:hover {
+          background-color: rgba(var(--primary-color-rgb), 0.14);
+        }
+      }
+
+      &.field-hidden {
+        opacity: 0.55;
+
+        &:hover { opacity: 0.85; }
+      }
+    }
+  }
+
   // Axis Slot Styles (replaces dropdowns)
   .axis-slot {
     display: flex;
@@ -2450,8 +2490,12 @@
   }
 }
 
+// .row-limit-tooltip used to force white-space: nowrap which made
+// the bubble stretch full-width. Global tooltip rule in styles.scss
+// now wraps to max-width: 240px — this class is intentionally a
+// no-op so we keep the styleClass binding in place without effect.
 ::ng-deep .row-limit-tooltip .p-tooltip-text {
-  white-space: nowrap;
+  // Inherits global tight tooltip style
 }
 
 // ===================================================================
@@ -2629,3 +2673,1503 @@
   color: var(--text-color-secondary);
   text-align: center;
 }
+
+
+// ============================================================================
+// ANALYSES REDESIGN — Linear / Vercel aesthetic
+// ----------------------------------------------------------------------------
+// Visual-only pass. Affects color, shadow, border, typography, hover/active.
+// HTML structure: top toolbar redesigned (.a-toolbar replaces .query-toolbar
+// + .sub-header). Sidebar dimensions and grid layout preserved as-is so
+// charts render identically at every screen size.
+// ============================================================================
+
+// Local design tokens for analyses (scoped to wrapper to avoid leakage)
+.query-editor-wrapper {
+  --a-bg-canvas: var(--home-background-color);
+  --a-bg-surface: var(--card-background);
+  --a-bg-hover: var(--hover-background);
+  --a-bg-sunken: rgba(0, 0, 0, 0.025);
+  --a-border-faint: var(--border-color);
+  --a-border: var(--border-color);
+  --a-border-bold: var(--border-strong);
+  --a-shadow-rest: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --a-shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --a-shadow-lift: 0 8px 24px rgba(0, 0, 0, 0.10);
+  --a-radius: 8px;
+  --a-radius-sm: 4px;
+}
+
+// Hide the legacy toolbar markup if it ever renders elsewhere
+.query-toolbar,
+.sub-header {
+  display: none !important;
+}
+
+// ----------------------------------------------------------------------------
+// UNIFIED TOP TOOLBAR (.a-toolbar)
+// 56px height. Three-column layout: identity left, segmented panel-toggles
+// in the centre, status + actions right. Hairline divider beneath.
+// ----------------------------------------------------------------------------
+.a-toolbar {
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-6);
+  gap: var(--space-5);
+  background: var(--a-bg-surface);
+  border-bottom: 1px solid var(--a-border-faint);
+}
+
+.a-toolbar__left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  flex: 1;
+}
+
+.a-toolbar__center {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.a-toolbar__right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 1;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.a-toolbar__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.a-toolbar__crumb {
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.a-toolbar__sep {
+  color: var(--text-subtle);
+  font-size: var(--fs-body);
+}
+
+.a-toolbar__name {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 320px;
+}
+
+.a-toolbar__divider {
+  width: 1px;
+  height: 20px;
+  background: var(--a-border-faint);
+  margin: 0 var(--space-2);
+}
+
+.a-toolbar__hint {
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: help;
+  padding: 4px;
+
+  &:hover { color: var(--primary-color); }
+}
+
+// Icon button — borderless, square, transparent, hover-tinted
+.a-icon-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: var(--a-radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: color var(--motion-fast) ease, background var(--motion-fast) ease;
+
+  i { font-size: 14px; }
+
+  &:hover:not(:disabled) {
+    color: var(--text-color);
+    background: var(--a-bg-hover);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &.a-back-btn:hover { color: var(--primary-color); }
+
+  // Dev-only variant — orange tint so it's clearly not a user-facing
+  // control. Visible only on non-production builds.
+  &.a-icon-btn--dev {
+    color: #f59e0b;
+    &:hover:not(:disabled) {
+      color: #b45309;
+      background: rgba(245, 158, 11, 0.12);
+    }
+  }
+}
+
+// Solid button — primary action (Save)
+.a-btn {
+  height: 32px;
+  padding: 0 var(--space-5);
+  border: none;
+  border-radius: var(--a-radius-sm);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  transition: background var(--motion-fast) ease, opacity var(--motion-fast) ease;
+
+  i { font-size: 13px; }
+
+  &--primary {
+    background: var(--primary-color);
+    color: var(--primary-text);
+
+    &:hover:not(:disabled) { background: var(--primary-hover); }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+}
+
+// ----------------------------------------------------------------------------
+// SEGMENTED CONTROL — panel toggles grouped in pairs
+// ----------------------------------------------------------------------------
+.a-segment {
+  display: inline-flex;
+  align-items: stretch;
+  background: var(--a-bg-sunken);
+  border: 1px solid var(--a-border-faint);
+  border-radius: var(--a-radius-sm);
+  padding: 2px;
+  gap: 1px;
+}
+
+.a-segment__btn {
+  height: 26px;
+  padding: 0 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  border-radius: 3px;
+  transition: color var(--motion-fast) ease, background var(--motion-fast) ease;
+
+  i { font-size: 12px; }
+
+  &:hover:not(.is-active) {
+    color: var(--text-color);
+    background: var(--a-bg-hover);
+  }
+
+  &.is-active {
+    color: var(--text-color);
+    background: var(--a-bg-surface);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  }
+}
+
+// ----------------------------------------------------------------------------
+// INLINE STATUS — colored dot + text
+// ----------------------------------------------------------------------------
+.a-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-3);
+  font-size: var(--fs-label);
+  color: var(--text-muted);
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.a-status__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+
+  &--loading {
+    background: var(--primary-color);
+    animation: a-pulse 1.4s ease-in-out infinite;
+  }
+
+  &--loaded {
+    background: var(--success-color);
+  }
+
+  &--error {
+    background: var(--error-color);
+  }
+}
+
+@keyframes a-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.a-status__text {
+  color: var(--text-color);
+  font-weight: var(--fw-medium);
+}
+
+// ----------------------------------------------------------------------------
+// LEFT SIDEBARS (datasource / visuals / visual-list / filter)
+// Visual chrome only — original widths preserved.
+// ----------------------------------------------------------------------------
+.datasource-sidebar,
+.visuals-sidebar,
+.visual-list-sidebar,
+.filter-sidebar {
+  border-right: 1px solid var(--a-border-faint) !important;
+  background: var(--a-bg-surface) !important;
+
+  .sidebar-header-info {
+    height: 44px !important;
+    padding: 0 var(--space-5) !important;
+    background: transparent !important;
+    border-bottom: 1px solid var(--a-border-faint);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+
+    .dataset-label,
+    .sidebar-label {
+      font-size: var(--fs-label) !important;
+      font-weight: var(--fw-semibold) !important;
+      color: var(--text-color) !important;
+      text-transform: none !important;
+      letter-spacing: 0 !important;
+      margin: 0;
+    }
+
+    .visual-count-badge,
+    .filter-count-badge {
+      background: var(--primary-color-transparent) !important;
+      color: var(--primary-color) !important;
+      font-size: var(--fs-micro) !important;
+      font-weight: var(--fw-semibold) !important;
+      padding: 1px 7px !important;
+      border-radius: var(--radius-pill) !important;
+      min-width: 0;
+    }
+  }
+
+  .sidebar-divider { display: none; }
+
+  .sidebar-content-inner {
+    padding: var(--space-2) 0;
+    background: var(--a-bg-surface);
+
+    &::-webkit-scrollbar { width: 3px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb {
+      background: var(--a-border-bold);
+      border-radius: 999px;
+      &:hover { background: var(--text-subtle); }
+    }
+    scrollbar-width: thin;
+    scrollbar-color: var(--a-border-bold) transparent;
+  }
+
+  // Search inputs
+  .search-wrapper {
+    padding: var(--space-3) var(--space-5) !important;
+    background: transparent !important;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// FIELD CARDS — neutral icons, flat rows
+// ----------------------------------------------------------------------------
+.fields-list {
+  padding: var(--space-2) 0 !important;
+  gap: 1px !important;
+}
+
+.field-card {
+  padding: 6px var(--space-5) !important;
+  background: transparent !important;
+  border: none !important;
+  border-left: 2px solid transparent !important;
+  border-radius: 0 !important;
+  gap: var(--space-4) !important;
+  transition:
+    background var(--motion-fast) ease,
+    border-left-color var(--motion-fast) ease !important;
+
+  &:hover {
+    background: var(--a-bg-hover) !important;
+    border-left-color: var(--primary-color) !important;
+    transform: none !important;
+
+    .field-icon { color: var(--primary-color) !important; }
+    .field-actions, .field-menu {
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+  }
+
+  &.custom-field { border-left-color: var(--primary-color) !important; }
+  &.analysis-field { border-left-color: var(--warning-color) !important; }
+  &.selectable { cursor: pointer; }
+
+  // Field type indicator — small icon with type-specific tint.
+  // Restored from the all-muted pass: types are common enough that
+  // a quiet color signal helps the user pick the right field type
+  // (numeric for aggregations, date for time series, etc.) without
+  // squinting at the icon. Saturation deliberately low so a long
+  // field list still reads as one calm column, not a rainbow.
+  .field-icon {
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 11px !important;
+    border-radius: var(--a-radius-sm) !important;
+    background: transparent !important;
+    color: var(--text-muted) !important;
+    transition: color var(--motion-fast) ease;
+    flex-shrink: 0;
+
+    &.type-numeric { color: #0e7490 !important; } // cyan-700 — numbers
+    &.type-text    { color: #6d28d9 !important; } // violet-700 — text
+    &.type-date    { color: #b45309 !important; } // amber-700 — date/time
+    &.type-bool    { color: #15803d !important; } // green-700 — boolean
+    &.type-special { color: #be185d !important; } // pink-700 — special
+  }
+
+  .field-name {
+    font-size: var(--fs-label) !important;
+    font-weight: var(--fw-regular) !important;
+    color: var(--text-color) !important;
+  }
+
+  .field-actions {
+    opacity: 0;
+    gap: var(--space-2) !important;
+
+    .field-action-icon {
+      font-size: 11px !important;
+      padding: 2px !important;
+      color: var(--text-muted) !important;
+      border-radius: 2px;
+
+      &:hover { color: var(--primary-color) !important; }
+      &.delete-icon:hover { color: var(--error-color) !important; }
+    }
+  }
+}
+
+.fields-section-label {
+  padding: var(--space-3) var(--space-5) var(--space-2) !important;
+  font-size: var(--fs-micro) !important;
+  font-weight: var(--fw-semibold) !important;
+  color: var(--text-muted) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.fields-sticky-header {
+  background: var(--a-bg-surface) !important;
+  border-bottom: 1px solid var(--a-border-faint) !important;
+
+  .add-field-action {
+    padding: var(--space-3) var(--space-5) !important;
+  }
+
+  .add-field-btn {
+    width: 100%;
+    height: 32px;
+    font-size: var(--fs-label) !important;
+    border-radius: var(--a-radius-sm) !important;
+    font-weight: var(--fw-medium) !important;
+  }
+}
+
+.dataset-name-section {
+  padding: var(--space-4) var(--space-5) !important;
+  border-bottom: 1px solid var(--a-border-faint) !important;
+}
+
+.dataset-name-text {
+  font-size: var(--fs-body) !important;
+  font-weight: var(--fw-semibold) !important;
+  color: var(--text-color) !important;
+  letter-spacing: 0 !important;
+}
+
+.dataset-name-divider {
+  &::before, &::after {
+    border-bottom: 1px solid var(--a-border-faint) !important;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// VISUAL LIST (Layers)
+// ----------------------------------------------------------------------------
+.visual-list-items {
+  padding: var(--space-2) 0 !important;
+  gap: 1px !important;
+}
+
+.visual-list-item {
+  padding: 6px var(--space-5) !important;
+  background: transparent !important;
+  border: none !important;
+  border-left: 2px solid transparent !important;
+  border-radius: 0 !important;
+  gap: var(--space-3) !important;
+  transition:
+    background var(--motion-fast) ease,
+    border-left-color var(--motion-fast) ease !important;
+
+  &:hover {
+    background: var(--a-bg-hover) !important;
+    border-left-color: var(--primary-color) !important;
+    transform: none !important;
+
+    .visual-icon { color: var(--primary-color) !important; background: transparent !important; }
+  }
+
+  &.focused {
+    background: var(--primary-color-transparent) !important;
+    border-left-color: var(--primary-color) !important;
+
+    .visual-icon { color: var(--primary-color) !important; background: transparent !important; }
+    .visual-name { color: var(--primary-color) !important; font-weight: var(--fw-semibold) !important; }
+  }
+
+  &.unconfigured { opacity: 0.6; }
+
+  .visual-icon {
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 11px !important;
+    background: transparent !important;
+    color: var(--text-muted) !important;
+    border-radius: var(--a-radius-sm) !important;
+    transition: color var(--motion-fast) ease;
+  }
+
+  .visual-name {
+    font-size: var(--fs-label) !important;
+    font-weight: var(--fw-regular) !important;
+    color: var(--text-color) !important;
+  }
+
+  .visual-type-label {
+    font-size: var(--fs-micro) !important;
+    color: var(--text-muted) !important;
+    opacity: 1 !important;
+  }
+}
+
+.add-visual-section,
+.add-filter-section {
+  padding: var(--space-4) var(--space-5) !important;
+}
+
+.add-visual-button,
+.add-filter-button {
+  width: 100% !important;
+  height: 32px;
+  font-size: var(--fs-label) !important;
+  font-weight: var(--fw-medium) !important;
+  border-radius: var(--a-radius-sm) !important;
+}
+
+.visual-list-empty,
+.filter-list-empty {
+  padding: var(--space-9) var(--space-5) !important;
+  color: var(--text-muted) !important;
+
+  i {
+    font-size: 24px !important;
+    color: var(--text-subtle) !important;
+    margin-bottom: var(--space-4) !important;
+    opacity: 1 !important;
+  }
+
+  p {
+    font-size: var(--fs-label) !important;
+    font-weight: var(--fw-regular) !important;
+    color: var(--text-muted) !important;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// CHART TYPE GRID
+// ----------------------------------------------------------------------------
+.chart-type-section { padding: 0 !important; }
+
+.chart-type-hint {
+  background: var(--a-bg-hover) !important;
+  border-bottom: 1px solid var(--a-border-faint) !important;
+  padding: var(--space-3) var(--space-5) !important;
+  font-size: var(--fs-label) !important;
+  color: var(--text-color) !important;
+  gap: var(--space-3) !important;
+
+  i {
+    color: var(--primary-color) !important;
+    font-size: 12px !important;
+  }
+}
+
+.chart-search-wrapper {
+  padding: var(--space-3) var(--space-5) !important;
+  background: var(--a-bg-surface) !important;
+  border-bottom: 1px solid var(--a-border-faint) !important;
+}
+
+.category-label {
+  background: transparent !important;
+  border-bottom: none !important;
+  padding: var(--space-4) var(--space-5) var(--space-2) !important;
+  color: var(--text-muted) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: var(--fs-micro) !important;
+  font-weight: var(--fw-semibold) !important;
+}
+
+.chart-categories { gap: 0 !important; }
+
+.chart-type-grid {
+  padding: 0 var(--space-4) var(--space-3) !important;
+  gap: var(--space-2) !important;
+}
+
+.chart-type-card {
+  padding: var(--space-3) var(--space-2) !important;
+  min-height: 56px !important;
+  border-radius: var(--a-radius-sm) !important;
+  border: 1px solid var(--a-border-faint) !important;
+  background: var(--a-bg-surface) !important;
+  gap: var(--space-2) !important;
+  transition:
+    border-color var(--motion-fast) ease,
+    background var(--motion-fast) ease !important;
+
+  &:hover {
+    background: var(--a-bg-hover) !important;
+    border-color: var(--a-border-bold) !important;
+    transform: none !important;
+
+    .chart-icon { color: var(--primary-color) !important; }
+    .chart-name { color: var(--text-color) !important; opacity: 1 !important; max-height: 24px !important; }
+  }
+
+  &.selected {
+    background: var(--primary-color-transparent) !important;
+    border-color: var(--primary-color) !important;
+
+    .chart-icon { color: var(--primary-color) !important; }
+    .chart-name { color: var(--primary-color) !important; font-weight: var(--fw-semibold) !important; opacity: 1 !important; }
+  }
+
+  .chart-icon {
+    font-size: 18px !important;
+    color: var(--text-muted) !important;
+  }
+
+  .chart-name {
+    font-size: var(--fs-micro) !important;
+    font-weight: var(--fw-medium) !important;
+    color: var(--text-muted) !important;
+    opacity: 0.85;
+    max-height: 16px;
+    transition: max-height var(--motion-fast) ease, opacity var(--motion-fast) ease, color var(--motion-fast) ease;
+  }
+}
+
+.selected-chart-header {
+  background: var(--a-bg-hover) !important;
+  padding: var(--space-3) var(--space-5) !important;
+  border-bottom: 1px solid var(--a-border-faint) !important;
+
+  .selected-chart-info {
+    font-size: var(--fs-label) !important;
+    font-weight: var(--fw-semibold) !important;
+    color: var(--text-color) !important;
+
+    i {
+      color: var(--primary-color) !important;
+      font-size: 14px !important;
+    }
+  }
+
+  button {
+    width: 24px;
+    height: 24px;
+    color: var(--text-muted) !important;
+
+    &:hover {
+      color: var(--primary-color) !important;
+      background: var(--a-bg-surface) !important;
+    }
+  }
+}
+
+// ----------------------------------------------------------------------------
+// FIELD MAPPING — chip-pill axis slots
+// ----------------------------------------------------------------------------
+.axis-selection-title {
+  font-size: var(--fs-micro) !important;
+  font-weight: var(--fw-semibold) !important;
+  color: var(--text-muted) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  text-align: left !important;
+  padding: var(--space-3) var(--space-5) 0 !important;
+  margin-bottom: var(--space-3) !important;
+}
+
+.section-divider { display: none !important; }
+
+.axis-slot {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: var(--space-2) !important;
+  padding: var(--space-3) var(--space-4) !important;
+  margin: 0 var(--space-5) var(--space-2) !important;
+  background: var(--a-bg-surface) !important;
+  border: 1px solid var(--a-border-faint) !important;
+  border-radius: var(--a-radius-sm) !important;
+  cursor: pointer;
+  position: relative;
+  animation: none !important;
+  transition:
+    border-color var(--motion-fast) ease,
+    background var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease !important;
+
+  &:hover:not(.active) {
+    border-color: var(--a-border-bold) !important;
+    background: var(--a-bg-hover) !important;
+  }
+
+  &.active {
+    border-color: var(--primary-color) !important;
+    background: var(--a-bg-surface) !important;
+    box-shadow: 0 0 0 2px var(--primary-color-transparent) !important;
+  }
+
+  &.has-value {
+    background: var(--a-bg-surface) !important;
+  }
+
+  &.optional {
+    border-style: dashed !important;
+    opacity: 0.85;
+
+    &.has-value { border-style: solid !important; opacity: 1; }
+  }
+
+  .axis-label {
+    font-size: var(--fs-micro) !important;
+    font-weight: var(--fw-semibold) !important;
+    color: var(--text-muted) !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+  }
+
+  .axis-placeholder {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-muted);
+    font-size: var(--fs-label);
+    font-style: normal !important;
+    line-height: 1.3;
+
+    i {
+      color: var(--text-subtle);
+      font-size: 11px;
+    }
+
+    span {
+      font-style: normal !important;
+      font-size: var(--fs-label) !important;
+    }
+  }
+
+  .axis-value {
+    display: inline-flex !important;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 2px 6px 2px 8px;
+    background: var(--primary-color-transparent);
+    border: 1px solid var(--primary-color);
+    border-radius: var(--radius-pill);
+    align-self: flex-start;
+    max-width: 100%;
+
+    > span {
+      color: var(--primary-color) !important;
+      font-size: var(--fs-micro) !important;
+      font-weight: var(--fw-medium) !important;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .clear-btn {
+      color: var(--primary-color) !important;
+      font-size: 10px !important;
+      width: 14px !important;
+      height: 14px !important;
+      padding: 0 !important;
+      border-radius: 50% !important;
+      background: transparent !important;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background var(--motion-fast) ease, color var(--motion-fast) ease;
+
+      &:hover {
+        color: var(--card-background) !important;
+        background: var(--primary-color) !important;
+      }
+    }
+  }
+}
+
+.axis-hint {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--space-3) !important;
+  margin: 0 var(--space-5) var(--space-3) !important;
+  padding: var(--space-3) var(--space-4) !important;
+  background: var(--primary-color-transparent) !important;
+  border: 1px solid var(--primary-color) !important;
+  border-radius: var(--a-radius-sm) !important;
+  font-size: var(--fs-label) !important;
+  font-weight: var(--fw-regular) !important;
+  color: var(--primary-color) !important;
+  animation: none !important;
+
+  i {
+    color: var(--primary-color) !important;
+    font-size: 12px !important;
+  }
+
+  span {
+    color: var(--primary-color) !important;
+    font-size: var(--fs-label) !important;
+    flex: 1;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// FILTER CARDS
+// ----------------------------------------------------------------------------
+.filter-cards {
+  padding: var(--space-2) var(--space-5) !important;
+  gap: var(--space-2) !important;
+}
+
+.filter-card {
+  background: var(--a-bg-surface) !important;
+  border: 1px solid var(--a-border-faint) !important;
+  border-radius: var(--a-radius-sm) !important;
+  padding: var(--space-3) var(--space-4) !important;
+
+  &:hover {
+    background: var(--a-bg-hover) !important;
+    border-color: var(--a-border-bold) !important;
+
+    .filter-card-actions { opacity: 1 !important; }
+  }
+
+  &.disabled { opacity: 0.55; }
+
+  .filter-card-name {
+    font-size: var(--fs-label) !important;
+    color: var(--text-color) !important;
+  }
+
+  .filter-card-column,
+  .filter-card-config small {
+    font-size: var(--fs-micro) !important;
+    color: var(--text-muted) !important;
+  }
+
+  .filter-card-type {
+    color: var(--text-muted) !important;
+    font-weight: var(--fw-medium) !important;
+  }
+
+  .badge {
+    border-radius: var(--radius-pill) !important;
+    font-size: 9px !important;
+    padding: 1px 6px !important;
+    font-weight: var(--fw-semibold) !important;
+  }
+
+  .badge-mandatory {
+    background: var(--primary-color-transparent) !important;
+    color: var(--primary-color) !important;
+  }
+
+  .badge-disabled {
+    background: var(--a-bg-hover) !important;
+    color: var(--text-muted) !important;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// CANVAS + VISUAL CARDS
+// ----------------------------------------------------------------------------
+.canvas-area {
+  background-color: var(--a-bg-canvas);
+  background-image: none;
+}
+
+// Visual outer card — Linear/Vercel chrome refined.
+// - 1px hairline at rest, 8px corner radius.
+// - Soft single shadow at rest, slightly deeper on hover.
+// - When focused: 1px primary border + 3px primary glow ring +
+//   subtle shadow. NOT a thick 2px border (was reading too heavy).
+// - .blinking-visual / .highlight-visual / .is-flash: layer-click
+//   feedback. Animate the primary glow ring on / off in a brief
+//   pulse so the user sees which card the click targeted.
+.visual-box {
+  background: var(--a-bg-surface) !important;
+  border: 1px solid var(--a-border-faint) !important;
+  border-radius: var(--a-radius) !important;
+  box-shadow: var(--a-shadow-rest) !important;
+  transition:
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease !important;
+  overflow: hidden;
+
+  &:hover {
+    border-color: var(--a-border-bold) !important;
+    box-shadow: var(--a-shadow-hover) !important;
+  }
+
+  // Focused: subtle. Just a slightly stronger neutral border + a
+  // tiny shadow deepening. No primary halo, no tinted border — the
+  // selected card should feel "lifted" not "highlighted in marker".
+  // Selection signal lives in the Layers sidebar + visual-actions
+  // toolbar appearing on hover.
+  &.focused {
+    border-color: var(--a-border-bold) !important;
+    box-shadow:
+      0 0 0 1px var(--a-border-bold),
+      var(--a-shadow-hover) !important;
+  }
+
+  &.is-dragging,
+  &.is-resizing {
+    box-shadow: var(--a-shadow-lift) !important;
+    cursor: grabbing;
+  }
+
+  // Layer-click highlight pulse. Triggered for ~1.2s when a user
+  // clicks a visual in the Layers sidebar (existing TS already
+  // toggles .blinking-visual). The pulse layers a primary glow
+  // ring over the resting shadow.
+  &.blinking-visual,
+  &.highlight-visual,
+  &.is-flash {
+    animation: a-card-flash 1.2s ease-out 1 !important;
+    border-color: var(--primary-color) !important;
+  }
+}
+
+@keyframes a-card-flash {
+  0% {
+    box-shadow:
+      0 0 0 0 var(--primary-color-transparent),
+      var(--a-shadow-hover);
+    border-color: var(--primary-color);
+  }
+  25% {
+    box-shadow:
+      0 0 0 6px var(--primary-color-transparent),
+      var(--a-shadow-hover);
+    border-color: var(--primary-color);
+  }
+  100% {
+    box-shadow:
+      0 0 0 0 var(--primary-color-transparent),
+      var(--a-shadow-rest);
+    border-color: var(--a-border-faint);
+  }
+}
+
+// Visual card header — clean toolbar pattern.
+// - 40px height
+// - Drag grip on the left (visible on hover only)
+// - Title centered vertically, fills available space
+// - Action icons on the right (hidden at rest; visible on card hover)
+// - Hairline divider below the header
+.visual-inline-title {
+  height: 40px !important;
+  padding: 0 var(--space-3) 0 var(--space-2) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--space-2) !important;
+  background: var(--a-bg-surface);
+  border-bottom: 1px solid var(--a-border-faint);
+  cursor: grab !important;
+
+  &:active { cursor: grabbing !important; }
+
+  // Drag grip dots — quiet at rest, primary tint on card hover.
+  &::before {
+    content: '⠿' !important;
+    font-size: 14px !important;
+    color: var(--text-subtle) !important;
+    opacity: 0 !important;
+    flex-shrink: 0;
+    letter-spacing: -1px;
+    width: 16px;
+    text-align: center;
+    transition: opacity var(--motion-fast) ease, color var(--motion-fast) ease !important;
+  }
+
+  // Title text — left of all action buttons, fills remaining space
+  .inline-title-text,
+  .title-text {
+    flex: 1 !important;
+    min-width: 0;
+    font-size: var(--fs-label) !important;
+    font-weight: var(--fw-semibold) !important;
+    color: var(--text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.4;
+    letter-spacing: 0;
+    padding: 2px 6px;
+    border-radius: var(--a-radius-sm);
+    cursor: pointer;
+    transition: background var(--motion-fast) ease;
+
+    &:hover {
+      background: var(--a-bg-hover);
+    }
+  }
+
+  // Title input (when editing) — same height as text, primary border
+  .title-input {
+    flex: 1 !important;
+    min-width: 0;
+    height: 24px;
+    padding: 0 8px;
+    font-size: var(--fs-label);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+    border: 1px solid var(--primary-color);
+    border-radius: var(--a-radius-sm);
+    background: var(--a-bg-surface);
+    outline: none;
+
+    &:focus {
+      box-shadow: 0 0 0 2px var(--primary-color-transparent);
+    }
+  }
+
+  // Action buttons cluster on the right side.
+  // Hidden at rest, visible on card hover. Each button is a 24px
+  // square with hover-tint background and primary on hover.
+  .visual-action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity var(--motion-fast) ease;
+
+    .action-icon {
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--a-radius-sm);
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text-muted);
+      background: transparent;
+      opacity: 1 !important;
+      transition:
+        color var(--motion-fast) ease,
+        background var(--motion-fast) ease;
+
+      &:hover {
+        color: var(--primary-color);
+        background: var(--a-bg-hover);
+      }
+    }
+
+    .maximize-icon:hover { color: var(--primary-color); }
+    .change-chart-icon:hover { color: var(--warning-color); }
+    .remove-icon:hover {
+      color: var(--error-color);
+      background: var(--error-bg) !important;
+    }
+  }
+}
+
+// Show action buttons + drag grip when hovering the card or when
+// the card is focused. The card itself owns the hover trigger so
+// the user can mouse anywhere in the card to reveal the toolbar.
+.visual-box:hover,
+.visual-box.focused {
+  .visual-inline-title {
+    &::before { opacity: 0.5 !important; }
+    .visual-action-buttons { opacity: 1; }
+  }
+}
+
+.visual-box:hover .visual-inline-title::before:hover {
+  opacity: 1 !important;
+}
+
+.visual-actions {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity var(--motion-fast) ease;
+  z-index: 2;
+
+  button {
+    width: 26px;
+    height: 26px;
+    border-radius: var(--a-radius-sm);
+    color: var(--text-muted);
+    background: var(--a-bg-surface);
+    border: 1px solid var(--a-border-faint);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+      color var(--motion-fast) ease,
+      background var(--motion-fast) ease,
+      border-color var(--motion-fast) ease;
+
+    .pi { font-size: 12px; }
+
+    &:hover {
+      color: var(--primary-color);
+      background: var(--a-bg-hover);
+      border-color: var(--primary-color);
+    }
+
+    &.delete-btn:hover {
+      color: var(--error-color);
+      border-color: var(--error-color);
+    }
+  }
+}
+
+.visual-box:hover .visual-actions,
+.visual-box.focused .visual-actions {
+  opacity: 1;
+}
+
+// Make .visual-body a positioning context for the absolute placeholder
+.visual-body {
+  position: relative;
+}
+
+.visual-content-placeholder {
+  // Absolute-position over the .visual-body so it does not compete
+  // with the (always-rendered-when-chart-type-set) .chart-click-guard
+  // for flex space. Both axes centred inside the card body.
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  gap: var(--space-3) !important;
+  padding: var(--space-8) !important;
+  background: var(--a-bg-surface) !important;
+  color: var(--text-muted) !important;
+  pointer-events: none; // let clicks fall through if needed
+
+  // Restore pointer-events on interactive children
+  > * { pointer-events: auto; }
+
+  // Icon — wrap variant has a tinted circle around a primary-color
+  // glyph, bare-icon variant is a muted glyph. Slightly tighter than
+  // the original 44px to feel more in-card / less marketing-block.
+  .placeholder-icon-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-color-transparent);
+    margin: 0 0 var(--space-3);
+
+    // PrimeIcon variant (legacy <i class="pi *">)
+    > i:not(.ci) {
+      font-size: 18px !important;
+      color: var(--primary-color) !important;
+      opacity: 1 !important;
+      margin: 0 !important;
+    }
+
+    // Custom SVG icon variant — needs filter override since the
+    // global .ci rule applies brightness(0) to make icons black.
+    > .ci {
+      width: 20px !important;
+      height: 20px !important;
+      margin: 0 !important;
+      opacity: 1 !important;
+      // Tint to primary color via CSS filters. Source: codepen
+      // recipe for filter-tinting solid black SVGs.
+      filter: invert(43%) sepia(72%) saturate(2000%) hue-rotate(190deg)
+        brightness(95%) contrast(95%) !important;
+    }
+  }
+
+  // Bare icon (no tinted ring) — PrimeIcon
+  > i:not(.ci) {
+    font-size: 24px !important;
+    color: var(--text-subtle) !important;
+    opacity: 1 !important;
+    margin: 0 0 var(--space-2) !important;
+  }
+
+  // Bare custom SVG icon
+  > .ci {
+    width: 26px !important;
+    height: 26px !important;
+    margin: 0 0 var(--space-2) !important;
+    opacity: 0.55 !important;
+    filter: grayscale(1) brightness(0.6) !important;
+  }
+
+  // Block headings/paragraphs: text-align: center already handles
+  // horizontal centring of the wrapped text. max-width caps the
+  // line length; margin: 0 auto re-centres the constrained block.
+  h3, p, .placeholder-title {
+    margin: 0 auto !important;
+    font-size: var(--fs-body) !important;
+    font-weight: var(--fw-semibold) !important;
+    color: var(--text-color) !important;
+    max-width: 320px;
+    line-height: 1.4;
+  }
+
+  small, .placeholder-subtitle {
+    display: block;
+    color: var(--text-muted) !important;
+    font-size: var(--fs-label) !important;
+    font-weight: var(--fw-regular) !important;
+    margin: 0 auto !important;
+    max-width: 360px;
+    line-height: 1.5;
+  }
+}
+
+.visual-loading-placeholder {
+  padding: var(--space-8) !important;
+  color: var(--text-muted) !important;
+  text-align: center;
+
+  i {
+    font-size: 20px !important;
+    color: var(--primary-color) !important;
+  }
+
+  p { font-size: var(--fs-label) !important; color: var(--text-muted) !important; }
+}
+
+.visual-error-placeholder {
+  padding: var(--space-8) !important;
+  color: var(--text-muted) !important;
+  text-align: center;
+
+  i {
+    font-size: 22px !important;
+    color: var(--error-color) !important;
+    margin-bottom: var(--space-3) !important;
+  }
+
+  p {
+    font-size: var(--fs-label) !important;
+    color: var(--text-color) !important;
+    font-weight: var(--fw-medium) !important;
+  }
+
+  small {
+    color: var(--text-muted) !important;
+    font-size: var(--fs-micro) !important;
+  }
+}
+
+// Maximized visual modal — sits OUTSIDE .query-editor-wrapper in
+// the DOM, so the locally-scoped --a-* tokens do not reach it.
+// Uses the global tokens directly (--card-background / --border-color
+// / etc.) so the modal surface is always a real opaque value.
+.maximized-visual-overlay {
+  background: rgba(15, 23, 42, 0.55) !important;
+  backdrop-filter: blur(2px);
+}
+
+.maximized-visual-container {
+  background: var(--card-background) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18) !important;
+  overflow: hidden;
+}
+
+.maximized-visual-header {
+  height: 48px !important;
+  padding: 0 var(--space-5) !important;
+  background: var(--card-background) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .maximized-visual-title {
+    font-size: var(--fs-body) !important;
+    font-weight: var(--fw-semibold) !important;
+    color: var(--text-color) !important;
+    letter-spacing: 0 !important;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .close-maximize-btn {
+    width: 28px !important;
+    height: 28px !important;
+    color: var(--text-muted) !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 4px !important;
+    flex-shrink: 0;
+    transition:
+      color var(--motion-fast) ease,
+      background var(--motion-fast) ease;
+
+    .pi { font-size: 12px !important; }
+
+    &:hover {
+      color: var(--text-color) !important;
+      background: var(--hover-background) !important;
+    }
+  }
+}
+
+.maximized-visual-body {
+  padding: var(--space-6) !important;
+  background: var(--card-background) !important;
+}
+
+// Empty state on the canvas when there are zero visuals.
+// Subtle: small muted icon, sentence-case quiet title, light hint,
+// minimal bullet tips. Reads as documentation, not a marketing block.
+.empty-state {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: var(--space-9) !important;
+  color: var(--text-muted) !important;
+  background: transparent !important;
+  border: none !important;
+  flex: 1;
+
+  // Custom SVG icon — muted, no tinted ring, no marketing chrome.
+  .ci,
+  .empty-state__icon {
+    display: inline-block !important;
+    width: 36px !important;
+    height: 36px !important;
+    margin: 0 0 var(--space-5) !important;
+    opacity: 0.5 !important;
+    filter: grayscale(1) brightness(0.6) !important;
+  }
+
+  // Bare PrimeIcon fallback (in case any callsite still uses pi)
+  > i:not(.ci) {
+    font-size: 28px !important;
+    color: var(--text-subtle) !important;
+    margin: 0 0 var(--space-5) !important;
+    opacity: 1 !important;
+  }
+
+  .empty-state__title,
+  h3 {
+    color: var(--text-color) !important;
+    font-weight: var(--fw-semibold) !important;
+    font-size: var(--fs-body) !important;
+    margin: 0 0 var(--space-2) !important;
+    line-height: 1.3;
+  }
+
+  .empty-state__hint,
+  > p {
+    color: var(--text-muted) !important;
+    font-size: var(--fs-label) !important;
+    font-weight: var(--fw-regular) !important;
+    margin: 0 0 var(--space-6) !important;
+    max-width: 320px;
+    line-height: 1.5;
+  }
+
+  // Quiet bullet tips list. Each line: small muted dot + plain copy.
+  // Replaces the previous boxed/iconed .empty-state-tips block.
+  .empty-state__tips {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    text-align: left;
+    color: var(--text-muted);
+    font-size: var(--fs-label);
+    line-height: 1.45;
+
+    li {
+      position: relative;
+      padding-left: var(--space-5);
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 4px;
+        top: 8px;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--text-subtle);
+      }
+    }
+  }
+
+  small {
+    color: var(--text-muted) !important;
+    font-size: var(--fs-label) !important;
+  }
+}
+
+// Hide the old boxed tips block (no longer rendered, but defensive)
+.empty-state-tips {
+  display: none !important;
+}
+
+// visual-list-empty (sidebar) — use the same subtle treatment
+.visual-list-empty {
+  .ci {
+    width: 28px !important;
+    height: 28px !important;
+    opacity: 0.45 !important;
+    filter: grayscale(1) brightness(0.6) !important;
+    margin: 0 0 var(--space-3) !important;
+  }
+}
+
+
+// ============================================================================
+// HOVER INSIGHTS CHIP — bottom-left of a visual card, reveals on hover.
+// Modern BI tools (Looker, Metabase) show row count + dataset name on
+// hover so the user knows which data each card represents at a glance.
+// Absolutely positioned; never affects layout dimensions.
+// ============================================================================
+.visual-insights {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-medium);
+  color: var(--text-muted);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(2px);
+  transition:
+    opacity var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+  backdrop-filter: blur(4px);
+
+  &__chunk {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+
+    i {
+      font-size: 9px;
+      color: var(--text-subtle);
+    }
+
+    & + & {
+      padding-left: 6px;
+      border-left: 1px solid var(--border-color);
+    }
+  }
+}
+
+.visual-box:hover .visual-insights {
+  opacity: 1;
+  transform: translateY(0);
+}
+

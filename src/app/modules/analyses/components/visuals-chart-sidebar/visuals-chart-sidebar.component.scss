@@ -1,0 +1,392 @@
+// Self-sufficient stylesheet for the field-mapping / chart-type
+// sidebar. All rules used by markup rendered HERE live in this file.
+// We rely on default Emulated encapsulation, so styles are scoped to
+// this component and don't leak.
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+// Header bar — 40px, matches the listings-module + properties sidebar.
+.sidebar-header-info {
+  height: 40px;
+  padding: 0 var(--space-5);
+  background: transparent;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .dataset-label {
+    font-size: var(--fs-label);
+    font-weight: var(--fw-semibold);
+    color: var(--text-muted);
+    letter-spacing: 0;
+    margin: 0;
+  }
+}
+
+.sidebar-divider {
+  height: 1px;
+  background-color: var(--border-color);
+  flex-shrink: 0;
+}
+
+.sidebar-content-inner {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+
+  &::-webkit-scrollbar {
+    width: 3px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+    &:hover { background: var(--text-subtle); }
+  }
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+// ---- Add Visual button ----
+.add-visual-section {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.add-visual-button {
+  width: 100%;
+  font-size: var(--fs-label);
+  padding: 6px 8px;
+}
+
+// ---- Chart Type section (when picking a chart) ----
+.chart-type-section {
+  display: flex;
+  flex-direction: column;
+  padding: 0 10px 16px 10px;
+
+  .section-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 8px 0 12px 0;
+  }
+
+  .axis-selection-title {
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-semibold);
+    color: var(--text-muted);
+    text-transform: none;
+    letter-spacing: 0;
+    margin-bottom: var(--space-3);
+    text-align: left;
+  }
+}
+
+// Contextual hint banner — quiet caption with a small primary icon.
+// Was: primary-tinted block with primary text (loud). Now: muted text
+// on the sidebar surface, primary icon as the only color signal.
+.chart-type-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 10px 12px;
+  background-color: transparent;
+  border-bottom: 1px solid var(--border-color);
+  font-size: var(--fs-label);
+  color: var(--text-muted);
+  line-height: 1.4;
+
+  i {
+    color: var(--primary-color);
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+}
+
+.chart-search-wrapper {
+  padding: 10px 12px;
+  background-color: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+}
+
+// ---- Chart categories + grid ----
+.chart-categories {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.chart-category-section {
+  margin-bottom: 4px;
+}
+
+.category-label {
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-semibold);
+  color: var(--text-muted);
+  text-transform: none;
+  letter-spacing: 0;
+  padding: 12px 10px 4px 10px;
+  background-color: transparent;
+  border-bottom: none;
+}
+
+.chart-type-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  padding: 8px 10px;
+}
+
+.chart-type-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--motion-base) ease;
+  gap: var(--space-2);
+  min-height: 50px;
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+
+  &:hover {
+    background-color: var(--hover-background);
+    border-color: var(--primary-color);
+
+    .chart-icon { color: var(--primary-color); }
+    .chart-name {
+      opacity: 1;
+      max-height: 24px;
+    }
+  }
+
+  &.selected {
+    background-color: rgba(var(--primary-color-rgb), 0.15);
+    border-color: var(--primary-color);
+
+    .chart-icon { color: var(--primary-color); }
+    .chart-name {
+      color: var(--primary-color);
+      font-weight: var(--fw-semibold);
+      opacity: 1;
+    }
+  }
+}
+
+.chart-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-h2);
+  color: var(--secondary-color);
+  transition: all var(--motion-base) ease;
+
+  &.rotate { transform: rotate(90deg); }
+}
+
+.chart-name {
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-medium);
+  color: var(--text-color);
+  text-align: center;
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  opacity: 0.7;
+  max-height: 16px;
+  transition: all var(--motion-base) ease;
+}
+
+// ---------------------------------------------------------------------------
+// FIELD-MAPPING — modern axis slot UI
+// ---------------------------------------------------------------------------
+// Rest:    1px hairline border, white card, subtle text.
+// Hover:   border-strong + faint hover tint.
+// Active:  1px primary border + 2px primary glow ring + crisp white bg.
+//          (No animated pulse — quiet primary ring is enough signal.)
+// Filled:  primary chip pill inside, dashed border drops to solid.
+// Optional (Y/Z): dashed border at rest; converts to solid when filled.
+// ---------------------------------------------------------------------------
+.axis-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    border-color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease;
+
+  &:hover {
+    border-color: var(--border-strong);
+    background-color: var(--hover-background);
+  }
+
+  &.active {
+    border-color: var(--primary-color);
+    background-color: var(--card-background);
+    box-shadow: 0 0 0 2px var(--primary-color-transparent);
+    animation: none;
+  }
+
+  &.has-value {
+    border-color: var(--primary-color);
+    background-color: var(--card-background);
+  }
+
+  &.optional {
+    border-style: dashed;
+    opacity: 1;
+
+    .axis-label { font-style: normal; opacity: 1; }
+
+    &.has-value { border-style: solid; }
+    &.active { border-style: solid; }
+  }
+}
+
+// Axis label: tiny muted caption — "X-Axis", "Y-Axis", "Row", "Source"...
+// Sentence-case (no uppercase), letter-spacing 0, micro size.
+.axis-label {
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-semibold);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.2;
+}
+
+// Filled slot — primary-tinted chip pill inside.
+.axis-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px 3px 8px;
+  background: var(--primary-color-transparent);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--radius-pill);
+  align-self: flex-start;
+  max-width: 100%;
+
+  > span {
+    color: var(--primary-color);
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-medium);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+
+  .clear-btn {
+    color: var(--primary-color);
+    font-size: 9px;
+    width: 14px;
+    height: 14px;
+    padding: 0;
+    border-radius: 50%;
+    background: transparent;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+      color var(--motion-fast) ease,
+      background var(--motion-fast) ease;
+
+    &:hover {
+      color: var(--card-background);
+      background: var(--primary-color);
+    }
+  }
+}
+
+// Empty slot — "+ Click to select field" placeholder.
+.axis-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+
+  i {
+    color: var(--text-subtle);
+    font-size: 10px;
+  }
+
+  span {
+    font-size: var(--fs-label);
+    font-style: normal;
+    font-weight: var(--fw-regular);
+    color: var(--text-muted);
+    line-height: 1.3;
+  }
+}
+
+// Hint banner above the slots — "Pick a field from the Data panel".
+// Quiet caption: light hover-bg, muted text, small primary icon.
+// Reads as a hint, not a callout.
+.axis-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  margin: 0 var(--space-5) var(--space-3);
+  background: var(--hover-background);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: var(--fs-label);
+  font-weight: var(--fw-regular);
+  color: var(--text-muted);
+  line-height: 1.4;
+
+  i {
+    color: var(--primary-color);
+    font-size: 13px;
+    flex-shrink: 0;
+    opacity: 1;
+  }
+
+  span {
+    flex: 1;
+    color: var(--text-muted);
+  }
+}

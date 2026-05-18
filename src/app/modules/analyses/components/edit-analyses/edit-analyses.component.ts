@@ -20,9 +20,11 @@ import { ANALYSES } from 'src/app/constants/routes';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
+import { environment } from 'src/environments/environment';
 import {
   CHART_TYPES,
   getDefaultChartConfig,
+  getDummyData,
   hasAxisLabels,
   is3DCoordinateChartType,
   isFlowLinesChartType,
@@ -31,6 +33,7 @@ import {
   isLines3dChartType,
   isPolygons3dChartType,
   isSankeyChartType,
+  isTableChartType,
   isWorldMapChartType,
 } from '../../constants/charts.constants';
 import { createVisual, Visual } from '../../models';
@@ -929,6 +932,17 @@ export class EditAnalysesComponent
       return;
     }
 
+    // Tables render the full dataset as-is; no axis-to-field mapping.
+    if (isTableChartType(visual.chartType)) {
+      // Seed an empty visibility config on first render so the table
+      // starts blank and the user opts each column in.
+      if (!visual.config || visual.config.tableHiddenColumns === undefined) {
+        this.seedTableHiddenColumns(visual);
+      }
+      visual.chartData = this.rawGraphData;
+      return;
+    }
+
     if (visual.chartType && visual.xAxisColumn && visual.yAxisColumn) {
       visual.chartData = this.chartDataTransformer.transformData(
         visual.chartType,
@@ -948,6 +962,13 @@ export class EditAnalysesComponent
   updateVisualChartData(visual: any): void {
     if (!this.rawGraphData || this.rawGraphData.length === 0) {
       visual.chartData = [];
+      return;
+    }
+    if (isTableChartType(visual.chartType)) {
+      if (!visual.config || visual.config.tableHiddenColumns === undefined) {
+        this.seedTableHiddenColumns(visual);
+      }
+      visual.chartData = this.rawGraphData;
       return;
     }
     visual.chartData = this.chartDataTransformer.transformData(
@@ -1208,6 +1229,58 @@ export class EditAnalysesComponent
     }
   }
 
+  /**
+   * Dev-only — true on local/non-prod builds. Drives the visibility of
+   * the "Plot all charts" debug button so QA/devs can render every
+   * chart type at once with dummy data, without manually picking
+   * fields for each.
+   */
+  get isDevBuild(): boolean {
+    return !environment.production;
+  }
+
+  /**
+   * Append one visual per registered chart type, each pre-filled with
+   * its dummy data so it renders immediately. Used by the dev-only
+   * "Plot all charts" button. Does NOT clear existing visuals — just
+   * appends, so it composes with hand-built layouts during testing.
+   */
+  plotAllChartTypes(): void {
+    this.markDirty();
+    for (const ct of CHART_TYPES) {
+      this.visualCounter++;
+      const visual = createVisual(
+        String(this.visualCounter),
+        getDefaultChartConfig(),
+      );
+      visual.chartType = ct.id;
+      visual.title = ct.name;
+      visual.chartData = getDummyData(ct.id);
+
+      // hasRequiredChartFields() guards the chart-renderer dispatch
+      // and only looks at whether axis columns are truthy — the actual
+      // string values aren't used downstream when the data is already
+      // pre-shaped (echart-visual takes data + chartType only). Stamp
+      // placeholders so the dispatch fires.
+      visual.xAxisColumn = '__dummy_x__';
+      visual.yAxisColumn = '__dummy_y__';
+      visual.zAxisColumn = '__dummy_z__';
+
+      // For tables, override the hidden-columns default so every dummy
+      // column shows immediately — the goal here is to SEE the chart,
+      // not exercise the empty-state.
+      if (isTableChartType(ct.id) && visual.config) {
+        visual.config.tableHiddenColumns = [];
+      }
+      this.visuals.push(visual);
+    }
+    this.placeVisualsOnGrid();
+    this.recalculateAllVisualDimensions();
+    this.focusedVisualId = String(this.visualCounter);
+    this.chartConfigVersion++;
+    this.cdr.markForCheck();
+  }
+
   addVisual(): void {
     this.markDirty();
     this.visualCounter++;
@@ -1347,6 +1420,10 @@ export class EditAnalysesComponent
     return isPolygons3dChartType(chartType ?? null);
   }
 
+  isTableChartType(chartType: string | null | undefined): boolean {
+    return isTableChartType(chartType ?? null);
+  }
+
   hasRequiredChartFields(visual: any): boolean {
     if (!visual.chartType) return false;
     // 3D coordinate charts need x + y + z
@@ -1438,8 +1515,31 @@ export class EditAnalysesComponent
     this.markDirty();
     const visual = this.getFocusedVisual();
     if (visual) {
+      // For tables: start with no columns shown. The user opts in by
+      // clicking fields. Only seed when the user hasn't already
+      // configured a hidden list (e.g. opening an existing analysis).
+      if (
+        isTableChartType(visual.chartType) &&
+        (!visual.config ||
+          visual.config.tableHiddenColumns === undefined)
+      ) {
+        this.seedTableHiddenColumns(visual);
+      }
       this.updateVisualChartData(visual);
     }
+  }
+
+  /**
+   * Initialise visual.config.tableHiddenColumns with every available
+   * field. Used the first time a visual becomes a table so the user
+   * sees an empty table and opts each column in.
+   */
+  private seedTableHiddenColumns(visual: any): void {
+    if (!visual.config) visual.config = {};
+    const cols = (this.allFields || [])
+      .map((f: any) => f?.columnToUse ?? f?.columnToView ?? f)
+      .filter((v: any) => typeof v === 'string' && v.length > 0);
+    visual.config.tableHiddenColumns = [...cols];
   }
 
   onAxisSelectionStarted(axis: 'x' | 'y' | 'z' | null): void {
@@ -1462,6 +1562,18 @@ export class EditAnalysesComponent
   }
 
   onFieldClick(field: any): void {
+    // Table visuals don't have axis slots; clicking a field toggles
+    // whether that column is shown in the table.
+    const focused = this.getFocusedVisual();
+    if (
+      focused &&
+      this.focusedVisualId &&
+      isTableChartType(focused.chartType)
+    ) {
+      this.toggleTableColumn(focused, field);
+      return;
+    }
+
     if (this.activeAxisSelection && this.focusedVisualId) {
       this.markDirty();
       const visual = this.getFocusedVisual();
@@ -1487,6 +1599,51 @@ export class EditAnalysesComponent
         this.cdr.markForCheck();
       }
     }
+  }
+
+  /**
+   * Flip the visibility of a single column on the focused table visual.
+   * The hidden list is stored on visual.config.tableHiddenColumns; we
+   * re-assign the array reference so OnPush downstream picks it up.
+   */
+  private toggleTableColumn(visual: any, field: any): void {
+    const col = field?.columnToUse || field?.columnToView;
+    if (!col) return;
+    this.markDirty();
+    if (!visual.config) visual.config = {};
+    const cfg = visual.config;
+    const hidden: string[] = Array.isArray(cfg.tableHiddenColumns)
+      ? [...cfg.tableHiddenColumns]
+      : [];
+    const idx = hidden.indexOf(col);
+    if (idx >= 0) {
+      hidden.splice(idx, 1);
+    } else {
+      hidden.push(col);
+    }
+    cfg.tableHiddenColumns = hidden;
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Used by the dataset-fields template to tint each field card in
+   * table mode. Returns true when the field's column is currently
+   * visible in the focused table visual.
+   */
+  isFieldVisibleInTable(field: any): boolean {
+    const focused = this.getFocusedVisual();
+    if (!focused || !isTableChartType(focused.chartType)) return false;
+    const col = field?.columnToUse || field?.columnToView;
+    if (!col) return false;
+    const hidden = focused.config?.tableHiddenColumns;
+    if (!Array.isArray(hidden)) return true;
+    return !hidden.includes(col);
+  }
+
+  /** True when the focused visual is a table — drives template visuals. */
+  isFocusedVisualTable(): boolean {
+    const focused = this.getFocusedVisual();
+    return !!focused && isTableChartType(focused.chartType);
   }
 
   // Maximize visual
@@ -1538,11 +1695,20 @@ export class EditAnalysesComponent
           behavior: 'smooth',
         });
 
-        // Add blinking highlight animation (like Add Visual)
+        // Trigger a single-shot 1.2s primary-glow pulse on the
+        // scrolled-to card so the user sees which card they clicked.
+        // The class is removed after the animation completes so a
+        // re-click can re-trigger it.
+        targetVisual.classList.remove('blinking-visual');
+        // Reflow forces the class re-add to actually retrigger the
+        // CSS animation (without this, removing then re-adding in
+        // the same tick is a no-op for keyframes).
+        // eslint-disable-next-line no-unused-expressions
+        void targetVisual.offsetWidth;
         targetVisual.classList.add('blinking-visual');
         setTimeout(() => {
           targetVisual.classList.remove('blinking-visual');
-        }, 500);
+        }, 1300);
       }
     }, 100);
   }

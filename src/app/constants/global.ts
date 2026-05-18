@@ -1,26 +1,23 @@
 export const LOGIN_PAGE_OPTIONS = [
   {
-    icon: 'eye',
-    title: 'Visual Datasource Explorer',
-    description:
-      'Navigate through your datasource structure with an intuitive visual interface',
+    icon: 'database',
+    title: 'Connect any database',
+    description: 'Postgres, MySQL, SQL Server and more — in minutes.',
+  },
+  {
+    icon: 'th-large',
+    title: 'Build dashboards visually',
+    description: 'Drag, drop and arrange charts — no SQL required.',
   },
   {
     icon: 'chart-line',
-    title: 'Performance Insights',
-    description:
-      'Get real-time performance metrics and query optimization suggestions',
+    title: 'Explore with rich visuals',
+    description: 'Bars, lines, pies, maps and KPIs out of the box.',
   },
   {
-    icon: 'key',
-    title: 'Secure Access',
-    description: 'Enterprise-grade security with role-based access control',
-  },
-  {
-    icon: 'table',
-    title: 'Smart Query Builder',
-    description:
-      'Build complex queries with our intelligent visual query builder',
+    icon: 'share-alt',
+    title: 'Share with your team',
+    description: 'Governed access with row-level security by default.',
   },
 ];
 

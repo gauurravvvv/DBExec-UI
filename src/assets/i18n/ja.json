@@ -153,7 +153,8 @@
     "LOCK": "Lock",
     "INCLUDE_ALL": "Include All",
     "CONFIRM": "Confirm",
-    "COPY_TO_CLIPBOARD": "Copy to clipboard"
+    "COPY_TO_CLIPBOARD": "Copy to clipboard",
+    "BACK": "戻る"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名は必須です",
@@ -758,7 +759,7 @@
     "CHART_TYPE": "チャートタイプ",
     "CHARTS": "チャート",
     "CLICK_FIELD_FROM_LEFT_PANEL": "左パネルからフィールドをクリック",
-    "CLICK_TO_CONFIGURE": "クリックしてチャートプロパティを設定",
+    "CLICK_TO_CONFIGURE": "ビジュアルパネルからタイプを選択",
     "CLICK_TO_SELECT_FIELD": "クリックしてフィールドを選択",
     "CLOCKWISE": "時計回り",
     "COLOR_SCHEME": "カラースキーム",
@@ -1090,7 +1091,15 @@
     "DEFAULT_20_PERCENT": "20%",
     "DEFAULT_30_PERCENT": "30%",
     "DEFAULT_90_PERCENT": "90%",
-    "EXAMPLE_50_PERCENT": "例: 50%"
+    "EXAMPLE_50_PERCENT": "例: 50%",
+    "FIELDS": "フィールド",
+    "TABLE_OPTIONS": "テーブルオプション",
+    "TABLE_COMPACT": "コンパクト表示",
+    "TABLE_STRIPED": "縞模様の行",
+    "TABLE_SHOW_ROW_NUMBERS": "行番号を表示",
+    "TABLE_COLUMNS": "列",
+    "TABLE_NO_MAPPING_HINT": "データセット一覧のフィールドをクリックして、テーブルの列として追加してください。",
+    "TABLE_PICK_COLUMNS_PROMPT": "サイドバーのフィールドをクリックして列として追加してください"
   },
   "DASHBOARD": {
     "TITLE": "ダッシュボード",

@@ -45,6 +45,105 @@ function getColors(colorScheme: string): string[] {
 }
 
 /**
+ * Build a 3D axis (xAxis3D / yAxis3D / zAxis3D) with our typography
+ * tokens applied to the axis name, tick labels, tick lines, and the
+ * splitLine grid. ECharts defaults to its own font + dark colours
+ * which clash with the 2D chart vocabulary; without this helper the
+ * 3D charts read with a noticeably heavier and differently-styled
+ * label set than their 2D siblings.
+ *
+ * `type` defaults to 'value'; pass 'category' for bar3D / map3D
+ * style charts. `name` is the axis label.
+ */
+function build3DAxis(
+  type: 'value' | 'category' | 'time' | 'log',
+  name: string,
+): any {
+  return {
+    type,
+    name,
+    nameTextStyle: {
+      ...CHART_TYPOGRAPHY.axisName,
+      fontFamily: CHART_TYPOGRAPHY.fontFamily,
+    },
+    axisLabel: {
+      ...CHART_TYPOGRAPHY.axisLabel,
+      fontFamily: CHART_TYPOGRAPHY.fontFamily,
+    },
+    axisLine: {
+      lineStyle: { color: CHART_TYPOGRAPHY.colors.axis },
+    },
+    axisTick: {
+      lineStyle: { color: CHART_TYPOGRAPHY.colors.axis },
+    },
+    splitLine: {
+      lineStyle: { color: CHART_TYPOGRAPHY.colors.grid },
+    },
+    splitArea: { show: false },
+  };
+}
+
+/**
+ * grid3D defaults render with a heavy black box outline and dark
+ * background; the default zoom is also too close which clips axis
+ * names and tick labels at the container edges. Apply our muted
+ * token set + tighter box dimensions + pulled-back camera distance
+ * so the 3D scene reads as a lighter, more print-friendly visual
+ * that fits comfortably inside the chart card.
+ *
+ * The grid3D positions itself relative to the chart container;
+ * `top: 60`, `bottom: 40` give the rendered scene clear vertical
+ * breathing room so the chart card chrome (header + footer) does
+ * not clip the projected axes.
+ */
+function build3DGrid(config: any): any {
+  return {
+    // Smaller boxes so the projected scene + its axis labels fit
+    // inside the chart container with margins on all sides.
+    boxWidth: config.grid3DBoxWidth ?? 80,
+    boxDepth: config.grid3DBoxDepth ?? 80,
+    boxHeight: config.grid3DBoxHeight ?? 80,
+    // Position the 3D scene so the projected scene + its axis
+    // labels have margins on all sides. ECharts grid3D ignores
+    // grid margins; padding comes from boxWidth + viewControl.distance.
+    top: 'middle',
+    left: 'center',
+    environment: 'auto',
+    axisLine: {
+      lineStyle: { color: CHART_TYPOGRAPHY.colors.axis, width: 1 },
+    },
+    axisLabel: {
+      textStyle: {
+        ...CHART_TYPOGRAPHY.axisLabel,
+        fontFamily: CHART_TYPOGRAPHY.fontFamily,
+      },
+      margin: 12,
+    },
+    axisPointer: {
+      lineStyle: { color: CHART_TYPOGRAPHY.colors.axis },
+    },
+    splitLine: {
+      lineStyle: { color: CHART_TYPOGRAPHY.colors.grid },
+    },
+    viewControl: {
+      // Pull the camera back so axis names + tick labels are not
+      // clipped at the container edges. Default ECharts distance is
+      // 150 which sits too close to the box, especially for non-
+      // square containers.
+      distance: config.viewDistance ?? 220,
+      autoRotate: config.autoRotate || false,
+      alpha: config.viewAlpha ?? 20,
+      beta: config.viewBeta ?? 40,
+      // Allow user rotation/zoom but keep panning disabled so the
+      // scene cannot drift out of the chart card.
+      panMouseButton: 'middle',
+      rotateMouseButton: 'left',
+      zoomSensitivity: 1,
+    },
+  };
+}
+
+/**
  * Creates a vertical linear gradient from a base color.
  * Lightens the color for the top stop, uses original for the bottom.
  */
@@ -190,9 +289,12 @@ function buildTooltip(config: any, defaultTrigger: string = 'item'): any {
 }
 
 function buildGrid(config: any): any {
-  // containLabel: true handles rotated label space automatically,
-  // so we only need base margins for axis names + legend
-  const baseBottom = config.showXAxisLabel ? 40 : 15;
+  // containLabel: true reserves space for rotated tick labels
+  // automatically — we only need a fixed base margin for the axis
+  // NAME (positioned via nameGap below the labels). Adding extra
+  // padding here on top of containLabel double-counts and squeezes
+  // the actual chart area.
+  const baseBottom = config.showXAxisLabel !== false ? 25 : 10;
   const pos = config.legend ? config.legendPosition || 'right' : '';
 
   return {
@@ -235,16 +337,11 @@ function buildCategoryAxis(
   const label = isX ? config.xAxisLabel : config.yAxisLabel;
 
   // nameGap positions the axis name relative to the axis line.
-  // containLabel ensures rotated labels don't overflow the grid,
-  // so nameGap only needs a modest bump for rotated labels.
-  let nameGap = isX ? 35 : 55;
-  if (isX && showLabel) {
-    const rotation = config.xAxisLabelRotate || 0;
-    if (rotation > 0) {
-      // Small bump: rotated labels extend below, axis name goes after them
-      nameGap = 35 + Math.min(Math.ceil(rotation * 0.3), 20);
-    }
-  }
+  // ECharts already accounts for the rotated tick label height when
+  // it lays out the axis name, so we only need a small visual gap
+  // here. Don't add big numbers — that pushes the name off the
+  // bottom of the chart card.
+  const nameGap = isX ? 28 : 55;
 
   const result: any = {
     type: 'category',
@@ -301,7 +398,13 @@ function buildValueAxis(config: any, axis: 'x' | 'y'): any {
     show: showAxis,
     name: showLabel ? label : '',
     nameLocation: 'middle',
-    nameGap: isX ? 35 : 55,
+    // X axis: small gap below the tick labels.
+    // Y axis: larger gap because Y tick labels rotate naturally to
+    // the side and the axis name reads vertically (so the gap is
+    // measured along the axis line direction).
+    // Both kept as fixed values; containLabel handles the actual
+    // tick label space in the grid.
+    nameGap: isX ? 28 : 45,
     nameTextStyle: {
       ...CHART_TYPOGRAPHY.axisName,
       fontFamily: CHART_TYPOGRAPHY.fontFamily,
@@ -416,10 +519,18 @@ function buildDataZoom(config: any, axis: 'x' | 'y' = 'x'): any[] {
       type: 'slider',
       ...index,
       ...positionProp,
+      // Match the app's primary blue (#2196f3). ECharts does not read
+      // CSS custom properties, so values are hard-coded but should track
+      // --primary-color in theme-variables.scss if it ever changes.
       borderColor: '#e5e7eb',
       backgroundColor: '#fafafa',
-      fillerColor: 'rgba(99, 102, 241, 0.12)',
-      handleStyle: { color: '#6366f1', borderColor: '#6366f1' },
+      fillerColor: 'rgba(33, 150, 243, 0.12)',
+      handleStyle: { color: '#2196f3', borderColor: '#2196f3' },
+      moveHandleStyle: { color: '#2196f3' },
+      emphasis: {
+        handleStyle: { color: '#1976d2', borderColor: '#1976d2' },
+        moveHandleStyle: { color: '#1976d2' },
+      },
       textStyle: {
         ...CHART_TYPOGRAPHY.axisLabel,
         fontFamily: CHART_TYPOGRAPHY.fontFamily,
@@ -866,6 +977,17 @@ export function buildPieChartOption(
       ? config.pieSelectedMode
       : false;
 
+  // Pie center: shift away from the legend position so the chart
+  // does not sit underneath / above the legend area. Default 50/50
+  // is fine only when there is no legend on any side.
+  const legendPos = config.legend ? config.legendPosition || 'right' : '';
+  const pieCenter: [string, string] =
+    legendPos === 'left' ? ['58%', '50%']
+      : legendPos === 'right' ? ['42%', '50%']
+      : legendPos === 'top' ? ['50%', '55%']
+      : legendPos === 'below' ? ['50%', '45%']
+      : ['50%', '50%'];
+
   const option: any = {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
@@ -876,6 +998,7 @@ export function buildPieChartOption(
       {
         type: 'pie',
         radius,
+        center: pieCenter,
         data: pieData,
         label: labelConfig,
         labelLine: { show: config.pieLabelLine !== false },
@@ -1152,48 +1275,47 @@ export function buildHeatMapChartOption(data: any[], config: any): any {
       },
     },
     ...buildLegendWithTitle(config),
-    grid: {
-      ...buildGrid(config),
-      top: 30,
-      bottom: config.showXAxisLabel ? 60 : 40,
+    // Heatmap needs extra bottom for the visualMap legend (the
+    // gradient color bar that lives below the chart). Stack on top
+    // of buildGrid's containLabel which handles tick label space.
+    grid: { ...buildGrid(config), bottom: 45 },
+    xAxis: {
+      type: 'category',
+      data: xCategories,
+      show: config.xAxis !== false,
+      name: config.showXAxisLabel ? config.xAxisLabel : '',
+      nameLocation: 'middle',
+      nameGap: 28,
+      nameTextStyle: {
+        ...CHART_TYPOGRAPHY.axisName,
+        fontFamily: CHART_TYPOGRAPHY.fontFamily,
+      },
+      splitArea: { show: true },
+      axisLabel: {
+        rotate: config.xAxisLabelRotate || 0,
+        overflow: config.trimXAxisTicks ? 'truncate' : 'none',
+        width: (config.maxXAxisTickLength || 16) * 7,
+        ...CHART_TYPOGRAPHY.axisLabel,
+        fontFamily: CHART_TYPOGRAPHY.fontFamily,
+      },
     },
-    xAxis: (() => {
-      const rotation = config.xAxisLabelRotate || 0;
-      let nameGap = 35;
-      if (rotation > 0 && config.showXAxisLabel) {
-        const maxLabelLen = (config.maxXAxisTickLength || 16) * 7;
-        nameGap =
-          35 +
-          Math.ceil(
-            Math.sin((rotation * Math.PI) / 180) * Math.min(maxLabelLen, 80),
-          );
-      }
-      return {
-        type: 'category',
-        data: xCategories,
-        show: config.xAxis !== false,
-        name: config.showXAxisLabel ? config.xAxisLabel : '',
-        nameLocation: 'middle',
-        nameGap,
-        splitArea: { show: true },
-        axisLabel: {
-          rotate: rotation,
-          overflow: config.trimXAxisTicks ? 'truncate' : 'none',
-          width: (config.maxXAxisTickLength || 16) * 7,
-        },
-      };
-    })(),
     yAxis: {
       type: 'category',
       data: yCategories,
       show: config.yAxis !== false,
       name: config.showYAxisLabel ? config.yAxisLabel : '',
       nameLocation: 'middle',
-      nameGap: 55,
+      nameGap: 45,
+      nameTextStyle: {
+        ...CHART_TYPOGRAPHY.axisName,
+        fontFamily: CHART_TYPOGRAPHY.fontFamily,
+      },
       splitArea: { show: true },
       axisLabel: {
         overflow: config.trimYAxisTicks ? 'truncate' : 'none',
         width: (config.maxYAxisTickLength || 16) * 7,
+        ...CHART_TYPOGRAPHY.axisLabel,
+        fontFamily: CHART_TYPOGRAPHY.fontFamily,
       },
     },
     visualMap: {
@@ -1202,7 +1324,13 @@ export function buildHeatMapChartOption(data: any[], config: any): any {
       calculable: true,
       orient: 'horizontal',
       left: 'center',
-      bottom: 0,
+      // Push the visualMap legend up a bit so it does not overlap the
+      // axis name on small chart cards.
+      bottom: 5,
+      textStyle: {
+        ...CHART_TYPOGRAPHY.axisLabel,
+        fontFamily: CHART_TYPOGRAPHY.fontFamily,
+      },
     },
     series: [
       {
@@ -1406,12 +1534,24 @@ export function buildFunnelChartOption(data: any[], config: any): any {
     ...buildLegendWithTitle(config),
     toolbox: buildToolbox(config),
     series: [
-      {
+      (() => {
+        const legendPos = config.legend
+          ? config.legendPosition || 'right'
+          : '';
+        // Shift the funnel away from the legend side so they do not
+        // overlap. Width contracts when the legend takes a left/right.
+        const left =
+          legendPos === 'left' ? '32%' : legendPos === 'right' ? '10%' : '10%';
+        const width =
+          legendPos === 'left' || legendPos === 'right' ? '58%' : '80%';
+        const top = legendPos === 'top' ? 50 : 30;
+        const bottom = legendPos === 'below' ? 50 : 20;
+        return {
         type: 'funnel',
-        left: '10%',
-        top: 40,
-        bottom: 20,
-        width: '80%',
+        left,
+        top,
+        bottom,
+        width,
         min: 0,
         max: Math.max(...data.map(d => d.value), 100),
         minSize: config.funnelMinSize || '0%',
@@ -1442,7 +1582,8 @@ export function buildFunnelChartOption(data: any[], config: any): any {
           },
         },
         data: funnelData,
-      },
+        };
+      })(),
     ],
   };
 }
@@ -1463,10 +1604,21 @@ export function buildSunburstChartOption(data: any[], config: any): any {
     },
     toolbox: buildToolbox(config),
     series: [
-      {
+      (() => {
+        const legendPos = config.legend
+          ? config.legendPosition || 'right'
+          : '';
+        const center: [string, string] =
+          legendPos === 'left' ? ['58%', '50%']
+            : legendPos === 'right' ? ['42%', '50%']
+            : legendPos === 'top' ? ['50%', '55%']
+            : legendPos === 'below' ? ['50%', '45%']
+            : ['50%', '50%'];
+        return {
         type: 'sunburst',
         data: sunburstData,
-        radius: ['15%', config.sunburstRadius || '90%'],
+        center,
+        radius: ['15%', config.sunburstRadius || '85%'],
         nodeClick:
           config.sunburstNodeClick === 'false'
             ? false
@@ -1497,7 +1649,8 @@ export function buildSunburstChartOption(data: any[], config: any): any {
             label: { position: 'outside', padding: 3, silent: false },
           },
         ],
-      },
+        };
+      })(),
     ],
   };
 }
@@ -1946,10 +2099,26 @@ export function buildPolarBarChartOption(data: any[], config: any): any {
     },
     radiusAxis: {
       show: config.yAxis !== false,
+      axisLabel: {
+        ...CHART_TYPOGRAPHY.axisLabel,
+        fontFamily: CHART_TYPOGRAPHY.fontFamily,
+      },
     },
-    polar: {
-      radius: [`${config.polarBarInnerRadius ?? 15}%`, '80%'],
-    },
+    polar: (() => {
+      const pos = config.legend ? config.legendPosition || 'right' : '';
+      // When the legend takes a side, shift the polar centre away
+      // from it so the chart does not sit under the legend area.
+      const center: [string, string] =
+        pos === 'left' ? ['58%', '50%']
+          : pos === 'right' ? ['42%', '50%']
+          : pos === 'top' ? ['50%', '55%']
+          : pos === 'below' ? ['50%', '45%']
+          : ['50%', '50%'];
+      return {
+        center,
+        radius: [`${config.polarBarInnerRadius ?? 15}%`, '75%'],
+      };
+    })(),
     series: [
       {
         type: 'bar',
@@ -2069,24 +2238,31 @@ export function buildParallelChartOption(data: any[], config: any): any {
   return {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
-    tooltip: { show: !config.tooltipDisabled },
+    tooltip: buildTooltip(config, "item"),
     ...buildLegendWithTitle(config),
     parallelAxis,
-    parallel: {
-      left: 80,
-      right: 80,
-      bottom: 60,
-      top: 60,
-      parallelAxisDefault: {
-        type: 'value',
-        nameLocation: 'end',
-        nameGap: 20,
-        nameTextStyle: {
-          ...CHART_TYPOGRAPHY.axisName,
-          fontFamily: CHART_TYPOGRAPHY.fontFamily,
+    parallel: (() => {
+      const pos = config.legend ? config.legendPosition || 'right' : '';
+      return {
+        left: pos === 'left' ? 140 : 40,
+        right: pos === 'right' ? 140 : 40,
+        bottom: pos === 'below' ? 60 : 40,
+        top: pos === 'top' ? 50 : 30,
+        parallelAxisDefault: {
+          type: 'value',
+          nameLocation: 'end',
+          nameGap: 12,
+          nameTextStyle: {
+            ...CHART_TYPOGRAPHY.axisName,
+            fontFamily: CHART_TYPOGRAPHY.fontFamily,
+          },
+          axisLabel: {
+            ...CHART_TYPOGRAPHY.axisLabel,
+            fontFamily: CHART_TYPOGRAPHY.fontFamily,
+          },
         },
-      },
-    },
+      };
+    })(),
     series: [
       {
         type: 'parallel',
@@ -2121,24 +2297,15 @@ export function buildBar3DChartOption(data: any[], config: any): any {
   return {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
-    tooltip: { show: !config.tooltipDisabled },
+    tooltip: buildTooltip(config, 'item'),
     visualMap: {
       max: maxVal,
       show: false,
     },
-    xAxis3D: { type: 'category', name: config.xAxisLabel || '' },
-    yAxis3D: { type: 'category', name: config.yAxisLabel || '' },
-    zAxis3D: { type: 'value', name: config.zAxisLabel || '' },
-    grid3D: {
-      boxWidth: config.grid3DBoxWidth || 100,
-      boxDepth: config.grid3DBoxDepth || 100,
-      boxHeight: config.grid3DBoxHeight || 100,
-      viewControl: {
-        autoRotate: config.autoRotate || false,
-        alpha: config.viewAlpha ?? 20,
-        beta: config.viewBeta ?? 40,
-      },
-    },
+    xAxis3D: build3DAxis('category', config.xAxisLabel || ''),
+    yAxis3D: build3DAxis('category', config.yAxisLabel || ''),
+    zAxis3D: build3DAxis('value', config.zAxisLabel || ''),
+    grid3D: build3DGrid(config),
     series: [
       {
         type: 'bar3D',
@@ -2169,17 +2336,11 @@ export function buildLine3DChartOption(data: any[], config: any): any {
   return {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
-    tooltip: { show: !config.tooltipDisabled },
-    xAxis3D: { type: 'value', name: config.xAxisLabel || '' },
-    yAxis3D: { type: 'value', name: config.yAxisLabel || '' },
-    zAxis3D: { type: 'value', name: config.zAxisLabel || '' },
-    grid3D: {
-      viewControl: {
-        autoRotate: config.autoRotate || false,
-        alpha: config.viewAlpha ?? 20,
-        beta: config.viewBeta ?? 40,
-      },
-    },
+    tooltip: buildTooltip(config, 'item'),
+    xAxis3D: build3DAxis('value', config.xAxisLabel || ''),
+    yAxis3D: build3DAxis('value', config.yAxisLabel || ''),
+    zAxis3D: build3DAxis('value', config.zAxisLabel || ''),
+    grid3D: build3DGrid(config),
     series: [
       {
         type: 'line3D',
@@ -2205,17 +2366,11 @@ export function buildScatter3DChartOption(data: any[], config: any): any {
   return {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
-    tooltip: { show: !config.tooltipDisabled },
-    xAxis3D: { type: 'value', name: config.xAxisLabel || '' },
-    yAxis3D: { type: 'value', name: config.yAxisLabel || '' },
-    zAxis3D: { type: 'value', name: config.zAxisLabel || '' },
-    grid3D: {
-      viewControl: {
-        autoRotate: config.autoRotate || false,
-        alpha: config.viewAlpha ?? 20,
-        beta: config.viewBeta ?? 40,
-      },
-    },
+    tooltip: buildTooltip(config, 'item'),
+    xAxis3D: build3DAxis('value', config.xAxisLabel || ''),
+    yAxis3D: build3DAxis('value', config.yAxisLabel || ''),
+    zAxis3D: build3DAxis('value', config.zAxisLabel || ''),
+    grid3D: build3DGrid(config),
     series: [
       {
         type: 'scatter3D',
@@ -2242,21 +2397,15 @@ export function buildSurfaceChartOption(data: any[], config: any): any {
   return {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
-    tooltip: { show: !config.tooltipDisabled },
+    tooltip: buildTooltip(config, 'item'),
     visualMap: {
       show: config.showVisualMap || false,
       dimension: 2,
     },
-    xAxis3D: { type: 'value', name: config.xAxisLabel || '' },
-    yAxis3D: { type: 'value', name: config.yAxisLabel || '' },
-    zAxis3D: { type: 'value', name: config.zAxisLabel || '' },
-    grid3D: {
-      viewControl: {
-        autoRotate: config.autoRotate || false,
-        alpha: config.viewAlpha ?? 20,
-        beta: config.viewBeta ?? 40,
-      },
-    },
+    xAxis3D: build3DAxis('value', config.xAxisLabel || ''),
+    yAxis3D: build3DAxis('value', config.yAxisLabel || ''),
+    zAxis3D: build3DAxis('value', config.zAxisLabel || ''),
+    grid3D: build3DGrid(config),
     series: [
       {
         type: 'surface',
@@ -2299,7 +2448,9 @@ export function buildGlobeChartOption(data: any[], config: any): any {
       viewControl: {
         autoRotate: config.autoRotate !== false,
         autoRotateSpeed: config.autoRotateSpeed || 10,
-        distance: 200,
+        // Pulled back so the globe + scatter points sit comfortably
+        // in the card without clipping at edges.
+        distance: config.viewDistance ?? 260,
       },
       light: {
         main: { intensity: 1.2, shadow: false },
@@ -2372,7 +2523,7 @@ export function buildGraphGLChartOption(
   return {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
-    tooltip: { show: !config.tooltipDisabled },
+    tooltip: buildTooltip(config, "item"),
     series: [
       {
         type: 'graphGL',
@@ -2411,7 +2562,7 @@ export function buildScatterGLChartOption(data: any[], config: any): any {
   return {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
-    tooltip: { show: !config.tooltipDisabled },
+    tooltip: buildTooltip(config, "item"),
     xAxis: {
       type: 'value',
       show: config.xAxis !== false,
@@ -2463,7 +2614,7 @@ export function buildLinesGLChartOption(data: any[], config: any): any {
   return {
     color: colors,
     ...buildAnimation(config),
-    tooltip: { show: !config.tooltipDisabled, trigger: 'axis' },
+    tooltip: buildTooltip(config, "axis"),
     xAxis: {
       type: 'value',
       show: config.xAxis !== false,
@@ -2511,25 +2662,28 @@ export function buildMap3DChartOption(data: any[], config: any): any {
       max: maxVal,
     },
     xAxis3D: {
-      type: 'category',
+      ...build3DAxis('category', ''),
       data: categories,
       axisLabel: {
-        rotate: 30,
+        ...CHART_TYPOGRAPHY.axisLabel,
         fontFamily: CHART_TYPOGRAPHY.fontFamily,
-        fontSize: CHART_TYPOGRAPHY.axisLabel.fontSize,
-        color: CHART_TYPOGRAPHY.axisLabel.color,
+        rotate: 30,
+        margin: 12,
       },
     },
-    yAxis3D: { type: 'category', data: [''] },
-    zAxis3D: { type: 'value', name: 'Value' },
+    yAxis3D: {
+      ...build3DAxis('category', ''),
+      data: [''],
+    },
+    zAxis3D: build3DAxis('value', config.zAxisLabel || 'Value'),
     grid3D: {
-      boxWidth: 120,
-      boxDepth: 40,
-      viewControl: {
-        autoRotate: config.autoRotate || false,
-        alpha: config.viewAlpha ?? 20,
-        beta: config.viewBeta ?? 40,
-      },
+      ...build3DGrid(config),
+      // Map3D is a flat bar grid (depth: 40 default) since y is a
+      // single category — override depth to keep that shape but
+      // inherit all the rest (camera distance, margins, typography).
+      boxWidth: 100,
+      boxDepth: 30,
+      boxHeight: 60,
       light: {
         main: { intensity: 1.2 },
         ambient: { intensity: 0.3 },
@@ -2796,7 +2950,7 @@ export function buildFlowGLChartOption(data: any[], config: any): any {
         return `Position: (${d[0].toFixed(2)}, ${d[1].toFixed(2)})<br/>Magnitude: ${d[2].toFixed(3)}`;
       },
     },
-    grid: { left: 50, right: 20, top: 20, bottom: 40, containLabel: true },
+    grid: buildGrid(config),
     xAxis: {
       type: 'value',
       show: true,
@@ -2875,7 +3029,8 @@ export function buildLines3DChartOption(data: any[], config: any): any {
       viewControl: {
         autoRotate: config.autoRotate !== false,
         autoRotateSpeed: config.autoRotateSpeed || 8,
-        distance: 200,
+        // Pulled back for Lines3D arcs to render fully visible.
+        distance: config.viewDistance ?? 260,
       },
       light: {
         main: { intensity: 1.0, shadow: false },
@@ -2939,7 +3094,9 @@ export function buildPolygons3DChartOption(data: any[], config: any): any {
         autoRotateSpeed: config.autoRotateSpeed || 4,
         alpha: 40,
         beta: 0,
-        distance: 80,
+        // Polygons render with the world map laid flat; pull camera
+        // back so the full continent extent is visible at default zoom.
+        distance: config.viewDistance ?? 180,
       },
       light: {
         main: { intensity: 1.5, shadow: false },

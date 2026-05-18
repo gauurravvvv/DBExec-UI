@@ -759,3 +759,89 @@
     transform: scale(1);
   }
 }
+
+// ===================================================================
+// REDESIGN OVERRIDES — chart card chrome matches edit-analyses
+// visual cards so a saved analysis reads the same on view and edit.
+// ===================================================================
+
+.visual-box {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--card-background);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: border-color var(--motion-fast) ease,
+              box-shadow var(--motion-fast) ease;
+
+  &:hover {
+    border-color: var(--border-strong);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+}
+
+.visual-inline-title {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-color);
+
+  .title-text {
+    font-size: var(--fs-body);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+  }
+}
+
+.visual-content-placeholder,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-3);
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  padding: var(--space-8);
+  color: var(--text-muted);
+
+  .placeholder-icon-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--primary-color-transparent);
+    margin-bottom: var(--space-2);
+
+    i {
+      font-size: 22px;
+      color: var(--primary-color);
+      margin: 0;
+    }
+  }
+
+  > i {
+    color: var(--text-subtle);
+    font-size: 24px;
+    margin: 0 0 var(--space-2);
+  }
+
+  p, h3 {
+    margin: 0;
+    color: var(--text-color);
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-body);
+    max-width: 280px;
+    line-height: 1.4;
+  }
+
+  small {
+    color: var(--text-muted);
+    font-size: var(--fs-label);
+    margin: 0;
+    max-width: 320px;
+    line-height: 1.5;
+  }
+}
+

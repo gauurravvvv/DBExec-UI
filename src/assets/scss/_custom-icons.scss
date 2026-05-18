@@ -136,6 +136,11 @@ $icon-url: '../icons/';
     &.ci-visualization {
       content: url($icon-url + 'visualization.svg');
     }
+    // Minimal axis + 3 bars, 1.5 stroke, no fills. Used in empty-state
+    // placeholders where the loud visualization icon read too heavy.
+    &.ci-chart-simple {
+      content: url($icon-url + 'chart-simple.svg');
+    }
     &.ci-analyses {
       content: url($icon-url + 'analyses.svg');
     }

@@ -1,5 +1,22 @@
+<!-- Table visual — renders with whatever data is available; does not
+     require axis field mapping (it shows all columns of the dataset). -->
+<ng-container *ngIf="visual.chartType && isTableChartType(visual.chartType)">
+  <app-table-visual
+    [chartConfig]="chartConfigRef"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [data]="getDisplayData(visual)"
+  ></app-table-visual>
+</ng-container>
+
 <!-- Standard charts: require field mapping -->
-<ng-container *ngIf="visual.chartType && hasRequiredChartFields(visual)">
+<ng-container
+  *ngIf="
+    visual.chartType &&
+    !isTableChartType(visual.chartType) &&
+    hasRequiredChartFields(visual)
+  "
+>
   <!-- Card chart (non-ECharts) -->
   <app-configurable-card-chart
     *ngIf="isCardChartType(visual.chartType); else echartBlock"
@@ -25,6 +42,7 @@
 <ng-container
   *ngIf="
     visual.chartType &&
+    !isTableChartType(visual.chartType) &&
     !hasRequiredChartFields(visual) &&
     isGlobeSpecialType(visual.chartType)
   "

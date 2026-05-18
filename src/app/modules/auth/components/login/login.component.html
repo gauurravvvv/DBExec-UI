@@ -1,126 +1,111 @@
-<div class="login-container">
-  <!-- Left Section - Marketing Content -->
-  <div class="marketing-section">
-    <!-- Add floating icons container -->
-    <div class="floating-icons">
-      <i class="ci ci-database floating-icon"></i>
-      <i class="ci ci-code floating-icon"></i>
-      <i class="ci ci-function floating-icon"></i>
-      <i class="ci ci-table-cells floating-icon"></i>
-      <i class="ci ci-globe floating-icon"></i>
-      <i class="ci ci-dataset floating-icon"></i>
-      <i class="ci ci-columns floating-icon"></i>
-      <i class="ci ci-dataset-binder floating-icon"></i>
-      <i class="ci ci-list-ol floating-icon"></i>
-      <i class="ci ci-sort-numeric floating-icon"></i>
-      <i class="ci ci-site-map floating-icon"></i>
-      <i class="ci ci-studio floating-icon"></i>
+<app-auth-shell
+  cardTitle="Welcome back"
+  cardSubtitle="Continue to DBExec"
+>
+  <form
+    id="auth-form"
+    [formGroup]="loginForm"
+    (ngSubmit)="onSubmit()"
+    class="auth-form"
+    novalidate
+  >
+    <div class="auth-form__field">
+      <label class="auth-visually-hidden" for="auth-account">Account</label>
+      <app-custom-input
+        inputId="auth-account"
+        formControlName="organisation"
+        placeholder="Account"
+        icon="pi-desktop"
+        autocomplete="organization"
+        ariaLabel="Account"
+        [showError]="
+          !!(
+            loginForm.get('organisation')?.invalid &&
+            (loginForm.get('organisation')?.touched || submitAttempted())
+          )
+        "
+        [errorMessage]="getErrorMessage('organisation')"
+      ></app-custom-input>
     </div>
 
-    <div class="brand mb-5">
-      <i class="ci ci-app-icon mr-2"></i>
-      <span>DBExec</span>
+    <div class="auth-form__field">
+      <label class="auth-visually-hidden" for="auth-username">Username</label>
+      <app-custom-input
+        inputId="auth-username"
+        formControlName="username"
+        placeholder="Username"
+        icon="pi-user"
+        autocomplete="username"
+        ariaLabel="Username"
+        [showError]="
+          !!(
+            loginForm.get('username')?.invalid &&
+            (loginForm.get('username')?.touched || submitAttempted())
+          )
+        "
+        [errorMessage]="getErrorMessage('username')"
+      ></app-custom-input>
     </div>
-    <h1 class="headline">Elevate Your Datasource<br />Management Experience</h1>
-    <p class="subtitle">Powerful . Intuitive . Secure</p>
-    <div class="features-grid">
-      <div
-        class="feature-item"
-        *ngFor="let feature of features; trackBy: trackByIndex"
+
+    <div
+      class="auth-form__field"
+      (focusin)="onPasswordFocus()"
+      (focusout)="onPasswordBlur()"
+    >
+      <label class="auth-visually-hidden" for="auth-password">Password</label>
+      <app-custom-input
+        inputId="auth-password"
+        formControlName="password"
+        placeholder="Password"
+        icon="pi-lock"
+        autocomplete="current-password"
+        ariaLabel="Password"
+        [showPasswordToggle]="true"
+        [showError]="
+          !!(
+            loginForm.get('password')?.invalid &&
+            (loginForm.get('password')?.touched || submitAttempted())
+          )
+        "
+        [errorMessage]="getErrorMessage('password')"
+      ></app-custom-input>
+      <p
+        class="auth-form__capslock"
+        *ngIf="capsLockOn() && passwordFocused()"
+        role="status"
+        aria-live="polite"
       >
-        <div class="feature-icon">
-          <i class="pi pi-{{ feature.icon }}"></i>
-        </div>
-        <div class="feature-content">
-          <h3>{{ feature.title }}</h3>
-          <p>{{ feature.description }}</p>
-        </div>
-      </div>
+        <i class="pi pi-info-circle" aria-hidden="true"></i>
+        Caps Lock is on
+      </p>
     </div>
 
-    <div class="security-badge">
-      <i class="pi pi-shield"></i>
-      Enterprise-Grade Security
+    <div
+      class="auth-form__error"
+      role="alert"
+      aria-live="polite"
+      [class.is-empty]="!loginError()"
+    >
+      <ng-container *ngIf="loginError()">
+        <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+        <span>{{ loginError() }}</span>
+      </ng-container>
     </div>
-  </div>
-  <!-- Right Section - Login Form -->
-  <div class="login-section">
-    <div class="login-box">
-      <h2>Welcome</h2>
-      <p class="text-500 mb-4">Sign in to continue to DBExec</p>
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="p-fluid">
-        <div class="field mb-4">
-          <app-custom-input
-            formControlName="organisation"
-            placeholder="Organisation"
-            icon="pi-building"
-            styleClass="p-inputtext-lg"
-            [showError]="
-              !!(
-                loginForm.get('organisation')?.invalid &&
-                loginForm.get('organisation')?.touched
-              )
-            "
-            [errorMessage]="getErrorMessage('organisation')"
-          >
-          </app-custom-input>
-        </div>
 
-        <div class="field mb-4">
-          <app-custom-input
-            formControlName="username"
-            placeholder="Username"
-            icon="pi-user"
-            styleClass="p-inputtext-lg"
-            [showError]="
-              !!(
-                loginForm.get('username')?.invalid &&
-                loginForm.get('username')?.touched
-              )
-            "
-            [errorMessage]="getErrorMessage('username')"
-          >
-          </app-custom-input>
-        </div>
+    <button
+      pButton
+      type="submit"
+      class="auth-form__submit"
+      [label]="loading() ? 'Signing in…' : 'Sign in'"
+      [disabled]="loginForm.invalid || loading()"
+      [loading]="loading()"
+    ></button>
 
-        <div class="field mb-4">
-          <app-custom-input
-            formControlName="password"
-            placeholder="Password"
-            icon="pi-lock"
-            styleClass="p-inputtext-lg"
-            [showPasswordToggle]="true"
-            [showError]="
-              !!(
-                loginForm.get('password')?.invalid &&
-                loginForm.get('password')?.touched
-              )
-            "
-            [errorMessage]="getErrorMessage('password')"
-          >
-          </app-custom-input>
-        </div>
-
-        <div class="flex align-items-center justify-content-end mb-4">
-          <a class="forgot-password" [routerLink]="['/forgot-password']">
-            Forgot password?
-          </a>
-        </div>
-
-        <button
-          pButton
-          type="submit"
-          [label]="loading() ? 'Signing in...' : 'Login'"
-          [disabled]="!loginForm.valid || loading()"
-          [loading]="loading()"
-          class="p-button-lg"
-        ></button>
-
-        <div class="login-error" *ngIf="loginError()">
-          <i class="pi pi-exclamation-circle"></i>
-          {{ loginError() }}
-        </div>
-      </form>
+    <div class="auth-form__footer-row">
+      <a class="auth-form__link" [routerLink]="['/forgot-password']">
+        Forgot password?
+      </a>
+      <span class="auth-form__hint">We'll email a reset link</span>
     </div>
-  </div>
-</div>
+  </form>
+</app-auth-shell>

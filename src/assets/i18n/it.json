@@ -153,7 +153,8 @@
     "LOCK": "Lock",
     "INCLUDE_ALL": "Include All",
     "CONFIRM": "Confirm",
-    "COPY_TO_CLIPBOARD": "Copy to clipboard"
+    "COPY_TO_CLIPBOARD": "Copy to clipboard",
+    "BACK": "Indietro"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Il nome è obbligatorio",
@@ -758,7 +759,7 @@
     "CHART_TYPE": "Tipo di grafico",
     "CHARTS": "Grafici",
     "CLICK_FIELD_FROM_LEFT_PANEL": "Clicca un campo dal pannello sinistro",
-    "CLICK_TO_CONFIGURE": "Clicca per configurare le proprietà del grafico",
+    "CLICK_TO_CONFIGURE": "Scegli un tipo dal pannello Visuali",
     "CLICK_TO_SELECT_FIELD": "Clicca per selezionare il campo",
     "CLOCKWISE": "Senso orario",
     "COLOR_SCHEME": "Schema colori",
@@ -1090,7 +1091,15 @@
     "DEFAULT_20_PERCENT": "20%",
     "DEFAULT_30_PERCENT": "30%",
     "DEFAULT_90_PERCENT": "90%",
-    "EXAMPLE_50_PERCENT": "es. 50%"
+    "EXAMPLE_50_PERCENT": "es. 50%",
+    "FIELDS": "Campi",
+    "TABLE_OPTIONS": "Opzioni tabella",
+    "TABLE_COMPACT": "Densità compatta",
+    "TABLE_STRIPED": "Righe alternate",
+    "TABLE_SHOW_ROW_NUMBERS": "Mostra numeri di riga",
+    "TABLE_COLUMNS": "Colonne",
+    "TABLE_NO_MAPPING_HINT": "Fai clic sui campi del dataset per aggiungerli come colonne della tabella.",
+    "TABLE_PICK_COLUMNS_PROMPT": "Fai clic sui campi nella barra laterale per aggiungerli come colonne"
   },
   "DASHBOARD": {
     "TITLE": "Dashboard",

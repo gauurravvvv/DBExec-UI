@@ -214,9 +214,31 @@ textarea,
 .p-tree .p-tree-container .p-treenode,
 .p-listbox,
 .p-listbox .p-listbox-list .p-listbox-item,
-.p-tooltip,
-.p-tooltip .p-tooltip-text {
-  font-size: var(--fs-body) !important;
+// Tooltip: tight, modern, sentence-case. Default PrimeNG renders too
+// large and too padded — pin to compact dimensions site-wide.
+.p-tooltip {
+  font-size: var(--fs-label) !important;
+
+  .p-tooltip-text {
+    font-size: var(--fs-label) !important;
+    font-weight: var(--fw-regular) !important;
+    line-height: 1.4 !important;
+    padding: 6px 10px !important;
+    border-radius: 6px !important;
+    max-width: 240px;
+    white-space: normal;
+    background: rgba(20, 20, 20, 0.92) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18) !important;
+  }
+
+  // Pointer arrow — match the dark bubble color
+  .p-tooltip-arrow {
+    border-top-color: rgba(20, 20, 20, 0.92) !important;
+    border-bottom-color: rgba(20, 20, 20, 0.92) !important;
+    border-left-color: rgba(20, 20, 20, 0.92) !important;
+    border-right-color: rgba(20, 20, 20, 0.92) !important;
+  }
 }
 
 // Within-overlay form controls — PrimeNG theme can re-state font-size on

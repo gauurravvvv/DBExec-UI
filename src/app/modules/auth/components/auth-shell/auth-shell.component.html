@@ -1,0 +1,56 @@
+<div class="auth-page">
+  <a class="auth-skip-link" href="#auth-form">Skip to form</a>
+
+  <header class="auth-topbar">
+    <a class="auth-topbar__brand" routerLink="/" aria-label="DBExec home">
+      <i class="ci ci-app-icon auth-topbar__mark" aria-hidden="true"></i>
+      <span class="auth-topbar__wordmark">DBExec</span>
+    </a>
+  </header>
+
+  <main class="auth-main">
+    <section class="auth-features" *ngIf="showFeatures" aria-hidden="true">
+      <div class="auth-features__heading">
+        <h1>{{ heroTitle }}</h1>
+        <p>{{ heroLede }}</p>
+      </div>
+      <ul class="auth-features__list">
+        <li
+          class="auth-feature"
+          *ngFor="let feature of features; let i = index; trackBy: trackByIndex"
+          [class.auth-feature--lead]="i === 0"
+          [style.animation-delay.s]="i * 0.08"
+        >
+          <span class="auth-feature__icon">
+            <i class="pi pi-{{ feature.icon }}"></i>
+          </span>
+          <div class="auth-feature__body">
+            <span class="auth-feature__title">{{ feature.title }}</span>
+            <span class="auth-feature__desc">{{ feature.description }}</span>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section class="auth-card" aria-labelledby="auth-card-title">
+      <h2 id="auth-card-title" class="auth-card__title">{{ cardTitle }}</h2>
+      <p class="auth-card__subtitle" *ngIf="cardSubtitle">{{ cardSubtitle }}</p>
+
+      <div id="auth-form" class="auth-card__content">
+        <ng-content></ng-content>
+      </div>
+    </section>
+  </main>
+
+  <footer class="auth-footer">
+    <div class="auth-footer__brand">
+      <i class="ci ci-app-icon auth-footer__mark" aria-hidden="true"></i>
+      <span>DBExec</span>
+    </div>
+    <p class="auth-footer__copyright">
+      DBExec {{ environment.appVersion }} &middot; Copyright &copy; {{ year }}
+      Ultragenic Research &amp; Technologies Private Limited &middot; All Rights
+      Reserved.
+    </p>
+  </footer>
+</div>

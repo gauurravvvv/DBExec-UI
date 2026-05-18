@@ -1,111 +1,136 @@
 <div class="query-editor-wrapper">
-  <!-- Header Toolbar -->
-  <div class="query-toolbar">
-    <div class="toolbar-left">
-      <div class="left-section">
-        <button
-          pButton
-          class="p-button-text p-button-plain back-button"
-          (click)="goBack()"
-        >
-          <i class="pi pi-arrow-left back-icon"></i>
-        </button>
-        <h3 class="toolbar-label">{{ 'ANALYSES.EDIT_ANALYSIS' | translate }}</h3>
+  <!-- Unified Top Toolbar: identity (left) + workspace controls (center) + actions (right) -->
+  <div class="a-toolbar">
+    <!-- Left: back arrow + breadcrumb-style label + analysis name -->
+    <div class="a-toolbar__left">
+      <button
+        type="button"
+        class="a-icon-btn a-back-btn"
+        (click)="goBack()"
+        [pTooltip]="'COMMON.BACK' | translate"
+        tooltipPosition="bottom"
+      >
+        <i class="pi pi-arrow-left"></i>
+      </button>
+      <div class="a-toolbar__title">
+        <span class="a-toolbar__crumb">{{ 'ANALYSES.EDIT_ANALYSIS' | translate }}</span>
+        <span class="a-toolbar__sep" aria-hidden="true">/</span>
+        <span class="a-toolbar__name">{{ analysisDetails?.name || '' }}</span>
       </div>
     </div>
-    <div class="toolbar-center">
-      <h3 class="toolbar-title">{{ analysisDetails?.name || '' }}</h3>
+
+    <!-- Center: segmented panel toggles (grouped pairs) -->
+    <div class="a-toolbar__center">
+      <div class="a-segment" role="group" aria-label="Data panels">
+        <button
+          type="button"
+          class="a-segment__btn"
+          [class.is-active]="isFieldsPanelOpen"
+          (click)="toggleFieldsPanel()"
+        >
+          <i class="pi pi-database"></i>
+          <span>{{ 'ANALYSES.FIELDS' | translate }}</span>
+        </button>
+        <button
+          type="button"
+          class="a-segment__btn"
+          [class.is-active]="isFilterPanelOpen"
+          (click)="toggleFilterPanel()"
+        >
+          <i class="pi pi-filter"></i>
+          <span>{{ 'ANALYSES.FILTERS' | translate }}</span>
+        </button>
+      </div>
+      <div class="a-segment" role="group" aria-label="Build panels">
+        <button
+          type="button"
+          class="a-segment__btn"
+          [class.is-active]="isVisualListPanelOpen"
+          (click)="toggleVisualListPanel()"
+        >
+          <i class="pi pi-list"></i>
+          <span>{{ 'ANALYSES.LAYERS' | translate }}</span>
+        </button>
+        <button
+          type="button"
+          class="a-segment__btn"
+          [class.is-active]="isVisualsPanelOpen"
+          (click)="toggleVisualsPanel()"
+        >
+          <i class="pi pi-chart-bar"></i>
+          <span>{{ 'ANALYSES.VISUALS' | translate }}</span>
+        </button>
+      </div>
     </div>
-    <div class="toolbar-right">
+
+    <!-- Right: status dot + actions -->
+    <div class="a-toolbar__right">
+      <!-- Dataset status: inline text + colored dot, no pill -->
+      <div
+        class="a-status"
+        *ngIf="datasetStatus$ | async as status"
+        [ngSwitch]="status"
+      >
+        <ng-container *ngSwitchCase="'loading'">
+          <span class="a-status__dot a-status__dot--loading"></span>
+          <span class="a-status__text">{{ 'ANALYSES.RETRIEVING_DATA' | translate }}</span>
+        </ng-container>
+        <ng-container *ngSwitchCase="'loaded'">
+          <span class="a-status__dot a-status__dot--loaded"></span>
+          <span class="a-status__text">{{ 'ANALYSES.ROWS_LOADED' | translate:{ count: (rawGraphData.length || 0) } }}</span>
+        </ng-container>
+        <ng-container *ngSwitchCase="'error'">
+          <span class="a-status__dot a-status__dot--error"></span>
+          <span class="a-status__text">{{ 'ANALYSES.ERROR_LOADING_DATA' | translate }}</span>
+        </ng-container>
+      </div>
+
+      <i
+        class="pi pi-info-circle a-toolbar__hint"
+        [pTooltip]="'ANALYSES.ROW_LIMIT_HINT' | translate"
+        tooltipPosition="bottom"
+        [tooltipOptions]="{ tooltipStyleClass: 'row-limit-tooltip' }"
+      ></i>
+
+      <div class="a-toolbar__divider" aria-hidden="true"></div>
+
       <button
-        pButton
-        class="p-button-text btn-primary"
-        [title]="'ANALYSES.REFRESH_DATA' | translate"
+        type="button"
+        class="a-icon-btn"
         (click)="refreshData()"
         [disabled]="(datasetStatus$ | async) === 'loading' || running()"
+        [pTooltip]="'ANALYSES.REFRESH_DATA' | translate"
+        tooltipPosition="bottom"
       >
         <i
           class="pi pi-refresh"
           [class.pi-spin]="(datasetStatus$ | async) === 'loading'"
         ></i>
       </button>
+
+      <!-- Dev-only: render one visual per chart type pre-filled with
+           dummy data, so every chart can be eyeballed without manual
+           field selection. Hidden in production builds. -->
       <button
-        pButton
-        class="p-button-text btn-primary"
-        [title]="'ANALYSES.SAVE_ANALYSIS' | translate"
+        *ngIf="isDevBuild"
+        type="button"
+        class="a-icon-btn a-icon-btn--dev"
+        (click)="plotAllChartTypes()"
+        pTooltip="DEV: plot every chart type with dummy data"
+        tooltipPosition="bottom"
+      >
+        <i class="pi pi-th-large"></i>
+      </button>
+
+      <button
+        type="button"
+        class="a-btn a-btn--primary"
         (click)="saveAnalysis()"
         [disabled]="!canSave || saving()"
       >
-        <i class="pi pi-save"></i>
+        <i class="pi" [class.pi-save]="!saving()" [class.pi-spin]="saving()" [class.pi-spinner]="saving()"></i>
+        <span>{{ saving() ? ('ANALYSES.SAVING' | translate) : ('COMMON.SAVE' | translate) }}</span>
       </button>
-    </div>
-  </div>
-
-  <!-- Sub Header with Toggle Buttons -->
-  <div class="sub-header">
-    <button
-      pButton
-      class="p-button-text btn-primary visual-list-btn"
-      [class.active]="isVisualListPanelOpen"
-      (click)="toggleVisualListPanel()"
-      [title]="'ANALYSES.TOGGLE_VISUAL_LIST' | translate"
-    >
-      <i class="pi pi-list"></i>
-    </button>
-    <button
-      pButton
-      class="p-button-text btn-primary field-btn"
-      [class.active]="isFieldsPanelOpen"
-      (click)="toggleFieldsPanel()"
-      [title]="'ANALYSES.TOGGLE_FIELDS' | translate"
-    >
-      <i class="pi pi-database"></i>
-    </button>
-    <button
-      pButton
-      class="p-button-text btn-primary visual-btn"
-      [class.active]="isVisualsPanelOpen"
-      (click)="toggleVisualsPanel()"
-      [title]="'ANALYSES.TOGGLE_VISUALS' | translate"
-    >
-      <i class="pi pi-chart-bar"></i>
-    </button>
-    <button
-      pButton
-      class="p-button-text btn-primary filter-btn"
-      [class.active]="isFilterPanelOpen"
-      (click)="toggleFilterPanel()"
-      [title]="'ANALYSES.TOGGLE_FILTERS' | translate"
-    >
-      <i class="pi pi-filter"></i>
-    </button>
-
-    <i
-      class="pi pi-info-circle row-limit-hint"
-      [pTooltip]="'ANALYSES.ROW_LIMIT_HINT' | translate"
-      tooltipPosition="left"
-      [tooltipOptions]="{ tooltipStyleClass: 'row-limit-tooltip' }"
-    ></i>
-
-    <!-- Dataset Loading Status Indicator -->
-    <div
-      class="dataset-status-indicator"
-      *ngIf="datasetStatus$ | async as status"
-    >
-      <ng-container [ngSwitch]="status">
-        <div *ngSwitchCase="'loading'" class="status-loading">
-          <i class="pi pi-spin pi-spinner"></i>
-          <span>{{ 'ANALYSES.RETRIEVING_DATA' | translate }}</span>
-        </div>
-        <div *ngSwitchCase="'loaded'" class="status-loaded">
-          <i class="pi pi-check-circle"></i>
-          <span>{{ 'ANALYSES.ROWS_LOADED' | translate:{ count: (rawGraphData.length || 0) } }}</span>
-        </div>
-        <div *ngSwitchCase="'error'" class="status-error">
-          <i class="pi pi-exclamation-circle"></i>
-          <span>{{ 'ANALYSES.ERROR_LOADING_DATA' | translate }}</span>
-        </div>
-      </ng-container>
     </div>
   </div>
 
@@ -131,9 +156,9 @@
             ></app-custom-input>
           </div>
 
-          <!-- Empty State -->
+          <!-- Empty State — quieter -->
           <div class="visual-list-empty" *ngIf="visuals.length === 0">
-            <i class="pi pi-inbox"></i>
+            <i class="ci ci-visualization" aria-hidden="true"></i>
             <p>{{ 'ANALYSES.NO_VISUALS_YET' | translate }}</p>
           </div>
 
@@ -221,6 +246,7 @@
             <div
               class="fields-list"
               [class.selection-mode]="activeAxisSelection"
+              [class.table-mode]="isFocusedVisualTable()"
             >
               <ng-container
                 *ngFor="let field of filteredDatasetFields; trackBy: trackById"
@@ -229,7 +255,9 @@
                   *ngIf="field._scope === 'dataset'"
                   class="field-card"
                   [class.custom-field]="field.type === 2"
-                  [class.selectable]="activeAxisSelection !== null"
+                  [class.selectable]="activeAxisSelection !== null || isFocusedVisualTable()"
+                  [class.field-shown]="isFocusedVisualTable() && isFieldVisibleInTable(field)"
+                  [class.field-hidden]="isFocusedVisualTable() && !isFieldVisibleInTable(field)"
                   (click)="onFieldClick(field)"
                 >
                   <div
@@ -257,6 +285,7 @@
             <div
               class="fields-list"
               [class.selection-mode]="activeAxisSelection"
+              [class.table-mode]="isFocusedVisualTable()"
             >
               <ng-container
                 *ngFor="let field of filteredDatasetFields; trackBy: trackById"
@@ -265,7 +294,9 @@
                   *ngIf="field._scope === 'analysis'"
                   class="field-card analysis-field"
                   [class.custom-field]="field.type === 2"
-                  [class.selectable]="activeAxisSelection !== null"
+                  [class.selectable]="activeAxisSelection !== null || isFocusedVisualTable()"
+                  [class.field-shown]="isFocusedVisualTable() && isFieldVisibleInTable(field)"
+                  [class.field-hidden]="isFocusedVisualTable() && !isFieldVisibleInTable(field)"
                   (click)="onFieldClick(field)"
                 >
                   <div
@@ -491,7 +522,8 @@
             (dragstart)="startDrag($event, visual)"
           >
             <span class="inline-title-text">{{ visual.title }}</span>
-            <!-- Chart type and action buttons -->
+            <!-- Action buttons (no chart-type switcher; users change
+                 chart type via the Layers + Visuals sidebars only) -->
             <div class="visual-action-buttons">
               <i
                 *ngIf="
@@ -503,13 +535,6 @@
                 class="pi pi-window-maximize action-icon maximize-icon"
                 (click)="maximizeVisual(visual, $event)"
                 [pTooltip]="'ANALYSES.MAXIMIZE' | translate"
-                tooltipPosition="top"
-              ></i>
-              <i
-                *ngIf="visual.chartType"
-                class="pi pi-refresh action-icon change-chart-icon"
-                (click)="clearChartType(visual); $event.stopPropagation()"
-                [pTooltip]="'ANALYSES.CHANGE_CHART_TYPE' | translate"
                 tooltipPosition="top"
               ></i>
               <i
@@ -543,7 +568,7 @@
               *ngIf="!visual.chartType && !visual.loading && !visual.error"
             >
               <div class="placeholder-icon-wrap">
-                <i class="pi pi-chart-bar"></i>
+                <i class="ci ci-chart-simple" aria-hidden="true"></i>
               </div>
               <p>{{ 'ANALYSES.SELECT_CHART_TYPE' | translate }}</p>
               <small>{{ 'ANALYSES.CLICK_TO_CONFIGURE' | translate }}</small>
@@ -551,6 +576,8 @@
 
             <!-- Placeholder when chart type selected but fields not mapped -->
             <!-- Not shown for lines3d/polygons3d since they display dummy data immediately -->
+            <!-- Not shown for tables — they have no axis mapping and render
+                 their own empty-state when no rows are present. -->
             <div
               class="visual-content-placeholder"
               *ngIf="
@@ -558,12 +585,13 @@
                 !hasRequiredChartFields(visual) &&
                 !isLines3dChartType(visual.chartType) &&
                 !isPolygons3dChartType(visual.chartType) &&
+                !isTableChartType(visual.chartType) &&
                 !visual.loading &&
                 !visual.error
               "
             >
               <div class="placeholder-icon-wrap">
-                <i class="pi pi-database"></i>
+                <i class="ci ci-database" aria-hidden="true"></i>
               </div>
               <p>{{ 'ANALYSES.MAP_DATA_FIELDS' | translate }}</p>
               <small>{{
@@ -602,6 +630,23 @@
               </div>
             </ng-container>
           </div>
+          <!-- Hover insights chip — bottom-left, hover-revealed.
+               Shows row count + chart-type for at-a-glance context.
+               Absolutely positioned so it does NOT affect layout. -->
+          <div
+            class="visual-insights"
+            *ngIf="visual.chartType && (visual.chartData?.length || hasRequiredChartFields(visual))"
+          >
+            <span class="visual-insights__chunk" *ngIf="visual.chartData?.length">
+              <i class="pi pi-database"></i>
+              {{ visual.chartData.length }} rows
+            </span>
+            <span class="visual-insights__chunk" *ngIf="visual.chartType">
+              <i class="pi pi-chart-bar"></i>
+              {{ visual.chartType }}
+            </span>
+          </div>
+
           <!-- Resize Handles -->
           <div
             class="resize-handle-right"
@@ -618,25 +663,16 @@
         </div>
       </div>
 
-      <!-- Empty State -->
+      <!-- Empty State — subtle, quieter copy + custom SVG icon -->
       <div class="empty-state" *ngIf="visuals.length === 0">
-        <i class="pi pi-chart-bar"></i>
-        <h3>{{ 'ANALYSES.NO_VISUALS_YET' | translate }}</h3>
-        <p>{{ 'ANALYSES.ADD_VISUAL_HINT' | translate }}</p>
-        <div class="empty-state-tips">
-          <div class="tip-item">
-            <i class="pi pi-info-circle"></i>
-            <span>{{ 'ANALYSES.TIP_CLICK_CHART' | translate }}</span>
-          </div>
-          <div class="tip-item">
-            <i class="pi pi-info-circle"></i>
-            <span>{{ 'ANALYSES.TIP_DRAG_RESIZE' | translate }}</span>
-          </div>
-          <div class="tip-item">
-            <i class="pi pi-info-circle"></i>
-            <span>{{ 'ANALYSES.TIP_RIGHT_CLICK' | translate }}</span>
-          </div>
-        </div>
+        <i class="ci ci-visualization empty-state__icon" aria-hidden="true"></i>
+        <h3 class="empty-state__title">{{ 'ANALYSES.NO_VISUALS_YET' | translate }}</h3>
+        <p class="empty-state__hint">{{ 'ANALYSES.ADD_VISUAL_HINT' | translate }}</p>
+        <ul class="empty-state__tips">
+          <li>{{ 'ANALYSES.TIP_CLICK_CHART' | translate }}</li>
+          <li>{{ 'ANALYSES.TIP_DRAG_RESIZE' | translate }}</li>
+          <li>{{ 'ANALYSES.TIP_RIGHT_CLICK' | translate }}</li>
+        </ul>
       </div>
     </div>
 
@@ -644,6 +680,7 @@
     <app-visual-config-sidebar
       *ngIf="isConfigSidebarOpen && focusedVisualId && focusedVisual?.chartType"
       [focusedVisual]="focusedVisual"
+      [allFields]="allFields"
       (close)="closeConfigSidebar()"
       (configChanged)="markDirty()"
     ></app-visual-config-sidebar>

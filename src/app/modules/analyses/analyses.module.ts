@@ -11,6 +11,7 @@ import { ChartRendererComponent } from './components/chart-renderer/chart-render
 import { EditAnalysesComponent } from './components/edit-analyses/edit-analyses.component';
 import { FilterDialogComponent } from './components/filter-dialog/filter-dialog.component';
 import { ListAnalysesComponent } from './components/list-analyses/list-analyses.component';
+import { TableVisualComponent } from './components/table-visual/table-visual.component';
 import { ViewAnalysesComponent } from './components/view-analyses/view-analyses.component';
 import { VisualConfigSidebarComponent } from './components/visual-config-sidebar/visual-config-sidebar.component';
 import { VisualsChartSidebarComponent } from './components/visuals-chart-sidebar/visuals-chart-sidebar.component';
@@ -20,6 +21,7 @@ import { addAnalysesReducer, ADD_ANALYSES_FEATURE_KEY } from './store';
   declarations: [
     ChartRendererComponent,
     FilterDialogComponent,
+    TableVisualComponent,
     VisualConfigSidebarComponent,
     VisualsChartSidebarComponent,
     EditAnalysesComponent,

@@ -28,8 +28,8 @@
         </app-custom-input>
       </div>
 
-      <!-- Color Scheme -->
-      <div class="config-group">
+      <!-- Color Scheme — hidden for table visuals (palette does not apply) -->
+      <div class="config-group" *ngIf="!isTableChartType(focusedVisual.chartType)">
         <label>{{ 'ANALYSES.COLOR_SCHEME' | translate }}</label>
         <app-custom-dropdown
           [options]="colorSchemes"
@@ -38,6 +38,57 @@
           optionValue="value"
           appendTo="body"
         ></app-custom-dropdown>
+      </div>
+
+      <!-- ===== Table-specific options ===== -->
+      <div
+        class="config-section"
+        *ngIf="isTableChartType(focusedVisual.chartType)"
+      >
+        <div class="section-title">{{ 'ANALYSES.TABLE_OPTIONS' | translate }}</div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.TABLE_COMPACT' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.tableCompact"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.TABLE_STRIPED' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.tableStriped"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.TABLE_SHOW_ROW_NUMBERS' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.tableShowRowNumbers"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+      </div>
+
+      <!-- ===== Table column visibility ===== -->
+      <div
+        class="config-section"
+        *ngIf="
+          isTableChartType(focusedVisual.chartType) &&
+          tableAvailableColumns.length > 0
+        "
+      >
+        <div class="section-title">{{ 'ANALYSES.TABLE_COLUMNS' | translate }}</div>
+        <div
+          class="config-row"
+          *ngFor="let col of tableAvailableColumns; trackBy: trackByValue"
+        >
+          <label>{{ tableColumnLabel(col) }}</label>
+          <app-custom-toggle
+            [ngModel]="isTableColumnVisible(col)"
+            (ngModelChange)="setTableColumnVisible(col, $event)"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
       </div>
 
       <!-- ===== Axis (ECharts axis config) ===== -->

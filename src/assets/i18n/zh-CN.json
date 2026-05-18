@@ -153,7 +153,8 @@
     "LOCK": "Lock",
     "INCLUDE_ALL": "Include All",
     "CONFIRM": "Confirm",
-    "COPY_TO_CLIPBOARD": "Copy to clipboard"
+    "COPY_TO_CLIPBOARD": "Copy to clipboard",
+    "BACK": "返回"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名字为必填项",
@@ -758,7 +759,7 @@
     "CHART_TYPE": "图表类型",
     "CHARTS": "图表",
     "CLICK_FIELD_FROM_LEFT_PANEL": "从左侧面板点击字段",
-    "CLICK_TO_CONFIGURE": "点击配置图表属性",
+    "CLICK_TO_CONFIGURE": "从可视化面板中选择一种类型",
     "CLICK_TO_SELECT_FIELD": "点击选择字段",
     "CLOCKWISE": "顺时针",
     "COLOR_SCHEME": "配色方案",
@@ -1090,7 +1091,15 @@
     "DEFAULT_20_PERCENT": "20%",
     "DEFAULT_30_PERCENT": "30%",
     "DEFAULT_90_PERCENT": "90%",
-    "EXAMPLE_50_PERCENT": "例如 50%"
+    "EXAMPLE_50_PERCENT": "例如 50%",
+    "FIELDS": "字段",
+    "TABLE_OPTIONS": "表格选项",
+    "TABLE_COMPACT": "紧凑密度",
+    "TABLE_STRIPED": "条纹行",
+    "TABLE_SHOW_ROW_NUMBERS": "显示行号",
+    "TABLE_COLUMNS": "列",
+    "TABLE_NO_MAPPING_HINT": "点击数据集列表中的字段，将其添加为表格列。",
+    "TABLE_PICK_COLUMNS_PROMPT": "点击侧边栏中的字段以将其添加为列"
   },
   "DASHBOARD": {
     "TITLE": "仪表盘",

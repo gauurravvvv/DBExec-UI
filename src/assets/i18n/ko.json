@@ -153,7 +153,8 @@
     "LOCK": "Lock",
     "INCLUDE_ALL": "Include All",
     "CONFIRM": "Confirm",
-    "COPY_TO_CLIPBOARD": "Copy to clipboard"
+    "COPY_TO_CLIPBOARD": "Copy to clipboard",
+    "BACK": "뒤로"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "이름은 필수 항목입니다",
@@ -758,7 +759,7 @@
     "CHART_TYPE": "차트 유형",
     "CHARTS": "차트",
     "CLICK_FIELD_FROM_LEFT_PANEL": "왼쪽 패널에서 필드를 클릭하세요",
-    "CLICK_TO_CONFIGURE": "차트 속성을 구성하려면 클릭하세요",
+    "CLICK_TO_CONFIGURE": "비주얼 패널에서 유형을 선택하세요",
     "CLICK_TO_SELECT_FIELD": "필드를 선택하려면 클릭하세요",
     "CLOCKWISE": "시계 방향",
     "COLOR_SCHEME": "색상 구성",
@@ -1090,7 +1091,15 @@
     "DEFAULT_20_PERCENT": "20%",
     "DEFAULT_30_PERCENT": "30%",
     "DEFAULT_90_PERCENT": "90%",
-    "EXAMPLE_50_PERCENT": "예: 50%"
+    "EXAMPLE_50_PERCENT": "예: 50%",
+    "FIELDS": "필드",
+    "TABLE_OPTIONS": "테이블 옵션",
+    "TABLE_COMPACT": "컴팩트 밀도",
+    "TABLE_STRIPED": "줄무늬 행",
+    "TABLE_SHOW_ROW_NUMBERS": "행 번호 표시",
+    "TABLE_COLUMNS": "열",
+    "TABLE_NO_MAPPING_HINT": "데이터셋 목록의 필드를 클릭하여 테이블 열로 추가하세요.",
+    "TABLE_PICK_COLUMNS_PROMPT": "사이드바에서 필드를 클릭하여 열로 추가하세요"
   },
   "DASHBOARD": {
     "TITLE": "대시보드",

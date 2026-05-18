@@ -29,6 +29,14 @@ export class CustomNumberComponent implements ControlValueAccessor {
   @Input() max: number | null = null;
   @Input() step = 1;
   @Input() showButtons = false;
+  /**
+   * PrimeNG layout: 'stacked' renders large vertical +/- arrows on the
+   * right (~80px tall, dominates the input); 'horizontal' puts the +/-
+   * inline on each side at normal input height. Default to 'horizontal'
+   * since most callsites use this component in compact form contexts
+   * (config sidebar, filter dialog). Override per-callsite if needed.
+   */
+  @Input() buttonLayout: 'stacked' | 'horizontal' | 'vertical' = 'horizontal';
   @Input() prefix = '';
   @Input() suffix = '';
   @Input() useGrouping = false;

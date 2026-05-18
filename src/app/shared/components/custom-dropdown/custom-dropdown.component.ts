@@ -1,5 +1,5 @@
 import {
-  ChangeDetectionStrategy,
+  AfterViewInit,
   ChangeDetectorRef,
   Component,
   EventEmitter,
@@ -36,10 +36,17 @@ export type DropdownFetcher = (args: {
       multi: true,
     },
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  // Default change detection (was OnPush). OnPush prevented the wrapper
+  // from observing the bound ngModel value when it landed mid-stream
+  // (after the inner <p-dropdown> initialised), so dropdowns rendering
+  // a pre-populated value showed blank until the user interacted with
+  // something else. With Default CD the wrapper re-checks on every
+  // tick the parent triggers, so the inner [ngModel]="value" picks up
+  // the bound value immediately. The wrapper has no heavy work in its
+  // template, so Default CD has negligible cost here.
 })
 export class CustomDropdownComponent
-  implements ControlValueAccessor, OnChanges
+  implements ControlValueAccessor, OnChanges, AfterViewInit
 {
   @Input() label = '';
   @Input() placeholder = '';
@@ -136,7 +143,34 @@ export class CustomDropdownComponent
   private onChange: (value: any) => void = () => {};
   private onTouched: () => void = () => {};
 
+  /**
+   * After the inner PrimeNG <p-dropdown> has mounted, nudge it to
+   * re-resolve its selected option label. PrimeNG initialises with
+   * options=[] (our @Input default) BEFORE the parent's actual
+   * options array arrives via ngOnChanges; when options finally
+   * appear, p-dropdown does NOT re-attempt to match the bound value
+   * against the new options, so the trigger stays blank until the
+   * user opens the panel. Forcing a value re-stamp here flushes
+   * the inner binding.
+   */
+  ngAfterViewInit(): void {
+    this.flushValueBinding();
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
+    // When the static options array arrives (or changes), p-dropdown
+    // does not auto-re-match the bound value against the new options.
+    // Re-stamp the value so its display label refreshes.
+    if (
+      changes['options'] &&
+      !changes['options'].firstChange &&
+      this.value !== null &&
+      this.value !== undefined &&
+      this.value !== ''
+    ) {
+      this.flushValueBinding();
+    }
+
     // If the parent toggles into serverMode after init, reset internal state.
     if (changes['serverMode'] && this.serverMode) {
       this.resetServerState();
@@ -181,6 +215,20 @@ export class CustomDropdownComponent
         this.resolveSelectedItem(value);
       }
     }
+    // OnPush: writeValue runs outside Angular zone for the wrapper, so the
+    // PrimeNG <p-dropdown> child never sees [(ngModel)] change unless we
+    // mark this view for re-check. Without this, dropdowns that bind to a
+    // pre-populated config value render blank on initial paint until the
+    // user clicks elsewhere.
+    this.cdr.markForCheck();
+    // Belt-and-braces: re-push the value on the next microtask. Some
+    // OnPush parent chains (visual-config-sidebar uses ngDoCheck JSON
+    // snapshot diffing and doesn't propagate ref changes for nested
+    // mutations) won't observe the immediate markForCheck, so the
+    // inner <p-dropdown> initialises with value=undefined and renders
+    // blank. Re-marking after the current tick gives the inner
+    // dropdown a chance to pick up the bound model.
+    Promise.resolve().then(() => this.cdr.markForCheck());
   }
 
   registerOnChange(fn: (value: any) => void): void {
@@ -258,6 +306,32 @@ export class CustomDropdownComponent
     this.serverSearch = '';
     this.serverLoading = false;
     this.selectedItem = null;
+  }
+
+  /**
+   * Force the inner p-dropdown to re-resolve its display label. We
+   * cache the current value, null it, run CD, then restore. The
+   * round-trip triggers p-dropdown's internal selection lookup
+   * against the current options array.
+   *
+   * Only useful for static-options dropdowns (server-mode uses
+   * refreshSelectedItem instead). Guarded so it does not fire
+   * during the initial mount when value is null/undefined/empty.
+   */
+  private flushValueBinding(): void {
+    if (this.serverMode) return;
+    if (this.value === null || this.value === undefined || this.value === '') {
+      return;
+    }
+    // Defer past the current CD pass so the inner dropdown has
+    // settled with the current options before we re-stamp.
+    setTimeout(() => {
+      const cached = this.value;
+      this.value = null;
+      this.cdr.detectChanges();
+      this.value = cached;
+      this.cdr.detectChanges();
+    }, 0);
   }
 
   private async fetchPage(

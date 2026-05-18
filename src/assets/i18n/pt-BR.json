@@ -153,7 +153,8 @@
     "LOCK": "Lock",
     "INCLUDE_ALL": "Include All",
     "CONFIRM": "Confirm",
-    "COPY_TO_CLIPBOARD": "Copy to clipboard"
+    "COPY_TO_CLIPBOARD": "Copy to clipboard",
+    "BACK": "Voltar"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "O nome é obrigatório",
@@ -758,7 +759,7 @@
     "CHART_TYPE": "Tipo de gráfico",
     "CHARTS": "Gráficos",
     "CLICK_FIELD_FROM_LEFT_PANEL": "Clique em um campo do painel esquerdo",
-    "CLICK_TO_CONFIGURE": "Clique para configurar as propriedades do gráfico",
+    "CLICK_TO_CONFIGURE": "Escolha um tipo no painel Visuais",
     "CLICK_TO_SELECT_FIELD": "Clique para selecionar campo",
     "CLOCKWISE": "Sentido horário",
     "COLOR_SCHEME": "Esquema de cores",
@@ -1090,7 +1091,15 @@
     "DEFAULT_20_PERCENT": "20%",
     "DEFAULT_30_PERCENT": "30%",
     "DEFAULT_90_PERCENT": "90%",
-    "EXAMPLE_50_PERCENT": "ex.: 50%"
+    "EXAMPLE_50_PERCENT": "ex.: 50%",
+    "FIELDS": "Campos",
+    "TABLE_OPTIONS": "Opções de tabela",
+    "TABLE_COMPACT": "Densidade compacta",
+    "TABLE_STRIPED": "Linhas alternadas",
+    "TABLE_SHOW_ROW_NUMBERS": "Mostrar números de linha",
+    "TABLE_COLUMNS": "Colunas",
+    "TABLE_NO_MAPPING_HINT": "Clique nos campos do dataset para adicioná-los como colunas da tabela.",
+    "TABLE_PICK_COLUMNS_PROMPT": "Clique nos campos da barra lateral para adicioná-los como colunas"
   },
   "DASHBOARD": {
     "TITLE": "Painéis",

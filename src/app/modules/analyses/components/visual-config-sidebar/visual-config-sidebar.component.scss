@@ -1,0 +1,183 @@
+// Right Properties sidebar — refined to match the listings-module
+// vocabulary (hairline divider, sentence-case header, muted-grey
+// labels, no boxy hover, primary-tinted active states).
+//
+// Encapsulation: Emulated (default). All rules scope to this
+// component's DOM. The inner .config-sidebar div is rendered by
+// THIS component, so we own its chrome here in full.
+
+:host {
+  display: contents;
+}
+
+.config-sidebar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 280px;
+  background-color: var(--card-background);
+  border-left: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  animation: slideInRight var(--motion-slow) ease-out;
+  overflow: hidden;
+  z-index: var(--z-dropdown);
+  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.04);
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+// Header bar — 40px, matches listings sidebar headers
+.sidebar-header-info {
+  height: 40px;
+  padding: 0 var(--space-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+
+  .dataset-label {
+    font-size: var(--fs-label);
+    font-weight: var(--fw-semibold);
+    color: var(--text-muted);
+    letter-spacing: 0;
+    margin: 0;
+  }
+
+  .close-btn {
+    width: 24px;
+    height: 24px;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color var(--motion-fast) ease, background var(--motion-fast) ease;
+
+    .pi { font-size: 12px; }
+
+    &:hover {
+      color: var(--text-color);
+      background: var(--hover-background);
+    }
+  }
+}
+
+.sidebar-divider {
+  display: none; // header has its own border-bottom
+}
+
+// Scroll container — thin scrollbar matching the rest
+.sidebar-content-inner {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-5);
+
+  &::-webkit-scrollbar { width: 3px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+    &:hover { background: var(--text-subtle); }
+  }
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+.config-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+// Section block — grouped controls (Axis, Legend, Tooltip, etc.)
+// Hairline divider below each section (no card chrome).
+// Sections separated by negative space, not by 1px lines. Linear-style
+// rhythm: more breathing room reads more confident than form-y dividers.
+.config-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-bottom: var(--space-7);
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+}
+
+.section-title {
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-semibold);
+  color: var(--text-muted);
+  text-transform: none;
+  letter-spacing: 0;
+  margin: 0 0 var(--space-2) 0;
+  line-height: 1;
+}
+
+// Row layout: label flex:1, control right-aligned, single line.
+// Matches the listings-module row rhythm (height 32px).
+.config-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: 32px;
+
+  > label {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--fs-body);
+    font-weight: var(--fw-regular);
+    color: var(--text-color);
+    line-height: 1.3;
+    margin: 0;
+  }
+
+  > app-custom-toggle,
+  > app-custom-dropdown,
+  > app-custom-input,
+  > app-custom-number-input,
+  > app-custom-color-picker {
+    flex-shrink: 0;
+  }
+}
+
+// Full-width control (Visual Title input, Color Scheme dropdown,
+// axis-label text shown when toggle is on).
+.config-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+
+  > label {
+    font-size: var(--fs-label);
+    font-weight: var(--fw-medium);
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  app-custom-input,
+  app-custom-dropdown,
+  app-custom-color-picker,
+  app-custom-number-input {
+    display: block;
+    width: 100%;
+  }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}

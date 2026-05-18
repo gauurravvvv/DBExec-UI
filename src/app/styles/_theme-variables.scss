@@ -151,6 +151,29 @@
   --auth-strength-good: #10b981;
   --auth-strength-strong: #3b82f6;
 
+  // ── Auth page (login / forgot / reset) — radial wash tints ─────
+  // Two-blob composition: pale cyan top-left + indigo bottom-right,
+  // sitting over a barely-blue linear canvas (hard-coded in the shell).
+  --auth-wash-tint-b:  99, 102, 241;  // indigo-500 (bottom-right anchor)
+  --auth-wash-tint-c: 125, 211, 252;  // sky-300 (top-left highlight)
+  // Glassy surfaces — topbar, footer, login card. All use white with
+  // an alpha so the animated gradient bleeds through.
+  --auth-surface-glass: rgba(255, 255, 255, 0.92);
+  --auth-surface-chrome: rgba(255, 255, 255, 0.72);
+  --auth-input-surface: rgba(255, 255, 255, 0.6);
+  --auth-input-surface-hover: rgba(255, 255, 255, 0.85);
+  --auth-input-surface-focus: #ffffff;
+  // Soft ink overlay for borders / dividers / subtle shadows on the
+  // glassy surfaces — 15,23,42 = slate-900 RGB.
+  --auth-ink-rgb: 15, 23, 42;
+  --auth-divider: rgba(15, 23, 42, 0.06);
+  --auth-card-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 24px 60px -28px rgba(15, 23, 42, 0.25);
+  // CapsLock callout — sits in the warning palette but darker so AA
+  // contrast passes against the warning-bg tint.
+  --auth-warning-text: #7a4a05;
+
   // ================================================================
   // Typography system
   // Single source of truth. Inter for UI, JetBrains Mono for code/IDs,

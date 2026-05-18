@@ -15,16 +15,16 @@ import {
   isLines3dChartType,
   isPolygons3dChartType,
   isSankeyChartType,
+  isTableChartType,
 } from '../../constants/charts.constants';
 import { Visual } from '../../models';
 
 @Component({
   selector: 'app-visuals-chart-sidebar',
   templateUrl: './visuals-chart-sidebar.component.html',
-  // Intentionally no styleUrls. Parent edit-analyses owns the styling
-  // for `.visuals-sidebar .sidebar-content { ... }` etc., and a child
-  // with no stylesheet skips emulated encapsulation tagging on its DOM
-  // so the parent's selectors match naturally.
+  // Self-contained: child owns its full stylesheet so default Emulated
+  // encapsulation correctly scopes everything to this component's DOM.
+  styleUrls: ['./visuals-chart-sidebar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VisualsChartSidebarComponent {
@@ -47,6 +47,7 @@ export class VisualsChartSidebarComponent {
   is3DCoordinateChartType = is3DCoordinateChartType;
   isPolygons3dChartType = isPolygons3dChartType;
   isLines3dChartType = isLines3dChartType;
+  isTableChartType = isTableChartType;
   hasAxisLabels = hasAxisLabels;
 
   // Chart types and search

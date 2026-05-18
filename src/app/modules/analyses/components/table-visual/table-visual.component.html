@@ -1,0 +1,65 @@
+<div class="table-visual-wrapper" [class.is-compact]="compact" [class.is-striped]="striped">
+  <!-- Empty state when no data -->
+  <div class="table-visual__empty" *ngIf="!data?.length">
+    <i class="pi pi-database"></i>
+    <p>No data to display</p>
+  </div>
+
+  <!-- Empty state when data exists but no columns are selected. Tables
+       start hidden-by-default so the user opts each field in. -->
+  <div class="table-visual__empty" *ngIf="data?.length && columns.length === 0">
+    <i class="pi pi-eye-slash"></i>
+    <p>{{ 'ANALYSES.TABLE_PICK_COLUMNS_PROMPT' | translate }}</p>
+  </div>
+
+  <!-- The table itself. Same .modern-table family as the listings -->
+  <p-table
+    *ngIf="data?.length && columns.length > 0"
+    [value]="data"
+    [columns]="columns"
+    [scrollable]="true"
+    scrollHeight="flex"
+    [virtualScroll]="useVirtualScroll"
+    [virtualScrollItemSize]="rowHeight"
+    [rowHover]="true"
+    styleClass="p-datatable-sm modern-table table-visual__table"
+    [tableStyle]="{ 'min-width': '100%' }"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th *ngIf="showRowNumbers" class="table-visual__row-num-head">#</th>
+        <th
+          *ngFor="let col of columns; trackBy: trackByIndex"
+          [class.is-numeric]="col.numeric"
+        >
+          <div class="th-content">
+            <span>{{ col.header }}</span>
+          </div>
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+      <tr class="modern-row" (click)="onRowClick(row)">
+        <td *ngIf="showRowNumbers" class="table-visual__row-num">{{ rowIndex + 1 }}</td>
+        <td
+          *ngFor="let col of columns; trackBy: trackByIndex"
+          [class.is-numeric]="col.numeric"
+        >
+          <span class="cell-text" [title]="row[col.field]">
+            {{ formatCell(row[col.field], col) }}
+          </span>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr class="empty-row">
+        <td [attr.colspan]="(showRowNumbers ? 1 : 0) + columns.length" class="empty-message-cell">
+          <div class="empty-state-inline">
+            <i class="pi pi-search empty-state-icon"></i>
+            <span class="empty-state-text">No matching rows</span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

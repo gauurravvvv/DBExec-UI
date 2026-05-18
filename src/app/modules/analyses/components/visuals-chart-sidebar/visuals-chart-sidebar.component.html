@@ -364,10 +364,23 @@
         </div>
       </ng-container>
 
+      <!-- Table: no axis-to-field mapping needed. The table renders the
+           full dataset; column visibility lives in the right Properties
+           panel under Table options > Columns. -->
+      <ng-container *ngIf="isTableChartType(focusedVisual.chartType)">
+        <div class="axis-hint">
+          <i class="pi pi-info-circle"></i>
+          <span>
+            {{ 'ANALYSES.TABLE_NO_MAPPING_HINT' | translate }}
+          </span>
+        </div>
+      </ng-container>
+
       <!-- Non-axis charts: Category, Value (pie, gauge, card, tree-map, funnel, sunburst, tree, theme-river, bar-polar) -->
       <ng-container
         *ngIf="
           !hasAxisLabels(focusedVisual.chartType) &&
+          !isTableChartType(focusedVisual.chartType) &&
           !isBubbleChartType(focusedVisual.chartType) &&
           !isSankeyChartType(focusedVisual.chartType) &&
           !isGraphChartType(focusedVisual.chartType) &&

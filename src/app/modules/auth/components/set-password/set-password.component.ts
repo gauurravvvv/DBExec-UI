@@ -2,6 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  HostListener,
+  computed,
   inject,
   OnInit,
   signal,
@@ -9,7 +11,6 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SET_PASSWORD_PAGE_OPTIONS } from 'src/app/constants/global';
 import { AUTH } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
@@ -26,10 +27,10 @@ export class SetPasswordComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   setPasswordForm: FormGroup;
-  showPassword = false;
-  features = SET_PASSWORD_PAGE_OPTIONS;
   loading = signal(false);
   error = signal('');
+  capsLockOn = signal(false);
+  passwordFocused = signal(false);
   userId!: string;
   orgId!: string;
   token!: string;
@@ -38,6 +39,26 @@ export class SetPasswordComponent implements OnInit {
     'loading' | 'valid' | 'expired' | 'already_set' | 'invalid' | 'resent'
   >('loading');
   resending = signal(false);
+
+  // Card title + subtitle change with the state so the shell still hosts
+  // every variant cleanly.
+  readonly cardTitle = computed(() => {
+    switch (this.pageState()) {
+      case 'loading':     return 'Verifying link';
+      case 'valid':       return 'Set your password';
+      case 'expired':     return 'Link expired';
+      case 'resent':      return 'Link sent';
+      case 'already_set': return 'Already set';
+      case 'invalid':     return 'Invalid link';
+      default:            return 'Set your password';
+    }
+  });
+
+  readonly cardSubtitle = computed(() => {
+    return this.pageState() === 'valid'
+      ? 'Create a password to activate your account.'
+      : '';
+  });
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -136,8 +157,23 @@ export class SetPasswordComponent implements OnInit {
     }
   }
 
-  trackByIndex(index: number): number {
-    return index;
+  @HostListener('document:keydown', ['$event'])
+  @HostListener('document:keyup', ['$event'])
+  onKeyEvent(event: KeyboardEvent): void {
+    if (!this.passwordFocused()) return;
+    const next = !!event.getModifierState?.('CapsLock');
+    if (next !== this.capsLockOn()) {
+      this.capsLockOn.set(next);
+    }
+  }
+
+  onPasswordFocus(): void {
+    this.passwordFocused.set(true);
+  }
+
+  onPasswordBlur(): void {
+    this.passwordFocused.set(false);
+    this.capsLockOn.set(false);
   }
 
   getPasswordError(): string {
@@ -160,10 +196,4 @@ export class SetPasswordComponent implements OnInit {
     return '';
   }
 
-  togglePassword(event: Event, id: string) {
-    event.stopPropagation();
-    this.showPassword = !this.showPassword;
-    const input = document.getElementById(id) as HTMLInputElement;
-    input.type = this.showPassword ? 'text' : 'password';
-  }
 }

@@ -19,7 +19,7 @@ export const CHART_TYPES = [
   {
     id: 'bar-vertical-2d',
     name: 'Grouped Vertical',
-    icon: 'pi pi-align-left',
+    icon: 'pi pi-chart-bar',
     category: 'Bar Charts',
     description:
       'Compares multiple data series side-by-side within each category',
@@ -27,7 +27,7 @@ export const CHART_TYPES = [
   {
     id: 'bar-horizontal-2d',
     name: 'Grouped Horizontal',
-    icon: 'pi pi-align-left',
+    icon: 'pi pi-chart-bar',
     category: 'Bar Charts',
     description:
       'Displays multiple series horizontally for easy comparison across groups',
@@ -36,7 +36,7 @@ export const CHART_TYPES = [
   {
     id: 'bar-vertical-stacked',
     name: 'Stacked Vertical',
-    icon: 'pi pi-database',
+    icon: 'pi pi-server',
     category: 'Bar Charts',
     description:
       'Shows part-to-whole relationships by stacking bars vertically',
@@ -44,7 +44,7 @@ export const CHART_TYPES = [
   {
     id: 'bar-horizontal-stacked',
     name: 'Stacked Horizontal',
-    icon: 'pi pi-list',
+    icon: 'pi pi-server',
     category: 'Bar Charts',
     description:
       'Presents stacked data horizontally to show composition and totals',
@@ -77,7 +77,7 @@ export const CHART_TYPES = [
   {
     id: 'polar',
     name: 'Polar Chart',
-    icon: 'pi pi-sun',
+    icon: 'pi pi-compass',
     category: 'Line Charts',
     description:
       'Displays multivariate data on a circular grid for pattern comparison',
@@ -87,14 +87,14 @@ export const CHART_TYPES = [
   {
     id: 'area',
     name: 'Area Chart',
-    icon: 'pi pi-arrow-up',
+    icon: 'pi pi-chart-line',
     category: 'Area Charts',
     description: 'Shows trends over time with filled areas under the line',
   },
   {
     id: 'area-stacked',
     name: 'Stacked Area',
-    icon: 'pi pi-server',
+    icon: 'pi pi-chart-line',
     category: 'Area Charts',
     description:
       'Illustrates cumulative totals and individual contributions over time',
@@ -134,7 +134,7 @@ export const CHART_TYPES = [
   {
     id: 'donut',
     name: 'Donut Chart',
-    icon: 'pi pi-circle',
+    icon: 'pi pi-circle-fill',
     category: 'Pie Charts',
     description:
       'Circular chart with center cutout, ideal for displaying key metrics',
@@ -144,7 +144,7 @@ export const CHART_TYPES = [
   {
     id: 'gauge',
     name: 'Gauge',
-    icon: 'pi pi-compass',
+    icon: 'pi pi-stopwatch',
     category: 'Gauges',
     description:
       'Shows a single value on a radial scale with min and max ranges',
@@ -152,7 +152,7 @@ export const CHART_TYPES = [
   {
     id: 'linear-gauge',
     name: 'Linear Gauge',
-    icon: 'pi pi-minus',
+    icon: 'pi pi-sliders-h',
     category: 'Gauges',
     description:
       'Displays progress or value along a horizontal or vertical bar',
@@ -167,9 +167,17 @@ export const CHART_TYPES = [
     description: 'Presents key metrics as large, prominent numerical displays',
   },
   {
+    id: 'table',
+    name: 'Table',
+    icon: 'pi pi-table',
+    category: 'Cards',
+    description:
+      'Tabular view of the raw rows; sortable columns, virtual scroll for large datasets',
+  },
+  {
     id: 'heat-map',
     name: 'Heat Map',
-    icon: 'pi pi-table',
+    icon: 'pi pi-th-large',
     category: 'Maps',
     description: 'Uses color intensity to represent values in a matrix layout',
   },
@@ -191,7 +199,7 @@ export const CHART_TYPES = [
   {
     id: 'box-chart',
     name: 'Box Chart',
-    icon: 'pi pi-box',
+    icon: 'pi pi-window-minimize',
     category: 'Statistical',
     description:
       'Shows data distribution through quartiles, median, and outliers',
@@ -219,7 +227,7 @@ export const CHART_TYPES = [
   {
     id: 'funnel',
     name: 'Funnel Chart',
-    icon: 'pi pi-sort-amount-down',
+    icon: 'pi pi-sort-amount-down-alt',
     category: 'Funnel',
     description:
       'Visualizes progressive reduction of data through stages, ideal for conversion pipelines',
@@ -265,7 +273,7 @@ export const CHART_TYPES = [
   {
     id: 'line-stacked',
     name: 'Stacked Line',
-    icon: 'pi pi-arrows-v',
+    icon: 'pi pi-chart-line',
     category: 'Line Charts',
     description:
       'Shows cumulative trends by stacking multiple data series on a line chart',
@@ -273,7 +281,7 @@ export const CHART_TYPES = [
   {
     id: 'line-step',
     name: 'Step Line',
-    icon: 'pi pi-angle-right',
+    icon: 'pi pi-chart-line',
     category: 'Line Charts',
     description:
       'Displays data as a step function with sharp transitions between values',
@@ -283,7 +291,7 @@ export const CHART_TYPES = [
   {
     id: 'half-donut',
     name: 'Half Donut',
-    icon: 'pi pi-minus',
+    icon: 'pi pi-chart-pie',
     category: 'Pie Charts',
     description:
       'Semi-circle donut chart showing proportions in a 180-degree arc',
@@ -325,7 +333,7 @@ export const CHART_TYPES = [
   {
     id: 'bar-polar',
     name: 'Polar Bar',
-    icon: 'pi pi-chart-bar',
+    icon: 'pi pi-compass',
     category: 'Bar Charts',
     description:
       'Bar chart rendered in polar/circular coordinates for radial comparison',
@@ -335,7 +343,7 @@ export const CHART_TYPES = [
   {
     id: 'theme-river',
     name: 'Theme River',
-    icon: 'pi pi-chart-line',
+    icon: 'pi pi-bolt',
     category: 'Special',
     description:
       'Displays thematic data changes over time as a flowing river visualization',
@@ -343,7 +351,7 @@ export const CHART_TYPES = [
   {
     id: 'radar',
     name: 'Radar Chart',
-    icon: 'pi pi-sun',
+    icon: 'pi pi-compass',
     category: 'Statistical',
     description:
       'Displays multivariate data on a radial grid, ideal for comparing performance across dimensions',
@@ -351,7 +359,7 @@ export const CHART_TYPES = [
   {
     id: 'candlestick',
     name: 'Candlestick Chart',
-    icon: 'pi pi-building',
+    icon: 'pi pi-pause',
     category: 'Financial',
     description:
       'Shows open, high, low, close values for financial time series data',
@@ -369,14 +377,14 @@ export const CHART_TYPES = [
   {
     id: 'bar3d',
     name: 'Bar 3D',
-    icon: 'pi pi-chart-bar',
+    icon: 'pi pi-th-large',
     category: '3D Charts',
     description: 'Three-dimensional bar chart for spatial data comparison',
   },
   {
     id: 'line3d',
     name: 'Line 3D',
-    icon: 'pi pi-chart-line',
+    icon: 'pi pi-share-alt',
     category: '3D Charts',
     description:
       'Three-dimensional line chart for visualizing trajectories and paths in 3D space',
@@ -1035,6 +1043,14 @@ export const DEFAULT_CHART_CONFIG = {
   polygons3DBorderWidth: 1, // series.itemStyle.borderWidth
   polygons3DBorderColor: '#ffffff', // series.itemStyle.borderColor
   polygons3DOpacity: 0.8, // series.itemStyle.opacity
+
+  // === Table Visual ===
+  // Density: compact = 32px rows + smaller font; comfortable (default) = 44px.
+  tableCompact: false,
+  // Alternating row background (subtle hover-bg stripe).
+  tableStriped: false,
+  // Leading "#" column with 1-based row numbers.
+  tableShowRowNumbers: false,
 };
 
 // ============================================================
@@ -1206,6 +1222,55 @@ const SANKEY_DATA = {
 };
 
 /**
+ * World-map data: country name -> metric value. Uses real country
+ * names so the choropleth highlights real regions when the 'world'
+ * GeoJSON map is registered. (If it isn't registered the map renders
+ * blank — that's a missing-map issue, not a missing-data issue.)
+ */
+const WORLD_MAP_DATA = [
+  { name: 'United States', value: 8750 },
+  { name: 'China', value: 7200 },
+  { name: 'India', value: 6480 },
+  { name: 'Germany', value: 5810 },
+  { name: 'Japan', value: 5340 },
+  { name: 'United Kingdom', value: 4920 },
+  { name: 'France', value: 4690 },
+  { name: 'Brazil', value: 4220 },
+  { name: 'Canada', value: 3850 },
+  { name: 'Australia', value: 3540 },
+  { name: 'South Africa', value: 2810 },
+  { name: 'Mexico', value: 2670 },
+];
+
+/**
+ * Flow-lines data: { nodes, links } where each link has source/target
+ * names matching a node. Source nodes lean left, targets lean right,
+ * intermediates land in the middle (the builder auto-classifies).
+ */
+const FLOW_LINES_DATA = {
+  nodes: [
+    { name: 'Web' },
+    { name: 'Mobile' },
+    { name: 'API' },
+    { name: 'Queue' },
+    { name: 'Worker' },
+    { name: 'Database' },
+    { name: 'Cache' },
+    { name: 'Analytics' },
+  ],
+  links: [
+    { source: 'Web', target: 'API', value: 320 },
+    { source: 'Mobile', target: 'API', value: 280 },
+    { source: 'API', target: 'Queue', value: 240 },
+    { source: 'API', target: 'Cache', value: 180 },
+    { source: 'API', target: 'Database', value: 200 },
+    { source: 'Queue', target: 'Worker', value: 220 },
+    { source: 'Worker', target: 'Database', value: 160 },
+    { source: 'Worker', target: 'Analytics', value: 140 },
+  ],
+};
+
+/**
  * Tree data (single-series with hierarchical names)
  */
 const TREE_DATA = [
@@ -1277,6 +1342,22 @@ const NUMBER_CARD_DATA = [
   { name: 'NPS Score', value: 72 },
   { name: 'Support Tickets', value: 342 },
   { name: 'Uptime %', value: 99.97 },
+];
+
+/**
+ * Table dummy data: small set of mixed-type rows so the user can see
+ * column rendering (text / number / date) the first time they pick
+ * the Table chart type with no fields mapped.
+ */
+const TABLE_DATA = [
+  { id: 1, name: 'Alice Johnson', department: 'Engineering', salary: 95000, joined: '2022-03-15' },
+  { id: 2, name: 'Bob Smith',     department: 'Sales',       salary: 72000, joined: '2021-08-02' },
+  { id: 3, name: 'Carol White',   department: 'Marketing',   salary: 81000, joined: '2023-01-20' },
+  { id: 4, name: 'David Brown',   department: 'Engineering', salary: 98000, joined: '2020-11-09' },
+  { id: 5, name: 'Eve Davis',     department: 'Design',      salary: 76000, joined: '2023-06-14' },
+  { id: 6, name: 'Frank Miller',  department: 'Engineering', salary: 102000, joined: '2019-04-22' },
+  { id: 7, name: 'Grace Lee',     department: 'Sales',       salary: 68000, joined: '2022-09-30' },
+  { id: 8, name: 'Henry Wilson',  department: 'Marketing',   salary: 79000, joined: '2021-12-11' },
 ];
 
 /**
@@ -1757,6 +1838,7 @@ export const DUMMY_CHART_DATA: { [chartType: string]: any } = {
 
   // --- Cards ---
   'number-card': NUMBER_CARD_DATA,
+  table: TABLE_DATA,
 
   // --- Maps ---
   'heat-map': HEAT_MAP_DATA,
@@ -1811,6 +1893,8 @@ export const DUMMY_CHART_DATA: { [chartType: string]: any } = {
   flowgl: FLOW_GL_DATA,
   lines3d: LINES_3D_DATA,
   polygons3d: POLYGONS_3D_DATA,
+  'world-map': WORLD_MAP_DATA,
+  'flow-lines': FLOW_LINES_DATA,
 };
 
 /**
@@ -1912,6 +1996,7 @@ const NO_AXIS_CHART_TYPES = [
   'gauge',
   'linear-gauge',
   'number-card',
+  'table',
   'tree-map',
   'funnel',
   'sunburst',
@@ -1941,6 +2026,7 @@ const NO_GRADIENT_CHART_TYPES = [
   'gauge',
   'linear-gauge',
   'number-card',
+  'table',
   'sankey',
   'sunburst',
   'graph',
@@ -1993,6 +2079,11 @@ export function isGaugeChartType(chartType: string | null): boolean {
 export function isCardChartType(chartType: string | null): boolean {
   if (!chartType) return false;
   return chartType === 'number-card';
+}
+
+export function isTableChartType(chartType: string | null): boolean {
+  if (!chartType) return false;
+  return chartType === 'table';
 }
 
 export function isHeatMapChartType(chartType: string | null): boolean {
@@ -2172,6 +2263,36 @@ export function is3DCoordinateChartType(chartType: string | null): boolean {
   ].includes(chartType);
 }
 
+/**
+ * Chart types that require the echarts-gl extension (WebGL renderer
+ * and 3D / globe / WebGL series). Loading echarts-gl is expensive
+ * (~500KB minified + GPU init); only load it when one of these
+ * types is actually rendered.
+ */
+const GL_REQUIRED_CHART_TYPES = new Set([
+  // 3D charts
+  'bar3d',
+  'line3d',
+  'scatter3d',
+  'surface',
+  // Globe-based charts
+  'globe',
+  'lines3d',
+  'polygons3d',
+  // Geo3D
+  'map3d',
+  // WebGL-accelerated charts
+  'graphgl',
+  'scattergl',
+  'linesgl',
+  'flowgl',
+]);
+
+export function requiresGl(chartType: string | null | undefined): boolean {
+  if (!chartType) return false;
+  return GL_REQUIRED_CHART_TYPES.has(chartType);
+}
+
 export function supportsGradient(chartType: string | null): boolean {
   if (!chartType) return false;
   return !NO_GRADIENT_CHART_TYPES.includes(chartType);
@@ -2213,6 +2334,7 @@ export function supportsLegend(chartType: string | null): boolean {
   if (!chartType) return false;
   const noLegendTypes = [
     'number-card',
+    'table',
     'tree-map',
     'sunburst',
     'tree',
@@ -2300,12 +2422,15 @@ export function supportsToolbox(chartType: string | null): boolean {
 
 export function supportsTooltip(chartType: string | null): boolean {
   if (!chartType) return false;
-  return chartType !== 'number-card';
+  // number-card and table render values inline so a hover tooltip is
+  // redundant noise.
+  return chartType !== 'number-card' && chartType !== 'table';
 }
 
 export function supportsAnimation(chartType: string | null): boolean {
   if (!chartType) return false;
-  return chartType !== 'number-card';
+  // number-card and table do not have render transitions worth animating.
+  return chartType !== 'number-card' && chartType !== 'table';
 }
 
 // Get a fresh copy of default chart config

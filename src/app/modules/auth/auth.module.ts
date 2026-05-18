@@ -9,6 +9,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { AuthShellComponent } from './components/auth-shell/auth-shell.component';
 import { CliAuthComponent } from './components/cli-auth/cli-auth.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { LoginComponent } from './components/login/login.component';
@@ -17,6 +18,7 @@ import { SetPasswordComponent } from './components/set-password/set-password.com
 
 @NgModule({
   declarations: [
+    AuthShellComponent,
     LoginComponent,
     ForgotPasswordComponent,
     ResetPasswordComponent,

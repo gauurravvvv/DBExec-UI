@@ -507,3 +507,53 @@
     max-width: 400px;
   }
 }
+
+// ===================================================================
+// REDESIGN OVERRIDES — match edit-analyses visual card chrome.
+// ===================================================================
+
+.visual-box {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--card-background);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: border-color var(--motion-fast) ease,
+              box-shadow var(--motion-fast) ease;
+
+  &:hover {
+    border-color: var(--border-strong);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+}
+
+.visual-inline-title {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-color);
+
+  .title-text {
+    font-size: var(--fs-body);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+  }
+}
+
+// Filter sidebar in dashboard view — match the analyses panel chrome
+.filter-sidebar {
+  border-right: 1px solid var(--border-color) !important;
+
+  .sidebar-header-info {
+    height: 40px;
+    padding: 0 var(--space-5) !important;
+    background: transparent !important;
+    border-bottom: 1px solid var(--border-color);
+
+    .dataset-label {
+      font-size: var(--fs-label);
+      font-weight: var(--fw-semibold);
+      color: var(--text-muted);
+      text-transform: none;
+      letter-spacing: 0;
+    }
+  }
+}
+
