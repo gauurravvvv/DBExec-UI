@@ -1111,7 +1111,11 @@
     "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} opgeslagen waarden staan op dit moment niet in de gegevens",
     "FILTER_SELECT_DATE_RANGE": "Datumbereik kiezen",
     "FILTER_REMOVE_STALE": "Verwijderen",
-    "FILTER_N_SELECTED": "{0} geselecteerd"
+    "FILTER_N_SELECTED": "{0} geselecteerd",
+    "FILTER_DIALOG_SUBTITLE": "Stel in hoe dit filter eruitziet en zich gedraagt.",
+    "FILTER_SECTION_SOURCE": "Bron",
+    "FILTER_SECTION_BEHAVIOUR": "Gedrag",
+    "FILTER_SECTION_DEFAULT": "Standaardwaarde"
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",

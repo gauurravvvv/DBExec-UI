@@ -1111,7 +1111,11 @@
     "FILTER_SAVED_WITH_STALE_DEFAULTS": "有 {{count}} 个已保存的值当前不在数据中",
     "FILTER_SELECT_DATE_RANGE": "选择日期范围",
     "FILTER_REMOVE_STALE": "移除",
-    "FILTER_N_SELECTED": "已选 {0} 项"
+    "FILTER_N_SELECTED": "已选 {0} 项",
+    "FILTER_DIALOG_SUBTITLE": "配置此筛选器的外观和行为。",
+    "FILTER_SECTION_SOURCE": "来源",
+    "FILTER_SECTION_BEHAVIOUR": "行为",
+    "FILTER_SECTION_DEFAULT": "默认值"
   },
   "DASHBOARD": {
     "TITLE": "仪表盘",

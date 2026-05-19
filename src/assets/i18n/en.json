@@ -1148,7 +1148,11 @@
     "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} saved value(s) aren't in the data right now",
     "FILTER_SELECT_DATE_RANGE": "Select date range",
     "FILTER_REMOVE_STALE": "Remove",
-    "FILTER_N_SELECTED": "{0} selected"
+    "FILTER_N_SELECTED": "{0} selected",
+    "FILTER_DIALOG_SUBTITLE": "Configure how this filter looks and behaves.",
+    "FILTER_SECTION_SOURCE": "Source",
+    "FILTER_SECTION_BEHAVIOUR": "Behaviour",
+    "FILTER_SECTION_DEFAULT": "Default value"
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",

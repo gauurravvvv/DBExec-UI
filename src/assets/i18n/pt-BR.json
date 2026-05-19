@@ -1111,7 +1111,11 @@
     "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} valor(es) salvo(s) não estão nos dados no momento",
     "FILTER_SELECT_DATE_RANGE": "Selecionar intervalo de datas",
     "FILTER_REMOVE_STALE": "Remover",
-    "FILTER_N_SELECTED": "{0} selecionados"
+    "FILTER_N_SELECTED": "{0} selecionados",
+    "FILTER_DIALOG_SUBTITLE": "Configure a aparência e o comportamento deste filtro.",
+    "FILTER_SECTION_SOURCE": "Fonte",
+    "FILTER_SECTION_BEHAVIOUR": "Comportamento",
+    "FILTER_SECTION_DEFAULT": "Valor padrão"
   },
   "DASHBOARD": {
     "TITLE": "Painéis",

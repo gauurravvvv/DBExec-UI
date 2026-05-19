@@ -1111,7 +1111,11 @@
     "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} valor(es) guardado(s) no están en los datos ahora",
     "FILTER_SELECT_DATE_RANGE": "Seleccionar rango de fechas",
     "FILTER_REMOVE_STALE": "Eliminar",
-    "FILTER_N_SELECTED": "{0} seleccionados"
+    "FILTER_N_SELECTED": "{0} seleccionados",
+    "FILTER_DIALOG_SUBTITLE": "Configura cómo se ve y se comporta este filtro.",
+    "FILTER_SECTION_SOURCE": "Origen",
+    "FILTER_SECTION_BEHAVIOUR": "Comportamiento",
+    "FILTER_SECTION_DEFAULT": "Valor predeterminado"
   },
   "DASHBOARD": {
     "TITLE": "Paneles",

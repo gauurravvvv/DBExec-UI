@@ -1111,7 +1111,11 @@
     "FILTER_SAVED_WITH_STALE_DEFAULTS": "저장된 값 {{count}}개가 현재 데이터에 없습니다",
     "FILTER_SELECT_DATE_RANGE": "날짜 범위 선택",
     "FILTER_REMOVE_STALE": "제거",
-    "FILTER_N_SELECTED": "{0}개 선택됨"
+    "FILTER_N_SELECTED": "{0}개 선택됨",
+    "FILTER_DIALOG_SUBTITLE": "이 필터의 모양과 동작을 구성합니다.",
+    "FILTER_SECTION_SOURCE": "원본",
+    "FILTER_SECTION_BEHAVIOUR": "동작",
+    "FILTER_SECTION_DEFAULT": "기본값"
   },
   "DASHBOARD": {
     "TITLE": "대시보드",

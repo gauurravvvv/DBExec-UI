@@ -1111,7 +1111,11 @@
     "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} valeur(s) enregistrée(s) ne sont pas dans les données pour le moment",
     "FILTER_SELECT_DATE_RANGE": "Sélectionner une plage de dates",
     "FILTER_REMOVE_STALE": "Supprimer",
-    "FILTER_N_SELECTED": "{0} sélectionnés"
+    "FILTER_N_SELECTED": "{0} sélectionnés",
+    "FILTER_DIALOG_SUBTITLE": "Configurez l'apparence et le comportement de ce filtre.",
+    "FILTER_SECTION_SOURCE": "Source",
+    "FILTER_SECTION_BEHAVIOUR": "Comportement",
+    "FILTER_SECTION_DEFAULT": "Valeur par défaut"
   },
   "DASHBOARD": {
     "TITLE": "Tableaux de bord",

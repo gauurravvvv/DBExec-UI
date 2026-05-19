@@ -1111,7 +1111,11 @@
     "FILTER_SAVED_WITH_STALE_DEFAULTS": "保存された値のうち {{count}} 件は現在データに存在しません",
     "FILTER_SELECT_DATE_RANGE": "日付範囲を選択",
     "FILTER_REMOVE_STALE": "削除",
-    "FILTER_N_SELECTED": "{0} 件選択中"
+    "FILTER_N_SELECTED": "{0} 件選択中",
+    "FILTER_DIALOG_SUBTITLE": "このフィルターの外観と動作を設定します。",
+    "FILTER_SECTION_SOURCE": "ソース",
+    "FILTER_SECTION_BEHAVIOUR": "動作",
+    "FILTER_SECTION_DEFAULT": "デフォルト値"
   },
   "DASHBOARD": {
     "TITLE": "ダッシュボード",

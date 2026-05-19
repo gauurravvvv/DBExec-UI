@@ -1111,7 +1111,11 @@
     "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} gespeicherte Werte sind derzeit nicht in den Daten",
     "FILTER_SELECT_DATE_RANGE": "Datumsbereich wählen",
     "FILTER_REMOVE_STALE": "Entfernen",
-    "FILTER_N_SELECTED": "{0} ausgewählt"
+    "FILTER_N_SELECTED": "{0} ausgewählt",
+    "FILTER_DIALOG_SUBTITLE": "Konfiguriere Aussehen und Verhalten dieses Filters.",
+    "FILTER_SECTION_SOURCE": "Quelle",
+    "FILTER_SECTION_BEHAVIOUR": "Verhalten",
+    "FILTER_SECTION_DEFAULT": "Standardwert"
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",
