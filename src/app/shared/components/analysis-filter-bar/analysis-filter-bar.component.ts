@@ -4,8 +4,10 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   OnInit,
   Output,
+  SimpleChanges,
 } from '@angular/core';
 import { AnalysesService } from '../../../modules/analyses/services/analyses.service';
 import {
@@ -15,14 +17,12 @@ import {
 } from '../../../modules/analyses/services/filter-options-cache.service';
 
 /**
- * Per-filter UI state. `staleSelectedValues` holds saved values that
- * are no longer in the source data — surfaced as warning chips so
- * the user knows what's silently disappearing, instead of having it
- * silently disappear. `columnMissing` is set when the BE returned
- * `error: column_missing` for this filter, triggering an actionable
- * empty-state in the template.
+ * Per-filter UI state — what the template branches on. The bar's
+ * internal `state` map and the host-driven `filterStates` input both
+ * use this shape so the template doesn't have to discriminate
+ * sources.
  */
-interface FilterUiState {
+export interface FilterUiState {
   options: FilterOption[];
   total: number;
   totalApproximate: boolean;
@@ -33,23 +33,65 @@ interface FilterUiState {
   loading: boolean;
 }
 
+/**
+ * Closure shape for host-supplied dropdown fetchers. Matches
+ * app-custom-dropdown's serverMode contract.
+ */
+export type FilterFetcher = (args: {
+  search: string;
+  page: number;
+  limit: number;
+}) => Promise<{ items: FilterOption[]; total: number }>;
+
+/**
+ * AnalysisFilterBar — runs in two modes:
+ *
+ *  hosted (preferred): caller passes `[filters]`, `[filterStates]`,
+ *    and `[fetcherFor]` from a store-backed parent. The bar becomes
+ *    purely presentational — owns only the user's in-flight
+ *    selections (appliedValues, ephemeral form state) and emits
+ *    filtersApplied / filtersCleared events upward.
+ *
+ *  service (legacy): no inputs beyond orgId / analysisId. The bar
+ *    talks to AnalysesService + FilterOptionsCacheService directly,
+ *    same as before the store landed.
+ *
+ * Mode is auto-detected: presence of `[filters]` switches to hosted
+ * mode. The two paths coexist so individual host components can
+ * migrate to the store on their own schedule.
+ */
 @Component({
   selector: 'app-analysis-filter-bar',
   templateUrl: './analysis-filter-bar.component.html',
   styleUrls: ['./analysis-filter-bar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AnalysisFilterBarComponent implements OnInit {
+export class AnalysisFilterBarComponent implements OnInit, OnChanges {
+  // ── Shared inputs ────────────────────────────────────────────────
   @Input() orgId!: string;
   @Input() analysisId!: string;
   @Output() filtersApplied = new EventEmitter<any[]>();
   @Output() filtersCleared = new EventEmitter<void>();
 
-  filters: any[] = [];
-  /** Per-filter UI state keyed by filter id. Replaces the previous
-   *  pair of bare options + selection maps so all per-filter UI
-   *  concerns (options, staleness, error, loading) live in one slot. */
-  state: Record<string, FilterUiState> = {};
+  // ── Hosted-mode inputs ───────────────────────────────────────────
+  /** When present, switches into hosted mode and the bar stops calling
+   *  AnalysesService.listFilters / cache.open itself. */
+  @Input() filters: any[] | null = null;
+  /** Per-filter UI state keyed by filter id. */
+  @Input() filterStates: Record<string, FilterUiState> | null = null;
+  /** Host-supplied fetcher closure factory. The bar passes this
+   *  straight to app-custom-dropdown's [fetcher] binding. */
+  @Input() fetcherFactory: ((filter: any) => FilterFetcher) | null = null;
+  /** Host-supplied "dismiss stale chip" handler — keeps stale-chip
+   *  state in the store (a dispatch) instead of local. */
+  @Input() onDismissStale: ((filter: any, value: string) => void) | null =
+    null;
+
+  // ── Service-mode internal state ──────────────────────────────────
+  internalFilters: any[] = [];
+  internalState: Record<string, FilterUiState> = {};
+
+  // ── Form state — always local, both modes ───────────────────────
   appliedValues: { [filterId: string]: any } = {};
   isLoading = false;
 
@@ -59,34 +101,62 @@ export class AnalysisFilterBarComponent implements OnInit {
     private cdr: ChangeDetectorRef,
   ) {}
 
-  ngOnInit(): void {
-    this.loadFilters();
+  /** True while the bar should rely on its own service/cache calls
+   *  rather than the host-supplied inputs. */
+  get serviceMode(): boolean {
+    return this.filters === null;
   }
 
-  /** Force-clear the options cache and reload. Wire to the dataset
-   *  Refresh Data button. */
+  /** Resolved filter list for the template — host inputs override
+   *  service-mode internal state when present. */
+  get visibleFilters(): any[] {
+    return this.serviceMode ? this.internalFilters : this.filters ?? [];
+  }
+
+  /** Per-filter state in whichever mode is active. */
+  private resolveState(filterId: string): FilterUiState | null {
+    if (this.serviceMode) return this.internalState[filterId] ?? null;
+    return this.filterStates?.[filterId] ?? null;
+  }
+
+  ngOnInit(): void {
+    if (this.serviceMode) this.loadFilters();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Host swapped the analysis or the filter list — drop any in-flight
+    // selections so we don't apply stale values to the new analysis.
+    if (changes['analysisId'] && !changes['analysisId'].firstChange) {
+      this.appliedValues = {};
+    }
+    if (changes['filters'] && this.filters) {
+      // When the host hands us new filters, sync defaults from each
+      // filter's saved config. The host has already validated stale
+      // values before populating filterStates.
+      this.initializeDefaultsFromHosted();
+    }
+  }
+
+  /** Force-clear the options cache and reload (service mode only).
+   *  Hosted callers dispatch invalidateAnalysis instead. */
   refresh(): void {
+    if (!this.serviceMode) return;
     this.optionsCache.clear();
     this.loadFilters();
   }
 
+  // ── Service-mode load ─────────────────────────────────────────────
   async loadFilters(): Promise<void> {
     if (!this.orgId || !this.analysisId) return;
     this.isLoading = true;
     try {
-      // ONE network round trip: BE lists the analysis's enabled
-      // filters AND returns the first page of values for every
-      // dropdown / multi-select. Replaces the previous
-      // listFilters() + batched values() pair.
       const { filters, warmed } = await this.optionsCache.open(
         this.analysisId,
       );
-      this.filters = (filters || []).filter((f: any) => f.isEnabled);
+      this.internalFilters = (filters || []).filter((f: any) => f.isEnabled);
 
-      // Seed per-filter state so the template can render shells
-      // without an extra null check.
-      for (const f of this.filters) {
-        this.state[f.id] = {
+      for (const f of this.internalFilters) {
+        this.internalState[f.id] = {
           options: [],
           total: 0,
           totalApproximate: false,
@@ -98,19 +168,17 @@ export class AnalysisFilterBarComponent implements OnInit {
         };
       }
 
-      // Stamp the warm-cache results onto local state. open() already
-      // wrote them to the cache, so .get() resolves from memory.
-      const dropdownFilters = this.filters.filter(
+      const dropdownFilters = this.internalFilters.filter(
         f => f.controlType === 'dropdown' || f.controlType === 'list',
       );
       if (warmed && dropdownFilters.length) {
         for (const f of dropdownFilters) {
           const result = await this.optionsCache.get(this.analysisId, f.id);
-          this.applyResultToState(f.id, result);
+          this.applyResultToInternalState(f.id, result);
         }
       }
 
-      this.initializeDefaults();
+      this.initializeDefaultsFromInternal();
     } catch (err) {
       console.error('Failed to load filters', err);
     } finally {
@@ -119,39 +187,31 @@ export class AnalysisFilterBarComponent implements OnInit {
     }
   }
 
-  /**
-   * Build a fetcher closure compatible with app-custom-dropdown's
-   * server-mode contract. The dropdown calls this on panel open,
-   * filter-text change, and near-end scroll — pagination and search
-   * just work, backed by the same cache the eager prefetch uses.
-   *
-   * Returned items use the {value,label} shape; total comes straight
-   * from the BE response.
-   */
-  fetcherFor(filter: any) {
+  /** Service-mode fetcher closure — proxies the dropdown's serverMode
+   *  calls through the in-process cache so paging + search work
+   *  without an extra trip. */
+  fetcherFor(filter: any): FilterFetcher {
+    // Hosted mode delegates to the host's fetcherFactory.
+    if (!this.serviceMode && this.fetcherFactory) {
+      return this.fetcherFactory(filter);
+    }
     return async (args: { search: string; page: number; limit: number }) => {
-      const result = await this.optionsCache.get(
-        this.analysisId,
-        filter.id,
-        {
-          search: args.search || undefined,
-          page: args.page,
-          pageSize: args.limit,
-        },
-      );
-      // Reflect result state on the local UI slot so column-missing
-      // and staleness paths still react when the user interacts.
-      this.applyResultToState(filter.id, result);
+      const result = await this.optionsCache.get(this.analysisId, filter.id, {
+        search: args.search || undefined,
+        page: args.page,
+        pageSize: args.limit,
+      });
+      this.applyResultToInternalState(filter.id, result);
       if (!result.ok) return { items: [], total: 0 };
       return { items: result.values, total: result.total };
     };
   }
 
-  private applyResultToState(
+  private applyResultToInternalState(
     filterId: string,
     result: FilterValuesResult,
   ): void {
-    const s = this.state[filterId];
+    const s = this.internalState[filterId];
     if (!s) return;
     if (result.ok) {
       s.options = result.values;
@@ -170,18 +230,28 @@ export class AnalysisFilterBarComponent implements OnInit {
     }
   }
 
-  /**
-   * Apply saved defaults to appliedValues; split saved values that
-   * aren't in current options into a separate staleSelectedValues
-   * bucket so the template can surface warning chips instead of
-   * silently dropping them.
-   */
-  private initializeDefaults(): void {
-    for (const f of this.filters) {
+  // ── Default initialisation ───────────────────────────────────────
+  /** Service-mode wrapper around initializeDefaults — reads the bar's
+   *  internal state. */
+  private initializeDefaultsFromInternal(): void {
+    this.initializeDefaults(filter => this.internalState[filter.id]);
+  }
+
+  /** Hosted-mode wrapper. Note: in hosted mode the host has already
+   *  computed staleSelectedValues, so the bar only needs to apply the
+   *  present values to appliedValues. */
+  private initializeDefaultsFromHosted(): void {
+    this.initializeDefaults(filter => this.filterStates?.[filter.id] ?? null);
+  }
+
+  private initializeDefaults(
+    stateAccessor: (filter: any) => FilterUiState | null,
+  ): void {
+    for (const f of this.visibleFilters) {
       const config = f.config || {};
 
       if (f.filterType === 'category' && config.defaultValue != null) {
-        this.initializeCategoryDefault(f, config);
+        this.initializeCategoryDefault(f, config, stateAccessor);
       } else if (
         f.filterType === 'numeric_equality' &&
         config.defaultValue != null
@@ -197,9 +267,7 @@ export class AnalysisFilterBarComponent implements OnInit {
         ];
       } else if (f.filterType === 'time_equality' && config.defaultValue) {
         const d = new Date(config.defaultValue);
-        if (!isNaN(d.getTime())) {
-          this.appliedValues[f.id] = d;
-        }
+        if (!isNaN(d.getTime())) this.appliedValues[f.id] = d;
       } else if (f.filterType === 'time_range') {
         const dates: Date[] = [];
         if (config.dateRangeStart) {
@@ -215,28 +283,24 @@ export class AnalysisFilterBarComponent implements OnInit {
     }
   }
 
-  /**
-   * Case-insensitive match of saved defaults against live options.
-   * Present matches go into appliedValues; missing ones go into
-   * staleSelectedValues for the warning-chip render path.
-   */
-  private initializeCategoryDefault(filter: any, config: any): void {
-    const s = this.state[filter.id];
+  private initializeCategoryDefault(
+    filter: any,
+    config: any,
+    stateAccessor: (filter: any) => FilterUiState | null,
+  ): void {
+    const s = stateAccessor(filter);
     if (!s) return;
-
     const liveLookup = new Map<string, string | number>();
     for (const opt of s.options) {
       if (opt.value === null || opt.value === undefined) continue;
       liveLookup.set(String(opt.value).toLowerCase(), opt.value);
     }
-
     const rawDefaults = Array.isArray(config.defaultValue)
       ? config.defaultValue
       : [config.defaultValue];
     const stringDefaults = rawDefaults
       .filter((d: any) => d !== null && d !== undefined && d !== '')
       .map((d: any) => String(d));
-
     const present: (string | number)[] = [];
     const stale: string[] = [];
     for (const d of stringDefaults) {
@@ -244,9 +308,10 @@ export class AnalysisFilterBarComponent implements OnInit {
       if (hit !== undefined) present.push(hit);
       else stale.push(d);
     }
-
-    s.staleSelectedValues = stale;
-
+    // In service mode we own staleSelectedValues; in hosted mode the
+    // host has already populated it via the store, so we don't write
+    // here.
+    if (this.serviceMode) s.staleSelectedValues = stale;
     if (present.length === 0) return;
     if (filter.controlType === 'dropdown') {
       this.appliedValues[filter.id] = present[0];
@@ -255,35 +320,46 @@ export class AnalysisFilterBarComponent implements OnInit {
     }
   }
 
-  /** Drop one stale chip from the warning row. Doesn't touch BE — the
-   *  warning is presentational; users either accept the stale value
-   *  (chart returns zero rows for it) or edit the filter to fix the
-   *  saved config. */
-  removeStaleValue(filter: any, value: string): void {
-    const s = this.state[filter.id];
-    if (!s) return;
-    s.staleSelectedValues = s.staleSelectedValues.filter(v => v !== value);
-    this.cdr.markForCheck();
-  }
-
-  hasStaleValues(filter: any): boolean {
-    return !!this.state[filter.id]?.staleSelectedValues.length;
-  }
-
-  isColumnMissing(filter: any): boolean {
-    return !!this.state[filter.id]?.columnMissing;
+  /** Template helper — exposes per-filter state regardless of mode. */
+  stateFor(filter: any): FilterUiState | null {
+    return this.resolveState(filter.id);
   }
 
   optionsFor(filter: any): FilterOption[] {
-    return this.state[filter.id]?.options || [];
+    return this.stateFor(filter)?.options || [];
   }
 
   truncatedFor(filter: any): boolean {
-    return !!this.state[filter.id]?.truncated;
+    return !!this.stateFor(filter)?.truncated;
   }
 
   totalFor(filter: any): number {
-    return this.state[filter.id]?.total || 0;
+    return this.stateFor(filter)?.total || 0;
+  }
+
+  hasStaleValues(filter: any): boolean {
+    return !!this.stateFor(filter)?.staleSelectedValues.length;
+  }
+
+  staleValuesFor(filter: any): string[] {
+    return this.stateFor(filter)?.staleSelectedValues || [];
+  }
+
+  isColumnMissing(filter: any): boolean {
+    return !!this.stateFor(filter)?.columnMissing;
+  }
+
+  removeStaleValue(filter: any, value: string): void {
+    if (this.onDismissStale) {
+      // Hosted mode — bubble up so the host can dispatch.
+      this.onDismissStale(filter, value);
+      return;
+    }
+    // Service mode — mutate the bar's own state.
+    const s = this.internalState[filter.id];
+    if (!s) return;
+    s.staleSelectedValues = s.staleSelectedValues.filter(v => v !== value);
+    this.cdr.markForCheck();
   }
 
   trackById(_index: number, item: any): any {
@@ -295,7 +371,7 @@ export class AnalysisFilterBarComponent implements OnInit {
   }
 
   applyFilters(): void {
-    const applied = this.filters
+    const applied = this.visibleFilters
       .filter(f => {
         const val = this.appliedValues[f.id];
         return (
@@ -337,10 +413,9 @@ export class AnalysisFilterBarComponent implements OnInit {
           f.filterType === 'time_range' ||
           f.filterType === 'time_equality'
         ) {
-          // PrimeNG range-mode emits [start, null] while the user is
-          // mid-selection (only the start picked). Treat null end as
-          // "not ready" — skip emitting this filter so the chart
-          // query doesn't run against a half-completed range.
+          // PrimeNG range mode emits [start, null] while the user is
+          // mid-selection. Skip half-formed ranges so the chart
+          // doesn't re-query on an unfinished selection.
           if (
             Array.isArray(val) &&
             val.length === 2 &&
@@ -352,22 +427,16 @@ export class AnalysisFilterBarComponent implements OnInit {
             base.dateRangeEnd =
               val[1] instanceof Date ? val[1].toISOString() : val[1];
             base.operator = 'BETWEEN';
-          } else if (
-            !Array.isArray(val) &&
-            val != null &&
-            val !== ''
-          ) {
+          } else if (!Array.isArray(val) && val != null && val !== '') {
             const dateVal = val instanceof Date ? val.toISOString() : val;
             base.values = [dateVal];
           } else {
-            // Partial / empty — bail out by emitting a no-op marker.
             base._skip = true;
           }
         }
 
         return base;
       })
-      // Strip partial-range markers; see the time_range branch above.
       .filter(b => !b._skip);
 
     this.filtersApplied.emit(applied);
@@ -375,11 +444,11 @@ export class AnalysisFilterBarComponent implements OnInit {
 
   clearFilters(): void {
     this.appliedValues = {};
-    // Stale chips are presentational only; they vanish along with
-    // the selection state when the user clicks Clear.
-    for (const f of this.filters) {
-      const s = this.state[f.id];
-      if (s) s.staleSelectedValues = [];
+    if (this.serviceMode) {
+      for (const f of this.internalFilters) {
+        const s = this.internalState[f.id];
+        if (s) s.staleSelectedValues = [];
+      }
     }
     this.filtersCleared.emit();
   }
@@ -387,13 +456,10 @@ export class AnalysisFilterBarComponent implements OnInit {
   getDefaultOperator(filterType: string): string {
     switch (filterType) {
       case 'category':
-        return 'EQUALS';
       case 'numeric_equality':
-        return 'EQUALS';
-      case 'numeric_range':
-        return 'BETWEEN';
       case 'time_equality':
         return 'EQUALS';
+      case 'numeric_range':
       case 'time_range':
         return 'BETWEEN';
       default:

@@ -486,7 +486,7 @@
       [orgId]="orgId"
       [analysisId]="analysisId"
       [configuredFiltersCount]="configuredFilters.length"
-      (saved)="loadExistingFilters()"
+      (saved)="onFilterSaved($event)"
     ></app-filter-dialog>
 
     <!-- Center Container -->

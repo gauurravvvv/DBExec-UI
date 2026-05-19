@@ -14,16 +14,31 @@
  */
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { catchError, concatMap, from, map, mergeMap, of } from 'rxjs';
+import { Store } from '@ngrx/store';
+import {
+  catchError,
+  concatMap,
+  EMPTY,
+  from,
+  map,
+  mergeMap,
+  of,
+  take,
+} from 'rxjs';
 import { AnalysesService } from '../services/analyses.service';
 import * as A from './analyses-filter.actions';
-import { FilterOptionsEntry } from './analyses-filter.state';
+import { selectLane } from './analyses-filter.selectors';
+import {
+  FILTER_CACHE_CONFIG,
+  FilterOptionsEntry,
+} from './analyses-filter.state';
 
 @Injectable()
 export class AnalysesFilterEffects {
   constructor(
     private actions$: Actions,
     private analysesService: AnalysesService,
+    private store: Store,
   ) {}
 
   /**
@@ -35,10 +50,25 @@ export class AnalysesFilterEffects {
   loadOpen$ = createEffect(() =>
     this.actions$.pipe(
       ofType(A.loadOpen),
+      // Freshness gate — for each loadOpen action, peek the current
+      // lane state once; if it's loaded AND within TTL, short-circuit.
+      // take(1) is essential — store.select is a hot stream that
+      // never completes, so without it the chain would hang.
+      concatMap(action =>
+        this.store.select(selectLane(action.analysisId)).pipe(
+          take(1),
+          mergeMap(lane => {
+            const fresh =
+              lane.status === 'loaded' &&
+              lane.loadedAt != null &&
+              Date.now() - lane.loadedAt < FILTER_CACHE_CONFIG.TTL_MS;
+            return fresh ? EMPTY : of(action);
+          }),
+        ),
+      ),
+      // Now we have a stream of loadOpen actions that genuinely need
+      // a network call.
       concatMap(({ analysisId }) =>
-        // Promise wrapped with of() so we can use rxjs operators.
-        // The service already returns a Promise<any> shaped as the
-        // raw HTTP body, so we cast the data shape locally.
         from(
           this.analysesService.getFilterValuesBatch({
             analysisId,

@@ -90,7 +90,13 @@ export class FilterDialogComponent implements OnChanges {
   @Input() configuredFiltersCount: number = 0;
 
   @Output() visibleChange = new EventEmitter<boolean>();
-  @Output() saved = new EventEmitter<void>();
+  /**
+   * Emits the saved filter row so the parent can dispatch a precise
+   * store update (filterSaved) instead of refetching the whole list.
+   * Old void-event consumers still work — they'll just ignore the
+   * payload.
+   */
+  @Output() saved = new EventEmitter<any>();
 
   // Form fields
   filterDialogColumn: any = null;
@@ -310,15 +316,23 @@ export class FilterDialogComponent implements OnChanges {
       }
 
       if (this.globalService.handleSuccessService(res, true)) {
-        // Step F payoff — if the BE flagged saved defaults as already
-        // stale, raise a non-blocking warn toast so the user knows
-        // before they navigate away. The save itself is committed.
         const stale: any[] = res?.data?.staleDefaults ?? [];
         if (Array.isArray(stale) && stale.length > 0) {
           this.surfaceStaleDefaultsWarning(stale);
         }
+        // The BE returns different shapes for add vs update:
+        //   add    → data.filters: SavedFilter[]
+        //   update → data.filter:  SavedFilter
+        // Normalise to a single saved row so the parent can dispatch
+        // filterSaved with it. We assume single-filter saves (which
+        // matches the current dialog flow).
+        const savedFilter =
+          res?.data?.filter ??
+          (Array.isArray(res?.data?.filters)
+            ? res.data.filters[0]
+            : null);
         this.visibleChange.emit(false);
-        this.saved.emit();
+        this.saved.emit(savedFilter);
       }
     } catch (err) {
       this.globalService.handleErrorService(err);

@@ -1,6 +1,6 @@
-<div class="filter-bar" *ngIf="filters.length > 0">
+<div class="filter-bar" *ngIf="visibleFilters.length > 0">
   <div class="filter-controls">
-    <ng-container *ngFor="let filter of filters; trackBy: trackById">
+    <ng-container *ngFor="let filter of visibleFilters; trackBy: trackById">
       <!-- Column-missing empty state.
            If the BE flagged the target column as no longer in the
            dataset SQL output, the dropdown can't render — replace it
@@ -58,7 +58,7 @@
           </span>
           <span
             class="filter-stale-chip"
-            *ngFor="let v of state[filter.id].staleSelectedValues"
+            *ngFor="let v of staleValuesFor(filter)"
             [title]="'ANALYSES.FILTER_STALE_TOOLTIP' | translate"
           >
             {{ v }}
@@ -107,7 +107,7 @@
           </span>
           <span
             class="filter-stale-chip"
-            *ngFor="let v of state[filter.id].staleSelectedValues"
+            *ngFor="let v of staleValuesFor(filter)"
             [title]="'ANALYSES.FILTER_STALE_TOOLTIP' | translate"
           >
             {{ v }}

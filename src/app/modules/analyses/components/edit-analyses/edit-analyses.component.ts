@@ -42,10 +42,14 @@ import { TranslateService } from '@ngx-translate/core';
 import { ChartDataTransformerService } from '../../services';
 import {
   AddAnalysesActions,
+  AnalysesFilterActions,
+  AnalysesFilterDef,
   DatasetLoadingStatus,
+  selectConfiguredFilters,
   selectDatasetByKey,
   selectDatasetData,
   selectDatasetStatus,
+  selectFilterLoadStatus,
   selectIsDatasetLoaded,
   selectIsDatasetStale,
 } from '../../store';
@@ -577,15 +581,18 @@ export class EditAnalysesComponent
           this.datasetId = response.data.datasetId;
 
           if (this.datasetId) {
-            // Immediately initialize store selectors so cached data is available
+            // Initialise selectors first so the filter store subscription
+            // is wired BEFORE we dispatch loadOpen (avoids a missed
+            // emission). The selectors themselves also dispatch the
+            // initial loadOpen action.
             this.initializeStoreSelectors();
 
-            // Load dataset info, analysis fields, filters in parallel
             this.loadDatasetInfo();
             this.loadAnalysisFields();
-            this.loadExistingFilters();
+            // loadExistingFilters() removed — initializeStoreSelectors
+            // dispatches loadOpen which the analysesFilter effect
+            // handles. Subscription auto-updates configuredFilters.
 
-            // Check cache and load data + visuals
             this.checkCachedDataAndLoad();
           }
         }
@@ -670,7 +677,14 @@ export class EditAnalysesComponent
   }
 
   /**
-   * Initialize NgRx store selectors and subscribe to data changes
+   * Initialize NgRx store selectors and subscribe to data changes.
+   *
+   * Two slices feed this component:
+   *   addAnalyses     — dataset cache (graphData / status / loaded).
+   *   analysesFilter  — filter metadata + per-filter option cache.
+   *
+   * The filter selectors render configuredFilters from the store
+   * instead of the old loadExistingFilters() local fetch.
    */
   initializeStoreSelectors(): void {
     this.graphData$ = this.store.select(
@@ -681,6 +695,40 @@ export class EditAnalysesComponent
     );
     this.isDataLoaded$ = this.store.select(
       selectIsDatasetLoaded(this.orgId, this.datasetId),
+    );
+
+    // Filter slice — mirror the store's configured[] into the
+    // component's local field that the template + dialog already read.
+    // The selector returns AnalysesFilterDef[]; we map into the
+    // existing ConfiguredFilter shape so no template changes are
+    // needed.
+    this.store
+      .select(selectConfiguredFilters(this.analysisId))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((filters: AnalysesFilterDef[]) => {
+        this.configuredFilters = (filters || []).map(f => ({
+          tempId: f.id,
+          name: f.name,
+          columnName: f.columnName,
+          filterType: f.filterType,
+          controlType: f.controlType,
+          config: f.config || {},
+          nullOption: f.nullOption || 'ALL_VALUES',
+          isEnabled: f.isEnabled !== false,
+          isMandatory: !!f.isMandatory,
+          sequence: f.sequence ?? 0,
+        }));
+        this.cdr.markForCheck();
+      });
+
+    // Kick the store to (a) mark this analysis active, and (b) fetch
+    // the filter list + first page of dropdown options. Idempotent —
+    // the effect short-circuits when the lane is warm.
+    this.store.dispatch(
+      AnalysesFilterActions.setActiveAnalysis({ analysisId: this.analysisId }),
+    );
+    this.store.dispatch(
+      AnalysesFilterActions.loadOpen({ analysisId: this.analysisId }),
     );
 
     // Subscribe to graphData$ to populate rawGraphData and transform charts
@@ -1135,7 +1183,14 @@ export class EditAnalysesComponent
         filter.tempId,
       );
       if (this.globalService.handleSuccessService(res, true)) {
-        await this.loadExistingFilters();
+        // Surgical store patch — drop the deleted filter from the
+        // lane and clear its option cache. No network refetch needed.
+        this.store.dispatch(
+          AnalysesFilterActions.filterDeleted({
+            analysisId: this.analysisId,
+            filterId: filter.tempId,
+          }),
+        );
       }
     } catch (err) {
       this.globalService.handleErrorService(err);
@@ -1202,31 +1257,38 @@ export class EditAnalysesComponent
     return this.filterTypeOptions.find(o => o.value === type)?.label || type;
   }
 
-  async loadExistingFilters(): Promise<void> {
-    try {
-      const res: any = await this.analysesService.listFilters(
-        this.orgId,
-        this.analysisId,
+  /**
+   * Dialog `(saved)` handler. The dialog passes the saved filter row
+   * back — we dispatch filterSaved so the store patches its lane in
+   * place (no full-list refetch needed). If the payload is missing
+   * (legacy emit-without-value) we fall back to a full reload via
+   * loadOpen so behaviour stays correct.
+   */
+  onFilterSaved(filter: any): void {
+    if (filter && filter.id) {
+      this.store.dispatch(
+        AnalysesFilterActions.filterSaved({
+          analysisId: this.analysisId,
+          filter: {
+            id: filter.id,
+            name: filter.name,
+            filterType: filter.filterType,
+            controlType: filter.controlType,
+            columnName: filter.columnName,
+            config: filter.config || {},
+            nullOption: filter.nullOption || 'ALL_VALUES',
+            isEnabled: filter.isEnabled !== false,
+            isMandatory: !!filter.isMandatory,
+            sequence: filter.sequence ?? 0,
+          },
+        }),
       );
-      if (res?.status && res.data) {
-        this.configuredFilters = (res.data || []).map((f: any) => ({
-          tempId: f.id || crypto.randomUUID(),
-          name: f.name,
-          columnName: f.columnName,
-          filterType: f.filterType,
-          controlType: f.controlType,
-          config: f.config || {},
-          nullOption: f.nullOption || 'ALL_VALUES',
-          isEnabled: f.isEnabled !== false,
-          isMandatory: f.isMandatory || false,
-          sequence: f.sequence ?? 0,
-        }));
-      } else if (res && !res.status) {
-        this.globalService.handleSuccessService(res, false, true);
-      }
-    } catch (err) {
-      this.globalService.handleErrorService(err);
+      return;
     }
+    // Fallback for safety — kick a fresh open-mode load.
+    this.store.dispatch(
+      AnalysesFilterActions.loadOpen({ analysisId: this.analysisId }),
+    );
   }
 
   /**
