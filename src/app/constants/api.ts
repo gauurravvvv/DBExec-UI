@@ -225,7 +225,12 @@ export const ANALYSIS_FILTER = {
   UPDATE: '/analysis-filter/update',
   DELETE: '/analysis-filter/delete/',
   LIST: '/analysis-filter/list/',
+  // Legacy single-filter values endpoint. Kept for callers that
+  // haven't migrated; new code should prefer VALUES_BATCH.
   VALUES: '/analysis-filter/values/',
+  // Batched values endpoint — one request returns options for any
+  // number of filters, with pagination + search support.
+  VALUES_BATCH: '/analysis-filter/values',
 };
 
 export const GLOBAL_SEARCH = {

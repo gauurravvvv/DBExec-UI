@@ -1136,7 +1136,14 @@
     "TABLE_SHOW_ROW_NUMBERS": "Show row numbers",
     "TABLE_COLUMNS": "Columns",
     "TABLE_NO_MAPPING_HINT": "Click fields in the dataset list to add them as table columns.",
-    "TABLE_PICK_COLUMNS_PROMPT": "Click fields from the sidebar to add them as columns"
+    "TABLE_PICK_COLUMNS_PROMPT": "Click fields from the sidebar to add them as columns",
+    "FILTER_SELECT": "Select…",
+    "FILTER_SELECT_DATE": "Select date",
+    "FILTER_SEARCH": "Search…",
+    "FILTER_TRUNCATED": "Showing first results — type to search ({{count}} total)",
+    "FILTER_STALE_VALUES": "These saved values are no longer in the data:",
+    "FILTER_STALE_TOOLTIP": "Saved selection no longer exists in source data. Click × to remove.",
+    "FILTER_COLUMN_MISSING": "This filter's column is no longer in the dataset. Remove the filter to clear this warning."
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",

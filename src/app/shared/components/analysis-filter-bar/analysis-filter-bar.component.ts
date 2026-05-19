@@ -8,6 +8,30 @@ import {
   Output,
 } from '@angular/core';
 import { AnalysesService } from '../../../modules/analyses/services/analyses.service';
+import {
+  FilterOption,
+  FilterOptionsCacheService,
+  FilterValuesResult,
+} from '../../../modules/analyses/services/filter-options-cache.service';
+
+/**
+ * Per-filter UI state. `staleSelectedValues` holds saved values that
+ * are no longer in the source data — surfaced as warning chips so
+ * the user knows what's silently disappearing, instead of having it
+ * silently disappear. `columnMissing` is set when the BE returned
+ * `error: column_missing` for this filter, triggering an actionable
+ * empty-state in the template.
+ */
+interface FilterUiState {
+  options: FilterOption[];
+  total: number;
+  totalApproximate: boolean;
+  truncated: boolean;
+  staleSelectedValues: string[];
+  columnMissing: boolean;
+  errorMessage: string | null;
+  loading: boolean;
+}
 
 @Component({
   selector: 'app-analysis-filter-bar',
@@ -22,16 +46,27 @@ export class AnalysisFilterBarComponent implements OnInit {
   @Output() filtersCleared = new EventEmitter<void>();
 
   filters: any[] = [];
-  filterValues: { [filterId: string]: any[] } = {};
+  /** Per-filter UI state keyed by filter id. Replaces the previous
+   *  pair of bare options + selection maps so all per-filter UI
+   *  concerns (options, staleness, error, loading) live in one slot. */
+  state: Record<string, FilterUiState> = {};
   appliedValues: { [filterId: string]: any } = {};
   isLoading = false;
 
   constructor(
     private analysesService: AnalysesService,
+    private optionsCache: FilterOptionsCacheService,
     private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
+    this.loadFilters();
+  }
+
+  /** Force-clear the options cache and reload. Wire to the dataset
+   *  Refresh Data button. */
+  refresh(): void {
+    this.optionsCache.clear();
     this.loadFilters();
   }
 
@@ -43,12 +78,45 @@ export class AnalysisFilterBarComponent implements OnInit {
         this.orgId,
         this.analysisId,
       );
-      if (res?.status) {
-        this.filters = (res.data || []).filter((f: any) => f.isEnabled);
-        // Load live options FIRST, then validate defaults against them
-        await this.loadAllFilterValues();
-        this.initializeDefaults();
+      if (!res?.status) return;
+
+      this.filters = (res.data || []).filter((f: any) => f.isEnabled);
+
+      // Seed per-filter state so the template can render shells
+      // without an extra null check.
+      for (const f of this.filters) {
+        this.state[f.id] = {
+          options: [],
+          total: 0,
+          totalApproximate: false,
+          truncated: false,
+          staleSelectedValues: [],
+          columnMissing: false,
+          errorMessage: null,
+          loading: false,
+        };
       }
+
+      const dropdownFilters = this.filters.filter(
+        f => f.controlType === 'dropdown' || f.controlType === 'list',
+      );
+
+      if (dropdownFilters.length) {
+        // One batched call populates every dropdown's first page —
+        // see FilterOptionsCacheService.prefetch for the coalesce
+        // logic. Subsequent .get() calls below read from the warm
+        // cache instead of refetching.
+        await this.optionsCache.prefetch(
+          this.analysisId,
+          dropdownFilters.map(f => f.id),
+        );
+        for (const f of dropdownFilters) {
+          const result = await this.optionsCache.get(this.analysisId, f.id);
+          this.applyResultToState(f.id, result);
+        }
+      }
+
+      this.initializeDefaults();
     } catch (err) {
       console.error('Failed to load filters', err);
     } finally {
@@ -57,41 +125,68 @@ export class AnalysisFilterBarComponent implements OnInit {
     }
   }
 
-  async loadAllFilterValues(): Promise<void> {
-    const dropdownFilters = this.filters.filter(
-      f => f.controlType === 'dropdown' || f.controlType === 'list',
-    );
-    const promises = dropdownFilters.map(async f => {
-      try {
-        const res: any = await this.analysesService.getFilterValues(
-          this.orgId,
-          f.id,
-        );
-        if (res?.status) {
-          this.filterValues[f.id] = (res.data || []).map((v: any) => ({
-            label: String(v),
-            value: String(v),
-          }));
-        }
-      } catch (err) {
-        console.error(`Failed to load values for filter ${f.name}`, err);
-      }
-    });
-    await Promise.all(promises);
+  /**
+   * Build a fetcher closure compatible with app-custom-dropdown's
+   * server-mode contract. The dropdown calls this on panel open,
+   * filter-text change, and near-end scroll — pagination and search
+   * just work, backed by the same cache the eager prefetch uses.
+   *
+   * Returned items use the {value,label} shape; total comes straight
+   * from the BE response.
+   */
+  fetcherFor(filter: any) {
+    return async (args: { search: string; page: number; limit: number }) => {
+      const result = await this.optionsCache.get(
+        this.analysisId,
+        filter.id,
+        {
+          search: args.search || undefined,
+          page: args.page,
+          pageSize: args.limit,
+        },
+      );
+      // Reflect result state on the local UI slot so column-missing
+      // and staleness paths still react when the user interacts.
+      this.applyResultToState(filter.id, result);
+      if (!result.ok) return { items: [], total: 0 };
+      return { items: result.values, total: result.total };
+    };
+  }
+
+  private applyResultToState(
+    filterId: string,
+    result: FilterValuesResult,
+  ): void {
+    const s = this.state[filterId];
+    if (!s) return;
+    if (result.ok) {
+      s.options = result.values;
+      s.total = result.total;
+      s.totalApproximate = result.totalApproximate;
+      s.truncated = result.truncated;
+      s.columnMissing = false;
+      s.errorMessage = null;
+    } else {
+      s.options = [];
+      s.total = 0;
+      s.totalApproximate = false;
+      s.truncated = false;
+      s.columnMissing = result.error === 'column_missing';
+      s.errorMessage = result.message || null;
+    }
   }
 
   /**
-   * Validates and sets defaults from filter config against live dropdown options.
-   * - Category defaults are matched case-insensitively against live values
-   * - Stale/missing defaults are silently dropped
-   * - Array defaults on single-select (dropdown) take the first valid match
-   * - Numeric defaults are type-coerced to numbers
+   * Apply saved defaults to appliedValues; split saved values that
+   * aren't in current options into a separate staleSelectedValues
+   * bucket so the template can surface warning chips instead of
+   * silently dropping them.
    */
   private initializeDefaults(): void {
     for (const f of this.filters) {
       const config = f.config || {};
 
-      if (f.filterType === 'category' && config.defaultValue) {
+      if (f.filterType === 'category' && config.defaultValue != null) {
         this.initializeCategoryDefault(f, config);
       } else if (
         f.filterType === 'numeric_equality' &&
@@ -127,40 +222,77 @@ export class AnalysisFilterBarComponent implements OnInit {
   }
 
   /**
-   * Validates category defaults against live dropdown/multiselect options.
-   * Uses case-insensitive matching and resolves to the exact-case live value.
+   * Case-insensitive match of saved defaults against live options.
+   * Present matches go into appliedValues; missing ones go into
+   * staleSelectedValues for the warning-chip render path.
    */
   private initializeCategoryDefault(filter: any, config: any): void {
-    const liveOptions = this.filterValues[filter.id] || [];
-    // Build a lookup map: lowercase → exact-case live value
-    const liveLookup = new Map<string, string>();
-    for (const opt of liveOptions) {
+    const s = this.state[filter.id];
+    if (!s) return;
+
+    const liveLookup = new Map<string, string | number>();
+    for (const opt of s.options) {
+      if (opt.value === null || opt.value === undefined) continue;
       liveLookup.set(String(opt.value).toLowerCase(), opt.value);
     }
 
-    // Normalize defaults to string array regardless of config shape
     const rawDefaults = Array.isArray(config.defaultValue)
       ? config.defaultValue
       : [config.defaultValue];
-    const stringDefaults = rawDefaults.map((d: any) => String(d));
+    const stringDefaults = rawDefaults
+      .filter((d: any) => d !== null && d !== undefined && d !== '')
+      .map((d: any) => String(d));
 
-    // Match against live options (case-insensitive), resolve to exact case
-    const validDefaults = stringDefaults
-      .map((d: string) => liveLookup.get(d.toLowerCase()))
-      .filter((v: string | undefined): v is string => v !== undefined);
+    const present: (string | number)[] = [];
+    const stale: string[] = [];
+    for (const d of stringDefaults) {
+      const hit = liveLookup.get(d.toLowerCase());
+      if (hit !== undefined) present.push(hit);
+      else stale.push(d);
+    }
 
-    if (validDefaults.length === 0) return;
+    s.staleSelectedValues = stale;
 
+    if (present.length === 0) return;
     if (filter.controlType === 'dropdown') {
-      // Single-select: use first valid match
-      this.appliedValues[filter.id] = validDefaults[0];
+      this.appliedValues[filter.id] = present[0];
     } else if (filter.controlType === 'list') {
-      // Multi-select: use all valid matches
-      this.appliedValues[filter.id] = validDefaults;
+      this.appliedValues[filter.id] = present;
     }
   }
 
-  trackById(index: number, item: any): any {
+  /** Drop one stale chip from the warning row. Doesn't touch BE — the
+   *  warning is presentational; users either accept the stale value
+   *  (chart returns zero rows for it) or edit the filter to fix the
+   *  saved config. */
+  removeStaleValue(filter: any, value: string): void {
+    const s = this.state[filter.id];
+    if (!s) return;
+    s.staleSelectedValues = s.staleSelectedValues.filter(v => v !== value);
+    this.cdr.markForCheck();
+  }
+
+  hasStaleValues(filter: any): boolean {
+    return !!this.state[filter.id]?.staleSelectedValues.length;
+  }
+
+  isColumnMissing(filter: any): boolean {
+    return !!this.state[filter.id]?.columnMissing;
+  }
+
+  optionsFor(filter: any): FilterOption[] {
+    return this.state[filter.id]?.options || [];
+  }
+
+  truncatedFor(filter: any): boolean {
+    return !!this.state[filter.id]?.truncated;
+  }
+
+  totalFor(filter: any): number {
+    return this.state[filter.id]?.total || 0;
+  }
+
+  trackById(_index: number, item: any): any {
     return item.id;
   }
 
@@ -231,6 +363,12 @@ export class AnalysisFilterBarComponent implements OnInit {
 
   clearFilters(): void {
     this.appliedValues = {};
+    // Stale chips are presentational only; they vanish along with
+    // the selection state when the user clicks Clear.
+    for (const f of this.filters) {
+      const s = this.state[f.id];
+      if (s) s.staleSelectedValues = [];
+    }
     this.filtersCleared.emit();
   }
 

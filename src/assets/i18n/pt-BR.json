@@ -1099,7 +1099,14 @@
     "TABLE_SHOW_ROW_NUMBERS": "Mostrar números de linha",
     "TABLE_COLUMNS": "Colunas",
     "TABLE_NO_MAPPING_HINT": "Clique nos campos do dataset para adicioná-los como colunas da tabela.",
-    "TABLE_PICK_COLUMNS_PROMPT": "Clique nos campos da barra lateral para adicioná-los como colunas"
+    "TABLE_PICK_COLUMNS_PROMPT": "Clique nos campos da barra lateral para adicioná-los como colunas",
+    "FILTER_SELECT": "Selecionar…",
+    "FILTER_SELECT_DATE": "Selecionar data",
+    "FILTER_SEARCH": "Pesquisar…",
+    "FILTER_TRUNCATED": "Mostrando primeiros resultados — digite para pesquisar ({{count}} no total)",
+    "FILTER_STALE_VALUES": "Estes valores salvos não estão mais nos dados:",
+    "FILTER_STALE_TOOLTIP": "Seleção salva não existe mais nos dados de origem. Clique em × para remover.",
+    "FILTER_COLUMN_MISSING": "A coluna deste filtro não está mais no dataset. Remova o filtro para limpar este aviso."
   },
   "DASHBOARD": {
     "TITLE": "Painéis",

@@ -1099,7 +1099,14 @@
     "TABLE_SHOW_ROW_NUMBERS": "행 번호 표시",
     "TABLE_COLUMNS": "열",
     "TABLE_NO_MAPPING_HINT": "데이터셋 목록의 필드를 클릭하여 테이블 열로 추가하세요.",
-    "TABLE_PICK_COLUMNS_PROMPT": "사이드바에서 필드를 클릭하여 열로 추가하세요"
+    "TABLE_PICK_COLUMNS_PROMPT": "사이드바에서 필드를 클릭하여 열로 추가하세요",
+    "FILTER_SELECT": "선택…",
+    "FILTER_SELECT_DATE": "날짜 선택",
+    "FILTER_SEARCH": "검색…",
+    "FILTER_TRUNCATED": "처음 결과 표시 중 — 검색하려면 입력하세요 (총 {{count}})",
+    "FILTER_STALE_VALUES": "이 저장된 값은 더 이상 데이터에 없습니다:",
+    "FILTER_STALE_TOOLTIP": "저장된 선택이 원본 데이터에 더 이상 없습니다. ×를 클릭하여 제거하세요.",
+    "FILTER_COLUMN_MISSING": "이 필터의 열이 데이터셋에 더 이상 없습니다. 필터를 제거하여 이 경고를 해제하세요."
   },
   "DASHBOARD": {
     "TITLE": "대시보드",

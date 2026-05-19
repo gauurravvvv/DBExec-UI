@@ -1099,7 +1099,14 @@
     "TABLE_SHOW_ROW_NUMBERS": "显示行号",
     "TABLE_COLUMNS": "列",
     "TABLE_NO_MAPPING_HINT": "点击数据集列表中的字段，将其添加为表格列。",
-    "TABLE_PICK_COLUMNS_PROMPT": "点击侧边栏中的字段以将其添加为列"
+    "TABLE_PICK_COLUMNS_PROMPT": "点击侧边栏中的字段以将其添加为列",
+    "FILTER_SELECT": "选择…",
+    "FILTER_SELECT_DATE": "选择日期",
+    "FILTER_SEARCH": "搜索…",
+    "FILTER_TRUNCATED": "显示前几条结果 — 输入以搜索（共 {{count}} 条）",
+    "FILTER_STALE_VALUES": "以下已保存的值不再存在于数据中：",
+    "FILTER_STALE_TOOLTIP": "已保存的选择不再存在于源数据中。点击 × 以移除。",
+    "FILTER_COLUMN_MISSING": "此筛选器的列不再存在于数据集中。请删除筛选器以清除此警告。"
   },
   "DASHBOARD": {
     "TITLE": "仪表盘",

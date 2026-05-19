@@ -1099,7 +1099,14 @@
     "TABLE_SHOW_ROW_NUMBERS": "Rijnummers tonen",
     "TABLE_COLUMNS": "Kolommen",
     "TABLE_NO_MAPPING_HINT": "Klik op velden in de dataset-lijst om ze als tabelkolommen toe te voegen.",
-    "TABLE_PICK_COLUMNS_PROMPT": "Klik op velden in de zijbalk om ze als kolommen toe te voegen"
+    "TABLE_PICK_COLUMNS_PROMPT": "Klik op velden in de zijbalk om ze als kolommen toe te voegen",
+    "FILTER_SELECT": "Selecteren…",
+    "FILTER_SELECT_DATE": "Datum kiezen",
+    "FILTER_SEARCH": "Zoeken…",
+    "FILTER_TRUNCATED": "Eerste resultaten — typ om te zoeken ({{count}} totaal)",
+    "FILTER_STALE_VALUES": "Deze opgeslagen waarden staan niet meer in de gegevens:",
+    "FILTER_STALE_TOOLTIP": "Opgeslagen selectie staat niet meer in brongegevens. Klik op × om te verwijderen.",
+    "FILTER_COLUMN_MISSING": "De kolom van dit filter staat niet meer in de dataset. Verwijder het filter om deze waarschuwing te wissen."
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",

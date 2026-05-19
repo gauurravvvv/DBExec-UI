@@ -1,40 +1,129 @@
 <div class="filter-bar" *ngIf="filters.length > 0">
   <div class="filter-controls">
     <ng-container *ngFor="let filter of filters; trackBy: trackById">
-      <!-- Category: Dropdown -->
-      <div class="filter-control" *ngIf="filter.controlType === 'dropdown'">
+      <!-- Column-missing empty state.
+           If the BE flagged the target column as no longer in the
+           dataset SQL output, the dropdown can't render — replace it
+           with an actionable empty-state instead of letting the
+           filter sit there silently broken. -->
+      <div
+        class="filter-control filter-control--error"
+        *ngIf="isColumnMissing(filter)"
+      >
+        <div class="filter-error-card">
+          <i class="pi pi-exclamation-triangle"></i>
+          <div class="filter-error-text">
+            <strong>{{ filter.name }}</strong>
+            <span>{{ 'ANALYSES.FILTER_COLUMN_MISSING' | translate }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category: single-select dropdown.
+           Uses app-custom-dropdown in server-mode so search, paging,
+           and scroll-to-load all flow through the cache. preloadedItems
+           seeds the panel from the eager prefetch so the first open
+           is instant. -->
+      <div
+        class="filter-control"
+        *ngIf="filter.controlType === 'dropdown' && !isColumnMissing(filter)"
+      >
         <app-custom-dropdown
           [label]="filter.name"
-          [options]="filterValues[filter.id] || []"
+          [serverMode]="true"
+          [fetcher]="fetcherFor(filter)"
+          [preloadedItems]="optionsFor(filter)"
+          [preloadedTotal]="totalFor(filter)"
+          [pageSize]="100"
           optionLabel="label"
           optionValue="value"
-          [placeholder]="filter.config?.placeholder || 'Select ' + filter.name"
+          [placeholder]="filter.config?.placeholder || ('ANALYSES.FILTER_SELECT' | translate)"
           [showClear]="true"
-          [filter]="(filterValues[filter.id] || []).length > 10"
+          [filter]="true"
           [(ngModel)]="appliedValues[filter.id]"
           (onChangeEvent)="onFilterChange(filter, $event)"
           [appendTo]="'body'"
         ></app-custom-dropdown>
+        <!-- Truncation hint — surfaces when the BE returned a partial
+             page so users know to type to search rather than scroll. -->
+        <small class="filter-truncated-hint" *ngIf="truncatedFor(filter)">
+          {{ 'ANALYSES.FILTER_TRUNCATED' | translate: { count: totalFor(filter) } }}
+        </small>
+        <!-- Staleness row — chips for saved values that aren't in
+             current source data. -->
+        <div class="filter-stale-row" *ngIf="hasStaleValues(filter)">
+          <i class="pi pi-exclamation-circle"></i>
+          <span class="filter-stale-label">
+            {{ 'ANALYSES.FILTER_STALE_VALUES' | translate }}
+          </span>
+          <span
+            class="filter-stale-chip"
+            *ngFor="let v of state[filter.id].staleSelectedValues"
+            [title]="'ANALYSES.FILTER_STALE_TOOLTIP' | translate"
+          >
+            {{ v }}
+            <button
+              type="button"
+              class="filter-stale-remove"
+              (click)="removeStaleValue(filter, v)"
+              [attr.aria-label]="'COMMON.REMOVE' | translate"
+            >
+              <i class="pi pi-times"></i>
+            </button>
+          </span>
+        </div>
       </div>
 
-      <!-- Category: Multi-Select List -->
-      <div class="filter-control" *ngIf="filter.controlType === 'list'">
+      <!-- Category: multi-select list. Same server-mode pattern as the
+           single-select dropdown above. -->
+      <div
+        class="filter-control"
+        *ngIf="filter.controlType === 'list' && !isColumnMissing(filter)"
+      >
         <app-custom-multiselect
           [label]="filter.name"
-          [options]="filterValues[filter.id] || []"
+          [serverMode]="true"
+          [fetcher]="fetcherFor(filter)"
+          [preloadedItems]="optionsFor(filter)"
+          [preloadedTotal]="totalFor(filter)"
+          [pageSize]="100"
           optionLabel="label"
           optionValue="value"
-          [placeholder]="filter.config?.placeholder || 'Select ' + filter.name"
-          [filter]="(filterValues[filter.id] || []).length > 10"
+          [placeholder]="filter.config?.placeholder || ('ANALYSES.FILTER_SELECT' | translate)"
+          [filter]="true"
           [(ngModel)]="appliedValues[filter.id]"
           display="comma"
           [maxSelectedLabels]="1"
           [selectedItemsLabel]="'{0} selected'"
           [appendTo]="'body'"
         ></app-custom-multiselect>
+        <small class="filter-truncated-hint" *ngIf="truncatedFor(filter)">
+          {{ 'ANALYSES.FILTER_TRUNCATED' | translate: { count: totalFor(filter) } }}
+        </small>
+        <div class="filter-stale-row" *ngIf="hasStaleValues(filter)">
+          <i class="pi pi-exclamation-circle"></i>
+          <span class="filter-stale-label">
+            {{ 'ANALYSES.FILTER_STALE_VALUES' | translate }}
+          </span>
+          <span
+            class="filter-stale-chip"
+            *ngFor="let v of state[filter.id].staleSelectedValues"
+            [title]="'ANALYSES.FILTER_STALE_TOOLTIP' | translate"
+          >
+            {{ v }}
+            <button
+              type="button"
+              class="filter-stale-remove"
+              (click)="removeStaleValue(filter, v)"
+              [attr.aria-label]="'COMMON.REMOVE' | translate"
+            >
+              <i class="pi pi-times"></i>
+            </button>
+          </span>
+        </div>
       </div>
 
-      <!-- Numeric: Input -->
+      <!-- Numeric: text input -->
       <div
         class="filter-control"
         *ngIf="
@@ -51,7 +140,7 @@
         ></app-custom-number>
       </div>
 
-      <!-- Numeric: Slider -->
+      <!-- Numeric: range slider -->
       <div
         class="filter-control slider-control"
         *ngIf="filter.controlType === 'slider'"
@@ -64,7 +153,7 @@
         ></app-custom-rangeslider>
       </div>
 
-      <!-- Date: Calendar -->
+      <!-- Date: calendar -->
       <div class="filter-control" *ngIf="filter.controlType === 'datepicker'">
         <app-custom-calendar
           [label]="filter.name"
@@ -73,14 +162,14 @@
             filter.filterType === 'time_range' ? 'multiple' : 'single'
           "
           [showTime]="filter.config?.includeTime || false"
-          [placeholder]="filter.config?.placeholder || 'Select date'"
+          [placeholder]="filter.config?.placeholder || ('ANALYSES.FILTER_SELECT_DATE' | translate)"
           [dateFormat]="filter.config?.dateFormat || 'yy-mm-dd'"
           [numberOfMonths]="filter.filterType === 'time_range' ? 2 : 1"
           (onChangeEvent)="onFilterChange(filter, appliedValues[filter.id])"
         ></app-custom-calendar>
       </div>
 
-      <!-- Text: Input -->
+      <!-- Free-text search input (category + text controlType) -->
       <div
         class="filter-control"
         *ngIf="
@@ -89,7 +178,7 @@
       >
         <app-custom-input
           [label]="filter.name"
-          [placeholder]="filter.config?.placeholder || 'Search ' + filter.name"
+          [placeholder]="filter.config?.placeholder || ('ANALYSES.FILTER_SEARCH' | translate)"
           [(ngModel)]="appliedValues[filter.id]"
           (ngModelChange)="onFilterChange(filter, appliedValues[filter.id])"
         >
@@ -105,11 +194,15 @@
       [disabled]="!hasActiveFilters"
     >
       <i class="pi pi-check"></i>
-      Apply
+      {{ 'COMMON.APPLY' | translate }}
     </button>
-    <button class="btn-clear" (click)="clearFilters()" *ngIf="hasActiveFilters">
+    <button
+      class="btn-clear"
+      (click)="clearFilters()"
+      *ngIf="hasActiveFilters"
+    >
       <i class="pi pi-times"></i>
-      Clear
+      {{ 'COMMON.CLEAR' | translate }}
     </button>
   </div>
 </div>

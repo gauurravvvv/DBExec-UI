@@ -1099,7 +1099,14 @@
     "TABLE_SHOW_ROW_NUMBERS": "Zeilennummern anzeigen",
     "TABLE_COLUMNS": "Spalten",
     "TABLE_NO_MAPPING_HINT": "Klicken Sie auf Felder in der Datasetliste, um sie als Tabellenspalten hinzuzufuegen.",
-    "TABLE_PICK_COLUMNS_PROMPT": "Klicken Sie auf Felder in der Seitenleiste, um sie als Spalten hinzuzufuegen"
+    "TABLE_PICK_COLUMNS_PROMPT": "Klicken Sie auf Felder in der Seitenleiste, um sie als Spalten hinzuzufuegen",
+    "FILTER_SELECT": "Auswählen…",
+    "FILTER_SELECT_DATE": "Datum wählen",
+    "FILTER_SEARCH": "Suchen…",
+    "FILTER_TRUNCATED": "Erste Ergebnisse — zum Suchen tippen ({{count}} insgesamt)",
+    "FILTER_STALE_VALUES": "Diese gespeicherten Werte sind nicht mehr in den Daten:",
+    "FILTER_STALE_TOOLTIP": "Gespeicherte Auswahl gibt es in den Quelldaten nicht mehr. Klicken Sie auf ×, um sie zu entfernen.",
+    "FILTER_COLUMN_MISSING": "Die Spalte dieses Filters ist nicht mehr im Dataset. Entfernen Sie den Filter, um diese Warnung zu beheben."
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",

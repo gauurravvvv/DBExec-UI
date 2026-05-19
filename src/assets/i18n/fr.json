@@ -1099,7 +1099,14 @@
     "TABLE_SHOW_ROW_NUMBERS": "Afficher les numéros de ligne",
     "TABLE_COLUMNS": "Colonnes",
     "TABLE_NO_MAPPING_HINT": "Cliquez sur les champs du dataset pour les ajouter comme colonnes du tableau.",
-    "TABLE_PICK_COLUMNS_PROMPT": "Cliquez sur les champs dans la barre laterale pour les ajouter en colonnes"
+    "TABLE_PICK_COLUMNS_PROMPT": "Cliquez sur les champs dans la barre laterale pour les ajouter en colonnes",
+    "FILTER_SELECT": "Sélectionner…",
+    "FILTER_SELECT_DATE": "Sélectionner une date",
+    "FILTER_SEARCH": "Rechercher…",
+    "FILTER_TRUNCATED": "Premiers résultats — tapez pour rechercher ({{count}} au total)",
+    "FILTER_STALE_VALUES": "Ces valeurs enregistrées ne sont plus dans les données :",
+    "FILTER_STALE_TOOLTIP": "La sélection enregistrée n'existe plus dans les données source. Cliquez sur × pour la supprimer.",
+    "FILTER_COLUMN_MISSING": "La colonne de ce filtre n'est plus dans le dataset. Supprimez le filtre pour effacer cet avertissement."
   },
   "DASHBOARD": {
     "TITLE": "Tableaux de bord",

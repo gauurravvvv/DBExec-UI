@@ -1099,7 +1099,14 @@
     "TABLE_SHOW_ROW_NUMBERS": "行番号を表示",
     "TABLE_COLUMNS": "列",
     "TABLE_NO_MAPPING_HINT": "データセット一覧のフィールドをクリックして、テーブルの列として追加してください。",
-    "TABLE_PICK_COLUMNS_PROMPT": "サイドバーのフィールドをクリックして列として追加してください"
+    "TABLE_PICK_COLUMNS_PROMPT": "サイドバーのフィールドをクリックして列として追加してください",
+    "FILTER_SELECT": "選択…",
+    "FILTER_SELECT_DATE": "日付を選択",
+    "FILTER_SEARCH": "検索…",
+    "FILTER_TRUNCATED": "最初の結果を表示中 — 検索するには入力してください (合計 {{count}})",
+    "FILTER_STALE_VALUES": "次の保存された値はデータ内にありません:",
+    "FILTER_STALE_TOOLTIP": "保存された選択はソースデータに存在しません。×をクリックして削除してください。",
+    "FILTER_COLUMN_MISSING": "このフィルタの列はデータセットにありません。フィルタを削除してこの警告を消してください。"
   },
   "DASHBOARD": {
     "TITLE": "ダッシュボード",

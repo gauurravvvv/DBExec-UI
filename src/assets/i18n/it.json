@@ -1099,7 +1099,14 @@
     "TABLE_SHOW_ROW_NUMBERS": "Mostra numeri di riga",
     "TABLE_COLUMNS": "Colonne",
     "TABLE_NO_MAPPING_HINT": "Fai clic sui campi del dataset per aggiungerli come colonne della tabella.",
-    "TABLE_PICK_COLUMNS_PROMPT": "Fai clic sui campi nella barra laterale per aggiungerli come colonne"
+    "TABLE_PICK_COLUMNS_PROMPT": "Fai clic sui campi nella barra laterale per aggiungerli come colonne",
+    "FILTER_SELECT": "Seleziona…",
+    "FILTER_SELECT_DATE": "Seleziona data",
+    "FILTER_SEARCH": "Cerca…",
+    "FILTER_TRUNCATED": "Mostro i primi risultati — digita per cercare ({{count}} totali)",
+    "FILTER_STALE_VALUES": "Questi valori salvati non sono più nei dati:",
+    "FILTER_STALE_TOOLTIP": "La selezione salvata non esiste più nei dati di origine. Fai clic su × per rimuoverla.",
+    "FILTER_COLUMN_MISSING": "La colonna di questo filtro non è più nel dataset. Rimuovi il filtro per cancellare l'avviso."
   },
   "DASHBOARD": {
     "TITLE": "Dashboard",

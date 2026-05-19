@@ -1099,7 +1099,14 @@
     "TABLE_SHOW_ROW_NUMBERS": "Mostrar números de fila",
     "TABLE_COLUMNS": "Columnas",
     "TABLE_NO_MAPPING_HINT": "Haz clic en los campos del dataset para agregarlos como columnas de la tabla.",
-    "TABLE_PICK_COLUMNS_PROMPT": "Haz clic en los campos de la barra lateral para agregarlos como columnas"
+    "TABLE_PICK_COLUMNS_PROMPT": "Haz clic en los campos de la barra lateral para agregarlos como columnas",
+    "FILTER_SELECT": "Seleccionar…",
+    "FILTER_SELECT_DATE": "Seleccionar fecha",
+    "FILTER_SEARCH": "Buscar…",
+    "FILTER_TRUNCATED": "Mostrando primeros resultados — escribe para buscar ({{count}} en total)",
+    "FILTER_STALE_VALUES": "Estos valores guardados ya no están en los datos:",
+    "FILTER_STALE_TOOLTIP": "La selección guardada ya no existe en los datos de origen. Haz clic en × para eliminarla.",
+    "FILTER_COLUMN_MISSING": "La columna de este filtro ya no está en el conjunto de datos. Elimina el filtro para descartar este aviso."
   },
   "DASHBOARD": {
     "TITLE": "Paneles",

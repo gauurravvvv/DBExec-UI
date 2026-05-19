@@ -93,3 +93,119 @@
     }
   }
 }
+
+// Truncation hint — small caption under a dropdown when the BE
+// flagged that more values exist beyond the current page.
+.filter-truncated-hint {
+  display: block;
+  margin-top: var(--space-2);
+  font-size: var(--fs-micro);
+  color: var(--secondary-color);
+  font-style: italic;
+}
+
+// Stale-value warning row — appears under the dropdown when saved
+// defaults reference values no longer in source data. Each chip is
+// clickable to dismiss; the chart query will still attempt the
+// stale value (returning zero rows) until the user updates the saved
+// filter config.
+.filter-stale-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--warning-bg, rgba(245, 158, 11, 0.08));
+  border: 1px solid var(--warning-color, rgba(245, 158, 11, 0.4));
+  border-radius: var(--radius-sm);
+
+  > i.pi {
+    color: var(--warning-color, #b45309);
+    font-size: 0.85rem;
+  }
+
+  .filter-stale-label {
+    font-size: var(--fs-micro);
+    color: var(--warning-color, #b45309);
+    font-weight: var(--fw-medium);
+  }
+
+  .filter-stale-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 2px 6px 2px 8px;
+    background: var(--card-background);
+    border: 1px dashed var(--warning-color, #f59e0b);
+    border-radius: var(--radius-xs);
+    font-size: var(--fs-micro);
+    color: var(--text-color);
+    line-height: 1.6;
+
+    .filter-stale-remove {
+      width: 18px;
+      height: 18px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: var(--secondary-color);
+      cursor: pointer;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: none;
+
+      i {
+        font-size: 10px;
+      }
+
+      &:hover {
+        background: var(--hover-background);
+        color: var(--text-color);
+      }
+    }
+  }
+}
+
+// Column-missing empty-state — replaces the dropdown when the BE
+// reports `error: column_missing` for a filter. Compact, amber-
+// tinted, fits the dropdown's footprint so the filter bar layout
+// doesn't reflow.
+.filter-control--error {
+  .filter-error-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--warning-bg, rgba(245, 158, 11, 0.08));
+    border: 1px solid var(--warning-color, rgba(245, 158, 11, 0.4));
+    border-radius: var(--radius-sm);
+    height: 100%;
+
+    > i.pi {
+      color: var(--warning-color, #b45309);
+      font-size: 1rem;
+      margin-top: 2px;
+    }
+
+    .filter-error-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      strong {
+        font-size: var(--fs-control);
+        color: var(--text-color);
+        font-weight: var(--fw-semibold);
+      }
+
+      span {
+        font-size: var(--fs-micro);
+        color: var(--secondary-color);
+        line-height: 1.4;
+      }
+    }
+  }
+}

@@ -328,6 +328,30 @@ export class AnalysesService {
   }
 
   /**
+   * Batched dropdown-values fetch. Returns options for any number of
+   * filters in one round trip. Per-filter errors don't fail the
+   * batch — each filterId in the response carries its own ok/error.
+   *
+   * Body shape:
+   *   { analysisId, requests: [{ filterId, search?, page?, pageSize? }, ...] }
+   * Response shape:
+   *   { status: true, data: { results: { [filterId]: FilterValuesResult } } }
+   */
+  getFilterValuesBatch(payload: {
+    analysisId: string;
+    requests: Array<{
+      filterId: string;
+      search?: string;
+      page?: number;
+      pageSize?: number;
+    }>;
+  }) {
+    return lastValueFrom(
+      this.http.apiPost(ANALYSIS_FILTER.VALUES_BATCH, payload),
+    );
+  }
+
+  /**
    * Run a dataset query in the context of an analysis.
    * Returns data enriched with both dataset-level and analysis-level custom fields.
    * POST /analyses/run
