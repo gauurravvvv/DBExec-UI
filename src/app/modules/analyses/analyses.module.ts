@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { MenuModule } from 'primeng/menu';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
@@ -15,7 +16,13 @@ import { TableVisualComponent } from './components/table-visual/table-visual.com
 import { ViewAnalysesComponent } from './components/view-analyses/view-analyses.component';
 import { VisualConfigSidebarComponent } from './components/visual-config-sidebar/visual-config-sidebar.component';
 import { VisualsChartSidebarComponent } from './components/visuals-chart-sidebar/visuals-chart-sidebar.component';
-import { addAnalysesReducer, ADD_ANALYSES_FEATURE_KEY } from './store';
+import {
+  addAnalysesReducer,
+  ADD_ANALYSES_FEATURE_KEY,
+  analysesFilterReducer,
+  AnalysesFilterEffects,
+  ANALYSES_FILTER_FEATURE_KEY,
+} from './store';
 
 @NgModule({
   declarations: [
@@ -37,8 +44,13 @@ import { addAnalysesReducer, ADD_ANALYSES_FEATURE_KEY } from './store';
     SharedModule,
     SharedChartsModule,
     MenuModule,
-    // NgRx Feature Store
+    // NgRx feature stores. Two slices — dataset cache + filter slice.
     StoreModule.forFeature(ADD_ANALYSES_FEATURE_KEY, addAnalysesReducer),
+    StoreModule.forFeature(
+      ANALYSES_FILTER_FEATURE_KEY,
+      analysesFilterReducer,
+    ),
+    EffectsModule.forFeature([AnalysesFilterEffects]),
   ],
 })
 export class AnalysesModule {}
