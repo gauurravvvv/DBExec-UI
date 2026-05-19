@@ -721,17 +721,14 @@ export class EditAnalysesComponent
         this.cdr.markForCheck();
       });
 
-    // Kick the store to (a) mark this analysis active, and (b) fetch
-    // the filter list + first page of dropdown options. Idempotent —
-    // the effect short-circuits when the lane is warm.
+    // Mark this analysis active so selectors target the right lane.
+    // The actual loadOpen dispatch is DEFERRED to toggleFilterPanel —
+    // users who never open the filter sidebar shouldn't pay for the
+    // filter-list + dropdown-options network round trip. The effect's
+    // own freshness gate handles re-opens, so this lazy strategy
+    // composes correctly with the existing cache.
     this.store.dispatch(
       AnalysesFilterActions.setActiveAnalysis({ analysisId: this.analysisId }),
-    );
-    this.store.dispatch(
-      AnalysesFilterActions.loadOpen({
-        analysisId: this.analysisId,
-        organisation: this.orgId,
-      }),
     );
 
     // Subscribe to graphData$ to populate rawGraphData and transform charts
@@ -1157,6 +1154,19 @@ export class EditAnalysesComponent
     // If opening filter panel, close visuals panel (mutual exclusivity)
     if (this.isFilterPanelOpen) {
       this.isVisualsPanelOpen = false;
+      // Lazy-load the filter list + first-page dropdown options the
+      // moment the user signals intent to interact with filters.
+      // The effect's freshness gate (10-min TTL) means re-opens
+      // within the window are a no-op; subsequent opens after TTL
+      // refresh in the background.
+      if (this.analysisId && this.orgId) {
+        this.store.dispatch(
+          AnalysesFilterActions.loadOpen({
+            analysisId: this.analysisId,
+            organisation: this.orgId,
+          }),
+        );
+      }
     }
     // Wait for CSS transition to complete, then recalculate dimensions
     setTimeout(() => {
