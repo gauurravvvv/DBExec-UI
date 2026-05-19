@@ -1106,7 +1106,9 @@
     "FILTER_TRUNCATED": "Mostrando primeros resultados — escribe para buscar ({{count}} en total)",
     "FILTER_STALE_VALUES": "Estos valores guardados ya no están en los datos:",
     "FILTER_STALE_TOOLTIP": "La selección guardada ya no existe en los datos de origen. Haz clic en × para eliminarla.",
-    "FILTER_COLUMN_MISSING": "La columna de este filtro ya no está en el conjunto de datos. Elimina el filtro para descartar este aviso."
+    "FILTER_COLUMN_MISSING": "La columna de este filtro ya no está en el conjunto de datos. Elimina el filtro para descartar este aviso.",
+    "FILTER_SAVED_WITH_WARNING": "Filtro guardado, con advertencia",
+    "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} valor(es) guardado(s) no están en los datos ahora"
   },
   "DASHBOARD": {
     "TITLE": "Paneles",

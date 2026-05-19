@@ -1106,7 +1106,9 @@
     "FILTER_TRUNCATED": "Eerste resultaten — typ om te zoeken ({{count}} totaal)",
     "FILTER_STALE_VALUES": "Deze opgeslagen waarden staan niet meer in de gegevens:",
     "FILTER_STALE_TOOLTIP": "Opgeslagen selectie staat niet meer in brongegevens. Klik op × om te verwijderen.",
-    "FILTER_COLUMN_MISSING": "De kolom van dit filter staat niet meer in de dataset. Verwijder het filter om deze waarschuwing te wissen."
+    "FILTER_COLUMN_MISSING": "De kolom van dit filter staat niet meer in de dataset. Verwijder het filter om deze waarschuwing te wissen.",
+    "FILTER_SAVED_WITH_WARNING": "Filter opgeslagen, met een waarschuwing",
+    "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} opgeslagen waarden staan op dit moment niet in de gegevens"
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",

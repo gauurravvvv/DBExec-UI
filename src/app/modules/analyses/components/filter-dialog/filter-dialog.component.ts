@@ -8,6 +8,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { MessageService } from 'primeng/api';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import { AnalysesService } from '../../services/analyses.service';
@@ -125,6 +126,7 @@ export class FilterDialogComponent implements OnChanges {
     private analysesService: AnalysesService,
     private datasetService: DatasetService,
     private translate: TranslateService,
+    private messageService: MessageService,
   ) {
     this.filterTypeOptions = [
       { label: this.translate.instant('ANALYSES.FILTER_TYPE_CATEGORY'), value: 'category' },
@@ -310,6 +312,13 @@ export class FilterDialogComponent implements OnChanges {
       }
 
       if (this.globalService.handleSuccessService(res, true)) {
+        // Step F payoff — if the BE flagged saved defaults as already
+        // stale, raise a non-blocking warn toast so the user knows
+        // before they navigate away. The save itself is committed.
+        const stale: any[] = res?.data?.staleDefaults ?? [];
+        if (Array.isArray(stale) && stale.length > 0) {
+          this.surfaceStaleDefaultsWarning(stale);
+        }
         this.visibleChange.emit(false);
         this.saved.emit();
       }
@@ -318,6 +327,46 @@ export class FilterDialogComponent implements OnChanges {
     } finally {
       this.isSavingFilter = false;
     }
+  }
+
+  /**
+   * Raise a non-blocking warn toast when the BE flagged saved defaults
+   * as already missing from the dataset. The save itself succeeded —
+   * this is advisory so the user can come back and fix the config
+   * before the next dashboard view.
+   */
+  private surfaceStaleDefaultsWarning(stale: any[]): void {
+    // Collapse per-filter reports into a single bullet list. Most
+    // saves touch one filter, so this is usually a single line.
+    const totalCount = stale.reduce(
+      (acc: number, r: any) => acc + (r?.values?.length ?? 0),
+      0,
+    );
+    if (totalCount === 0) {
+      // Filter-level error (e.g. column_missing) with no specific
+      // values. Use the per-filter message verbatim.
+      const messages = stale
+        .map((r: any) => r?.message)
+        .filter(Boolean)
+        .join(' — ');
+      if (!messages) return;
+      this.messageService.add({
+        severity: 'warn',
+        summary: this.translate.instant('ANALYSES.FILTER_SAVED_WITH_WARNING'),
+        detail: messages,
+        life: 6000,
+      });
+      return;
+    }
+    this.messageService.add({
+      severity: 'warn',
+      summary: this.translate.instant('ANALYSES.FILTER_SAVED_WITH_WARNING'),
+      detail: this.translate.instant(
+        'ANALYSES.FILTER_SAVED_WITH_STALE_DEFAULTS',
+        { count: totalCount },
+      ),
+      life: 6000,
+    });
   }
 
   onFilterTypeChange(): void {

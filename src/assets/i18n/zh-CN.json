@@ -1106,7 +1106,9 @@
     "FILTER_TRUNCATED": "显示前几条结果 — 输入以搜索（共 {{count}} 条）",
     "FILTER_STALE_VALUES": "以下已保存的值不再存在于数据中：",
     "FILTER_STALE_TOOLTIP": "已保存的选择不再存在于源数据中。点击 × 以移除。",
-    "FILTER_COLUMN_MISSING": "此筛选器的列不再存在于数据集中。请删除筛选器以清除此警告。"
+    "FILTER_COLUMN_MISSING": "此筛选器的列不再存在于数据集中。请删除筛选器以清除此警告。",
+    "FILTER_SAVED_WITH_WARNING": "已保存筛选器（含警告）",
+    "FILTER_SAVED_WITH_STALE_DEFAULTS": "有 {{count}} 个已保存的值当前不在数据中"
   },
   "DASHBOARD": {
     "TITLE": "仪表盘",

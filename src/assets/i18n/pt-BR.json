@@ -1106,7 +1106,9 @@
     "FILTER_TRUNCATED": "Mostrando primeiros resultados — digite para pesquisar ({{count}} no total)",
     "FILTER_STALE_VALUES": "Estes valores salvos não estão mais nos dados:",
     "FILTER_STALE_TOOLTIP": "Seleção salva não existe mais nos dados de origem. Clique em × para remover.",
-    "FILTER_COLUMN_MISSING": "A coluna deste filtro não está mais no dataset. Remova o filtro para limpar este aviso."
+    "FILTER_COLUMN_MISSING": "A coluna deste filtro não está mais no dataset. Remova o filtro para limpar este aviso.",
+    "FILTER_SAVED_WITH_WARNING": "Filtro salvo, com aviso",
+    "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} valor(es) salvo(s) não estão nos dados no momento"
   },
   "DASHBOARD": {
     "TITLE": "Painéis",

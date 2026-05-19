@@ -1106,7 +1106,9 @@
     "FILTER_TRUNCATED": "Premiers résultats — tapez pour rechercher ({{count}} au total)",
     "FILTER_STALE_VALUES": "Ces valeurs enregistrées ne sont plus dans les données :",
     "FILTER_STALE_TOOLTIP": "La sélection enregistrée n'existe plus dans les données source. Cliquez sur × pour la supprimer.",
-    "FILTER_COLUMN_MISSING": "La colonne de ce filtre n'est plus dans le dataset. Supprimez le filtre pour effacer cet avertissement."
+    "FILTER_COLUMN_MISSING": "La colonne de ce filtre n'est plus dans le dataset. Supprimez le filtre pour effacer cet avertissement.",
+    "FILTER_SAVED_WITH_WARNING": "Filtre enregistré, avec un avertissement",
+    "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} valeur(s) enregistrée(s) ne sont pas dans les données pour le moment"
   },
   "DASHBOARD": {
     "TITLE": "Tableaux de bord",
