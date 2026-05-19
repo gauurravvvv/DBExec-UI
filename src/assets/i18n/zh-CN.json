@@ -1110,7 +1110,8 @@
     "FILTER_SAVED_WITH_WARNING": "已保存筛选器（含警告）",
     "FILTER_SAVED_WITH_STALE_DEFAULTS": "有 {{count}} 个已保存的值当前不在数据中",
     "FILTER_SELECT_DATE_RANGE": "选择日期范围",
-    "FILTER_REMOVE_STALE": "移除"
+    "FILTER_REMOVE_STALE": "移除",
+    "FILTER_N_SELECTED": "已选 {0} 项"
   },
   "DASHBOARD": {
     "TITLE": "仪表盘",

@@ -93,6 +93,12 @@
 
     <!-- Default Value Section — Category -->
     <div class="filter-dialog-field" *ngIf="filterDialogType === 'category'">
+      <!-- maxSelectedLabels caps how many chips render before
+           PrimeNG collapses them into selectedItemsLabel. Without an
+           explicit selectedItemsLabel (or with the wrapper's bare
+           default), the multiselect appeared to "swallow" picks past
+           the 4th. Pairing maxSelectedLabels with a translated
+           "{N} selected" label keeps the overflow state legible. -->
       <app-custom-multiselect
         [options]="filterDialogCategoryValues"
         [(ngModel)]="filterDialogDefaultValue"
@@ -105,6 +111,8 @@
         "
         [filter]="true"
         display="chip"
+        [maxSelectedLabels]="3"
+        [selectedItemsLabel]="'ANALYSES.FILTER_N_SELECTED' | translate"
         appendTo="body"
       ></app-custom-multiselect>
       <small

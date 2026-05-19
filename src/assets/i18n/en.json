@@ -1147,7 +1147,8 @@
     "FILTER_SAVED_WITH_WARNING": "Filter saved, with a warning",
     "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} saved value(s) aren't in the data right now",
     "FILTER_SELECT_DATE_RANGE": "Select date range",
-    "FILTER_REMOVE_STALE": "Remove"
+    "FILTER_REMOVE_STALE": "Remove",
+    "FILTER_N_SELECTED": "{0} selected"
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",

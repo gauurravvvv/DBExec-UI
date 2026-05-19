@@ -1110,7 +1110,8 @@
     "FILTER_SAVED_WITH_WARNING": "Filter opgeslagen, met een waarschuwing",
     "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} opgeslagen waarden staan op dit moment niet in de gegevens",
     "FILTER_SELECT_DATE_RANGE": "Datumbereik kiezen",
-    "FILTER_REMOVE_STALE": "Verwijderen"
+    "FILTER_REMOVE_STALE": "Verwijderen",
+    "FILTER_N_SELECTED": "{0} geselecteerd"
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",

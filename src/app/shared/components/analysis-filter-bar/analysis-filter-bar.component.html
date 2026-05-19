@@ -94,7 +94,7 @@
           [(ngModel)]="appliedValues[filter.id]"
           display="comma"
           [maxSelectedLabels]="1"
-          [selectedItemsLabel]="'{0} selected'"
+          [selectedItemsLabel]="'ANALYSES.FILTER_N_SELECTED' | translate"
           [appendTo]="'body'"
         ></app-custom-multiselect>
         <small class="filter-truncated-hint" *ngIf="truncatedFor(filter)">

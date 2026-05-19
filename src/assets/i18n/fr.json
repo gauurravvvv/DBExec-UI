@@ -1110,7 +1110,8 @@
     "FILTER_SAVED_WITH_WARNING": "Filtre enregistré, avec un avertissement",
     "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} valeur(s) enregistrée(s) ne sont pas dans les données pour le moment",
     "FILTER_SELECT_DATE_RANGE": "Sélectionner une plage de dates",
-    "FILTER_REMOVE_STALE": "Supprimer"
+    "FILTER_REMOVE_STALE": "Supprimer",
+    "FILTER_N_SELECTED": "{0} sélectionnés"
   },
   "DASHBOARD": {
     "TITLE": "Tableaux de bord",
