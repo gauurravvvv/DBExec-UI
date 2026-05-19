@@ -1108,7 +1108,8 @@
     "FILTER_STALE_TOOLTIP": "已保存的选择不再存在于源数据中。点击 × 以移除。",
     "FILTER_COLUMN_MISSING": "此筛选器的列不再存在于数据集中。请删除筛选器以清除此警告。",
     "FILTER_SAVED_WITH_WARNING": "已保存筛选器（含警告）",
-    "FILTER_SAVED_WITH_STALE_DEFAULTS": "有 {{count}} 个已保存的值当前不在数据中"
+    "FILTER_SAVED_WITH_STALE_DEFAULTS": "有 {{count}} 个已保存的值当前不在数据中",
+    "FILTER_SELECT_DATE_RANGE": "选择日期范围"
   },
   "DASHBOARD": {
     "TITLE": "仪表盘",
@@ -1138,7 +1139,9 @@
   "TOAST": {
     "SUCCESS": "成功",
     "ERROR": "错误",
-    "ERROR_DEFAULT": "发生了一个错误"
+    "ERROR_DEFAULT": "发生了一个错误",
+    "WARNING": "警告",
+    "INFO": "提示"
   },
   "PAGE_TITLES": {
     "HOME": "首页",

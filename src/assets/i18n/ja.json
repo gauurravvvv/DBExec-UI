@@ -1108,7 +1108,8 @@
     "FILTER_STALE_TOOLTIP": "保存された選択はソースデータに存在しません。×をクリックして削除してください。",
     "FILTER_COLUMN_MISSING": "このフィルタの列はデータセットにありません。フィルタを削除してこの警告を消してください。",
     "FILTER_SAVED_WITH_WARNING": "フィルターを保存しました（警告あり）",
-    "FILTER_SAVED_WITH_STALE_DEFAULTS": "保存された値のうち {{count}} 件は現在データに存在しません"
+    "FILTER_SAVED_WITH_STALE_DEFAULTS": "保存された値のうち {{count}} 件は現在データに存在しません",
+    "FILTER_SELECT_DATE_RANGE": "日付範囲を選択"
   },
   "DASHBOARD": {
     "TITLE": "ダッシュボード",
@@ -1138,7 +1139,9 @@
   "TOAST": {
     "SUCCESS": "成功",
     "ERROR": "エラー",
-    "ERROR_DEFAULT": "エラーが発生しました"
+    "ERROR_DEFAULT": "エラーが発生しました",
+    "WARNING": "警告",
+    "INFO": "情報"
   },
   "PAGE_TITLES": {
     "HOME": "ホーム",

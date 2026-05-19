@@ -194,4 +194,44 @@ export class FilterOptionsCacheService {
       coalesceWith: filterIds.slice(1),
     });
   }
+
+  /**
+   * Analysis-open shortcut: one network round trip returns BOTH the
+   * filter metadata AND the first page of values for every dropdown.
+   * Replaces the previous `listFilters() then prefetch(...)` pair.
+   *
+   * Returned filters[] mirrors the legacy listFilters response shape,
+   * so the caller can drop it straight onto the same `filters: []`
+   * field it used before. Values are stamped into the cache so
+   * subsequent .get() calls resolve from memory.
+   */
+  async open(
+    analysisId: string,
+    pageSize = 100,
+  ): Promise<{ filters: any[]; warmed: boolean }> {
+    try {
+      const res: any = await this.analysesService.getFilterValuesBatch({
+        analysisId,
+        mode: 'open' as any,
+        // The BE derives requests from the analysis filter list in
+        // 'open' mode; an empty array is accepted.
+        requests: [],
+      } as any);
+      if (!res?.status) return { filters: [], warmed: false };
+      const payload = res.data || {};
+      const filters: any[] = Array.isArray(payload.filters)
+        ? payload.filters
+        : [];
+      const results: Record<string, FilterValuesResult> =
+        payload.results || {};
+      const now = Date.now();
+      for (const [id, result] of Object.entries(results)) {
+        this.store.set(this.key(id, '', 1), { result, ts: now });
+      }
+      return { filters, warmed: true };
+    } catch (err) {
+      console.warn('[FilterOptionsCache] open() failed', err);
+      return { filters: [], warmed: false };
+    }
+  }
 }

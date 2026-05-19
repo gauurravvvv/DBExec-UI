@@ -74,13 +74,14 @@ export class AnalysisFilterBarComponent implements OnInit {
     if (!this.orgId || !this.analysisId) return;
     this.isLoading = true;
     try {
-      const res: any = await this.analysesService.listFilters(
-        this.orgId,
+      // ONE network round trip: BE lists the analysis's enabled
+      // filters AND returns the first page of values for every
+      // dropdown / multi-select. Replaces the previous
+      // listFilters() + batched values() pair.
+      const { filters, warmed } = await this.optionsCache.open(
         this.analysisId,
       );
-      if (!res?.status) return;
-
-      this.filters = (res.data || []).filter((f: any) => f.isEnabled);
+      this.filters = (filters || []).filter((f: any) => f.isEnabled);
 
       // Seed per-filter state so the template can render shells
       // without an extra null check.
@@ -97,19 +98,12 @@ export class AnalysisFilterBarComponent implements OnInit {
         };
       }
 
+      // Stamp the warm-cache results onto local state. open() already
+      // wrote them to the cache, so .get() resolves from memory.
       const dropdownFilters = this.filters.filter(
         f => f.controlType === 'dropdown' || f.controlType === 'list',
       );
-
-      if (dropdownFilters.length) {
-        // One batched call populates every dropdown's first page —
-        // see FilterOptionsCacheService.prefetch for the coalesce
-        // logic. Subsequent .get() calls below read from the warm
-        // cache instead of refetching.
-        await this.optionsCache.prefetch(
-          this.analysisId,
-          dropdownFilters.map(f => f.id),
-        );
+      if (warmed && dropdownFilters.length) {
         for (const f of dropdownFilters) {
           const result = await this.optionsCache.get(this.analysisId, f.id);
           this.applyResultToState(f.id, result);
@@ -343,20 +337,38 @@ export class AnalysisFilterBarComponent implements OnInit {
           f.filterType === 'time_range' ||
           f.filterType === 'time_equality'
         ) {
-          if (Array.isArray(val) && val.length === 2) {
+          // PrimeNG range-mode emits [start, null] while the user is
+          // mid-selection (only the start picked). Treat null end as
+          // "not ready" — skip emitting this filter so the chart
+          // query doesn't run against a half-completed range.
+          if (
+            Array.isArray(val) &&
+            val.length === 2 &&
+            val[0] != null &&
+            val[1] != null
+          ) {
             base.dateRangeStart =
               val[0] instanceof Date ? val[0].toISOString() : val[0];
             base.dateRangeEnd =
               val[1] instanceof Date ? val[1].toISOString() : val[1];
             base.operator = 'BETWEEN';
-          } else {
+          } else if (
+            !Array.isArray(val) &&
+            val != null &&
+            val !== ''
+          ) {
             const dateVal = val instanceof Date ? val.toISOString() : val;
             base.values = [dateVal];
+          } else {
+            // Partial / empty — bail out by emitting a no-op marker.
+            base._skip = true;
           }
         }
 
         return base;
-      });
+      })
+      // Strip partial-range markers; see the time_range branch above.
+      .filter(b => !b._skip);
 
     this.filtersApplied.emit(applied);
   }

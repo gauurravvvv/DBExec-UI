@@ -1108,7 +1108,8 @@
     "FILTER_STALE_TOOLTIP": "Gespeicherte Auswahl gibt es in den Quelldaten nicht mehr. Klicken Sie auf ×, um sie zu entfernen.",
     "FILTER_COLUMN_MISSING": "Die Spalte dieses Filters ist nicht mehr im Dataset. Entfernen Sie den Filter, um diese Warnung zu beheben.",
     "FILTER_SAVED_WITH_WARNING": "Filter mit Warnung gespeichert",
-    "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} gespeicherte Werte sind derzeit nicht in den Daten"
+    "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} gespeicherte Werte sind derzeit nicht in den Daten",
+    "FILTER_SELECT_DATE_RANGE": "Datumsbereich wählen"
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",
@@ -1138,7 +1139,9 @@
   "TOAST": {
     "SUCCESS": "Erfolg",
     "ERROR": "Fehler",
-    "ERROR_DEFAULT": "Ein Fehler ist aufgetreten"
+    "ERROR_DEFAULT": "Ein Fehler ist aufgetreten",
+    "WARNING": "Warnung",
+    "INFO": "Info"
   },
   "PAGE_TITLES": {
     "HOME": "Startseite",

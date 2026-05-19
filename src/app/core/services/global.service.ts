@@ -70,6 +70,41 @@ export class GlobalService {
     return response.status;
   }
 
+  /**
+   * Non-blocking warning toast. Used for advisory states where the
+   * underlying action succeeded but a follow-up nudge is worth
+   * surfacing (e.g. "saved, but some defaults are now stale").
+   * Lives 6s — longer than success/error so the user has time to
+   * read the secondary detail.
+   */
+  showWarn(detail: string, summary?: string): void {
+    this.messageService.add({
+      severity: 'warn',
+      summary: summary ?? this.translate.instant('TOAST.WARNING'),
+      detail,
+      life: 6000,
+      styleClass: 'custom-toast',
+      contentStyleClass: 'custom-toast-content',
+      icon: 'pi pi-exclamation-triangle',
+    });
+  }
+
+  /**
+   * Quiet informational toast. Use for ambient confirmations where
+   * a success toast would feel too loud.
+   */
+  showInfo(detail: string, summary?: string): void {
+    this.messageService.add({
+      severity: 'info',
+      summary: summary ?? this.translate.instant('TOAST.INFO'),
+      detail,
+      life: 3000,
+      styleClass: 'custom-toast',
+      contentStyleClass: 'custom-toast-content',
+      icon: 'pi pi-info-circle',
+    });
+  }
+
   toControl(absCtrl: AbstractControl): UntypedFormControl {
     const ctrl = absCtrl as UntypedFormControl;
     return ctrl;

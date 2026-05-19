@@ -8,7 +8,6 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { MessageService } from 'primeng/api';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import { AnalysesService } from '../../services/analyses.service';
@@ -126,7 +125,6 @@ export class FilterDialogComponent implements OnChanges {
     private analysesService: AnalysesService,
     private datasetService: DatasetService,
     private translate: TranslateService,
-    private messageService: MessageService,
   ) {
     this.filterTypeOptions = [
       { label: this.translate.instant('ANALYSES.FILTER_TYPE_CATEGORY'), value: 'category' },
@@ -334,39 +332,35 @@ export class FilterDialogComponent implements OnChanges {
    * as already missing from the dataset. The save itself succeeded —
    * this is advisory so the user can come back and fix the config
    * before the next dashboard view.
+   *
+   * Routes through GlobalService.showWarn so toast styling and
+   * severity stay consistent with the rest of the app (the previous
+   * direct MessageService call was a small abstraction leak).
    */
   private surfaceStaleDefaultsWarning(stale: any[]): void {
-    // Collapse per-filter reports into a single bullet list. Most
-    // saves touch one filter, so this is usually a single line.
     const totalCount = stale.reduce(
       (acc: number, r: any) => acc + (r?.values?.length ?? 0),
       0,
     );
+    const summary = this.translate.instant(
+      'ANALYSES.FILTER_SAVED_WITH_WARNING',
+    );
     if (totalCount === 0) {
       // Filter-level error (e.g. column_missing) with no specific
       // values. Use the per-filter message verbatim.
-      const messages = stale
+      const detail = stale
         .map((r: any) => r?.message)
         .filter(Boolean)
         .join(' — ');
-      if (!messages) return;
-      this.messageService.add({
-        severity: 'warn',
-        summary: this.translate.instant('ANALYSES.FILTER_SAVED_WITH_WARNING'),
-        detail: messages,
-        life: 6000,
-      });
+      if (!detail) return;
+      this.globalService.showWarn(detail, summary);
       return;
     }
-    this.messageService.add({
-      severity: 'warn',
-      summary: this.translate.instant('ANALYSES.FILTER_SAVED_WITH_WARNING'),
-      detail: this.translate.instant(
-        'ANALYSES.FILTER_SAVED_WITH_STALE_DEFAULTS',
-        { count: totalCount },
-      ),
-      life: 6000,
-    });
+    const detail = this.translate.instant(
+      'ANALYSES.FILTER_SAVED_WITH_STALE_DEFAULTS',
+      { count: totalCount },
+    );
+    this.globalService.showWarn(detail, summary);
   }
 
   onFilterTypeChange(): void {

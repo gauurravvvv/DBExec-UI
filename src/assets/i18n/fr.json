@@ -1108,7 +1108,8 @@
     "FILTER_STALE_TOOLTIP": "La sélection enregistrée n'existe plus dans les données source. Cliquez sur × pour la supprimer.",
     "FILTER_COLUMN_MISSING": "La colonne de ce filtre n'est plus dans le dataset. Supprimez le filtre pour effacer cet avertissement.",
     "FILTER_SAVED_WITH_WARNING": "Filtre enregistré, avec un avertissement",
-    "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} valeur(s) enregistrée(s) ne sont pas dans les données pour le moment"
+    "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} valeur(s) enregistrée(s) ne sont pas dans les données pour le moment",
+    "FILTER_SELECT_DATE_RANGE": "Sélectionner une plage de dates"
   },
   "DASHBOARD": {
     "TITLE": "Tableaux de bord",
@@ -1138,7 +1139,9 @@
   "TOAST": {
     "SUCCESS": "Succès",
     "ERROR": "Erreur",
-    "ERROR_DEFAULT": "Une erreur s'est produite"
+    "ERROR_DEFAULT": "Une erreur s'est produite",
+    "WARNING": "Avertissement",
+    "INFO": "Info"
   },
   "PAGE_TITLES": {
     "HOME": "Accueil",

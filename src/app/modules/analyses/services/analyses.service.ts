@@ -339,6 +339,9 @@ export class AnalysesService {
    */
   getFilterValuesBatch(payload: {
     analysisId: string;
+    // 'open' tells the BE to list + fetch values in one trip;
+    // 'fetch' (default) is the lazy per-dropdown form.
+    mode?: 'open' | 'fetch';
     requests: Array<{
       filterId: string;
       search?: string;

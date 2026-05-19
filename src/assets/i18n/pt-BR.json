@@ -1108,7 +1108,8 @@
     "FILTER_STALE_TOOLTIP": "Seleção salva não existe mais nos dados de origem. Clique em × para remover.",
     "FILTER_COLUMN_MISSING": "A coluna deste filtro não está mais no dataset. Remova o filtro para limpar este aviso.",
     "FILTER_SAVED_WITH_WARNING": "Filtro salvo, com aviso",
-    "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} valor(es) salvo(s) não estão nos dados no momento"
+    "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} valor(es) salvo(s) não estão nos dados no momento",
+    "FILTER_SELECT_DATE_RANGE": "Selecionar intervalo de datas"
   },
   "DASHBOARD": {
     "TITLE": "Painéis",
@@ -1138,7 +1139,9 @@
   "TOAST": {
     "SUCCESS": "Sucesso",
     "ERROR": "Erro",
-    "ERROR_DEFAULT": "Ocorreu um erro"
+    "ERROR_DEFAULT": "Ocorreu um erro",
+    "WARNING": "Aviso",
+    "INFO": "Info"
   },
   "PAGE_TITLES": {
     "HOME": "Início",

@@ -153,18 +153,49 @@
         ></app-custom-rangeslider>
       </div>
 
-      <!-- Date: calendar -->
-      <div class="filter-control" *ngIf="filter.controlType === 'datepicker'">
+      <!-- Date range — uses app-custom-daterange so PrimeNG's
+           selectionMode='range' is wired correctly. The previous
+           build used selectionMode='multiple', which lets users
+           click N independent dates rather than a [start, end] pair. -->
+      <div
+        class="filter-control"
+        *ngIf="
+          filter.controlType === 'datepicker' &&
+          filter.filterType === 'time_range'
+        "
+      >
+        <app-custom-daterange
+          [label]="filter.name"
+          [(ngModel)]="appliedValues[filter.id]"
+          [showTime]="filter.config?.includeTime || false"
+          [placeholder]="
+            filter.config?.placeholder ||
+            ('ANALYSES.FILTER_SELECT_DATE_RANGE' | translate)
+          "
+          [dateFormat]="filter.config?.dateFormat || 'yy-mm-dd'"
+          [numberOfMonths]="2"
+          (onChangeEvent)="onFilterChange(filter, appliedValues[filter.id])"
+        ></app-custom-daterange>
+      </div>
+
+      <!-- Single date — equality picker. -->
+      <div
+        class="filter-control"
+        *ngIf="
+          filter.controlType === 'datepicker' &&
+          filter.filterType !== 'time_range'
+        "
+      >
         <app-custom-calendar
           [label]="filter.name"
           [(ngModel)]="appliedValues[filter.id]"
-          [selectionMode]="
-            filter.filterType === 'time_range' ? 'multiple' : 'single'
-          "
+          selectionMode="single"
           [showTime]="filter.config?.includeTime || false"
-          [placeholder]="filter.config?.placeholder || ('ANALYSES.FILTER_SELECT_DATE' | translate)"
+          [placeholder]="
+            filter.config?.placeholder ||
+            ('ANALYSES.FILTER_SELECT_DATE' | translate)
+          "
           [dateFormat]="filter.config?.dateFormat || 'yy-mm-dd'"
-          [numberOfMonths]="filter.filterType === 'time_range' ? 2 : 1"
           (onChangeEvent)="onFilterChange(filter, appliedValues[filter.id])"
         ></app-custom-calendar>
       </div>
