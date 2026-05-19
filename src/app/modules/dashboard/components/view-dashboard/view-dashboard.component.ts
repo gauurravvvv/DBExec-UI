@@ -16,14 +16,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DASHBOARD as DB_ROUTES } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import {
-  getDummyData,
+  getMissingFieldsForVisual,
   hasAxisLabels,
   is3DCoordinateChartType,
   isCardChartType,
   isGraphChartType,
   isHeatMapChartType,
   isLines3dChartType,
-  isPolygons3dChartType,
   isSankeyChartType,
 } from '../../../analyses/constants/charts.constants';
 import { Visual } from '../../../analyses/models/visual.model';
@@ -56,10 +55,44 @@ export class ViewDashboardComponent
   rawData: any[] = [];
   appliedFilters: any[] = [];
 
+  /**
+   * Monotonically increasing id stamped on every executeQuery call.
+   * When a rapid sequence of filter changes fires multiple queries
+   * back-to-back, the earlier responses get discarded — only the
+   * most recent query's result is allowed to write back into the
+   * canvas. Without this guard the second query could finish first
+   * and then be silently overwritten by the slower first response,
+   * leaving stale chart data on screen.
+   *
+   * This is a lightweight alternative to RxJS switchMap; we keep
+   * the Promise-based service contract and just compare ids on
+   * resolve/reject.
+   */
+  private currentQueryId = 0;
+
   isDataLoading = signal(false);
 
-  // Filter sidebar
+  /**
+   * Filter sidebar open state. Default CLOSED so the dashboard
+   * loads with the canvas at full width — viewers consuming a
+   * dashboard usually want chart real estate first; only the ones
+   * who want to drill down open the panel. The toolbar filter
+   * button toggles this. Mirrors the Edit Analysis sidebar pattern
+   * so navigation between modules feels the same.
+   */
   isFilterSidebarOpen = false;
+
+  toggleFilterSidebar(): void {
+    this.isFilterSidebarOpen = !this.isFilterSidebarOpen;
+    // After the sidebar slides in/out the canvas width changes —
+    // recompute visuals' pixel sizes so charts redraw at the new
+    // dimensions. 350ms matches the CSS transition duration on
+    // .filter-sidebar's width property.
+    setTimeout(() => {
+      this.updateCanvasDimensions();
+      this.recalculateAllVisualDimensions();
+    }, 350);
+  }
 
   // Canvas dimensions
   @ViewChild('canvasContainer') canvasContainer!: ElementRef<HTMLDivElement>;
@@ -225,6 +258,11 @@ export class ViewDashboardComponent
   executeQuery(filters?: any[]): void {
     if (!this.dashboard) return;
 
+    // Stamp this call with a fresh id and capture it locally; any
+    // older in-flight queries will see their captured id no longer
+    // matches currentQueryId on resolve and will short-circuit.
+    const queryId = ++this.currentQueryId;
+
     this.isDataLoading.set(true);
 
     this.visuals.forEach(v => {
@@ -233,11 +271,18 @@ export class ViewDashboardComponent
       v.error = false;
     });
 
+    // limit: -1 tells the BE to skip the LIMIT wrap entirely and
+    // return the full result set. Dashboards are consumption surfaces
+    // where the user expects "real" totals/averages/proportions over
+    // the complete population — a sampled cap would silently distort
+    // every aggregate they see. Edit Analysis still uses the default
+    // cap (1000) because that surface is for building charts, where a
+    // representative sample is sufficient and faster to iterate on.
     const payload: any = {
       datasetId: this.dashboard.datasetId,
       analysisId: this.dashboard.analysisId,
       organisation: this.orgId,
-      limit: 1000,
+      limit: -1,
     };
 
     if (filters && filters.length > 0) {
@@ -250,6 +295,11 @@ export class ViewDashboardComponent
     this.analysesService
       .runAnalysisQuery(payload)
       .then(response => {
+        // Stale response — a newer executeQuery has already fired
+        // since this one was issued. Drop the result silently so
+        // we don't overwrite fresher chart data.
+        if (queryId !== this.currentQueryId) return;
+
         this.isDataLoading.set(false);
 
         if (this.globalService.handleSuccessService(response, false)) {
@@ -266,6 +316,10 @@ export class ViewDashboardComponent
         setTimeout(() => this.trySetupCanvas(), 0);
       })
       .catch(() => {
+        // Same staleness guard on the error path — don't flash an
+        // error banner from a superseded query.
+        if (queryId !== this.currentQueryId) return;
+
         this.isDataLoading.set(false);
         this.visuals.forEach(v => {
           v.loading = false;
@@ -423,12 +477,23 @@ export class ViewDashboardComponent
 
   // ── Chart Helpers ──
 
-  isGlobeSpecialType(chartType: string): boolean {
-    return isLines3dChartType(chartType) || isPolygons3dChartType(chartType);
+  /**
+   * Columns this visual is bound to that no longer exist in the
+   * rebound data. See the helper in charts.constants.ts for the
+   * full rationale. Surfaces a clear "field missing" empty state
+   * instead of letting the chart fall through to a misleading empty paint.
+   */
+  getMissingFields(visual: Visual): string[] {
+    const sample = this.rawData?.[0];
+    return getMissingFieldsForVisual(visual, sample);
   }
 
   hasRequiredChartFields(visual: Visual): boolean {
     if (!visual.chartType) return false;
+    // A bound column no longer exists in the rebound data → not
+    // renderable. The template surfaces a distinct viewer-facing
+    // empty-state telling them to contact the dashboard owner.
+    if (this.getMissingFields(visual).length > 0) return false;
     if (is3DCoordinateChartType(visual.chartType)) {
       return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);
     }
@@ -449,25 +514,16 @@ export class ViewDashboardComponent
   }
 
   getDisplayData(visual: Visual): any {
-    if (visual?.chartData?.length) {
-      return visual.chartData;
-    }
-    return getDummyData(visual?.chartType || '');
+    // Always return the real (possibly empty) data. Dummy/sample
+    // rows were removed from the runtime path because they triggered
+    // misleading tooltips on phantom values and persisted after the
+    // underlying column was deleted. Empty-state UX is owned by the
+    // template's missing-field and no-config branches.
+    return visual?.chartData ?? [];
   }
 
   trackByVisualId(index: number, visual: Visual): string {
     return visual.id;
-  }
-
-  // ── Filter Sidebar ──
-
-  toggleFilterSidebar(): void {
-    this.isFilterSidebarOpen = !this.isFilterSidebarOpen;
-    // Recalculate after sidebar transition completes
-    setTimeout(() => {
-      this.updateCanvasDimensions();
-      this.recalculateAllVisualDimensions();
-    }, 350);
   }
 
   // ── Navigation ──

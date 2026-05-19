@@ -5,6 +5,7 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   Output,
   SimpleChanges,
@@ -66,12 +67,47 @@ export type FilterFetcher = (args: {
   styleUrls: ['./analysis-filter-bar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AnalysisFilterBarComponent implements OnInit, OnChanges {
+export class AnalysisFilterBarComponent
+  implements OnInit, OnChanges, OnDestroy
+{
   // ── Shared inputs ────────────────────────────────────────────────
   @Input() orgId!: string;
   @Input() analysisId!: string;
   @Output() filtersApplied = new EventEmitter<any[]>();
   @Output() filtersCleared = new EventEmitter<void>();
+
+  /**
+   * When set to a positive integer, switches the bar into "overflow"
+   * mode: the first `maxVisible` enabled filters render inline; the
+   * rest collapse behind a "More filters" overlay button. Set to 0
+   * or leave undefined to render every filter inline (the default,
+   * used by the Edit Analysis sidebar).
+   *
+   * The split is purely cosmetic — every filter still binds its
+   * own ngModel, so changing a value behind the overflow panel
+   * still triggers a re-query when Apply is clicked. There's no
+   * notion of "secondary filters" beyond visibility.
+   */
+  @Input() maxVisible: number | null = null;
+
+  /**
+   * Auto-apply mode. When true, any value change emits filtersApplied
+   * after a short debounce — no Apply button click required. Used by
+   * the dashboard surface where viewers want immediate feedback as
+   * they change values. The Edit Analysis usage keeps the default
+   * (false), where users build up a multi-filter selection and
+   * commit it with the Apply button.
+   *
+   * Debounce avoids firing one query per keystroke for text/numeric
+   * inputs while still feeling instant for clicks on dropdowns.
+   */
+  @Input() autoApply: boolean = false;
+
+  /** Debounce window for autoApply, in ms. 300ms is the sweet spot —
+   *  fast enough to feel live, slow enough to coalesce a multiselect
+   *  user-click + click-away sequence into one query. */
+  private static readonly AUTO_APPLY_DEBOUNCE_MS = 300;
+  private autoApplyTimer: any = null;
 
   // ── Hosted-mode inputs ───────────────────────────────────────────
   /** When present, switches into hosted mode and the bar stops calling
@@ -113,6 +149,45 @@ export class AnalysisFilterBarComponent implements OnInit, OnChanges {
     return this.serviceMode ? this.internalFilters : this.filters ?? [];
   }
 
+  /**
+   * Filters that render inline in the bar. When maxVisible is unset
+   * or zero, every visible filter qualifies (legacy behaviour).
+   * Otherwise we slice off the first N to keep the bar from wrapping
+   * past the toolbar's height.
+   */
+  get primaryFilters(): any[] {
+    const all = this.visibleFilters;
+    const cap = this.maxVisible ?? 0;
+    if (!cap || cap <= 0) return all;
+    return all.slice(0, cap);
+  }
+
+  /**
+   * Filters that live behind the "More filters" overflow button.
+   * Empty unless maxVisible is set AND there are more filters than
+   * the cap.
+   */
+  get overflowFilters(): any[] {
+    const all = this.visibleFilters;
+    const cap = this.maxVisible ?? 0;
+    if (!cap || cap <= 0) return [];
+    return all.slice(cap);
+  }
+
+  /**
+   * Count of overflow filters that already have a value applied —
+   * surfaces as a small numeric badge on the "More filters" button
+   * so users notice when hidden filters are constraining their data.
+   */
+  get overflowAppliedCount(): number {
+    return this.overflowFilters.reduce((n, f) => {
+      const v = this.appliedValues[f.id];
+      if (v === null || v === undefined || v === '') return n;
+      if (Array.isArray(v) && v.length === 0) return n;
+      return n + 1;
+    }, 0);
+  }
+
   /** Per-filter state in whichever mode is active. */
   private resolveState(filterId: string): FilterUiState | null {
     if (this.serviceMode) return this.internalState[filterId] ?? null;
@@ -121,6 +196,16 @@ export class AnalysisFilterBarComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     if (this.serviceMode) this.loadFilters();
+  }
+
+  ngOnDestroy(): void {
+    // Clear any pending auto-apply timer so an emit doesn't fire
+    // after the component is torn down (e.g. the user navigated
+    // away during the debounce window).
+    if (this.autoApplyTimer) {
+      clearTimeout(this.autoApplyTimer);
+      this.autoApplyTimer = null;
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -376,6 +461,24 @@ export class AnalysisFilterBarComponent implements OnInit, OnChanges {
 
   onFilterChange(filter: any, value: any): void {
     this.appliedValues[filter.id] = value;
+    // In auto-apply mode (dashboard) a value change re-emits filters
+    // after a short debounce. We do NOT touch the existing Apply
+    // button flow — applyFilters() works the same regardless of
+    // mode; auto-apply just calls it for the user.
+    if (this.autoApply) {
+      this.scheduleAutoApply();
+    }
+  }
+
+  /** Schedule a debounced auto-apply. Successive value changes within
+   *  the debounce window reset the timer, so a flurry of edits coalesces
+   *  into a single query. Idempotent. */
+  private scheduleAutoApply(): void {
+    if (this.autoApplyTimer) clearTimeout(this.autoApplyTimer);
+    this.autoApplyTimer = setTimeout(
+      () => this.applyFilters(),
+      AnalysisFilterBarComponent.AUTO_APPLY_DEBOUNCE_MS,
+    );
   }
 
   applyFilters(): void {

@@ -9,6 +9,13 @@
       border-radius: var(--radius-lg);
       overflow: hidden;
       box-shadow: 0 20px 60px var(--overlay-background);
+      // Cap height at 90vh so a tall form (range + null handling +
+      // many defaults) doesn't push the footer off screen. The
+      // header and footer stay sticky; only .p-dialog-content
+      // scrolls (see content rule below).
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
     }
 
     // Header — icon-led, two-line title + subtitle. Matches the
@@ -81,10 +88,31 @@
 
     // Body — generous-but-not-loose padding. The form gap is the
     // primary spacing lever; padding handles the outer edge only.
+    // Scrolls vertically when content exceeds the available space
+    // (the dialog as a whole is capped at 90vh above). Header and
+    // footer remain sticky around it.
     .p-dialog-content {
       padding: var(--space-8);
       background: var(--card-background);
-      overflow: visible;
+      overflow-y: auto;
+      overflow-x: hidden;
+      flex: 1;
+      min-height: 0;
+
+      // Thin custom scrollbar to match the rest of the app.
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: var(--radius-xs);
+        &:hover {
+          background: var(--border-strong, var(--secondary-color));
+        }
+      }
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
     }
 
     // Footer — quiet. No tinted fill, no leading icon on Cancel,

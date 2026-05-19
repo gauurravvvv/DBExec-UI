@@ -1,6 +1,11 @@
 <div class="view-category-wrapper">
   <div class="view-category-container">
-    <!-- Header Section -->
+    <!-- Page header — title on the left, toolbar actions on the right.
+         The filter-toggle button mirrors the segmented-toolbar pattern
+         used by Edit Analysis (left sidebar opened/closed by an icon
+         button in the toolbar), so cross-module navigation feels the
+         same. Refresh sits next to it as the second "operate the
+         dashboard" control. -->
     <div class="page-header">
       <div class="left-section">
         <button
@@ -26,26 +31,37 @@
         </span>
       </div>
       <div class="header-actions">
+        <!--
+          Filter-panel toggle — icon-only, segmented-button feel.
+          Active state when the sidebar is open. Hidden when the
+          analysis has zero filters configured (nothing to show).
+        -->
         <button
-          pButton
-          class="p-button-text btn-icon"
-          [class.active]="isFilterSidebarOpen"
+          type="button"
+          class="header-icon-btn"
+          [class.is-active]="isFilterSidebarOpen"
           (click)="toggleFilterSidebar()"
           *ngIf="filters.length > 0"
-          [title]="'DASHBOARD.TOGGLE_FILTERS' | translate"
+          [pTooltip]="'DASHBOARD.FILTERS' | translate"
+          tooltipPosition="bottom"
+          [attr.aria-label]="'DASHBOARD.FILTERS' | translate"
+          [attr.aria-expanded]="isFilterSidebarOpen"
         >
           <i class="pi pi-filter"></i>
         </button>
         <button
-          class="btn-secondary"
+          type="button"
+          class="header-icon-btn"
           (click)="onRefresh()"
           [disabled]="isDataLoading()"
+          [pTooltip]="'DASHBOARD.REFRESH_DATA_TOOLTIP' | translate"
+          tooltipPosition="bottom"
+          [attr.aria-label]="'DASHBOARD.REFRESH_DATA_TOOLTIP' | translate"
         >
           <i
             class="pi"
             [ngClass]="isDataLoading() ? 'pi-spin pi-spinner' : 'pi-refresh'"
           ></i>
-          {{ 'COMMON.REFRESH' | translate }}
         </button>
       </div>
     </div>
@@ -56,9 +72,21 @@
       <p>{{ 'DASHBOARD.LOADING_DASHBOARD' | translate }}</p>
     </div>
 
-    <!-- Content Section -->
+    <!-- Content Section — sidebar on the left, canvas filling the rest. -->
     <div class="content-section" *ngIf="!loading() && dashboard">
-      <!-- Filter Sidebar -->
+      <!--
+        Filter sidebar — mirrors the Edit Analysis chrome (260px panel,
+        sticky header with title + count badge, divider, scrollable
+        content). When collapsed, the sidebar slides out to zero-width
+        so the canvas takes the full row.
+
+        Inside, we render the shared analysis-filter-bar with
+        [autoApply]=true so any value change debounces and re-emits
+        filtersApplied automatically — no separate "Apply" button to
+        hunt for. The bar's chips render vertically (one per row)
+        because we override its native horizontal flex via ::ng-deep
+        in this component's SCSS (see .filter-sidebar override block).
+      -->
       <div
         class="filter-sidebar"
         [class.collapsed]="!isFilterSidebarOpen"
@@ -66,8 +94,10 @@
       >
         <div class="sidebar-content">
           <div class="sidebar-header-info">
-            <div class="sidebar-label">{{ 'DASHBOARD.FILTERS' | translate }}</div>
-            <span class="filter-count-badge" *ngIf="filters.length > 0">
+            <div class="dataset-label">
+              {{ 'DASHBOARD.FILTERS' | translate }}
+            </div>
+            <span class="visual-count-badge" *ngIf="filters.length > 0">
               {{ filters.length }}
             </span>
           </div>
@@ -75,7 +105,8 @@
           <div class="sidebar-content-inner">
             <app-analysis-filter-bar
               [orgId]="orgId"
-              [analysisId]="dashboard.analysisId"
+              [analysisId]="dashboard?.analysisId"
+              [autoApply]="true"
               (filtersApplied)="onFiltersApplied($event)"
               (filtersCleared)="onFiltersCleared()"
             ></app-analysis-filter-bar>
@@ -132,6 +163,38 @@
                 </div>
               </div>
 
+              <!--
+                Missing-field placeholder — viewer-facing variant.
+                Shown when a saved visual references a column that no
+                longer exists (custom field deleted, dataset SQL
+                edited, column renamed). The dashboard viewer can't
+                edit the visual config themselves, so the message
+                tells them to contact the dashboard owner rather than
+                offering a re-map button (the edit-analyses surface
+                has that button).
+              -->
+              <div
+                class="visual-content-placeholder visual-content-placeholder--missing-field"
+                *ngIf="
+                  !visual.loading &&
+                  !visual.error &&
+                  visual.loaded &&
+                  visual.chartType &&
+                  getMissingFields(visual).length > 0
+                "
+              >
+                <div class="placeholder-icon-wrap">
+                  <i class="pi pi-exclamation-triangle"></i>
+                </div>
+                <p>{{ 'DASHBOARD.VISUAL_FIELD_MISSING' | translate }}</p>
+                <small>
+                  {{
+                    'DASHBOARD.VISUAL_FIELD_MISSING_DESC_VIEWER'
+                      | translate: { fields: getMissingFields(visual).join(', ') }
+                  }}
+                </small>
+              </div>
+
               <!-- No Config -->
               <div
                 class="visual-content-placeholder"
@@ -139,6 +202,7 @@
                   !visual.loading &&
                   !visual.error &&
                   visual.loaded &&
+                  getMissingFields(visual).length === 0 &&
                   (!visual.chartType || !hasRequiredChartFields(visual))
                 "
               >
@@ -181,24 +245,14 @@
                 </ng-template>
               </ng-container>
 
-              <!-- Globe Charts (show with dummy data when no mapping) -->
-              <ng-container
-                *ngIf="
-                  !visual.loading &&
-                  !visual.error &&
-                  !hasRequiredChartFields(visual) &&
-                  visual.chartType &&
-                  isGlobeSpecialType(visual.chartType)
-                "
-              >
-                <app-echart-visual
-                  [chartType]="visual.chartType!"
-                  [chartConfig]="visual.config"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [data]="getDisplayData(visual)"
-                ></app-echart-visual>
-              </ng-container>
+<!--
+                Globe / 3D-line charts previously had a special path to
+                render with dummy data when no field mapping existed.
+                Removed because the dummy rows triggered tooltips on
+                phantom values. These charts now follow the same
+                "no axes mapped → empty state" rule as everything
+                else; the placeholder branches above handle the UX.
+              -->
             </div>
           </div>
         </div>

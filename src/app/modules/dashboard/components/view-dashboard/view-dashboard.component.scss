@@ -8,8 +8,11 @@
     display: flex;
     flex-direction: column;
 
+    // Title row — thin, identity-only. Actions moved to the filter
+     // row below so the header reads as "you are here", not as a
+     // toolbar competing with the data for attention.
     .page-header {
-      padding: var(--space-7);
+      padding: var(--space-5) var(--space-7);
       border-bottom: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
@@ -43,15 +46,15 @@
 
         h2 {
           margin: var(--space-0);
-          font-size: var(--fs-h1);
+          font-size: var(--fs-h2);
           font-weight: var(--fw-semibold);
           color: var(--text-color);
         }
       }
 
       .back-button {
-        width: 36px !important;
-        height: 36px !important;
+        width: 32px !important;
+        height: 32px !important;
         border-radius: 50% !important;
         display: flex !important;
         align-items: center !important;
@@ -65,65 +68,53 @@
         }
       }
 
+      // Right-side toolbar actions: filter-toggle + refresh.
+      // Icon-only, segmented-style — the visual rhythm matches
+      // Edit Analysis's toolbar so users feel at home moving
+      // between modules.
       .header-actions {
         display: flex;
-        gap: var(--space-4);
+        gap: var(--space-3);
         align-items: center;
+      }
 
-        button {
-          display: inline-flex;
-          align-items: center;
-          gap: var(--space-4);
-          border-radius: var(--radius-sm);
-          font-weight: var(--fw-semibold);
-          font-size: var(--fs-body);
-          cursor: pointer;
-          transition: all var(--motion-base) ease;
-          border: none;
+      .header-icon-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--secondary-color);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--motion-base) ease;
 
-          &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-          }
+        i {
+          font-size: var(--fs-control);
         }
 
-        .btn-icon {
-          width: 36px;
-          height: 36px;
-          padding: var(--space-0);
-          justify-content: center;
-          background: transparent;
-          color: var(--text-color);
-          border-radius: var(--radius-sm);
-
-          &:hover {
-            background: var(--hover-background);
-          }
-
-          &.active {
-            background: rgba(var(--primary-color-rgb), 0.1);
-            color: var(--primary-color);
-
-            i {
-              color: var(--primary-color) !important;
-            }
-          }
-
-          i {
-            font-size: var(--fs-h3);
-            color: var(--text-color) !important;
-          }
-        }
-
-        .btn-secondary {
-          padding: 8px 18px;
+        &:hover:not(:disabled) {
+          color: var(--primary-color);
           background: var(--hover-background);
-          color: var(--text-color);
-          border: 1px solid var(--border-color);
+          border-color: var(--border-color);
+        }
 
-          &:hover:not(:disabled) {
-            background: var(--border-color);
-          }
+        &.is-active {
+          color: var(--primary-color);
+          background: var(--primary-color-transparent);
+          border-color: var(--primary-color);
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        &:focus-visible {
+          outline: 2px solid var(--primary-color);
+          outline-offset: 2px;
         }
       }
     }
@@ -150,6 +141,10 @@
     }
 
     .content-section {
+      // Two children: collapsible filter sidebar on the left,
+      // canvas on the right. Row direction places them side-by-side.
+      // When the sidebar is collapsed (width: 0), the canvas takes
+      // the full row.
       flex: 1;
       overflow: hidden;
       display: flex;
@@ -181,23 +176,34 @@
 }
 
 // ===================================================================
-// Filter Sidebar — matching edit-analyses sidebar pattern
+// Filter sidebar — mirrors Edit Analysis pattern
 // ===================================================================
+// 260px collapsible left panel. Header (title + count badge),
+// divider, scrollable content. When collapsed, slides out to
+// width: 0 so the canvas takes the full row. Animation matches
+// the toolbar's filter-toggle button so the interaction reads
+// as a single coherent gesture.
+//
+// The inner analysis-filter-bar is forced to render vertically
+// via the ::ng-deep override block at the bottom of this file —
+// the bar is horizontal by default (intended for top-bar usage
+// from earlier iterations), but inside a 260px sidebar each chip
+// gets a full row.
 .filter-sidebar {
   width: 260px;
   min-width: 260px;
-  background-color: var(--card-background);
-  border-right: 2px solid var(--border-color);
+  background: var(--card-background);
+  border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   transition: all var(--motion-slow) ease;
   overflow: hidden;
+  flex-shrink: 0;
 
   &.collapsed {
     width: 0;
     min-width: 0;
     border-right: none;
-    overflow: hidden;
   }
 
   .sidebar-content {
@@ -205,7 +211,7 @@
     flex-direction: column;
     flex: 1;
     overflow: hidden;
-    min-width: 260px;
+    min-width: 260px; // hold inner content width during slide-out animation
   }
 
   .sidebar-header-info {
@@ -218,15 +224,15 @@
     align-items: center;
     justify-content: space-between;
 
-    .sidebar-label {
+    .dataset-label {
       font-size: var(--fs-body);
       font-weight: var(--fw-semibold);
       color: var(--secondary-color);
       letter-spacing: 0.5px;
-      margin: var(--space-0);
+      margin: 0;
     }
 
-    .filter-count-badge {
+    .visual-count-badge {
       background-color: var(--primary-color);
       color: var(--primary-text);
       font-size: var(--fs-micro);
@@ -249,65 +255,6 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-  }
-}
-
-// Override filter-bar layout to be vertical inside sidebar
-:host ::ng-deep {
-  .filter-sidebar {
-    .filter-bar {
-      flex-direction: column;
-      align-items: stretch;
-      padding: var(--space-0);
-      border-bottom: none;
-      gap: var(--space-0);
-      height: 100%;
-      overflow: hidden;
-    }
-
-    .filter-controls {
-      flex-direction: column;
-      align-items: stretch;
-      gap: var(--space-5);
-      padding: var(--space-5);
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-
-      &::-webkit-scrollbar {
-        width: 6px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background: transparent;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: var(--border-color);
-        border-radius: var(--radius-xs);
-
-        &:hover {
-          background: var(--secondary-color);
-        }
-      }
-    }
-
-    .filter-control {
-      min-width: 0;
-      max-width: none;
-      width: 100%;
-    }
-
-    .filter-actions {
-      flex-shrink: 0;
-      padding: var(--space-5);
-      border-top: 1px solid var(--border-color);
-      background: var(--card-background);
-
-      button {
-        flex: 1;
-      }
-    }
   }
 }
 
@@ -464,6 +411,8 @@
   height: 100%;
   gap: var(--space-4);
   color: var(--secondary-color);
+  padding: var(--space-5);
+  text-align: center;
 
   .placeholder-icon-wrap {
     i {
@@ -475,6 +424,30 @@
   p {
     margin: var(--space-0);
     font-size: var(--fs-control);
+  }
+
+  small {
+    font-size: var(--fs-micro);
+    color: var(--secondary-color);
+    line-height: var(--lh-snug);
+    max-width: 320px;
+  }
+
+  // Missing-field variant — amber chrome so viewers register this
+  // as "something's wrong with the source data" rather than "chart
+  // not configured yet". Mirrors the edit-analyses variant so
+  // viewers and owners see consistent visual language for the same
+  // underlying problem.
+  &--missing-field {
+    .placeholder-icon-wrap i {
+      color: var(--warning-color, #b45309);
+      opacity: 1;
+    }
+
+    > p {
+      color: var(--warning-color, #b45309);
+      font-weight: var(--fw-semibold);
+    }
   }
 }
 
@@ -537,23 +510,76 @@
   }
 }
 
-// Filter sidebar in dashboard view — match the analyses panel chrome
-.filter-sidebar {
-  border-right: 1px solid var(--border-color) !important;
+// ===================================================================
+// Inner analysis-filter-bar overrides inside the dashboard sidebar
+// ===================================================================
+// The shared bar renders chips horizontally with flex-wrap by default
+// (designed for a top-bar layout used in earlier iterations). Inside
+// our 260px sidebar each chip needs its own row, so we override the
+// bar's flex direction and reset its container padding. ::ng-deep
+// pierces the bar's emulated encapsulation; scoping to .filter-sidebar
+// keeps the override surgical — other consumers (Edit Analysis,
+// view-analyses) are unaffected.
+:host ::ng-deep .filter-sidebar {
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+    border-bottom: none;
+    background: transparent;
+    gap: 0;
+    height: 100%;
+    overflow: hidden;
+  }
 
-  .sidebar-header-info {
-    height: 40px;
-    padding: 0 var(--space-5) !important;
-    background: transparent !important;
-    border-bottom: 1px solid var(--border-color);
+  .filter-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-5);
+    padding: var(--space-5);
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
 
-    .dataset-label {
-      font-size: var(--fs-label);
-      font-weight: var(--fw-semibold);
-      color: var(--text-muted);
-      text-transform: none;
-      letter-spacing: 0;
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: var(--radius-xs);
+
+      &:hover {
+        background: var(--secondary-color);
+      }
+    }
+  }
+
+  // Each filter chip takes the full sidebar width — no min/max
+  // cap that would create awkward dead space.
+  .filter-control {
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+  }
+
+  // Filter actions (Clear button — Apply is hidden in autoApply
+  // mode) pinned to the bottom with a divider so they don't scroll
+  // away when the user has many filters.
+  .filter-actions {
+    flex-shrink: 0;
+    padding: var(--space-5);
+    border-top: 1px solid var(--border-color);
+    background: var(--card-background);
+
+    button {
+      flex: 1;
     }
   }
 }
+
 

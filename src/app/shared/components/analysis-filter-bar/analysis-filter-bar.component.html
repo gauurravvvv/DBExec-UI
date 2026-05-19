@@ -1,6 +1,65 @@
 <div class="filter-bar" *ngIf="visibleFilters.length > 0">
   <div class="filter-controls">
-    <ng-container *ngFor="let filter of visibleFilters; trackBy: trackById">
+    <!-- Primary (inline) filters. When maxVisible is unset, this is
+         every filter — the legacy sidebar usage. When maxVisible is
+         set (dashboard top-bar usage), it's the first N; the rest go
+         into the overflow overlay below. -->
+    <ng-container
+      *ngFor="let filter of primaryFilters; trackBy: trackById"
+    >
+      <ng-container
+        *ngTemplateOutlet="filterChip; context: { $implicit: filter }"
+      ></ng-container>
+    </ng-container>
+
+    <!-- "More filters" button — visible only when there's overflow.
+         Opens a small overlay panel that hosts the same chip template
+         used inline above, so every chip type (dropdown / multi / range
+         / date / slider / text) renders identically whether it's
+         primary or overflow. -->
+    <button
+      *ngIf="overflowFilters.length > 0"
+      type="button"
+      class="filter-overflow-btn"
+      (click)="overflowPanel.toggle($event)"
+      [attr.aria-label]="'ANALYSES.FILTER_MORE' | translate"
+    >
+      <i class="pi pi-sliders-h"></i>
+      <span>{{ 'ANALYSES.FILTER_MORE' | translate }}</span>
+      <span class="overflow-count">+{{ overflowFilters.length }}</span>
+      <span class="overflow-applied" *ngIf="overflowAppliedCount > 0">
+        {{ overflowAppliedCount }}
+      </span>
+    </button>
+
+    <p-overlayPanel
+      #overflowPanel
+      [dismissable]="true"
+      [showCloseIcon]="false"
+      styleClass="filter-overflow-panel"
+      appendTo="body"
+    >
+      <ng-template pTemplate="content">
+        <div class="filter-overflow-list">
+          <ng-container
+            *ngFor="let filter of overflowFilters; trackBy: trackById"
+          >
+            <ng-container
+              *ngTemplateOutlet="
+                filterChip;
+                context: { $implicit: filter }
+              "
+            ></ng-container>
+          </ng-container>
+        </div>
+      </ng-template>
+    </p-overlayPanel>
+
+    <!-- Per-filter chip template — single source of truth for how each
+         filter renders. Used by both primary (inline) and overflow
+         (overlay) iterators above so the two paths stay in sync.
+         `let-filter` shadows the outer-scope `filter` from the *ngFor. -->
+    <ng-template #filterChip let-filter>
       <!-- Column-missing empty state.
            If the BE flagged the target column as no longer in the
            dataset SQL output, the dropdown can't render — replace it
@@ -215,11 +274,21 @@
         >
         </app-custom-input>
       </div>
-    </ng-container>
+    </ng-template>
   </div>
 
+  <!--
+    Action buttons. In autoApply mode (dashboard) the Apply button is
+    redundant — value changes are debounced and emit automatically —
+    so we hide it. Clear is always visible so users discover the
+    feature, but it's disabled until at least one filter has a value.
+    The disabled-but-visible pattern (vs *ngIf hide) is intentional:
+    the button "popping in" only when active values exist confuses
+    first-time viewers who never see it on a fresh dashboard.
+  -->
   <div class="filter-actions">
     <button
+      *ngIf="!autoApply"
       class="btn-apply"
       (click)="applyFilters()"
       [disabled]="!hasActiveFilters"
@@ -230,7 +299,13 @@
     <button
       class="btn-clear"
       (click)="clearFilters()"
-      *ngIf="hasActiveFilters"
+      [disabled]="!hasActiveFilters"
+      [pTooltip]="
+        hasActiveFilters
+          ? ('ANALYSES.FILTER_CLEAR_ALL_TOOLTIP' | translate)
+          : ('ANALYSES.FILTER_CLEAR_NONE_TOOLTIP' | translate)
+      "
+      tooltipPosition="top"
     >
       <i class="pi pi-times"></i>
       {{ 'COMMON.CLEAR' | translate }}

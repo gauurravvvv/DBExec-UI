@@ -91,6 +91,18 @@
       transform: translateY(-1px);
       box-shadow: var(--shadow-md);
     }
+
+    // Disabled state — calm, muted. The button stays visible (so
+    // users discover the Clear feature) but reads as "not available
+    // right now" rather than broken. Box-shadow drops to none and
+    // colour goes muted; parent rule already handles opacity +
+    // cursor.
+    &:disabled {
+      background: var(--hover-background);
+      border-color: var(--border-color);
+      color: var(--secondary-color);
+      box-shadow: none;
+    }
   }
 }
 
@@ -206,6 +218,89 @@
         color: var(--secondary-color);
         line-height: 1.4;
       }
+    }
+  }
+}
+
+// ── Overflow ("More filters") button + panel ──────────────────────
+// Only renders when the consumer sets [maxVisible] and the filter
+// count exceeds that cap. Inline filter chips already use generous
+// vertical space, so the overflow button matches their visual weight
+// rather than the smaller toolbar icons — users should see it as a
+// peer of the inline filters.
+.filter-overflow-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0.55rem 0.9rem;
+  border-radius: var(--radius-sm);
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  font-size: var(--fs-control);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  transition: border-color var(--motion-base) ease,
+    background var(--motion-base) ease;
+  align-self: flex-end;
+  height: 38px;
+
+  &:hover {
+    border-color: var(--primary-color);
+    background: var(--hover-background);
+  }
+
+  i {
+    color: var(--secondary-color);
+    font-size: var(--fs-control);
+  }
+
+  .overflow-count {
+    font-size: var(--fs-micro);
+    color: var(--secondary-color);
+    padding: 1px var(--space-2);
+    border-radius: var(--radius-xs);
+    background: var(--hover-background);
+  }
+
+  // Applied-count badge — primary tint signals "values active behind
+  // this button" so users don't forget that hidden filters are
+  // constraining their data.
+  .overflow-applied {
+    font-size: var(--fs-micro);
+    color: var(--primary-text);
+    background: var(--primary-color);
+    border-radius: var(--radius-pill, 999px);
+    min-width: 18px;
+    height: 18px;
+    padding: 0 var(--space-2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--fw-semibold);
+  }
+}
+
+// PrimeNG overlay panel for the "More filters" content. We render
+// it appendTo='body', so the styling has to be global-ish — but the
+// styleClass scopes it. ::ng-deep is required because the panel is
+// outside this component's encapsulation.
+:host ::ng-deep .filter-overflow-panel {
+  .p-overlaypanel-content {
+    padding: var(--space-5) var(--space-5);
+    max-width: 520px;
+  }
+
+  .filter-overflow-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+
+    .filter-control {
+      // In the overlay, give each filter the full panel width so
+      // dropdowns and date pickers don't feel cramped.
+      max-width: none;
+      width: 100%;
     }
   }
 }
