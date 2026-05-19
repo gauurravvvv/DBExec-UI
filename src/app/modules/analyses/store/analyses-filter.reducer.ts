@@ -15,6 +15,7 @@ import {
   AnalysesFilterState,
   AnalysisFilterLane,
   emptyLane,
+  FILTER_CACHE_CONFIG,
   initialAnalysesFilterState,
   optionsRequestKey,
 } from './analyses-filter.state';
@@ -23,7 +24,7 @@ import {
 // per-filter metadata + option cache + UI flags.
 
 /** Helper — ensures a lane exists, returning the patched state. */
-function withLane<T>(
+function withLane(
   state: AnalysesFilterState,
   analysisId: string,
   patch: (lane: AnalysisFilterLane) => AnalysisFilterLane,
@@ -54,12 +55,21 @@ export const analysesFilterReducer = createReducer(
   })),
 
   // ── Open (list + values) ────────────────────────────────────────
+  // We only flip to 'loading' if the effect will actually fetch.
+  // The effect short-circuits when the lane is already loaded AND
+  // within TTL; reflect the same freshness rule here so the
+  // reducer doesn't strand the lane in 'loading' on a no-op
+  // dispatch. Lanes that ARE stale (or never loaded) move to
+  // 'loading' as expected.
   on(Actions.loadOpen, (state, { analysisId }) =>
-    withLane(state, analysisId, lane => ({
-      ...lane,
-      status: 'loading',
-      loadError: null,
-    })),
+    withLane(state, analysisId, lane => {
+      const fresh =
+        lane.status === 'loaded' &&
+        lane.loadedAt != null &&
+        Date.now() - lane.loadedAt < FILTER_CACHE_CONFIG.TTL_MS;
+      if (fresh) return lane; // No-op — the effect will skip the call.
+      return { ...lane, status: 'loading', loadError: null };
+    }),
   ),
 
   on(Actions.loadOpenSuccess, (state, { analysisId, filters, results }) =>
@@ -77,14 +87,19 @@ export const analysesFilterReducer = createReducer(
           fetchedAt: entry.fetchedAt || now,
         };
         nextOptions[filterId] = perFilter;
-        // If the BE flagged a column-missing error for this filter,
-        // bubble it into the flags slot so the bar renders the
-        // empty-state card without reading deep into options.
         if (entry.error?.code === 'column_missing') {
+          // Surface the missing-column error so the bar can render
+          // the empty-state card without inspecting options.
           nextFlags[filterId] = {
             columnMissing: true,
             errorMessage: entry.error.message,
           };
+        } else if (!entry.error) {
+          // Heal a previously-set flag — a fresh successful fetch
+          // means the column is back / the error has resolved.
+          // Without this, a column that got dropped and then
+          // restored would keep showing the error card.
+          if (nextFlags[filterId]) delete nextFlags[filterId];
         }
       }
       return {
@@ -123,6 +138,9 @@ export const analysesFilterReducer = createReducer(
             columnMissing: true,
             errorMessage: entry.error.message,
           };
+        } else if (!entry.error && nextFlags[filterId]) {
+          // Successful fetch — heal any previously-set error flag.
+          delete nextFlags[filterId];
         }
         return {
           ...lane,

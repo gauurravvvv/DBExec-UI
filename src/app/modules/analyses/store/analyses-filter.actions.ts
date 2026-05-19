@@ -99,16 +99,9 @@ export const markColumnMissing = createAction(
   props<{ analysisId: string; filterId: string; message: string | null }>(),
 );
 
-// ── Applied filters (what the chart query receives) ─────────────────
-
-export const applyFilters = createAction(
-  '[Analyses Filter] Apply Filters',
-  props<{ filters: any[] }>(),
-);
-
-export const clearAppliedFilters = createAction(
-  '[Analyses Filter] Clear Applied Filters',
-);
+// Applied filters (the chart-query payload) live on the existing
+// addAnalyses slice. No action duplication here — see
+// AddAnalysesActions.applyFilters / clearAllFilters.
 
 // ── Edit-side: dialog save / delete fold the BE result back in ──────
 

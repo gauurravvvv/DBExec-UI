@@ -1,10 +1,15 @@
 /**
  * Analyses Filter Slice — selectors.
  *
- * Two-arg selectors (`(state, analysisId)` style) use the props
- * pattern so consumers can target a specific analysis without
- * mutating the active id. Same-result memoisation gives us free
- * OnPush change-detection wins.
+ * IMPORTANT — the factory-style selectors below (`selectLane(id)` and
+ * friends) construct a NEW memoised selector on every call. Components
+ * MUST call them once per subscription (e.g. inside `ngOnInit`) and
+ * cache the returned selector, NOT call them on every template tick
+ * or inside an observable pipe. Repeated factory calls defeat
+ * memoisation and reallocate per-emission, costing OnPush wins.
+ *
+ *   ok:  const sel$ = this.store.select(selectLane(id));   // once
+ *   bad: this.store.select(selectLane(this.id))            // per tick
  */
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import {
@@ -12,9 +17,17 @@ import {
   AnalysesFilterState,
   AnalysisFilterLane,
   emptyLane,
+  FilterFlags,
   FilterOptionsEntry,
   optionsRequestKey,
 } from './analyses-filter.state';
+
+// Frozen default reused across emissions so the no-flags case
+// returns a referentially stable object — important for OnPush.
+const DEFAULT_FLAGS: FilterFlags = Object.freeze({
+  columnMissing: false,
+  errorMessage: null,
+});
 
 const featureSelector = createFeatureSelector<AnalysesFilterState>(
   ANALYSES_FILTER_FEATURE_KEY,
@@ -78,6 +91,5 @@ export const selectFilterStale = (analysisId: string | null, filterId: string) =
 export const selectFilterFlags = (analysisId: string | null, filterId: string) =>
   createSelector(
     selectLane(analysisId),
-    lane =>
-      lane.flags[filterId] ?? { columnMissing: false, errorMessage: null },
+    lane => lane.flags[filterId] ?? DEFAULT_FLAGS,
   );
