@@ -6,14 +6,12 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {
-  getDummyData,
   hasAxisLabels,
   is3DCoordinateChartType,
   isCardChartType,
   isGraphChartType,
   isHeatMapChartType,
   isLines3dChartType,
-  isPolygons3dChartType,
   isSankeyChartType,
   isTableChartType,
 } from '../../constants/charts.constants';
@@ -46,6 +44,22 @@ export class ChartRendererComponent implements OnChanges {
    */
   @Input() configVersion = 0;
 
+  /**
+   * Twin of configVersion for `visual.chartData` mutations. The parent
+   * bumps this whenever the dataset query re-runs and rebuilds
+   * chartData on every visual. Without this kick, OnPush sees the
+   * same `visual` reference and skips CD on this component — the
+   * template never re-reads `visual.chartData` via getDisplayData(),
+   * so the chart stays painted with rows from the previous query
+   * even though the parent already assigned the new data.
+   *
+   * We don't use the value; its mere presence as a changed @Input
+   * forces ngOnChanges to fire, which propagates the new chartData
+   * down to <app-echart-visual> through getDisplayData() in the
+   * template.
+   */
+  @Input() dataVersion = 0;
+
   /** Shallow clone of `visual.config` rebuilt on every configVersion bump. */
   chartConfigRef: any = {};
 
@@ -56,10 +70,6 @@ export class ChartRendererComponent implements OnChanges {
     if (changes['visual'] || changes['configVersion']) {
       this.chartConfigRef = { ...(this.visual?.config ?? {}) };
     }
-  }
-
-  isGlobeSpecialType(chartType: string): boolean {
-    return isLines3dChartType(chartType) || isPolygons3dChartType(chartType);
   }
 
   hasRequiredChartFields(visual: Visual): boolean {
@@ -84,14 +94,11 @@ export class ChartRendererComponent implements OnChanges {
   }
 
   getDisplayData(visual: Visual): any {
-    if (visual?.chartData?.length) {
-      return visual.chartData;
-    }
-    // Tables never show dummy/sample rows — render the real (possibly
-    // empty) dataset so the user sees the actual state of their data.
-    if (isTableChartType(visual?.chartType ?? '')) {
-      return [];
-    }
-    return getDummyData(visual?.chartType ?? '');
+    // Always return the real (possibly empty) data — dummy/sample
+    // rows have been removed from the runtime path because they
+    // misled users (charts looked populated when no real data was
+    // there, and tooltips fired on fake values). The parent
+    // template's empty-state branches own the "no data" UX now.
+    return visual?.chartData ?? [];
   }
 }

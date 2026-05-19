@@ -108,19 +108,6 @@
         ></i>
       </button>
 
-      <!-- Dev-only: render one visual per chart type pre-filled with
-           dummy data, so every chart can be eyeballed without manual
-           field selection. Hidden in production builds. -->
-      <button
-        *ngIf="isDevBuild"
-        type="button"
-        class="a-icon-btn a-icon-btn--dev"
-        (click)="plotAllChartTypes()"
-        pTooltip="DEV: plot every chart type with dummy data"
-        tooltipPosition="bottom"
-      >
-        <i class="pi pi-th-large"></i>
-      </button>
 
       <button
         type="button"
@@ -600,6 +587,48 @@
               <small>{{ 'ANALYSES.CLICK_TO_CONFIGURE' | translate }}</small>
             </div>
 
+            <!--
+              Missing-field placeholder — distinct from the generic
+              "map your axes" prompt below. Shown when the visual is
+              configured (chart type + axis names present) but one or
+              more of those names no longer exist in the rebound data:
+              custom field deleted, dataset SQL edited, column renamed.
+              Catches all four cases via getMissingFields().
+
+              Priority order: this branch wins over the generic
+              "MAP_DATA_FIELDS" branch when both could match, so we
+              don't tell the user to "select an axis" when they
+              already did and the field just disappeared.
+            -->
+            <div
+              class="visual-content-placeholder visual-content-placeholder--missing-field"
+              *ngIf="
+                visual.chartType &&
+                getMissingFields(visual).length > 0 &&
+                !visual.loading &&
+                !visual.error
+              "
+            >
+              <div class="placeholder-icon-wrap">
+                <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+              </div>
+              <p>{{ 'ANALYSES.VISUAL_FIELD_MISSING' | translate }}</p>
+              <small>
+                {{
+                  'ANALYSES.VISUAL_FIELD_MISSING_DESC'
+                    | translate: { fields: getMissingFields(visual).join(', ') }
+                }}
+              </small>
+              <button
+                type="button"
+                class="visual-remap-btn"
+                (click)="openVisualConfigForRemap(visual.id, $event)"
+              >
+                <i class="pi pi-pencil"></i>
+                {{ 'ANALYSES.VISUAL_FIX_FIELD' | translate }}
+              </button>
+            </div>
+
             <!-- Placeholder when chart type selected but fields not mapped -->
             <!-- Not shown for lines3d/polygons3d since they display dummy data immediately -->
             <!-- Not shown for tables — they have no axis mapping and render
@@ -609,6 +638,7 @@
               *ngIf="
                 visual.chartType &&
                 !hasRequiredChartFields(visual) &&
+                getMissingFields(visual).length === 0 &&
                 !isLines3dChartType(visual.chartType) &&
                 !isPolygons3dChartType(visual.chartType) &&
                 !isTableChartType(visual.chartType) &&
@@ -652,16 +682,26 @@
                   [chartWidth]="visual.width"
                   [chartHeight]="visual.height - 35"
                   [configVersion]="chartConfigVersion"
+                  [dataVersion]="chartDataVersion"
                 ></app-chart-renderer>
               </div>
             </ng-container>
           </div>
-          <!-- Hover insights chip — bottom-left, hover-revealed.
-               Shows row count + chart-type for at-a-glance context.
-               Absolutely positioned so it does NOT affect layout. -->
+          <!--
+            Hover insights chip — bottom-left, hover-revealed.
+            Shows row count + chart-type for at-a-glance context.
+            Hidden when the visual is in a missing-field state
+            because the underlying chartData (if any) describes
+            phantom rows that aren't being rendered — surfacing
+            "N rows" would mislead the user about what's on screen.
+          -->
           <div
             class="visual-insights"
-            *ngIf="visual.chartType && (visual.chartData?.length || hasRequiredChartFields(visual))"
+            *ngIf="
+              visual.chartType &&
+              (visual.chartData?.length || hasRequiredChartFields(visual)) &&
+              getMissingFields(visual).length === 0
+            "
           >
             <span class="visual-insights__chunk" *ngIf="visual.chartData?.length">
               <i class="pi pi-database"></i>
@@ -736,6 +776,7 @@
         [chartWidth]="950"
         [chartHeight]="560"
         [configVersion]="chartConfigVersion"
+        [dataVersion]="chartDataVersion"
       ></app-chart-renderer>
     </div>
   </div>

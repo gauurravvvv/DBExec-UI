@@ -20,11 +20,10 @@ import { ANALYSES } from 'src/app/constants/routes';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
-import { environment } from 'src/environments/environment';
 import {
   CHART_TYPES,
   getDefaultChartConfig,
-  getDummyData,
+  getMissingFieldsForVisual,
   hasAxisLabels,
   is3DCoordinateChartType,
   isFlowLinesChartType,
@@ -87,6 +86,16 @@ export class EditAnalysesComponent
    * reaches the inner EchartVisual whose ngDoCheck does the deep diff.
    */
   chartConfigVersion = 0;
+
+  /**
+   * Twin of chartConfigVersion for `visual.chartData` mutations.
+   * Bumped after every transform pass so chart-renderer's OnPush sees
+   * a real @Input change. Without this kick, mutating `visual.chartData`
+   * in-place doesn't propagate — the parent reference (visual) is the
+   * same object and OnPush blocks CD. Symptom before the fix: chart
+   * stayed painted with stale rows after a field-edit re-query.
+   */
+  chartDataVersion = 0;
 
   markDirty(): void {
     this._isDirty = true;
@@ -831,12 +840,26 @@ export class EditAnalysesComponent
       return;
     }
 
+    // Re-transform every loaded visual on every query response. The
+    // previous guard (`!visual.chartData?.length`) skipped visuals
+    // that already had chart data — which was exactly the case that
+    // needs re-transformation after a field edit / formula change.
+    // Without the re-transform, charts kept showing rows from the
+    // previous query even after the new response landed. Skeleton
+    // visuals (loaded=false) are still skipped — their initial
+    // transform fires when they hydrate.
     this.visuals.forEach(visual => {
-      // Only transform visuals that are loaded (not in skeleton state)
-      if (visual.loaded && !visual.chartData?.length) {
+      if (visual.loaded) {
         this.transformSingleVisualChartData(visual);
       }
     });
+
+    // Bump the dataVersion counter so chart-renderer's OnPush
+    // detects a real @Input change and propagates the new chartData
+    // down to <app-echart-visual>. Without this, in-place mutation
+    // of visual.chartData doesn't trigger CD on the OnPush child —
+    // the chart keeps painting rows from the previous query.
+    this.chartDataVersion++;
   }
 
   /**
@@ -1134,7 +1157,24 @@ export class EditAnalysesComponent
         .catch(() => {
           this.cdr.markForCheck();
         });
-      // Re-run dataset query so the new field's computed values are available
+
+      // Field edits can change the values produced by the column even
+      // when the column key stays the same (BE doesn't allow renaming
+      // columnToUse). Drop the filter store lane so any filter that
+      // pulls distinct values from this column re-fetches options on
+      // the next sidebar open. Cheap; only affects filter dropdowns.
+      if (this.analysisId) {
+        this.store.dispatch(
+          AnalysesFilterActions.invalidateAnalysis({
+            analysisId: this.analysisId,
+          }),
+        );
+      }
+
+      // Re-run dataset query so the new field's computed values are
+      // available. getMissingFields() will sustain the missing-field
+      // empty-state on visuals that reference a column the BE no
+      // longer projects (e.g. dataset-level custom field deleted).
       this.loadDatasetData();
     }
   }
@@ -1151,13 +1191,16 @@ export class EditAnalysesComponent
 
   proceedDeleteField(): void {
     if (!this.fieldToDelete) return;
+    // Capture the doomed column key BEFORE the entity reference is
+    // cleared, so the post-delete cleanup below can compare against it.
+    const deletedColumnKey = this.fieldToDelete.columnToUse;
     this.datasetService
       .deleteDatasetField(this.orgId, this.datasetId, this.fieldToDelete.id)
       .then((response: any) => {
         if (this.globalService.handleSuccessService(response, true)) {
           this.fieldToDelete = null;
           this.showDeleteFieldConfirm = false;
-          this.loadAnalysisFields();
+          this.handleFieldDeleted(deletedColumnKey);
         } else {
           // Keep dialog open so user sees context; toast shows the API error
           this.showDeleteFieldConfirm = false;
@@ -1167,6 +1210,62 @@ export class EditAnalysesComponent
         console.error('Error deleting field:', error);
         this.showDeleteFieldConfirm = false;
       });
+  }
+
+  /**
+   * Post-delete cleanup that propagates a field deletion across the
+   * surfaces that cache its value or reference its column key. Without
+   * this, the user only sees the change after a page reload — the
+   * sidebar updates from loadAnalysisFields() but the canvas keeps
+   * showing the old chart because rawGraphData still has the deleted
+   * column in its projection.
+   *
+   * Steps, in order:
+   *  1. Refresh the field lists (sidebar + custom-field dialog options)
+   *  2. Eagerly clear chartData on any visual that was bound to the
+   *     deleted column so the amber missing-field empty-state appears
+   *     immediately, before the network round-trip below completes.
+   *  3. Invalidate the analyses-filter store lane so saved filters
+   *     referencing the deleted column will surface their
+   *     column_missing warning the next time the sidebar opens.
+   *  4. Re-run /analyses/run to refresh rawGraphData with the new
+     *     (deleted-column-absent) projection. getMissingFields() then
+     *     correctly returns the deleted column name on affected
+     *     visuals, sustaining the empty-state across future renders.
+   */
+  private handleFieldDeleted(deletedColumnKey: string | null | undefined): void {
+    this.loadAnalysisFields();
+
+    if (deletedColumnKey) {
+      // Step 2: eager clear of any visual that referenced the doomed
+      // column. The reference comparison covers all three axis wells.
+      // Bump chartDataVersion so chart-renderer's OnPush picks up the
+      // cleared data; without it the chart would keep painting the
+      // pre-delete rows until the re-run query lands.
+      for (const visual of this.visuals) {
+        if (
+          visual.xAxisColumn === deletedColumnKey ||
+          visual.yAxisColumn === deletedColumnKey ||
+          visual.zAxisColumn === deletedColumnKey
+        ) {
+          visual.chartData = [];
+        }
+      }
+      this.chartDataVersion++;
+      this.cdr.markForCheck();
+    }
+
+    // Step 3: drop the filter store lane so saved filters resync.
+    if (this.analysisId) {
+      this.store.dispatch(
+        AnalysesFilterActions.invalidateAnalysis({
+          analysisId: this.analysisId,
+        }),
+      );
+    }
+
+    // Step 4: refresh dataset rows.
+    this.loadDatasetData();
   }
 
   toggleFieldsPanel(): void {
@@ -1393,58 +1492,6 @@ export class EditAnalysesComponent
     );
   }
 
-  /**
-   * Dev-only — true on local/non-prod builds. Drives the visibility of
-   * the "Plot all charts" debug button so QA/devs can render every
-   * chart type at once with dummy data, without manually picking
-   * fields for each.
-   */
-  get isDevBuild(): boolean {
-    return !environment.production;
-  }
-
-  /**
-   * Append one visual per registered chart type, each pre-filled with
-   * its dummy data so it renders immediately. Used by the dev-only
-   * "Plot all charts" button. Does NOT clear existing visuals — just
-   * appends, so it composes with hand-built layouts during testing.
-   */
-  plotAllChartTypes(): void {
-    this.markDirty();
-    for (const ct of CHART_TYPES) {
-      this.visualCounter++;
-      const visual = createVisual(
-        String(this.visualCounter),
-        getDefaultChartConfig(),
-      );
-      visual.chartType = ct.id;
-      visual.title = ct.name;
-      visual.chartData = getDummyData(ct.id);
-
-      // hasRequiredChartFields() guards the chart-renderer dispatch
-      // and only looks at whether axis columns are truthy — the actual
-      // string values aren't used downstream when the data is already
-      // pre-shaped (echart-visual takes data + chartType only). Stamp
-      // placeholders so the dispatch fires.
-      visual.xAxisColumn = '__dummy_x__';
-      visual.yAxisColumn = '__dummy_y__';
-      visual.zAxisColumn = '__dummy_z__';
-
-      // For tables, override the hidden-columns default so every dummy
-      // column shows immediately — the goal here is to SEE the chart,
-      // not exercise the empty-state.
-      if (isTableChartType(ct.id) && visual.config) {
-        visual.config.tableHiddenColumns = [];
-      }
-      this.visuals.push(visual);
-    }
-    this.placeVisualsOnGrid();
-    this.recalculateAllVisualDimensions();
-    this.focusedVisualId = String(this.visualCounter);
-    this.chartConfigVersion++;
-    this.cdr.markForCheck();
-  }
-
   addVisual(): void {
     this.markDirty();
     this.visualCounter++;
@@ -1588,8 +1635,37 @@ export class EditAnalysesComponent
     return isTableChartType(chartType ?? null);
   }
 
+  /**
+   * Returns the list of columns this visual is bound to that no
+   * longer exist in the rebound data. Empty array = everything maps.
+   *
+   * Why this matters: when a custom field is deleted, the dataset
+   * SQL is edited, or a column gets renamed, the visual's saved
+   * xAxisColumn / yAxisColumn / zAxisColumn strings still point at
+   * the dead name. Without this guard, the chart renderer falls
+   * through to dummy data and the user sees a misleading bar (one
+   * "(empty)" category, height equal to row count). Surface a clear
+   * empty state instead.
+   *
+   * We use rawGraphData[0] as the sample row — every row in the
+   * /analyses/run projection has the same shape, so one row is
+   * enough to enumerate available columns. When rawGraphData is
+   * empty (load failure, no rows), the helper returns [] so we
+   * fall through to the chart's own empty-state handling rather
+   * than flagging a false positive.
+   */
+  getMissingFields(visual: any): string[] {
+    const sample = this.rawGraphData?.[0];
+    return getMissingFieldsForVisual(visual, sample);
+  }
+
   hasRequiredChartFields(visual: any): boolean {
     if (!visual.chartType) return false;
+    // A column saved on the visual no longer exists in the rebound
+    // data → not "configured", regardless of whether the bound names
+    // are non-empty strings. The template uses this to swap chart
+    // render for a re-map prompt.
+    if (this.getMissingFields(visual).length > 0) return false;
     // 3D coordinate charts need x + y + z
     if (is3DCoordinateChartType(visual.chartType)) {
       return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);
@@ -1662,6 +1738,19 @@ export class EditAnalysesComponent
     if (this.isResizing) return;
     event.stopPropagation();
     this.focusedVisualId = this.focusedVisualId === id ? null : id;
+  }
+
+  /**
+   * Triggered from the missing-field empty-state's "Re-map field"
+   * button. Same as opening the chart config sidebar via right-click,
+   * but spelled as its own method so the call site reads clearly and
+   * we control exactly what happens (focus this visual + open the
+   * config panel) without relying on click bubbling.
+   */
+  openVisualConfigForRemap(id: string, event: MouseEvent): void {
+    event.stopPropagation();
+    this.focusedVisualId = id;
+    this.isConfigSidebarOpen = true;
   }
 
   onVisualRightClick(event: MouseEvent, id: string): void {

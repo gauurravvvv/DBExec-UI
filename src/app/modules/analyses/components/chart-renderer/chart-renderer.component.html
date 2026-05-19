@@ -38,20 +38,12 @@
   </ng-template>
 </ng-container>
 
-<!-- Globe charts: show with dummy data (no field mapping required) -->
-<ng-container
-  *ngIf="
-    visual.chartType &&
-    !isTableChartType(visual.chartType) &&
-    !hasRequiredChartFields(visual) &&
-    isGlobeSpecialType(visual.chartType)
-  "
->
-  <app-echart-visual
-    [chartType]="visual.chartType!"
-    [chartConfig]="chartConfigRef"
-    [chartWidth]="chartWidth"
-    [chartHeight]="chartHeight"
-    [data]="getDisplayData(visual)"
-  ></app-echart-visual>
-</ng-container>
+<!--
+  Globe / 3D-line charts previously had a "render with dummy data
+  when no field mapping" path so users could see the chart shape
+  before mapping. That path was removed because dummy data was
+  triggering misleading tooltips and persisting after columns were
+  deleted. These charts now follow the standard "no axes → empty
+  state" rule like every other chart type.
+-->
+

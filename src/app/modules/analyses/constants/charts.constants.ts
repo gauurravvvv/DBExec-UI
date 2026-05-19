@@ -1897,13 +1897,18 @@ export const DUMMY_CHART_DATA: { [chartType: string]: any } = {
   'flow-lines': FLOW_LINES_DATA,
 };
 
-/**
- * Returns the appropriate dummy data for a given chart type.
- * Falls back to single-series data if the chart type is not recognized.
- */
-export function getDummyData(chartType: string): any {
-  return DUMMY_CHART_DATA[chartType] ?? SINGLE_SERIES_DATA;
-}
+// getDummyData() was removed — it was used to populate charts with
+// sample rows when no real data was bound, which silently misled
+// users (tooltips fired on phantom values, "Plot all charts" dev
+// button persisted, charts looked populated after their source
+// column was deleted). Empty-state UX is now owned by template
+// branches in chart-renderer + view-dashboard.
+//
+// DUMMY_CHART_DATA below is kept (large constant, only referenced
+// internally) for any future testing-only path. If you need to seed
+// a chart with sample data, import the constant directly and wire
+// it through a test-only code path — do not expose it as a runtime
+// fallback again.
 
 // Chart type arrays for helper functions
 const BAR_CHART_TYPES = [
@@ -2436,4 +2441,45 @@ export function supportsAnimation(chartType: string | null): boolean {
 // Get a fresh copy of default chart config
 export function getDefaultChartConfig(): any {
   return { ...DEFAULT_CHART_CONFIG };
+}
+
+// =====================================================================
+// Missing-field detection for saved visuals
+// ---------------------------------------------------------------------
+// A visual stores xAxisColumn / yAxisColumn / zAxisColumn as plain
+// strings. When the underlying field is deleted (custom field removed,
+// dataset SQL edited so the column is no longer projected, field
+// renamed), the visual's saved config still references the dead name.
+// Without a guard, the chart renderer falls through to dummy data and
+// the user sees a misleading bar. This helper enumerates the bound
+// fields whose names are NOT present in the rebound data sample, so
+// callers can surface a clear "field missing" empty state instead of
+// rendering bogus data.
+//
+// Why a sample row instead of the full set: every row in /analyses/run
+// has the same column shape (it's a single SELECT projection), so one
+// row is enough to enumerate available columns. Cheap to compute.
+//
+// Returns the missing names in order: x, y, z. Empty array = all bound
+// fields exist in the data.
+// =====================================================================
+export function getMissingFieldsForVisual(
+  visual: { xAxisColumn?: string | null; yAxisColumn?: string | null; zAxisColumn?: string | null } | null | undefined,
+  sampleRow: any,
+): string[] {
+  if (!visual) return [];
+  // When there's no data at all (query failed, no rows), we can't
+  // tell what columns the query WOULD have produced. Don't flag a
+  // false positive — fall through to the chart's own empty-data
+  // handling instead.
+  if (sampleRow === null || sampleRow === undefined) return [];
+
+  const availableColumns = new Set(Object.keys(sampleRow));
+  const missing: string[] = [];
+
+  for (const col of [visual.xAxisColumn, visual.yAxisColumn, visual.zAxisColumn]) {
+    if (col && !availableColumns.has(col)) missing.push(col);
+  }
+
+  return missing;
 }

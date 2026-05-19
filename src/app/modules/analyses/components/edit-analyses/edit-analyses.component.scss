@@ -4225,3 +4225,66 @@
   transform: translateY(0);
 }
 
+// =====================================================================
+// Missing-field placeholder variant
+// ---------------------------------------------------------------------
+// Shown when a visual is bound to a field that no longer exists in
+// the rebound data (custom field deleted, dataset SQL changed,
+// column renamed). Amber chrome distinguishes it from the neutral
+// "select an axis" empty-state used for unconfigured charts.
+//
+// The variant inherits absolute positioning, flex centring, etc.
+// from .visual-content-placeholder; we only override the colours
+// + add the small re-map button at the bottom.
+// =====================================================================
+.visual-content-placeholder--missing-field {
+  // Icon ring tints amber instead of primary so users register
+  // this as a warning state, not a configuration state.
+  .placeholder-icon-wrap {
+    background: var(--warning-bg, rgba(245, 158, 11, 0.12)) !important;
+
+    > i:not(.ci) {
+      color: var(--warning-color, #b45309) !important;
+    }
+  }
+
+  // The body copy stays muted (it's a description, not the headline)
+  // but the headline `<p>` picks up a warning tint to match the icon.
+  > p {
+    color: var(--warning-color, #b45309) !important;
+    font-weight: var(--fw-semibold);
+  }
+
+  // Re-map button — calm but visible. Mirrors the secondary button
+  // chrome from filter-dialog / add-custom-field so the visual
+  // language stays consistent across action buttons.
+  .visual-remap-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-5);
+    margin-top: var(--space-3);
+    border-radius: var(--radius-sm);
+    background: var(--card-background);
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    font-size: var(--fs-control);
+    font-weight: var(--fw-semibold);
+    cursor: pointer;
+    transition: all var(--motion-base) ease;
+
+    i {
+      font-size: var(--fs-micro);
+    }
+
+    &:hover {
+      background: var(--primary-color-transparent);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
+  }
+}
+
