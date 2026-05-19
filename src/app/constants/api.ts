@@ -213,11 +213,24 @@ export const ANALYSES = {
   VIEW_VISUAL: '/analyses/visual/',
   GET_FIELDS: '/analyses/get/fields/',
   RUN_QUERY: '/analyses/run',
+  // Unified distinct-values lookup — handles raw dataset columns AND
+  // custom fields (dataset-level + analysis-level). Path:
+  // POST /analyses/distinct-values/:orgId/:analysisId  body: { fieldName, search?, page?, pageSize? }
+  DISTINCT_VALUES: '/analyses/distinct-values/',
+  // Single-call bootstrap for the Edit Analysis page — replaces the
+  // legacy VIEW + dataset/get + GET_FIELDS trio. Returns:
+  // { analysis: {id, name, description, datasetId, datasourceId, datasetName},
+  //   datasetFields: [], analysisFields: [] }
+  BOOTSTRAP: '/analyses/bootstrap/',
 };
 
 export const ANALYSES_VISUAL = {
   LIST: '/visual/list',
-  VIEW: '/visual/get/',
+  // Hydrated list — same as LIST but every visual ships with its
+  // visualConfig already populated. Replaces the legacy /visual/get
+  // single-visual endpoint that was used in the now-removed
+  // fetchVisualsIndependently N+1 pattern.
+  LIST_WITH_CONFIG: '/visual/list-with-config/',
 };
 
 export const ANALYSIS_FILTER = {
@@ -225,11 +238,9 @@ export const ANALYSIS_FILTER = {
   UPDATE: '/analysis-filter/update',
   DELETE: '/analysis-filter/delete/',
   LIST: '/analysis-filter/list/',
-  // Legacy single-filter values endpoint. Kept for callers that
-  // haven't migrated; new code should prefer VALUES_BATCH.
-  VALUES: '/analysis-filter/values/',
   // Batched values endpoint — one request returns options for any
-  // number of filters, with pagination + search support.
+  // number of filters, with pagination + search support. The legacy
+  // single-filter VALUES endpoint was removed (zero FE callers).
   VALUES_BATCH: '/analysis-filter/values',
 };
 

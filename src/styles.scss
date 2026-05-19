@@ -2919,3 +2919,75 @@ body {
 // .p-checkbox rule + per-module first-column sizing. Checkbox styling
 // now comes from the global .p-checkbox block higher in this file,
 // and first-column width / centring is handled per-module SCSS.
+
+// ============================================================================
+// Global typography override for .confirmation-popup
+// ----------------------------------------------------------------------------
+// The .confirmation-popup pattern (used by all delete/update confirm dialogs
+// across listing modules, view pages, and edit pages — ~48 components in
+// total) was originally written with a type scale calibrated for page heroes:
+//   - h3 at --fs-h1 (20px) instead of --fs-h2 (17px)
+//   - .delete-intro at --fs-h3 (15px) instead of --fs-body (14px)
+//   - .popup-icon at --fs-h1 (20px) instead of --fs-h2
+//   - .delete-info-list <i> at --fs-h3 (15px) instead of --fs-body (14px)
+//
+// Editing 48 component files would have been pure churn — same diff per file,
+// easy to miss one. This block is the single source of truth instead. The
+// `body` prefix gives it the extra element specificity needed to win against
+// the component-scoped `[_ngcontent-*]` attribute selectors that Angular
+// adds automatically.
+//
+// We also pin font-family to var(--font-ui) here. Most popups inherit the
+// right family from body, but stray elements (<button>, <textarea> rendered
+// outside app-custom-input) drop back to the user-agent default unless we
+// pin them explicitly.
+// ============================================================================
+// Why `!important` here: each of the 48 per-component SCSS files nests
+// .popup-header .popup-icon several levels deep, which compiles (with
+// Angular's view-encapsulation attribute selectors) to the same
+// specificity as anything we can write in a global stylesheet. Doubling
+// or tripling class selectors hits the same wall. Rather than fight a
+// specificity arms race, we mark the type-scale + font-family overrides
+// !important — narrowly scoped to .confirmation-popup, with a clear
+// comment explaining intent. If a single popup ever needs a genuine
+// override, the per-component rule can also be marked !important.
+.confirmation-popup {
+  font-family: var(--font-ui) !important;
+
+  .popup-content {
+    font-family: var(--font-ui) !important;
+  }
+
+  .popup-header {
+    h3 {
+      font-size: var(--fs-h2) !important;  // 17px — dialog title scale
+    }
+
+    .popup-icon {
+      // Shrink the icon circle too. The bigger circle was paired with the
+      // bigger h3; both step down together so the proportion stays right.
+      width: 40px !important;
+      height: 40px !important;
+      font-size: var(--fs-h2) !important;  // 17px
+    }
+  }
+
+  .standard-delete-section {
+    .delete-intro {
+      font-size: var(--fs-body) !important;  // 14px — paragraph scale
+    }
+
+    .delete-info-list li i {
+      font-size: var(--fs-body) !important;  // match the row text
+    }
+  }
+
+  // Buttons / textareas / inputs inside the popup — re-pin font-family
+  // in case any bare element slipped through without inherit. Buttons
+  // and inputs lose body's font-family by default in some browsers.
+  button,
+  textarea,
+  input {
+    font-family: var(--font-ui) !important;
+  }
+}

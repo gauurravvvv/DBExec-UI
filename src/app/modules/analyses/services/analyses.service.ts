@@ -100,6 +100,22 @@ export class AnalysesService {
     );
   }
 
+  /**
+   * Single-call bootstrap for the Edit Analysis page. Returns the
+   * minimal projection of analysis metadata + dataset name +
+   * dataset/analysis field lists in one round trip. Replaces three
+   * legacy calls (viewAnalyses, getDataset, getAnalysisFields) for
+   * this surface only — the legacy endpoints stay alive for other
+   * callers that need fuller payloads.
+   *
+   * GET /analyses/bootstrap/:orgId/:analysisId
+   */
+  getBootstrap(orgId: string, analysisId: string) {
+    return lastValueFrom(
+      this.http.apiGet(ANALYSES.BOOTSTRAP + `${orgId}/${analysisId}`),
+    );
+  }
+
   viewVisuals(orgId: string, analysisId: string) {
     return lastValueFrom(
       this.http.apiGet(ANALYSES.VIEW_VISUAL + `${orgId}/${analysisId}`),
@@ -117,13 +133,15 @@ export class AnalysesService {
   }
 
   /**
-   * Get individual visual data with full configuration
-   * GET /visual/get/:orgId/:analysisId/:visualId
+   * Hydrated list — every visual ships with its visualConfig
+   * already populated. Replaces the N+1 listVisuals + getVisual
+   * loop on Edit Analysis first load.
+   * GET /visual/list-with-config/:orgId/:analysisId
    */
-  getVisual(orgId: string, analysisId: string, visualId: string | number) {
+  listVisualsWithConfig(orgId: string, analysisId: string) {
     return lastValueFrom(
       this.http.apiGet(
-        ANALYSES_VISUAL.VIEW + `${orgId}/${analysisId}/${visualId}`,
+        ANALYSES_VISUAL.LIST_WITH_CONFIG + `${orgId}/${analysisId}`,
       ),
     );
   }
@@ -268,6 +286,38 @@ export class AnalysesService {
     );
   }
 
+  /**
+   * Distinct values for any field on an analysis — raw dataset column
+   * OR custom field at the dataset/analysis level. The BE decides
+   * which path to take based on whether the field has customLogic.
+   *
+   * POST /analyses/distinct-values/:orgId/:analysisId
+   * body: { fieldName, search?, page?, pageSize? }
+   *
+   * Replaces the dataset-scoped getDistinctColumnValues for callers
+   * that have an analysis context. RLS rule editor still uses the
+   * old dataset-scoped endpoint — RLS conditions can't reference
+   * analysis-level fields anyway, so the split is intentional.
+   */
+  getDistinctFieldValues(
+    orgId: string,
+    analysisId: string,
+    fieldName: string,
+    options?: { search?: string; page?: number; pageSize?: number },
+  ) {
+    return lastValueFrom(
+      this.http.apiPost(
+        ANALYSES.DISTINCT_VALUES + `${orgId}/${analysisId}`,
+        {
+          fieldName,
+          ...(options?.search !== undefined ? { search: options.search } : {}),
+          ...(options?.page !== undefined ? { page: options.page } : {}),
+          ...(options?.pageSize !== undefined ? { pageSize: options.pageSize } : {}),
+        },
+      ),
+    );
+  }
+
   updateDataset(payload: any) {
     const { id, name, description, organisation, datasource, sql } = payload;
     return lastValueFrom(
@@ -324,12 +374,6 @@ export class AnalysesService {
   listFilters(orgId: string, analysisId: string) {
     return lastValueFrom(
       this.http.apiGet(ANALYSIS_FILTER.LIST + `${orgId}/${analysisId}`),
-    );
-  }
-
-  getFilterValues(orgId: string, filterId: string) {
-    return lastValueFrom(
-      this.http.apiGet(ANALYSIS_FILTER.VALUES + `${orgId}/${filterId}`),
     );
   }
 

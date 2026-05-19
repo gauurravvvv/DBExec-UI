@@ -116,11 +116,17 @@ export class AddCustomFieldDialogComponent
     private translate: TranslateService,
   ) {}
 
+  // ESC is wired through requestClose() so the unsaved-changes guard
+  // runs before the dialog actually closes. p-dialog's built-in
+  // closeOnEscape is disabled in the template; we listen at the
+  // document level instead to keep the guard centralised.
   @HostListener('document:keydown.escape', ['$event'])
-  handleEscapeKey(event: KeyboardEvent) {
-    if (this.visible) {
-      this.onCancel();
-    }
+  handleEscapeKey(_event: KeyboardEvent) {
+    if (!this.visible) return;
+    // If the unsaved-changes prompt is open, let it own ESC (its own
+    // closeOnEscape calls cancelClose via onHide).
+    if (this.showUnsavedPrompt) return;
+    this.requestClose();
   }
 
   ngAfterViewInit() {
@@ -151,12 +157,16 @@ export class AddCustomFieldDialogComponent
             dataType: this.editFieldData.dataType || 'text',
           };
         } else {
-          // Add mode - reset form
+          // Add mode — default to a numeric (decimal) field. Custom
+          // fields are overwhelmingly aggregations (sums, ratios,
+          // averages), so seeding "numeric" saves a click for the
+          // common case. Users who need a text/date field can change
+          // it from the dropdown.
           this.customField = {
             columnToView: '',
             columnToUse: '',
             formula: '',
-            dataType: 'text',
+            dataType: 'numeric',
           };
         }
 
@@ -169,6 +179,11 @@ export class AddCustomFieldDialogComponent
         this.expandedCategories = {};
         this.selectedFunction = null;
         this.fieldSearchQuery = '';
+        this.showUnsavedPrompt = false;
+        this.formDirty = false;
+        // Snapshot the opening state so we can decide whether the
+        // form is dirty when the user tries to close.
+        this.initialSnapshot = JSON.stringify(this.customField);
 
         // Filter out the current field being edited to prevent self-reference
         if (this.editMode && this.editFieldData) {
@@ -188,6 +203,45 @@ export class AddCustomFieldDialogComponent
         this.disposeEditor();
       }
     }
+  }
+
+  // ── Unsaved-changes guard ────────────────────────────────────────
+  //
+  // The dialog can be closed by four paths: the header ×, footer
+  // Cancel, ESC key, and (defensively) p-dialog's onHide. All four
+  // route through requestClose() — which only emits the close event
+  // if the form is clean, otherwise it opens a small nested confirm
+  // prompt. This prevents accidental data loss for users who've
+  // typed a long formula.
+
+  showUnsavedPrompt = false;
+  formDirty = false;
+  private initialSnapshot = '';
+
+  private isDirty(): boolean {
+    if (this.formDirty) return true;
+    return JSON.stringify(this.customField) !== this.initialSnapshot;
+  }
+
+  /** All close paths (header ×, Cancel, ESC) funnel through here. */
+  requestClose(): void {
+    if (this.isSubmitting) return; // never abandon a save in flight
+    if (this.isDirty()) {
+      this.showUnsavedPrompt = true;
+      this.cdr.markForCheck();
+      return;
+    }
+    this.close.emit(null);
+  }
+
+  cancelClose(): void {
+    this.showUnsavedPrompt = false;
+    this.cdr.markForCheck();
+  }
+
+  confirmDiscard(): void {
+    this.showUnsavedPrompt = false;
+    this.close.emit(null);
   }
 
   private setupThemeObserver(): void {
@@ -420,6 +474,16 @@ export class AddCustomFieldDialogComponent
 
     // Save button requires: field name, custom logic, AND successful validation
     this.isSaveEnabled = false;
+
+    // Monaco's onDidChangeModelContent fires outside the Angular zone,
+    // so OnPush change detection doesn't pick up the new column value
+    // on its own. Without this, the Validate button stays disabled
+    // until some unrelated event (hover, click) wakes CD up — which
+    // looked like a bug ("I typed a formula, why is Validate greyed
+    // out?"). The textarea fallback path triggers CD via ngModel
+    // already, so marking here is safe in both paths.
+    this.formDirty = true;
+    this.cdr.markForCheck();
   }
 
   onSubmit() {
@@ -523,8 +587,147 @@ export class AddCustomFieldDialogComponent
     return usedIds;
   }
 
-  onCancel() {
-    this.close.emit(null);
+  // Public cancel entry point — kept for backwards compatibility with
+  // anything still wiring (click)="onCancel()" directly. New template
+  // uses requestClose() which gates on dirty state; this just forwards.
+  onCancel(): void {
+    this.requestClose();
+  }
+
+  /**
+   * Tooltip body shown over the disabled Save button so users see
+   * *why* the button is greyed out instead of having to guess. Two
+   * distinct states map to two different hints:
+   *   - missing required field → "fill the label, data type, formula"
+   *   - everything filled but not validated → "validate the formula"
+   * Empty string when Save is enabled (PrimeNG hides the tooltip).
+   */
+  get saveDisabledHint(): string {
+    if (this.isSaveEnabled || this.isSubmitting) return '';
+    const name = this.customField.columnToView?.trim() || '';
+    const dataType = this.customField.dataType || '';
+    const formula = this.customField.columnToUse?.trim() || '';
+    // Required-field state takes priority: tell users to fill the
+    // form before pointing them at Validate.
+    if (!name || !dataType || !formula || this.fieldNameError) {
+      return this.translate.instant('DATASET.CUSTOM_FIELD_SAVE_DISABLED_HINT');
+    }
+    // Everything filled — what's missing is the validation step.
+    return this.translate.instant('DATASET.CUSTOM_FIELD_VALIDATE_FIRST_HINT');
+  }
+
+  onDataTypeChange(): void {
+    // Changing data type doesn't invalidate the formula, so we don't
+    // reset validation. Just track dirtiness so the unsaved-changes
+    // guard catches a stray dropdown change.
+    this.formDirty = true;
+  }
+
+  // ── Field type pill helpers ──────────────────────────────────────
+  // Renders a compact pill on each field row showing its data type.
+  // Glyphs (abc / 123 / yn / 📅 / 🕓 / { }) are picked to be readable
+  // at micro size where a full label wouldn't fit.
+
+  private fieldTypeMap(field: any): {
+    cls: string;
+    glyph: string;
+    labelKey: string;
+  } {
+    const dt = (field?.dataType || field?.type_name || '').toLowerCase();
+    if (
+      dt.includes('int') ||
+      dt.includes('numeric') ||
+      dt.includes('decimal') ||
+      dt.includes('float') ||
+      dt.includes('double') ||
+      dt.includes('real') ||
+      dt.includes('number')
+    ) {
+      return { cls: 'number', glyph: '#', labelKey: 'DATASET.DATA_TYPE' };
+    }
+    if (dt.includes('bool')) {
+      return { cls: 'bool', glyph: '✓', labelKey: 'DATASET.DATA_TYPE' };
+    }
+    if (dt.includes('timestamp') || dt.includes('datetime') || dt === 'time') {
+      return { cls: 'datetime', glyph: '⏱', labelKey: 'DATASET.DATA_TYPE' };
+    }
+    if (dt.includes('date')) {
+      return { cls: 'date', glyph: '📅', labelKey: 'DATASET.DATA_TYPE' };
+    }
+    if (dt.includes('json')) {
+      return { cls: 'json', glyph: '{}', labelKey: 'DATASET.DATA_TYPE' };
+    }
+    return { cls: 'text', glyph: 'Aa', labelKey: 'DATASET.DATA_TYPE' };
+  }
+
+  getFieldTypeClass(field: any): string {
+    return this.fieldTypeMap(field).cls;
+  }
+
+  getFieldTypeGlyph(field: any): string {
+    return this.fieldTypeMap(field).glyph;
+  }
+
+  getFieldTypeLabel(field: any): string {
+    const dt = field?.dataType || field?.type_name || '';
+    return dt || this.translate.instant(this.fieldTypeMap(field).labelKey);
+  }
+
+  // ── Keyboard navigation on the two list rails ────────────────────
+  // ArrowUp/ArrowDown moves selection; Enter inserts the highlighted
+  // row at the editor cursor. This lets keyboard-only users build a
+  // formula without ever touching the mouse.
+
+  onFieldsListKeydown(event: KeyboardEvent): void {
+    if (this.filteredFields.length === 0) return;
+    const currentIdx = this.selectedField
+      ? this.filteredFields.findIndex(
+          (f: any) => f.columnToUse === this.selectedField.columnToUse,
+        )
+      : -1;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      const next = Math.min(currentIdx + 1, this.filteredFields.length - 1);
+      this.selectDatasetField(this.filteredFields[Math.max(0, next)]);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      const prev = Math.max(currentIdx - 1, 0);
+      this.selectDatasetField(this.filteredFields[prev]);
+    } else if (event.key === 'Enter' && this.selectedField) {
+      event.preventDefault();
+      this.insertField(this.selectedField);
+    }
+  }
+
+  onFunctionsListKeydown(event: KeyboardEvent): void {
+    // Build a flat ordered list of functions across expanded categories
+    // — keyboard nav should feel continuous even though the UI groups
+    // them. Collapsed categories are skipped.
+    const flat: FunctionDefinition[] = [];
+    for (const cat of this.filteredCategories) {
+      if (this.isCategoryExpanded(cat.id)) {
+        flat.push(...cat.functions);
+      }
+    }
+    if (flat.length === 0) return;
+
+    const currentIdx = this.selectedFunction
+      ? flat.findIndex((fn) => fn.name === this.selectedFunction!.name)
+      : -1;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      const next = Math.min(currentIdx + 1, flat.length - 1);
+      this.selectFunction(flat[Math.max(0, next)]);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      const prev = Math.max(currentIdx - 1, 0);
+      this.selectFunction(flat[prev]);
+    } else if (event.key === 'Enter' && this.selectedFunction) {
+      event.preventDefault();
+      this.insertFunction(this.selectedFunction);
+    }
   }
 
   onValidate() {

@@ -93,6 +93,7 @@
             [required]="true"
             [autoDisplayFirst]="false"
             appendTo="body"
+            (onChangeEvent)="onControlTypeChange()"
           ></app-custom-dropdown>
         </div>
       </div>
@@ -192,10 +193,48 @@
         {{ 'ANALYSES.FILTER_SECTION_DEFAULT' | translate }}
       </h4>
 
-      <!-- Category -->
+      <!-- Category — default-value control is chosen by the control
+           type: 'dropdown' (Single Select) → single-pick app-custom-dropdown,
+           'list' (Multi Select) → app-custom-multiselect. Both share
+           the same options list (filterDialogCategoryValues) and the
+           same stale-defaults UI underneath. -->
       <div
         class="filter-dialog-field"
-        *ngIf="filterDialogType === 'category'"
+        *ngIf="
+          filterDialogType === 'category' &&
+          filterDialogControl === 'dropdown'
+        "
+      >
+        <app-custom-dropdown
+          [options]="filterDialogCategoryValues"
+          [(ngModel)]="filterDialogDefaultValue"
+          [label]="'ANALYSES.DEFAULT_VALUE_LABEL' | translate"
+          optionLabel="label"
+          optionValue="value"
+          [placeholder]="
+            isLoadingFilterValues
+              ? ('ANALYSES.LOADING_VALUES' | translate)
+              : ('ANALYSES.SELECT_DEFAULT_VALUES' | translate)
+          "
+          [filter]="true"
+          filterBy="label"
+          [autoDisplayFirst]="false"
+          appendTo="body"
+        ></app-custom-dropdown>
+        <ng-container
+          *ngTemplateOutlet="categoryEmptyHint"
+        ></ng-container>
+        <ng-container
+          *ngTemplateOutlet="categoryStaleRow"
+        ></ng-container>
+      </div>
+
+      <div
+        class="filter-dialog-field"
+        *ngIf="
+          filterDialogType === 'category' &&
+          filterDialogControl !== 'dropdown'
+        "
       >
         <app-custom-multiselect
           [options]="filterDialogCategoryValues"
@@ -213,6 +252,18 @@
           [selectedItemsLabel]="'ANALYSES.FILTER_N_SELECTED' | translate"
           appendTo="body"
         ></app-custom-multiselect>
+        <ng-container
+          *ngTemplateOutlet="categoryEmptyHint"
+        ></ng-container>
+        <ng-container
+          *ngTemplateOutlet="categoryStaleRow"
+        ></ng-container>
+      </div>
+
+      <!-- Shared empty-options hint and stale-defaults warning, kept
+           as templates so the two category branches don't duplicate
+           the markup. -->
+      <ng-template #categoryEmptyHint>
         <small
           class="field-hint"
           *ngIf="
@@ -222,6 +273,8 @@
           <i class="pi pi-info-circle"></i>
           {{ 'ANALYSES.LOAD_DATA_TO_SEE_VALUES' | translate }}
         </small>
+      </ng-template>
+      <ng-template #categoryStaleRow>
         <div
           class="filter-stale-row"
           *ngIf="filterDialogStaleDefaults.length > 0"
@@ -245,7 +298,7 @@
             {{ 'ANALYSES.FILTER_REMOVE_STALE' | translate }}
           </button>
         </div>
-      </div>
+      </ng-template>
 
       <!-- Numeric equality — single value, full width. -->
       <div
@@ -329,31 +382,41 @@
       <button class="btn-cancel" type="button" (click)="cancel()">
         {{ 'COMMON.CANCEL' | translate }}
       </button>
-      <button
-        class="btn-primary"
-        type="button"
-        (click)="save()"
-        [disabled]="
-          !filterDialogColumn ||
-          !filterDialogType ||
-          !filterDialogControl ||
-          isSavingFilter
-        "
+      <!--
+        The save button is wrapped in a span so the disabled-state
+        tooltip can still fire on hover. Browsers swallow pointer
+        events on disabled <button> elements, which would otherwise
+        hide the explanation of *why* Save is greyed out. The span
+        owns the tooltip and routes hover to the user — the button
+        keeps the click + disabled semantics.
+      -->
+      <span
+        class="btn-primary-wrap"
+        [pTooltip]="saveDisabledHint"
+        tooltipPosition="top"
+        [tooltipDisabled]="!isSaveDisabled"
       >
-        <i
-          class="pi"
-          *ngIf="isSavingFilter"
-          [class.pi-spin]="true"
-          [class.pi-spinner]="true"
-        ></i>
-        {{
-          isSavingFilter
-            ? ('ANALYSES.SAVING' | translate)
-            : editingFilter
-              ? ('ANALYSES.UPDATE_FILTER' | translate)
-              : ('ANALYSES.ADD_FILTER' | translate)
-        }}
-      </button>
+        <button
+          class="btn-primary"
+          type="button"
+          (click)="save()"
+          [disabled]="isSaveDisabled"
+        >
+          <i
+            class="pi"
+            *ngIf="isSavingFilter"
+            [class.pi-spin]="true"
+            [class.pi-spinner]="true"
+          ></i>
+          {{
+            isSavingFilter
+              ? ('ANALYSES.SAVING' | translate)
+              : editingFilter
+                ? ('ANALYSES.UPDATE_FILTER' | translate)
+                : ('ANALYSES.ADD_FILTER' | translate)
+          }}
+        </button>
+      </span>
     </div>
   </ng-template>
 </p-dialog>

@@ -136,8 +136,10 @@
         font-size: var(--fs-label);
         font-weight: var(--fw-semibold);
         color: var(--secondary-color);
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
+        // Title-case as authored in i18n ("Source", "Behaviour")
+        // instead of forced uppercase — reads softer and matches
+        // the rest of the app's section headings.
+        letter-spacing: 0;
       }
     }
 
@@ -147,16 +149,15 @@
       gap: var(--space-3);
       min-width: 0;
 
-      // Required-field marker — the shared dropdown / input wrappers
-      // render a red asterisk when [required]="true"; we re-tint it
-      // to primary so it reads as "this is a key field" rather than
-      // "this is an error". The asterisk stays — it's the universally
-      // legible convention — just calmer.
+      // Required-field marker. Red is the convention users read
+      // instantly as "must fill"; we keep the shared wrappers' default
+      // colour rather than re-tinting it, so every required asterisk
+      // across the app — filter dialog, custom-field dialog, listing
+      // delete dialogs — reads the same way.
       &--required ::ng-deep .required {
-        color: var(--primary-color);
+        color: var(--error-color);
         font-weight: var(--fw-semibold);
         margin-left: 2px;
-        opacity: 0.9;
       }
 
       label {
@@ -207,6 +208,13 @@
       display: flex;
       justify-content: flex-end;
       gap: var(--space-4);
+
+      // Wrap span that owns the disabled-state tooltip on the Save
+      // button — needs to be a flex item itself so the layout stays
+      // identical to having the button directly in the footer.
+      .btn-primary-wrap {
+        display: inline-flex;
+      }
 
       button {
         display: inline-flex;

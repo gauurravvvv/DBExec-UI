@@ -569,37 +569,66 @@ export class EditAnalysesComponent
   }
 
   /**
-   * Step 1: Load analysis data
+   * Step 1: Load analysis bootstrap — single call that primes the
+   * page with analysis metadata + dataset name + dataset/analysis
+   * field lists. Replaces three legacy calls (viewAnalyses,
+   * loadDatasetInfo, loadAnalysisFields) on first load.
+   *
+   * The helper methods (loadDatasetInfo, loadAnalysisFields) stay
+   * available for the Refresh Fields button and any code path that
+   * needs to re-fetch just one slice without re-running the whole
+   * bootstrap.
    */
   loadAnalysis(): void {
     this.analysesService
-      .viewAnalyses(this.orgId, this.analysisId)
+      .getBootstrap(this.orgId, this.analysisId)
       .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.analysisDetails = response.data;
-          this.datasourceId = response.data.datasourceId;
-          this.datasetId = response.data.datasetId;
-
-          if (this.datasetId) {
-            // Initialise selectors first so the filter store subscription
-            // is wired BEFORE we dispatch loadOpen (avoids a missed
-            // emission). The selectors themselves also dispatch the
-            // initial loadOpen action.
-            this.initializeStoreSelectors();
-
-            this.loadDatasetInfo();
-            this.loadAnalysisFields();
-            // loadExistingFilters() removed — initializeStoreSelectors
-            // dispatches loadOpen which the analysesFilter effect
-            // handles. Subscription auto-updates configuredFilters.
-
-            this.checkCachedDataAndLoad();
-          }
+        if (!this.globalService.handleSuccessService(response, false)) {
+          this.cdr.markForCheck();
+          return;
         }
+
+        const data = response.data || {};
+        const a = data.analysis || {};
+
+        // Analysis metadata. Old viewAnalyses returned a much fatter
+        // payload (nested dataset, nested datasource, organisation
+        // fields, createdOn). The page never used any of that — we
+        // only project what's actually consumed.
+        this.analysisDetails = a;
+        this.datasourceId = a.datasourceId;
+        this.datasetId = a.datasetId;
+
+        // Dataset details — the page only needs the name (sidebar
+        // header crumb) and the field list. Build a thin stub so
+        // template bindings like `datasetDetails?.name` keep working
+        // without changing every template reference.
+        this.datasetDetails = {
+          id: a.datasetId,
+          name: a.datasetName,
+          datasetFields: data.datasetFields || [],
+        };
+
+        // Analysis-level custom fields
+        this.analysisFields = data.analysisFields || [];
+
+        // Rebuild the merged allFields list once, after both slices
+        // are populated. The old chain rebuilt twice (once per call);
+        // bootstrap does it in a single pass.
+        this.rebuildAllFields();
+
+        if (this.datasetId) {
+          // Initialise selectors first so the filter store
+          // subscription is wired BEFORE any dispatch.
+          this.initializeStoreSelectors();
+
+          this.checkCachedDataAndLoad();
+        }
+
         this.cdr.markForCheck();
       })
       .catch(error => {
-        console.error('Error loading analysis:', error);
+        console.error('Error loading analysis bootstrap:', error);
         this.cdr.markForCheck();
       });
   }
@@ -811,165 +840,112 @@ export class EditAnalysesComponent
   }
 
   /**
-   * Step 4: Load visual list as skeletons, then fetch each visual independently
+   * Step 4: Load all visuals — single hydrated call. The response
+   * already includes each visual's visualConfig, so we hydrate the
+   * canvas in one pass instead of doing list + N per-visual fetches.
+   *
+   * The original list+per-visual pattern is kept available via
+   * listVisuals() / getVisual() for any future code path that wants
+   * skeleton-first behaviour. On the Edit Analysis canvas the user
+   * always sees all visuals at once, so paying for one combined
+   * round trip wins clearly.
    */
   loadAllVisuals(): void {
-    // First, get the list of visuals (for skeleton)
     this.analysesService
-      .listVisuals(this.orgId, this.analysisId)
+      .listVisualsWithConfig(this.orgId, this.analysisId)
       .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const visualsData = response.data.visuals || [];
+        if (!this.globalService.handleSuccessService(response, false)) return;
 
-          // Create skeleton visuals with loading state
-          this.visuals = visualsData.map((visualData: any) => {
-            // Extract chart configuration from nested visualConfig object
-            const visualConfig = visualData.visualConfig || {};
+        const visualsData = response.data.visuals || [];
 
-            const visual: any = {
-              id: visualData.id,
-              title: visualData.title || this.translate.instant('COMMON.LOADING'),
-              x: visualData.x || 0,
-              y: visualData.y || 0,
-              width: visualData.width || 400,
-              height: visualData.height || 350,
-              // Use ratios if available, otherwise calculate from legacy pixels
-              widthRatio: visualData.widthRatio || null,
-              heightRatio: visualData.heightRatio || null,
-              xRatio: visualData.xRatio ?? null,
-              yRatio: visualData.yRatio ?? null,
-              // Extract from nested visualConfig
-              chartType: visualConfig.chartType || visualData.chartType || null,
-              xAxisColumn:
-                visualConfig.xAxisColumn || visualData.xAxisColumn || null,
-              yAxisColumn:
-                visualConfig.yAxisColumn || visualData.yAxisColumn || null,
-              zAxisColumn:
-                visualConfig.zAxisColumn || visualData.zAxisColumn || null,
-              config: visualConfig.config
-                ? { ...getDefaultChartConfig(), ...visualConfig.config }
-                : visualData.config
-                  ? { ...getDefaultChartConfig(), ...visualData.config }
-                  : getDefaultChartConfig(),
-              chartData: [],
-              loading: true, // Skeleton loading state
-              loaded: false,
-            };
+        this.visuals = visualsData.map((visualData: any) => {
+          // visualConfig is guaranteed populated by the hydrated
+          // endpoint (LEFT JOIN — null is valid for orphaned visuals
+          // that never had a config saved). Fall back to top-level
+          // fields for those rare cases so we never crash.
+          const visualConfig = visualData.visualConfig || {};
 
-            // Calculate ratios from legacy pixels if not available
-            if (
-              !visual.widthRatio ||
-              !visual.heightRatio ||
-              visual.xRatio === null ||
-              visual.yRatio === null
-            ) {
-              this.calculateRatiosFromLegacy(visual);
-            }
+          const visual: any = {
+            id: visualData.id,
+            title: visualData.title || this.translate.instant('COMMON.LOADING'),
+            x: visualData.x || 0,
+            y: visualData.y || 0,
+            width: visualData.width || 400,
+            height: visualData.height || 350,
+            widthRatio: visualData.widthRatio || null,
+            heightRatio: visualData.heightRatio || null,
+            xRatio: visualData.xRatio ?? null,
+            yRatio: visualData.yRatio ?? null,
+            chartType: visualConfig.chartType || visualData.chartType || null,
+            xAxisColumn:
+              visualConfig.xAxisColumn || visualData.xAxisColumn || null,
+            yAxisColumn:
+              visualConfig.yAxisColumn || visualData.yAxisColumn || null,
+            zAxisColumn:
+              visualConfig.zAxisColumn || visualData.zAxisColumn || null,
+            config: visualConfig.config
+              ? { ...getDefaultChartConfig(), ...visualConfig.config }
+              : visualData.config
+                ? { ...getDefaultChartConfig(), ...visualData.config }
+                : getDefaultChartConfig(),
+            chartData: [],
+            // No two-phase skeleton anymore — everything we need is
+            // already in the response. Mark loaded immediately so
+            // the canvas paints without an empty-state flash.
+            loading: false,
+            loaded: true,
+          };
 
-            // Ensure grid properties exist
-            if (!visual.colSpan) {
-              visual.colSpan = Math.max(
-                4,
-                Math.min(24, Math.round((visual.widthRatio || 0.5) * 24)),
-              );
-            }
-            if (!visual.rowSpan) {
-              visual.rowSpan = Math.max(
-                3,
-                Math.round((visual.heightRatio || 0.5) * this.GRID_ROWS),
-              );
-            }
-            visual.gridCol = 0;
-            visual.gridRow = 0;
-
-            // Compute pixel dimensions from ratios based on current canvas
-            this.computeVisualDimensions(visual);
-
-            return visual;
-          });
-
-          // Place visuals on grid after all are loaded
-          this.placeVisualsOnGrid();
-
-          // Set visual counter
-          if (this.visuals.length > 0) {
-            this.visualCounter = Math.max(
-              ...this.visuals.map(v => Number(v.id) || 0),
-              0,
-            );
+          if (
+            !visual.widthRatio ||
+            !visual.heightRatio ||
+            visual.xRatio === null ||
+            visual.yRatio === null
+          ) {
+            this.calculateRatiosFromLegacy(visual);
           }
 
-          this.cdr.markForCheck();
+          if (!visual.colSpan) {
+            visual.colSpan = Math.max(
+              4,
+              Math.min(24, Math.round((visual.widthRatio || 0.5) * 24)),
+            );
+          }
+          if (!visual.rowSpan) {
+            visual.rowSpan = Math.max(
+              3,
+              Math.round((visual.heightRatio || 0.5) * this.GRID_ROWS),
+            );
+          }
+          visual.gridCol = 0;
+          visual.gridRow = 0;
 
-          // Step 5: Fetch each visual independently and plot in real-time
-          this.fetchVisualsIndependently();
+          this.computeVisualDimensions(visual);
+
+          return visual;
+        });
+
+        this.placeVisualsOnGrid();
+
+        if (this.visuals.length > 0) {
+          this.visualCounter = Math.max(
+            ...this.visuals.map(v => Number(v.id) || 0),
+            0,
+          );
         }
+
+        // If the dataset rows have already arrived, transform each
+        // visual's chartData now. Otherwise the rows will trigger
+        // transforms when they land (see loadDatasetDataSuccess).
+        if (this.rawGraphData && this.rawGraphData.length > 0) {
+          this.visuals.forEach(v => this.transformSingleVisualChartData(v));
+        }
+
+        this.cdr.markForCheck();
       })
       .catch(error => {
         console.error('Error loading visuals:', error);
       });
-  }
-
-  /**
-   * Step 5: Fetch each visual independently in parallel
-   * Plot each visual as soon as its data arrives
-   */
-  fetchVisualsIndependently(): void {
-    // Create promises for all visuals
-    this.visuals.forEach(visual => {
-      this.analysesService
-        .getVisual(this.orgId, this.analysisId, visual.id)
-        .then(response => {
-          if (this.globalService.handleSuccessService(response, false)) {
-            const visualData = response.data;
-
-            // Find and update the visual in our array
-            const visualIndex = this.visuals.findIndex(v => v.id === visual.id);
-            if (visualIndex !== -1) {
-              // Extract from nested visualConfig (API returns data this way)
-              const visualConfig = visualData.visualConfig || {};
-
-              // Update visual with full data
-              this.visuals[visualIndex] = {
-                ...this.visuals[visualIndex],
-                title: visualData.title || this.visuals[visualIndex].title,
-                chartType:
-                  visualConfig.chartType || visualData.chartType || null,
-                xAxisColumn:
-                  visualConfig.xAxisColumn || visualData.xAxisColumn || null,
-                yAxisColumn:
-                  visualConfig.yAxisColumn || visualData.yAxisColumn || null,
-                zAxisColumn:
-                  visualConfig.zAxisColumn || visualData.zAxisColumn || null,
-                config: visualConfig.config
-                  ? { ...getDefaultChartConfig(), ...visualConfig.config }
-                  : visualData.config
-                    ? { ...getDefaultChartConfig(), ...visualData.config }
-                    : getDefaultChartConfig(),
-                loading: false,
-                loaded: true,
-              };
-
-              // Transform chart data if rawGraphData is available
-              if (this.rawGraphData && this.rawGraphData.length > 0) {
-                this.transformSingleVisualChartData(this.visuals[visualIndex]);
-              }
-
-              this.cdr.markForCheck();
-            }
-          }
-        })
-        .catch(error => {
-          console.error(`Error fetching visual ${visual.id}:`, error);
-          // Mark visual as failed
-          const visualIndex = this.visuals.findIndex(v => v.id === visual.id);
-          if (visualIndex !== -1) {
-            this.visuals[visualIndex].loading = false;
-            this.visuals[visualIndex].error = true;
-            this.cdr.markForCheck();
-          }
-        });
-    });
   }
 
   /**
@@ -1033,6 +1009,89 @@ export class EditAnalysesComponent
   refreshData(): void {
     // Simply call loadDatasetData again to refresh the data
     this.loadDatasetData();
+  }
+
+  // ── Refresh the field list ────────────────────────────────────────
+  // Re-fetches BOTH the dataset's schema fields and the analysis-level
+  // custom fields, then drops the analyses-filter store lane so the
+  // filter sidebar refetches its filters + options too. This is the
+  // single entry point users hit when they want to see what someone
+  // (themselves or a collaborator) has added since the page loaded.
+  //
+  // Why do both at once: the merged allFields list and the filter list
+  // share the same "this analysis" mental model. Splitting them into
+  // two separate refresh buttons would be confusing — and the user
+  // explicitly asked for one button that covers both surfaces.
+  //
+  // Why not a full page reload: it discards in-progress visual config,
+  // chart edits, axis selections, etc. — work the user hasn't saved
+  // yet. This refresh keeps all of that intact.
+
+  isRefreshingFields = false;
+
+  refreshFields(): void {
+    if (this.isRefreshingFields) return; // guard against rapid clicks
+    if (!this.orgId || !this.analysisId || !this.datasetId) return;
+
+    this.isRefreshingFields = true;
+    this.cdr.markForCheck();
+
+    // Kick off dataset + analysis-fields fetches in parallel. They
+    // share rebuildAllFields() as their merge point; each completes
+    // independently, so we use Promise.allSettled to keep the
+    // spinner accurate even if one of the two fails.
+    const datasetPromise = this.datasetService
+      .getDataset(this.orgId, this.datasetId)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.datasetDetails = response.data;
+          this.rebuildAllFields();
+        }
+      })
+      .catch(err => {
+        console.error('Refresh: dataset fields failed', err);
+      });
+
+    const analysisPromise = this.analysesService
+      .getAnalysisFields(this.orgId, this.analysisId)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.analysisFields = response.data?.analysisFields || [];
+          this.rebuildAllFields();
+        }
+      })
+      .catch(err => {
+        console.error('Refresh: analysis fields failed', err);
+      });
+
+    Promise.allSettled([datasetPromise, analysisPromise]).then(() => {
+      // Drop the analyses-filter lane so the next sidebar interaction
+      // (or the immediate loadOpen below, if the sidebar is open)
+      // pulls fresh filter rows + dropdown options. The freshness
+      // gate inside loadOpen$ effect respects loadedAt; we use the
+      // explicit invalidate to bypass it.
+      this.store.dispatch(
+        AnalysesFilterActions.invalidateAnalysis({
+          analysisId: this.analysisId,
+        }),
+      );
+
+      // If the filter sidebar is open right now, the user expects
+      // to see fresh filters immediately — no second click needed.
+      // Re-dispatch loadOpen after the invalidate so the effect
+      // takes the empty-lane fast path and fetches.
+      if (this.isFilterPanelOpen) {
+        this.store.dispatch(
+          AnalysesFilterActions.loadOpen({
+            analysisId: this.analysisId,
+            organisation: this.orgId,
+          }),
+        );
+      }
+
+      this.isRefreshingFields = false;
+      this.cdr.markForCheck();
+    });
   }
 
   goBack(): void {

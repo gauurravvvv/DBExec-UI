@@ -1,83 +1,158 @@
-<div class="add-custom-field-popup" *ngIf="visible" (click)="onCancel()">
-  <div class="popup-content" (click)="$event.stopPropagation()">
-    <!-- Header -->
-    <div class="dialog-header">
-      <div class="header-left">
-        <i class="pi pi-code"></i>
-        <h2>{{ editMode ? ('DATASET.EDIT_CUSTOM_FIELD' | translate) : ('DATASET.ADD_CUSTOM_FIELD' | translate) }}</h2>
+<!--
+  Custom-field builder dialog.
+
+  Identity follows the same icon-led header pattern as the analyses
+  filter-dialog (icon square + h3 + subtitle), so every modal in the
+  app reads consistently. Built on <p-dialog> so we get focus trap,
+  ESC handling, ARIA roles, and restore-focus for free — none of
+  which worked in the previous hand-rolled overlay.
+
+  Layout: a three-pane body — dataset fields on the left, Monaco
+  editor in the middle, function reference on the right. On narrow
+  viewports the side panels collapse into stacked rails above and
+  below the editor (see SCSS responsive block).
+
+  Backdrop dismiss is intentionally disabled ([dismissableMask]=false)
+  and ESC is handled at the document level so it routes through
+  requestClose() — the unsaved-changes prompt can intercept both.
+-->
+<p-dialog
+  [visible]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [dismissableMask]="false"
+  [closeOnEscape]="false"
+  [style]="{
+    width: 'min(1280px, 94vw)',
+    height: 'min(780px, 90vh)'
+  }"
+  styleClass="add-custom-field-dialog"
+  [showHeader]="true"
+>
+  <!-- Icon-led header (custom template; matches filter-dialog). -->
+  <ng-template pTemplate="header">
+    <div class="acf-header">
+      <div class="acf-header__icon" aria-hidden="true">
+        <i class="pi pi-bolt"></i>
+      </div>
+      <div class="acf-header__text">
+        <h3>
+          {{
+            editMode
+              ? ('DATASET.EDIT_CUSTOM_FIELD' | translate)
+              : ('DATASET.ADD_CUSTOM_FIELD' | translate)
+          }}
+        </h3>
+        <p>{{ 'DATASET.CUSTOM_FIELD_DIALOG_SUBTITLE' | translate }}</p>
       </div>
       <button
-        pButton
-        class="p-button-text p-button-rounded p-button-sm close-btn"
-        icon="pi pi-times"
-        (click)="onCancel()"
+        type="button"
+        class="acf-header__close"
+        (click)="requestClose()"
         [pTooltip]="'COMMON.CLOSE' | translate"
         tooltipPosition="bottom"
-      ></button>
+        [attr.aria-label]="'COMMON.CLOSE' | translate"
+      >
+        <i class="pi pi-times"></i>
+      </button>
     </div>
+  </ng-template>
 
-    <!-- Main Content -->
-    <div class="dialog-body">
-      <!-- Left Side - Dataset Fields Panel -->
-      <div class="fields-panel">
-        <div class="panel-header">
-          <h4>
-            <i class="pi pi-database mr-2"></i>
-            {{ 'DATASET.DATASET_FIELDS' | translate }}
-          </h4>
-          <span class="field-count">{{ filteredFields.length }} {{ 'DATASET.FIELDS' | translate | lowercase }}</span>
-        </div>
-
-        <div class="search-box">
-          <app-custom-input
-            [(ngModel)]="fieldSearchQuery"
-            [placeholder]="'DATASET.SEARCH_FIELDS' | translate"
-            icon="pi-search"
-            (ngModelChange)="onFieldSearch()"
-          ></app-custom-input>
-        </div>
-
-        <div class="fields-list">
-          <div
-            class="field-item"
-            *ngFor="let field of filteredFields; trackBy: trackById"
-            (click)="selectDatasetField(field)"
-            (dblclick)="insertField(field)"
-            [class.selected]="selectedField?.columnToUse === field.columnToUse"
-            [class.custom-field]="field.type === 2"
-          >
-            <span class="field-name">{{ field.columnToView }}</span>
-            <code class="field-column">{{ field.columnToUse }}</code>
-          </div>
-
-          <div class="no-results" *ngIf="filteredFields.length === 0">
-            <i class="pi pi-database"></i>
-            <p>{{ 'DATASET.NO_FIELDS_FOUND' | translate }}</p>
-          </div>
-        </div>
-
-        <!-- Field Description Section -->
-        <div class="description-section" *ngIf="selectedField">
-          <div class="description-header">
-            <span class="selected-fn-name">{{
-              selectedField.columnToView
-            }}</span>
-          </div>
-          <code class="selected-fn-usage"
-            >{{ '{' }}{{ selectedField.columnToUse }}{{ '}' }}</code
-          >
-          <p class="selected-fn-desc">
-            {{ 'DATASET.COLUMN' | translate }}: {{ selectedField.columnToUse }}
-          </p>
-        </div>
-        <div class="description-section empty" *ngIf="!selectedField">
-          <p>{{ 'DATASET.CLICK_TO_VIEW_INSERT' | translate }}</p>
-        </div>
+  <!-- Main 3-column body -->
+  <div class="acf-body">
+    <!-- ─── Left rail · Dataset fields ──────────────────────────── -->
+    <aside class="acf-rail acf-rail--fields">
+      <div class="acf-rail__head">
+        <h4>
+          <i class="pi pi-database"></i>
+          {{ 'DATASET.DATASET_FIELDS' | translate }}
+        </h4>
+        <span class="acf-count">{{ filteredFields.length }}</span>
       </div>
 
-      <!-- Center - Form Section -->
-      <div class="form-section">
-        <div class="form-field">
+      <div class="acf-rail__search">
+        <app-custom-input
+          [(ngModel)]="fieldSearchQuery"
+          [placeholder]="'DATASET.SEARCH_FIELDS' | translate"
+          icon="pi-search"
+          (ngModelChange)="onFieldSearch()"
+        ></app-custom-input>
+      </div>
+
+      <ul
+        class="acf-list"
+        role="listbox"
+        [attr.aria-label]="'DATASET.DATASET_FIELDS' | translate"
+        (keydown)="onFieldsListKeydown($event)"
+        tabindex="0"
+      >
+        <li
+          *ngFor="let field of filteredFields; trackBy: trackById"
+          class="acf-list__item"
+          role="option"
+          [class.is-selected]="selectedField?.columnToUse === field.columnToUse"
+          [class.is-custom]="field.type === 2"
+          [attr.aria-selected]="
+            selectedField?.columnToUse === field.columnToUse
+          "
+          (click)="selectDatasetField(field)"
+          (dblclick)="insertField(field)"
+        >
+          <div class="acf-list__item-main">
+            <span class="acf-list__name">{{ field.columnToView }}</span>
+            <code class="acf-list__code">{{ field.columnToUse }}</code>
+          </div>
+          <span
+            class="acf-type-pill"
+            [class]="'acf-type-pill--' + getFieldTypeClass(field)"
+            [pTooltip]="getFieldTypeLabel(field)"
+            tooltipPosition="left"
+            aria-hidden="true"
+          >
+            {{ getFieldTypeGlyph(field) }}
+          </span>
+          <button
+            *ngIf="selectedField?.columnToUse === field.columnToUse"
+            type="button"
+            class="acf-list__insert"
+            (click)="insertField(field); $event.stopPropagation()"
+            [pTooltip]="'DATASET.INSERT' | translate"
+            tooltipPosition="left"
+            [attr.aria-label]="'DATASET.INSERT' | translate"
+          >
+            <i class="pi pi-arrow-right"></i>
+          </button>
+        </li>
+
+        <li class="acf-empty" *ngIf="filteredFields.length === 0">
+          <i class="pi pi-database"></i>
+          <p>{{ 'DATASET.NO_FIELDS_FOUND' | translate }}</p>
+        </li>
+      </ul>
+
+      <!-- Selected-field preview / empty hint -->
+      <div class="acf-preview" *ngIf="selectedField">
+        <div class="acf-preview__row">
+          <span class="acf-preview__name">{{ selectedField.columnToView }}</span>
+        </div>
+        <code class="acf-preview__code"
+          >{{ '{' }}{{ selectedField.columnToUse }}{{ '}' }}</code
+        >
+        <p class="acf-preview__hint">
+          {{ 'DATASET.CLICK_PREVIEW_DBLCLICK_INSERT' | translate }}
+        </p>
+      </div>
+      <div class="acf-preview acf-preview--empty" *ngIf="!selectedField">
+        <p>{{ 'DATASET.CLICK_TO_VIEW_INSERT' | translate }}</p>
+      </div>
+    </aside>
+
+    <!-- ─── Centre · form & editor ─────────────────────────────── -->
+    <section class="acf-form">
+      <div class="acf-form__row">
+        <div class="acf-form__field acf-form__field--required">
           <app-custom-input
             [(ngModel)]="customField.columnToView"
             [label]="'DATASET.FIELD_NAME_TO_DISPLAY' | translate"
@@ -85,15 +160,25 @@
             icon="pi-tag"
             [required]="true"
             (ngModelChange)="onFieldNameChange()"
+          ></app-custom-input>
+          <!-- Derived chip so the user understands the dual concept:
+               this label is *also* the formula handle other fields use
+               to reference this calculation. -->
+          <small
+            class="acf-form__derived"
+            *ngIf="customField.columnToView?.trim() && !fieldNameError"
           >
-          </app-custom-input>
-          <small class="field-name-error" *ngIf="fieldNameError">
+            <i class="pi pi-link"></i>
+            {{ 'DATASET.WILL_BE_REFERENCED_AS' | translate }}
+            <code>{{ '{' }}{{ customField.columnToView.trim() }}{{ '}' }}</code>
+          </small>
+          <small class="acf-form__error" *ngIf="fieldNameError">
             <i class="pi pi-exclamation-triangle"></i>
             {{ fieldNameError }}
           </small>
         </div>
 
-        <div class="form-field">
+        <div class="acf-form__field acf-form__field--required">
           <app-custom-dropdown
             [options]="analyticalTypes"
             [(ngModel)]="customField.dataType"
@@ -103,179 +188,289 @@
             [placeholder]="'DATASET.SELECT_DATA_TYPE' | translate"
             [filter]="true"
             [autoDisplayFirst]="false"
+            [required]="true"
             appendTo="body"
-          >
-          </app-custom-dropdown>
-        </div>
-
-        <div class="form-field custom-logic-field">
-          <label>{{ 'DATASET.CUSTOM_LOGIC' | translate }} <span class="required">*</span></label>
-
-          <!-- Monaco Editor Container -->
-          <div
-            class="editor-wrapper"
-            [hidden]="isLoadingEditor || monacoLoadFailed"
-          >
-            <div
-              #formulaEditorContainer
-              id="formula-editor-container"
-              class="formula-editor"
-            ></div>
-          </div>
-
-          <!-- Loading State -->
-          <div
-            class="editor-loading"
-            *ngIf="isLoadingEditor && !monacoLoadFailed"
-          >
-            <i class="pi pi-spin pi-spinner"></i>
-            <span>{{ 'DATASET.LOADING_EDITOR' | translate }}</span>
-          </div>
-
-          <!-- Error Fallback -->
-          <div class="editor-fallback" *ngIf="monacoLoadFailed">
-            <app-custom-input
-              [(ngModel)]="customField.columnToUse"
-              [placeholder]="'DATASET.ENTER_FORMULA' | translate"
-              inputMode="textarea"
-              [rows]="5"
-              (ngModelChange)="onFormulaChange()"
-            ></app-custom-input>
-          </div>
-
-          <small class="hint">
-            <i class="pi pi-lightbulb"></i>
-            {{ 'DATASET.FORMULA_HINT' | translate }}
-          </small>
-
-          <!-- Validation Result -->
-          <div
-            class="validation-result"
-            *ngIf="validationResult"
-            [class.valid]="validationResult.valid"
-            [class.invalid]="!validationResult.valid"
-          >
-            <i
-              class="pi"
-              [ngClass]="
-                validationResult.valid ? 'pi-check-circle' : 'pi-times-circle'
-              "
-            ></i>
-            <span>{{ validationResult.message }}</span>
-          </div>
-        </div>
-
-        <!-- Footer Actions -->
-        <div class="popup-actions">
-          <button
-            type="button"
-            class="btn-cancel"
-            (click)="onCancel()"
-            [disabled]="isSubmitting"
-          >
-            <i class="pi pi-times"></i>
-            {{ 'COMMON.CANCEL' | translate }}
-          </button>
-          <button
-            type="button"
-            class="btn-secondary"
-            (click)="onValidate()"
-            [disabled]="!customField.columnToUse || isValidating"
-          >
-            <i class="pi pi-check-circle"></i>
-            {{ 'DATASET.VALIDATE' | translate }}
-          </button>
-          <button
-            type="button"
-            class="btn-save"
-            (click)="onSubmit()"
-            [disabled]="!isSaveEnabled || isSubmitting"
-          >
-            <i class="pi" [ngClass]="editMode ? 'pi-save' : 'pi-plus'"></i>
-            {{ editMode ? ('DATASET.SAVE_CHANGES' | translate) : ('DATASET.ADD_FIELD' | translate) }}
-          </button>
+            (ngModelChange)="onDataTypeChange()"
+          ></app-custom-dropdown>
         </div>
       </div>
 
-      <!-- Right Side - Functions Reference Panel -->
-      <div class="functions-panel">
-        <div class="panel-header">
-          <h4>
-            <i class="pi pi-book mr-2"></i>
-            {{ 'DATASET.FUNCTIONS_REFERENCE' | translate }}
-          </h4>
-          <span class="function-count"
-            >{{
-              functionSearchQuery
-                ? getFilteredFunctionCount() + ' / ' + getTotalFunctionCount()
-                : getTotalFunctionCount()
-            }}
-            {{ 'DATASET.FUNCTIONS' | translate }}</span
-          >
+      <div class="acf-form__field acf-form__field--required acf-form__field--editor">
+        <label>
+          <i class="pi pi-code"></i>
+          {{ 'DATASET.CUSTOM_LOGIC' | translate }}
+          <span class="required">*</span>
+        </label>
+
+        <!-- Monaco container -->
+        <div
+          class="acf-editor"
+          [hidden]="isLoadingEditor || monacoLoadFailed"
+        >
+          <div
+            #formulaEditorContainer
+            id="formula-editor-container"
+            class="acf-editor__monaco"
+          ></div>
         </div>
 
-        <div class="search-box">
+        <!-- Loading state -->
+        <div
+          class="acf-editor acf-editor--loading"
+          *ngIf="isLoadingEditor && !monacoLoadFailed"
+        >
+          <i class="pi pi-spin pi-spinner"></i>
+          <span>{{ 'DATASET.LOADING_EDITOR' | translate }}</span>
+        </div>
+
+        <!-- Monaco fallback -->
+        <div class="acf-editor acf-editor--fallback" *ngIf="monacoLoadFailed">
           <app-custom-input
-            [(ngModel)]="functionSearchQuery"
-            [placeholder]="'DATASET.SEARCH_FUNCTIONS' | translate"
-            icon="pi-search"
-            (ngModelChange)="onFunctionSearch()"
+            [(ngModel)]="customField.columnToUse"
+            [placeholder]="'DATASET.ENTER_FORMULA' | translate"
+            inputMode="textarea"
+            [rows]="8"
+            (ngModelChange)="onFormulaChange()"
           ></app-custom-input>
         </div>
 
-        <div class="categories-list">
-          <div
-            class="category-section"
-            *ngFor="let category of filteredCategories; trackBy: trackById"
-          >
-            <div class="category-header" (click)="toggleCategory(category.id)">
-              <div class="category-info">
-                <i [class]="category.icon"></i>
-                <span class="category-name">{{ category.name }}</span>
-                <span class="count-badge">{{ category.functions.length }}</span>
-              </div>
-              <i
-                class="pi"
-                [ngClass]="
-                  isCategoryExpanded(category.id)
-                    ? 'pi-chevron-down'
-                    : 'pi-chevron-right'
-                "
-              ></i>
-            </div>
+        <small class="acf-form__hint">
+          <i class="pi pi-lightbulb"></i>
+          {{ 'DATASET.FORMULA_HINT' | translate }}
+        </small>
 
-            <div class="functions-list" *ngIf="isCategoryExpanded(category.id)">
-              <div
-                class="function-item"
-                *ngFor="let fn of category.functions; trackBy: trackByName"
-                (click)="selectFunction(fn)"
-                (dblclick)="insertFunction(fn)"
-                [class.selected]="selectedFunction?.name === fn.name"
-              >
-                <span class="function-name">{{ fn.name }}</span>
-                <code class="function-usage">{{ fn.usage }}</code>
-              </div>
-            </div>
-          </div>
-
-          <div class="no-results" *ngIf="filteredCategories.length === 0">
-            <i class="pi pi-search"></i>
-            <p>{{ 'DATASET.NO_FUNCTIONS_FOUND' | translate }}</p>
-          </div>
-        </div>
-
-        <!-- Description Section -->
-        <div class="description-section" *ngIf="selectedFunction">
-          <div class="description-header">
-            <span class="selected-fn-name">{{ selectedFunction.name }}()</span>
-          </div>
-          <code class="selected-fn-usage">{{ selectedFunction.usage }}</code>
-          <p class="selected-fn-desc">{{ selectedFunction.description }}</p>
-        </div>
-        <div class="description-section empty" *ngIf="!selectedFunction">
-          <p>{{ 'DATASET.CLICK_VIEW_DESC_INSERT' | translate }}</p>
+        <div
+          class="acf-validation"
+          *ngIf="validationResult"
+          [class.is-valid]="validationResult.valid"
+          [class.is-invalid]="!validationResult.valid"
+          role="status"
+          [attr.aria-live]="validationResult.valid ? 'polite' : 'assertive'"
+        >
+          <i
+            class="pi"
+            [ngClass]="
+              validationResult.valid ? 'pi-check-circle' : 'pi-times-circle'
+            "
+          ></i>
+          <span>{{ validationResult.message }}</span>
         </div>
       </div>
-    </div>
+    </section>
+
+    <!-- ─── Right rail · function reference ────────────────────── -->
+    <aside class="acf-rail acf-rail--functions">
+      <div class="acf-rail__head">
+        <h4>
+          <i class="pi pi-book"></i>
+          {{ 'DATASET.FUNCTIONS_REFERENCE' | translate }}
+        </h4>
+        <span class="acf-count">
+          {{
+            functionSearchQuery
+              ? getFilteredFunctionCount() + ' / ' + getTotalFunctionCount()
+              : getTotalFunctionCount()
+          }}
+        </span>
+      </div>
+
+      <div class="acf-rail__search">
+        <app-custom-input
+          [(ngModel)]="functionSearchQuery"
+          [placeholder]="'DATASET.SEARCH_FUNCTIONS' | translate"
+          icon="pi-search"
+          (ngModelChange)="onFunctionSearch()"
+        ></app-custom-input>
+      </div>
+
+      <div
+        class="acf-categories"
+        role="listbox"
+        [attr.aria-label]="'DATASET.FUNCTIONS_REFERENCE' | translate"
+        (keydown)="onFunctionsListKeydown($event)"
+        tabindex="0"
+      >
+        <div
+          class="acf-category"
+          *ngFor="let category of filteredCategories; trackBy: trackById"
+          [class.is-expanded]="isCategoryExpanded(category.id)"
+        >
+          <button
+            type="button"
+            class="acf-category__head"
+            (click)="toggleCategory(category.id)"
+            [attr.aria-expanded]="isCategoryExpanded(category.id)"
+          >
+            <span class="acf-category__title">
+              <i [class]="category.icon"></i>
+              <span>{{ category.name }}</span>
+              <span class="acf-count acf-count--inline">
+                {{ category.functions.length }}
+              </span>
+            </span>
+            <i
+              class="pi pi-chevron-down acf-category__chevron"
+              [class.is-collapsed]="!isCategoryExpanded(category.id)"
+              aria-hidden="true"
+            ></i>
+          </button>
+
+          <ul
+            class="acf-fn-list"
+            *ngIf="isCategoryExpanded(category.id)"
+            role="group"
+          >
+            <li
+              *ngFor="let fn of category.functions; trackBy: trackByName"
+              class="acf-fn-item"
+              role="option"
+              [class.is-selected]="selectedFunction?.name === fn.name"
+              [attr.aria-selected]="selectedFunction?.name === fn.name"
+              (click)="selectFunction(fn)"
+              (dblclick)="insertFunction(fn)"
+            >
+              <div class="acf-fn-item__main">
+                <span class="acf-fn-item__name">{{ fn.name }}</span>
+                <code class="acf-fn-item__usage">{{ fn.usage }}</code>
+              </div>
+              <button
+                *ngIf="selectedFunction?.name === fn.name"
+                type="button"
+                class="acf-fn-item__insert"
+                (click)="insertFunction(fn); $event.stopPropagation()"
+                [pTooltip]="'DATASET.INSERT' | translate"
+                tooltipPosition="left"
+                [attr.aria-label]="'DATASET.INSERT' | translate"
+              >
+                <i class="pi pi-arrow-right"></i>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <div class="acf-empty" *ngIf="filteredCategories.length === 0">
+          <i class="pi pi-search"></i>
+          <p>{{ 'DATASET.NO_FUNCTIONS_FOUND' | translate }}</p>
+        </div>
+      </div>
+
+      <!-- Selected-function preview / empty hint -->
+      <div class="acf-preview" *ngIf="selectedFunction">
+        <div class="acf-preview__row">
+          <span class="acf-preview__name">{{ selectedFunction.name }}()</span>
+        </div>
+        <code class="acf-preview__code">{{ selectedFunction.usage }}</code>
+        <p class="acf-preview__desc">{{ selectedFunction.description }}</p>
+      </div>
+      <div class="acf-preview acf-preview--empty" *ngIf="!selectedFunction">
+        <p>{{ 'DATASET.CLICK_VIEW_DESC_INSERT' | translate }}</p>
+      </div>
+    </aside>
   </div>
-</div>
+
+  <!-- Footer — Validate is a pre-flight secondary action and reads as
+       such by sitting on the left, with primary Save and Cancel paired
+       on the right. -->
+  <ng-template pTemplate="footer">
+    <div class="acf-footer">
+      <button
+        type="button"
+        class="acf-btn acf-btn--secondary acf-footer__validate"
+        (click)="onValidate()"
+        [disabled]="!customField.columnToUse || isValidating"
+      >
+        <i
+          class="pi"
+          [class.pi-spin]="isValidating"
+          [class.pi-spinner]="isValidating"
+          [class.pi-check-circle]="!isValidating"
+        ></i>
+        {{ 'DATASET.VALIDATE' | translate }}
+      </button>
+
+      <div class="acf-footer__primary">
+        <button
+          type="button"
+          class="acf-btn acf-btn--ghost"
+          (click)="requestClose()"
+          [disabled]="isSubmitting"
+        >
+          {{ 'COMMON.CANCEL' | translate }}
+        </button>
+        <!--
+          Span wrapper owns the tooltip — browsers swallow pointer
+          events on disabled buttons, so the explanation of why Save
+          is greyed out has to live on a hover-capable parent.
+          The tooltip is suppressed while a save is in flight (the
+          spinner already tells the user what's happening).
+        -->
+        <span
+          class="acf-btn-primary-wrap"
+          [pTooltip]="saveDisabledHint"
+          tooltipPosition="top"
+          [tooltipDisabled]="isSaveEnabled || isSubmitting"
+        >
+        <button
+          type="button"
+          class="acf-btn acf-btn--primary"
+          (click)="onSubmit()"
+          [disabled]="!isSaveEnabled || isSubmitting"
+        >
+          <i
+            class="pi"
+            [class.pi-spin]="isSubmitting"
+            [class.pi-spinner]="isSubmitting"
+            [class.pi-save]="!isSubmitting && editMode"
+            [class.pi-plus]="!isSubmitting && !editMode"
+          ></i>
+          {{
+            editMode
+              ? ('DATASET.SAVE_CHANGES' | translate)
+              : ('DATASET.ADD_FIELD' | translate)
+          }}
+        </button>
+        </span>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Unsaved-changes prompt — nested confirm rendered above the dialog
+     when the user tries to close with dirty state. Kept inline (rather
+     than going through a global service) so the lifecycle of the
+     question is bound to this dialog instance. -->
+<p-dialog
+  [(visible)]="showUnsavedPrompt"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [dismissableMask]="false"
+  [closeOnEscape]="true"
+  (onHide)="cancelClose()"
+  [style]="{ width: 'min(420px, 92vw)' }"
+  styleClass="acf-unsaved-dialog"
+>
+  <ng-template pTemplate="header">
+    <div class="acf-unsaved-header">
+      <div class="acf-unsaved-header__icon">
+        <i class="pi pi-exclamation-circle"></i>
+      </div>
+      <div class="acf-unsaved-header__text">
+        <h3>{{ 'DATASET.UNSAVED_CHANGES' | translate }}</h3>
+        <p>{{ 'DATASET.UNSAVED_CHANGES_MSG' | translate }}</p>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <div class="acf-unsaved-footer">
+      <button type="button" class="acf-btn acf-btn--ghost" (click)="cancelClose()">
+        {{ 'DATASET.KEEP_EDITING' | translate }}
+      </button>
+      <button type="button" class="acf-btn acf-btn--danger" (click)="confirmDiscard()">
+        <i class="pi pi-trash"></i>
+        {{ 'DATASET.DISCARD' | translate }}
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>

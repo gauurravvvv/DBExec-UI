@@ -1,215 +1,427 @@
-// Premium Design Variables
-.add-custom-field-popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--overlay-background);
-  backdrop-filter: blur(8px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: var(--z-overlay);
-  animation: fadeIn 0.2s ease-out;
+// =====================================================================
+// Custom-field builder dialog
+// ---------------------------------------------------------------------
+// PrimeNG renders <p-dialog> in an overlay attached to <body>, outside
+// this component's emulated-encapsulation root. To reach the dialog
+// content from here we use ::ng-deep, scoped to .add-custom-field-dialog
+// so this rule only matches our specific dialog and doesn't leak.
+//
+// Design language matches the analyses filter-dialog: icon-led header,
+// neutral footer chrome, primary action uses the gradient Add button,
+// quiet secondary actions. Tokens (--space-*, --radius-*, --fs-*) are
+// used throughout so dark mode, scaling, and theming Just Work.
+// =====================================================================
 
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
+// Reusable scrollbar — applied via @extend %acf-scrollbar.
+%acf-scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--radius-xs);
+
+    &:hover {
+      background: var(--border-strong, var(--secondary-color));
     }
   }
 
-  .popup-content {
-    background: var(--card-background);
-    border-radius: var(--radius-lg);
-    box-shadow:
-      var(--shadow-xl),
-      0 0 0 1px var(--border-color);
-    width: calc(100vw - 60px);
-    height: calc(100vh - 60px);
-    max-width: 1600px;
-    max-height: 900px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    animation: slideUp 0.25s ease-out;
-
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px) scale(0.95);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
+  &::-webkit-scrollbar-track {
+    background: transparent;
   }
+}
 
-  // Header
-  .dialog-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border-color);
+:host ::ng-deep {
+  .add-custom-field-dialog {
+    .p-dialog {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 20px 60px var(--overlay-background);
+      // p-dialog defaults to display:flex/column so header/content/footer
+      // stack vertically; we let the content panel absorb remaining
+      // height via flex:1 below.
+    }
 
-    .header-left {
+    .p-dialog-mask {
+      // 4px blur matches filter-dialog; 8px felt heavy.
+      backdrop-filter: blur(4px);
+      background: var(--overlay-background);
+    }
+
+    .p-dialog-header {
+      padding: var(--space-6) var(--space-7);
+      background: var(--card-background);
+      border-bottom: 1px solid var(--border-color);
+      align-items: flex-start;
+    }
+
+    .p-dialog-content {
+      padding: 0;
+      background: var(--card-background);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .p-dialog-footer {
+      padding: var(--space-5) var(--space-7);
+      background: var(--card-background);
+      border-top: 1px solid var(--border-color);
+    }
+
+    // ── Header chrome ──────────────────────────────────────────────
+    // Icon square + h3 + subtitle + close. Same identity as the
+    // filter-dialog so users see a consistent modal "shape" across
+    // the app.
+    .acf-header {
       display: flex;
       align-items: center;
       gap: var(--space-5);
+      flex: 1;
+      min-width: 0;
 
-      i {
-        font-size: var(--fs-h1);
-        color: var(--primary-color);
-      }
-
-      h2 {
-        margin: var(--space-0);
-        font-size: var(--fs-h2);
-        font-weight: var(--fw-semibold);
-        color: var(--text-color);
-      }
-    }
-
-    .close-btn {
-      color: var(--secondary-color);
-
-      &:hover {
-        color: var(--text-color);
-        background: var(--hover-background) !important;
-      }
-    }
-  }
-
-  // Main Body - 3 columns
-  .dialog-body {
-    flex: 1;
-    display: flex;
-    overflow: hidden;
-  }
-
-  // Shared Panel Styles
-  .fields-panel,
-  .functions-panel {
-    width: 340px;
-    display: flex;
-    flex-direction: column;
-    background: var(--hover-background);
-    overflow: hidden;
-
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 16px;
-      background: var(--card-background);
-      border-bottom: 1px solid var(--border-color);
-
-      h4 {
-        margin: var(--space-0);
-        font-size: var(--fs-control);
-        font-weight: var(--fw-semibold);
-        color: var(--text-color);
-        display: flex;
+      &__icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-md);
+        display: inline-flex;
         align-items: center;
+        justify-content: center;
+        background: var(--primary-color-transparent);
+        flex-shrink: 0;
 
         i {
+          font-size: 1.05rem;
           color: var(--primary-color);
         }
       }
 
-      .function-count,
-      .field-count {
-        font-size: var(--fs-micro);
-        color: var(--secondary-color);
-        background: var(--hover-background);
-        padding: 3px 8px;
-        border-radius: var(--radius-md);
+      &__text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+        flex: 1;
+
+        h3 {
+          margin: 0;
+          font-size: var(--fs-h2);
+          font-weight: var(--fw-semibold);
+          color: var(--text-color);
+          letter-spacing: -0.01em;
+          line-height: var(--lh-tight);
+        }
+
+        p {
+          margin: 0;
+          font-size: var(--fs-label);
+          color: var(--secondary-color);
+          line-height: var(--lh-snug);
+        }
       }
-    }
 
-    .search-box {
-      padding: 10px 12px;
-      background: var(--card-background);
-      border-bottom: 1px solid var(--border-color);
+      &__close {
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-md);
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--secondary-color);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--motion-base) ease;
 
-      .p-input-icon-left {
-        width: 100%;
+        &:hover {
+          color: var(--text-color);
+          background: var(--hover-background);
+          border-color: var(--border-color);
+        }
 
         i {
-          color: var(--secondary-color);
-          left: 10px;
-        }
-
-        input {
-          width: 100%;
-          font-size: var(--fs-label);
-          padding: 8px 8px 8px 32px;
-          background: var(--hover-background);
-          border: 1px solid var(--border-color);
-          border-radius: var(--radius-sm);
-          color: var(--text-color);
-          transition: all var(--motion-base);
-
-          &:focus {
-            border-color: var(--primary-color);
-            outline: none;
-            background: var(--card-background);
-            box-shadow: 0 0 0 2px var(--primary-color-transparent);
-          }
+          font-size: var(--fs-control);
         }
       }
     }
 
-    .description-section {
-      padding: 12px 14px;
-      background: var(--card-background);
-      border-top: 1px solid var(--border-color);
-      min-height: 120px;
+    // ── Body — three-pane layout ───────────────────────────────────
+    .acf-body {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 280px 1fr 320px;
+      min-height: 0;
+      overflow: hidden;
+    }
 
-      .description-header {
+    // ── Rails (left + right) ───────────────────────────────────────
+    .acf-rail {
+      display: flex;
+      flex-direction: column;
+      background: var(--hover-background);
+      min-height: 0;
+      overflow: hidden;
+
+      &--fields {
+        border-right: 1px solid var(--border-color);
+      }
+
+      &--functions {
+        border-left: 1px solid var(--border-color);
+      }
+
+      &__head {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 6px;
+        gap: var(--space-3);
+        padding: var(--space-4) var(--space-5);
+        background: var(--card-background);
+        border-bottom: 1px solid var(--border-color);
 
-        .selected-fn-name {
+        h4 {
+          margin: 0;
           font-size: var(--fs-control);
           font-weight: var(--fw-semibold);
-          color: var(--primary-color);
+          color: var(--text-color);
+          display: flex;
+          align-items: center;
+          gap: var(--space-3);
+          min-width: 0;
+
+          i {
+            color: var(--primary-color);
+            font-size: var(--fs-body);
+          }
         }
       }
 
-      .selected-fn-usage {
+      &__search {
+        padding: var(--space-3) var(--space-4);
+        background: var(--card-background);
+        border-bottom: 1px solid var(--border-color);
+      }
+    }
+
+    // Count pill — used in panel headers + category headers.
+    .acf-count {
+      font-size: var(--fs-micro);
+      color: var(--secondary-color);
+      background: var(--hover-background);
+      padding: 2px var(--space-3);
+      border-radius: var(--radius-pill, 999px);
+      font-weight: var(--fw-medium);
+      flex-shrink: 0;
+
+      &--inline {
+        margin-left: auto;
+      }
+    }
+
+    // ── List rails — dataset fields on the left ────────────────────
+    .acf-list {
+      @extend %acf-scrollbar;
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-3);
+      list-style: none;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+
+      &:focus-visible {
+        outline: 2px solid var(--primary-color);
+        outline-offset: -2px;
+      }
+
+      &__item {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-3) var(--space-4);
+        background: var(--card-background);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: border-color var(--motion-base) ease,
+          background var(--motion-base) ease;
+
+        &:hover {
+          border-color: var(--primary-color);
+        }
+
+        // Selected state is *visibly stronger* than hover: a left bar
+        // + tinted background + bolder border. Previously selected and
+        // hovered looked identical, which made keyboard nav confusing.
+        &.is-selected {
+          border-color: var(--primary-color);
+          background: var(--primary-color-transparent);
+          box-shadow: inset 3px 0 0 0 var(--primary-color);
+        }
+
+        &.is-custom {
+          // Custom (calculated) fields get a hairline bar on the right
+          // so they're distinguishable from raw dataset columns.
+          &::after {
+            content: '';
+            position: absolute;
+            top: 6px;
+            bottom: 6px;
+            right: 0;
+            width: 2px;
+            background: var(--primary-color);
+            border-radius: var(--radius-xs);
+            opacity: 0.6;
+          }
+        }
+      }
+
+      &__item-main {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+        flex: 1;
+      }
+
+      &__name {
+        font-size: var(--fs-label);
+        font-weight: var(--fw-semibold);
+        color: var(--text-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      &__code {
+        font-size: var(--fs-micro);
+        font-family: var(--font-mono);
+        color: var(--secondary-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      &__insert {
+        flex-shrink: 0;
+        width: 26px;
+        height: 26px;
+        border: 1px solid var(--primary-color);
+        background: var(--card-background);
+        color: var(--primary-color);
+        border-radius: var(--radius-sm);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background var(--motion-base) ease;
+
+        i {
+          font-size: var(--fs-micro);
+        }
+
+        &:hover {
+          background: var(--primary-color);
+          color: var(--primary-text);
+        }
+      }
+    }
+
+    // ── Type pills — compact glyph + colour per data type ──────────
+    .acf-type-pill {
+      flex-shrink: 0;
+      min-width: 22px;
+      height: 18px;
+      padding: 0 6px;
+      border-radius: var(--radius-xs);
+      font-size: 9px;
+      font-weight: var(--fw-semibold);
+      font-family: var(--font-mono);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: 0.02em;
+      background: var(--hover-background);
+      color: var(--secondary-color);
+
+      &--number {
+        background: var(--info-bg, rgba(59, 130, 246, 0.1));
+        color: var(--info-color, #2563eb);
+      }
+      &--bool {
+        background: var(--success-bg);
+        color: var(--success-color);
+      }
+      &--date,
+      &--datetime {
+        background: var(--warning-bg, rgba(245, 158, 11, 0.1));
+        color: var(--warning-color, #b45309);
+      }
+      &--json {
+        background: var(--primary-color-transparent);
+        color: var(--primary-color);
+      }
+      &--text {
+        background: var(--hover-background);
+        color: var(--secondary-color);
+      }
+    }
+
+    // ── Preview panels (selected field / selected function hints) ──
+    .acf-preview {
+      padding: var(--space-4) var(--space-5);
+      background: var(--card-background);
+      border-top: 1px solid var(--border-color);
+      min-height: 110px;
+
+      &__row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-3);
+      }
+
+      &__name {
+        font-size: var(--fs-control);
+        font-weight: var(--fw-semibold);
+        color: var(--primary-color);
+      }
+
+      &__code {
         display: block;
         font-size: var(--fs-micro);
         font-family: var(--font-mono);
         background: var(--hover-background);
-        padding: 6px 8px;
+        padding: var(--space-2) var(--space-3);
         border-radius: var(--radius-sm);
         color: var(--text-color);
-        margin-bottom: 6px;
+        margin-bottom: var(--space-3);
         word-break: break-all;
       }
 
-      .selected-fn-desc {
+      &__hint,
+      &__desc {
         font-size: var(--fs-micro);
-        color: var(--text-color);
-        margin: var(--space-0);
-        line-height: 1.4;
+        color: var(--secondary-color);
+        margin: 0;
+        line-height: var(--lh-snug);
       }
 
-      &.empty {
+      &--empty {
         display: flex;
         align-items: center;
         justify-content: center;
+        text-align: center;
 
         p {
-          margin: var(--space-0);
+          margin: 0;
           font-size: var(--fs-micro);
           color: var(--secondary-color);
           font-style: italic;
@@ -217,444 +429,373 @@
       }
     }
 
-    .no-results {
+    // ── Empty state ────────────────────────────────────────────────
+    .acf-empty {
+      list-style: none;
       text-align: center;
-      padding: 30px 16px;
+      padding: var(--space-7) var(--space-5);
       color: var(--secondary-color);
 
       i {
         font-size: var(--fs-h1);
         opacity: 0.3;
-        margin-bottom: 8px;
+        margin-bottom: var(--space-3);
         display: block;
       }
 
       p {
-        margin: var(--space-0);
+        margin: 0;
         font-size: var(--fs-micro);
       }
     }
-  }
 
-  // Left Panel - Dataset Fields
-  .fields-panel {
-    width: 260px;
-    border-right: 1px solid var(--border-color);
-
-    .fields-list {
-      flex: 1;
+    // ── Centre form ────────────────────────────────────────────────
+    .acf-form {
+      padding: var(--space-6) var(--space-7);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
       overflow-y: auto;
-      padding: var(--space-4);
+      min-height: 0;
+      @extend %acf-scrollbar;
 
-      &::-webkit-scrollbar {
-        width: 6px;
-      }
+      &__row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-5);
 
-      &::-webkit-scrollbar-thumb {
-        background: var(--border-color);
-        border-radius: var(--radius-xs);
-      }
-    }
-
-    .field-item {
-      padding: 8px 10px;
-      background: var(--card-background);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: all var(--motion-base) ease;
-      border: 1px solid var(--border-color);
-      margin-bottom: 4px;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-
-      &:hover,
-      &.selected {
-        border-color: var(--primary-color);
-        background: var(--primary-color-transparent);
-      }
-
-      &.custom-field {
-        border-left: 3px solid var(--primary-color);
-      }
-
-      .field-name {
-        font-size: var(--fs-label);
-        font-weight: var(--fw-semibold);
-        color: var(--text-color);
-      }
-
-      .field-column {
-        font-size: var(--fs-micro);
-        font-family: var(--font-mono);
-        color: var(--secondary-color);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-    }
-  }
-
-  // Center - Form Section
-  .form-section {
-    flex: 1;
-    min-width: 350px;
-    padding: var(--space-7);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-6);
-    overflow-y: auto;
-    border-right: 1px solid var(--border-color);
-
-    .form-field {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-3);
-
-      label {
-        color: var(--text-color);
-        font-weight: var(--fw-medium);
-        font-size: var(--fs-control);
-
-        .required {
-          color: var(--error-color);
+        @media (max-width: 700px) {
+          grid-template-columns: 1fr;
         }
       }
 
-      input {
-        width: 100%;
-        background: var(--hover-background);
-        border: 1px solid var(--border-color);
-        color: var(--text-color);
-        font-size: var(--fs-h3);
-        padding: 0.75rem 1rem;
-        border-radius: var(--radius-sm);
-        transition: all var(--motion-base);
-
-        &::placeholder {
-          color: var(--secondary-color);
-          opacity: 0.7;
-        }
-
-        &:focus {
-          background: var(--card-background);
-          border-color: var(--primary-color);
-          outline: none;
-          box-shadow: 0 0 0 2px var(--primary-color-transparent);
-        }
-      }
-
-      .field-name-error {
-        display: flex;
-        align-items: center;
-        gap: var(--space-3);
-        color: var(--error-color);
-        font-size: var(--fs-micro);
-        margin-top: 4px;
-
-        i {
-          font-size: var(--fs-label);
-        }
-      }
-
-      &.custom-logic-field {
-        flex: 1;
-        min-height: 200px;
+      &__field {
         display: flex;
         flex-direction: column;
+        gap: var(--space-3);
+        min-width: 0;
 
-        .editor-wrapper {
-          flex: 1;
-          border: 1px solid var(--border-color);
-          border-radius: var(--radius-sm);
-          overflow: hidden;
-          background: var(--card-background);
-          transition: all var(--motion-base);
-
-          &:focus-within {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px var(--primary-color-transparent);
-          }
-
-          .formula-editor {
-            height: 100%;
-            min-height: 180px;
-          }
+        // Required-field marker — same red convention used everywhere
+        // else in the app (filter dialog, listing-delete dialogs, the
+        // editor label below). Red on the asterisk reads as "must fill"
+        // at a glance; primary-tinted required markers were inconsistent
+        // with the rest of the codebase.
+        &--required ::ng-deep .required {
+          color: var(--error-color);
+          font-weight: var(--fw-semibold);
+          margin-left: 2px;
         }
 
-        .editor-loading {
-          flex: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: var(--space-5);
-          background: var(--hover-background);
-          border: 1px solid var(--border-color);
-          border-radius: var(--radius-sm);
-          color: var(--secondary-color);
-          font-size: var(--fs-control);
-          min-height: 180px;
-
-          i {
-            font-size: var(--fs-h2);
-          }
-        }
-
-        .editor-fallback {
-          flex: 1;
-          display: flex;
-
-          textarea {
-            flex: 1;
-            width: 100%;
-            background: var(--card-background);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            font-size: var(--fs-control);
-            padding: var(--space-5);
-            border-radius: var(--radius-sm);
-            resize: none;
-            font-family: var(--font-mono);
-            line-height: 1.5;
-            min-height: 180px;
-
-            &::placeholder {
-              color: var(--text-color);
-              opacity: 0.5;
-              font-family: inherit;
-            }
-
-            &:focus {
-              border-color: var(--primary-color);
-              outline: none;
-              box-shadow: 0 0 0 2px var(--primary-color-transparent);
-            }
-          }
-        }
-
-        .hint {
+        label {
+          font-size: var(--fs-body);
+          font-weight: var(--fw-medium);
+          color: var(--text-color);
           display: flex;
           align-items: center;
           gap: var(--space-3);
-          color: var(--secondary-color);
-          font-size: var(--fs-micro);
-          margin-top: 6px;
 
           i {
-            font-size: var(--fs-label);
+            font-size: var(--fs-control);
             color: var(--primary-color);
           }
         }
 
-        .validation-result {
+        &--editor {
+          flex: 1;
+          min-height: 280px;
           display: flex;
-          align-items: flex-start;
-          gap: var(--space-4);
-          padding: 10px 12px;
-          border-radius: var(--radius-sm);
-          font-size: var(--fs-label);
-          margin-top: 8px;
-
-          i {
-            font-size: var(--fs-body);
-            margin-top: 1px;
-          }
-
-          span {
-            flex: 1;
-            line-height: 1.4;
-          }
-
-          &.valid {
-            background: var(--success-bg);
-            border: 1px solid var(--success-bg);
-            color: var(--success-color);
-          }
-
-          &.invalid {
-            background: var(--error-bg);
-            border: 1px solid var(--error-bg);
-            color: var(--error-color);
-          }
+          flex-direction: column;
+          // The bare <label>…<span class="required"> markup here picks
+          // up the shared `&--required ::ng-deep .required` rule above
+          // (red asterisk) — no per-field override needed.
         }
       }
-    }
 
-    .popup-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: var(--space-5);
-      margin-top: auto;
-      padding-top: 16px;
-
-      // Shared button base — matches change-password dialog pattern
-      .btn-cancel,
-      .btn-secondary,
-      .btn-save {
+      // Derived-reference chip — shown live under the Label input so
+      // users see how the name becomes a formula reference.
+      &__derived {
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        gap: var(--space-3);
-        padding: 0.75rem 1.5rem !important;
-        border-radius: var(--radius-md) !important;
-        font-weight: var(--fw-semibold);
-        font-size: var(--fs-body);
-        cursor: pointer;
-        transition: all var(--motion-base) ease;
-
-        i {
-          font-size: var(--fs-control);
-        }
-
-        &:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-          box-shadow: none;
-        }
-      }
-
-      .btn-cancel {
-        background: var(--hover-background) !important;
-        border: 1px solid var(--border-color) !important;
-        color: var(--text-color) !important;
-
-        &:hover:not(:disabled) {
-          background: var(--border-color) !important;
-        }
-      }
-
-      .btn-secondary {
-        background: var(--hover-background) !important;
-        border: 1px solid var(--primary-color) !important;
-        color: var(--primary-color) !important;
-
-        &:hover:not(:disabled) {
-          background: var(--primary-color-transparent) !important;
-        }
-      }
-
-      .btn-save {
-        background: var(--primary-color) !important;
-        color: white !important;
-        border: none !important;
-        box-shadow: 0 4px 14px var(--primary-color-transparent);
-
-        &:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px var(--primary-color-transparent);
-        }
-
-        &:active:not(:disabled) {
-          transform: translateY(0);
-        }
-      }
-    }
-  }
-
-  // Right Panel - Functions Reference
-  .functions-panel {
-    .categories-list {
-      flex: 1;
-      overflow-y: auto;
-      padding: var(--space-4);
-
-      &::-webkit-scrollbar {
-        width: 6px;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: var(--border-color);
-        border-radius: var(--radius-xs);
-      }
-    }
-
-    .category-section {
-      margin-bottom: 6px;
-      background: var(--card-background);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-      border: 1px solid var(--border-color);
-    }
-
-    .category-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 12px;
-      cursor: pointer;
-      transition: background var(--motion-base);
-
-      &:hover {
-        background: var(--hover-background);
-      }
-
-      .category-info {
-        display: flex;
-        align-items: center;
-        gap: var(--space-4);
-
-        i {
-          font-size: var(--fs-control);
-          color: var(--primary-color);
-          width: 16px;
-        }
-
-        .category-name {
-          font-size: var(--fs-micro);
-          font-weight: var(--fw-semibold);
-          color: var(--text-color);
-        }
-
-        .count-badge {
-          background: var(--hover-background);
-          color: var(--secondary-color);
-          font-size: var(--fs-micro);
-          padding: 2px 5px;
-          border-radius: var(--radius-md);
-        }
-      }
-
-      > i {
+        gap: var(--space-2);
         font-size: var(--fs-micro);
         color: var(--secondary-color);
+
+        i {
+          color: var(--primary-color);
+          font-size: var(--fs-micro);
+        }
+
+        code {
+          font-family: var(--font-mono);
+          color: var(--text-color);
+          background: var(--hover-background);
+          padding: 1px var(--space-2);
+          border-radius: var(--radius-xs);
+        }
+      }
+
+      &__error {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        color: var(--error-color);
+        font-size: var(--fs-micro);
+
+        i {
+          font-size: var(--fs-label);
+        }
+      }
+
+      &__hint {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        color: var(--secondary-color);
+        font-size: var(--fs-micro);
+
+        i {
+          font-size: var(--fs-label);
+          color: var(--primary-color);
+        }
       }
     }
 
-    .functions-list {
-      border-top: 1px solid var(--border-color);
+    // ── Editor (Monaco / loading / fallback) ───────────────────────
+    .acf-editor {
+      flex: 1;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: var(--card-background);
+      transition: border-color var(--motion-base) ease,
+        box-shadow var(--motion-base) ease;
+      min-height: 280px;
+      display: flex;
+
+      &:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px var(--primary-color-transparent);
+      }
+
+      &__monaco {
+        flex: 1;
+        height: 100%;
+        min-height: 280px;
+      }
+
+      &--loading {
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-4);
+        background: var(--hover-background);
+        color: var(--secondary-color);
+        font-size: var(--fs-control);
+
+        i {
+          font-size: var(--fs-h2);
+        }
+      }
+
+      &--fallback {
+        // Textarea fallback shows when Monaco fails to load. Custom-input
+        // renders its own chrome; we just provide the wrapper height.
+        padding: 0;
+      }
+    }
+
+    // ── Validation result strip ────────────────────────────────────
+    .acf-validation {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-sm);
+      font-size: var(--fs-label);
+      border: 1px solid transparent;
+
+      i {
+        font-size: var(--fs-body);
+        margin-top: 1px;
+        flex-shrink: 0;
+      }
+
+      span {
+        flex: 1;
+        line-height: var(--lh-snug);
+      }
+
+      &.is-valid {
+        background: var(--success-bg);
+        border-color: var(--success-bg);
+        color: var(--success-color);
+      }
+
+      &.is-invalid {
+        background: var(--error-bg);
+        border-color: var(--error-bg);
+        color: var(--error-color);
+      }
+    }
+
+    // ── Functions panel ────────────────────────────────────────────
+    .acf-categories {
+      @extend %acf-scrollbar;
+      flex: 1;
+      overflow-y: auto;
       padding: var(--space-3);
       display: flex;
       flex-direction: column;
-      gap: var(--space-2);
-      background: var(--hover-background);
-      max-height: 180px;
-      overflow-y: auto;
+      gap: var(--space-3);
+
+      &:focus-visible {
+        outline: 2px solid var(--primary-color);
+        outline-offset: -2px;
+      }
     }
 
-    .function-item {
-      padding: 6px 8px;
+    .acf-category {
       background: var(--card-background);
+      border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: all var(--motion-base) ease;
-      border: 1px solid transparent;
+      overflow: hidden;
+      flex-shrink: 0; // keep collapsed headers visible while one is open
+
+      // When expanded, lift slightly so the active category reads as
+      // "you are here" against the surrounding collapsed headers.
+      &.is-expanded {
+        border-color: var(--primary-color);
+        box-shadow: 0 2px 6px var(--primary-color-transparent);
+      }
+
+      &__head {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-3) var(--space-4);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        transition: background var(--motion-base) ease;
+
+        &:hover {
+          background: var(--hover-background);
+        }
+      }
+
+      &__title {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        min-width: 0;
+        flex: 1;
+
+        > i {
+          color: var(--primary-color);
+          font-size: var(--fs-control);
+          width: 16px;
+          flex-shrink: 0;
+        }
+
+        > span:first-of-type {
+          font-size: var(--fs-label);
+          font-weight: var(--fw-semibold);
+          color: var(--text-color);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      &__chevron {
+        font-size: var(--fs-micro);
+        color: var(--secondary-color);
+        flex-shrink: 0;
+        // Single chevron icon that rotates 0° → -90° when collapsed.
+        // Cheaper than swapping icon classes and reads as smooth motion.
+        transition: transform var(--motion-base) ease;
+
+        &.is-collapsed {
+          transform: rotate(-90deg);
+        }
+      }
+    }
+
+    .acf-fn-list {
+      border-top: 1px solid var(--border-color);
+      padding: var(--space-2);
       display: flex;
       flex-direction: column;
       gap: var(--space-1);
+      background: var(--hover-background);
+      list-style: none;
+      margin: 0;
 
-      &:hover,
-      &.selected {
+      // Cap the open list so other (collapsed) category headers stay
+      // visible — otherwise expanding "String Functions" (22 items)
+      // pushes all other categories out of the viewport. The list
+      // gets its own thin scroll inside the cap.
+      max-height: 320px;
+      overflow-y: auto;
+      @extend %acf-scrollbar;
+
+      // Smooth fade-in when a category opens. We can't animate height
+      // (auto → fixed) without JS, but a quick opacity fade with a
+      // small vertical offset reads as "expanding".
+      animation: acf-fn-list-in 180ms ease-out;
+    }
+
+    @keyframes acf-fn-list-in {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .acf-fn-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      background: var(--card-background);
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: border-color var(--motion-base) ease,
+        background var(--motion-base) ease;
+
+      &:hover {
         border-color: var(--primary-color);
-        background: var(--primary-color-transparent);
       }
 
-      .function-name {
+      &.is-selected {
+        border-color: var(--primary-color);
+        background: var(--primary-color-transparent);
+        box-shadow: inset 3px 0 0 0 var(--primary-color);
+      }
+
+      &__main {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        min-width: 0;
+        flex: 1;
+      }
+
+      &__name {
         font-size: var(--fs-micro);
         font-weight: var(--fw-semibold);
         color: var(--primary-color);
       }
 
-      .function-usage {
+      &__usage {
         font-size: var(--fs-micro);
         font-family: var(--font-mono);
         color: var(--secondary-color);
@@ -662,43 +803,233 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
+
+      &__insert {
+        flex-shrink: 0;
+        width: 22px;
+        height: 22px;
+        border: 1px solid var(--primary-color);
+        background: var(--card-background);
+        color: var(--primary-color);
+        border-radius: var(--radius-xs);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background var(--motion-base) ease;
+
+        i {
+          font-size: 9px;
+        }
+
+        &:hover {
+          background: var(--primary-color);
+          color: var(--primary-text);
+        }
+      }
+    }
+
+    // ── Footer buttons ─────────────────────────────────────────────
+    // Validate sits on the left as a pre-flight secondary action;
+    // Cancel + Save pair on the right as the deliberate exits.
+    .acf-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+
+      &__validate {
+        // Left-aligned via the parent's justify-content: space-between;
+        // no margin trick needed.
+      }
+
+      &__primary {
+        display: flex;
+        gap: var(--space-3);
+        align-items: center;
+      }
+    }
+
+    // Wrap span that owns the disabled-state tooltip on the Save
+    // button — browsers swallow pointer events on disabled <button>
+    // elements, so the tooltip has to live on a hover-capable parent.
+    .acf-btn-primary-wrap {
+      display: inline-flex;
+    }
+
+    .acf-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: 0.55rem 1.1rem;
+      border-radius: var(--radius-sm);
+      font-weight: var(--fw-semibold);
+      font-size: var(--fs-body);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background var(--motion-base) ease,
+        border-color var(--motion-base) ease,
+        color var(--motion-base) ease,
+        box-shadow var(--motion-base) ease;
+
+      i {
+        font-size: var(--fs-control);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      &--ghost {
+        background: transparent;
+        border-color: var(--border-color);
+        color: var(--text-color);
+
+        &:hover:not(:disabled) {
+          background: var(--hover-background);
+        }
+      }
+
+      &--secondary {
+        background: transparent;
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+
+        &:hover:not(:disabled) {
+          background: var(--primary-color-transparent);
+        }
+      }
+
+      &--primary {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--primary-hover)
+        );
+        color: var(--primary-text);
+        box-shadow: 0 4px 10px var(--primary-color-transparent);
+
+        // No transform/translateY on hover — that pattern is dated.
+        // A subtle shadow bump signals interactivity without bouncing.
+        &:hover:not(:disabled) {
+          box-shadow: var(--shadow-md);
+        }
+      }
+
+      &--danger {
+        background: var(--error-color);
+        color: var(--primary-text);
+        border-color: var(--error-color);
+
+        &:hover:not(:disabled) {
+          filter: brightness(0.95);
+        }
+      }
+    }
+
+    // ── Responsive ─────────────────────────────────────────────────
+    // Below 1100px the right rail collapses (the editor is the
+    // critical surface; functions become a bottom drawer instead).
+    @media (max-width: 1100px) {
+      .acf-body {
+        grid-template-columns: 240px 1fr;
+      }
+
+      .acf-rail--functions {
+        display: none;
+      }
+    }
+
+    // Below 820px the left rail also folds, putting the editor full
+    // width. Field picker remains accessible via Monaco autocompletion.
+    @media (max-width: 820px) {
+      .acf-body {
+        grid-template-columns: 1fr;
+      }
+
+      .acf-rail--fields {
+        display: none;
+      }
+
+      .acf-form {
+        padding: var(--space-5);
+      }
     }
   }
-}
 
-// Responsive
-@media (max-width: 1100px) {
-  .add-custom-field-popup .popup-content {
-    width: calc(100vw - 20px);
-    height: calc(100vh - 20px);
-
-    .fields-panel,
-    .functions-panel {
-      width: 280px;
-    }
-  }
-}
-
-@media (max-width: 900px) {
-  .add-custom-field-popup .popup-content {
-    .dialog-body {
-      flex-direction: column;
+  // ── Unsaved-changes prompt ───────────────────────────────────────
+  // A second p-dialog, smaller, sits on top of the main one. Uses the
+  // same chrome tokens as filter-dialog's prompts.
+  .acf-unsaved-dialog {
+    .p-dialog {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
     }
 
-    .fields-panel,
-    .functions-panel {
-      width: 100%;
-      max-height: 200px;
-    }
-
-    .fields-panel {
-      border-right: none;
+    .p-dialog-header {
+      padding: var(--space-6) var(--space-7);
+      background: var(--card-background);
       border-bottom: 1px solid var(--border-color);
     }
 
-    .form-section {
-      border-right: none;
-      min-height: 250px;
+    .p-dialog-content {
+      padding: 0;
+      background: var(--card-background);
+    }
+
+    .p-dialog-footer {
+      padding: var(--space-5) var(--space-7);
+      background: var(--card-background);
+      border-top: 1px solid var(--border-color);
+    }
+
+    .acf-unsaved-header {
+      display: flex;
+      gap: var(--space-4);
+      align-items: flex-start;
+
+      &__icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-md);
+        background: var(--warning-bg, rgba(245, 158, 11, 0.1));
+        color: var(--warning-color, #b45309);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        i {
+          font-size: 1.05rem;
+        }
+      }
+
+      &__text {
+        flex: 1;
+        min-width: 0;
+
+        h3 {
+          margin: 0 0 var(--space-2);
+          font-size: var(--fs-h2);
+          font-weight: var(--fw-semibold);
+          color: var(--text-color);
+        }
+
+        p {
+          margin: 0;
+          font-size: var(--fs-label);
+          color: var(--secondary-color);
+          line-height: var(--lh-snug);
+        }
+      }
+    }
+
+    .acf-unsaved-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-3);
     }
   }
 }

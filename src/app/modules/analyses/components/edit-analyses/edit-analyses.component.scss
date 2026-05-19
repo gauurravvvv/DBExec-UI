@@ -361,6 +361,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: var(--space-3);
 
     .dataset-label {
       font-size: var(--fs-body);
@@ -368,6 +369,8 @@
       color: var(--secondary-color);
       letter-spacing: 0.5px;
       margin: var(--space-0);
+      flex: 1;
+      min-width: 0;
     }
 
     .visual-count-badge {
@@ -379,6 +382,38 @@
       border-radius: var(--radius-lg);
       min-width: 20px;
       text-align: center;
+    }
+
+    // Refresh button — quiet by default, primary tint on hover so it
+    // reads as "do this" without screaming on first glance.
+    .fields-refresh-btn {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--secondary-color);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--motion-base) ease;
+
+      i {
+        font-size: var(--fs-control);
+      }
+
+      &:hover:not(:disabled) {
+        color: var(--primary-color);
+        background: var(--card-background);
+        border-color: var(--border-color);
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
     }
 
     .dataset-name {

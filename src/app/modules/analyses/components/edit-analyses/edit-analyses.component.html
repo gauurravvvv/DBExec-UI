@@ -198,6 +198,27 @@
           <span class="visual-count-badge" *ngIf="allFields.length > 0">
             {{ allFields.length }}
           </span>
+          <!--
+            Refresh icon — re-fetches dataset fields, analysis fields,
+            AND the filter list (via invalidating the analyses-filter
+            store lane). Single button covers both surfaces because the
+            data model is "this analysis"; splitting it would be
+            confusing. See refreshFields() for the full flow.
+          -->
+          <button
+            type="button"
+            class="fields-refresh-btn"
+            (click)="refreshFields()"
+            [disabled]="isRefreshingFields"
+            [pTooltip]="'ANALYSES.REFRESH_FIELDS_TOOLTIP' | translate"
+            tooltipPosition="bottom"
+            [attr.aria-label]="'ANALYSES.REFRESH_FIELDS_TOOLTIP' | translate"
+          >
+            <i
+              class="pi pi-refresh"
+              [class.pi-spin]="isRefreshingFields"
+            ></i>
+          </button>
         </div>
         <div class="sidebar-divider"></div>
         <div class="sidebar-content-inner fields-panel-content">
@@ -477,11 +498,16 @@
       </div>
     </div>
 
-    <!-- Filter Configuration Dialog -->
+    <!-- Filter Configuration Dialog
+         Receives the merged dataset + analysis-level field list so
+         analysis-scoped custom fields (created via Add Field) are
+         filterable. Previously the dropdown was scoped to dataset
+         fields only, which silently excluded everything the user
+         had built at the analysis level. -->
     <app-filter-dialog
       [(visible)]="showFilterDialog"
       [editingFilter]="editingFilter"
-      [datasetFields]="datasetDetails?.datasetFields || []"
+      [datasetFields]="allFields"
       [datasetId]="datasetId"
       [orgId]="orgId"
       [analysisId]="analysisId"
