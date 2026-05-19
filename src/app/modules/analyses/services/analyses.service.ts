@@ -304,11 +304,17 @@ export class AnalysesService {
     }
   }
 
-  async deleteFilter(orgId: string, filterId: string) {
+  async deleteFilter(
+    orgId: string,
+    filterId: string,
+    justification?: string,
+  ) {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiDelete(ANALYSIS_FILTER.DELETE + `${orgId}/${filterId}`),
+        this.http.apiDelete(ANALYSIS_FILTER.DELETE + `${orgId}/${filterId}`, {
+          body: { justification },
+        }),
       );
     } finally {
       this._saving.set(false);

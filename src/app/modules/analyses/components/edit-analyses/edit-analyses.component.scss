@@ -2596,6 +2596,23 @@
           }
         }
       }
+
+      // Justification block — required textarea + character counter.
+      // Mirrors the listing modules' confirm-delete idiom so deletes
+      // that need an audit reason look and behave the same everywhere.
+      .justification-section {
+        text-align: left;
+        margin-top: var(--space-6);
+
+        .char-count {
+          display: block;
+          text-align: right;
+          margin-top: var(--space-2);
+          font-size: var(--fs-label);
+          color: var(--secondary-color);
+          opacity: 0.6;
+        }
+      }
     }
 
     .popup-actions {

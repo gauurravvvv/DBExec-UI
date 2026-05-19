@@ -1187,13 +1187,39 @@ export class EditAnalysesComponent
 
   isDeletingFilter: string | null = null;
 
-  async removeFilter(filter: ConfiguredFilter): Promise<void> {
-    if (this.isDeletingFilter) return; // prevent double-click
+  // ── Filter-delete confirmation popup ─────────────────────────────
+  // Mirrors the listing-module pattern: open a popup with a required
+  // justification textarea, only fire the network call when the user
+  // confirms with a non-empty reason. The reason flows to the BE for
+  // audit-log capture (see deleteAnalysisFilter controller).
+  showDeleteFilterConfirm = false;
+  filterToDelete: ConfiguredFilter | null = null;
+  filterDeleteJustification = '';
+
+  confirmRemoveFilter(filter: ConfiguredFilter): void {
+    if (this.isDeletingFilter) return; // prevent double-click while a delete is in flight
+    this.filterToDelete = filter;
+    this.filterDeleteJustification = '';
+    this.showDeleteFilterConfirm = true;
+  }
+
+  cancelRemoveFilter(): void {
+    this.showDeleteFilterConfirm = false;
+    this.filterToDelete = null;
+    this.filterDeleteJustification = '';
+  }
+
+  async proceedRemoveFilter(): Promise<void> {
+    const filter = this.filterToDelete;
+    const reason = this.filterDeleteJustification.trim();
+    if (!filter || !reason) return;
+
     this.isDeletingFilter = filter.tempId;
     try {
       const res: any = await this.analysesService.deleteFilter(
         this.orgId,
         filter.tempId,
+        reason,
       );
       if (this.globalService.handleSuccessService(res, true)) {
         // Surgical store patch — drop the deleted filter from the
@@ -1209,6 +1235,7 @@ export class EditAnalysesComponent
       this.globalService.handleErrorService(err);
     } finally {
       this.isDeletingFilter = null;
+      this.cancelRemoveFilter();
     }
   }
 

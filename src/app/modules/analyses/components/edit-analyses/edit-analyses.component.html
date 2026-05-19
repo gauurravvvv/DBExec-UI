@@ -434,7 +434,7 @@
                         ? 'pi pi-spin pi-spinner'
                         : 'pi pi-trash'
                     "
-                    (click)="removeFilter(filter)"
+                    (click)="confirmRemoveFilter(filter)"
                     [pTooltip]="
                       isDeletingFilter === filter.tempId
                         ? ('ANALYSES.DELETING' | translate)
@@ -756,6 +756,85 @@
       <button class="btn-confirm" (click)="proceedDeleteField()">
         <i class="pi pi-trash"></i>
         {{ 'COMMON.DELETE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Filter Confirmation Dialog — mirrors listing-module copy,
+     with a required justification textarea so the audit log can capture
+     why this filter was removed. Reuses the .confirmation-popup chrome
+     defined further down in the component's SCSS. -->
+<div class="confirmation-popup" *ngIf="showDeleteFilterConfirm">
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-trash"></i>
+      </div>
+      <h3>{{ 'ANALYSES.CONFIRM_DELETE_FILTER' | translate }}</h3>
+    </div>
+    <div class="standard-delete-section">
+      <p class="delete-intro" *ngIf="filterToDelete">
+        {{
+          'ANALYSES.CONFIRM_DELETE_FILTER_MSG'
+            | translate: { name: filterToDelete.name || filterToDelete.columnName }
+        }}
+      </p>
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'ANALYSES.DELETE_FILTER_INFO' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'ANALYSES.DELETE_FILTER_VISUALS_AFFECTED' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
+        </li>
+      </ul>
+
+      <div class="justification-section">
+        <app-custom-input
+          [(ngModel)]="filterDeleteJustification"
+          [label]="'COMMON.JUSTIFICATION' | translate"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
+          inputMode="textarea"
+          [rows]="3"
+          [maxLength]="500"
+          [required]="true"
+        ></app-custom-input>
+        <small class="char-count">{{ filterDeleteJustification.length }}/500</small>
+      </div>
+    </div>
+    <div class="popup-actions">
+      <button
+        class="btn-cancel"
+        type="button"
+        (click)="cancelRemoveFilter()"
+        [disabled]="isDeletingFilter"
+      >
+        <i class="pi pi-times"></i>
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm"
+        type="button"
+        (click)="proceedRemoveFilter()"
+        [disabled]="!filterDeleteJustification.trim() || !!isDeletingFilter"
+      >
+        <i
+          class="pi"
+          [class.pi-spin]="!!isDeletingFilter"
+          [class.pi-spinner]="!!isDeletingFilter"
+          [class.pi-trash]="!isDeletingFilter"
+        ></i>
+        {{
+          isDeletingFilter
+            ? ('ANALYSES.DELETING' | translate)
+            : ('COMMON.DELETE' | translate)
+        }}
       </button>
     </div>
   </div>
