@@ -1109,7 +1109,8 @@
     "FILTER_COLUMN_MISSING": "이 필터의 열이 데이터셋에 더 이상 없습니다. 필터를 제거하여 이 경고를 해제하세요.",
     "FILTER_SAVED_WITH_WARNING": "필터를 저장했습니다(경고 포함)",
     "FILTER_SAVED_WITH_STALE_DEFAULTS": "저장된 값 {{count}}개가 현재 데이터에 없습니다",
-    "FILTER_SELECT_DATE_RANGE": "날짜 범위 선택"
+    "FILTER_SELECT_DATE_RANGE": "날짜 범위 선택",
+    "FILTER_REMOVE_STALE": "제거"
   },
   "DASHBOARD": {
     "TITLE": "대시보드",

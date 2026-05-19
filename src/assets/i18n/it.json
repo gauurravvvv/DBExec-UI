@@ -1109,7 +1109,8 @@
     "FILTER_COLUMN_MISSING": "La colonna di questo filtro non è più nel dataset. Rimuovi il filtro per cancellare l'avviso.",
     "FILTER_SAVED_WITH_WARNING": "Filtro salvato, con avviso",
     "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} valore/i salvato/i non sono attualmente nei dati",
-    "FILTER_SELECT_DATE_RANGE": "Seleziona intervallo di date"
+    "FILTER_SELECT_DATE_RANGE": "Seleziona intervallo di date",
+    "FILTER_REMOVE_STALE": "Rimuovi"
   },
   "DASHBOARD": {
     "TITLE": "Dashboard",

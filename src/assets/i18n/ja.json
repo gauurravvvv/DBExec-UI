@@ -1109,7 +1109,8 @@
     "FILTER_COLUMN_MISSING": "このフィルタの列はデータセットにありません。フィルタを削除してこの警告を消してください。",
     "FILTER_SAVED_WITH_WARNING": "フィルターを保存しました（警告あり）",
     "FILTER_SAVED_WITH_STALE_DEFAULTS": "保存された値のうち {{count}} 件は現在データに存在しません",
-    "FILTER_SELECT_DATE_RANGE": "日付範囲を選択"
+    "FILTER_SELECT_DATE_RANGE": "日付範囲を選択",
+    "FILTER_REMOVE_STALE": "削除"
   },
   "DASHBOARD": {
     "TITLE": "ダッシュボード",

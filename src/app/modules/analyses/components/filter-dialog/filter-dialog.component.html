@@ -115,6 +115,36 @@
       >
         <i class="pi pi-info-circle"></i> {{ 'ANALYSES.LOAD_DATA_TO_SEE_VALUES' | translate }}
       </small>
+
+      <!-- Stale-default warning. Visible when one or more saved
+           default values are not present in the freshly-loaded options
+           (a source value got dropped between filter creation and
+           re-edit). Catches the case before the user re-saves the
+           same stale value. Click "Remove" to strip them; otherwise
+           the multiselect keeps them as selected chips until Save. -->
+      <div
+        class="filter-stale-row"
+        *ngIf="filterDialogStaleDefaults.length > 0"
+      >
+        <i class="pi pi-exclamation-circle"></i>
+        <span class="filter-stale-label">
+          {{ 'ANALYSES.FILTER_STALE_VALUES' | translate }}
+        </span>
+        <span
+          class="filter-stale-chip"
+          *ngFor="let v of filterDialogStaleDefaults"
+          [title]="'ANALYSES.FILTER_STALE_TOOLTIP' | translate"
+        >
+          {{ v }}
+        </span>
+        <button
+          type="button"
+          class="filter-stale-remove-all"
+          (click)="removeStaleDefaults()"
+        >
+          {{ 'ANALYSES.FILTER_REMOVE_STALE' | translate }}
+        </button>
+      </div>
     </div>
 
     <!-- Default Value Section — Numeric Equality -->

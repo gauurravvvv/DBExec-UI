@@ -290,10 +290,14 @@ export class AnalysisFilterBarComponent implements OnInit, OnChanges {
   ): void {
     const s = stateAccessor(filter);
     if (!s) return;
+    // Case- AND whitespace-insensitive lookup: 'Marketing ' (saved
+    // with a trailing space) should still match live 'Marketing'.
+    // Mirrors the BE probe's LOWER(TRIM(...)) comparison so the two
+    // sides agree on what counts as stale.
     const liveLookup = new Map<string, string | number>();
     for (const opt of s.options) {
       if (opt.value === null || opt.value === undefined) continue;
-      liveLookup.set(String(opt.value).toLowerCase(), opt.value);
+      liveLookup.set(String(opt.value).trim().toLowerCase(), opt.value);
     }
     const rawDefaults = Array.isArray(config.defaultValue)
       ? config.defaultValue
@@ -304,7 +308,7 @@ export class AnalysisFilterBarComponent implements OnInit, OnChanges {
     const present: (string | number)[] = [];
     const stale: string[] = [];
     for (const d of stringDefaults) {
-      const hit = liveLookup.get(d.toLowerCase());
+      const hit = liveLookup.get(d.trim().toLowerCase());
       if (hit !== undefined) present.push(hit);
       else stale.push(d);
     }

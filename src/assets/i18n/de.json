@@ -1109,7 +1109,8 @@
     "FILTER_COLUMN_MISSING": "Die Spalte dieses Filters ist nicht mehr im Dataset. Entfernen Sie den Filter, um diese Warnung zu beheben.",
     "FILTER_SAVED_WITH_WARNING": "Filter mit Warnung gespeichert",
     "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} gespeicherte Werte sind derzeit nicht in den Daten",
-    "FILTER_SELECT_DATE_RANGE": "Datumsbereich wählen"
+    "FILTER_SELECT_DATE_RANGE": "Datumsbereich wählen",
+    "FILTER_REMOVE_STALE": "Entfernen"
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",

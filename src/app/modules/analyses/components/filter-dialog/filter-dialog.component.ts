@@ -112,6 +112,18 @@ export class FilterDialogComponent implements OnChanges {
   filterDialogIncludeTime: boolean = false;
   filterDialogDateFormat: string = 'yy-mm-dd';
   filterDialogCategoryValues: any[] = [];
+  /**
+   * Saved default values that are NOT in the freshly-loaded
+   * filterDialogCategoryValues. Populated by recomputeStaleDefaults()
+   * after the picker options resolve. Rendered as a warning row above
+   * the multiselect so the user knows what's about to be re-saved as
+   * stale.
+   *
+   * Stored as the raw saved values (strings/numbers) for direct render;
+   * comparison is case- and whitespace-insensitive against the live
+   * option labels.
+   */
+  filterDialogStaleDefaults: string[] = [];
   isLoadingFilterValues: boolean = false;
   isSavingFilter: boolean = false;
 
@@ -202,6 +214,7 @@ export class FilterDialogComponent implements OnChanges {
     this.filterDialogIncludeTime = false;
     this.filterDialogDateFormat = 'yy-mm-dd';
     this.filterDialogCategoryValues = [];
+    this.filterDialogStaleDefaults = [];
     this.isLoadingFilterValues = false;
     this.controlTypeOptions = [];
     this.operatorOptions = [];
@@ -532,7 +545,76 @@ export class FilterDialogComponent implements OnChanges {
       console.error('Failed to load distinct values', err);
     } finally {
       this.isLoadingFilterValues = false;
+      // Reconcile any saved-but-missing defaults against the freshly
+      // loaded options. The user sees a warning row before they Save,
+      // so they don't accidentally re-persist a value that's already
+      // gone from source.
+      this.recomputeStaleDefaults();
     }
+  }
+
+  /**
+   * Split `filterDialogDefaultValue` into "present" (still in
+   * filterDialogCategoryValues) and "stale" (not). Stale values stay
+   * in the model so the multiselect still shows them as selected
+   * chips, but we surface a warning row + a one-click "Remove stale"
+   * action in the template.
+   *
+   * Matching is case- and whitespace-insensitive — saved 'Marketing '
+   * with a trailing space should still match live 'Marketing'.
+   *
+   * Called every time the options list changes (column switch,
+   * dialog open with existing filter).
+   */
+  recomputeStaleDefaults(): void {
+    if (this.filterDialogType !== 'category') {
+      this.filterDialogStaleDefaults = [];
+      return;
+    }
+    const dv = this.filterDialogDefaultValue;
+    if (dv === null || dv === undefined || dv === '') {
+      this.filterDialogStaleDefaults = [];
+      return;
+    }
+    const saved: string[] = (Array.isArray(dv) ? dv : [dv])
+      .filter(v => v !== null && v !== undefined && v !== '')
+      .map(v => String(v));
+    if (saved.length === 0) {
+      this.filterDialogStaleDefaults = [];
+      return;
+    }
+    const liveNorm = new Set(
+      (this.filterDialogCategoryValues || []).map(o =>
+        String(o.value ?? '').trim().toLowerCase(),
+      ),
+    );
+    this.filterDialogStaleDefaults = saved.filter(
+      v => !liveNorm.has(v.trim().toLowerCase()),
+    );
+  }
+
+  /**
+   * Drop the stale entries from `filterDialogDefaultValue`. The user
+   * clicks the "Remove stale" button in the warning row; we strip
+   * them from the model and recompute (should yield [] now). The
+   * actual persistence still requires a Save click.
+   */
+  removeStaleDefaults(): void {
+    const dv = this.filterDialogDefaultValue;
+    if (dv === null || dv === undefined) return;
+    const stale = new Set(
+      this.filterDialogStaleDefaults.map(s => s.trim().toLowerCase()),
+    );
+    const next = (Array.isArray(dv) ? dv : [dv]).filter(
+      v =>
+        v !== null &&
+        v !== undefined &&
+        v !== '' &&
+        !stale.has(String(v).trim().toLowerCase()),
+    );
+    // Preserve single-vs-array shape; multi-select expects array.
+    this.filterDialogDefaultValue = Array.isArray(dv) ? next : next[0] ?? null;
+    this.recomputeStaleDefaults();
   }
 
   private extractDefaultValue(config: any, filterType: string): any {

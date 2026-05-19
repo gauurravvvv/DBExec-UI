@@ -1109,7 +1109,8 @@
     "FILTER_COLUMN_MISSING": "La columna de este filtro ya no está en el conjunto de datos. Elimina el filtro para descartar este aviso.",
     "FILTER_SAVED_WITH_WARNING": "Filtro guardado, con advertencia",
     "FILTER_SAVED_WITH_STALE_DEFAULTS": "{{count}} valor(es) guardado(s) no están en los datos ahora",
-    "FILTER_SELECT_DATE_RANGE": "Seleccionar rango de fechas"
+    "FILTER_SELECT_DATE_RANGE": "Seleccionar rango de fechas",
+    "FILTER_REMOVE_STALE": "Eliminar"
   },
   "DASHBOARD": {
     "TITLE": "Paneles",
