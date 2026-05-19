@@ -26,7 +26,10 @@ export const setActiveAnalysis = createAction(
 
 export const loadOpen = createAction(
   '[Analyses Filter] Load Open',
-  props<{ analysisId: string }>(),
+  // `organisation` is required by the BE middleware to resolve the
+  // org's shared-DB connection. Every analysis-filter call sends it;
+  // omitting it crashes the BE for system admins on the default org.
+  props<{ analysisId: string; organisation: string }>(),
 );
 
 export const loadOpenSuccess = createAction(
@@ -48,8 +51,10 @@ export const loadOpenFailure = createAction(
 
 export const fetchValues = createAction(
   '[Analyses Filter] Fetch Values',
+  // organisation is required for the same reason as on loadOpen.
   props<{
     analysisId: string;
+    organisation: string;
     filterId: string;
     search?: string;
     page?: number;

@@ -99,6 +99,10 @@ export class FilterOptionsCacheService {
       page?: number;
       pageSize?: number;
       coalesceWith?: string[];
+      /** Required — the BE middleware uses this to resolve the org's
+       *  shared-DB connection. Other analysis-filter calls send the
+       *  same field; see analyses.service.getFilterValuesBatch. */
+      organisation?: string;
     } = {},
   ): Promise<FilterValuesResult> {
     const search = options.search ?? '';
@@ -133,6 +137,7 @@ export class FilterOptionsCacheService {
     const fetchPromise = (async () => {
       try {
         const res: any = await this.analysesService.getFilterValuesBatch({
+          organisation: options.organisation ?? '',
           analysisId,
           requests,
         });
@@ -182,6 +187,7 @@ export class FilterOptionsCacheService {
    * when every requested filter is in the cache.
    */
   async prefetch(
+    organisation: string,
     analysisId: string,
     filterIds: string[],
     pageSize?: number,
@@ -192,6 +198,7 @@ export class FilterOptionsCacheService {
     await this.get(analysisId, filterIds[0], {
       pageSize,
       coalesceWith: filterIds.slice(1),
+      organisation,
     });
   }
 
@@ -204,13 +211,20 @@ export class FilterOptionsCacheService {
    * so the caller can drop it straight onto the same `filters: []`
    * field it used before. Values are stamped into the cache so
    * subsequent .get() calls resolve from memory.
+   *
+   * `organisation` is REQUIRED so the BE middleware can resolve the
+   * shared-DB connection. Other analysis-filter calls send the same
+   * field; without it the BE crashes on master_db_connection access
+   * for system admins on the default org.
    */
   async open(
+    organisation: string,
     analysisId: string,
     pageSize = 100,
   ): Promise<{ filters: any[]; warmed: boolean }> {
     try {
       const res: any = await this.analysesService.getFilterValuesBatch({
+        organisation,
         analysisId,
         mode: 'open' as any,
         // The BE derives requests from the analysis filter list in

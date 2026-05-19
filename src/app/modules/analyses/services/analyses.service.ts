@@ -338,6 +338,14 @@ export class AnalysesService {
    *   { status: true, data: { results: { [filterId]: FilterValuesResult } } }
    */
   getFilterValuesBatch(payload: {
+    // `organisation` is REQUIRED — every other analysis-filter call
+    // sends it (see addFilters, updateFilter, deleteFilter). The BE
+    // VerifyMasterDatabaseMiddleware reads it to resolve the org's
+    // shared-DB connection. Omitting it causes the middleware to fall
+    // through to the loggedInOrgId fallback, which for system admins
+    // on the default org leaves master_db_connection undefined and
+    // crashes the controller.
+    organisation: string;
     analysisId: string;
     // 'open' tells the BE to list + fetch values in one trip;
     // 'fetch' (default) is the lazy per-dropdown form.

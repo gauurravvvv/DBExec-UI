@@ -151,6 +151,7 @@ export class AnalysisFilterBarComponent implements OnInit, OnChanges {
     this.isLoading = true;
     try {
       const { filters, warmed } = await this.optionsCache.open(
+        this.orgId,
         this.analysisId,
       );
       this.internalFilters = (filters || []).filter((f: any) => f.isEnabled);
@@ -173,7 +174,9 @@ export class AnalysisFilterBarComponent implements OnInit, OnChanges {
       );
       if (warmed && dropdownFilters.length) {
         for (const f of dropdownFilters) {
-          const result = await this.optionsCache.get(this.analysisId, f.id);
+          const result = await this.optionsCache.get(this.analysisId, f.id, {
+            organisation: this.orgId,
+          });
           this.applyResultToInternalState(f.id, result);
         }
       }
@@ -200,6 +203,7 @@ export class AnalysisFilterBarComponent implements OnInit, OnChanges {
         search: args.search || undefined,
         page: args.page,
         pageSize: args.limit,
+        organisation: this.orgId,
       });
       this.applyResultToInternalState(filter.id, result);
       if (!result.ok) return { items: [], total: 0 };

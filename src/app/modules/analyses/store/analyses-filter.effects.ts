@@ -68,9 +68,10 @@ export class AnalysesFilterEffects {
       ),
       // Now we have a stream of loadOpen actions that genuinely need
       // a network call.
-      concatMap(({ analysisId }) =>
+      concatMap(({ analysisId, organisation }) =>
         from(
           this.analysesService.getFilterValuesBatch({
+            organisation,
             analysisId,
             mode: 'open' as any,
             // BE derives the request list in 'open' mode; the
@@ -121,9 +122,10 @@ export class AnalysesFilterEffects {
   fetchValues$ = createEffect(() =>
     this.actions$.pipe(
       ofType(A.fetchValues),
-      mergeMap(({ analysisId, filterId, search, page, pageSize }) =>
+      mergeMap(({ analysisId, organisation, filterId, search, page, pageSize }) =>
         from(
           this.analysesService.getFilterValuesBatch({
+            organisation,
             analysisId,
             mode: 'fetch' as any,
             requests: [

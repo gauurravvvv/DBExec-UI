@@ -728,7 +728,10 @@ export class EditAnalysesComponent
       AnalysesFilterActions.setActiveAnalysis({ analysisId: this.analysisId }),
     );
     this.store.dispatch(
-      AnalysesFilterActions.loadOpen({ analysisId: this.analysisId }),
+      AnalysesFilterActions.loadOpen({
+        analysisId: this.analysisId,
+        organisation: this.orgId,
+      }),
     );
 
     // Subscribe to graphData$ to populate rawGraphData and transform charts
@@ -1287,7 +1290,10 @@ export class EditAnalysesComponent
     }
     // Fallback for safety — kick a fresh open-mode load.
     this.store.dispatch(
-      AnalysesFilterActions.loadOpen({ analysisId: this.analysisId }),
+      AnalysesFilterActions.loadOpen({
+        analysisId: this.analysisId,
+        organisation: this.orgId,
+      }),
     );
   }
 
