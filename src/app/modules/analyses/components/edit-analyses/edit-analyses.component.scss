@@ -2906,6 +2906,18 @@
     &:hover:not(:disabled) { background: var(--primary-hover); }
     &:disabled { opacity: 0.5; cursor: not-allowed; }
   }
+
+  // Secondary action — Publish lives next to Save and needs to read
+  // as a sibling action, not the primary one. Green gradient mirrors
+  // the legacy view-analyses .btn-publish so users coming from the
+  // old surface recognise the affordance.
+  &--secondary {
+    background: linear-gradient(135deg, var(--success-color), var(--success-dark));
+    color: var(--primary-text);
+
+    &:hover:not(:disabled) { filter: brightness(1.05); }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
 }
 
 // ----------------------------------------------------------------------------

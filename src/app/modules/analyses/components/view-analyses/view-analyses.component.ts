@@ -8,9 +8,8 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ANALYSES, DASHBOARD as DB_ROUTES } from 'src/app/constants/routes';
+import { ANALYSES } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DashboardService } from '../../../dashboard/services/dashboard.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import { AnalysesService } from '../../services/analyses.service';
 
@@ -33,10 +32,6 @@ export class ViewAnalysesComponent implements OnInit {
   showDeleteConfirm = false;
   deleteJustification = '';
 
-  // Publish dialog
-  showPublishDialog = false;
-  publishForm = { name: '', description: '' };
-
   // Custom field dialog
   showAddCustomFieldDialog = false;
 
@@ -46,7 +41,6 @@ export class ViewAnalysesComponent implements OnInit {
     private datasetService: DatasetService,
     private globalService: GlobalService,
     private analysesService: AnalysesService,
-    private dashboardService: DashboardService,
   ) {}
 
   get saving() {
@@ -208,46 +202,6 @@ export class ViewAnalysesComponent implements OnInit {
           this.cdr.markForCheck();
         });
     }
-  }
-
-  openPublishDialog(): void {
-    this.publishForm = { name: '', description: '' };
-    this.showPublishDialog = true;
-  }
-
-  cancelPublish(): void {
-    this.showPublishDialog = false;
-    this.publishForm = { name: '', description: '' };
-  }
-
-  proceedPublish(): void {
-    if (!this.publishForm.name?.trim()) return;
-
-    const payload = {
-      orgId: this.analysisDetails.organisationId,
-      name: this.publishForm.name.trim(),
-      description: this.publishForm.description?.trim() || '',
-      analysisId: this.analysisDetails.id,
-      analysisName: this.analysisDetails.name,
-      datasetId: this.analysisDetails.datasetId,
-      datasetName: this.analysisDetails.dataset?.name || '',
-      datasourceId: this.analysisDetails.datasourceId,
-      datasourceName: this.analysisDetails.datasource?.name || '',
-    };
-
-    this.dashboardService
-      .addDashboard(payload)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.showPublishDialog = false;
-          this.publishForm = { name: '', description: '' };
-          this.router.navigate([DB_ROUTES.view(this.orgId, response.data.id)]);
-        }
-        this.cdr.markForCheck();
-      })
-      .catch(() => {
-        this.cdr.markForCheck();
-      });
   }
 
   openAddCustomFieldDialog(): void {

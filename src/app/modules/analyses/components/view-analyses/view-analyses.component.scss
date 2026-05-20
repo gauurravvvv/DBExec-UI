@@ -94,17 +94,6 @@
           }
         }
 
-        .btn-publish {
-          background: linear-gradient(135deg, var(--success-color), var(--success-dark));
-          color: var(--primary-text);
-          box-shadow: 0 4px 10px var(--success-bg);
-
-          &:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
-          }
-        }
-
         .btn-danger {
           background: linear-gradient(135deg, var(--error-color), var(--error-color));
           color: var(--primary-text);
@@ -448,112 +437,6 @@
   align-items: center;
   z-index: var(--z-overlay);
   animation: fadeIn 0.2s ease-out;
-
-  .popup-content.publish-dialog {
-    max-width: 480px;
-
-    .popup-header .publish-icon {
-      background: var(--success-bg);
-      color: var(--success-color);
-    }
-
-    .publish-form-section {
-      padding: 0 2rem 1.5rem;
-
-      .form-group {
-        margin-bottom: 1rem;
-
-        label {
-          display: block;
-          margin-bottom: 0.5rem;
-          font-size: var(--fs-control);
-          font-weight: var(--fw-semibold);
-          color: var(--text-color);
-
-          .required {
-            color: var(--error-color);
-            margin-left: 2px;
-          }
-        }
-
-        input,
-        textarea {
-          width: 100%;
-          padding: 0.65rem 0.75rem;
-          border: 1px solid var(--border-color);
-          border-radius: var(--radius-sm);
-          background: var(--card-background);
-          color: var(--text-color);
-          font-size: var(--fs-control);
-          font-family: inherit;
-          transition: border-color var(--motion-base);
-
-          &::placeholder {
-            color: var(--secondary-color);
-            opacity: 0.6;
-          }
-
-          &:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px var(--primary-color-transparent);
-          }
-        }
-
-        textarea {
-          resize: vertical;
-        }
-      }
-
-      .publish-info {
-        background: var(--hover-background);
-        border-radius: var(--radius-md);
-        padding: var(--space-6);
-
-        h4 {
-          margin: 0 0 0.75rem;
-          font-size: var(--fs-control);
-          font-weight: var(--fw-semibold);
-          color: var(--text-color);
-          opacity: 0.8;
-        }
-
-        .info-row {
-          display: flex;
-          align-items: center;
-          gap: var(--space-5);
-          padding: 0.4rem 0;
-          font-size: var(--fs-body);
-          color: var(--text-color);
-
-          i {
-            color: var(--secondary-color);
-            font-size: var(--fs-body);
-            width: 16px;
-            text-align: center;
-          }
-        }
-      }
-    }
-
-    .btn-publish-confirm {
-      background: linear-gradient(135deg, var(--success-color), var(--success-dark)) !important;
-      color: white !important;
-      box-shadow: 0 4px 6px -1px var(--success-bg) !important;
-
-      &:hover:not(:disabled) {
-        background: linear-gradient(135deg, var(--success-color), var(--success-color)) !important;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 8px -1px var(--success-bg) !important;
-      }
-
-      &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        transform: none;
-      }
-    }
-  }
 
   .popup-content {
     background: var(--card-background);
