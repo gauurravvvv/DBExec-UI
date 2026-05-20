@@ -41,7 +41,7 @@ export class SectionService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(SECTION.VIEW + `${orgId}/${id}`),
+        this.http.apiGet(SECTION.GET + `${orgId}/${id}`),
       );
       if (res?.status) this._current.set(res.data);
     } catch {
@@ -108,9 +108,7 @@ export class SectionService {
     orgId: string,
   ) {
     return lastValueFrom(
-      this.http.apiDelete(SECTION.BULK_DELETE + orgId, {
-        body: { ids, justification },
-      }),
+      this.http.apiPost(SECTION.BULK_DELETE_PREFIX + orgId + SECTION.BULK_DELETE_SUFFIX, { ids, justification }),
     );
   }
 
@@ -122,7 +120,7 @@ export class SectionService {
   }
 
   viewSection(orgId: string, id: string) {
-    return lastValueFrom(this.http.apiGet(SECTION.VIEW + `${orgId}/${id}`));
+    return lastValueFrom(this.http.apiGet(SECTION.GET + `${orgId}/${id}`));
   }
 
   updateSection(sectionForm: FormGroup, justification?: string) {

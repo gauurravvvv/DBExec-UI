@@ -45,7 +45,7 @@ export class PromptService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(PROMPT.VIEW + `${orgId}/${id}`),
+        this.http.apiGet(PROMPT.GET + `${orgId}/${id}`),
       );
       if (res?.status) this._current.set(res.data);
     } catch {
@@ -58,7 +58,7 @@ export class PromptService {
   async loadConfig(orgId: string, id: string): Promise<void> {
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(PROMPT.GET_CONFIG + `${orgId}/${id}`),
+        this.http.apiGet(PROMPT.GET + `${orgId}/${id}` + PROMPT.CONFIG_SUFFIX),
       );
       if (res?.status) this._config.set(res.data);
     } catch {
@@ -96,8 +96,9 @@ export class PromptService {
         description,
         status,
       } = form.value;
+      // PUT /prompts/:orgId/:promptId
       return await lastValueFrom(
-        this.http.apiPut(PROMPT.UPDATE, {
+        this.http.apiPut(PROMPT.UPDATE + `${organisation}/${id}`, {
           id,
           organisation,
           datasource,
@@ -117,7 +118,14 @@ export class PromptService {
   async configPrompt(data: any): Promise<any> {
     this._saving.set(true);
     try {
-      return await lastValueFrom(this.http.apiPost(PROMPT.CONFIG, data));
+      // POST /prompts/:orgId/:promptId/config — body still carries
+      // the full payload; the id is taken from the path.
+      return await lastValueFrom(
+        this.http.apiPost(
+          PROMPT.GET + `${data.organisation}/${data.id}` + PROMPT.CONFIG_SUFFIX,
+          data,
+        ),
+      );
     } finally {
       this._saving.set(false);
     }
@@ -148,9 +156,7 @@ export class PromptService {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiDelete(PROMPT.BULK_DELETE + orgId, {
-          body: { ids, justification },
-        }),
+        this.http.apiPost(PROMPT.BULK_DELETE_PREFIX + orgId + PROMPT.BULK_DELETE_SUFFIX, { ids, justification }),
       );
     } finally {
       this._saving.set(false);
@@ -158,38 +164,56 @@ export class PromptService {
   }
 
   async getPromptValuesBySQL(params: any): Promise<any> {
+    // POST /prompts/:orgId/:promptId/values
     return lastValueFrom(
-      this.http.apiPost(PROMPT.GET_PROMPT_VALUES_BY_SQL, {
-        orgId: params.orgId,
-        datasourceId: params.datasourceId,
-        query: params.query,
-      }),
+      this.http.apiPost(
+        PROMPT.GET +
+          `${params.orgId}/${params.promptId}` +
+          PROMPT.VALUES_SUFFIX,
+        {
+          orgId: params.orgId,
+          datasourceId: params.datasourceId,
+          query: params.query,
+        },
+      ),
     );
   }
 
   async refreshPromptValues(params: any): Promise<any> {
+    // POST /prompts/:orgId/:promptId/refresh-values
     return lastValueFrom(
-      this.http.apiPut(PROMPT.REFRSH_PROMPT_VALUES_BY_SQL, {
-        organisation: params.orgId,
-        datasourceId: params.datasourceId,
-        promptId: params.promptId,
-      }),
+      this.http.apiPost(
+        PROMPT.GET +
+          `${params.orgId}/${params.promptId}` +
+          PROMPT.REFRESH_VALUES_SUFFIX,
+        {
+          organisation: params.orgId,
+          datasourceId: params.datasourceId,
+          promptId: params.promptId,
+        },
+      ),
     );
   }
 
   async updateAppearance(params: any): Promise<any> {
+    // PUT /prompts/:orgId/:promptId/appearance
     return lastValueFrom(
-      this.http.apiPut(PROMPT.UPDATE_APPEARANCE, {
-        id: params.id,
-        organisation: params.orgId,
-        appearence: params.appearance,
-      }),
+      this.http.apiPut(
+        PROMPT.GET +
+          `${params.orgId}/${params.id}` +
+          PROMPT.APPEARANCE_SUFFIX,
+        {
+          id: params.id,
+          organisation: params.orgId,
+          appearence: params.appearance,
+        },
+      ),
     );
   }
 
   async getAppearance(orgId: string, id: string): Promise<any> {
     return lastValueFrom(
-      this.http.apiGet(PROMPT.GET_APPEARANCE + `${orgId}/${id}`),
+      this.http.apiGet(PROMPT.GET + `${orgId}/${id}` + PROMPT.APPEARANCE_SUFFIX),
     );
   }
 
@@ -223,9 +247,7 @@ export class PromptService {
     orgId: string,
   ): Promise<any> {
     return lastValueFrom(
-      this.http.apiDelete(PROMPT.BULK_DELETE + orgId, {
-        body: { ids, justification },
-      }),
+      this.http.apiPost(PROMPT.BULK_DELETE_PREFIX + orgId + PROMPT.BULK_DELETE_SUFFIX, { ids, justification }),
     );
   }
 
@@ -237,7 +259,7 @@ export class PromptService {
   }
 
   viewPrompt(orgId: string, id: string): Promise<any> {
-    return lastValueFrom(this.http.apiGet(PROMPT.VIEW + `${orgId}/${id}`));
+    return lastValueFrom(this.http.apiGet(PROMPT.GET + `${orgId}/${id}`));
   }
 
   updatePrompt(promptForm: FormGroup, justification?: string): Promise<any> {
@@ -252,7 +274,7 @@ export class PromptService {
       status,
     } = promptForm.value;
     return lastValueFrom(
-      this.http.apiPut(PROMPT.UPDATE, {
+      this.http.apiPut(PROMPT.UPDATE + `${organisation}/${id}`, {
         id,
         organisation,
         datasource,
@@ -268,23 +290,29 @@ export class PromptService {
 
   getConfig(orgId: string, id: string): Promise<any> {
     return lastValueFrom(
-      this.http.apiGet(PROMPT.GET_CONFIG + `${orgId}/${id}`),
+      this.http.apiGet(PROMPT.GET + `${orgId}/${id}` + PROMPT.CONFIG_SUFFIX),
     );
   }
 
   refreshPromptValuesBySQL(params: any): Promise<any> {
+    // POST /prompts/:orgId/:promptId/refresh-values
     return lastValueFrom(
-      this.http.apiPut(PROMPT.REFRSH_PROMPT_VALUES_BY_SQL, {
-        organisation: params.orgId,
-        datasourceId: params.datasourceId,
-        promptId: params.promptId,
-      }),
+      this.http.apiPost(
+        PROMPT.GET +
+          `${params.orgId}/${params.promptId}` +
+          PROMPT.REFRESH_VALUES_SUFFIX,
+        {
+          organisation: params.orgId,
+          datasourceId: params.datasourceId,
+          promptId: params.promptId,
+        },
+      ),
     );
   }
 
   getAppearence(orgId: string, id: string): Promise<any> {
     return lastValueFrom(
-      this.http.apiGet(PROMPT.GET_APPEARANCE + `${orgId}/${id}`),
+      this.http.apiGet(PROMPT.GET + `${orgId}/${id}` + PROMPT.APPEARANCE_SUFFIX),
     );
   }
 }

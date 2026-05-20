@@ -41,7 +41,7 @@ export class TabService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(TAB.VIEW + `${orgId}/${tabId}`),
+        this.http.apiGet(TAB.GET + `${orgId}/${tabId}`),
       );
       if (res?.status) this._current.set(res.data);
     } finally {
@@ -93,7 +93,8 @@ export class TabService {
   }
 
   listAllTabData(params: any) {
-    return lastValueFrom(this.http.apiGet(TAB.GET_ALL, { params }));
+    // GET /tabs/tree — nested tabs → sections → prompts.
+    return lastValueFrom(this.http.apiGet(TAB.TREE, { params }));
   }
 
   deleteTab(orgId: string, id: string, justification?: string) {
@@ -110,9 +111,7 @@ export class TabService {
     orgId: string,
   ) {
     return lastValueFrom(
-      this.http.apiDelete(TAB.BULK_DELETE + orgId, {
-        body: { ids, justification },
-      }),
+      this.http.apiPost(TAB.BULK_DELETE_PREFIX + orgId + TAB.BULK_DELETE_SUFFIX, { ids, justification }),
     );
   }
 
@@ -124,7 +123,7 @@ export class TabService {
   }
 
   viewTab(orgId: string, id: string) {
-    return lastValueFrom(this.http.apiGet(TAB.VIEW + `${orgId}/${id}`));
+    return lastValueFrom(this.http.apiGet(TAB.GET + `${orgId}/${id}`));
   }
 
   updateTab(tabForm: FormGroup, justification?: string) {

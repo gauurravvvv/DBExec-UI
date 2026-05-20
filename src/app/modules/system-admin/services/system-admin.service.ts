@@ -39,7 +39,7 @@ export class SystemAdminService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(SYSTEM_ADMIN.VIEW + id),
+        this.http.apiGet(SYSTEM_ADMIN.GET + id),
       );
       if (res?.status) this._current.set(res.data);
     } finally {
@@ -70,7 +70,7 @@ export class SystemAdminService {
       const { id, firstName, lastName, username, email, status } =
         form.getRawValue();
       return await lastValueFrom(
-        this.http.apiPut(SYSTEM_ADMIN.UPDATE, {
+        this.http.apiPut(SYSTEM_ADMIN.UPDATE + id, {
           id,
           firstName,
           lastName,
@@ -94,23 +94,31 @@ export class SystemAdminService {
   }
 
   async bulkDelete(ids: string[], justification?: string): Promise<any> {
+    // POST /system-admins/bulk-delete
     return lastValueFrom(
-      this.http.apiDelete(SYSTEM_ADMIN.BULK_DELETE, {
-        body: { ids, justification },
-      }),
+      this.http.apiPost(SYSTEM_ADMIN.BULK_DELETE, { ids, justification }),
     );
   }
 
   async unlock(id: string): Promise<any> {
-    return lastValueFrom(this.http.apiPut(SYSTEM_ADMIN.UNLOCK + id, {}));
+    // POST /system-admins/:id/unlock — action, not update.
+    return lastValueFrom(
+      this.http.apiPost(
+        SYSTEM_ADMIN.UNLOCK_PREFIX + id + SYSTEM_ADMIN.UNLOCK_SUFFIX,
+        {},
+      ),
+    );
   }
 
   async updatePassword(id: string, password: string): Promise<any> {
+    // PUT /system-admins/:id/password
     return lastValueFrom(
-      this.http.apiPut(SYSTEM_ADMIN.UPDATE_PASSWORD, {
-        id,
-        newPassword: password,
-      }),
+      this.http.apiPut(
+        SYSTEM_ADMIN.UPDATE_PASSWORD_PREFIX +
+          id +
+          SYSTEM_ADMIN.UPDATE_PASSWORD_SUFFIX,
+        { id, newPassword: password },
+      ),
     );
   }
 

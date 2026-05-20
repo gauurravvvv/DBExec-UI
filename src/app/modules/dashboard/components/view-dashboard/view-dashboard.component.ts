@@ -314,6 +314,7 @@ export class ViewDashboardComponent
     // /dashboard/run instead of poking the live analyses endpoint.
     // Source analysis edits no longer affect dashboard query results.
     const payload: any = {
+      orgId: this.orgId,
       dashboardId: this.dashboard.id,
       limit: -1,
     };

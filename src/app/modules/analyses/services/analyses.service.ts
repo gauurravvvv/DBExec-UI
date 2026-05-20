@@ -85,9 +85,7 @@ export class AnalysesService {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiDelete(ANALYSES.BULK_DELETE + orgId, {
-          body: { ids, justification },
-        }),
+        this.http.apiPost(ANALYSES.BULK_DELETE_PREFIX + orgId + ANALYSES.BULK_DELETE_SUFFIX, { ids, justification }),
       );
     } finally {
       this._saving.set(false);
@@ -96,7 +94,7 @@ export class AnalysesService {
 
   viewAnalyses(orgId: string, analysisId: string) {
     return lastValueFrom(
-      this.http.apiGet(ANALYSES.VIEW + `${orgId}/${analysisId}`),
+      this.http.apiGet(ANALYSES.GET + `${orgId}/${analysisId}`),
     );
   }
 
@@ -108,27 +106,25 @@ export class AnalysesService {
    * this surface only — the legacy endpoints stay alive for other
    * callers that need fuller payloads.
    *
-   * GET /analyses/bootstrap/:orgId/:analysisId
+   * GET /analyses/:orgId/:analysisId/bootstrap
    */
   getBootstrap(orgId: string, analysisId: string) {
     return lastValueFrom(
-      this.http.apiGet(ANALYSES.BOOTSTRAP + `${orgId}/${analysisId}`),
-    );
-  }
-
-  viewVisuals(orgId: string, analysisId: string) {
-    return lastValueFrom(
-      this.http.apiGet(ANALYSES.VIEW_VISUAL + `${orgId}/${analysisId}`),
+      this.http.apiGet(
+        ANALYSES.BOOTSTRAP_PREFIX +
+          `${orgId}/${analysisId}` +
+          ANALYSES.BOOTSTRAP_SUFFIX,
+      ),
     );
   }
 
   /**
-   * List all visuals for an analysis (skeleton data only)
-   * GET /visual/list/:orgId/:analysisId
+   * List all visuals for an analysis (skeleton data only).
+   * GET /visuals/:orgId/:analysisId
    */
   listVisuals(orgId: string, analysisId: string) {
     return lastValueFrom(
-      this.http.apiGet(ANALYSES_VISUAL.LIST + `/${orgId}/${analysisId}`),
+      this.http.apiGet(ANALYSES_VISUAL.LIST + `${orgId}/${analysisId}`),
     );
   }
 
@@ -136,12 +132,12 @@ export class AnalysesService {
    * Hydrated list — every visual ships with its visualConfig
    * already populated. Replaces the N+1 listVisuals + getVisual
    * loop on Edit Analysis first load.
-   * GET /visual/list-with-config/:orgId/:analysisId
+   * GET /visuals/:orgId/:analysisId?include=config
    */
   listVisualsWithConfig(orgId: string, analysisId: string) {
     return lastValueFrom(
       this.http.apiGet(
-        ANALYSES_VISUAL.LIST_WITH_CONFIG + `${orgId}/${analysisId}`,
+        ANALYSES_VISUAL.LIST + `${orgId}/${analysisId}?include=config`,
       ),
     );
   }
@@ -159,7 +155,8 @@ export class AnalysesService {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPut(ANALYSES.UPDATE, {
+        // PUT /analyses/:orgId/:analysisId — id moves to path.
+        this.http.apiPut(ANALYSES.UPDATE + `${organisation}/${id}`, {
           id,
           name,
           description,
@@ -176,14 +173,14 @@ export class AnalysesService {
   }
 
   viewSystemAdmin(id: string) {
-    return lastValueFrom(this.http.apiGet(SYSTEM_ADMIN.VIEW + `${id}`));
+    return lastValueFrom(this.http.apiGet(SYSTEM_ADMIN.GET + `${id}`));
   }
 
   updateSystemAdmin(systemAdminForm: FormGroup) {
     const { id, firstName, lastName, username, email, mobile, status } =
       systemAdminForm.value;
     return lastValueFrom(
-      this.http.apiPut(SYSTEM_ADMIN.UPDATE, {
+      this.http.apiPut(SYSTEM_ADMIN.UPDATE + id, {
         id,
         firstName,
         lastName,
@@ -196,18 +193,25 @@ export class AnalysesService {
   }
 
   viewDataset(orgId: string, id: string) {
-    return lastValueFrom(this.http.apiGet(DATASET.VIEW + `${orgId}/${id}`));
+    return lastValueFrom(this.http.apiGet(DATASET.GET + `${orgId}/${id}`));
   }
 
   updateDatasetMapping(payload: any) {
     const { mappingId, datasetId, organisation, columnNameToView } = payload;
+    // PUT /datasets/:orgId/:datasetId/fields/:fieldId
     return lastValueFrom(
-      this.http.apiPut(DATASET.UPDATE_FIELD, {
-        mappingId,
-        datasetId,
-        organisation,
-        columnNameToView,
-      }),
+      this.http.apiPut(
+        DATASET.GET +
+          `${organisation}/${datasetId}` +
+          DATASET.FIELD_SEGMENT +
+          mappingId,
+        {
+          mappingId,
+          datasetId,
+          organisation,
+          columnNameToView,
+        },
+      ),
     );
   }
 
@@ -227,7 +231,7 @@ export class AnalysesService {
       status,
     } = payload;
     return lastValueFrom(
-      this.http.apiPut(DATASOURCE.UPDATE, {
+      this.http.apiPut(DATASOURCE.UPDATE + `${organisation}/${id}`, {
         id,
         name,
         description,
@@ -247,7 +251,9 @@ export class AnalysesService {
   listDatasourceSchemas(params: any) {
     return lastValueFrom(
       this.http.apiGet(
-        DATASOURCE.LIST_SCHEMAS + `${params.orgId}/${params.datasourceId}`,
+        DATASOURCE.LIST_SCHEMAS_PREFIX +
+          `${params.orgId}/${params.datasourceId}` +
+          DATASOURCE.LIST_SCHEMAS_SUFFIX,
       ),
     );
   }
@@ -255,8 +261,11 @@ export class AnalysesService {
   listSchemaTables(params: any) {
     return lastValueFrom(
       this.http.apiGet(
-        DATASOURCE.LIST_SCHEMA_TABLES +
-          `${params.orgId}/${params.datasourceId}/${params.schemaName}`,
+        DATASOURCE.LIST_SCHEMAS_PREFIX +
+          `${params.orgId}/${params.datasourceId}` +
+          DATASOURCE.SCHEMAS_SEGMENT +
+          params.schemaName +
+          DATASOURCE.TABLES_SEGMENT.replace(/\/$/, ''),
       ),
     );
   }
@@ -264,15 +273,20 @@ export class AnalysesService {
   listTableColumns(params: any) {
     return lastValueFrom(
       this.http.apiGet(
-        DATASOURCE.LIST_TABLE_COLUMNS +
-          `${params.orgId}/${params.datasourceId}/${params.schemaName}/${params.tableName}`,
+        DATASOURCE.LIST_SCHEMAS_PREFIX +
+          `${params.orgId}/${params.datasourceId}` +
+          DATASOURCE.SCHEMAS_SEGMENT +
+          params.schemaName +
+          DATASOURCE.TABLES_SEGMENT +
+          params.tableName +
+          DATASOURCE.COLUMNS_SEGMENT,
       ),
     );
   }
 
   getDataset(orgId: string, datasetId: string) {
     return lastValueFrom(
-      this.http.apiGet(DATASET.VIEW + `${orgId}/${datasetId}`),
+      this.http.apiGet(DATASET.GET + `${orgId}/${datasetId}`),
     );
   }
 
@@ -281,8 +295,13 @@ export class AnalysesService {
    * GET /analyses/get/fields/:orgId/:analysisId
    */
   getAnalysisFields(orgId: string, analysisId: string) {
+    // GET /analyses/:orgId/:analysisId/fields
     return lastValueFrom(
-      this.http.apiGet(ANALYSES.GET_FIELDS + `${orgId}/${analysisId}`),
+      this.http.apiGet(
+        ANALYSES.FIELDS_PREFIX +
+          `${orgId}/${analysisId}` +
+          ANALYSES.FIELDS_SUFFIX,
+      ),
     );
   }
 
@@ -307,7 +326,9 @@ export class AnalysesService {
   ) {
     return lastValueFrom(
       this.http.apiPost(
-        ANALYSES.DISTINCT_VALUES + `${orgId}/${analysisId}`,
+        ANALYSES.DISTINCT_VALUES_PREFIX +
+          `${orgId}/${analysisId}` +
+          ANALYSES.DISTINCT_VALUES_SUFFIX,
         {
           fieldName,
           ...(options?.search !== undefined ? { search: options.search } : {}),
@@ -321,7 +342,7 @@ export class AnalysesService {
   updateDataset(payload: any) {
     const { id, name, description, organisation, datasource, sql } = payload;
     return lastValueFrom(
-      this.http.apiPut(DATASET.UPDATE, {
+      this.http.apiPut(DATASET.UPDATE + `${organisation}/${id}`, {
         id,
         name,
         description,
@@ -346,8 +367,12 @@ export class AnalysesService {
   async updateFilter(payload: any) {
     this._saving.set(true);
     try {
+      // PUT /analysis-filters/:orgId/:filterId — id moves to path.
       return await lastValueFrom(
-        this.http.apiPut(ANALYSIS_FILTER.UPDATE, payload),
+        this.http.apiPut(
+          ANALYSIS_FILTER.UPDATE + `${payload.organisation}/${payload.id}`,
+          payload,
+        ),
       );
     } finally {
       this._saving.set(false);
@@ -434,7 +459,15 @@ export class AnalysesService {
     }
     this._running.set(true);
     try {
-      return await lastValueFrom(this.http.apiPost(ANALYSES.RUN_QUERY, body));
+      // POST /analyses/:orgId/:analysisId/run
+      return await lastValueFrom(
+        this.http.apiPost(
+          ANALYSES.RUN_QUERY_PREFIX +
+            `${organisation}/${analysisId}` +
+            ANALYSES.RUN_QUERY_SUFFIX,
+          body,
+        ),
+      );
     } finally {
       this._running.set(false);
     }

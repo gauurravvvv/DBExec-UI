@@ -1,8 +1,28 @@
+/**
+ * API endpoint constants — single source of truth for every BE path
+ * the FE talks to. All paths are relative to `environment.apiServer`
+ * (which already includes the `/api/v1` prefix), so values here start
+ * with the resource segment.
+ *
+ * Convention (matches BE ROUTING.md):
+ *   - Plural resource names (/users, /orgs, /dashboards, ...).
+ *   - Singletons stay singular (/auth, /home, /profile, /search).
+ *   - Constants ending in `/` are meant to be concatenated with id(s).
+ *     Example: `apiGet(USER.GET + orgId + '/' + id)` →
+ *       GET /api/v1/users/<orgId>/<id>
+ *   - Constants without a trailing `/` are full paths.
+ *
+ * Path-vs-body migration: PUT/DELETE used to carry id in body. They
+ * now take id in the path, e.g. `UPDATE: '/users/'` is the prefix
+ * for `PUT /users/:orgId/:id`. Service methods now build the path
+ * with concatenation.
+ */
+
 export const AUTH = {
   LOGIN: '/auth/login',
   LOGOUT: '/auth/logout',
   REFRESH_TOKEN: '/auth/refresh',
-  GENERATE_OTP: '/auth/generateOTP',
+  GENERATE_OTP: '/auth/generate-otp',
   RESET_PASSWORD: '/auth/reset',
   SET_PASSWORD: '/auth/set-password',
   VERIFY_SETUP_TOKEN: '/auth/verify-setup-token',
@@ -11,284 +31,311 @@ export const AUTH = {
 };
 
 export const HOME = {
-  SYSTEM_ADMIN: '/dashboard/system-admin/',
+  // /home is a singleton route, not nested under /dashboards.
+  SYSTEM_ADMIN: '/home/system-admin/',
 };
 
 export const SYSTEM_ADMIN = {
-  LIST: '/system-admin/list',
-  DELETE: '/system-admin/delete/',
-  BULK_DELETE: '/system-admin/delete/bulk',
-  ADD: '/system-admin/add',
-  VIEW: '/system-admin/get/',
-  UPDATE: '/system-admin/update',
-  UPDATE_PASSWORD: '/system-admin/update/password',
-  UNLOCK: '/system-admin/unlock/',
+  BASE: '/system-admins',
+  LIST: '/system-admins',
+  ADD: '/system-admins',
+  // Templated single-resource paths
+  GET: '/system-admins/',         // GET /system-admins/:id
+  UPDATE: '/system-admins/',      // PUT /system-admins/:id
+  DELETE: '/system-admins/',      // DELETE /system-admins/:id
+  BULK_DELETE: '/system-admins/bulk-delete',
+  UPDATE_PASSWORD_PREFIX: '/system-admins/',  // PUT /system-admins/:id/password
+  UPDATE_PASSWORD_SUFFIX: '/password',
+  UNLOCK_PREFIX: '/system-admins/',           // POST /system-admins/:id/unlock
+  UNLOCK_SUFFIX: '/unlock',
 };
 
 export const ORGANISATION = {
-  LIST: '/org/list',
-  ADD: '/org/add',
-  DELETE: '/org/delete/',
-  BULK_DELETE: '/org/delete/bulk',
-  VIEW: '/org/get/',
-  EDIT: '/org/update',
-  REFRESH_MASTER_DB: '/org/refresh-master-db/',
+  LIST: '/orgs',
+  ADD: '/orgs',
+  GET: '/orgs/',                  // GET /orgs/:id
+  UPDATE: '/orgs/',               // PUT /orgs/:id
+  DELETE: '/orgs/',               // DELETE /orgs/:id
+  BULK_DELETE: '/orgs/bulk-delete',
+  REFRESH_MASTER_DB_PREFIX: '/orgs/',  // POST /orgs/:id/refresh-master-db
+  REFRESH_MASTER_DB_SUFFIX: '/refresh-master-db',
 };
 
 export const USER = {
-  LIST: '/user/list',
-  DELETE: '/user/delete/',
-  BULK_DELETE: '/user/delete/bulk/',
-  ADD: '/user/add',
-  BULK_ADD_VALIDATE: '/user/bulk-add/validate',
-  BULK_ADD_COMMIT: '/user/bulk-add/commit',
-  VIEW: '/user/get/',
-  UPDATE: '/user/update',
-  UPDATE_PASSWORD: '/user/update/password',
-  UNLOCK: '/user/unlock/',
+  LIST: '/users',
+  ADD: '/users',
+  GET: '/users/',                 // GET /users/:orgId/:id
+  UPDATE: '/users/',              // PUT /users/:orgId/:id
+  DELETE: '/users/',              // DELETE /users/:orgId/:id
+  BULK_DELETE_PREFIX: '/users/',  // POST /users/:orgId/bulk-delete
+  BULK_DELETE_SUFFIX: '/bulk-delete',
+  BULK_ADD_VALIDATE: '/users/bulk/validate',
+  BULK_ADD_COMMIT: '/users/bulk/commit',
+  UPDATE_PASSWORD_PREFIX: '/users/',  // PUT /users/:orgId/:id/password
+  UPDATE_PASSWORD_SUFFIX: '/password',
+  UNLOCK_PREFIX: '/users/',           // POST /users/:orgId/:id/unlock
+  UNLOCK_SUFFIX: '/unlock',
 };
 
 export const DATASOURCE = {
-  LIST: '/datasource/list',
-  DELETE: '/datasource/delete/',
-  BULK_DELETE: '/datasource/delete/bulk/',
-  ADD: '/datasource/add',
-  VIEW: '/datasource/get/',
-  UPDATE: '/datasource/update',
-  LIST_SCHEMAS: '/datasource/schema/list/',
-  LIST_SCHEMA_TABLES: '/datasource/table/list/',
-  LIST_TABLE_COLUMNS: '/datasource/table/columns/list/',
-  RUN_QUERY: '/datasource/runQuery',
-  VALIDATE: '/datasource/validate',
-};
-
-export const ENVIRONMENT = {
-  LIST: '/environment/list',
-  DELETE: '/environment/delete/',
-  ADD: '/environment/add',
-  VIEW: '/environment/get/',
-  EDIT: '/environment/update',
-};
-
-export const CATEGORY = {
-  LIST: '/category/list',
-  DELETE: '/category/delete/',
-  ADD: '/category/add',
-  VIEW: '/category/get/',
-  EDIT: '/category/update',
+  LIST: '/datasources',
+  ADD: '/datasources',
+  GET: '/datasources/',           // GET /datasources/:orgId/:id
+  UPDATE: '/datasources/',        // PUT /datasources/:orgId/:id
+  DELETE: '/datasources/',        // DELETE /datasources/:orgId/:id
+  BULK_DELETE_PREFIX: '/datasources/',  // POST /datasources/:orgId/bulk-delete
+  BULK_DELETE_SUFFIX: '/bulk-delete',
+  VALIDATE: '/datasources/validate',
+  // Introspection — operate on the live target DB
+  LIST_SCHEMAS_PREFIX: '/datasources/',    // GET /datasources/:orgId/:datasourceId/schemas
+  LIST_SCHEMAS_SUFFIX: '/schemas',
+  // Schema tables/columns are built inline by services:
+  // GET /datasources/:orgId/:datasourceId/schemas/:schema/tables
+  // GET /datasources/:orgId/:datasourceId/schemas/:schema/tables/:table/columns
+  SCHEMAS_SEGMENT: '/schemas/',
+  TABLES_SEGMENT: '/tables/',
+  COLUMNS_SEGMENT: '/columns',
+  // POST /datasources/:orgId/:datasourceId/query
+  RUN_QUERY_PREFIX: '/datasources/',
+  RUN_QUERY_SUFFIX: '/query',
+  // GET /datasources/:orgId/:datasourceId/activity
+  ACTIVITY_PREFIX: '/datasources/',
+  ACTIVITY_SUFFIX: '/activity',
+  // POST /datasources/:orgId/:datasourceId/activity/cancel-query
+  ACTIVITY_CANCEL_SUFFIX: '/activity/cancel-query',
+  // POST /datasources/:orgId/:datasourceId/activity/terminate
+  ACTIVITY_TERMINATE_SUFFIX: '/activity/terminate',
 };
 
 export const GROUP = {
-  LIST: '/group/list',
-  DELETE: '/group/delete/',
-  BULK_DELETE: '/group/delete/bulk/',
-  ADD: '/group/add',
-  VIEW: '/group/get/',
-  EDIT: '/group/update',
-};
-
-export const SECRET = {
-  LIST: '/secret/list',
-  DELETE: '/secret/delete/',
-  DELETE_ALL: '/secret/deleteAll/',
-  ADD: '/secret/add',
-  VIEW: '/secret/get/',
-  EDIT: '/secret/update',
-  DOWNLOAD: '/secret/download/',
-  CHANGE_VISIBILITY: '/secret/changeVisibility/',
+  LIST: '/groups',
+  ADD: '/groups',
+  GET: '/groups/',
+  UPDATE: '/groups/',
+  DELETE: '/groups/',
+  BULK_DELETE_PREFIX: '/groups/',
+  BULK_DELETE_SUFFIX: '/bulk-delete',
 };
 
 export const DATASET = {
-  ADD: '/dataset/add',
-  ADD_VIA_BUILDER: '/dataset/add/builder',
-  LIST: '/dataset/list',
-  DELETE: '/dataset/delete/',
-  BULK_DELETE: '/dataset/delete/bulk/',
-  VIEW: '/dataset/get/',
-  VIEW_FIELD: '/dataset/get/field/',
-  UPDATE: '/dataset/update',
-  UPDATE_VIA_BUILDER: '/dataset/update/builder',
-  UPDATE_FIELD: '/dataset/update/field',
-  DELETE_FIELD: '/dataset/delete/field/',
-  VALIDATE_FIELD: '/dataset/validate/field',
-  ADD_FIELD: '/dataset/add/field',
-  RUN_QUERY: '/dataset/run',
-  DISTINCT_VALUES: '/dataset/distinct-values/', // POST /:orgId/:datasetId, body: { columnName }
-  DUPLICATE: '/dataset/duplicate/',
+  LIST: '/datasets',
+  ADD: '/datasets',
+  ADD_VIA_BUILDER: '/datasets/from-builder',
+  GET: '/datasets/',              // GET /datasets/:orgId/:datasetId
+  UPDATE: '/datasets/',           // PUT /datasets/:orgId/:datasetId
+  UPDATE_VIA_BUILDER_PREFIX: '/datasets/',  // PUT /datasets/:orgId/:datasetId/from-builder
+  UPDATE_VIA_BUILDER_SUFFIX: '/from-builder',
+  DELETE: '/datasets/',           // DELETE /datasets/:orgId/:datasetId
+  BULK_DELETE_PREFIX: '/datasets/',
+  BULK_DELETE_SUFFIX: '/bulk-delete',
+  // POST /datasets/:datasetId/run
+  RUN_QUERY_PREFIX: '/datasets/',
+  RUN_QUERY_SUFFIX: '/run',
+  // POST /datasets/:orgId/:datasetId/duplicate
+  DUPLICATE_PREFIX: '/datasets/',
+  DUPLICATE_SUFFIX: '/duplicate',
+  // POST /datasets/:orgId/:datasetId/distinct-values
+  DISTINCT_VALUES_PREFIX: '/datasets/',
+  DISTINCT_VALUES_SUFFIX: '/distinct-values',
+  // Field subresource
+  // POST /datasets/:datasetId/fields
+  ADD_FIELD_PREFIX: '/datasets/',
+  ADD_FIELD_SUFFIX: '/fields',
+  // POST /datasets/:datasetId/fields/validate
+  VALIDATE_FIELD_SUFFIX: '/fields/validate',
+  // GET /datasets/:orgId/:datasetId/fields/:fieldId
+  // PUT /datasets/:orgId/:datasetId/fields/:fieldId
+  // DELETE /datasets/:orgId/:datasetId/fields/:fieldId
+  FIELD_SEGMENT: '/fields/',
 };
 
 export const TAB = {
-  ADD: '/tab/add',
-  LIST: '/tab/list',
-  DELETE: '/tab/delete/',
-  BULK_DELETE: '/tab/delete/bulk/',
-  VIEW: '/tab/get/',
-  UPDATE: '/tab/update',
-  GET_ALL: '/tab/listAll',
-  GET_SECTIONS: '/tab/getSections/',
+  LIST: '/tabs',
+  ADD: '/tabs',
+  TREE: '/tabs/tree',
+  GET: '/tabs/',                  // GET /tabs/:orgId/:tabId
+  UPDATE: '/tabs/',               // PUT /tabs/:orgId/:tabId
+  DELETE: '/tabs/',               // DELETE /tabs/:orgId/:tabId
+  BULK_DELETE_PREFIX: '/tabs/',
+  BULK_DELETE_SUFFIX: '/bulk-delete',
+  // GET /tabs/:orgId/:tabId/sections?queryBuilderId=
+  SECTIONS_PREFIX: '/tabs/',
+  SECTIONS_SUFFIX: '/sections',
 };
 
 export const SECTION = {
-  ADD: '/section/add',
-  LIST: '/section/list',
-  DELETE: '/section/delete/',
-  BULK_DELETE: '/section/delete/bulk/',
-  VIEW: '/section/get/',
-  UPDATE: '/section/update',
-  GET_PROMPTS: '/section/getPrompts/',
+  LIST: '/sections',
+  ADD: '/sections',
+  GET: '/sections/',
+  UPDATE: '/sections/',
+  DELETE: '/sections/',
+  BULK_DELETE_PREFIX: '/sections/',
+  BULK_DELETE_SUFFIX: '/bulk-delete',
+  // GET /sections/:orgId/:sectionId/prompts?queryBuilderId=&tabId=
+  PROMPTS_PREFIX: '/sections/',
+  PROMPTS_SUFFIX: '/prompts',
 };
 
 export const PROMPT = {
-  ADD: '/prompt/add',
-  LIST: '/prompt/list',
-  DELETE: '/prompt/delete/',
-  BULK_DELETE: '/prompt/delete/bulk/',
-  VIEW: '/prompt/get/',
-  UPDATE: '/prompt/update',
-  CONFIG: '/prompt/config',
-  GET_CONFIG: '/prompt/getConfig/',
-  GET_PROMPT_VALUES_BY_SQL: '/prompt/getValues',
-  REFRSH_PROMPT_VALUES_BY_SQL: '/prompt/refreshValues',
-  UPDATE_APPEARANCE: '/prompt/customise',
-  GET_APPEARANCE: '/prompt/getAppearance/',
+  LIST: '/prompts',
+  ADD: '/prompts',
+  GET: '/prompts/',
+  UPDATE: '/prompts/',
+  DELETE: '/prompts/',
+  BULK_DELETE_PREFIX: '/prompts/',
+  BULK_DELETE_SUFFIX: '/bulk-delete',
+  // POST/GET /prompts/:orgId/:promptId/config
+  CONFIG_PREFIX: '/prompts/',
+  CONFIG_SUFFIX: '/config',
+  // POST /prompts/:orgId/:promptId/values
+  VALUES_SUFFIX: '/values',
+  // POST /prompts/:orgId/:promptId/refresh-values
+  REFRESH_VALUES_SUFFIX: '/refresh-values',
+  // PUT/GET /prompts/:orgId/:promptId/appearance
+  APPEARANCE_SUFFIX: '/appearance',
 };
 
 export const QUERY_BUILDER = {
-  ADD: '/query-builder/add',
-  LIST: '/query-builder/list',
-  DELETE: '/query-builder/delete/',
-  BULK_DELETE: '/query-builder/delete/bulk/',
-  VIEW: '/query-builder/get/',
-  UPDATE: '/query-builder/update',
-  SAVE_CONFIGURATION: '/query-builder/config',
-  GET_QUERY_BUILDER_CONFIGURATION: '/query-builder/getConfig/',
-  GET_TABS: '/query-builder/getTabs/',
-  GET_STRUCTURE: '/query-builder/getStructure/',
-  EXECUTE: '/query-builder/execute',
+  LIST: '/query-builders',
+  ADD: '/query-builders',
+  GET: '/query-builders/',
+  UPDATE: '/query-builders/',
+  DELETE: '/query-builders/',
+  BULK_DELETE_PREFIX: '/query-builders/',
+  BULK_DELETE_SUFFIX: '/bulk-delete',
+  // GET /query-builders/:orgId/:queryBuilderId/tabs
+  TABS_PREFIX: '/query-builders/',
+  TABS_SUFFIX: '/tabs',
+  // POST/GET /query-builders/:orgId/:queryBuilderId/config
+  CONFIG_SUFFIX: '/config',
+  // GET /query-builders/:orgId/:queryBuilderId/structure
+  STRUCTURE_SUFFIX: '/structure',
+  // POST /query-builders/:orgId/:queryBuilderId/execute
+  EXECUTE_SUFFIX: '/execute',
 };
 
 export const QUERY = {
-  EXECUTE: '/query/execute',
-  SAVE: '/query/save',
-  LIST: '/query/list',
-  DELETE: '/query/delete/',
-  VIEW: '/query/get/',
-  HISTORY: '/query/history',
-  VALIDATE: '/query/validate',
-  EXPLAIN: '/query/explain',
-  EXPORT: '/query/export',
+  EXECUTE: '/queries/execute',
+  STRUCTURE: '/queries/structure',
+  EXPORT: '/queries/export',
 };
 
 export const ROLE = {
-  ADD: '/role/add',
-  LIST: '/role/list',
-  DELETE: '/role/delete/',
-  BULK_DELETE: '/role/delete/bulk/',
-  VIEW: '/role/get/',
-  UPDATE: '/role/update',
-  LIST_PERMISSIONS: '/role/permissions',
+  LIST: '/roles',
+  ADD: '/roles',
+  GET: '/roles/',
+  UPDATE: '/roles/',
+  DELETE: '/roles/',
+  BULK_DELETE_PREFIX: '/roles/',
+  BULK_DELETE_SUFFIX: '/bulk-delete',
+  LIST_PERMISSIONS: '/roles/permissions',
 };
 
 export const ACCESS = {
-  GET: '/access/get',
+  GET: '/access/',                // GET /access/:orgId/:connectionId
   GRANT: '/access/grant',
 };
 
 export const CONNECTIONS = {
-  ADD: '/connections/add',
-  LIST: '/connections/list',
-  DELETE: '/connections/delete/',
-  BULK_DELETE: '/connections/delete/bulk/',
-  VIEW: '/connections/get/',
-  UPDATE: '/connections/update',
+  LIST: '/connections',
+  ADD: '/connections',
+  GET: '/connections/',
+  UPDATE: '/connections/',
+  DELETE: '/connections/',
+  BULK_DELETE_PREFIX: '/connections/',
+  BULK_DELETE_SUFFIX: '/bulk-delete',
 };
 
 export const ANALYSES = {
-  ADD: '/analyses/add',
-  LIST: '/analyses/list',
-  DELETE: '/analyses/delete/',
-  BULK_DELETE: '/analyses/delete/bulk/',
-  VIEW: '/analyses/get/',
-  UPDATE: '/analyses/update',
-  VIEW_VISUAL: '/analyses/visual/',
-  GET_FIELDS: '/analyses/get/fields/',
-  RUN_QUERY: '/analyses/run',
-  // Unified distinct-values lookup — handles raw dataset columns AND
-  // custom fields (dataset-level + analysis-level). Path:
-  // POST /analyses/distinct-values/:orgId/:analysisId  body: { fieldName, search?, page?, pageSize? }
-  DISTINCT_VALUES: '/analyses/distinct-values/',
-  // Single-call bootstrap for the Edit Analysis page — replaces the
-  // legacy VIEW + dataset/get + GET_FIELDS trio. Returns:
-  // { analysis: {id, name, description, datasetId, datasourceId, datasetName},
-  //   datasetFields: [], analysisFields: [] }
-  BOOTSTRAP: '/analyses/bootstrap/',
+  LIST: '/analyses',
+  ADD: '/analyses',
+  GET: '/analyses/',              // GET /analyses/:orgId/:analysisId
+  UPDATE: '/analyses/',           // PUT /analyses/:orgId/:analysisId
+  DELETE: '/analyses/',           // DELETE /analyses/:orgId/:analysisId
+  BULK_DELETE_PREFIX: '/analyses/',
+  BULK_DELETE_SUFFIX: '/bulk-delete',
+  // GET /analyses/:orgId/:analysisId/fields
+  FIELDS_PREFIX: '/analyses/',
+  FIELDS_SUFFIX: '/fields',
+  // GET /analyses/:orgId/:analysisId/bootstrap
+  BOOTSTRAP_PREFIX: '/analyses/',
+  BOOTSTRAP_SUFFIX: '/bootstrap',
+  // POST /analyses/:orgId/:analysisId/run
+  RUN_QUERY_PREFIX: '/analyses/',
+  RUN_QUERY_SUFFIX: '/run',
+  // POST /analyses/:orgId/:analysisId/distinct-values
+  DISTINCT_VALUES_PREFIX: '/analyses/',
+  DISTINCT_VALUES_SUFFIX: '/distinct-values',
 };
 
 export const ANALYSES_VISUAL = {
-  LIST: '/visual/list',
-  // Hydrated list — same as LIST but every visual ships with its
-  // visualConfig already populated. Replaces the legacy /visual/get
-  // single-visual endpoint that was used in the now-removed
-  // fetchVisualsIndependently N+1 pattern.
-  LIST_WITH_CONFIG: '/visual/list-with-config/',
+  // GET /visuals/:orgId/:analysisId           skeleton list
+  // GET /visuals/:orgId/:analysisId?include=config   hydrated list
+  LIST: '/visuals/',
 };
 
 export const ANALYSIS_FILTER = {
-  ADD: '/analysis-filter/add',
-  UPDATE: '/analysis-filter/update',
-  DELETE: '/analysis-filter/delete/',
-  LIST: '/analysis-filter/list/',
-  // Batched values endpoint — one request returns options for any
-  // number of filters, with pagination + search support. The legacy
-  // single-filter VALUES endpoint was removed (zero FE callers).
-  VALUES_BATCH: '/analysis-filter/values',
+  ADD: '/analysis-filters',
+  LIST: '/analysis-filters/',         // GET /analysis-filters/:orgId/:analysisId
+  UPDATE: '/analysis-filters/',       // PUT /analysis-filters/:orgId/:filterId
+  DELETE: '/analysis-filters/',       // DELETE /analysis-filters/:orgId/:filterId
+  VALUES_BATCH: '/analysis-filters/values',
 };
 
 export const GLOBAL_SEARCH = {
-  SEARCH: '/search/global',
+  SEARCH: '/search',
 };
 
 export const ANNOUNCEMENT = {
-  ADD: '/announcement/add',
-  UPDATE: '/announcement/update/',
-  DELETE: '/announcement/delete/',
-  LIST: '/announcement/list',
-  GET: '/announcement/get',
-  DETAILS: '/announcement/details/',
-  DISMISS: '/announcement/dismiss/',
+  LIST: '/announcements',
+  ADD: '/announcements',
+  CURRENT: '/announcements/current',
+  GET: '/announcements/',             // GET /announcements/:id
+  UPDATE: '/announcements/',          // PUT /announcements/:id
+  DELETE: '/announcements/',          // DELETE /announcements/:id
+  DISMISS_PREFIX: '/announcements/',  // POST /announcements/:id/dismiss
+  DISMISS_SUFFIX: '/dismiss',
 };
 
 export const AUDIT = {
-  LIST: '/audit/list',
-  LOGIN_ACTIVITY: '/audit/login-activity',
-  EXPORT_LOGS: '/audit/export/logs',
-  EXPORT_LOGIN_ACTIVITY: '/audit/export/login-activity',
+  LIST: '/audit-logs',
+  LOGIN_ACTIVITY: '/audit-logs/login-activity',
+  EXPORT_LOGS: '/audit-logs/export',
+  EXPORT_LOGIN_ACTIVITY: '/audit-logs/login-activity/export',
 };
 
 export const PROFILE = {
-  GET: '/profile/get',
-  CHANGE_PASSWORD: '/profile/change-password',
+  GET: '/profile',
+  CHANGE_PASSWORD: '/profile/password',
   UPDATE_LOCALE: '/profile/locale',
 };
 
 export const DASHBOARD = {
-  PUBLISH: '/dashboard/publish',
-  GET: '/dashboard/get/',
-  RENDER: '/dashboard/render/',
-  LIST: '/dashboard/list',
-  DELETE: '/dashboard/delete/',
-  BULK_DELETE: '/dashboard/delete/bulk/',
-  RUN_QUERY: '/dashboard/run',
-  DISTINCT_VALUES: '/dashboard/distinct-values/',
+  LIST: '/dashboards',
+  GET: '/dashboards/',              // GET /dashboards/:orgId/:id
+  DELETE: '/dashboards/',           // DELETE /dashboards/:orgId/:id
+  BULK_DELETE_PREFIX: '/dashboards/',
+  BULK_DELETE_SUFFIX: '/bulk-delete',
+  // GET /dashboards/:orgId/:id/render
+  RENDER_PREFIX: '/dashboards/',
+  RENDER_SUFFIX: '/render',
+  // POST /dashboards/:orgId/publish
+  PUBLISH_PREFIX: '/dashboards/',
+  PUBLISH_SUFFIX: '/publish',
+  // POST /dashboards/:orgId/:id/run
+  RUN_PREFIX: '/dashboards/',
+  RUN_SUFFIX: '/run',
+  // POST /dashboards/:orgId/:dashboardId/distinct-values
+  DISTINCT_VALUES_PREFIX: '/dashboards/',
+  DISTINCT_VALUES_SUFFIX: '/distinct-values',
 };
 
 export const RLS_RULE = {
-  ADD: '/rls-rule/add',
-  UPDATE: '/rls-rule/update',
-  DELETE: '/rls-rule/delete/',
-  LIST: '/rls-rule/list',
-  VIEW: '/rls-rule/get/',
-  LIST_ASSIGNMENTS: '/rls-rule/assignment/list/',
-  ADD_ASSIGNMENT: '/rls-rule/assignment/add',
-  DELETE_ASSIGNMENT: '/rls-rule/assignment/delete/',
+  ADD: '/rls-rules',
+  GET: '/rls-rules/',                 // GET /rls-rules/:orgId/:ruleId
+  UPDATE: '/rls-rules/',              // PUT /rls-rules/:orgId/:ruleId
+  DELETE: '/rls-rules/',              // DELETE /rls-rules/:orgId/:ruleId
+  // GET /rls-rules/:orgId/datasets/:datasetId
+  LIST_FOR_DATASET_PREFIX: '/rls-rules/',
+  LIST_FOR_DATASET_INFIX: '/datasets/',
 };

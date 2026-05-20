@@ -42,7 +42,7 @@ export class DatasourceService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(DATASOURCE.VIEW + `${orgId}/${id}`),
+        this.http.apiGet(DATASOURCE.GET + `${orgId}/${id}`),
       );
       if (res?.status) this._current.set(res.data);
     } finally {
@@ -99,7 +99,8 @@ export class DatasourceService {
         status,
       } = payload;
       return await lastValueFrom(
-        this.http.apiPut(DATASOURCE.UPDATE, {
+        // PUT /datasources/:orgId/:id
+        this.http.apiPut(DATASOURCE.UPDATE + `${organisation}/${id}`, {
           id,
           name,
           description,
@@ -124,10 +125,10 @@ export class DatasourceService {
     id: string,
     justification?: string,
   ): Promise<any> {
-    // NOTE: API uses POST for delete (intentional)
+    // DELETE /datasources/:orgId/:id — body carries justification.
     return await lastValueFrom(
-      this.http.apiPost(DATASOURCE.DELETE + `${orgId}/${id}`, {
-        justification,
+      this.http.apiDelete(DATASOURCE.DELETE + `${orgId}/${id}`, {
+        body: { justification },
       }),
     );
   }
@@ -137,12 +138,12 @@ export class DatasourceService {
     justification: string | undefined,
     orgId: string,
   ): Promise<any> {
-    // NOTE: API uses POST for bulk delete (intentional)
+    // POST /datasources/:orgId/bulk-delete
     return await lastValueFrom(
-      this.http.apiPost(DATASOURCE.BULK_DELETE + `${orgId}`, {
-        ids,
-        justification,
-      }),
+      this.http.apiPost(
+        DATASOURCE.BULK_DELETE_PREFIX + orgId + DATASOURCE.BULK_DELETE_SUFFIX,
+        { ids, justification },
+      ),
     );
   }
 
@@ -153,7 +154,11 @@ export class DatasourceService {
   async loadSchemas(orgId: string, datasourceId: string) {
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(DATASOURCE.LIST_SCHEMAS + `${orgId}/${datasourceId}`),
+        this.http.apiGet(
+          DATASOURCE.LIST_SCHEMAS_PREFIX +
+            `${orgId}/${datasourceId}` +
+            DATASOURCE.LIST_SCHEMAS_SUFFIX,
+        ),
       );
       if (res?.status) this._schemas.set(res.data ?? []);
     } catch {
@@ -161,11 +166,12 @@ export class DatasourceService {
     }
   }
 
-  // These methods are used by other modules and view — keep as-is
   listDatasourceSchemas(params: any) {
     return lastValueFrom(
       this.http.apiGet(
-        DATASOURCE.LIST_SCHEMAS + `${params.orgId}/${params.datasourceId}`,
+        DATASOURCE.LIST_SCHEMAS_PREFIX +
+          `${params.orgId}/${params.datasourceId}` +
+          DATASOURCE.LIST_SCHEMAS_SUFFIX,
       ),
     );
   }
@@ -173,8 +179,11 @@ export class DatasourceService {
   listSchemaTables(params: any) {
     return lastValueFrom(
       this.http.apiGet(
-        DATASOURCE.LIST_SCHEMA_TABLES +
-          `${params.orgId}/${params.datasourceId}/${params.schemaName}`,
+        DATASOURCE.LIST_SCHEMAS_PREFIX +
+          `${params.orgId}/${params.datasourceId}` +
+          DATASOURCE.SCHEMAS_SEGMENT +
+          params.schemaName +
+          DATASOURCE.TABLES_SEGMENT.replace(/\/$/, ''),
       ),
     );
   }
@@ -182,8 +191,13 @@ export class DatasourceService {
   listTableColumns(params: any) {
     return lastValueFrom(
       this.http.apiGet(
-        DATASOURCE.LIST_TABLE_COLUMNS +
-          `${params.orgId}/${params.datasourceId}/${params.schemaName}/${params.tableName}`,
+        DATASOURCE.LIST_SCHEMAS_PREFIX +
+          `${params.orgId}/${params.datasourceId}` +
+          DATASOURCE.SCHEMAS_SEGMENT +
+          params.schemaName +
+          DATASOURCE.TABLES_SEGMENT +
+          params.tableName +
+          DATASOURCE.COLUMNS_SEGMENT,
       ),
     );
   }
@@ -191,12 +205,18 @@ export class DatasourceService {
   async runQuery(params: any): Promise<any> {
     this._queryLoading.set(true);
     try {
+      // POST /datasources/:orgId/:datasourceId/query
       return await lastValueFrom(
-        this.http.apiPost(DATASOURCE.RUN_QUERY, {
-          orgId: params.orgId,
-          datasourceId: params.datasourceId,
-          query: params.query,
-        }),
+        this.http.apiPost(
+          DATASOURCE.RUN_QUERY_PREFIX +
+            `${params.orgId}/${params.datasourceId}` +
+            DATASOURCE.RUN_QUERY_SUFFIX,
+          {
+            orgId: params.orgId,
+            datasourceId: params.datasourceId,
+            query: params.query,
+          },
+        ),
       );
     } finally {
       this._queryLoading.set(false);
@@ -209,6 +229,6 @@ export class DatasourceService {
   }
 
   viewDatasource(orgId: string, id: string) {
-    return lastValueFrom(this.http.apiGet(DATASOURCE.VIEW + `${orgId}/${id}`));
+    return lastValueFrom(this.http.apiGet(DATASOURCE.GET + `${orgId}/${id}`));
   }
 }

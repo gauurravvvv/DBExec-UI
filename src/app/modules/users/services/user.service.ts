@@ -39,7 +39,7 @@ export class UserService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(USER.VIEW + `${orgId}/${id}`),
+        this.http.apiGet(USER.GET + `${orgId}/${id}`),
       );
       if (res?.status) this._current.set(res.data);
     } finally {
@@ -106,8 +106,10 @@ export class UserService {
         organisation,
         groupIds,
       } = form.getRawValue();
+      // PUT /users/:orgId/:id — id now in path, the bridge middleware
+      // copies it back into req.body.id for the existing validator.
       return await lastValueFrom(
-        this.http.apiPut(USER.UPDATE, {
+        this.http.apiPut(USER.UPDATE + `${organisation}/${id}`, {
           id,
           firstName,
           lastName,
@@ -141,22 +143,34 @@ export class UserService {
     justification: string | undefined,
     orgId: string,
   ): Promise<any> {
+    // POST /users/:orgId/bulk-delete
     return await lastValueFrom(
-      this.http.apiDelete(USER.BULK_DELETE + orgId, {
-        body: { ids, justification },
-      }),
+      this.http.apiPost(
+        USER.BULK_DELETE_PREFIX + orgId + USER.BULK_DELETE_SUFFIX,
+        { ids, justification },
+      ),
     );
   }
 
   async unlock(orgId: string, id: string): Promise<any> {
+    // POST /users/:orgId/:id/unlock — action, not update.
     return await lastValueFrom(
-      this.http.apiPut(USER.UNLOCK + `${orgId}/${id}`, {}),
+      this.http.apiPost(
+        USER.UNLOCK_PREFIX + `${orgId}/${id}` + USER.UNLOCK_SUFFIX,
+        {},
+      ),
     );
   }
 
-  async updatePassword(id: string, password: string): Promise<any> {
+  async updatePassword(orgId: string, id: string, password: string): Promise<any> {
+    // PUT /users/:orgId/:id/password — id now in path.
     return await lastValueFrom(
-      this.http.apiPut(USER.UPDATE_PASSWORD, { id, newPassword: password }),
+      this.http.apiPut(
+        USER.UPDATE_PASSWORD_PREFIX +
+          `${orgId}/${id}` +
+          USER.UPDATE_PASSWORD_SUFFIX,
+        { newPassword: password },
+      ),
     );
   }
 
@@ -170,6 +184,6 @@ export class UserService {
   }
 
   viewOrgUser(orgId: string, id: string) {
-    return lastValueFrom(this.http.apiGet(USER.VIEW + `${orgId}/${id}`));
+    return lastValueFrom(this.http.apiGet(USER.GET + `${orgId}/${id}`));
   }
 }

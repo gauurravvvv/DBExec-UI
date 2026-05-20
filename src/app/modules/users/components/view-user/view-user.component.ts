@@ -112,6 +112,7 @@ export class ViewUserComponent implements OnInit {
   async onPasswordDialogClose(newPassword: string | null) {
     if (newPassword) {
       const response = await this.userService.updatePassword(
+        this.orgId,
         this.userId,
         newPassword,
       );

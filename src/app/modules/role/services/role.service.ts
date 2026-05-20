@@ -40,7 +40,7 @@ export class RoleService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(ROLE.VIEW + `${orgId}/${roleId}`),
+        this.http.apiGet(ROLE.GET + `${orgId}/${roleId}`),
       );
       if (res?.status) this._current.set(res.data);
     } finally {
@@ -93,9 +93,7 @@ export class RoleService {
     orgId: string,
   ): Promise<any> {
     return await lastValueFrom(
-      this.http.apiDelete(ROLE.BULK_DELETE + orgId, {
-        body: { ids, justification },
-      }),
+      this.http.apiPost(ROLE.BULK_DELETE_PREFIX + orgId + ROLE.BULK_DELETE_SUFFIX, { ids, justification }),
     );
   }
 
@@ -122,7 +120,7 @@ export class RoleService {
   }
 
   viewRole(orgId: string, roleId: string) {
-    return lastValueFrom(this.http.apiGet(ROLE.VIEW + `${orgId}/${roleId}`));
+    return lastValueFrom(this.http.apiGet(ROLE.GET + `${orgId}/${roleId}`));
   }
 
   addRole(data: {
@@ -164,9 +162,7 @@ export class RoleService {
     orgId: string,
   ) {
     return lastValueFrom(
-      this.http.apiDelete(ROLE.BULK_DELETE + orgId, {
-        body: { ids, justification },
-      }),
+      this.http.apiPost(ROLE.BULK_DELETE_PREFIX + orgId + ROLE.BULK_DELETE_SUFFIX, { ids, justification }),
     );
   }
 }

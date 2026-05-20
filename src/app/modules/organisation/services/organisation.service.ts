@@ -45,7 +45,7 @@ export class OrganisationService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(ORGANISATION.VIEW + id),
+        this.http.apiGet(ORGANISATION.GET + id),
       );
       if (res?.status) this._current.set(res.data);
     } finally {
@@ -186,7 +186,7 @@ export class OrganisationService {
         payload.sesFrom = sesFrom;
       }
 
-      return await lastValueFrom(this.http.apiPut(ORGANISATION.EDIT, payload));
+      return await lastValueFrom(this.http.apiPut(ORGANISATION.UPDATE + payload.id, payload));
     } finally {
       this._saving.set(false);
     }
@@ -208,10 +208,9 @@ export class OrganisationService {
   async bulkDelete(ids: string[], justification?: string): Promise<any> {
     this._saving.set(true);
     try {
+      // POST /orgs/bulk-delete — subresource for the bulk action.
       return await lastValueFrom(
-        this.http.apiDelete(ORGANISATION.BULK_DELETE, {
-          body: { ids, justification },
-        }),
+        this.http.apiPost(ORGANISATION.BULK_DELETE, { ids, justification }),
       );
     } finally {
       this._saving.set(false);
@@ -352,14 +351,12 @@ export class OrganisationService {
       payload.sesFrom = sesFrom;
     }
 
-    return lastValueFrom(this.http.apiPut(ORGANISATION.EDIT, payload));
+    return lastValueFrom(this.http.apiPut(ORGANISATION.UPDATE + payload.id, payload));
   }
 
   bulkDeleteOrganisation(ids: string[], justification?: string) {
     return lastValueFrom(
-      this.http.apiDelete(ORGANISATION.BULK_DELETE, {
-        body: { ids, justification },
-      }),
+      this.http.apiPost(ORGANISATION.BULK_DELETE, { ids, justification }),
     );
   }
 
@@ -372,12 +369,18 @@ export class OrganisationService {
   }
 
   viewOrganisation(id: string) {
-    return lastValueFrom(this.http.apiGet(ORGANISATION.VIEW + `${id}`));
+    return lastValueFrom(this.http.apiGet(ORGANISATION.GET + `${id}`));
   }
 
   refreshMasterDb(orgId: string) {
+    // POST /orgs/:id/refresh-master-db — id-first, action-suffix.
     return lastValueFrom(
-      this.http.apiPost(ORGANISATION.REFRESH_MASTER_DB + `${orgId}`, {}),
+      this.http.apiPost(
+        ORGANISATION.REFRESH_MASTER_DB_PREFIX +
+          orgId +
+          ORGANISATION.REFRESH_MASTER_DB_SUFFIX,
+        {},
+      ),
     );
   }
 

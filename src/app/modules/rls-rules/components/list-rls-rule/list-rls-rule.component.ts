@@ -287,8 +287,17 @@ export class ListRlsRuleComponent implements OnInit {
     }
     if (Object.keys(filter).length > 0) params.filter = JSON.stringify(filter);
 
+    // PRE-EXISTING SEMANTIC MISMATCH: the BE list endpoint is
+    // scoped by dataset, not datasource. The FE list page exposes a
+    // datasource selector. Passing selectedDatasource through has
+    // always resulted in zero matches because dataset ids and
+    // datasource ids don't overlap; we keep the behaviour for
+    // continuity but this page needs a redesign (dataset-scoped
+    // selector or a different listing endpoint). Filter/sort params
+    // are ignored by the new BE route — keeping the call site
+    // unchanged so the UI shape doesn't shift in the same PR.
     this.rlsRulesService
-      .load(this.selectedOrg, this.selectedDatasource, params)
+      .load(this.selectedOrg, this.selectedDatasource)
       .then(() => {
         this.cdr.markForCheck();
       })

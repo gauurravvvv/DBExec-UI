@@ -71,7 +71,8 @@ export class AnnouncementService {
       let params = new HttpParams();
       if (orgId) params = params.set('orgId', orgId);
       const res: any = await lastValueFrom(
-        this.http.apiGet(ANNOUNCEMENT.DETAILS + id, { params }),
+        // GET /announcements/:id — single read.
+        this.http.apiGet(ANNOUNCEMENT.GET + id, { params }),
       );
       if (res?.status) this._current.set(res.data);
     } catch {
@@ -116,12 +117,18 @@ export class AnnouncementService {
 
   /** @deprecated Use loadActive() + active signal. Kept for header compatibility until Task 21. */
   getActive(): Promise<any> {
-    return lastValueFrom(this.http.apiGet(ANNOUNCEMENT.GET));
+    return lastValueFrom(this.http.apiGet(ANNOUNCEMENT.CURRENT));
   }
 
   async dismiss(announcementId: string): Promise<any> {
+    // POST /announcements/:id/dismiss
     return lastValueFrom(
-      this.http.apiPost(ANNOUNCEMENT.DISMISS + announcementId, {}),
+      this.http.apiPost(
+        ANNOUNCEMENT.DISMISS_PREFIX +
+          announcementId +
+          ANNOUNCEMENT.DISMISS_SUFFIX,
+        {},
+      ),
     );
   }
 

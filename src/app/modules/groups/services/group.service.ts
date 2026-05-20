@@ -39,7 +39,7 @@ export class GroupService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(GROUP.VIEW + `${orgId}/${groupId}`),
+        this.http.apiGet(GROUP.GET + `${orgId}/${groupId}`),
       );
       if (res?.status) this._current.set(res.data);
     } finally {
@@ -71,7 +71,7 @@ export class GroupService {
       const { id, name, description, status, users, organisation, roleId } =
         form.getRawValue();
       return await lastValueFrom(
-        this.http.apiPut(GROUP.EDIT, {
+        this.http.apiPut(GROUP.UPDATE + `${organisation}/${id}`, {
           id,
           name,
           description,
@@ -105,9 +105,7 @@ export class GroupService {
     orgId: string,
   ): Promise<any> {
     return await lastValueFrom(
-      this.http.apiDelete(GROUP.BULK_DELETE + orgId, {
-        body: { ids, justification },
-      }),
+      this.http.apiPost(GROUP.BULK_DELETE_PREFIX + orgId + GROUP.BULK_DELETE_SUFFIX, { ids, justification }),
     );
   }
 
@@ -121,6 +119,6 @@ export class GroupService {
   }
 
   viewGroup(orgId: string, groupId: string) {
-    return lastValueFrom(this.http.apiGet(GROUP.VIEW + `${orgId}/${groupId}`));
+    return lastValueFrom(this.http.apiGet(GROUP.GET + `${orgId}/${groupId}`));
   }
 }

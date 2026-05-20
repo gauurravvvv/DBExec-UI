@@ -39,7 +39,7 @@ export class ConnectionService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(CONNECTIONS.VIEW + `${orgId}/${id}`),
+        this.http.apiGet(CONNECTIONS.GET + `${orgId}/${id}`),
       );
       if (res?.status) this._current.set(res.data);
     } finally {
@@ -122,9 +122,7 @@ export class ConnectionService {
     orgId: string,
   ): Promise<any> {
     return await lastValueFrom(
-      this.http.apiDelete(CONNECTIONS.BULK_DELETE + `${orgId}`, {
-        body: { ids, justification },
-      }),
+      this.http.apiPost(CONNECTIONS.BULK_DELETE_PREFIX + `${orgId}` + CONNECTIONS.BULK_DELETE_SUFFIX, { ids, justification }),
     );
   }
 
@@ -138,6 +136,6 @@ export class ConnectionService {
   }
 
   viewConnection(orgId: string, id: string) {
-    return lastValueFrom(this.http.apiGet(CONNECTIONS.VIEW + `${orgId}/${id}`));
+    return lastValueFrom(this.http.apiGet(CONNECTIONS.GET + `${orgId}/${id}`));
   }
 }
