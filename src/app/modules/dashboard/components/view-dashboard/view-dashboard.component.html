@@ -103,9 +103,16 @@
           </div>
           <div class="sidebar-divider"></div>
           <div class="sidebar-content-inner">
+            <!-- Hosted mode: we pass the snapshotted filters directly
+                 and a fetcher factory pointing at the dashboard
+                 distinct-values endpoint, so the bar never falls back
+                 to the live AnalysesService path. analysisId is
+                 intentionally blank — the dashboard owns its filters. -->
             <app-analysis-filter-bar
               [orgId]="orgId"
-              [analysisId]="dashboard?.analysisId"
+              [analysisId]="''"
+              [filters]="filters"
+              [fetcherFactory]="dashboardFetcherFactory"
               [autoApply]="true"
               (filtersApplied)="onFiltersApplied($event)"
               (filtersCleared)="onFiltersCleared()"

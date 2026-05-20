@@ -16,7 +16,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
-import { ANALYSES } from 'src/app/constants/routes';
+import { ANALYSES, DASHBOARD } from 'src/app/constants/routes';
+import { DashboardService } from 'src/app/modules/dashboard/services/dashboard.service';
+import { PublishDashboardPayload } from '../publish-dashboard-dialog/publish-dashboard-dialog.component';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
@@ -283,6 +285,12 @@ export class EditAnalysesComponent
   isConfigSidebarOpen: boolean = false;
   showSaveDialog: boolean = false;
 
+  // Publish-to-dashboard state. Tracked alongside save state but
+  // independent so the user can have one in-flight without blocking
+  // the other.
+  showPublishDialog: boolean = false;
+  publishing: boolean = false;
+
   // NgRx Store Observables
   graphData$!: Observable<any[] | null>;
   datasetStatus$!: Observable<DatasetLoadingStatus>;
@@ -336,6 +344,7 @@ export class EditAnalysesComponent
     private analysesService: AnalysesService,
     private chartDataTransformer: ChartDataTransformerService,
     private translate: TranslateService,
+    private dashboardService: DashboardService,
   ) {}
 
   get saving() {
@@ -2252,5 +2261,55 @@ export class EditAnalysesComponent
           this.cdr.markForCheck();
         });
     }
+  }
+
+  /**
+   * Opens the publish-to-dashboard dialog. We gate access through the
+   * button's `disabled` state (no unsaved changes, has visuals, not
+   * already saving/publishing) so by the time we get here the analysis
+   * is in a publishable state.
+   */
+  openPublishDashboardDialog(): void {
+    this.showPublishDialog = true;
+  }
+
+  /**
+   * Handles the publish dialog closing. `payload === null` means the
+   * user cancelled. A payload triggers the actual server call.
+   *
+   * On success we navigate to the new (or republished) dashboard.
+   * That mirrors the save-analysis flow which also navigates away on
+   * success — it confirms the operation succeeded and gives the user
+   * something to do next.
+   */
+  handlePublishDialogClose(payload: PublishDashboardPayload | null): void {
+    if (!payload) {
+      this.showPublishDialog = false;
+      return;
+    }
+
+    this.publishing = true;
+    this.dashboardService
+      .publish({
+        orgId: this.orgId,
+        analysisId: this.analysisId,
+        mode: payload.mode,
+        dashboardId: payload.dashboardId,
+        name: payload.name,
+        description: payload.description,
+      })
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, true)) {
+          this.showPublishDialog = false;
+          const newId = response?.data?.id;
+          if (newId) {
+            this.router.navigate([DASHBOARD.view(this.orgId, newId)]);
+          }
+        }
+      })
+      .finally(() => {
+        this.publishing = false;
+        this.cdr.markForCheck();
+      });
   }
 }

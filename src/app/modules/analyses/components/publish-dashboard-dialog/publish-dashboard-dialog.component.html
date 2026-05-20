@@ -1,0 +1,192 @@
+<div class="publish-dashboard-popup" *ngIf="visible">
+  <div class="popup-content">
+    <h3>
+      <i class="pi pi-upload mr-2"></i>
+      {{ 'DASHBOARD.PUBLISH_DASHBOARD_TITLE' | translate }}
+    </h3>
+
+    <p class="source-line" *ngIf="analysisName">
+      {{ 'DASHBOARD.PUBLISH_FROM_ANALYSIS' | translate }}
+      <strong>{{ analysisName }}</strong>
+    </p>
+
+    <!-- Mode tabs: publish-as-new (default) vs republish into existing. -->
+    <div class="mode-tabs">
+      <button
+        type="button"
+        class="tab"
+        [class.active]="mode === 'new'"
+        (click)="setMode('new')"
+      >
+        <i class="pi pi-plus mr-1"></i>
+        {{ 'DASHBOARD.PUBLISH_AS_NEW' | translate }}
+      </button>
+      <button
+        type="button"
+        class="tab"
+        [class.active]="mode === 'existing'"
+        [disabled]="!loadingExisting && existingDashboards.length === 0"
+        (click)="setMode('existing')"
+      >
+        <i class="pi pi-refresh mr-1"></i>
+        {{ 'DASHBOARD.PUBLISH_AS_EXISTING' | translate }}
+        <span class="count-pill" *ngIf="existingDashboards.length">
+          {{ existingDashboards.length }}
+        </span>
+      </button>
+    </div>
+
+    <form [formGroup]="form" class="publish-form">
+      <!-- ── NEW MODE ────────────────────────────────────────────── -->
+      <ng-container *ngIf="mode === 'new'">
+        <div class="form-field">
+          <app-custom-input
+            formControlName="name"
+            [label]="'DASHBOARD.PUBLISH_NEW_NAME_LABEL' | translate"
+            [placeholder]="'DASHBOARD.PUBLISH_NEW_NAME_PLACEHOLDER' | translate"
+            icon="pi-chart-bar"
+            [required]="true"
+            [showError]="
+              !!(form.get('name')?.invalid && form.get('name')?.touched)
+            "
+            [errorMessage]="getNameError()"
+          ></app-custom-input>
+        </div>
+
+        <div class="form-field">
+          <app-custom-input
+            formControlName="description"
+            [label]="'COMMON.DESCRIPTION' | translate"
+            [placeholder]="
+              'DASHBOARD.PUBLISH_DESCRIPTION_PLACEHOLDER' | translate
+            "
+            icon="pi-align-left"
+          ></app-custom-input>
+          <small class="char-count">
+            {{ form.get('description')?.value?.length || 0 }}/500
+          </small>
+        </div>
+
+        <p class="hint">
+          <i class="pi pi-info-circle"></i>
+          {{ 'DASHBOARD.PUBLISH_NEW_HINT' | translate }}
+        </p>
+      </ng-container>
+
+      <!-- ── EXISTING MODE ───────────────────────────────────────── -->
+      <ng-container *ngIf="mode === 'existing'">
+        <div class="form-field">
+          <label>
+            {{ 'DASHBOARD.PUBLISH_TARGET_LABEL' | translate }}
+            <span class="required">*</span>
+          </label>
+
+          <div class="loading-line" *ngIf="loadingExisting">
+            <i class="pi pi-spin pi-spinner"></i>
+            {{ 'COMMON.LOADING' | translate }}
+          </div>
+
+          <div
+            class="empty-line"
+            *ngIf="!loadingExisting && existingDashboards.length === 0"
+          >
+            {{ 'DASHBOARD.PUBLISH_NO_EXISTING' | translate }}
+          </div>
+
+          <ul
+            class="target-list"
+            *ngIf="!loadingExisting && existingDashboards.length > 0"
+          >
+            <li
+              *ngFor="let d of existingDashboards"
+              class="target-item"
+              [class.selected]="form.get('dashboardId')?.value === d.id"
+              (click)="
+                form.get('dashboardId')?.setValue(d.id);
+                confirmingOverwrite = false
+              "
+            >
+              <div class="target-name">{{ d.name }}</div>
+              <div class="target-meta">
+                <span *ngIf="d.snapshotVersion">
+                  v{{ d.snapshotVersion }}
+                </span>
+                <span *ngIf="d.publishedAt">
+                  · {{ d.publishedAt | date: 'medium' }}
+                </span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Optional rename + description overrides on republish -->
+        <div class="form-field">
+          <app-custom-input
+            formControlName="name"
+            [label]="'DASHBOARD.PUBLISH_RENAME_LABEL' | translate"
+            [placeholder]="'DASHBOARD.PUBLISH_RENAME_PLACEHOLDER' | translate"
+            icon="pi-pencil"
+            [showError]="
+              !!(form.get('name')?.invalid && form.get('name')?.touched)
+            "
+            [errorMessage]="getNameError()"
+          ></app-custom-input>
+        </div>
+
+        <!-- Destructive confirmation. Only shown after the user has
+             clicked the primary button once with a target selected. -->
+        <div class="overwrite-warning" *ngIf="confirmingOverwrite">
+          <i class="pi pi-exclamation-triangle"></i>
+          <span>
+            {{ 'DASHBOARD.PUBLISH_OVERWRITE_WARNING' | translate }}
+          </span>
+        </div>
+      </ng-container>
+
+      <div class="popup-actions">
+        <button
+          pButton
+          type="button"
+          [label]="'COMMON.CANCEL' | translate"
+          class="p-button-outlined btn-cancel"
+          (click)="onCancel()"
+          [disabled]="saving"
+        ></button>
+
+        <!-- Mid-flow "no, take me back" for the overwrite arm. -->
+        <button
+          *ngIf="confirmingOverwrite"
+          pButton
+          type="button"
+          [label]="'COMMON.BACK' | translate"
+          class="p-button-outlined btn-back"
+          (click)="cancelConfirm()"
+        ></button>
+
+        <button
+          pButton
+          type="button"
+          [label]="
+            (mode === 'existing'
+              ? confirmingOverwrite
+                ? 'DASHBOARD.PUBLISH_CONFIRM_OVERWRITE'
+                : 'DASHBOARD.PUBLISH_AS_EXISTING'
+              : 'DASHBOARD.PUBLISH'
+            ) | translate
+          "
+          class="p-button-primary btn-publish"
+          [ngClass]="{ 'btn-danger': confirmingOverwrite }"
+          [disabled]="!canSubmit"
+          (click)="onPrimaryClick()"
+        >
+          <i
+            class="pi mr-2"
+            [class.pi-upload]="!saving"
+            [class.pi-spin]="saving"
+            [class.pi-spinner]="saving"
+          ></i>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -77,6 +77,87 @@ export class DashboardService {
     }
   }
 
+  /**
+   * Publish — snapshot the source analysis into a dashboard.
+   *
+   * `mode === 'new'` creates a fresh dashboard; `name` is required.
+   * `mode === 'existing'` overwrites the children of an existing
+   * dashboard (destructive); `dashboardId` is required and `name`
+   * is optional (rename on republish). Caller is responsible for
+   * showing a confirmation before invoking 'existing'.
+   */
+  async publish(payload: {
+    orgId: string;
+    analysisId: string;
+    mode: 'new' | 'existing';
+    dashboardId?: string;
+    name?: string;
+    description?: string;
+    status?: 0 | 1;
+  }): Promise<any> {
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiPost(DASHBOARD.PUBLISH, payload));
+    } finally {
+      this._saving.set(false);
+    }
+  }
+
+  /**
+   * List dashboards that were published from a given analysis. Used
+   * by the publish dialog to populate the "Publish into existing"
+   * dropdown. Server has no dedicated endpoint for this yet; we filter
+   * the list client-side by sourceAnalysisId.
+   */
+  async listForAnalysis(params: {
+    orgId: string;
+    datasourceId: string;
+    analysisId: string;
+  }): Promise<any[]> {
+    const res: any = await lastValueFrom(
+      this.http.apiGet(DASHBOARD.LIST, {
+        params: {
+          orgId: params.orgId,
+          datasourceId: params.datasourceId,
+          limit: 100,
+          page: 1,
+        },
+      }),
+    );
+    const all: any[] = res?.data?.dashboards ?? [];
+    return all.filter((d) => d.sourceAnalysisId === params.analysisId);
+  }
+
+  /**
+   * Run the dashboard's snapshotted SQL with user-applied filters.
+   * Returns the full enriched row set (server caps with LIMIT).
+   */
+  async runQuery(payload: {
+    dashboardId: string;
+    filters?: any[];
+    limit?: number;
+  }): Promise<any> {
+    return lastValueFrom(this.http.apiPost(DASHBOARD.RUN_QUERY, payload));
+  }
+
+  /**
+   * Distinct values for a single field on a dashboard. Mirrors
+   * analysesService.getDistinctFieldValues so the shared
+   * analysis-filter-bar fetcher-factory plugs straight in.
+   */
+  async getDistinctFieldValues(
+    orgId: string,
+    dashboardId: string,
+    body: { fieldName: string; search?: string; page?: number; pageSize?: number },
+  ): Promise<any> {
+    return lastValueFrom(
+      this.http.apiPost(
+        DASHBOARD.DISTINCT_VALUES + `${orgId}/${dashboardId}`,
+        body,
+      ),
+    );
+  }
+
   async delete(orgId: string, id: string, justification: string): Promise<any> {
     this._saving.set(true);
     try {

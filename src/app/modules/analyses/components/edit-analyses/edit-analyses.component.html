@@ -118,6 +118,39 @@
         <i class="pi" [class.pi-save]="!saving()" [class.pi-spin]="saving()" [class.pi-spinner]="saving()"></i>
         <span>{{ saving() ? ('ANALYSES.SAVING' | translate) : ('COMMON.SAVE' | translate) }}</span>
       </button>
+
+      <!-- Publish creates a snapshot dashboard from this analysis.
+           Disabled while saving, while there are unsaved changes, or
+           while a publish is already in flight. Tooltips explain each
+           blocked state so the user isn't left guessing. -->
+      <button
+        type="button"
+        class="a-btn a-btn--secondary"
+        (click)="openPublishDashboardDialog()"
+        [disabled]="
+          saving() ||
+          publishing ||
+          hasUnsavedChanges() ||
+          !visuals.length
+        "
+        [pTooltip]="
+          (hasUnsavedChanges()
+            ? 'DASHBOARD.PUBLISH_UNSAVED_HINT'
+            : !visuals.length
+            ? 'DASHBOARD.PUBLISH_NO_VISUALS_HINT'
+            : 'DASHBOARD.PUBLISH'
+          ) | translate
+        "
+        tooltipPosition="bottom"
+      >
+        <i
+          class="pi"
+          [class.pi-upload]="!publishing"
+          [class.pi-spin]="publishing"
+          [class.pi-spinner]="publishing"
+        ></i>
+        <span>{{ 'DASHBOARD.PUBLISH' | translate }}</span>
+      </button>
     </div>
   </div>
 
@@ -792,6 +825,17 @@
   (close)="handleSaveDialogClose($event)"
 >
 </app-save-analyses-dialog>
+
+<!-- Publish Dashboard Dialog -->
+<app-publish-dashboard-dialog
+  [visible]="showPublishDialog"
+  [orgId]="orgId"
+  [datasourceId]="datasourceId"
+  [analysisId]="analysisId"
+  [analysisName]="analysisDetails?.name || ''"
+  [saving]="publishing"
+  (close)="handlePublishDialogClose($event)"
+></app-publish-dashboard-dialog>
 
 <!-- Delete Field Confirmation Dialog -->
 <div class="confirmation-popup" *ngIf="showDeleteFieldConfirm">

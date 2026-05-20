@@ -29,6 +29,7 @@ import { Visual } from '../../../analyses/models/visual.model';
 import { AnalysesService } from '../../../analyses/services/analyses.service';
 import { ChartDataTransformerService } from '../../../analyses/services/chart-data-transformer.service';
 import { TranslateService } from '@ngx-translate/core';
+import { FilterFetcher } from 'src/app/shared/components/analysis-filter-bar/analysis-filter-bar.component';
 import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
@@ -54,6 +55,39 @@ export class ViewDashboardComponent
   filters: any[] = [];
   rawData: any[] = [];
   appliedFilters: any[] = [];
+
+  /**
+   * Fetcher factory passed to the shared filter-bar so its dropdowns
+   * resolve distinct values via the dashboard's own endpoint instead
+   * of the analyses one. Each per-filter call resolves the dashboard's
+   * snapshotted column or custom field — never the live source.
+   *
+   * Stable identity: arrow bound on the instance, so passing it down
+   * via [fetcherFactory] doesn't churn the bar's @Input on every CD
+   * pass.
+   */
+  dashboardFetcherFactory = (filter: any): FilterFetcher => {
+    return async ({ search, page, limit }) => {
+      const response: any = await this._dashboardService.getDistinctFieldValues(
+        this.orgId,
+        this.dashboardId,
+        {
+          fieldName: filter?.columnName || filter?.fieldName,
+          search,
+          page,
+          pageSize: limit,
+        },
+      );
+      const data = response?.data || {};
+      return {
+        items: (data.values || []).map((v: any) => ({
+          label: v.label ?? String(v.value),
+          value: v.value,
+        })),
+        total: data.total ?? (data.values?.length || 0),
+      };
+    };
+  };
 
   /**
    * Monotonically increasing id stamped on every executeQuery call.
@@ -278,10 +312,11 @@ export class ViewDashboardComponent
     // every aggregate they see. Edit Analysis still uses the default
     // cap (1000) because that surface is for building charts, where a
     // representative sample is sufficient and faster to iterate on.
+    // Post-snapshot: dashboards run their own snapshotted SQL via
+    // /dashboard/run instead of poking the live analyses endpoint.
+    // Source analysis edits no longer affect dashboard query results.
     const payload: any = {
-      datasetId: this.dashboard.datasetId,
-      analysisId: this.dashboard.analysisId,
-      organisation: this.orgId,
+      dashboardId: this.dashboard.id,
       limit: -1,
     };
 
@@ -292,8 +327,8 @@ export class ViewDashboardComponent
       this.appliedFilters = [];
     }
 
-    this.analysesService
-      .runAnalysisQuery(payload)
+    this._dashboardService
+      .runQuery(payload)
       .then(response => {
         // Stale response — a newer executeQuery has already fired
         // since this one was issued. Drop the result silently so

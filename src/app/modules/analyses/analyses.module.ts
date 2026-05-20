@@ -12,6 +12,7 @@ import { ChartRendererComponent } from './components/chart-renderer/chart-render
 import { EditAnalysesComponent } from './components/edit-analyses/edit-analyses.component';
 import { FilterDialogComponent } from './components/filter-dialog/filter-dialog.component';
 import { ListAnalysesComponent } from './components/list-analyses/list-analyses.component';
+import { PublishDashboardDialogComponent } from './components/publish-dashboard-dialog/publish-dashboard-dialog.component';
 import { TableVisualComponent } from './components/table-visual/table-visual.component';
 import { ViewAnalysesComponent } from './components/view-analyses/view-analyses.component';
 import { VisualConfigSidebarComponent } from './components/visual-config-sidebar/visual-config-sidebar.component';
@@ -34,6 +35,7 @@ import {
     EditAnalysesComponent,
     ViewAnalysesComponent,
     ListAnalysesComponent,
+    PublishDashboardDialogComponent,
   ],
   imports: [
     CommonModule,
