@@ -747,6 +747,87 @@ export const PICTORIAL_REPEAT_DIRECTION_OPTIONS = [
   { label: 'End', value: 'end' },
 ];
 
+// ─── New dropdown option lists for Phase 4b ────────────────────────────────
+// These back the additional config sections (emphasis, visualMap orient,
+// data-zoom filter mode, sankey label edge, etc.) added to the sidebar.
+
+export const EMPHASIS_FOCUS_OPTIONS = [
+  { label: 'None', value: 'none' },
+  { label: 'Self', value: 'self' },
+  { label: 'Series', value: 'series' },
+  { label: 'Adjacency', value: 'adjacency' }, // sankey/graph
+  { label: 'Ancestor', value: 'ancestor' }, // sunburst
+  { label: 'Descendant', value: 'descendant' }, // sunburst
+];
+
+export const VISUAL_MAP_ORIENT_OPTIONS = [
+  { label: 'Horizontal', value: 'horizontal' },
+  { label: 'Vertical', value: 'vertical' },
+];
+
+export const VISUAL_MAP_TYPE_OPTIONS = [
+  { label: 'Continuous', value: 'continuous' },
+  { label: 'Piecewise', value: 'piecewise' },
+];
+
+export const DATA_ZOOM_TYPE_OPTIONS = [
+  { label: 'Inside only', value: 'inside' },
+  { label: 'Slider only', value: 'slider' },
+  { label: 'Both', value: 'both' },
+];
+
+export const DATA_ZOOM_FILTER_MODE_OPTIONS = [
+  { label: 'Filter', value: 'filter' },
+  { label: 'Weak filter', value: 'weakFilter' },
+  { label: 'Empty', value: 'empty' },
+  { label: 'None', value: 'none' },
+];
+
+export const AREA_ORIGIN_OPTIONS = [
+  { label: 'Auto', value: 'auto' },
+  { label: 'Start', value: 'start' },
+  { label: 'End', value: 'end' },
+];
+
+export const SUNBURST_LABEL_ROTATE_OPTIONS = [
+  { label: 'Radial', value: 'radial' },
+  { label: 'Tangential', value: 'tangential' },
+  { label: 'Horizontal (0°)', value: 0 },
+];
+
+export const COLOR_MAPPING_BY_OPTIONS = [
+  { label: 'Value', value: 'value' },
+  { label: 'Index', value: 'index' },
+  { label: 'ID', value: 'id' },
+];
+
+export const MAP_NAME_PROPERTY_HINTS = [
+  { label: 'name (default)', value: 'name' },
+  { label: 'NAME', value: 'NAME' },
+  { label: 'name_en', value: 'name_en' },
+  { label: 'shapeName', value: 'shapeName' },
+];
+
+export const FUNNEL_LABEL_POSITION_OPTIONS = [
+  { label: 'Inside', value: 'inside' },
+  { label: 'Outside', value: 'outside' },
+  { label: 'Right', value: 'right' },
+  { label: 'Left', value: 'left' },
+  { label: 'Top', value: 'top' },
+  { label: 'Bottom', value: 'bottom' },
+];
+
+export const THEME_RIVER_LABEL_POSITION_OPTIONS = [
+  { label: 'Left', value: 'left' },
+  { label: 'Right', value: 'right' },
+];
+
+export const SHADING_MODE_OPTIONS = [
+  { label: 'Color', value: 'color' },
+  { label: 'Lambert', value: 'lambert' },
+  { label: 'Realistic', value: 'realistic' },
+];
+
 // Pictorial bar chart options
 export const PICTORIAL_SYMBOLS = [
   { label: 'Round Rect', value: 'roundRect' },

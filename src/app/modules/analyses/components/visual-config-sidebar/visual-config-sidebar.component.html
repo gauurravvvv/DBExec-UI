@@ -2350,6 +2350,719 @@
           </div>
         </div>
       </ng-container>
+
+      <!-- ============================================================
+           PHASE 4B: extended config sections covering ECharts 5.6
+           options that an analytics tool reasonably exposes to the
+           user. Each section is gated by the predicate that makes the
+           knob meaningful — e.g. visualMap only on charts ECharts
+           5.6 says can consume it (heatmap, scatter, treemap, map).
+           ============================================================ -->
+
+      <!-- ===== Emphasis (highlight-on-hover) ===== -->
+      <!-- Most cartesian + composite series support an `emphasis.focus`
+           knob. `adjacency` is only meaningful on sankey/graph;
+           ancestor/descendant only on sunburst. -->
+      <div
+        class="config-section"
+        *ngIf="supportsEmphasis(focusedVisual.chartType)"
+      >
+        <div class="section-title">{{ 'ANALYSES.EMPHASIS' | translate }}</div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.FOCUS_MODE' | translate }}</label>
+          <app-custom-dropdown
+            [options]="emphasisFocusOptions"
+            [(ngModel)]="focusedVisual.config.emphasis"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          ></app-custom-dropdown>
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.HOVER_SCALE' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.emphasisScale"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+      </div>
+
+      <!-- ===== VisualMap (color/value mapping bar) ===== -->
+      <!-- ECharts 5.6 lists visualMap as the canonical color-mapping
+           helper for heatmap, scatter, treemap, and map series. -->
+      <div
+        class="config-section"
+        *ngIf="
+          isHeatMapChartType(focusedVisual.chartType) ||
+          isScatterChartType(focusedVisual.chartType) ||
+          isTreeMapChartType(focusedVisual.chartType) ||
+          isWorldMapChartType(focusedVisual.chartType)
+        "
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.VISUAL_MAP' | translate }}
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.SHOW_VISUAL_MAP' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.visualMapShow"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+        <ng-container *ngIf="focusedVisual.config.visualMapShow">
+          <div class="config-group">
+            <label>{{ 'ANALYSES.TYPE' | translate }}</label>
+            <app-custom-dropdown
+              [options]="visualMapTypeOptions"
+              [(ngModel)]="focusedVisual.config.visualMapType"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+            ></app-custom-dropdown>
+          </div>
+          <div class="config-group">
+            <label>{{ 'ANALYSES.ORIENTATION' | translate }}</label>
+            <app-custom-dropdown
+              [options]="visualMapOrientOptions"
+              [(ngModel)]="focusedVisual.config.visualMapOrient"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+            ></app-custom-dropdown>
+          </div>
+          <div class="config-row">
+            <label>{{ 'ANALYSES.CALCULABLE' | translate }}</label>
+            <app-custom-toggle
+              [(ngModel)]="focusedVisual.config.visualMapCalculable"
+              [showStatusLabel]="false"
+            ></app-custom-toggle>
+          </div>
+          <div class="config-group">
+            <label>{{ 'ANALYSES.MIN' | translate }}</label>
+            <app-custom-number
+              [(ngModel)]="focusedVisual.config.visualMapMin"
+              [showButtons]="false"
+            ></app-custom-number>
+          </div>
+          <div class="config-group">
+            <label>{{ 'ANALYSES.MAX' | translate }}</label>
+            <app-custom-number
+              [(ngModel)]="focusedVisual.config.visualMapMax"
+              [showButtons]="false"
+            ></app-custom-number>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- ===== DataZoom extras (throttle / filter mode) ===== -->
+      <div
+        class="config-section"
+        *ngIf="
+          supportsDataZoom(focusedVisual.chartType) &&
+          focusedVisual.config.dataZoom
+        "
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.DATA_ZOOM_OPTIONS' | translate }}
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.TYPE' | translate }}</label>
+          <app-custom-dropdown
+            [options]="dataZoomTypeOptions"
+            [(ngModel)]="focusedVisual.config.dataZoomType"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          ></app-custom-dropdown>
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.FILTER_MODE' | translate }}</label>
+          <app-custom-dropdown
+            [options]="dataZoomFilterModeOptions"
+            [(ngModel)]="focusedVisual.config.dataZoomFilterMode"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          ></app-custom-dropdown>
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.THROTTLE_MS' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="focusedVisual.config.dataZoomThrottle"
+            [min]="0"
+            [max]="2000"
+            [showButtons]="true"
+            suffix="ms"
+          ></app-custom-number>
+        </div>
+      </div>
+
+      <!-- ===== Performance Mode (large/progressive flags) ===== -->
+      <!-- ECharts large/progressive rendering kicks in at the thresholds
+           below. Default is on; opt-out for charts where per-item style
+           is critical. -->
+      <div
+        class="config-section"
+        *ngIf="
+          isScatterChartType(focusedVisual.chartType) ||
+          isLineChartType(focusedVisual.chartType) ||
+          isBarChartType(focusedVisual.chartType)
+        "
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.PERFORMANCE_MODE' | translate }}
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.ENABLE_LARGE_MODE' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.performanceMode"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+        <ng-container *ngIf="focusedVisual.config.performanceMode !== false">
+          <div class="config-group">
+            <label>{{ 'ANALYSES.LARGE_THRESHOLD' | translate }}</label>
+            <app-custom-number
+              [(ngModel)]="focusedVisual.config.largeThreshold"
+              [min]="500"
+              [max]="50000"
+              [showButtons]="true"
+            ></app-custom-number>
+          </div>
+          <div class="config-group">
+            <label>{{ 'ANALYSES.PROGRESSIVE_CHUNK' | translate }}</label>
+            <app-custom-number
+              [(ngModel)]="focusedVisual.config.progressive"
+              [min]="100"
+              [max]="10000"
+              [showButtons]="true"
+            ></app-custom-number>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- ===== Bar additions (width bounds + clip) ===== -->
+      <div
+        class="config-section"
+        *ngIf="isBarChartType(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.BAR_SIZING' | translate }}
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.BAR_MAX_WIDTH' | translate }}</label>
+          <app-custom-input
+            [(ngModel)]="focusedVisual.config.barMaxWidth"
+            placeholder="auto / 32px / 30%"
+          ></app-custom-input>
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.BAR_MIN_WIDTH' | translate }}</label>
+          <app-custom-input
+            [(ngModel)]="focusedVisual.config.barMinWidth"
+            placeholder="auto / 4px"
+          ></app-custom-input>
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.CLIP_TO_GRID' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.clip"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+      </div>
+
+      <!-- ===== Area: areaStyle origin ===== -->
+      <div
+        class="config-section"
+        *ngIf="isAreaChartType(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.AREA_BASELINE' | translate }}
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.FILL_FROM' | translate }}</label>
+          <app-custom-dropdown
+            [options]="areaOriginOptions"
+            [(ngModel)]="focusedVisual.config.areaOrigin"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          ></app-custom-dropdown>
+        </div>
+      </div>
+
+      <!-- ===== Pie additions (slice border + label line lengths) ===== -->
+      <div
+        class="config-section"
+        *ngIf="isPieChartType(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.PIE_REFINEMENTS' | translate }}
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.MIN_SHOW_LABEL_ANGLE' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="focusedVisual.config.pieMinShowLabelAngle"
+            [min]="0"
+            [max]="30"
+            [step]="0.5"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.LABEL_LINE_LENGTH' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="focusedVisual.config.pieLabelLineLength"
+            [min]="0"
+            [max]="50"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.LABEL_LINE_LENGTH_2' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="focusedVisual.config.pieLabelLineLength2"
+            [min]="0"
+            [max]="50"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.SLICE_BORDER_WIDTH' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="focusedVisual.config.pieBorderWidth"
+            [min]="0"
+            [max]="10"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+      </div>
+
+      <!-- ===== Sankey additions (layoutIterations + edge label) ===== -->
+      <div
+        class="config-section"
+        *ngIf="isSankeyChartType(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.SANKEY_LAYOUT' | translate }}
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.LAYOUT_ITERATIONS' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="focusedVisual.config.sankeyLayoutIterations"
+            [min]="0"
+            [max]="64"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.HIGHLIGHT_ADJACENCY' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.sankeyFocusAdjacency"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+      </div>
+
+      <!-- ===== Graph additions (force.layoutAnimation + circular) ===== -->
+      <div
+        class="config-section"
+        *ngIf="isGraphChartType(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.GRAPH_EXTRAS' | translate }}
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.LIVE_FORCE_LAYOUT' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.graphForceLayoutAnimation"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.ROTATE_CIRCULAR_LABELS' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.graphCircularRotateLabel"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+      </div>
+
+      <!-- ===== Sunburst additions (label rotate + focus) ===== -->
+      <div
+        class="config-section"
+        *ngIf="isSunburstChartType(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.SUNBURST_LABELS' | translate }}
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.LABEL_ROTATION' | translate }}</label>
+          <app-custom-dropdown
+            [options]="sunburstLabelRotateOptions"
+            [(ngModel)]="focusedVisual.config.sunburstLabelRotate"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          ></app-custom-dropdown>
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.FOCUS_MODE' | translate }}</label>
+          <app-custom-dropdown
+            [options]="emphasisFocusOptions"
+            [(ngModel)]="focusedVisual.config.sunburstEmphasisFocus"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          ></app-custom-dropdown>
+        </div>
+      </div>
+
+      <!-- ===== Treemap additions (visual dimension + colorMapping) ===== -->
+      <div
+        class="config-section"
+        *ngIf="isTreeMapChartType(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.TREEMAP_COLOR_MAPPING' | translate }}
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.VISUAL_DIMENSION' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="focusedVisual.config.treemapVisualDimension"
+            [min]="0"
+            [max]="10"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.COLOR_MAPPING_BY' | translate }}</label>
+          <app-custom-dropdown
+            [options]="colorMappingByOptions"
+            [(ngModel)]="focusedVisual.config.treemapColorMappingBy"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          ></app-custom-dropdown>
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.SQUARE_RATIO' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="focusedVisual.config.treemapSquareRatio"
+            [min]="0.1"
+            [max]="3"
+            [step]="0.1"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.SHOW_UPPER_LABEL' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.treemapUpperLabel"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+      </div>
+
+      <!-- ===== Gauge additions (color stops + detail) ===== -->
+      <div
+        class="config-section"
+        *ngIf="focusedVisual.chartType === 'gauge'"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.GAUGE_DETAIL' | translate }}
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.DETAIL_FORMATTER' | translate }}</label>
+          <app-custom-input
+            [(ngModel)]="focusedVisual.config.gaugeDetailFormatter"
+            placeholder="{value}%"
+          ></app-custom-input>
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.SHOW_ANCHOR' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.gaugeAnchorShow"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+        <div class="config-group" *ngIf="focusedVisual.config.gaugeAnchorShow">
+          <label>{{ 'ANALYSES.ANCHOR_SIZE' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="focusedVisual.config.gaugeAnchorSize"
+            [min]="4"
+            [max]="30"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+      </div>
+
+      <!-- ===== Map additions (nameProperty + selectedMode) ===== -->
+      <div
+        class="config-section"
+        *ngIf="isWorldMapChartType(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.MAP_EXTRAS' | translate }}
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.NAME_PROPERTY' | translate }}</label>
+          <app-custom-dropdown
+            [options]="mapNamePropertyHints"
+            [(ngModel)]="focusedVisual.config.worldMapNameProperty"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          ></app-custom-dropdown>
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.ASPECT_SCALE' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="focusedVisual.config.worldMapAspectScale"
+            [min]="0.5"
+            [max]="2"
+            [step]="0.05"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.ALLOW_SELECT' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.worldMapSelectable"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+      </div>
+
+      <!-- ===== Funnel: label position ===== -->
+      <div
+        class="config-section"
+        *ngIf="isFunnelChartType(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.FUNNEL_LABELS' | translate }}
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.LABEL_POSITION' | translate }}</label>
+          <app-custom-dropdown
+            [options]="funnelLabelPositionOptions"
+            [(ngModel)]="focusedVisual.config.funnelLabelPosition"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          ></app-custom-dropdown>
+        </div>
+      </div>
+
+      <!-- ===== Theme River: label position + boundary gap ===== -->
+      <div
+        class="config-section"
+        *ngIf="isThemeRiverChartType(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.THEME_RIVER_EXTRAS' | translate }}
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.LABEL_POSITION' | translate }}</label>
+          <app-custom-dropdown
+            [options]="themeRiverLabelPositionOptions"
+            [(ngModel)]="focusedVisual.config.themeRiverLabelPosition"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          ></app-custom-dropdown>
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.BOUNDARY_GAP_PERCENT' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="focusedVisual.config.themeRiverBoundaryGap"
+            [min]="0"
+            [max]="30"
+            [showButtons]="true"
+            suffix="%"
+          ></app-custom-number>
+        </div>
+      </div>
+
+      <!-- ===== Lines / Flow Lines: full effect block ===== -->
+      <div
+        class="config-section"
+        *ngIf="isFlowLinesChartType(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.LINE_EFFECT' | translate }}
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.SHOW_EFFECT' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.flowLinesEffectExtra"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+        <ng-container *ngIf="focusedVisual.config.flowLinesEffectExtra">
+          <div class="config-group">
+            <label>{{ 'ANALYSES.PERIOD_SEC' | translate }}</label>
+            <app-custom-number
+              [(ngModel)]="focusedVisual.config.flowLinesPeriod"
+              [min]="1"
+              [max]="20"
+              [step]="0.5"
+              [showButtons]="true"
+              suffix="s"
+            ></app-custom-number>
+          </div>
+          <div class="config-group">
+            <label>{{ 'ANALYSES.TRAIL_LENGTH' | translate }}</label>
+            <app-custom-number
+              [(ngModel)]="focusedVisual.config.flowLinesTrailLength"
+              [min]="0"
+              [max]="1"
+              [step]="0.05"
+              [showButtons]="true"
+            ></app-custom-number>
+          </div>
+          <div class="config-group">
+            <label>{{ 'ANALYSES.SYMBOL_SIZE' | translate }}</label>
+            <app-custom-number
+              [(ngModel)]="focusedVisual.config.flowLinesEffectSymbolSize"
+              [min]="1"
+              [max]="20"
+              [showButtons]="true"
+            ></app-custom-number>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- ===== Candlestick: large/largeThreshold ===== -->
+      <div
+        class="config-section"
+        *ngIf="isCandlestickChartType(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.CANDLESTICK_PERF' | translate }}
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.ENABLE_LARGE_MODE' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.candleLarge"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+        <div class="config-group" *ngIf="focusedVisual.config.candleLarge">
+          <label>{{ 'ANALYSES.LARGE_THRESHOLD' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="focusedVisual.config.candleLargeThreshold"
+            [min]="200"
+            [max]="50000"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+      </div>
+
+      <!-- ===== Parallel: axisExpandable ===== -->
+      <div
+        class="config-section"
+        *ngIf="isParallelChartType(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.PARALLEL_INTERACTION' | translate }}
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.AXIS_EXPANDABLE' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.parallelAxisExpandable"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+        <div class="config-group" *ngIf="focusedVisual.config.parallelAxisExpandable">
+          <label>{{ 'ANALYSES.AXIS_EXPAND_COUNT' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="focusedVisual.config.parallelAxisExpandCount"
+            [min]="0"
+            [max]="20"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+      </div>
+
+      <!-- ===== 3D extras: shading + light ===== -->
+      <div
+        class="config-section"
+        *ngIf="
+          isBar3dChartType(focusedVisual.chartType) ||
+          isLine3dChartType(focusedVisual.chartType) ||
+          isScatter3dChartType(focusedVisual.chartType) ||
+          isSurfaceChartType(focusedVisual.chartType)
+        "
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.SCENE_3D' | translate }}
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.SHADING_MODE' | translate }}</label>
+          <app-custom-dropdown
+            [options]="shadingModeOptions"
+            [(ngModel)]="focusedVisual.config.shading"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          ></app-custom-dropdown>
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.MAIN_LIGHT_INTENSITY' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="focusedVisual.config.mainLightIntensity"
+            [min]="0"
+            [max]="3"
+            [step]="0.1"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.AMBIENT_LIGHT_INTENSITY' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="focusedVisual.config.ambientLightIntensity"
+            [min]="0"
+            [max]="2"
+            [step]="0.1"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.POST_EFFECT' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.postEffect"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+      </div>
+
+      <!-- ===== Tooltip extras (confine + value precision) ===== -->
+      <div
+        class="config-section"
+        *ngIf="supportsTooltip(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.TOOLTIP_EXTRAS' | translate }}
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.VALUE_PRECISION' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="focusedVisual.config.tooltipPrecision"
+            [min]="0"
+            [max]="6"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.APPEND_TO_BODY' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.tooltipAppendToBody"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+      </div>
     </div>
   </div>
 </div>

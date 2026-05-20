@@ -140,6 +140,26 @@ function build3DGrid(config: any): any {
       rotateMouseButton: 'left',
       zoomSensitivity: 1,
     },
+    // Light: main is the directional key light, ambient is the
+    // fill/wrap-around contribution. Picked sensible defaults that
+    // make 3D bars/scatter readable without blowing out highlights.
+    light: {
+      main: {
+        intensity: config.mainLightIntensity ?? 1.2,
+        shadow: false,
+      },
+      ambient: {
+        intensity: config.ambientLightIntensity ?? 0.5,
+      },
+    },
+    // postEffect: enables SSAO + bloom screen-space effects. Off by
+    // default — costs frame budget and only meaningfully improves
+    // scenes with deep occluders.
+    postEffect: {
+      enable: config.postEffect === true,
+      SSAO: { enable: true, radius: 1, intensity: 1.2 },
+      bloom: { enable: true, intensity: 0.1 },
+    },
   };
 }
 
@@ -262,10 +282,17 @@ function buildLegendWithTitle(config: any): any {
 
 function buildTooltip(config: any, defaultTrigger: string = 'item'): any {
   const trigger = config.tooltipTrigger || defaultTrigger;
+  // `appendToBody: true` reparents the tooltip DOM under document.body,
+  // which is the workaround for tooltips getting clipped when the chart
+  // sits inside an overflow:hidden ancestor (common in dashboard grids).
+  // Off by default — only opt in when the user toggles it, to keep
+  // tooltips contained to the chart by default.
+  const appendToBody = config.tooltipAppendToBody === true;
   const tooltip: any = {
     show: !config.tooltipDisabled,
     trigger,
-    confine: true,
+    confine: !appendToBody, // confine and appendToBody are mutually exclusive
+    appendToBody,
     backgroundColor: 'rgba(255, 255, 255, 0.96)',
     borderColor: '#e5e7eb',
     borderWidth: 1,
@@ -277,6 +304,15 @@ function buildTooltip(config: any, defaultTrigger: string = 'item'): any {
     },
     extraCssText: 'box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);',
   };
+  // Precision: when set, ECharts will round numeric values in the
+  // tooltip to N decimal places. Only applies when no custom formatter
+  // is supplied (custom formatters take precedence).
+  if (typeof config.tooltipPrecision === 'number') {
+    tooltip.valueFormatter = (v: any) => {
+      if (typeof v !== 'number') return v;
+      return v.toFixed(config.tooltipPrecision);
+    };
+  }
   if (config.axisPointerType && config.axisPointerType !== 'none') {
     tooltip.axisPointer = {
       type: config.axisPointerType,
@@ -609,7 +645,12 @@ export function buildBarChartOption(
 
   const barSeriesBase: any = {};
   if (config.barWidth) barSeriesBase.barWidth = config.barWidth;
+  if (config.barMaxWidth) barSeriesBase.barMaxWidth = config.barMaxWidth;
+  if (config.barMinWidth) barSeriesBase.barMinWidth = config.barMinWidth;
   if (config.showBackground) barSeriesBase.showBackground = true;
+  // `clip: false` lets bars extend past the grid edge — useful for
+  // dataZoom interactions where partially-visible bars matter.
+  if (config.clip !== undefined) barSeriesBase.clip = config.clip;
 
   if (isMulti) {
     const sourceData = multiData && multiData.length > 0 ? multiData : data;
@@ -933,7 +974,10 @@ export function buildAreaChartOption(
       name: s.name,
       type: 'line',
       ...(isStacked ? { stack: 'total' } : {}),
-      areaStyle: { opacity: areaOpacity },
+      areaStyle: {
+        opacity: areaOpacity,
+        ...(config.areaOrigin ? { origin: config.areaOrigin } : {}),
+      },
       data: s.values,
       smooth: step ? false : smooth,
       step: step || undefined,
@@ -1041,7 +1085,8 @@ export function buildPieChartOption(
         center: pieCenter,
         data: pieData,
         label: labelConfig,
-        labelLine: { show: config.pieLabelLine !== false },
+        // labelLine block lives below with the length/length2 extensions
+        // (duplicate-key sweep collapsed the two into one).
         roseType: roseType,
         clockwise: config.pieClockwise !== false,
         startAngle: config.pieStartAngle ?? 90,
@@ -1052,10 +1097,19 @@ export function buildPieChartOption(
         padAngle: config.piePadAngle ?? 0,
         selectedMode: selectedMode,
         selectedOffset: config.pieSelectedOffset ?? 10,
+        minShowLabelAngle: config.pieMinShowLabelAngle ?? 0,
+        labelLine: {
+          show: config.pieLabelLine !== false,
+          length: config.pieLabelLineLength ?? 15,
+          length2: config.pieLabelLineLength2 ?? 10,
+        },
         itemStyle: {
           borderRadius: config.pieBorderRadius ?? 0,
+          borderWidth: config.pieBorderWidth ?? 0,
+          borderColor: '#fff',
         },
         emphasis: {
+          focus: config.emphasis || 'self',
           itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.2)' },
         },
       },
@@ -1248,12 +1302,19 @@ export function buildGaugeChartOption(data: any[], config: any): any {
           // Gauge centre value IS the chart's visual hierarchy — keep this
           // intentionally larger than chartTitle so the reading dominates.
           show: config.gaugeShowValue !== false,
-          formatter: config.units ? `{value} ${config.units}` : '{value}',
+          formatter:
+            config.gaugeDetailFormatter ||
+            (config.units ? `{value} ${config.units}` : '{value}'),
           fontFamily: CHART_TYPOGRAPHY.fontFamily,
           fontSize: 20,
           fontWeight: CHART_TYPOGRAPHY.chartTitle.fontWeight,
           color: CHART_TYPOGRAPHY.chartTitle.color,
           offsetCenter: [0, '70%'],
+        },
+        anchor: {
+          show: config.gaugeAnchorShow === true,
+          size: config.gaugeAnchorSize ?? 12,
+          itemStyle: { color: '#fff', borderColor: '#999', borderWidth: 2 },
         },
         title: {
           show: true,
@@ -1359,10 +1420,12 @@ export function buildHeatMapChartOption(data: any[], config: any): any {
       },
     },
     visualMap: {
-      min: minVal,
-      max: maxVal,
-      calculable: true,
-      orient: 'horizontal',
+      show: config.visualMapShow !== false,
+      type: config.visualMapType || 'continuous',
+      min: config.visualMapMin ?? minVal,
+      max: config.visualMapMax ?? maxVal,
+      calculable: config.visualMapCalculable !== false,
+      orient: config.visualMapOrient || 'horizontal',
       left: 'center',
       // Push the visualMap legend up a bit so it does not overlap the
       // axis name on small chart cards.
@@ -1423,6 +1486,9 @@ export function buildTreeMapChartOption(data: any[], config: any): any {
             : config.treemapNodeClick || 'zoomToNode',
         leafDepth: config.treemapLeafDepth ?? 1,
         visualDimension: config.treemapVisualDimension ?? 0,
+        colorMappingBy: config.treemapColorMappingBy || 'index',
+        squareRatio: config.treemapSquareRatio ?? 0.5 * (1 + Math.sqrt(5)),
+        upperLabel: { show: config.treemapUpperLabel === true, height: 18 },
         breadcrumb: { show: config.treemapBreadcrumb || false },
         label: {
           show: config.treemapShowLabels !== false,
@@ -1610,11 +1676,13 @@ export function buildFunnelChartOption(data: any[], config: any): any {
           gap: config.funnelGap ?? 2,
           label: {
             show: config.labels !== false,
-            position: 'inside',
+            position: config.funnelLabelPosition || 'inside',
             formatter: '{b}: {c}',
             fontSize: config.labelFontSize || 12,
           },
-          labelLine: { show: false },
+          // Outside labels need a label-line; keep inside/right/left/top/bottom
+          // unconnected (line would visually clutter inside the funnel).
+          labelLine: { show: config.funnelLabelPosition === 'outside' },
           itemStyle: {
             borderColor: '#fff',
             borderWidth: 1,
@@ -1689,7 +1757,10 @@ export function buildSunburstChartOption(data: any[], config: any): any {
           startAngle: config.sunburstStartAngle ?? 90,
           label: {
             show: config.labels !== false,
-            rotate: 'radial',
+            rotate:
+              config.sunburstLabelRotate !== undefined
+                ? config.sunburstLabelRotate
+                : 'radial',
             fontSize: config.labelFontSize || 10,
           },
           itemStyle: {
@@ -1697,7 +1768,7 @@ export function buildSunburstChartOption(data: any[], config: any): any {
             borderColor: '#fff',
           },
           emphasis: {
-            focus: 'ancestor',
+            focus: config.sunburstEmphasisFocus || 'ancestor',
             itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.3)' },
           },
           levels: [
@@ -1741,9 +1812,14 @@ export function buildSankeyChartOption(
         nodeGap: config.sankeyNodeGap || 8,
         nodeAlign: config.sankeyNodeAlign || 'justify',
         draggable: config.sankeyDraggable !== false,
-        layoutIterations: 32,
+        layoutIterations: config.sankeyLayoutIterations ?? 32,
+        // Default to adjacency-highlight on sankey — it's the visual idiom
+        // users expect (hovering a flow lights up its source + target).
+        // The user-controlled toggle lets them swap to a different focus mode.
         emphasis: {
-          focus: 'adjacency',
+          focus: config.sankeyFocusAdjacency === false
+            ? (config.emphasis || 'none')
+            : 'adjacency',
         },
         lineStyle: {
           color: 'gradient',
@@ -2001,7 +2077,15 @@ export function buildGraphChartOption(
           edgeLength: config.graphEdgeLength || 100,
           gravity: config.graphGravity ?? 0.1,
           friction: config.graphForceFriction ?? 0.6,
+          // Live layout — when true, ECharts keeps running the force
+          // simulation after the initial paint (gives the "settling"
+          // animation you'd see in dedicated graph tools). When false,
+          // the layout freezes after the first frame.
+          layoutAnimation: config.graphForceLayoutAnimation !== false,
         },
+        // Only meaningful for the circular layout but harmless when set
+        // for other layouts (ECharts ignores it).
+        circular: { rotateLabel: config.graphCircularRotateLabel === true },
         edgeLabel: {
           show: config.graphEdgeLabel || false,
           fontFamily: CHART_TYPOGRAPHY.fontFamily,
@@ -2099,7 +2183,27 @@ export function buildTreeChartOption(data: any[], config: any): any {
 
 // ========= Theme River Chart =========
 export function buildThemeRiverChartOption(data: any[], config: any): any {
-  const riverData = data.map((d, i) => [i, d.value, String(d.name)]);
+  // The new transformer (transformToThemeRiver) emits [time, value, category]
+  // triples directly when `timeColumn` is set. Older paths and the
+  // single-series fallback still arrive as `{name, value}[]` — wrap those
+  // into the canonical triple form using row-index as the synthetic time.
+  // Detect the shape by inspecting the first row.
+  const isAlreadyTripleShape =
+    data.length > 0 && Array.isArray(data[0]) && data[0].length === 3;
+  const riverData = isAlreadyTripleShape
+    ? data
+    : data.map((d, i) => [i, d.value, String(d.name)]);
+
+  // Theme-river works best with a time axis. If row[0] looks like an ISO
+  // string or Date, switch the singleAxis to `time`; otherwise keep value.
+  const firstTime = riverData[0]?.[0];
+  const axisType =
+    firstTime instanceof Date ||
+    (typeof firstTime === 'string' && !Number.isNaN(Date.parse(firstTime)))
+      ? 'time'
+      : 'value';
+
+  const boundaryGapPct = config.themeRiverBoundaryGap ?? 10;
 
   return {
     color: getColors(config.colorScheme),
@@ -2108,20 +2212,26 @@ export function buildThemeRiverChartOption(data: any[], config: any): any {
       show: !config.tooltipDisabled,
       trigger: 'axis',
     },
+    legend: buildLegend(config),
     toolbox: buildToolbox(config),
     singleAxis: {
-      type: 'value',
+      type: axisType,
       bottom: 30,
     },
     series: [
       {
         type: 'themeRiver',
         data: riverData,
+        // ECharts themeRiver expects boundaryGap as a [top, bottom] pair
+        // of percent strings — derive from the single % the user set.
+        boundaryGap: [`${boundaryGapPct}%`, `${boundaryGapPct}%`],
         label: {
           show: config.labels !== false,
+          position: config.themeRiverLabelPosition || 'left',
           fontSize: config.labelFontSize || 11,
         },
         emphasis: {
+          focus: config.emphasis || 'self',
           itemStyle: { shadowBlur: 20, shadowColor: 'rgba(0, 0, 0, 0.3)' },
         },
       },
@@ -2330,6 +2440,12 @@ export function buildCandlestickChartOption(data: any[] | any, config: any): any
       {
         type: 'candlestick',
         data: values,
+        // `large` switches to batch-rendered primitives — per-item itemStyle
+        // is ignored above this threshold, but candlestick rendering cost
+        // drops dramatically. Off by default to preserve the bull/bear
+        // colour scheme on small/medium charts.
+        large: config.candleLarge === true,
+        largeThreshold: config.candleLargeThreshold ?? 600,
         itemStyle: {
           color: config.candleBullColor || '#ec0000',
           color0: config.candleBearColor || '#00da3c',
@@ -2402,6 +2518,14 @@ export function buildParallelChartOption(data: any[] | any, config: any): any {
         right: pos === 'right' ? 140 : 40,
         bottom: pos === 'below' ? 60 : 40,
         top: pos === 'top' ? 50 : 30,
+        // axisExpandable enables click-and-drag on an axis to spread
+        // adjacent axes (useful when there are many dimensions).
+        axisExpandable: config.parallelAxisExpandable === true,
+        axisExpandCount: config.parallelAxisExpandCount ?? 0,
+        axisExpandCenter:
+          config.parallelAxisExpandable && config.parallelAxisExpandCount
+            ? Math.floor(parallelAxis.length / 2)
+            : undefined,
         parallelAxisDefault: {
           type: 'value',
           nameLocation: 'end',
@@ -2903,6 +3027,9 @@ export function buildWorldMapChartOption(data: any[], config: any): any {
         type: 'map',
         mapType: 'world',
         roam: config.worldMapRoam !== false,
+        nameProperty: config.worldMapNameProperty || 'name',
+        aspectScale: config.worldMapAspectScale ?? 0.75,
+        selectedMode: config.worldMapSelectable ? 'single' : false,
         label: {
           show: config.worldMapShowLabels || false,
           fontFamily: CHART_TYPOGRAPHY.fontFamily,
@@ -3034,8 +3161,8 @@ export function buildFlowLinesChartOption(
         },
         effect: {
           show: showEffect,
-          period: config.flowLinesEffectPeriod ?? 4,
-          trailLength: 0.7,
+          period: config.flowLinesPeriod ?? config.flowLinesEffectPeriod ?? 4,
+          trailLength: config.flowLinesTrailLength ?? 0.7,
           color: primaryColor,
           symbolSize: config.flowLinesEffectSymbolSize ?? 4,
         },
