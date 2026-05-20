@@ -447,6 +447,26 @@ export class HeaderComponent implements OnInit {
     if (this.changingLocale) return;
     this.changingLocale = true;
     await this.localeService.changeLocale(locale);
+
+    // If the user landed via a `?locale=` URL param, that was meant
+    // to be a temporary preview. Now that they've made an explicit
+    // dropdown choice — which we just persisted — the URL param is
+    // misleading: a future page reload (or share) would reapply the
+    // temp locale and clobber the new persisted choice. Strip it.
+    const currentTree = this.router.parseUrl(this.router.url);
+    if (currentTree.queryParams['locale'] !== undefined) {
+      const { locale: _drop, ...keep } = currentTree.queryParams;
+      // Navigate to the same path, replacing the URL in history so
+      // the user can't "back" into the temp locale by accident.
+      const path = currentTree.root.children['primary']?.segments
+        .map(s => '/' + s.path)
+        .join('') || '/';
+      this.router.navigate([path], {
+        queryParams: keep,
+        replaceUrl: true,
+      });
+    }
+
     this.changingLocale = false;
     this.cdr.markForCheck();
   }

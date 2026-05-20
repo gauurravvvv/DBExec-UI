@@ -15,6 +15,7 @@ import { filter } from 'rxjs/operators';
 import { StorageType } from './constants/storageType';
 import { IdleTimeoutService } from './core/services/idle-timeout.service';
 import { LoadingService } from './core/services/loading.service';
+import { LocaleService } from './core/services/locale.service';
 import { LoginService } from './core/services/login.service';
 import { SessionExpiredService } from './core/services/session-expired.service';
 import { StorageService } from './core/services/storage.service';
@@ -43,6 +44,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private titleService: Title,
     private translate: TranslateService,
+    private localeService: LocaleService,
   ) {
     const savedTheme = StorageService.get(StorageType.THEME);
     if (!savedTheme) {
@@ -70,6 +72,9 @@ export class AppComponent implements OnInit, OnDestroy {
         this.idleTimeoutService.stop();
         this.showIdleWarningDialog = false;
         this.showSessionExpiredDialog = true;
+        // Drop any active temp locale — when the user logs in again
+        // their persisted preference must take over.
+        this.localeService.clearTempLocale();
       });
 
     // Idle timeout warning (countdown tick)
@@ -93,7 +98,8 @@ export class AppComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.updateTitle());
 
-    // Start/stop idle tracking based on route
+    // Start/stop idle tracking based on route, and react to ?locale=
+    // query param. See handleLocaleQueryParam for the locale logic.
     this.router.events
       .pipe(
         filter(
@@ -104,6 +110,8 @@ export class AppComponent implements OnInit, OnDestroy {
       .subscribe(event => {
         // Update browser tab title
         this.updateTitle();
+
+        this.handleLocaleQueryParam(event.urlAfterRedirects || event.url);
 
         if (
           event.url === '/login' ||
@@ -148,6 +156,46 @@ export class AppComponent implements OnInit, OnDestroy {
     this.performLogout();
   }
 
+  /**
+   * Handle the `?locale=xx-YY` URL query parameter.
+   *
+   * Behaviour:
+   * - Only active inside the authenticated app shell (URLs starting
+   *   with /app). Public routes (login, forgot-password) are skipped
+   *   so a stale ?locale= on a login link doesn't accidentally lock
+   *   the login page into a different language.
+   * - `?locale=<supported>` → apply via applyTempLocale (no PATCH,
+   *   no localStorage write, no JWT refresh). The user's persisted
+   *   preference stays untouched.
+   * - Unsupported value → silently ignored. The current locale
+   *   stays in place; we don't want a typo to flip the language to
+   *   the default.
+   *
+   * Once a temp locale is set, it survives the rest of the session.
+   * We do NOT restore the persisted locale when the URL param later
+   * disappears — that would break the "navigate around and stay in
+   * the temp language" expectation, because internal nav strips query
+   * params unless they're explicitly preserved. The temp locale is
+   * cleared only on:
+   *   - the user picking a new language from the header dropdown
+   *     (the header strips the param and persists their choice), or
+   *   - logout → next login (initFromToken resets to the persisted
+   *     value from the JWT).
+   */
+  private handleLocaleQueryParam(url: string): void {
+    if (!url.startsWith('/app')) return;
+
+    const queryStart = url.indexOf('?');
+    if (queryStart < 0) return;
+    const params = new URLSearchParams(url.slice(queryStart));
+    const requested = params.get('locale');
+    if (!requested) return;
+
+    if (this.localeService.isSupported(requested)) {
+      this.localeService.applyTempLocale(requested);
+    }
+  }
+
   private updateTitle(): void {
     let route = this.activatedRoute;
     while (route.firstChild) route = route.firstChild;
@@ -166,6 +214,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private finalizeLogout(): void {
     StorageService.clear();
+    // Drop any active ?locale= override so the next login picks up
+    // the user's persisted preference even if the URL doesn't carry
+    // the param anymore.
+    this.localeService.clearTempLocale();
     this.router.navigate(['/login']);
   }
 }

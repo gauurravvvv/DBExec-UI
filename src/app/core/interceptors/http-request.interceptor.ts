@@ -9,6 +9,7 @@ import {
 import { Injectable } from '@angular/core';
 
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, from, Observable, of, throwError } from 'rxjs';
 import { catchError, filter, finalize, switchMap, take } from 'rxjs/operators';
 import { AUTH } from 'src/app/constants/api';
@@ -30,6 +31,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     private router: Router,
     private loginService: LoginService,
     private sessionExpiredService: SessionExpiredService,
+    private translate: TranslateService,
   ) {}
 
   intercept(
@@ -63,7 +65,16 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     const organisationId =
       StorageService.get(StorageType.ORGANISATION_ID) || '';
 
-    const locale = StorageService.get(StorageType.LOCALE) || 'en';
+    // Send the language the user is actually seeing right now —
+    // either the persisted locale (from the JWT / storage) or a
+    // temporary locale set via the ?locale= URL param. We read it
+    // from TranslateService because that's the in-memory source of
+    // truth maintained by LocaleService. Falls back to storage and
+    // then 'en' to cover edge cases (pre-bootstrap requests, etc.).
+    const locale =
+      this.translate.currentLang ||
+      StorageService.get(StorageType.LOCALE) ||
+      'en';
     let headers = req.headers
       .set('x-auth-token', accessToken)
       .set('x-organization-id', organisationId)
