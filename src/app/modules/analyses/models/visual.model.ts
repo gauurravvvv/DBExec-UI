@@ -39,6 +39,51 @@ export interface ChartDataMapping {
 }
 
 /**
+ * Field-role identifiers a chart can declare it needs. The renderer + sidebar
+ * + transformer all read from this same enum so each chart only ever asks for
+ * the columns ECharts actually consumes for that series type.
+ *
+ * Legacy 3-slot roles (xAxis/yAxis/zAxis) are kept for the bar/line/pie/
+ * scatter/funnel family that genuinely fits a simple category+value shape;
+ * everything else gets its own role(s).
+ */
+export type RoleKey =
+  | 'xAxis'
+  | 'yAxis'
+  | 'zAxis'
+  // candlestick — OHLC ordering matches ECharts canonical [open, close, low, high]
+  | 'open'
+  | 'high'
+  | 'low'
+  | 'close'
+  // boxplot — single numeric column of raw samples that gets reduced to a 5-tuple
+  | 'sample'
+  // hierarchy — name + value + parent-name (parent of root is null/empty)
+  | 'parent'
+  // radar — one column per indicator axis (ordered list)
+  | 'indicators'
+  // parallel — one column per axis (ordered list, N-dimensional)
+  | 'dimensions'
+  // multi-series (2D/stacked/normalized bars, multi-line) — extra value columns
+  | 'valueColumns'
+  // geo charts — longitude / latitude / optional value
+  | 'lng'
+  | 'lat'
+  // time-series and theme-river
+  | 'time';
+
+/**
+ * Per-chart role contract. Read by:
+ *   - the field-mapping sidebar (renders the right column-pickers)
+ *   - hasRequiredChartFields() (validates before render)
+ *   - ChartDataTransformerService.transformData() (knows which Visual fields to read)
+ */
+export interface ChartRolesSpec {
+  required: RoleKey[];
+  optional: RoleKey[];
+}
+
+/**
  * Visual object representing a chart on the canvas
  */
 export interface Visual {
@@ -96,6 +141,37 @@ export interface Visual {
   /** Column name for Z-axis / third dimension (heat-map) */
   zAxisColumn: string | null;
 
+  // ─── Per-chart role columns ─────────────────────────────────────────────
+  // Optional fields. Only the columns relevant to the selected chart type
+  // are surfaced in the sidebar — others stay null/undefined and the
+  // transformer ignores them. Adding a new role to ECharts here also
+  // requires extending RoleKey + the chart's roles spec in charts.constants.
+
+  /** Candlestick: open price column */
+  openColumn?: string | null;
+  /** Candlestick: high price column */
+  highColumn?: string | null;
+  /** Candlestick: low price column */
+  lowColumn?: string | null;
+  /** Candlestick: close price column */
+  closeColumn?: string | null;
+  /** Boxplot: raw-samples numeric column (5-tuple computed per category) */
+  sampleColumn?: string | null;
+  /** Tree / treemap / sunburst: parent-name column (root rows have null/empty parent) */
+  parentColumn?: string | null;
+  /** Radar: one column per indicator axis */
+  indicatorColumns?: string[];
+  /** Parallel: one column per N-D axis (order = render order) */
+  dimensionColumns?: string[];
+  /** Multi-series bars / lines / area / theme-river: extra value columns */
+  valueColumns?: string[];
+  /** Geo: longitude column (globe / lines3d / polygons3d / world-map) */
+  lngColumn?: string | null;
+  /** Geo: latitude column */
+  latColumn?: string | null;
+  /** Theme-river: time column (falls back to row index if unset) */
+  timeColumn?: string | null;
+
   /** Pre-computed chart data - using any[] for template compatibility with different chart components */
   chartData: any[];
 
@@ -139,12 +215,25 @@ export interface DatasetDetails {
 export type AxisSelection = 'x' | 'y' | 'z' | null;
 
 /**
- * Field labels for different chart types
+ * Field labels for different chart types.
+ *
+ * Legacy `field1/field2/field3` are kept for the old 3-slot sidebar (bar/line/
+ * pie/scatter etc.). `roles` is the new, per-chart contract — populated for
+ * charts whose roles spec in charts.constants extends beyond the 3-slot model
+ * (candlestick, boxplot, hierarchical, radar, parallel, geo).
  */
 export interface FieldLabels {
   field1: string;
   field2: string;
   field3?: string;
+  roles?: Array<{
+    key: RoleKey;
+    label: string;
+    /** true for list-valued roles (indicators[], dimensions[], valueColumns[]) */
+    multi?: boolean;
+    /** false for optional-but-not-required roles */
+    required?: boolean;
+  }>;
 }
 
 /**
@@ -171,6 +260,18 @@ export function createVisual(id: string, config: any): Visual {
     xAxisColumn: null,
     yAxisColumn: null,
     zAxisColumn: null,
+    openColumn: null,
+    highColumn: null,
+    lowColumn: null,
+    closeColumn: null,
+    sampleColumn: null,
+    parentColumn: null,
+    indicatorColumns: [],
+    dimensionColumns: [],
+    valueColumns: [],
+    lngColumn: null,
+    latColumn: null,
+    timeColumn: null,
     chartData: [],
     config,
   };
