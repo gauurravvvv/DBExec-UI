@@ -1,4 +1,5 @@
 import {
+  HttpBackend,
   HttpClient,
   HttpClientModule,
   HTTP_INTERCEPTORS,
@@ -18,7 +19,35 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { RippleModule } from 'primeng/ripple';
 import { ToastModule } from 'primeng/toast';
-export function HttpLoaderFactory(http: HttpClient) {
+/**
+ * Build the TranslateHttpLoader against an isolated `HttpClient` that
+ * sits directly on top of `HttpBackend` — bypassing the
+ * `HTTP_INTERCEPTORS` chain entirely.
+ *
+ * Two reasons:
+ *
+ *   1. Static i18n assets under /assets/i18n/*.json don't need auth
+ *      headers, loading spinners, or session-expired handling. Running
+ *      them through the auth interceptor adds work for no benefit.
+ *
+ *   2. The old factory pulled `HttpClient` from root, which is itself
+ *      built from `HTTP_INTERCEPTORS`. Since our HttpRequestInterceptor
+ *      injects `TranslateService` (for the JWT-locale claim's error
+ *      messages), that closes a DI cycle (NG0200):
+ *
+ *        HTTP_INTERCEPTORS
+ *          -> HttpRequestInterceptor
+ *            -> TranslateService          (constructor)
+ *              -> TranslateLoader factory
+ *                -> HttpClient            (root, awaits HTTP_INTERCEPTORS)
+ *                  -> HTTP_INTERCEPTORS   (cycle)
+ *
+ * Using HttpBackend cuts the cycle: `new HttpClient(handler)` against
+ * the raw backend never asks for `HTTP_INTERCEPTORS`, so TranslateService
+ * can finish constructing without the interceptor chain being resolved.
+ */
+export function HttpLoaderFactory(handler: HttpBackend) {
+  const http = new HttpClient(handler);
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
@@ -63,7 +92,7 @@ import { SharedModule } from './shared/shared.module';
       loader: {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,
-        deps: [HttpClient],
+        deps: [HttpBackend],
       },
     }),
     // NgRx Store

@@ -27,21 +27,37 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     new BehaviorSubject<string | null>(null);
 
   /**
-   * `LoginService` is resolved lazily through `Injector` instead of being
-   * constructor-injected. Direct injection used to create a circular DI
-   * cycle (NG0200): this interceptor sits inside the `HTTP_INTERCEPTORS`
-   * multi-provider, and `LoginService` → `HttpClientService` → `HttpClient`
-   * needs `HTTP_INTERCEPTORS` to be fully resolved before it can be
-   * built. Deferring the lookup to method-call time lets Angular finish
-   * constructing the interceptor chain first, then on the first refresh-
-   * token request the `LoginService` is materialised — by which point
-   * `HttpClient` is available.
+   * Both `LoginService` and `TranslateService` are resolved lazily
+   * through `Injector` instead of being constructor-injected. Direct
+   * injection used to create a circular DI cycle (NG0200): this
+   * interceptor sits inside the `HTTP_INTERCEPTORS` multi-provider,
+   * and each of these services has a transitive dependency on
+   * `HttpClient` — which itself can't finish constructing until
+   * `HTTP_INTERCEPTORS` is fully resolved.
    *
-   * Documented Angular pattern:
-   * https://angular.dev/errors/NG0200
+   *   LoginService     -> HttpClientService -> HttpClient -> HTTP_INTERCEPTORS
+   *   TranslateService -> TranslateLoader   -> HttpClient -> HTTP_INTERCEPTORS
+   *                       (factory deps)
+   *
+   * Deferring the lookup to method-call time lets Angular finish
+   * constructing the interceptor chain first; by the time
+   * `intercept()` fires for a real request, both services are
+   * materialised and `HttpClient` is fully built.
+   *
+   * Note: the TranslateLoader factory in `app.module.ts` is *also*
+   * fixed to use `HttpBackend` directly, which is the canonical
+   * ngx-translate workaround. Either fix on its own resolves the
+   * cycle; we apply both to be defensive against future changes to
+   * either side.
+   *
+   * Reference: https://angular.dev/errors/NG0200
    */
   private get loginService(): LoginService {
     return this.injector.get(LoginService);
+  }
+
+  private get translate(): TranslateService {
+    return this.injector.get(TranslateService);
   }
 
   constructor(
@@ -49,7 +65,6 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     private router: Router,
     private injector: Injector,
     private sessionExpiredService: SessionExpiredService,
-    private translate: TranslateService,
   ) {}
 
   intercept(
