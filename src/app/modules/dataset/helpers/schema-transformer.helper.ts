@@ -7,8 +7,8 @@ import {
 } from './dummy-data.helper';
 
 /**
- * Shape of a single column entry as returned by /query/getStructure on the BE.
- * See DbExec-API/src/controllers/query/getDatasourceStructure.ts.
+ * Shape of a single column entry as returned by POST /api/v1/queries/structure.
+ * BE controller: src/modules/queries/controllers/getDatasourceStructure.ts
  */
 interface ApiColumn {
   name: string;
@@ -38,9 +38,9 @@ interface ApiSchemaGroup {
 /** Helper class for transforming the BE schema response into DatasourceSchema. */
 export class SchemaTransformerHelper {
   /**
-   * Convert the BE `/query/getStructure` response into a DatasourceSchema
-   * array. The BE always returns the same shape (validated in
-   * DbExec-API/src/controllers/query/getDatasourceStructure.ts), so this is a
+   * Convert the BE `POST /api/v1/queries/structure` response into a
+   * DatasourceSchema array. The BE always returns the same shape (built in
+   * src/modules/queries/controllers/getDatasourceStructure.ts), so this is a
    * straight mapping. If the response shape ever drifts, the type system and
    * Logger.error in the controller will surface the mismatch — no defensive
    * fallbacks needed here.
