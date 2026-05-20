@@ -1931,5 +1931,17 @@
     "HINT": "Salva il lavoro prima di navigare altrove.",
     "STAY": "Rimani",
     "DISCARD_LEAVE": "Ignora e lascia"
+  },
+  "SESSION": {
+    "EXPIRED_TITLE": "Sessione scaduta",
+    "EXPIRED_MESSAGE": "La tua sessione è terminata. Potresti aver effettuato l'accesso da un'altra posizione.",
+    "EXPIRED_BULLET_1": "È consentita una sola sessione attiva per utente",
+    "EXPIRED_BULLET_2": "Accedi nuovamente per continuare",
+    "GO_TO_LOGIN": "Vai al login",
+    "IDLE_TITLE": "Avviso di inattività",
+    "IDLE_MESSAGE": "Verrai disconnesso per inattività.",
+    "IDLE_SECONDS_REMAINING": "secondi rimanenti",
+    "LOGOUT_NOW": "Disconnetti ora",
+    "STAY_LOGGED_IN": "Rimani connesso"
   }
 }

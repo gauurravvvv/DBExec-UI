@@ -1931,5 +1931,17 @@
     "HINT": "Sla uw werk op voordat u de pagina verlaat.",
     "STAY": "Blijven",
     "DISCARD_LEAVE": "Verwerpen en verlaten"
+  },
+  "SESSION": {
+    "EXPIRED_TITLE": "Sessie verlopen",
+    "EXPIRED_MESSAGE": "Uw sessie is beëindigd. Mogelijk hebt u zich vanaf een andere locatie aangemeld.",
+    "EXPIRED_BULLET_1": "Slechts één actieve sessie per gebruiker is toegestaan",
+    "EXPIRED_BULLET_2": "Meld u opnieuw aan om door te gaan",
+    "GO_TO_LOGIN": "Naar inloggen",
+    "IDLE_TITLE": "Inactiviteitswaarschuwing",
+    "IDLE_MESSAGE": "U wordt uitgelogd wegens inactiviteit.",
+    "IDLE_SECONDS_REMAINING": "seconden resterend",
+    "LOGOUT_NOW": "Nu uitloggen",
+    "STAY_LOGGED_IN": "Ingelogd blijven"
   }
 }

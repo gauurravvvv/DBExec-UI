@@ -1931,5 +1931,17 @@
     "HINT": "Enregistrez votre travail avant de quitter.",
     "STAY": "Rester",
     "DISCARD_LEAVE": "Ignorer et quitter"
+  },
+  "SESSION": {
+    "EXPIRED_TITLE": "Session expirée",
+    "EXPIRED_MESSAGE": "Votre session a pris fin. Cela peut être dû à une connexion depuis un autre emplacement.",
+    "EXPIRED_BULLET_1": "Une seule session active est autorisée par utilisateur",
+    "EXPIRED_BULLET_2": "Veuillez vous reconnecter pour continuer",
+    "GO_TO_LOGIN": "Aller à la connexion",
+    "IDLE_TITLE": "Avertissement d'inactivité",
+    "IDLE_MESSAGE": "Vous serez déconnecté pour cause d'inactivité.",
+    "IDLE_SECONDS_REMAINING": "secondes restantes",
+    "LOGOUT_NOW": "Se déconnecter maintenant",
+    "STAY_LOGGED_IN": "Rester connecté"
   }
 }

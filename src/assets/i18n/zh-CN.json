@@ -1931,5 +1931,17 @@
     "HINT": "在离开之前请保存您的工作。",
     "STAY": "留下",
     "DISCARD_LEAVE": "放弃并离开"
+  },
+  "SESSION": {
+    "EXPIRED_TITLE": "会话已过期",
+    "EXPIRED_MESSAGE": "您的会话已结束。这可能是因为您从另一位置登录。",
+    "EXPIRED_BULLET_1": "每个用户只允许一个活动会话",
+    "EXPIRED_BULLET_2": "请重新登录以继续",
+    "GO_TO_LOGIN": "前往登录",
+    "IDLE_TITLE": "空闲警告",
+    "IDLE_MESSAGE": "由于不活动，您将被注销。",
+    "IDLE_SECONDS_REMAINING": "秒后注销",
+    "LOGOUT_NOW": "立即注销",
+    "STAY_LOGGED_IN": "保持登录"
   }
 }

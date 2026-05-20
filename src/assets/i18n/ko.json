@@ -1931,5 +1931,17 @@
     "HINT": "이동하기 전에 작업을 저장하세요.",
     "STAY": "머물기",
     "DISCARD_LEAVE": "취소하고 이동"
+  },
+  "SESSION": {
+    "EXPIRED_TITLE": "세션 만료됨",
+    "EXPIRED_MESSAGE": "세션이 종료되었습니다. 다른 위치에서 로그인했을 수 있습니다.",
+    "EXPIRED_BULLET_1": "사용자당 활성 세션은 하나만 허용됩니다",
+    "EXPIRED_BULLET_2": "계속하려면 다시 로그인하세요",
+    "GO_TO_LOGIN": "로그인으로 이동",
+    "IDLE_TITLE": "비활성 경고",
+    "IDLE_MESSAGE": "비활성으로 인해 로그아웃됩니다.",
+    "IDLE_SECONDS_REMAINING": "초 남음",
+    "LOGOUT_NOW": "지금 로그아웃",
+    "STAY_LOGGED_IN": "로그인 유지"
   }
 }

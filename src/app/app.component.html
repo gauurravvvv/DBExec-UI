@@ -11,28 +11,27 @@
       <div class="popup-icon">
         <i class="pi pi-sign-out"></i>
       </div>
-      <h3>Session Expired</h3>
+      <h3>{{ 'SESSION.EXPIRED_TITLE' | translate }}</h3>
     </div>
     <div class="popup-body">
       <p class="popup-message">
-        Your session has ended. This may be because you logged in from another
-        location.
+        {{ 'SESSION.EXPIRED_MESSAGE' | translate }}
       </p>
       <ul class="popup-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>Only one active session is allowed per user</span>
+          <span>{{ 'SESSION.EXPIRED_BULLET_1' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>Please log in again to continue</span>
+          <span>{{ 'SESSION.EXPIRED_BULLET_2' | translate }}</span>
         </li>
       </ul>
     </div>
     <div class="popup-actions">
       <button class="btn-confirm" (click)="onSessionExpiredOk()">
         <i class="pi pi-sign-in"></i>
-        Go to Login
+        {{ 'SESSION.GO_TO_LOGIN' | translate }}
       </button>
     </div>
   </div>
@@ -44,23 +43,23 @@
       <div class="popup-icon idle-icon">
         <i class="pi pi-clock"></i>
       </div>
-      <h3>Inactivity Warning</h3>
+      <h3>{{ 'SESSION.IDLE_TITLE' | translate }}</h3>
     </div>
     <div class="popup-body">
-      <p class="popup-message">You will be logged out due to inactivity.</p>
+      <p class="popup-message">{{ 'SESSION.IDLE_MESSAGE' | translate }}</p>
       <div class="countdown-display">
         <span class="countdown-number">{{ idleCountdown }}</span>
-        <span class="countdown-label">seconds remaining</span>
+        <span class="countdown-label">{{ 'SESSION.IDLE_SECONDS_REMAINING' | translate }}</span>
       </div>
     </div>
     <div class="popup-actions">
       <button class="btn-cancel" (click)="onIdleLogoutNow()">
         <i class="pi pi-sign-out"></i>
-        Logout Now
+        {{ 'SESSION.LOGOUT_NOW' | translate }}
       </button>
       <button class="btn-confirm" (click)="onIdleStayLoggedIn()">
         <i class="pi pi-refresh"></i>
-        Stay Logged In
+        {{ 'SESSION.STAY_LOGGED_IN' | translate }}
       </button>
     </div>
   </div>

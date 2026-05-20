@@ -1968,5 +1968,17 @@
     "HINT": "Save your work before navigating away.",
     "STAY": "Stay",
     "DISCARD_LEAVE": "Discard & Leave"
+  },
+  "SESSION": {
+    "EXPIRED_TITLE": "Session Expired",
+    "EXPIRED_MESSAGE": "Your session has ended. This may be because you logged in from another location.",
+    "EXPIRED_BULLET_1": "Only one active session is allowed per user",
+    "EXPIRED_BULLET_2": "Please log in again to continue",
+    "GO_TO_LOGIN": "Go to Login",
+    "IDLE_TITLE": "Inactivity Warning",
+    "IDLE_MESSAGE": "You will be logged out due to inactivity.",
+    "IDLE_SECONDS_REMAINING": "seconds remaining",
+    "LOGOUT_NOW": "Logout Now",
+    "STAY_LOGGED_IN": "Stay Logged In"
   }
 }

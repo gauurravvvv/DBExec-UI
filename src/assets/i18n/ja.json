@@ -1931,5 +1931,17 @@
     "HINT": "移動する前に作業を保存してください。",
     "STAY": "留まる",
     "DISCARD_LEAVE": "破棄して離れる"
+  },
+  "SESSION": {
+    "EXPIRED_TITLE": "セッションが終了しました",
+    "EXPIRED_MESSAGE": "セッションが終了しました。別の場所からログインした可能性があります。",
+    "EXPIRED_BULLET_1": "ユーザーごとに1つのアクティブセッションのみ許可されます",
+    "EXPIRED_BULLET_2": "続行するには再度ログインしてください",
+    "GO_TO_LOGIN": "ログインへ",
+    "IDLE_TITLE": "非アクティブ警告",
+    "IDLE_MESSAGE": "非アクティブのためログアウトされます。",
+    "IDLE_SECONDS_REMAINING": "秒で終了",
+    "LOGOUT_NOW": "今すぐログアウト",
+    "STAY_LOGGED_IN": "ログインを継続"
   }
 }

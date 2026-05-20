@@ -1931,5 +1931,17 @@
     "HINT": "Speichern Sie Ihre Arbeit, bevor Sie die Seite verlassen.",
     "STAY": "Bleiben",
     "DISCARD_LEAVE": "Verwerfen & Verlassen"
+  },
+  "SESSION": {
+    "EXPIRED_TITLE": "Sitzung abgelaufen",
+    "EXPIRED_MESSAGE": "Ihre Sitzung wurde beendet. Möglicherweise haben Sie sich von einem anderen Ort angemeldet.",
+    "EXPIRED_BULLET_1": "Pro Benutzer ist nur eine aktive Sitzung erlaubt",
+    "EXPIRED_BULLET_2": "Bitte melden Sie sich erneut an, um fortzufahren",
+    "GO_TO_LOGIN": "Zur Anmeldung",
+    "IDLE_TITLE": "Inaktivitätswarnung",
+    "IDLE_MESSAGE": "Sie werden wegen Inaktivität abgemeldet.",
+    "IDLE_SECONDS_REMAINING": "Sekunden verbleibend",
+    "LOGOUT_NOW": "Jetzt abmelden",
+    "STAY_LOGGED_IN": "Angemeldet bleiben"
   }
 }
