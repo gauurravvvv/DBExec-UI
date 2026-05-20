@@ -72,7 +72,9 @@
     text-align: right;
     font-variant-numeric: tabular-nums;
 
-    .th-content { justify-content: flex-end; }
+    .th-content {
+      justify-content: flex-end;
+    }
   }
 
   // Cell text — truncate long strings, full value on hover via title.

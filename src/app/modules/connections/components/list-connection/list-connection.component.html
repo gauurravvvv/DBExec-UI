@@ -7,35 +7,35 @@
       </div>
 
       <div class="header-actions">
-          <!-- Bulk Delete Button -->
-          <button
-            *ngIf="selectedCount > 0"
-            pButton
-            [label]="'COMMON.DELETE_COUNT' | translate:{ count: selectedCount }"
-            icon="pi pi-trash"
-            (click)="confirmBulkDelete()"
-            class="p-button-raised p-button-danger modern-button"
-          ></button>
+        <!-- Bulk Delete Button -->
+        <button
+          *ngIf="selectedCount > 0"
+          pButton
+          [label]="'COMMON.DELETE_COUNT' | translate: { count: selectedCount }"
+          icon="pi pi-trash"
+          (click)="confirmBulkDelete()"
+          class="p-button-raised p-button-danger modern-button"
+        ></button>
 
-          <!-- Clear Filters Button -->
-          <button
-            pButton
-            [label]="'COMMON.CLEAR' | translate"
-            icon="pi pi-filter-slash"
-            (click)="clearFilters()"
-            [disabled]="!isFilterActive"
-            class="p-button-outlined p-button-danger modern-button"
-          ></button>
+        <!-- Clear Filters Button -->
+        <button
+          pButton
+          [label]="'COMMON.CLEAR' | translate"
+          icon="pi pi-filter-slash"
+          (click)="clearFilters()"
+          [disabled]="!isFilterActive"
+          class="p-button-outlined p-button-danger modern-button"
+        ></button>
 
-          <!-- Add Button -->
-          <button
-            pButton
-            [label]="'COMMON.ADD' | translate"
-            icon="pi pi-plus"
-            (click)="onAddNewConnection()"
-            class="p-button-raised p-button-primary modern-button"
-          ></button>
-              </div>
+        <!-- Add Button -->
+        <button
+          pButton
+          [label]="'COMMON.ADD' | translate"
+          icon="pi pi-plus"
+          (click)="onAddNewConnection()"
+          class="p-button-raised p-button-primary modern-button"
+        ></button>
+      </div>
     </div>
 
     <!-- Unified Toolbar & Content Card -->
@@ -121,21 +121,38 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.NAME' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('name')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('name') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('name') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('name'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('name') > 0 && sortHelper.size > 1">{{ sortHelper.index('name') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('name')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up': sortHelper.direction('name') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('name') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('name'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('name') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('name') }}</span
+                    >
                   </span>
                 </div>
               </th>
               <th style="min-width: 20rem">
-                <div class="th-content">{{ 'COMMON.DESCRIPTION' | translate }}</div>
+                <div class="th-content">
+                  {{ 'COMMON.DESCRIPTION' | translate }}
+                </div>
               </th>
               <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">{{ 'COMMON.USERNAME' | translate }}</div>
+                <div class="th-content">
+                  {{ 'COMMON.USERNAME' | translate }}
+                </div>
               </th>
               <th
                 style="width: 9rem; min-width: 9rem"
@@ -145,13 +162,26 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.STATUS' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('status')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('status') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('status') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('status'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('status') > 0 && sortHelper.size > 1">{{ sortHelper.index('status') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('status')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up': sortHelper.direction('status') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('status') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('status'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('status') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('status') }}</span
+                    >
                   </span>
                 </div>
               </th>
@@ -163,18 +193,34 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.CREATED_ON' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('createdOn')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('createdOn') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('createdOn') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('createdOn'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('createdOn') > 0 && sortHelper.size > 1">{{ sortHelper.index('createdOn') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('createdOn')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up':
+                          sortHelper.direction('createdOn') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('createdOn') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('createdOn'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('createdOn') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('createdOn') }}</span
+                    >
                   </span>
                 </div>
               </th>
               <th style="width: 7rem; min-width: 7rem">
-                <div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div>
+                <div class="th-content actions-th">
+                  {{ 'COMMON.ACTIONS' | translate }}
+                </div>
               </th>
             </tr>
             <!-- Filter Row -->
@@ -272,7 +318,11 @@
                 >
                   <span class="dot"></span>
                   <span class="label">
-                    {{ connection.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                    {{
+                      connection.status === 1
+                        ? ('COMMON.ACTIVE' | translate)
+                        : ('COMMON.INACTIVE' | translate)
+                    }}
                   </span>
                 </span>
               </td>
@@ -312,13 +362,14 @@
                 <div class="empty-state-inline">
                   <i class="pi pi-search empty-state-icon"></i>
                   <span class="empty-state-text">
-                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash; {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
+                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash;
+                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
                   </span>
                 </div>
               </td>
             </tr>
           </ng-template>
-        
+
           <ng-template pTemplate="paginatorright">
             <button
               type="button"
@@ -350,14 +401,21 @@
       <p class="delete-intro" *ngIf="!bulkDelete">
         {{ 'CONNECTION.CONFIRM_DELETE_MESSAGE' | translate }}
       </p>
-      <p class="delete-intro" *ngIf="bulkDelete"
-        [innerHTML]="'CONNECTION.CONFIRM_BULK_DELETE_MESSAGE' | translate:{ count: selectedCount }">
-      </p>
+      <p
+        class="delete-intro"
+        *ngIf="bulkDelete"
+        [innerHTML]="
+          'CONNECTION.CONFIRM_BULK_DELETE_MESSAGE'
+            | translate: { count: selectedCount }
+        "
+      ></p>
 
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>{{ 'CONNECTION.DELETE_AFFECTED_USERS_GROUPS' | translate }}</span>
+          <span>{{
+            'CONNECTION.DELETE_AFFECTED_USERS_GROUPS' | translate
+          }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
@@ -366,7 +424,10 @@
       </ul>
 
       <div class="justification-section">
-        <label>{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label>
+        <label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
+        >
         <textarea
           [(ngModel)]="deleteJustification"
           [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"

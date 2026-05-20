@@ -7,6 +7,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslateService } from '@ngx-translate/core';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -15,7 +16,6 @@ import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
-import { TranslateService } from '@ngx-translate/core';
 import { AuditService } from '../../services/audit.service';
 
 type AuditLogSortField = 'action' | 'createdOn';
@@ -128,8 +128,7 @@ export class ListAuditLogsComponent implements OnInit {
     const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
-      const res: any =
-        await this.organisationService.listOrganisation(params);
+      const res: any = await this.organisationService.listOrganisation(params);
       if (this.globalService.handleSuccessService(res, false)) {
         const orgs = (res?.data?.orgs ?? []).filter(
           (o: any) => o.isDefault !== 1,

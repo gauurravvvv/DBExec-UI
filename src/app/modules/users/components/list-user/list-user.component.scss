@@ -129,7 +129,11 @@
       padding: 0.65rem 1.25rem;
 
       &.p-button-primary {
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--primary-hover)
+        ) !important;
         border: none !important;
         color: white !important;
         box-shadow: 0 4px 10px var(--primary-color-transparent);
@@ -224,7 +228,9 @@
 
           &:hover {
             color: var(--text-color);
-            .sort-indicator { opacity: 1; }
+            .sort-indicator {
+              opacity: 1;
+            }
           }
 
           &.is-sorted {
@@ -232,7 +238,9 @@
             background: transparent;
             .sort-indicator {
               opacity: 1;
-              .pi { color: var(--primary-color); }
+              .pi {
+                color: var(--primary-color);
+              }
             }
           }
 
@@ -249,7 +257,9 @@
             opacity: 0;
             transition: opacity var(--motion-fast) ease;
 
-            &.is-sorted { opacity: 1; }
+            &.is-sorted {
+              opacity: 1;
+            }
 
             .pi {
               font-size: 11px;
@@ -312,7 +322,9 @@
       // Body Rows
       .p-datatable-tbody > tr {
         background: var(--card-background);
-        transition: background-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease;
+        transition:
+          background-color var(--motion-fast) ease,
+          box-shadow var(--motion-fast) ease;
         border-bottom: 1px solid var(--border-color);
         position: relative;
 
@@ -351,8 +363,12 @@
 
       .p-datatable-thead > tr > th.p-frozen-column-end,
       .p-datatable-tbody > tr > td.p-frozen-column-end,
-      .p-datatable-thead > tr > th.p-frozen-column:has(+ :not(.p-frozen-column)),
-      .p-datatable-tbody > tr > td.p-frozen-column:has(+ :not(.p-frozen-column)) {
+      .p-datatable-thead
+        > tr
+        > th.p-frozen-column:has(+ :not(.p-frozen-column)),
+      .p-datatable-tbody
+        > tr
+        > td.p-frozen-column:has(+ :not(.p-frozen-column)) {
         box-shadow: 4px 0 6px -4px rgba(0, 0, 0, 0.08);
       }
 
@@ -446,15 +462,21 @@
             background-color var(--motion-fast) ease,
             color var(--motion-fast) ease;
 
-          i { font-size: var(--fs-body); }
+          i {
+            font-size: var(--fs-body);
+          }
 
           &:hover {
             background: var(--card-background);
             color: var(--text-color);
           }
 
-          &.edit-btn:hover { color: var(--primary-color); }
-          &.delete-btn:hover { color: var(--error-color); }
+          &.edit-btn:hover {
+            color: var(--primary-color);
+          }
+          &.delete-btn:hover {
+            color: var(--error-color);
+          }
 
           &.unlock-btn {
             color: var(--warning-color);
@@ -788,7 +810,11 @@ td.empty-message-cell {
         }
 
         &.btn-confirm {
-          background: linear-gradient(135deg, var(--error-color), var(--error-color));
+          background: linear-gradient(
+            135deg,
+            var(--error-color),
+            var(--error-color)
+          );
           color: var(--primary-text);
           box-shadow: 0 4px 14px var(--error-bg);
           &:hover:not(:disabled) {

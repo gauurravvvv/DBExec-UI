@@ -131,9 +131,15 @@ export class EditDatasetFieldsDialogComponent implements OnChanges {
     if (!name) {
       this.nameError = this.translate.instant('VALIDATION.FIELD_NAME_REQUIRED');
     } else if (name.length < this.MIN_NAME_LENGTH) {
-      this.nameError = this.translate.instant('VALIDATION.FIELD_NAME_MIN_LENGTH', { length: this.MIN_NAME_LENGTH });
+      this.nameError = this.translate.instant(
+        'VALIDATION.FIELD_NAME_MIN_LENGTH',
+        { length: this.MIN_NAME_LENGTH },
+      );
     } else if (name.length > this.MAX_NAME_LENGTH) {
-      this.nameError = this.translate.instant('VALIDATION.FIELD_NAME_MAX_LENGTH', { length: this.MAX_NAME_LENGTH });
+      this.nameError = this.translate.instant(
+        'VALIDATION.FIELD_NAME_MAX_LENGTH',
+        { length: this.MAX_NAME_LENGTH },
+      );
     } else {
       this.nameError = '';
     }

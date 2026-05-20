@@ -81,7 +81,11 @@
         }
 
         .btn-save {
-          background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
+          background: linear-gradient(
+            135deg,
+            var(--primary-color),
+            var(--primary-hover)
+          ) !important;
           color: white !important;
           border: none !important;
           padding: 0.65rem 1.25rem;
@@ -335,7 +339,11 @@
             color: var(--error-color);
           }
           .contrast-meter__fill {
-            background: linear-gradient(90deg, var(--error-color), var(--error-hover));
+            background: linear-gradient(
+              90deg,
+              var(--error-color),
+              var(--error-hover)
+            );
           }
         }
 
@@ -347,7 +355,11 @@
             color: var(--warning-hover);
           }
           .contrast-meter__fill {
-            background: linear-gradient(90deg, var(--warning-color), var(--warning-hover));
+            background: linear-gradient(
+              90deg,
+              var(--warning-color),
+              var(--warning-hover)
+            );
           }
         }
 
@@ -359,7 +371,11 @@
             color: var(--success-color);
           }
           .contrast-meter__fill {
-            background: linear-gradient(90deg, var(--success-color), var(--success-color));
+            background: linear-gradient(
+              90deg,
+              var(--success-color),
+              var(--success-color)
+            );
           }
         }
 
@@ -371,7 +387,11 @@
             color: var(--primary-hover);
           }
           .contrast-meter__fill {
-            background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
+            background: linear-gradient(
+              90deg,
+              var(--primary-color),
+              var(--primary-hover)
+            );
           }
         }
       }

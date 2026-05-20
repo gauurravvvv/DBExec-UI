@@ -2068,7 +2068,11 @@ td.empty-message-cell {
         }
 
         &.btn-confirm {
-          background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+          background: linear-gradient(
+            135deg,
+            var(--primary-color),
+            var(--primary-hover)
+          );
           color: var(--primary-text);
           box-shadow: 0 4px 14px var(--primary-color-transparent);
           &:hover:not(:disabled) {

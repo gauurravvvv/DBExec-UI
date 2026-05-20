@@ -40,54 +40,54 @@ export const SYSTEM_ADMIN = {
   LIST: '/system-admins',
   ADD: '/system-admins',
   // Templated single-resource paths
-  GET: '/system-admins/',         // GET /system-admins/:id
-  UPDATE: '/system-admins/',      // PUT /system-admins/:id
-  DELETE: '/system-admins/',      // DELETE /system-admins/:id
+  GET: '/system-admins/', // GET /system-admins/:id
+  UPDATE: '/system-admins/', // PUT /system-admins/:id
+  DELETE: '/system-admins/', // DELETE /system-admins/:id
   BULK_DELETE: '/system-admins/bulk-delete',
-  UPDATE_PASSWORD_PREFIX: '/system-admins/',  // PUT /system-admins/:id/password
+  UPDATE_PASSWORD_PREFIX: '/system-admins/', // PUT /system-admins/:id/password
   UPDATE_PASSWORD_SUFFIX: '/password',
-  UNLOCK_PREFIX: '/system-admins/',           // POST /system-admins/:id/unlock
+  UNLOCK_PREFIX: '/system-admins/', // POST /system-admins/:id/unlock
   UNLOCK_SUFFIX: '/unlock',
 };
 
 export const ORGANISATION = {
   LIST: '/orgs',
   ADD: '/orgs',
-  GET: '/orgs/',                  // GET /orgs/:id
-  UPDATE: '/orgs/',               // PUT /orgs/:id
-  DELETE: '/orgs/',               // DELETE /orgs/:id
+  GET: '/orgs/', // GET /orgs/:id
+  UPDATE: '/orgs/', // PUT /orgs/:id
+  DELETE: '/orgs/', // DELETE /orgs/:id
   BULK_DELETE: '/orgs/bulk-delete',
-  REFRESH_MASTER_DB_PREFIX: '/orgs/',  // POST /orgs/:id/refresh-master-db
+  REFRESH_MASTER_DB_PREFIX: '/orgs/', // POST /orgs/:id/refresh-master-db
   REFRESH_MASTER_DB_SUFFIX: '/refresh-master-db',
 };
 
 export const USER = {
   LIST: '/users',
   ADD: '/users',
-  GET: '/users/',                 // GET /users/:orgId/:id
-  UPDATE: '/users/',              // PUT /users/:orgId/:id
-  DELETE: '/users/',              // DELETE /users/:orgId/:id
-  BULK_DELETE_PREFIX: '/users/',  // POST /users/:orgId/bulk-delete
+  GET: '/users/', // GET /users/:orgId/:id
+  UPDATE: '/users/', // PUT /users/:orgId/:id
+  DELETE: '/users/', // DELETE /users/:orgId/:id
+  BULK_DELETE_PREFIX: '/users/', // POST /users/:orgId/bulk-delete
   BULK_DELETE_SUFFIX: '/bulk-delete',
   BULK_ADD_VALIDATE: '/users/bulk/validate',
   BULK_ADD_COMMIT: '/users/bulk/commit',
-  UPDATE_PASSWORD_PREFIX: '/users/',  // PUT /users/:orgId/:id/password
+  UPDATE_PASSWORD_PREFIX: '/users/', // PUT /users/:orgId/:id/password
   UPDATE_PASSWORD_SUFFIX: '/password',
-  UNLOCK_PREFIX: '/users/',           // POST /users/:orgId/:id/unlock
+  UNLOCK_PREFIX: '/users/', // POST /users/:orgId/:id/unlock
   UNLOCK_SUFFIX: '/unlock',
 };
 
 export const DATASOURCE = {
   LIST: '/datasources',
   ADD: '/datasources',
-  GET: '/datasources/',           // GET /datasources/:orgId/:id
-  UPDATE: '/datasources/',        // PUT /datasources/:orgId/:id
-  DELETE: '/datasources/',        // DELETE /datasources/:orgId/:id
-  BULK_DELETE_PREFIX: '/datasources/',  // POST /datasources/:orgId/bulk-delete
+  GET: '/datasources/', // GET /datasources/:orgId/:id
+  UPDATE: '/datasources/', // PUT /datasources/:orgId/:id
+  DELETE: '/datasources/', // DELETE /datasources/:orgId/:id
+  BULK_DELETE_PREFIX: '/datasources/', // POST /datasources/:orgId/bulk-delete
   BULK_DELETE_SUFFIX: '/bulk-delete',
   VALIDATE: '/datasources/validate',
   // Introspection — operate on the live target DB
-  LIST_SCHEMAS_PREFIX: '/datasources/',    // GET /datasources/:orgId/:datasourceId/schemas
+  LIST_SCHEMAS_PREFIX: '/datasources/', // GET /datasources/:orgId/:datasourceId/schemas
   LIST_SCHEMAS_SUFFIX: '/schemas',
   // Schema tables/columns are built inline by services:
   // GET /datasources/:orgId/:datasourceId/schemas/:schema/tables
@@ -121,11 +121,11 @@ export const DATASET = {
   LIST: '/datasets',
   ADD: '/datasets',
   ADD_VIA_BUILDER: '/datasets/from-builder',
-  GET: '/datasets/',              // GET /datasets/:orgId/:datasetId
-  UPDATE: '/datasets/',           // PUT /datasets/:orgId/:datasetId
-  UPDATE_VIA_BUILDER_PREFIX: '/datasets/',  // PUT /datasets/:orgId/:datasetId/from-builder
+  GET: '/datasets/', // GET /datasets/:orgId/:datasetId
+  UPDATE: '/datasets/', // PUT /datasets/:orgId/:datasetId
+  UPDATE_VIA_BUILDER_PREFIX: '/datasets/', // PUT /datasets/:orgId/:datasetId/from-builder
   UPDATE_VIA_BUILDER_SUFFIX: '/from-builder',
-  DELETE: '/datasets/',           // DELETE /datasets/:orgId/:datasetId
+  DELETE: '/datasets/', // DELETE /datasets/:orgId/:datasetId
   BULK_DELETE_PREFIX: '/datasets/',
   BULK_DELETE_SUFFIX: '/bulk-delete',
   // POST /datasets/:datasetId/run
@@ -153,9 +153,9 @@ export const TAB = {
   LIST: '/tabs',
   ADD: '/tabs',
   TREE: '/tabs/tree',
-  GET: '/tabs/',                  // GET /tabs/:orgId/:tabId
-  UPDATE: '/tabs/',               // PUT /tabs/:orgId/:tabId
-  DELETE: '/tabs/',               // DELETE /tabs/:orgId/:tabId
+  GET: '/tabs/', // GET /tabs/:orgId/:tabId
+  UPDATE: '/tabs/', // PUT /tabs/:orgId/:tabId
+  DELETE: '/tabs/', // DELETE /tabs/:orgId/:tabId
   BULK_DELETE_PREFIX: '/tabs/',
   BULK_DELETE_SUFFIX: '/bulk-delete',
   // GET /tabs/:orgId/:tabId/sections?queryBuilderId=
@@ -232,7 +232,7 @@ export const ROLE = {
 };
 
 export const ACCESS = {
-  GET: '/access/',                // GET /access/:orgId/:connectionId
+  GET: '/access/', // GET /access/:orgId/:connectionId
   GRANT: '/access/grant',
 };
 
@@ -249,9 +249,9 @@ export const CONNECTIONS = {
 export const ANALYSES = {
   LIST: '/analyses',
   ADD: '/analyses',
-  GET: '/analyses/',              // GET /analyses/:orgId/:analysisId
-  UPDATE: '/analyses/',           // PUT /analyses/:orgId/:analysisId
-  DELETE: '/analyses/',           // DELETE /analyses/:orgId/:analysisId
+  GET: '/analyses/', // GET /analyses/:orgId/:analysisId
+  UPDATE: '/analyses/', // PUT /analyses/:orgId/:analysisId
+  DELETE: '/analyses/', // DELETE /analyses/:orgId/:analysisId
   BULK_DELETE_PREFIX: '/analyses/',
   BULK_DELETE_SUFFIX: '/bulk-delete',
   // GET /analyses/:orgId/:analysisId/fields
@@ -276,9 +276,9 @@ export const ANALYSES_VISUAL = {
 
 export const ANALYSIS_FILTER = {
   ADD: '/analysis-filters',
-  LIST: '/analysis-filters/',         // GET /analysis-filters/:orgId/:analysisId
-  UPDATE: '/analysis-filters/',       // PUT /analysis-filters/:orgId/:filterId
-  DELETE: '/analysis-filters/',       // DELETE /analysis-filters/:orgId/:filterId
+  LIST: '/analysis-filters/', // GET /analysis-filters/:orgId/:analysisId
+  UPDATE: '/analysis-filters/', // PUT /analysis-filters/:orgId/:filterId
+  DELETE: '/analysis-filters/', // DELETE /analysis-filters/:orgId/:filterId
   VALUES_BATCH: '/analysis-filters/values',
 };
 
@@ -290,10 +290,10 @@ export const ANNOUNCEMENT = {
   LIST: '/announcements',
   ADD: '/announcements',
   CURRENT: '/announcements/current',
-  GET: '/announcements/',             // GET /announcements/:id
-  UPDATE: '/announcements/',          // PUT /announcements/:id
-  DELETE: '/announcements/',          // DELETE /announcements/:id
-  DISMISS_PREFIX: '/announcements/',  // POST /announcements/:id/dismiss
+  GET: '/announcements/', // GET /announcements/:id
+  UPDATE: '/announcements/', // PUT /announcements/:id
+  DELETE: '/announcements/', // DELETE /announcements/:id
+  DISMISS_PREFIX: '/announcements/', // POST /announcements/:id/dismiss
   DISMISS_SUFFIX: '/dismiss',
 };
 
@@ -312,8 +312,8 @@ export const PROFILE = {
 
 export const DASHBOARD = {
   LIST: '/dashboards',
-  GET: '/dashboards/',              // GET /dashboards/:orgId/:id
-  DELETE: '/dashboards/',           // DELETE /dashboards/:orgId/:id
+  GET: '/dashboards/', // GET /dashboards/:orgId/:id
+  DELETE: '/dashboards/', // DELETE /dashboards/:orgId/:id
   BULK_DELETE_PREFIX: '/dashboards/',
   BULK_DELETE_SUFFIX: '/bulk-delete',
   // GET /dashboards/:orgId/:id/render
@@ -332,9 +332,9 @@ export const DASHBOARD = {
 
 export const RLS_RULE = {
   ADD: '/rls-rules',
-  GET: '/rls-rules/',                 // GET /rls-rules/:orgId/:ruleId
-  UPDATE: '/rls-rules/',              // PUT /rls-rules/:orgId/:ruleId
-  DELETE: '/rls-rules/',              // DELETE /rls-rules/:orgId/:ruleId
+  GET: '/rls-rules/', // GET /rls-rules/:orgId/:ruleId
+  UPDATE: '/rls-rules/', // PUT /rls-rules/:orgId/:ruleId
+  DELETE: '/rls-rules/', // DELETE /rls-rules/:orgId/:ruleId
   // GET /rls-rules/:orgId/datasets/:datasetId
   LIST_FOR_DATASET_PREFIX: '/rls-rules/',
   LIST_FOR_DATASET_INFIX: '/datasets/',

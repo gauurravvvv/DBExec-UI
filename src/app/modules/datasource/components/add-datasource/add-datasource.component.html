@@ -221,7 +221,8 @@
                     : connectionTestResult === 'success'
                       ? ('DATASOURCE.CONNECTION_SUCCESSFUL' | translate)
                       : connectionTestResult === 'failed'
-                        ? (connectionTestError || ('DATASOURCE.CONNECTION_FAILED_RETRY' | translate))
+                        ? connectionTestError ||
+                          ('DATASOURCE.CONNECTION_FAILED_RETRY' | translate)
                         : ('DATASOURCE.TEST_CONNECTION' | translate)
                 }}
               </a>

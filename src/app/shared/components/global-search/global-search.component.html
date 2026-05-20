@@ -70,7 +70,8 @@
     <div class="empty-state" *ngIf="searchTerm && searchResults.length === 0">
       <i class="pi pi-search empty-icon"></i>
       <p class="empty-text">
-        {{ 'SEARCH.NO_RESULTS' | translate }} <strong>"{{ searchTerm }}"</strong>
+        {{ 'SEARCH.NO_RESULTS' | translate }}
+        <strong>"{{ searchTerm }}"</strong>
       </p>
       <p class="empty-sub">{{ 'SEARCH.TRY_DIFFERENT' | translate }}</p>
     </div>
@@ -83,9 +84,15 @@
 
     <!-- Footer -->
     <div class="search-footer">
-      <div class="shortcut"><kbd>↑</kbd><kbd>↓</kbd><span>{{ 'SEARCH.NAVIGATE' | translate }}</span></div>
-      <div class="shortcut"><kbd>↵</kbd><span>{{ 'SEARCH.OPEN' | translate }}</span></div>
-      <div class="shortcut"><kbd>ESC</kbd><span>{{ 'SEARCH.CLOSE' | translate }}</span></div>
+      <div class="shortcut">
+        <kbd>↑</kbd><kbd>↓</kbd><span>{{ 'SEARCH.NAVIGATE' | translate }}</span>
+      </div>
+      <div class="shortcut">
+        <kbd>↵</kbd><span>{{ 'SEARCH.OPEN' | translate }}</span>
+      </div>
+      <div class="shortcut">
+        <kbd>ESC</kbd><span>{{ 'SEARCH.CLOSE' | translate }}</span>
+      </div>
     </div>
   </div>
 </div>

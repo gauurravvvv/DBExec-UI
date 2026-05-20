@@ -9,8 +9,8 @@
     flex-direction: column;
 
     // Title row — thin, identity-only. Actions moved to the filter
-     // row below so the header reads as "you are here", not as a
-     // toolbar competing with the data for attention.
+    // row below so the header reads as "you are here", not as a
+    // toolbar competing with the data for attention.
     .page-header {
       padding: var(--space-5) var(--space-7);
       border-bottom: 1px solid var(--border-color);
@@ -490,8 +490,9 @@
   border-radius: 8px;
   background: var(--card-background);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: border-color var(--motion-fast) ease,
-              box-shadow var(--motion-fast) ease;
+  transition:
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease;
 
   &:hover {
     border-color: var(--border-strong);
@@ -581,5 +582,3 @@
     }
   }
 }
-
-

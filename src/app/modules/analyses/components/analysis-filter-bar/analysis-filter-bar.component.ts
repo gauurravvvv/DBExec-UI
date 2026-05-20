@@ -120,8 +120,7 @@ export class AnalysisFilterBarComponent
   @Input() fetcherFactory: ((filter: any) => FilterFetcher) | null = null;
   /** Host-supplied "dismiss stale chip" handler — keeps stale-chip
    *  state in the store (a dispatch) instead of local. */
-  @Input() onDismissStale: ((filter: any, value: string) => void) | null =
-    null;
+  @Input() onDismissStale: ((filter: any, value: string) => void) | null = null;
 
   // ── Service-mode internal state ──────────────────────────────────
   internalFilters: any[] = [];
@@ -146,7 +145,7 @@ export class AnalysisFilterBarComponent
   /** Resolved filter list for the template — host inputs override
    *  service-mode internal state when present. */
   get visibleFilters(): any[] {
-    return this.serviceMode ? this.internalFilters : this.filters ?? [];
+    return this.serviceMode ? this.internalFilters : (this.filters ?? []);
   }
 
   /**
@@ -311,16 +310,12 @@ export class AnalysisFilterBarComponent
         page: number;
         limit: number;
       }) => {
-        const result = await this.optionsCache.get(
-          this.analysisId,
-          filter.id,
-          {
-            search: args.search || undefined,
-            page: args.page,
-            pageSize: args.limit,
-            organisation: this.orgId,
-          },
-        );
+        const result = await this.optionsCache.get(this.analysisId, filter.id, {
+          search: args.search || undefined,
+          page: args.page,
+          pageSize: args.limit,
+          organisation: this.orgId,
+        });
         this.applyResultToInternalState(filter.id, result);
         if (!result.ok) return { items: [], total: 0 };
         return { items: result.values, total: result.total };

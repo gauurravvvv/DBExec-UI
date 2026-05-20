@@ -9,11 +9,11 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { ORGANISATION } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { TranslateService } from '@ngx-translate/core';
 import { OrganisationService } from '../../services/organisation.service';
 
 @Component({
@@ -351,17 +351,28 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
   getEmailFieldError(fieldName: string): string {
     const control = this.orgForm.get(fieldName);
     if (!control?.errors || !control.touched) return '';
-    if (control.errors['required']) return this.translate.instant('VALIDATION.FIELD_REQUIRED');
-    if (control.errors['email']) return this.translate.instant('VALIDATION.EMAIL_INVALID');
+    if (control.errors['required'])
+      return this.translate.instant('VALIDATION.FIELD_REQUIRED');
+    if (control.errors['email'])
+      return this.translate.instant('VALIDATION.EMAIL_INVALID');
     if (control.errors['maxlength'])
-      return this.translate.instant('VALIDATION.MAX_LENGTH', { length: control.errors['maxlength'].requiredLength });
+      return this.translate.instant('VALIDATION.MAX_LENGTH', {
+        length: control.errors['maxlength'].requiredLength,
+      });
     if (control.errors['minlength'])
-      return this.translate.instant('VALIDATION.MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
+      return this.translate.instant('VALIDATION.MIN_LENGTH', {
+        length: control.errors['minlength'].requiredLength,
+      });
     if (control.errors['min'])
-      return this.translate.instant('VALIDATION.MIN_VALUE', { value: control.errors['min'].min });
+      return this.translate.instant('VALIDATION.MIN_VALUE', {
+        value: control.errors['min'].min,
+      });
     if (control.errors['max'])
-      return this.translate.instant('VALIDATION.MAX_VALUE', { value: control.errors['max'].max });
-    if (control.errors['pattern']) return this.translate.instant('VALIDATION.INVALID_FORMAT_REGION');
+      return this.translate.instant('VALIDATION.MAX_VALUE', {
+        value: control.errors['max'].max,
+      });
+    if (control.errors['pattern'])
+      return this.translate.instant('VALIDATION.INVALID_FORMAT_REGION');
     return '';
   }
 
@@ -584,11 +595,16 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
 
   getNameError(): string {
     const control = this.orgForm.get('name');
-    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.ORG_NAME_REQUIRED');
+    if (control?.errors?.['required'])
+      return this.translate.instant('VALIDATION.ORG_NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.ORG_NAME_MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
+      return this.translate.instant('VALIDATION.ORG_NAME_MIN_LENGTH', {
+        length: control.errors['minlength'].requiredLength,
+      });
     if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.ORG_NAME_MAX_LENGTH', { length: control.errors['maxlength'].requiredLength });
+      return this.translate.instant('VALIDATION.ORG_NAME_MAX_LENGTH', {
+        length: control.errors['maxlength'].requiredLength,
+      });
     if (control?.errors?.['pattern'])
       return this.translate.instant('VALIDATION.ORG_NAME_PATTERN');
     return '';
@@ -596,22 +612,32 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
 
   getDescriptionError(): string {
     const control = this.orgForm.get('description');
-    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.DESCRIPTION_REQUIRED');
+    if (control?.errors?.['required'])
+      return this.translate.instant('VALIDATION.DESCRIPTION_REQUIRED');
     if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.DESCRIPTION_MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
+      return this.translate.instant('VALIDATION.DESCRIPTION_MIN_LENGTH', {
+        length: control.errors['minlength'].requiredLength,
+      });
     if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.DESCRIPTION_MAX_LENGTH', { length: control.errors['maxlength'].requiredLength });
+      return this.translate.instant('VALIDATION.DESCRIPTION_MAX_LENGTH', {
+        length: control.errors['maxlength'].requiredLength,
+      });
     return '';
   }
 
   getSecurityFieldError(fieldName: string): string {
     const control = this.orgForm.get(fieldName);
     if (!control?.errors || !control.touched) return '';
-    if (control.errors['required']) return this.translate.instant('VALIDATION.FIELD_REQUIRED');
+    if (control.errors['required'])
+      return this.translate.instant('VALIDATION.FIELD_REQUIRED');
     if (control.errors['min'])
-      return this.translate.instant('VALIDATION.MIN_VALUE', { value: control.errors['min'].min });
+      return this.translate.instant('VALIDATION.MIN_VALUE', {
+        value: control.errors['min'].min,
+      });
     if (control.errors['max'])
-      return this.translate.instant('VALIDATION.MAX_VALUE', { value: control.errors['max'].max });
+      return this.translate.instant('VALIDATION.MAX_VALUE', {
+        value: control.errors['max'].max,
+      });
     return '';
   }
 

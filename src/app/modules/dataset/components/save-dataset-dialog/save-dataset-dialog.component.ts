@@ -91,11 +91,16 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
 
   getNameError(): string {
     const control = this.datasetForm.get('name');
-    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.DATASET_NAME_REQUIRED');
+    if (control?.errors?.['required'])
+      return this.translate.instant('VALIDATION.DATASET_NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.DATASET_NAME_MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
+      return this.translate.instant('VALIDATION.DATASET_NAME_MIN_LENGTH', {
+        length: control.errors['minlength'].requiredLength,
+      });
     if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.DATASET_NAME_MAX_LENGTH', { length: control.errors['maxlength'].requiredLength });
+      return this.translate.instant('VALIDATION.DATASET_NAME_MAX_LENGTH', {
+        length: control.errors['maxlength'].requiredLength,
+      });
     if (control?.errors?.['pattern'])
       return this.translate.instant('VALIDATION.DATASET_NAME_PATTERN');
     return '';

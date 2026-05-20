@@ -7,14 +7,18 @@
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>{{ 'GROUP.VIEW_TITLE' | translate }}</h2>
-        <span *ngIf="groupData?.isDefault === 1" class="default-badge"
-          >{{ 'GROUP.DEFAULT' | translate }}</span
-        >
+        <span *ngIf="groupData?.isDefault === 1" class="default-badge">{{
+          'GROUP.DEFAULT' | translate
+        }}</span>
       </div>
       <div class="header-actions">
         <button class="btn-primary" (click)="onEdit()">
           <i class="pi pi-pencil"></i>
-          {{ groupData?.isDefault === 1 ? ('GROUP.MANAGE_USERS' | translate) : ('COMMON.EDIT' | translate) }}
+          {{
+            groupData?.isDefault === 1
+              ? ('GROUP.MANAGE_USERS' | translate)
+              : ('COMMON.EDIT' | translate)
+          }}
         </button>
         <button
           *ngIf="groupData?.isDefault !== 1"
@@ -43,7 +47,11 @@
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.DESCRIPTION' | translate }}</label>
-              <p>{{ groupData.description || ('GROUP.NO_DESCRIPTION' | translate) }}</p>
+              <p>
+                {{
+                  groupData.description || ('GROUP.NO_DESCRIPTION' | translate)
+                }}
+              </p>
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.STATUS' | translate }}</label>
@@ -59,7 +67,11 @@
                       : 'pi-times-circle'
                   "
                 ></i>
-                {{ groupData.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                {{
+                  groupData.status === 1
+                    ? ('COMMON.ACTIVE' | translate)
+                    : ('COMMON.INACTIVE' | translate)
+                }}
               </span>
             </div>
             <div class="info-item">
@@ -140,7 +152,9 @@
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
-      <p class="delete-intro">{{ 'GROUP.CONFIRM_DELETE_SINGLE' | translate }}</p>
+      <p class="delete-intro">
+        {{ 'GROUP.CONFIRM_DELETE_SINGLE' | translate }}
+      </p>
 
       <ul class="delete-info-list">
         <li>
@@ -159,7 +173,8 @@
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"

@@ -47,7 +47,11 @@
                   class="status-badge"
                   [class.active]="organisationData.status === 1"
                 >
-                  {{ organisationData.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                  {{
+                    organisationData.status === 1
+                      ? ('COMMON.ACTIVE' | translate)
+                      : ('COMMON.INACTIVE' | translate)
+                  }}
                 </span>
               </div>
             </div>
@@ -123,7 +127,9 @@
               <span class="stat-value">{{
                 organisationData.datasourcesCount || 0
               }}</span>
-              <span class="stat-label">{{ 'ORG.DATASOURCES' | translate }}</span>
+              <span class="stat-label">{{
+                'ORG.DATASOURCES' | translate
+              }}</span>
             </div>
             <div class="stat-divider"></div>
             <div class="stat-item">
@@ -131,7 +137,9 @@
               <span class="stat-value">{{
                 organisationData.connectionsCount || 0
               }}</span>
-              <span class="stat-label">{{ 'ORG.CONNECTIONS' | translate }}</span>
+              <span class="stat-label">{{
+                'ORG.CONNECTIONS' | translate
+              }}</span>
             </div>
           </div>
         </div>
@@ -161,7 +169,11 @@
                   isRefreshingMasterDb ? 'pi-spin pi-spinner' : 'pi-refresh'
                 "
               ></i>
-              {{ isRefreshingMasterDb ? ('ORG.REFRESHING' | translate) : ('ORG.REFRESH_SCHEMA' | translate) }}
+              {{
+                isRefreshingMasterDb
+                  ? ('ORG.REFRESHING' | translate)
+                  : ('ORG.REFRESH_SCHEMA' | translate)
+              }}
             </button>
           </div>
           <div class="master-db-grid">
@@ -230,7 +242,13 @@
                 {{
                   organisationData.orgConfig.accountLockDurationHours === 0
                     ? ('ORG.PERMANENT_LOCK' | translate)
-                    : ('ORG.HOURS_VALUE' | translate:{ value: organisationData.orgConfig.accountLockDurationHours })
+                    : ('ORG.HOURS_VALUE'
+                      | translate
+                        : {
+                            value:
+                              organisationData.orgConfig
+                                .accountLockDurationHours,
+                          })
                 }}
               </span>
             </div>
@@ -239,18 +257,25 @@
                 <i class="pi pi-history"></i>
                 {{ 'ORG.PASSWORD_HISTORY_LIMIT' | translate }}
               </span>
-              <span class="value"
-                >{{ 'ORG.PASSWORDS_VALUE' | translate:{ value: organisationData.orgConfig.passwordHistoryLimit } }}</span
-              >
+              <span class="value">{{
+                'ORG.PASSWORDS_VALUE'
+                  | translate
+                    : { value: organisationData.orgConfig.passwordHistoryLimit }
+              }}</span>
             </div>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-sign-out"></i>
                 {{ 'ORG.IDLE_SESSION_TIMEOUT_LABEL' | translate }}
               </span>
-              <span class="value"
-                >{{ 'ORG.MINUTES_VALUE' | translate:{ value: organisationData.orgConfig.sessionInactivityTimeout } }}</span
-              >
+              <span class="value">{{
+                'ORG.MINUTES_VALUE'
+                  | translate
+                    : {
+                        value:
+                          organisationData.orgConfig.sessionInactivityTimeout,
+                      }
+              }}</span>
             </div>
           </div>
 
@@ -368,7 +393,9 @@
                 <i class="pi pi-shield"></i>
                 {{ 'ORG.ENCRYPTION_ALGORITHM' | translate }}
               </span>
-              <span class="value">{{ 'ORG.REVIEW_ENCRYPTION_VALUE' | translate }}</span>
+              <span class="value">{{
+                'ORG.REVIEW_ENCRYPTION_VALUE' | translate
+              }}</span>
             </div>
           </div>
         </div>
@@ -467,7 +494,8 @@
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"

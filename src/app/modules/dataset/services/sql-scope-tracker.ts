@@ -145,7 +145,12 @@ export function tokenize(sql: string): SqlToken[] {
     if (ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r') {
       const start = i;
       while (i < n && /\s/.test(sql[i])) i++;
-      tokens.push({ kind: 'whitespace', value: sql.slice(start, i), start, end: i });
+      tokens.push({
+        kind: 'whitespace',
+        value: sql.slice(start, i),
+        start,
+        end: i,
+      });
       continue;
     }
 
@@ -153,7 +158,12 @@ export function tokenize(sql: string): SqlToken[] {
     if (ch === '-' && sql[i + 1] === '-') {
       const start = i;
       while (i < n && sql[i] !== '\n') i++;
-      tokens.push({ kind: 'comment', value: sql.slice(start, i), start, end: i });
+      tokens.push({
+        kind: 'comment',
+        value: sql.slice(start, i),
+        start,
+        end: i,
+      });
       continue;
     }
 
@@ -162,9 +172,15 @@ export function tokenize(sql: string): SqlToken[] {
       const start = i;
       i += 2;
       while (i < n - 1 && !(sql[i] === '*' && sql[i + 1] === '/')) i++;
-      if (i < n - 1) i += 2; // consume */
+      if (i < n - 1)
+        i += 2; // consume */
       else i = n; // unterminated — eat the rest
-      tokens.push({ kind: 'comment', value: sql.slice(start, i), start, end: i });
+      tokens.push({
+        kind: 'comment',
+        value: sql.slice(start, i),
+        start,
+        end: i,
+      });
       continue;
     }
 
@@ -183,7 +199,12 @@ export function tokenize(sql: string): SqlToken[] {
         }
         i++;
       }
-      tokens.push({ kind: 'string', value: sql.slice(start, i), start, end: i });
+      tokens.push({
+        kind: 'string',
+        value: sql.slice(start, i),
+        start,
+        end: i,
+      });
       continue;
     }
 
@@ -231,7 +252,9 @@ export function tokenize(sql: string): SqlToken[] {
       const start = i;
       while (i < n && /[A-Za-z0-9_$]/.test(sql[i])) i++;
       const value = sql.slice(start, i).toLowerCase();
-      const kind: TokenKind = CLAUSE_KEYWORDS.has(value) ? 'keyword' : 'identifier';
+      const kind: TokenKind = CLAUSE_KEYWORDS.has(value)
+        ? 'keyword'
+        : 'identifier';
       tokens.push({ kind, value, start, end: i });
       continue;
     }
@@ -268,7 +291,11 @@ interface Scope {
   children: Scope[];
   /** Clause boundaries within THIS scope. Each entry: clause kind starting
    * at token index, ending at the next entry's start (or scope end). */
-  clauseBoundaries: { offsetStart: number; offsetEnd: number; clause: CursorScope['clause'] }[];
+  clauseBoundaries: {
+    offsetStart: number;
+    offsetEnd: number;
+    clause: CursorScope['clause'];
+  }[];
   /** Table refs declared in THIS scope's FROM/JOIN clauses. */
   tableRefs: ScopeTableRef[];
   /** CTE names declared in THIS scope's WITH preamble. */
@@ -285,7 +312,8 @@ export function findScopeAt(sql: string, offset: number): CursorScope | null {
   const meaningful = tokens.filter(
     t => t.kind !== 'whitespace' && t.kind !== 'comment',
   );
-  if (meaningful.length === 0) return { clause: 'generic', tableRefs: [], cteNames: [] };
+  if (meaningful.length === 0)
+    return { clause: 'generic', tableRefs: [], cteNames: [] };
 
   // Build the scope tree.
   const root: Scope = makeScope(0, sql.length, true, null);
@@ -378,7 +406,10 @@ function buildScopeTree(
       // Decide subquery vs transparent: peek first meaningful token after `(`.
       let firstIdx = i + 1;
       while (firstIdx < (matchIndex >= 0 ? matchIndex : to)) {
-        if (tokens[firstIdx].kind !== 'whitespace' && tokens[firstIdx].kind !== 'comment') {
+        if (
+          tokens[firstIdx].kind !== 'whitespace' &&
+          tokens[firstIdx].kind !== 'comment'
+        ) {
           break;
         }
         firstIdx++;
@@ -386,7 +417,8 @@ function buildScopeTree(
       const isSubquery =
         firstIdx < (matchIndex >= 0 ? matchIndex : to) &&
         tokens[firstIdx].kind === 'keyword' &&
-        (tokens[firstIdx].value === 'select' || tokens[firstIdx].value === 'with');
+        (tokens[firstIdx].value === 'select' ||
+          tokens[firstIdx].value === 'with');
 
       const child = makeScope(innerStart, innerEnd, isSubquery, current);
       current.children.push(child);
@@ -404,7 +436,11 @@ function buildScopeTree(
       if (isSubquery) {
         // Look back two non-trivial tokens for `AS` and the name before it.
         let j = i - 1;
-        if (j >= from && tokens[j].kind === 'keyword' && tokens[j].value === 'as') {
+        if (
+          j >= from &&
+          tokens[j].kind === 'keyword' &&
+          tokens[j].value === 'as'
+        ) {
           j--;
           if (j >= from && tokens[j].kind === 'identifier') {
             current.cteNames.push(tokens[j].value);
@@ -509,7 +545,11 @@ function buildScopeTree(
 }
 
 /** Find the next meaningful (non-whitespace, non-comment) token. */
-function nextMeaningful(tokens: SqlToken[], from: number, to: number): SqlToken | null {
+function nextMeaningful(
+  tokens: SqlToken[],
+  from: number,
+  to: number,
+): SqlToken | null {
   for (let i = from; i < to; i++) {
     const t = tokens[i];
     if (t.kind !== 'whitespace' && t.kind !== 'comment') return t;
@@ -564,7 +604,11 @@ function readTableRef(
 ): { ref: ScopeTableRef; consumedTo: number } | null {
   // Skip whitespace/comment
   let i = from;
-  while (i < to && (tokens[i].kind === 'whitespace' || tokens[i].kind === 'comment')) i++;
+  while (
+    i < to &&
+    (tokens[i].kind === 'whitespace' || tokens[i].kind === 'comment')
+  )
+    i++;
   if (i >= to) return null;
   if (tokens[i].kind === 'lparen') return null; // subquery — recursion handles it
 
@@ -601,7 +645,8 @@ function readTableRef(
       let aliasI = probeI + 1;
       while (
         aliasI < to &&
-        (tokens[aliasI].kind === 'whitespace' || tokens[aliasI].kind === 'comment')
+        (tokens[aliasI].kind === 'whitespace' ||
+          tokens[aliasI].kind === 'comment')
       ) {
         aliasI++;
       }
@@ -633,7 +678,10 @@ function findDeepestScope(scope: Scope, offset: number): Scope | null {
 }
 
 /** Within a scope, find the clause that contains `offset`. */
-function findClauseScopeFor(scope: Scope, offset: number): CursorScope['clause'] {
+function findClauseScopeFor(
+  scope: Scope,
+  offset: number,
+): CursorScope['clause'] {
   for (const c of scope.clauseBoundaries) {
     if (offset >= c.offsetStart && offset <= c.offsetEnd) {
       return c.clause;

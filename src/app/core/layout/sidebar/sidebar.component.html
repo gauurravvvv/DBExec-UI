@@ -47,10 +47,14 @@
           >
             <div class="link-content">
               <i [class]="item.icon"></i>
-              <span class="nav-text">{{ 'SIDEBAR.' + item.value | translate }}</span>
+              <span class="nav-text">{{
+                'SIDEBAR.' + item.value | translate
+              }}</span>
             </div>
-            <i class="pi pi-chevron-down submenu-arrow"
-               [class.expanded]="item.isExpanded"></i>
+            <i
+              class="pi pi-chevron-down submenu-arrow"
+              [class.expanded]="item.isExpanded"
+            ></i>
           </div>
 
           <!-- Menu item without subPermissions -->
@@ -64,7 +68,9 @@
           >
             <div class="link-content">
               <i [class]="item.icon"></i>
-              <span class="nav-text">{{ 'SIDEBAR.' + item.value | translate }}</span>
+              <span class="nav-text">{{
+                'SIDEBAR.' + item.value | translate
+              }}</span>
             </div>
           </a>
 
@@ -88,10 +94,14 @@
               >
                 <div class="link-content">
                   <i [class]="subItem.icon"></i>
-                  <span class="nav-text">{{ 'SIDEBAR.' + subItem.value | translate }}</span>
+                  <span class="nav-text">{{
+                    'SIDEBAR.' + subItem.value | translate
+                  }}</span>
                 </div>
-                <i class="pi pi-chevron-down submenu-arrow"
-                   [class.expanded]="subItem.isExpanded"></i>
+                <i
+                  class="pi pi-chevron-down submenu-arrow"
+                  [class.expanded]="subItem.isExpanded"
+                ></i>
               </div>
 
               <!-- Submenu item without children -->
@@ -104,7 +114,9 @@
               >
                 <div class="link-content">
                   <i [class]="subItem.icon"></i>
-                  <span class="nav-text">{{ 'SIDEBAR.' + subItem.value | translate }}</span>
+                  <span class="nav-text">{{
+                    'SIDEBAR.' + subItem.value | translate
+                  }}</span>
                 </div>
               </a>
 
@@ -144,10 +156,14 @@
       >
         <div class="link-content">
           <i [class]="nestedItem.icon"></i>
-          <span class="nav-text">{{ 'SIDEBAR.' + nestedItem.value | translate }}</span>
+          <span class="nav-text">{{
+            'SIDEBAR.' + nestedItem.value | translate
+          }}</span>
         </div>
-        <i class="pi pi-chevron-down submenu-arrow"
-           [class.expanded]="nestedItem.isExpanded"></i>
+        <i
+          class="pi pi-chevron-down submenu-arrow"
+          [class.expanded]="nestedItem.isExpanded"
+        ></i>
       </div>
 
       <!-- Nested item without children -->
@@ -160,7 +176,9 @@
       >
         <div class="link-content">
           <i [class]="nestedItem.icon"></i>
-          <span class="nav-text">{{ 'SIDEBAR.' + nestedItem.value | translate }}</span>
+          <span class="nav-text">{{
+            'SIDEBAR.' + nestedItem.value | translate
+          }}</span>
         </div>
       </a>
 

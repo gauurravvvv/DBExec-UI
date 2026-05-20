@@ -1,7 +1,11 @@
 import { Injectable, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
-import { DATASET, DATASOURCE, SYSTEM_ADMIN } from 'src/app/core/constants/api.constant';
+import {
+  DATASET,
+  DATASOURCE,
+  SYSTEM_ADMIN,
+} from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({
@@ -288,11 +292,14 @@ export class DatasetService {
     try {
       // POST /datasets/:datasetId/fields/validate
       return await lastValueFrom(
-        this.http.apiPost(DATASET.ADD_FIELD_PREFIX + datasetId + DATASET.VALIDATE_FIELD_SUFFIX, {
-          organisation,
-          datasetId,
-          customLogic,
-        }),
+        this.http.apiPost(
+          DATASET.ADD_FIELD_PREFIX + datasetId + DATASET.VALIDATE_FIELD_SUFFIX,
+          {
+            organisation,
+            datasetId,
+            customLogic,
+          },
+        ),
       );
     } finally {
       this._saving.set(false);

@@ -159,8 +159,7 @@ export class FilterOptionsCacheService {
           } as FilterValuesResult)
         );
       } catch (err: any) {
-        const message =
-          err?.error?.message || err?.message || 'Network error';
+        const message = err?.error?.message || err?.message || 'Network error';
         const result: FilterValuesResult = {
           ok: false,
           error: 'sql_error',
@@ -175,7 +174,8 @@ export class FilterOptionsCacheService {
 
     // Share the same in-flight promise for every requested id so two
     // simultaneous callers don't re-issue.
-    for (const id of ids) this.inFlight.set(this.key(id, search, page), fetchPromise);
+    for (const id of ids)
+      this.inFlight.set(this.key(id, search, page), fetchPromise);
 
     return fetchPromise;
   }
@@ -236,8 +236,7 @@ export class FilterOptionsCacheService {
       const filters: any[] = Array.isArray(payload.filters)
         ? payload.filters
         : [];
-      const results: Record<string, FilterValuesResult> =
-        payload.results || {};
+      const results: Record<string, FilterValuesResult> = payload.results || {};
       const now = Date.now();
       for (const [id, result] of Object.entries(results)) {
         this.store.set(this.key(id, '', 1), { result, ts: now });

@@ -41,7 +41,10 @@
             <div class="info-item">
               <label>{{ 'COMMON.DESCRIPTION' | translate }}</label>
               <p>
-                {{ analysisDetails.description || ('ANALYSES.NO_DESCRIPTION' | translate) }}
+                {{
+                  analysisDetails.description ||
+                    ('ANALYSES.NO_DESCRIPTION' | translate)
+                }}
               </p>
             </div>
             <div class="info-item">
@@ -55,7 +58,9 @@
               <label>{{ 'COMMON.DATASOURCE' | translate }}</label>
               <p class="with-icon">
                 <i class="pi pi-database mr-2"></i>
-                {{ datasetDetails?.datasource?.name || ('COMMON.NA' | translate) }}
+                {{
+                  datasetDetails?.datasource?.name || ('COMMON.NA' | translate)
+                }}
               </p>
             </div>
             <div class="info-item">
@@ -72,7 +77,11 @@
                       : 'pi-times-circle'
                   "
                 ></i>
-                {{ analysisDetails.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                {{
+                  analysisDetails.status === 1
+                    ? ('COMMON.ACTIVE' | translate)
+                    : ('COMMON.INACTIVE' | translate)
+                }}
               </span>
             </div>
             <div class="info-item">
@@ -210,7 +219,11 @@
               *ngFor="let visual of visuals; trackBy: trackById"
             >
               <i class="pi pi-chart-line"></i>
-              {{ visual.title || visual.name || ('ANALYSES.UNTITLED_VISUAL' | translate) }}
+              {{
+                visual.title ||
+                  visual.name ||
+                  ('ANALYSES.UNTITLED_VISUAL' | translate)
+              }}
             </div>
             <div *ngIf="!visuals || visuals.length === 0" class="no-data">
               {{ 'ANALYSES.NO_VISUALS_FOUND' | translate }}
@@ -246,7 +259,9 @@
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
-      <p class="delete-intro">{{ 'ANALYSES.CONFIRM_DELETE_SINGLE' | translate }}</p>
+      <p class="delete-intro">
+        {{ 'ANALYSES.CONFIRM_DELETE_SINGLE' | translate }}
+      </p>
 
       <ul class="delete-info-list">
         <li>

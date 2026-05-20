@@ -15,9 +15,7 @@
       <div class="warning-section" *ngIf="hasDuplicates">
         <div class="duplicate-warning">
           <i class="pi pi-exclamation-triangle"></i>
-          <span
-            >{{ 'PROMPT_MODULE.DUPLICATE_WARNING' | translate }}</span
-          >
+          <span>{{ 'PROMPT_MODULE.DUPLICATE_WARNING' | translate }}</span>
         </div>
       </div>
       <div class="action-buttons">
@@ -146,7 +144,10 @@
           *ngIf="selectedTab && sectionForm.get('tab')?.value"
         >
           <div class="fields-header">
-            <label>{{ 'PROMPT_MODULE.SECTION_GROUPS' | translate }}<span class="required">*</span></label>
+            <label
+              >{{ 'PROMPT_MODULE.SECTION_GROUPS' | translate
+              }}<span class="required">*</span></label
+            >
             <div class="button-group">
               <button
                 pButton
@@ -158,7 +159,11 @@
                 "
                 class="p-button-rounded p-button-text expand-collapse-btn"
                 (click)="areAllExpanded ? collapseAll() : expandAll()"
-                [pTooltip]="areAllExpanded ? ('COMMON.COLLAPSE_ALL' | translate) : ('COMMON.EXPAND_ALL' | translate)"
+                [pTooltip]="
+                  areAllExpanded
+                    ? ('COMMON.COLLAPSE_ALL' | translate)
+                    : ('COMMON.EXPAND_ALL' | translate)
+                "
                 tooltipPosition="bottom"
                 *ngIf="sectionGroups.length > 0"
               ></button>
@@ -236,7 +241,10 @@
                   class="section-count"
                   *ngIf="!isGroupExpanded(groupIndex)"
                 >
-                  {{ 'PROMPT_MODULE.PROMPT_COUNT' | translate: { count: getPrompts(groupIndex).length } }}
+                  {{
+                    'PROMPT_MODULE.PROMPT_COUNT'
+                      | translate: { count: getPrompts(groupIndex).length }
+                  }}
                 </span>
                 <button
                   pButton
@@ -286,7 +294,9 @@
                       <app-custom-input
                         formControlName="name"
                         [label]="'COMMON.NAME' | translate"
-                        [placeholder]="'PROMPT_MODULE.ENTER_PROMPT_NAME' | translate"
+                        [placeholder]="
+                          'PROMPT_MODULE.ENTER_PROMPT_NAME' | translate
+                        "
                         icon="pi-box"
                         [required]="true"
                         [showError]="

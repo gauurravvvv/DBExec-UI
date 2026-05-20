@@ -7,35 +7,35 @@
       </div>
 
       <div class="header-actions">
-          <!-- Bulk Delete Button -->
-          <button
-            *ngIf="selectedCount > 0"
-            pButton
-            [label]="('COMMON.DELETE' | translate) + ' (' + selectedCount + ')'"
-            icon="pi pi-trash"
-            (click)="confirmBulkDelete()"
-            class="p-button-raised p-button-danger modern-button"
-          ></button>
+        <!-- Bulk Delete Button -->
+        <button
+          *ngIf="selectedCount > 0"
+          pButton
+          [label]="('COMMON.DELETE' | translate) + ' (' + selectedCount + ')'"
+          icon="pi pi-trash"
+          (click)="confirmBulkDelete()"
+          class="p-button-raised p-button-danger modern-button"
+        ></button>
 
-          <!-- Clear Filters Button -->
-          <button
-            pButton
-            [label]="'COMMON.CLEAR' | translate"
-            icon="pi pi-filter-slash"
-            (click)="clearFilters()"
-            [disabled]="!isFilterActive"
-            class="p-button-outlined p-button-danger modern-button"
-          ></button>
+        <!-- Clear Filters Button -->
+        <button
+          pButton
+          [label]="'COMMON.CLEAR' | translate"
+          icon="pi pi-filter-slash"
+          (click)="clearFilters()"
+          [disabled]="!isFilterActive"
+          class="p-button-outlined p-button-danger modern-button"
+        ></button>
 
-          <!-- Add Button -->
-          <button
-            pButton
-            [label]="'COMMON.ADD' | translate"
-            icon="pi pi-plus"
-            (click)="onAddNewCategory()"
-            class="p-button-raised p-button-primary modern-button"
-          ></button>
-              </div>
+        <!-- Add Button -->
+        <button
+          pButton
+          [label]="'COMMON.ADD' | translate"
+          icon="pi pi-plus"
+          (click)="onAddNewCategory()"
+          class="p-button-raised p-button-primary modern-button"
+        ></button>
+      </div>
     </div>
 
     <!-- Unified Toolbar & Content Card -->
@@ -101,18 +101,33 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.NAME' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('name')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('name') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('name') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('name'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('name') > 0 && sortHelper.size > 1">{{ sortHelper.index('name') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('name')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up': sortHelper.direction('name') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('name') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('name'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('name') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('name') }}</span
+                    >
                   </span>
                 </div>
               </th>
               <th style="min-width: 20rem">
-                <div class="th-content">{{ 'COMMON.DESCRIPTION' | translate }}</div>
+                <div class="th-content">
+                  {{ 'COMMON.DESCRIPTION' | translate }}
+                </div>
               </th>
               <th style="width: 12rem; min-width: 12rem">
                 <div class="th-content">{{ 'COMMON.ROLE' | translate }}</div>
@@ -125,13 +140,26 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.STATUS' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('status')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('status') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('status') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('status'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('status') > 0 && sortHelper.size > 1">{{ sortHelper.index('status') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('status')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up': sortHelper.direction('status') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('status') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('status'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('status') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('status') }}</span
+                    >
                   </span>
                 </div>
               </th>
@@ -143,18 +171,34 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.CREATED_ON' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('createdOn')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('createdOn') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('createdOn') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('createdOn'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('createdOn') > 0 && sortHelper.size > 1">{{ sortHelper.index('createdOn') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('createdOn')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up':
+                          sortHelper.direction('createdOn') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('createdOn') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('createdOn'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('createdOn') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('createdOn') }}</span
+                    >
                   </span>
                 </div>
               </th>
               <th style="width: 7rem; min-width: 7rem">
-                <div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div>
+                <div class="th-content actions-th">
+                  {{ 'COMMON.ACTIONS' | translate }}
+                </div>
               </th>
             </tr>
             <!-- Filter Row -->
@@ -261,7 +305,11 @@
                 >
                   <span class="dot"></span>
                   <span class="label">
-                    {{ group.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                    {{
+                      group.status === 1
+                        ? ('COMMON.ACTIVE' | translate)
+                        : ('COMMON.INACTIVE' | translate)
+                    }}
                   </span>
                 </span>
               </td>
@@ -278,7 +326,11 @@
                   <button
                     class="icon-btn edit-btn"
                     (click)="onEdit(group.id)"
-                    [pTooltip]="group.isDefault === 1 ? ('GROUP.MANAGE_USERS' | translate) : ('COMMON.EDIT' | translate)"
+                    [pTooltip]="
+                      group.isDefault === 1
+                        ? ('GROUP.MANAGE_USERS' | translate)
+                        : ('COMMON.EDIT' | translate)
+                    "
                     tooltipPosition="bottom"
                   >
                     <i class="pi pi-pencil"></i>
@@ -306,13 +358,14 @@
                 <div class="empty-state-inline">
                   <i class="pi pi-search empty-state-icon"></i>
                   <span class="empty-state-text">
-                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash; {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
+                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash;
+                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
                   </span>
                 </div>
               </td>
             </tr>
           </ng-template>
-        
+
           <ng-template pTemplate="paginatorright">
             <button
               type="button"
@@ -344,9 +397,13 @@
       <p class="delete-intro" *ngIf="!bulkDelete">
         {{ 'GROUP.CONFIRM_DELETE_SINGLE' | translate }}
       </p>
-      <p class="delete-intro" *ngIf="bulkDelete"
-        [innerHTML]="'GROUP.CONFIRM_DELETE_BULK' | translate:{ count: selectedCount }">
-      </p>
+      <p
+        class="delete-intro"
+        *ngIf="bulkDelete"
+        [innerHTML]="
+          'GROUP.CONFIRM_DELETE_BULK' | translate: { count: selectedCount }
+        "
+      ></p>
 
       <ul class="delete-info-list">
         <li>
@@ -365,7 +422,8 @@
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"

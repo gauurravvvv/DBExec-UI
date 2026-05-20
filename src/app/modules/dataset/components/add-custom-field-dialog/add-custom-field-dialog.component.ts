@@ -13,6 +13,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
 import { FORMULA_EDITOR_OPTIONS } from '../../config/formula-editor.config';
@@ -23,7 +24,6 @@ import {
   getAllFunctions,
 } from '../../constants/functions-reference';
 import { DatasetService } from '../../services/dataset.service';
-import { TranslateService } from '@ngx-translate/core';
 import { ANALYTICAL_TYPES } from '../edit-dataset-fields-dialog/edit-dataset-fields-dialog.component';
 import {
   createFieldCompletionItem,
@@ -454,7 +454,10 @@ export class AddCustomFieldDialogComponent
 
     // Check if field name conflicts with a formula function name
     if (name && this.reservedNames.has(name)) {
-      this.fieldNameError = this.translate.instant('DATASET.RESERVED_FUNCTION_NAME', { name });
+      this.fieldNameError = this.translate.instant(
+        'DATASET.RESERVED_FUNCTION_NAME',
+        { name },
+      );
       this.isSaveEnabled = false;
       return;
     }
@@ -713,7 +716,7 @@ export class AddCustomFieldDialogComponent
     if (flat.length === 0) return;
 
     const currentIdx = this.selectedFunction
-      ? flat.findIndex((fn) => fn.name === this.selectedFunction!.name)
+      ? flat.findIndex(fn => fn.name === this.selectedFunction!.name)
       : -1;
 
     if (event.key === 'ArrowDown') {
@@ -755,7 +758,9 @@ export class AddCustomFieldDialogComponent
           this.isValidated = true;
           this.validationResult = {
             valid: true,
-            message: response.message || this.translate.instant('DATASET.FORMULA_VALIDATED'),
+            message:
+              response.message ||
+              this.translate.instant('DATASET.FORMULA_VALIDATED'),
           };
           // Update save button state - we just set isValidated to true above
           this.isSaveEnabled =
@@ -766,7 +771,9 @@ export class AddCustomFieldDialogComponent
           this.isValidated = false;
           this.validationResult = {
             valid: false,
-            message: response.message || this.translate.instant('DATASET.VALIDATION_FAILED'),
+            message:
+              response.message ||
+              this.translate.instant('DATASET.VALIDATION_FAILED'),
           };
         }
         this.cdr.markForCheck();
@@ -777,7 +784,8 @@ export class AddCustomFieldDialogComponent
         this.validationResult = {
           valid: false,
           message:
-            error?.error?.message || this.translate.instant('DATASET.VALIDATION_FAILED_RETRY'),
+            error?.error?.message ||
+            this.translate.instant('DATASET.VALIDATION_FAILED_RETRY'),
         };
         this.cdr.markForCheck();
       });

@@ -8,10 +8,10 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { SYSTEM_ADMIN } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
-import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SystemAdminService } from '../../services/system-admin.service';
 
@@ -155,11 +155,16 @@ export class EditSystemAdminComponent implements OnInit, HasUnsavedChanges {
 
   getFirstNameError(): string {
     const control = this.adminForm.get('firstName');
-    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.FIRST_NAME_REQUIRED');
+    if (control?.errors?.['required'])
+      return this.translate.instant('VALIDATION.FIRST_NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.FIRST_NAME_MIN', { min: control.errors['minlength'].requiredLength });
+      return this.translate.instant('VALIDATION.FIRST_NAME_MIN', {
+        min: control.errors['minlength'].requiredLength,
+      });
     if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.FIRST_NAME_MAX', { max: control.errors['maxlength'].requiredLength });
+      return this.translate.instant('VALIDATION.FIRST_NAME_MAX', {
+        max: control.errors['maxlength'].requiredLength,
+      });
     if (control?.errors?.['pattern'])
       return this.translate.instant('VALIDATION.FIRST_NAME_PATTERN');
     return '';
@@ -167,11 +172,16 @@ export class EditSystemAdminComponent implements OnInit, HasUnsavedChanges {
 
   getLastNameError(): string {
     const control = this.adminForm.get('lastName');
-    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.LAST_NAME_REQUIRED');
+    if (control?.errors?.['required'])
+      return this.translate.instant('VALIDATION.LAST_NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.LAST_NAME_MIN', { min: control.errors['minlength'].requiredLength });
+      return this.translate.instant('VALIDATION.LAST_NAME_MIN', {
+        min: control.errors['minlength'].requiredLength,
+      });
     if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.LAST_NAME_MAX', { max: control.errors['maxlength'].requiredLength });
+      return this.translate.instant('VALIDATION.LAST_NAME_MAX', {
+        max: control.errors['maxlength'].requiredLength,
+      });
     if (control?.errors?.['pattern'])
       return this.translate.instant('VALIDATION.LAST_NAME_PATTERN');
     return '';
@@ -179,8 +189,10 @@ export class EditSystemAdminComponent implements OnInit, HasUnsavedChanges {
 
   getEmailError(): string {
     const control = this.adminForm.get('email');
-    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.EMAIL_REQUIRED');
-    if (control?.errors?.['email']) return this.translate.instant('VALIDATION.EMAIL_INVALID');
+    if (control?.errors?.['required'])
+      return this.translate.instant('VALIDATION.EMAIL_REQUIRED');
+    if (control?.errors?.['email'])
+      return this.translate.instant('VALIDATION.EMAIL_INVALID');
     return '';
   }
 }

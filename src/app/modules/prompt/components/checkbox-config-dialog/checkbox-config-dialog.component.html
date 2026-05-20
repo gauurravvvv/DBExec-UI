@@ -11,10 +11,14 @@
   <div class="dialog-content">
     <div class="config-panel">
       <div class="panel-header">
-        <i class="pi pi-cog"></i><span>{{ 'PROMPT_MODULE.CONFIGURATION_OPTIONS' | translate }}</span>
+        <i class="pi pi-cog"></i
+        ><span>{{ 'PROMPT_MODULE.CONFIGURATION_OPTIONS' | translate }}</span>
       </div>
       <div class="config-form">
-        <div class="section-label"><i class="pi pi-sliders-h"></i> {{ 'PROMPT_MODULE.LAYOUT' | translate }}</div>
+        <div class="section-label">
+          <i class="pi pi-sliders-h"></i>
+          {{ 'PROMPT_MODULE.LAYOUT' | translate }}
+        </div>
 
         <div class="config-group">
           <label>{{ 'PROMPT_MODULE.ORIENTATION' | translate }}</label>
@@ -39,7 +43,9 @@
             appendTo="body"
           >
           </p-dropdown>
-          <small class="hint">{{ 'PROMPT_MODULE.COLUMNS_VERTICAL_HINT' | translate }}</small>
+          <small class="hint">{{
+            'PROMPT_MODULE.COLUMNS_VERTICAL_HINT' | translate
+          }}</small>
         </div>
         <div class="config-group">
           <label>{{ 'PROMPT_MODULE.GAP_BETWEEN_ITEMS' | translate }}</label>
@@ -54,7 +60,9 @@
           </p-dropdown>
         </div>
 
-        <div class="section-label"><i class="pi pi-eye"></i> {{ 'PROMPT_MODULE.APPEARANCE' | translate }}</div>
+        <div class="section-label">
+          <i class="pi pi-eye"></i> {{ 'PROMPT_MODULE.APPEARANCE' | translate }}
+        </div>
 
         <div class="config-group">
           <label>{{ 'PROMPT_MODULE.LABEL_POSITION' | translate }}</label>
@@ -87,7 +95,9 @@
           </p-dropdown>
         </div>
 
-        <div class="section-label"><i class="pi pi-cog"></i> {{ 'PROMPT_MODULE.BEHAVIOUR' | translate }}</div>
+        <div class="section-label">
+          <i class="pi pi-cog"></i> {{ 'PROMPT_MODULE.BEHAVIOUR' | translate }}
+        </div>
 
         <div class="config-row">
           <label>{{ 'PROMPT_MODULE.DISABLED' | translate }}</label>
@@ -104,10 +114,13 @@
 
     <div class="preview-panel">
       <div class="panel-header">
-        <i class="pi pi-eye"></i><span>{{ 'PROMPT_MODULE.PREVIEW' | translate }}</span>
+        <i class="pi pi-eye"></i
+        ><span>{{ 'PROMPT_MODULE.PREVIEW' | translate }}</span>
       </div>
       <div class="preview-content">
-        <div class="preview-label">{{ 'PROMPT_MODULE.TRY_IT_OUT' | translate }}</div>
+        <div class="preview-label">
+          {{ 'PROMPT_MODULE.TRY_IT_OUT' | translate }}
+        </div>
 
         <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
           <div *ngIf="formattedOptions.length > 0; else noOptions">
@@ -139,7 +152,9 @@
         <ng-template #noOptions>
           <div class="preview-hint">
             <i class="pi pi-info-circle"></i>
-            <span>{{ 'PROMPT_MODULE.ADD_VALUES_PREVIEW_CHECKBOX' | translate }}</span>
+            <span>{{
+              'PROMPT_MODULE.ADD_VALUES_PREVIEW_CHECKBOX' | translate
+            }}</span>
           </div>
         </ng-template>
 
@@ -147,7 +162,10 @@
           <i class="pi pi-bookmark"></i>
           <span
             >{{ 'PROMPT_MODULE.DEFAULT' | translate }}:
-            <strong>{{ config.defaultValues.length }} {{ 'PROMPT_MODULE.CHECKED' | translate }}</strong></span
+            <strong
+              >{{ config.defaultValues.length }}
+              {{ 'PROMPT_MODULE.CHECKED' | translate }}</strong
+            ></span
           >
           <button
             pButton
@@ -161,7 +179,8 @@
 
         <div class="config-summary">
           <div class="summary-title">
-            <i class="pi pi-info-circle"></i> {{ 'PROMPT_MODULE.ACTIVE_SETTINGS' | translate }}
+            <i class="pi pi-info-circle"></i>
+            {{ 'PROMPT_MODULE.ACTIVE_SETTINGS' | translate }}
           </div>
           <div class="summary-chips">
             <span
@@ -174,7 +193,8 @@
               *ngIf="
                 previewConfig.layout === 'vertical' && previewConfig.columns > 1
               "
-              >{{ previewConfig.columns }} {{ 'PROMPT_MODULE.COLS' | translate }}</span
+              >{{ previewConfig.columns }}
+              {{ 'PROMPT_MODULE.COLS' | translate }}</span
             >
             <span
               class="summary-chip"
@@ -182,20 +202,22 @@
               >{{ 'PROMPT_MODULE.LABEL_LEFT' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.gap !== 'medium'"
-              >{{ 'PROMPT_MODULE.GAP' | translate }}: {{ previewConfig.gap }}</span
+              >{{ 'PROMPT_MODULE.GAP' | translate }}:
+              {{ previewConfig.gap }}</span
             >
             <span
               class="summary-chip"
               *ngIf="previewConfig.checkboxIcon !== 'pi pi-check'"
               >{{ 'PROMPT_MODULE.CUSTOM_ICON' | translate }}</span
             >
-            <span class="summary-chip" *ngIf="previewConfig.disabled"
-              >{{ 'PROMPT_MODULE.DISABLED' | translate }}</span
-            >
+            <span class="summary-chip" *ngIf="previewConfig.disabled">{{
+              'PROMPT_MODULE.DISABLED' | translate
+            }}</span>
             <span
               class="summary-chip"
               *ngIf="previewConfig.defaultValues.length > 0"
-              >{{ previewConfig.defaultValues.length }} {{ 'PROMPT_MODULE.DEFAULT_LOWERCASE' | translate }}</span
+              >{{ previewConfig.defaultValues.length }}
+              {{ 'PROMPT_MODULE.DEFAULT_LOWERCASE' | translate }}</span
             >
             <span
               class="summary-empty"

@@ -41,7 +41,10 @@
             <div class="info-item">
               <label>{{ 'COMMON.DESCRIPTION' | translate }}</label>
               <p>
-                {{ connectionData.description || ('CONNECTION.NO_DESCRIPTION' | translate) }}
+                {{
+                  connectionData.description ||
+                    ('CONNECTION.NO_DESCRIPTION' | translate)
+                }}
               </p>
             </div>
             <div class="info-item">
@@ -58,7 +61,11 @@
                       : 'pi-times-circle'
                   "
                 ></i>
-                {{ connectionData.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                {{
+                  connectionData.status === 1
+                    ? ('COMMON.ACTIVE' | translate)
+                    : ('COMMON.INACTIVE' | translate)
+                }}
               </span>
             </div>
             <div class="info-item">
@@ -158,7 +165,9 @@
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>{{ 'CONNECTION.DELETE_AFFECTED_USERS_GROUPS' | translate }}</span>
+          <span>{{
+            'CONNECTION.DELETE_AFFECTED_USERS_GROUPS' | translate
+          }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
@@ -167,7 +176,10 @@
       </ul>
 
       <div class="justification-section">
-        <label>{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label>
+        <label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
+        >
         <textarea
           [(ngModel)]="deleteJustification"
           [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"

@@ -17,7 +17,6 @@
             )
           "
           [errorMessage]="getNameError()"
-
         >
         </app-custom-input>
       </div>
@@ -40,7 +39,8 @@
       <!-- Justification (for updates only) -->
       <div class="form-field justification-field" *ngIf="showJustification">
         <label for="saveJustification"
-          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
         >
         <textarea
           id="saveJustification"

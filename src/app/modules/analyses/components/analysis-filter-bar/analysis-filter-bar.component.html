@@ -4,9 +4,7 @@
          every filter — the legacy sidebar usage. When maxVisible is
          set (dashboard top-bar usage), it's the first N; the rest go
          into the overflow overlay below. -->
-    <ng-container
-      *ngFor="let filter of primaryFilters; trackBy: trackById"
-    >
+    <ng-container *ngFor="let filter of primaryFilters; trackBy: trackById">
       <ng-container
         *ngTemplateOutlet="filterChip; context: { $implicit: filter }"
       ></ng-container>
@@ -45,10 +43,7 @@
             *ngFor="let filter of overflowFilters; trackBy: trackById"
           >
             <ng-container
-              *ngTemplateOutlet="
-                filterChip;
-                context: { $implicit: filter }
-              "
+              *ngTemplateOutlet="filterChip; context: { $implicit: filter }"
             ></ng-container>
           </ng-container>
         </div>
@@ -96,7 +91,9 @@
           [pageSize]="100"
           optionLabel="label"
           optionValue="value"
-          [placeholder]="filter.config?.placeholder || ('ANALYSES.FILTER_SELECT' | translate)"
+          [placeholder]="
+            filter.config?.placeholder || ('ANALYSES.FILTER_SELECT' | translate)
+          "
           [showClear]="true"
           [filter]="true"
           [(ngModel)]="appliedValues[filter.id]"
@@ -106,7 +103,9 @@
         <!-- Truncation hint — surfaces when the BE returned a partial
              page so users know to type to search rather than scroll. -->
         <small class="filter-truncated-hint" *ngIf="truncatedFor(filter)">
-          {{ 'ANALYSES.FILTER_TRUNCATED' | translate: { count: totalFor(filter) } }}
+          {{
+            'ANALYSES.FILTER_TRUNCATED' | translate: { count: totalFor(filter) }
+          }}
         </small>
         <!-- Staleness row — chips for saved values that aren't in
              current source data. -->
@@ -148,7 +147,9 @@
           [pageSize]="100"
           optionLabel="label"
           optionValue="value"
-          [placeholder]="filter.config?.placeholder || ('ANALYSES.FILTER_SELECT' | translate)"
+          [placeholder]="
+            filter.config?.placeholder || ('ANALYSES.FILTER_SELECT' | translate)
+          "
           [filter]="true"
           [(ngModel)]="appliedValues[filter.id]"
           display="comma"
@@ -157,7 +158,9 @@
           [appendTo]="'body'"
         ></app-custom-multiselect>
         <small class="filter-truncated-hint" *ngIf="truncatedFor(filter)">
-          {{ 'ANALYSES.FILTER_TRUNCATED' | translate: { count: totalFor(filter) } }}
+          {{
+            'ANALYSES.FILTER_TRUNCATED' | translate: { count: totalFor(filter) }
+          }}
         </small>
         <div class="filter-stale-row" *ngIf="hasStaleValues(filter)">
           <i class="pi pi-exclamation-circle"></i>
@@ -268,7 +271,9 @@
       >
         <app-custom-input
           [label]="filter.name"
-          [placeholder]="filter.config?.placeholder || ('ANALYSES.FILTER_SEARCH' | translate)"
+          [placeholder]="
+            filter.config?.placeholder || ('ANALYSES.FILTER_SEARCH' | translate)
+          "
           [(ngModel)]="appliedValues[filter.id]"
           (ngModelChange)="onFilterChange(filter, appliedValues[filter.id])"
         >

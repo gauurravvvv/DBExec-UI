@@ -111,7 +111,10 @@ export class TabService {
     orgId: string,
   ) {
     return lastValueFrom(
-      this.http.apiPost(TAB.BULK_DELETE_PREFIX + orgId + TAB.BULK_DELETE_SUFFIX, { ids, justification }),
+      this.http.apiPost(
+        TAB.BULK_DELETE_PREFIX + orgId + TAB.BULK_DELETE_SUFFIX,
+        { ids, justification },
+      ),
     );
   }
 

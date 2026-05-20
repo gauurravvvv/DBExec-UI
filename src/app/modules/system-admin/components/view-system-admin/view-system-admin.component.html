@@ -89,7 +89,9 @@
         <div class="identity-meta">
           <div class="meta-item">
             <span class="label">{{ 'COMMON.ROLE' | translate }}</span>
-            <span class="value">{{ 'PROFILE.ROLE_SYSTEM_ADMIN' | translate }}</span>
+            <span class="value">{{
+              'PROFILE.ROLE_SYSTEM_ADMIN' | translate
+            }}</span>
           </div>
           <div class="meta-item">
             <span class="label">{{ 'COMMON.MEMBER_SINCE' | translate }}</span>
@@ -111,11 +113,17 @@
           <div class="info-group">
             <h4>{{ 'COMMON.PERSONAL_DETAILS' | translate }}</h4>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-user"></i> {{ 'COMMON.FIRST_NAME' | translate }}</span>
+              <span class="label"
+                ><i class="pi pi-user"></i>
+                {{ 'COMMON.FIRST_NAME' | translate }}</span
+              >
               <span class="value">{{ adminData?.firstName }}</span>
             </div>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-user"></i> {{ 'COMMON.LAST_NAME' | translate }}</span>
+              <span class="label"
+                ><i class="pi pi-user"></i>
+                {{ 'COMMON.LAST_NAME' | translate }}</span
+              >
               <span class="value">{{ adminData?.lastName }}</span>
             </div>
           </div>
@@ -124,11 +132,17 @@
           <div class="info-group">
             <h4>{{ 'COMMON.CONTACT_DETAILS' | translate }}</h4>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-envelope"></i> {{ 'COMMON.EMAIL' | translate }}</span>
+              <span class="label"
+                ><i class="pi pi-envelope"></i>
+                {{ 'COMMON.EMAIL' | translate }}</span
+              >
               <span class="value">{{ adminData?.email }}</span>
             </div>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-phone"></i> {{ 'COMMON.MOBILE' | translate }}</span>
+              <span class="label"
+                ><i class="pi pi-phone"></i>
+                {{ 'COMMON.MOBILE' | translate }}</span
+              >
               <span class="value">{{
                 adminData?.mobile || ('COMMON.NOT_PROVIDED' | translate)
               }}</span>
@@ -139,11 +153,17 @@
           <div class="info-group">
             <h4>{{ 'COMMON.ORGANISATION' | translate }}</h4>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-building"></i> {{ 'COMMON.NAME' | translate }}</span>
+              <span class="label"
+                ><i class="pi pi-building"></i>
+                {{ 'COMMON.NAME' | translate }}</span
+              >
               <span class="value">{{ adminData?.organisationName }}</span>
             </div>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-id-card"></i> {{ 'COMMON.ORG_ID' | translate }}</span>
+              <span class="label"
+                ><i class="pi pi-id-card"></i>
+                {{ 'COMMON.ORG_ID' | translate }}</span
+              >
               <span class="value">#{{ adminData?.organisationId }}</span>
             </div>
           </div>
@@ -152,7 +172,10 @@
           <div class="info-group">
             <h4>{{ 'COMMON.SYSTEM' | translate }}</h4>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-clock"></i> {{ 'COMMON.LAST_LOGIN' | translate }}</span>
+              <span class="label"
+                ><i class="pi pi-clock"></i>
+                {{ 'COMMON.LAST_LOGIN' | translate }}</span
+              >
               <span class="value">{{
                 adminData?.lastLogin
                   ? (adminData?.lastLogin | date: 'medium')
@@ -161,10 +184,13 @@
             </div>
             <div class="detail-row">
               <span class="label"
-                ><i class="pi pi-shield"></i> {{ 'COMMON.DEFAULT_USER' | translate }}</span
+                ><i class="pi pi-shield"></i>
+                {{ 'COMMON.DEFAULT_USER' | translate }}</span
               >
               <span class="value">{{
-                adminData?.isDefault === 1 ? ('COMMON.YES' | translate) : ('COMMON.NO' | translate)
+                adminData?.isDefault === 1
+                  ? ('COMMON.YES' | translate)
+                  : ('COMMON.NO' | translate)
               }}</span>
             </div>
           </div>
@@ -207,7 +233,8 @@
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"

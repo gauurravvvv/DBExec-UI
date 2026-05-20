@@ -33,7 +33,10 @@ export const FILTER_OPERATOR_KEYS: Record<
     { labelKey: 'ANALYSES.OPERATOR_EQUALS', value: 'EQUALS' },
     { labelKey: 'ANALYSES.OPERATOR_DOES_NOT_EQUAL', value: 'DOES_NOT_EQUAL' },
     { labelKey: 'ANALYSES.OPERATOR_CONTAINS', value: 'CONTAINS' },
-    { labelKey: 'ANALYSES.OPERATOR_DOES_NOT_CONTAIN', value: 'DOES_NOT_CONTAIN' },
+    {
+      labelKey: 'ANALYSES.OPERATOR_DOES_NOT_CONTAIN',
+      value: 'DOES_NOT_CONTAIN',
+    },
     { labelKey: 'ANALYSES.OPERATOR_STARTS_WITH', value: 'STARTS_WITH' },
     { labelKey: 'ANALYSES.OPERATOR_ENDS_WITH', value: 'ENDS_WITH' },
   ],
@@ -41,9 +44,15 @@ export const FILTER_OPERATOR_KEYS: Record<
     { labelKey: 'ANALYSES.OPERATOR_EQUALS', value: 'EQUALS' },
     { labelKey: 'ANALYSES.OPERATOR_NOT_EQUALS', value: 'NOT_EQUALS' },
     { labelKey: 'ANALYSES.OPERATOR_GREATER_THAN', value: 'GREATER_THAN' },
-    { labelKey: 'ANALYSES.OPERATOR_GREATER_THAN_OR_EQUAL', value: 'GREATER_THAN_OR_EQUAL' },
+    {
+      labelKey: 'ANALYSES.OPERATOR_GREATER_THAN_OR_EQUAL',
+      value: 'GREATER_THAN_OR_EQUAL',
+    },
     { labelKey: 'ANALYSES.OPERATOR_LESS_THAN', value: 'LESS_THAN' },
-    { labelKey: 'ANALYSES.OPERATOR_LESS_THAN_OR_EQUAL', value: 'LESS_THAN_OR_EQUAL' },
+    {
+      labelKey: 'ANALYSES.OPERATOR_LESS_THAN_OR_EQUAL',
+      value: 'LESS_THAN_OR_EQUAL',
+    },
   ],
   numeric_range: [{ labelKey: 'ANALYSES.OPERATOR_BETWEEN', value: 'BETWEEN' }],
   time_equality: [
@@ -172,11 +181,26 @@ export class FilterDialogComponent implements OnChanges {
     private translate: TranslateService,
   ) {
     this.filterTypeOptions = [
-      { label: this.translate.instant('ANALYSES.FILTER_TYPE_CATEGORY'), value: 'category' },
-      { label: this.translate.instant('ANALYSES.FILTER_TYPE_NUMERIC_EXACT'), value: 'numeric_equality' },
-      { label: this.translate.instant('ANALYSES.FILTER_TYPE_NUMERIC_RANGE'), value: 'numeric_range' },
-      { label: this.translate.instant('ANALYSES.FILTER_TYPE_DATETIME_EXACT'), value: 'time_equality' },
-      { label: this.translate.instant('ANALYSES.FILTER_TYPE_DATETIME_RANGE'), value: 'time_range' },
+      {
+        label: this.translate.instant('ANALYSES.FILTER_TYPE_CATEGORY'),
+        value: 'category',
+      },
+      {
+        label: this.translate.instant('ANALYSES.FILTER_TYPE_NUMERIC_EXACT'),
+        value: 'numeric_equality',
+      },
+      {
+        label: this.translate.instant('ANALYSES.FILTER_TYPE_NUMERIC_RANGE'),
+        value: 'numeric_range',
+      },
+      {
+        label: this.translate.instant('ANALYSES.FILTER_TYPE_DATETIME_EXACT'),
+        value: 'time_equality',
+      },
+      {
+        label: this.translate.instant('ANALYSES.FILTER_TYPE_DATETIME_RANGE'),
+        value: 'time_range',
+      },
     ];
     this.nullOptions = NULL_OPTION_KEYS.map(o => ({
       label: this.translate.instant(o.labelKey),
@@ -274,7 +298,9 @@ export class FilterDialogComponent implements OnChanges {
       ) {
         this.globalService.handleErrorService({
           status: false,
-          message: this.translate.instant('VALIDATION.RANGE_MIN_GREATER_THAN_MAX'),
+          message: this.translate.instant(
+            'VALIDATION.RANGE_MIN_GREATER_THAN_MAX',
+          ),
         });
         return;
       }
@@ -368,9 +394,7 @@ export class FilterDialogComponent implements OnChanges {
         // matches the current dialog flow).
         const savedFilter =
           res?.data?.filter ??
-          (Array.isArray(res?.data?.filters)
-            ? res.data.filters[0]
-            : null);
+          (Array.isArray(res?.data?.filters) ? res.data.filters[0] : null);
         this.visibleChange.emit(false);
         this.saved.emit(savedFilter);
       }
@@ -587,26 +611,47 @@ export class FilterDialogComponent implements OnChanges {
     switch (this.filterDialogType) {
       case 'category':
         this.controlTypeOptions = [
-          { label: this.translate.instant('ANALYSES.CONTROL_DROPDOWN'), value: 'dropdown' },
-          { label: this.translate.instant('ANALYSES.CONTROL_MULTI_SELECT'), value: 'list' },
+          {
+            label: this.translate.instant('ANALYSES.CONTROL_DROPDOWN'),
+            value: 'dropdown',
+          },
+          {
+            label: this.translate.instant('ANALYSES.CONTROL_MULTI_SELECT'),
+            value: 'list',
+          },
         ];
         break;
       case 'numeric_equality':
         this.controlTypeOptions = [
-          { label: this.translate.instant('ANALYSES.CONTROL_TEXT_INPUT'), value: 'text' },
-          { label: this.translate.instant('ANALYSES.CONTROL_DROPDOWN'), value: 'dropdown' },
+          {
+            label: this.translate.instant('ANALYSES.CONTROL_TEXT_INPUT'),
+            value: 'text',
+          },
+          {
+            label: this.translate.instant('ANALYSES.CONTROL_DROPDOWN'),
+            value: 'dropdown',
+          },
         ];
         break;
       case 'numeric_range':
         this.controlTypeOptions = [
-          { label: this.translate.instant('ANALYSES.CONTROL_SLIDER'), value: 'slider' },
-          { label: this.translate.instant('ANALYSES.CONTROL_TEXT_INPUT'), value: 'text' },
+          {
+            label: this.translate.instant('ANALYSES.CONTROL_SLIDER'),
+            value: 'slider',
+          },
+          {
+            label: this.translate.instant('ANALYSES.CONTROL_TEXT_INPUT'),
+            value: 'text',
+          },
         ];
         break;
       case 'time_equality':
       case 'time_range':
         this.controlTypeOptions = [
-          { label: this.translate.instant('ANALYSES.CONTROL_DATE_PICKER'), value: 'datepicker' },
+          {
+            label: this.translate.instant('ANALYSES.CONTROL_DATE_PICKER'),
+            value: 'datepicker',
+          },
         ];
         break;
       default:
@@ -709,7 +754,9 @@ export class FilterDialogComponent implements OnChanges {
     }
     const liveNorm = new Set(
       (this.filterDialogCategoryValues || []).map(o =>
-        String(o.value ?? '').trim().toLowerCase(),
+        String(o.value ?? '')
+          .trim()
+          .toLowerCase(),
       ),
     );
     this.filterDialogStaleDefaults = saved.filter(
@@ -737,7 +784,9 @@ export class FilterDialogComponent implements OnChanges {
         !stale.has(String(v).trim().toLowerCase()),
     );
     // Preserve single-vs-array shape; multi-select expects array.
-    this.filterDialogDefaultValue = Array.isArray(dv) ? next : next[0] ?? null;
+    this.filterDialogDefaultValue = Array.isArray(dv)
+      ? next
+      : (next[0] ?? null);
     this.recomputeStaleDefaults();
   }
 

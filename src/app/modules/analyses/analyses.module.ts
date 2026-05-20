@@ -20,8 +20,8 @@ import { VisualsChartSidebarComponent } from './components/visuals-chart-sidebar
 import {
   addAnalysesReducer,
   ADD_ANALYSES_FEATURE_KEY,
-  analysesFilterReducer,
   AnalysesFilterEffects,
+  analysesFilterReducer,
   ANALYSES_FILTER_FEATURE_KEY,
 } from './store';
 
@@ -48,10 +48,7 @@ import {
     MenuModule,
     // NgRx feature stores. Two slices — dataset cache + filter slice.
     StoreModule.forFeature(ADD_ANALYSES_FEATURE_KEY, addAnalysesReducer),
-    StoreModule.forFeature(
-      ANALYSES_FILTER_FEATURE_KEY,
-      analysesFilterReducer,
-    ),
+    StoreModule.forFeature(ANALYSES_FILTER_FEATURE_KEY, analysesFilterReducer),
     EffectsModule.forFeature([AnalysesFilterEffects]),
   ],
 })

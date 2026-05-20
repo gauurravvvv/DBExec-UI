@@ -27,10 +27,26 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
   @ViewChild('codeInput') codeInputRef!: ElementRef<HTMLInputElement>;
 
   features = [
-    { icon: 'desktop', titleKey: 'AUTH_FEATURES.CLI_1_TITLE', descKey: 'AUTH_FEATURES.CLI_1_DESC' },
-    { icon: 'shield', titleKey: 'AUTH_FEATURES.CLI_2_TITLE', descKey: 'AUTH_FEATURES.CLI_2_DESC' },
-    { icon: 'bolt', titleKey: 'AUTH_FEATURES.CLI_3_TITLE', descKey: 'AUTH_FEATURES.CLI_3_DESC' },
-    { icon: 'lock', titleKey: 'AUTH_FEATURES.CLI_4_TITLE', descKey: 'AUTH_FEATURES.CLI_4_DESC' },
+    {
+      icon: 'desktop',
+      titleKey: 'AUTH_FEATURES.CLI_1_TITLE',
+      descKey: 'AUTH_FEATURES.CLI_1_DESC',
+    },
+    {
+      icon: 'shield',
+      titleKey: 'AUTH_FEATURES.CLI_2_TITLE',
+      descKey: 'AUTH_FEATURES.CLI_2_DESC',
+    },
+    {
+      icon: 'bolt',
+      titleKey: 'AUTH_FEATURES.CLI_3_TITLE',
+      descKey: 'AUTH_FEATURES.CLI_3_DESC',
+    },
+    {
+      icon: 'lock',
+      titleKey: 'AUTH_FEATURES.CLI_4_TITLE',
+      descKey: 'AUTH_FEATURES.CLI_4_DESC',
+    },
   ];
 
   pageState = signal<
@@ -57,9 +73,7 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     if (!this.loginService.isLoggedIn()) {
       this.pageState.set('not-logged-in');
-      this.message.set(
-        this.translate.instant('AUTH.NEED_LOGIN_FOR_CLI'),
-      );
+      this.message.set(this.translate.instant('AUTH.NEED_LOGIN_FOR_CLI'));
       return;
     }
 
@@ -119,12 +133,19 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
             const d = response.data;
             this.message.set(
               d
-                ? this.translate.instant('AUTH.CLI_SIGNED_IN_AS', { name: d.name, role: d.role, org: d.organisation })
+                ? this.translate.instant('AUTH.CLI_SIGNED_IN_AS', {
+                    name: d.name,
+                    role: d.role,
+                    org: d.organisation,
+                  })
                 : this.translate.instant('AUTH.CLI_AUTHORIZED_MSG'),
             );
           } else {
             this.pageState.set('error');
-            this.message.set(response.message || this.translate.instant('AUTH.CLI_AUTH_FAILED'));
+            this.message.set(
+              response.message ||
+                this.translate.instant('AUTH.CLI_AUTH_FAILED'),
+            );
           }
           this.loading.set(false);
         },
@@ -157,16 +178,12 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
       .subscribe({
         next: () => {
           this.pageState.set('denied');
-          this.message.set(
-            this.translate.instant('AUTH.CLI_DENIED_MSG'),
-          );
+          this.message.set(this.translate.instant('AUTH.CLI_DENIED_MSG'));
           this.loading.set(false);
         },
         error: () => {
           this.pageState.set('denied');
-          this.message.set(
-            this.translate.instant('AUTH.CLI_DENIED_MSG'),
-          );
+          this.message.set(this.translate.instant('AUTH.CLI_DENIED_MSG'));
           this.loading.set(false);
         },
       });

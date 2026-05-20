@@ -15,13 +15,13 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { ANALYSES, DASHBOARD } from 'src/app/core/constants/routes.constant';
-import { DashboardService } from 'src/app/modules/dashboard/services/dashboard.service';
-import { PublishDashboardPayload } from '../publish-dashboard-dialog/publish-dashboard-dialog.component';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { DashboardService } from 'src/app/modules/dashboard/services/dashboard.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import {
   CHART_TYPES,
@@ -39,9 +39,8 @@ import {
   isWorldMapChartType,
 } from '../../constants/charts.constants';
 import { createVisual, Visual } from '../../models';
-import { AnalysesService } from '../../services/analyses.service';
-import { TranslateService } from '@ngx-translate/core';
 import { ChartDataTransformerService } from '../../services';
+import { AnalysesService } from '../../services/analyses.service';
 import {
   AddAnalysesActions,
   AnalysesFilterActions,
@@ -51,7 +50,6 @@ import {
   selectDatasetByKey,
   selectDatasetData,
   selectDatasetStatus,
-  selectFilterLoadStatus,
   selectIsDatasetLoaded,
   selectIsDatasetStale,
 } from '../../store';
@@ -61,6 +59,7 @@ import {
   FILTER_OPERATOR_KEYS,
   NULL_OPTION_KEYS,
 } from '../filter-dialog/filter-dialog.component';
+import { PublishDashboardPayload } from '../publish-dashboard-dialog/publish-dashboard-dialog.component';
 
 @Component({
   selector: 'app-edit-analyses',
@@ -359,11 +358,26 @@ export class EditAnalysesComponent
 
   ngOnInit(): void {
     this.filterTypeOptions = [
-      { label: this.translate.instant('ANALYSES.FILTER_TYPE_CATEGORY'), value: 'category' },
-      { label: this.translate.instant('ANALYSES.FILTER_TYPE_NUMERIC_EXACT'), value: 'numeric_equality' },
-      { label: this.translate.instant('ANALYSES.FILTER_TYPE_NUMERIC_RANGE'), value: 'numeric_range' },
-      { label: this.translate.instant('ANALYSES.FILTER_TYPE_DATETIME_EXACT'), value: 'time_equality' },
-      { label: this.translate.instant('ANALYSES.FILTER_TYPE_DATETIME_RANGE'), value: 'time_range' },
+      {
+        label: this.translate.instant('ANALYSES.FILTER_TYPE_CATEGORY'),
+        value: 'category',
+      },
+      {
+        label: this.translate.instant('ANALYSES.FILTER_TYPE_NUMERIC_EXACT'),
+        value: 'numeric_equality',
+      },
+      {
+        label: this.translate.instant('ANALYSES.FILTER_TYPE_NUMERIC_RANGE'),
+        value: 'numeric_range',
+      },
+      {
+        label: this.translate.instant('ANALYSES.FILTER_TYPE_DATETIME_EXACT'),
+        value: 'time_equality',
+      },
+      {
+        label: this.translate.instant('ANALYSES.FILTER_TYPE_DATETIME_RANGE'),
+        value: 'time_range',
+      },
     ];
 
     this.route.params
@@ -827,7 +841,9 @@ export class EditAnalysesComponent
             AddAnalysesActions.loadDatasetDataFailure({
               orgId: this.orgId,
               datasetId: this.datasetId,
-              error: response?.message || this.translate.instant('ANALYSES.FAILED_LOAD_GRAPH_DATA'),
+              error:
+                response?.message ||
+                this.translate.instant('ANALYSES.FAILED_LOAD_GRAPH_DATA'),
             }),
           );
         }
@@ -838,7 +854,9 @@ export class EditAnalysesComponent
           AddAnalysesActions.loadDatasetDataFailure({
             orgId: this.orgId,
             datasetId: this.datasetId,
-            error: error?.message || this.translate.instant('ANALYSES.ERROR_LOADING_GRAPH_DATA'),
+            error:
+              error?.message ||
+              this.translate.instant('ANALYSES.ERROR_LOADING_GRAPH_DATA'),
           }),
         );
       });
@@ -1241,11 +1259,13 @@ export class EditAnalysesComponent
    *     referencing the deleted column will surface their
    *     column_missing warning the next time the sidebar opens.
    *  4. Re-run /analyses/run to refresh rawGraphData with the new
-     *     (deleted-column-absent) projection. getMissingFields() then
-     *     correctly returns the deleted column name on affected
-     *     visuals, sustaining the empty-state across future renders.
+   *     (deleted-column-absent) projection. getMissingFields() then
+   *     correctly returns the deleted column name on affected
+   *     visuals, sustaining the empty-state across future renders.
    */
-  private handleFieldDeleted(deletedColumnKey: string | null | undefined): void {
+  private handleFieldDeleted(
+    deletedColumnKey: string | null | undefined,
+  ): void {
     this.loadAnalysisFields();
 
     if (deletedColumnKey) {
@@ -1411,12 +1431,16 @@ export class EditAnalysesComponent
 
   getOperatorLabel(filterType: string, operatorValue: string): string {
     const ops = FILTER_OPERATOR_KEYS[filterType] || [];
-    const match = ops.find((o: { labelKey: string; value: string }) => o.value === operatorValue);
+    const match = ops.find(
+      (o: { labelKey: string; value: string }) => o.value === operatorValue,
+    );
     return match ? this.translate.instant(match.labelKey) : operatorValue;
   }
 
   getNullOptionLabel(value: string): string {
-    const match = NULL_OPTION_KEYS.find((o: { labelKey: string; value: string }) => o.value === value);
+    const match = NULL_OPTION_KEYS.find(
+      (o: { labelKey: string; value: string }) => o.value === value,
+    );
     return match ? this.translate.instant(match.labelKey) : value;
   }
 
@@ -1436,14 +1460,25 @@ export class EditAnalysesComponent
     }
     if (config.defaultValue) {
       if (Array.isArray(config.defaultValue)) {
-        parts.push(this.translate.instant('ANALYSES.DEFAULT_VALUES_COUNT', { count: config.defaultValue.length }));
+        parts.push(
+          this.translate.instant('ANALYSES.DEFAULT_VALUES_COUNT', {
+            count: config.defaultValue.length,
+          }),
+        );
       } else {
-        parts.push(this.translate.instant('ANALYSES.DEFAULT_VALUE', { value: config.defaultValue }));
+        parts.push(
+          this.translate.instant('ANALYSES.DEFAULT_VALUE', {
+            value: config.defaultValue,
+          }),
+        );
       }
     }
     if (config.rangeMin !== undefined || config.rangeMax !== undefined) {
       parts.push(
-        this.translate.instant('ANALYSES.RANGE_SUMMARY', { min: config.rangeMin ?? '...', max: config.rangeMax ?? '...' }),
+        this.translate.instant('ANALYSES.RANGE_SUMMARY', {
+          min: config.rangeMin ?? '...',
+          max: config.rangeMax ?? '...',
+        }),
       );
     }
     if (config.dateRangeStart || config.dateRangeEnd) {
@@ -1785,8 +1820,7 @@ export class EditAnalysesComponent
       // configured a hidden list (e.g. opening an existing analysis).
       if (
         isTableChartType(visual.chartType) &&
-        (!visual.config ||
-          visual.config.tableHiddenColumns === undefined)
+        (!visual.config || visual.config.tableHiddenColumns === undefined)
       ) {
         this.seedTableHiddenColumns(visual);
       }

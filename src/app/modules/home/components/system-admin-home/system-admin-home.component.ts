@@ -108,11 +108,26 @@ export class SystemAdminHomeComponent implements OnInit {
 
   updateStats() {
     this.stats = [
-      { title: this.translate.instant('HOME.ACTIVE_USERS_24H'), value: this.activeUsers24hrs },
-      { title: this.translate.instant('HOME.ACTIVE_USERS_3D'), value: this.activeUsers3days },
-      { title: this.translate.instant('HOME.ACTIVE_USERS_7D'), value: this.activeUsers7days },
-      { title: this.translate.instant('HOME.ACTIVE_USERS_15D'), value: this.activeUsers15days },
-      { title: this.translate.instant('HOME.ACTIVE_USERS_30D'), value: this.activeUsers30days },
+      {
+        title: this.translate.instant('HOME.ACTIVE_USERS_24H'),
+        value: this.activeUsers24hrs,
+      },
+      {
+        title: this.translate.instant('HOME.ACTIVE_USERS_3D'),
+        value: this.activeUsers3days,
+      },
+      {
+        title: this.translate.instant('HOME.ACTIVE_USERS_7D'),
+        value: this.activeUsers7days,
+      },
+      {
+        title: this.translate.instant('HOME.ACTIVE_USERS_15D'),
+        value: this.activeUsers15days,
+      },
+      {
+        title: this.translate.instant('HOME.ACTIVE_USERS_30D'),
+        value: this.activeUsers30days,
+      },
     ];
 
     this.overviews = [

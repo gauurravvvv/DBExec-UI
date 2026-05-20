@@ -15,7 +15,11 @@
             class="pi"
             [ngClass]="isActive() ? 'pi-check-circle' : 'pi-times-circle'"
           ></i>
-          {{ isActive() ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+          {{
+            isActive()
+              ? ('COMMON.ACTIVE' | translate)
+              : ('COMMON.INACTIVE' | translate)
+          }}
         </span>
       </div>
       <div class="header-actions">
@@ -76,7 +80,12 @@
             </div>
             <div class="info-item full-width">
               <label>{{ 'COMMON.DESCRIPTION' | translate }}</label>
-              <p>{{ data.description || ('ANNOUNCEMENT.NO_DESCRIPTION' | translate) }}</p>
+              <p>
+                {{
+                  data.description ||
+                    ('ANNOUNCEMENT.NO_DESCRIPTION' | translate)
+                }}
+              </p>
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.ORGANISATION' | translate }}</label>
@@ -97,7 +106,9 @@
               <p class="with-icon">
                 <i class="pi pi-calendar mr-2"></i>
                 {{
-                  data.startTime ? (data.startTime | date: 'medium') : ('ANNOUNCEMENT.NOT_SET' | translate)
+                  data.startTime
+                    ? (data.startTime | date: 'medium')
+                    : ('ANNOUNCEMENT.NOT_SET' | translate)
                 }}
               </p>
             </div>
@@ -105,7 +116,11 @@
               <label>{{ 'ANNOUNCEMENT.END_DATE' | translate }}</label>
               <p class="with-icon">
                 <i class="pi pi-calendar mr-2"></i>
-                {{ data.endTime ? (data.endTime | date: 'medium') : ('ANNOUNCEMENT.NOT_SET' | translate) }}
+                {{
+                  data.endTime
+                    ? (data.endTime | date: 'medium')
+                    : ('ANNOUNCEMENT.NOT_SET' | translate)
+                }}
               </p>
             </div>
             <div class="info-item">

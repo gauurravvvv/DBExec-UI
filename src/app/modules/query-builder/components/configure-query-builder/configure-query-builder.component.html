@@ -21,7 +21,11 @@
         <button
           pButton
           type="button"
-          [label]="isFreeze ? ('COMMON.UNLOCK' | translate) : ('COMMON.LOCK' | translate)"
+          [label]="
+            isFreeze
+              ? ('COMMON.UNLOCK' | translate)
+              : ('COMMON.LOCK' | translate)
+          "
           class="p-button-outlined"
           (click)="screenState()"
           *ngIf="hasSelectedPrompts()"
@@ -35,7 +39,11 @@
         <button
           pButton
           type="button"
-          [label]="hasExistingConfiguration() ? ('COMMON.CANCEL' | translate) : ('COMMON.CLEAR' | translate)"
+          [label]="
+            hasExistingConfiguration()
+              ? ('COMMON.CANCEL' | translate)
+              : ('COMMON.CLEAR' | translate)
+          "
           class="p-button-outlined p-button-danger"
           (click)="handleCancelOrClear()"
           *ngIf="
@@ -64,7 +72,9 @@
     <div class="screen-wrapper">
       <div class="sidebar" [class.collapsed]="isSidebarCollapsed">
         <div class="sidebar-content">
-          <div class="rotated-title" *ngIf="isSidebarCollapsed">{{ 'QUERY_BUILDER_MODULE.TABS' | translate }}</div>
+          <div class="rotated-title" *ngIf="isSidebarCollapsed">
+            {{ 'QUERY_BUILDER_MODULE.TABS' | translate }}
+          </div>
 
           <div class="sidebar-header" *ngIf="!isSidebarCollapsed">
             <h3>{{ 'QUERY_BUILDER_MODULE.AVAILABLE_TABS' | translate }}</h3>
@@ -81,7 +91,8 @@
                 <div class="tab-info">
                   <span class="tab-name">{{ tab.name }}</span>
                   <span class="section-count"
-                    >- {{ tab?.sections?.length || 0 }} {{ 'COMMON.SECTIONS' | translate }}</span
+                    >- {{ tab?.sections?.length || 0 }}
+                    {{ 'COMMON.SECTIONS' | translate }}</span
                   >
                 </div>
               </div>
@@ -91,7 +102,9 @@
           <div class="sidebar-footer" *ngIf="isFreeze && !isSidebarCollapsed">
             <div class="helper-note">
               <i class="pi pi-info-circle"></i>
-              <span>{{ 'QUERY_BUILDER_MODULE.UNLOCK_TO_MODIFY' | translate }}</span>
+              <span>{{
+                'QUERY_BUILDER_MODULE.UNLOCK_TO_MODIFY' | translate
+              }}</span>
             </div>
           </div>
         </div>
@@ -109,7 +122,9 @@
 
       <div class="main-content" [class.expanded]="isSidebarCollapsed">
         <div class="helper-text-container" *ngIf="!openTabs.length">
-          <div class="helper-text">{{ 'QUERY_BUILDER_MODULE.CLICK_TAB_TO_CONFIGURE' | translate }}</div>
+          <div class="helper-text">
+            {{ 'QUERY_BUILDER_MODULE.CLICK_TAB_TO_CONFIGURE' | translate }}
+          </div>
         </div>
 
         <div class="tab-container" *ngIf="openTabs.length">
@@ -245,7 +260,9 @@
                               [binary]="true"
                               (onChange)="toggleAllPrompts(section)"
                             ></p-checkbox>
-                            <span class="select-all-label">{{ 'COMMON.INCLUDE_ALL' | translate }}</span>
+                            <span class="select-all-label">{{
+                              'COMMON.INCLUDE_ALL' | translate
+                            }}</span>
                           </div>
                         </div>
                       </div>
@@ -347,8 +364,12 @@
     <h3>{{ 'COMMON.CONFIRM' | translate }}</h3>
     <p>{{ 'QUERY_BUILDER_MODULE.REVERT_CONFIRM' | translate }}</p>
     <div class="popup-actions">
-      <button class="btn-cancel" (click)="closeDialog()">{{ 'COMMON.NO' | translate }}</button>
-      <button class="btn-confirm" (click)="clearSelected()">{{ 'COMMON.YES' | translate }}</button>
+      <button class="btn-cancel" (click)="closeDialog()">
+        {{ 'COMMON.NO' | translate }}
+      </button>
+      <button class="btn-confirm" (click)="clearSelected()">
+        {{ 'COMMON.YES' | translate }}
+      </button>
     </div>
   </div>
 </div>
@@ -358,8 +379,12 @@
     <h3>{{ 'COMMON.CONFIRM' | translate }}</h3>
     <p>{{ 'QUERY_BUILDER_MODULE.CLEAR_ALL_SELECTIONS' | translate }}</p>
     <div class="popup-actions">
-      <button class="btn-cancel" (click)="closeDialog()">{{ 'COMMON.NO' | translate }}</button>
-      <button class="btn-confirm" (click)="clearAllSelections()">{{ 'COMMON.YES' | translate }}</button>
+      <button class="btn-cancel" (click)="closeDialog()">
+        {{ 'COMMON.NO' | translate }}
+      </button>
+      <button class="btn-confirm" (click)="clearAllSelections()">
+        {{ 'COMMON.YES' | translate }}
+      </button>
     </div>
   </div>
 </div>

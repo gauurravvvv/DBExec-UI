@@ -138,7 +138,10 @@
 
         <!-- Groups -->
         <div class="form-field">
-          <label>{{ 'USER.GROUPS' | translate }} <span class="required">*</span></label>
+          <label
+            >{{ 'USER.GROUPS' | translate }}
+            <span class="required">*</span></label
+          >
           <app-custom-multiselect
             formControlName="groupIds"
             [serverMode]="true"
@@ -166,7 +169,10 @@
 
         <!-- Language / Locale -->
         <div class="form-field">
-          <label>{{ 'USER.LANGUAGE' | translate }} <span class="required">*</span></label>
+          <label
+            >{{ 'USER.LANGUAGE' | translate }}
+            <span class="required">*</span></label
+          >
           <app-custom-dropdown
             formControlName="locale"
             [options]="locales"

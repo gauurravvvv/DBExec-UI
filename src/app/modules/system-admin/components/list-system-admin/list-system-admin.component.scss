@@ -149,7 +149,11 @@
 
       // When pButton directive is used + primary class
       &.p-button-primary {
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--primary-hover)
+        );
         color: var(--primary-text);
         border: none;
         box-shadow: 0 4px 10px var(--primary-color-transparent);
@@ -263,7 +267,9 @@
           // indicator pops in. No background fill — keep the chrome calm.
           &:hover {
             color: var(--text-color);
-            .sort-indicator { opacity: 1; }
+            .sort-indicator {
+              opacity: 1;
+            }
           }
 
           // Active sort: column header itself becomes the primary colour;
@@ -273,7 +279,9 @@
             background: transparent;
             .sort-indicator {
               opacity: 1;
-              .pi { color: var(--primary-color); }
+              .pi {
+                color: var(--primary-color);
+              }
             }
           }
 
@@ -427,8 +435,12 @@
       // horizontally.
       .p-datatable-thead > tr > th.p-frozen-column-end,
       .p-datatable-tbody > tr > td.p-frozen-column-end,
-      .p-datatable-thead > tr > th.p-frozen-column:has(+ :not(.p-frozen-column)),
-      .p-datatable-tbody > tr > td.p-frozen-column:has(+ :not(.p-frozen-column)) {
+      .p-datatable-thead
+        > tr
+        > th.p-frozen-column:has(+ :not(.p-frozen-column)),
+      .p-datatable-tbody
+        > tr
+        > td.p-frozen-column:has(+ :not(.p-frozen-column)) {
         box-shadow: 4px 0 6px -4px rgba(0, 0, 0, 0.08);
       }
 
@@ -544,7 +556,9 @@
             background-color var(--motion-fast) ease,
             color var(--motion-fast) ease;
 
-          i { font-size: var(--fs-body); }
+          i {
+            font-size: var(--fs-body);
+          }
 
           &:hover {
             background: var(--card-background);
@@ -910,7 +924,11 @@ td.empty-message-cell {
         }
 
         &.btn-confirm {
-          background: linear-gradient(135deg, var(--error-color), var(--error-color));
+          background: linear-gradient(
+            135deg,
+            var(--error-color),
+            var(--error-color)
+          );
           color: var(--primary-text);
           box-shadow: 0 4px 14px var(--error-bg);
           &:hover:not(:disabled) {

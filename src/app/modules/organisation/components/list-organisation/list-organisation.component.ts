@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -16,7 +17,6 @@ import { ORGANISATION } from 'src/app/core/constants/routes.constant';
 import { IParams } from 'src/app/core/models/global.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
-import { TranslateService } from '@ngx-translate/core';
 import { OrganisationService } from '../../services/organisation.service';
 
 type OrgSortField = 'name' | 'status' | 'createdOn';

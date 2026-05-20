@@ -182,7 +182,9 @@ export class OrganisationService {
         payload.sesFrom = sesFrom;
       }
 
-      return await lastValueFrom(this.http.apiPut(ORGANISATION.UPDATE + payload.id, payload));
+      return await lastValueFrom(
+        this.http.apiPut(ORGANISATION.UPDATE + payload.id, payload),
+      );
     } finally {
       this._saving.set(false);
     }
@@ -345,7 +347,9 @@ export class OrganisationService {
       payload.sesFrom = sesFrom;
     }
 
-    return lastValueFrom(this.http.apiPut(ORGANISATION.UPDATE + payload.id, payload));
+    return lastValueFrom(
+      this.http.apiPut(ORGANISATION.UPDATE + payload.id, payload),
+    );
   }
 
   bulkDeleteOrganisation(ids: string[], justification?: string) {

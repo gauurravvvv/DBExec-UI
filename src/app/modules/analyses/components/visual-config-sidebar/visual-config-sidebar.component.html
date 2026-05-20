@@ -29,7 +29,10 @@
       </div>
 
       <!-- Color Scheme — hidden for table visuals (palette does not apply) -->
-      <div class="config-group" *ngIf="!isTableChartType(focusedVisual.chartType)">
+      <div
+        class="config-group"
+        *ngIf="!isTableChartType(focusedVisual.chartType)"
+      >
         <label>{{ 'ANALYSES.COLOR_SCHEME' | translate }}</label>
         <app-custom-dropdown
           [options]="colorSchemes"
@@ -45,7 +48,9 @@
         class="config-section"
         *ngIf="isTableChartType(focusedVisual.chartType)"
       >
-        <div class="section-title">{{ 'ANALYSES.TABLE_OPTIONS' | translate }}</div>
+        <div class="section-title">
+          {{ 'ANALYSES.TABLE_OPTIONS' | translate }}
+        </div>
         <div class="config-row">
           <label>{{ 'ANALYSES.TABLE_COMPACT' | translate }}</label>
           <app-custom-toggle
@@ -77,7 +82,9 @@
           tableAvailableColumns.length > 0
         "
       >
-        <div class="section-title">{{ 'ANALYSES.TABLE_COLUMNS' | translate }}</div>
+        <div class="section-title">
+          {{ 'ANALYSES.TABLE_COLUMNS' | translate }}
+        </div>
         <div
           class="config-row"
           *ngFor="let col of tableAvailableColumns; trackBy: trackByValue"
@@ -191,7 +198,9 @@
         class="config-section"
         *ngIf="supportsDataLabel(focusedVisual.chartType)"
       >
-        <div class="section-title">{{ 'ANALYSES.DATA_LABELS' | translate }}</div>
+        <div class="section-title">
+          {{ 'ANALYSES.DATA_LABELS' | translate }}
+        </div>
         <div class="config-row">
           <label>{{ 'ANALYSES.SHOW_LABELS' | translate }}</label>
           <app-custom-toggle
@@ -366,7 +375,9 @@
           supportsToolbox(focusedVisual.chartType)
         "
       >
-        <div class="section-title">{{ 'ANALYSES.INTERACTIVE' | translate }}</div>
+        <div class="section-title">
+          {{ 'ANALYSES.INTERACTIVE' | translate }}
+        </div>
         <div
           class="config-row"
           *ngIf="supportsDataZoom(focusedVisual.chartType)"
@@ -392,7 +403,9 @@
       <!-- ===== Bar Series Options ===== -->
       <ng-container *ngIf="isBarChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.BAR_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.BAR_OPTIONS' | translate }}
+          </div>
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.barWidth"
@@ -447,7 +460,9 @@
       <!-- ===== Line Series Options ===== -->
       <ng-container *ngIf="isLineChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.LINE_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.LINE_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.SMOOTH_CURVE' | translate }}</label>
             <app-custom-toggle
@@ -562,7 +577,9 @@
       <!-- ===== Area Series Options ===== -->
       <ng-container *ngIf="isAreaChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.AREA_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.AREA_OPTIONS' | translate }}
+          </div>
           <div class="config-group">
             <label>{{ 'ANALYSES.AREA_OPACITY' | translate }}</label>
             <app-custom-number
@@ -687,7 +704,9 @@
       <!-- ===== Pie Series Options ===== -->
       <ng-container *ngIf="isPieChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.PIE_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.PIE_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.SHOW_LABELS' | translate }}</label>
             <app-custom-toggle
@@ -855,7 +874,9 @@
         "
       >
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.RADAR_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.RADAR_OPTIONS' | translate }}
+          </div>
           <div class="config-group">
             <label>{{ 'ANALYSES.SHAPE' | translate }}</label>
             <app-custom-dropdown
@@ -927,7 +948,9 @@
       <!-- ===== Gauge Series Options ===== -->
       <ng-container *ngIf="isGaugeChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.GAUGE_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.GAUGE_OPTIONS' | translate }}
+          </div>
           <div class="config-group">
             <label>{{ 'ANALYSES.MIN_VALUE' | translate }}</label>
             <app-custom-number
@@ -1089,7 +1112,9 @@
       <!-- ===== Card Options ===== -->
       <ng-container *ngIf="isCardChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.CARD_DISPLAY' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.CARD_DISPLAY' | translate }}
+          </div>
           <div class="config-group">
             <label>{{ 'ANALYSES.INNER_PADDING' | translate }}</label>
             <app-custom-number
@@ -1106,7 +1131,9 @@
       <!-- ===== Scatter Series Options ===== -->
       <ng-container *ngIf="isScatterChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.SCATTER_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.SCATTER_OPTIONS' | translate }}
+          </div>
           <div class="config-group">
             <label>{{ 'ANALYSES.SYMBOL_SIZE' | translate }}</label>
             <app-custom-number
@@ -1197,7 +1224,9 @@
       <!-- ===== Bubble Series Options ===== -->
       <ng-container *ngIf="isBubbleChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.BUBBLE_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.BUBBLE_OPTIONS' | translate }}
+          </div>
           <div class="config-group">
             <label>{{ 'ANALYSES.MIN_BUBBLE_SIZE' | translate }}</label>
             <app-custom-number
@@ -1224,7 +1253,9 @@
       <!-- ===== Box Chart Options ===== -->
       <ng-container *ngIf="isBoxChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.BOX_PLOT_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.BOX_PLOT_OPTIONS' | translate }}
+          </div>
           <div class="config-group">
             <label>{{ 'ANALYSES.LAYOUT' | translate }}</label>
             <app-custom-dropdown
@@ -1282,7 +1313,9 @@
       <!-- ===== Heatmap Series Options ===== -->
       <ng-container *ngIf="isHeatMapChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.HEATMAP_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.HEATMAP_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.SHOW_CELL_VALUES' | translate }}</label>
             <app-custom-toggle
@@ -1296,7 +1329,9 @@
       <!-- ===== Treemap Series Options ===== -->
       <ng-container *ngIf="isTreeMapChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.TREEMAP_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.TREEMAP_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.SHOW_LABELS' | translate }}</label>
             <app-custom-toggle
@@ -1343,7 +1378,9 @@
       <!-- ===== Funnel Series Options ===== -->
       <ng-container *ngIf="isFunnelChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.FUNNEL_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.FUNNEL_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.SHOW_LABELS' | translate }}</label>
             <app-custom-toggle
@@ -1413,7 +1450,9 @@
       <!-- ===== Sunburst Series Options ===== -->
       <ng-container *ngIf="isSunburstChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.SUNBURST_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.SUNBURST_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.SHOW_LABELS' | translate }}</label>
             <app-custom-toggle
@@ -1465,7 +1504,9 @@
       <!-- ===== Sankey Series Options ===== -->
       <ng-container *ngIf="isSankeyChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.SANKEY_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.SANKEY_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.SHOW_LABELS' | translate }}</label>
             <app-custom-toggle
@@ -1543,7 +1584,9 @@
       <!-- ===== Waterfall Options ===== -->
       <ng-container *ngIf="isWaterfallChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.WATERFALL_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.WATERFALL_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.SHOW_TOTAL_BAR' | translate }}</label>
             <app-custom-toggle
@@ -1564,7 +1607,9 @@
       <!-- ===== Graph Series Options ===== -->
       <ng-container *ngIf="isGraphChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.GRAPH_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.GRAPH_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.SHOW_LABELS' | translate }}</label>
             <app-custom-toggle
@@ -1672,7 +1717,9 @@
       <!-- ===== Tree Series Options ===== -->
       <ng-container *ngIf="isTreeChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.TREE_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.TREE_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.SHOW_LABELS' | translate }}</label>
             <app-custom-toggle
@@ -1747,7 +1794,9 @@
       <!-- ===== Theme River Series Options ===== -->
       <ng-container *ngIf="isThemeRiverChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.THEME_RIVER_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.THEME_RIVER_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.SHOW_LABELS' | translate }}</label>
             <app-custom-toggle
@@ -1761,7 +1810,9 @@
       <!-- ===== Pictorial Bar Series Options ===== -->
       <ng-container *ngIf="isPictorialBarChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.PICTORIAL_BAR_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.PICTORIAL_BAR_OPTIONS' | translate }}
+          </div>
           <div class="config-group">
             <label>{{ 'ANALYSES.SYMBOL_SHAPE' | translate }}</label>
             <app-custom-dropdown
@@ -1820,7 +1871,9 @@
       <!-- ===== Polar Bar Series Options ===== -->
       <ng-container *ngIf="isPolarBarChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.POLAR_BAR_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.POLAR_BAR_OPTIONS' | translate }}
+          </div>
           <div class="config-group">
             <label>{{ 'ANALYSES.INNER_RADIUS' | translate }}</label>
             <app-custom-number
@@ -1851,7 +1904,9 @@
       <!-- ===== Candlestick Options ===== -->
       <ng-container *ngIf="isCandlestickChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.CANDLESTICK_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.CANDLESTICK_OPTIONS' | translate }}
+          </div>
           <div class="config-group">
             <label>{{ 'ANALYSES.BULL_UP_COLOR' | translate }}</label>
             <input
@@ -1932,7 +1987,9 @@
       <!-- ===== Parallel Options ===== -->
       <ng-container *ngIf="isParallelChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.PARALLEL_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.PARALLEL_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.SMOOTH_LINES' | translate }}</label>
             <app-custom-toggle
@@ -2000,7 +2057,9 @@
         "
       >
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.THREE_D_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.THREE_D_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.AUTO_ROTATE' | translate }}</label>
             <app-custom-toggle
@@ -2051,7 +2110,9 @@
       <!-- ===== Surface-Specific Options ===== -->
       <ng-container *ngIf="isSurfaceChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.SURFACE_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.SURFACE_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.SHOW_WIREFRAME' | translate }}</label>
             <app-custom-toggle
@@ -2072,7 +2133,9 @@
       <!-- ===== Globe Options ===== -->
       <ng-container *ngIf="isGlobeChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.GLOBE_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.GLOBE_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.AUTO_ROTATE' | translate }}</label>
             <app-custom-toggle
@@ -2086,7 +2149,9 @@
       <!-- ===== World Map Options ===== -->
       <ng-container *ngIf="isWorldMapChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.WORLD_MAP_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.WORLD_MAP_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.ENABLE_ZOOM_PAN' | translate }}</label>
             <app-custom-toggle
@@ -2123,7 +2188,9 @@
       <!-- ===== Flow Lines Options ===== -->
       <ng-container *ngIf="isFlowLinesChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.FLOW_LINES_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.FLOW_LINES_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.ANIMATED_EFFECT' | translate }}</label>
             <app-custom-toggle
@@ -2179,7 +2246,9 @@
       <!-- ===== Lines 3D Options ===== -->
       <ng-container *ngIf="isLines3dChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.LINES_3D_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.LINES_3D_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.AUTO_ROTATE_GLOBE' | translate }}</label>
             <app-custom-toggle
@@ -2242,7 +2311,9 @@
       <!-- ===== Polygons 3D Options ===== -->
       <ng-container *ngIf="isPolygons3dChartType(focusedVisual.chartType)">
         <div class="config-section">
-          <div class="section-title">{{ 'ANALYSES.POLYGONS_3D_OPTIONS' | translate }}</div>
+          <div class="section-title">
+            {{ 'ANALYSES.POLYGONS_3D_OPTIONS' | translate }}
+          </div>
           <div class="config-row">
             <label>{{ 'ANALYSES.AUTO_ROTATE_GLOBE' | translate }}</label>
             <app-custom-toggle

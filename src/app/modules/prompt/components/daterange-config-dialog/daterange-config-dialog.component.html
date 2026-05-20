@@ -24,7 +24,9 @@
           <app-custom-input
             [(ngModel)]="config.placeholder"
             [label]="'PROMPT_MODULE.PLACEHOLDER_TEXT' | translate"
-            [placeholder]="'PROMPT_MODULE.PLACEHOLDER_DATE_RANGE_EXAMPLE' | translate"
+            [placeholder]="
+              'PROMPT_MODULE.PLACEHOLDER_DATE_RANGE_EXAMPLE' | translate
+            "
           >
           </app-custom-input>
         </div>
@@ -94,7 +96,9 @@
         </div>
 
         <div class="config-row">
-          <label>{{ 'PROMPT_MODULE.ALLOW_SELECT_OTHER_MONTHS' | translate }}</label>
+          <label>{{
+            'PROMPT_MODULE.ALLOW_SELECT_OTHER_MONTHS' | translate
+          }}</label>
           <p-inputSwitch
             [(ngModel)]="config.selectOtherMonths"
             [disabled]="!config.showOtherMonths"
@@ -190,9 +194,9 @@
               {{ day.label }}
             </span>
           </div>
-          <small class="hint"
-            >{{ 'PROMPT_MODULE.DISABLED_DAYS_PICKER_HINT' | translate }}</small
-          >
+          <small class="hint">{{
+            'PROMPT_MODULE.DISABLED_DAYS_PICKER_HINT' | translate
+          }}</small>
         </div>
       </div>
       <div class="apply-preview-action">
@@ -211,7 +215,9 @@
       </div>
 
       <div class="preview-content">
-        <div class="preview-label">{{ 'PROMPT_MODULE.TRY_IT_OUT' | translate }}</div>
+        <div class="preview-label">
+          {{ 'PROMPT_MODULE.TRY_IT_OUT' | translate }}
+        </div>
 
         <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
           <app-custom-daterange
@@ -281,38 +287,44 @@
         <!-- Config Summary -->
         <div class="config-summary">
           <div class="summary-title">
-            <i class="pi pi-info-circle"></i> {{ 'PROMPT_MODULE.ACTIVE_SETTINGS' | translate }}
+            <i class="pi pi-info-circle"></i>
+            {{ 'PROMPT_MODULE.ACTIVE_SETTINGS' | translate }}
           </div>
           <div class="summary-chips">
             <span class="summary-chip" *ngIf="previewConfig.numberOfMonths > 1"
-              >{{ previewConfig.numberOfMonths }} {{ 'PROMPT_MODULE.MONTHS' | translate }}</span
+              >{{ previewConfig.numberOfMonths }}
+              {{ 'PROMPT_MODULE.MONTHS' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.showTime"
-              >{{ 'PROMPT_MODULE.TIME_PICKER' | translate }}{{ previewConfig.showSeconds ? ' + Sec' : '' }}</span
+              >{{ 'PROMPT_MODULE.TIME_PICKER' | translate
+              }}{{ previewConfig.showSeconds ? ' + Sec' : '' }}</span
             >
-            <span class="summary-chip" *ngIf="previewConfig.inline"
-              >{{ 'PROMPT_MODULE.INLINE' | translate }}</span
-            >
-            <span class="summary-chip" *ngIf="previewConfig.showButtonBar"
-              >{{ 'PROMPT_MODULE.BUTTON_BAR' | translate }}</span
-            >
-            <span class="summary-chip" *ngIf="previewConfig.showWeek"
-              >{{ 'PROMPT_MODULE.WEEK_NUMBERS' | translate }}</span
-            >
-            <span class="summary-chip" *ngIf="previewConfig.readonlyInput"
-              >{{ 'PROMPT_MODULE.READ_ONLY' | translate }}</span
-            >
+            <span class="summary-chip" *ngIf="previewConfig.inline">{{
+              'PROMPT_MODULE.INLINE' | translate
+            }}</span>
+            <span class="summary-chip" *ngIf="previewConfig.showButtonBar">{{
+              'PROMPT_MODULE.BUTTON_BAR' | translate
+            }}</span>
+            <span class="summary-chip" *ngIf="previewConfig.showWeek">{{
+              'PROMPT_MODULE.WEEK_NUMBERS' | translate
+            }}</span>
+            <span class="summary-chip" *ngIf="previewConfig.readonlyInput">{{
+              'PROMPT_MODULE.READ_ONLY' | translate
+            }}</span>
             <span
               class="summary-chip"
               *ngIf="previewConfig.disabledDays.length > 0"
-              >{{ 'PROMPT_MODULE.DAYS_DISABLED' | translate: { count: previewConfig.disabledDays.length } }}</span
+              >{{
+                'PROMPT_MODULE.DAYS_DISABLED'
+                  | translate: { count: previewConfig.disabledDays.length }
+              }}</span
             >
-            <span class="summary-chip" *ngIf="previewConfig.minDate"
-              >{{ 'PROMPT_MODULE.MIN_DATE_SET' | translate }}</span
-            >
-            <span class="summary-chip" *ngIf="previewConfig.maxDate"
-              >{{ 'PROMPT_MODULE.MAX_DATE_SET' | translate }}</span
-            >
+            <span class="summary-chip" *ngIf="previewConfig.minDate">{{
+              'PROMPT_MODULE.MIN_DATE_SET' | translate
+            }}</span>
+            <span class="summary-chip" *ngIf="previewConfig.maxDate">{{
+              'PROMPT_MODULE.MAX_DATE_SET' | translate
+            }}</span>
             <span
               class="summary-empty"
               *ngIf="

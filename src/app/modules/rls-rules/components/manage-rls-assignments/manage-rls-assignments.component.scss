@@ -98,7 +98,11 @@
         justify-content: center;
         gap: var(--space-3);
         padding: 10px 16px;
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--primary-hover)
+        );
         color: var(--primary-text);
         border: none;
         border-radius: var(--radius-md);

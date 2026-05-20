@@ -256,14 +256,14 @@ textarea,
 // Pin them to the icon-scale tokens so the alert/info/error icon visually
 // anchors the popup without dwarfing its body copy.
 .p-confirm-popup .p-confirm-popup-icon {
-  font-size: var(--icon-lg) !important;   // 24px — compact popup
+  font-size: var(--icon-lg) !important; // 24px — compact popup
 }
 .p-confirm-dialog .p-confirm-dialog-icon,
 .p-dialog.p-confirm-dialog .p-confirm-dialog-icon {
-  font-size: var(--icon-xl) !important;   // 36px — modal-scale dialog
+  font-size: var(--icon-xl) !important; // 36px — modal-scale dialog
 }
 .p-toast .p-toast-message .p-toast-message-content .p-toast-message-icon {
-  font-size: var(--icon-xl) !important;   // 36px — top-right toast
+  font-size: var(--icon-xl) !important; // 36px — top-right toast
 }
 // Toast message body text + summary
 .p-toast .p-toast-message .p-toast-summary {
@@ -657,7 +657,9 @@ p-table {
   // might NOT have a checkbox column at all — in that case the filter
   // row's first cell is a search input on the data column, which
   // needs full width. Use :has() on the thead to scope.
-  .p-datatable-thead:has(p-tableheadercheckbox) > tr:nth-child(2) > th:first-child {
+  .p-datatable-thead:has(p-tableheadercheckbox)
+    > tr:nth-child(2)
+    > th:first-child {
     width: 2.75rem !important;
     min-width: 2.75rem !important;
     padding-left: 0 !important;
@@ -784,7 +786,8 @@ p-table {
   align-items: center;
   justify-content: center;
   color: var(--text-color-secondary);
-  transition: color var(--motion-fast) ease,
+  transition:
+    color var(--motion-fast) ease,
     background-color var(--motion-fast) ease,
     border-color var(--motion-fast) ease;
 
@@ -2960,7 +2963,7 @@ body {
 
   .popup-header {
     h3 {
-      font-size: var(--fs-h2) !important;  // 17px — dialog title scale
+      font-size: var(--fs-h2) !important; // 17px — dialog title scale
     }
 
     .popup-icon {
@@ -2968,17 +2971,17 @@ body {
       // bigger h3; both step down together so the proportion stays right.
       width: 40px !important;
       height: 40px !important;
-      font-size: var(--fs-h2) !important;  // 17px
+      font-size: var(--fs-h2) !important; // 17px
     }
   }
 
   .standard-delete-section {
     .delete-intro {
-      font-size: var(--fs-body) !important;  // 14px — paragraph scale
+      font-size: var(--fs-body) !important; // 14px — paragraph scale
     }
 
     .delete-info-list li i {
-      font-size: var(--fs-body) !important;  // match the row text
+      font-size: var(--fs-body) !important; // match the row text
     }
   }
 

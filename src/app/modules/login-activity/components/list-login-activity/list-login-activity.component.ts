@@ -7,15 +7,15 @@ import {
   ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslateService } from '@ngx-translate/core';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { DEFAULT_PAGE } from 'src/app/core/constants/global.constant';
 import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
-import { TranslateService } from '@ngx-translate/core';
 import { AuditService } from 'src/app/modules/audit-logs/services/audit.service';
+import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 
 @Component({
   selector: 'app-list-login-activity',
@@ -71,12 +71,30 @@ export class ListLoginActivityComponent implements OnInit {
 
   ngOnInit(): void {
     this.eventTypeOptions = [
-      { label: this.translate.instant('LOGIN_ACTIVITY.LOGIN_SUCCESS'), value: 'LOGIN_SUCCESS' },
-      { label: this.translate.instant('LOGIN_ACTIVITY.LOGIN_FAILED'), value: 'LOGIN_FAILED' },
-      { label: this.translate.instant('LOGIN_ACTIVITY.LOGOUT'), value: 'LOGOUT' },
-      { label: this.translate.instant('LOGIN_ACTIVITY.TOKEN_REFRESH'), value: 'TOKEN_REFRESH' },
-      { label: this.translate.instant('LOGIN_ACTIVITY.PASSWORD_RESET'), value: 'PASSWORD_RESET' },
-      { label: this.translate.instant('LOGIN_ACTIVITY.OTP_GENERATED'), value: 'OTP_GENERATED' },
+      {
+        label: this.translate.instant('LOGIN_ACTIVITY.LOGIN_SUCCESS'),
+        value: 'LOGIN_SUCCESS',
+      },
+      {
+        label: this.translate.instant('LOGIN_ACTIVITY.LOGIN_FAILED'),
+        value: 'LOGIN_FAILED',
+      },
+      {
+        label: this.translate.instant('LOGIN_ACTIVITY.LOGOUT'),
+        value: 'LOGOUT',
+      },
+      {
+        label: this.translate.instant('LOGIN_ACTIVITY.TOKEN_REFRESH'),
+        value: 'TOKEN_REFRESH',
+      },
+      {
+        label: this.translate.instant('LOGIN_ACTIVITY.PASSWORD_RESET'),
+        value: 'PASSWORD_RESET',
+      },
+      {
+        label: this.translate.instant('LOGIN_ACTIVITY.OTP_GENERATED'),
+        value: 'OTP_GENERATED',
+      },
     ];
 
     this.isSystemAdmin =
@@ -111,8 +129,7 @@ export class ListLoginActivityComponent implements OnInit {
     const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
-      const res: any =
-        await this.organisationService.listOrganisation(params);
+      const res: any = await this.organisationService.listOrganisation(params);
       if (this.globalService.handleSuccessService(res, false)) {
         const all = res?.data?.orgs ?? [];
         const items = all.filter((org: any) => org.isDefault !== 1);

@@ -7,25 +7,25 @@
       </div>
 
       <div class="header-actions">
-          <!-- Clear Filters Button -->
-          <button
-            pButton
-            [label]="'COMMON.CLEAR' | translate"
-            icon="pi pi-filter-slash"
-            (click)="clearFilters()"
-            [disabled]="!isFilterActive"
-            class="p-button-outlined p-button-danger modern-button"
-          ></button>
+        <!-- Clear Filters Button -->
+        <button
+          pButton
+          [label]="'COMMON.CLEAR' | translate"
+          icon="pi pi-filter-slash"
+          (click)="clearFilters()"
+          [disabled]="!isFilterActive"
+          class="p-button-outlined p-button-danger modern-button"
+        ></button>
 
-          <!-- Add Button -->
-          <button
-            pButton
-            [label]="'RLS.ADD_RULE' | translate"
-            icon="pi pi-plus"
-            (click)="onAddNewRule()"
-            class="p-button-raised p-button-primary modern-button"
-          ></button>
-              </div>
+        <!-- Add Button -->
+        <button
+          pButton
+          [label]="'RLS.ADD_RULE' | translate"
+          icon="pi pi-plus"
+          (click)="onAddNewRule()"
+          class="p-button-raised p-button-primary modern-button"
+        ></button>
+      </div>
     </div>
 
     <!-- Unified Toolbar & Content Card -->
@@ -106,7 +106,7 @@
               <th style="width: 32%">
                 <div class="th-content">{{ 'RLS.CONDITIONS' | translate }}</div>
               </th>
-              <th  style="width: 8rem; min-width: 8rem">
+              <th style="width: 8rem; min-width: 8rem">
                 <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
               </th>
               <th style="width: 16%">
@@ -172,7 +172,10 @@
                   *ngIf="rule.conditions?.length; else noConds"
                 >
                   <span class="conditions-count-badge">
-                    {{ 'RLS.CONDITION_COUNT' | translate: { count: rule.conditions.length } }}
+                    {{
+                      'RLS.CONDITION_COUNT'
+                        | translate: { count: rule.conditions.length }
+                    }}
                   </span>
                   <ng-container
                     *ngFor="
@@ -187,7 +190,10 @@
                     </span>
                   </ng-container>
                   <span class="more-conds" *ngIf="rule.conditions.length > 2">
-                    {{ 'RLS.MORE_CONDITIONS' | translate: { count: rule.conditions.length - 2 } }}
+                    {{
+                      'RLS.MORE_CONDITIONS'
+                        | translate: { count: rule.conditions.length - 2 }
+                    }}
                   </span>
                 </div>
                 <ng-template #noConds><span>-</span></ng-template>
@@ -201,7 +207,11 @@
                   }"
                 >
                   <span class="dot"></span>
-                  {{ rule.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                  {{
+                    rule.status === 1
+                      ? ('COMMON.ACTIVE' | translate)
+                      : ('COMMON.INACTIVE' | translate)
+                  }}
                 </span>
               </td>
               <td>
@@ -245,16 +255,16 @@
           <ng-template pTemplate="emptymessage">
             <tr>
               <td colspan="5" class="empty-message-cell text-center">
-                <span *ngIf="!selectedDatasource"
-                  >{{ 'RLS.SELECT_DATASOURCE_MSG' | translate }}</span
-                >
-                <span *ngIf="selectedDatasource"
-                  >{{ 'RLS.NO_RULES_FOUND' | translate }}</span
-                >
+                <span *ngIf="!selectedDatasource">{{
+                  'RLS.SELECT_DATASOURCE_MSG' | translate
+                }}</span>
+                <span *ngIf="selectedDatasource">{{
+                  'RLS.NO_RULES_FOUND' | translate
+                }}</span>
               </td>
             </tr>
           </ng-template>
-        
+
           <ng-template pTemplate="paginatorright">
             <button
               type="button"
@@ -309,7 +319,8 @@
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"

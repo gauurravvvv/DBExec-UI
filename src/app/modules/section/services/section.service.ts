@@ -108,7 +108,10 @@ export class SectionService {
     orgId: string,
   ) {
     return lastValueFrom(
-      this.http.apiPost(SECTION.BULK_DELETE_PREFIX + orgId + SECTION.BULK_DELETE_SUFFIX, { ids, justification }),
+      this.http.apiPost(
+        SECTION.BULK_DELETE_PREFIX + orgId + SECTION.BULK_DELETE_SUFFIX,
+        { ids, justification },
+      ),
     );
   }
 

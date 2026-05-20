@@ -68,11 +68,17 @@
           <div class="info-group">
             <h4>{{ 'PROFILE.PERSONAL_DETAILS' | translate }}</h4>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-user"></i> {{ 'PROFILE.FIRST_NAME' | translate }}</span>
+              <span class="label"
+                ><i class="pi pi-user"></i>
+                {{ 'PROFILE.FIRST_NAME' | translate }}</span
+              >
               <span class="value">{{ profile()?.firstName }}</span>
             </div>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-user"></i> {{ 'PROFILE.LAST_NAME' | translate }}</span>
+              <span class="label"
+                ><i class="pi pi-user"></i>
+                {{ 'PROFILE.LAST_NAME' | translate }}</span
+              >
               <span class="value">{{
                 profile()?.lastName || ('COMMON.NOT_PROVIDED' | translate)
               }}</span>
@@ -83,11 +89,17 @@
           <div class="info-group">
             <h4>{{ 'PROFILE.CONTACT_DETAILS' | translate }}</h4>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-envelope"></i> {{ 'PROFILE.EMAIL' | translate }}</span>
+              <span class="label"
+                ><i class="pi pi-envelope"></i>
+                {{ 'PROFILE.EMAIL' | translate }}</span
+              >
               <span class="value">{{ profile()?.email }}</span>
             </div>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-at"></i> {{ 'PROFILE.USERNAME' | translate }}</span>
+              <span class="label"
+                ><i class="pi pi-at"></i>
+                {{ 'PROFILE.USERNAME' | translate }}</span
+              >
               <span class="value">{{ profile()?.username }}</span>
             </div>
           </div>
@@ -96,7 +108,10 @@
           <div class="info-group">
             <h4>{{ 'PROFILE.ORGANISATION' | translate }}</h4>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-building"></i> {{ 'PROFILE.NAME' | translate }}</span>
+              <span class="label"
+                ><i class="pi pi-building"></i>
+                {{ 'PROFILE.NAME' | translate }}</span
+              >
               <span class="value">{{
                 profile()?.organisationName || ('COMMON.NA' | translate)
               }}</span>
@@ -106,7 +121,8 @@
               *ngIf="profile()?.organisation?.description"
             >
               <span class="label"
-                ><i class="pi pi-info-circle"></i> {{ 'PROFILE.DESCRIPTION' | translate }}</span
+                ><i class="pi pi-info-circle"></i>
+                {{ 'PROFILE.DESCRIPTION' | translate }}</span
               >
               <span class="value">{{
                 profile()?.organisation?.description
@@ -118,7 +134,10 @@
           <div class="info-group">
             <h4>{{ 'PROFILE.SYSTEM' | translate }}</h4>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-clock"></i> {{ 'PROFILE.LAST_LOGIN' | translate }}</span>
+              <span class="label"
+                ><i class="pi pi-clock"></i>
+                {{ 'PROFILE.LAST_LOGIN' | translate }}</span
+              >
               <span class="value">{{
                 profile()?.lastLogin
                   ? (profile()?.lastLogin | date: 'medium')

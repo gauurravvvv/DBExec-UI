@@ -26,7 +26,7 @@
   [closeOnEscape]="false"
   [style]="{
     width: 'min(1280px, 94vw)',
-    height: 'min(780px, 90vh)'
+    height: 'min(780px, 90vh)',
   }"
   styleClass="add-custom-field-dialog"
   [showHeader]="true"
@@ -135,7 +135,9 @@
       <!-- Selected-field preview / empty hint -->
       <div class="acf-preview" *ngIf="selectedField">
         <div class="acf-preview__row">
-          <span class="acf-preview__name">{{ selectedField.columnToView }}</span>
+          <span class="acf-preview__name">{{
+            selectedField.columnToView
+          }}</span>
         </div>
         <code class="acf-preview__code"
           >{{ '{' }}{{ selectedField.columnToUse }}{{ '}' }}</code
@@ -195,7 +197,9 @@
         </div>
       </div>
 
-      <div class="acf-form__field acf-form__field--required acf-form__field--editor">
+      <div
+        class="acf-form__field acf-form__field--required acf-form__field--editor"
+      >
         <label>
           <i class="pi pi-code"></i>
           {{ 'DATASET.CUSTOM_LOGIC' | translate }}
@@ -203,10 +207,7 @@
         </label>
 
         <!-- Monaco container -->
-        <div
-          class="acf-editor"
-          [hidden]="isLoadingEditor || monacoLoadFailed"
-        >
+        <div class="acf-editor" [hidden]="isLoadingEditor || monacoLoadFailed">
           <div
             #formulaEditorContainer
             id="formula-editor-container"
@@ -410,25 +411,25 @@
           tooltipPosition="top"
           [tooltipDisabled]="isSaveEnabled || isSubmitting"
         >
-        <button
-          type="button"
-          class="acf-btn acf-btn--primary"
-          (click)="onSubmit()"
-          [disabled]="!isSaveEnabled || isSubmitting"
-        >
-          <i
-            class="pi"
-            [class.pi-spin]="isSubmitting"
-            [class.pi-spinner]="isSubmitting"
-            [class.pi-save]="!isSubmitting && editMode"
-            [class.pi-plus]="!isSubmitting && !editMode"
-          ></i>
-          {{
-            editMode
-              ? ('DATASET.SAVE_CHANGES' | translate)
-              : ('DATASET.ADD_FIELD' | translate)
-          }}
-        </button>
+          <button
+            type="button"
+            class="acf-btn acf-btn--primary"
+            (click)="onSubmit()"
+            [disabled]="!isSaveEnabled || isSubmitting"
+          >
+            <i
+              class="pi"
+              [class.pi-spin]="isSubmitting"
+              [class.pi-spinner]="isSubmitting"
+              [class.pi-save]="!isSubmitting && editMode"
+              [class.pi-plus]="!isSubmitting && !editMode"
+            ></i>
+            {{
+              editMode
+                ? ('DATASET.SAVE_CHANGES' | translate)
+                : ('DATASET.ADD_FIELD' | translate)
+            }}
+          </button>
         </span>
       </div>
     </div>
@@ -464,10 +465,18 @@
   </ng-template>
   <ng-template pTemplate="footer">
     <div class="acf-unsaved-footer">
-      <button type="button" class="acf-btn acf-btn--ghost" (click)="cancelClose()">
+      <button
+        type="button"
+        class="acf-btn acf-btn--ghost"
+        (click)="cancelClose()"
+      >
         {{ 'DATASET.KEEP_EDITING' | translate }}
       </button>
-      <button type="button" class="acf-btn acf-btn--danger" (click)="confirmDiscard()">
+      <button
+        type="button"
+        class="acf-btn acf-btn--danger"
+        (click)="confirmDiscard()"
+      >
         <i class="pi pi-trash"></i>
         {{ 'DATASET.DISCARD' | translate }}
       </button>

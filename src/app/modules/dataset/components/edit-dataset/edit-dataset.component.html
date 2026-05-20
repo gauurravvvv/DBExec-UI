@@ -201,7 +201,9 @@
                 <i
                   class="pi"
                   [ngClass]="
-                    isExpanded(schemaPath(selectedDatasourceObj.id, schema.name))
+                    isExpanded(
+                      schemaPath(selectedDatasourceObj.id, schema.name)
+                    )
                       ? 'pi-chevron-down'
                       : 'pi-chevron-right'
                   "
@@ -209,7 +211,8 @@
                 <i class="pi pi-folder"></i>
                 <span class="schema-name">{{ schema.name }}</span>
                 <span class="table-count"
-                  >{{ schema.tables.length }} {{ 'DATASET.TABLES' | translate }}</span
+                  >{{ schema.tables.length }}
+                  {{ 'DATASET.TABLES' | translate }}</span
                 >
               </div>
 
@@ -261,7 +264,8 @@
                     <i class="pi pi-table"></i>
                     <span class="table-name">{{ table.name }}</span>
                     <span class="column-count"
-                      >{{ table.columns.length }} {{ 'DATASET.COLS' | translate }}</span
+                      >{{ table.columns.length }}
+                      {{ 'DATASET.COLS' | translate }}</span
                     >
                   </div>
 
@@ -289,7 +293,11 @@
                         )
                       "
                       [title]="
-                        ('DATASET.CLICK_TO_INSERT' | translate) + ' ' + table.name + '.' + column.name
+                        ('DATASET.CLICK_TO_INSERT' | translate) +
+                        ' ' +
+                        table.name +
+                        '.' +
+                        column.name
                       "
                     >
                       <i
@@ -301,8 +309,7 @@
                           'pi-circle':
                             !column.isPrimaryKey && !column.isForeignKey,
                           'is-pk': column.isPrimaryKey,
-                          'is-fk':
-                            column.isForeignKey && !column.isPrimaryKey,
+                          'is-fk': column.isForeignKey && !column.isPrimaryKey,
                         }"
                       ></i>
                       <span class="column-name">{{ column.name }}</span>
@@ -372,7 +379,9 @@
         >
           <i class="pi pi-spin pi-spinner"></i>
           <p>{{ 'DATASET.LOADING_MONACO' | translate }}</p>
-          <p class="loading-hint">{{ 'DATASET.LOADING_MONACO_HINT' | translate }}</p>
+          <p class="loading-hint">
+            {{ 'DATASET.LOADING_MONACO_HINT' | translate }}
+          </p>
         </div>
 
         <!-- Error State -->
@@ -412,9 +421,9 @@
               "
             ></i>
           </span>
-          <span class="status-text" *ngIf="queryResult.error"
-            >{{ 'DATASET.QUERY_FAILED' | translate }}</span
-          >
+          <span class="status-text" *ngIf="queryResult.error">{{
+            'DATASET.QUERY_FAILED' | translate
+          }}</span>
           <span
             class="status-text"
             *ngIf="!queryResult.error && queryResult.rows.length > 0"
@@ -439,7 +448,10 @@
               !queryResult.message
             "
           >
-            {{ 'DATASET.NO_ROWS_RETURNED' | translate:{ time: queryResult.executionTime } }}
+            {{
+              'DATASET.NO_ROWS_RETURNED'
+                | translate: { time: queryResult.executionTime }
+            }}
           </span>
         </div>
         <div class="status-bar-right">
@@ -480,10 +492,7 @@
   Click-outside-to-close was removed because users mid-scroll through long
   results frequently misclicked the overlay edge and lost their position.
 -->
-<div
-  class="results-popup-overlay"
-  *ngIf="showResultsPopup && queryResult"
->
+<div class="results-popup-overlay" *ngIf="showResultsPopup && queryResult">
   <div
     class="results-popup-container"
     [class.compact]="
@@ -497,7 +506,9 @@
     <div class="results-popup-header">
       <div class="popup-header-left">
         <i class="pi pi-table"></i>
-        <span class="popup-title">{{ 'DATASET.QUERY_RESULTS' | translate }}</span>
+        <span class="popup-title">{{
+          'DATASET.QUERY_RESULTS' | translate
+        }}</span>
         <span
           class="popup-meta"
           *ngIf="!queryResult.error && queryResult.columns.length > 0"
@@ -665,11 +676,6 @@
 </div>
 
 <!-- Hidden File Input for SQL Import -->
-<input
-  type="file"
-  #fileInput
-  hidden
-  (change)="onFileSelected($event)"
-/>
+<input type="file" #fileInput hidden (change)="onFileSelected($event)" />
 
 <p-toast key="topRight" position="top-right"></p-toast>

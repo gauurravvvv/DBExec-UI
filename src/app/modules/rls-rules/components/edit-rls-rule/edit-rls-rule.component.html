@@ -71,7 +71,8 @@
         <div class="conditions-section" formArrayName="conditions">
           <div class="conditions-header">
             <span class="conditions-label">
-              {{ 'RLS.FILTER_CONDITIONS' | translate }} <span class="required">*</span>
+              {{ 'RLS.FILTER_CONDITIONS' | translate }}
+              <span class="required">*</span>
             </span>
             <button
               type="button"
@@ -146,7 +147,9 @@
                   [showToggleAll]="true"
                   display="chip"
                   [maxSelectedLabels]="5"
-                  [selectedItemsLabel]="'RLS.VALUES_SELECTED' | translate: { count: '{0}' }"
+                  [selectedItemsLabel]="
+                    'RLS.VALUES_SELECTED' | translate: { count: '{0}' }
+                  "
                   [required]="true"
                   [showError]="
                     !!(

@@ -13,8 +13,10 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { DASHBOARD as DB_ROUTES } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { FilterFetcher } from 'src/app/modules/analyses/components/analysis-filter-bar/analysis-filter-bar.component';
 import {
   getMissingFieldsForVisual,
   hasAxisLabels,
@@ -27,8 +29,6 @@ import {
 } from '../../../analyses/constants/charts.constants';
 import { Visual } from '../../../analyses/models/visual.model';
 import { ChartDataTransformerService } from '../../../analyses/services/chart-data-transformer.service';
-import { TranslateService } from '@ngx-translate/core';
-import { FilterFetcher } from 'src/app/modules/analyses/components/analysis-filter-bar/analysis-filter-bar.component';
 import { DashboardService } from '../../services/dashboard.service';
 
 @Component({

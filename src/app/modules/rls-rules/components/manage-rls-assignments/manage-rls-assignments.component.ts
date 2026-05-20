@@ -8,11 +8,11 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
-import { TranslateService } from '@ngx-translate/core';
 import { RlsRulesService } from '../../services/rls-rules.service';
 
 @Component({

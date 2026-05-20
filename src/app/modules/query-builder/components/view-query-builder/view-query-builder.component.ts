@@ -10,9 +10,9 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TreeNode } from 'primeng/api';
 
+import { TranslateService } from '@ngx-translate/core';
 import { QUERY_BUILDER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { TranslateService } from '@ngx-translate/core';
 import { QueryBuilderService } from '../../services/query-builder.service';
 import { createPromptFormControl } from '../execute-query-builder/helpers/form.helper';
 import { getPlaceholder } from '../execute-query-builder/helpers/prompt-renderer.helper';
@@ -112,12 +112,16 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
             this.loadSections(this.tabs[0]);
           }
         } else {
-          this.tabError = response.message || this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_TABS');
+          this.tabError =
+            response.message ||
+            this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_TABS');
           this.loadingTabs = false;
         }
       })
       .catch(() => {
-        this.tabError = this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_TABS');
+        this.tabError = this.translate.instant(
+          'QUERY_BUILDER_MODULE.FAILED_LOAD_TABS',
+        );
         this.loadingTabs = false;
       });
   }
@@ -141,12 +145,16 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
             this.loadPrompts(section, tab);
           });
         } else {
-          tab.error = response.message || this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_SECTIONS');
+          tab.error =
+            response.message ||
+            this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_SECTIONS');
           tab.loading = false;
         }
       })
       .catch(() => {
-        tab.error = this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_SECTIONS');
+        tab.error = this.translate.instant(
+          'QUERY_BUILDER_MODULE.FAILED_LOAD_SECTIONS',
+        );
         tab.loading = false;
       });
   }
@@ -175,12 +183,16 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
 
           this.addPromptControls(section.prompts);
         } else {
-          section.error = response.message || this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_PROMPTS');
+          section.error =
+            response.message ||
+            this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_PROMPTS');
           section.loading = false;
         }
       })
       .catch(() => {
-        section.error = this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_PROMPTS');
+        section.error = this.translate.instant(
+          'QUERY_BUILDER_MODULE.FAILED_LOAD_PROMPTS',
+        );
         section.loading = false;
       });
   }

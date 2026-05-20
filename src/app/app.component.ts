@@ -9,8 +9,8 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { PrimeNGConfig } from 'primeng/api';
 import { TranslateService } from '@ngx-translate/core';
+import { PrimeNGConfig } from 'primeng/api';
 import { filter } from 'rxjs/operators';
 import { StorageType } from './core/constants/storage-type.constant';
 import { IdleTimeoutService } from './core/services/idle-timeout.service';

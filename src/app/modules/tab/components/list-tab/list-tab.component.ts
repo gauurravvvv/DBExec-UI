@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -18,7 +19,6 @@ import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
-import { TranslateService } from '@ngx-translate/core';
 import { TabService } from '../../services/tab.service';
 
 @Component({
@@ -247,8 +247,7 @@ export class ListTabComponent implements OnInit {
     const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
-      const res: any =
-        await this.organisationService.listOrganisation(params);
+      const res: any = await this.organisationService.listOrganisation(params);
       if (this.globalService.handleSuccessService(res, false)) {
         return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
       }

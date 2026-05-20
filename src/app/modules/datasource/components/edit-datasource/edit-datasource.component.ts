@@ -16,13 +16,13 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { DATASOURCE } from 'src/app/core/constants/routes.constant';
 import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
-import { TranslateService } from '@ngx-translate/core';
 import { DatasourceService } from '../../services/datasource.service';
 
 @Component({
@@ -362,11 +362,16 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
   getErrorMessage(fieldName: string): string {
     const control = this.datasourceForm.get(fieldName);
     if (control?.errors) {
-      if (control.errors['required']) return this.translate.instant('VALIDATION.FIELD_REQUIRED');
+      if (control.errors['required'])
+        return this.translate.instant('VALIDATION.FIELD_REQUIRED');
       if (control.errors['minlength'])
-        return this.translate.instant('VALIDATION.MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
+        return this.translate.instant('VALIDATION.MIN_LENGTH', {
+          length: control.errors['minlength'].requiredLength,
+        });
       if (control.errors['maxlength'])
-        return this.translate.instant('VALIDATION.MAX_LENGTH', { length: control.errors['maxlength'].requiredLength });
+        return this.translate.instant('VALIDATION.MAX_LENGTH', {
+          length: control.errors['maxlength'].requiredLength,
+        });
       if (control.errors['pattern']) {
         switch (fieldName) {
           case 'name':

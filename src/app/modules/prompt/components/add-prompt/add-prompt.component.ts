@@ -9,6 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/core/constants';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { PROMPT } from 'src/app/core/constants/routes.constant';
@@ -20,7 +21,6 @@ import { OrganisationService } from 'src/app/modules/organisation/services/organ
 import { PromptService } from 'src/app/modules/prompt/services/prompt.service';
 import { SectionService } from 'src/app/modules/section/services/section.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
-import { TranslateService } from '@ngx-translate/core';
 import { PROMPT_TYPES } from '../../constants/prompt.constant';
 
 @Component({
@@ -159,11 +159,16 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
   }
 
   getNameError(control: any): string {
-    if (control?.errors?.['required']) return this.translate.instant('PROMPT_MODULE.NAME_REQUIRED');
+    if (control?.errors?.['required'])
+      return this.translate.instant('PROMPT_MODULE.NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return this.translate.instant('PROMPT_MODULE.NAME_MIN', { min: control.errors['minlength'].requiredLength });
+      return this.translate.instant('PROMPT_MODULE.NAME_MIN', {
+        min: control.errors['minlength'].requiredLength,
+      });
     if (control?.errors?.['maxlength'])
-      return this.translate.instant('PROMPT_MODULE.NAME_MAX', { max: control.errors['maxlength'].requiredLength });
+      return this.translate.instant('PROMPT_MODULE.NAME_MAX', {
+        max: control.errors['maxlength'].requiredLength,
+      });
     if (control?.errors?.['pattern'])
       return this.translate.instant('PROMPT_MODULE.NAME_PATTERN');
     return '';
@@ -325,8 +330,7 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
     const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
-      const res: any =
-        await this.organisationService.listOrganisation(params);
+      const res: any = await this.organisationService.listOrganisation(params);
       if (this.globalService.handleSuccessService(res, false)) {
         return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
       }
@@ -478,7 +482,8 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
         if (this.globalService.handleSuccessService(response, false)) {
           const items = response?.data?.datasources ?? [];
           this.preloadedDatasources = items;
-          this.preloadedDatasourcesTotal = response?.data?.count ?? items.length;
+          this.preloadedDatasourcesTotal =
+            response?.data?.count ?? items.length;
           this.datasources = items;
         }
       })

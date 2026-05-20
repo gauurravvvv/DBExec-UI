@@ -81,7 +81,9 @@
           <i class="pi pi-check" *ngIf="currentStep > 1"></i>
           <span *ngIf="currentStep <= 1">2</span>
         </div>
-        <span class="step-label">{{ 'ORG.STEP_MASTER_DATASOURCE' | translate }}</span>
+        <span class="step-label">{{
+          'ORG.STEP_MASTER_DATASOURCE' | translate
+        }}</span>
       </div>
       <div class="step-line"></div>
       <div
@@ -90,7 +92,9 @@
         (click)="onStepClick(2)"
       >
         <div class="step-dot">3</div>
-        <span class="step-label">{{ 'ORG.STEP_SECURITY_EMAIL' | translate }}</span>
+        <span class="step-label">{{
+          'ORG.STEP_SECURITY_EMAIL' | translate
+        }}</span>
       </div>
     </div>
 
@@ -327,14 +331,17 @@
                 class="connection-status success"
                 *ngIf="connectionTestResult() === 'success'"
               >
-                <i class="pi pi-check-circle"></i> {{ 'ORG.CONNECTED' | translate }}
+                <i class="pi pi-check-circle"></i>
+                {{ 'ORG.CONNECTED' | translate }}
               </span>
               <span
                 class="connection-status failed"
                 *ngIf="connectionTestResult() === 'failed'"
               >
                 <i class="pi pi-times-circle"></i>
-                {{ connectionTestError() || ('ORG.CONNECTION_FAILED' | translate) }}
+                {{
+                  connectionTestError() || ('ORG.CONNECTION_FAILED' | translate)
+                }}
               </span>
             </div>
           </div>
@@ -518,7 +525,8 @@
                 [class.active]="selectedEmailProvider === 'SES'"
                 (click)="orgForm.get('emailProvider')?.setValue('SES')"
               >
-                <i class="pi pi-cloud"></i> {{ 'ORG.CUSTOM_AWS_SES' | translate }}
+                <i class="pi pi-cloud"></i>
+                {{ 'ORG.CUSTOM_AWS_SES' | translate }}
               </button>
             </div>
 
@@ -628,7 +636,9 @@
                 <app-custom-input
                   formControlName="sesSecretAccessKey"
                   [label]="'ORG.SECRET_ACCESS_KEY' | translate"
-                  [placeholder]="'ORG.SECRET_ACCESS_KEY_PLACEHOLDER' | translate"
+                  [placeholder]="
+                    'ORG.SECRET_ACCESS_KEY_PLACEHOLDER' | translate
+                  "
                   icon="pi-lock"
                   [showPasswordToggle]="true"
                 ></app-custom-input>
@@ -666,8 +676,12 @@
             </div>
             <div class="readonly-info-card">
               <div class="info-row">
-                <span class="info-label">{{ 'ORG.ENCRYPTION_METHOD' | translate }}</span>
-                <span class="info-value">{{ 'ORG.REVIEW_ENCRYPTION_VALUE' | translate }}</span>
+                <span class="info-label">{{
+                  'ORG.ENCRYPTION_METHOD' | translate
+                }}</span>
+                <span class="info-value">{{
+                  'ORG.REVIEW_ENCRYPTION_VALUE' | translate
+                }}</span>
               </div>
               <p class="readonly-note">
                 <i class="pi pi-lock"></i>

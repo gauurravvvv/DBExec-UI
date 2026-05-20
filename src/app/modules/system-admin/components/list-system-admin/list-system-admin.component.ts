@@ -9,10 +9,10 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { TranslateService } from '@ngx-translate/core';
 import { SYSTEM_ADMIN } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';

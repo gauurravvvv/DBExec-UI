@@ -15,10 +15,10 @@ import { COLOR_PALETTES } from './chart-config.helper';
 //   chartTitle  → 13px / 600 / strong  (matches --fs-control)
 const CHART_FONT_FAMILY =
   "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-const CHART_COLOR_MUTED = '#6b7280';   // matches --text-muted
-const CHART_COLOR_STRONG = '#374151';  // matches --table-header-text
-const CHART_COLOR_GRID = '#f0f0f0';    // soft grid line
-const CHART_COLOR_AXIS = '#d1d5db';    // axis line / tick
+const CHART_COLOR_MUTED = '#6b7280'; // matches --text-muted
+const CHART_COLOR_STRONG = '#374151'; // matches --table-header-text
+const CHART_COLOR_GRID = '#f0f0f0'; // soft grid line
+const CHART_COLOR_AXIS = '#d1d5db'; // axis line / tick
 
 export const CHART_TYPOGRAPHY = {
   fontFamily: CHART_FONT_FAMILY,
@@ -982,11 +982,15 @@ export function buildPieChartOption(
   // is fine only when there is no legend on any side.
   const legendPos = config.legend ? config.legendPosition || 'right' : '';
   const pieCenter: [string, string] =
-    legendPos === 'left' ? ['58%', '50%']
-      : legendPos === 'right' ? ['42%', '50%']
-      : legendPos === 'top' ? ['50%', '55%']
-      : legendPos === 'below' ? ['50%', '45%']
-      : ['50%', '50%'];
+    legendPos === 'left'
+      ? ['58%', '50%']
+      : legendPos === 'right'
+        ? ['42%', '50%']
+        : legendPos === 'top'
+          ? ['50%', '55%']
+          : legendPos === 'below'
+            ? ['50%', '45%']
+            : ['50%', '50%'];
 
   const option: any = {
     color: getColors(config.colorScheme),
@@ -1535,9 +1539,7 @@ export function buildFunnelChartOption(data: any[], config: any): any {
     toolbox: buildToolbox(config),
     series: [
       (() => {
-        const legendPos = config.legend
-          ? config.legendPosition || 'right'
-          : '';
+        const legendPos = config.legend ? config.legendPosition || 'right' : '';
         // Shift the funnel away from the legend side so they do not
         // overlap. Width contracts when the legend takes a left/right.
         const left =
@@ -1547,41 +1549,41 @@ export function buildFunnelChartOption(data: any[], config: any): any {
         const top = legendPos === 'top' ? 50 : 30;
         const bottom = legendPos === 'below' ? 50 : 20;
         return {
-        type: 'funnel',
-        left,
-        top,
-        bottom,
-        width,
-        min: 0,
-        max: Math.max(...data.map(d => d.value), 100),
-        minSize: config.funnelMinSize || '0%',
-        maxSize: config.funnelMaxSize || '100%',
-        sort: config.funnelSort || 'descending',
-        orient: config.funnelOrient || 'vertical',
-        funnelAlign: config.funnelAlign || 'center',
-        gap: config.funnelGap ?? 2,
-        label: {
-          show: config.labels !== false,
-          position: 'inside',
-          formatter: '{b}: {c}',
-          fontSize: config.labelFontSize || 12,
-        },
-        labelLine: { show: false },
-        itemStyle: {
-          borderColor: '#fff',
-          borderWidth: 1,
-        },
-        emphasis: {
-          // Hover-emphasized label — one notch above dataLabel so the
-          // hovered segment reads as primary.
+          type: 'funnel',
+          left,
+          top,
+          bottom,
+          width,
+          min: 0,
+          max: Math.max(...data.map(d => d.value), 100),
+          minSize: config.funnelMinSize || '0%',
+          maxSize: config.funnelMaxSize || '100%',
+          sort: config.funnelSort || 'descending',
+          orient: config.funnelOrient || 'vertical',
+          funnelAlign: config.funnelAlign || 'center',
+          gap: config.funnelGap ?? 2,
           label: {
-            fontFamily: CHART_TYPOGRAPHY.fontFamily,
-            fontSize: CHART_TYPOGRAPHY.tooltip.fontSize,
-            fontWeight: CHART_TYPOGRAPHY.chartTitle.fontWeight,
-            color: CHART_TYPOGRAPHY.chartTitle.color,
+            show: config.labels !== false,
+            position: 'inside',
+            formatter: '{b}: {c}',
+            fontSize: config.labelFontSize || 12,
           },
-        },
-        data: funnelData,
+          labelLine: { show: false },
+          itemStyle: {
+            borderColor: '#fff',
+            borderWidth: 1,
+          },
+          emphasis: {
+            // Hover-emphasized label — one notch above dataLabel so the
+            // hovered segment reads as primary.
+            label: {
+              fontFamily: CHART_TYPOGRAPHY.fontFamily,
+              fontSize: CHART_TYPOGRAPHY.tooltip.fontSize,
+              fontWeight: CHART_TYPOGRAPHY.chartTitle.fontWeight,
+              color: CHART_TYPOGRAPHY.chartTitle.color,
+            },
+          },
+          data: funnelData,
         };
       })(),
     ],
@@ -1605,50 +1607,54 @@ export function buildSunburstChartOption(data: any[], config: any): any {
     toolbox: buildToolbox(config),
     series: [
       (() => {
-        const legendPos = config.legend
-          ? config.legendPosition || 'right'
-          : '';
+        const legendPos = config.legend ? config.legendPosition || 'right' : '';
         const center: [string, string] =
-          legendPos === 'left' ? ['58%', '50%']
-            : legendPos === 'right' ? ['42%', '50%']
-            : legendPos === 'top' ? ['50%', '55%']
-            : legendPos === 'below' ? ['50%', '45%']
-            : ['50%', '50%'];
+          legendPos === 'left'
+            ? ['58%', '50%']
+            : legendPos === 'right'
+              ? ['42%', '50%']
+              : legendPos === 'top'
+                ? ['50%', '55%']
+                : legendPos === 'below'
+                  ? ['50%', '45%']
+                  : ['50%', '50%'];
         return {
-        type: 'sunburst',
-        data: sunburstData,
-        center,
-        radius: ['15%', config.sunburstRadius || '85%'],
-        nodeClick:
-          config.sunburstNodeClick === 'false'
-            ? false
-            : config.sunburstNodeClick || 'rootToNode',
-        sort:
-          config.sunburstSort === 'none' ? null : config.sunburstSort || 'desc',
-        startAngle: config.sunburstStartAngle ?? 90,
-        label: {
-          show: config.labels !== false,
-          rotate: 'radial',
-          fontSize: config.labelFontSize || 10,
-        },
-        itemStyle: {
-          borderWidth: 2,
-          borderColor: '#fff',
-        },
-        emphasis: {
-          focus: 'ancestor',
-          itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.3)' },
-        },
-        levels: [
-          {},
-          { r0: '15%', r: '50%', label: { rotate: 'tangential' } },
-          { r0: '50%', r: '70%', label: { align: 'right' } },
-          {
-            r0: '70%',
-            r: '90%',
-            label: { position: 'outside', padding: 3, silent: false },
+          type: 'sunburst',
+          data: sunburstData,
+          center,
+          radius: ['15%', config.sunburstRadius || '85%'],
+          nodeClick:
+            config.sunburstNodeClick === 'false'
+              ? false
+              : config.sunburstNodeClick || 'rootToNode',
+          sort:
+            config.sunburstSort === 'none'
+              ? null
+              : config.sunburstSort || 'desc',
+          startAngle: config.sunburstStartAngle ?? 90,
+          label: {
+            show: config.labels !== false,
+            rotate: 'radial',
+            fontSize: config.labelFontSize || 10,
           },
-        ],
+          itemStyle: {
+            borderWidth: 2,
+            borderColor: '#fff',
+          },
+          emphasis: {
+            focus: 'ancestor',
+            itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.3)' },
+          },
+          levels: [
+            {},
+            { r0: '15%', r: '50%', label: { rotate: 'tangential' } },
+            { r0: '50%', r: '70%', label: { align: 'right' } },
+            {
+              r0: '70%',
+              r: '90%',
+              label: { position: 'outside', padding: 3, silent: false },
+            },
+          ],
         };
       })(),
     ],
@@ -2109,11 +2115,15 @@ export function buildPolarBarChartOption(data: any[], config: any): any {
       // When the legend takes a side, shift the polar centre away
       // from it so the chart does not sit under the legend area.
       const center: [string, string] =
-        pos === 'left' ? ['58%', '50%']
-          : pos === 'right' ? ['42%', '50%']
-          : pos === 'top' ? ['50%', '55%']
-          : pos === 'below' ? ['50%', '45%']
-          : ['50%', '50%'];
+        pos === 'left'
+          ? ['58%', '50%']
+          : pos === 'right'
+            ? ['42%', '50%']
+            : pos === 'top'
+              ? ['50%', '55%']
+              : pos === 'below'
+                ? ['50%', '45%']
+                : ['50%', '50%'];
       return {
         center,
         radius: [`${config.polarBarInnerRadius ?? 15}%`, '75%'],
@@ -2238,7 +2248,7 @@ export function buildParallelChartOption(data: any[], config: any): any {
   return {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
-    tooltip: buildTooltip(config, "item"),
+    tooltip: buildTooltip(config, 'item'),
     ...buildLegendWithTitle(config),
     parallelAxis,
     parallel: (() => {
@@ -2523,7 +2533,7 @@ export function buildGraphGLChartOption(
   return {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
-    tooltip: buildTooltip(config, "item"),
+    tooltip: buildTooltip(config, 'item'),
     series: [
       {
         type: 'graphGL',
@@ -2562,7 +2572,7 @@ export function buildScatterGLChartOption(data: any[], config: any): any {
   return {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
-    tooltip: buildTooltip(config, "item"),
+    tooltip: buildTooltip(config, 'item'),
     xAxis: {
       type: 'value',
       show: config.xAxis !== false,
@@ -2614,7 +2624,7 @@ export function buildLinesGLChartOption(data: any[], config: any): any {
   return {
     color: colors,
     ...buildAnimation(config),
-    tooltip: buildTooltip(config, "axis"),
+    tooltip: buildTooltip(config, 'axis'),
     xAxis: {
       type: 'value',
       show: config.xAxis !== false,

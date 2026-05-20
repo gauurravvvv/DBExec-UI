@@ -14,8 +14,8 @@ import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { GlobalSearchService } from '../../services/global-search.service';
 import { SIDEBAR_ITEMS_ROUTES } from '../../../core/layout/sidebar/sidebar.constant';
+import { GlobalSearchService } from '../../services/global-search.service';
 
 @Component({
   selector: 'app-global-search',

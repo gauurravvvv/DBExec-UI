@@ -1,4 +1,8 @@
-<div class="table-visual-wrapper" [class.is-compact]="compact" [class.is-striped]="striped">
+<div
+  class="table-visual-wrapper"
+  [class.is-compact]="compact"
+  [class.is-striped]="striped"
+>
   <!-- Empty state when no data -->
   <div class="table-visual__empty" *ngIf="!data?.length">
     <i class="pi pi-database"></i>
@@ -40,7 +44,9 @@
     </ng-template>
     <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
       <tr class="modern-row" (click)="onRowClick(row)">
-        <td *ngIf="showRowNumbers" class="table-visual__row-num">{{ rowIndex + 1 }}</td>
+        <td *ngIf="showRowNumbers" class="table-visual__row-num">
+          {{ rowIndex + 1 }}
+        </td>
         <td
           *ngFor="let col of columns; trackBy: trackByIndex"
           [class.is-numeric]="col.numeric"
@@ -53,7 +59,10 @@
     </ng-template>
     <ng-template pTemplate="emptymessage">
       <tr class="empty-row">
-        <td [attr.colspan]="(showRowNumbers ? 1 : 0) + columns.length" class="empty-message-cell">
+        <td
+          [attr.colspan]="(showRowNumbers ? 1 : 0) + columns.length"
+          class="empty-message-cell"
+        >
           <div class="empty-state-inline">
             <i class="pi pi-search empty-state-icon"></i>
             <span class="empty-state-text">No matching rows</span>

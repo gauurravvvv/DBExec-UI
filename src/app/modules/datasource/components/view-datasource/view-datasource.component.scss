@@ -174,7 +174,11 @@
           }
 
           &.btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            background: linear-gradient(
+              135deg,
+              var(--primary-color),
+              var(--primary-hover)
+            );
             color: var(--primary-text);
             box-shadow: 0 4px 10px var(--primary-color-transparent);
 
@@ -192,7 +196,11 @@
           }
 
           &.btn-danger {
-            background: linear-gradient(135deg, var(--error-color), var(--error-color));
+            background: linear-gradient(
+              135deg,
+              var(--error-color),
+              var(--error-color)
+            );
             color: var(--primary-text);
             box-shadow: 0 4px 10px var(--error-bg);
 
@@ -1814,7 +1822,11 @@
         }
 
         &.btn-confirm {
-          background: linear-gradient(135deg, var(--error-color), var(--error-color));
+          background: linear-gradient(
+            135deg,
+            var(--error-color),
+            var(--error-color)
+          );
           color: var(--primary-text);
           box-shadow: 0 4px 14px var(--error-bg);
 

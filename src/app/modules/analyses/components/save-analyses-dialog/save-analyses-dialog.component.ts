@@ -35,7 +35,10 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
   analysisForm!: FormGroup;
   saveJustification = '';
 
-  constructor(private fb: FormBuilder, private translate: TranslateService) {}
+  constructor(
+    private fb: FormBuilder,
+    private translate: TranslateService,
+  ) {}
 
   @HostListener('document:keydown.escape', ['$event'])
   handleEscapeKey(event: KeyboardEvent) {
@@ -78,11 +81,16 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
 
   getNameError(): string {
     const control = this.analysisForm.get('name');
-    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.ANALYSIS_NAME_REQUIRED');
+    if (control?.errors?.['required'])
+      return this.translate.instant('VALIDATION.ANALYSIS_NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.ANALYSIS_NAME_MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
+      return this.translate.instant('VALIDATION.ANALYSIS_NAME_MIN_LENGTH', {
+        length: control.errors['minlength'].requiredLength,
+      });
     if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.ANALYSIS_NAME_MAX_LENGTH', { length: control.errors['maxlength'].requiredLength });
+      return this.translate.instant('VALIDATION.ANALYSIS_NAME_MAX_LENGTH', {
+        length: control.errors['maxlength'].requiredLength,
+      });
     if (control?.errors?.['pattern'])
       return this.translate.instant('VALIDATION.ANALYSIS_NAME_PATTERN');
     return '';

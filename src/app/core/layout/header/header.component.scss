@@ -49,7 +49,11 @@
     color: var(--text-color);
 
     .highlight {
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      background: linear-gradient(
+        135deg,
+        var(--primary-color),
+        var(--primary-light)
+      );
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -146,14 +150,16 @@
   align-items: center;
   gap: var(--space-4);
   padding: 0 10px 0 12px;
-  height: 34px;       // match icon-btn / locale / avatar for clean baseline
+  height: 34px; // match icon-btn / locale / avatar for clean baseline
   min-width: 220px;
   background: var(--hover-background);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   cursor: pointer;
   margin-right: 8px;
-  transition: border-color var(--motion-fast) ease, background-color var(--motion-fast) ease;
+  transition:
+    border-color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease;
 
   &:hover {
     border-color: var(--primary-color);
@@ -277,7 +283,11 @@
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+      background: linear-gradient(
+        135deg,
+        var(--primary-color),
+        var(--primary-hover)
+      );
       color: var(--primary-text);
       display: flex;
       align-items: center;
@@ -287,7 +297,6 @@
       flex-shrink: 0;
       box-shadow: 0 2px 8px var(--primary-color-transparent);
     }
-
   }
 
   .profile-menu {
@@ -313,7 +322,11 @@
         width: 38px;
         height: 38px;
         border-radius: 50%;
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--primary-hover)
+        );
         color: var(--primary-text);
         display: flex;
         align-items: center;

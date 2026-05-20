@@ -63,7 +63,8 @@ export class GlobalService {
       this.messageService.add({
         severity: 'error',
         summary: this.translate.instant('TOAST.ERROR'),
-        detail: response.message || this.translate.instant('TOAST.ERROR_DEFAULT'),
+        detail:
+          response.message || this.translate.instant('TOAST.ERROR_DEFAULT'),
         life: 3000,
       });
     }

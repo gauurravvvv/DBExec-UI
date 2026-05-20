@@ -40,7 +40,11 @@
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.DESCRIPTION' | translate }}</label>
-              <p>{{ tabData.description || ('COMMON.NO_DESCRIPTION' | translate) }}</p>
+              <p>
+                {{
+                  tabData.description || ('COMMON.NO_DESCRIPTION' | translate)
+                }}
+              </p>
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.STATUS' | translate }}</label>
@@ -51,7 +55,11 @@
                     tabData.status === 1 ? 'pi-check-circle' : 'pi-times-circle'
                   "
                 ></i>
-                {{ tabData.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                {{
+                  tabData.status === 1
+                    ? ('COMMON.ACTIVE' | translate)
+                    : ('COMMON.INACTIVE' | translate)
+                }}
               </span>
             </div>
             <div class="info-item">
@@ -115,7 +123,9 @@
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
-      <p class="delete-intro">{{ 'SECTION_MODULE.DELETE_SINGLE' | translate }}</p>
+      <p class="delete-intro">
+        {{ 'SECTION_MODULE.DELETE_SINGLE' | translate }}
+      </p>
 
       <ul class="delete-info-list">
         <li>
@@ -130,7 +140,8 @@
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"

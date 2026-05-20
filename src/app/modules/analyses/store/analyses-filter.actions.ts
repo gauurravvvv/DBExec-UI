@@ -7,10 +7,7 @@
  * and dispatch the former on completion.
  */
 import { createAction, props } from '@ngrx/store';
-import {
-  AnalysesFilterDef,
-  FilterOptionsEntry,
-} from './analyses-filter.state';
+import { AnalysesFilterDef, FilterOptionsEntry } from './analyses-filter.state';
 
 // ── Open / lifecycle ────────────────────────────────────────────────
 
@@ -80,7 +77,10 @@ export const fetchValuesFailure = createAction(
     filterId: string;
     search: string;
     page: number;
-    error: { code: 'column_missing' | 'sql_error' | 'forbidden'; message: string };
+    error: {
+      code: 'column_missing' | 'sql_error' | 'forbidden';
+      message: string;
+    };
   }>(),
 );
 

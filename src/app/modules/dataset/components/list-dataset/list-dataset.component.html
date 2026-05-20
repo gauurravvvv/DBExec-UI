@@ -7,37 +7,37 @@
       </div>
 
       <div class="header-actions">
-          <!-- Bulk Delete Button -->
-          <button
-            *ngIf="selectedCount > 0"
-            pButton
-            [label]="('COMMON.DELETE' | translate) + ' (' + selectedCount + ')'"
-            icon="pi pi-trash"
-            (click)="confirmBulkDelete()"
-            class="p-button-raised p-button-danger modern-button"
-          ></button>
+        <!-- Bulk Delete Button -->
+        <button
+          *ngIf="selectedCount > 0"
+          pButton
+          [label]="('COMMON.DELETE' | translate) + ' (' + selectedCount + ')'"
+          icon="pi pi-trash"
+          (click)="confirmBulkDelete()"
+          class="p-button-raised p-button-danger modern-button"
+        ></button>
 
-          <!-- Clear Filters Button -->
-          <button
-            pButton
-            [label]="'COMMON.CLEAR' | translate"
-            icon="pi pi-filter-slash"
-            (click)="clearFilters()"
-            [disabled]="!isFilterActive"
-            class="p-button-outlined p-button-danger modern-button"
-          ></button>
+        <!-- Clear Filters Button -->
+        <button
+          pButton
+          [label]="'COMMON.CLEAR' | translate"
+          icon="pi pi-filter-slash"
+          (click)="clearFilters()"
+          [disabled]="!isFilterActive"
+          class="p-button-outlined p-button-danger modern-button"
+        ></button>
 
-          <!-- Add Button -->
-          <p-splitButton
-            [label]="'COMMON.ADD' | translate"
-            icon="pi pi-plus"
-            (onClick)="onAddNewAdmin()"
-            [model]="addDatasetItems"
-            styleClass="p-button-raised p-button-primary modern-split-button"
-            appendTo="body"
-          >
-          </p-splitButton>
-              </div>
+        <!-- Add Button -->
+        <p-splitButton
+          [label]="'COMMON.ADD' | translate"
+          icon="pi pi-plus"
+          (onClick)="onAddNewAdmin()"
+          [model]="addDatasetItems"
+          styleClass="p-button-raised p-button-primary modern-split-button"
+          appendTo="body"
+        >
+        </p-splitButton>
+      </div>
     </div>
 
     <!-- Unified Toolbar & Content Card -->
@@ -123,18 +123,33 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.NAME' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('name')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('name') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('name') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('name'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('name') > 0 && sortHelper.size > 1">{{ sortHelper.index('name') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('name')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up': sortHelper.direction('name') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('name') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('name'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('name') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('name') }}</span
+                    >
                   </span>
                 </div>
               </th>
               <th style="min-width: 20rem">
-                <div class="th-content">{{ 'COMMON.DESCRIPTION' | translate }}</div>
+                <div class="th-content">
+                  {{ 'COMMON.DESCRIPTION' | translate }}
+                </div>
               </th>
               <th
                 style="width: 9rem; min-width: 9rem"
@@ -144,13 +159,26 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.STATUS' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('status')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('status') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('status') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('status'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('status') > 0 && sortHelper.size > 1">{{ sortHelper.index('status') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('status')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up': sortHelper.direction('status') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('status') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('status'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('status') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('status') }}</span
+                    >
                   </span>
                 </div>
               </th>
@@ -162,18 +190,34 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.CREATED_ON' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('createdOn')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('createdOn') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('createdOn') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('createdOn'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('createdOn') > 0 && sortHelper.size > 1">{{ sortHelper.index('createdOn') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('createdOn')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up':
+                          sortHelper.direction('createdOn') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('createdOn') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('createdOn'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('createdOn') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('createdOn') }}</span
+                    >
                   </span>
                 </div>
               </th>
               <th style="width: 7rem; min-width: 7rem">
-                <div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div>
+                <div class="th-content actions-th">
+                  {{ 'COMMON.ACTIONS' | translate }}
+                </div>
               </th>
             </tr>
             <!-- Filter Row -->
@@ -253,7 +297,11 @@
                 >
                   <span class="dot"></span>
                   <span class="label">
-                    {{ dataset.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                    {{
+                      dataset.status === 1
+                        ? ('COMMON.ACTIVE' | translate)
+                        : ('COMMON.INACTIVE' | translate)
+                    }}
                   </span>
                 </span>
               </td>
@@ -301,13 +349,14 @@
                 <div class="empty-state-inline">
                   <i class="pi pi-search empty-state-icon"></i>
                   <span class="empty-state-text">
-                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash; {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
+                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash;
+                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
                   </span>
                 </div>
               </td>
             </tr>
           </ng-template>
-        
+
           <ng-template pTemplate="paginatorright">
             <button
               type="button"
@@ -339,8 +388,13 @@
       <p class="delete-intro" *ngIf="!bulkDelete">
         {{ 'DATASET.CONFIRM_DELETE_SINGLE' | translate }}
       </p>
-      <p class="delete-intro" *ngIf="bulkDelete" [innerHTML]="'DATASET.CONFIRM_DELETE_BULK' | translate:{ count: selectedCount }">
-      </p>
+      <p
+        class="delete-intro"
+        *ngIf="bulkDelete"
+        [innerHTML]="
+          'DATASET.CONFIRM_DELETE_BULK' | translate: { count: selectedCount }
+        "
+      ></p>
 
       <ul class="delete-info-list">
         <li>
@@ -404,7 +458,9 @@
       (click)="useAsAnalysis(activeDataset?.id); op.hide()"
     >
       <i class="pi pi-chart-bar action-icon analysis"></i>
-      <span class="action-label">{{ 'DATASET.USE_IN_ANALYSIS' | translate }}</span>
+      <span class="action-label">{{
+        'DATASET.USE_IN_ANALYSIS' | translate
+      }}</span>
     </button>
   </div>
 </p-overlayPanel>
@@ -489,7 +545,9 @@
         "
       >
         <i class="pi pi-search"></i>
-        <span>{{ 'COMMON.NO_RESULTS_FOR' | translate:{ term: qbSearchTerm } }}</span>
+        <span>{{
+          'COMMON.NO_RESULTS_FOR' | translate: { term: qbSearchTerm }
+        }}</span>
       </div>
 
       <!-- Result rows -->
@@ -516,7 +574,11 @@
             inactive: screen.status !== 1,
           }"
         >
-          {{ screen.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+          {{
+            screen.status === 1
+              ? ('COMMON.ACTIVE' | translate)
+              : ('COMMON.INACTIVE' | translate)
+          }}
         </span>
         <i class="pi pi-arrow-right cmd-row-arrow"></i>
       </div>
@@ -525,10 +587,15 @@
     <!-- Footer hints -->
     <div class="cmd-footer">
       <div class="cmd-hint">
-        <kbd>&uarr;</kbd><kbd>&darr;</kbd> <span>{{ 'COMMON.NAVIGATE' | translate }}</span>
+        <kbd>&uarr;</kbd><kbd>&darr;</kbd>
+        <span>{{ 'COMMON.NAVIGATE' | translate }}</span>
       </div>
-      <div class="cmd-hint"><kbd>&crarr;</kbd> <span>{{ 'COMMON.SELECT' | translate }}</span></div>
-      <div class="cmd-hint"><kbd>esc</kbd> <span>{{ 'COMMON.CLOSE' | translate }}</span></div>
+      <div class="cmd-hint">
+        <kbd>&crarr;</kbd> <span>{{ 'COMMON.SELECT' | translate }}</span>
+      </div>
+      <div class="cmd-hint">
+        <kbd>esc</kbd> <span>{{ 'COMMON.CLOSE' | translate }}</span>
+      </div>
     </div>
   </div>
 </div>

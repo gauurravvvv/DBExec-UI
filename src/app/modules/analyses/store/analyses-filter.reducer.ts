@@ -43,16 +43,19 @@ export const analysesFilterReducer = createReducer(
   initialAnalysesFilterState,
 
   // ── Active analysis ─────────────────────────────────────────────
-  on(Actions.setActiveAnalysis, (state, { analysisId }): AnalysesFilterState => ({
-    ...state,
-    activeAnalysisId: analysisId,
-    // Eagerly ensure the lane exists so selectors can return defaults
-    // before the first network call resolves.
-    byAnalysis: {
-      ...state.byAnalysis,
-      [analysisId]: state.byAnalysis[analysisId] ?? emptyLane(),
-    },
-  })),
+  on(
+    Actions.setActiveAnalysis,
+    (state, { analysisId }): AnalysesFilterState => ({
+      ...state,
+      activeAnalysisId: analysisId,
+      // Eagerly ensure the lane exists so selectors can return defaults
+      // before the first network call resolves.
+      byAnalysis: {
+        ...state.byAnalysis,
+        [analysisId]: state.byAnalysis[analysisId] ?? emptyLane(),
+      },
+    }),
+  ),
 
   // ── Open (list + values) ────────────────────────────────────────
   // We only flip to 'loading' if the effect will actually fetch.
@@ -263,14 +266,12 @@ export const analysesFilterReducer = createReducer(
     return { ...state, byAnalysis: next };
   }),
 
-  on(
-    Actions.invalidateFilterOptions,
-    (state, { analysisId, filterId }) =>
-      withLane(state, analysisId, lane => {
-        if (!lane.options[filterId]) return lane;
-        const nextOptions = { ...lane.options };
-        delete nextOptions[filterId];
-        return { ...lane, options: nextOptions };
-      }),
+  on(Actions.invalidateFilterOptions, (state, { analysisId, filterId }) =>
+    withLane(state, analysisId, lane => {
+      if (!lane.options[filterId]) return lane;
+      const nextOptions = { ...lane.options };
+      delete nextOptions[filterId];
+      return { ...lane, options: nextOptions };
+    }),
   ),
 );

@@ -27,7 +27,11 @@
               dashboard.status === 1 ? 'pi-check-circle' : 'pi-times-circle'
             "
           ></i>
-          {{ dashboard.status === 1 ? ('DASHBOARD.LIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+          {{
+            dashboard.status === 1
+              ? ('DASHBOARD.LIVE' | translate)
+              : ('COMMON.INACTIVE' | translate)
+          }}
         </span>
       </div>
       <div class="header-actions">
@@ -155,7 +159,9 @@
               <div class="visual-loading-placeholder" *ngIf="visual.loading">
                 <div class="loading-content">
                   <i class="pi pi-spin pi-spinner loading-spinner"></i>
-                  <span class="loading-text">{{ 'DASHBOARD.LOADING_VISUALIZATION' | translate }}</span>
+                  <span class="loading-text">{{
+                    'DASHBOARD.LOADING_VISUALIZATION' | translate
+                  }}</span>
                 </div>
               </div>
 
@@ -166,7 +172,9 @@
               >
                 <div class="error-content">
                   <i class="pi pi-exclamation-triangle error-icon"></i>
-                  <span class="error-text">{{ 'DASHBOARD.FAILED_TO_LOAD_DATA' | translate }}</span>
+                  <span class="error-text">{{
+                    'DASHBOARD.FAILED_TO_LOAD_DATA' | translate
+                  }}</span>
                 </div>
               </div>
 
@@ -197,7 +205,8 @@
                 <small>
                   {{
                     'DASHBOARD.VISUAL_FIELD_MISSING_DESC_VIEWER'
-                      | translate: { fields: getMissingFields(visual).join(', ') }
+                      | translate
+                        : { fields: getMissingFields(visual).join(', ') }
                   }}
                 </small>
               </div>
@@ -252,7 +261,7 @@
                 </ng-template>
               </ng-container>
 
-<!--
+              <!--
                 Globe / 3D-line charts previously had a special path to
                 render with dummy data when no field mapping existed.
                 Removed because the dummy rows triggered tooltips on

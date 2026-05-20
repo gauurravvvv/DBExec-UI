@@ -45,10 +45,7 @@ export const roleGuard: CanActivateFn = (route, state) => {
   }
 
   // Check module-level permission if specified
-  if (
-    requiredPermission &&
-    !globalService.hasPermission(requiredPermission)
-  ) {
+  if (requiredPermission && !globalService.hasPermission(requiredPermission)) {
     router.navigate([getHomeByRole(userRole)]);
     return false;
   }

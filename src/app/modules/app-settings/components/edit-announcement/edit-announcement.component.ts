@@ -14,12 +14,12 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { ANNOUNCEMENT } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
-import { TranslateService } from '@ngx-translate/core';
 import {
   AnnouncementService,
   UpdateAnnouncementPayload,
@@ -259,8 +259,12 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
     if (r < this.minContrastRatio) {
       return {
         level: 'needs-work',
-        label: this.translate.instant('ANNOUNCEMENT.CONTRAST_NEEDS_IMPROVEMENT'),
-        hint: this.translate.instant('ANNOUNCEMENT.CONTRAST_NEEDS_IMPROVEMENT_DESC'),
+        label: this.translate.instant(
+          'ANNOUNCEMENT.CONTRAST_NEEDS_IMPROVEMENT',
+        ),
+        hint: this.translate.instant(
+          'ANNOUNCEMENT.CONTRAST_NEEDS_IMPROVEMENT_DESC',
+        ),
         percent: 45,
       };
     }
@@ -345,16 +349,21 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
 
   getNameError(): string {
     const c = this.announcementForm.get('name');
-    if (c?.errors?.['required']) return this.translate.instant('ANNOUNCEMENT.TITLE_REQUIRED');
-    if (c?.errors?.['maxlength']) return this.translate.instant('ANNOUNCEMENT.TITLE_MAX', { max: 255 });
+    if (c?.errors?.['required'])
+      return this.translate.instant('ANNOUNCEMENT.TITLE_REQUIRED');
+    if (c?.errors?.['maxlength'])
+      return this.translate.instant('ANNOUNCEMENT.TITLE_MAX', { max: 255 });
     return '';
   }
 
   getDescriptionError(): string {
     const c = this.announcementForm.get('description');
-    if (c?.errors?.['required']) return this.translate.instant('ANNOUNCEMENT.DESCRIPTION_REQUIRED');
+    if (c?.errors?.['required'])
+      return this.translate.instant('ANNOUNCEMENT.DESCRIPTION_REQUIRED');
     if (c?.errors?.['maxlength'])
-      return this.translate.instant('ANNOUNCEMENT.DESCRIPTION_MAX', { max: this.maxDescriptionLength });
+      return this.translate.instant('ANNOUNCEMENT.DESCRIPTION_MAX', {
+        max: this.maxDescriptionLength,
+      });
     return '';
   }
 }

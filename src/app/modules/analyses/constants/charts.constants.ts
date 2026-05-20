@@ -1350,14 +1350,62 @@ const NUMBER_CARD_DATA = [
  * the Table chart type with no fields mapped.
  */
 const TABLE_DATA = [
-  { id: 1, name: 'Alice Johnson', department: 'Engineering', salary: 95000, joined: '2022-03-15' },
-  { id: 2, name: 'Bob Smith',     department: 'Sales',       salary: 72000, joined: '2021-08-02' },
-  { id: 3, name: 'Carol White',   department: 'Marketing',   salary: 81000, joined: '2023-01-20' },
-  { id: 4, name: 'David Brown',   department: 'Engineering', salary: 98000, joined: '2020-11-09' },
-  { id: 5, name: 'Eve Davis',     department: 'Design',      salary: 76000, joined: '2023-06-14' },
-  { id: 6, name: 'Frank Miller',  department: 'Engineering', salary: 102000, joined: '2019-04-22' },
-  { id: 7, name: 'Grace Lee',     department: 'Sales',       salary: 68000, joined: '2022-09-30' },
-  { id: 8, name: 'Henry Wilson',  department: 'Marketing',   salary: 79000, joined: '2021-12-11' },
+  {
+    id: 1,
+    name: 'Alice Johnson',
+    department: 'Engineering',
+    salary: 95000,
+    joined: '2022-03-15',
+  },
+  {
+    id: 2,
+    name: 'Bob Smith',
+    department: 'Sales',
+    salary: 72000,
+    joined: '2021-08-02',
+  },
+  {
+    id: 3,
+    name: 'Carol White',
+    department: 'Marketing',
+    salary: 81000,
+    joined: '2023-01-20',
+  },
+  {
+    id: 4,
+    name: 'David Brown',
+    department: 'Engineering',
+    salary: 98000,
+    joined: '2020-11-09',
+  },
+  {
+    id: 5,
+    name: 'Eve Davis',
+    department: 'Design',
+    salary: 76000,
+    joined: '2023-06-14',
+  },
+  {
+    id: 6,
+    name: 'Frank Miller',
+    department: 'Engineering',
+    salary: 102000,
+    joined: '2019-04-22',
+  },
+  {
+    id: 7,
+    name: 'Grace Lee',
+    department: 'Sales',
+    salary: 68000,
+    joined: '2022-09-30',
+  },
+  {
+    id: 8,
+    name: 'Henry Wilson',
+    department: 'Marketing',
+    salary: 79000,
+    joined: '2021-12-11',
+  },
 ];
 
 /**
@@ -2464,7 +2512,14 @@ export function getDefaultChartConfig(): any {
 // fields exist in the data.
 // =====================================================================
 export function getMissingFieldsForVisual(
-  visual: { xAxisColumn?: string | null; yAxisColumn?: string | null; zAxisColumn?: string | null } | null | undefined,
+  visual:
+    | {
+        xAxisColumn?: string | null;
+        yAxisColumn?: string | null;
+        zAxisColumn?: string | null;
+      }
+    | null
+    | undefined,
   sampleRow: any,
 ): string[] {
   if (!visual) return [];
@@ -2477,7 +2532,11 @@ export function getMissingFieldsForVisual(
   const availableColumns = new Set(Object.keys(sampleRow));
   const missing: string[] = [];
 
-  for (const col of [visual.xAxisColumn, visual.yAxisColumn, visual.zAxisColumn]) {
+  for (const col of [
+    visual.xAxisColumn,
+    visual.yAxisColumn,
+    visual.zAxisColumn,
+  ]) {
     if (col && !availableColumns.has(col)) missing.push(col);
   }
 

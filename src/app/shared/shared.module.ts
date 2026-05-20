@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
+import { AnalysisFilterBarComponent } from '../modules/analyses/components/analysis-filter-bar/analysis-filter-bar.component';
 import { SaveAnalysesDialogComponent } from '../modules/analyses/components/save-analyses-dialog/save-analyses-dialog.component';
 import { AddCustomFieldDialogComponent } from '../modules/dataset/components/add-custom-field-dialog/add-custom-field-dialog.component';
-import { AnalysisFilterBarComponent } from '../modules/analyses/components/analysis-filter-bar/analysis-filter-bar.component';
 import { ChangePasswordDialogComponent } from './components/change-password-dialog/change-password-dialog.component';
 import { ConfirmLeaveDialogComponent } from './components/confirm-leave-dialog/confirm-leave-dialog.component';
 import { CustomAccordionComponent } from './components/custom-accordion/custom-accordion.component';
@@ -20,7 +21,6 @@ import { CustomRangesliderComponent } from './components/custom-rangeslider/cust
 import { CustomTextareaComponent } from './components/custom-textarea/custom-textarea.component';
 import { CustomToggleComponent } from './components/custom-toggle/custom-toggle.component';
 import { GlobalSearchComponent } from './components/global-search/global-search.component';
-import { TranslateModule } from '@ngx-translate/core';
 import { AppPrimeNGModule } from './modules/app-primeng.module';
 import { FileSizePipe } from './pipes/file-size.pipe';
 import {
@@ -55,7 +55,13 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     FilterTablesPipe,
     ReplaceUnderscoresPipe,
   ],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, AppPrimeNGModule, TranslateModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    AppPrimeNGModule,
+    TranslateModule,
+  ],
   exports: [
     ChangePasswordDialogComponent,
     ConfirmLeaveDialogComponent,

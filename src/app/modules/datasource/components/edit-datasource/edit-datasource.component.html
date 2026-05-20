@@ -35,7 +35,9 @@
       <div class="warning-message">
         <div class="warning-header" (click)="toggleWarning()">
           <i class="pi pi-exclamation-triangle"></i>
-          <span class="warning-title">{{ 'DATASOURCE.EDIT_WARNING_TITLE' | translate }}</span>
+          <span class="warning-title">{{
+            'DATASOURCE.EDIT_WARNING_TITLE' | translate
+          }}</span>
           <i
             class="pi"
             [ngClass]="{
@@ -50,13 +52,16 @@
         >
           <div class="warning-text">
             <p>
-              <i class="pi pi-circle-fill"></i> {{ 'DATASOURCE.EDIT_WARNING_CHANGES' | translate }}
+              <i class="pi pi-circle-fill"></i>
+              {{ 'DATASOURCE.EDIT_WARNING_CHANGES' | translate }}
             </p>
             <p>
-              <i class="pi pi-circle-fill"></i> {{ 'DATASOURCE.EDIT_WARNING_TEST_REQUIRED' | translate }}
+              <i class="pi pi-circle-fill"></i>
+              {{ 'DATASOURCE.EDIT_WARNING_TEST_REQUIRED' | translate }}
             </p>
             <p>
-              <i class="pi pi-circle-fill"></i> {{ 'DATASOURCE.EDIT_WARNING_CREDENTIALS' | translate }}
+              <i class="pi pi-circle-fill"></i>
+              {{ 'DATASOURCE.EDIT_WARNING_CREDENTIALS' | translate }}
             </p>
           </div>
         </div>
@@ -226,7 +231,8 @@
                   : connectionTestResult === 'success'
                     ? ('DATASOURCE.CONNECTION_SUCCESSFUL' | translate)
                     : connectionTestResult === 'failed'
-                      ? (connectionTestError || ('DATASOURCE.CONNECTION_FAILED_RETRY' | translate))
+                      ? connectionTestError ||
+                        ('DATASOURCE.CONNECTION_FAILED_RETRY' | translate)
                       : ('DATASOURCE.TEST_CONNECTION' | translate)
               }}
             </a>
@@ -249,7 +255,9 @@
             >
             </p-inputSwitch>
             <span class="status-label">{{
-              datasourceForm.get('status')?.value ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate)
+              datasourceForm.get('status')?.value
+                ? ('COMMON.ACTIVE' | translate)
+                : ('COMMON.INACTIVE' | translate)
             }}</span>
           </div>
         </div>
@@ -274,7 +282,8 @@
 
       <div class="justification-section">
         <label for="saveJustification"
-          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
         >
         <textarea
           id="saveJustification"

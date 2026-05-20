@@ -16,12 +16,12 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { RLS_RULE } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from 'src/app/modules/dataset/services/dataset.service';
-import { TranslateService } from '@ngx-translate/core';
 import { RlsRulesService } from '../../services/rls-rules.service';
 
 function nonEmptyArray(control: AbstractControl): ValidationErrors | null {
@@ -340,11 +340,16 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
 
   getNameError(): string {
     const control = this.rlsForm.get('name');
-    if (control?.errors?.['required']) return this.translate.instant('RLS.NAME_REQUIRED');
+    if (control?.errors?.['required'])
+      return this.translate.instant('RLS.NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return this.translate.instant('RLS.NAME_MIN', { min: control.errors['minlength'].requiredLength });
+      return this.translate.instant('RLS.NAME_MIN', {
+        min: control.errors['minlength'].requiredLength,
+      });
     if (control?.errors?.['maxlength'])
-      return this.translate.instant('RLS.NAME_MAX', { max: control.errors['maxlength'].requiredLength });
+      return this.translate.instant('RLS.NAME_MAX', {
+        max: control.errors['maxlength'].requiredLength,
+      });
     if (control?.errors?.['pattern'])
       return this.translate.instant('RLS.NAME_PATTERN');
     return '';

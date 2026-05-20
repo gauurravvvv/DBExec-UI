@@ -48,12 +48,15 @@
         <!-- Justification (for updates) -->
         <div class="form-field justification-section" *ngIf="showJustification">
           <label for="justification"
-            >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
+            >{{ 'COMMON.JUSTIFICATION' | translate }}
+            <span class="required">*</span></label
           >
           <textarea
             id="justification"
             formControlName="justification"
-            [placeholder]="'COMMON.JUSTIFICATION_UPDATE_PLACEHOLDER' | translate"
+            [placeholder]="
+              'COMMON.JUSTIFICATION_UPDATE_PLACEHOLDER' | translate
+            "
             rows="3"
             maxlength="500"
           ></textarea>

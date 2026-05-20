@@ -7,32 +7,32 @@
       </div>
 
       <div class="header-actions">
-          <button
-            pButton
-            icon="pi pi-file-pdf"
-            [pTooltip]="'COMMON.EXPORT_PDF' | translate"
-            tooltipPosition="top"
-            (click)="exportLogs('pdf')"
-            [disabled]="totalItems() === 0"
-            class="p-button-outlined p-button-danger modern-button"
-          ></button>
-          <button
-            pButton
-            icon="pi pi-refresh"
-            [pTooltip]="'COMMON.REFRESH' | translate"
-            tooltipPosition="top"
-            (click)="refreshLogs()"
-            class="p-button-outlined modern-button"
-          ></button>
-          <button
-            pButton
-            [label]="'COMMON.CLEAR' | translate"
-            icon="pi pi-filter-slash"
-            (click)="clearFilters()"
-            [disabled]="!isFilterActive"
-            class="p-button-outlined p-button-danger modern-button"
-          ></button>
-              </div>
+        <button
+          pButton
+          icon="pi pi-file-pdf"
+          [pTooltip]="'COMMON.EXPORT_PDF' | translate"
+          tooltipPosition="top"
+          (click)="exportLogs('pdf')"
+          [disabled]="totalItems() === 0"
+          class="p-button-outlined p-button-danger modern-button"
+        ></button>
+        <button
+          pButton
+          icon="pi pi-refresh"
+          [pTooltip]="'COMMON.REFRESH' | translate"
+          tooltipPosition="top"
+          (click)="refreshLogs()"
+          class="p-button-outlined modern-button"
+        ></button>
+        <button
+          pButton
+          [label]="'COMMON.CLEAR' | translate"
+          icon="pi pi-filter-slash"
+          (click)="clearFilters()"
+          [disabled]="!isFilterActive"
+          class="p-button-outlined p-button-danger modern-button"
+        ></button>
+      </div>
     </div>
 
     <!-- Unified Toolbar & Content Card -->
@@ -103,7 +103,9 @@
                 <div class="th-content">{{ 'COMMON.NAME' | translate }}</div>
               </th>
               <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">{{ 'AUDIT.PERFORMED_BY' | translate }}</div>
+                <div class="th-content">
+                  {{ 'AUDIT.PERFORMED_BY' | translate }}
+                </div>
               </th>
               <th
                 style="width: 9rem; min-width: 9rem"
@@ -113,13 +115,26 @@
               >
                 <div class="th-content">
                   <span>{{ 'AUDIT.ACTION' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('action')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('action') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('action') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('action'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('action') > 0 && sortHelper.size > 1">{{ sortHelper.index('action') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('action')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up': sortHelper.direction('action') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('action') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('action'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('action') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('action') }}</span
+                    >
                   </span>
                 </div>
               </th>
@@ -137,21 +152,39 @@
               >
                 <div class="th-content">
                   <span>{{ 'AUDIT.TIMESTAMP' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('createdOn')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('createdOn') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('createdOn') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('createdOn'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('createdOn') > 0 && sortHelper.size > 1">{{ sortHelper.index('createdOn') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('createdOn')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up':
+                          sortHelper.direction('createdOn') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('createdOn') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('createdOn'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('createdOn') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('createdOn') }}</span
+                    >
                   </span>
                 </div>
               </th>
               <th style="width: 10rem; min-width: 10rem">
-                <div class="th-content">{{ 'AUDIT.IP_ADDRESS' | translate }}</div>
+                <div class="th-content">
+                  {{ 'AUDIT.IP_ADDRESS' | translate }}
+                </div>
               </th>
               <th style="min-width: 16rem">
-                <div class="th-content">{{ 'AUDIT.JUSTIFICATION' | translate }}</div>
+                <div class="th-content">
+                  {{ 'AUDIT.JUSTIFICATION' | translate }}
+                </div>
               </th>
             </tr>
             <!-- Filter Row -->
@@ -259,7 +292,11 @@
                 >
                   <span class="dot"></span>
                   <span class="label">
-                    {{ log.responseSuccess ? ('AUDIT.SUCCESS' | translate) : ('AUDIT.FAILED' | translate) }}
+                    {{
+                      log.responseSuccess
+                        ? ('AUDIT.SUCCESS' | translate)
+                        : ('AUDIT.FAILED' | translate)
+                    }}
                   </span>
                 </span>
               </td>
@@ -289,13 +326,14 @@
                 <div class="empty-state-inline">
                   <i class="pi pi-search empty-state-icon"></i>
                   <span class="empty-state-text">
-                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash; {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
+                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash;
+                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
                   </span>
                 </div>
               </td>
             </tr>
           </ng-template>
-        
+
           <ng-template pTemplate="paginatorright">
             <button
               type="button"
@@ -396,7 +434,11 @@
             [class.success]="selectedLog.responseSuccess"
             [class.failed]="!selectedLog.responseSuccess"
           ></span>
-          {{ selectedLog.responseSuccess ? ('AUDIT.SUCCESS' | translate) : ('AUDIT.FAILED' | translate) }}
+          {{
+            selectedLog.responseSuccess
+              ? ('AUDIT.SUCCESS' | translate)
+              : ('AUDIT.FAILED' | translate)
+          }}
         </span>
       </div>
       <div class="info-item">
@@ -413,7 +455,9 @@
     <div class="popup-section" *ngIf="selectedLog.justification">
       <div class="section-header">
         <i class="pi pi-align-left"></i>
-        <span class="section-title">{{ 'AUDIT.JUSTIFICATION' | translate }}</span>
+        <span class="section-title">{{
+          'AUDIT.JUSTIFICATION' | translate
+        }}</span>
       </div>
       <p class="justification-detail">{{ selectedLog.justification }}</p>
     </div>
@@ -452,7 +496,9 @@
     >
       <div class="section-header">
         <i class="pi pi-list"></i>
-        <span class="section-title">{{ 'AUDIT.ENTITY_DETAILS' | translate }}</span>
+        <span class="section-title">{{
+          'AUDIT.ENTITY_DETAILS' | translate
+        }}</span>
       </div>
       <table class="details-table">
         <tbody>

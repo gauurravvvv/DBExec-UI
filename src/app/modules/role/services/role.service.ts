@@ -93,7 +93,10 @@ export class RoleService {
     orgId: string,
   ): Promise<any> {
     return await lastValueFrom(
-      this.http.apiPost(ROLE.BULK_DELETE_PREFIX + orgId + ROLE.BULK_DELETE_SUFFIX, { ids, justification }),
+      this.http.apiPost(
+        ROLE.BULK_DELETE_PREFIX + orgId + ROLE.BULK_DELETE_SUFFIX,
+        { ids, justification },
+      ),
     );
   }
 
@@ -162,7 +165,10 @@ export class RoleService {
     orgId: string,
   ) {
     return lastValueFrom(
-      this.http.apiPost(ROLE.BULK_DELETE_PREFIX + orgId + ROLE.BULK_DELETE_SUFFIX, { ids, justification }),
+      this.http.apiPost(
+        ROLE.BULK_DELETE_PREFIX + orgId + ROLE.BULK_DELETE_SUFFIX,
+        { ids, justification },
+      ),
     );
   }
 }

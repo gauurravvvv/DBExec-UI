@@ -26,9 +26,9 @@
               <i class="pi pi-shield"></i>
             </div>
             <h3 class="role-name">{{ roleData.name }}</h3>
-            <span *ngIf="roleData.isDefault === 1" class="default-badge"
-              >{{ 'ROLE.DEFAULT' | translate }}</span
-            >
+            <span *ngIf="roleData.isDefault === 1" class="default-badge">{{
+              'ROLE.DEFAULT' | translate
+            }}</span>
           </div>
 
           <!-- Role Information -->
@@ -51,7 +51,11 @@
                   class="status-badge"
                   [class.active]="roleData.status === 1"
                 >
-                  {{ roleData.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                  {{
+                    roleData.status === 1
+                      ? ('COMMON.ACTIVE' | translate)
+                      : ('COMMON.INACTIVE' | translate)
+                  }}
                 </span>
               </span>
             </div>
@@ -61,7 +65,9 @@
 
       <!-- Permissions Section -->
       <div class="permissions-section" *ngIf="permissions.length > 0">
-        <h4 class="section-title">{{ 'ROLE.SCREEN_PERMISSIONS' | translate }}</h4>
+        <h4 class="section-title">
+          {{ 'ROLE.SCREEN_PERMISSIONS' | translate }}
+        </h4>
         <div class="permission-columns">
           <div
             class="column"

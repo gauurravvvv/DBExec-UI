@@ -4,7 +4,11 @@
 // Header action buttons (matching view-prompt pattern)
 .action-buttons {
   .btn-primary {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--primary-hover)
+    );
     color: var(--primary-text);
     box-shadow: 0 4px 10px var(--primary-color-transparent);
 
@@ -15,7 +19,11 @@
   }
 
   .btn-configure {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--primary-hover)
+    );
     color: var(--primary-text);
     box-shadow: 0 4px 10px var(--primary-color-transparent);
 

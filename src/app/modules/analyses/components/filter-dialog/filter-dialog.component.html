@@ -201,8 +201,7 @@
       <div
         class="filter-dialog-field"
         *ngIf="
-          filterDialogType === 'category' &&
-          filterDialogControl === 'dropdown'
+          filterDialogType === 'category' && filterDialogControl === 'dropdown'
         "
       >
         <app-custom-dropdown
@@ -221,19 +220,14 @@
           [autoDisplayFirst]="false"
           appendTo="body"
         ></app-custom-dropdown>
-        <ng-container
-          *ngTemplateOutlet="categoryEmptyHint"
-        ></ng-container>
-        <ng-container
-          *ngTemplateOutlet="categoryStaleRow"
-        ></ng-container>
+        <ng-container *ngTemplateOutlet="categoryEmptyHint"></ng-container>
+        <ng-container *ngTemplateOutlet="categoryStaleRow"></ng-container>
       </div>
 
       <div
         class="filter-dialog-field"
         *ngIf="
-          filterDialogType === 'category' &&
-          filterDialogControl !== 'dropdown'
+          filterDialogType === 'category' && filterDialogControl !== 'dropdown'
         "
       >
         <app-custom-multiselect
@@ -252,12 +246,8 @@
           [selectedItemsLabel]="'ANALYSES.FILTER_N_SELECTED' | translate"
           appendTo="body"
         ></app-custom-multiselect>
-        <ng-container
-          *ngTemplateOutlet="categoryEmptyHint"
-        ></ng-container>
-        <ng-container
-          *ngTemplateOutlet="categoryStaleRow"
-        ></ng-container>
+        <ng-container *ngTemplateOutlet="categoryEmptyHint"></ng-container>
+        <ng-container *ngTemplateOutlet="categoryStaleRow"></ng-container>
       </div>
 
       <!-- Shared empty-options hint and stale-defaults warning, kept

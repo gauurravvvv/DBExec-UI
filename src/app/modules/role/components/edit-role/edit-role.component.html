@@ -7,7 +7,9 @@
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>{{ 'ROLE.EDIT_TITLE' | translate }}</h2>
-        <span *ngIf="isDefault" class="default-badge">{{ 'ROLE.DEFAULT' | translate }}</span>
+        <span *ngIf="isDefault" class="default-badge">{{
+          'ROLE.DEFAULT' | translate
+        }}</span>
       </div>
       <div class="action-buttons">
         <button
@@ -88,7 +90,8 @@
       <!-- Permissions Section -->
       <div class="permissions-section" *ngIf="permissions.length > 0">
         <label class="section-title"
-          >{{ 'ROLE.SCREEN_PERMISSIONS' | translate }}<span class="required"> *</span></label
+          >{{ 'ROLE.SCREEN_PERMISSIONS' | translate
+          }}<span class="required"> *</span></label
         >
 
         <div class="permissions-grid">
@@ -147,7 +150,8 @@
       <p class="delete-intro">{{ 'ROLE.UPDATE_CONFIRM' | translate }}</p>
       <div class="justification-section">
         <label for="saveJustification"
-          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
         >
         <textarea
           id="saveJustification"

@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -19,7 +20,6 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
-import { TranslateService } from '@ngx-translate/core';
 import { ConnectionService } from '../../services/connection.service';
 
 type ConnectionSortField = 'name' | 'status' | 'createdOn';
@@ -142,8 +142,7 @@ export class ListConnectionComponent implements OnInit {
     const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
-      const res: any =
-        await this.organisationService.listOrganisation(params);
+      const res: any = await this.organisationService.listOrganisation(params);
       if (this.globalService.handleSuccessService(res, false)) {
         return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
       }
@@ -254,7 +253,8 @@ export class ListConnectionComponent implements OnInit {
         if (this.globalService.handleSuccessService(response, false)) {
           const items = response?.data?.datasources ?? [];
           this.preloadedDatasources = items;
-          this.preloadedDatasourcesTotal = response?.data?.count ?? items.length;
+          this.preloadedDatasourcesTotal =
+            response?.data?.count ?? items.length;
           this.datasources = [...items];
           if (this.datasources.length > 0) {
             this.selectedDatasource = this.datasources[0].id;

@@ -169,8 +169,7 @@ export class ListQueryBuilderComponent implements OnInit {
     const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
-      const res: any =
-        await this.organisationService.listOrganisation(params);
+      const res: any = await this.organisationService.listOrganisation(params);
       if (this.globalService.handleSuccessService(res, false)) {
         return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
       }
@@ -508,7 +507,9 @@ export class ListQueryBuilderComponent implements OnInit {
   }
 
   onEditQueryBuilder(queryBuilder: any) {
-    this.router.navigate([QUERY_BUILDER.edit(this.selectedOrg, queryBuilder.id,)]);
+    this.router.navigate([
+      QUERY_BUILDER.edit(this.selectedOrg, queryBuilder.id),
+    ]);
   }
 
   onConfig(id: string) {

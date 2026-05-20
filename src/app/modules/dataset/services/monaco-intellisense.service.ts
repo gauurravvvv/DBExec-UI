@@ -966,7 +966,11 @@ export class MonacoIntelliSenseService {
    * through would cause downstream code to dereference null tableSchema.
    */
   private resolveScopeRefs(
-    scopeRefs: { schemaName: string | null; tableName: string; alias: string | null }[],
+    scopeRefs: {
+      schemaName: string | null;
+      tableName: string;
+      alias: string | null;
+    }[],
     tableByName: Map<string, TableSchema>,
   ): TableRef[] {
     const out: TableRef[] = [];
@@ -1004,7 +1008,9 @@ export class MonacoIntelliSenseService {
       return cached;
     }
     const result = this.stripStringsAndComments(sql);
-    if (this.stripCache.size >= MonacoIntelliSenseService.STRIP_CACHE_CAPACITY) {
+    if (
+      this.stripCache.size >= MonacoIntelliSenseService.STRIP_CACHE_CAPACITY
+    ) {
       // Evict oldest (least recently used) entry.
       const oldestKey = this.stripCache.keys().next().value;
       if (oldestKey !== undefined) {
@@ -1683,8 +1689,7 @@ export class MonacoIntelliSenseService {
     while ((m = tableRegex.exec(stripped)) !== null) {
       const schemaName = m[1] || null;
       const tableName = m[2];
-      const tableTokenStart =
-        m.index + m[0].length - tableName.length;
+      const tableTokenStart = m.index + m[0].length - tableName.length;
       const tableTokenEnd = tableTokenStart + tableName.length;
 
       // CTEs are valid table references — skip if this name is a CTE.
@@ -1729,7 +1734,8 @@ export class MonacoIntelliSenseService {
       const column = q[2];
       const qualifierStart = q.index;
       const qualifierEnd = qualifierStart + qualifier.length;
-      const columnStart = qualifierEnd + (q[0].length - qualifier.length - column.length);
+      const columnStart =
+        qualifierEnd + (q[0].length - qualifier.length - column.length);
       const columnEnd = columnStart + column.length;
 
       // Skip if this is in a FROM/JOIN/UPDATE/INTO position — that's
@@ -2004,10 +2010,7 @@ export class MonacoIntelliSenseService {
     // Keywords are a flat list — only show a tooltip for the canonical match.
     if (SQL_KEYWORDS.includes(upper)) {
       return {
-        contents: [
-          { value: `**${upper}**` },
-          { value: '_SQL keyword_' },
-        ],
+        contents: [{ value: `**${upper}**` }, { value: '_SQL keyword_' }],
       };
     }
 

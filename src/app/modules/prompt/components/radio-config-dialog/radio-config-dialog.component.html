@@ -11,10 +11,14 @@
   <div class="dialog-content">
     <div class="config-panel">
       <div class="panel-header">
-        <i class="pi pi-cog"></i><span>{{ 'PROMPT_MODULE.CONFIGURATION_OPTIONS' | translate }}</span>
+        <i class="pi pi-cog"></i
+        ><span>{{ 'PROMPT_MODULE.CONFIGURATION_OPTIONS' | translate }}</span>
       </div>
       <div class="config-form">
-        <div class="section-label"><i class="pi pi-sliders-h"></i> {{ 'PROMPT_MODULE.LAYOUT' | translate }}</div>
+        <div class="section-label">
+          <i class="pi pi-sliders-h"></i>
+          {{ 'PROMPT_MODULE.LAYOUT' | translate }}
+        </div>
 
         <div class="config-group">
           <label>{{ 'PROMPT_MODULE.ORIENTATION' | translate }}</label>
@@ -81,10 +85,13 @@
 
     <div class="preview-panel">
       <div class="panel-header">
-        <i class="pi pi-eye"></i><span>{{ 'PROMPT_MODULE.PREVIEW' | translate }}</span>
+        <i class="pi pi-eye"></i
+        ><span>{{ 'PROMPT_MODULE.PREVIEW' | translate }}</span>
       </div>
       <div class="preview-content">
-        <div class="preview-label">{{ 'PROMPT_MODULE.TRY_IT_OUT' | translate }}</div>
+        <div class="preview-label">
+          {{ 'PROMPT_MODULE.TRY_IT_OUT' | translate }}
+        </div>
 
         <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
           <div *ngIf="formattedOptions.length > 0; else noOptions">
@@ -121,7 +128,8 @@
         <div class="default-indicator" *ngIf="config.defaultValue != null">
           <i class="pi pi-bookmark"></i>
           <span
-            >{{ 'PROMPT_MODULE.DEFAULT' | translate }}: <strong>{{ config.defaultValue }}</strong></span
+            >{{ 'PROMPT_MODULE.DEFAULT' | translate }}:
+            <strong>{{ config.defaultValue }}</strong></span
           >
           <button
             pButton
@@ -135,7 +143,8 @@
 
         <div class="config-summary">
           <div class="summary-title">
-            <i class="pi pi-info-circle"></i> {{ 'PROMPT_MODULE.ACTIVE_SETTINGS' | translate }}
+            <i class="pi pi-info-circle"></i>
+            {{ 'PROMPT_MODULE.ACTIVE_SETTINGS' | translate }}
           </div>
           <div class="summary-chips">
             <span
@@ -156,7 +165,8 @@
               >{{ 'PROMPT_MODULE.LABEL_LEFT' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.gap !== 'medium'"
-              >{{ 'PROMPT_MODULE.GAP' | translate }}: {{ previewConfig.gap }}</span
+              >{{ 'PROMPT_MODULE.GAP' | translate }}:
+              {{ previewConfig.gap }}</span
             >
             <span
               class="summary-chip"

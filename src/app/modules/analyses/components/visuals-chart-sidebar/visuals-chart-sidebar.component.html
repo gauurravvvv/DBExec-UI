@@ -78,7 +78,9 @@
       *ngIf="focusedVisualId && focusedVisual?.chartType"
     >
       <div class="section-divider"></div>
-      <div class="axis-selection-title">{{ 'ANALYSES.DATA_MAPPING' | translate }}</div>
+      <div class="axis-selection-title">
+        {{ 'ANALYSES.DATA_MAPPING' | translate }}
+      </div>
       <div class="axis-hint" *ngIf="activeAxisSelection">
         <i class="pi pi-arrow-left"></i>
         <span>{{ 'ANALYSES.CLICK_FIELD_FROM_LEFT_PANEL' | translate }}</span>
@@ -217,7 +219,9 @@
           [class.has-value]="focusedVisual.zAxisColumn"
           (click)="startAxisSelection('z')"
         >
-          <div class="axis-label">{{ 'ANALYSES.SIZE_OPTIONAL' | translate }}</div>
+          <div class="axis-label">
+            {{ 'ANALYSES.SIZE_OPTIONAL' | translate }}
+          </div>
           <div class="axis-value" *ngIf="focusedVisual.zAxisColumn">
             <span>{{ getFieldDisplayName(focusedVisual.zAxisColumn) }}</span>
             <i
@@ -243,7 +247,9 @@
         >
           <div class="axis-label">
             {{
-              isPolygons3dChartType(focusedVisual.chartType) ? ('ANALYSES.NAME' | translate) : ('ANALYSES.X_AXIS' | translate)
+              isPolygons3dChartType(focusedVisual.chartType)
+                ? ('ANALYSES.NAME' | translate)
+                : ('ANALYSES.X_AXIS' | translate)
             }}
           </div>
           <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">

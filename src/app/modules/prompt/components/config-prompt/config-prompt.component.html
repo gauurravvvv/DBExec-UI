@@ -206,7 +206,8 @@
           >
             <div class="form-field full-width">
               <label for="promptJoin">
-                {{ 'PROMPT_MODULE.PROMPT_JOIN_CONDITION' | translate }}<span class="required">*</span>
+                {{ 'PROMPT_MODULE.PROMPT_JOIN_CONDITION' | translate
+                }}<span class="required">*</span>
                 <i
                   class="pi pi-info-circle info-icon"
                   [pTooltip]="'PROMPT_MODULE.JOIN_CONDITION_HINT' | translate"
@@ -244,9 +245,9 @@
                     <span
                       >{{ filteredJoinColumns.length }} column(s) found</span
                     >
-                    <span class="keyboard-hint"
-                      >{{ 'PROMPT_MODULE.KEYBOARD_HINT' | translate }}</span
-                    >
+                    <span class="keyboard-hint">{{
+                      'PROMPT_MODULE.KEYBOARD_HINT' | translate
+                    }}</span>
                   </div>
                   <div class="suggestions-list">
                     <div
@@ -272,9 +273,14 @@
                     class="suggestions-footer"
                     *ngIf="filteredJoinColumns.length > maxSuggestions"
                   >
-                    <span
-                      >{{ 'PROMPT_MODULE.SHOWING_RESULTS' | translate: { shown: maxSuggestions, total: filteredJoinColumns.length } }}</span
-                    >
+                    <span>{{
+                      'PROMPT_MODULE.SHOWING_RESULTS'
+                        | translate
+                          : {
+                              shown: maxSuggestions,
+                              total: filteredJoinColumns.length,
+                            }
+                    }}</span>
                   </div>
                 </div>
 
@@ -289,7 +295,10 @@
                 >
                   <div class="no-results-content">
                     <i class="pi pi-search"></i>
-                    <span>{{ 'PROMPT_MODULE.NO_COLUMNS_FOUND' | translate: { alias: currentJoinAlias } }}</span>
+                    <span>{{
+                      'PROMPT_MODULE.NO_COLUMNS_FOUND'
+                        | translate: { alias: currentJoinAlias }
+                    }}</span>
                   </div>
                 </div>
               </div>
@@ -311,7 +320,8 @@
           <div class="form-row">
             <div class="form-field full-width">
               <label for="promptWhere">
-                {{ 'PROMPT_MODULE.PROMPT_WHERE_CONDITION' | translate }}<span class="required">*</span>
+                {{ 'PROMPT_MODULE.PROMPT_WHERE_CONDITION' | translate
+                }}<span class="required">*</span>
                 <i
                   class="pi pi-info-circle info-icon"
                   [pTooltip]="'PROMPT_MODULE.WHERE_CONDITION_HINT' | translate"
@@ -330,7 +340,9 @@
                     (keydown)="onWhereKeydown($event)"
                     (blur)="hideSuggestionsDelayed()"
                     (focus)="onWhereFocus($event)"
-                    [placeholder]="'PROMPT_MODULE.ENTER_WHERE_CONDITION' | translate"
+                    [placeholder]="
+                      'PROMPT_MODULE.ENTER_WHERE_CONDITION' | translate
+                    "
                     autocomplete="off"
                     [ngClass]="{
                       'ng-invalid ng-dirty':
@@ -346,10 +358,13 @@
                   *ngIf="showSuggestions && filteredColumns.length > 0"
                 >
                   <div class="suggestions-header">
-                    <span>{{ filteredColumns.length }} {{ 'PROMPT_MODULE.COLUMNS_FOUND' | translate }}</span>
-                    <span class="keyboard-hint"
-                      >{{ 'PROMPT_MODULE.KEYBOARD_HINT' | translate }}</span
+                    <span
+                      >{{ filteredColumns.length }}
+                      {{ 'PROMPT_MODULE.COLUMNS_FOUND' | translate }}</span
                     >
+                    <span class="keyboard-hint">{{
+                      'PROMPT_MODULE.KEYBOARD_HINT' | translate
+                    }}</span>
                   </div>
                   <div class="suggestions-list">
                     <div
@@ -372,9 +387,14 @@
                     class="suggestions-footer"
                     *ngIf="filteredColumns.length > maxSuggestions"
                   >
-                    <span
-                      >{{ 'PROMPT_MODULE.SHOWING_RESULTS' | translate: { shown: maxSuggestions, total: filteredColumns.length } }}</span
-                    >
+                    <span>{{
+                      'PROMPT_MODULE.SHOWING_RESULTS'
+                        | translate
+                          : {
+                              shown: maxSuggestions,
+                              total: filteredColumns.length,
+                            }
+                    }}</span>
                   </div>
                 </div>
 
@@ -389,7 +409,10 @@
                 >
                   <div class="no-results-content">
                     <i class="pi pi-search"></i>
-                    <span>{{ 'PROMPT_MODULE.NO_COLUMNS_FOUND' | translate: { alias: currentAlias } }}</span>
+                    <span>{{
+                      'PROMPT_MODULE.NO_COLUMNS_FOUND'
+                        | translate: { alias: currentAlias }
+                    }}</span>
                   </div>
                 </div>
               </div>
@@ -408,10 +431,15 @@
               >
                 <i class="pi pi-lightbulb"></i>
                 <span *ngIf="isRangeType()">
-                  <strong>{{ 'PROMPT_MODULE.RANGE_PROMPTS' | translate }}:</strong> {{ 'PROMPT_MODULE.USE' | translate }}
+                  <strong
+                    >{{ 'PROMPT_MODULE.RANGE_PROMPTS' | translate }}:</strong
+                  >
+                  {{ 'PROMPT_MODULE.USE' | translate }}
                   <code>{{ '{' }}startValue{{ '}' }}</code> and
-                  <code>{{ '{' }}endValue{{ '}' }}</code> {{ 'PROMPT_MODULE.AS_PLACEHOLDERS' | translate }}
-                  <br />{{ 'PROMPT_MODULE.EXAMPLE' | translate }}:
+                  <code>{{ '{' }}endValue{{ '}' }}</code>
+                  {{ 'PROMPT_MODULE.AS_PLACEHOLDERS' | translate }} <br />{{
+                    'PROMPT_MODULE.EXAMPLE' | translate
+                  }}:
                   <code
                     >alias.column BETWEEN '{{ '{' }}startValue{{ '}' }}' AND '{{
                       '{'
@@ -419,15 +447,29 @@
                   >
                 </span>
                 <span *ngIf="isMultiValueType()">
-                  <strong>{{ 'PROMPT_MODULE.MULTI_VALUE_PROMPTS' | translate }}:</strong> {{ 'PROMPT_MODULE.USE' | translate }}
-                  <code>{{ '{' }}value{{ '}' }}</code> {{ 'PROMPT_MODULE.AS_PLACEHOLDER' | translate }}
-                  <br />{{ 'PROMPT_MODULE.EXAMPLE' | translate }}:
+                  <strong
+                    >{{
+                      'PROMPT_MODULE.MULTI_VALUE_PROMPTS' | translate
+                    }}:</strong
+                  >
+                  {{ 'PROMPT_MODULE.USE' | translate }}
+                  <code>{{ '{' }}value{{ '}' }}</code>
+                  {{ 'PROMPT_MODULE.AS_PLACEHOLDER' | translate }} <br />{{
+                    'PROMPT_MODULE.EXAMPLE' | translate
+                  }}:
                   <code>alias.column IN ('{{ '{' }}value{{ '}' }}')</code>
                 </span>
                 <span *ngIf="!isRangeType() && !isMultiValueType()">
-                  <strong>{{ 'PROMPT_MODULE.SINGLE_VALUE_PROMPTS' | translate }}:</strong> {{ 'PROMPT_MODULE.USE' | translate }}
-                  <code>{{ '{' }}value{{ '}' }}</code> {{ 'PROMPT_MODULE.AS_PLACEHOLDER' | translate }}
-                  <br />{{ 'PROMPT_MODULE.EXAMPLE' | translate }}:
+                  <strong
+                    >{{
+                      'PROMPT_MODULE.SINGLE_VALUE_PROMPTS' | translate
+                    }}:</strong
+                  >
+                  {{ 'PROMPT_MODULE.USE' | translate }}
+                  <code>{{ '{' }}value{{ '}' }}</code>
+                  {{ 'PROMPT_MODULE.AS_PLACEHOLDER' | translate }} <br />{{
+                    'PROMPT_MODULE.EXAMPLE' | translate
+                  }}:
                   <code>alias.column = '{{ '{' }}value{{ '}' }}'</code>
                 </span>
               </small>
@@ -473,7 +515,8 @@
             <div class="form-field">
               <div class="label-with-clear">
                 <label for="promptValues" class="label-with-clear__label">
-                  {{ 'PROMPT_MODULE.PROMPT_VALUES' | translate }}<span class="required">*</span>
+                  {{ 'PROMPT_MODULE.PROMPT_VALUES' | translate
+                  }}<span class="required">*</span>
                   <i
                     class="pi pi-info-circle info-icon"
                     [pTooltip]="'PROMPT_MODULE.PROMPT_VALUES_HINT' | translate"

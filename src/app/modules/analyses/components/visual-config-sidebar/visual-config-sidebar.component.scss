@@ -62,9 +62,13 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: color var(--motion-fast) ease, background var(--motion-fast) ease;
+    transition:
+      color var(--motion-fast) ease,
+      background var(--motion-fast) ease;
 
-    .pi { font-size: 12px; }
+    .pi {
+      font-size: 12px;
+    }
 
     &:hover {
       color: var(--text-color);
@@ -84,12 +88,18 @@
   overflow-x: hidden;
   padding: var(--space-5);
 
-  &::-webkit-scrollbar { width: 3px; }
-  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar {
+    width: 3px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
   &::-webkit-scrollbar-thumb {
     background: var(--border-strong);
     border-radius: 999px;
-    &:hover { background: var(--text-subtle); }
+    &:hover {
+      background: var(--text-subtle);
+    }
   }
   scrollbar-width: thin;
   scrollbar-color: var(--border-strong) transparent;
@@ -178,6 +188,12 @@
 }
 
 @keyframes slideInRight {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }

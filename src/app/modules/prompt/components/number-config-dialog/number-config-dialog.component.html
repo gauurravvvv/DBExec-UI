@@ -11,16 +11,22 @@
   <div class="dialog-content">
     <div class="config-panel">
       <div class="panel-header">
-        <i class="pi pi-cog"></i><span>{{ 'PROMPT_MODULE.CONFIGURATION_OPTIONS' | translate }}</span>
+        <i class="pi pi-cog"></i
+        ><span>{{ 'PROMPT_MODULE.CONFIGURATION_OPTIONS' | translate }}</span>
       </div>
       <div class="config-form">
-        <div class="section-label"><i class="pi pi-sliders-h"></i> {{ 'PROMPT_MODULE.BASIC' | translate }}</div>
+        <div class="section-label">
+          <i class="pi pi-sliders-h"></i>
+          {{ 'PROMPT_MODULE.BASIC' | translate }}
+        </div>
 
         <div class="config-group">
           <app-custom-input
             [(ngModel)]="config.placeholder"
             [label]="'PROMPT_MODULE.PLACEHOLDER_TEXT' | translate"
-            [placeholder]="'PROMPT_MODULE.PLACEHOLDER_NUMBER_EXAMPLE' | translate"
+            [placeholder]="
+              'PROMPT_MODULE.PLACEHOLDER_NUMBER_EXAMPLE' | translate
+            "
           >
           </app-custom-input>
         </div>
@@ -65,7 +71,8 @@
         </div>
 
         <div class="section-label">
-          <i class="pi pi-sort-alt"></i> {{ 'PROMPT_MODULE.SPINNER_BUTTONS' | translate }}
+          <i class="pi pi-sort-alt"></i>
+          {{ 'PROMPT_MODULE.SPINNER_BUTTONS' | translate }}
         </div>
 
         <div class="config-row">
@@ -73,7 +80,9 @@
           <p-inputSwitch [(ngModel)]="config.showButtons"></p-inputSwitch>
         </div>
 
-        <div class="section-label"><i class="pi pi-tag"></i> {{ 'PROMPT_MODULE.FORMAT' | translate }}</div>
+        <div class="section-label">
+          <i class="pi pi-tag"></i> {{ 'PROMPT_MODULE.FORMAT' | translate }}
+        </div>
 
         <div class="config-group">
           <app-custom-input
@@ -92,7 +101,9 @@
           </app-custom-input>
         </div>
 
-        <div class="section-label"><i class="pi pi-cog"></i> {{ 'PROMPT_MODULE.BEHAVIOUR' | translate }}</div>
+        <div class="section-label">
+          <i class="pi pi-cog"></i> {{ 'PROMPT_MODULE.BEHAVIOUR' | translate }}
+        </div>
 
         <div class="config-row">
           <label>{{ 'PROMPT_MODULE.DISABLED' | translate }}</label>
@@ -113,10 +124,13 @@
 
     <div class="preview-panel">
       <div class="panel-header">
-        <i class="pi pi-eye"></i><span>{{ 'PROMPT_MODULE.PREVIEW' | translate }}</span>
+        <i class="pi pi-eye"></i
+        ><span>{{ 'PROMPT_MODULE.PREVIEW' | translate }}</span>
       </div>
       <div class="preview-content">
-        <div class="preview-label">{{ 'PROMPT_MODULE.TRY_IT_OUT' | translate }}</div>
+        <div class="preview-label">
+          {{ 'PROMPT_MODULE.TRY_IT_OUT' | translate }}
+        </div>
 
         <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
           <app-custom-number
@@ -148,7 +162,8 @@
         <div class="default-indicator" *ngIf="config.defaultValue !== null">
           <i class="pi pi-bookmark"></i>
           <span
-            >{{ 'PROMPT_MODULE.DEFAULT' | translate }}: <strong>{{ config.defaultValue }}</strong></span
+            >{{ 'PROMPT_MODULE.DEFAULT' | translate }}:
+            <strong>{{ config.defaultValue }}</strong></span
           >
           <button
             pButton
@@ -162,30 +177,33 @@
 
         <div class="config-summary">
           <div class="summary-title">
-            <i class="pi pi-info-circle"></i> {{ 'PROMPT_MODULE.ACTIVE_SETTINGS' | translate }}
+            <i class="pi pi-info-circle"></i>
+            {{ 'PROMPT_MODULE.ACTIVE_SETTINGS' | translate }}
           </div>
           <div class="summary-chips">
-            <span class="summary-chip" *ngIf="previewConfig.showButtons"
-              >{{ 'PROMPT_MODULE.BUTTONS' | translate }}</span
-            >
+            <span class="summary-chip" *ngIf="previewConfig.showButtons">{{
+              'PROMPT_MODULE.BUTTONS' | translate
+            }}</span>
             <span class="summary-chip" *ngIf="previewConfig.min !== null"
-              >{{ 'PROMPT_MODULE.MIN' | translate }}: {{ previewConfig.min }}</span
+              >{{ 'PROMPT_MODULE.MIN' | translate }}:
+              {{ previewConfig.min }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.max !== null"
-              >{{ 'PROMPT_MODULE.MAX' | translate }}: {{ previewConfig.max }}</span
+              >{{ 'PROMPT_MODULE.MAX' | translate }}:
+              {{ previewConfig.max }}</span
             >
-            <span class="summary-chip" *ngIf="previewConfig.prefix"
-              >{{ 'PROMPT_MODULE.PREFIX' | translate }}</span
-            >
-            <span class="summary-chip" *ngIf="previewConfig.suffix"
-              >{{ 'PROMPT_MODULE.SUFFIX' | translate }}</span
-            >
-            <span class="summary-chip" *ngIf="previewConfig.disabled"
-              >{{ 'PROMPT_MODULE.DISABLED' | translate }}</span
-            >
-            <span class="summary-chip" *ngIf="previewConfig.readonly"
-              >{{ 'PROMPT_MODULE.READ_ONLY' | translate }}</span
-            >
+            <span class="summary-chip" *ngIf="previewConfig.prefix">{{
+              'PROMPT_MODULE.PREFIX' | translate
+            }}</span>
+            <span class="summary-chip" *ngIf="previewConfig.suffix">{{
+              'PROMPT_MODULE.SUFFIX' | translate
+            }}</span>
+            <span class="summary-chip" *ngIf="previewConfig.disabled">{{
+              'PROMPT_MODULE.DISABLED' | translate
+            }}</span>
+            <span class="summary-chip" *ngIf="previewConfig.readonly">{{
+              'PROMPT_MODULE.READ_ONLY' | translate
+            }}</span>
             <span
               class="summary-empty"
               *ngIf="

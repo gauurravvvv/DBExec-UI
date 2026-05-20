@@ -7,35 +7,35 @@
       </div>
 
       <div class="header-actions">
-          <!-- Bulk Delete Button -->
-          <button
-            *ngIf="selectedCount > 0"
-            pButton
-            [label]="'COMMON.DELETE_COUNT' | translate:{ count: selectedCount }"
-            icon="pi pi-trash"
-            (click)="confirmBulkDelete()"
-            class="p-button-raised p-button-danger modern-button"
-          ></button>
+        <!-- Bulk Delete Button -->
+        <button
+          *ngIf="selectedCount > 0"
+          pButton
+          [label]="'COMMON.DELETE_COUNT' | translate: { count: selectedCount }"
+          icon="pi pi-trash"
+          (click)="confirmBulkDelete()"
+          class="p-button-raised p-button-danger modern-button"
+        ></button>
 
-          <!-- Clear Filters Button -->
-          <button
-            pButton
-            [label]="'COMMON.CLEAR' | translate"
-            icon="pi pi-filter-slash"
-            (click)="clearFilters()"
-            [disabled]="!isFilterActive"
-            class="p-button-outlined p-button-danger modern-button"
-          ></button>
+        <!-- Clear Filters Button -->
+        <button
+          pButton
+          [label]="'COMMON.CLEAR' | translate"
+          icon="pi pi-filter-slash"
+          (click)="clearFilters()"
+          [disabled]="!isFilterActive"
+          class="p-button-outlined p-button-danger modern-button"
+        ></button>
 
-          <!-- Add Button -->
-          <button
-            pButton
-            [label]="'COMMON.ADD' | translate"
-            icon="pi pi-plus"
-            (click)="onAddNewRole()"
-            class="p-button-raised p-button-primary modern-button"
-          ></button>
-              </div>
+        <!-- Add Button -->
+        <button
+          pButton
+          [label]="'COMMON.ADD' | translate"
+          icon="pi pi-plus"
+          (click)="onAddNewRole()"
+          class="p-button-raised p-button-primary modern-button"
+        ></button>
+      </div>
     </div>
 
     <!-- Unified Toolbar & Content Card -->
@@ -95,16 +95,22 @@
                 <div class="th-content">{{ 'COMMON.NAME' | translate }}</div>
               </th>
               <th style="min-width: 20rem">
-                <div class="th-content">{{ 'ROLE.DESCRIPTION' | translate }}</div>
+                <div class="th-content">
+                  {{ 'ROLE.DESCRIPTION' | translate }}
+                </div>
               </th>
-              <th  style="width: 9rem; min-width: 9rem">
+              <th style="width: 9rem; min-width: 9rem">
                 <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
               </th>
-              <th  style="width: 12rem; min-width: 12rem">
-                <div class="th-content">{{ 'COMMON.CREATED_ON' | translate }}</div>
+              <th style="width: 12rem; min-width: 12rem">
+                <div class="th-content">
+                  {{ 'COMMON.CREATED_ON' | translate }}
+                </div>
               </th>
               <th style="width: 7rem; min-width: 7rem">
-                <div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div>
+                <div class="th-content actions-th">
+                  {{ 'COMMON.ACTIONS' | translate }}
+                </div>
               </th>
             </tr>
             <!-- Filter Row -->
@@ -182,7 +188,11 @@
                   }"
                 >
                   <span class="dot"></span>
-                  {{ role.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                  {{
+                    role.status === 1
+                      ? ('COMMON.ACTIVE' | translate)
+                      : ('COMMON.INACTIVE' | translate)
+                  }}
                 </span>
               </td>
               <td>
@@ -196,7 +206,9 @@
                     class="icon-btn edit-btn"
                     (click)="onEdit(role.id)"
                     [pTooltip]="
-                      role.isDefault === 1 ? ('ROLE.CANNOT_EDIT_DEFAULT' | translate) : ('COMMON.EDIT' | translate)
+                      role.isDefault === 1
+                        ? ('ROLE.CANNOT_EDIT_DEFAULT' | translate)
+                        : ('COMMON.EDIT' | translate)
                     "
                     tooltipPosition="bottom"
                     [disabled]="role.isDefault === 1"
@@ -226,13 +238,14 @@
                 <div class="empty-state-inline">
                   <i class="pi pi-search empty-state-icon"></i>
                   <span class="empty-state-text">
-                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash; {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
+                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash;
+                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
                   </span>
                 </div>
               </td>
             </tr>
           </ng-template>
-        
+
           <ng-template pTemplate="paginatorright">
             <button
               type="button"
@@ -264,8 +277,11 @@
       <p class="delete-intro" *ngIf="!bulkDelete">
         {{ 'ROLE.DELETE_SINGLE' | translate }}
       </p>
-      <p class="delete-intro" *ngIf="bulkDelete" [innerHTML]="'ROLE.DELETE_BULK' | translate:{ count: selectedCount }">
-      </p>
+      <p
+        class="delete-intro"
+        *ngIf="bulkDelete"
+        [innerHTML]="'ROLE.DELETE_BULK' | translate: { count: selectedCount }"
+      ></p>
 
       <ul class="delete-info-list">
         <li>
@@ -284,7 +300,8 @@
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"

@@ -33,7 +33,10 @@ export interface FilterOptionsEntry {
   truncated: boolean;
   nextPage: number | null;
   fetchedAt: number; // ms — drives TTL eviction
-  error?: { code: 'column_missing' | 'sql_error' | 'forbidden'; message: string };
+  error?: {
+    code: 'column_missing' | 'sql_error' | 'forbidden';
+    message: string;
+  };
 }
 
 /** Per-filter ad-hoc UI flags. columnMissing drives the "remove me"

@@ -122,7 +122,12 @@ export class ConnectionService {
     orgId: string,
   ): Promise<any> {
     return await lastValueFrom(
-      this.http.apiPost(CONNECTIONS.BULK_DELETE_PREFIX + `${orgId}` + CONNECTIONS.BULK_DELETE_SUFFIX, { ids, justification }),
+      this.http.apiPost(
+        CONNECTIONS.BULK_DELETE_PREFIX +
+          `${orgId}` +
+          CONNECTIONS.BULK_DELETE_SUFFIX,
+        { ids, justification },
+      ),
     );
   }
 

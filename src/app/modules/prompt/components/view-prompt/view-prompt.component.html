@@ -40,7 +40,12 @@
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.DESCRIPTION' | translate }}</label>
-              <p>{{ promptData.description || ('COMMON.NO_DESCRIPTION' | translate) }}</p>
+              <p>
+                {{
+                  promptData.description ||
+                    ('COMMON.NO_DESCRIPTION' | translate)
+                }}
+              </p>
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.STATUS' | translate }}</label>
@@ -56,7 +61,11 @@
                       : 'pi-times-circle'
                   "
                 ></i>
-                {{ promptData.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                {{
+                  promptData.status === 1
+                    ? ('COMMON.ACTIVE' | translate)
+                    : ('COMMON.INACTIVE' | translate)
+                }}
               </span>
             </div>
             <div class="info-item">
@@ -116,14 +125,22 @@
               <label>{{ 'PROMPT_MODULE.MANDATORY' | translate }}</label>
               <p class="with-icon">
                 <i class="pi pi-star mr-2"></i>
-                {{ promptData.mandatory ? ('COMMON.YES' | translate) : ('COMMON.NO' | translate) }}
+                {{
+                  promptData.mandatory
+                    ? ('COMMON.YES' | translate)
+                    : ('COMMON.NO' | translate)
+                }}
               </p>
             </div>
             <div class="info-item">
               <label>{{ 'PROMPT_MODULE.GROUPED' | translate }}</label>
               <p class="with-icon">
                 <i class="pi pi-clone mr-2"></i>
-                {{ promptData.isGroup ? ('COMMON.YES' | translate) : ('COMMON.NO' | translate) }}
+                {{
+                  promptData.isGroup
+                    ? ('COMMON.YES' | translate)
+                    : ('COMMON.NO' | translate)
+                }}
               </p>
             </div>
           </div>
@@ -145,7 +162,9 @@
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
-      <p class="delete-intro">{{ 'PROMPT_MODULE.DELETE_SINGLE' | translate }}</p>
+      <p class="delete-intro">
+        {{ 'PROMPT_MODULE.DELETE_SINGLE' | translate }}
+      </p>
 
       <ul class="delete-info-list">
         <li>
@@ -160,7 +179,8 @@
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"

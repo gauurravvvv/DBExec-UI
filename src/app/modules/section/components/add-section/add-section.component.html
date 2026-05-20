@@ -114,7 +114,10 @@
           *ngIf="sectionForm.get('datasource')?.value"
         >
           <div class="fields-header">
-            <label>{{ 'SECTION_MODULE.SECTIONS_LABEL' | translate }}<span class="required">*</span></label>
+            <label
+              >{{ 'SECTION_MODULE.SECTIONS_LABEL' | translate
+              }}<span class="required">*</span></label
+            >
             <div class="button-group">
               <button
                 pButton
@@ -126,7 +129,11 @@
                 "
                 class="p-button-rounded p-button-text expand-collapse-btn"
                 (click)="areAllExpanded ? collapseAll() : expandAll()"
-                [pTooltip]="areAllExpanded ? ('COMMON.COLLAPSE_ALL' | translate) : ('COMMON.EXPAND_ALL' | translate)"
+                [pTooltip]="
+                  areAllExpanded
+                    ? ('COMMON.COLLAPSE_ALL' | translate)
+                    : ('COMMON.EXPAND_ALL' | translate)
+                "
                 tooltipPosition="bottom"
                 *ngIf="tabGroups.length > 0"
               ></button>
@@ -204,9 +211,9 @@
                   class="section-count"
                   *ngIf="!isGroupExpanded(groupIndex)"
                 >
-                  {{ getTabSections(groupIndex).length }} {{ 'COMMON.SECTION' | translate }}{{
-                    getTabSections(groupIndex).length !== 1 ? 's' : ''
-                  }}
+                  {{ getTabSections(groupIndex).length }}
+                  {{ 'COMMON.SECTION' | translate
+                  }}{{ getTabSections(groupIndex).length !== 1 ? 's' : '' }}
                 </span>
                 <button
                   pButton
@@ -254,7 +261,9 @@
                       <app-custom-input
                         formControlName="name"
                         [label]="'COMMON.NAME' | translate"
-                        [placeholder]="'SECTION_MODULE.ENTER_SECTION_NAME' | translate"
+                        [placeholder]="
+                          'SECTION_MODULE.ENTER_SECTION_NAME' | translate
+                        "
                         icon="pi-box"
                         [required]="true"
                         [showError]="

@@ -250,7 +250,8 @@
         border: 1px solid var(--border-color);
         border-radius: var(--radius-sm);
         cursor: pointer;
-        transition: border-color var(--motion-base) ease,
+        transition:
+          border-color var(--motion-base) ease,
           background var(--motion-base) ease;
 
         &:hover {
@@ -567,7 +568,8 @@
       border-radius: var(--radius-sm);
       overflow: hidden;
       background: var(--card-background);
-      transition: border-color var(--motion-base) ease,
+      transition:
+        border-color var(--motion-base) ease,
         box-shadow var(--motion-base) ease;
       min-height: 280px;
       display: flex;
@@ -768,7 +770,8 @@
       border: 1px solid transparent;
       border-radius: var(--radius-sm);
       cursor: pointer;
-      transition: border-color var(--motion-base) ease,
+      transition:
+        border-color var(--motion-base) ease,
         background var(--motion-base) ease;
 
       &:hover {
@@ -867,7 +870,8 @@
       font-size: var(--fs-body);
       border: 1px solid transparent;
       cursor: pointer;
-      transition: background var(--motion-base) ease,
+      transition:
+        background var(--motion-base) ease,
         border-color var(--motion-base) ease,
         color var(--motion-base) ease,
         box-shadow var(--motion-base) ease;

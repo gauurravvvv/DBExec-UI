@@ -63,7 +63,9 @@
   &::-webkit-scrollbar-thumb {
     background: var(--border-strong);
     border-radius: 999px;
-    &:hover { background: var(--text-subtle); }
+    &:hover {
+      background: var(--text-subtle);
+    }
   }
   scrollbar-width: thin;
   scrollbar-color: var(--border-strong) transparent;
@@ -183,7 +185,9 @@
     background-color: var(--hover-background);
     border-color: var(--primary-color);
 
-    .chart-icon { color: var(--primary-color); }
+    .chart-icon {
+      color: var(--primary-color);
+    }
     .chart-name {
       opacity: 1;
       max-height: 24px;
@@ -194,7 +198,9 @@
     background-color: rgba(var(--primary-color-rgb), 0.15);
     border-color: var(--primary-color);
 
-    .chart-icon { color: var(--primary-color); }
+    .chart-icon {
+      color: var(--primary-color);
+    }
     .chart-name {
       color: var(--primary-color);
       font-weight: var(--fw-semibold);
@@ -211,7 +217,9 @@
   color: var(--secondary-color);
   transition: all var(--motion-base) ease;
 
-  &.rotate { transform: rotate(90deg); }
+  &.rotate {
+    transform: rotate(90deg);
+  }
 }
 
 .chart-name {
@@ -275,10 +283,17 @@
     border-style: dashed;
     opacity: 1;
 
-    .axis-label { font-style: normal; opacity: 1; }
+    .axis-label {
+      font-style: normal;
+      opacity: 1;
+    }
 
-    &.has-value { border-style: solid; }
-    &.active { border-style: solid; }
+    &.has-value {
+      border-style: solid;
+    }
+    &.active {
+      border-style: solid;
+    }
   }
 }
 

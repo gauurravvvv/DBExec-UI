@@ -14,20 +14,22 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { Observable, Subject, TimeoutError } from 'rxjs';
 import { debounceTime, first, timeout } from 'rxjs/operators';
 import { DATASET, QUERY_BUILDER } from 'src/app/core/constants/routes.constant';
 import { ROLES } from 'src/app/core/constants/user.constant';
+import { IAPIResponse } from 'src/app/core/models/global.model';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
+import { expandAnimation } from '../../animations/expand.animation';
 import {
   MONACO_EDITOR_OPTIONS,
   QUERY_EXECUTION_TIMEOUT_MS,
   SQL_EDITOR_PLACEHOLDER,
 } from '../../config/sql-editor.config';
-import { IAPIResponse } from 'src/app/core/models/global.model';
 import {
   DatasourceSchema,
   QueryExecuteData,
@@ -47,13 +49,11 @@ import {
   selectIsSchemaStale,
   selectSchemaByKey,
 } from '../../store';
-import { TranslateService } from '@ngx-translate/core';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 
 // Declare Monaco and window for TypeScript
 declare const monaco: any;
 declare const window: any;
-import { expandAnimation } from '../../animations/expand.animation';
 
 @Component({
   selector: 'app-edit-dataset',
@@ -632,9 +632,7 @@ export class EditDatasetComponent
               // user is still on this DB.
               if (token === this.schemaSelectionToken) {
                 this.datasources = Object.values(this.datasourceSchemas);
-                this.monacoIntelliSenseService.setDatasources(
-                  this.datasources,
-                );
+                this.monacoIntelliSenseService.setDatasources(this.datasources);
               }
 
               this.loadingDatasources[dbId] = false;
@@ -647,7 +645,9 @@ export class EditDatasetComponent
                 AddDatasetActions.loadSchemaDataFailure({
                   orgId,
                   dbId: dbIdStr,
-                  error: error.message || this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
+                  error:
+                    error.message ||
+                    this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
                 }),
               );
 
@@ -662,7 +662,9 @@ export class EditDatasetComponent
           AddDatasetActions.loadSchemaDataFailure({
             orgId,
             dbId: dbIdStr,
-            error: error.message || this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
+            error:
+              error.message ||
+              this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
           }),
         );
 
@@ -788,7 +790,9 @@ export class EditDatasetComponent
       this.messageService.add({
         severity: 'error',
         summary: this.translate.instant('DATASET.FILE_TOO_LARGE'),
-        detail: this.translate.instant('DATASET.FILE_SIZE_LIMIT', { size: maxSizeInMB }),
+        detail: this.translate.instant('DATASET.FILE_SIZE_LIMIT', {
+          size: maxSizeInMB,
+        }),
         key: 'topRight',
         life: 3000,
         styleClass: 'custom-toast',
@@ -981,88 +985,88 @@ export class EditDatasetComponent
       .executeQuery(payload)
       .pipe(timeout(QUERY_EXECUTION_TIMEOUT_MS))
       .subscribe({
-      next: (response: IAPIResponse<QueryExecuteData>) => {
-        if (!response.status) {
+        next: (response: IAPIResponse<QueryExecuteData>) => {
+          if (!response.status) {
+            this.queryResult = {
+              columns: [],
+              rows: [],
+              rowCount: 0,
+              executionTime: `${Date.now() - startTime}ms`,
+              error:
+                response.message ||
+                this.translate.instant('DATASET.QUERY_EXECUTION_FAILED'),
+            };
+            this.isExecutingQuery = false;
+            this.cdr.markForCheck();
+            return;
+          }
+
+          const data = response.data;
+          if (!data) {
+            this.queryResult = {
+              columns: [],
+              rows: [],
+              rowCount: 0,
+              executionTime: `${Date.now() - startTime}ms`,
+              message: response.message,
+            };
+            this.isExecutingQuery = false;
+            this.cdr.markForCheck();
+            return;
+          }
+
+          const executionTime =
+            typeof data.executionTime === 'number'
+              ? `${data.executionTime}ms`
+              : data.executionTime || `${Date.now() - startTime}ms`;
+
+          this.queryResult = {
+            columns: data.columns ?? [],
+            columnTypes: data.columnTypes ?? {},
+            rows: Array.isArray(data.data) ? data.data : [],
+            rowCount: data.rowCount ?? 0,
+            executionTime,
+            query: data.query,
+          };
+
+          if (this.queryResult.columns.length > 0) {
+            this.showResultsPopup = true;
+          }
+
+          this.isExecutingQuery = false;
+          this.cdr.markForCheck();
+        },
+        error: (error: any) => {
+          const executionTime = `${Date.now() - startTime}ms`;
+
+          // Extract error message — RxJS TimeoutError gets a friendlier copy.
+          let errorMessage: string;
+          if (error instanceof TimeoutError) {
+            errorMessage = this.translate.instant('DATASET.QUERY_TIMEOUT');
+          } else if (error?.error?.message) {
+            errorMessage = error.error.message;
+          } else if (error?.message) {
+            errorMessage = error.message;
+          } else if (typeof error?.error === 'string') {
+            errorMessage = error.error;
+          } else {
+            errorMessage = this.translate.instant(
+              'DATASET.QUERY_EXECUTION_FAILED',
+            );
+          }
+
           this.queryResult = {
             columns: [],
             rows: [],
             rowCount: 0,
-            executionTime: `${Date.now() - startTime}ms`,
-            error:
-              response.message ||
-              this.translate.instant('DATASET.QUERY_EXECUTION_FAILED'),
+            executionTime: executionTime,
+            error: errorMessage,
           };
+
           this.isExecutingQuery = false;
           this.cdr.markForCheck();
-          return;
-        }
-
-        const data = response.data;
-        if (!data) {
-          this.queryResult = {
-            columns: [],
-            rows: [],
-            rowCount: 0,
-            executionTime: `${Date.now() - startTime}ms`,
-            message: response.message,
-          };
-          this.isExecutingQuery = false;
-          this.cdr.markForCheck();
-          return;
-        }
-
-        const executionTime =
-          typeof data.executionTime === 'number'
-            ? `${data.executionTime}ms`
-            : data.executionTime || `${Date.now() - startTime}ms`;
-
-        this.queryResult = {
-          columns: data.columns ?? [],
-          columnTypes: data.columnTypes ?? {},
-          rows: Array.isArray(data.data) ? data.data : [],
-          rowCount: data.rowCount ?? 0,
-          executionTime,
-          query: data.query,
-        };
-
-        if (this.queryResult.columns.length > 0) {
-          this.showResultsPopup = true;
-        }
-
-        this.isExecutingQuery = false;
-        this.cdr.markForCheck();
-      },
-      error: (error: any) => {
-        const executionTime = `${Date.now() - startTime}ms`;
-
-        // Extract error message — RxJS TimeoutError gets a friendlier copy.
-        let errorMessage: string;
-        if (error instanceof TimeoutError) {
-          errorMessage = this.translate.instant('DATASET.QUERY_TIMEOUT');
-        } else if (error?.error?.message) {
-          errorMessage = error.error.message;
-        } else if (error?.message) {
-          errorMessage = error.message;
-        } else if (typeof error?.error === 'string') {
-          errorMessage = error.error;
-        } else {
-          errorMessage = this.translate.instant(
-            'DATASET.QUERY_EXECUTION_FAILED',
-          );
-        }
-
-        this.queryResult = {
-          columns: [],
-          rows: [],
-          rowCount: 0,
-          executionTime: executionTime,
-          error: errorMessage,
-        };
-
-        this.isExecutingQuery = false;
-        this.cdr.markForCheck();
-      },
-    });
+        },
+      });
   }
 
   onDatasetDialogClose(formData: DatasetFormData | null): void {

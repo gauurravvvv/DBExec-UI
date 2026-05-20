@@ -75,8 +75,15 @@ export class UserService {
   async add(form: FormGroup): Promise<any> {
     this._saving.set(true);
     try {
-      const { firstName, lastName, username, email, organisation, groupIds, locale } =
-        form.value;
+      const {
+        firstName,
+        lastName,
+        username,
+        email,
+        organisation,
+        groupIds,
+        locale,
+      } = form.value;
       return await lastValueFrom(
         this.http.apiPost(USER.ADD, {
           firstName,
@@ -162,7 +169,11 @@ export class UserService {
     );
   }
 
-  async updatePassword(orgId: string, id: string, password: string): Promise<any> {
+  async updatePassword(
+    orgId: string,
+    id: string,
+    password: string,
+  ): Promise<any> {
     // PUT /users/:orgId/:id/password — id now in path.
     return await lastValueFrom(
       this.http.apiPut(

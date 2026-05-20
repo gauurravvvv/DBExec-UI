@@ -9,13 +9,13 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { GROUP } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
-import { TranslateService } from '@ngx-translate/core';
 import { GroupService } from '../../services/group.service';
 
 @Component({
@@ -246,11 +246,16 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
 
   getNameError(): string {
     const control = this.groupForm.get('name');
-    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.GROUP_NAME_REQUIRED');
+    if (control?.errors?.['required'])
+      return this.translate.instant('VALIDATION.GROUP_NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.GROUP_NAME_MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
+      return this.translate.instant('VALIDATION.GROUP_NAME_MIN_LENGTH', {
+        length: control.errors['minlength'].requiredLength,
+      });
     if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.GROUP_NAME_MAX_LENGTH', { length: control.errors['maxlength'].requiredLength });
+      return this.translate.instant('VALIDATION.GROUP_NAME_MAX_LENGTH', {
+        length: control.errors['maxlength'].requiredLength,
+      });
     if (control?.errors?.['pattern'])
       return this.translate.instant('VALIDATION.GROUP_NAME_PATTERN');
     return '';

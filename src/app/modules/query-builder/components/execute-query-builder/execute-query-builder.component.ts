@@ -242,12 +242,17 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
             }
           }
         } else {
-          this.tabError.set(response.message || this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_TABS'));
+          this.tabError.set(
+            response.message ||
+              this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_TABS'),
+          );
           this.loadingTabs.set(false);
         }
       })
       .catch(() => {
-        this.tabError.set(this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_TABS'));
+        this.tabError.set(
+          this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_TABS'),
+        );
         this.loadingTabs.set(false);
       });
   }
@@ -275,13 +280,17 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
             this.loadPrompts(section, tab);
           });
         } else {
-          tab.error = response.message || this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_SECTIONS');
+          tab.error =
+            response.message ||
+            this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_SECTIONS');
           tab.loading = false;
         }
         this.cdr.markForCheck();
       })
       .catch(() => {
-        tab.error = this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_SECTIONS');
+        tab.error = this.translate.instant(
+          'QUERY_BUILDER_MODULE.FAILED_LOAD_SECTIONS',
+        );
         tab.loading = false;
         this.cdr.markForCheck();
       });
@@ -321,13 +330,17 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
             this.checkAndLoadDatasetForEdit();
           }
         } else {
-          section.error = response.message || this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_PROMPTS');
+          section.error =
+            response.message ||
+            this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_PROMPTS');
           section.loading = false;
         }
         this.cdr.markForCheck();
       })
       .catch(() => {
-        section.error = this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_PROMPTS');
+        section.error = this.translate.instant(
+          'QUERY_BUILDER_MODULE.FAILED_LOAD_PROMPTS',
+        );
         section.loading = false;
         this.cdr.markForCheck();
       });
@@ -441,13 +454,17 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
           this.showExecuteResult = false;
           this.showSqlResult = true;
         } else {
-          this.executeError = response.message || this.translate.instant('QUERY_BUILDER_MODULE.FAILED_GENERATE_SQL');
+          this.executeError =
+            response.message ||
+            this.translate.instant('QUERY_BUILDER_MODULE.FAILED_GENERATE_SQL');
           this.globalService.handleSuccessService(response, false);
         }
         this.cdr.markForCheck();
       })
       .catch(() => {
-        this.executeError = this.translate.instant('QUERY_BUILDER_MODULE.FAILED_GENERATE_SQL');
+        this.executeError = this.translate.instant(
+          'QUERY_BUILDER_MODULE.FAILED_GENERATE_SQL',
+        );
         this.cdr.markForCheck();
       });
   }
@@ -503,7 +520,9 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
             rows: [],
             rowCount: 0,
             executionTime: `${Date.now() - startTime}ms`,
-            error: response.message || this.translate.instant('QUERY_BUILDER_MODULE.QUERY_FAILED'),
+            error:
+              response.message ||
+              this.translate.instant('QUERY_BUILDER_MODULE.QUERY_FAILED'),
           };
           this.isExecutingQuery = false;
           this.showResultsPopup = true;
@@ -547,7 +566,9 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       error: (error: any) => {
-        let errorMessage = this.translate.instant('QUERY_BUILDER_MODULE.QUERY_FAILED');
+        let errorMessage = this.translate.instant(
+          'QUERY_BUILDER_MODULE.QUERY_FAILED',
+        );
         if (error.error?.message) {
           errorMessage = error.error.message;
         } else if (error.message) {

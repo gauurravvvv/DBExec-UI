@@ -5,8 +5,8 @@ import {
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DATASOURCE } from 'src/app/core/constants/routes.constant';
 import { TranslateService } from '@ngx-translate/core';
+import { DATASOURCE } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from '../../services/datasource.service';
 

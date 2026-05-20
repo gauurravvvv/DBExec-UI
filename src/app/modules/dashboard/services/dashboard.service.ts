@@ -60,9 +60,7 @@ export class DashboardService {
       const res: any = await lastValueFrom(
         // GET /dashboards/:orgId/:id/render
         this.http.apiGet(
-          DASHBOARD.RENDER_PREFIX +
-            `${orgId}/${id}` +
-            DASHBOARD.RENDER_SUFFIX,
+          DASHBOARD.RENDER_PREFIX + `${orgId}/${id}` + DASHBOARD.RENDER_SUFFIX,
         ),
       );
       if (res?.status) this._rendered.set(res.data);
@@ -96,9 +94,7 @@ export class DashboardService {
       // POST /dashboards/:orgId/publish
       return await lastValueFrom(
         this.http.apiPost(
-          DASHBOARD.PUBLISH_PREFIX +
-            payload.orgId +
-            DASHBOARD.PUBLISH_SUFFIX,
+          DASHBOARD.PUBLISH_PREFIX + payload.orgId + DASHBOARD.PUBLISH_SUFFIX,
           payload,
         ),
       );
@@ -162,7 +158,12 @@ export class DashboardService {
   async getDistinctFieldValues(
     orgId: string,
     dashboardId: string,
-    body: { fieldName: string; search?: string; page?: number; pageSize?: number },
+    body: {
+      fieldName: string;
+      search?: string;
+      page?: number;
+      pageSize?: number;
+    },
   ): Promise<any> {
     // POST /dashboards/:orgId/:dashboardId/distinct-values
     return lastValueFrom(
@@ -196,7 +197,10 @@ export class DashboardService {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPost(DASHBOARD.BULK_DELETE_PREFIX + orgId + DASHBOARD.BULK_DELETE_SUFFIX, { ids, justification }),
+        this.http.apiPost(
+          DASHBOARD.BULK_DELETE_PREFIX + orgId + DASHBOARD.BULK_DELETE_SUFFIX,
+          { ids, justification },
+        ),
       );
     } finally {
       this._saving.set(false);

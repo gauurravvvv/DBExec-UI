@@ -40,7 +40,9 @@
             <span class="stat-value">{{
               dbData?.statistics?.databaseSizeMB | fileSize
             }}</span>
-            <span class="stat-label">{{ 'DATASOURCE.DATASOURCE_SIZE' | translate }}</span>
+            <span class="stat-label">{{
+              'DATASOURCE.DATASOURCE_SIZE' | translate
+            }}</span>
           </div>
         </div>
         <div class="stat-card animated">
@@ -49,7 +51,9 @@
           </div>
           <div class="stat-info">
             <span class="stat-value">{{ dbData.statistics.totalTables }}</span>
-            <span class="stat-label">{{ 'DATASOURCE.TOTAL_TABLES' | translate }}</span>
+            <span class="stat-label">{{
+              'DATASOURCE.TOTAL_TABLES' | translate
+            }}</span>
           </div>
         </div>
         <div class="stat-card animated">
@@ -58,7 +62,9 @@
           </div>
           <div class="stat-info">
             <span class="stat-value">{{ dbData.statistics.totalSchemas }}</span>
-            <span class="stat-label">{{ 'DATASOURCE.SCHEMAS' | translate }}</span>
+            <span class="stat-label">{{
+              'DATASOURCE.SCHEMAS' | translate
+            }}</span>
           </div>
         </div>
         <div class="stat-card animated">
@@ -67,7 +73,9 @@
           </div>
           <div class="stat-info">
             <span class="stat-value">{{ dbData.statistics.totalIndexes }}</span>
-            <span class="stat-label">{{ 'DATASOURCE.INDEXES' | translate }}</span>
+            <span class="stat-label">{{
+              'DATASOURCE.INDEXES' | translate
+            }}</span>
           </div>
         </div>
       </div>
@@ -79,7 +87,10 @@
           <!-- Configuration Card -->
           <div class="info-card">
             <div class="card-header">
-              <h3><i class="pi pi-cog"></i>{{ 'DATASOURCE.CONFIGURATION' | translate }}</h3>
+              <h3>
+                <i class="pi pi-cog"></i
+                >{{ 'DATASOURCE.CONFIGURATION' | translate }}
+              </h3>
             </div>
             <div class="card-content">
               <div class="config-grid">
@@ -92,13 +103,19 @@
                   </p>
                 </div>
                 <div class="config-item">
-                  <label>{{ 'DATASOURCE.CONNECTION_STATUS' | translate }}</label>
+                  <label>{{
+                    'DATASOURCE.CONNECTION_STATUS' | translate
+                  }}</label>
                   <p>
                     <span
                       class="status-badge"
                       [class.active]="dbData.status === 1"
                     >
-                      {{ dbData.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                      {{
+                        dbData.status === 1
+                          ? ('COMMON.ACTIVE' | translate)
+                          : ('COMMON.INACTIVE' | translate)
+                      }}
                     </span>
                   </p>
                 </div>
@@ -132,12 +149,19 @@
           <!-- Storage Analysis -->
           <div class="info-card storage-card">
             <div class="card-header">
-              <h3><i class="pi pi-chart-line"></i>{{ 'DATASOURCE.STORAGE_ANALYSIS' | translate }}</h3>
+              <h3>
+                <i class="pi pi-chart-line"></i
+                >{{ 'DATASOURCE.STORAGE_ANALYSIS' | translate }}
+              </h3>
             </div>
             <div class="card-content">
               <div class="charts-grid">
                 <div class="chart-container">
-                  <h4>{{ 'DATASOURCE.STORAGE_DISTRIBUTION_BY_SCHEMA' | translate }}</h4>
+                  <h4>
+                    {{
+                      'DATASOURCE.STORAGE_DISTRIBUTION_BY_SCHEMA' | translate
+                    }}
+                  </h4>
                   <div class="chart-wrapper">
                     <p-chart
                       type="pie"
@@ -157,7 +181,10 @@
           <!-- Schema Analysis -->
           <div class="info-card">
             <div class="card-header">
-              <h3><i class="pi pi-file"></i>{{ 'DATASOURCE.SCHEMA_ANALYSIS' | translate }}</h3>
+              <h3>
+                <i class="pi pi-file"></i
+                >{{ 'DATASOURCE.SCHEMA_ANALYSIS' | translate }}
+              </h3>
               <div class="search-box">
                 <span class="p-input-icon-left">
                   <i class="pi pi-search"></i>
@@ -202,15 +229,21 @@
                   </div>
                   <div class="schema-stats">
                     <div class="stat">
-                      <span class="label">{{ 'DATASOURCE.TABLES' | translate }}</span>
+                      <span class="label">{{
+                        'DATASOURCE.TABLES' | translate
+                      }}</span>
                       <span class="value">{{ schema.tableCount }}</span>
                     </div>
                     <div class="stat">
-                      <span class="label">{{ 'DATASOURCE.VIEWS' | translate }}</span>
+                      <span class="label">{{
+                        'DATASOURCE.VIEWS' | translate
+                      }}</span>
                       <span class="value">{{ schema.viewCount }}</span>
                     </div>
                     <div class="stat">
-                      <span class="label">{{ 'DATASOURCE.FUNCTIONS' | translate }}</span>
+                      <span class="label">{{
+                        'DATASOURCE.FUNCTIONS' | translate
+                      }}</span>
                       <span class="value">{{ schema.functionCount }}</span>
                     </div>
                   </div>
@@ -231,7 +264,9 @@
                         <div
                           class="table-name"
                           (click)="onTableClick($event, schema, table)"
-                          [title]="'DATASOURCE.CLICK_VIEW_TABLE_DETAILS' | translate"
+                          [title]="
+                            'DATASOURCE.CLICK_VIEW_TABLE_DETAILS' | translate
+                          "
                         >
                           <i class="pi pi-table"></i>
                           <span>{{ table.name }}</span>
@@ -241,9 +276,13 @@
                             formatTableSize(table.sizeMB.total)
                           }}</span>
                           <span class="rows"
-                            >{{ table.totalColumns }} {{ 'DATASOURCE.COLUMNS' | translate }}</span
+                            >{{ table.totalColumns }}
+                            {{ 'DATASOURCE.COLUMNS' | translate }}</span
                           >
-                          <span class="rows">{{ table.rowCount }} {{ 'DATASOURCE.ROWS' | translate }}</span>
+                          <span class="rows"
+                            >{{ table.rowCount }}
+                            {{ 'DATASOURCE.ROWS' | translate }}</span
+                          >
                         </div>
                       </div>
                       <div class="no-tables" *ngIf="schema.name.length === 0">
@@ -259,7 +298,10 @@
           <!-- Tables Overview -->
           <div class="info-card">
             <div class="card-header">
-              <h3><i class="pi pi-table"></i>{{ 'DATASOURCE.TOP_STORAGE_TABLES' | translate }}</h3>
+              <h3>
+                <i class="pi pi-table"></i
+                >{{ 'DATASOURCE.TOP_STORAGE_TABLES' | translate }}
+              </h3>
             </div>
             <div class="card-content">
               <div class="top-tables">
@@ -322,11 +364,15 @@
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>{{ 'DATASOURCE.DELETE_INFO_ASSOCIATED_DATA' | translate }}</span>
+          <span>{{
+            'DATASOURCE.DELETE_INFO_ASSOCIATED_DATA' | translate
+          }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>{{ 'DATASOURCE.DELETE_INFO_CONNECTED_DATASETS' | translate }}</span>
+          <span>{{
+            'DATASOURCE.DELETE_INFO_CONNECTED_DATASETS' | translate
+          }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
@@ -335,7 +381,10 @@
       </ul>
 
       <div class="justification-section">
-        <label>{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label>
+        <label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
+        >
         <textarea
           [(ngModel)]="deleteJustification"
           [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
@@ -368,7 +417,9 @@
 <div class="confirmation-popup" *ngIf="showTableDetails">
   <div class="popup-content table-details-popup">
     <div class="popup-header">
-      <h3><i class="pi pi-table"></i> {{ 'DATASOURCE.TABLE_DETAILS' | translate }}</h3>
+      <h3>
+        <i class="pi pi-table"></i> {{ 'DATASOURCE.TABLE_DETAILS' | translate }}
+      </h3>
       <button class="close-btn" (click)="closeTableDetails()">
         <i class="pi pi-times"></i>
       </button>
@@ -392,19 +443,31 @@
         <h4>{{ 'DATASOURCE.STATISTICS' | translate }}</h4>
         <div class="stats-grid">
           <div class="stat-item">
-            <label><i class="pi pi-database"></i> {{ 'DATASOURCE.TOTAL_SIZE' | translate }}</label>
+            <label
+              ><i class="pi pi-database"></i>
+              {{ 'DATASOURCE.TOTAL_SIZE' | translate }}</label
+            >
             <p>{{ selectedTable.sizeMB.total | fileSize }}</p>
           </div>
           <div class="stat-item">
-            <label><i class="pi pi-list"></i> {{ 'DATASOURCE.COLUMNS' | translate }}</label>
+            <label
+              ><i class="pi pi-list"></i>
+              {{ 'DATASOURCE.COLUMNS' | translate }}</label
+            >
             <p>{{ selectedTable.totalColumns }}</p>
           </div>
           <div class="stat-item">
-            <label><i class="pi pi-align-justify"></i> {{ 'DATASOURCE.ROWS' | translate }}</label>
+            <label
+              ><i class="pi pi-align-justify"></i>
+              {{ 'DATASOURCE.ROWS' | translate }}</label
+            >
             <p>{{ selectedTable.rowCount | number }}</p>
           </div>
           <div class="stat-item">
-            <label><i class="pi pi-search"></i> {{ 'DATASOURCE.INDEXES' | translate }}</label>
+            <label
+              ><i class="pi pi-search"></i>
+              {{ 'DATASOURCE.INDEXES' | translate }}</label
+            >
             <p>{{ selectedTable.totalIndexes }}</p>
           </div>
         </div>
@@ -415,19 +478,25 @@
         <h4>{{ 'DATASOURCE.SIZE_BREAKDOWN' | translate }}</h4>
         <div class="size-breakdown">
           <div class="size-item">
-            <span class="size-label">{{ 'DATASOURCE.DATA_SIZE' | translate }}</span>
+            <span class="size-label">{{
+              'DATASOURCE.DATA_SIZE' | translate
+            }}</span>
             <span class="size-value">{{
               formatTableSize(selectedTable.sizeMB.data)
             }}</span>
           </div>
           <div class="size-item">
-            <span class="size-label">{{ 'DATASOURCE.INDEX_SIZE' | translate }}</span>
+            <span class="size-label">{{
+              'DATASOURCE.INDEX_SIZE' | translate
+            }}</span>
             <span class="size-value">{{
               formatTableSize(selectedTable.sizeMB.index)
             }}</span>
           </div>
           <div class="size-item">
-            <span class="size-label">{{ 'DATASOURCE.UNUSED_SPACE' | translate }}</span>
+            <span class="size-label">{{
+              'DATASOURCE.UNUSED_SPACE' | translate
+            }}</span>
             <span class="size-value">{{
               formatTableSize(selectedTable.sizeMB.unused)
             }}</span>
@@ -437,7 +506,11 @@
 
       <!-- Columns Section -->
       <div class="detail-section">
-        <h4>{{ 'DATASOURCE.COLUMNS' | translate }} ({{ selectedTable.columns?.length || 0 }})</h4>
+        <h4>
+          {{ 'DATASOURCE.COLUMNS' | translate }} ({{
+            selectedTable.columns?.length || 0
+          }})
+        </h4>
         <div class="columns-list">
           <div
             class="column-item"
@@ -453,7 +526,9 @@
     </div>
 
     <div class="popup-actions">
-      <button class="btn-cancel" (click)="closeTableDetails()">{{ 'COMMON.CLOSE' | translate }}</button>
+      <button class="btn-cancel" (click)="closeTableDetails()">
+        {{ 'COMMON.CLOSE' | translate }}
+      </button>
     </div>
   </div>
 </div>

@@ -129,7 +129,11 @@
       padding: 0.65rem 1.25rem;
 
       &.p-button-primary {
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--primary-hover)
+        ) !important;
         border: none !important;
         color: white !important;
         box-shadow: 0 4px 10px var(--primary-color-transparent);
@@ -621,7 +625,11 @@ td.empty-message-cell {
         }
 
         &.btn-confirm {
-          background: linear-gradient(135deg, var(--error-color), var(--error-color));
+          background: linear-gradient(
+            135deg,
+            var(--error-color),
+            var(--error-color)
+          );
           color: var(--primary-text);
           box-shadow: 0 4px 14px var(--error-bg);
           &:hover:not(:disabled) {

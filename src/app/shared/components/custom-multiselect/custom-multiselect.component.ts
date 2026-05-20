@@ -83,9 +83,7 @@ export class CustomMultiselectComponent
   @Input() searchDebounceMs = 300;
   @Input() preloadedItems: any[] | null = null;
   @Input() preloadedTotal: number | null = null;
-  @Input() resolveSelected:
-    | ((value: any) => Promise<any | null>)
-    | null = null;
+  @Input() resolveSelected: ((value: any) => Promise<any | null>) | null = null;
 
   value: any[] = [];
   disabled = false;
@@ -240,9 +238,7 @@ export class CustomMultiselectComponent
     if (!this.value || this.value.length === 0) return;
     for (const v of this.value) {
       if (this.selectedItems.has(v)) continue;
-      const match = this.serverOptions.find(opt =>
-        this.matchesValue(opt, v),
-      );
+      const match = this.serverOptions.find(opt => this.matchesValue(opt, v));
       if (match) this.selectedItems.set(v, match);
     }
   }

@@ -82,7 +82,9 @@ export class ListSortHelper<F extends string> {
   /** JSON-string for the `sort` query param, or undefined when no sort is active. */
   serialize(): string | undefined {
     if (this.state.length === 0) return undefined;
-    return JSON.stringify(this.state.map(s => ({ field: s.field, order: s.order })));
+    return JSON.stringify(
+      this.state.map(s => ({ field: s.field, order: s.order })),
+    );
   }
 
   clear(): void {

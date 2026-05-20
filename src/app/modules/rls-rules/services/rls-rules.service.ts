@@ -153,9 +153,7 @@ export class RlsRulesService {
   }
 
   viewRule(orgId: string, ruleId: string) {
-    return lastValueFrom(
-      this.http.apiGet(RLS_RULE.GET + `${orgId}/${ruleId}`),
-    );
+    return lastValueFrom(this.http.apiGet(RLS_RULE.GET + `${orgId}/${ruleId}`));
   }
 
   addRule(payload: any) {

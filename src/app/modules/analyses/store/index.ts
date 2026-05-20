@@ -12,10 +12,9 @@ export * as AddAnalysesActions from './add-analyses.actions';
 export { addAnalysesReducer } from './add-analyses.reducer';
 export * from './add-analyses.selectors';
 export * from './add-analyses.state';
-
 // ── analysesFilter slice ───────────────────────────────────────────
 export * as AnalysesFilterActions from './analyses-filter.actions';
+export { AnalysesFilterEffects } from './analyses-filter.effects';
 export { analysesFilterReducer } from './analyses-filter.reducer';
 export * from './analyses-filter.selectors';
 export * from './analyses-filter.state';
-export { AnalysesFilterEffects } from './analyses-filter.effects';

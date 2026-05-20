@@ -85,7 +85,11 @@
         }
 
         .btn-save {
-          background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
+          background: linear-gradient(
+            135deg,
+            var(--primary-color),
+            var(--primary-hover)
+          ) !important;
           color: white !important;
           border: none !important;
           padding: 0.65rem 1.25rem;
@@ -220,8 +224,11 @@
     border-radius: var(--radius-md);
     cursor: pointer;
     color: var(--secondary-color);
-    transition: border-color var(--motion-fast) ease, background-color var(--motion-fast) ease,
-      color var(--motion-fast) ease, opacity var(--motion-fast) ease;
+    transition:
+      border-color var(--motion-fast) ease,
+      background-color var(--motion-fast) ease,
+      color var(--motion-fast) ease,
+      opacity var(--motion-fast) ease;
 
     &:hover:not(.is-disabled) {
       border-color: var(--primary-color);
@@ -316,15 +323,21 @@
   &.success {
     background: var(--success-bg, rgba(34, 197, 94, 0.08));
     border-color: var(--success-color);
-    .num { color: var(--success-color); }
+    .num {
+      color: var(--success-color);
+    }
   }
   &.warning {
     background: var(--warning-bg, rgba(234, 179, 8, 0.1));
     border-color: var(--warning-color);
-    .num { color: var(--warning-color); }
+    .num {
+      color: var(--warning-color);
+    }
   }
   &.total {
-    .num { color: var(--text-color); }
+    .num {
+      color: var(--text-color);
+    }
   }
 }
 

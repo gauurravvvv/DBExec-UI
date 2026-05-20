@@ -229,10 +229,12 @@
 <div class="preview-overlay" *ngIf="showPreview" (click)="showPreview = false">
   <div class="preview-container" (click)="$event.stopPropagation()">
     <div class="preview-header">
-      <h3><i class="pi pi-eye"></i> {{ 'ANNOUNCEMENT.LIVE_PREVIEW' | translate }}</h3>
-      <span class="preview-subtitle"
-        >{{ 'ANNOUNCEMENT.EXACTLY_HOW_USERS_SEE' | translate }}</span
-      >
+      <h3>
+        <i class="pi pi-eye"></i> {{ 'ANNOUNCEMENT.LIVE_PREVIEW' | translate }}
+      </h3>
+      <span class="preview-subtitle">{{
+        'ANNOUNCEMENT.EXACTLY_HOW_USERS_SEE' | translate
+      }}</span>
       <button class="preview-close" (click)="showPreview = false">
         <i class="pi pi-times"></i>
       </button>
@@ -259,7 +261,8 @@
             >
             <span class="preview-banner__divider">|</span>
             <span class="preview-banner__message">{{
-              announcementForm.get('name')?.value || ('ANNOUNCEMENT.YOUR_TITLE_HERE' | translate)
+              announcementForm.get('name')?.value ||
+                ('ANNOUNCEMENT.YOUR_TITLE_HERE' | translate)
             }}</span>
           </div>
         </div>
@@ -283,7 +286,10 @@
               >ANNOUNCEMENT</span
             >
             <h4 class="preview-popup-mock__title">
-              {{ announcementForm.get('name')?.value || ('ANNOUNCEMENT.YOUR_TITLE_HERE' | translate) }}
+              {{
+                announcementForm.get('name')?.value ||
+                  ('ANNOUNCEMENT.YOUR_TITLE_HERE' | translate)
+              }}
             </h4>
             <p class="preview-popup-mock__desc">
               {{
@@ -293,9 +299,12 @@
             </p>
             <div class="preview-popup-mock__footer">
               <span class="preview-popup-mock__checkbox">
-                <i class="pi pi-stop"></i> {{ 'HEADER.DO_NOT_SHOW_AGAIN' | translate }}
+                <i class="pi pi-stop"></i>
+                {{ 'HEADER.DO_NOT_SHOW_AGAIN' | translate }}
               </span>
-              <span class="preview-popup-mock__btn">{{ 'HEADER.DISMISS' | translate }}</span>
+              <span class="preview-popup-mock__btn">{{
+                'HEADER.DISMISS' | translate
+              }}</span>
             </div>
           </div>
         </div>

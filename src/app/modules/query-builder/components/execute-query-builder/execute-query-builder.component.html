@@ -77,7 +77,11 @@
           [disabled]="executing() || !hasAnyValue || !queryRanSuccessfully"
         >
           <i class="pi pi-save"></i>
-          {{ isEditMode ? ('COMMON.UPDATE' | translate) : ('COMMON.SAVE' | translate) }}
+          {{
+            isEditMode
+              ? ('COMMON.UPDATE' | translate)
+              : ('COMMON.SAVE' | translate)
+          }}
         </button>
       </div>
     </div>
@@ -226,7 +230,9 @@
                   "
                 >
                   <i class="pi pi-info-circle"></i>
-                  <span>{{ 'QUERY_BUILDER_MODULE.NO_PROMPTS' | translate }}</span>
+                  <span>{{
+                    'QUERY_BUILDER_MODULE.NO_PROMPTS' | translate
+                  }}</span>
                 </div>
 
                 <!-- Prompt Form Fields -->
@@ -720,7 +726,10 @@
                         class="p-error"
                         *ngIf="getPromptControl(prompt)?.hasError('required')"
                       >
-                        {{ 'QUERY_BUILDER_MODULE.PROMPT_REQUIRED' | translate: { name: prompt.name } }}
+                        {{
+                          'QUERY_BUILDER_MODULE.PROMPT_REQUIRED'
+                            | translate: { name: prompt.name }
+                        }}
                       </small>
                     </div>
                   </div>
@@ -737,7 +746,13 @@
 <!-- Save Dialog -->
 <div class="save-screen-popup" *ngIf="showSaveDialog">
   <div class="popup-content">
-    <h3>{{ isEditMode ? ('QUERY_BUILDER_MODULE.UPDATE_DATASET' | translate) : ('QUERY_BUILDER_MODULE.SAVE_AS_DATASET' | translate) }}</h3>
+    <h3>
+      {{
+        isEditMode
+          ? ('QUERY_BUILDER_MODULE.UPDATE_DATASET' | translate)
+          : ('QUERY_BUILDER_MODULE.SAVE_AS_DATASET' | translate)
+      }}
+    </h3>
     <form [formGroup]="saveForm" class="save-form">
       <div class="form-field">
         <app-custom-input
@@ -749,7 +764,9 @@
           [showError]="
             !!(saveForm.get('name')?.invalid && saveForm.get('name')?.touched)
           "
-          [errorMessage]="'QUERY_BUILDER_MODULE.DATASET_NAME_REQUIRED' | translate"
+          [errorMessage]="
+            'QUERY_BUILDER_MODULE.DATASET_NAME_REQUIRED' | translate
+          "
         >
         </app-custom-input>
       </div>
@@ -757,12 +774,15 @@
         <app-custom-input
           formControlName="description"
           [label]="'COMMON.DESCRIPTION' | translate"
-          [placeholder]="'QUERY_BUILDER_MODULE.ENTER_DESCRIPTION_OPTIONAL' | translate"
+          [placeholder]="
+            'QUERY_BUILDER_MODULE.ENTER_DESCRIPTION_OPTIONAL' | translate
+          "
           icon="pi-align-left"
         >
         </app-custom-input>
         <small class="char-count">
-          {{ saveForm.get('description')?.value?.length || 0 }}/500 {{ 'QUERY_BUILDER_MODULE.CHARACTERS' | translate }}
+          {{ saveForm.get('description')?.value?.length || 0 }}/500
+          {{ 'QUERY_BUILDER_MODULE.CHARACTERS' | translate }}
         </small>
       </div>
 
@@ -777,7 +797,11 @@
         <button
           pButton
           type="submit"
-          [label]="isEditMode ? ('COMMON.UPDATE' | translate) : ('COMMON.SAVE' | translate)"
+          [label]="
+            isEditMode
+              ? ('COMMON.UPDATE' | translate)
+              : ('COMMON.SAVE' | translate)
+          "
           class="p-button-outlined"
           [disabled]="saveForm.invalid || isSaving()"
           (click)="onSaveConfirm()"
@@ -854,7 +878,11 @@
       >
         <i class="pi pi-spin pi-spinner" *ngIf="executing()"></i>
         <i class="pi pi-cog" *ngIf="!executing()"></i>
-        {{ executing() ? ('COMMON.GENERATING' | translate) : ('COMMON.GENERATE' | translate) }}
+        {{
+          executing()
+            ? ('COMMON.GENERATING' | translate)
+            : ('COMMON.GENERATE' | translate)
+        }}
       </button>
     </div>
   </div>
@@ -877,7 +905,9 @@
     <div class="sql-result-body">
       <div class="sql-block">
         <div class="sql-block-header">
-          <span class="sql-block-label">{{ 'QUERY_BUILDER_MODULE.SQL_QUERY' | translate }}</span>
+          <span class="sql-block-label">{{
+            'QUERY_BUILDER_MODULE.SQL_QUERY' | translate
+          }}</span>
           <button
             class="btn-copy"
             type="button"
@@ -892,11 +922,15 @@
 
       <div class="sql-components" *ngIf="sqlComponents">
         <div class="sql-component-row" *ngIf="sqlComponents.schema">
-          <span class="component-label">{{ 'QUERY_BUILDER_MODULE.SCHEMA' | translate }}</span>
+          <span class="component-label">{{
+            'QUERY_BUILDER_MODULE.SCHEMA' | translate
+          }}</span>
           <span class="component-value">{{ sqlComponents.schema }}</span>
         </div>
         <div class="sql-component-row" *ngIf="sqlComponents.tables?.length > 0">
-          <span class="component-label">{{ 'QUERY_BUILDER_MODULE.TABLES' | translate }}</span>
+          <span class="component-label">{{
+            'QUERY_BUILDER_MODULE.TABLES' | translate
+          }}</span>
           <span class="component-value">
             <span
               class="component-tag"
@@ -910,13 +944,17 @@
           class="sql-component-row"
           *ngIf="sqlComponents.columns?.length > 0"
         >
-          <span class="component-label">{{ 'QUERY_BUILDER_MODULE.COLUMNS' | translate }}</span>
+          <span class="component-label">{{
+            'QUERY_BUILDER_MODULE.COLUMNS' | translate
+          }}</span>
           <span class="component-value">{{
             sqlComponents.columns.join(', ')
           }}</span>
         </div>
         <div class="sql-component-row" *ngIf="sqlComponents.joins?.length > 0">
-          <span class="component-label">{{ 'QUERY_BUILDER_MODULE.JOINS' | translate }}</span>
+          <span class="component-label">{{
+            'QUERY_BUILDER_MODULE.JOINS' | translate
+          }}</span>
           <span class="component-value">
             <span
               class="component-tag"
@@ -929,7 +967,9 @@
           class="sql-component-row"
           *ngIf="sqlComponents.whereConditions?.length > 0"
         >
-          <span class="component-label">{{ 'QUERY_BUILDER_MODULE.FILTERS' | translate }}</span>
+          <span class="component-label">{{
+            'QUERY_BUILDER_MODULE.FILTERS' | translate
+          }}</span>
           <span class="component-value">
             <span
               class="component-tag"
@@ -957,7 +997,11 @@
       >
         <i class="pi pi-spin pi-spinner" *ngIf="isExecutingQuery"></i>
         <i class="pi pi-play" *ngIf="!isExecutingQuery"></i>
-        {{ isExecutingQuery ? ('COMMON.RUNNING' | translate) : ('QUERY_BUILDER_MODULE.RUN_QUERY' | translate) }}
+        {{
+          isExecutingQuery
+            ? ('COMMON.RUNNING' | translate)
+            : ('QUERY_BUILDER_MODULE.RUN_QUERY' | translate)
+        }}
       </button>
     </div>
   </div>
@@ -982,7 +1026,9 @@
     <div class="results-popup-header">
       <div class="popup-header-left">
         <i class="pi pi-table"></i>
-        <span class="popup-title">{{ 'QUERY_BUILDER_MODULE.QUERY_RESULTS' | translate }}</span>
+        <span class="popup-title">{{
+          'QUERY_BUILDER_MODULE.QUERY_RESULTS' | translate
+        }}</span>
         <span
           class="popup-meta"
           *ngIf="!queryResult.error && queryResult.columns.length > 0"

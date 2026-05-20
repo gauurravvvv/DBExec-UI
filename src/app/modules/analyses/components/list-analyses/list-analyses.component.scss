@@ -211,7 +211,9 @@
 
           &:hover {
             color: var(--text-color);
-            .sort-indicator { opacity: 1; }
+            .sort-indicator {
+              opacity: 1;
+            }
           }
 
           &.is-sorted {
@@ -219,7 +221,9 @@
             background: transparent;
             .sort-indicator {
               opacity: 1;
-              .pi { color: var(--primary-color); }
+              .pi {
+                color: var(--primary-color);
+              }
             }
           }
 
@@ -236,7 +240,9 @@
             opacity: 0;
             transition: opacity var(--motion-fast) ease;
 
-            &.is-sorted { opacity: 1; }
+            &.is-sorted {
+              opacity: 1;
+            }
 
             .pi {
               font-size: 11px;
@@ -299,7 +305,9 @@
       // Body Rows
       .p-datatable-tbody > tr {
         background: var(--card-background);
-        transition: background-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease;
+        transition:
+          background-color var(--motion-fast) ease,
+          box-shadow var(--motion-fast) ease;
         border-bottom: 1px solid var(--border-color);
         position: relative;
 
@@ -311,14 +319,22 @@
           font-size: var(--fs-body);
           line-height: 1.45;
 
-          &:first-child { padding-left: 2rem; }
-          &:last-child { padding-right: 2rem; }
+          &:first-child {
+            padding-left: 2rem;
+          }
+          &:last-child {
+            padding-right: 2rem;
+          }
         }
 
         &:hover {
           background-color: var(--hover-background) !important;
-          td:first-child { box-shadow: inset 3px 0 0 0 var(--primary-color); }
-          .row-actions { opacity: 1; }
+          td:first-child {
+            box-shadow: inset 3px 0 0 0 var(--primary-color);
+          }
+          .row-actions {
+            opacity: 1;
+          }
         }
       }
 
@@ -328,8 +344,12 @@
 
       .p-datatable-thead > tr > th.p-frozen-column-end,
       .p-datatable-tbody > tr > td.p-frozen-column-end,
-      .p-datatable-thead > tr > th.p-frozen-column:has(+ :not(.p-frozen-column)),
-      .p-datatable-tbody > tr > td.p-frozen-column:has(+ :not(.p-frozen-column)) {
+      .p-datatable-thead
+        > tr
+        > th.p-frozen-column:has(+ :not(.p-frozen-column)),
+      .p-datatable-tbody
+        > tr
+        > td.p-frozen-column:has(+ :not(.p-frozen-column)) {
         box-shadow: 4px 0 6px -4px rgba(0, 0, 0, 0.08);
       }
 
@@ -339,20 +359,38 @@
 
       // Link Style
       .dataset-name-link {
-        color: var(--text-color); font-weight: var(--fw-semibold); font-size: var(--fs-h3);
-        text-decoration: none; display: block; white-space: nowrap;
-        overflow: hidden; text-overflow: ellipsis; max-width: 100%;
-        border-radius: var(--radius-xs); padding: 2px 0;
+        color: var(--text-color);
+        font-weight: var(--fw-semibold);
+        font-size: var(--fs-h3);
+        text-decoration: none;
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        border-radius: var(--radius-xs);
+        padding: 2px 0;
 
-        &:hover { color: var(--primary-color); }
-        &:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+        &:hover {
+          color: var(--primary-color);
+        }
+        &:focus-visible {
+          outline: 2px solid var(--primary-color);
+          outline-offset: 2px;
+        }
       }
 
       // Description
       .description-text {
-        color: var(--secondary-color); white-space: nowrap;
-        overflow: hidden; text-overflow: ellipsis; display: block; max-width: 100%;
-        &.is-truncatable { cursor: help; }
+        color: var(--secondary-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+        max-width: 100%;
+        &.is-truncatable {
+          cursor: help;
+        }
       }
 
       .date-text {
@@ -377,7 +415,6 @@
         text-overflow: ellipsis;
         white-space: nowrap;
       }
-
 
       // Row Actions
       .row-actions {
@@ -481,7 +518,9 @@
 }
 
 // 4. Empty State
-td.text-center { text-align: center; }
+td.text-center {
+  text-align: center;
+}
 
 td.empty-message-cell {
   text-align: center;
@@ -491,19 +530,39 @@ td.empty-message-cell {
   background: var(--card-background) !important;
 
   .empty-state {
-    display: flex; flex-direction: column; align-items: center;
-    gap: var(--space-5); max-width: 28rem; margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-5);
+    max-width: 28rem;
+    margin: 0 auto;
 
     .empty-icon {
-      width: 56px; height: 56px; border-radius: 50%;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
       background: var(--hover-background);
-      display: inline-flex; align-items: center; justify-content: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       margin-bottom: 0.5rem;
-      i { font-size: var(--fs-h1); color: var(--secondary-color); opacity: 0.7; }
+      i {
+        font-size: var(--fs-h1);
+        color: var(--secondary-color);
+        opacity: 0.7;
+      }
     }
 
-    .empty-title { font-size: var(--fs-h3); font-weight: var(--fw-semibold); color: var(--text-color); }
-    .empty-subtitle { font-size: var(--fs-body); color: var(--secondary-color); line-height: 1.5; }
+    .empty-title {
+      font-size: var(--fs-h3);
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
+    }
+    .empty-subtitle {
+      font-size: var(--fs-body);
+      color: var(--secondary-color);
+      line-height: 1.5;
+    }
   }
 }
 

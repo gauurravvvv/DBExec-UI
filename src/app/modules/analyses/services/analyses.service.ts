@@ -85,7 +85,10 @@ export class AnalysesService {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPost(ANALYSES.BULK_DELETE_PREFIX + orgId + ANALYSES.BULK_DELETE_SUFFIX, { ids, justification }),
+        this.http.apiPost(
+          ANALYSES.BULK_DELETE_PREFIX + orgId + ANALYSES.BULK_DELETE_SUFFIX,
+          { ids, justification },
+        ),
       );
     } finally {
       this._saving.set(false);
@@ -333,7 +336,9 @@ export class AnalysesService {
           fieldName,
           ...(options?.search !== undefined ? { search: options.search } : {}),
           ...(options?.page !== undefined ? { page: options.page } : {}),
-          ...(options?.pageSize !== undefined ? { pageSize: options.pageSize } : {}),
+          ...(options?.pageSize !== undefined
+            ? { pageSize: options.pageSize }
+            : {}),
         },
       ),
     );
@@ -379,11 +384,7 @@ export class AnalysesService {
     }
   }
 
-  async deleteFilter(
-    orgId: string,
-    filterId: string,
-    justification?: string,
-  ) {
+  async deleteFilter(orgId: string, filterId: string, justification?: string) {
     this._saving.set(true);
     try {
       return await lastValueFrom(

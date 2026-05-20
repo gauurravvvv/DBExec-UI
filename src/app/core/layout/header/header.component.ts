@@ -16,11 +16,14 @@ import { Store } from '@ngrx/store';
 import { auditTime, filter } from 'rxjs/operators';
 import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import {
+  LocaleService,
+  SUPPORTED_LOCALES,
+} from 'src/app/core/services/locale.service';
 import { LoginService } from 'src/app/core/services/login.service';
 import { StorageService } from 'src/app/core/services/storage.service';
 import { AddAnalysesActions } from 'src/app/modules/analyses/store';
 import { AnnouncementService } from 'src/app/modules/app-settings/services/announcement.service';
-import { LocaleService, SUPPORTED_LOCALES } from 'src/app/core/services/locale.service';
 import { GlobalSearchService } from '../../../shared/services/global-search.service';
 
 interface Announcement {
@@ -458,9 +461,10 @@ export class HeaderComponent implements OnInit {
       const { locale: _drop, ...keep } = currentTree.queryParams;
       // Navigate to the same path, replacing the URL in history so
       // the user can't "back" into the temp locale by accident.
-      const path = currentTree.root.children['primary']?.segments
-        .map(s => '/' + s.path)
-        .join('') || '/';
+      const path =
+        currentTree.root.children['primary']?.segments
+          .map(s => '/' + s.path)
+          .join('') || '/';
       this.router.navigate([path], {
         queryParams: keep,
         replaceUrl: true,

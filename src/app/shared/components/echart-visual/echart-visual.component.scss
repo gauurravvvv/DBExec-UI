@@ -29,6 +29,9 @@
     justify-content: center;
     color: var(--text-muted);
 
-    i { font-size: 20px; color: var(--primary-color, #2196f3); }
+    i {
+      font-size: 20px;
+      color: var(--primary-color, #2196f3);
+    }
   }
 }

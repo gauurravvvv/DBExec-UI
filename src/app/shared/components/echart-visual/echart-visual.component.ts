@@ -93,7 +93,10 @@ export class EchartVisualComponent
    * cards on a canvas the leak compounds and FPS / memory degrade.
    */
   ngOnDestroy(): void {
-    if (this.echartsInstance && typeof this.echartsInstance.dispose === 'function') {
+    if (
+      this.echartsInstance &&
+      typeof this.echartsInstance.dispose === 'function'
+    ) {
       this.echartsInstance.dispose();
       this.echartsInstance = null;
     }

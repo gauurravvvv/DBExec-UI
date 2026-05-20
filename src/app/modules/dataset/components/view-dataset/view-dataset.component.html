@@ -40,11 +40,22 @@
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.DESCRIPTION' | translate }}</label>
-              <p>{{ datasetData.description || ('DATASET.NO_DESCRIPTION' | translate) }}</p>
+              <p>
+                {{
+                  datasetData.description ||
+                    ('DATASET.NO_DESCRIPTION' | translate)
+                }}
+              </p>
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.TYPE' | translate }}</label>
-              <p>{{ datasetData.type === 1 ? ('DATASET.SQL_BASED' | translate) : ('DATASET.PROMPT_BASED' | translate) }}</p>
+              <p>
+                {{
+                  datasetData.type === 1
+                    ? ('DATASET.SQL_BASED' | translate)
+                    : ('DATASET.PROMPT_BASED' | translate)
+                }}
+              </p>
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.STATUS' | translate }}</label>
@@ -60,7 +71,11 @@
                       : 'pi-times-circle'
                   "
                 ></i>
-                {{ datasetData.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                {{
+                  datasetData.status === 1
+                    ? ('COMMON.ACTIVE' | translate)
+                    : ('COMMON.INACTIVE' | translate)
+                }}
               </span>
             </div>
             <div class="info-item">
@@ -180,7 +195,11 @@
           <div class="section-header">
             <h3>
               <i class="pi pi-code mr-2"></i>
-              {{ datasetData.type === 2 ? ('DATASET.GENERATED_SQL_QUERY' | translate) : ('DATASET.SQL_QUERY' | translate) }}
+              {{
+                datasetData.type === 2
+                  ? ('DATASET.GENERATED_SQL_QUERY' | translate)
+                  : ('DATASET.SQL_QUERY' | translate)
+              }}
             </h3>
             <div class="sql-actions">
               <button
@@ -249,7 +268,9 @@
                   <span
                     class="field-datatype"
                     *ngIf="entity.dataType"
-                    [pTooltip]="('DATASET.SOURCE' | translate) + ': ' + entity.dataType"
+                    [pTooltip]="
+                      ('DATASET.SOURCE' | translate) + ': ' + entity.dataType
+                    "
                     tooltipPosition="top"
                   >
                     <i
@@ -371,7 +392,9 @@
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
-      <p class="delete-intro">{{ 'DATASET.CONFIRM_DELETE_SINGLE' | translate }}</p>
+      <p class="delete-intro">
+        {{ 'DATASET.CONFIRM_DELETE_SINGLE' | translate }}
+      </p>
 
       <ul class="delete-info-list">
         <li>
@@ -390,7 +413,8 @@
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"
@@ -434,7 +458,9 @@
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
-      <p class="delete-intro">{{ 'DATASET.CONFIRM_DELETE_FIELD_MSG' | translate }}</p>
+      <p class="delete-intro">
+        {{ 'DATASET.CONFIRM_DELETE_FIELD_MSG' | translate }}
+      </p>
 
       <ul class="delete-info-list">
         <li>

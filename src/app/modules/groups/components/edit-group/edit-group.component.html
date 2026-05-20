@@ -11,7 +11,9 @@
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>{{ 'GROUP.EDIT_TITLE' | translate }}</h2>
-        <span *ngIf="isDefaultGroup" class="default-badge">{{ 'GROUP.DEFAULT' | translate }}</span>
+        <span *ngIf="isDefaultGroup" class="default-badge">{{
+          'GROUP.DEFAULT' | translate
+        }}</span>
       </div>
       <div class="action-buttons">
         <button
@@ -134,7 +136,9 @@
     </div>
 
     <div class="standard-delete-section">
-      <p class="delete-intro">{{ 'GROUP.CONFIRM_UPDATE_MESSAGE' | translate }}</p>
+      <p class="delete-intro">
+        {{ 'GROUP.CONFIRM_UPDATE_MESSAGE' | translate }}
+      </p>
 
       <div class="justification-section">
         <app-custom-input

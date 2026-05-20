@@ -129,7 +129,11 @@
       padding: 0.65rem 1.25rem;
 
       &.p-button-primary {
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--primary-hover)
+        );
         color: var(--primary-text);
         border: none;
         box-shadow: 0 4px 10px var(--primary-color-transparent);

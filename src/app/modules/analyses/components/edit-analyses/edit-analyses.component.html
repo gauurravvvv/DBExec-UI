@@ -13,7 +13,9 @@
         <i class="pi pi-arrow-left"></i>
       </button>
       <div class="a-toolbar__title">
-        <span class="a-toolbar__crumb">{{ 'ANALYSES.EDIT_ANALYSIS' | translate }}</span>
+        <span class="a-toolbar__crumb">{{
+          'ANALYSES.EDIT_ANALYSIS' | translate
+        }}</span>
         <span class="a-toolbar__sep" aria-hidden="true">/</span>
         <span class="a-toolbar__name">{{ analysisDetails?.name || '' }}</span>
       </div>
@@ -73,15 +75,22 @@
       >
         <ng-container *ngSwitchCase="'loading'">
           <span class="a-status__dot a-status__dot--loading"></span>
-          <span class="a-status__text">{{ 'ANALYSES.RETRIEVING_DATA' | translate }}</span>
+          <span class="a-status__text">{{
+            'ANALYSES.RETRIEVING_DATA' | translate
+          }}</span>
         </ng-container>
         <ng-container *ngSwitchCase="'loaded'">
           <span class="a-status__dot a-status__dot--loaded"></span>
-          <span class="a-status__text">{{ 'ANALYSES.ROWS_LOADED' | translate:{ count: (rawGraphData.length || 0) } }}</span>
+          <span class="a-status__text">{{
+            'ANALYSES.ROWS_LOADED'
+              | translate: { count: rawGraphData.length || 0 }
+          }}</span>
         </ng-container>
         <ng-container *ngSwitchCase="'error'">
           <span class="a-status__dot a-status__dot--error"></span>
-          <span class="a-status__text">{{ 'ANALYSES.ERROR_LOADING_DATA' | translate }}</span>
+          <span class="a-status__text">{{
+            'ANALYSES.ERROR_LOADING_DATA' | translate
+          }}</span>
         </ng-container>
       </div>
 
@@ -108,15 +117,23 @@
         ></i>
       </button>
 
-
       <button
         type="button"
         class="a-btn a-btn--primary"
         (click)="saveAnalysis()"
         [disabled]="!canSave || saving()"
       >
-        <i class="pi" [class.pi-save]="!saving()" [class.pi-spin]="saving()" [class.pi-spinner]="saving()"></i>
-        <span>{{ saving() ? ('ANALYSES.SAVING' | translate) : ('COMMON.SAVE' | translate) }}</span>
+        <i
+          class="pi"
+          [class.pi-save]="!saving()"
+          [class.pi-spin]="saving()"
+          [class.pi-spinner]="saving()"
+        ></i>
+        <span>{{
+          saving()
+            ? ('ANALYSES.SAVING' | translate)
+            : ('COMMON.SAVE' | translate)
+        }}</span>
       </button>
 
       <!-- Publish creates a snapshot dashboard from this analysis.
@@ -128,17 +145,14 @@
         class="a-btn a-btn--secondary"
         (click)="openPublishDashboardDialog()"
         [disabled]="
-          saving() ||
-          publishing() ||
-          hasUnsavedChanges() ||
-          !visuals.length
+          saving() || publishing() || hasUnsavedChanges() || !visuals.length
         "
         [pTooltip]="
           (hasUnsavedChanges()
             ? 'DASHBOARD.PUBLISH_UNSAVED_HINT'
             : !visuals.length
-            ? 'DASHBOARD.PUBLISH_NO_VISUALS_HINT'
-            : 'DASHBOARD.PUBLISH'
+              ? 'DASHBOARD.PUBLISH_NO_VISUALS_HINT'
+              : 'DASHBOARD.PUBLISH'
           ) | translate
         "
         tooltipPosition="bottom"
@@ -234,10 +248,7 @@
             tooltipPosition="bottom"
             [attr.aria-label]="'ANALYSES.REFRESH_FIELDS_TOOLTIP' | translate"
           >
-            <i
-              class="pi pi-refresh"
-              [class.pi-spin]="isRefreshingFields"
-            ></i>
+            <i class="pi pi-refresh" [class.pi-spin]="isRefreshingFields"></i>
           </button>
         </div>
         <div class="sidebar-divider"></div>
@@ -296,16 +307,20 @@
                   *ngIf="field._scope === 'dataset'"
                   class="field-card"
                   [class.custom-field]="field.type === 2"
-                  [class.selectable]="activeAxisSelection !== null || isFocusedVisualTable()"
-                  [class.field-shown]="isFocusedVisualTable() && isFieldVisibleInTable(field)"
-                  [class.field-hidden]="isFocusedVisualTable() && !isFieldVisibleInTable(field)"
+                  [class.selectable]="
+                    activeAxisSelection !== null || isFocusedVisualTable()
+                  "
+                  [class.field-shown]="
+                    isFocusedVisualTable() && isFieldVisibleInTable(field)
+                  "
+                  [class.field-hidden]="
+                    isFocusedVisualTable() && !isFieldVisibleInTable(field)
+                  "
                   (click)="onFieldClick(field)"
                 >
                   <div
                     class="field-icon"
-                    [ngClass]="
-                      'type-' + getDataTypeCategory(field.dataType)
-                    "
+                    [ngClass]="'type-' + getDataTypeCategory(field.dataType)"
                   >
                     <i
                       class="pi"
@@ -335,16 +350,20 @@
                   *ngIf="field._scope === 'analysis'"
                   class="field-card analysis-field"
                   [class.custom-field]="field.type === 2"
-                  [class.selectable]="activeAxisSelection !== null || isFocusedVisualTable()"
-                  [class.field-shown]="isFocusedVisualTable() && isFieldVisibleInTable(field)"
-                  [class.field-hidden]="isFocusedVisualTable() && !isFieldVisibleInTable(field)"
+                  [class.selectable]="
+                    activeAxisSelection !== null || isFocusedVisualTable()
+                  "
+                  [class.field-shown]="
+                    isFocusedVisualTable() && isFieldVisibleInTable(field)
+                  "
+                  [class.field-hidden]="
+                    isFocusedVisualTable() && !isFieldVisibleInTable(field)
+                  "
                   (click)="onFieldClick(field)"
                 >
                   <div
                     class="field-icon"
-                    [ngClass]="
-                      'type-' + getDataTypeCategory(field.dataType)
-                    "
+                    [ngClass]="'type-' + getDataTypeCategory(field.dataType)"
                   >
                     <i
                       class="pi"
@@ -499,12 +518,14 @@
                 <small>{{ getFilterConfigSummary(filter) }}</small>
               </div>
               <div class="filter-card-badges">
-                <span class="badge badge-mandatory" *ngIf="filter.isMandatory"
+                <span
+                  class="badge badge-mandatory"
+                  *ngIf="filter.isMandatory"
                   >{{ 'ANALYSES.REQUIRED' | translate }}</span
                 >
-                <span class="badge badge-disabled" *ngIf="!filter.isEnabled"
-                  >{{ 'ANALYSES.DISABLED' | translate }}</span
-                >
+                <span class="badge badge-disabled" *ngIf="!filter.isEnabled">{{
+                  'ANALYSES.DISABLED' | translate
+                }}</span>
               </div>
             </div>
           </div>
@@ -596,7 +617,9 @@
             <div class="visual-loading-placeholder" *ngIf="visual.loading">
               <div class="loading-content">
                 <i class="pi pi-spin pi-spinner loading-spinner"></i>
-                <span class="loading-text">{{ 'ANALYSES.LOADING_VISUALIZATION' | translate }}</span>
+                <span class="loading-text">{{
+                  'ANALYSES.LOADING_VISUALIZATION' | translate
+                }}</span>
               </div>
             </div>
 
@@ -604,7 +627,9 @@
             <div class="visual-error-placeholder" *ngIf="visual.error">
               <div class="error-content">
                 <i class="pi pi-exclamation-triangle error-icon"></i>
-                <span class="error-text">{{ 'ANALYSES.FAILED_LOAD_VISUALIZATION' | translate }}</span>
+                <span class="error-text">{{
+                  'ANALYSES.FAILED_LOAD_VISUALIZATION' | translate
+                }}</span>
               </div>
             </div>
 
@@ -687,20 +712,21 @@
                 'ANALYSES.ASSIGN_AXES_HINT'
                   | translate
                     : {
-                        axes:
-                          isHeatMapChartType(visual.chartType)
-                            ? ('ANALYSES.ROW_COLUMN_VALUE' | translate)
-                            : isSankeyChartType(visual.chartType) ||
-                                isGraphChartType(visual.chartType) ||
-                                isFlowLinesChartType(visual.chartType)
-                              ? ('ANALYSES.SOURCE_TARGET_VALUE' | translate)
-                              : isWorldMapChartType(visual.chartType)
-                                ? ('ANALYSES.REGION_AND_VALUE' | translate)
-                                : isLines3dChartType(visual.chartType)
-                                  ? ('ANALYSES.LONGITUDE_AND_LATITUDE' | translate)
-                                  : isPolygons3dChartType(visual.chartType)
-                                    ? ('ANALYSES.NAME_LONGITUDE_LATITUDE' | translate)
-                                    : ('ANALYSES.X_AXIS_AND_Y_AXIS' | translate)
+                        axes: isHeatMapChartType(visual.chartType)
+                          ? ('ANALYSES.ROW_COLUMN_VALUE' | translate)
+                          : isSankeyChartType(visual.chartType) ||
+                              isGraphChartType(visual.chartType) ||
+                              isFlowLinesChartType(visual.chartType)
+                            ? ('ANALYSES.SOURCE_TARGET_VALUE' | translate)
+                            : isWorldMapChartType(visual.chartType)
+                              ? ('ANALYSES.REGION_AND_VALUE' | translate)
+                              : isLines3dChartType(visual.chartType)
+                                ? ('ANALYSES.LONGITUDE_AND_LATITUDE'
+                                  | translate)
+                                : isPolygons3dChartType(visual.chartType)
+                                  ? ('ANALYSES.NAME_LONGITUDE_LATITUDE'
+                                    | translate)
+                                  : ('ANALYSES.X_AXIS_AND_Y_AXIS' | translate),
                       }
               }}</small>
             </div>
@@ -736,7 +762,10 @@
               getMissingFields(visual).length === 0
             "
           >
-            <span class="visual-insights__chunk" *ngIf="visual.chartData?.length">
+            <span
+              class="visual-insights__chunk"
+              *ngIf="visual.chartData?.length"
+            >
               <i class="pi pi-database"></i>
               {{ visual.chartData.length }} rows
             </span>
@@ -765,8 +794,12 @@
       <!-- Empty State — subtle, quieter copy + custom SVG icon -->
       <div class="empty-state" *ngIf="visuals.length === 0">
         <i class="ci ci-visualization empty-state__icon" aria-hidden="true"></i>
-        <h3 class="empty-state__title">{{ 'ANALYSES.NO_VISUALS_YET' | translate }}</h3>
-        <p class="empty-state__hint">{{ 'ANALYSES.ADD_VISUAL_HINT' | translate }}</p>
+        <h3 class="empty-state__title">
+          {{ 'ANALYSES.NO_VISUALS_YET' | translate }}
+        </h3>
+        <p class="empty-state__hint">
+          {{ 'ANALYSES.ADD_VISUAL_HINT' | translate }}
+        </p>
         <ul class="empty-state__tips">
           <li>{{ 'ANALYSES.TIP_CLICK_CHART' | translate }}</li>
           <li>{{ 'ANALYSES.TIP_DRAG_RESIZE' | translate }}</li>
@@ -847,7 +880,9 @@
       <h3>{{ 'ANALYSES.CONFIRM_DELETE_FIELD' | translate }}</h3>
     </div>
     <div class="standard-delete-section">
-      <p class="delete-intro">{{ 'ANALYSES.CONFIRM_DELETE_FIELD_MSG' | translate }}</p>
+      <p class="delete-intro">
+        {{ 'ANALYSES.CONFIRM_DELETE_FIELD_MSG' | translate }}
+      </p>
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
@@ -888,7 +923,8 @@
       <p class="delete-intro" *ngIf="filterToDelete">
         {{
           'ANALYSES.CONFIRM_DELETE_FILTER_MSG'
-            | translate: { name: filterToDelete.name || filterToDelete.columnName }
+            | translate
+              : { name: filterToDelete.name || filterToDelete.columnName }
         }}
       </p>
       <ul class="delete-info-list">
@@ -898,7 +934,9 @@
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>{{ 'ANALYSES.DELETE_FILTER_VISUALS_AFFECTED' | translate }}</span>
+          <span>{{
+            'ANALYSES.DELETE_FILTER_VISUALS_AFFECTED' | translate
+          }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
@@ -916,7 +954,9 @@
           [maxLength]="500"
           [required]="true"
         ></app-custom-input>
-        <small class="char-count">{{ filterDeleteJustification.length }}/500</small>
+        <small class="char-count"
+          >{{ filterDeleteJustification.length }}/500</small
+        >
       </div>
     </div>
     <div class="popup-actions">

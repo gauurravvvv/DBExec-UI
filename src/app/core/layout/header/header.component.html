@@ -23,7 +23,9 @@
         *ngIf="userRole !== 'SYSTEM-ADMIN'"
       >
         <i class="pi pi-search"></i>
-        <span class="placeholder">{{ 'HEADER.SEARCH_PLACEHOLDER' | translate }}</span>
+        <span class="placeholder">{{
+          'HEADER.SEARCH_PLACEHOLDER' | translate
+        }}</span>
         <kbd class="shortcut">⌘K</kbd>
       </div>
 
@@ -224,7 +226,9 @@
       <p>{{ 'HEADER.ALL_CAUGHT_UP' | translate }}</p>
     </div>
   </ng-template>
-  <div class="notification-footer">{{ 'HEADER.SHOWING_LAST_30_DAYS' | translate }}</div>
+  <div class="notification-footer">
+    {{ 'HEADER.SHOWING_LAST_30_DAYS' | translate }}
+  </div>
 </div>
 
 <!-- Global Search -->

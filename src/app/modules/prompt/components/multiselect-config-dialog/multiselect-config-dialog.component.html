@@ -24,7 +24,9 @@
           <app-custom-input
             [(ngModel)]="config.placeholder"
             [label]="'PROMPT_MODULE.PLACEHOLDER_TEXT' | translate"
-            [placeholder]="'PROMPT_MODULE.PLACEHOLDER_OPTIONS_EXAMPLE' | translate"
+            [placeholder]="
+              'PROMPT_MODULE.PLACEHOLDER_OPTIONS_EXAMPLE' | translate
+            "
           >
           </app-custom-input>
         </div>
@@ -54,9 +56,9 @@
             type="number"
           >
           </app-custom-input>
-          <small class="hint"
-            >{{ 'PROMPT_MODULE.MAX_LABELS_HINT' | translate }}</small
-          >
+          <small class="hint">{{
+            'PROMPT_MODULE.MAX_LABELS_HINT' | translate
+          }}</small>
         </div>
 
         <div class="config-group" *ngIf="config.displayMode === 'comma'">
@@ -67,7 +69,8 @@
           >
           </app-custom-input>
           <small class="hint"
-            >{{ 'PROMPT_MODULE.SELECTED_ITEMS_HINT' | translate }} <code>{{ '{0}' }}</code></small
+            >{{ 'PROMPT_MODULE.SELECTED_ITEMS_HINT' | translate }}
+            <code>{{ '{0}' }}</code></small
           >
         </div>
 
@@ -93,9 +96,9 @@
         <div class="config-row">
           <div>
             <label class="label-block">Limit Max Selections</label>
-            <small class="hint hint--flush"
-              >{{ 'PROMPT_MODULE.LIMIT_SELECTIONS_HINT' | translate }}</small
-            >
+            <small class="hint hint--flush">{{
+              'PROMPT_MODULE.LIMIT_SELECTIONS_HINT' | translate
+            }}</small>
           </div>
           <p-inputSwitch
             [(ngModel)]="limitEnabled"
@@ -137,7 +140,9 @@
           </div>
 
           <div class="config-row">
-            <label>{{ 'PROMPT_MODULE.RESET_FILTER_ON_CLOSE' | translate }}</label>
+            <label>{{
+              'PROMPT_MODULE.RESET_FILTER_ON_CLOSE' | translate
+            }}</label>
             <p-inputSwitch
               [(ngModel)]="config.resetFilterOnHide"
             ></p-inputSwitch>
@@ -184,9 +189,9 @@
         <div class="config-row">
           <div>
             <label class="label-block">Virtual Scroll</label>
-            <small class="hint hint--flush"
-              >{{ 'PROMPT_MODULE.VIRTUAL_SCROLL_HINT' | translate }}</small
-            >
+            <small class="hint hint--flush">{{
+              'PROMPT_MODULE.VIRTUAL_SCROLL_HINT' | translate
+            }}</small>
           </div>
           <p-inputSwitch [(ngModel)]="config.virtualScroll"></p-inputSwitch>
         </div>
@@ -292,32 +297,37 @@
         <!-- Config Summary -->
         <div class="config-summary">
           <div class="summary-title">
-            <i class="pi pi-info-circle"></i> {{ 'PROMPT_MODULE.ACTIVE_SETTINGS' | translate }}
+            <i class="pi pi-info-circle"></i>
+            {{ 'PROMPT_MODULE.ACTIVE_SETTINGS' | translate }}
           </div>
           <div class="summary-chips">
             <span class="summary-chip">{{
               previewConfig.displayMode === 'chip' ? 'Chips' : 'Comma'
             }}</span>
             <span class="summary-chip" *ngIf="previewConfig.filter"
-              >{{ 'PROMPT_MODULE.FILTER' | translate }} ({{ previewConfig.filterMatchMode }})</span
+              >{{ 'PROMPT_MODULE.FILTER' | translate }} ({{
+                previewConfig.filterMatchMode
+              }})</span
             >
-            <span class="summary-chip" *ngIf="previewConfig.resetFilterOnHide"
+            <span
+              class="summary-chip"
+              *ngIf="previewConfig.resetFilterOnHide"
               >{{ 'PROMPT_MODULE.AUTO_RESET_FILTER' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.showToggleAll"
               >Toggle All</span
             >
-            <span class="summary-chip" *ngIf="!previewConfig.showHeader"
-              >{{ 'PROMPT_MODULE.NO_HEADER' | translate }}</span
-            >
+            <span class="summary-chip" *ngIf="!previewConfig.showHeader">{{
+              'PROMPT_MODULE.NO_HEADER' | translate
+            }}</span>
             <span
               class="summary-chip"
               *ngIf="previewConfig.selectionLimit != null"
               >Limit: {{ previewConfig.selectionLimit }}</span
             >
-            <span class="summary-chip" *ngIf="previewConfig.virtualScroll"
-              >{{ 'PROMPT_MODULE.VIRTUAL_SCROLL' | translate }}</span
-            >
+            <span class="summary-chip" *ngIf="previewConfig.virtualScroll">{{
+              'PROMPT_MODULE.VIRTUAL_SCROLL' | translate
+            }}</span>
             <span
               class="summary-chip"
               *ngIf="previewConfig.scrollHeight !== '200px'"

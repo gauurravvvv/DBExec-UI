@@ -70,7 +70,11 @@
   }
 
   .btn-apply {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--primary-hover)
+    );
     color: var(--primary-text);
     box-shadow: 0 4px 10px var(--primary-color-transparent);
 
@@ -240,7 +244,8 @@
   font-size: var(--fs-control);
   font-weight: var(--fw-medium);
   cursor: pointer;
-  transition: border-color var(--motion-base) ease,
+  transition:
+    border-color var(--motion-base) ease,
     background var(--motion-base) ease;
   align-self: flex-end;
   height: 38px;

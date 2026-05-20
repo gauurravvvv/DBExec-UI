@@ -211,7 +211,9 @@
                   "
                 >
                   <i class="pi pi-info-circle"></i>
-                  <span>{{ 'QUERY_BUILDER_MODULE.NO_PROMPTS' | translate }}</span>
+                  <span>{{
+                    'QUERY_BUILDER_MODULE.NO_PROMPTS' | translate
+                  }}</span>
                 </div>
 
                 <!-- Prompt Form Fields -->
@@ -705,7 +707,10 @@
                         class="p-error"
                         *ngIf="getPromptControl(prompt)?.hasError('required')"
                       >
-                        {{ 'QUERY_BUILDER_MODULE.PROMPT_REQUIRED' | translate: { name: prompt.name } }}
+                        {{
+                          'QUERY_BUILDER_MODULE.PROMPT_REQUIRED'
+                            | translate: { name: prompt.name }
+                        }}
                       </small>
                     </div>
                   </div>
@@ -737,9 +742,7 @@
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
-          <span
-            >{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span
-          >
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
@@ -749,7 +752,8 @@
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"

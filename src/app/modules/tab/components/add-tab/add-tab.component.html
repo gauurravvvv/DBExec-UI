@@ -15,9 +15,7 @@
       <div class="warning-section" *ngIf="hasDuplicates">
         <div class="duplicate-warning">
           <i class="pi pi-exclamation-triangle"></i>
-          <span
-            >{{ 'TAB.DUPLICATE_WARNING' | translate }}</span
-          >
+          <span>{{ 'TAB.DUPLICATE_WARNING' | translate }}</span>
         </div>
       </div>
       <div class="action-buttons">
@@ -112,7 +110,10 @@
           *ngIf="tabForm.get('datasource')?.value"
         >
           <div class="fields-header">
-            <label>{{ 'TAB.TABS_LABEL' | translate }}<span class="required">*</span></label>
+            <label
+              >{{ 'TAB.TABS_LABEL' | translate
+              }}<span class="required">*</span></label
+            >
             <div class="button-group">
               <button
                 pButton

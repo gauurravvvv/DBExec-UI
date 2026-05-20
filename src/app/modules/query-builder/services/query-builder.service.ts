@@ -1,7 +1,11 @@
 import { Injectable, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
-import { QUERY_BUILDER, SECTION, TAB } from 'src/app/core/constants/api.constant';
+import {
+  QUERY_BUILDER,
+  SECTION,
+  TAB,
+} from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 export interface ExecuteQueryBuilderRequest {
@@ -70,14 +74,20 @@ export class QueryBuilderService {
 
   async loadStructure(orgId: string, id: string): Promise<void> {
     const res: any = await lastValueFrom(
-      this.http.apiGet(QUERY_BUILDER.GET + `${orgId}/${id}` + QUERY_BUILDER.STRUCTURE_SUFFIX),
+      this.http.apiGet(
+        QUERY_BUILDER.GET + `${orgId}/${id}` + QUERY_BUILDER.STRUCTURE_SUFFIX,
+      ),
     );
     if (res?.status) this._structure.set(res.data);
   }
 
   async loadTabs(orgId: string, queryBuilderId: string): Promise<void> {
     const res: any = await lastValueFrom(
-      this.http.apiGet(QUERY_BUILDER.GET + `${orgId}/${queryBuilderId}` + QUERY_BUILDER.TABS_SUFFIX),
+      this.http.apiGet(
+        QUERY_BUILDER.GET +
+          `${orgId}/${queryBuilderId}` +
+          QUERY_BUILDER.TABS_SUFFIX,
+      ),
     );
     if (res?.status) this._tabs.set(res.data ?? []);
   }
@@ -180,7 +190,12 @@ export class QueryBuilderService {
     orgId: string,
   ): Promise<any> {
     return lastValueFrom(
-      this.http.apiPost(QUERY_BUILDER.BULK_DELETE_PREFIX + orgId + QUERY_BUILDER.BULK_DELETE_SUFFIX, { ids, justification }),
+      this.http.apiPost(
+        QUERY_BUILDER.BULK_DELETE_PREFIX +
+          orgId +
+          QUERY_BUILDER.BULK_DELETE_SUFFIX,
+        { ids, justification },
+      ),
     );
   }
 
@@ -286,7 +301,11 @@ export class QueryBuilderService {
 
   getQueryBuilderTabs(orgId: string, queryBuilderId: string): Promise<any> {
     return lastValueFrom(
-      this.http.apiGet(QUERY_BUILDER.GET + `${orgId}/${queryBuilderId}` + QUERY_BUILDER.TABS_SUFFIX),
+      this.http.apiGet(
+        QUERY_BUILDER.GET +
+          `${orgId}/${queryBuilderId}` +
+          QUERY_BUILDER.TABS_SUFFIX,
+      ),
     );
   }
 

@@ -1,12 +1,16 @@
-import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpClientModule,
+  HTTP_INTERCEPTORS,
+} from '@angular/common/http';
 import { isDevMode, NgModule } from '@angular/core';
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { MessageService } from 'primeng/api';
 import { DropdownModule } from 'primeng/dropdown';
@@ -22,11 +26,11 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpErrorInterceptor } from './core/interceptors/http-error.interceptor';
 import { HttpRequestInterceptor } from './core/interceptors/http-request.interceptor';
-import { AuthModule } from './modules/auth/auth.module';
 import { FooterComponent } from './core/layout/footer/footer.component';
 import { HeaderComponent } from './core/layout/header/header.component';
 import { HomeComponent } from './core/layout/home/home.component';
 import { SidebarComponent } from './core/layout/sidebar/sidebar.component';
+import { AuthModule } from './modules/auth/auth.module';
 import { AppPrimeNGModule } from './shared/modules/app-primeng.module';
 import { SharedModule } from './shared/shared.module';
 

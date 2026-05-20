@@ -21,7 +21,10 @@
       <div class="details-grid">
         <!-- Basic Information -->
         <div class="info-section">
-          <h3><i class="pi pi-info-circle mr-2"></i> {{ 'COMMON.BASIC_INFORMATION' | translate }}</h3>
+          <h3>
+            <i class="pi pi-info-circle mr-2"></i>
+            {{ 'COMMON.BASIC_INFORMATION' | translate }}
+          </h3>
           <div class="info-grid">
             <div class="info-item">
               <label>{{ 'RLS.RULE_NAME' | translate }}</label>
@@ -29,7 +32,12 @@
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.DESCRIPTION' | translate }}</label>
-              <p>{{ current()!.description || ('COMMON.NO_DESCRIPTION' | translate) }}</p>
+              <p>
+                {{
+                  current()!.description ||
+                    ('COMMON.NO_DESCRIPTION' | translate)
+                }}
+              </p>
             </div>
             <div class="info-item">
               <label>{{ 'RLS.DATASET' | translate }}</label>
@@ -47,7 +55,11 @@
                     current()!.isEnabled ? 'pi-check-circle' : 'pi-times-circle'
                   "
                 ></i>
-                {{ current()!.isEnabled ? ('COMMON.ENABLED' | translate) : ('COMMON.DISABLED' | translate) }}
+                {{
+                  current()!.isEnabled
+                    ? ('COMMON.ENABLED' | translate)
+                    : ('COMMON.DISABLED' | translate)
+                }}
               </span>
             </div>
             <div class="info-item">
@@ -94,7 +106,8 @@
         <!-- Filter Conditions -->
         <div class="info-section">
           <h3>
-            <i class="pi pi-filter mr-2"></i> {{ 'RLS.FILTER_CONDITIONS' | translate }}
+            <i class="pi pi-filter mr-2"></i>
+            {{ 'RLS.FILTER_CONDITIONS' | translate }}
             <span class="count-badge">{{
               current()!.conditions?.length || 0
             }}</span>
@@ -134,7 +147,8 @@
             <div class="no-data">{{ 'RLS.NO_CONDITIONS' | translate }}</div>
           </ng-template>
           <p class="and-note" *ngIf="current()!.conditions?.length > 1">
-            <i class="pi pi-info-circle"></i> {{ 'RLS.ALL_CONDITIONS_ANDED_TOGETHER' | translate }}
+            <i class="pi pi-info-circle"></i>
+            {{ 'RLS.ALL_CONDITIONS_ANDED_TOGETHER' | translate }}
           </p>
         </div>
       </div>
@@ -167,7 +181,8 @@
       </ul>
       <div class="justification-section">
         <label for="deleteJustification"
-          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"

@@ -13,8 +13,8 @@
  */
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import {
-  ANALYSES_FILTER_FEATURE_KEY,
   AnalysesFilterState,
+  ANALYSES_FILTER_FEATURE_KEY,
   AnalysisFilterLane,
   emptyLane,
   FilterFlags,
@@ -82,13 +82,15 @@ export const selectFirstPageOptions = (
   filterId: string,
 ) => selectFilterOptions(analysisId, filterId, '', 1);
 
-export const selectFilterStale = (analysisId: string | null, filterId: string) =>
-  createSelector(
-    selectLane(analysisId),
-    lane => lane.stale[filterId] ?? [],
-  );
+export const selectFilterStale = (
+  analysisId: string | null,
+  filterId: string,
+) => createSelector(selectLane(analysisId), lane => lane.stale[filterId] ?? []);
 
-export const selectFilterFlags = (analysisId: string | null, filterId: string) =>
+export const selectFilterFlags = (
+  analysisId: string | null,
+  filterId: string,
+) =>
   createSelector(
     selectLane(analysisId),
     lane => lane.flags[filterId] ?? DEFAULT_FLAGS,

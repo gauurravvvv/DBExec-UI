@@ -17,12 +17,14 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { Observable, Subject, TimeoutError } from 'rxjs';
 import { debounceTime, first, timeout } from 'rxjs/operators';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { DATASET } from 'src/app/core/constants/routes.constant';
 import { ROLES } from 'src/app/core/constants/user.constant';
+import { IAPIResponse } from 'src/app/core/models/global.model';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
@@ -33,7 +35,6 @@ import {
   QUERY_EXECUTION_TIMEOUT_MS,
   SQL_EDITOR_PLACEHOLDER,
 } from '../../config/sql-editor.config';
-import { IAPIResponse } from 'src/app/core/models/global.model';
 import {
   DatasourceSchema,
   QueryExecuteData,
@@ -55,7 +56,6 @@ import {
   selectIsSchemaStale,
   selectSchemaByKey,
 } from '../../store';
-import { TranslateService } from '@ngx-translate/core';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 
 // Declare Monaco and window for TypeScript

@@ -154,8 +154,8 @@
   // ── Auth page (login / forgot / reset) — radial wash tints ─────
   // Two-blob composition: pale cyan top-left + indigo bottom-right,
   // sitting over a barely-blue linear canvas (hard-coded in the shell).
-  --auth-wash-tint-b:  99, 102, 241;  // indigo-500 (bottom-right anchor)
-  --auth-wash-tint-c: 125, 211, 252;  // sky-300 (top-left highlight)
+  --auth-wash-tint-b: 99, 102, 241; // indigo-500 (bottom-right anchor)
+  --auth-wash-tint-c: 125, 211, 252; // sky-300 (top-left highlight)
   // Glassy surfaces — topbar, footer, login card. All use white with
   // an alpha so the animated gradient bleeds through.
   --auth-surface-glass: rgba(255, 255, 255, 0.92);
@@ -168,8 +168,7 @@
   --auth-ink-rgb: 15, 23, 42;
   --auth-divider: rgba(15, 23, 42, 0.06);
   --auth-card-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.04),
-    0 24px 60px -28px rgba(15, 23, 42, 0.25);
+    0 1px 2px rgba(15, 23, 42, 0.04), 0 24px 60px -28px rgba(15, 23, 42, 0.25);
   // CapsLock callout — sits in the warning palette but darker so AA
   // contrast passes against the warning-bg tint.
   --auth-warning-text: #7a4a05;
@@ -182,23 +181,24 @@
   // ================================================================
 
   // Font families
-  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+  --font-ui:
+    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     'Helvetica Neue', Arial, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas,
-    monospace;
+  --font-mono:
+    'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --font-brand: 'Poppins', var(--font-ui);
 
   // Type scale — calibrated for an analytics product. Comfortable, never
   // tiny, never marketing-sized. No token below 11px exists; do not bypass.
-  --fs-h1: 1.25rem;        // 20px — page titles (one per page)
-  --fs-h2: 1.0625rem;      // 17px — section / dialog titles
-  --fs-h3: 0.9375rem;      // 15px — sub-section titles
+  --fs-h1: 1.25rem; // 20px — page titles (one per page)
+  --fs-h2: 1.0625rem; // 17px — section / dialog titles
+  --fs-h3: 0.9375rem; // 15px — sub-section titles
   --fs-card-title: 0.875rem; // 14px — card / panel titles
-  --fs-body: 0.875rem;     // 14px — body text, paragraphs, inputs, table cells
-  --fs-table: 0.875rem;    // 14px — table cells (alias of body, for clarity)
+  --fs-body: 0.875rem; // 14px — body text, paragraphs, inputs, table cells
+  --fs-table: 0.875rem; // 14px — table cells (alias of body, for clarity)
   --fs-control: 0.8125rem; // 13px — sidebar nav rows, buttons, chips, header controls
-  --fs-label: 0.75rem;     // 12px — form labels, captions
-  --fs-micro: 0.6875rem;   // 11px — uppercase section headers, footer
+  --fs-label: 0.75rem; // 12px — form labels, captions
+  --fs-micro: 0.6875rem; // 11px — uppercase section headers, footer
 
   // Weights
   --fw-regular: 400;
@@ -207,27 +207,27 @@
   --fw-bold: 700;
 
   // Line heights
-  --lh-tight: 1.25;        // headings
-  --lh-snug: 1.4;          // ui rows, buttons
-  --lh-normal: 1.55;       // body paragraphs
+  --lh-tight: 1.25; // headings
+  --lh-snug: 1.4; // ui rows, buttons
+  --lh-normal: 1.55; // body paragraphs
 
   // Letter spacing (only where it earns its keep)
-  --ls-tight: -0.01em;     // large headings
-  --ls-snug: -0.005em;     // medium headings
+  --ls-tight: -0.01em; // large headings
+  --ls-snug: -0.005em; // medium headings
   --ls-normal: 0;
-  --ls-wide: 0.04em;       // uppercase section labels
-  --ls-wider: 0.06em;      // smallest uppercase
+  --ls-wide: 0.04em; // uppercase section labels
+  --ls-wider: 0.06em; // smallest uppercase
 
   // Icon-size scale — separate from text. PrimeIcons render via font-size,
   // and decorative icons (empty-state heros, spinners, illustrations) often
   // need to be visibly larger than any text token. Keep them on their own
   // axis so text and icon scales evolve independently.
-  --icon-xs: 0.75rem;      // 12px — inline next to small text
-  --icon-sm: 0.875rem;     // 14px — inline next to body text, button icons
-  --icon-md: 1rem;         // 16px — toolbar icons, inputs
-  --icon-lg: 1.5rem;       // 24px — section icons, empty-state secondary
-  --icon-xl: 2.25rem;      // 36px — empty-state hero, loading spinners
-  --icon-2xl: 3rem;        // 48px — splash / onboarding heros
+  --icon-xs: 0.75rem; // 12px — inline next to small text
+  --icon-sm: 0.875rem; // 14px — inline next to body text, button icons
+  --icon-md: 1rem; // 16px — toolbar icons, inputs
+  --icon-lg: 1.5rem; // 24px — section icons, empty-state secondary
+  --icon-xl: 2.25rem; // 36px — empty-state hero, loading spinners
+  --icon-2xl: 3rem; // 48px — splash / onboarding heros
 
   // ================================================================
   // Spacing scale — 8-point grid with a couple of half-steps at the
@@ -235,18 +235,18 @@
   // and gap so the app reads as one density across every page.
   // ================================================================
   --space-0: 0;
-  --space-1: 0.125rem;     //  2px
-  --space-2: 0.25rem;      //  4px
-  --space-3: 0.375rem;     //  6px
-  --space-4: 0.5rem;       //  8px
-  --space-5: 0.75rem;      // 12px
-  --space-6: 1rem;         // 16px — default page-level padding step
-  --space-7: 1.25rem;      // 20px
-  --space-8: 1.5rem;       // 24px
-  --space-9: 2rem;         // 32px
-  --space-10: 2.5rem;      // 40px
-  --space-11: 3rem;        // 48px
-  --space-12: 4rem;        // 64px
+  --space-1: 0.125rem; //  2px
+  --space-2: 0.25rem; //  4px
+  --space-3: 0.375rem; //  6px
+  --space-4: 0.5rem; //  8px
+  --space-5: 0.75rem; // 12px
+  --space-6: 1rem; // 16px — default page-level padding step
+  --space-7: 1.25rem; // 20px
+  --space-8: 1.5rem; // 24px
+  --space-9: 2rem; // 32px
+  --space-10: 2.5rem; // 40px
+  --space-11: 3rem; // 48px
+  --space-12: 4rem; // 64px
 
   // ================================================================
   // Radius scale — replaces the per-module $radius-sm/md/lg Sass vars.
@@ -283,7 +283,6 @@
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-linear: linear;
 }
-
 
 // ================================================================
 // Global PrimeNG Menu theming

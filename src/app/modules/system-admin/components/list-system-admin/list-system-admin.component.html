@@ -77,13 +77,27 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.USERNAME' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('username')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('username') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('username') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('username'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('username') > 0 && sortHelper.size > 1">{{ sortHelper.index('username') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('username')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up':
+                          sortHelper.direction('username') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('username') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('username'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('username') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('username') }}</span
+                    >
                   </span>
                 </div>
               </th>
@@ -95,13 +109,27 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.FIRST_NAME' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('firstName')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('firstName') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('firstName') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('firstName'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('firstName') > 0 && sortHelper.size > 1">{{ sortHelper.index('firstName') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('firstName')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up':
+                          sortHelper.direction('firstName') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('firstName') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('firstName'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('firstName') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('firstName') }}</span
+                    >
                   </span>
                 </div>
               </th>
@@ -113,13 +141,27 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.LAST_NAME' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('lastName')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('lastName') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('lastName') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('lastName'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('lastName') > 0 && sortHelper.size > 1">{{ sortHelper.index('lastName') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('lastName')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up':
+                          sortHelper.direction('lastName') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('lastName') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('lastName'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('lastName') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('lastName') }}</span
+                    >
                   </span>
                 </div>
               </th>
@@ -131,13 +173,26 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.EMAIL' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('email')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('email') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('email') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('email'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('email') > 0 && sortHelper.size > 1">{{ sortHelper.index('email') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('email')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up': sortHelper.direction('email') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('email') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('email'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('email') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('email') }}</span
+                    >
                   </span>
                 </div>
               </th>
@@ -149,13 +204,26 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.STATUS' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('status')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('status') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('status') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('status'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('status') > 0 && sortHelper.size > 1">{{ sortHelper.index('status') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('status')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up': sortHelper.direction('status') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('status') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('status'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('status') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('status') }}</span
+                    >
                   </span>
                 </div>
               </th>
@@ -167,13 +235,27 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.LAST_LOGIN' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('lastLogin')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('lastLogin') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('lastLogin') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('lastLogin'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('lastLogin') > 0 && sortHelper.size > 1">{{ sortHelper.index('lastLogin') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('lastLogin')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up':
+                          sortHelper.direction('lastLogin') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('lastLogin') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('lastLogin'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('lastLogin') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('lastLogin') }}</span
+                    >
                   </span>
                 </div>
               </th>
@@ -185,18 +267,34 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.CREATED_ON' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('createdOn')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('createdOn') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('createdOn') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('createdOn'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('createdOn') > 0 && sortHelper.size > 1">{{ sortHelper.index('createdOn') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('createdOn')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up':
+                          sortHelper.direction('createdOn') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('createdOn') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('createdOn'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('createdOn') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('createdOn') }}</span
+                    >
                   </span>
                 </div>
               </th>
               <th style="width: 7rem; min-width: 7rem">
-                <div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div>
+                <div class="th-content actions-th">
+                  {{ 'COMMON.ACTIONS' | translate }}
+                </div>
               </th>
             </tr>
             <!-- Filter Row -->
@@ -317,9 +415,17 @@
               <td>
                 <span
                   class="date-text"
-                  [title]="admin.lastLogin ? (admin.lastLogin | date: 'dd MMM yyyy, HH:mm:ss') : ''"
+                  [title]="
+                    admin.lastLogin
+                      ? (admin.lastLogin | date: 'dd MMM yyyy, HH:mm:ss')
+                      : ''
+                  "
                 >
-                  {{ admin.lastLogin ? (admin.lastLogin | date: 'dd MMM yyyy, HH:mm') : ('COMMON.NEVER' | translate) }}
+                  {{
+                    admin.lastLogin
+                      ? (admin.lastLogin | date: 'dd MMM yyyy, HH:mm')
+                      : ('COMMON.NEVER' | translate)
+                  }}
                 </span>
               </td>
               <td>
@@ -375,7 +481,8 @@
                 <div class="empty-state-inline">
                   <i class="pi pi-search empty-state-icon"></i>
                   <span class="empty-state-text">
-                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash; {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
+                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash;
+                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
                   </span>
                 </div>
               </td>
@@ -413,8 +520,13 @@
       <p class="delete-intro" *ngIf="!bulkDelete">
         {{ 'SYSTEM_ADMIN.DELETE_SINGLE' | translate }}
       </p>
-      <p class="delete-intro" *ngIf="bulkDelete" [innerHTML]="'SYSTEM_ADMIN.DELETE_BULK' | translate:{ count: selectedCount }">
-      </p>
+      <p
+        class="delete-intro"
+        *ngIf="bulkDelete"
+        [innerHTML]="
+          'SYSTEM_ADMIN.DELETE_BULK' | translate: { count: selectedCount }
+        "
+      ></p>
 
       <ul class="delete-info-list">
         <li>
@@ -433,7 +545,8 @@
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"

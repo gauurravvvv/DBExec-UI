@@ -32,8 +32,16 @@
           [preloadedTotal]="preloadedScopeTargetsTotal"
           [optionLabel]="newScope === 'user' ? 'displayLabel' : 'name'"
           optionValue="id"
-          [label]="newScope === 'user' ? ('RLS.USER' | translate) : ('RLS.GROUP' | translate)"
-          [placeholder]="newScope === 'user' ? ('RLS.SELECT_USER' | translate) : ('RLS.SELECT_GROUP' | translate)"
+          [label]="
+            newScope === 'user'
+              ? ('RLS.USER' | translate)
+              : ('RLS.GROUP' | translate)
+          "
+          [placeholder]="
+            newScope === 'user'
+              ? ('RLS.SELECT_USER' | translate)
+              : ('RLS.SELECT_GROUP' | translate)
+          "
           [filter]="true"
           [autoDisplayFirst]="false"
           [disabled]="!newScope || scopeTargetsLoading"
@@ -45,7 +53,11 @@
           [disabled]="!newScope || !newScopeId || saving()"
         >
           <i class="pi pi-plus"></i>
-          {{ saving() ? ('RLS.ADDING' | translate) : ('RLS.ADD_ASSIGNMENT' | translate) }}
+          {{
+            saving()
+              ? ('RLS.ADDING' | translate)
+              : ('RLS.ADD_ASSIGNMENT' | translate)
+          }}
         </button>
       </div>
     </div>

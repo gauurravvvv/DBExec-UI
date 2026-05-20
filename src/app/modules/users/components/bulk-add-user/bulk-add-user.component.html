@@ -156,7 +156,9 @@
                   hidden
                 />
               </label>
-              <small class="file-error" *ngIf="fileError">{{ fileError }}</small>
+              <small class="file-error" *ngIf="fileError">{{
+                fileError
+              }}</small>
               <small
                 class="error-text"
                 *ngIf="
@@ -201,13 +203,21 @@
           <div class="summary-cards">
             <div class="summary-tile total">
               <span class="num">{{ validateRes.summary.total }}</span>
-              <span class="lbl">{{ 'USER.BULK_ADD_TOTAL_ROWS' | translate }}</span>
+              <span class="lbl">{{
+                'USER.BULK_ADD_TOTAL_ROWS' | translate
+              }}</span>
             </div>
-            <div class="summary-tile success" *ngIf="validateRes.summary.valid > 0">
+            <div
+              class="summary-tile success"
+              *ngIf="validateRes.summary.valid > 0"
+            >
               <span class="num">{{ validateRes.summary.valid }}</span>
               <span class="lbl">{{ 'USER.BULK_ADD_VALID' | translate }}</span>
             </div>
-            <div class="summary-tile warning" *ngIf="validateRes.summary.invalid > 0">
+            <div
+              class="summary-tile warning"
+              *ngIf="validateRes.summary.invalid > 0"
+            >
               <span class="num">{{ validateRes.summary.invalid }}</span>
               <span class="lbl">{{ 'USER.BULK_ADD_INVALID' | translate }}</span>
             </div>
@@ -216,7 +226,11 @@
           <div class="invalid-list" *ngIf="validateRes.invalid.length > 0">
             <div class="list-header">
               <span>{{ 'USER.BULK_ADD_INVALID_ROWS' | translate }}</span>
-              <button class="link-btn" type="button" (click)="downloadInvalid()">
+              <button
+                class="link-btn"
+                type="button"
+                (click)="downloadInvalid()"
+              >
                 <i class="pi pi-download"></i>
                 {{ 'USER.BULK_ADD_DOWNLOAD_INVALID' | translate }}
               </button>
@@ -244,7 +258,10 @@
           <p class="proceed-prompt" *ngIf="validateRes.summary.valid > 0">
             {{ 'USER.BULK_ADD_PROCEED_PROMPT' | translate }}
           </p>
-          <p class="proceed-prompt error" *ngIf="validateRes.summary.valid === 0">
+          <p
+            class="proceed-prompt error"
+            *ngIf="validateRes.summary.valid === 0"
+          >
             {{ 'USER.BULK_ADD_NO_VALID_ROWS' | translate }}
           </p>
         </div>
@@ -266,11 +283,18 @@
           <div class="summary-cards">
             <div class="summary-tile success">
               <span class="num">{{ commitRes.summary.successful }}</span>
-              <span class="lbl">{{ 'USER.BULK_ADD_CREATED_SUCCESS' | translate }}</span>
+              <span class="lbl">{{
+                'USER.BULK_ADD_CREATED_SUCCESS' | translate
+              }}</span>
             </div>
-            <div class="summary-tile warning" *ngIf="commitRes.summary.failed > 0">
+            <div
+              class="summary-tile warning"
+              *ngIf="commitRes.summary.failed > 0"
+            >
               <span class="num">{{ commitRes.summary.failed }}</span>
-              <span class="lbl">{{ 'USER.BULK_ADD_CREATED_FAILED' | translate }}</span>
+              <span class="lbl">{{
+                'USER.BULK_ADD_CREATED_FAILED' | translate
+              }}</span>
             </div>
           </div>
 

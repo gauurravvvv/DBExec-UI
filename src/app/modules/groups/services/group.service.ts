@@ -105,7 +105,10 @@ export class GroupService {
     orgId: string,
   ): Promise<any> {
     return await lastValueFrom(
-      this.http.apiPost(GROUP.BULK_DELETE_PREFIX + orgId + GROUP.BULK_DELETE_SUFFIX, { ids, justification }),
+      this.http.apiPost(
+        GROUP.BULK_DELETE_PREFIX + orgId + GROUP.BULK_DELETE_SUFFIX,
+        { ids, justification },
+      ),
     );
   }
 

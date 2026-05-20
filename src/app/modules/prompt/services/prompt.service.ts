@@ -156,7 +156,10 @@ export class PromptService {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPost(PROMPT.BULK_DELETE_PREFIX + orgId + PROMPT.BULK_DELETE_SUFFIX, { ids, justification }),
+        this.http.apiPost(
+          PROMPT.BULK_DELETE_PREFIX + orgId + PROMPT.BULK_DELETE_SUFFIX,
+          { ids, justification },
+        ),
       );
     } finally {
       this._saving.set(false);
@@ -199,9 +202,7 @@ export class PromptService {
     // PUT /prompts/:orgId/:promptId/appearance
     return lastValueFrom(
       this.http.apiPut(
-        PROMPT.GET +
-          `${params.orgId}/${params.id}` +
-          PROMPT.APPEARANCE_SUFFIX,
+        PROMPT.GET + `${params.orgId}/${params.id}` + PROMPT.APPEARANCE_SUFFIX,
         {
           id: params.id,
           organisation: params.orgId,
@@ -213,7 +214,9 @@ export class PromptService {
 
   async getAppearance(orgId: string, id: string): Promise<any> {
     return lastValueFrom(
-      this.http.apiGet(PROMPT.GET + `${orgId}/${id}` + PROMPT.APPEARANCE_SUFFIX),
+      this.http.apiGet(
+        PROMPT.GET + `${orgId}/${id}` + PROMPT.APPEARANCE_SUFFIX,
+      ),
     );
   }
 
@@ -247,7 +250,10 @@ export class PromptService {
     orgId: string,
   ): Promise<any> {
     return lastValueFrom(
-      this.http.apiPost(PROMPT.BULK_DELETE_PREFIX + orgId + PROMPT.BULK_DELETE_SUFFIX, { ids, justification }),
+      this.http.apiPost(
+        PROMPT.BULK_DELETE_PREFIX + orgId + PROMPT.BULK_DELETE_SUFFIX,
+        { ids, justification },
+      ),
     );
   }
 
@@ -312,7 +318,9 @@ export class PromptService {
 
   getAppearence(orgId: string, id: string): Promise<any> {
     return lastValueFrom(
-      this.http.apiGet(PROMPT.GET + `${orgId}/${id}` + PROMPT.APPEARANCE_SUFFIX),
+      this.http.apiGet(
+        PROMPT.GET + `${orgId}/${id}` + PROMPT.APPEARANCE_SUFFIX,
+      ),
     );
   }
 }

@@ -48,7 +48,12 @@ interface CommitResponse {
   message: string;
   data: {
     summary: { requested: number; successful: number; failed: number };
-    successful: { row: number; email: string; username: string; userId: string }[];
+    successful: {
+      row: number;
+      email: string;
+      username: string;
+      userId: string;
+    }[];
     failed: { row: number; email: string; reason: string }[];
   };
 }
@@ -124,8 +129,7 @@ export class BulkAddUserComponent implements OnInit {
     const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
-      const res: any =
-        await this.organisationService.listOrganisation(params);
+      const res: any = await this.organisationService.listOrganisation(params);
       if (this.globalService.handleSuccessService(res, false)) {
         return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
       }
@@ -320,7 +324,10 @@ export class BulkAddUserComponent implements OnInit {
     if (!this.validateRes?.invalid?.length) return;
     const header = 'row,email,reason\n';
     const rows = this.validateRes.invalid
-      .map(r => `${r.row},${this.csvEscape(r.email ?? '')},${this.csvEscape(r.reason)}`)
+      .map(
+        r =>
+          `${r.row},${this.csvEscape(r.email ?? '')},${this.csvEscape(r.reason)}`,
+      )
       .join('\n');
     this.downloadCsvBlob(header + rows + '\n', 'bulk-users-invalid.csv');
   }

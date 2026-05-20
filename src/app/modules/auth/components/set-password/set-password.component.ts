@@ -1,9 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   HostListener,
-  computed,
   inject,
   OnInit,
   signal,
@@ -44,13 +44,20 @@ export class SetPasswordComponent implements OnInit {
   // every variant cleanly.
   readonly cardTitle = computed(() => {
     switch (this.pageState()) {
-      case 'loading':     return 'Verifying link';
-      case 'valid':       return 'Set your password';
-      case 'expired':     return 'Link expired';
-      case 'resent':      return 'Link sent';
-      case 'already_set': return 'Already set';
-      case 'invalid':     return 'Invalid link';
-      default:            return 'Set your password';
+      case 'loading':
+        return 'Verifying link';
+      case 'valid':
+        return 'Set your password';
+      case 'expired':
+        return 'Link expired';
+      case 'resent':
+        return 'Link sent';
+      case 'already_set':
+        return 'Already set';
+      case 'invalid':
+        return 'Invalid link';
+      default:
+        return 'Set your password';
     }
   });
 
@@ -195,5 +202,4 @@ export class SetPasswordComponent implements OnInit {
       return 'Password must contain at least one special character (e.g., @$!%*?&)';
     return '';
   }
-
 }

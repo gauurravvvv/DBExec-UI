@@ -7,23 +7,23 @@
       </div>
 
       <div class="header-actions">
-          <button
-            pButton
-            [label]="'COMMON.CLEAR' | translate"
-            icon="pi pi-filter-slash"
-            (click)="clearFilters()"
-            [disabled]="!isFilterActive"
-            class="p-button-outlined p-button-danger modern-button"
-          ></button>
+        <button
+          pButton
+          [label]="'COMMON.CLEAR' | translate"
+          icon="pi pi-filter-slash"
+          (click)="clearFilters()"
+          [disabled]="!isFilterActive"
+          class="p-button-outlined p-button-danger modern-button"
+        ></button>
 
-          <button
-            pButton
-            [label]="'COMMON.ADD' | translate"
-            icon="pi pi-plus"
-            (click)="onAdd()"
-            class="p-button-raised p-button-primary modern-button"
-          ></button>
-              </div>
+        <button
+          pButton
+          [label]="'COMMON.ADD' | translate"
+          icon="pi pi-plus"
+          (click)="onAdd()"
+          class="p-button-raised p-button-primary modern-button"
+        ></button>
+      </div>
     </div>
 
     <!-- Unified Toolbar & Content Card -->
@@ -73,28 +73,42 @@
           <ng-template pTemplate="header">
             <tr>
               <th style="width: 5rem; min-width: 5rem" pFrozenColumn>
-                <div class="th-content">{{ 'ANNOUNCEMENT.PREVIEW' | translate }}</div>
+                <div class="th-content">
+                  {{ 'ANNOUNCEMENT.PREVIEW' | translate }}
+                </div>
               </th>
               <th style="width: 14rem; min-width: 14rem" pFrozenColumn>
-                <div class="th-content">{{ 'ANNOUNCEMENT.ANNOUNCEMENT_TITLE' | translate }}</div>
+                <div class="th-content">
+                  {{ 'ANNOUNCEMENT.ANNOUNCEMENT_TITLE' | translate }}
+                </div>
               </th>
               <th style="min-width: 20rem">
-                <div class="th-content">{{ 'COMMON.DESCRIPTION' | translate }}</div>
+                <div class="th-content">
+                  {{ 'COMMON.DESCRIPTION' | translate }}
+                </div>
               </th>
               <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">{{ 'ANNOUNCEMENT.GROUP' | translate }}</div>
+                <div class="th-content">
+                  {{ 'ANNOUNCEMENT.GROUP' | translate }}
+                </div>
               </th>
-              <th  style="width: 9rem; min-width: 9rem">
+              <th style="width: 9rem; min-width: 9rem">
                 <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
               </th>
               <th style="width: 14rem; min-width: 14rem">
-                <div class="th-content">{{ 'ANNOUNCEMENT.ACTIVE_WINDOW' | translate }}</div>
+                <div class="th-content">
+                  {{ 'ANNOUNCEMENT.ACTIVE_WINDOW' | translate }}
+                </div>
               </th>
-              <th  style="width: 12rem; min-width: 12rem">
-                <div class="th-content">{{ 'COMMON.CREATED_ON' | translate }}</div>
+              <th style="width: 12rem; min-width: 12rem">
+                <div class="th-content">
+                  {{ 'COMMON.CREATED_ON' | translate }}
+                </div>
               </th>
               <th style="width: 7rem; min-width: 7rem">
-                <div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div>
+                <div class="th-content actions-th">
+                  {{ 'COMMON.ACTIONS' | translate }}
+                </div>
               </th>
             </tr>
             <!-- Filter Row -->
@@ -200,7 +214,11 @@
                   }"
                 >
                   <span class="dot"></span>
-                  {{ isActive(a) ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                  {{
+                    isActive(a)
+                      ? ('COMMON.ACTIVE' | translate)
+                      : ('COMMON.INACTIVE' | translate)
+                  }}
                 </span>
               </td>
               <td>
@@ -253,13 +271,14 @@
                 <div class="empty-state-inline">
                   <i class="pi pi-search empty-state-icon"></i>
                   <span class="empty-state-text">
-                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash; {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
+                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash;
+                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
                   </span>
                 </div>
               </td>
             </tr>
           </ng-template>
-        
+
           <ng-template pTemplate="paginatorright">
             <button
               type="button"

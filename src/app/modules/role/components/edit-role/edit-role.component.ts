@@ -11,12 +11,12 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { ROLE } from 'src/app/core/constants/routes.constant';
 import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { TranslateService } from '@ngx-translate/core';
 import { RoleService } from '../../services/role.service';
 
 @Component({
@@ -210,7 +210,8 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
 
   getNameError(): string {
     const nameControl = this.roleForm.get('name');
-    if (nameControl?.errors?.['required']) return this.translate.instant('VALIDATION.NAME_REQUIRED');
+    if (nameControl?.errors?.['required'])
+      return this.translate.instant('VALIDATION.NAME_REQUIRED');
     if (nameControl?.errors?.['pattern'])
       return this.translate.instant('VALIDATION.NAME_PATTERN');
     return '';

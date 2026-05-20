@@ -124,7 +124,11 @@
       }
 
       .btn-save {
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--primary-hover)
+        ) !important;
         color: white !important;
         border: none !important;
         box-shadow: 0 4px 10px var(--primary-color-transparent);

@@ -3,8 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { PERMISSIONS } from './core/constants/permissions.constant';
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
-import { AUTH_ROUTES } from './modules/auth/auth-routing.module';
 import { HomeComponent } from './core/layout/home/home.component';
+import { AUTH_ROUTES } from './modules/auth/auth-routing.module';
 
 const routes: Routes = [
   {
@@ -52,14 +52,20 @@ const routes: Routes = [
         loadChildren: () =>
           import('./modules/users/users.module').then(m => m.UsersModule),
         canActivate: [roleGuard],
-        data: { permission: PERMISSIONS.USER_MANAGEMENT, title: 'PAGE_TITLES.USERS' },
+        data: {
+          permission: PERMISSIONS.USER_MANAGEMENT,
+          title: 'PAGE_TITLES.USERS',
+        },
       },
       {
         path: 'groups',
         loadChildren: () =>
           import('./modules/groups/groups.module').then(m => m.GroupsModule),
         canActivate: [roleGuard],
-        data: { permission: PERMISSIONS.USER_GROUP, title: 'PAGE_TITLES.GROUPS' },
+        data: {
+          permission: PERMISSIONS.USER_GROUP,
+          title: 'PAGE_TITLES.GROUPS',
+        },
       },
       {
         path: 'rls-rules',
@@ -68,14 +74,20 @@ const routes: Routes = [
             m => m.RlsRulesModule,
           ),
         canActivate: [roleGuard],
-        data: { permission: PERMISSIONS.RLS_RULES, title: 'PAGE_TITLES.RLS_RULES' },
+        data: {
+          permission: PERMISSIONS.RLS_RULES,
+          title: 'PAGE_TITLES.RLS_RULES',
+        },
       },
       {
         path: 'access',
         loadChildren: () =>
           import('./modules/access/access.module').then(m => m.AccessModule),
         canActivate: [roleGuard],
-        data: { permission: PERMISSIONS.ACCESS_MANAGEMENT, title: 'PAGE_TITLES.ACCESS' },
+        data: {
+          permission: PERMISSIONS.ACCESS_MANAGEMENT,
+          title: 'PAGE_TITLES.ACCESS',
+        },
       },
       // Permission-gated
       {
@@ -85,7 +97,10 @@ const routes: Routes = [
             m => m.DatasourceModule,
           ),
         canActivate: [roleGuard],
-        data: { permission: PERMISSIONS.SETUP_DB, title: 'PAGE_TITLES.DATASOURCES' },
+        data: {
+          permission: PERMISSIONS.SETUP_DB,
+          title: 'PAGE_TITLES.DATASOURCES',
+        },
       },
       {
         path: 'connections',
@@ -94,14 +109,20 @@ const routes: Routes = [
             m => m.ConnectionsModule,
           ),
         canActivate: [roleGuard],
-        data: { permission: PERMISSIONS.DB_CONNECTIONS, title: 'PAGE_TITLES.CONNECTIONS' },
+        data: {
+          permission: PERMISSIONS.DB_CONNECTIONS,
+          title: 'PAGE_TITLES.CONNECTIONS',
+        },
       },
       {
         path: 'roles',
         loadChildren: () =>
           import('./modules/role/role.module').then(m => m.RoleModule),
         canActivate: [roleGuard],
-        data: { permission: PERMISSIONS.ROLE_MANAGEMENT, title: 'PAGE_TITLES.ROLES' },
+        data: {
+          permission: PERMISSIONS.ROLE_MANAGEMENT,
+          title: 'PAGE_TITLES.ROLES',
+        },
       },
       {
         path: 'datasets',
@@ -117,7 +138,10 @@ const routes: Routes = [
             m => m.AnalysesModule,
           ),
         canActivate: [roleGuard],
-        data: { permission: PERMISSIONS.ANALYSES, title: 'PAGE_TITLES.ANALYSES' },
+        data: {
+          permission: PERMISSIONS.ANALYSES,
+          title: 'PAGE_TITLES.ANALYSES',
+        },
       },
       {
         path: 'dashboards',
@@ -126,7 +150,10 @@ const routes: Routes = [
             m => m.DashboardModule,
           ),
         canActivate: [roleGuard],
-        data: { permission: PERMISSIONS.DASHBOARD, title: 'PAGE_TITLES.DASHBOARDS' },
+        data: {
+          permission: PERMISSIONS.DASHBOARD,
+          title: 'PAGE_TITLES.DASHBOARDS',
+        },
       },
       {
         path: 'tabs',
@@ -140,14 +167,20 @@ const routes: Routes = [
         loadChildren: () =>
           import('./modules/section/section.module').then(m => m.SectionModule),
         canActivate: [roleGuard],
-        data: { permission: PERMISSIONS.QB_SECTION, title: 'PAGE_TITLES.SECTIONS' },
+        data: {
+          permission: PERMISSIONS.QB_SECTION,
+          title: 'PAGE_TITLES.SECTIONS',
+        },
       },
       {
         path: 'prompts',
         loadChildren: () =>
           import('./modules/prompt/prompt.module').then(m => m.PromptModule),
         canActivate: [roleGuard],
-        data: { permission: PERMISSIONS.QB_PROMPT, title: 'PAGE_TITLES.PROMPTS' },
+        data: {
+          permission: PERMISSIONS.QB_PROMPT,
+          title: 'PAGE_TITLES.PROMPTS',
+        },
       },
       {
         path: 'query-builders',
@@ -156,14 +189,22 @@ const routes: Routes = [
             m => m.QueryBuilderModule,
           ),
         canActivate: [roleGuard],
-        data: { permission: PERMISSIONS.QB_SCREEN, title: 'PAGE_TITLES.QUERY_BUILDERS' },
+        data: {
+          permission: PERMISSIONS.QB_SCREEN,
+          title: 'PAGE_TITLES.QUERY_BUILDERS',
+        },
       },
       {
         path: 'audit',
         loadChildren: () =>
-          import('./modules/audit-logs/audit-logs.module').then(m => m.AuditLogsModule),
+          import('./modules/audit-logs/audit-logs.module').then(
+            m => m.AuditLogsModule,
+          ),
         canActivate: [roleGuard],
-        data: { permission: PERMISSIONS.AUDIT_LOGS, title: 'PAGE_TITLES.AUDIT_LOGS' },
+        data: {
+          permission: PERMISSIONS.AUDIT_LOGS,
+          title: 'PAGE_TITLES.AUDIT_LOGS',
+        },
       },
       {
         path: 'audit/logins',

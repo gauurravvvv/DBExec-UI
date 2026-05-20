@@ -7,26 +7,26 @@
       </div>
 
       <div class="header-actions">
-          <!-- Bulk Delete Button -->
-          <button
-            *ngIf="selectedCount > 0"
-            pButton
-            [label]="('COMMON.DELETE' | translate) + ' (' + selectedCount + ')'"
-            icon="pi pi-trash"
-            (click)="confirmBulkDelete()"
-            class="p-button-raised p-button-danger modern-button"
-          ></button>
+        <!-- Bulk Delete Button -->
+        <button
+          *ngIf="selectedCount > 0"
+          pButton
+          [label]="('COMMON.DELETE' | translate) + ' (' + selectedCount + ')'"
+          icon="pi pi-trash"
+          (click)="confirmBulkDelete()"
+          class="p-button-raised p-button-danger modern-button"
+        ></button>
 
-          <!-- Clear Filters Button -->
-          <button
-            pButton
-            [label]="'COMMON.CLEAR' | translate"
-            icon="pi pi-filter-slash"
-            (click)="clearFilters()"
-            [disabled]="!isFilterActive"
-            class="p-button-outlined p-button-danger modern-button"
-          ></button>
-              </div>
+        <!-- Clear Filters Button -->
+        <button
+          pButton
+          [label]="'COMMON.CLEAR' | translate"
+          icon="pi pi-filter-slash"
+          (click)="clearFilters()"
+          [disabled]="!isFilterActive"
+          class="p-button-outlined p-button-danger modern-button"
+        ></button>
+      </div>
     </div>
 
     <!-- Unified Toolbar & Content Card -->
@@ -111,13 +111,26 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.NAME' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('name')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('name') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('name') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('name'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('name') > 0 && sortHelper.size > 1">{{ sortHelper.index('name') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('name')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up': sortHelper.direction('name') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('name') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('name'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('name') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('name') }}</span
+                    >
                   </span>
                 </div>
               </th>
@@ -126,10 +139,14 @@
                    (the source can be edited or deleted independently), so
                    showing the current analysis name would be misleading. -->
               <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">{{ 'DASHBOARD.DATASET' | translate }}</div>
+                <div class="th-content">
+                  {{ 'DASHBOARD.DATASET' | translate }}
+                </div>
               </th>
               <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">{{ 'COMMON.DATASOURCE' | translate }}</div>
+                <div class="th-content">
+                  {{ 'COMMON.DATASOURCE' | translate }}
+                </div>
               </th>
               <th
                 style="width: 9rem; min-width: 9rem"
@@ -139,13 +156,26 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.STATUS' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('status')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('status') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('status') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('status'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('status') > 0 && sortHelper.size > 1">{{ sortHelper.index('status') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('status')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up': sortHelper.direction('status') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('status') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('status'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('status') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('status') }}</span
+                    >
                   </span>
                 </div>
               </th>
@@ -157,18 +187,34 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.CREATED_ON' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('createdOn')">
-                    <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('createdOn') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('createdOn') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('createdOn'),
-                    }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('createdOn') > 0 && sortHelper.size > 1">{{ sortHelper.index('createdOn') }}</span>
+                  <span
+                    class="sort-indicator"
+                    [class.is-sorted]="!!sortHelper.direction('createdOn')"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-arrow-up':
+                          sortHelper.direction('createdOn') === 'asc',
+                        'pi-arrow-down':
+                          sortHelper.direction('createdOn') === 'desc',
+                        'pi-arrows-v': !sortHelper.direction('createdOn'),
+                      }"
+                    ></i>
+                    <span
+                      class="sort-badge"
+                      *ngIf="
+                        sortHelper.index('createdOn') > 0 && sortHelper.size > 1
+                      "
+                      >{{ sortHelper.index('createdOn') }}</span
+                    >
                   </span>
                 </div>
               </th>
               <th style="width: 7rem; min-width: 7rem">
-                <div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div>
+                <div class="th-content actions-th">
+                  {{ 'COMMON.ACTIONS' | translate }}
+                </div>
               </th>
             </tr>
             <!-- Filter Row -->
@@ -231,11 +277,7 @@
               <td pFrozenColumn>
                 <a
                   class="dataset-name-link"
-                  [routerLink]="[
-                    '/app/dashboards',
-                    selectedOrg,
-                    dashboard.id,
-                  ]"
+                  [routerLink]="['/app/dashboards', selectedOrg, dashboard.id]"
                 >
                   {{ dashboard.name }}
                 </a>
@@ -245,10 +287,7 @@
                    live join — datasource isn't part of the snapshot
                    scope, so a deleted datasource shows blank here. -->
               <td>
-                <span
-                  class="description-text"
-                  [title]="dashboard.datasetName"
-                >
+                <span class="description-text" [title]="dashboard.datasetName">
                   {{ dashboard.datasetName }}
                 </span>
               </td>
@@ -270,7 +309,11 @@
                 >
                   <span class="dot"></span>
                   <span class="label">
-                    {{ dashboard.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                    {{
+                      dashboard.status === 1
+                        ? ('COMMON.ACTIVE' | translate)
+                        : ('COMMON.INACTIVE' | translate)
+                    }}
                   </span>
                 </span>
               </td>
@@ -302,13 +345,14 @@
                 <div class="empty-state-inline">
                   <i class="pi pi-search empty-state-icon"></i>
                   <span class="empty-state-text">
-                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash; {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
+                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash;
+                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
                   </span>
                 </div>
               </td>
             </tr>
           </ng-template>
-        
+
           <ng-template pTemplate="paginatorright">
             <button
               type="button"
@@ -338,8 +382,13 @@
       <p class="delete-intro" *ngIf="!bulkDelete">
         {{ 'DASHBOARD.CONFIRM_DELETE_SINGLE' | translate }}
       </p>
-      <p class="delete-intro" *ngIf="bulkDelete" [innerHTML]="'DASHBOARD.CONFIRM_DELETE_BULK' | translate:{ count: selectedCount }">
-      </p>
+      <p
+        class="delete-intro"
+        *ngIf="bulkDelete"
+        [innerHTML]="
+          'DASHBOARD.CONFIRM_DELETE_BULK' | translate: { count: selectedCount }
+        "
+      ></p>
 
       <ul class="delete-info-list">
         <li>
@@ -358,7 +407,8 @@
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"
