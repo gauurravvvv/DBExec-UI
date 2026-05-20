@@ -8,6 +8,6 @@
   $topbarItemTextColor: #616161;
   $topbarItemTextHoverBgColor: rgba(0, 0, 0, 0.12);
 
-  @import '../_topbar_exports';
-  @import '../_topbar_theme';
+  @import '../_topbar_exports.scss';
+  @import '../_topbar_theme.scss';
 }

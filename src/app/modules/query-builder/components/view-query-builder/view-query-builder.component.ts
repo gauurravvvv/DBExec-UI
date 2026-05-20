@@ -10,7 +10,7 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TreeNode } from 'primeng/api';
 
-import { QUERY_BUILDER } from 'src/app/constants/routes';
+import { QUERY_BUILDER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { TranslateService } from '@ngx-translate/core';
 import { QueryBuilderService } from '../../services/query-builder.service';

@@ -23,10 +23,10 @@ import { AppComponent } from './app.component';
 import { HttpErrorInterceptor } from './core/interceptors/http-error.interceptor';
 import { HttpRequestInterceptor } from './core/interceptors/http-request.interceptor';
 import { AuthModule } from './modules/auth/auth.module';
-import { FooterComponent } from './shared/components/layout/footer/footer.component';
-import { HeaderComponent } from './shared/components/layout/header/header.component';
-import { HomeComponent } from './shared/components/layout/home/home.component';
-import { SidebarComponent } from './shared/components/layout/sidebar/sidebar.component';
+import { FooterComponent } from './core/layout/footer/footer.component';
+import { HeaderComponent } from './core/layout/header/header.component';
+import { HomeComponent } from './core/layout/home/home.component';
+import { SidebarComponent } from './core/layout/sidebar/sidebar.component';
 import { AppPrimeNGModule } from './shared/modules/app-primeng.module';
 import { SharedModule } from './shared/shared.module';
 

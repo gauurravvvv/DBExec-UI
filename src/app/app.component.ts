@@ -12,7 +12,7 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { PrimeNGConfig } from 'primeng/api';
 import { TranslateService } from '@ngx-translate/core';
 import { filter } from 'rxjs/operators';
-import { StorageType } from './constants/storageType';
+import { StorageType } from './core/constants/storage-type.constant';
 import { IdleTimeoutService } from './core/services/idle-timeout.service';
 import { LoadingService } from './core/services/loading.service';
 import { LocaleService } from './core/services/locale.service';

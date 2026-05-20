@@ -17,10 +17,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
-import { ANALYSES, DASHBOARD } from 'src/app/constants/routes';
+import { ANALYSES, DASHBOARD } from 'src/app/core/constants/routes.constant';
 import { DashboardService } from 'src/app/modules/dashboard/services/dashboard.service';
 import { PublishDashboardPayload } from '../publish-dashboard-dialog/publish-dashboard-dialog.component';
-import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
+import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import {

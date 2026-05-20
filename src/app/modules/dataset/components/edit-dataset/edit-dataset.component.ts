@@ -17,9 +17,9 @@ import { Store } from '@ngrx/store';
 import { MessageService } from 'primeng/api';
 import { Observable, Subject, TimeoutError } from 'rxjs';
 import { debounceTime, first, timeout } from 'rxjs/operators';
-import { DATASET, QUERY_BUILDER } from 'src/app/constants/routes';
-import { ROLES } from 'src/app/constants/user.constant';
-import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
+import { DATASET, QUERY_BUILDER } from 'src/app/core/constants/routes.constant';
+import { ROLES } from 'src/app/core/constants/user.constant';
+import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
 import {
@@ -27,7 +27,7 @@ import {
   QUERY_EXECUTION_TIMEOUT_MS,
   SQL_EDITOR_PLACEHOLDER,
 } from '../../config/sql-editor.config';
-import { IAPIResponse } from 'src/app/core/interfaces/global.interface';
+import { IAPIResponse } from 'src/app/core/models/global.model';
 import {
   DatasourceSchema,
   QueryExecuteData,

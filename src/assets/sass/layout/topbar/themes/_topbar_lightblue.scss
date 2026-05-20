@@ -8,6 +8,6 @@
   $topbarMenuButtonBgColor: #fdd835;
   $topbarMenuButtonTextColor: #212121;
 
-  @import '../_topbar_exports';
-  @import '../_topbar_theme';
+  @import '../_topbar_exports.scss';
+  @import '../_topbar_theme.scss';
 }

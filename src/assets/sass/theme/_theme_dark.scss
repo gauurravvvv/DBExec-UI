@@ -1,6 +1,6 @@
-@import '../variables/theme/_theme_dark';
-@import './_compact';
-@import '../overrides/_theme_variables';
-@import './designer/_components';
-@import './extensions/_vendor_extensions';
-@import '../overrides/_theme_styles';
+@import '../variables/theme/_theme_dark.scss';
+@import './_compact.scss';
+@import '../overrides/_theme_variables.scss';
+@import './designer/_components.scss';
+@import './extensions/_vendor_extensions.scss';
+@import '../overrides/_theme_styles.scss';

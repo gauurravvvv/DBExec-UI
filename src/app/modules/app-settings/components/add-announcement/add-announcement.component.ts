@@ -15,10 +15,10 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DEFAULT_PAGE } from 'src/app/constants';
-import { ANNOUNCEMENT } from 'src/app/constants/routes';
-import { ROLES } from 'src/app/constants/user.constant';
-import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
+import { DEFAULT_PAGE } from 'src/app/core/constants';
+import { ANNOUNCEMENT } from 'src/app/core/constants/routes.constant';
+import { ROLES } from 'src/app/core/constants/user.constant';
+import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';

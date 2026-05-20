@@ -7,10 +7,10 @@ import {
 } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ROLES } from 'src/app/constants/user.constant';
+import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
-import { HOME_ROUTES } from 'src/app/shared/components/layout/sidebar/sidebar.constant';
+import { HOME_ROUTES } from 'src/app/core/layout/sidebar/sidebar.constant';
 
 // Single generic message for any "wrong identifier or credential" outcome.
 // Specific server-side reasons (lockout, downtime, etc.) still pass through.

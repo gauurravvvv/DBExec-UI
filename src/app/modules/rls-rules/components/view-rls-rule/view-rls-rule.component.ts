@@ -6,7 +6,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RLS_RULE } from 'src/app/constants/routes';
+import { RLS_RULE } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { RlsRulesService } from '../../services/rls-rules.service';
 

@@ -21,7 +21,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TreeNode } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { DATASET, QUERY_BUILDER } from 'src/app/constants/routes';
+import { DATASET, QUERY_BUILDER } from 'src/app/core/constants/routes.constant';
 
 import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';

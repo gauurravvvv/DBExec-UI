@@ -10,6 +10,6 @@
 
   $inlineMenuBorderColor: rgba(255, 255, 255, 0.24);
 
-  @import '../_menu_exports';
-  @import '../_menu_theme';
+  @import '../_menu_exports.scss';
+  @import '../_menu_theme.scss';
 }

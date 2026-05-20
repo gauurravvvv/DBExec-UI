@@ -9,11 +9,11 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DEFAULT_PAGE } from 'src/app/constants';
-import { REGEX } from 'src/app/constants/regex.constant';
-import { GROUP } from 'src/app/constants/routes';
-import { ROLES } from 'src/app/constants/user.constant';
-import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
+import { DEFAULT_PAGE } from 'src/app/core/constants';
+import { REGEX } from 'src/app/core/constants/regex.constant';
+import { GROUP } from 'src/app/core/constants/routes.constant';
+import { ROLES } from 'src/app/core/constants/user.constant';
+import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { RoleService } from 'src/app/modules/role/services/role.service';

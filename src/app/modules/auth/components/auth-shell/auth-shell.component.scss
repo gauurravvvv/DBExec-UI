@@ -119,7 +119,7 @@
 
   // Mirrors the authed header's .logo-container exactly so users see
   // the same wordmark in the same spot whether they're signed in or
-  // not. See src/app/shared/components/layout/header/header.component.scss
+  // not. See src/app/core/layout/header/header.component.scss
   // — keep these two recipes in sync when the brand mark changes.
   &__brand {
     display: flex;

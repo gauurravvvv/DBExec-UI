@@ -8,7 +8,7 @@ import {
   DATASET,
   DATASOURCE,
   SYSTEM_ADMIN,
-} from 'src/app/constants/api';
+} from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({

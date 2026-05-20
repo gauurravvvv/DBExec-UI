@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
-import { ANNOUNCEMENT } from 'src/app/constants/api';
+import { ANNOUNCEMENT } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 export interface AnnouncementPayload {

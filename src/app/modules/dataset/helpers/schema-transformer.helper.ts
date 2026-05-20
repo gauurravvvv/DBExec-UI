@@ -1,4 +1,4 @@
-import { IAPIResponse } from 'src/app/core/interfaces/global.interface';
+import { IAPIResponse } from 'src/app/core/models/global.model';
 import {
   DatasourceSchema,
   SchemaGroup,

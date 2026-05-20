@@ -9,9 +9,9 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { REGEX } from 'src/app/constants/regex.constant';
-import { ORGANISATION } from 'src/app/constants/routes';
-import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
+import { REGEX } from 'src/app/core/constants/regex.constant';
+import { ORGANISATION } from 'src/app/core/constants/routes.constant';
+import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SUPPORTED_LOCALES } from 'src/app/core/services/locale.service';
 import { TranslateService } from '@ngx-translate/core';

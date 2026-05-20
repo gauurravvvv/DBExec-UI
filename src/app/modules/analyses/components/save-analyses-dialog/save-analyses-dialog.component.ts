@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { REGEX } from 'src/app/constants/regex.constant';
+import { REGEX } from 'src/app/core/constants/regex.constant';
 
 export interface AnalysisFormData {
   name: string;

@@ -10,6 +10,6 @@
 
   $inlineMenuBorderColor: hsla(0, 0%, 100%, 0.12);
 
-  @import '../_menu_exports';
-  @import '../_menu_theme';
+  @import '../_menu_exports.scss';
+  @import '../_menu_theme.scss';
 }

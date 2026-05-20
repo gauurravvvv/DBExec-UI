@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
-import { RLS_RULE } from 'src/app/constants/api';
+import { RLS_RULE } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 /**

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { lastValueFrom } from 'rxjs';
-import { PROFILE } from 'src/app/constants/api';
+import { PROFILE } from 'src/app/core/constants/api.constant';
 import { StorageService } from './storage.service';
-import { StorageType } from 'src/app/constants/storageType';
+import { StorageType } from 'src/app/core/constants/storage-type.constant';
 import { HttpClientService } from './http-client.service';
 import { GlobalService } from './global.service';
 import { LoginService } from './login.service';

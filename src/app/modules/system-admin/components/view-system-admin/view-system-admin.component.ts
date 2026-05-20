@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SYSTEM_ADMIN } from 'src/app/constants/routes';
+import { SYSTEM_ADMIN } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SystemAdminService } from '../../services/system-admin.service';
 

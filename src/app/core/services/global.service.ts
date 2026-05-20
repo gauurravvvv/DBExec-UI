@@ -5,9 +5,9 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { BehaviorSubject } from 'rxjs';
-import { StorageType } from '../../constants/storageType';
-import { ROLES } from '../../constants/user.constant';
-import { IAPIResponse } from '../interfaces/global.interface';
+import { StorageType } from '../constants/storage-type.constant';
+import { ROLES } from '../constants/user.constant';
+import { IAPIResponse } from '../models/global.model';
 import { StorageService } from './storage.service';
 
 @Injectable({

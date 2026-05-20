@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
-import { DATASOURCE, ORGANISATION } from 'src/app/constants/api';
+import { DATASOURCE, ORGANISATION } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({

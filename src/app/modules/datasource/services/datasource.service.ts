@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
-import { DATASOURCE } from 'src/app/constants/api';
+import { DATASOURCE } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({ providedIn: 'root' })

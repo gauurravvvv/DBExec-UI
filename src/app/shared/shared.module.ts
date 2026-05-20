@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SaveAnalysesDialogComponent } from '../modules/analyses/components/save-analyses-dialog/save-analyses-dialog.component';
 import { AddCustomFieldDialogComponent } from '../modules/dataset/components/add-custom-field-dialog/add-custom-field-dialog.component';
-import { AnalysisFilterBarComponent } from './components/analysis-filter-bar/analysis-filter-bar.component';
+import { AnalysisFilterBarComponent } from '../modules/analyses/components/analysis-filter-bar/analysis-filter-bar.component';
 import { ChangePasswordDialogComponent } from './components/change-password-dialog/change-password-dialog.component';
 import { ConfirmLeaveDialogComponent } from './components/confirm-leave-dialog/confirm-leave-dialog.component';
 import { CustomAccordionComponent } from './components/custom-accordion/custom-accordion.component';

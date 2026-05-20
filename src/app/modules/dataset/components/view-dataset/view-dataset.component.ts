@@ -5,7 +5,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DATASET, QUERY_BUILDER } from 'src/app/constants/routes';
+import { DATASET, QUERY_BUILDER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../services/dataset.service';
 

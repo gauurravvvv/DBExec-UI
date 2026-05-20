@@ -3,99 +3,99 @@
 @import '_colors';
 
 //Input
-@import './components/input/_autocomplete';
-@import './components/input/_calendar';
-@import './components/input/_cascadeselect';
-@import './components/input/_checkbox';
-@import './components/input/_chips';
-@import './components/input/_colorpicker';
-@import './components/input/_dropdown';
-@import './components/input/_editor';
-@import './components/input/_inputgroup';
-@import './components/input/_inputmask';
-@import './components/input/_inputnumber';
-@import './components/input/_inputswitch';
-@import './components/input/_inputtext';
-@import './components/input/_listbox';
-@import './components/input/_multiselect';
-@import './components/input/_password';
-@import './components/input/_radiobutton';
-@import './components/input/_rating';
-@import './components/input/_selectbutton';
-@import './components/input/_slider';
-@import './components/input/_togglebutton';
-@import './components/input/_treeselect';
+@import './components/input/_autocomplete.scss';
+@import './components/input/_calendar.scss';
+@import './components/input/_cascadeselect.scss';
+@import './components/input/_checkbox.scss';
+@import './components/input/_chips.scss';
+@import './components/input/_colorpicker.scss';
+@import './components/input/_dropdown.scss';
+@import './components/input/_editor.scss';
+@import './components/input/_inputgroup.scss';
+@import './components/input/_inputmask.scss';
+@import './components/input/_inputnumber.scss';
+@import './components/input/_inputswitch.scss';
+@import './components/input/_inputtext.scss';
+@import './components/input/_listbox.scss';
+@import './components/input/_multiselect.scss';
+@import './components/input/_password.scss';
+@import './components/input/_radiobutton.scss';
+@import './components/input/_rating.scss';
+@import './components/input/_selectbutton.scss';
+@import './components/input/_slider.scss';
+@import './components/input/_togglebutton.scss';
+@import './components/input/_treeselect.scss';
 
 //Button
-@import './components/button/_button';
-@import './components/button/_speeddial';
-@import './components/button/_splitbutton';
+@import './components/button/_button.scss';
+@import './components/button/_speeddial.scss';
+@import './components/button/_splitbutton.scss';
 
 //Data
-@import './components/data/_carousel';
-@import './components/data/_datatable';
-@import './components/data/_dataview';
-@import './components/data/_filter';
-@import './components/data/_fullcalendar';
-@import './components/data/_orderlist';
-@import './components/data/_organizationchart';
-@import './components/data/_paginator';
-@import './components/data/_picklist';
-@import './components/data/_timeline';
-@import './components/data/_tree';
-@import './components/data/_treetable';
-@import './components/data/_virtualscroller';
+@import './components/data/_carousel.scss';
+@import './components/data/_datatable.scss';
+@import './components/data/_dataview.scss';
+@import './components/data/_filter.scss';
+@import './components/data/_fullcalendar.scss';
+@import './components/data/_orderlist.scss';
+@import './components/data/_organizationchart.scss';
+@import './components/data/_paginator.scss';
+@import './components/data/_picklist.scss';
+@import './components/data/_timeline.scss';
+@import './components/data/_tree.scss';
+@import './components/data/_treetable.scss';
+@import './components/data/_virtualscroller.scss';
 
 //Panel
-@import './components/panel/_accordion';
-@import './components/panel/_card';
-@import './components/panel/_divider';
-@import './components/panel/_fieldset';
-@import './components/panel/_panel';
-@import './components/panel/_scrollpanel';
-@import './components/panel/_splitter';
-@import './components/panel/_tabview';
-@import './components/panel/_toolbar';
+@import './components/panel/_accordion.scss';
+@import './components/panel/_card.scss';
+@import './components/panel/_divider.scss';
+@import './components/panel/_fieldset.scss';
+@import './components/panel/_panel.scss';
+@import './components/panel/_scrollpanel.scss';
+@import './components/panel/_splitter.scss';
+@import './components/panel/_tabview.scss';
+@import './components/panel/_toolbar.scss';
 
 //Overlay
-@import './components/overlay/_confirmpopup';
-@import './components/overlay/_dialog';
-@import './components/overlay/_overlaypanel';
-@import './components/overlay/_sidebar';
-@import './components/overlay/_tooltip';
+@import './components/overlay/_confirmpopup.scss';
+@import './components/overlay/_dialog.scss';
+@import './components/overlay/_overlaypanel.scss';
+@import './components/overlay/_sidebar.scss';
+@import './components/overlay/_tooltip.scss';
 
 //File
-@import './components/file/_fileupload';
+@import './components/file/_fileupload.scss';
 
 //Menu
-@import './components/menu/_breadcrumb';
-@import './components/menu/_contextmenu';
-@import './components/menu/_dock';
-@import './components/menu/_megamenu';
-@import './components/menu/_menu';
-@import './components/menu/_menubar';
-@import './components/menu/_panelmenu';
-@import './components/menu/_slidemenu';
-@import './components/menu/_steps';
-@import './components/menu/_tabmenu';
-@import './components/menu/_tieredmenu';
+@import './components/menu/_breadcrumb.scss';
+@import './components/menu/_contextmenu.scss';
+@import './components/menu/_dock.scss';
+@import './components/menu/_megamenu.scss';
+@import './components/menu/_menu.scss';
+@import './components/menu/_menubar.scss';
+@import './components/menu/_panelmenu.scss';
+@import './components/menu/_slidemenu.scss';
+@import './components/menu/_steps.scss';
+@import './components/menu/_tabmenu.scss';
+@import './components/menu/_tieredmenu.scss';
 
 //Messages
-@import './components/messages/_inlinemessage';
-@import './components/messages/_message';
+@import './components/messages/_inlinemessage.scss';
+@import './components/messages/_message.scss';
 @import 'components/messages/toast';
 
 //MultiMedia
-@import './components/multimedia/_galleria';
+@import './components/multimedia/_galleria.scss';
 
 //Misc
-@import './components/misc/_avatar';
-@import './components/misc/_badge';
-@import './components/misc/_blockui';
-@import './components/misc/_chip';
-@import './components/misc/_inplace';
-@import './components/misc/_progressbar';
-@import './components/misc/_scrolltop';
-@import './components/misc/_skeleton';
-@import './components/misc/_tag';
-@import './components/misc/_terminal';
+@import './components/misc/_avatar.scss';
+@import './components/misc/_badge.scss';
+@import './components/misc/_blockui.scss';
+@import './components/misc/_chip.scss';
+@import './components/misc/_inplace.scss';
+@import './components/misc/_progressbar.scss';
+@import './components/misc/_scrolltop.scss';
+@import './components/misc/_skeleton.scss';
+@import './components/misc/_tag.scss';
+@import './components/misc/_terminal.scss';

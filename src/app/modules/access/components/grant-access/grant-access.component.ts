@@ -8,10 +8,10 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { DEFAULT_PAGE } from 'src/app/constants';
-import { ROLES } from 'src/app/constants/user.constant';
+import { DEFAULT_PAGE } from 'src/app/core/constants';
+import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { ConnectionService } from 'src/app/modules/connection/services/connection.service';
+import { ConnectionService } from 'src/app/modules/connections/services/connection.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { TranslateService } from '@ngx-translate/core';

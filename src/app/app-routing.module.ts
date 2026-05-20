@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { PERMISSIONS } from './constants/permissions.constant';
+import { PERMISSIONS } from './core/constants/permissions.constant';
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 import { AUTH_ROUTES } from './modules/auth/auth-routing.module';
-import { HomeComponent } from './shared/components/layout/home/home.component';
+import { HomeComponent } from './core/layout/home/home.component';
 
 const routes: Routes = [
   {
@@ -57,7 +57,7 @@ const routes: Routes = [
       {
         path: 'groups',
         loadChildren: () =>
-          import('./modules/groups/group.module').then(m => m.GroupModule),
+          import('./modules/groups/groups.module').then(m => m.GroupsModule),
         canActivate: [roleGuard],
         data: { permission: PERMISSIONS.USER_GROUP, title: 'PAGE_TITLES.GROUPS' },
       },
@@ -90,7 +90,7 @@ const routes: Routes = [
       {
         path: 'connections',
         loadChildren: () =>
-          import('./modules/connection/connection.module').then(
+          import('./modules/connections/connections.module').then(
             m => m.ConnectionsModule,
           ),
         canActivate: [roleGuard],
@@ -161,14 +161,14 @@ const routes: Routes = [
       {
         path: 'audit',
         loadChildren: () =>
-          import('./modules/audit/audit.module').then(m => m.AuditModule),
+          import('./modules/audit-logs/audit-logs.module').then(m => m.AuditLogsModule),
         canActivate: [roleGuard],
         data: { permission: PERMISSIONS.AUDIT_LOGS, title: 'PAGE_TITLES.AUDIT_LOGS' },
       },
       {
         path: 'audit/logins',
         loadChildren: () =>
-          import('./modules/audit/login-activity.module').then(
+          import('./modules/login-activity/login-activity.module').then(
             m => m.LoginActivityModule,
           ),
         canActivate: [roleGuard],

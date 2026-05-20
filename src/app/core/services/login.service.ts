@@ -1,8 +1,8 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { lastValueFrom, Observable } from 'rxjs';
-import { AUTH } from 'src/app/constants/api';
-import { StorageType } from 'src/app/constants/storageType';
+import { AUTH } from 'src/app/core/constants/api.constant';
+import { StorageType } from 'src/app/core/constants/storage-type.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 import { StorageService } from 'src/app/core/services/storage.service';
 

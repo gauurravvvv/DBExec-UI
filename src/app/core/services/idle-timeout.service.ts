@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { fromEvent, merge, Subject, Subscription } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
-import { StorageType } from 'src/app/constants/storageType';
+import { StorageType } from 'src/app/core/constants/storage-type.constant';
 import { StorageService } from 'src/app/core/services/storage.service';
 
 @Injectable({

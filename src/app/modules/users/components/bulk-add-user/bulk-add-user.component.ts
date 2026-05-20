@@ -7,9 +7,9 @@ import {
   ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { DEFAULT_PAGE } from 'src/app/constants';
-import { USER } from 'src/app/constants/routes';
-import { ROLES } from 'src/app/constants/user.constant';
+import { DEFAULT_PAGE } from 'src/app/core/constants';
+import { USER } from 'src/app/core/constants/routes.constant';
+import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { UserService } from '../../services/user.service';

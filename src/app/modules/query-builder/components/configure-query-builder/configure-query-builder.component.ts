@@ -7,7 +7,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { QUERY_BUILDER } from 'src/app/constants/routes';
+import { QUERY_BUILDER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
 import { QueryBuilderService } from '../../services/query-builder.service';
@@ -47,7 +47,7 @@ import {
 } from './helpers/group.helper';
 
 // Import style helpers
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/core/constants';
 import {
   getGroupBulletStyle as getGroupBulletStyleHelper,
   getGroupedPromptsCount as getGroupedPromptsCountHelper,

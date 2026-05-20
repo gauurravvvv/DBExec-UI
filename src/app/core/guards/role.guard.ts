@@ -1,10 +1,10 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { ROLES } from 'src/app/constants/user.constant';
+import { ROLES } from 'src/app/core/constants/user.constant';
 import {
   AUTH_ROUTES,
   HOME_ROUTES,
-} from 'src/app/shared/components/layout/sidebar/sidebar.constant';
+} from 'src/app/core/layout/sidebar/sidebar.constant';
 import { GlobalService } from '../services/global.service';
 
 function getHomeByRole(role: string): string {

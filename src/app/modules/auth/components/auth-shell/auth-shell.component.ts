@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { LOGIN_PAGE_OPTIONS } from 'src/app/constants/global';
+import { LOGIN_PAGE_OPTIONS } from 'src/app/core/constants/global.constant';
 import { environment } from 'src/environments/environment';
 
 interface Feature {

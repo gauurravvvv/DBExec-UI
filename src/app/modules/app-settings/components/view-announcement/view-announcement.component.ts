@@ -5,7 +5,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ANNOUNCEMENT } from 'src/app/constants/routes';
+import { ANNOUNCEMENT } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { AnnouncementService } from '../../services/announcement.service';
 

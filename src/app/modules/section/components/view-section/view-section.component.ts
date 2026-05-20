@@ -6,7 +6,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SECTION } from 'src/app/constants/routes';
+import { SECTION } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { TranslateService } from '@ngx-translate/core';
 import { SectionService } from '../../services/section.service';
