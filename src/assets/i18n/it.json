@@ -416,7 +416,16 @@
     "ADMIN_LANGUAGE": "Lingua dell'amministratore",
     "ADMIN_LANGUAGE_PLACEHOLDER": "Seleziona la lingua per l'email di benvenuto",
     "ADMIN_LOCALE": "Lingua dell'amministratore",
-    "ADMIN_LOCALE_PLACEHOLDER": "Seleziona la lingua per l'email di benvenuto"
+    "ADMIN_LOCALE_PLACEHOLDER": "Seleziona la lingua per l'email di benvenuto",
+    "ENCRYPTION_AUTO_TITLE": "Crittografia gestita per te",
+    "ENCRYPTION_AUTO_DESCRIPTION": "Tutti i segreti memorizzati dalla tua organizzazione (password delle fonti dati, credenziali SMTP/SES, password utente) vengono crittografati automaticamente. Non devi scegliere un algoritmo né ricordare una chiave.",
+    "ENCRYPTION_BULLET_1": "AES-256-GCM (crittografia autenticata)",
+    "ENCRYPTION_BULLET_2": "Viene generata una chiave unica per la tua organizzazione",
+    "ENCRYPTION_BULLET_3": "La chiave master è memorizzata fuori dal database",
+    "ENCRYPTION_AUTO_ACK_DESC": "Comprendo che DBExec genererà e gestirà le chiavi di crittografia per questa organizzazione per mio conto. La chiave master risiede sul server applicativo, separata dal database.",
+    "ENCRYPTION_AUTO_ACK_ERROR": "Conferma la configurazione della crittografia prima di continuare.",
+    "ENCRYPTION_AUTO_REVIEW_NOTE": "Verrà generata una nuova chiave AES-256-GCM per questa organizzazione. La chiave master della piattaforma la avvolge.",
+    "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (chiave per organizzazione generata automaticamente)"
   },
   "ROLE": {
     "TITLE": "Ruoli",

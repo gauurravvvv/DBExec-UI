@@ -416,7 +416,16 @@
     "ADMIN_LANGUAGE": "Idioma do administrador",
     "ADMIN_LANGUAGE_PLACEHOLDER": "Selecionar idioma para o e-mail de boas-vindas",
     "ADMIN_LOCALE": "Idioma do administrador",
-    "ADMIN_LOCALE_PLACEHOLDER": "Selecionar idioma para o e-mail de boas-vindas"
+    "ADMIN_LOCALE_PLACEHOLDER": "Selecionar idioma para o e-mail de boas-vindas",
+    "ENCRYPTION_AUTO_TITLE": "Criptografia gerenciada para você",
+    "ENCRYPTION_AUTO_DESCRIPTION": "Todos os segredos armazenados pela sua organização (senhas de fontes de dados, credenciais SMTP/SES, senhas de usuários) são criptografados automaticamente. Você não precisa escolher um algoritmo nem lembrar uma chave.",
+    "ENCRYPTION_BULLET_1": "AES-256-GCM (criptografia autenticada)",
+    "ENCRYPTION_BULLET_2": "Uma chave única é gerada para sua organização",
+    "ENCRYPTION_BULLET_3": "A chave mestra fica armazenada fora do banco",
+    "ENCRYPTION_AUTO_ACK_DESC": "Entendo que o DBExec gerará e gerenciará as chaves de criptografia para esta organização em meu nome. A chave mestra fica no servidor da aplicação, separada do banco de dados.",
+    "ENCRYPTION_AUTO_ACK_ERROR": "Confirme a configuração de criptografia antes de continuar.",
+    "ENCRYPTION_AUTO_REVIEW_NOTE": "Uma nova chave AES-256-GCM será gerada para esta organização. A chave mestra da plataforma a envolve.",
+    "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (chave por organização gerada automaticamente)"
   },
   "ROLE": {
     "TITLE": "Funções",

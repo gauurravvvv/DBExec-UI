@@ -416,7 +416,16 @@
     "ADMIN_LANGUAGE": "Beheerdertaal",
     "ADMIN_LANGUAGE_PLACEHOLDER": "Taal selecteren voor welkomstmail",
     "ADMIN_LOCALE": "Beheerdertaal",
-    "ADMIN_LOCALE_PLACEHOLDER": "Taal selecteren voor welkomstmail"
+    "ADMIN_LOCALE_PLACEHOLDER": "Taal selecteren voor welkomstmail",
+    "ENCRYPTION_AUTO_TITLE": "Versleuteling voor u beheerd",
+    "ENCRYPTION_AUTO_DESCRIPTION": "Alle geheimen die uw organisatie opslaat (datasource-wachtwoorden, SMTP/SES-referenties, gebruikerswachtwoorden) worden automatisch versleuteld. U hoeft geen algoritme te kiezen of een sleutel te onthouden.",
+    "ENCRYPTION_BULLET_1": "AES-256-GCM (geauthenticeerde versleuteling)",
+    "ENCRYPTION_BULLET_2": "Per organisatie wordt een unieke sleutel gegenereerd",
+    "ENCRYPTION_BULLET_3": "De masterkey wordt buiten de database opgeslagen",
+    "ENCRYPTION_AUTO_ACK_DESC": "Ik begrijp dat DBExec encryptiesleutels namens mij genereert en beheert voor deze organisatie. De masterkey staat op de applicatieserver, gescheiden van de database.",
+    "ENCRYPTION_AUTO_ACK_ERROR": "Bevestig de encryptieconfiguratie voordat u doorgaat.",
+    "ENCRYPTION_AUTO_REVIEW_NOTE": "Er wordt een nieuwe AES-256-GCM-sleutel gegenereerd voor deze organisatie. De masterkey van het platform omhult deze.",
+    "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (per organisatie automatisch gegenereerde sleutel)"
   },
   "ROLE": {
     "TITLE": "Rollen",

@@ -22,7 +22,9 @@ interface OrganisationConfig {
 }
 
 interface OrgConfig {
-  encryptionAlgorithm: string;
+  /** @deprecated legacy column. Always null for orgs created after the
+   *  envelope-encryption migration; some legacy rows still carry it. */
+  encryptionAlgorithm?: string | null;
   maxLoginAttempts: number;
   accountLockDurationHours: number;
   passwordHistoryLimit: number;
@@ -59,7 +61,8 @@ interface OrganisationData {
   dbStatus: 'connected' | 'not_configured' | 'connection_failed';
   masterDbConfig: MasterDbConfig;
   orgConfig: OrgConfig;
-  encryptionAlgorithm: string;
+  /** @deprecated legacy top-level mirror of orgConfig.encryptionAlgorithm. */
+  encryptionAlgorithm?: string | null;
 }
 
 @Component({

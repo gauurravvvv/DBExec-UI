@@ -83,15 +83,10 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
           Validators.maxLength(500),
         ],
       ],
-      encryptionAlgorithm: ['', [Validators.required]],
-      pepperKey: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(32),
-          Validators.pattern(REGEX.pepperKey),
-        ],
-      ],
+      // Encryption configuration is no longer collected from the
+      // admin. The BE generates a per-org AES-256-GCM Data Encryption
+      // Key (DEK) server-side and wraps it under the platform master
+      // key on every org creation. See SECURITY.md for the design.
       // Master database fields
       dbHost: [
         '',
@@ -176,14 +171,10 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
   isStep1Valid(): boolean {
     const nameValid = this.orgForm.get('name')?.valid || false;
     const descValid = this.orgForm.get('description')?.valid || false;
-    const encValid = this.orgForm.get('encryptionAlgorithm')?.valid || false;
-    const pepperValid = this.orgForm.get('pepperKey')?.valid || false;
+    // Encryption is server-managed — the only acknowledgment we still
+    // gate on is the high-level confirmation checkbox.
     return (
-      nameValid &&
-      descValid &&
-      encValid &&
-      pepperValid &&
-      this.orgForm.get('confirmationChecked')?.value
+      nameValid && descValid && this.orgForm.get('confirmationChecked')?.value
     );
   }
 
@@ -421,15 +412,6 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  encryptionAlgorithms = [
-    { value: 'aes-256-gcm', label: 'aes-256-gcm' },
-    { value: 'aes-192-gcm', label: 'aes-192-gcm' },
-    { value: 'aes-128-gcm', label: 'aes-128-gcm' },
-    { value: 'aes-256-cbc', label: 'aes-256-cbc' },
-    { value: 'aes-192-cbc', label: 'aes-192-cbc' },
-    { value: 'aes-128-cbc', label: 'aes-128-cbc' },
-  ];
-
   toggleDbPasswordVisibility(event: Event) {
     event.preventDefault();
     this.showDbPassword = !this.showDbPassword;
@@ -464,16 +446,6 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
       return this.translate.instant('VALIDATION.DESCRIPTION_MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
     if (control?.errors?.['maxlength'])
       return this.translate.instant('VALIDATION.DESCRIPTION_MAX_LENGTH', { length: control.errors['maxlength'].requiredLength });
-    return '';
-  }
-
-  getPepperKeyError(): string {
-    const control = this.orgForm.get('pepperKey');
-    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.PEPPER_KEY_REQUIRED');
-    if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.PEPPER_KEY_MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
-    if (control?.errors?.['pattern'])
-      return this.translate.instant('VALIDATION.PEPPER_KEY_PATTERN');
     return '';
   }
 

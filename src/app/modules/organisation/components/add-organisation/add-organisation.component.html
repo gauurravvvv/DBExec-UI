@@ -136,54 +136,48 @@
             </app-custom-input>
           </div>
 
-          <!-- Encryption Config Group -->
+          <!-- Encryption: managed server-side, no admin input needed.
+               Kept on the form-section column so it sits in the
+               existing visual rhythm of step-1.  -->
           <div class="form-group-section">
             <div class="group-header">
               <i class="pi pi-shield"></i>
               <span>{{ 'ORG.ENCRYPTION_CONFIG' | translate }}</span>
             </div>
 
-            <app-custom-dropdown
-              formControlName="encryptionAlgorithm"
-              [label]="'ORG.ENCRYPTION_METHOD' | translate"
-              [placeholder]="'ORG.SELECT_ENCRYPTION_METHOD' | translate"
-              [options]="encryptionAlgorithms"
-              optionLabel="label"
-              optionValue="value"
-              [filter]="true"
-              filterBy="label"
-              appendTo="body"
-              [required]="true"
-              [showError]="
-                !!(
-                  orgForm.get('encryptionAlgorithm')?.invalid &&
-                  orgForm.get('encryptionAlgorithm')?.touched
-                )
-              "
-              [errorMessage]="'VALIDATION.ENCRYPTION_METHOD_REQUIRED' | translate"
-            >
-            </app-custom-dropdown>
-
-            <app-custom-input
-              formControlName="pepperKey"
-              [label]="'ORG.PEPPER_KEY' | translate"
-              [placeholder]="'ORG.PEPPER_KEY_PLACEHOLDER' | translate"
-              icon="pi-lock"
-              [required]="true"
-              [showPasswordToggle]="true"
-              [showError]="
-                !!(
-                  orgForm.get('pepperKey')?.invalid &&
-                  orgForm.get('pepperKey')?.touched
-                )
-              "
-              [errorMessage]="getPepperKeyError()"
-            >
-            </app-custom-input>
+            <div class="encryption-auto-card">
+              <div class="encryption-auto-icon">
+                <i class="pi pi-lock"></i>
+              </div>
+              <div class="encryption-auto-body">
+                <div class="encryption-auto-title">
+                  {{ 'ORG.ENCRYPTION_AUTO_TITLE' | translate }}
+                </div>
+                <div class="encryption-auto-description">
+                  {{ 'ORG.ENCRYPTION_AUTO_DESCRIPTION' | translate }}
+                </div>
+                <ul class="encryption-auto-list">
+                  <li>
+                    <i class="pi pi-check"></i>
+                    {{ 'ORG.ENCRYPTION_BULLET_1' | translate }}
+                  </li>
+                  <li>
+                    <i class="pi pi-check"></i>
+                    {{ 'ORG.ENCRYPTION_BULLET_2' | translate }}
+                  </li>
+                  <li>
+                    <i class="pi pi-check"></i>
+                    {{ 'ORG.ENCRYPTION_BULLET_3' | translate }}
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Right Column: Encryption Acknowledgment -->
+        <!-- Right Column: Acknowledgment that the data will be encrypted.
+             Keeps the binary checkbox so the user still consciously
+             confirms the security model before proceeding. -->
         <div class="step-1-right">
           <div class="acknowledgments-container">
             <div class="acknowledgments-title">
@@ -192,16 +186,16 @@
             <div class="acknowledgment-card">
               <app-custom-binary-checkbox
                 formControlName="confirmationChecked"
-                [label]="'ORG.ENCRYPTION_CONFIG' | translate"
-                [description]="'ORG.ENCRYPTION_ACK_DESC' | translate"
+                [label]="'ORG.ENCRYPTION_AUTO_TITLE' | translate"
+                [description]="'ORG.ENCRYPTION_AUTO_ACK_DESC' | translate"
                 [showError]="
                   !!(
                     !orgForm.get('confirmationChecked')?.value &&
-                    orgForm.get('encryptionAlgorithm')?.valid &&
-                    orgForm.get('pepperKey')?.valid
+                    orgForm.get('name')?.valid &&
+                    orgForm.get('description')?.valid
                   )
                 "
-                [errorMessage]="'ORG.ENCRYPTION_ACK_ERROR' | translate"
+                [errorMessage]="'ORG.ENCRYPTION_AUTO_ACK_ERROR' | translate"
               ></app-custom-binary-checkbox>
             </div>
           </div>
@@ -673,19 +667,11 @@
             <div class="readonly-info-card">
               <div class="info-row">
                 <span class="info-label">{{ 'ORG.ENCRYPTION_METHOD' | translate }}</span>
-                <span class="info-value">{{
-                  orgForm.get('encryptionAlgorithm')?.value || ('ORG.NOT_CONFIGURED' | translate)
-                }}</span>
-              </div>
-              <div class="info-row">
-                <span class="info-label">{{ 'ORG.PEPPER_KEY' | translate }}</span>
-                <span class="info-value masked">{{
-                  orgForm.get('pepperKey')?.value ? '********' : ('ORG.NOT_SET' | translate)
-                }}</span>
+                <span class="info-value">{{ 'ORG.REVIEW_ENCRYPTION_VALUE' | translate }}</span>
               </div>
               <p class="readonly-note">
                 <i class="pi pi-lock"></i>
-                {{ 'ORG.ENCRYPTION_IMMUTABLE_NOTE' | translate }}
+                {{ 'ORG.ENCRYPTION_AUTO_REVIEW_NOTE' | translate }}
               </p>
             </div>
           </div>

@@ -595,17 +595,11 @@
             <div class="readonly-info-card">
               <div class="info-row">
                 <span class="info-label">{{ 'ORG.ENCRYPTION_METHOD' | translate }}</span>
-                <span class="info-value">{{
-                  orgData?.encryptionAlgorithm || ('ORG.NOT_CONFIGURED' | translate)
-                }}</span>
-              </div>
-              <div class="info-row">
-                <span class="info-label">{{ 'ORG.PEPPER_KEY' | translate }}</span>
-                <span class="info-value masked">********</span>
+                <span class="info-value">{{ 'ORG.REVIEW_ENCRYPTION_VALUE' | translate }}</span>
               </div>
               <p class="readonly-note">
                 <i class="pi pi-lock"></i>
-                {{ 'ORG.ENCRYPTION_IMMUTABLE_NOTE' | translate }}
+                {{ 'ORG.ENCRYPTION_AUTO_REVIEW_NOTE' | translate }}
               </p>
             </div>
           </div>

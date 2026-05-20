@@ -359,25 +359,16 @@
               </div>
             </ng-container>
 
-            <!-- Encryption Info -->
+            <!-- Encryption Info — the per-org key is generated and
+                 managed server-side. We don't show key material; just
+                 confirm the algorithm. -->
             <div class="encryption-divider"></div>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-shield"></i>
                 {{ 'ORG.ENCRYPTION_ALGORITHM' | translate }}
               </span>
-              <span class="value">{{
-                organisationData.orgConfig.encryptionAlgorithm ||
-                  organisationData.encryptionAlgorithm ||
-                  '—'
-              }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-lock"></i>
-                {{ 'ORG.PEPPER_KEY' | translate }}
-              </span>
-              <span class="value masked-value">••••••••••••••••</span>
+              <span class="value">{{ 'ORG.REVIEW_ENCRYPTION_VALUE' | translate }}</span>
             </div>
           </div>
         </div>

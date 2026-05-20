@@ -416,7 +416,16 @@
     "ADMIN_LANGUAGE": "관리자 언어",
     "ADMIN_LANGUAGE_PLACEHOLDER": "환영 이메일 언어 선택",
     "ADMIN_LOCALE": "관리자 언어",
-    "ADMIN_LOCALE_PLACEHOLDER": "환영 이메일 언어 선택"
+    "ADMIN_LOCALE_PLACEHOLDER": "환영 이메일 언어 선택",
+    "ENCRYPTION_AUTO_TITLE": "암호화 자동 관리",
+    "ENCRYPTION_AUTO_DESCRIPTION": "조직이 저장하는 모든 비밀(데이터 소스 비밀번호, SMTP/SES 자격 증명, 사용자 비밀번호)은 자동으로 암호화됩니다. 알고리즘을 선택하거나 키를 기억할 필요가 없습니다.",
+    "ENCRYPTION_BULLET_1": "AES-256-GCM (인증된 암호화)",
+    "ENCRYPTION_BULLET_2": "조직별로 고유한 키 생성",
+    "ENCRYPTION_BULLET_3": "마스터 키는 데이터베이스 외부에 저장",
+    "ENCRYPTION_AUTO_ACK_DESC": "DBExec가 이 조직의 암호화 키를 대신 생성·관리한다는 점을 이해합니다. 마스터 키는 데이터베이스와 분리된 애플리케이션 서버에 보관됩니다.",
+    "ENCRYPTION_AUTO_ACK_ERROR": "계속하기 전에 암호화 구성을 확인해 주세요.",
+    "ENCRYPTION_AUTO_REVIEW_NOTE": "이 조직을 위한 새로운 AES-256-GCM 키가 생성됩니다. 플랫폼 마스터 키가 이를 감쌉니다.",
+    "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (조직별 자동 생성 키)"
   },
   "ROLE": {
     "TITLE": "역할",

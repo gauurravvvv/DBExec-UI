@@ -59,8 +59,6 @@ export class OrganisationService {
       const {
         name,
         description,
-        encryptionAlgorithm,
-        pepperKey,
         dbHost,
         dbPort,
         dbName,
@@ -87,8 +85,6 @@ export class OrganisationService {
       const payload: any = {
         name,
         description,
-        encryptionAlgorithm,
-        pepperKey,
         dbHost,
         dbPort,
         dbName,
@@ -231,8 +227,6 @@ export class OrganisationService {
     const {
       name,
       description,
-      encryptionAlgorithm,
-      pepperKey,
       dbHost,
       dbPort,
       dbName,
@@ -255,11 +249,11 @@ export class OrganisationService {
       sesFrom,
     } = orgForm.value;
 
+    // Encryption: per-org key generated server-side; the FE doesn't
+    // send anything related to algorithm or pepper.
     const payload: any = {
       name,
       description,
-      encryptionAlgorithm,
-      pepperKey,
       dbHost,
       dbPort,
       dbName,

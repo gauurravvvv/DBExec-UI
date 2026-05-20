@@ -416,7 +416,16 @@
     "ADMIN_LANGUAGE": "Idioma del administrador",
     "ADMIN_LANGUAGE_PLACEHOLDER": "Seleccionar idioma para el correo de bienvenida",
     "ADMIN_LOCALE": "Idioma del administrador",
-    "ADMIN_LOCALE_PLACEHOLDER": "Seleccionar idioma para el correo de bienvenida"
+    "ADMIN_LOCALE_PLACEHOLDER": "Seleccionar idioma para el correo de bienvenida",
+    "ENCRYPTION_AUTO_TITLE": "Cifrado gestionado por nosotros",
+    "ENCRYPTION_AUTO_DESCRIPTION": "Todos los secretos que almacena su organización (contraseñas de fuentes de datos, credenciales SMTP/SES, contraseñas de usuarios) se cifran automáticamente. No necesita elegir un algoritmo ni recordar una clave.",
+    "ENCRYPTION_BULLET_1": "AES-256-GCM (cifrado autenticado)",
+    "ENCRYPTION_BULLET_2": "Se genera una clave única para su organización",
+    "ENCRYPTION_BULLET_3": "La clave maestra se almacena fuera de la base de datos",
+    "ENCRYPTION_AUTO_ACK_DESC": "Entiendo que DBExec generará y gestionará las claves de cifrado para esta organización en mi nombre. La clave maestra reside en el servidor de la aplicación, separada de la base de datos.",
+    "ENCRYPTION_AUTO_ACK_ERROR": "Confirme la configuración de cifrado antes de continuar.",
+    "ENCRYPTION_AUTO_REVIEW_NOTE": "Se generará una nueva clave AES-256-GCM para esta organización. La clave maestra de la plataforma la envuelve.",
+    "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (clave por organización generada automáticamente)"
   },
   "ROLE": {
     "TITLE": "Roles",
