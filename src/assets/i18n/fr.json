@@ -1143,9 +1143,7 @@
   "DASHBOARD": {
     "TITLE": "Tableaux de bord",
     "SUBTITLE": "Afficher et gérer les tableaux de bord publiés",
-    "ANALYSIS": "Analyse",
     "DATASET": "Jeu de données",
-    "SEARCH_ANALYSIS": "Rechercher une analyse",
     "SEARCH_DATASET": "Rechercher un jeu de données",
     "SEARCH_DATASOURCE": "Rechercher une source de données",
     "NO_DASHBOARDS_FOUND": "Aucun tableau de bord trouvé",

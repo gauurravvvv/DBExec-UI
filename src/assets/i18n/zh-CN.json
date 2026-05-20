@@ -1143,9 +1143,7 @@
   "DASHBOARD": {
     "TITLE": "仪表盘",
     "SUBTITLE": "查看和管理已发布的仪表盘",
-    "ANALYSIS": "分析",
     "DATASET": "数据集",
-    "SEARCH_ANALYSIS": "搜索分析",
     "SEARCH_DATASET": "搜索数据集",
     "SEARCH_DATASOURCE": "搜索数据源",
     "NO_DASHBOARDS_FOUND": "未找到仪表盘",

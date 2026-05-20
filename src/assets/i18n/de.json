@@ -1143,9 +1143,7 @@
   "DASHBOARD": {
     "TITLE": "Dashboards",
     "SUBTITLE": "Veröffentlichte Dashboards anzeigen und verwalten",
-    "ANALYSIS": "Analyse",
     "DATASET": "Datensatz",
-    "SEARCH_ANALYSIS": "Analyse suchen",
     "SEARCH_DATASET": "Datensatz suchen",
     "SEARCH_DATASOURCE": "Datenquelle suchen",
     "NO_DASHBOARDS_FOUND": "Keine Dashboards gefunden",

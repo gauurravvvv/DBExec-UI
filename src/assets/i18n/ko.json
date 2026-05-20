@@ -1143,9 +1143,7 @@
   "DASHBOARD": {
     "TITLE": "대시보드",
     "SUBTITLE": "게시된 대시보드를 조회하고 관리합니다",
-    "ANALYSIS": "분석",
     "DATASET": "데이터셋",
-    "SEARCH_ANALYSIS": "분석 검색",
     "SEARCH_DATASET": "데이터셋 검색",
     "SEARCH_DATASOURCE": "데이터소스 검색",
     "NO_DASHBOARDS_FOUND": "대시보드를 찾을 수 없습니다",

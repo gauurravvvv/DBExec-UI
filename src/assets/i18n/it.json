@@ -1143,9 +1143,7 @@
   "DASHBOARD": {
     "TITLE": "Dashboard",
     "SUBTITLE": "Visualizza e gestisci le dashboard pubblicate",
-    "ANALYSIS": "Analisi",
     "DATASET": "Dataset",
-    "SEARCH_ANALYSIS": "Cerca analisi",
     "SEARCH_DATASET": "Cerca dataset",
     "SEARCH_DATASOURCE": "Cerca sorgente dati",
     "NO_DASHBOARDS_FOUND": "Nessuna dashboard trovata",

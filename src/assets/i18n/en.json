@@ -1180,9 +1180,7 @@
   "DASHBOARD": {
     "TITLE": "Dashboards",
     "SUBTITLE": "View and manage published dashboards",
-    "ANALYSIS": "Analysis",
     "DATASET": "Dataset",
-    "SEARCH_ANALYSIS": "Search Analysis",
     "SEARCH_DATASET": "Search Dataset",
     "SEARCH_DATASOURCE": "Search Datasource",
     "NO_DASHBOARDS_FOUND": "No dashboards found",

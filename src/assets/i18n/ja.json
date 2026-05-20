@@ -1143,9 +1143,7 @@
   "DASHBOARD": {
     "TITLE": "ダッシュボード",
     "SUBTITLE": "公開されたダッシュボードを表示・管理します",
-    "ANALYSIS": "分析",
     "DATASET": "データセット",
-    "SEARCH_ANALYSIS": "分析を検索",
     "SEARCH_DATASET": "データセットを検索",
     "SEARCH_DATASOURCE": "データソースを検索",
     "NO_DASHBOARDS_FOUND": "ダッシュボードが見つかりません",

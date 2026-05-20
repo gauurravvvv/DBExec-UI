@@ -1143,9 +1143,7 @@
   "DASHBOARD": {
     "TITLE": "Painéis",
     "SUBTITLE": "Visualize e gerencie painéis publicados",
-    "ANALYSIS": "Análise",
     "DATASET": "Conjunto de dados",
-    "SEARCH_ANALYSIS": "Pesquisar análise",
     "SEARCH_DATASET": "Pesquisar conjunto de dados",
     "SEARCH_DATASOURCE": "Pesquisar fonte de dados",
     "NO_DASHBOARDS_FOUND": "Nenhum painel encontrado",

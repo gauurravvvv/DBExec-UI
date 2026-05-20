@@ -1143,9 +1143,7 @@
   "DASHBOARD": {
     "TITLE": "Dashboards",
     "SUBTITLE": "Bekijk en beheer gepubliceerde dashboards",
-    "ANALYSIS": "Analyse",
     "DATASET": "Dataset",
-    "SEARCH_ANALYSIS": "Zoek analyse",
     "SEARCH_DATASET": "Zoek dataset",
     "SEARCH_DATASOURCE": "Zoek databron",
     "NO_DASHBOARDS_FOUND": "Geen dashboards gevonden",
