@@ -457,130 +457,30 @@
         </div>
       </ng-container>
 
-      <!-- ===== Line Series Options ===== -->
-      <ng-container *ngIf="isLineChartType(focusedVisual.chartType)">
+      <!-- ===== Line / Area Series Options =====
+           Merged from previously-duplicate Line and Area sections — every
+           line/area control was identical between them apart from the
+           `areaOpacity` slider, which now appears only when the chart is
+           an area variant. -->
+      <ng-container
+        *ngIf="
+          isLineChartType(focusedVisual.chartType) ||
+          isAreaChartType(focusedVisual.chartType)
+        "
+      >
         <div class="config-section">
           <div class="section-title">
-            {{ 'ANALYSES.LINE_OPTIONS' | translate }}
+            {{
+              isAreaChartType(focusedVisual.chartType)
+                ? ('ANALYSES.AREA_OPTIONS' | translate)
+                : ('ANALYSES.LINE_OPTIONS' | translate)
+            }}
           </div>
-          <div class="config-row">
-            <label>{{ 'ANALYSES.SMOOTH_CURVE' | translate }}</label>
-            <app-custom-toggle
-              [(ngModel)]="focusedVisual.config.lineSmooth"
-              [showStatusLabel]="false"
-            ></app-custom-toggle>
-          </div>
-          <div class="config-group" *ngIf="focusedVisual.config.lineSmooth">
-            <label>{{ 'ANALYSES.SMOOTHNESS' | translate }}</label>
-            <app-custom-number
-              [(ngModel)]="focusedVisual.config.lineSmoothness"
-              [min]="0"
-              [max]="1"
-              [step]="0.1"
-              [showButtons]="true"
-            ></app-custom-number>
-          </div>
-          <div class="config-group">
-            <label>{{ 'ANALYSES.STEP_STYLE' | translate }}</label>
-            <app-custom-dropdown
-              [options]="lineStepOptions"
-              [(ngModel)]="focusedVisual.config.lineStep"
-              optionLabel="label"
-              optionValue="value"
-              appendTo="body"
-            ></app-custom-dropdown>
-          </div>
-          <div class="config-group">
-            <label>{{ 'ANALYSES.LINE_STYLE' | translate }}</label>
-            <app-custom-dropdown
-              [options]="lineStyleTypes"
-              [(ngModel)]="focusedVisual.config.lineStyleType"
-              optionLabel="label"
-              optionValue="value"
-              appendTo="body"
-            ></app-custom-dropdown>
-          </div>
-          <div class="config-row">
-            <label>{{ 'ANALYSES.SHOW_SYMBOL' | translate }}</label>
-            <app-custom-toggle
-              [(ngModel)]="focusedVisual.config.showSymbol"
-              [showStatusLabel]="false"
-            ></app-custom-toggle>
-          </div>
-          <ng-container *ngIf="focusedVisual.config.showSymbol">
-            <div class="config-group">
-              <label>{{ 'ANALYSES.SYMBOL_SHAPE' | translate }}</label>
-              <app-custom-dropdown
-                [options]="symbolShapes"
-                [(ngModel)]="focusedVisual.config.symbolShape"
-                optionLabel="label"
-                optionValue="value"
-                appendTo="body"
-              ></app-custom-dropdown>
-            </div>
-            <div class="config-group">
-              <label>{{ 'ANALYSES.SYMBOL_SIZE' | translate }}</label>
-              <app-custom-number
-                [(ngModel)]="focusedVisual.config.symbolSize"
-                [min]="1"
-                [max]="20"
-                [showButtons]="true"
-              ></app-custom-number>
-            </div>
-          </ng-container>
-          <div class="config-group">
-            <label>{{ 'ANALYSES.LINE_WIDTH' | translate }}</label>
-            <app-custom-number
-              [(ngModel)]="focusedVisual.config.lineWidth"
-              [min]="1"
-              [max]="10"
-              [showButtons]="true"
-            ></app-custom-number>
-          </div>
-          <div class="config-row">
-            <label>{{ 'ANALYSES.CONNECT_NULL_POINTS' | translate }}</label>
-            <app-custom-toggle
-              [(ngModel)]="focusedVisual.config.connectNulls"
-              [showStatusLabel]="false"
-            ></app-custom-toggle>
-          </div>
-          <div class="config-row">
-            <label>{{ 'ANALYSES.END_LABEL' | translate }}</label>
-            <app-custom-toggle
-              [(ngModel)]="focusedVisual.config.endLabel"
-              [showStatusLabel]="false"
-            ></app-custom-toggle>
-          </div>
-          <div class="config-group">
-            <label>{{ 'ANALYSES.SAMPLING' | translate }}</label>
-            <app-custom-dropdown
-              [options]="samplingOptions"
-              [(ngModel)]="focusedVisual.config.sampling"
-              optionLabel="label"
-              optionValue="value"
-              appendTo="body"
-            ></app-custom-dropdown>
-          </div>
-          <div class="config-group">
-            <label>{{ 'ANALYSES.SHOW_ALL_SYMBOLS' | translate }}</label>
-            <app-custom-dropdown
-              [options]="showAllSymbolOptions"
-              [(ngModel)]="focusedVisual.config.showAllSymbol"
-              optionLabel="label"
-              optionValue="value"
-              appendTo="body"
-            ></app-custom-dropdown>
-          </div>
-        </div>
-      </ng-container>
-
-      <!-- ===== Area Series Options ===== -->
-      <ng-container *ngIf="isAreaChartType(focusedVisual.chartType)">
-        <div class="config-section">
-          <div class="section-title">
-            {{ 'ANALYSES.AREA_OPTIONS' | translate }}
-          </div>
-          <div class="config-group">
+          <!-- Area-only: fill opacity -->
+          <div
+            class="config-group"
+            *ngIf="isAreaChartType(focusedVisual.chartType)"
+          >
             <label>{{ 'ANALYSES.AREA_OPACITY' | translate }}</label>
             <app-custom-number
               [(ngModel)]="focusedVisual.config.areaOpacity"
