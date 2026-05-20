@@ -272,9 +272,6 @@ export const PROFILE = {
 };
 
 export const DASHBOARD = {
-  // ADD is deprecated server-side — kept here only for legacy callers
-  // that haven't migrated to PUBLISH yet. Hitting it returns 400.
-  ADD: '/dashboard/add',
   PUBLISH: '/dashboard/publish',
   GET: '/dashboard/get/',
   RENDER: '/dashboard/render/',

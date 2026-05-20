@@ -121,9 +121,10 @@
                   </span>
                 </div>
               </th>
-              <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">{{ 'DASHBOARD.ANALYSIS' | translate }}</div>
-              </th>
+              <!-- Analysis column removed post-snapshot: a published dashboard
+                   no longer holds a live link back to its source analysis
+                   (the source can be edited or deleted independently), so
+                   showing the current analysis name would be misleading. -->
               <th style="width: 12rem; min-width: 12rem">
                 <div class="th-content">{{ 'DASHBOARD.DATASET' | translate }}</div>
               </th>
@@ -178,13 +179,6 @@
                   [(ngModel)]="filterValues.name"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'COMMON.SEARCH_NAME' | translate"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.analysisName"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'DASHBOARD.SEARCH_ANALYSIS' | translate"
                 ></app-custom-input>
               </th>
               <th>
@@ -246,28 +240,24 @@
                   {{ dashboard.name }}
                 </a>
               </td>
+              <!-- Dataset name comes from the snapshot copy stored on
+                   the dashboard row (dataset_name). Datasource is the
+                   live join — datasource isn't part of the snapshot
+                   scope, so a deleted datasource shows blank here. -->
               <td>
                 <span
                   class="description-text"
-                  [title]="dashboard.analysis?.name"
+                  [title]="dashboard.datasetName"
                 >
-                  {{ dashboard.analysis?.name }}
+                  {{ dashboard.datasetName }}
                 </span>
               </td>
               <td>
                 <span
                   class="description-text"
-                  [title]="dashboard.analysis?.dataset?.name"
+                  [title]="dashboard.datasource?.name"
                 >
-                  {{ dashboard.analysis?.dataset?.name }}
-                </span>
-              </td>
-              <td>
-                <span
-                  class="description-text"
-                  [title]="dashboard.analysis?.datasource?.name"
-                >
-                  {{ dashboard.analysis?.datasource?.name }}
+                  {{ dashboard.datasource?.name }}
                 </span>
               </td>
               <td>

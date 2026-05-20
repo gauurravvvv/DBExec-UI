@@ -129,7 +129,7 @@
         (click)="openPublishDashboardDialog()"
         [disabled]="
           saving() ||
-          publishing ||
+          publishing() ||
           hasUnsavedChanges() ||
           !visuals.length
         "
@@ -145,9 +145,9 @@
       >
         <i
           class="pi"
-          [class.pi-upload]="!publishing"
-          [class.pi-spin]="publishing"
-          [class.pi-spinner]="publishing"
+          [class.pi-upload]="!publishing()"
+          [class.pi-spin]="publishing()"
+          [class.pi-spinner]="publishing()"
         ></i>
         <span>{{ 'DASHBOARD.PUBLISH' | translate }}</span>
       </button>
@@ -833,7 +833,7 @@
   [datasourceId]="datasourceId"
   [analysisId]="analysisId"
   [analysisName]="analysisDetails?.name || ''"
-  [saving]="publishing"
+  [saving]="publishing()"
   (close)="handlePublishDialogClose($event)"
 ></app-publish-dashboard-dialog>
 

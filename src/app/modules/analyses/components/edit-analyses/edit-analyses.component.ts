@@ -9,6 +9,7 @@ import {
   inject,
   OnDestroy,
   OnInit,
+  signal,
   ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -287,9 +288,11 @@ export class EditAnalysesComponent
 
   // Publish-to-dashboard state. Tracked alongside save state but
   // independent so the user can have one in-flight without blocking
-  // the other.
+  // the other. publishing is a signal so OnPush still picks up the
+  // flip if a future refactor moves the assignment outside a
+  // zone-triggered context (timer, microtask).
   showPublishDialog: boolean = false;
-  publishing: boolean = false;
+  publishing = signal(false);
 
   // NgRx Store Observables
   graphData$!: Observable<any[] | null>;
@@ -2288,7 +2291,7 @@ export class EditAnalysesComponent
       return;
     }
 
-    this.publishing = true;
+    this.publishing.set(true);
     this.dashboardService
       .publish({
         orgId: this.orgId,
@@ -2308,7 +2311,7 @@ export class EditAnalysesComponent
         }
       })
       .finally(() => {
-        this.publishing = false;
+        this.publishing.set(false);
         this.cdr.markForCheck();
       });
   }

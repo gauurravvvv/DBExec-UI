@@ -75,7 +75,6 @@ export class ListDashboardComponent implements OnInit {
 
   filterValues: any = {
     name: '',
-    analysisName: '',
     datasetName: '',
     datasourceName: '',
     status: null,
@@ -93,7 +92,6 @@ export class ListDashboardComponent implements OnInit {
   get isFilterActive(): boolean {
     return (
       !!this.filterValues.name ||
-      !!this.filterValues.analysisName ||
       !!this.filterValues.datasetName ||
       !!this.filterValues.datasourceName ||
       this.filterValues.status !== null ||
@@ -232,7 +230,6 @@ export class ListDashboardComponent implements OnInit {
   clearFilters() {
     this.filterValues = {
       name: '',
-      analysisName: '',
       datasetName: '',
       datasourceName: '',
       status: null,
@@ -326,9 +323,6 @@ export class ListDashboardComponent implements OnInit {
     const filter: any = {};
     if (this.filterValues.name) {
       filter.name = this.filterValues.name;
-    }
-    if (this.filterValues.analysisName) {
-      filter.analysisName = this.filterValues.analysisName;
     }
     if (this.filterValues.datasetName) {
       filter.datasetName = this.filterValues.datasetName;

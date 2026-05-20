@@ -68,15 +68,6 @@ export class DashboardService {
     }
   }
 
-  async add(payload: any): Promise<any> {
-    this._saving.set(true);
-    try {
-      return await lastValueFrom(this.http.apiPost(DASHBOARD.ADD, payload));
-    } finally {
-      this._saving.set(false);
-    }
-  }
-
   /**
    * Publish — snapshot the source analysis into a dashboard.
    *
@@ -106,8 +97,9 @@ export class DashboardService {
   /**
    * List dashboards that were published from a given analysis. Used
    * by the publish dialog to populate the "Publish into existing"
-   * dropdown. Server has no dedicated endpoint for this yet; we filter
-   * the list client-side by sourceAnalysisId.
+   * dropdown. The list endpoint accepts a `sourceAnalysisId` query
+   * param, so we get pre-filtered rows from the server — no client
+   * fan-out, no silent miss past the page cap.
    */
   async listForAnalysis(params: {
     orgId: string;
@@ -119,13 +111,13 @@ export class DashboardService {
         params: {
           orgId: params.orgId,
           datasourceId: params.datasourceId,
+          sourceAnalysisId: params.analysisId,
           limit: 100,
           page: 1,
         },
       }),
     );
-    const all: any[] = res?.data?.dashboards ?? [];
-    return all.filter((d) => d.sourceAnalysisId === params.analysisId);
+    return res?.data?.dashboards ?? [];
   }
 
   /**
@@ -191,39 +183,5 @@ export class DashboardService {
   resetCurrent(): void {
     this._current.set(null);
     this._rendered.set(null);
-  }
-
-  // ── Legacy aliases (kept for backward compatibility) ──
-
-  addDashboard(payload: any): Promise<any> {
-    return this.add(payload);
-  }
-
-  getDashboard(orgId: string, id: string): Promise<any> {
-    return lastValueFrom(this.http.apiGet(DASHBOARD.GET + `${orgId}/${id}`));
-  }
-
-  listDashboards(params: any): Promise<any> {
-    return lastValueFrom(this.http.apiGet(DASHBOARD.LIST, { params }));
-  }
-
-  renderDashboard(orgId: string, id: string): Promise<any> {
-    return lastValueFrom(this.http.apiGet(DASHBOARD.RENDER + `${orgId}/${id}`));
-  }
-
-  async deleteDashboard(
-    orgId: string,
-    id: string,
-    justification: string,
-  ): Promise<any> {
-    return this.delete(orgId, id, justification);
-  }
-
-  async bulkDeleteDashboard(
-    ids: string[],
-    justification: string | undefined,
-    orgId: string,
-  ): Promise<any> {
-    return this.bulkDelete(ids, justification, orgId);
   }
 }

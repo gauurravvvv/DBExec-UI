@@ -213,12 +213,22 @@ export class AnalysisFilterBarComponent
     // selections so we don't apply stale values to the new analysis.
     if (changes['analysisId'] && !changes['analysisId'].firstChange) {
       this.appliedValues = {};
+      this.fetcherCache.clear();
     }
     if (changes['filters'] && this.filters) {
       // When the host hands us new filters, sync defaults from each
       // filter's saved config. The host has already validated stale
       // values before populating filterStates.
       this.initializeDefaultsFromHosted();
+      // New filter set may have different ids — drop stale cache
+      // entries (a stale closure could leak a different filter's
+      // identity into the dropdown).
+      this.fetcherCache.clear();
+    }
+    if (changes['fetcherFactory']) {
+      // Host replaced the fetcher factory — every cached closure is
+      // now bound to a stale factory reference.
+      this.fetcherCache.clear();
     }
   }
 
@@ -275,25 +285,50 @@ export class AnalysisFilterBarComponent
     }
   }
 
+  /** Per-filter cache of the closure returned by fetcherFor. The
+   *  template binds `[fetcher]="fetcherFor(filter)"`, which runs on
+   *  every CD pass — without memoization each tick produces a new
+   *  closure reference and the dropdown's ngOnChanges treats it as
+   *  a fresh fetcher, potentially re-arming pagination. Cache by
+   *  filter.id and only invalidate when the host's fetcherFactory
+   *  reference itself changes (handled in ngOnChanges). */
+  private fetcherCache = new Map<string, FilterFetcher>();
+
   /** Service-mode fetcher closure — proxies the dropdown's serverMode
    *  calls through the in-process cache so paging + search work
    *  without an extra trip. */
   fetcherFor(filter: any): FilterFetcher {
-    // Hosted mode delegates to the host's fetcherFactory.
+    const cached = this.fetcherCache.get(filter.id);
+    if (cached) return cached;
+
+    let fetcher: FilterFetcher;
     if (!this.serviceMode && this.fetcherFactory) {
-      return this.fetcherFactory(filter);
+      // Hosted mode delegates to the host's fetcherFactory.
+      fetcher = this.fetcherFactory(filter);
+    } else {
+      fetcher = async (args: {
+        search: string;
+        page: number;
+        limit: number;
+      }) => {
+        const result = await this.optionsCache.get(
+          this.analysisId,
+          filter.id,
+          {
+            search: args.search || undefined,
+            page: args.page,
+            pageSize: args.limit,
+            organisation: this.orgId,
+          },
+        );
+        this.applyResultToInternalState(filter.id, result);
+        if (!result.ok) return { items: [], total: 0 };
+        return { items: result.values, total: result.total };
+      };
     }
-    return async (args: { search: string; page: number; limit: number }) => {
-      const result = await this.optionsCache.get(this.analysisId, filter.id, {
-        search: args.search || undefined,
-        page: args.page,
-        pageSize: args.limit,
-        organisation: this.orgId,
-      });
-      this.applyResultToInternalState(filter.id, result);
-      if (!result.ok) return { items: [], total: 0 };
-      return { items: result.values, total: result.total };
-    };
+
+    this.fetcherCache.set(filter.id, fetcher);
+    return fetcher;
   }
 
   private applyResultToInternalState(

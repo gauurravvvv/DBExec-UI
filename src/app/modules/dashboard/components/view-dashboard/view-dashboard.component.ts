@@ -26,7 +26,6 @@ import {
   isSankeyChartType,
 } from '../../../analyses/constants/charts.constants';
 import { Visual } from '../../../analyses/models/visual.model';
-import { AnalysesService } from '../../../analyses/services/analyses.service';
 import { ChartDataTransformerService } from '../../../analyses/services/chart-data-transformer.service';
 import { TranslateService } from '@ngx-translate/core';
 import { FilterFetcher } from 'src/app/shared/components/analysis-filter-bar/analysis-filter-bar.component';
@@ -72,7 +71,7 @@ export class ViewDashboardComponent
         this.orgId,
         this.dashboardId,
         {
-          fieldName: filter?.columnName || filter?.fieldName,
+          fieldName: filter?.columnName,
           search,
           page,
           pageSize: limit,
@@ -149,7 +148,6 @@ export class ViewDashboardComponent
     private router: Router,
     private cdr: ChangeDetectorRef,
     private globalService: GlobalService,
-    private analysesService: AnalysesService,
     private chartDataTransformer: ChartDataTransformerService,
     private translate: TranslateService,
   ) {}
