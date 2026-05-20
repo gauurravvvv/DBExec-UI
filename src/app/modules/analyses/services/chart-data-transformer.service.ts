@@ -28,6 +28,28 @@ const LINES3D_CHART_TYPE = 'lines3d';
 const POLYGONS3D_CHART_TYPE = 'polygons3d';
 const THREE_D_CHART_TYPES = ['bar3d', 'line3d', 'scatter3d'];
 
+// New per-family chart-id sets — match the ECharts-canonical shapes we
+// produce in phase 2. Each set maps a chart family to its dedicated
+// transformer; transformData() dispatches by these first, then falls back
+// to the legacy single-series path for charts that genuinely fit it.
+const MULTI_BAR_CHART_TYPES = [
+  'bar-vertical-2d',
+  'bar-horizontal-2d',
+  'bar-vertical-stacked',
+  'bar-horizontal-stacked',
+  'bar-vertical-normalized',
+  'bar-horizontal-normalized',
+];
+const CANDLESTICK_CHART_TYPE = 'candlestick';
+const HIERARCHY_CHART_TYPES = ['tree-map', 'sunburst', 'tree'];
+const RADAR_CHART_TYPE = 'radar';
+const PARALLEL_CHART_TYPE = 'parallel';
+const THEME_RIVER_CHART_TYPE = 'theme-river';
+const GLOBE_CHART_TYPE = 'globe';
+const WORLD_MAP_CHART_TYPE = 'world-map';
+const LINESGL_CHART_TYPE = 'linesgl';
+const FLOWGL_CHART_TYPE = 'flowgl';
+
 /**
  * Maximum label length for chart categories (prevents overflow)
  */
@@ -95,9 +117,11 @@ export class ChartDataTransformerService {
         return this.transformToSankeyFormat(rawData, mapping);
       }
 
-      // Lines 3D: [[lng, lat], ...] coordinate pairs for globe polyline
+      // Lines 3D: [[lng, lat], ...] coordinate pairs for globe polyline.
+      // When lngColumn/latColumn are explicitly set we use those (geo
+      // canonical); otherwise fall back to xAxis/yAxis as legacy did.
       if (chartType === LINES3D_CHART_TYPE) {
-        return this.transformTo3DFormat(rawData, mapping);
+        return this.transformToGeoLines3D(rawData, mapping);
       }
 
       // Polygons 3D: grouped polygon vertices by name
@@ -108,6 +132,63 @@ export class ChartDataTransformerService {
       // 3D charts need [[x, y, z], ...] coordinate format
       if (THREE_D_CHART_TYPES.includes(chartType)) {
         return this.transformTo3DFormat(rawData, mapping);
+      }
+
+      // ── New per-family transformers (Phase 2) ────────────────────────
+      // Multi-series bars (2D / stacked / normalized) need a wrapped
+      // shape — single series can't stack against itself.
+      if (MULTI_BAR_CHART_TYPES.includes(chartType)) {
+        return this.transformToMultiSeriesByValueColumns(rawData, mapping);
+      }
+
+      // Multi-line / multi-area when valueColumns are populated.
+      // (Single-series fallback covered below.)
+      if (
+        MULTI_SERIES_CHART_TYPES.includes(chartType) &&
+        mapping.valueColumns &&
+        mapping.valueColumns.length > 0
+      ) {
+        return this.transformToMultiSeriesByValueColumns(rawData, mapping);
+      }
+
+      // Candlestick — OHLC ordering matches ECharts canonical [open, close, low, high]
+      if (chartType === CANDLESTICK_CHART_TYPE) {
+        return this.transformToOhlc(rawData, mapping);
+      }
+
+      // Hierarchical — tree/treemap/sunburst with parent column
+      if (HIERARCHY_CHART_TYPES.includes(chartType)) {
+        return this.transformToHierarchy(rawData, mapping);
+      }
+
+      // Radar — one value per indicator axis
+      if (chartType === RADAR_CHART_TYPE) {
+        return this.transformToRadar(rawData, mapping);
+      }
+
+      // Parallel — N-dim row per data point
+      if (chartType === PARALLEL_CHART_TYPE) {
+        return this.transformToParallel(rawData, mapping);
+      }
+
+      // Theme river — [time, value, category] triples
+      if (chartType === THEME_RIVER_CHART_TYPE) {
+        return this.transformToThemeRiver(rawData, mapping);
+      }
+
+      // Globe — [lng, lat, value] triples on geo coord system
+      if (chartType === GLOBE_CHART_TYPE) {
+        return this.transformToGeoLngLatValue(rawData, mapping);
+      }
+
+      // Lines GL — pair-of-points segments
+      if (chartType === LINESGL_CHART_TYPE) {
+        return this.transformToLineSegments(rawData, mapping);
+      }
+
+      // Flow GL — vector field [[x, y, vx, vy]...]
+      if (chartType === FLOWGL_CHART_TYPE) {
+        return this.transformToVectorField(rawData, mapping);
       }
 
       // Standard 2-field transformation
@@ -381,12 +462,17 @@ export class ChartDataTransformerService {
       return [];
     }
 
-    const bubbleData: any[] = [];
+    // ECharts bubble (scatter with size) expects numeric x AND y. When the
+    // x column is non-numeric we substitute the row index as x (treating
+    // bubble as a strip-plot grouped by category label). Previously this
+    // function used `row[xAxisColumn]` twice — once as the category label,
+    // once as the numeric x — which collapsed x to 0 for any category x.
+    const isXNumeric = this.isColumnNumeric(rawData, mapping.xAxisColumn);
     const categoryMap = new Map<string, any[]>();
 
-    rawData.forEach(row => {
+    rawData.forEach((row, rowIdx) => {
       const category = this.formatLabelValue(row[mapping.xAxisColumn!]);
-      const x = this.toNumber(row[mapping.xAxisColumn!]);
+      const x = isXNumeric ? this.toNumber(row[mapping.xAxisColumn!]) : rowIdx;
       const y = this.toNumber(row[mapping.yAxisColumn!]);
       const r = mapping.zAxisColumn
         ? this.toNumber(row[mapping.zAxisColumn])
@@ -420,7 +506,11 @@ export class ChartDataTransformerService {
     rawData: any[],
     mapping: ChartDataMapping,
   ): any[] {
-    if (!mapping.xAxisColumn || !mapping.yAxisColumn) {
+    // Prefer the new `sampleColumn` role (raw samples — the canonical
+    // ECharts input for boxplot). Fall back to yAxisColumn for visuals
+    // created before the role spec existed.
+    const sampleCol = mapping.sampleColumn ?? mapping.yAxisColumn;
+    if (!mapping.xAxisColumn || !sampleCol) {
       return [];
     }
 
@@ -429,7 +519,7 @@ export class ChartDataTransformerService {
     // Group numeric values by category
     rawData.forEach(row => {
       const category = this.formatLabelValue(row[mapping.xAxisColumn!]);
-      const value = this.toNumber(row[mapping.yAxisColumn!]);
+      const value = this.toNumber(row[sampleCol!]);
 
       if (!groupMap.has(category)) {
         groupMap.set(category, []);
@@ -670,5 +760,330 @@ export class ChartDataTransformerService {
     }
 
     return !!(visual.xAxisColumn && visual.yAxisColumn);
+  }
+
+  // ── New per-family transformers (Phase 2) ───────────────────────────────
+
+  /**
+   * Multi-series bars / lines / areas. `xAxisColumn` defines the category;
+   * `yAxisColumn` is the first value series; `valueColumns` carries any
+   * additional series. Output shape matches `MultiSeriesData[]`:
+   *
+   *   [{ name: <seriesName>, series: [{ name: <category>, value: <n> }, ...] }]
+   *
+   * One outer entry per series — that's what every consumer of multi-series
+   * shape (line/area/2D-bar builders) already expects.
+   */
+  private transformToMultiSeriesByValueColumns(
+    rawData: any[],
+    mapping: ChartDataMapping,
+  ): MultiSeriesData[] {
+    if (!mapping.xAxisColumn || !mapping.yAxisColumn) {
+      return [];
+    }
+    const valueCols = [mapping.yAxisColumn!, ...(mapping.valueColumns ?? [])];
+
+    // Aggregate one numeric-or-count per (series, category)
+    return valueCols.map(col => {
+      const isNumeric = this.isColumnNumeric(rawData, col);
+      const aggregated = new Map<string, number>();
+      rawData.forEach(row => {
+        const name = this.formatLabelValue(row[mapping.xAxisColumn!]);
+        const value = isNumeric ? this.toNumber(row[col]) : 1;
+        aggregated.set(name, (aggregated.get(name) ?? 0) + value);
+      });
+      return {
+        name: col,
+        series: Array.from(aggregated.entries()).map(([name, value]) => ({
+          name,
+          value,
+        })),
+      };
+    });
+  }
+
+  /**
+   * Candlestick — `[[open, close, low, high], ...]` per category.
+   * Empty rows or missing role columns surface as `null` data items so
+   * ECharts skips them rather than rendering a zero-height candle.
+   */
+  private transformToOhlc(rawData: any[], mapping: ChartDataMapping): any {
+    const { xAxisColumn, openColumn, highColumn, lowColumn, closeColumn } =
+      mapping;
+    if (
+      !xAxisColumn ||
+      !openColumn ||
+      !highColumn ||
+      !lowColumn ||
+      !closeColumn
+    ) {
+      return { categories: [], values: [] };
+    }
+    const categories: string[] = [];
+    const values: (number[] | null)[] = [];
+    rawData.forEach(row => {
+      categories.push(this.formatLabelValue(row[xAxisColumn]));
+      const o = this.toNumber(row[openColumn]);
+      const c = this.toNumber(row[closeColumn]);
+      const l = this.toNumber(row[lowColumn]);
+      const h = this.toNumber(row[highColumn]);
+      if (!isFinite(o) || !isFinite(c) || !isFinite(l) || !isFinite(h)) {
+        values.push(null);
+      } else {
+        values.push([o, c, l, h]);
+      }
+    });
+    return { categories, values };
+  }
+
+  /**
+   * Hierarchical — tree/treemap/sunburst. Reads `xAxisColumn` (name),
+   * `yAxisColumn` (value), `parentColumn` (parent-name). Rows with a null
+   * or empty parent become roots. Returns a forest (array of trees); the
+   * tree builder wraps a single synthetic root around it if needed.
+   *
+   * If no `parentColumn` is set, returns flat `{name, value}[]` as siblings
+   * of an implicit root — matches old behaviour.
+   */
+  private transformToHierarchy(rawData: any[], mapping: ChartDataMapping): any {
+    const { xAxisColumn, yAxisColumn, parentColumn } = mapping;
+    if (!xAxisColumn || !yAxisColumn) {
+      return [];
+    }
+    if (!parentColumn) {
+      // Legacy flat fallback so visuals without a parent column keep rendering.
+      return rawData
+        .map(row => ({
+          name: this.formatLabelValue(row[xAxisColumn]),
+          value: this.toNumber(row[yAxisColumn]),
+        }))
+        .filter(n => n.name);
+    }
+    // Build a name → node map, then attach children to their parents.
+    const nodes = new Map<string, { name: string; value: number; children: any[] }>();
+    rawData.forEach(row => {
+      const name = this.formatLabelValue(row[xAxisColumn]);
+      const value = this.toNumber(row[yAxisColumn]);
+      if (!name || name === '(empty)') return;
+      if (nodes.has(name)) {
+        // Aggregate duplicate-named rows
+        nodes.get(name)!.value += value;
+      } else {
+        nodes.set(name, { name, value, children: [] });
+      }
+    });
+    const roots: any[] = [];
+    rawData.forEach(row => {
+      const name = this.formatLabelValue(row[xAxisColumn]);
+      const node = nodes.get(name);
+      if (!node) return;
+      const rawParent = row[parentColumn];
+      const parentName =
+        rawParent === null || rawParent === undefined || rawParent === ''
+          ? null
+          : this.formatLabelValue(rawParent);
+      if (parentName === null || parentName === name) {
+        if (!roots.includes(node)) roots.push(node);
+      } else {
+        const parent = nodes.get(parentName);
+        if (parent && !parent.children.includes(node)) {
+          parent.children.push(node);
+        } else if (!parent && !roots.includes(node)) {
+          // Orphan — parent doesn't exist; treat as root so it still renders.
+          roots.push(node);
+        }
+      }
+    });
+    return roots;
+  }
+
+  /**
+   * Radar — `[{name, value: [v1, v2, ...vK]}]`. `xAxisColumn` is the series
+   * name; each row becomes one polygon. `indicatorColumns` defines the K
+   * radar axes (in order). Each indicator's max is derived from the column.
+   */
+  private transformToRadar(rawData: any[], mapping: ChartDataMapping): any {
+    const { xAxisColumn, indicatorColumns } = mapping;
+    if (!xAxisColumn || !indicatorColumns?.length) {
+      return { indicators: [], series: [] };
+    }
+    const indicators = indicatorColumns.map(col => {
+      const max = Math.max(
+        0,
+        ...rawData.map(r => this.toNumber(r[col])).filter(v => isFinite(v)),
+      );
+      return { name: col, max: max || 1 };
+    });
+    const series = rawData.map(row => ({
+      name: this.formatLabelValue(row[xAxisColumn]),
+      value: indicatorColumns.map(col => this.toNumber(row[col])),
+    }));
+    return { indicators, series };
+  }
+
+  /**
+   * Parallel — `[[d0, d1, ...dN], ...]` plus `parallelAxis[]` config. Reads
+   * `dimensionColumns` (ordered). xAxis is optional and, when set, used as
+   * the line-name (legend entry).
+   */
+  private transformToParallel(rawData: any[], mapping: ChartDataMapping): any {
+    const { xAxisColumn, dimensionColumns } = mapping;
+    if (!dimensionColumns?.length) {
+      return { axes: [], data: [] };
+    }
+    const axes = dimensionColumns.map((col, idx) => ({
+      dim: idx,
+      name: col,
+      type: this.isColumnNumeric(rawData, col) ? 'value' : 'category',
+    }));
+    const data = rawData.map(row => {
+      const values = dimensionColumns.map(col => {
+        return this.isColumnNumeric(rawData, col)
+          ? this.toNumber(row[col])
+          : this.formatLabelValue(row[col]);
+      });
+      const name = xAxisColumn
+        ? this.formatLabelValue(row[xAxisColumn])
+        : undefined;
+      return name ? { name, value: values } : values;
+    });
+    return { axes, data };
+  }
+
+  /**
+   * Theme river — `[[time, value, category], ...]`. If `timeColumn` is set
+   * we use its values; otherwise we synthesise a time axis from the row
+   * index so legacy visuals still render (the old behaviour).
+   */
+  private transformToThemeRiver(
+    rawData: any[],
+    mapping: ChartDataMapping,
+  ): any[] {
+    const { xAxisColumn, yAxisColumn, timeColumn } = mapping;
+    if (!xAxisColumn || !yAxisColumn) return [];
+    return rawData.map((row, idx) => {
+      const time = timeColumn ? row[timeColumn] : idx;
+      const value = this.toNumber(row[yAxisColumn]);
+      const category = this.formatLabelValue(row[xAxisColumn]);
+      return [time, value, category];
+    });
+  }
+
+  /**
+   * Globe / geo overlay — `[{value: [lng, lat, value]}, ...]`.
+   * `lngColumn` / `latColumn` are required; `yAxisColumn` (if set)
+   * carries the third numeric value, otherwise 1.
+   */
+  private transformToGeoLngLatValue(
+    rawData: any[],
+    mapping: ChartDataMapping,
+  ): any[] {
+    const { lngColumn, latColumn, yAxisColumn } = mapping;
+    if (!lngColumn || !latColumn) return [];
+    return rawData
+      .map(row => {
+        const lng = this.toNumber(row[lngColumn]);
+        const lat = this.toNumber(row[latColumn]);
+        const value = yAxisColumn ? this.toNumber(row[yAxisColumn]) : 1;
+        return isFinite(lng) && isFinite(lat)
+          ? { value: [lng, lat, value] }
+          : null;
+      })
+      .filter((v): v is { value: number[] } => v !== null);
+  }
+
+  /**
+   * Lines 3D on globe — pair-of-points segments. Prefer lng/lat roles
+   * when set; fall back to x/y for backwards compat (legacy behaviour
+   * was to read xAxis as lng and yAxis as lat).
+   */
+  private transformToGeoLines3D(
+    rawData: any[],
+    mapping: ChartDataMapping,
+  ): any[] {
+    const lngCol = mapping.lngColumn ?? mapping.xAxisColumn;
+    const latCol = mapping.latColumn ?? mapping.yAxisColumn;
+    if (!lngCol || !latCol) return [];
+    return rawData
+      .map(row => {
+        const lng = this.toNumber(row[lngCol]);
+        const lat = this.toNumber(row[latCol]);
+        return isFinite(lng) && isFinite(lat) ? [lng, lat, 0] : null;
+      })
+      .filter((v): v is number[] => v !== null);
+  }
+
+  /**
+   * Lines GL — multi-segment polyline. Each row contributes a vertex; the
+   * builder splits into `[start, end]` pairs.
+   */
+  private transformToLineSegments(
+    rawData: any[],
+    mapping: ChartDataMapping,
+  ): any[] {
+    const lngCol = mapping.lngColumn ?? mapping.xAxisColumn;
+    const latCol = mapping.latColumn ?? mapping.yAxisColumn;
+    if (!lngCol || !latCol) return [];
+    const points: number[][] = [];
+    rawData.forEach(row => {
+      const x = this.toNumber(row[lngCol]);
+      const y = this.toNumber(row[latCol]);
+      if (isFinite(x) && isFinite(y)) points.push([x, y]);
+    });
+    // Build consecutive [start, end] pairs as separate line segments.
+    const segments: any[] = [];
+    for (let i = 0; i < points.length - 1; i++) {
+      segments.push({ coords: [points[i], points[i + 1]] });
+    }
+    return segments;
+  }
+
+  /**
+   * Flow GL — vector field `[[x, y, vx, vy], ...]`. Needs four columns
+   * mapped: x = lngColumn, y = latColumn, vx = xAxisColumn, vy = yAxisColumn
+   * (legacy roles repurposed for the velocity components).
+   */
+  private transformToVectorField(
+    rawData: any[],
+    mapping: ChartDataMapping,
+  ): any[] {
+    const { lngColumn, latColumn, xAxisColumn, yAxisColumn } = mapping;
+    if (!lngColumn || !latColumn || !xAxisColumn || !yAxisColumn) return [];
+    return rawData
+      .map(row => {
+        const x = this.toNumber(row[lngColumn]);
+        const y = this.toNumber(row[latColumn]);
+        const vx = this.toNumber(row[xAxisColumn]);
+        const vy = this.toNumber(row[yAxisColumn]);
+        return isFinite(x) && isFinite(y) && isFinite(vx) && isFinite(vy)
+          ? [x, y, vx, vy]
+          : null;
+      })
+      .filter((v): v is number[] => v !== null);
+  }
+
+  /**
+   * Build a ChartDataMapping from a Visual — central helper consumed by all
+   * the call sites so they don't each have to know which role columns to
+   * forward. New roles added to Visual only need to be added here.
+   */
+  buildMapping(visual: any): ChartDataMapping {
+    return {
+      xAxisColumn: visual.xAxisColumn ?? null,
+      yAxisColumn: visual.yAxisColumn ?? null,
+      zAxisColumn: visual.zAxisColumn ?? null,
+      openColumn: visual.openColumn ?? null,
+      highColumn: visual.highColumn ?? null,
+      lowColumn: visual.lowColumn ?? null,
+      closeColumn: visual.closeColumn ?? null,
+      sampleColumn: visual.sampleColumn ?? null,
+      parentColumn: visual.parentColumn ?? null,
+      indicatorColumns: visual.indicatorColumns ?? [],
+      dimensionColumns: visual.dimensionColumns ?? [],
+      valueColumns: visual.valueColumns ?? [],
+      lngColumn: visual.lngColumn ?? null,
+      latColumn: visual.latColumn ?? null,
+      timeColumn: visual.timeColumn ?? null,
+    };
   }
 }

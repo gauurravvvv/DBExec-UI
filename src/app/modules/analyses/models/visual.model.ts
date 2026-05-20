@@ -30,12 +30,27 @@ export type MultiSeriesData = ChartSeriesData;
 export type ChartData = ChartDataPoint[] | ChartSeriesData[];
 
 /**
- * Data mapping configuration for chart axes
+ * Data mapping configuration for chart axes. Carries the legacy 3-slot model
+ * AND the new per-chart roles — the transformer reads whichever ones the
+ * chart's roles spec actually needs.
  */
 export interface ChartDataMapping {
   xAxisColumn: string | null;
   yAxisColumn: string | null;
   zAxisColumn?: string | null;
+  // Extended roles — optional, populated only for chart types that need them
+  openColumn?: string | null;
+  highColumn?: string | null;
+  lowColumn?: string | null;
+  closeColumn?: string | null;
+  sampleColumn?: string | null;
+  parentColumn?: string | null;
+  indicatorColumns?: string[];
+  dimensionColumns?: string[];
+  valueColumns?: string[];
+  lngColumn?: string | null;
+  latColumn?: string | null;
+  timeColumn?: string | null;
 }
 
 /**

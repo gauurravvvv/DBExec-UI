@@ -1024,11 +1024,7 @@ export class EditAnalysesComponent
       visual.chartData = this.chartDataTransformer.transformData(
         visual.chartType,
         this.rawGraphData,
-        {
-          xAxisColumn: visual.xAxisColumn,
-          yAxisColumn: visual.yAxisColumn,
-          zAxisColumn: visual.zAxisColumn,
-        },
+        this.chartDataTransformer.buildMapping(visual),
       );
     }
   }
@@ -1051,11 +1047,7 @@ export class EditAnalysesComponent
     visual.chartData = this.chartDataTransformer.transformData(
       visual.chartType,
       this.rawGraphData,
-      {
-        xAxisColumn: visual.xAxisColumn,
-        yAxisColumn: visual.yAxisColumn,
-        zAxisColumn: visual.zAxisColumn,
-      },
+      this.chartDataTransformer.buildMapping(visual),
     );
   }
 

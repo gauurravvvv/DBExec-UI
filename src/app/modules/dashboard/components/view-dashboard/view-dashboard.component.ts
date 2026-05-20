@@ -367,15 +367,10 @@ export class ViewDashboardComponent
   transformAllVisuals(): void {
     this.visuals.forEach(visual => {
       if (visual.chartType && visual.xAxisColumn && visual.yAxisColumn) {
-        const mapping = {
-          xAxisColumn: visual.xAxisColumn,
-          yAxisColumn: visual.yAxisColumn,
-          zAxisColumn: visual.zAxisColumn || null,
-        };
         visual.chartData = this.chartDataTransformer.transformData(
           visual.chartType,
           this.rawData,
-          mapping,
+          this.chartDataTransformer.buildMapping(visual),
         ) as any[];
         visual.loading = false;
         visual.loaded = true;
