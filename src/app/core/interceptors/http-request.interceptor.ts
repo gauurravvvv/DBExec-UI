@@ -6,7 +6,7 @@ import {
   HttpRequest,
   HttpResponse,
 } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -26,10 +26,28 @@ export class HttpRequestInterceptor implements HttpInterceptor {
   private refreshTokenSubject: BehaviorSubject<string | null> =
     new BehaviorSubject<string | null>(null);
 
+  /**
+   * `LoginService` is resolved lazily through `Injector` instead of being
+   * constructor-injected. Direct injection used to create a circular DI
+   * cycle (NG0200): this interceptor sits inside the `HTTP_INTERCEPTORS`
+   * multi-provider, and `LoginService` → `HttpClientService` → `HttpClient`
+   * needs `HTTP_INTERCEPTORS` to be fully resolved before it can be
+   * built. Deferring the lookup to method-call time lets Angular finish
+   * constructing the interceptor chain first, then on the first refresh-
+   * token request the `LoginService` is materialised — by which point
+   * `HttpClient` is available.
+   *
+   * Documented Angular pattern:
+   * https://angular.dev/errors/NG0200
+   */
+  private get loginService(): LoginService {
+    return this.injector.get(LoginService);
+  }
+
   constructor(
     private loadingService: LoadingService,
     private router: Router,
-    private loginService: LoginService,
+    private injector: Injector,
     private sessionExpiredService: SessionExpiredService,
     private translate: TranslateService,
   ) {}
