@@ -6,13 +6,8 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {
-  hasAxisLabels,
-  is3DCoordinateChartType,
+  getChartRoles,
   isCardChartType,
-  isGraphChartType,
-  isHeatMapChartType,
-  isLines3dChartType,
-  isSankeyChartType,
   isTableChartType,
 } from '../../constants/charts.constants';
 import { Visual } from '../../models';
@@ -74,23 +69,38 @@ export class ChartRendererComponent implements OnChanges {
 
   hasRequiredChartFields(visual: Visual): boolean {
     if (!visual.chartType) return false;
-    if (is3DCoordinateChartType(visual.chartType)) {
-      return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);
+    // Role-spec driven: same logic as edit-analyses (single source of
+    // truth in CHART_ROLES). Each chart declares its required roles
+    // and the validator just walks them.
+    const spec = getChartRoles(visual.chartType);
+    return spec.required.every(role => this.hasRoleValue(visual, role));
+  }
+
+  private hasRoleValue(visual: any, role: string): boolean {
+    switch (role) {
+      case 'xAxis': return !!visual.xAxisColumn;
+      case 'yAxis': return !!visual.yAxisColumn;
+      case 'zAxis': return !!visual.zAxisColumn;
+      case 'open': return !!visual.openColumn;
+      case 'high': return !!visual.highColumn;
+      case 'low': return !!visual.lowColumn;
+      case 'close': return !!visual.closeColumn;
+      case 'sample': return !!visual.sampleColumn;
+      case 'parent': return !!visual.parentColumn;
+      case 'lng': return !!visual.lngColumn;
+      case 'lat': return !!visual.latColumn;
+      case 'time': return !!visual.timeColumn;
+      case 'indicators':
+        return Array.isArray(visual.indicatorColumns) &&
+          visual.indicatorColumns.length > 0;
+      case 'dimensions':
+        return Array.isArray(visual.dimensionColumns) &&
+          visual.dimensionColumns.length > 0;
+      case 'valueColumns':
+        return Array.isArray(visual.valueColumns) &&
+          visual.valueColumns.length > 0;
+      default: return false;
     }
-    if (isLines3dChartType(visual.chartType)) {
-      return !!(visual.xAxisColumn && visual.yAxisColumn);
-    }
-    if (!hasAxisLabels(visual.chartType)) {
-      return !!(visual.xAxisColumn || visual.yAxisColumn);
-    }
-    if (
-      isHeatMapChartType(visual.chartType) ||
-      isSankeyChartType(visual.chartType) ||
-      isGraphChartType(visual.chartType)
-    ) {
-      return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);
-    }
-    return !!(visual.xAxisColumn && visual.yAxisColumn);
   }
 
   getDisplayData(visual: Visual): any {

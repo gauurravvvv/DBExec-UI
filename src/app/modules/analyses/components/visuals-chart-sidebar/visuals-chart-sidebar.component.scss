@@ -295,6 +295,62 @@
       border-style: solid;
     }
   }
+
+  // List-valued role slot — radar indicators, parallel dimensions,
+  // multi-series valueColumns. The slot stays as a container with chips
+  // inside instead of behaving like a click-to-pick zone.
+  &.multi {
+    cursor: default;
+
+    &:hover {
+      border-color: var(--border-color);
+      background-color: var(--card-background);
+    }
+  }
+}
+
+// Chip strip inside a multi role slot. Each picked column shows as a chip;
+// the trailing "+ Add Column" pseudo-chip starts a new pick.
+.axis-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.axis-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background-color: var(--primary-color-transparent);
+  border: 1px solid var(--primary-color);
+  border-radius: 999px;
+  font-size: var(--fs-micro);
+  color: var(--text-color);
+
+  i.pi-times {
+    cursor: pointer;
+    opacity: 0.6;
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &.add-chip {
+    background-color: transparent;
+    border-style: dashed;
+    border-color: var(--border-strong);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition:
+      border-color var(--motion-fast) ease,
+      color var(--motion-fast) ease;
+
+    &:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+  }
 }
 
 // Axis label: tiny muted caption — "X-Axis", "Y-Axis", "Row", "Source"...

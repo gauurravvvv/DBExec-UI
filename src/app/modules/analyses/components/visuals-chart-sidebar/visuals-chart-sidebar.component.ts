@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import {
   CHART_TYPES,
+  getChartRoles,
   hasAxisLabels,
   is3DCoordinateChartType,
   isBubbleChartType,
@@ -17,7 +18,48 @@ import {
   isSankeyChartType,
   isTableChartType,
 } from '../../constants/charts.constants';
-import { Visual } from '../../models';
+import { RoleKey, Visual } from '../../models/visual.model';
+
+/**
+ * A single slot in the field-mapping panel. Driven by the chart's
+ * `roles` spec in charts.constants. Lets the same template render every
+ * chart type's field pickers without hardcoded blocks per chart family.
+ */
+interface RoleSlot {
+  key: RoleKey;
+  label: string;
+  required: boolean;
+  /** true for list-valued roles (indicators, dimensions, valueColumns) */
+  multi: boolean;
+}
+
+/**
+ * Human-readable label for each role. Centralised here so future
+ * localisation (i18n keys) only has to change one place.
+ */
+const ROLE_LABELS: Record<RoleKey, string> = {
+  xAxis: 'X-Axis',
+  yAxis: 'Y-Axis',
+  zAxis: 'Z-Axis',
+  open: 'Open',
+  high: 'High',
+  low: 'Low',
+  close: 'Close',
+  sample: 'Sample (raw values)',
+  parent: 'Parent (hierarchy)',
+  indicators: 'Indicator Columns',
+  dimensions: 'Dimension Columns',
+  valueColumns: 'Value Columns',
+  lng: 'Longitude',
+  lat: 'Latitude',
+  time: 'Time',
+};
+
+const LIST_VALUED_ROLES: ReadonlySet<RoleKey> = new Set<RoleKey>([
+  'indicators',
+  'dimensions',
+  'valueColumns',
+]);
 
 @Component({
   selector: 'app-visuals-chart-sidebar',
@@ -31,12 +73,17 @@ export class VisualsChartSidebarComponent {
   @Input() focusedVisual!: Visual;
   @Input() focusedVisualId: string | null = null;
   @Input() isDataLoaded = false;
-  @Input() activeAxisSelection: 'x' | 'y' | 'z' | null = null;
+  /**
+   * Which role slot is currently waiting for a column pick. Generalised
+   * from the legacy `'x' | 'y' | 'z'` to any RoleKey so the same selection
+   * mechanism drives every chart-type's field roles.
+   */
+  @Input() activeAxisSelection: RoleKey | null = null;
   @Input() allFields: any[] = [];
 
   @Output() addVisualClicked = new EventEmitter<void>();
   @Output() chartTypeSelected = new EventEmitter<void>();
-  @Output() axisSelectionStarted = new EventEmitter<'x' | 'y' | 'z' | null>();
+  @Output() axisSelectionStarted = new EventEmitter<RoleKey | null>();
   @Output() axisFieldCleared = new EventEmitter<void>();
 
   // Chart type checkers
@@ -107,18 +154,163 @@ export class VisualsChartSidebarComponent {
     }
   }
 
-  startAxisSelection(axis: 'x' | 'y' | 'z'): void {
-    const newValue = this.activeAxisSelection === axis ? null : axis;
+  startAxisSelection(role: RoleKey): void {
+    const newValue = this.activeAxisSelection === role ? null : role;
     this.axisSelectionStarted.emit(newValue);
   }
 
-  clearAxisField(axis: 'x' | 'y' | 'z', event: Event): void {
+  clearAxisField(role: RoleKey, event: Event): void {
     event.stopPropagation();
     if (!this.focusedVisual) return;
-    if (axis === 'x') this.focusedVisual.xAxisColumn = null;
-    else if (axis === 'y') this.focusedVisual.yAxisColumn = null;
-    else if (axis === 'z') this.focusedVisual.zAxisColumn = null;
+    this.clearRoleOnVisual(this.focusedVisual, role);
     this.axisFieldCleared.emit();
+  }
+
+  /**
+   * Centralised setter — write a column name into the Visual field that
+   * the role points to. Used by the parent's onFieldClick after the user
+   * picks a column from the field tree.
+   */
+  setRoleOnVisual(visual: any, role: RoleKey, columnName: string): void {
+    switch (role) {
+      case 'xAxis': visual.xAxisColumn = columnName; break;
+      case 'yAxis': visual.yAxisColumn = columnName; break;
+      case 'zAxis': visual.zAxisColumn = columnName; break;
+      case 'open': visual.openColumn = columnName; break;
+      case 'high': visual.highColumn = columnName; break;
+      case 'low': visual.lowColumn = columnName; break;
+      case 'close': visual.closeColumn = columnName; break;
+      case 'sample': visual.sampleColumn = columnName; break;
+      case 'parent': visual.parentColumn = columnName; break;
+      case 'lng': visual.lngColumn = columnName; break;
+      case 'lat': visual.latColumn = columnName; break;
+      case 'time': visual.timeColumn = columnName; break;
+      case 'indicators': {
+        if (!Array.isArray(visual.indicatorColumns)) visual.indicatorColumns = [];
+        if (!visual.indicatorColumns.includes(columnName)) {
+          visual.indicatorColumns = [...visual.indicatorColumns, columnName];
+        }
+        break;
+      }
+      case 'dimensions': {
+        if (!Array.isArray(visual.dimensionColumns)) visual.dimensionColumns = [];
+        if (!visual.dimensionColumns.includes(columnName)) {
+          visual.dimensionColumns = [...visual.dimensionColumns, columnName];
+        }
+        break;
+      }
+      case 'valueColumns': {
+        if (!Array.isArray(visual.valueColumns)) visual.valueColumns = [];
+        if (!visual.valueColumns.includes(columnName)) {
+          visual.valueColumns = [...visual.valueColumns, columnName];
+        }
+        break;
+      }
+    }
+  }
+
+  private clearRoleOnVisual(visual: any, role: RoleKey): void {
+    switch (role) {
+      case 'xAxis': visual.xAxisColumn = null; break;
+      case 'yAxis': visual.yAxisColumn = null; break;
+      case 'zAxis': visual.zAxisColumn = null; break;
+      case 'open': visual.openColumn = null; break;
+      case 'high': visual.highColumn = null; break;
+      case 'low': visual.lowColumn = null; break;
+      case 'close': visual.closeColumn = null; break;
+      case 'sample': visual.sampleColumn = null; break;
+      case 'parent': visual.parentColumn = null; break;
+      case 'lng': visual.lngColumn = null; break;
+      case 'lat': visual.latColumn = null; break;
+      case 'time': visual.timeColumn = null; break;
+      case 'indicators': visual.indicatorColumns = []; break;
+      case 'dimensions': visual.dimensionColumns = []; break;
+      case 'valueColumns': visual.valueColumns = []; break;
+    }
+  }
+
+  /**
+   * Look up the column-name currently bound to a role. Returns array for
+   * list-valued roles, string for scalar roles. Template uses this to
+   * render the chip(s) inside each slot.
+   */
+  getRoleValue(role: RoleKey): string | string[] | null {
+    const v = this.focusedVisual as any;
+    if (!v) return null;
+    switch (role) {
+      case 'xAxis': return v.xAxisColumn ?? null;
+      case 'yAxis': return v.yAxisColumn ?? null;
+      case 'zAxis': return v.zAxisColumn ?? null;
+      case 'open': return v.openColumn ?? null;
+      case 'high': return v.highColumn ?? null;
+      case 'low': return v.lowColumn ?? null;
+      case 'close': return v.closeColumn ?? null;
+      case 'sample': return v.sampleColumn ?? null;
+      case 'parent': return v.parentColumn ?? null;
+      case 'lng': return v.lngColumn ?? null;
+      case 'lat': return v.latColumn ?? null;
+      case 'time': return v.timeColumn ?? null;
+      case 'indicators': return v.indicatorColumns ?? [];
+      case 'dimensions': return v.dimensionColumns ?? [];
+      case 'valueColumns': return v.valueColumns ?? [];
+    }
+  }
+
+  /**
+   * Drives the dynamic field-mapping template — returns the ordered list
+   * of role slots to render for the current chart type. Required slots
+   * appear first, optional slots second.
+   */
+  getRoleSlots(): RoleSlot[] {
+    const spec = getChartRoles(this.focusedVisual?.chartType ?? null);
+    const slots: RoleSlot[] = [];
+    spec.required.forEach(key =>
+      slots.push({
+        key,
+        label: ROLE_LABELS[key] ?? key,
+        required: true,
+        multi: LIST_VALUED_ROLES.has(key),
+      }),
+    );
+    spec.optional.forEach(key =>
+      slots.push({
+        key,
+        label: ROLE_LABELS[key] ?? key,
+        required: false,
+        multi: LIST_VALUED_ROLES.has(key),
+      }),
+    );
+    return slots;
+  }
+
+  /** Remove a single item from a list-valued role (chip × button). */
+  removeFromMultiRole(role: RoleKey, columnName: string, event: Event): void {
+    event.stopPropagation();
+    if (!this.focusedVisual) return;
+    const v = this.focusedVisual as any;
+    if (role === 'indicators') {
+      v.indicatorColumns = (v.indicatorColumns ?? []).filter(
+        (c: string) => c !== columnName,
+      );
+    } else if (role === 'dimensions') {
+      v.dimensionColumns = (v.dimensionColumns ?? []).filter(
+        (c: string) => c !== columnName,
+      );
+    } else if (role === 'valueColumns') {
+      v.valueColumns = (v.valueColumns ?? []).filter(
+        (c: string) => c !== columnName,
+      );
+    }
+    this.axisFieldCleared.emit();
+  }
+
+  /** Type-guard for the template — returns true when value is an array. */
+  asArray(v: string | string[] | null): string[] {
+    return Array.isArray(v) ? v : [];
+  }
+
+  asScalar(v: string | string[] | null): string | null {
+    return Array.isArray(v) ? null : v;
   }
 
   getFieldDisplayName(columnToUse: string | null): string {

@@ -25,6 +25,7 @@ import { DashboardService } from 'src/app/modules/dashboard/services/dashboard.s
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import {
   CHART_TYPES,
+  getChartRoles,
   getDefaultChartConfig,
   getMissingFieldsForVisual,
   hasAxisLabels,
@@ -39,6 +40,7 @@ import {
   isWorldMapChartType,
 } from '../../constants/charts.constants';
 import { createVisual, Visual } from '../../models';
+import { RoleKey } from '../../models/visual.model';
 import { ChartDataTransformerService } from '../../services';
 import { AnalysesService } from '../../services/analyses.service';
 import {
@@ -311,7 +313,7 @@ export class EditAnalysesComponent
   editingTitleId: string | null = null;
 
   // Axis selection mode
-  activeAxisSelection: 'x' | 'y' | 'z' | null = null;
+  activeAxisSelection: RoleKey | null = null;
 
   // Canvas container reference and dimensions for responsive sizing
   @ViewChild('canvasContainer') canvasContainer!: ElementRef<HTMLDivElement>;
@@ -1705,27 +1707,41 @@ export class EditAnalysesComponent
     // are non-empty strings. The template uses this to swap chart
     // render for a re-map prompt.
     if (this.getMissingFields(visual).length > 0) return false;
-    // 3D coordinate charts need x + y + z
-    if (is3DCoordinateChartType(visual.chartType)) {
-      return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);
+    // Role-spec driven validation: each chart declares its required
+    // roles in CHART_ROLES (charts.constants.ts). Single source of
+    // truth — same spec drives sidebar pickers + transformer dispatch.
+    const spec = getChartRoles(visual.chartType);
+    return spec.required.every(role => this.hasRoleValue(visual, role));
+  }
+
+  /**
+   * Has the user configured a non-empty value for this role on the visual?
+   * Scalar roles → non-empty string; list-valued roles → non-empty array.
+   */
+  private hasRoleValue(visual: any, role: RoleKey): boolean {
+    switch (role) {
+      case 'xAxis': return !!visual.xAxisColumn;
+      case 'yAxis': return !!visual.yAxisColumn;
+      case 'zAxis': return !!visual.zAxisColumn;
+      case 'open': return !!visual.openColumn;
+      case 'high': return !!visual.highColumn;
+      case 'low': return !!visual.lowColumn;
+      case 'close': return !!visual.closeColumn;
+      case 'sample': return !!visual.sampleColumn;
+      case 'parent': return !!visual.parentColumn;
+      case 'lng': return !!visual.lngColumn;
+      case 'lat': return !!visual.latColumn;
+      case 'time': return !!visual.timeColumn;
+      case 'indicators':
+        return Array.isArray(visual.indicatorColumns) &&
+          visual.indicatorColumns.length > 0;
+      case 'dimensions':
+        return Array.isArray(visual.dimensionColumns) &&
+          visual.dimensionColumns.length > 0;
+      case 'valueColumns':
+        return Array.isArray(visual.valueColumns) &&
+          visual.valueColumns.length > 0;
     }
-    // lines3d needs longitude AND latitude (x + y), even though it has no axis labels
-    if (isLines3dChartType(visual.chartType)) {
-      return !!(visual.xAxisColumn && visual.yAxisColumn);
-    }
-    // No-axis charts only need at least one field
-    if (!hasAxisLabels(visual.chartType)) {
-      return !!(visual.xAxisColumn || visual.yAxisColumn);
-    }
-    // 3-axis charts: heat-map, sankey, graph need x + y + z
-    if (
-      isHeatMapChartType(visual.chartType) ||
-      isSankeyChartType(visual.chartType) ||
-      isGraphChartType(visual.chartType)
-    ) {
-      return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);
-    }
-    return !!(visual.xAxisColumn && visual.yAxisColumn);
   }
 
   removeVisual(id: string): void {
@@ -1833,9 +1849,9 @@ export class EditAnalysesComponent
     visual.config.tableHiddenColumns = [...cols];
   }
 
-  onAxisSelectionStarted(axis: 'x' | 'y' | 'z' | null): void {
-    this.activeAxisSelection = axis;
-    if (axis && !this.isFieldsPanelOpen) {
+  onAxisSelectionStarted(role: RoleKey | null): void {
+    this.activeAxisSelection = role;
+    if (role && !this.isFieldsPanelOpen) {
       if (this.isVisualListPanelOpen) {
         this.isVisualListPanelOpen = false;
       }
@@ -1871,23 +1887,67 @@ export class EditAnalysesComponent
       if (visual) {
         // Use columnToUse — this is the actual key in the raw data rows
         const fieldName = field.columnToUse || field.columnToView;
-
-        if (this.activeAxisSelection === 'x') {
-          visual.xAxisColumn = fieldName;
-        } else if (this.activeAxisSelection === 'y') {
-          visual.yAxisColumn = fieldName;
-        } else if (this.activeAxisSelection === 'z') {
-          visual.zAxisColumn = fieldName;
-        }
-
-        // Update chart data if required axes are set
+        // Centralised setter: writes the column into the role-specific
+        // Visual field. List-valued roles (indicators/dimensions/
+        // valueColumns) keep the active selection open so the user can
+        // pick more columns without re-clicking the slot.
+        this.applyRoleSelection(visual, this.activeAxisSelection, fieldName);
         this.updateVisualChartData(visual);
+        const stayOpen =
+          this.activeAxisSelection === 'indicators' ||
+          this.activeAxisSelection === 'dimensions' ||
+          this.activeAxisSelection === 'valueColumns';
+        if (!stayOpen) {
+          this.activeAxisSelection = null;
+        }
+        this.cdr.markForCheck();
+      }
+    }
+  }
 
-        // Clear selection mode after assignment
-        this.activeAxisSelection = null;
-        // Trigger change detection to update the UI
-        this.cdr.markForCheck();
-        this.cdr.markForCheck();
+  /**
+   * Apply a column pick to the right Visual field based on the active role.
+   * List-valued roles append uniquely; scalar roles overwrite. Mirrors the
+   * sidebar's setRoleOnVisual so both paths converge on the same model.
+   */
+  private applyRoleSelection(
+    visual: any,
+    role: RoleKey,
+    columnName: string,
+  ): void {
+    switch (role) {
+      case 'xAxis': visual.xAxisColumn = columnName; break;
+      case 'yAxis': visual.yAxisColumn = columnName; break;
+      case 'zAxis': visual.zAxisColumn = columnName; break;
+      case 'open': visual.openColumn = columnName; break;
+      case 'high': visual.highColumn = columnName; break;
+      case 'low': visual.lowColumn = columnName; break;
+      case 'close': visual.closeColumn = columnName; break;
+      case 'sample': visual.sampleColumn = columnName; break;
+      case 'parent': visual.parentColumn = columnName; break;
+      case 'lng': visual.lngColumn = columnName; break;
+      case 'lat': visual.latColumn = columnName; break;
+      case 'time': visual.timeColumn = columnName; break;
+      case 'indicators': {
+        if (!Array.isArray(visual.indicatorColumns)) visual.indicatorColumns = [];
+        if (!visual.indicatorColumns.includes(columnName)) {
+          visual.indicatorColumns = [...visual.indicatorColumns, columnName];
+        }
+        break;
+      }
+      case 'dimensions': {
+        if (!Array.isArray(visual.dimensionColumns)) visual.dimensionColumns = [];
+        if (!visual.dimensionColumns.includes(columnName)) {
+          visual.dimensionColumns = [...visual.dimensionColumns, columnName];
+        }
+        break;
+      }
+      case 'valueColumns': {
+        if (!Array.isArray(visual.valueColumns)) visual.valueColumns = [];
+        if (!visual.valueColumns.includes(columnName)) {
+          visual.valueColumns = [...visual.valueColumns, columnName];
+        }
+        break;
       }
     }
   }
