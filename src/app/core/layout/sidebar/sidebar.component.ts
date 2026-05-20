@@ -59,21 +59,11 @@ export class SidebarComponent implements OnInit {
   private peekLeaveTimer: ReturnType<typeof setTimeout> | null = null;
 
   /**
-   * Delay before a hovered parent-with-children auto-expands. The user
-   * has to keep the cursor on the item for this long before the
-   * submenu opens — stops the sidebar from flickering open on every
-   * sweep past a parent row. 200ms matches the OS-level hover-intent
-   * timings macOS/Windows menus use.
+   * localStorage key holding the set of expanded parent `value`s so the
+   * user's open branches survive page refreshes — the small-but-important
+   * detail Linear/Notion/Vercel sidebars all do.
    */
-  private static readonly HOVER_EXPAND_DELAY = 200;
-  /** Per-item pending-expand timer. Keyed by the menu item itself so
-   *  multiple parents can be hovered in sequence without interfering.
-   *  Regular Map (not WeakMap) so we can iterate and clear all
-   *  pending timers on full-sidebar leave. */
-  private hoverExpandTimers = new Map<
-    MenuItem,
-    ReturnType<typeof setTimeout>
-  >();
+  private static readonly EXPANDED_STORAGE_KEY = 'sidebar.expanded';
 
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
@@ -85,6 +75,9 @@ export class SidebarComponent implements OnInit {
   ) {
     const permissions = this.globalService.getTokenDetails('permission');
     this.menuItems = this.processMenuItems(permissions);
+    // Restore the user's previously-expanded branches from localStorage
+    // so a page refresh doesn't reset their open tree.
+    this.restoreExpandedState();
   }
 
   ngOnInit() {
@@ -156,11 +149,6 @@ export class SidebarComponent implements OnInit {
   private clearPeekTimers(): void {
     this.cancelPeekEnter();
     this.cancelPeekLeave();
-    // Drop any pending hover-expand timers too — they were scheduled
-    // for items the user is no longer hovering, and if the rail just
-    // collapsed there's nothing for them to open onto.
-    this.hoverExpandTimers.forEach(t => clearTimeout(t));
-    this.hoverExpandTimers.clear();
   }
 
   private recomputeExpanded(): void {
@@ -255,32 +243,83 @@ export class SidebarComponent implements OnInit {
     });
   }
 
+  /**
+   * Click toggle. Linear/Notion/Vercel-style: click-only interaction, no
+   * hover-expand, no accordion auto-collapse — every branch the user
+   * opens stays open until they click it again. Multiple branches can
+   * be open simultaneously, which is the modern minimal-sidebar pattern.
+   *
+   * Closing a parent still cascades to its descendants so re-opening
+   * the parent shows it in a clean state.
+   */
   toggleSubmenuAndExpand(item: MenuItem) {
     if (!this.isExpanded) {
-      // Coming from collapsed → click on a parent icon should pin the
-      // sidebar open (the user made a deliberate choice) and then open
-      // this branch on the next tick once the width transition kicks in.
+      // Coming from collapsed → click on a parent icon pins the rail
+      // open (deliberate choice). Branch opens on the next tick once
+      // the width transition has started.
       this.clearPeekTimers();
       this.isPinnedOpen = true;
       this.recomputeExpanded();
       setTimeout(() => {
-        this.collapseSiblingsOf(item);
         item.isExpanded = true;
+        this.persistExpandedState();
         this.cdr.markForCheck();
       }, 100);
-    } else {
-      const opening = !item.isExpanded;
-      // Accordion behaviour: opening this branch collapses every sibling
-      // at the same level (and their descendants). Without this the user
-      // can build up a deep stack of open branches that quickly fills
-      // the rail and forces scrolling.
-      if (opening) this.collapseSiblingsOf(item);
-      item.isExpanded = opening;
-      // Closing a parent must also close everything under it, otherwise
-      // descendants keep their isExpanded=true state and pop back open the
-      // next time the parent is re-opened.
-      if (!opening) this.collapseDescendants(item);
-      this.cdr.markForCheck();
+      return;
+    }
+    const opening = !item.isExpanded;
+    item.isExpanded = opening;
+    if (!opening) this.collapseDescendants(item);
+    this.persistExpandedState();
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Persist the set of currently-expanded parent `value`s to
+   * localStorage so the open state survives a page refresh. Matches
+   * what every modern SaaS sidebar does — Linear, Notion, Vercel,
+   * Supabase, GitHub all remember which branches you opened.
+   */
+  private persistExpandedState(): void {
+    try {
+      const open: string[] = [];
+      const collect = (items: MenuItem[]) => {
+        for (const i of items) {
+          if (i.isExpanded && i.value) open.push(i.value);
+          if (i.subPermissions?.length) collect(i.subPermissions);
+        }
+      };
+      collect(this.menuItems);
+      localStorage.setItem(
+        SidebarComponent.EXPANDED_STORAGE_KEY,
+        JSON.stringify(open),
+      );
+    } catch {
+      // localStorage can be unavailable (private mode, quota, etc.).
+      // Persistence is a nicety, not a correctness requirement.
+    }
+  }
+
+  /**
+   * Restore the expanded set saved by `persistExpandedState`. Walks
+   * the freshly-built menu tree and flips `isExpanded` on any parent
+   * whose `value` is in the stored set. Falls back to noop when the
+   * key isn't present (first-ever visit) or localStorage is blocked.
+   */
+  private restoreExpandedState(): void {
+    try {
+      const raw = localStorage.getItem(SidebarComponent.EXPANDED_STORAGE_KEY);
+      if (!raw) return;
+      const set = new Set<string>(JSON.parse(raw) as string[]);
+      const apply = (items: MenuItem[]) => {
+        for (const i of items) {
+          if (i.value && set.has(i.value)) i.isExpanded = true;
+          if (i.subPermissions?.length) apply(i.subPermissions);
+        }
+      };
+      apply(this.menuItems);
+    } catch {
+      // Stored payload was malformed or storage was blocked — ignore.
     }
   }
 
@@ -289,95 +328,6 @@ export class SidebarComponent implements OnInit {
     for (const child of item.subPermissions) {
       child.isExpanded = false;
       this.collapseDescendants(child);
-    }
-  }
-
-  /**
-   * Collapse every sibling of `target` at the same level (and their
-   * descendants). Drives the accordion rule "only one branch open per
-   * level at a time" without forcing the caller to know about the tree
-   * structure. Walks the menu tree to find the sibling array containing
-   * `target`, then closes the others.
-   *
-   * Called from both the click path (toggleSubmenuAndExpand) and the
-   * hover-expand timer so both interaction modes converge on the same
-   * one-branch-open invariant.
-   */
-  private collapseSiblingsOf(target: MenuItem): void {
-    const siblings = this.findSiblings(target, this.menuItems);
-    if (!siblings) return;
-    for (const sibling of siblings) {
-      if (sibling === target) continue;
-      if (!sibling.isExpanded) continue;
-      sibling.isExpanded = false;
-      this.collapseDescendants(sibling);
-    }
-  }
-
-  /**
-   * Recursive search for the array that holds `target` as a direct
-   * child. Returns null if not found (shouldn't happen in practice,
-   * but defensive in case a stale item reference is passed in).
-   */
-  private findSiblings(
-    target: MenuItem,
-    list: MenuItem[],
-  ): MenuItem[] | null {
-    if (list.includes(target)) return list;
-    for (const item of list) {
-      if (item.subPermissions?.length) {
-        const found = this.findSiblings(target, item.subPermissions);
-        if (found) return found;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Mouse enters a parent-with-children row. Schedule an auto-expand
-   * after HOVER_EXPAND_DELAY — if the cursor stays on this row long
-   * enough, the submenu opens without a click. Brief sweeps past the
-   * row cancel the timer in onParentMouseLeave before it fires.
-   *
-   * No-ops when the sidebar is collapsed (only the icon rail is
-   * visible — submenus are positioned absolutely and hovering the
-   * narrow icon shouldn't snap a panel open before the rail itself
-   * expands), and no-ops when the item is already expanded.
-   */
-  onParentMouseEnter(item: MenuItem): void {
-    if (!this.isExpanded) return;
-    if (!item.subPermissions?.length) return;
-    if (item.isExpanded) return;
-    if (this.hoverExpandTimers.has(item)) return;
-    const t = setTimeout(() => {
-      this.hoverExpandTimers.delete(item);
-      // Re-check the gating conditions at fire time — the user may have
-      // collapsed the rail, clicked the item, or navigated away during
-      // the delay.
-      if (!this.isExpanded || !item.subPermissions?.length || item.isExpanded) {
-        return;
-      }
-      // Accordion: collapse any open sibling at this level first so only
-      // one branch is open at a time. Matches click behaviour.
-      this.collapseSiblingsOf(item);
-      item.isExpanded = true;
-      this.cdr.markForCheck();
-    }, SidebarComponent.HOVER_EXPAND_DELAY);
-    this.hoverExpandTimers.set(item, t);
-  }
-
-  /**
-   * Cursor left the parent before the intent timer fired — cancel.
-   * Does NOT collapse already-open submenus; that's intentional so
-   * users can sweep the cursor down into the open child list without
-   * losing it. Closure happens on click of the same parent (toggle)
-   * or on full sidebar mouse-leave.
-   */
-  onParentMouseLeave(item: MenuItem): void {
-    const t = this.hoverExpandTimers.get(item);
-    if (t) {
-      clearTimeout(t);
-      this.hoverExpandTimers.delete(item);
     }
   }
 
