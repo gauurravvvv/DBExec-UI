@@ -50,6 +50,20 @@ export class EchartVisualComponent
    */
   glReady = true;
 
+  /**
+   * Init options passed to `echarts.init`. `useDirtyRect: true` switches the
+   * canvas renderer to partial-repaint mode — only the bounding box of
+   * changed graphic elements is redrawn each frame. Net win for dashboards
+   * where most of the chart is static between renders (tooltips moving
+   * over a heatmap, filter dropdown changes, etc.).
+   *
+   * Reference: https://echarts.apache.org/handbook/en/best-practices/canvas-vs-svg/
+   */
+  initOpts = {
+    renderer: 'canvas' as const,
+    useDirtyRect: true,
+  };
+
   private previousConfigSnapshot = '';
   private hasRenderedOnce = false;
 

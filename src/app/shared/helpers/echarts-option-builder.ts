@@ -311,6 +311,35 @@ function buildAnimation(config: any): any {
     animation: config.animations !== false,
     animationDuration: config.animationDuration ?? 1000,
     animationEasing: config.animationEasing || 'cubicOut',
+    // Suppress entrance animation for big charts — full tween on >2k items
+    // costs more in paint time than the polish is worth, and the chart
+    // appears stalled while it animates. ECharts docs explicitly recommend
+    // capping animation at ~2k items on busy dashboards.
+    animationThreshold: 2000,
+  };
+}
+
+/**
+ * Performance flags ECharts 5.6 documents for series that render many items.
+ *
+ *   - `large: true` switches scatter/bar/line/lines to batch-rendered primitives
+ *     (per-item itemStyle is ignored, but layout cost drops dramatically).
+ *   - `largeThreshold` controls when `large` activates (default differs per series).
+ *   - `progressive` chunks rendering into N-item passes so the UI thread stays
+ *     responsive on >3k items.
+ *
+ * Spread the return into any series object that benefits. No-op when config
+ * explicitly opts out (`performanceMode: false`).
+ *
+ * Reference: https://echarts.apache.org/en/option.html#series-scatter.large
+ */
+function buildPerfFlags(config: any): any {
+  if (config?.performanceMode === false) return {};
+  return {
+    large: true,
+    largeThreshold: config?.largeThreshold ?? 2000,
+    progressive: config?.progressive ?? 400,
+    progressiveThreshold: config?.progressiveThreshold ?? 3000,
   };
 }
 
@@ -514,11 +543,18 @@ function buildDataZoom(config: any, axis: 'x' | 'y' = 'x'): any[] {
   // Position the slider outside the grid with enough room
   const positionProp =
     axis === 'y' ? { right: 5, width: 20 } : { bottom: 2, height: 20 };
+  // Throttle filter recompute. Without throttle, every wheel tick triggers
+  // a full data-axis recompute — ~16ms × 60fps = a continuous load on the
+  // main thread. 100ms is the value ECharts itself uses in their docs.
+  const throttle = config.dataZoomThrottle ?? 100;
+  const filterMode = config.dataZoomFilterMode || 'filter';
   return [
     {
       type: 'slider',
       ...index,
       ...positionProp,
+      throttle,
+      filterMode,
       // Match the app's primary blue (#2196f3). ECharts does not read
       // CSS custom properties, so values are hard-coded but should track
       // --primary-color in theme-variables.scss if it ever changes.
@@ -536,7 +572,7 @@ function buildDataZoom(config: any, axis: 'x' | 'y' = 'x'): any[] {
         fontFamily: CHART_TYPOGRAPHY.fontFamily,
       },
     },
-    { type: 'inside', ...index },
+    { type: 'inside', ...index, throttle, filterMode },
   ];
 }
 
@@ -1354,10 +1390,20 @@ export function buildHeatMapChartOption(data: any[], config: any): any {
 
 // ========= Tree Map Chart =========
 export function buildTreeMapChartOption(data: any[], config: any): any {
-  const treeData = data.map(d => ({
-    name: String(d.name),
-    value: d.value,
-  }));
+  // Transformer returns either a forest (hierarchy with children[]) or a flat
+  // array. ECharts treemap natively recurses on `children`, so we just pass
+  // the data through when it's already hierarchical.
+  const treeData = data.map(d => {
+    if (
+      d &&
+      typeof d === 'object' &&
+      Array.isArray((d as any).children) &&
+      (d as any).children.length > 0
+    ) {
+      return d;
+    }
+    return { name: String((d as any).name), value: (d as any).value };
+  });
 
   return {
     color: getColors(config.colorScheme),
@@ -1503,7 +1549,7 @@ export function buildScatterChartOption(
               },
               showEffectOn: config.effectShowOn || 'render',
             }
-          : {}),
+          : buildPerfFlags(config)),
         label: buildDataLabel(config),
         emphasis: {
           focus: config.emphasis || 'series',
@@ -1592,10 +1638,19 @@ export function buildFunnelChartOption(data: any[], config: any): any {
 
 // ========= Sunburst Chart =========
 export function buildSunburstChartOption(data: any[], config: any): any {
-  const sunburstData = data.map(d => ({
-    name: String(d.name),
-    value: d.value,
-  }));
+  // Hierarchy-aware: when the transformer returns nodes with children[],
+  // pass them through; otherwise flatten to the legacy single-ring shape.
+  const sunburstData = data.map(d => {
+    if (
+      d &&
+      typeof d === 'object' &&
+      Array.isArray((d as any).children) &&
+      (d as any).children.length > 0
+    ) {
+      return d;
+    }
+    return { name: String((d as any).name), value: (d as any).value };
+  });
 
   return {
     color: getColors(config.colorScheme),
@@ -1851,7 +1906,12 @@ export function buildBoxPlotChartOption(data: any[], config: any): any {
         const q3 = values[Math.floor(len * 0.75)];
         boxData.push([values[0], q1, median, q3, values[len - 1]]);
       }
+    } else if (Array.isArray(item.value) && item.value.length === 5) {
+      // New transformer shape: { name, value: [min, q1, median, q3, max] }
+      // — already a 5-tuple, pass through unchanged.
+      boxData.push(item.value);
     } else if (item.value !== undefined) {
+      // Fallback for single-value rows (degenerate box).
       boxData.push([
         item.value,
         item.value,
@@ -1964,13 +2024,32 @@ export function buildGraphChartOption(
 
 // ========= Tree Chart =========
 export function buildTreeChartOption(data: any[], config: any): any {
-  const treeData = {
-    name: 'Root',
-    children: data.map(d => ({
-      name: String(d.name),
-      value: d.value,
-    })),
-  };
+  // The transformer (transformToHierarchy) returns a forest of root nodes
+  // when parentColumn is set, or a flat array of leaves otherwise. ECharts
+  // tree expects a single root, so we synthesise one when the input has
+  // multiple roots or no `children` on the first item.
+  const isAlreadyHierarchical =
+    data.length > 0 &&
+    data[0] &&
+    typeof data[0] === 'object' &&
+    Array.isArray((data[0] as any).children);
+  const treeData =
+    isAlreadyHierarchical && data.length === 1
+      ? (data[0] as any)
+      : {
+          name: 'Root',
+          children: data.map(d => {
+            // Hierarchical entries already have a children[] of their own
+            if (
+              d &&
+              typeof d === 'object' &&
+              Array.isArray((d as any).children)
+            ) {
+              return d;
+            }
+            return { name: String((d as any).name), value: (d as any).value };
+          }),
+        };
 
   return {
     color: getColors(config.colorScheme),
@@ -2144,23 +2223,78 @@ export function buildPolarBarChartOption(data: any[], config: any): any {
 }
 
 // ========= Radar Chart (standalone) =========
-export function buildRadarChartOption(data: any[], config: any): any {
-  // Radar uses the same logic as polar chart
-  return buildPolarChartOption(data, config);
+export function buildRadarChartOption(data: any[] | any, config: any): any {
+  // New transformer returns `{indicators: [{name, max}], series: [{name, value: number[]}]}`.
+  // Legacy `[{name, series: [{name, value}]}]` is detected and routed to the
+  // old polar-style fallback for visuals that haven't migrated to indicatorColumns yet.
+  const isNewShape =
+    data &&
+    !Array.isArray(data) &&
+    Array.isArray((data as any).indicators) &&
+    Array.isArray((data as any).series);
+  if (!isNewShape) {
+    return buildPolarChartOption(data as any[], config);
+  }
+
+  const { indicators, series } = data as {
+    indicators: { name: string; max: number }[];
+    series: { name: string; value: number[] }[];
+  };
+
+  return {
+    color: getColors(config.colorScheme),
+    ...buildAnimation(config),
+    tooltip: {
+      ...buildTooltip(config, 'item'),
+    },
+    legend: buildLegend(config),
+    toolbox: buildToolbox(config),
+    radar: {
+      indicator: indicators,
+      shape: config.radarShape || 'polygon',
+      splitNumber: config.radarSplitNumber ?? 5,
+      axisName: {
+        color: '#666',
+        fontSize: config.labelFontSize || 12,
+      },
+    },
+    series: [
+      {
+        type: 'radar',
+        data: series,
+        symbol: config.radarSymbol || 'circle',
+        symbolSize: config.radarSymbolSize ?? 6,
+        lineStyle: { width: config.radarLineWidth ?? 2 },
+        areaStyle: { opacity: config.radarAreaOpacity ?? 0.2 },
+        emphasis: { focus: 'self' },
+      },
+    ],
+  };
 }
 
 // ========= Candlestick Chart =========
-export function buildCandlestickChartOption(data: any[], config: any): any {
-  // Data format: each item = [open, close, low, high] or { name, value: [open, close, low, high] }
+export function buildCandlestickChartOption(data: any[] | any, config: any): any {
+  // The new OHLC transformer returns `{categories, values}` where values is
+  // an array of `[open, close, low, high]` 4-tuples (ECharts canonical
+  // ordering, see https://echarts.apache.org/en/option.html#series-candlestick.data).
+  // Older inputs (`{name, value:[o,c,l,h]}[]` or bare `number[][]`) are still
+  // honoured so existing dashboards keep working.
   let categories: string[] = [];
-  let values: number[][] = [];
+  let values: any[] = [];
 
-  if (data.length > 0 && data[0].value && Array.isArray(data[0].value)) {
-    categories = data.map(d => String(d.name));
-    values = data.map(d => d.value);
-  } else if (data.length > 0 && Array.isArray(data[0])) {
-    categories = data.map((_, i) => `Day ${i + 1}`);
-    values = data;
+  if (data && !Array.isArray(data) && Array.isArray((data as any).values)) {
+    categories = (data as any).categories ?? [];
+    values = (data as any).values;
+  } else if (Array.isArray(data) && data.length > 0) {
+    if (data[0].value && Array.isArray(data[0].value)) {
+      categories = data.map(d => String(d.name));
+      values = data.map(d => d.value);
+    } else if (Array.isArray(data[0])) {
+      categories = data.map((_, i) => `Day ${i + 1}`);
+      values = data as number[][];
+    } else {
+      return {};
+    }
   } else {
     return {};
   }
@@ -2219,31 +2353,41 @@ export function buildCandlestickChartOption(data: any[], config: any): any {
 }
 
 // ========= Parallel Chart =========
-export function buildParallelChartOption(data: any[], config: any): any {
-  // Data format: { dimensions: ['dim1', 'dim2', ...], data: [[v1, v2, ...], ...] }
-  // Or array of objects with named fields
+export function buildParallelChartOption(data: any[] | any, config: any): any {
+  // New transformer returns `{axes: [{dim, name, type}], data: [[v0..vN]|{name,value}]}`.
+  // Legacy: `{dimensions: [...], data: [[...]]}` or array-of-objects.
   let dimensions: string[] = [];
-  let seriesData: number[][] = [];
+  let seriesData: any[] = [];
+  let parallelAxis: any[];
 
-  if (data.length > 0 && data[0].dimensions) {
+  if (data && !Array.isArray(data) && Array.isArray((data as any).axes)) {
+    parallelAxis = (data as any).axes;
+    dimensions = parallelAxis.map((a: any) => a.name);
+    seriesData = (data as any).data ?? [];
+  } else if (Array.isArray(data) && data.length > 0 && data[0].dimensions) {
     dimensions = data[0].dimensions;
     seriesData = data[0].data || [];
+    parallelAxis = dimensions.map((dim, i) => ({
+      dim: i,
+      name: dim,
+      type: typeof seriesData[0]?.[i] === 'number' ? 'value' : 'category',
+    }));
   } else if (
+    Array.isArray(data) &&
     data.length > 0 &&
     typeof data[0] === 'object' &&
     !Array.isArray(data[0])
   ) {
     dimensions = Object.keys(data[0]);
     seriesData = data.map(d => dimensions.map(dim => d[dim]));
+    parallelAxis = dimensions.map((dim, i) => ({
+      dim: i,
+      name: dim,
+      type: typeof seriesData[0]?.[i] === 'number' ? 'value' : 'category',
+    }));
   } else {
     return {};
   }
-
-  const parallelAxis = dimensions.map((dim, i) => ({
-    dim: i,
-    name: dim,
-    type: typeof seriesData[0]?.[i] === 'number' ? 'value' : 'category',
-  }));
 
   return {
     color: getColors(config.colorScheme),
