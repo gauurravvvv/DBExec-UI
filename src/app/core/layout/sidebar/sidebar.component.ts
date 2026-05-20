@@ -264,11 +264,17 @@ export class SidebarComponent implements OnInit {
       this.isPinnedOpen = true;
       this.recomputeExpanded();
       setTimeout(() => {
+        this.collapseSiblingsOf(item);
         item.isExpanded = true;
         this.cdr.markForCheck();
       }, 100);
     } else {
       const opening = !item.isExpanded;
+      // Accordion behaviour: opening this branch collapses every sibling
+      // at the same level (and their descendants). Without this the user
+      // can build up a deep stack of open branches that quickly fills
+      // the rail and forces scrolling.
+      if (opening) this.collapseSiblingsOf(item);
       item.isExpanded = opening;
       // Closing a parent must also close everything under it, otherwise
       // descendants keep their isExpanded=true state and pop back open the
@@ -284,6 +290,47 @@ export class SidebarComponent implements OnInit {
       child.isExpanded = false;
       this.collapseDescendants(child);
     }
+  }
+
+  /**
+   * Collapse every sibling of `target` at the same level (and their
+   * descendants). Drives the accordion rule "only one branch open per
+   * level at a time" without forcing the caller to know about the tree
+   * structure. Walks the menu tree to find the sibling array containing
+   * `target`, then closes the others.
+   *
+   * Called from both the click path (toggleSubmenuAndExpand) and the
+   * hover-expand timer so both interaction modes converge on the same
+   * one-branch-open invariant.
+   */
+  private collapseSiblingsOf(target: MenuItem): void {
+    const siblings = this.findSiblings(target, this.menuItems);
+    if (!siblings) return;
+    for (const sibling of siblings) {
+      if (sibling === target) continue;
+      if (!sibling.isExpanded) continue;
+      sibling.isExpanded = false;
+      this.collapseDescendants(sibling);
+    }
+  }
+
+  /**
+   * Recursive search for the array that holds `target` as a direct
+   * child. Returns null if not found (shouldn't happen in practice,
+   * but defensive in case a stale item reference is passed in).
+   */
+  private findSiblings(
+    target: MenuItem,
+    list: MenuItem[],
+  ): MenuItem[] | null {
+    if (list.includes(target)) return list;
+    for (const item of list) {
+      if (item.subPermissions?.length) {
+        const found = this.findSiblings(target, item.subPermissions);
+        if (found) return found;
+      }
+    }
+    return null;
   }
 
   /**
@@ -310,6 +357,9 @@ export class SidebarComponent implements OnInit {
       if (!this.isExpanded || !item.subPermissions?.length || item.isExpanded) {
         return;
       }
+      // Accordion: collapse any open sibling at this level first so only
+      // one branch is open at a time. Matches click behaviour.
+      this.collapseSiblingsOf(item);
       item.isExpanded = true;
       this.cdr.markForCheck();
     }, SidebarComponent.HOVER_EXPAND_DELAY);
