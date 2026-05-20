@@ -58,6 +58,23 @@ export class SidebarComponent implements OnInit {
   private peekEnterTimer: ReturnType<typeof setTimeout> | null = null;
   private peekLeaveTimer: ReturnType<typeof setTimeout> | null = null;
 
+  /**
+   * Delay before a hovered parent-with-children auto-expands. The user
+   * has to keep the cursor on the item for this long before the
+   * submenu opens — stops the sidebar from flickering open on every
+   * sweep past a parent row. 200ms matches the OS-level hover-intent
+   * timings macOS/Windows menus use.
+   */
+  private static readonly HOVER_EXPAND_DELAY = 200;
+  /** Per-item pending-expand timer. Keyed by the menu item itself so
+   *  multiple parents can be hovered in sequence without interfering.
+   *  Regular Map (not WeakMap) so we can iterate and clear all
+   *  pending timers on full-sidebar leave. */
+  private hoverExpandTimers = new Map<
+    MenuItem,
+    ReturnType<typeof setTimeout>
+  >();
+
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
@@ -139,6 +156,11 @@ export class SidebarComponent implements OnInit {
   private clearPeekTimers(): void {
     this.cancelPeekEnter();
     this.cancelPeekLeave();
+    // Drop any pending hover-expand timers too — they were scheduled
+    // for items the user is no longer hovering, and if the rail just
+    // collapsed there's nothing for them to open onto.
+    this.hoverExpandTimers.forEach(t => clearTimeout(t));
+    this.hoverExpandTimers.clear();
   }
 
   private recomputeExpanded(): void {
@@ -261,6 +283,51 @@ export class SidebarComponent implements OnInit {
     for (const child of item.subPermissions) {
       child.isExpanded = false;
       this.collapseDescendants(child);
+    }
+  }
+
+  /**
+   * Mouse enters a parent-with-children row. Schedule an auto-expand
+   * after HOVER_EXPAND_DELAY — if the cursor stays on this row long
+   * enough, the submenu opens without a click. Brief sweeps past the
+   * row cancel the timer in onParentMouseLeave before it fires.
+   *
+   * No-ops when the sidebar is collapsed (only the icon rail is
+   * visible — submenus are positioned absolutely and hovering the
+   * narrow icon shouldn't snap a panel open before the rail itself
+   * expands), and no-ops when the item is already expanded.
+   */
+  onParentMouseEnter(item: MenuItem): void {
+    if (!this.isExpanded) return;
+    if (!item.subPermissions?.length) return;
+    if (item.isExpanded) return;
+    if (this.hoverExpandTimers.has(item)) return;
+    const t = setTimeout(() => {
+      this.hoverExpandTimers.delete(item);
+      // Re-check the gating conditions at fire time — the user may have
+      // collapsed the rail, clicked the item, or navigated away during
+      // the delay.
+      if (!this.isExpanded || !item.subPermissions?.length || item.isExpanded) {
+        return;
+      }
+      item.isExpanded = true;
+      this.cdr.markForCheck();
+    }, SidebarComponent.HOVER_EXPAND_DELAY);
+    this.hoverExpandTimers.set(item, t);
+  }
+
+  /**
+   * Cursor left the parent before the intent timer fired — cancel.
+   * Does NOT collapse already-open submenus; that's intentional so
+   * users can sweep the cursor down into the open child list without
+   * losing it. Closure happens on click of the same parent (toggle)
+   * or on full sidebar mouse-leave.
+   */
+  onParentMouseLeave(item: MenuItem): void {
+    const t = this.hoverExpandTimers.get(item);
+    if (t) {
+      clearTimeout(t);
+      this.hoverExpandTimers.delete(item);
     }
   }
 

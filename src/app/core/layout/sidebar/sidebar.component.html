@@ -42,6 +42,8 @@
             *ngIf="item.subPermissions?.length"
             class="nav-link expandable"
             (click)="toggleSubmenuAndExpand(item)"
+            (mouseenter)="onParentMouseEnter(item)"
+            (mouseleave)="onParentMouseLeave(item)"
             [class.expanded]="item.isExpanded"
             [class.has-active-child]="hasActiveDescendant(item)"
           >
@@ -89,6 +91,8 @@
                 *ngIf="subItem.subPermissions?.length"
                 class="submenu-link"
                 (click)="toggleSubmenuAndExpand(subItem)"
+                (mouseenter)="onParentMouseEnter(subItem)"
+                (mouseleave)="onParentMouseLeave(subItem)"
                 [class.expanded]="subItem.isExpanded"
                 [class.has-active-child]="hasActiveDescendant(subItem)"
               >
@@ -151,6 +155,8 @@
         *ngIf="nestedItem.subPermissions?.length"
         class="submenu-link"
         (click)="toggleSubmenuAndExpand(nestedItem)"
+        (mouseenter)="onParentMouseEnter(nestedItem)"
+        (mouseleave)="onParentMouseLeave(nestedItem)"
         [class.expanded]="nestedItem.isExpanded"
         [class.has-active-child]="hasActiveDescendant(nestedItem)"
       >
