@@ -2342,6 +2342,24 @@ export class EditAnalysesComponent
         .then(response => {
           if (this.globalService.handleSuccessService(response, true)) {
             this._isDirty = false;
+            // The BE versioning model spawns a new Analyses row on
+            // every save and leaves the old row immutable. The
+            // response payload carries the new id under `data.id`
+            // (along with previousVersionId / lineageId /
+            // versionNumber for audit). Pin our in-memory analysisId
+            // to the new id so any post-save interaction — Publish,
+            // re-Save, share link, browser refresh mid-session —
+            // addresses the version we just wrote rather than the
+            // now-historical row.
+            //
+            // Defensive `?.data?.id`: tolerates an older BE that
+            // doesn't return the versioning payload, in which case
+            // we fall through to the legacy redirect-only behaviour
+            // without crashing.
+            const newId = response?.data?.id;
+            if (newId && newId !== this.analysisId) {
+              this.analysisId = newId;
+            }
             this.router.navigate([ANALYSES.LIST]);
           }
           this.cdr.markForCheck();
