@@ -396,24 +396,40 @@ export class AddDatasetComponent
    */
   private bootstrapPreselectedDatasource(datasourceId: string): void {
     if (!this.selectedOrg?.id) return;
+
+    // Fast path — the list-dataset popup carries the full datasource
+    // record through router state when the user clicks Continue.
+    // That record already has id / name / config (with dbType), which
+    // is everything the toolbar needs. Avoids hitting GET
+    // /datasources/:org/:id, which builds an expensive stats blob
+    // (size MB, row counts, per-table index counts) we don't render
+    // on this page.
+    const navState = this.router.getCurrentNavigation()?.extras?.state as
+      | { datasource?: any }
+      | undefined;
+    const stateDs =
+      navState?.datasource ??
+      // Angular replays state via window.history.state on refresh of
+      // the same SPA navigation; also check that fallback.
+      (window.history?.state?.datasource ?? null);
+
+    if (stateDs?.id && String(stateDs.id) === String(datasourceId)) {
+      this.applyPreselectedDatasource(stateDs);
+      return;
+    }
+
+    // Slow path — direct deep-link / browser refresh / external
+    // navigation that didn't pass router state. Fall back to the
+    // full fetch; the toolbar still needs the dbType to render
+    // dialect-aware autocomplete.
     this.isLoadingDatasources = true;
     this.datasourceService
       .viewDatasource(String(this.selectedOrg.id), datasourceId)
       .then((res: any) => {
         this.isLoadingDatasources = false;
         if (this.globalService.handleSuccessService(res, false)) {
-          // viewDatasource returns the datasource object directly in
-          // res.data per the BE getDatasource controller.
           const ds = res?.data;
-          if (ds?.id) {
-            this.selectedDatasourceObj = ds;
-            // Mirror to the preloadedDatasources list so any downstream
-            // lookups (e.g. dbType badge resolver) still find it.
-            this.preloadedDatasources = [ds];
-            this.preloadedDatasourcesTotal = 1;
-            this.availableDatasources = [ds];
-            this.proceedWithDatasourceChange(ds);
-          }
+          if (ds?.id) this.applyPreselectedDatasource(ds);
         }
         this.cdr.markForCheck();
       })
@@ -421,6 +437,20 @@ export class AddDatasetComponent
         this.isLoadingDatasources = false;
         this.cdr.markForCheck();
       });
+  }
+
+  /**
+   * Common landing point for both fast (router state) and slow
+   * (fetched) bootstrap paths — wires the selected datasource into
+   * the component, mirrors it into the lookup lists used by the
+   * dbType badge resolver, and triggers the lazy schema load.
+   */
+  private applyPreselectedDatasource(ds: any): void {
+    this.selectedDatasourceObj = ds;
+    this.preloadedDatasources = [ds];
+    this.preloadedDatasourcesTotal = 1;
+    this.availableDatasources = [ds];
+    this.proceedWithDatasourceChange(ds);
   }
 
   private initializeComponent(): void {
@@ -1086,11 +1116,41 @@ export class AddDatasetComponent
 
     return new Promise((resolve, reject) => {
       try {
-        // Lazy first step: schemas only. The previous bulk call
-        // (`getDatasourceStructure`) was Postgres-only and ballooned
-        // for multi-thousand-table datasources. Tables and columns
-        // are fetched on expand via ensureTablesLoaded /
-        // ensureColumnsLoaded.
+        // When the user picked a schema in the popup we already know
+        // its name from the URL — skip the schemas-list round-trip
+        // entirely and seed the tree with that one schema. The
+        // tables fetch on expand still hits the BE normally.
+        if (this.scopedSchema) {
+          const tagged: any = {
+            name: 'datasource',
+            schemas: [{ name: this.scopedSchema, tables: [] }],
+          };
+          const dbType = this.getDbTypeFor(dbId);
+          if (dbType) tagged.dbType = dbType;
+          this.store.dispatch(
+            AddDatasetActions.loadSchemaDataSuccess({
+              orgId,
+              dbId: dbIdStr,
+              data: tagged,
+            }),
+          );
+          this.datasourceSchemas[dbId] = tagged;
+          if (token === this.schemaSelectionToken) {
+            this.datasources = Object.values(this.datasourceSchemas);
+            this.monacoIntelliSenseService.setDatasources(this.datasources);
+          }
+          this.loadingDatasources[dbId] = false;
+          this.cdr.markForCheck();
+          // Auto-kick the tables fetch so the user lands on a
+          // populated tree.
+          this.ensureTablesLoaded(dbId, this.scopedSchema);
+          resolve();
+          return;
+        }
+
+        // No scoped schema — fetch the full schema list. Lazy first
+        // step: schemas only. Tables and columns are fetched on
+        // expand via ensureTablesLoaded / ensureColumnsLoaded.
         this.datasourceService
           .listDatasourceSchemas({
             orgId,
@@ -1122,16 +1182,6 @@ export class AddDatasetComponent
 
             this.loadingDatasources[dbId] = false;
             this.cdr.markForCheck();
-
-            // If we arrived with a scoped schema (?schema=…), kick
-            // off the tables fetch immediately so the user lands in
-            // a tree that's already populated. ensureTablesLoaded
-            // is idempotent: if the user manually expanded the
-            // schema before this fires, the in-memory guard skips
-            // the duplicate call.
-            if (this.scopedSchema) {
-              this.ensureTablesLoaded(dbId, this.scopedSchema);
-            }
             resolve();
           })
           .catch((error: any) => {

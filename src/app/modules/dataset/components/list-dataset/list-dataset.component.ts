@@ -661,7 +661,18 @@ export class ListDatasetComponent implements OnInit {
     }
     if (this.selectedOrg) queryParams.orgId = this.selectedOrg;
     this.showDsPickerPopup = false;
-    this.router.navigate([DATASET.ADD], { queryParams });
+    // Carry the full datasource record (already fetched from the
+    // listDatasource paginator) through router state so the add page
+    // doesn't have to re-hit GET /datasources/:org/:id just to
+    // resolve name + dbType for the toolbar. That endpoint also
+    // builds an expensive stats blob (size MB, row counts,
+    // per-table index counts) — wasteful for the create flow where
+    // none of that is rendered. The add page falls back to the
+    // fetch on direct deep-link / refresh.
+    this.router.navigate([DATASET.ADD], {
+      queryParams,
+      state: { datasource: this.dsPickerSelected },
+    });
   }
 
   onAddViaPrompts() {
