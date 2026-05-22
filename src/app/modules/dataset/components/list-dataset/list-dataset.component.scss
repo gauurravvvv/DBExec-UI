@@ -1277,13 +1277,65 @@ td.empty-message-cell {
 
   .ds-picker-body {
     padding: var(--space-7) var(--space-6) var(--space-6);
-    // Reserve enough room for the dropdown trigger plus a sensible
-    // floating-label gap. The dropdown panel opens downward and
-    // overflows the dialog box (which is fine with `overflow:
-    // visible` above), but the trigger itself needs vertical
-    // breathing room so the floating label doesn't collide with the
-    // header border.
+    // Reserve enough room for the two dropdowns to stack with a
+    // small gap. The dropdown panels open downward and overflow the
+    // dialog box (which is fine with `overflow: visible` above), but
+    // the triggers themselves need vertical breathing room.
     min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+
+    // The custom dropdown component is self-contained; just give
+    // each instance its own row.
+    app-custom-dropdown {
+      display: block;
+    }
+
+    // Spinner row shown while schemas load. Sits in the same vertical
+    // slot the schema dropdown will occupy so the dialog doesn't
+    // jump when the data resolves.
+    .ds-picker-schema-status {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-2);
+      color: var(--text-color);
+      opacity: 0.75;
+      font-size: var(--fs-body-sm, 13px);
+
+      i.pi-spinner {
+        font-size: 14px;
+      }
+    }
+
+    // Inline error if the schema fetch fails (e.g. unreachable
+    // datasource). The user can dismiss by closing the popup and
+    // retrying.
+    .ds-picker-schema-error {
+      display: inline-flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      color: var(--error-color, #c62828);
+      background: var(--error-bg, rgba(198, 40, 40, 0.08));
+      border-radius: var(--radius-xs);
+      font-size: var(--fs-body-sm, 13px);
+      line-height: 1.4;
+
+      i {
+        font-size: 14px;
+        margin-top: 1px;
+      }
+    }
+
+    .ds-picker-hint {
+      margin: var(--space-2) 0 0;
+      font-size: var(--fs-label, 12px);
+      color: var(--text-color);
+      opacity: 0.6;
+      line-height: 1.4;
+    }
   }
 
   .ds-picker-footer {

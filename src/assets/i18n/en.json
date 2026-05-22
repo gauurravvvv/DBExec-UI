@@ -652,6 +652,8 @@
     "ACTIVE_DIALECT": "Active SQL dialect",
     "ADD_CUSTOM_FIELD": "Add Custom Field",
     "PICK_DATASOURCE": "Choose datasource",
+    "SCHEMA": "Schema",
+    "SCHEMA_PICKER_HINT": "The editor will be scoped to this schema. Tables from other schemas will not be visible.",
     "ADD_FIELD": "Add Field",
     "ANALYSES": "Analyses",
     "BASIC_INFORMATION": "Basic Information",

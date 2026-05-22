@@ -88,7 +88,7 @@
       font-size: var(--fs-body, 14px);
       font-weight: var(--fw-medium, 500);
       color: var(--text-color);
-      max-width: 240px;
+      max-width: 360px;
       white-space: nowrap;
       overflow: hidden;
 
@@ -97,9 +97,24 @@
         flex-shrink: 0;
       }
 
-      .ds-info-name {
+      .ds-info-name,
+      .ds-info-schema {
         overflow: hidden;
         text-overflow: ellipsis;
+        max-width: 140px;
+      }
+
+      .ds-info-schema {
+        color: var(--text-color);
+        opacity: 0.85;
+      }
+
+      // Subtle divider between datasource name and scoped schema.
+      // Same icon as a breadcrumb so the relationship reads visually.
+      .ds-info-sep {
+        font-size: 11px;
+        opacity: 0.5;
+        margin: 0 -2px;
       }
     }
 

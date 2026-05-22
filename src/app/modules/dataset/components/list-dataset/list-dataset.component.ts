@@ -504,21 +504,37 @@ export class ListDatasetComponent implements OnInit {
   }
 
   // ── Datasource picker popup state ─────────────────────────────────
+  // Two-step picker: pick a datasource, then pick a schema within
+  // that datasource. The schema dropdown only appears after a
+  // datasource is chosen; Continue requires both. The chosen schema
+  // becomes the editor's scope (sidebar shows only that schema's
+  // tables and the editor defaults to it for unqualified table
+  // references).
   showDsPickerPopup = false;
   dsPickerSelected: any = null;
+  schemaPickerSelected: any = null;
   /** Mirror of preloaded datasources so the popup opens with content
-   *  on the very first click; the dropdown's serverMode fetcher takes
-   *  over for search + pagination. */
+   *  on first click; the dropdown's serverMode fetcher handles
+   *  search + pagination from there. */
   dsPickerPreloaded: any[] | null = null;
   dsPickerPreloadedTotal: number | null = null;
+  /** Schema list for the currently-picked datasource. Reloaded each
+   *  time the user picks a different datasource. `null` = not yet
+   *  loaded; `[]` = loaded but empty. */
+  schemaPickerOptions: { name: string }[] | null = null;
+  schemaPickerLoading = false;
+  schemaPickerError: string | null = null;
 
   openDatasourcePicker(): void {
     this.dsPickerSelected = null;
+    this.schemaPickerSelected = null;
+    this.schemaPickerOptions = null;
+    this.schemaPickerError = null;
     this.dsPickerPreloaded = null;
     this.dsPickerPreloadedTotal = null;
     this.showDsPickerPopup = true;
-    // Prime the dropdown with the first page so the user sees options
-    // immediately instead of an empty list waiting for the fetcher.
+    // Prime the datasource dropdown with page 1 so users see options
+    // immediately instead of waiting for the server-mode fetcher.
     this.primeDatasourcePicker();
   }
 
@@ -571,18 +587,73 @@ export class ListDatasetComponent implements OnInit {
   };
 
   /**
-   * Continue from the popup: route to /datasets/new with the picked
-   * datasource as a query param. The add page bootstraps directly
-   * from this without re-prompting.
+   * Fires when the datasource dropdown changes. Reset the schema
+   * selection and re-fetch the schema list for the new datasource.
+   * Skips the call if the user cleared the dropdown.
+   */
+  onDsPickerDatasourceChange(): void {
+    this.schemaPickerSelected = null;
+    this.schemaPickerOptions = null;
+    this.schemaPickerError = null;
+    const ds = this.dsPickerSelected;
+    if (!ds?.id || !this.selectedOrg) return;
+    this.loadSchemasForPicker(String(this.selectedOrg), String(ds.id));
+  }
+
+  private loadSchemasForPicker(orgId: string, datasourceId: string): void {
+    this.schemaPickerLoading = true;
+    this.schemaPickerOptions = null;
+    this.schemaPickerError = null;
+    this.cdr.markForCheck();
+
+    this.datasourceService
+      .listDatasourceSchemas({ orgId, datasourceId })
+      .then((res: any) => {
+        if (this.globalService.handleSuccessService(res, false)) {
+          // BE returns [{ schema_name, tables: [] }] per
+          // src/modules/datasources/controllers/schema/listSchema.ts.
+          // Map to a friendlier shape for the dropdown.
+          const rows = res?.data ?? [];
+          this.schemaPickerOptions = rows
+            .map((r: any) => ({ name: r.schema_name }))
+            .filter((s: any) => !!s.name);
+          if (this.schemaPickerOptions?.length === 1) {
+            // Single-schema datasources (common for org-internal apps)
+            // — auto-select so the user can just hit Continue.
+            this.schemaPickerSelected = this.schemaPickerOptions[0];
+          }
+        } else {
+          this.schemaPickerOptions = [];
+          this.schemaPickerError =
+            res?.message ||
+            this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA');
+        }
+        this.schemaPickerLoading = false;
+        this.cdr.markForCheck();
+      })
+      .catch((err: any) => {
+        this.schemaPickerOptions = [];
+        this.schemaPickerError =
+          err?.message ||
+          this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA');
+        this.schemaPickerLoading = false;
+        this.cdr.markForCheck();
+      });
+  }
+
+  /**
+   * Continue from the popup: route to /datasets/new with both the
+   * datasource and the schema baked into the query string. The add
+   * page filters its sidebar to that schema and uses it as the
+   * default for unqualified table references in the editor.
    */
   onDsPickerContinue(): void {
-    if (!this.dsPickerSelected?.id) return;
+    if (!this.dsPickerSelected?.id || !this.schemaPickerSelected?.name) return;
     const queryParams: any = {
       datasourceId: this.dsPickerSelected.id,
+      schema: this.schemaPickerSelected.name,
     };
-    if (this.selectedOrg) {
-      queryParams.orgId = this.selectedOrg;
-    }
+    if (this.selectedOrg) queryParams.orgId = this.selectedOrg;
     this.showDsPickerPopup = false;
     this.router.navigate([DATASET.ADD], { queryParams });
   }

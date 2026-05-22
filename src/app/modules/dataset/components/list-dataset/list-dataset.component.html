@@ -512,6 +512,9 @@
       </button>
     </div>
     <div class="ds-picker-body">
+      <!-- Step 1: Datasource. Changing this resets the schema
+           selection below; the schema list re-fetches against the
+           new datasource. -->
       <app-custom-dropdown
         [(ngModel)]="dsPickerSelected"
         [label]="'COMMON.DATASOURCE' | translate"
@@ -526,8 +529,57 @@
         [filter]="true"
         filterBy="name"
         icon="pi-database"
+        (onChangeEvent)="onDsPickerDatasourceChange()"
       >
       </app-custom-dropdown>
+
+      <!-- Step 2: Schema. Only renders once a datasource is
+           selected. While loading, shows a spinner row; if no
+           schemas come back, shows an inline error so the user
+           knows the BE call failed rather than guessing why
+           Continue is greyed. -->
+      <ng-container *ngIf="dsPickerSelected">
+        <div
+          class="ds-picker-schema-status"
+          *ngIf="schemaPickerLoading"
+        >
+          <i class="pi pi-spin pi-spinner"></i>
+          <span>{{ 'DATASET.LOADING_SCHEMA' | translate }}</span>
+        </div>
+
+        <app-custom-dropdown
+          *ngIf="!schemaPickerLoading && schemaPickerOptions"
+          [(ngModel)]="schemaPickerSelected"
+          [label]="'DATASET.SCHEMA' | translate"
+          [floatingLabel]="true"
+          [options]="schemaPickerOptions"
+          optionLabel="name"
+          [optionValue]="null"
+          [filter]="true"
+          filterBy="name"
+          icon="pi-sitemap"
+        >
+        </app-custom-dropdown>
+
+        <div
+          class="ds-picker-schema-error"
+          *ngIf="schemaPickerError && !schemaPickerLoading"
+        >
+          <i class="pi pi-exclamation-triangle"></i>
+          <span>{{ schemaPickerError }}</span>
+        </div>
+
+        <p
+          class="ds-picker-hint"
+          *ngIf="
+            !schemaPickerLoading &&
+            !schemaPickerError &&
+            schemaPickerOptions?.length
+          "
+        >
+          {{ 'DATASET.SCHEMA_PICKER_HINT' | translate }}
+        </p>
+      </ng-container>
     </div>
     <div class="ds-picker-footer">
       <button
@@ -540,7 +592,7 @@
       <button
         pButton
         class="p-button-primary"
-        [disabled]="!dsPickerSelected"
+        [disabled]="!dsPickerSelected || !schemaPickerSelected"
         (click)="onDsPickerContinue()"
       >
         {{ 'COMMON.CONTINUE' | translate }}

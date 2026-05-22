@@ -7,11 +7,18 @@
            used to live here are gone; if the user wants to switch
            datasource they go back to the list. -->
 
-      <!-- Selected datasource name + dialect badge.
-           Read-only readouts — no interaction. -->
+      <!-- Selected datasource name + (optional) scoped schema.
+           Both read-only; if scopedSchema is set we render
+           `datasource › schema` so the user knows they're editing
+           against a single schema, not the whole datasource. -->
       <div class="ds-info" *ngIf="selectedDatasourceObj">
         <i class="pi pi-database ds-info-icon" aria-hidden="true"></i>
         <span class="ds-info-name">{{ selectedDatasourceObj.name }}</span>
+        <ng-container *ngIf="scopedSchema">
+          <i class="pi pi-angle-right ds-info-sep" aria-hidden="true"></i>
+          <i class="pi pi-sitemap ds-info-icon" aria-hidden="true"></i>
+          <span class="ds-info-schema">{{ scopedSchema }}</span>
+        </ng-container>
       </div>
 
       <!-- Active engine badge — reminds the user which SQL dialect the
@@ -173,7 +180,8 @@
             <div
               *ngFor="
                 let schema of datasourceSchemas[selectedDatasourceObj.id]
-                  ?.schemas || [] | filterSchemas: schemaSearchText;
+                  ?.schemas || []
+                    | filterSchemas: schemaSearchText:scopedSchema;
                 trackBy: trackByName
               "
               class="schema-item"

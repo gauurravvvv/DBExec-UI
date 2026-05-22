@@ -118,6 +118,14 @@ export class AddDatasetComponent
    * means collapse cascades and refreshes don't fall out of sync.
    */
   expandedPaths = new Set<string>();
+  /**
+   * When the user opens add-dataset via the list-page popup we pass
+   * a `schema` query param. The sidebar filter pipe (filterSchemas)
+   * reads this and shows only that schema; cross-schema queries
+   * still work (the editor doesn't reject them) but the tree is
+   * scoped. Null = no scoping; show every schema as before.
+   */
+  scopedSchema: string | null = null;
   schemaSearchText = '';
   selectedDatasource: string = '';
   selectedSchema: string = '';
@@ -316,6 +324,15 @@ export class AddDatasetComponent
     const qp = this.route.snapshot.queryParamMap;
     const queryOrgId = qp.get('orgId');
     const queryDatasourceId = qp.get('datasourceId');
+    const querySchema = qp.get('schema');
+    if (querySchema) {
+      // Scope the editor to a single schema. The sidebar filter
+      // pipe reads `scopedSchema` and hides every other schema row;
+      // the picked one auto-expands on load so the user lands
+      // straight in the tables list.
+      this.scopedSchema = querySchema;
+      this.expandedPaths.add(`${queryDatasourceId}.${querySchema}`);
+    }
 
     if (queryOrgId) {
       this.selectedOrg = { id: queryOrgId };
@@ -1105,6 +1122,16 @@ export class AddDatasetComponent
 
             this.loadingDatasources[dbId] = false;
             this.cdr.markForCheck();
+
+            // If we arrived with a scoped schema (?schema=…), kick
+            // off the tables fetch immediately so the user lands in
+            // a tree that's already populated. ensureTablesLoaded
+            // is idempotent: if the user manually expanded the
+            // schema before this fires, the in-memory guard skips
+            // the duplicate call.
+            if (this.scopedSchema) {
+              this.ensureTablesLoaded(dbId, this.scopedSchema);
+            }
             resolve();
           })
           .catch((error: any) => {
