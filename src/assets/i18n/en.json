@@ -657,6 +657,7 @@
     "SCHEMA_PICKER_HINT": "The editor will be scoped to this schema. Tables from other schemas will not be visible.",
     "SCHEMA_PICKER_HINT_OPTIONAL": "Leave blank to connect to the whole datasource. Pick a schema to narrow the editor's sidebar to it.",
     "SCHEMA_PICK_DATASOURCE_FIRST": "Pick a datasource above to choose a schema.",
+    "EDITOR_DISABLED": "Editor disabled — schema unavailable.",
     "ADD_FIELD": "Add Field",
     "ANALYSES": "Analyses",
     "BASIC_INFORMATION": "Basic Information",

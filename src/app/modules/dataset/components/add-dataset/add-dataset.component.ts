@@ -126,6 +126,36 @@ export class AddDatasetComponent
    * scoped. Null = no scoping; show every schema as before.
    */
   scopedSchema: string | null = null;
+
+  /**
+   * True when the user arrived via `?schema=X` AND that schema's
+   * tables fetch came back with a 404 / failure. Used to grey out
+   * the SQL editor and block Run — without the scoped schema we
+   * can't trust the autocomplete OR resolve unqualified table
+   * references, so letting the user type into the editor would
+   * produce queries that can't validate. Calculated on every
+   * change-detection cycle by checking the matching schema row's
+   * `tablesError` flag.
+   */
+  get scopedSchemaUnavailable(): boolean {
+    if (!this.scopedSchema || !this.selectedDatasourceObj?.id) return false;
+    const tree = this.datasourceSchemas[this.selectedDatasourceObj.id];
+    const schema = tree?.schemas?.find(
+      (s: any) => s.name === this.scopedSchema,
+    ) as any;
+    return !!schema?.tablesError;
+  }
+
+  /** Convenience for the template — the actual error message
+   *  pulled from the scoped schema's tablesError, if any. */
+  get scopedSchemaErrorMessage(): string | null {
+    if (!this.scopedSchema || !this.selectedDatasourceObj?.id) return null;
+    const tree = this.datasourceSchemas[this.selectedDatasourceObj.id];
+    const schema = tree?.schemas?.find(
+      (s: any) => s.name === this.scopedSchema,
+    ) as any;
+    return schema?.tablesError || null;
+  }
   schemaSearchText = '';
   selectedDatasource: string = '';
   selectedSchema: string = '';
@@ -878,11 +908,16 @@ export class AddDatasetComponent
 
         const initialValue = this.initialQuery || SQL_EDITOR_PLACEHOLDER;
 
-        // Create Monaco Editor instance
+        // Create Monaco Editor instance. `readOnly` reflects the
+        // current scopedSchemaUnavailable state — if the user
+        // arrived via ?schema=X and that schema 404'd before the
+        // editor mounted, start the editor locked so they don't
+        // type a query that can't execute.
         this.editor = monaco.editor.create(container, {
           ...MONACO_EDITOR_OPTIONS,
           value: initialValue,
           theme: this.currentTheme,
+          readOnly: this.scopedSchemaUnavailable,
         });
         this.currentQuery = initialValue;
 
@@ -1902,6 +1937,25 @@ export class AddDatasetComponent
     };
     this.datasources = Object.values(this.datasourceSchemas);
     this.monacoIntelliSenseService.setDatasources(this.datasources);
+    // If the patched schema is the one the URL scoped us to, the
+    // editor's read-only state may need to flip (error appeared /
+    // cleared). Cheap to re-evaluate every time; idempotent.
+    if (schemaName === this.scopedSchema) {
+      this.syncEditorReadOnlyState();
+    }
+  }
+
+  /**
+   * Push the current `scopedSchemaUnavailable` state into Monaco's
+   * `readOnly` option. Called after every lazy-load resolution so
+   * the editor flips locked/unlocked in step with the sidebar's
+   * error state. No-op if the editor hasn't been created yet
+   * (loadMonacoEditor handles initial state via the same path).
+   */
+  private syncEditorReadOnlyState(): void {
+    if (!this.editor) return;
+    const readOnly = this.scopedSchemaUnavailable;
+    this.editor.updateOptions({ readOnly });
   }
 
   /**

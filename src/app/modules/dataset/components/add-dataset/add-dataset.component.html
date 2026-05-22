@@ -44,7 +44,11 @@
         class="p-button-text btn-dataset"
         (click)="saveAsDataset()"
         [disabled]="
-          isLoadingEditor || !selectedDatasourceObj || !editor || isQueryEmpty
+          isLoadingEditor ||
+          !selectedDatasourceObj ||
+          !editor ||
+          isQueryEmpty ||
+          scopedSchemaUnavailable
         "
         [title]="'DATASET.SAVE_AS_DATASET' | translate"
         [attr.aria-label]="'DATASET.SAVE_AS_DATASET' | translate"
@@ -55,7 +59,12 @@
         pButton
         class="p-button-text btn-export"
         (click)="triggerFileInput()"
-        [disabled]="isLoadingEditor || !selectedDatasourceObj || !editor"
+        [disabled]="
+          isLoadingEditor ||
+          !selectedDatasourceObj ||
+          !editor ||
+          scopedSchemaUnavailable
+        "
         [title]="'DATASET.IMPORT_SQL_FILE' | translate"
         [attr.aria-label]="'DATASET.IMPORT_SQL_FILE' | translate"
       >
@@ -66,7 +75,11 @@
         class="p-button-text btn-export"
         (click)="exportCurrentScript()"
         [disabled]="
-          isLoadingEditor || !selectedDatasourceObj || !editor || isQueryEmpty
+          isLoadingEditor ||
+          !selectedDatasourceObj ||
+          !editor ||
+          isQueryEmpty ||
+          scopedSchemaUnavailable
         "
         [title]="'DATASET.EXPORT_SCRIPT' | translate"
         [attr.aria-label]="'DATASET.EXPORT_SCRIPT' | translate"
@@ -78,7 +91,11 @@
         class="p-button-text btn-danger"
         (click)="clearEditor()"
         [disabled]="
-          isLoadingEditor || !selectedDatasourceObj || !editor || isQueryEmpty
+          isLoadingEditor ||
+          !selectedDatasourceObj ||
+          !editor ||
+          isQueryEmpty ||
+          scopedSchemaUnavailable
         "
         [title]="'DATASET.CLEAR_EDITOR' | translate"
         [attr.aria-label]="'DATASET.CLEAR_EDITOR' | translate"
@@ -94,7 +111,8 @@
           !selectedDatasourceObj ||
           !editor ||
           isExecutingQuery ||
-          isQueryEmpty
+          isQueryEmpty ||
+          scopedSchemaUnavailable
         "
         [title]="'DATASET.EXECUTE_QUERY' | translate"
         [attr.aria-label]="'DATASET.EXECUTE_QUERY' | translate"
@@ -384,6 +402,23 @@
     <div class="editor-results-area">
       <!-- Monaco Editor Section -->
       <div class="editor-section">
+        <!-- Scoped-schema unavailable banner. Renders when the user
+             arrived via ?schema=X and that schema's tables fetch
+             failed (404 / permission / etc). Editor flips read-only
+             and Save / Run / Clear are disabled because there's no
+             reliable schema for the SQL to resolve against. -->
+        <div
+          class="editor-disabled-banner"
+          *ngIf="scopedSchemaUnavailable"
+          [attr.role]="'alert'"
+        >
+          <i class="pi pi-lock" aria-hidden="true"></i>
+          <div class="banner-text">
+            <strong>{{ 'DATASET.EDITOR_DISABLED' | translate }}</strong>
+            <span *ngIf="scopedSchemaErrorMessage">{{ scopedSchemaErrorMessage }}</span>
+          </div>
+        </div>
+
         <div
           class="editor-container"
           [hidden]="isLoadingEditor || monacoLoadFailed"

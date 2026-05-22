@@ -738,7 +738,8 @@
     "SCHEMA_PICK_DATASOURCE_FIRST": "上でデータソースを選択するとスキーマを選択できます。",
     "SEARCH_DATASOURCES": "データソースを検索…",
     "NO_DATASOURCES": "データソースが見つかりません",
-    "SCHEMA": "スキーマ"
+    "SCHEMA": "スキーマ",
+    "EDITOR_DISABLED": "エディタは無効です — スキーマを利用できません。"
   },
   "ANALYSES": {
     "TITLE": "分析",

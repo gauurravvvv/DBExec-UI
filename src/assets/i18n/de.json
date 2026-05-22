@@ -738,7 +738,8 @@
     "SCHEMA_PICK_DATASOURCE_FIRST": "Wählen Sie oben eine Datenquelle, um ein Schema zu wählen.",
     "SEARCH_DATASOURCES": "Datenquellen suchen…",
     "NO_DATASOURCES": "Keine Datenquellen gefunden",
-    "SCHEMA": "Schema"
+    "SCHEMA": "Schema",
+    "EDITOR_DISABLED": "Editor deaktiviert – Schema nicht verfügbar."
   },
   "ANALYSES": {
     "TITLE": "Analysen",

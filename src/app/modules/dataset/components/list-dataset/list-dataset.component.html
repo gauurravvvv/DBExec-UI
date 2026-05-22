@@ -521,6 +521,33 @@
       </button>
     </div>
     <div class="ds-picker-body">
+      <!-- Step 0 (system admins only): Organisation. Selecting an
+           org cascades a reset: datasource and schema below clear,
+           the datasource list re-fetches against the new org.
+           Defaults to the org currently selected on the list page
+           when the popup opens. -->
+      <app-custom-dropdown
+        *ngIf="showOrganisationDropdown"
+        [(ngModel)]="dsPickerOrgSelected"
+        [label]="'COMMON.ORGANISATION' | translate"
+        [placeholder]="'COMMON.ORGANISATION' | translate"
+        [floatingLabel]="true"
+        [serverMode]="true"
+        [fetcher]="loadOrgsPage"
+        [pageSize]="10"
+        [preloadedItems]="dsPickerOrgPreloaded"
+        [preloadedTotal]="dsPickerOrgPreloadedTotal"
+        optionLabel="name"
+        [optionValue]="null"
+        [filter]="true"
+        filterBy="name"
+        icon="pi-building"
+        appendTo="body"
+        panelStyleClass="ds-picker-panel"
+        (onChangeEvent)="onDsPickerOrgChange()"
+      >
+      </app-custom-dropdown>
+
       <!-- Step 1: Datasource. Always visible. Changing this resets
            the schema selection below and re-fetches the schema
            list against the new datasource.
@@ -549,6 +576,7 @@
         icon="pi-database"
         appendTo="body"
         panelStyleClass="ds-picker-panel"
+        [disabled]="showOrganisationDropdown && !dsPickerOrgSelected"
         (onChangeEvent)="onDsPickerDatasourceChange()"
       >
       </app-custom-dropdown>

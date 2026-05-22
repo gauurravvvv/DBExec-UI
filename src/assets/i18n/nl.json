@@ -738,7 +738,8 @@
     "SCHEMA_PICK_DATASOURCE_FIRST": "Kies hierboven een gegevensbron om een schema te selecteren.",
     "SEARCH_DATASOURCES": "Gegevensbronnen zoeken…",
     "NO_DATASOURCES": "Geen gegevensbronnen gevonden",
-    "SCHEMA": "Schema"
+    "SCHEMA": "Schema",
+    "EDITOR_DISABLED": "Editor uitgeschakeld — schema niet beschikbaar."
   },
   "ANALYSES": {
     "TITLE": "Analyses",

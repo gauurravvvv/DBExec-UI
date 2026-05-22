@@ -504,13 +504,25 @@ export class ListDatasetComponent implements OnInit {
   }
 
   // ── Datasource picker popup state ─────────────────────────────────
-  // Two-step picker: pick a datasource, then pick a schema within
-  // that datasource. The schema dropdown only appears after a
-  // datasource is chosen; Continue requires both. The chosen schema
-  // becomes the editor's scope (sidebar shows only that schema's
-  // tables and the editor defaults to it for unqualified table
-  // references).
+  // Three-step picker (for system admins; org-only users skip step 1):
+  //   1. Org    — system-admin-only. Defaults to the list page's
+  //               currently-active org. Changing resets steps 2+3.
+  //   2. Datasource — datasources in the picked org. Changing
+  //               resets step 3.
+  //   3. Schema — optional. Schemas in the picked datasource. The
+  //               choice scopes the editor's sidebar to that schema.
+  // Continue requires datasource. Org auto-defaults from the page,
+  // schema is optional.
   showDsPickerPopup = false;
+  /** Org selected inside the popup. For non-system-admins this just
+   *  mirrors `this.selectedOrg` (popup never lets them change it).
+   *  For system admins it can differ from the list page's org until
+   *  Continue navigates. */
+  dsPickerOrgSelected: any = null;
+  /** Preloaded orgs for the popup dropdown — primes it with the
+   *  first page so the user sees options on open. */
+  dsPickerOrgPreloaded: any[] | null = null;
+  dsPickerOrgPreloadedTotal: number | null = null;
   dsPickerSelected: any = null;
   schemaPickerSelected: any = null;
   /** Mirror of preloaded datasources so the popup opens with content
@@ -532,10 +544,78 @@ export class ListDatasetComponent implements OnInit {
     this.schemaPickerError = null;
     this.dsPickerPreloaded = null;
     this.dsPickerPreloadedTotal = null;
+    // Seed the popup's org from the list page's current selection.
+    // For non-system-admins this is the JWT-derived org (read-only
+    // in the popup); for system admins it's a soft default they
+    // can override via the org dropdown.
+    this.dsPickerOrgSelected = this.resolveListPageOrg();
+    this.dsPickerOrgPreloaded = null;
+    this.dsPickerOrgPreloadedTotal = null;
     this.showDsPickerPopup = true;
+    if (this.showOrganisationDropdown) {
+      this.primeDsPickerOrgs();
+    }
     // Prime the datasource dropdown with page 1 so users see options
     // immediately instead of waiting for the server-mode fetcher.
     this.primeDatasourcePicker();
+  }
+
+  /**
+   * Convert the list-page's `selectedOrg` (which can be either a
+   * raw id string for system admins or a JWT-derived id for org
+   * users) into the object shape the popup's custom-dropdown
+   * expects. Returns null when there's no current org context.
+   */
+  private resolveListPageOrg(): any {
+    if (!this.selectedOrg) return null;
+    if (typeof this.selectedOrg === 'object') return this.selectedOrg;
+    // selectedOrg is a bare id; look it up in the org list we
+    // already loaded for the list page (if system admin). For org
+    // users, build a stub object so the popup dropdown displays
+    // _something_ even though it never actually opens.
+    const match = this.organisations?.find(
+      (o: any) => String(o.id) === String(this.selectedOrg),
+    );
+    return match ?? { id: this.selectedOrg };
+  }
+
+  /** Page-1 prime for the popup org dropdown so it opens with
+   *  content. Subsequent search/scroll goes through loadOrgsPage. */
+  private primeDsPickerOrgs(): void {
+    this.organisationService
+      .listOrganisation({ page: 1, limit: 10 })
+      .then((res: any) => {
+        if (this.globalService.handleSuccessService(res, false)) {
+          this.dsPickerOrgPreloaded = res?.data?.orgs ?? [];
+          this.dsPickerOrgPreloadedTotal =
+            res?.data?.count ?? this.dsPickerOrgPreloaded?.length ?? 0;
+        }
+      })
+      .catch(() => {
+        this.dsPickerOrgPreloaded = [];
+        this.dsPickerOrgPreloadedTotal = 0;
+      });
+  }
+
+  /**
+   * Fires when the popup's org dropdown changes (system admins
+   * only — the dropdown isn't rendered for org-scoped users).
+   * Cascades the reset: clear datasource + schema and re-prime
+   * the datasource list against the new org.
+   */
+  onDsPickerOrgChange(): void {
+    this.dsPickerSelected = null;
+    this.dsPickerPreloaded = null;
+    this.dsPickerPreloadedTotal = null;
+    this.schemaPickerSelected = null;
+    this.schemaPickerOptions = null;
+    this.schemaPickerError = null;
+    this.schemaPickerLoading = false;
+    this.dsPickerSchemaToken++; // discard any in-flight schema fetch
+    if (this.dsPickerOrgSelected?.id) {
+      this.primeDatasourcePicker();
+    }
+    this.cdr.markForCheck();
   }
 
   closeDatasourcePicker(): void {
@@ -558,10 +638,18 @@ export class ListDatasetComponent implements OnInit {
     }
   }
 
+  /** Active org for the popup's datasource fetches. Falls back to
+   *  the list page's org if the popup's local override is empty
+   *  (e.g. mid-reset). */
+  private get dsPickerActiveOrgId(): string | null {
+    return this.dsPickerOrgSelected?.id || this.selectedOrg || null;
+  }
+
   private primeDatasourcePicker(): void {
-    if (!this.selectedOrg) return;
+    const orgId = this.dsPickerActiveOrgId;
+    if (!orgId) return;
     this.datasourceService
-      .listDatasource({ orgId: this.selectedOrg, page: 1, limit: 10 })
+      .listDatasource({ orgId, page: 1, limit: 10 })
       .then((res: any) => {
         if (this.globalService.handleSuccessService(res, false)) {
           this.dsPickerPreloaded = res?.data?.datasources ?? [];
@@ -585,8 +673,9 @@ export class ListDatasetComponent implements OnInit {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    if (!this.selectedOrg) return { items: [], total: 0 };
-    const params: any = { orgId: this.selectedOrg, page, limit };
+    const orgId = this.dsPickerActiveOrgId;
+    if (!orgId) return { items: [], total: 0 };
+    const params: any = { orgId, page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       const res: any = await this.datasourceService.listDatasource(params);
@@ -624,11 +713,12 @@ export class ListDatasetComponent implements OnInit {
     this.schemaPickerError = null;
     this.schemaPickerLoading = false;
     const ds = this.dsPickerSelected;
-    if (!ds?.id || !this.selectedOrg) {
+    const orgId = this.dsPickerActiveOrgId;
+    if (!ds?.id || !orgId) {
       this.cdr.markForCheck();
       return;
     }
-    this.loadSchemasForPicker(String(this.selectedOrg), String(ds.id));
+    this.loadSchemasForPicker(String(orgId), String(ds.id));
   }
 
   private loadSchemasForPicker(orgId: string, datasourceId: string): void {
@@ -695,7 +785,13 @@ export class ListDatasetComponent implements OnInit {
     if (this.schemaPickerSelected?.name) {
       queryParams.schema = this.schemaPickerSelected.name;
     }
-    if (this.selectedOrg) queryParams.orgId = this.selectedOrg;
+    // Use the popup's chosen org (set by the org dropdown for system
+    // admins, or seeded from the list page for org-scoped users)
+    // rather than the list page's selectedOrg directly — a system
+    // admin can pick a different org in the popup than the one
+    // they're filtering the list by.
+    const orgId = this.dsPickerActiveOrgId;
+    if (orgId) queryParams.orgId = orgId;
     this.showDsPickerPopup = false;
     // Carry the full datasource record (already fetched from the
     // listDatasource paginator) through router state so the add page

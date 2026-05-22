@@ -738,7 +738,8 @@
     "SCHEMA_PICK_DATASOURCE_FIRST": "위에서 데이터 소스를 선택하여 스키마를 선택하세요.",
     "SEARCH_DATASOURCES": "데이터 소스 검색…",
     "NO_DATASOURCES": "데이터 소스를 찾을 수 없습니다",
-    "SCHEMA": "스키마"
+    "SCHEMA": "스키마",
+    "EDITOR_DISABLED": "편집기가 비활성화됨 — 스키마를 사용할 수 없습니다."
   },
   "ANALYSES": {
     "TITLE": "분석",

@@ -738,7 +738,8 @@
     "SCHEMA_PICK_DATASOURCE_FIRST": "Scegli un'origine dati sopra per selezionare uno schema.",
     "SEARCH_DATASOURCES": "Cerca origini dati…",
     "NO_DATASOURCES": "Nessuna origine dati trovata",
-    "SCHEMA": "Schema"
+    "SCHEMA": "Schema",
+    "EDITOR_DISABLED": "Editor disabilitato — schema non disponibile."
   },
   "ANALYSES": {
     "TITLE": "Analisi",

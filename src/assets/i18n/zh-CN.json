@@ -738,7 +738,8 @@
     "SCHEMA_PICK_DATASOURCE_FIRST": "请先在上方选择数据源,然后选择 schema。",
     "SEARCH_DATASOURCES": "搜索数据源…",
     "NO_DATASOURCES": "未找到数据源",
-    "SCHEMA": "Schema"
+    "SCHEMA": "Schema",
+    "EDITOR_DISABLED": "编辑器已禁用 — Schema 不可用。"
   },
   "ANALYSES": {
     "TITLE": "分析",

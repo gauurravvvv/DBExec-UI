@@ -738,7 +738,8 @@
     "SCHEMA_PICK_DATASOURCE_FIRST": "Elija una fuente de datos arriba para elegir un esquema.",
     "SEARCH_DATASOURCES": "Buscar fuentes de datos…",
     "NO_DATASOURCES": "No se encontraron fuentes de datos",
-    "SCHEMA": "Esquema"
+    "SCHEMA": "Esquema",
+    "EDITOR_DISABLED": "Editor deshabilitado: esquema no disponible."
   },
   "ANALYSES": {
     "TITLE": "Análisis",
