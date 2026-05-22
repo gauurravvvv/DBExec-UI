@@ -489,6 +489,66 @@
   (close)="onCreateAnalysisDialogClose($event)"
 ></app-save-analyses-dialog>
 
+<!-- Datasource picker — opens from the Add button. User picks the
+     datasource here, then routes to /datasets/new?datasourceId=…
+     with the engine preselected. The add page does NOT show org or
+     datasource dropdowns; deep links without a query param fall back
+     to a legacy bootstrap on the add page side. -->
+<div
+  class="cmd-overlay"
+  *ngIf="showDsPickerPopup"
+  (click)="closeDatasourcePicker()"
+>
+  <div class="cmd-palette ds-picker" (click)="$event.stopPropagation()">
+    <div class="ds-picker-header">
+      <h3>{{ 'DATASET.PICK_DATASOURCE' | translate }}</h3>
+      <button
+        type="button"
+        class="ds-picker-close"
+        (click)="closeDatasourcePicker()"
+        [attr.aria-label]="'COMMON.CLOSE' | translate"
+      >
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="ds-picker-body">
+      <app-custom-dropdown
+        [(ngModel)]="dsPickerSelected"
+        [label]="'COMMON.DATASOURCE' | translate"
+        [floatingLabel]="true"
+        [serverMode]="true"
+        [fetcher]="loadDsPickerPage"
+        [pageSize]="10"
+        [preloadedItems]="dsPickerPreloaded"
+        [preloadedTotal]="dsPickerPreloadedTotal"
+        optionLabel="name"
+        [optionValue]="null"
+        [filter]="true"
+        filterBy="name"
+        icon="pi-database"
+      >
+      </app-custom-dropdown>
+    </div>
+    <div class="ds-picker-footer">
+      <button
+        pButton
+        class="p-button-text"
+        (click)="closeDatasourcePicker()"
+      >
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        pButton
+        class="p-button-primary"
+        [disabled]="!dsPickerSelected"
+        (click)="onDsPickerContinue()"
+      >
+        {{ 'COMMON.CONTINUE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Command Palette: Query Builder Selection -->
 <div
   class="cmd-overlay"

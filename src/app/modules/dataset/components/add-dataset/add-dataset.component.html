@@ -2,54 +2,22 @@
   <!-- Header Toolbar -->
   <div class="query-toolbar">
     <div class="toolbar-left">
-      <!-- Organisation Dropdown -->
-      <div class="dropdown-field" *ngIf="showOrganisationDropdown">
-        <app-custom-dropdown
-          [(ngModel)]="selectedOrg"
-          [label]="'COMMON.SELECT_ORGANISATION' | translate"
-          [floatingLabel]="true"
-          [serverMode]="true"
-          [fetcher]="loadOrgsPage"
-          [pageSize]="10"
-          [preloadedItems]="preloadedOrgs"
-          [preloadedTotal]="preloadedOrgsTotal"
-          optionLabel="name"
-          [optionValue]="null"
-          [filter]="true"
-          filterBy="name"
-          [floatingLabel]="true"
-          (onChangeEvent)="onOrgChange({ value: $event })"
-          icon="pi-building"
-        >
-        </app-custom-dropdown>
-      </div>
+      <!-- Datasource is preselected via the list-dataset Add popup
+           (?datasourceId=…). The org and datasource dropdowns that
+           used to live here are gone; if the user wants to switch
+           datasource they go back to the list. -->
 
-      <!-- Datasource Dropdown — server-driven -->
-      <div class="dropdown-field">
-        <app-custom-dropdown
-          [(ngModel)]="selectedDatasourceObj"
-          [label]="'COMMON.SELECT_DATASOURCE' | translate"
-          [floatingLabel]="true"
-          [serverMode]="true"
-          [fetcher]="loadDatasourcesPage"
-          [pageSize]="10"
-          [preloadedItems]="preloadedDatasources"
-          [preloadedTotal]="preloadedDatasourcesTotal"
-          optionLabel="name"
-          [optionValue]="null"
-          [filter]="true"
-          filterBy="name"
-          [floatingLabel]="true"
-          (onChangeEvent)="onDatasourceChange({ value: $event })"
-          icon="pi-database"
-        >
-        </app-custom-dropdown>
+      <!-- Selected datasource name + dialect badge.
+           Read-only readouts — no interaction. -->
+      <div class="ds-info" *ngIf="selectedDatasourceObj">
+        <i class="pi pi-database ds-info-icon" aria-hidden="true"></i>
+        <span class="ds-info-name">{{ selectedDatasourceObj.name }}</span>
       </div>
 
       <!-- Active engine badge — reminds the user which SQL dialect the
-           editor's autocomplete is scoped to. Only renders when a
-           datasource is selected; uses the same icon class + label as the
-           Add/Edit Datasource form for visual consistency. -->
+           editor's autocomplete is scoped to. Uses the same icon
+           class + label as the Add/Edit Datasource form for visual
+           consistency. -->
       <div
         class="db-type-badge"
         *ngIf="selectedDbTypeOption"

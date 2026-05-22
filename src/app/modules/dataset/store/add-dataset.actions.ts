@@ -40,3 +40,72 @@ export const refreshSchemaData = createAction(
   '[Add Dataset] Refresh Schema Data',
   props<{ orgId: string; dbId: string }>(),
 );
+
+// ── Lazy-load: tables for one schema ────────────────────────────────
+// Dispatched when the user expands a schema row in the sidebar. The
+// reducer flips that schema's `tablesStatus` to 'loading'; the
+// component (or an effect, if we ever add one) calls the BE and
+// dispatches the success / failure variant.
+export const loadTablesForSchema = createAction(
+  '[Add Dataset] Load Tables For Schema',
+  props<{ orgId: string; dbId: string; schemaName: string }>(),
+);
+
+export const loadTablesForSchemaSuccess = createAction(
+  '[Add Dataset] Load Tables For Schema Success',
+  props<{
+    orgId: string;
+    dbId: string;
+    schemaName: string;
+    tables: { name: string; alias?: string }[];
+  }>(),
+);
+
+export const loadTablesForSchemaFailure = createAction(
+  '[Add Dataset] Load Tables For Schema Failure',
+  props<{
+    orgId: string;
+    dbId: string;
+    schemaName: string;
+    error: string;
+  }>(),
+);
+
+// ── Lazy-load: columns for one table ────────────────────────────────
+// Same pattern as tables, one level deeper.
+export const loadColumnsForTable = createAction(
+  '[Add Dataset] Load Columns For Table',
+  props<{
+    orgId: string;
+    dbId: string;
+    schemaName: string;
+    tableName: string;
+  }>(),
+);
+
+export const loadColumnsForTableSuccess = createAction(
+  '[Add Dataset] Load Columns For Table Success',
+  props<{
+    orgId: string;
+    dbId: string;
+    schemaName: string;
+    tableName: string;
+    columns: {
+      name: string;
+      type: string;
+      nullable: boolean;
+      defaultValue?: string | null;
+    }[];
+  }>(),
+);
+
+export const loadColumnsForTableFailure = createAction(
+  '[Add Dataset] Load Columns For Table Failure',
+  props<{
+    orgId: string;
+    dbId: string;
+    schemaName: string;
+    tableName: string;
+    error: string;
+  }>(),
+);

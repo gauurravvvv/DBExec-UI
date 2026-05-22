@@ -492,8 +492,99 @@ export class ListDatasetComponent implements OnInit {
       });
   }
 
+  /**
+   * Open the datasource-picker popup. Previously routed straight to
+   * /datasets/new; the popup is the new entry point so the add page
+   * doesn't have to show org + datasource dropdowns. The popup itself
+   * is a `cmd-overlay` block in the template — see the matching close
+   * + continue handlers below.
+   */
   onAddNewAdmin() {
-    this.router.navigate([DATASET.ADD]);
+    this.openDatasourcePicker();
+  }
+
+  // ── Datasource picker popup state ─────────────────────────────────
+  showDsPickerPopup = false;
+  dsPickerSelected: any = null;
+  /** Mirror of preloaded datasources so the popup opens with content
+   *  on the very first click; the dropdown's serverMode fetcher takes
+   *  over for search + pagination. */
+  dsPickerPreloaded: any[] | null = null;
+  dsPickerPreloadedTotal: number | null = null;
+
+  openDatasourcePicker(): void {
+    this.dsPickerSelected = null;
+    this.dsPickerPreloaded = null;
+    this.dsPickerPreloadedTotal = null;
+    this.showDsPickerPopup = true;
+    // Prime the dropdown with the first page so the user sees options
+    // immediately instead of an empty list waiting for the fetcher.
+    this.primeDatasourcePicker();
+  }
+
+  closeDatasourcePicker(): void {
+    this.showDsPickerPopup = false;
+  }
+
+  private primeDatasourcePicker(): void {
+    if (!this.selectedOrg) return;
+    this.datasourceService
+      .listDatasource({ orgId: this.selectedOrg, page: 1, limit: 10 })
+      .then((res: any) => {
+        if (this.globalService.handleSuccessService(res, false)) {
+          this.dsPickerPreloaded = res?.data?.datasources ?? [];
+          this.dsPickerPreloadedTotal =
+            res?.data?.count ?? this.dsPickerPreloaded?.length ?? 0;
+        }
+      })
+      .catch(() => {
+        this.dsPickerPreloaded = [];
+        this.dsPickerPreloadedTotal = 0;
+      });
+  }
+
+  /** Server-mode fetcher for the popup's datasource dropdown. */
+  loadDsPickerPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    if (!this.selectedOrg) return { items: [], total: 0 };
+    const params: any = { orgId: this.selectedOrg, page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.datasourceService.listDatasource(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return {
+          items: res?.data?.datasources ?? [],
+          total: res?.data?.count ?? 0,
+        };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
+  /**
+   * Continue from the popup: route to /datasets/new with the picked
+   * datasource as a query param. The add page bootstraps directly
+   * from this without re-prompting.
+   */
+  onDsPickerContinue(): void {
+    if (!this.dsPickerSelected?.id) return;
+    const queryParams: any = {
+      datasourceId: this.dsPickerSelected.id,
+    };
+    if (this.selectedOrg) {
+      queryParams.orgId = this.selectedOrg;
+    }
+    this.showDsPickerPopup = false;
+    this.router.navigate([DATASET.ADD], { queryParams });
   }
 
   onAddViaPrompts() {

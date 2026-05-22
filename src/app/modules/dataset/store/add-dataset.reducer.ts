@@ -10,6 +10,9 @@ import {
   CACHE_CONFIG,
   getSchemaKey,
   initialAddDatasetState,
+  LazySchemaGroup,
+  LazySchemaTree,
+  LazyTableNode,
   SchemaEntry,
 } from './add-dataset.state';
 
@@ -217,4 +220,149 @@ export const addDatasetReducer = createReducer(
       };
     },
   ),
+
+  // ── Lazy-load: tables for one schema ─────────────────────────────
+  // Three handlers (loading/success/failure) update the nested
+  // `tablesStatus`/`tables` on the matching schema row. Immutable
+  // updates all the way down so OnPush components in the sidebar
+  // pick up the change.
+  on(
+    AddDatasetActions.loadTablesForSchema,
+    (state, { orgId, dbId, schemaName }): AddDatasetState =>
+      updateSchemaNode(state, orgId, dbId, schemaName, group => ({
+        ...group,
+        tablesStatus: 'loading',
+        tablesError: null,
+      })),
+  ),
+  on(
+    AddDatasetActions.loadTablesForSchemaSuccess,
+    (state, { orgId, dbId, schemaName, tables }): AddDatasetState =>
+      updateSchemaNode(state, orgId, dbId, schemaName, group => ({
+        ...group,
+        tablesStatus: 'loaded',
+        tablesError: null,
+        // Preserve any column data we already had for tables that
+        // re-appear in the new list — re-fetching the table list
+        // shouldn't blow away expanded columns. Identity by table name.
+        tables: tables.map(t => {
+          const existing = group.tables.find(
+            existing => existing.name === t.name,
+          );
+          if (existing) return { ...existing, alias: t.alias ?? existing.alias };
+          return {
+            name: t.name,
+            alias: t.alias,
+            columnsStatus: 'idle' as const,
+            columnsError: null,
+            columns: [],
+          };
+        }),
+      })),
+  ),
+  on(
+    AddDatasetActions.loadTablesForSchemaFailure,
+    (state, { orgId, dbId, schemaName, error }): AddDatasetState =>
+      updateSchemaNode(state, orgId, dbId, schemaName, group => ({
+        ...group,
+        tablesStatus: 'error',
+        tablesError: error,
+      })),
+  ),
+
+  // ── Lazy-load: columns for one table ─────────────────────────────
+  on(
+    AddDatasetActions.loadColumnsForTable,
+    (state, { orgId, dbId, schemaName, tableName }): AddDatasetState =>
+      updateTableNode(state, orgId, dbId, schemaName, tableName, table => ({
+        ...table,
+        columnsStatus: 'loading',
+        columnsError: null,
+      })),
+  ),
+  on(
+    AddDatasetActions.loadColumnsForTableSuccess,
+    (
+      state,
+      { orgId, dbId, schemaName, tableName, columns },
+    ): AddDatasetState =>
+      updateTableNode(state, orgId, dbId, schemaName, tableName, table => ({
+        ...table,
+        columnsStatus: 'loaded',
+        columnsError: null,
+        columns: columns.map(c => ({
+          name: c.name,
+          type: c.type,
+          nullable: c.nullable,
+          defaultValue: c.defaultValue ?? null,
+        })),
+      })),
+  ),
+  on(
+    AddDatasetActions.loadColumnsForTableFailure,
+    (state, { orgId, dbId, schemaName, tableName, error }): AddDatasetState =>
+      updateTableNode(state, orgId, dbId, schemaName, tableName, table => ({
+        ...table,
+        columnsStatus: 'error',
+        columnsError: error,
+      })),
+  ),
 );
+
+/**
+ * Immutably update the schema-group identified by (orgId, dbId,
+ * schemaName) using the provided patch function. No-op when the
+ * cache key or the schema row is missing — callers shouldn't see a
+ * lazy-load action for a schema they didn't fetch.
+ */
+function updateSchemaNode(
+  state: AddDatasetState,
+  orgId: string,
+  dbId: string,
+  schemaName: string,
+  patch: (group: LazySchemaGroup) => LazySchemaGroup,
+): AddDatasetState {
+  const key = getSchemaKey(orgId, dbId);
+  const entry = state.schemas[key];
+  if (!entry || !entry.data) return state;
+
+  const tree: LazySchemaTree = entry.data;
+  const idx = tree.schemas.findIndex(s => s.name === schemaName);
+  if (idx < 0) return state;
+
+  const nextSchemas = tree.schemas.slice();
+  nextSchemas[idx] = patch(tree.schemas[idx]);
+  return {
+    ...state,
+    schemas: {
+      ...state.schemas,
+      [key]: {
+        ...entry,
+        data: { ...tree, schemas: nextSchemas },
+        lastAccessedAt: new Date(),
+      },
+    },
+  };
+}
+
+/**
+ * Immutably update the table node identified by (orgId, dbId,
+ * schemaName, tableName). Same no-op behaviour as updateSchemaNode
+ * when the lookup fails.
+ */
+function updateTableNode(
+  state: AddDatasetState,
+  orgId: string,
+  dbId: string,
+  schemaName: string,
+  tableName: string,
+  patch: (table: LazyTableNode) => LazyTableNode,
+): AddDatasetState {
+  return updateSchemaNode(state, orgId, dbId, schemaName, group => {
+    const idx = group.tables.findIndex(t => t.name === tableName);
+    if (idx < 0) return group;
+    const nextTables = group.tables.slice();
+    nextTables[idx] = patch(group.tables[idx]);
+    return { ...group, tables: nextTables };
+  });
+}

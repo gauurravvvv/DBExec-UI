@@ -1185,3 +1185,59 @@ td.empty-message-cell {
     }
   }
 }
+
+
+// ── Datasource picker popup ─────────────────────────────────────────
+// Reuses the .cmd-overlay + .cmd-palette base styles defined above.
+// The ds-picker variant overrides padding + adds header / body /
+// footer rows so the popup reads as a small dialog rather than a
+// search palette. Centred vertically because there is no scrolling
+// results list to anchor to the top.
+.cmd-palette.ds-picker {
+  max-width: 480px;
+  padding: 0;
+
+  .ds-picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--border-color);
+
+    h3 {
+      margin: 0;
+      font-size: var(--fs-h4, 16px);
+      font-weight: var(--fw-semibold, 600);
+      color: var(--text-color);
+    }
+
+    .ds-picker-close {
+      background: transparent;
+      border: none;
+      color: var(--text-color);
+      opacity: 0.7;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: var(--radius-xs);
+      line-height: 0;
+
+      &:hover {
+        opacity: 1;
+        background: var(--hover-background);
+      }
+    }
+  }
+
+  .ds-picker-body {
+    padding: var(--space-6);
+  }
+
+  .ds-picker-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    border-top: 1px solid var(--border-color);
+    background: var(--card-background);
+  }
+}

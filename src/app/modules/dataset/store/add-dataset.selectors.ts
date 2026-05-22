@@ -9,6 +9,8 @@ import {
   CACHE_CONFIG,
   getSchemaKey,
   isSchemaStale,
+  LazySchemaGroup,
+  LazyTableNode,
   SchemaEntry,
 } from './add-dataset.state';
 
@@ -128,3 +130,37 @@ export const selectIsActiveSchemaStale = createSelector(
     return isSchemaStale(entry.loadedAt);
   },
 );
+
+// ── Lazy-tree selectors ─────────────────────────────────────────────
+// Look up the schema-group node by (orgId, dbId, schemaName). Returns
+// null when the cache entry, the tree, or the schema row is missing.
+// Use this in the sidebar to read tablesStatus + tables for one row.
+export const selectSchemaNode = (
+  orgId: string,
+  dbId: string,
+  schemaName: string,
+) =>
+  createSelector(
+    selectSchemaByKey(orgId, dbId),
+    (entry): LazySchemaGroup | null => {
+      const tree = entry?.data;
+      if (!tree) return null;
+      return tree.schemas.find(s => s.name === schemaName) ?? null;
+    },
+  );
+
+// Look up a single table node by (orgId, dbId, schemaName, tableName).
+// Returns null when any link in the chain is missing.
+export const selectTableNode = (
+  orgId: string,
+  dbId: string,
+  schemaName: string,
+  tableName: string,
+) =>
+  createSelector(
+    selectSchemaNode(orgId, dbId, schemaName),
+    (group): LazyTableNode | null => {
+      if (!group) return null;
+      return group.tables.find(t => t.name === tableName) ?? null;
+    },
+  );

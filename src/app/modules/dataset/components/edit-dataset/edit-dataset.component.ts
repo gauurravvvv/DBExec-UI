@@ -42,6 +42,7 @@ import {
   ContextMenuItem,
   ContextMenuPosition,
 } from '../../models/query-tab.model';
+import { DatasourceService } from '../../../datasource/services/datasource.service';
 import { DatasetService } from '../../services/dataset.service';
 import { MonacoIntelliSenseService } from '../../services/monaco-intellisense.service';
 import { QueryService } from '../../services/query.service';
@@ -236,6 +237,7 @@ export class EditDatasetComponent
 
   constructor(
     private queryService: QueryService,
+    private datasourceService: DatasourceService,
     private monacoIntelliSenseService: MonacoIntelliSenseService,
     private sqlLinterService: SqlLinterService,
     private globalService: GlobalService,
@@ -689,60 +691,55 @@ export class EditDatasetComponent
 
     return new Promise((resolve, reject) => {
       try {
-        this.queryService
-          .getDatasourceStructure(dbId, this.selectedOrg.id)
-          .subscribe({
-            next: (response: any) => {
-              const schemaData =
-                SchemaTransformerHelper.transformSchemaResponse(response);
+        // Lazy schema-list fetch (see add-dataset for the same pattern).
+        this.datasourceService
+          .listDatasourceSchemas({
+            orgId,
+            datasourceId: dbIdStr,
+          })
+          .then((response: any) => {
+            const schemaData =
+              SchemaTransformerHelper.transformLazySchemasResponse(response);
 
-              // Dispatch success action with schema data — cache stays valid
-              // for this dbId regardless of whether the user moved on.
-              if (schemaData.length > 0) {
-                // Tag with dbType post-hoc so dialect resolution works
-                // when the user reopens this dataset later.
-                const dbType =
-                  this.selectedDatasourceObj?.config?.dbType ?? null;
-                const tagged = dbType
-                  ? { ...schemaData[0], dbType }
-                  : schemaData[0];
-                this.store.dispatch(
-                  AddDatasetActions.loadSchemaDataSuccess({
-                    orgId,
-                    dbId: dbIdStr,
-                    data: tagged,
-                  }),
-                );
-                this.datasourceSchemas[dbId] = tagged;
-              }
-
-              // Push fresh schema into the IntelliSense cache only if the
-              // user is still on this DB.
-              if (token === this.schemaSelectionToken) {
-                this.datasources = Object.values(this.datasourceSchemas);
-                this.monacoIntelliSenseService.setDatasources(this.datasources);
-              }
-
-              this.loadingDatasources[dbId] = false;
-              this.cdr.markForCheck();
-              resolve();
-            },
-            error: (error: any) => {
-              // Dispatch failure action
+            if (schemaData.length > 0) {
+              const dbType =
+                this.selectedDatasourceObj?.config?.dbType ?? null;
+              const tagged = dbType
+                ? { ...schemaData[0], dbType }
+                : schemaData[0];
               this.store.dispatch(
-                AddDatasetActions.loadSchemaDataFailure({
+                AddDatasetActions.loadSchemaDataSuccess({
                   orgId,
                   dbId: dbIdStr,
-                  error:
-                    error.message ||
-                    this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
+                  data: tagged,
                 }),
               );
+              this.datasourceSchemas[dbId] = tagged;
+            }
 
-              this.loadingDatasources[dbId] = false;
-              this.cdr.markForCheck();
-              reject(error);
-            },
+            if (token === this.schemaSelectionToken) {
+              this.datasources = Object.values(this.datasourceSchemas);
+              this.monacoIntelliSenseService.setDatasources(this.datasources);
+            }
+
+            this.loadingDatasources[dbId] = false;
+            this.cdr.markForCheck();
+            resolve();
+          })
+          .catch((error: any) => {
+            this.store.dispatch(
+              AddDatasetActions.loadSchemaDataFailure({
+                orgId,
+                dbId: dbIdStr,
+                error:
+                  error?.message ||
+                  this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
+              }),
+            );
+
+            this.loadingDatasources[dbId] = false;
+            this.cdr.markForCheck();
+            reject(error);
           });
       } catch (error: any) {
         // Dispatch failure action
@@ -1254,18 +1251,148 @@ export class EditDatasetComponent
     const key = this.schemaPath(dbId, schemaName);
     if (this.expandedPaths.has(key)) {
       this.collapseSchemaSubtree(dbId, schemaName);
-    } else {
-      this.expandedPaths.add(key);
+      return;
     }
+    this.expandedPaths.add(key);
+    this.ensureTablesLoaded(dbId, schemaName);
   }
 
   toggleTable(dbId: string, schemaName: string, tableName: string): void {
     const key = this.tablePath(dbId, schemaName, tableName);
     if (this.expandedPaths.has(key)) {
       this.expandedPaths.delete(key);
-    } else {
-      this.expandedPaths.add(key);
+      return;
     }
+    this.expandedPaths.add(key);
+    this.ensureColumnsLoaded(dbId, schemaName, tableName);
+  }
+
+  /**
+   * Lazy fetch tables on first expand of a schema row. See
+   * add-dataset.component.ts for the matching implementation; the two
+   * components have to repeat the logic because the schema cache is
+   * keyed per-component instance, not in a shared service.
+   */
+  private ensureTablesLoaded(dbId: string, schemaName: string): void {
+    if (!this.selectedOrg?.id) return;
+    const orgId = String(this.selectedOrg.id);
+    const dbIdStr = String(dbId);
+    const schema = this.datasourceSchemas[dbId]?.schemas?.find(
+      s => s.name === schemaName,
+    ) as any;
+    if (schema && Array.isArray(schema.tables) && schema.tables.length > 0) {
+      return;
+    }
+    this.store.dispatch(
+      AddDatasetActions.loadTablesForSchema({
+        orgId,
+        dbId: dbIdStr,
+        schemaName,
+      }),
+    );
+    this.datasourceService
+      .listSchemaTables({ orgId, datasourceId: dbIdStr, schemaName })
+      .then((response: any) => {
+        const tables =
+          SchemaTransformerHelper.transformLazyTablesResponse(response);
+        if (schema) {
+          schema.tables = tables;
+          this.datasources = Object.values(this.datasourceSchemas);
+          this.monacoIntelliSenseService.setDatasources(this.datasources);
+        }
+        this.store.dispatch(
+          AddDatasetActions.loadTablesForSchemaSuccess({
+            orgId,
+            dbId: dbIdStr,
+            schemaName,
+            tables: tables.map(t => ({ name: t.name, alias: t.alias })),
+          }),
+        );
+        this.cdr.markForCheck();
+      })
+      .catch((error: any) => {
+        this.store.dispatch(
+          AddDatasetActions.loadTablesForSchemaFailure({
+            orgId,
+            dbId: dbIdStr,
+            schemaName,
+            error:
+              error?.message ||
+              this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
+          }),
+        );
+        this.cdr.markForCheck();
+      });
+  }
+
+  private ensureColumnsLoaded(
+    dbId: string,
+    schemaName: string,
+    tableName: string,
+  ): void {
+    if (!this.selectedOrg?.id) return;
+    const orgId = String(this.selectedOrg.id);
+    const dbIdStr = String(dbId);
+    const schema = this.datasourceSchemas[dbId]?.schemas?.find(
+      s => s.name === schemaName,
+    ) as any;
+    const table = schema?.tables?.find((t: any) => t.name === tableName);
+    if (table && Array.isArray(table.columns) && table.columns.length > 0) {
+      return;
+    }
+    this.store.dispatch(
+      AddDatasetActions.loadColumnsForTable({
+        orgId,
+        dbId: dbIdStr,
+        schemaName,
+        tableName,
+      }),
+    );
+    this.datasourceService
+      .listTableColumns({
+        orgId,
+        datasourceId: dbIdStr,
+        schemaName,
+        tableName,
+      })
+      .then((response: any) => {
+        const columns =
+          SchemaTransformerHelper.transformLazyColumnsResponse(response);
+        if (table) {
+          table.columns = columns;
+          this.datasources = Object.values(this.datasourceSchemas);
+          this.monacoIntelliSenseService.setDatasources(this.datasources);
+        }
+        this.store.dispatch(
+          AddDatasetActions.loadColumnsForTableSuccess({
+            orgId,
+            dbId: dbIdStr,
+            schemaName,
+            tableName,
+            columns: columns.map(c => ({
+              name: c.name,
+              type: c.type,
+              nullable: c.nullable,
+              defaultValue: c.defaultValue ?? null,
+            })),
+          }),
+        );
+        this.cdr.markForCheck();
+      })
+      .catch((error: any) => {
+        this.store.dispatch(
+          AddDatasetActions.loadColumnsForTableFailure({
+            orgId,
+            dbId: dbIdStr,
+            schemaName,
+            tableName,
+            error:
+              error?.message ||
+              this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
+          }),
+        );
+        this.cdr.markForCheck();
+      });
   }
 
   isTableExpanded(

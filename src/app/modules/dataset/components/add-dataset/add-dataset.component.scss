@@ -76,6 +76,33 @@
       }
     }
 
+    // Read-only datasource name displayed in the toolbar. Replaces
+    // the dropdown that used to live here once the popup-driven flow
+    // took over preselection. Visually paired with the dbType badge
+    // to its right.
+    .ds-info {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 4px 10px;
+      font-size: var(--fs-body, 14px);
+      font-weight: var(--fw-medium, 500);
+      color: var(--text-color);
+      max-width: 240px;
+      white-space: nowrap;
+      overflow: hidden;
+
+      .ds-info-icon {
+        color: var(--primary-color);
+        flex-shrink: 0;
+      }
+
+      .ds-info-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
     // Engine badge that sits inline with the datasource dropdown to
     // remind the user which SQL dialect the editor's autocomplete is
     // scoped to. Visual style follows the dbType pills used elsewhere
