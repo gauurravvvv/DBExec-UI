@@ -497,9 +497,18 @@
 <div
   class="cmd-overlay has-ds-picker"
   *ngIf="showDsPickerPopup"
-  (click)="closeDatasourcePicker()"
+  (click)="onDsPickerOverlayClick($event)"
 >
-  <div class="cmd-palette ds-picker" (click)="$event.stopPropagation()">
+  <!--
+    No `$event.stopPropagation()` on the dialog itself — PrimeNG's
+    outside-click listener is wired to `document` and any
+    stopPropagation on a parent eats it (panels stay open). Instead
+    the overlay's click handler discriminates: only close when the
+    click landed on the overlay backdrop, not on a child element.
+    The dropdowns themselves still use `appendTo="body"` so their
+    panels live outside the dialog tree entirely.
+  -->
+  <div class="cmd-palette ds-picker">
     <div class="ds-picker-header">
       <h3>{{ 'DATASET.PICK_DATASOURCE' | translate }}</h3>
       <button
@@ -526,6 +535,7 @@
       <app-custom-dropdown
         [(ngModel)]="dsPickerSelected"
         [label]="'COMMON.DATASOURCE' | translate"
+        [placeholder]="'COMMON.DATASOURCE' | translate"
         [floatingLabel]="true"
         [serverMode]="true"
         [fetcher]="loadDsPickerPage"
@@ -538,6 +548,7 @@
         filterBy="name"
         icon="pi-database"
         appendTo="body"
+        panelStyleClass="ds-picker-panel"
         (onChangeEvent)="onDsPickerDatasourceChange()"
       >
       </app-custom-dropdown>
@@ -553,6 +564,7 @@
           class="ds-picker-schema-dropdown"
           [(ngModel)]="schemaPickerSelected"
           [label]="('DATASET.SCHEMA' | translate) + ' (' + ('COMMON.OPTIONAL' | translate) + ')'"
+          [placeholder]="'DATASET.SCHEMA' | translate"
           [floatingLabel]="true"
           [options]="schemaPickerOptions || []"
           optionLabel="name"
@@ -561,6 +573,7 @@
           filterBy="name"
           icon="pi-sitemap"
           appendTo="body"
+          panelStyleClass="ds-picker-panel"
           [disabled]="!dsPickerSelected || schemaPickerLoading"
         >
         </app-custom-dropdown>

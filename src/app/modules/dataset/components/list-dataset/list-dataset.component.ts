@@ -542,6 +542,22 @@ export class ListDatasetComponent implements OnInit {
     this.showDsPickerPopup = false;
   }
 
+  /**
+   * Backdrop click handler. Closes the popup ONLY when the click
+   * landed on the overlay element itself, not on a child of the
+   * dialog. Replaces the previous pattern of `stopPropagation` on
+   * the dialog body — that worked but ate PrimeNG's document-level
+   * outside-click listener, leaving dropdown panels stuck open.
+   * Comparing event.target against currentTarget keeps the
+   * backdrop-close behaviour without interfering with anything
+   * inside the dialog.
+   */
+  onDsPickerOverlayClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.closeDatasourcePicker();
+    }
+  }
+
   private primeDatasourcePicker(): void {
     if (!this.selectedOrg) return;
     this.datasourceService

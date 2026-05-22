@@ -3109,3 +3109,27 @@ body {
   }
 }
 /* trigger-rebuild 1779393582 */
+
+// ── Datasource picker popup — body-mounted dropdown panels ────────
+// The picker dialog uses appendTo="body" on its dropdowns so
+// PrimeNG's outside-click handler still fires when the user clicks
+// inside the dialog (the dialog itself eats stopPropagation on the
+// backdrop click — see list-dataset.component.html). Body-level
+// panels don't inherit a width from their trigger, so the panel
+// reads narrower than the dropdown box and looks off-axis.
+//
+// `panelStyleClass="ds-picker-panel"` on both dropdowns marks the
+// rendered panel; PrimeNG copies the class to the .p-dropdown-panel
+// at body level. Targeted here:
+//   - Min-width matches the trigger box (~460px inside a 480px
+//     dialog after padding).
+//   - max-height keeps the option list scrollable, not crashing into
+//     the dialog footer.
+.p-dropdown-panel.ds-picker-panel {
+  min-width: 420px !important;
+  max-width: 460px;
+
+  .p-dropdown-items-wrapper {
+    max-height: 240px;
+  }
+}
