@@ -26,6 +26,8 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
 import { expandAnimation } from '../../animations/expand.animation';
 import {
+  DIALECT_LINT_DEBOUNCE_MS,
+  ENABLE_DIALECT_LINT,
   MONACO_EDITOR_OPTIONS,
   QUERY_EXECUTION_TIMEOUT_MS,
   SQL_EDITOR_PLACEHOLDER,
@@ -43,6 +45,11 @@ import {
 import { DatasetService } from '../../services/dataset.service';
 import { MonacoIntelliSenseService } from '../../services/monaco-intellisense.service';
 import { QueryService } from '../../services/query.service';
+import { SqlLinterService } from '../../services/sql-linter.service';
+import {
+  DATABASE_TYPES,
+  DatabaseTypeOption,
+} from '../../../datasource/constants/database-types.constant';
 import {
   AddDatasetActions,
   SchemaLoadingStatus,
@@ -130,6 +137,11 @@ export class EditDatasetComponent
   private hoverProviderDisposable: any = null;
   private signatureHelpDisposable: any = null;
 
+  /** Debounce handle for dialect lint. Cleared in ngOnDestroy. */
+  private dialectLintTimer: ReturnType<typeof setTimeout> | null = null;
+  /** Monaco markers owner-id for the lint pass. */
+  private static readonly DIALECT_LINT_OWNER = 'sql-dialect-lint';
+
   // Stable bound reference for context menu listener
   private boundCloseContextMenu = this.closeContextMenu.bind(this);
 
@@ -140,6 +152,22 @@ export class EditDatasetComponent
   showOrganisationDropdown: boolean = false;
   selectedDatasourceObj: any = null;
   selectedDatasourceName: string = '';
+
+  /**
+   * DatabaseTypeOption for the dataset's owning datasource. Drives the
+   * dbType badge next to the read-only datasource input. Edit mode
+   * never lets the user change datasources, so this is fixed once
+   * `selectedDatasourceObj` resolves from the dataset record.
+   */
+  get selectedDbTypeOption(): DatabaseTypeOption | null {
+    const dbType = this.selectedDatasourceObj?.config?.dbType;
+    if (!dbType) return null;
+    return (
+      DATABASE_TYPES.find(t => t.value === dbType) ??
+      DATABASE_TYPES.find(t => t.value === 'postgres') ??
+      null
+    );
+  }
 
   // Database Schema Management
   datasourceSchemas: { [dbId: string]: DatasourceSchema } = {};
@@ -209,6 +237,7 @@ export class EditDatasetComponent
   constructor(
     private queryService: QueryService,
     private monacoIntelliSenseService: MonacoIntelliSenseService,
+    private sqlLinterService: SqlLinterService,
     private globalService: GlobalService,
     private datasetService: DatasetService,
     private router: Router,
@@ -375,6 +404,12 @@ export class EditDatasetComponent
       this.signatureHelpDisposable.dispose();
     }
 
+    // Cancel any pending lint pass so it doesn't fire after teardown.
+    if (this.dialectLintTimer) {
+      clearTimeout(this.dialectLintTimer);
+      this.dialectLintTimer = null;
+    }
+
     // Cleanup theme observer
     if (this.themeObserver) {
       this.themeObserver.disconnect();
@@ -413,6 +448,13 @@ export class EditDatasetComponent
       this.cdr.markForCheck();
       return;
     }
+
+    // Lock the dialect to the datasource we're editing against. Edit
+    // mode never lets the user switch datasources — the dataset is
+    // bound to one — so this only needs to fire once per editor init.
+    this.monacoIntelliSenseService.setActiveDbType(
+      this.selectedDatasourceObj?.config?.dbType ?? null,
+    );
 
     // Wait for the DOM to be ready
     setTimeout(() => {
@@ -455,11 +497,16 @@ export class EditDatasetComponent
         // / hasQueryChanged) won't update as the user types under OnPush.
         this.editor.onDidChangeModelContent(() => {
           this.currentQuery = this.editor.getValue();
+          this.scheduleDialectLint();
           this.cdr.markForCheck();
         });
 
         // Register IntelliSense
         this.registerIntelliSenseProviders();
+        // Kick an initial lint pass so the user sees marker decorations
+        // for any pre-existing syntax errors when they open an existing
+        // dataset (instead of only on subsequent keystrokes).
+        this.scheduleDialectLint();
 
         // Add keyboard shortcuts via service
         this.monacoIntelliSenseService.registerKeyboardShortcuts(
@@ -507,6 +554,34 @@ export class EditDatasetComponent
   /**
    * Register IntelliSense providers
    */
+  /**
+   * Debounced dialect-aware lint pass. Re-parses the model with the
+   * active dialect's grammar, surfaces error nodes as Monaco markers.
+   * No-op when ENABLE_DIALECT_LINT is false.
+   */
+  private scheduleDialectLint(): void {
+    if (!ENABLE_DIALECT_LINT) return;
+    if (!this.editor) return;
+    if (this.dialectLintTimer) clearTimeout(this.dialectLintTimer);
+    this.dialectLintTimer = setTimeout(() => {
+      this.dialectLintTimer = null;
+      this.runDialectLint();
+    }, DIALECT_LINT_DEBOUNCE_MS);
+  }
+
+  private runDialectLint(): void {
+    if (!this.editor) return;
+    const model = this.editor.getModel();
+    if (!model) return;
+    const dbType = this.selectedDatasourceObj?.config?.dbType ?? null;
+    const markers = this.sqlLinterService.lint(model.getValue(), dbType);
+    monaco.editor.setModelMarkers(
+      model,
+      EditDatasetComponent.DIALECT_LINT_OWNER,
+      markers,
+    );
+  }
+
   private registerIntelliSenseProviders(): void {
     // Dispose previous providers if they exist
     if (this.completionProviderDisposable) {
@@ -574,7 +649,13 @@ export class EditDatasetComponent
    * Apply cached schema data from store to component state
    */
   private applyCachedSchemaData(dbId: string, schemaData: any): void {
-    // Store schema data by database ID
+    // Tag the schema record with its dbType so multi-datasource hover
+    // / completion can resolve the dialect (the API schema response
+    // doesn't include it; we annotate post-hoc from the active record).
+    const dbType = this.selectedDatasourceObj?.config?.dbType ?? null;
+    if (schemaData && dbType) {
+      schemaData = { ...schemaData, dbType };
+    }
     this.datasourceSchemas[dbId] = schemaData;
 
     // Push fresh schema into the IntelliSense cache. Providers read this
@@ -618,14 +699,21 @@ export class EditDatasetComponent
               // Dispatch success action with schema data — cache stays valid
               // for this dbId regardless of whether the user moved on.
               if (schemaData.length > 0) {
+                // Tag with dbType post-hoc so dialect resolution works
+                // when the user reopens this dataset later.
+                const dbType =
+                  this.selectedDatasourceObj?.config?.dbType ?? null;
+                const tagged = dbType
+                  ? { ...schemaData[0], dbType }
+                  : schemaData[0];
                 this.store.dispatch(
                   AddDatasetActions.loadSchemaDataSuccess({
                     orgId,
                     dbId: dbIdStr,
-                    data: schemaData[0],
+                    data: tagged,
                   }),
                 );
-                this.datasourceSchemas[dbId] = schemaData[0];
+                this.datasourceSchemas[dbId] = tagged;
               }
 
               // Push fresh schema into the IntelliSense cache only if the

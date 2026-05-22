@@ -648,6 +648,7 @@
   "DATASET": {
     "TITLE": "Datasets",
     "SUBTITLE": "Manage your datasets and query configurations",
+    "ACTIVE_DIALECT": "Active SQL dialect",
     "ADD_CUSTOM_FIELD": "Add Custom Field",
     "ADD_FIELD": "Add Field",
     "ANALYSES": "Analyses",

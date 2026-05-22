@@ -36,6 +36,17 @@ export interface SchemaGroup {
 export interface DatasourceSchema {
   name: string;
   schemas: SchemaGroup[];
+  /**
+   * Database engine for this datasource (postgres / mysql / mariadb /
+   * mssql / oracle / snowflake). Used to scope IntelliSense suggestions
+   * to the right SQL dialect. Optional with a Postgres default — legacy
+   * data and tests without the field still resolve correctly.
+   *
+   * Stored on the schema record (not just the active selection) so that
+   * when multiple datasources are in the sidebar, each can be queried in
+   * its own dialect should we ever expose per-datasource active editing.
+   */
+  dbType?: string;
 }
 
 export interface QueryResult {

@@ -28,9 +28,15 @@ import { IAPIResponse } from 'src/app/core/models/global.model';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
+import {
+  DATABASE_TYPES,
+  DatabaseTypeOption,
+} from 'src/app/modules/datasource/constants/database-types.constant';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import {
+  DIALECT_LINT_DEBOUNCE_MS,
+  ENABLE_DIALECT_LINT,
   MONACO_EDITOR_OPTIONS,
   QUERY_EXECUTION_TIMEOUT_MS,
   SQL_EDITOR_PLACEHOLDER,
@@ -49,6 +55,7 @@ import { DatasetService } from '../../services/dataset.service';
 import { MonacoIntelliSenseService } from '../../services/monaco-intellisense.service';
 import { QueryService } from '../../services/query.service';
 import { SqlFormatterService } from '../../services/sql-formatter.service';
+import { SqlLinterService } from '../../services/sql-linter.service';
 import { SqlValidatorService } from '../../services/sql-validator.service';
 import {
   AddDatasetActions,
@@ -147,6 +154,11 @@ export class AddDatasetComponent
   private completionProviderDisposable: any = null;
   private hoverProviderDisposable: any = null;
   private signatureHelpDisposable: any = null;
+  /** Debounce handle for dialect lint. Cleared in ngOnDestroy. */
+  private dialectLintTimer: ReturnType<typeof setTimeout> | null = null;
+  /** Monaco markers owner-id for the lint pass. Stable string so
+   *  successive setModelMarkers() calls replace the previous batch. */
+  private static readonly DIALECT_LINT_OWNER = 'sql-dialect-lint';
 
   // Organisation Management
   organisations: any[] = [];
@@ -159,6 +171,22 @@ export class AddDatasetComponent
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
   selectedDatasourceObj: any = null;
+
+  /**
+   * Resolves the active datasource's engine to a DatabaseTypeOption so
+   * the template can render the dbType badge (icon + label) next to the
+   * datasource dropdown. Null when no datasource is selected. Falls back
+   * to the Postgres entry for unknown / missing dbType (legacy rows).
+   */
+  get selectedDbTypeOption(): DatabaseTypeOption | null {
+    const dbType = this.selectedDatasourceObj?.config?.dbType;
+    if (!dbType) return null;
+    return (
+      DATABASE_TYPES.find(t => t.value === dbType) ??
+      DATABASE_TYPES.find(t => t.value === 'postgres') ??
+      null
+    );
+  }
 
   // Database Schema Management
   datasourceSchemas: { [dbId: string]: DatasourceSchema } = {};
@@ -238,6 +266,7 @@ export class AddDatasetComponent
     private datasourceService: DatasourceService,
     private monacoIntelliSenseService: MonacoIntelliSenseService,
     private sqlFormatterService: SqlFormatterService,
+    private sqlLinterService: SqlLinterService,
     private sqlValidatorService: SqlValidatorService,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
@@ -383,6 +412,13 @@ export class AddDatasetComponent
 
     // Reset editor and results
     this.resetEditor();
+
+    // Push the new dbType into the IntelliSense service so keyword /
+    // function suggestions match the dialect the user is now writing
+    // against. Cheap — providers stay registered and read this lazily.
+    this.monacoIntelliSenseService.setActiveDbType(
+      selectedDb?.config?.dbType ?? null,
+    );
 
     // Expand the database in the tree
     this.expandedPaths.add(selectedDb.id);
@@ -642,6 +678,13 @@ export class AddDatasetComponent
       this.signatureHelpDisposable.dispose();
     }
 
+    // Cancel any pending lint pass so it doesn't fire after the
+    // editor (and its model) have been torn down.
+    if (this.dialectLintTimer) {
+      clearTimeout(this.dialectLintTimer);
+      this.dialectLintTimer = null;
+    }
+
     // Dispose formatter and validator
     this.sqlFormatterService.dispose();
     this.sqlValidatorService.dispose();
@@ -727,11 +770,13 @@ export class AddDatasetComponent
         this.editor.onDidChangeModelContent(() => {
           this.currentQuery = this.editor.getValue();
           this.sqlValidatorService.validateDebounced(this.editor.getModel());
+          this.scheduleDialectLint();
           this.cdr.markForCheck();
         });
 
         // Initial validation
         this.sqlValidatorService.validate(this.editor.getModel());
+        this.scheduleDialectLint();
 
         // Add keyboard shortcuts via service
         this.monacoIntelliSenseService.registerKeyboardShortcuts(
@@ -774,6 +819,36 @@ export class AddDatasetComponent
         this.cdr.markForCheck();
       }
     }, 100);
+  }
+
+  /**
+   * Debounced dialect-aware lint pass. Re-parses the model with the
+   * active dialect's grammar, surfaces error nodes as Monaco markers.
+   * No-op when the feature flag is off so the rest of Phase 2 can ship
+   * without exposing this surface to users.
+   */
+  private scheduleDialectLint(): void {
+    if (!ENABLE_DIALECT_LINT) return;
+    if (!this.editor) return;
+    if (this.dialectLintTimer) clearTimeout(this.dialectLintTimer);
+    this.dialectLintTimer = setTimeout(() => {
+      this.dialectLintTimer = null;
+      this.runDialectLint();
+    }, DIALECT_LINT_DEBOUNCE_MS);
+  }
+
+  private runDialectLint(): void {
+    if (!this.editor) return;
+    const model = this.editor.getModel();
+    if (!model) return;
+    const dbType =
+      this.selectedDatasourceObj?.config?.dbType ?? null;
+    const markers = this.sqlLinterService.lint(model.getValue(), dbType);
+    monaco.editor.setModelMarkers(
+      model,
+      AddDatasetComponent.DIALECT_LINT_OWNER,
+      markers,
+    );
   }
 
   /**
@@ -846,7 +921,15 @@ export class AddDatasetComponent
    * Apply cached schema data from store to component state
    */
   private applyCachedSchemaData(dbId: string, schemaData: any): void {
-    // Store schema data by database ID
+    // Tag the schema record with its dbType so hover / completion can
+    // resolve the right dialect even when several datasources are loaded
+    // into the IntelliSense cache simultaneously. The transformer doesn't
+    // know the dbType (the API schema response doesn't include it), so
+    // we annotate post-hoc from the matching datasource record.
+    const dbType = this.getDbTypeFor(dbId);
+    if (schemaData && dbType) {
+      schemaData = { ...schemaData, dbType };
+    }
     this.datasourceSchemas[dbId] = schemaData;
 
     // Push fresh schema into the IntelliSense cache. The completion/hover
@@ -857,6 +940,24 @@ export class AddDatasetComponent
 
     this.loadingDatasources[dbId] = false;
     this.cdr.markForCheck();
+  }
+
+  /**
+   * Resolve the dbType of a datasource id from whichever list is
+   * authoritative right now — preloaded results first, then the active
+   * selection if it matches.
+   */
+  private getDbTypeFor(dbId: string): string | null {
+    const fromList =
+      this.availableDatasources?.find((d: any) => String(d?.id) === String(dbId))
+        ?.config?.dbType ??
+      this.preloadedDatasources?.find((d: any) => String(d?.id) === String(dbId))
+        ?.config?.dbType;
+    if (fromList) return fromList;
+    if (String(this.selectedDatasourceObj?.id) === String(dbId)) {
+      return this.selectedDatasourceObj?.config?.dbType ?? null;
+    }
+    return null;
   }
 
   /**
@@ -892,14 +993,20 @@ export class AddDatasetComponent
               // Dispatch success action with schema data — even if the user
               // moved on, the cache is still valid for this dbId so we keep it.
               if (schemaData.length > 0) {
+                // Tag with dbType post-hoc so the IntelliSense providers
+                // can resolve the right dialect for this datasource.
+                const dbType = this.getDbTypeFor(dbId);
+                const tagged = dbType
+                  ? { ...schemaData[0], dbType }
+                  : schemaData[0];
                 this.store.dispatch(
                   AddDatasetActions.loadSchemaDataSuccess({
                     orgId,
                     dbId: dbIdStr,
-                    data: schemaData[0],
+                    data: tagged,
                   }),
                 );
-                this.datasourceSchemas[dbId] = schemaData[0];
+                this.datasourceSchemas[dbId] = tagged;
               }
 
               // Only push the schema into the IntelliSense cache if the user

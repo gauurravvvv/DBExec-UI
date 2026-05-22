@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
+import { DatabaseTypeValue } from '../../datasource/constants/database-types.constant';
 import {
-  SQL_FUNCTIONS,
-  SQL_KEYWORDS,
-  SQL_SNIPPETS,
-} from '../config/sql-editor.config';
+  COMMON_SQL_SNIPPETS,
+  getDialectSpec,
+} from '../config/sql-dialects';
 import {
   DatasourceSchema,
   TableColumn,
@@ -134,6 +134,20 @@ export class MonacoIntelliSenseService {
   private currentDatasources: DatasourceSchema[] = [];
 
   /**
+   * Active dbType for completion / hover / signature-help. Drives which
+   * dialect spec (keyword + function lists, parser) the providers read
+   * from. Defaults to undefined → getDialectSpec falls back to Postgres
+   * so legacy behaviour is preserved when the component hasn't wired in
+   * a dbType yet.
+   *
+   * Updated via setActiveDbType() from add-dataset / edit-dataset when
+   * the user selects (or the page loads with) a datasource. Provider
+   * registration does NOT need to be redone on change — callbacks read
+   * this field lazily.
+   */
+  private activeDbType: DatabaseTypeValue | string | null = null;
+
+  /**
    * Bumped on every setDatasources() call. Used to invalidate the lookup
    * cache below — providers stay registered, but rebuild their maps lazily
    * the first time they're called after a schema update.
@@ -172,6 +186,19 @@ export class MonacoIntelliSenseService {
     this.lookupsCacheVersion = -1;
     this.tableRefsCache = null;
     this.cteRefsCache = null;
+  }
+
+  /**
+   * Update which dialect spec the completion / hover / signature-help
+   * providers should pull from. Safe to call on every datasource switch
+   * — providers don't need re-registration, the next callback invocation
+   * reads the new value.
+   *
+   * Pass null/undefined to fall back to the Postgres default (used when
+   * the component hasn't resolved a dbType yet).
+   */
+  setActiveDbType(dbType: DatabaseTypeValue | string | null | undefined): void {
+    this.activeDbType = dbType ?? null;
   }
 
   /**
@@ -1489,8 +1516,12 @@ export class MonacoIntelliSenseService {
     range: any,
     sortPrefix: string,
   ): void {
-    for (const kw of SQL_KEYWORDS) {
-      if (seen.has(kw)) continue;
+    // Dialect spec lookup is O(1) (switch on dbType, return a const). Reading
+    // it once per call keeps the loop hot path simple.
+    const { keywords, types } = getDialectSpec(this.activeDbType);
+
+    const emit = (kw: string) => {
+      if (seen.has(kw)) return;
       seen.add(kw);
 
       // Multi-word keywords: use filterText for matching
@@ -1504,7 +1535,13 @@ export class MonacoIntelliSenseService {
         sortText: sortPrefix + kw,
         range: range,
       });
-    }
+    };
+
+    for (const kw of keywords) emit(kw);
+    // Types are surfaced under the same Keyword kind for now — Monaco's
+    // CompletionItemKind doesn't have a distinct "type" kind that styles
+    // nicely, and they behave identically in autocomplete.
+    for (const t of types) emit(t);
   }
 
   private addFunctions(
@@ -1513,7 +1550,12 @@ export class MonacoIntelliSenseService {
     range: any,
     sortPrefix: string,
   ): void {
-    for (const fn of SQL_FUNCTIONS) {
+    const { functions, extraFunctionNames } = getDialectSpec(this.activeDbType);
+
+    // Rich entries first — they carry param signatures and descriptions
+    // for hover / signature-help, so we want them in the dedup set
+    // ahead of the bare names below.
+    for (const fn of functions) {
       if (seen.has(fn.name)) continue;
       seen.add(fn.name);
 
@@ -1533,10 +1575,33 @@ export class MonacoIntelliSenseService {
         range: range,
       });
     }
+
+    // Long-tail names from the library that we haven't catalogued with
+    // docs yet. Sorted one band lower so the rich entries (which have
+    // signature help) win when both match a prefix. No description ⇒
+    // detail is just the engine label.
+    for (const raw of extraFunctionNames) {
+      const upper = raw.toUpperCase();
+      if (seen.has(upper)) continue;
+      seen.add(upper);
+      suggestions.push({
+        label: upper,
+        kind: monaco.languages.CompletionItemKind.Function,
+        detail: 'SQL Function',
+        insertText: `${upper}($0)`,
+        insertTextRules:
+          monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        // One sortPrefix below the rich-entries band so when the user
+        // types a prefix that matches both, the catalogued (richer)
+        // entry shows up on top.
+        sortText: sortPrefix + 'z_' + upper,
+        range: range,
+      });
+    }
   }
 
   private addSnippets(suggestions: any[], seen: Set<string>, range: any): void {
-    for (const snippet of SQL_SNIPPETS) {
+    for (const snippet of COMMON_SQL_SNIPPETS) {
       if (seen.has(snippet.label)) continue;
       seen.add(snippet.label);
       suggestions.push({
@@ -1895,14 +1960,20 @@ export class MonacoIntelliSenseService {
           return { contents };
         }
 
+        // Dialect-scoped keyword / function lookup. The dialect is the one
+        // currently active for this editor — set via setActiveDbType().
+        const dialect = getDialectSpec(this.activeDbType);
+
         // Check if it's a SQL keyword — show brief description
-        const kwMatch = SQL_KEYWORDS.find(kw => kw.toLowerCase() === wordLower);
+        const kwMatch =
+          dialect.keywords.find(kw => kw.toLowerCase() === wordLower) ||
+          dialect.types.find(t => t.toLowerCase() === wordLower);
         if (kwMatch) {
           return { contents: [{ value: `**SQL Keyword:** \`${kwMatch}\`` }] };
         }
 
         // Check if it's a SQL function
-        const fnMatch = SQL_FUNCTIONS.find(
+        const fnMatch = dialect.functions.find(
           fn => fn.name.toLowerCase() === wordLower,
         );
         if (fnMatch) {
@@ -1987,17 +2058,19 @@ export class MonacoIntelliSenseService {
   }
 
   /**
-   * Look up `word` in the static SQL_KEYWORDS / SQL_FUNCTIONS lists and
-   * return a hover-content payload, or null if there's no match. Case
-   * insensitive.
+   * Look up `word` against the active dialect's keyword / function lists
+   * and return a hover-content payload, or null if there's no match.
+   * Case-insensitive.
    */
   private buildKeywordOrFunctionHover(
     word: string,
   ): { contents: { value: string }[] } | null {
     const upper = word.toUpperCase();
+    const dialect = getDialectSpec(this.activeDbType);
 
-    // Built-in functions carry richer info (params + description).
-    const fn = SQL_FUNCTIONS.find(f => f.name.toUpperCase() === upper);
+    // Built-in functions catalogued with docs carry richer info
+    // (params + description). Try those first.
+    const fn = dialect.functions.find(f => f.name.toUpperCase() === upper);
     if (fn) {
       return {
         contents: [
@@ -2007,8 +2080,20 @@ export class MonacoIntelliSenseService {
       };
     }
 
-    // Keywords are a flat list — only show a tooltip for the canonical match.
-    if (SQL_KEYWORDS.includes(upper)) {
+    // Long-tail function names harvested from lang-sql (currently only
+    // MSSQL ships this list). No docs available — fall through to a
+    // bare-name tooltip so the user at least knows it's a function.
+    if (
+      dialect.extraFunctionNames.some(n => n.toUpperCase() === upper)
+    ) {
+      return {
+        contents: [{ value: `**${upper}**` }, { value: '_SQL function_' }],
+      };
+    }
+
+    // Keywords / types are flat lists — only show a tooltip for canonical
+    // matches in the active dialect.
+    if (dialect.keywords.includes(upper) || dialect.types.includes(upper)) {
       return {
         contents: [{ value: `**${upper}**` }, { value: '_SQL keyword_' }],
       };
@@ -2091,8 +2176,8 @@ export class MonacoIntelliSenseService {
 
           const funcName = funcNameMatch[1].toUpperCase();
 
-          // Look up the function definition
-          const funcDef = SQL_FUNCTIONS.find(
+          // Look up the function definition in the dialect catalog
+          const funcDef = getDialectSpec(this.activeDbType).functions.find(
             f => f.name.toUpperCase() === funcName,
           );
           if (!funcDef) return null;

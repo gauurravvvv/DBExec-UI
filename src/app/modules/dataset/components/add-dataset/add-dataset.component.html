@@ -45,6 +45,23 @@
         >
         </app-custom-dropdown>
       </div>
+
+      <!-- Active engine badge — reminds the user which SQL dialect the
+           editor's autocomplete is scoped to. Only renders when a
+           datasource is selected; uses the same icon class + label as the
+           Add/Edit Datasource form for visual consistency. -->
+      <div
+        class="db-type-badge"
+        *ngIf="selectedDbTypeOption"
+        [title]="
+          ('DATASET.ACTIVE_DIALECT' | translate) +
+          ': ' +
+          selectedDbTypeOption.label
+        "
+      >
+        <i [class]="selectedDbTypeOption.iconClass" aria-hidden="true"></i>
+        <span>{{ selectedDbTypeOption.label }}</span>
+      </div>
     </div>
     <div class="toolbar-right">
       <button
