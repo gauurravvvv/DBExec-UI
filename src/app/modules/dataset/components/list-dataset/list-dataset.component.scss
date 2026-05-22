@@ -1277,14 +1277,16 @@ td.empty-message-cell {
 
   .ds-picker-body {
     padding: var(--space-7) var(--space-6) var(--space-6);
-    // Reserve enough room for the two dropdowns to stack with a
-    // small gap. The dropdown panels open downward and overflow the
-    // dialog box (which is fine with `overflow: visible` above), but
-    // the triggers themselves need vertical breathing room.
+    // Reserve enough room for up to three dropdowns (org, datasource,
+    // schema) stacked with a comfortable gap. The dropdown panels
+    // open downward and overflow the dialog box (which is fine with
+    // `overflow: visible` above), but the triggers themselves need
+    // vertical breathing room — and the floating labels need room
+    // above each trigger so they don't collide with the row above.
     min-height: 100px;
     display: flex;
     flex-direction: column;
-    gap: var(--space-5);
+    gap: var(--space-7);
 
     // The custom dropdown component is self-contained; just give
     // each instance its own row.

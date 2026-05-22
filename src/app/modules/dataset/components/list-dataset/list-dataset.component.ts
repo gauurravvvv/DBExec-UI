@@ -548,9 +548,17 @@ export class ListDatasetComponent implements OnInit {
     // For non-system-admins this is the JWT-derived org (read-only
     // in the popup); for system admins it's a soft default they
     // can override via the org dropdown.
-    this.dsPickerOrgSelected = this.resolveListPageOrg();
-    this.dsPickerOrgPreloaded = null;
-    this.dsPickerOrgPreloadedTotal = null;
+    const seededOrg = this.resolveListPageOrg();
+    this.dsPickerOrgSelected = seededOrg;
+    // Pre-seed the org dropdown's preloaded list with the resolved
+    // org. The serverMode dropdown needs the selected value to be
+    // PRESENT in its options list to render a label — otherwise it
+    // shows blank until the user opens the panel. The async
+    // primeDsPickerOrgs below will replace this with the full page
+    // a moment later; this just covers the initial paint.
+    this.dsPickerOrgPreloaded =
+      seededOrg && seededOrg.name ? [seededOrg] : null;
+    this.dsPickerOrgPreloadedTotal = this.dsPickerOrgPreloaded?.length ?? null;
     this.showDsPickerPopup = true;
     if (this.showOrganisationDropdown) {
       this.primeDsPickerOrgs();
@@ -576,19 +584,84 @@ export class ListDatasetComponent implements OnInit {
     const match = this.organisations?.find(
       (o: any) => String(o.id) === String(this.selectedOrg),
     );
-    return match ?? { id: this.selectedOrg };
+    if (match) return match;
+    // Id-only stub. The popup dropdown will still render blank in
+    // its trigger because it can't find a matching option. Kick a
+    // one-shot fetch to backfill the name so the next CD cycle has
+    // a renderable label.
+    const stub = { id: this.selectedOrg };
+    this.backfillSeededOrgName(this.selectedOrg);
+    return stub;
+  }
+
+  /**
+   * One-shot fetch to resolve the seeded org's name when only its
+   * id was available (e.g. JWT context for SYSTEM-ADMIN before
+   * loadOrganisations() lands). Patches dsPickerOrgSelected in
+   * place and also the preloaded-options list so the dropdown's
+   * trigger and panel both render the name.
+   */
+  private backfillSeededOrgName(orgId: string): void {
+    this.organisationService
+      .listOrganisation({ page: 1, limit: 50 })
+      .then((res: any) => {
+        if (!this.globalService.handleSuccessService(res, false)) return;
+        const match = (res?.data?.orgs ?? []).find(
+          (o: any) => String(o.id) === String(orgId),
+        );
+        if (!match) return;
+        // Only patch if the user hasn't already picked a different
+        // org in the popup — that would clobber their choice.
+        if (
+          this.dsPickerOrgSelected &&
+          String(this.dsPickerOrgSelected.id) === String(orgId)
+        ) {
+          this.dsPickerOrgSelected = match;
+          if (this.dsPickerOrgPreloaded) {
+            // Replace the id-only stub in the preloaded list, or
+            // prepend if it isn't there.
+            const idx = this.dsPickerOrgPreloaded.findIndex(
+              (o: any) => String(o.id) === String(orgId),
+            );
+            if (idx >= 0) {
+              const next = this.dsPickerOrgPreloaded.slice();
+              next[idx] = match;
+              this.dsPickerOrgPreloaded = next;
+            }
+          }
+          this.cdr.markForCheck();
+        }
+      })
+      .catch(() => {});
   }
 
   /** Page-1 prime for the popup org dropdown so it opens with
-   *  content. Subsequent search/scroll goes through loadOrgsPage. */
+   *  content. Subsequent search/scroll goes through loadOrgsPage.
+   *  Merges the page-1 list with whatever org we seeded (so the
+   *  selected row stays visible if it wasn't on page 1). */
   private primeDsPickerOrgs(): void {
     this.organisationService
       .listOrganisation({ page: 1, limit: 10 })
       .then((res: any) => {
         if (this.globalService.handleSuccessService(res, false)) {
-          this.dsPickerOrgPreloaded = res?.data?.orgs ?? [];
-          this.dsPickerOrgPreloadedTotal =
-            res?.data?.count ?? this.dsPickerOrgPreloaded?.length ?? 0;
+          const orgs: any[] = res?.data?.orgs ?? [];
+          const seeded = this.dsPickerOrgSelected;
+          // If the page-1 results don't already include the seeded
+          // org, prepend it so the dropdown can render its label.
+          // Avoids a flicker where the trigger goes blank between
+          // the synchronous seed and the page-1 arrival.
+          if (
+            seeded?.id &&
+            seeded?.name &&
+            !orgs.some(o => String(o.id) === String(seeded.id))
+          ) {
+            this.dsPickerOrgPreloaded = [seeded, ...orgs];
+            this.dsPickerOrgPreloadedTotal =
+              (res?.data?.count ?? orgs.length) + 1;
+          } else {
+            this.dsPickerOrgPreloaded = orgs;
+            this.dsPickerOrgPreloadedTotal = res?.data?.count ?? orgs.length;
+          }
         }
       })
       .catch(() => {
