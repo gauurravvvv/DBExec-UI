@@ -1188,56 +1188,156 @@ td.empty-message-cell {
 
 
 // ── Datasource picker popup ─────────────────────────────────────────
-// Reuses the .cmd-overlay + .cmd-palette base styles defined above.
-// The ds-picker variant overrides padding + adds header / body /
-// footer rows so the popup reads as a small dialog rather than a
-// search palette. Centred vertically because there is no scrolling
-// results list to anchor to the top.
+//
+// Uses the .cmd-overlay base for the dim backdrop, but as a small
+// modal dialog with a wrapped dropdown — NOT the command-palette
+// search-and-list pattern below. Several base overrides are needed:
+//
+//   1. The base overlay pins itself to the top of the viewport
+//      (padding-top: 12vh + align-items: flex-start) — fine for a
+//      tall results list, wrong for a 250px dialog. We override to
+//      center vertically.
+//
+//   2. The base .cmd-palette has overflow: hidden so its scrollable
+//      result list clips cleanly. The PrimeNG dropdown panel inside
+//      our dialog renders absolutely below its trigger; it needs to
+//      extend past the dialog body, so we override to `visible`. The
+//      body section keeps a defined min-height so there's room
+//      below the trigger for the panel to open downward without
+//      hitting the footer.
+//
+//   3. The base .cmd-palette has fixed max-height for scroll
+//      containment; we set a smaller `min-height` and remove the
+//      max so the dialog sizes to content.
+//
+// Wrap the rules under .cmd-overlay.has-ds-picker so the scoping is
+// explicit (any other .cmd-palette on the page keeps the original
+// command-palette behaviour). The host overlay div carries the
+// `has-ds-picker` class when *ngIf="showDsPickerPopup" is true.
+.cmd-overlay:has(.cmd-palette.ds-picker),
+.cmd-overlay.has-ds-picker {
+  align-items: center;
+  padding-top: 0;
+}
+
 .cmd-palette.ds-picker {
   max-width: 480px;
-  padding: 0;
+  width: min(92%, 480px);
+  max-height: none;
+  // Override the parent's `overflow: hidden` — the wrapped dropdown
+  // needs to expand past the dialog's box. Drop shadow + border
+  // already define the visual edge; no clipping needed.
+  overflow: visible;
+  // Animation: fade + tiny scale from .cmd-palette's cmdDrop
+  // already plays; nothing to change.
 
   .ds-picker-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: var(--space-4);
     padding: var(--space-5) var(--space-6);
     border-bottom: 1px solid var(--border-color);
+    background: var(--card-background);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
 
     h3 {
       margin: 0;
       font-size: var(--fs-h4, 16px);
       font-weight: var(--fw-semibold, 600);
       color: var(--text-color);
+      line-height: 1.2;
     }
 
     .ds-picker-close {
       background: transparent;
       border: none;
       color: var(--text-color);
-      opacity: 0.7;
+      opacity: 0.65;
       cursor: pointer;
-      padding: 4px;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       border-radius: var(--radius-xs);
-      line-height: 0;
+      transition: all var(--motion-fast, 0.15s) ease;
+
+      i {
+        font-size: 14px;
+      }
 
       &:hover {
         opacity: 1;
         background: var(--hover-background);
+        color: var(--text-color);
       }
     }
   }
 
   .ds-picker-body {
-    padding: var(--space-6);
+    padding: var(--space-7) var(--space-6) var(--space-6);
+    // Reserve enough room for the dropdown trigger plus a sensible
+    // floating-label gap. The dropdown panel opens downward and
+    // overflows the dialog box (which is fine with `overflow:
+    // visible` above), but the trigger itself needs vertical
+    // breathing room so the floating label doesn't collide with the
+    // header border.
+    min-height: 100px;
   }
 
   .ds-picker-footer {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     gap: var(--space-3);
-    padding: var(--space-4) var(--space-6);
+    padding: var(--space-4) var(--space-6) var(--space-5);
     border-top: 1px solid var(--border-color);
     background: var(--card-background);
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+
+    // Footer buttons inherit p-button styling from PrimeNG. Slight
+    // sizing override so the pair reads as a balanced dialog
+    // action row, not a tight inline group.
+    .p-button {
+      min-width: 96px;
+      padding: 0.55rem 1rem !important;
+      font-size: var(--fs-body, 14px);
+      font-weight: var(--fw-medium, 500);
+    }
+
+    .p-button.p-button-primary {
+      background: linear-gradient(
+        135deg,
+        var(--primary-color),
+        var(--primary-hover)
+      );
+      border: none;
+      color: var(--primary-text);
+      box-shadow: 0 4px 10px var(--primary-color-transparent);
+
+      &:hover:not(:disabled) {
+        opacity: 1;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+      }
+    }
+
+    .p-button.p-button-text {
+      color: var(--text-color);
+      background: transparent;
+      border: 1px solid transparent;
+
+      &:hover {
+        background: var(--hover-background);
+      }
+    }
   }
 }
