@@ -230,6 +230,15 @@ export class AddDatasetComponent
   datasourceSchemas: { [dbId: string]: DatasourceSchema } = {};
   loadingDatasources: { [dbId: string]: boolean } = {};
   isLoadingDatasources: boolean = false;
+  /**
+   * Per-datasource mode flag the BE returns with the bulk schema
+   * tree. `eager` = columns shipped inline (typical case);
+   * `lazy` = warehouse-scale database, BE auto-degraded to schemas
+   * + tables only, columns fetched per-table on first use. Lets
+   * the sidebar tell the user why their first column reference
+   * takes a beat to resolve.
+   */
+  schemaTreeMode: { [dbId: string]: 'eager' | 'lazy' } = {};
   // Sequence counter incremented on every datasource/org switch. Async schema
   // load callbacks compare against this to discard responses for selections
   // the user has already moved away from.
@@ -1189,16 +1198,30 @@ export class AddDatasetComponent
                 return;
               }
 
-              const transformed =
-                SchemaTransformerHelper.transformSchemaResponse(response);
-              // Tag every node as 'loaded' so the lazy paths (which
-              // still drive expand UX) become no-ops. Without this
-              // the sidebar would show "idle" spinners next to fully-
-              // populated rows.
-              const fullyLoadedTree = this.markTreeFullyLoaded(
-                transformed[0],
-                this.getDbTypeFor(dbId),
-              );
+              const { datasources: transformed, mode } =
+                SchemaTransformerHelper.transformSchemaResponseWithMode(
+                  response,
+                );
+              // Mode = 'eager': columns shipped inline; every node
+              // gets tablesStatus + columnsStatus = 'loaded' so the
+              // lazy expand paths become no-ops.
+              // Mode = 'lazy': BE auto-degraded (warehouse-scale
+              // database). Schemas + tables are present; columns
+              // are NOT. Mark tables loaded but columns idle so
+              // ensureColumnsLoaded fires per-table on first
+              // expand / IntelliSense reference. Track the mode on
+              // the tree so the sidebar can hint at it.
+              const loadedTree =
+                mode === 'eager'
+                  ? this.markTreeFullyLoaded(
+                      transformed[0],
+                      this.getDbTypeFor(dbId),
+                    )
+                  : this.markTreeTablesOnlyLoaded(
+                      transformed[0],
+                      this.getDbTypeFor(dbId),
+                    );
+              this.schemaTreeMode[dbId] = mode;
 
               // When the user picked a schema in the popup, narrow
               // the tree to just that schema so the sidebar matches
@@ -1207,12 +1230,12 @@ export class AddDatasetComponent
               // separate scoped endpoint.
               const finalTree = this.scopedSchema
                 ? {
-                    ...fullyLoadedTree,
-                    schemas: fullyLoadedTree.schemas.filter(
+                    ...loadedTree,
+                    schemas: loadedTree.schemas.filter(
                       (s: any) => s.name === this.scopedSchema,
                     ),
                   }
-                : fullyLoadedTree;
+                : loadedTree;
 
               this.store.dispatch(
                 AddDatasetActions.loadSchemaDataSuccess({
@@ -1981,6 +2004,36 @@ export class AddDatasetComponent
           ...table,
           columnsStatus: 'loaded',
           columnsError: null,
+        })),
+      })),
+    };
+  }
+
+  /**
+   * Lazy-mode counterpart: tables are present (BE shipped them) but
+   * columns are NOT. Mark tables loaded so the schema-expand spinner
+   * stays off, but leave column status idle so `ensureColumnsLoaded`
+   * fires the per-table fetch the first time the user expands the
+   * row (or the first time Monaco's IntelliSense / hover needs that
+   * table's columns). This is the warehouse-scale path.
+   */
+  private markTreeTablesOnlyLoaded(
+    tree: any,
+    dbType?: string | null,
+  ): any {
+    if (!tree) return tree;
+    return {
+      ...tree,
+      ...(dbType ? { dbType } : {}),
+      schemas: (tree.schemas ?? []).map((schema: any) => ({
+        ...schema,
+        tablesStatus: 'loaded',
+        tablesError: null,
+        tables: (schema.tables ?? []).map((table: any) => ({
+          ...table,
+          columnsStatus: 'idle',
+          columnsError: null,
+          columns: table.columns ?? [],
         })),
       })),
     };

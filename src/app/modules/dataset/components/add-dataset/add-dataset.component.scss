@@ -1061,6 +1061,35 @@
   }
 }
 
+// ── Lazy-mode hint in the schema sidebar ────────────────────────────
+// Shown when the BE auto-degraded the bulk schema load (warehouse-
+// scale database). Inline copy, not a toast — informational only.
+.schema-lazy-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2, 8px);
+  margin: 0 var(--space-3, 12px) var(--space-3, 12px);
+  padding: var(--space-2, 8px) var(--space-3, 12px);
+  background: var(--hover-background, #f3f4f6);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: var(--radius-xs, 3px);
+  color: var(--text-color);
+  font-size: var(--fs-label, 12px);
+  line-height: 1.4;
+
+  i {
+    flex: 0 0 auto;
+    margin-top: 1px;
+    color: var(--primary-color);
+    opacity: 0.7;
+  }
+
+  span {
+    flex: 1 1 auto;
+    opacity: 0.85;
+  }
+}
+
 // ── Schema-tree skeleton shimmer ────────────────────────────────────
 // Rendered in place of the schema list while the bulk
 // getDatasourceStructure call is in flight. Each row mimics one

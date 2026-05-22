@@ -35,6 +35,24 @@ interface ApiSchemaGroup {
   tables: ApiTable[];
 }
 
+/**
+ * New envelope shape introduced when `getDatasourceStructure` learned
+ * to auto-degrade for warehouse-scale databases. `eager` carries
+ * columns inline (the original behaviour); `lazy` ships schemas +
+ * tables only and the FE fetches columns per-table on first use.
+ *
+ * The transformer accepts both this object form AND the legacy bare
+ * array form so older BE versions keep working.
+ */
+export type SchemaTreeMode = 'eager' | 'lazy';
+export interface ApiSchemaTreeEnvelope {
+  mode: SchemaTreeMode;
+  schemas: ApiSchemaGroup[];
+  /** Approximate column count the BE found; useful for telemetry +
+   *  for showing a "this is a big database" hint. Optional. */
+  approxColumnCount?: number;
+}
+
 /** Helper class for transforming the BE schema response into DatasourceSchema. */
 export class SchemaTransformerHelper {
   /**
@@ -48,14 +66,53 @@ export class SchemaTransformerHelper {
    * Returns a single-element array (one logical datasource per response) to
    * match the existing call-site contract.
    */
+  /**
+   * @returns the schema array. Callers that need the `mode` flag
+   * should use `transformSchemaResponseWithMode` instead.
+   */
   static transformSchemaResponse(
-    response: IAPIResponse<ApiSchemaGroup[]> | ApiSchemaGroup[],
+    response:
+      | IAPIResponse<ApiSchemaGroup[] | ApiSchemaTreeEnvelope>
+      | ApiSchemaGroup[]
+      | ApiSchemaTreeEnvelope,
   ): DatasourceSchema[] {
-    // Accept either the wrapped envelope or a bare array (some legacy
-    // callers may have already unwrapped).
-    const schemasData: ApiSchemaGroup[] = Array.isArray(response)
-      ? response
-      : (response?.data ?? []);
+    return this.transformSchemaResponseWithMode(response).datasources;
+  }
+
+  /**
+   * Same conversion as `transformSchemaResponse` but also surfaces
+   * the `mode` flag the BE ships in the new envelope shape. Legacy
+   * BE responses (bare array) default to `eager` since they always
+   * carried columns inline.
+   */
+  static transformSchemaResponseWithMode(
+    response:
+      | IAPIResponse<ApiSchemaGroup[] | ApiSchemaTreeEnvelope>
+      | ApiSchemaGroup[]
+      | ApiSchemaTreeEnvelope,
+  ): { datasources: DatasourceSchema[]; mode: SchemaTreeMode } {
+    // Unwrap the standard {status, data} envelope if present.
+    const inner: ApiSchemaGroup[] | ApiSchemaTreeEnvelope | undefined =
+      Array.isArray(response)
+        ? response
+        : (response as any)?.data !== undefined
+          ? (response as any).data
+          : (response as ApiSchemaTreeEnvelope);
+
+    // Resolve to (schemasData, mode). New envelope: an object with
+    // `mode` + `schemas`. Legacy: a bare array, treated as eager.
+    let schemasData: ApiSchemaGroup[];
+    let mode: SchemaTreeMode;
+    if (Array.isArray(inner)) {
+      schemasData = inner;
+      mode = 'eager';
+    } else if (inner && Array.isArray((inner as ApiSchemaTreeEnvelope).schemas)) {
+      schemasData = (inner as ApiSchemaTreeEnvelope).schemas;
+      mode = (inner as ApiSchemaTreeEnvelope).mode || 'eager';
+    } else {
+      schemasData = [];
+      mode = 'eager';
+    }
 
     const schemas: SchemaGroup[] = schemasData.map(
       (schemaData): SchemaGroup => ({
@@ -82,12 +139,15 @@ export class SchemaTransformerHelper {
       }),
     );
 
-    return [
-      {
-        name: 'datasource',
-        schemas,
-      },
-    ];
+    return {
+      datasources: [
+        {
+          name: 'datasource',
+          schemas,
+        },
+      ],
+      mode,
+    };
   }
 
   /**

@@ -135,7 +135,7 @@
         <div class="sidebar-header">
           <h4>
             <i class="pi pi-sitemap"></i>
-            {{ 'DATASET.SCHEMA_EXPLORER' | translate }}
+            {{ 'DATASET.DATABASE_EXPLORER' | translate }}
           </h4>
           <button
             pButton
@@ -164,6 +164,21 @@
               [placeholder]="'DATASET.SEARCH_TABLES' | translate"
               icon="pi-search"
             ></app-custom-input>
+          </div>
+
+          <!-- Lazy-mode hint. The BE auto-degraded the schema load
+               because this datasource is large; columns will fetch
+               per-table as the user expands rows. Quiet inline copy,
+               not a toast — informational, not actionable. -->
+          <div
+            class="schema-lazy-hint"
+            *ngIf="
+              selectedDatasourceObj &&
+              schemaTreeMode[selectedDatasourceObj.id] === 'lazy'
+            "
+          >
+            <i class="pi pi-info-circle" aria-hidden="true"></i>
+            <span>{{ 'DATASET.SCHEMA_LAZY_MODE_HINT' | translate }}</span>
           </div>
 
           <!-- No Datasource Selected Message -->
@@ -385,7 +400,7 @@
 
         <!-- Rotated Title (When Collapsed) -->
         <div class="rotated-title" *ngIf="!showDatasourceSidebar">
-          {{ 'DATASET.SCHEMA_EXPLORER' | translate }}
+          {{ 'DATASET.DATABASE_EXPLORER' | translate }}
         </div>
       </div>
     </div>
