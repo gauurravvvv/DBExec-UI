@@ -580,6 +580,42 @@
     padding-left: 12px;
   }
 
+  // Inline error displayed under a schema (or, in the .nested
+  // variant, a table) when the lazy lazy-load returns
+  // status:false. Soft tinted error pill so the message reads as
+  // surfaced feedback rather than an angry exception. Indented to
+  // align with the would-be tables/columns list it's replacing.
+  .schema-error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    margin: var(--space-2) 0 var(--space-2) 28px;
+    padding: 8px 10px;
+    background: var(--error-bg, rgba(198, 40, 40, 0.08));
+    border: 1px solid var(--error-color, #c62828);
+    border-left-width: 3px;
+    border-radius: var(--radius-xs, 6px);
+    color: var(--error-color, #c62828);
+    font-size: var(--fs-label, 12px);
+    line-height: 1.4;
+
+    i {
+      font-size: 13px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    span {
+      flex: 1 1 auto;
+      min-width: 0;
+      word-break: break-word;
+    }
+
+    &.nested {
+      margin-left: 44px;
+    }
+  }
+
   .table-item {
     .table-header {
       display: flex;

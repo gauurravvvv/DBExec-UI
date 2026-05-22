@@ -212,10 +212,29 @@
                 >
               </div>
 
+              <!-- Inline error from the BE — surfaced when a lazy
+                   tables fetch returns status:false (e.g. schema
+                   was deleted server-side, permission revoked, or
+                   the user manually typed a bad ?schema= in the
+                   URL). Without this the sidebar would silently
+                   render an empty tables list and the user would
+                   have no idea why. -->
+              <div
+                class="schema-error"
+                *ngIf="
+                  schema.tablesError &&
+                  isExpanded(schemaPath(selectedDatasourceObj.id, schema.name))
+                "
+              >
+                <i class="pi pi-exclamation-triangle"></i>
+                <span>{{ schema.tablesError }}</span>
+              </div>
+
               <!-- Tables List -->
               <div
                 class="tables-list"
                 *ngIf="
+                  !schema.tablesError &&
                   isExpanded(schemaPath(selectedDatasourceObj.id, schema.name))
                 "
                 @expand
@@ -265,10 +284,30 @@
                     >
                   </div>
 
+                  <!-- Inline error for the columns lazy-fetch (e.g.
+                       table deleted server-side, permission revoked,
+                       URL typo via deep link). Mirrors the schema-
+                       level error UI above. -->
+                  <div
+                    class="schema-error nested"
+                    *ngIf="
+                      table.columnsError &&
+                      isTableExpanded(
+                        selectedDatasourceObj.id,
+                        schema.name,
+                        table.name
+                      )
+                    "
+                  >
+                    <i class="pi pi-exclamation-triangle"></i>
+                    <span>{{ table.columnsError }}</span>
+                  </div>
+
                   <!-- Columns List -->
                   <div
                     class="columns-list"
                     *ngIf="
+                      !table.columnsError &&
                       isTableExpanded(
                         selectedDatasourceObj.id,
                         schema.name,

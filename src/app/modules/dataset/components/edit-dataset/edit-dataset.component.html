@@ -233,10 +233,24 @@
                 >
               </div>
 
+              <!-- Inline error from a failed tables fetch. See
+                   add-dataset.component.html for full rationale. -->
+              <div
+                class="schema-error"
+                *ngIf="
+                  schema.tablesError &&
+                  isExpanded(schemaPath(selectedDatasourceObj.id, schema.name))
+                "
+              >
+                <i class="pi pi-exclamation-triangle"></i>
+                <span>{{ schema.tablesError }}</span>
+              </div>
+
               <!-- Tables List -->
               <div
                 class="tables-list"
                 *ngIf="
+                  !schema.tablesError &&
                   isExpanded(schemaPath(selectedDatasourceObj.id, schema.name))
                 "
                 @expand
@@ -286,10 +300,28 @@
                     >
                   </div>
 
+                  <!-- Inline error for failed columns fetch (see
+                       add-dataset for full rationale). -->
+                  <div
+                    class="schema-error nested"
+                    *ngIf="
+                      table.columnsError &&
+                      isTableExpanded(
+                        selectedDatasourceObj.id,
+                        schema.name,
+                        table.name
+                      )
+                    "
+                  >
+                    <i class="pi pi-exclamation-triangle"></i>
+                    <span>{{ table.columnsError }}</span>
+                  </div>
+
                   <!-- Columns List -->
                   <div
                     class="columns-list"
                     *ngIf="
+                      !table.columnsError &&
                       isTableExpanded(
                         selectedDatasourceObj.id,
                         schema.name,

@@ -1293,14 +1293,39 @@ export class EditDatasetComponent
     this.datasourceService
       .listSchemaTables({ orgId, datasourceId: dbIdStr, schemaName })
       .then((response: any) => {
+        // BE returns HTTP 200 with `status: false` for app-level
+        // failures (e.g. schema not found). Surface the message in
+        // the sidebar + a toast rather than silently rendering 0
+        // tables. Mirrors the add-dataset implementation.
+        if (response && response.status === false) {
+          const msg =
+            response.message ||
+            this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA');
+          this.globalService.handleSuccessService(response, false);
+          this.store.dispatch(
+            AddDatasetActions.loadTablesForSchemaFailure({
+              orgId,
+              dbId: dbIdStr,
+              schemaName,
+              error: msg,
+            }),
+          );
+          this.replaceSchemaNode(dbId, schemaName, prev => ({
+            ...prev,
+            tablesError: msg,
+            tablesStatus: 'error',
+          }));
+          this.cdr.markForCheck();
+          return;
+        }
+
         const tables =
           SchemaTransformerHelper.transformLazyTablesResponse(response);
-        // Immutable rebuild — OnPush + pure pipes both need a new
-        // reference at every level (datasourceSchemas, the tree, the
-        // schemas array, and the schema row) to re-render.
         this.replaceSchemaNode(dbId, schemaName, prev => ({
           ...prev,
           tables,
+          tablesError: null,
+          tablesStatus: 'loaded',
         }));
         this.store.dispatch(
           AddDatasetActions.loadTablesForSchemaSuccess({
@@ -1313,16 +1338,22 @@ export class EditDatasetComponent
         this.cdr.markForCheck();
       })
       .catch((error: any) => {
+        const msg =
+          error?.message ||
+          this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA');
         this.store.dispatch(
           AddDatasetActions.loadTablesForSchemaFailure({
             orgId,
             dbId: dbIdStr,
             schemaName,
-            error:
-              error?.message ||
-              this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
+            error: msg,
           }),
         );
+        this.replaceSchemaNode(dbId, schemaName, prev => ({
+          ...prev,
+          tablesError: msg,
+          tablesStatus: 'error',
+        }));
         this.cdr.markForCheck();
       });
   }
@@ -1401,11 +1432,36 @@ export class EditDatasetComponent
         tableName,
       })
       .then((response: any) => {
+        if (response && response.status === false) {
+          const msg =
+            response.message ||
+            this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA');
+          this.globalService.handleSuccessService(response, false);
+          this.store.dispatch(
+            AddDatasetActions.loadColumnsForTableFailure({
+              orgId,
+              dbId: dbIdStr,
+              schemaName,
+              tableName,
+              error: msg,
+            }),
+          );
+          this.replaceTableNode(dbId, schemaName, tableName, prev => ({
+            ...prev,
+            columnsError: msg,
+            columnsStatus: 'error',
+          }));
+          this.cdr.markForCheck();
+          return;
+        }
+
         const columns =
           SchemaTransformerHelper.transformLazyColumnsResponse(response);
         this.replaceTableNode(dbId, schemaName, tableName, prev => ({
           ...prev,
           columns,
+          columnsError: null,
+          columnsStatus: 'loaded',
         }));
         this.store.dispatch(
           AddDatasetActions.loadColumnsForTableSuccess({
@@ -1424,17 +1480,23 @@ export class EditDatasetComponent
         this.cdr.markForCheck();
       })
       .catch((error: any) => {
+        const msg =
+          error?.message ||
+          this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA');
         this.store.dispatch(
           AddDatasetActions.loadColumnsForTableFailure({
             orgId,
             dbId: dbIdStr,
             schemaName,
             tableName,
-            error:
-              error?.message ||
-              this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
+            error: msg,
           }),
         );
+        this.replaceTableNode(dbId, schemaName, tableName, prev => ({
+          ...prev,
+          columnsError: msg,
+          columnsStatus: 'error',
+        }));
         this.cdr.markForCheck();
       });
   }
