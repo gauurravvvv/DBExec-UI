@@ -1,0 +1,103 @@
+<!--
+  Dataset picker dialog — opens from the dataset list's Add
+  button. Three rows: org (system admins only), datasource
+  (required), schema (optional). Styled to match
+  save-analyses-dialog: title at top, label-above-input rows,
+  outlined Cancel + filled Continue at bottom-right.
+
+  Outside-click handling: the backdrop's click listener calls
+  onBackdropClick which discriminates on event.target — only a
+  click directly on the backdrop dismisses the dialog. The dialog
+  body has no stopPropagation, so document-level listeners (including
+  PrimeNG's dropdown outside-click) fire normally. Dropdown panels
+  render in-place (not appendTo="body") so they inherit the trigger
+  width and a click anywhere else in the dialog correctly counts as
+  "outside" from PrimeNG's view — closes the panel cleanly.
+-->
+<div class="save-analysis-popup ds-picker-popup" *ngIf="visible" (click)="onBackdropClick($event)">
+  <div class="popup-content">
+    <h3>{{ 'DATASET.PICK_DATASOURCE' | translate }}</h3>
+
+    <!-- Step 0 (system admins only): Organisation. Selecting an
+         org cascades a reset: datasource and schema clear, the
+         datasource list re-fetches against the new org. -->
+    <div class="form-field" *ngIf="showOrgDropdown">
+      <label>{{ 'COMMON.ORGANISATION' | translate }}</label>
+      <app-custom-dropdown [(ngModel)]="orgSelected" [placeholder]="'COMMON.ORGANISATION' | translate"
+        [floatingLabel]="false" [serverMode]="true" [fetcher]="loadOrgsPage" [pageSize]="10"
+        [preloadedItems]="orgPreloaded" [preloadedTotal]="orgPreloadedTotal" optionLabel="name" [optionValue]="null"
+        [filter]="true" filterBy="name" icon="pi-building" (onChangeEvent)="onOrgChange()">
+      </app-custom-dropdown>
+    </div>
+
+    <!-- Step 1: Datasource. Required. Changing this resets the
+         schema selection below and re-fetches the schema list. -->
+    <div class="form-field">
+      <label>
+        {{ 'COMMON.DATASOURCE' | translate }}
+        <span class="required">*</span>
+      </label>
+      <app-custom-dropdown [(ngModel)]="datasourceSelected" [placeholder]="'COMMON.DATASOURCE' | translate"
+        [floatingLabel]="false" [serverMode]="true" [fetcher]="loadDsPage" [pageSize]="10"
+        [preloadedItems]="dsPreloaded" [preloadedTotal]="dsPreloadedTotal" optionLabel="name" [optionValue]="null"
+        [filter]="true" filterBy="name" icon="pi-database" [disabled]="showOrgDropdown && !orgSelected"
+        (onChangeEvent)="onDatasourceChange()">
+      </app-custom-dropdown>
+    </div>
+
+    <!-- Step 2 (optional): Schema. Always rendered so the user
+         sees the field up front. Disabled until a datasource is
+         picked. Leaving this empty is supported — the editor will
+         open against the whole datasource. -->
+    <div class="form-field">
+      <label>
+        {{ 'DATASET.SCHEMA' | translate }}
+        <span class="optional-tag">({{ 'COMMON.OPTIONAL' | translate }})</span>
+      </label>
+      <div class="ds-picker-schema-row">
+        <app-custom-dropdown class="ds-picker-schema-dropdown" [(ngModel)]="schemaSelected"
+          [placeholder]="'DATASET.SCHEMA' | translate" [floatingLabel]="false" [options]="schemaOptions || []"
+          optionLabel="name" [optionValue]="null" [filter]="true" filterBy="name" icon="pi-sitemap"
+          [disabled]="!datasourceSelected || schemaLoading">
+        </app-custom-dropdown>
+        <button *ngIf="schemaSelected" type="button" class="ds-picker-schema-clear" (click)="clearSchema()"
+          [attr.aria-label]="'COMMON.CLEAR' | translate" [title]="'COMMON.CLEAR' | translate">
+          <i class="pi pi-times-circle" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <!-- Inline status under the schema row. Three exclusive
+           states: idle (no datasource), loading, error. Plain
+           muted text — toast already does the loud notice. -->
+      <small class="form-hint" *ngIf="!datasourceSelected">
+        <i class="pi pi-info-circle"></i>
+        {{ 'DATASET.SCHEMA_PICK_DATASOURCE_FIRST' | translate }}
+      </small>
+      <small class="form-hint" *ngIf="datasourceSelected && schemaLoading">
+        <i class="pi pi-spin pi-spinner"></i>
+        {{ 'DATASET.LOADING_SCHEMA' | translate }}
+      </small>
+      <small class="form-hint error" *ngIf="datasourceSelected && schemaError && !schemaLoading">
+        <i class="pi pi-exclamation-triangle"></i>
+        {{ schemaError }}
+      </small>
+      <small class="form-hint" *ngIf="
+          datasourceSelected &&
+          !schemaLoading &&
+          !schemaError &&
+          schemaOptions?.length
+        ">
+        {{ 'DATASET.SCHEMA_PICKER_HINT_OPTIONAL' | translate }}
+      </small>
+    </div>
+
+    <div class="popup-actions">
+      <button pButton type="button" [label]="'COMMON.CANCEL' | translate" class="p-button-outlined btn-cancel"
+        (click)="onCancel()"></button>
+      <button pButton type="button" [label]="'COMMON.CONTINUE' | translate" class="p-button-primary btn-save"
+        [disabled]="!datasourceSelected" (click)="onContinue()">
+        <i class="pi pi-arrow-right mr-2"></i>
+      </button>
+    </div>
+  </div>
+</div>

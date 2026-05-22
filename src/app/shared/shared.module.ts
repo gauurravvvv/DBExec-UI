@@ -5,6 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AnalysisFilterBarComponent } from '../modules/analyses/components/analysis-filter-bar/analysis-filter-bar.component';
 import { SaveAnalysesDialogComponent } from '../modules/analyses/components/save-analyses-dialog/save-analyses-dialog.component';
 import { AddCustomFieldDialogComponent } from '../modules/dataset/components/add-custom-field-dialog/add-custom-field-dialog.component';
+import { DatasetPickerDialogComponent } from '../modules/dataset/components/dataset-picker-dialog/dataset-picker-dialog.component';
 import { ChangePasswordDialogComponent } from './components/change-password-dialog/change-password-dialog.component';
 import { ConfirmLeaveDialogComponent } from './components/confirm-leave-dialog/confirm-leave-dialog.component';
 import { CustomAccordionComponent } from './components/custom-accordion/custom-accordion.component';
@@ -47,6 +48,7 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     GlobalSearchComponent,
     AddCustomFieldDialogComponent,
     SaveAnalysesDialogComponent,
+    DatasetPickerDialogComponent,
     AnalysisFilterBarComponent,
     CustomAccordionComponent,
     CustomBinaryCheckboxComponent,
@@ -79,6 +81,7 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     GlobalSearchComponent,
     AddCustomFieldDialogComponent,
     SaveAnalysesDialogComponent,
+    DatasetPickerDialogComponent,
     AnalysisFilterBarComponent,
     CustomAccordionComponent,
     CustomBinaryCheckboxComponent,
