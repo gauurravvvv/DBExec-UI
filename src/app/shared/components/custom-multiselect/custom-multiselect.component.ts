@@ -2,12 +2,17 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  DestroyRef,
   forwardRef,
+  inject,
   Input,
   OnChanges,
+  OnInit,
   SimpleChanges,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
 
 /**
  * Server-driven fetcher contract for the multi-select. Identical to the
@@ -33,10 +38,16 @@ export type MultiselectFetcher = (args: {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomMultiselectComponent
-  implements ControlValueAccessor, OnChanges
+  implements ControlValueAccessor, OnChanges, OnInit
 {
   @Input() label = '';
   @Input() placeholder = '';
+  /**
+   * Optional leading icon class (e.g. "pi-users"). Renders as an
+   * absolutely-positioned <i> at the trigger's left edge — mirrors the
+   * pattern used by app-custom-input and app-custom-dropdown.
+   */
+  @Input() icon = '';
   @Input() options: any[] = [];
   @Input() optionLabel = 'label';
   @Input() optionValue: string | null = '';
@@ -62,8 +73,12 @@ export class CustomMultiselectComponent
   @Input() selectedItemsLabel = '{0} items selected';
   @Input() selectionLimit!: number;
   @Input() scrollHeight = '200px';
-  @Input() emptyMessage = 'No results found';
-  @Input() emptyFilterMessage = 'No results found';
+  // Empty / loading / filter-placeholder strings. Empty-string default
+  // is a sentinel for "use the translation"; explicit consumer values
+  // win. Resolved fields below are what the template binds.
+  @Input() emptyMessage = '';
+  @Input() emptyFilterMessage = '';
+  @Input() filterPlaceholder = '';
   @Input() virtualScroll = false;
   @Input() virtualScrollItemSize = 38;
   @Input() errorMessage = '';
@@ -100,7 +115,42 @@ export class CustomMultiselectComponent
   // labelled even when the current page doesn't include them.
   private selectedItems = new Map<any, any>();
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  // Translated strings bound by the template — kept in sync with the
+  // active locale via TranslateService.onLangChange.
+  resolvedEmptyMessage = '';
+  resolvedEmptyFilterMessage = '';
+  resolvedLoadingMessage = '';
+  resolvedFilterPlaceholder = '';
+
+  private destroyRef = inject(DestroyRef);
+
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
+  ) {}
+
+  ngOnInit(): void {
+    this.resolveTranslations();
+    this.translate.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.resolveTranslations();
+        this.cdr.markForCheck();
+      });
+  }
+
+  private resolveTranslations(): void {
+    this.resolvedEmptyMessage =
+      this.emptyMessage ||
+      this.translate.instant('COMMON.NO_OPTIONS_AVAILABLE');
+    this.resolvedEmptyFilterMessage =
+      this.emptyFilterMessage ||
+      this.translate.instant('COMMON.NO_RESULTS_FOUND');
+    this.resolvedLoadingMessage = this.translate.instant('COMMON.LOADING');
+    this.resolvedFilterPlaceholder =
+      this.filterPlaceholder ||
+      this.translate.instant('COMMON.SEARCH_PLACEHOLDER');
+  }
 
   private onChange: (value: any[]) => void = () => {};
   private onTouched: () => void = () => {};

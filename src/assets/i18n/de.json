@@ -156,7 +156,10 @@
     "INCLUDE_ALL": "Include All",
     "CONFIRM": "Confirm",
     "COPY_TO_CLIPBOARD": "Copy to clipboard",
-    "BACK": "Zurück"
+    "BACK": "Zurück",
+    "SEARCH_PLACEHOLDER": "Suchen...",
+    "NO_RESULTS_FOUND": "Keine Ergebnisse gefunden",
+    "NO_OPTIONS_AVAILABLE": "Keine Optionen verfügbar"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Vorname ist erforderlich",

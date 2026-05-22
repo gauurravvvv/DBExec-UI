@@ -2,39 +2,49 @@
   <ng-container *ngIf="label">
     <!-- Floating Label -->
     <span class="p-float-label" *ngIf="floatingLabel">
-      <p-multiSelect
-        [options]="serverMode ? serverOptions : options"
-        [optionLabel]="optionLabel"
-        [optionValue]="$any(optionValue)"
-        [(ngModel)]="value"
-        [filter]="filter"
-        [filterBy]="filterBy || optionLabel"
-        [filterMatchMode]="filterMatchMode"
-        [resetFilterOnHide]="resetFilterOnHide"
-        [showToggleAll]="showToggleAll"
-        [showHeader]="showHeader"
-        [maxSelectedLabels]="maxSelectedLabels"
-        [selectedItemsLabel]="selectedItemsLabel"
-        [selectionLimit]="selectionLimit"
-        [scrollHeight]="scrollHeight"
-        [emptyMessage]="emptyMessage"
-        [emptyFilterMessage]="serverLoading ? 'Loading…' : emptyFilterMessage"
-        [virtualScroll]="virtualScroll"
-        [virtualScrollItemSize]="virtualScrollItemSize"
-        [style]="{ width: '100%' }"
-        [panelStyle]="{ width: '100%' }"
-        [placeholder]="placeholder"
-        [display]="display"
-        [disabled]="disabled"
-        [ngClass]="{ 'ng-invalid ng-dirty': showError }"
-        (onChange)="onValueChange($event.value)"
-        (onBlur)="onBlur()"
-        (onPanelShow)="onPanelShow()"
-        (onFilter)="onServerFilter($event)"
-        [inputId]="inputId"
-        [appendTo]="appendTo"
-      >
-      </p-multiSelect>
+      <span class="multiselect-with-icon" [class.has-leading-icon]="icon">
+        <i
+          *ngIf="icon"
+          class="pi {{ icon }} multiselect-leading-icon"
+          aria-hidden="true"
+        ></i>
+        <p-multiSelect
+          [options]="serverMode ? serverOptions : options"
+          [optionLabel]="optionLabel"
+          [optionValue]="$any(optionValue)"
+          [(ngModel)]="value"
+          [filter]="filter"
+          [filterBy]="filterBy || optionLabel"
+          [filterMatchMode]="filterMatchMode"
+          [resetFilterOnHide]="resetFilterOnHide"
+          [showToggleAll]="showToggleAll"
+          [showHeader]="showHeader"
+          [maxSelectedLabels]="maxSelectedLabels"
+          [selectedItemsLabel]="selectedItemsLabel"
+          [selectionLimit]="selectionLimit"
+          [scrollHeight]="scrollHeight"
+          [emptyMessage]="resolvedEmptyMessage"
+          [filterPlaceHolder]="resolvedFilterPlaceholder"
+          [emptyFilterMessage]="
+            serverLoading ? resolvedLoadingMessage : resolvedEmptyFilterMessage
+          "
+          [virtualScroll]="virtualScroll"
+          [virtualScrollItemSize]="virtualScrollItemSize"
+          [style]="{ width: '100%' }"
+          [panelStyle]="{ width: '100%' }"
+          [placeholder]="placeholder"
+          [display]="display"
+          [disabled]="disabled"
+          [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+          (onChange)="onValueChange($event.value)"
+          (onBlur)="onBlur()"
+          (onPanelShow)="onPanelShow()"
+          (onFilter)="onServerFilter($event)"
+          [inputId]="inputId"
+          [appendTo]="appendTo"
+        >
+        </p-multiSelect>
+      </span>
       <label [for]="inputId">
         {{ label }}
         <span class="required" *ngIf="required">*</span>
@@ -46,72 +56,93 @@
         {{ label }}
         <span class="required" *ngIf="required">*</span>
       </label>
-      <p-multiSelect
-        [options]="serverMode ? serverOptions : options"
-        [optionLabel]="optionLabel"
-        [optionValue]="$any(optionValue)"
-        [(ngModel)]="value"
-        [filter]="filter"
-        [filterBy]="filterBy || optionLabel"
-        [filterMatchMode]="filterMatchMode"
-        [resetFilterOnHide]="resetFilterOnHide"
-        [showToggleAll]="showToggleAll"
-        [showHeader]="showHeader"
-        [maxSelectedLabels]="maxSelectedLabels"
-        [selectedItemsLabel]="selectedItemsLabel"
-        [selectionLimit]="selectionLimit"
-        [scrollHeight]="scrollHeight"
-        [emptyMessage]="emptyMessage"
-        [emptyFilterMessage]="serverLoading ? 'Loading…' : emptyFilterMessage"
-        [virtualScroll]="virtualScroll"
-        [virtualScrollItemSize]="virtualScrollItemSize"
-        [style]="{ width: '100%' }"
-        [panelStyle]="{ width: '100%' }"
-        [placeholder]="placeholder"
-        [display]="display"
-        [disabled]="disabled"
-        [ngClass]="{ 'ng-invalid ng-dirty': showError }"
-        (onChange)="onValueChange($event.value)"
-        (onBlur)="onBlur()"
-        (onPanelShow)="onPanelShow()"
-        (onFilter)="onServerFilter($event)"
-        [appendTo]="appendTo"
-      >
-      </p-multiSelect>
+      <span class="multiselect-with-icon" [class.has-leading-icon]="icon">
+        <i
+          *ngIf="icon"
+          class="pi {{ icon }} multiselect-leading-icon"
+          aria-hidden="true"
+        ></i>
+        <p-multiSelect
+          [options]="serverMode ? serverOptions : options"
+          [optionLabel]="optionLabel"
+          [optionValue]="$any(optionValue)"
+          [(ngModel)]="value"
+          [filter]="filter"
+          [filterBy]="filterBy || optionLabel"
+          [filterMatchMode]="filterMatchMode"
+          [resetFilterOnHide]="resetFilterOnHide"
+          [showToggleAll]="showToggleAll"
+          [showHeader]="showHeader"
+          [maxSelectedLabels]="maxSelectedLabels"
+          [selectedItemsLabel]="selectedItemsLabel"
+          [selectionLimit]="selectionLimit"
+          [scrollHeight]="scrollHeight"
+          [emptyMessage]="resolvedEmptyMessage"
+          [filterPlaceHolder]="resolvedFilterPlaceholder"
+          [emptyFilterMessage]="
+            serverLoading ? resolvedLoadingMessage : resolvedEmptyFilterMessage
+          "
+          [virtualScroll]="virtualScroll"
+          [virtualScrollItemSize]="virtualScrollItemSize"
+          [style]="{ width: '100%' }"
+          [panelStyle]="{ width: '100%' }"
+          [placeholder]="placeholder"
+          [display]="display"
+          [disabled]="disabled"
+          [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+          (onChange)="onValueChange($event.value)"
+          (onBlur)="onBlur()"
+          (onPanelShow)="onPanelShow()"
+          (onFilter)="onServerFilter($event)"
+          [appendTo]="appendTo"
+        >
+        </p-multiSelect>
+      </span>
     </ng-container>
   </ng-container>
   <!-- No Label -->
-  <p-multiSelect
+  <span
     *ngIf="!label"
-    [options]="options"
-    [optionLabel]="optionLabel"
-    [optionValue]="$any(optionValue)"
-    [(ngModel)]="value"
-    [filter]="filter"
-    [filterBy]="filterBy || optionLabel"
-    [filterMatchMode]="filterMatchMode"
-    [resetFilterOnHide]="resetFilterOnHide"
-    [showToggleAll]="showToggleAll"
-    [showHeader]="showHeader"
-    [maxSelectedLabels]="maxSelectedLabels"
-    [selectedItemsLabel]="selectedItemsLabel"
-    [selectionLimit]="selectionLimit"
-    [scrollHeight]="scrollHeight"
-    [emptyMessage]="emptyMessage"
-    [emptyFilterMessage]="emptyFilterMessage"
-    [virtualScroll]="virtualScroll"
-    [virtualScrollItemSize]="virtualScrollItemSize"
-    [style]="{ width: '100%' }"
-    [panelStyle]="{ width: '100%' }"
-    [placeholder]="placeholder"
-    [display]="display"
-    [disabled]="disabled"
-    [ngClass]="{ 'ng-invalid ng-dirty': showError }"
-    (onChange)="onValueChange($event.value)"
-    (onBlur)="onBlur()"
-    [appendTo]="appendTo"
+    class="multiselect-with-icon"
+    [class.has-leading-icon]="icon"
   >
-  </p-multiSelect>
+    <i
+      *ngIf="icon"
+      class="pi {{ icon }} multiselect-leading-icon"
+      aria-hidden="true"
+    ></i>
+    <p-multiSelect
+      [options]="options"
+      [optionLabel]="optionLabel"
+      [optionValue]="$any(optionValue)"
+      [(ngModel)]="value"
+      [filter]="filter"
+      [filterBy]="filterBy || optionLabel"
+      [filterMatchMode]="filterMatchMode"
+      [resetFilterOnHide]="resetFilterOnHide"
+      [showToggleAll]="showToggleAll"
+      [showHeader]="showHeader"
+      [maxSelectedLabels]="maxSelectedLabels"
+      [selectedItemsLabel]="selectedItemsLabel"
+      [selectionLimit]="selectionLimit"
+      [scrollHeight]="scrollHeight"
+      [emptyMessage]="resolvedEmptyMessage"
+      [filterPlaceHolder]="resolvedFilterPlaceholder"
+      [emptyFilterMessage]="resolvedEmptyFilterMessage"
+      [virtualScroll]="virtualScroll"
+      [virtualScrollItemSize]="virtualScrollItemSize"
+      [style]="{ width: '100%' }"
+      [panelStyle]="{ width: '100%' }"
+      [placeholder]="placeholder"
+      [display]="display"
+      [disabled]="disabled"
+      [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+      (onChange)="onValueChange($event.value)"
+      (onBlur)="onBlur()"
+      [appendTo]="appendTo"
+    >
+    </p-multiSelect>
+  </span>
   <small class="error-message" *ngIf="showError && errorMessage">
     {{ errorMessage }}
   </small>

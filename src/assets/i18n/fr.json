@@ -156,7 +156,10 @@
     "INCLUDE_ALL": "Include All",
     "CONFIRM": "Confirm",
     "COPY_TO_CLIPBOARD": "Copy to clipboard",
-    "BACK": "Retour"
+    "BACK": "Retour",
+    "SEARCH_PLACEHOLDER": "Rechercher...",
+    "NO_RESULTS_FOUND": "Aucun résultat",
+    "NO_OPTIONS_AVAILABLE": "Aucune option disponible"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Le prénom est requis",

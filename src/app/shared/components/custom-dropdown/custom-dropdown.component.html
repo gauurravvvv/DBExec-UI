@@ -2,38 +2,69 @@
   <ng-container *ngIf="label">
     <!-- Floating Label -->
     <span class="p-float-label" *ngIf="floatingLabel">
-      <p-dropdown
-        [options]="serverMode ? serverOptions : options"
-        [optionLabel]="optionLabel"
-        [optionValue]="$any(optionValue)"
-        [(ngModel)]="value"
-        [filter]="filter"
-        [filterBy]="filterBy || optionLabel"
-        [filterPlaceholder]="filterPlaceholder"
-        [filterMatchMode]="filterMatchMode"
-        [resetFilterOnHide]="resetFilterOnHide"
-        [showClear]="showClear"
-        [editable]="editable"
-        [autoDisplayFirst]="autoDisplayFirst"
-        [scrollHeight]="scrollHeight"
-        [emptyMessage]="emptyMessage"
-        [emptyFilterMessage]="serverLoading ? 'Loading…' : emptyFilterMessage"
-        [virtualScroll]="virtualScroll"
-        [virtualScrollItemSize]="virtualScrollItemSize"
-        [style]="style || { width: '100%' }"
-        [panelStyle]="panelStyle || { width: '100%' }"
-        [placeholder]="placeholder"
-        [disabled]="disabled"
-        [ngClass]="{ 'ng-invalid ng-dirty': showError }"
-        (onChange)="onValueChange($event.value)"
-        (onBlur)="onBlur()"
-        (onShow)="onPanelShow()"
-        (onFilter)="onServerFilter($event)"
-        (onScroll)="onServerScroll($event)"
-        [inputId]="inputId"
-        [appendTo]="appendTo"
+      <span
+        class="dropdown-with-icon"
+        [class.has-leading-icon]="icon && !triggerTemplate"
       >
-      </p-dropdown>
+        <i
+          *ngIf="icon && !triggerTemplate"
+          class="pi {{ icon }} dropdown-leading-icon"
+          aria-hidden="true"
+        ></i>
+        <p-dropdown
+          [options]="serverMode ? serverOptions : options"
+          [optionLabel]="optionLabel"
+          [optionValue]="$any(optionValue)"
+          [(ngModel)]="value"
+          [filter]="filter"
+          [filterBy]="filterBy || optionLabel"
+          [filterPlaceholder]="resolvedFilterPlaceholder"
+          [filterMatchMode]="filterMatchMode"
+          [resetFilterOnHide]="resetFilterOnHide"
+          [showClear]="showClear"
+          [editable]="editable"
+          [autoDisplayFirst]="autoDisplayFirst"
+          [scrollHeight]="scrollHeight"
+          [emptyMessage]="resolvedEmptyMessage"
+          [emptyFilterMessage]="
+            serverLoading ? resolvedLoadingMessage : resolvedEmptyFilterMessage
+          "
+          [virtualScroll]="virtualScroll"
+          [virtualScrollItemSize]="virtualScrollItemSize"
+          [style]="style || { width: '100%' }"
+          [panelStyle]="panelStyle || { width: '100%' }"
+          [placeholder]="placeholder"
+          [disabled]="disabled"
+          [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+          (onChange)="onValueChange($event.value)"
+          (onBlur)="onBlur()"
+          (onShow)="onPanelShow()"
+          (onFilter)="onServerFilter($event)"
+          (onScroll)="onServerScroll($event)"
+          [inputId]="inputId"
+          [appendTo]="appendTo"
+          [styleClass]="styleClass"
+          [panelStyleClass]="panelStyleClass"
+        >
+          <ng-template
+            *ngIf="triggerTemplate"
+            let-option
+            pTemplate="selectedItem"
+          >
+            <ng-container
+              *ngTemplateOutlet="
+                triggerTemplate;
+                context: { $implicit: option }
+              "
+            ></ng-container>
+          </ng-template>
+          <ng-template *ngIf="itemTemplate" let-option pTemplate="item">
+            <ng-container
+              *ngTemplateOutlet="itemTemplate; context: { $implicit: option }"
+            ></ng-container>
+          </ng-template>
+        </p-dropdown>
+      </span>
       <label [for]="inputId">
         {{ label }}
         <span class="required" *ngIf="required">*</span>
@@ -45,72 +76,127 @@
         {{ label }}
         <span class="required" *ngIf="required">*</span>
       </label>
-      <p-dropdown
-        [options]="serverMode ? serverOptions : options"
-        [optionLabel]="optionLabel"
-        [optionValue]="$any(optionValue)"
-        [(ngModel)]="value"
-        [filter]="filter"
-        [filterBy]="filterBy || optionLabel"
-        [filterPlaceholder]="filterPlaceholder"
-        [filterMatchMode]="filterMatchMode"
-        [resetFilterOnHide]="resetFilterOnHide"
-        [showClear]="showClear"
-        [editable]="editable"
-        [autoDisplayFirst]="autoDisplayFirst"
-        [scrollHeight]="scrollHeight"
-        [emptyMessage]="emptyMessage"
-        [emptyFilterMessage]="serverLoading ? 'Loading…' : emptyFilterMessage"
-        [virtualScroll]="virtualScroll"
-        [virtualScrollItemSize]="virtualScrollItemSize"
-        [style]="style || { width: '100%' }"
-        [panelStyle]="panelStyle || { width: '100%' }"
-        [placeholder]="placeholder"
-        [disabled]="disabled"
-        [ngClass]="{ 'ng-invalid ng-dirty': showError }"
-        (onChange)="onValueChange($event.value)"
-        (onBlur)="onBlur()"
-        (onShow)="onPanelShow()"
-        (onFilter)="onServerFilter($event)"
-        (onScroll)="onServerScroll($event)"
-        [appendTo]="appendTo"
+      <span
+        class="dropdown-with-icon"
+        [class.has-leading-icon]="icon && !triggerTemplate"
       >
-      </p-dropdown>
+        <i
+          *ngIf="icon && !triggerTemplate"
+          class="pi {{ icon }} dropdown-leading-icon"
+          aria-hidden="true"
+        ></i>
+        <p-dropdown
+          [options]="serverMode ? serverOptions : options"
+          [optionLabel]="optionLabel"
+          [optionValue]="$any(optionValue)"
+          [(ngModel)]="value"
+          [filter]="filter"
+          [filterBy]="filterBy || optionLabel"
+          [filterPlaceholder]="resolvedFilterPlaceholder"
+          [filterMatchMode]="filterMatchMode"
+          [resetFilterOnHide]="resetFilterOnHide"
+          [showClear]="showClear"
+          [editable]="editable"
+          [autoDisplayFirst]="autoDisplayFirst"
+          [scrollHeight]="scrollHeight"
+          [emptyMessage]="resolvedEmptyMessage"
+          [emptyFilterMessage]="
+            serverLoading ? resolvedLoadingMessage : resolvedEmptyFilterMessage
+          "
+          [virtualScroll]="virtualScroll"
+          [virtualScrollItemSize]="virtualScrollItemSize"
+          [style]="style || { width: '100%' }"
+          [panelStyle]="panelStyle || { width: '100%' }"
+          [placeholder]="placeholder"
+          [disabled]="disabled"
+          [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+          (onChange)="onValueChange($event.value)"
+          (onBlur)="onBlur()"
+          (onShow)="onPanelShow()"
+          (onFilter)="onServerFilter($event)"
+          (onScroll)="onServerScroll($event)"
+          [appendTo]="appendTo"
+          [styleClass]="styleClass"
+          [panelStyleClass]="panelStyleClass"
+        >
+          <ng-template
+            *ngIf="triggerTemplate"
+            let-option
+            pTemplate="selectedItem"
+          >
+            <ng-container
+              *ngTemplateOutlet="
+                triggerTemplate;
+                context: { $implicit: option }
+              "
+            ></ng-container>
+          </ng-template>
+          <ng-template *ngIf="itemTemplate" let-option pTemplate="item">
+            <ng-container
+              *ngTemplateOutlet="itemTemplate; context: { $implicit: option }"
+            ></ng-container>
+          </ng-template>
+        </p-dropdown>
+      </span>
     </ng-container>
   </ng-container>
   <!-- No Label -->
-  <p-dropdown
+  <span
     *ngIf="!label"
-    [options]="serverMode ? serverOptions : options"
-    [optionLabel]="optionLabel"
-    [optionValue]="$any(optionValue)"
-    [(ngModel)]="value"
-    [filter]="filter"
-    [filterBy]="filterBy || optionLabel"
-    [filterPlaceholder]="filterPlaceholder"
-    [filterMatchMode]="filterMatchMode"
-    [resetFilterOnHide]="resetFilterOnHide"
-    [showClear]="showClear"
-    [editable]="editable"
-    [autoDisplayFirst]="autoDisplayFirst"
-    [scrollHeight]="scrollHeight"
-    [emptyMessage]="emptyMessage"
-    [emptyFilterMessage]="serverLoading ? 'Loading…' : emptyFilterMessage"
-    [virtualScroll]="virtualScroll"
-    [virtualScrollItemSize]="virtualScrollItemSize"
-    [style]="style || { width: '100%' }"
-    [panelStyle]="panelStyle || { width: '100%' }"
-    [placeholder]="placeholder"
-    [disabled]="disabled"
-    [ngClass]="{ 'ng-invalid ng-dirty': showError }"
-    (onChange)="onValueChange($event.value)"
-    (onBlur)="onBlur()"
-    (onShow)="onPanelShow()"
-    (onFilter)="onServerFilter($event)"
-    (onScroll)="onServerScroll($event)"
-    [appendTo]="appendTo"
+    class="dropdown-with-icon"
+    [class.has-leading-icon]="icon && !triggerTemplate"
   >
-  </p-dropdown>
+    <i
+      *ngIf="icon && !triggerTemplate"
+      class="pi {{ icon }} dropdown-leading-icon"
+      aria-hidden="true"
+    ></i>
+    <p-dropdown
+      [options]="serverMode ? serverOptions : options"
+      [optionLabel]="optionLabel"
+      [optionValue]="$any(optionValue)"
+      [(ngModel)]="value"
+      [filter]="filter"
+      [filterBy]="filterBy || optionLabel"
+      [filterPlaceholder]="resolvedFilterPlaceholder"
+      [filterMatchMode]="filterMatchMode"
+      [resetFilterOnHide]="resetFilterOnHide"
+      [showClear]="showClear"
+      [editable]="editable"
+      [autoDisplayFirst]="autoDisplayFirst"
+      [scrollHeight]="scrollHeight"
+      [emptyMessage]="resolvedEmptyMessage"
+      [emptyFilterMessage]="
+        serverLoading ? resolvedLoadingMessage : resolvedEmptyFilterMessage
+      "
+      [virtualScroll]="virtualScroll"
+      [virtualScrollItemSize]="virtualScrollItemSize"
+      [style]="style || { width: '100%' }"
+      [panelStyle]="panelStyle || { width: '100%' }"
+      [placeholder]="placeholder"
+      [disabled]="disabled"
+      [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+      (onChange)="onValueChange($event.value)"
+      (onBlur)="onBlur()"
+      (onShow)="onPanelShow()"
+      (onFilter)="onServerFilter($event)"
+      (onScroll)="onServerScroll($event)"
+      [appendTo]="appendTo"
+      [styleClass]="styleClass"
+      [panelStyleClass]="panelStyleClass"
+    >
+      <ng-template *ngIf="triggerTemplate" let-option pTemplate="selectedItem">
+        <ng-container
+          *ngTemplateOutlet="triggerTemplate; context: { $implicit: option }"
+        ></ng-container>
+      </ng-template>
+      <ng-template *ngIf="itemTemplate" let-option pTemplate="item">
+        <ng-container
+          *ngTemplateOutlet="itemTemplate; context: { $implicit: option }"
+        ></ng-container>
+      </ng-template>
+    </p-dropdown>
+  </span>
   <small class="error-message" *ngIf="showError && errorMessage">
     {{ errorMessage }}
   </small>

@@ -156,7 +156,10 @@
     "INCLUDE_ALL": "Include All",
     "CONFIRM": "Confirm",
     "COPY_TO_CLIPBOARD": "Copy to clipboard",
-    "BACK": "戻る"
+    "BACK": "戻る",
+    "SEARCH_PLACEHOLDER": "検索...",
+    "NO_RESULTS_FOUND": "該当する結果がありません",
+    "NO_OPTIONS_AVAILABLE": "利用可能なオプションがありません"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名は必須です",

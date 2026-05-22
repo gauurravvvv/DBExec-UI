@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   forwardRef,
   Input,
@@ -48,11 +49,22 @@ export class CustomInputComponent implements ControlValueAccessor {
   disabled = false;
   passwordVisible = false;
 
+  constructor(private cdr: ChangeDetectorRef) {}
+
   private onChange: (value: string) => void = () => {};
   private onTouched: () => void = () => {};
 
+  /**
+   * Reactive-forms writes (formControl.setValue / patchValue) land here.
+   * Because the component is OnPush, simply assigning `this.value` does
+   * not schedule a CD pass — the DOM <input> keeps showing the old value
+   * until the user interacts (focus + blur, or a typed keystroke) and
+   * forces a check. markForCheck schedules a re-check on the next
+   * Angular tick so programmatic updates render immediately.
+   */
   writeValue(value: string): void {
     this.value = value || '';
+    this.cdr.markForCheck();
   }
 
   registerOnChange(fn: (value: string) => void): void {

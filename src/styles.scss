@@ -2911,9 +2911,19 @@ body {
   }
 }
 
-// Fixed width for organisation/database dropdowns in toolbar areas
+// Fixed width for organisation/database dropdowns in toolbar areas.
+//
+// Use a single `width` (not a min/max range) so the trigger stays at
+// exactly the same width regardless of value length. Earlier we had
+// min-width: 200px + max-width: 280px which let the trigger expand
+// from 200 → 280 when a long value was selected — that's the "width
+// changes with value" bug the user reported.
+//
+// `flex: 0 0 240px` locks the size in the flex container too — neither
+// shrink nor grow.
 .card-toolbar .dropdown-field {
-  min-width: 200px;
+  flex: 0 0 240px;
+  width: 240px;
 }
 
 // Old `.modern-table` overrides (forced circle checkbox + asymmetric
@@ -2994,3 +3004,108 @@ body {
     font-family: var(--font-ui) !important;
   }
 }
+
+// ── Header locale dropdown panel ──────────────────────────────────
+// The locale picker uses appendTo="body" so its panel renders outside
+// the header component's view encapsulation. These styles target the
+// panelStyleClass passed by header.component.html so the dense-row
+// treatment only applies to this specific overlay.
+//
+// Width is pinned to ~210px so the panel doesn't stretch to match the
+// trigger (which is only ~64px). Rows are 30px tall (smaller than the
+// default ~42px) for a command-palette feel.
+.p-dropdown-panel.locale-dropdown-panel {
+  min-width: 210px !important;
+  width: 210px !important;
+  border-radius: var(--radius-md) !important;
+
+  .p-dropdown-items {
+    padding: 4px !important;
+  }
+
+  .p-dropdown-item {
+    padding: 6px 10px !important;
+    border-radius: var(--radius-xs);
+    line-height: 1.2;
+    min-height: 30px;
+
+    &.p-highlight {
+      background: var(--primary-color-transparent) !important;
+      color: var(--text-color) !important;
+    }
+  }
+}
+
+// ── Body-appended dropdown / multiselect overlay clamps ──────────────
+//
+// Lives in global styles.scss (not component SCSS) because when
+// appendTo="body" the .p-overlay / .p-dropdown-panel are rendered
+// OUTSIDE the component's view and lose Angular view-encapsulation
+// attributes — :host ::ng-deep rules in the component SCSS don't reach
+// them (confirmed via DOM inspection).
+//
+// Bug surface: PrimeNG inlines `min-width: <triggerWidth>` on
+// .p-overlay so the overlay matches the trigger AT LEAST. But the
+// overlay's natural width is `auto`, which expands to fit the widest
+// option in the panel — so a 200px trigger with a long option label
+// would produce a 502px-wide overlay.
+//
+// Strategy: keep PrimeNG's min-width logic (so the overlay never
+// shrinks below the trigger), and TRUNCATE option labels so they
+// can't expand the overlay past min-width. This gives:
+//   panel.width === trigger.width  (always)
+//   long option labels ellipsis inside the panel
+//
+// No `max-width` on .p-overlay — that would either be a no-op (when
+// min-width > max-width, min-width wins) or force the panel narrower
+// than the trigger (which looks wrong).
+// Cap the overlay AND panel at 320px. PrimeNG inlines `min-width:
+// <triggerWidth>` on .p-overlay; without an upper bound, the overlay
+// natural-sizes to the widest option label (a 200px trigger could
+// produce a 500+px overlay with a long org name).
+//
+// Behaviour now:
+//   - Trigger ≤ 320px (toolbar filters, table filters): panel capped
+//     at 320px. Options truncate with ellipsis if needed.
+//   - Trigger > 320px (form dropdowns at 600+px): min-width wins over
+//     max-width per CSS rules, so panel == trigger width. Cap is a
+//     silent no-op — correct behaviour for wide form fields.
+//
+// 320px chosen to match the widest toolbar dropdown (.dropdown-field
+// is 280px + ~16px chrome). Tighter would clip common values; wider
+// would defeat the purpose for narrow filters.
+.p-overlay {
+  max-width: 320px !important;
+}
+
+.p-dropdown-panel,
+.p-multiselect-panel {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 320px !important;
+}
+
+// Truncate option labels with ellipsis so they can't push the overlay
+// past PrimeNG's min-width (= trigger width). Without this, a long
+// option expanded the overlay to fit, breaking width parity.
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item,
+.p-multiselect-panel .p-multiselect-items .p-multiselect-item {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+
+  // Template-projected option rows (db-type, locale) get the ellipsis
+  // on the leaf text node via min-width:0 on this flex parent + on
+  // each child element.
+  > * {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+/* trigger-rebuild 1779393582 */

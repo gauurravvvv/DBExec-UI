@@ -1,3 +1,32 @@
+// Leading-icon wrapper. Mirrors custom-dropdown / custom-input so the
+// three form controls share the same visual treatment when an icon
+// is supplied. Uses logical properties so RTL locales flip correctly.
+.multiselect-with-icon {
+  position: relative;
+  display: block;
+  width: 100%;
+
+  .multiselect-leading-icon {
+    position: absolute;
+    inset-inline-start: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-color);
+    opacity: 0.55;
+    font-size: var(--fs-body);
+    pointer-events: none;
+    z-index: 1;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    text-align: center;
+  }
+
+  &.has-leading-icon ::ng-deep .p-multiselect .p-multiselect-label {
+    padding-inline-start: 2.5rem !important;
+  }
+}
+
 .form-field {
   display: flex;
   flex-direction: column;
@@ -13,9 +42,14 @@
       font-weight: var(--fw-medium);
       color: color-mix(in srgb, var(--text-color) 60%, transparent);
       background: var(--card-background);
-      padding: 2px 8px;
-      margin-left: -4px;
-      z-index: var(--z-base);
+      padding: 0 4px;
+      // z-index 2 keeps the notch above the dropdown's border. Lower
+      // values let the border render on top and clipped the label's
+      // bottom half in some browsers.
+      z-index: 2;
+      transition:
+        top var(--motion-fast) ease,
+        font-size var(--motion-fast) ease;
 
       .required {
         color: var(--error-color);
@@ -42,16 +76,70 @@
 }
 
 :host ::ng-deep {
+  // ── Floating label (floatingLabel=true consumers) ─────────────────
+  //
+  // Same shape as the custom-dropdown SCSS — see that file for the
+  // detailed rationale. Two states:
+  //   resting:  label sits inside the trigger at the value-text baseline
+  //   floated:  label notches the top border of the trigger
+  //
+  // The trigger is wrapped in .multiselect-with-icon, which broke
+  // PrimeNG's default sibling selector — :has() reaches through.
+
+  // Hide placeholder while the label is in resting position so the two
+  // don't visually collide.
   .p-float-label
     .p-multiselect:not(.p-focus)
     .p-multiselect-label.p-placeholder {
     opacity: 0;
   }
 
+  // Resting horizontal offset — match the multiselect's text inset.
+  // Both `left` and `inset-inline-start` are set: PrimeNG's theme.css
+  // uses physical `left` and would otherwise win the cascade. See
+  // custom-dropdown SCSS for the full rationale.
+  .p-float-label > label {
+    left: 0.5rem;
+    inset-inline-start: 0.5rem;
+  }
+  .p-float-label:has(.multiselect-with-icon.has-leading-icon) > label {
+    left: 2.5rem;
+    inset-inline-start: 2.5rem;
+  }
+
+  // Floated state — see custom-dropdown SCSS for rationale on !important.
+  // The leading-icon resting rule has higher specificity than this one,
+  // so without !important a focused multiselect with a leading icon
+  // would keep the 2.5rem resting offset instead of sliding to the
+  // corner.
+  .p-float-label:focus-within > label,
+  .p-float-label:has(.p-inputwrapper-filled) > label,
+  .p-float-label:has(.p-inputwrapper-focus) > label {
+    top: -0.5rem;
+    margin-top: 0;
+    font-size: var(--fs-label);
+    left: 0.25rem !important;
+    inset-inline-start: 0.25rem !important;
+  }
+
+  // Force <p-multiSelect> host to block — see custom-dropdown SCSS for
+  // why this matters (inline host causes long content to break out
+  // of the trigger).
+  p-multiSelect {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
   .p-multiselect {
     background: var(--card-background);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
+    // Constant trigger width regardless of how many chips / how long
+    // the selected-items label is.
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
 
     &.ng-invalid.ng-touched,
     &.ng-invalid.ng-dirty {
@@ -74,12 +162,33 @@
     .p-multiselect-label {
       color: var(--text-color);
       font-size: var(--fs-body);
-      padding: 0.625rem 0.75rem;
+      // Individual paddings + !important on padding-right so PrimeNG's
+      // theme padding doesn't bleed through when chips overflow and
+      // collide with the clear icon. See custom-dropdown SCSS for the
+      // detailed rationale.
+      padding-top: 0.625rem;
+      padding-bottom: 0.625rem;
+      padding-left: 0.75rem;
+      padding-right: 2.5rem !important; // reserves chevron space
+      display: block !important;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       &.p-placeholder {
         color: var(--text-color);
         opacity: 0.4;
       }
+    }
+
+    // Reposition clear icon next to the chevron + extend label padding
+    // when clearable. Same pattern as custom-dropdown.
+    .p-multiselect-clear-icon {
+      right: 2.25rem !important;
+    }
+    &.p-multiselect-clearable .p-multiselect-label {
+      padding-right: 3.5rem !important;
     }
 
     .p-multiselect-trigger {

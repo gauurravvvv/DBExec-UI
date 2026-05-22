@@ -2,14 +2,21 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
+  ContentChild,
+  DestroyRef,
   EventEmitter,
   forwardRef,
+  inject,
   Input,
   OnChanges,
+  OnInit,
   Output,
   SimpleChanges,
+  TemplateRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
 
 /**
  * Server-driven fetcher contract. Each call returns one page of items and the
@@ -46,10 +53,20 @@ export type DropdownFetcher = (args: {
   // template, so Default CD has negligible cost here.
 })
 export class CustomDropdownComponent
-  implements ControlValueAccessor, OnChanges, AfterViewInit
+  implements ControlValueAccessor, OnChanges, AfterViewInit, OnInit
 {
+  private destroyRef = inject(DestroyRef);
+
   @Input() label = '';
   @Input() placeholder = '';
+  /**
+   * Optional leading icon class (e.g. "pi-building"). Renders as a
+   * <i class="pi pi-X"> absolutely positioned at the left edge of the
+   * dropdown trigger, mirroring app-custom-input's icon prop. Ignored
+   * when a custom selectedItem/trigger template is supplied — those
+   * templates render their own glyph and shouldn't compete with this.
+   */
+  @Input() icon = '';
   @Input() options: any[] = [];
   @Input() optionLabel = 'label';
   @Input() optionValue: string | null = '';
@@ -73,8 +90,21 @@ export class CustomDropdownComponent
   @Input() editable = false;
   @Input() autoDisplayFirst = true;
   @Input() scrollHeight = '200px';
-  @Input() emptyMessage = 'No results found';
-  @Input() emptyFilterMessage = 'No results found';
+  // Empty / loading / filter-placeholder strings.
+  //
+  // Empty-string default is a sentinel meaning "use the translation".
+  // The component resolves them in ngOnInit from i18n keys and
+  // re-resolves whenever the user changes locale (subscribed via
+  // TranslateService.onLangChange). Consumers can still override per
+  // call site if they want a custom string — the explicit value wins.
+  @Input() emptyMessage = '';
+  @Input() emptyFilterMessage = '';
+  // Internal resolved strings — bound into the template instead of the
+  // raw inputs so PrimeNG sees the translated value.
+  resolvedEmptyMessage = '';
+  resolvedEmptyFilterMessage = '';
+  resolvedLoadingMessage = '';
+  resolvedFilterPlaceholder = '';
   @Input() virtualScroll = false;
   @Input() virtualScrollItemSize = 38;
   @Input() errorMessage = '';
@@ -83,6 +113,13 @@ export class CustomDropdownComponent
   @Input() appendTo: any = null;
   @Input() style: { [key: string]: string } = {};
   @Input() panelStyle: { [key: string]: string } | null = null;
+  // CSS class applied to the dropdown panel — useful when the panel
+  // appends to body (so it escapes view-encapsulation) and the host
+  // page needs to target items in it. Consumers pass e.g.
+  // panelStyleClass="locale-dropdown-panel" and define styles in a
+  // global SCSS scope or via ::ng-deep.
+  @Input() panelStyleClass = '';
+  @Input() styleClass = '';
 
   // ── Server-driven mode ──────────────────────────────────────────────────
   // When serverMode=true, the dropdown ignores [options] and instead calls
@@ -117,6 +154,56 @@ export class CustomDropdownComponent
    */
   @Input() resolveSelected: ((value: any) => Promise<any>) | null = null;
 
+  /**
+   * Optional caller-supplied template for rendering each option AND the
+   * trigger's selected-item slot. Receives the full option object as
+   * `$implicit`, so consumers can show icons, multi-line content, etc.
+   *
+   * Two usage modes:
+   *
+   *   1. Single template — same content for trigger and panel rows:
+   *      <app-custom-dropdown ...>
+   *        <ng-template let-opt>
+   *          <i [class]="opt.iconClass"></i>{{ opt.label }}
+   *        </ng-template>
+   *      </app-custom-dropdown>
+   *
+   *   2. Two templates — different trigger vs row (use template refs):
+   *      <app-custom-dropdown ...>
+   *        <ng-template #selectedItemTemplate let-opt>
+   *          {{ opt.shortCode }}
+   *        </ng-template>
+   *        <ng-template #itemTemplate let-opt>
+   *          <i [class]="opt.flagClass"></i>{{ opt.label }}
+   *        </ng-template>
+   *      </app-custom-dropdown>
+   *
+   * Resolution order for each slot:
+   *   selectedItem slot  →  selectedItemTemplate ?? itemTemplate ?? default
+   *   panel item slot    →  itemTemplate ?? default
+   *
+   * The unnamed `@ContentChild(TemplateRef)` fallback below picks up the
+   * single-template call sites that pre-date the named refs.
+   */
+  @ContentChild('itemTemplate')
+  namedItemTemplate: TemplateRef<any> | null = null;
+
+  @ContentChild('selectedItemTemplate')
+  selectedItemTemplate: TemplateRef<any> | null = null;
+
+  @ContentChild(TemplateRef)
+  private firstUnnamedTemplate: TemplateRef<any> | null = null;
+
+  /** Resolved template for panel rows. */
+  get itemTemplate(): TemplateRef<any> | null {
+    return this.namedItemTemplate ?? this.firstUnnamedTemplate;
+  }
+
+  /** Resolved template for the trigger's selected-item slot. */
+  get triggerTemplate(): TemplateRef<any> | null {
+    return this.selectedItemTemplate ?? this.itemTemplate;
+  }
+
   @Output() onChangeEvent = new EventEmitter<any>();
 
   value: any = null;
@@ -138,7 +225,41 @@ export class CustomDropdownComponent
   // time the user types a non-matching filter and closes the panel.
   private selectedItem: any = null;
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
+  ) {}
+
+  ngOnInit(): void {
+    this.resolveTranslations();
+    // Re-resolve when the user switches locale at runtime so the
+    // empty / loading / placeholder strings update without needing a
+    // dropdown re-mount.
+    this.translate.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.resolveTranslations();
+        this.cdr.markForCheck();
+      });
+  }
+
+  /**
+   * Resolve translated strings for empty / loading / filter-placeholder
+   * states. Consumer overrides (non-empty inputs) win; the sentinel
+   * empty string falls back to the i18n key.
+   */
+  private resolveTranslations(): void {
+    this.resolvedEmptyMessage =
+      this.emptyMessage ||
+      this.translate.instant('COMMON.NO_OPTIONS_AVAILABLE');
+    this.resolvedEmptyFilterMessage =
+      this.emptyFilterMessage ||
+      this.translate.instant('COMMON.NO_RESULTS_FOUND');
+    this.resolvedLoadingMessage = this.translate.instant('COMMON.LOADING');
+    this.resolvedFilterPlaceholder =
+      this.filterPlaceholder ||
+      this.translate.instant('COMMON.SEARCH_PLACEHOLDER');
+  }
 
   private onChange: (value: any) => void = () => {};
   private onTouched: () => void = () => {};

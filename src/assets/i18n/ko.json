@@ -156,7 +156,10 @@
     "INCLUDE_ALL": "Include All",
     "CONFIRM": "Confirm",
     "COPY_TO_CLIPBOARD": "Copy to clipboard",
-    "BACK": "뒤로"
+    "BACK": "뒤로",
+    "SEARCH_PLACEHOLDER": "검색...",
+    "NO_RESULTS_FOUND": "결과를 찾을 수 없습니다",
+    "NO_OPTIONS_AVAILABLE": "사용 가능한 옵션이 없습니다"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "이름은 필수 항목입니다",

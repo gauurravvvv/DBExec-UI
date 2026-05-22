@@ -3,6 +3,45 @@
   width: 100%;
 }
 
+// Leading-icon wrapper. Mirrors PrimeNG's .p-input-icon-left pattern so
+// dropdowns and inputs share the same visual treatment. The wrapper is
+// `display: block` (not inline-block) so the inner p-dropdown can take
+// 100% width. The icon is absolutely positioned over the trigger's
+// inline-start edge using logical properties so RTL locales (Arabic /
+// Hebrew) flip it automatically — without this, the icon sat at the
+// physical left in RTL and overlapped the selected value text.
+.dropdown-with-icon {
+  position: relative;
+  display: block;
+  width: 100%;
+
+  .dropdown-leading-icon {
+    position: absolute;
+    // logical: starts on the reading-direction side
+    inset-inline-start: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-color);
+    opacity: 0.55;
+    font-size: var(--fs-body);
+    pointer-events: none;
+    z-index: 1;
+    // Lock icon width so a wider glyph doesn't shift the centre point.
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    text-align: center;
+  }
+
+  // Bump the trigger label's inline-start padding so the value text
+  // doesn't slide under the icon. Use logical padding so RTL also gets
+  // the right gap. Specificity is high (host > class > deep) so it
+  // beats consumer-supplied [styleClass] overrides.
+  &.has-leading-icon ::ng-deep .p-dropdown .p-dropdown-label {
+    padding-inline-start: 2.5rem !important;
+  }
+}
+
 .form-field {
   display: flex;
   flex-direction: column;
@@ -33,12 +72,33 @@
 }
 
 :host ::ng-deep {
-  // Floating label styles — background cuts through border, no vertical padding
-  .p-float-label label {
+  // ── Floating label (floatingLabel=true consumers) ─────────────────
+  //
+  // Layout we want:
+  //   resting:  label sits inside the trigger at the value-text baseline
+  //   floated:  label notches the top border of the trigger
+  //
+  // The trigger lives inside our `.dropdown-with-icon` wrapper, which
+  // broke PrimeNG's default `.p-inputwrapper-filled ~ label` sibling
+  // selector — adding `:has()` variants gets us back to a clean
+  // floated state.
+
+  // Base label styling — applies to both resting and floated. The
+  // background + padding form the notch that "cuts through" the
+  // trigger's top border in the floated state. z-index keeps the
+  // label above the trigger's border (otherwise the border can render
+  // on top of the label and clip its bottom half).
+  .p-float-label > label {
     font-weight: var(--fw-medium);
     color: color-mix(in srgb, var(--text-color) 60%, transparent);
     background: var(--card-background);
-    z-index: var(--z-base);
+    padding: 0 4px;
+    z-index: 2;
+    line-height: 1;
+    transition:
+      top var(--motion-fast) ease,
+      font-size var(--motion-fast) ease,
+      inset-inline-start var(--motion-fast) ease;
 
     .required {
       color: var(--error-color);
@@ -46,18 +106,76 @@
     }
   }
 
-  // Floated state: sit precisely on top border line
-  .p-float-label:focus-within label,
-  .p-float-label .p-inputwrapper-filled ~ label,
-  .p-float-label .p-inputwrapper-focus ~ label {
-    top: -0.55rem !important;
-    font-size: var(--fs-label) !important;
+  // Resting horizontal offset — sits at the trigger's text inset.
+  // PrimeNG's theme.css sets `left: 0.75rem` on .p-float-label > label
+  // and that physical-left property beats our logical-property override
+  // when both are applied — so we set BOTH `left` and
+  // `inset-inline-start`. The physical property overrides PrimeNG in
+  // LTR; the logical property auto-flips in RTL (where `left` is
+  // irrelevant because the inline-start side is the right).
+  .p-float-label > label {
+    left: 0.5rem;
+    inset-inline-start: 0.5rem;
+  }
+  // When a leading icon is rendered, scoot the resting label past it.
+  .p-float-label:has(.dropdown-with-icon.has-leading-icon) > label {
+    left: 2.5rem;
+    inset-inline-start: 2.5rem;
   }
 
-  // Hide placeholder when floating label is in resting position (no value, not focused)
-  // to prevent overlap between the label and placeholder text
+  // Floated state — top sits exactly on the border line, font shrinks.
+  // -0.5rem with a label height ~1rem puts the label's vertical centre
+  // on top: 0 of the trigger, which is the border line. The notch reads
+  // cleanly when the label's background colour matches the surface
+  // behind it (set above).
+  //
+  // Three selectors cover the three trigger states that should float:
+  //   :focus-within     — keyboard focus, panel open
+  //   :has(filled)      — has a value
+  //   :has(focus)       — PrimeNG's own focus class (defensive)
+  //
+  // The "filled"/"focus" classes land on the <p-dropdown> element which
+  // is one level deeper than <label> after the wrapper refactor, so we
+  // need :has() to reach through.
+  // Floated state — must beat the leading-icon resting rule above on
+  // specificity. The icon rule uses `:has(.dropdown-with-icon.has-leading-icon)`
+  // which has high specificity (3 classes); we match or exceed it here
+  // by using `!important` on the inline-start values. Without this, a
+  // focused dropdown WITH a leading icon would stay at the 2.5rem
+  // resting-with-icon position instead of sliding to the corner.
+  .p-float-label:focus-within > label,
+  .p-float-label:has(.p-inputwrapper-filled) > label,
+  .p-float-label:has(.p-inputwrapper-focus) > label {
+    top: -0.5rem;
+    margin-top: 0;
+    font-size: var(--fs-label);
+    // Pin to the trigger's far-left corner — directly above the icon
+    // (when present) and above the value text. 0.25rem (~4px) hugs the
+    // border line tightly; the label's own horizontal padding gives it
+    // visual breathing room from the corner radius.
+    left: 0.25rem !important;
+    inset-inline-start: 0.25rem !important;
+  }
+
+  // Hide the placeholder text when the floating label is in its resting
+  // position (no value, not focused) so the label and placeholder don't
+  // visually collide. Once focused or filled the label floats up and
+  // the placeholder is hidden by PrimeNG's own logic.
   .p-float-label .p-dropdown:not(.p-focus) .p-dropdown-label.p-placeholder {
     opacity: 0;
+  }
+
+  // The <p-dropdown> Angular host element defaults to display: inline.
+  // Without forcing it to block, a long value text can push the inner
+  // <div class="p-dropdown"> out of its containing block — leaving the
+  // trigger expanded and the label NOT truncating because the parent
+  // line-box is now bigger than the form-field. Force the host AND the
+  // inner box to block + width: 100% so the trigger respects its
+  // container width and the label's ellipsis can clip.
+  p-dropdown {
+    display: block;
+    width: 100%;
+    min-width: 0;
   }
 
   .p-dropdown {
@@ -65,6 +183,20 @@
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
     outline: none !important;
+    // Constant width regardless of value length. width: 100% lets the
+    // trigger fill the host's container (a form field grid cell, a
+    // table-column <th>, etc.) so it doesn't shrink to the selected
+    // value's text width — which was the "switching from All to
+    // Inactive shrinks the dropdown" bug. min-width: 0 paired with
+    // the label's overflow: hidden enables ellipsis truncation when
+    // the value is longer than the column allows.
+    width: 100%;
+    min-width: 0;
+    // max-width: 100% is what actually CLIPS the box when the content
+    // would otherwise expand. Without this, the label's overflow:
+    // hidden has no constraint to clip against and the value text
+    // breaks out of the trigger.
+    max-width: 100%;
 
     &,
     &:focus,
@@ -99,9 +231,29 @@
     .p-dropdown-label {
       color: var(--text-color);
       font-size: var(--fs-body);
-      padding: 0.625rem 0.75rem;
+      // Individual padding properties (not shorthand) so PrimeNG's
+      // clearable padding-right can layer on top via the more-specific
+      // selector below. !important on padding-right because PrimeNG's
+      // theme sets padding-right: 1.75rem in some states and that
+      // intermittently bled through, causing the value text to run
+      // into the clear icon (the "Inactive×" bug).
+      padding-top: 0.625rem;
+      padding-bottom: 0.625rem;
+      padding-left: 0.75rem;
+      padding-right: 2.5rem !important; // reserves chevron space
       border: none !important;
       box-shadow: none !important;
+      // Force block so ellipsis kicks in when the column is narrow
+      // (status filter at 9rem). PrimeNG's default display can be
+      // flex, which breaks single-line truncation unless the child
+      // has min-width: 0.
+      display: block !important;
+      min-width: 0;
+      // Long values truncate with ellipsis instead of pushing the
+      // trigger wider.
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       &.p-placeholder {
         color: var(--text-color);
@@ -112,6 +264,18 @@
         background: transparent !important;
         color: var(--text-color) !important;
       }
+    }
+
+    // When [showClear]=true, PrimeNG adds .p-dropdown-clearable on the
+    // host and renders a ✕ button. We position the ✕ closer to the
+    // chevron (right: 2.25rem instead of PrimeNG's 3rem default) so
+    // narrow columns (status filter at 9rem) don't waste horizontal
+    // space, and the label gets enough padding to clear BOTH icons.
+    .p-dropdown-clear-icon {
+      right: 2.25rem !important;
+    }
+    &.p-dropdown-clearable .p-dropdown-label {
+      padding-right: 3.5rem !important;
     }
 
     .p-dropdown-trigger {
@@ -138,6 +302,11 @@
     border-radius: var(--radius-sm) !important;
     box-shadow: var(--shadow-md) !important;
     margin-top: 2px !important;
+    box-sizing: border-box;
+    // Panel width is constrained globally (see styles.scss). PrimeNG
+    // sets `min-width: <triggerWidth>` inline on .p-overlay; the global
+    // styles.scss truncates options so the panel cannot expand past
+    // the min-width set by PrimeNG. Net effect: panel == trigger width.
 
     .p-dropdown-header {
       background: var(--card-background) !important;
@@ -175,6 +344,10 @@
         font-size: var(--fs-body) !important;
         margin: 1px 0.25rem !important;
         border-radius: var(--radius-xs) !important;
+        // Truncation is set by the global rule in styles.scss
+        // (display: flex !important; overflow: hidden; ellipsis) so
+        // it applies uniformly across all overlay panels. Don't
+        // re-declare `display` here — the global rule needs to win.
 
         &:hover {
           background: var(--hover-background) !important;
