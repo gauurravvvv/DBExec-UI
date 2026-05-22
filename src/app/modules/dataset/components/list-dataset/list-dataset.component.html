@@ -514,7 +514,15 @@
     <div class="ds-picker-body">
       <!-- Step 1: Datasource. Always visible. Changing this resets
            the schema selection below and re-fetches the schema
-           list against the new datasource. -->
+           list against the new datasource.
+
+           appendTo="body" detaches the panel from the dialog DOM
+           tree. Without it, the panel renders inside `.cmd-palette`
+           which has `(click)="$event.stopPropagation()"` to prevent
+           the overlay's backdrop-click handler from firing — that
+           stop also swallows PrimeNG's document-level outside-click
+           listener, so panels stuck open. Mounting at body level
+           sidesteps the dialog's stopPropagation entirely. -->
       <app-custom-dropdown
         [(ngModel)]="dsPickerSelected"
         [label]="'COMMON.DATASOURCE' | translate"
@@ -529,6 +537,7 @@
         [filter]="true"
         filterBy="name"
         icon="pi-database"
+        appendTo="body"
         (onChangeEvent)="onDsPickerDatasourceChange()"
       >
       </app-custom-dropdown>
@@ -551,6 +560,7 @@
           [filter]="true"
           filterBy="name"
           icon="pi-sitemap"
+          appendTo="body"
           [disabled]="!dsPickerSelected || schemaPickerLoading"
         >
         </app-custom-dropdown>
