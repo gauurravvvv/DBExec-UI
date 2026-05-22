@@ -1350,24 +1350,27 @@ td.empty-message-cell {
     .ds-picker-schema-status {
       display: flex;
       align-items: center;
-      gap: var(--space-3);
-      padding: 10px 12px;
+      gap: var(--space-2);
+      padding: 6px 10px;
       background: var(--primary-color-transparent, rgba(56, 132, 255, 0.08));
       border: 1px solid var(--primary-color-transparent, rgba(56, 132, 255, 0.18));
       border-left: 3px solid var(--primary-color, #3884ff);
       border-radius: var(--radius-xs, 6px);
       color: var(--text-color);
-      font-size: var(--fs-body-sm, 13px);
-      line-height: 1.4;
+      // Use the dialog's label-tier size, not body-sm. The 13px
+      // fallback was reading larger than the surrounding hint text;
+      // 12px lines up with the rest of the picker's supporting copy.
+      font-size: var(--fs-label, 12px);
+      line-height: 1.35;
 
       i {
         color: var(--primary-color, #3884ff);
-        font-size: 15px;
+        font-size: 13px;
         flex-shrink: 0;
       }
 
       i.pi-spinner {
-        font-size: 14px;
+        font-size: 12px;
       }
 
       span {
