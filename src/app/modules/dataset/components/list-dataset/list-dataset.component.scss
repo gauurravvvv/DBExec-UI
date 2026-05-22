@@ -1335,17 +1335,45 @@ td.empty-message-cell {
     // Spinner row shown while schemas load. Sits in the same vertical
     // slot the schema dropdown will occupy so the dialog doesn't
     // jump when the data resolves.
+    // Inline status / hint row that sits under the schema dropdown.
+    // Three states share these styles:
+    //   1. Idle — "Pick a datasource above…" with an info icon.
+    //   2. Loading — spinner + "Loading schemas…".
+    //   3. (Errors get a separate .ds-picker-schema-error rule below.)
+    //
+    // Visual treatment: soft tinted info card with a primary-blue
+    // accent so it reads as guidance rather than the inert grey
+    // muted text we had before. Border + tinted background give the
+    // row enough weight that it doesn't look like leftover spacing,
+    // while the lower opacity on the text keeps the dialog focus
+    // on the dropdowns above.
     .ds-picker-schema-status {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       gap: var(--space-3);
-      padding: var(--space-3) var(--space-2);
+      padding: 10px 12px;
+      background: var(--primary-color-transparent, rgba(56, 132, 255, 0.08));
+      border: 1px solid var(--primary-color-transparent, rgba(56, 132, 255, 0.18));
+      border-left: 3px solid var(--primary-color, #3884ff);
+      border-radius: var(--radius-xs, 6px);
       color: var(--text-color);
-      opacity: 0.75;
       font-size: var(--fs-body-sm, 13px);
+      line-height: 1.4;
+
+      i {
+        color: var(--primary-color, #3884ff);
+        font-size: 15px;
+        flex-shrink: 0;
+      }
 
       i.pi-spinner {
         font-size: 14px;
+      }
+
+      span {
+        // Slightly muted vs full text-color so the icon does the
+        // attention-grab and the message reads as supporting copy.
+        opacity: 0.85;
       }
     }
 
