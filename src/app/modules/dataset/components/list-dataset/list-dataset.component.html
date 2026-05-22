@@ -489,49 +489,37 @@
   (close)="onCreateAnalysisDialogClose($event)"
 ></app-save-analyses-dialog>
 
-<!-- Datasource picker — opens from the Add button. User picks the
-     datasource here, then routes to /datasets/new?datasourceId=…
-     with the engine preselected. The add page does NOT show org or
-     datasource dropdowns; deep links without a query param fall back
-     to a legacy bootstrap on the add page side. -->
+<!-- Datasource picker — opens from the Add button. Styled to match
+     the Create-Analysis / Save-Dataset popup pattern: title at top
+     left, label-above-input rows with no floating label, action
+     buttons bottom-right (outlined Cancel + filled primary
+     Continue).
+
+     Outside-click closes via `onDsPickerOverlayClick($event)` which
+     discriminates between backdrop and dialog-body clicks. Earlier
+     `stopPropagation` on the dialog ate PrimeNG's document-level
+     listener (panels stuck open) — this pattern leaves the document
+     event chain intact while still preventing the backdrop close
+     from firing on every inside click. -->
 <div
-  class="cmd-overlay has-ds-picker"
+  class="save-analysis-popup ds-picker-popup"
   *ngIf="showDsPickerPopup"
   (click)="onDsPickerOverlayClick($event)"
 >
-  <!--
-    No `$event.stopPropagation()` on the dialog itself — PrimeNG's
-    outside-click listener is wired to `document` and any
-    stopPropagation on a parent eats it (panels stay open). Instead
-    the overlay's click handler discriminates: only close when the
-    click landed on the overlay backdrop, not on a child element.
-    The dropdowns themselves still use `appendTo="body"` so their
-    panels live outside the dialog tree entirely.
-  -->
-  <div class="cmd-palette ds-picker">
-    <div class="ds-picker-header">
-      <h3>{{ 'DATASET.PICK_DATASOURCE' | translate }}</h3>
-      <button
-        type="button"
-        class="ds-picker-close"
-        (click)="closeDatasourcePicker()"
-        [attr.aria-label]="'COMMON.CLOSE' | translate"
-      >
-        <i class="pi pi-times" aria-hidden="true"></i>
-      </button>
-    </div>
-    <div class="ds-picker-body">
-      <!-- Step 0 (system admins only): Organisation. Selecting an
-           org cascades a reset: datasource and schema below clear,
-           the datasource list re-fetches against the new org.
-           Defaults to the org currently selected on the list page
-           when the popup opens. -->
+  <div class="popup-content">
+    <h3>{{ 'DATASET.PICK_DATASOURCE' | translate }}</h3>
+
+    <!-- Step 0 (system admins only): Organisation. Selecting an
+         org cascades a reset: datasource and schema below clear,
+         the datasource list re-fetches against the new org.
+         Defaults to the org currently selected on the list page
+         when the popup opens. -->
+    <div class="form-field" *ngIf="showOrganisationDropdown">
+      <label>{{ 'COMMON.ORGANISATION' | translate }}</label>
       <app-custom-dropdown
-        *ngIf="showOrganisationDropdown"
         [(ngModel)]="dsPickerOrgSelected"
-        [label]="'COMMON.ORGANISATION' | translate"
         [placeholder]="'COMMON.ORGANISATION' | translate"
-        [floatingLabel]="true"
+        [floatingLabel]="false"
         [serverMode]="true"
         [fetcher]="loadOrgsPage"
         [pageSize]="10"
@@ -547,23 +535,20 @@
         (onChangeEvent)="onDsPickerOrgChange()"
       >
       </app-custom-dropdown>
+    </div>
 
-      <!-- Step 1: Datasource. Always visible. Changing this resets
-           the schema selection below and re-fetches the schema
-           list against the new datasource.
-
-           appendTo="body" detaches the panel from the dialog DOM
-           tree. Without it, the panel renders inside `.cmd-palette`
-           which has `(click)="$event.stopPropagation()"` to prevent
-           the overlay's backdrop-click handler from firing — that
-           stop also swallows PrimeNG's document-level outside-click
-           listener, so panels stuck open. Mounting at body level
-           sidesteps the dialog's stopPropagation entirely. -->
+    <!-- Step 1: Datasource. Required. Changing this resets the
+         schema selection below and re-fetches the schema list
+         against the new datasource. -->
+    <div class="form-field">
+      <label>
+        {{ 'COMMON.DATASOURCE' | translate }}
+        <span class="required">*</span>
+      </label>
       <app-custom-dropdown
         [(ngModel)]="dsPickerSelected"
-        [label]="'COMMON.DATASOURCE' | translate"
         [placeholder]="'COMMON.DATASOURCE' | translate"
-        [floatingLabel]="true"
+        [floatingLabel]="false"
         [serverMode]="true"
         [fetcher]="loadDsPickerPage"
         [pageSize]="10"
@@ -580,20 +565,23 @@
         (onChangeEvent)="onDsPickerDatasourceChange()"
       >
       </app-custom-dropdown>
+    </div>
 
-      <!-- Step 2 (optional): Schema. Always rendered so the user
-           sees both fields up front. Disabled until a datasource
-           is picked. Once enabled, populates with that datasource's
-           schemas (re-fetches whenever the datasource changes).
-           Leaving this empty is supported — the editor will open
-           against the whole datasource if no schema is chosen. -->
+    <!-- Step 2 (optional): Schema. Always rendered so the user
+         sees the field up front. Disabled until a datasource is
+         picked. Leaving this empty is supported — the editor will
+         open against the whole datasource if no schema is chosen. -->
+    <div class="form-field">
+      <label>
+        {{ 'DATASET.SCHEMA' | translate }}
+        <span class="optional-tag">({{ 'COMMON.OPTIONAL' | translate }})</span>
+      </label>
       <div class="ds-picker-schema-row">
         <app-custom-dropdown
           class="ds-picker-schema-dropdown"
           [(ngModel)]="schemaPickerSelected"
-          [label]="('DATASET.SCHEMA' | translate) + ' (' + ('COMMON.OPTIONAL' | translate) + ')'"
           [placeholder]="'DATASET.SCHEMA' | translate"
-          [floatingLabel]="true"
+          [floatingLabel]="false"
           [options]="schemaPickerOptions || []"
           optionLabel="name"
           [optionValue]="null"
@@ -605,9 +593,6 @@
           [disabled]="!dsPickerSelected || schemaPickerLoading"
         >
         </app-custom-dropdown>
-        <!-- Quick clear so the user can wipe a stray selection
-             without re-typing into the filter. Only when there's
-             something to clear. -->
         <button
           *ngIf="schemaPickerSelected"
           type="button"
@@ -620,36 +605,33 @@
         </button>
       </div>
 
-      <!-- Inline status below the schema row. Three mutually-
-           exclusive states: idle (nothing picked yet), loading,
-           or error. Reserves vertical space so the dialog height
-           stays stable across transitions. -->
-      <div
-        class="ds-picker-schema-status"
+      <!-- Inline status under the schema dropdown. Three mutually-
+           exclusive states: idle (no datasource yet), loading,
+           error. Plain muted text — no tinted background — to
+           match the save-analysis popup's quiet supporting copy. -->
+      <small
+        class="form-hint"
         *ngIf="!dsPickerSelected"
       >
         <i class="pi pi-info-circle"></i>
-        <span>{{ 'DATASET.SCHEMA_PICK_DATASOURCE_FIRST' | translate }}</span>
-      </div>
-
-      <div
-        class="ds-picker-schema-status"
+        {{ 'DATASET.SCHEMA_PICK_DATASOURCE_FIRST' | translate }}
+      </small>
+      <small
+        class="form-hint"
         *ngIf="dsPickerSelected && schemaPickerLoading"
       >
         <i class="pi pi-spin pi-spinner"></i>
-        <span>{{ 'DATASET.LOADING_SCHEMA' | translate }}</span>
-      </div>
-
-      <div
-        class="ds-picker-schema-error"
+        {{ 'DATASET.LOADING_SCHEMA' | translate }}
+      </small>
+      <small
+        class="form-hint error"
         *ngIf="dsPickerSelected && schemaPickerError && !schemaPickerLoading"
       >
         <i class="pi pi-exclamation-triangle"></i>
-        <span>{{ schemaPickerError }}</span>
-      </div>
-
-      <p
-        class="ds-picker-hint"
+        {{ schemaPickerError }}
+      </small>
+      <small
+        class="form-hint"
         *ngIf="
           dsPickerSelected &&
           !schemaPickerLoading &&
@@ -658,23 +640,26 @@
         "
       >
         {{ 'DATASET.SCHEMA_PICKER_HINT_OPTIONAL' | translate }}
-      </p>
+      </small>
     </div>
-    <div class="ds-picker-footer">
+
+    <div class="popup-actions">
       <button
         pButton
-        class="p-button-text"
+        type="button"
+        [label]="'COMMON.CANCEL' | translate"
+        class="p-button-outlined btn-cancel"
         (click)="closeDatasourcePicker()"
-      >
-        {{ 'COMMON.CANCEL' | translate }}
-      </button>
+      ></button>
       <button
         pButton
-        class="p-button-primary"
+        type="button"
+        [label]="'COMMON.CONTINUE' | translate"
+        class="p-button-primary btn-save"
         [disabled]="!dsPickerSelected"
         (click)="onDsPickerContinue()"
       >
-        {{ 'COMMON.CONTINUE' | translate }}
+        <i class="pi pi-arrow-right mr-2"></i>
       </button>
     </div>
   </div>

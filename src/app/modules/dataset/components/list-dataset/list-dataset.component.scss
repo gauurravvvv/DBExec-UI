@@ -1189,74 +1189,188 @@ td.empty-message-cell {
 
 // ── Datasource picker popup ─────────────────────────────────────────
 //
-// Uses the .cmd-overlay base for the dim backdrop, but as a small
-// modal dialog with a wrapped dropdown — NOT the command-palette
-// search-and-list pattern below. Several base overrides are needed:
+// Adopts the Save-Analysis / Save-Dataset popup pattern: title at
+// top, label-above-dropdown rows (no floating labels), outlined
+// Cancel + filled Continue at bottom-right. The base layout is
+// duplicated from save-analyses-dialog.component.scss because
+// Angular's per-component view encapsulation prevents us from
+// inheriting those styles across components — once the analyses
+// popup proves stable here, we can promote the shared rules to
+// a global partial. Keeping the same selector name
+// (.save-analysis-popup) lets the markup stay portable.
 //
-//   1. The base overlay pins itself to the top of the viewport
-//      (padding-top: 12vh + align-items: flex-start) — fine for a
-//      tall results list, wrong for a 250px dialog. We override to
-//      center vertically.
-//
-//   2. The base .cmd-palette has overflow: hidden so its scrollable
-//      result list clips cleanly. The PrimeNG dropdown panel inside
-//      our dialog renders absolutely below its trigger; it needs to
-//      extend past the dialog body, so we override to `visible`. The
-//      body section keeps a defined min-height so there's room
-//      below the trigger for the panel to open downward without
-//      hitting the footer.
-//
-//   3. The base .cmd-palette has fixed max-height for scroll
-//      containment; we set a smaller `min-height` and remove the
-//      max so the dialog sizes to content.
-//
-// Wrap the rules under .cmd-overlay.has-ds-picker so the scoping is
-// explicit (any other .cmd-palette on the page keeps the original
-// command-palette behaviour). The host overlay div carries the
-// `has-ds-picker` class when *ngIf="showDsPickerPopup" is true.
-.cmd-overlay:has(.cmd-palette.ds-picker),
-.cmd-overlay.has-ds-picker {
+// Outside-click handling: the overlay's click listener
+// discriminates on event.target — only the backdrop closes the
+// dialog. PrimeNG's document-level outside-click listener stays
+// intact (no stopPropagation on the dialog), so dropdown panels
+// close when the user clicks anywhere else.
+.save-analysis-popup.ds-picker-popup {
+  // ── Base layout (duplicated from save-analyses-dialog.scss) ─
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--overlay-background);
+  display: flex;
+  justify-content: center;
   align-items: center;
-  padding-top: 0;
-}
+  z-index: var(--z-overlay);
 
-.cmd-palette.ds-picker {
-  max-width: 480px;
-  width: min(92%, 480px);
-  max-height: none;
-  // Override the parent's `overflow: hidden` — the wrapped dropdown
-  // needs to expand past the dialog's box. Drop shadow + border
-  // already define the visual edge; no clipping needed.
-  overflow: visible;
-  // Animation: fade + tiny scale from .cmd-palette's cmdDrop
-  // already plays; nothing to change.
-
-  .ds-picker-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-4);
-    padding: var(--space-5) var(--space-6);
-    border-bottom: 1px solid var(--border-color);
+  .popup-content {
     background: var(--card-background);
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    padding: var(--space-8);
+    border-radius: var(--radius-md);
+    box-shadow: 0 2px 10px var(--shadow-color);
+    // Slightly wider than the save-analyses default (500px) to
+    // comfortably hold three dropdown rows + the inline
+    // schema-clear button on the same line as the schema row.
+    width: 520px;
+    max-width: 92%;
 
     h3 {
-      margin: 0;
-      font-size: var(--fs-h4, 16px);
-      font-weight: var(--fw-semibold, 600);
       color: var(--text-color);
-      line-height: 1.2;
+      margin: 0 0 24px 0;
+      font-size: var(--fs-h1);
+      font-weight: var(--fw-semibold);
+    }
+  }
+
+  .popup-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-5);
+    margin-top: 24px;
+
+    .btn-cancel {
+      background: var(--card-background) !important;
+      border: 1px solid var(--border-color) !important;
+      color: var(--text-color) !important;
+      box-shadow: var(--shadow-sm);
+      font-weight: var(--fw-semibold);
+      transition: all var(--motion-base) ease;
+
+      &:hover:not(:disabled) {
+        background: var(--hover-background) !important;
+        border-color: var(--secondary-color) !important;
+      }
     }
 
-    .ds-picker-close {
+    .btn-save {
+      background: linear-gradient(
+        135deg,
+        var(--primary-color),
+        var(--primary-hover)
+      ) !important;
+      color: var(--primary-text) !important;
+      border: none !important;
+      box-shadow: 0 4px 10px var(--primary-color-transparent);
+      font-weight: var(--fw-semibold);
+      transition: all var(--motion-base) ease;
+
+      &:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 2px var(--primary-color-transparent);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      i {
+        font-size: var(--fs-h3);
+      }
+    }
+  }
+
+  .form-field {
+    margin-bottom: 18px;
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 8px;
+      color: var(--text-color);
+      font-weight: var(--fw-medium);
+      font-size: var(--fs-body);
+
+      .required {
+        color: var(--error-color);
+        margin-left: 2px;
+      }
+
+      // Small "(Optional)" tag next to the schema label. Lower
+      // visual weight than the required asterisk — the schema is
+      // a hint, not a gate.
+      .optional-tag {
+        color: var(--text-color);
+        opacity: 0.55;
+        font-weight: var(--fw-regular, 400);
+        font-size: var(--fs-label, 12px);
+      }
+    }
+
+    // Force the custom dropdown into the popup's full row width.
+    // Default has-leading-icon flex layout works fine; just keep
+    // the block-level wrapper.
+    app-custom-dropdown {
+      display: block;
+    }
+
+    // Helper / hint copy below a dropdown — same style as the
+    // base popup's .char-count text. .error variant tints red.
+    .form-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+      color: var(--text-color);
+      opacity: 0.65;
+      font-size: var(--fs-label, 12px);
+      line-height: 1.4;
+
+      i {
+        font-size: 12px;
+        flex-shrink: 0;
+      }
+
+      &.error {
+        color: var(--error-color);
+        opacity: 1;
+      }
+    }
+  }
+
+  // Wrapper for the schema dropdown + inline clear button. Flex
+  // row so the clear button hugs the right edge without breaking
+  // the dropdown's full-width layout.
+  .ds-picker-schema-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+
+    .ds-picker-schema-dropdown {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .ds-picker-schema-clear {
+      flex: 0 0 auto;
       background: transparent;
       border: none;
       color: var(--text-color);
-      opacity: 0.65;
+      opacity: 0.55;
       cursor: pointer;
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -1264,205 +1378,16 @@ td.empty-message-cell {
       transition: all var(--motion-fast, 0.15s) ease;
 
       i {
-        font-size: 14px;
+        font-size: 16px;
       }
 
       &:hover {
         opacity: 1;
         background: var(--hover-background);
-        color: var(--text-color);
-      }
-    }
-  }
-
-  .ds-picker-body {
-    padding: var(--space-7) var(--space-6) var(--space-6);
-    // Reserve enough room for up to three dropdowns (org, datasource,
-    // schema) stacked with a comfortable gap. The dropdown panels
-    // open downward and overflow the dialog box (which is fine with
-    // `overflow: visible` above), but the triggers themselves need
-    // vertical breathing room — and the floating labels need room
-    // above each trigger so they don't collide with the row above.
-    min-height: 100px;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-7);
-
-    // The custom dropdown component is self-contained; just give
-    // each instance its own row.
-    app-custom-dropdown {
-      display: block;
-    }
-
-    // Wrapper for the schema dropdown + its inline clear button.
-    // Flex row so the clear button hugs the right edge without
-    // hijacking the dropdown's full-width layout.
-    .ds-picker-schema-row {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-
-      .ds-picker-schema-dropdown {
-        flex: 1 1 auto;
-        min-width: 0;
-      }
-
-      .ds-picker-schema-clear {
-        flex: 0 0 auto;
-        background: transparent;
-        border: none;
-        color: var(--text-color);
-        opacity: 0.55;
-        cursor: pointer;
-        width: 30px;
-        height: 30px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: var(--radius-xs);
-        transition: all var(--motion-fast, 0.15s) ease;
-
-        i {
-          font-size: 16px;
-        }
-
-        &:hover {
-          opacity: 1;
-          background: var(--hover-background);
-          color: var(--error-color, #c62828);
-        }
-      }
-    }
-
-    // Spinner row shown while schemas load. Sits in the same vertical
-    // slot the schema dropdown will occupy so the dialog doesn't
-    // jump when the data resolves.
-    // Inline status / hint row that sits under the schema dropdown.
-    // Three states share these styles:
-    //   1. Idle — "Pick a datasource above…" with an info icon.
-    //   2. Loading — spinner + "Loading schemas…".
-    //   3. (Errors get a separate .ds-picker-schema-error rule below.)
-    //
-    // Visual treatment: soft tinted info card with a primary-blue
-    // accent so it reads as guidance rather than the inert grey
-    // muted text we had before. Border + tinted background give the
-    // row enough weight that it doesn't look like leftover spacing,
-    // while the lower opacity on the text keeps the dialog focus
-    // on the dropdowns above.
-    .ds-picker-schema-status {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      padding: 6px 10px;
-      background: var(--primary-color-transparent, rgba(56, 132, 255, 0.08));
-      border: 1px solid var(--primary-color-transparent, rgba(56, 132, 255, 0.18));
-      border-left: 3px solid var(--primary-color, #3884ff);
-      border-radius: var(--radius-xs, 6px);
-      color: var(--text-color);
-      // Use the dialog's label-tier size, not body-sm. The 13px
-      // fallback was reading larger than the surrounding hint text;
-      // 12px lines up with the rest of the picker's supporting copy.
-      font-size: var(--fs-label, 12px);
-      line-height: 1.35;
-
-      i {
-        color: var(--primary-color, #3884ff);
-        font-size: 13px;
-        flex-shrink: 0;
-      }
-
-      i.pi-spinner {
-        font-size: 12px;
-      }
-
-      span {
-        // Slightly muted vs full text-color so the icon does the
-        // attention-grab and the message reads as supporting copy.
-        opacity: 0.85;
-      }
-    }
-
-    // Inline error if the schema fetch fails (e.g. unreachable
-    // datasource). The user can dismiss by closing the popup and
-    // retrying.
-    .ds-picker-schema-error {
-      display: inline-flex;
-      align-items: flex-start;
-      gap: var(--space-3);
-      padding: var(--space-3) var(--space-4);
-      color: var(--error-color, #c62828);
-      background: var(--error-bg, rgba(198, 40, 40, 0.08));
-      border-radius: var(--radius-xs);
-      font-size: var(--fs-body-sm, 13px);
-      line-height: 1.4;
-
-      i {
-        font-size: 14px;
-        margin-top: 1px;
-      }
-    }
-
-    .ds-picker-hint {
-      margin: var(--space-2) 0 0;
-      font-size: var(--fs-label, 12px);
-      color: var(--text-color);
-      opacity: 0.6;
-      line-height: 1.4;
-    }
-  }
-
-  .ds-picker-footer {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-4) var(--space-6) var(--space-5);
-    border-top: 1px solid var(--border-color);
-    background: var(--card-background);
-    border-radius: 0 0 var(--radius-md) var(--radius-md);
-
-    // Footer buttons inherit p-button styling from PrimeNG. Slight
-    // sizing override so the pair reads as a balanced dialog
-    // action row, not a tight inline group.
-    .p-button {
-      min-width: 96px;
-      padding: 0.55rem 1rem !important;
-      font-size: var(--fs-body, 14px);
-      font-weight: var(--fw-medium, 500);
-    }
-
-    .p-button.p-button-primary {
-      background: linear-gradient(
-        135deg,
-        var(--primary-color),
-        var(--primary-hover)
-      );
-      border: none;
-      color: var(--primary-text);
-      box-shadow: 0 4px 10px var(--primary-color-transparent);
-
-      &:hover:not(:disabled) {
-        opacity: 1;
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-md);
-      }
-
-      &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        box-shadow: none;
-        transform: none;
-      }
-    }
-
-    .p-button.p-button-text {
-      color: var(--text-color);
-      background: transparent;
-      border: 1px solid transparent;
-
-      &:hover {
-        background: var(--hover-background);
+        color: var(--error-color, #c62828);
       }
     }
   }
 }
+
+
