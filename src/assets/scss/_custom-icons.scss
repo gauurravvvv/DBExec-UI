@@ -41,6 +41,9 @@ $icon-url: '../icons/';
   &.ci-db-oracle {
     background-image: url('#{$icon-url}oracle.svg');
   }
+  &.ci-db-snowflake {
+    background-image: url('#{$icon-url}snowflake.svg');
+  }
 }
 
 // Country flags — colour-preserving, same shape as .ci-db. Used by the

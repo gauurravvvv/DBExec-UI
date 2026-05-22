@@ -124,40 +124,83 @@
             </ng-template>
           </app-custom-dropdown>
 
-          <!-- Host Field -->
-          <app-custom-input
-            formControlName="host"
-            [label]="'DATASOURCE.HOST' | translate"
-            [placeholder]="'DATASOURCE.ENTER_HOST' | translate"
-            icon="pi-desktop"
-            [required]="true"
-            [showError]="
-              !!(
-                datasourceForm.get('host')?.invalid &&
-                datasourceForm.get('host')?.touched
-              )
-            "
-            [errorMessage]="getErrorMessage('host')"
-          >
-          </app-custom-input>
+          <!-- ── TypeORM engines: Host + Port ── -->
+          <ng-container *ngIf="!isSnowflake">
+            <!-- Host Field -->
+            <app-custom-input
+              formControlName="host"
+              [label]="'DATASOURCE.HOST' | translate"
+              [placeholder]="'DATASOURCE.ENTER_HOST' | translate"
+              icon="pi-desktop"
+              [required]="true"
+              [showError]="
+                !!(
+                  datasourceForm.get('host')?.invalid &&
+                  datasourceForm.get('host')?.touched
+                )
+              "
+              [errorMessage]="getErrorMessage('host')"
+            >
+            </app-custom-input>
 
-          <!-- Port Field -->
-          <app-custom-input
-            formControlName="port"
-            [label]="'DATASOURCE.PORT' | translate"
-            [placeholder]="'DATASOURCE.ENTER_PORT' | translate"
-            icon="pi-hashtag"
-            type="number"
-            [required]="true"
-            [showError]="
-              !!(
-                datasourceForm.get('port')?.invalid &&
-                datasourceForm.get('port')?.touched
-              )
-            "
-            [errorMessage]="getErrorMessage('port')"
-          >
-          </app-custom-input>
+            <!-- Port Field -->
+            <app-custom-input
+              formControlName="port"
+              [label]="'DATASOURCE.PORT' | translate"
+              [placeholder]="'DATASOURCE.ENTER_PORT' | translate"
+              icon="pi-hashtag"
+              type="number"
+              [required]="true"
+              [showError]="
+                !!(
+                  datasourceForm.get('port')?.invalid &&
+                  datasourceForm.get('port')?.touched
+                )
+              "
+              [errorMessage]="getErrorMessage('port')"
+            >
+            </app-custom-input>
+          </ng-container>
+
+          <!-- ── Snowflake: Account + Warehouse + (optional) Role + Schema ── -->
+          <ng-container *ngIf="isSnowflake">
+            <!-- Account: Snowflake URL prefix, e.g. xy12345.us-east-1.aws.
+                 This is the unique identifier of the customer's Snowflake
+                 deployment — NOT a port/host pair. -->
+            <app-custom-input
+              formControlName="account"
+              [label]="'DATASOURCE.ACCOUNT' | translate"
+              [placeholder]="'DATASOURCE.ENTER_ACCOUNT' | translate"
+              icon="pi-globe"
+              [required]="true"
+              [showError]="
+                !!(
+                  datasourceForm.get('account')?.invalid &&
+                  datasourceForm.get('account')?.touched
+                )
+              "
+              [errorMessage]="getErrorMessage('account')"
+            >
+            </app-custom-input>
+
+            <!-- Warehouse: the Snowflake compute warehouse that runs the
+                 queries (e.g. COMPUTE_WH, ANALYTICS_WH). Required. -->
+            <app-custom-input
+              formControlName="warehouse"
+              [label]="'DATASOURCE.WAREHOUSE' | translate"
+              [placeholder]="'DATASOURCE.ENTER_WAREHOUSE' | translate"
+              icon="pi-server"
+              [required]="true"
+              [showError]="
+                !!(
+                  datasourceForm.get('warehouse')?.invalid &&
+                  datasourceForm.get('warehouse')?.touched
+                )
+              "
+              [errorMessage]="getErrorMessage('warehouse')"
+            >
+            </app-custom-input>
+          </ng-container>
 
           <!-- Database Name Field -->
           <app-custom-input
@@ -210,6 +253,27 @@
             [errorMessage]="getErrorMessage('password')"
           >
           </app-custom-input>
+
+          <!-- Snowflake-only optional fields. Role and Schema let the
+               user pin the session to a specific role and default
+               schema inside the database. Both optional — Snowflake
+               picks user-default values when omitted. -->
+          <ng-container *ngIf="isSnowflake">
+            <app-custom-input
+              formControlName="role"
+              [label]="'DATASOURCE.ROLE' | translate"
+              [placeholder]="'DATASOURCE.ENTER_ROLE' | translate"
+              icon="pi-shield"
+            >
+            </app-custom-input>
+            <app-custom-input
+              formControlName="schemaName"
+              [label]="'DATASOURCE.SCHEMA' | translate"
+              [placeholder]="'DATASOURCE.ENTER_SCHEMA' | translate"
+              icon="pi-sitemap"
+            >
+            </app-custom-input>
+          </ng-container>
 
           <!-- Connection Test -->
           <div class="form-field">

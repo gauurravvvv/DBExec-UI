@@ -203,6 +203,12 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
       // dbType is read once from the saved record and used for the
       // connection-test call + the read-only display row. It cannot
       // be edited so it isn't part of the form.
+      //
+      // NOTE: Editing a Snowflake datasource on this screen is not
+      // yet supported — the form below shows host/port (TypeORM
+      // shape) but a Snowflake datasource has account/warehouse/role
+      // instead. As a workaround for now, a Snowflake datasource
+      // can be deleted + recreated. Full edit support is a follow-up.
       this.dbType = data.config?.dbType || 'postgres';
       this.dbTypeOption =
         DATABASE_TYPES.find(t => t.value === this.dbType) || null;

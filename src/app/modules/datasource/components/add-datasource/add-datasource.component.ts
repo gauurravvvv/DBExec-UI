@@ -17,7 +17,10 @@ import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
-import { DATABASE_TYPES } from '../../constants/database-types.constant';
+import {
+  DATABASE_TYPES,
+  isSnowflakeType,
+} from '../../constants/database-types.constant';
 import { DatasourceService } from '../../services/datasource.service';
 
 @Component({
@@ -78,9 +81,22 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
     // Reset connection test when connection fields change. `type` is in
     // the list so switching DB engines also forces a re-test — credentials
     // valid for Postgres may not be valid for MySQL even if the host /
-    // user look the same. Bumping the request id invalidates any in-flight
-    // response so it can't apply stale state.
-    ['type', 'host', 'port', 'database', 'username', 'password'].forEach(
+    // user look the same. Snowflake adds account/warehouse/role/schemaName
+    // to the reset set since they're part of the connection identity.
+    // Bumping the request id invalidates any in-flight response so it
+    // can't apply stale state.
+    [
+      'type',
+      'host',
+      'port',
+      'database',
+      'username',
+      'password',
+      'account',
+      'warehouse',
+      'role',
+      'schemaName',
+    ].forEach(
       field => {
         this.datasourceForm
           .get(field)
@@ -94,43 +110,34 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
       },
     );
 
-    // Smart port pre-fill on engine change.
-    //
-    // Behaviour:
-    //  - If port is empty                  → fill with the new engine's default
-    //  - If port matches ANY known default → swap to the new engine's default
-    //    (covers "user accepted the default for Postgres, then switched to
-    //    MySQL" — they almost certainly want 3306, not 5432)
-    //  - If port is a custom value         → leave it alone (user typed it)
-    //
-    // The check runs in `setValue` with `emitEvent: false` so swapping the
-    // port doesn't independently retrigger the connection-test reset above
-    // — that reset already fired from the type change.
+    // Type-change side effects: (a) swap field validators, (b) smart
+    // port pre-fill. Snowflake skips the port-fill since it has no port.
     this.datasourceForm
       .get('type')
       ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((value: string) => {
-        const portControl = this.datasourceForm.get('port');
-        const matched = this.databaseTypes.find(t => t.value === value);
-        if (!matched || !portControl) return;
+        this.applyTypeValidators(value);
 
+        const matched = this.databaseTypes.find(t => t.value === value);
+        if (!matched || matched.defaultPort === null) return;
+        const portControl = this.datasourceForm.get('port');
+        if (!portControl) return;
         const currentPort = portControl.value;
         const isEmpty = currentPort === '' || currentPort == null;
         const isKnownDefault = this.databaseTypes.some(
-          t => String(t.defaultPort) === String(currentPort),
+          t => t.defaultPort !== null && String(t.defaultPort) === String(currentPort),
         );
         if (isEmpty || isKnownDefault) {
           portControl.setValue(matched.defaultPort, { emitEvent: false });
         }
       });
 
-    // Seed the initial port for the default engine (Postgres → 5432).
-    // The valueChanges subscription above only runs on changes, not on the
-    // initial value, so we have to set it once here for the form to land
-    // in a useful state.
+    // Initial seed — pin validators + port for whatever engine the form
+    // starts on (Postgres by default).
     const initialType = this.datasourceForm.get('type')?.value;
+    this.applyTypeValidators(initialType);
     const initialMatch = this.databaseTypes.find(t => t.value === initialType);
-    if (initialMatch) {
+    if (initialMatch && initialMatch.defaultPort !== null) {
       this.datasourceForm
         .get('port')
         ?.setValue(initialMatch.defaultPort, { emitEvent: false });
@@ -150,6 +157,9 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
       ],
       description: ['', [Validators.maxLength(500)]],
       type: ['postgres', Validators.required],
+      // host / port — required for TypeORM engines, optional for
+      // Snowflake. Validators are swapped in applyTypeValidators()
+      // based on the selected engine.
       host: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9.-]+$')]],
       port: [
         '',
@@ -166,6 +176,13 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
       ],
       username: ['', Validators.required],
       password: ['', [Validators.required]],
+      // Snowflake-specific. account+warehouse are required when the
+      // engine is Snowflake (validators flipped at runtime); role and
+      // schemaName stay optional.
+      account: [''],
+      warehouse: [''],
+      role: [''],
+      schemaName: [''],
       organisation: [
         this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN
           ? ''
@@ -178,6 +195,46 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
     if (this.showOrganisationDropdown) {
       orgControl?.setValidators([Validators.required]);
     }
+  }
+
+  /**
+   * True when the currently-selected engine is Snowflake. Drives both
+   * the conditional template rendering (show/hide host vs account
+   * fields) and the runtime validator swap below.
+   */
+  get isSnowflake(): boolean {
+    return isSnowflakeType(this.datasourceForm?.get('type')?.value);
+  }
+
+  /**
+   * Swap field-required validators based on the selected engine. The
+   * form has both shape's fields declared up-front; this method just
+   * marks the right subset as required for the current engine.
+   */
+  private applyTypeValidators(value: string | null): void {
+    const isSf = isSnowflakeType(value);
+    const set = (
+      name: string,
+      required: boolean,
+      extras: any[] = [],
+    ): void => {
+      const ctrl = this.datasourceForm.get(name);
+      if (!ctrl) return;
+      ctrl.setValidators(
+        required ? [Validators.required, ...extras] : extras,
+      );
+      ctrl.updateValueAndValidity({ emitEvent: false });
+    };
+    // host + port → required for TypeORM engines, optional for Snowflake
+    set('host', !isSf, [Validators.pattern('^[a-zA-Z0-9.-]+$')]);
+    set('port', !isSf, [
+      Validators.pattern('^[0-9]+$'),
+      Validators.min(1),
+      Validators.max(65535),
+    ]);
+    // account + warehouse → required for Snowflake, optional otherwise
+    set('account', isSf);
+    set('warehouse', isSf);
   }
 
   /**
@@ -226,18 +283,29 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
   async onSubmit(): Promise<void> {
     if (this.datasourceForm.valid && this.connectionTested) {
       const formValue = this.datasourceForm.getRawValue();
+      const isSf = isSnowflakeType(formValue.type);
 
       const payload: any = {
         name: formValue.name,
         description: formValue.description,
         type: formValue.type,
-        host: formValue.host,
-        port: formValue.port,
         database: formValue.database,
         username: formValue.username,
         password: formValue.password,
         organisation: formValue.organisation,
       };
+
+      if (isSf) {
+        // Snowflake fields. host/port are not included — the BE entity
+        // stores empty-string / 0 sentinels for those columns.
+        payload.account = formValue.account;
+        payload.warehouse = formValue.warehouse;
+        payload.role = formValue.role;
+        payload.schemaName = formValue.schemaName;
+      } else {
+        payload.host = formValue.host;
+        payload.port = formValue.port;
+      }
 
       const response = await this.datasourceService.add(payload);
       if (this.globalService.handleSuccessService(response)) {
@@ -337,15 +405,29 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
     this.connectionTestError = null;
     const reqId = ++this.testRequestId;
 
+    const isSf = isSnowflakeType(formValue.type);
     this.organisationService
-      .validateDatasource({
-        type: formValue.type,
-        host: formValue.host,
-        port: formValue.port,
-        database: formValue.database,
-        username: formValue.username,
-        password: formValue.password,
-      })
+      .validateDatasource(
+        isSf
+          ? {
+              type: formValue.type,
+              database: formValue.database,
+              username: formValue.username,
+              password: formValue.password,
+              account: formValue.account,
+              warehouse: formValue.warehouse,
+              role: formValue.role,
+              schemaName: formValue.schemaName,
+            }
+          : {
+              type: formValue.type,
+              host: formValue.host,
+              port: formValue.port,
+              database: formValue.database,
+              username: formValue.username,
+              password: formValue.password,
+            },
+      )
       .then((response: any) => {
         // Discard if user has edited a field or started a newer test
         if (reqId !== this.testRequestId) return;
@@ -376,7 +458,11 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
   }
 
   isConnectionFieldsValid(): boolean {
-    const fields = ['host', 'port', 'database', 'username', 'password'];
+    // Snowflake needs account + warehouse instead of host + port.
+    // role + schemaName are optional in both shapes.
+    const fields = this.isSnowflake
+      ? ['account', 'warehouse', 'database', 'username', 'password']
+      : ['host', 'port', 'database', 'username', 'password'];
     return fields.every(
       f =>
         this.datasourceForm.get(f)?.valid && this.datasourceForm.get(f)?.value,

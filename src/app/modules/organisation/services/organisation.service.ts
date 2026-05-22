@@ -384,11 +384,17 @@ export class OrganisationService {
 
   validateDatasource(payload: {
     type: string;
-    host: string;
-    port: number;
     database: string;
     username: string;
     password: string;
+    // TypeORM-engine params (Postgres/MySQL/MariaDB/MSSQL/Oracle)
+    host?: string;
+    port?: number;
+    // Snowflake-only params
+    account?: string;
+    warehouse?: string;
+    role?: string;
+    schemaName?: string;
   }) {
     return lastValueFrom(this.http.apiPost(DATASOURCE.VALIDATE, payload));
   }

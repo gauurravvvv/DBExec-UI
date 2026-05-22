@@ -8,11 +8,26 @@
  * in _custom-icons.scss; logos live as local SVGs under src/assets/icons
  * so there's no remote dependency at render time.
  */
+export type DatabaseTypeValue =
+  | 'postgres'
+  | 'mysql'
+  | 'mariadb'
+  | 'mssql'
+  | 'oracle'
+  | 'snowflake';
+
 export interface DatabaseTypeOption {
-  value: 'postgres' | 'mysql' | 'mariadb' | 'mssql' | 'oracle';
+  value: DatabaseTypeValue;
   label: string;
   iconClass: string;
-  defaultPort: number;
+  // `defaultPort` doesn't apply to Snowflake — it's a cloud URL, not
+  // a host+port pair. nullable to signal "skip the port field" at
+  // the call site.
+  defaultPort: number | null;
+  // When true, the Add/Edit form shows Snowflake-specific fields
+  // (account/warehouse/role/schema) and hides host+port. Cleaner than
+  // re-checking the value string everywhere.
+  isSnowflake?: boolean;
 }
 
 export const DATABASE_TYPES: DatabaseTypeOption[] = [
@@ -46,4 +61,18 @@ export const DATABASE_TYPES: DatabaseTypeOption[] = [
     iconClass: 'ci-db ci-db-oracle',
     defaultPort: 1521,
   },
+  {
+    value: 'snowflake',
+    label: 'Snowflake',
+    iconClass: 'ci-db ci-db-snowflake',
+    defaultPort: null,
+    isSnowflake: true,
+  },
 ];
+
+/**
+ * Helper used by the form to decide which fields to render. Centralised
+ * here so the Add and Edit components don't drift on the comparison.
+ */
+export const isSnowflakeType = (value: string | null | undefined): boolean =>
+  value === 'snowflake';
