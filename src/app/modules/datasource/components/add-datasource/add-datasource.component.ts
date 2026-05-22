@@ -17,6 +17,7 @@ import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { DATABASE_TYPES } from '../../constants/database-types.constant';
 import { DatasourceService } from '../../services/datasource.service';
 
 @Component({
@@ -34,6 +35,7 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
   preloadedOrgsTotal: number | null = null;
   private _showOrganisationDropdown = false;
   showPassword: boolean = false;
+  databaseTypes = DATABASE_TYPES;
 
   // Connection test
   connectionTested = false;
@@ -73,19 +75,66 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
       this.loadOrganisations();
     }
 
-    // Reset connection test when connection fields change. Bumping the request
-    // id invalidates any in-flight response so it can't apply stale state.
-    ['host', 'port', 'database', 'username', 'password'].forEach(field => {
+    // Reset connection test when connection fields change. `type` is in
+    // the list so switching DB engines also forces a re-test — credentials
+    // valid for Postgres may not be valid for MySQL even if the host /
+    // user look the same. Bumping the request id invalidates any in-flight
+    // response so it can't apply stale state.
+    ['type', 'host', 'port', 'database', 'username', 'password'].forEach(
+      field => {
+        this.datasourceForm
+          .get(field)
+          ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(() => {
+            this.connectionTested = false;
+            this.connectionTestResult = null;
+            this.connectionTestError = null;
+            this.testRequestId++;
+          });
+      },
+    );
+
+    // Smart port pre-fill on engine change.
+    //
+    // Behaviour:
+    //  - If port is empty                  → fill with the new engine's default
+    //  - If port matches ANY known default → swap to the new engine's default
+    //    (covers "user accepted the default for Postgres, then switched to
+    //    MySQL" — they almost certainly want 3306, not 5432)
+    //  - If port is a custom value         → leave it alone (user typed it)
+    //
+    // The check runs in `setValue` with `emitEvent: false` so swapping the
+    // port doesn't independently retrigger the connection-test reset above
+    // — that reset already fired from the type change.
+    this.datasourceForm
+      .get('type')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((value: string) => {
+        const portControl = this.datasourceForm.get('port');
+        const matched = this.databaseTypes.find(t => t.value === value);
+        if (!matched || !portControl) return;
+
+        const currentPort = portControl.value;
+        const isEmpty = currentPort === '' || currentPort == null;
+        const isKnownDefault = this.databaseTypes.some(
+          t => String(t.defaultPort) === String(currentPort),
+        );
+        if (isEmpty || isKnownDefault) {
+          portControl.setValue(matched.defaultPort, { emitEvent: false });
+        }
+      });
+
+    // Seed the initial port for the default engine (Postgres → 5432).
+    // The valueChanges subscription above only runs on changes, not on the
+    // initial value, so we have to set it once here for the form to land
+    // in a useful state.
+    const initialType = this.datasourceForm.get('type')?.value;
+    const initialMatch = this.databaseTypes.find(t => t.value === initialType);
+    if (initialMatch) {
       this.datasourceForm
-        .get(field)
-        ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(() => {
-          this.connectionTested = false;
-          this.connectionTestResult = null;
-          this.connectionTestError = null;
-          this.testRequestId++;
-        });
-    });
+        .get('port')
+        ?.setValue(initialMatch.defaultPort, { emitEvent: false });
+    }
   }
 
   initForm(): void {
@@ -100,7 +149,7 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
         ],
       ],
       description: ['', [Validators.maxLength(500)]],
-      type: [{ value: 'postgres', disabled: true }],
+      type: ['postgres', Validators.required],
       host: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9.-]+$')]],
       port: [
         '',
@@ -201,8 +250,11 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
   onCancel(): void {
     if (this.isFormDirty) {
       this.datasourceForm.reset();
+      // Restore the default engine + its standard port. setValue
+      // triggers valueChanges so the smart-prefill logic above re-runs
+      // and the port lands on 5432, matching the screen the user saw on
+      // first arrival.
       this.datasourceForm.get('type')?.setValue('postgres');
-      this.datasourceForm.get('type')?.disable();
       this.datasourceForm.markAsPristine();
       this.connectionTested = false;
       this.connectionTestLoading = false;

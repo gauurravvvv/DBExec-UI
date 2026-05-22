@@ -647,6 +647,35 @@
   }
 }
 
+// Read-only database type row. Subtle — no input border, no hover state,
+// no chevron. Just a labelled fact, matching the Add screen's icon
+// vocabulary so the user recognises the engine without needing a control.
+.db-type-readonly {
+  .normal-label {
+    font-weight: var(--fw-medium);
+    color: var(--text-color);
+    margin-bottom: var(--space-4);
+    display: block;
+  }
+
+  .db-type-readonly-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: 0.55rem 0;
+    color: var(--text-color);
+    font-size: var(--fs-body);
+  }
+
+  // The .ci-db base class already sets size (24px) + background-* —
+  // this just keeps the dark-mode tweak from the old design.
+  .ci-db {
+    :host-context(.dark-theme) & {
+      filter: brightness(0.95);
+    }
+  }
+}
+
 :host ::ng-deep {
   .p-button {
     &.p-button-text {

@@ -382,6 +382,36 @@
   }
 }
 
+// Database-type dropdown option — icon + label row used inside the
+// shared <app-custom-dropdown>. The shared dropdown wraps PrimeNG's
+// p-dropdown; PrimeNG renders the trigger label inside .p-dropdown-label
+// and each option inside .p-dropdown-item. The icon needs a fixed size
+// so brand marks don't dominate the row.
+.db-type-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+
+  .ci-db {
+    // Override the 24px default from _custom-icons.scss for this denser
+    // dropdown context. 20px reads cleanly against the standard p-dropdown
+    // line-height without crowding the label.
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .db-type-option-label {
+    color: var(--text-color);
+    font-size: var(--fs-body);
+    line-height: 1.3;
+  }
+
+  :host-context(.dark-theme) & .ci-db {
+    filter: brightness(0.95);
+  }
+}
+
 .connection-test-section {
   display: flex;
   flex-direction: column;

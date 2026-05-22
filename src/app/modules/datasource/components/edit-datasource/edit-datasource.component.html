@@ -76,7 +76,7 @@
           formControlName="name"
           [label]="'COMMON.NAME' | translate"
           [placeholder]="'COMMON.ENTER_NAME' | translate"
-          icon="pi-database"
+          icon="pi-id-card"
           [required]="true"
           [showError]="
             !!(
@@ -116,14 +116,17 @@
         >
         </app-custom-input>
 
-        <!-- Type Field (disabled) -->
-        <app-custom-input
-          formControlName="type"
-          [label]="'COMMON.TYPE' | translate"
-          icon="pi-database"
-          [inputDisabled]="true"
-        >
-        </app-custom-input>
+        <!-- Type — read-only. Engine cannot be changed on an existing
+             datasource because every downstream dataset's SQL is dialect-
+             specific. Rendered as a plain icon + label row rather than a
+             disabled control so the user doesn't expect to interact with it. -->
+        <div class="form-field db-type-readonly" *ngIf="dbTypeOption">
+          <label class="normal-label">{{ 'COMMON.TYPE' | translate }}</label>
+          <div class="db-type-readonly-row">
+            <i [class]="dbTypeOption.iconClass" aria-hidden="true"></i>
+            <span>{{ dbTypeOption.label }}</span>
+          </div>
+        </div>
 
         <!-- Host Field -->
         <app-custom-input

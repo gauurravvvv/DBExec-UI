@@ -42,6 +42,7 @@
 
       <!-- Language Selector -->
       <app-custom-dropdown
+        class="locale-dropdown"
         [(ngModel)]="currentLocale"
         [options]="locales"
         optionLabel="label"
@@ -50,8 +51,32 @@
         [autoDisplayFirst]="false"
         [disabled]="changingLocale"
         appendTo="body"
+        panelStyleClass="locale-dropdown-panel"
         (onChangeEvent)="onLocaleChange($event)"
-      ></app-custom-dropdown>
+      >
+        <!-- Trigger: compact flag + ISO code (e.g. 🇺🇸 EN) -->
+        <ng-template #selectedItemTemplate let-locale>
+          <div class="locale-trigger">
+            <i [class]="locale.flagClass" aria-hidden="true"></i>
+            <span class="locale-trigger-code">{{ locale.shortCode }}</span>
+          </div>
+        </ng-template>
+        <!-- Panel rows: flag + full native name + active checkmark -->
+        <ng-template #itemTemplate let-locale>
+          <div
+            class="locale-option"
+            [class.is-active]="locale.code === currentLocale"
+          >
+            <i [class]="locale.flagClass" aria-hidden="true"></i>
+            <span class="locale-option-label">{{ locale.label }}</span>
+            <i
+              *ngIf="locale.code === currentLocale"
+              class="pi pi-check locale-option-check"
+              aria-hidden="true"
+            ></i>
+          </div>
+        </ng-template>
+      </app-custom-dropdown>
 
       <!-- Notifications -->
       <button

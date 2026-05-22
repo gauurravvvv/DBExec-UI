@@ -10,6 +10,93 @@ $icon-url: '../icons/';
   vertical-align: middle;
 }
 
+// Database engine logos — colour-preserving variant of .ci.
+// These are brand marks (Postgres elephant, MySQL dolphin, etc.) so they
+// must NOT inherit the `filter: brightness(0)` rule below. Use them as
+// <i class="ci-db ci-db-postgres"></i>. Sized small (18px) because the
+// Add Datasource card layout is the only consumer today; bump via a
+// utility class if a larger surface is added later.
+.ci-db {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  vertical-align: middle;
+  flex-shrink: 0;
+
+  &.ci-db-postgres {
+    background-image: url('#{$icon-url}postgresql.svg');
+  }
+  &.ci-db-mysql {
+    background-image: url('#{$icon-url}mysql.svg');
+  }
+  &.ci-db-mariadb {
+    background-image: url('#{$icon-url}mariadb.svg');
+  }
+  &.ci-db-mssql {
+    background-image: url('#{$icon-url}mssql.svg');
+  }
+  &.ci-db-oracle {
+    background-image: url('#{$icon-url}oracle.svg');
+  }
+}
+
+// Country flags — colour-preserving, same shape as .ci-db. Used by the
+// header locale picker. Files live in src/assets/icons/flags/ and are
+// keyed by ISO 3166-1 alpha-2 country code (not the locale code — many
+// locales share a country). Locale → flag mapping is handled at the call
+// site so this CSS stays focused on glyph delivery.
+//
+// Aspect ratio: flags are rectangles, but a square card box is set so
+// long flags don't push label rows out of alignment. background-size:
+// contain centres the rectangle inside the square. 1px subtle border so
+// white flags (Japan) don't bleed into white surfaces.
+.ci-flag {
+  display: inline-block;
+  width: 22px;
+  height: 16px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  vertical-align: middle;
+  flex-shrink: 0;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+
+  &.ci-flag-us {
+    background-image: url('#{$icon-url}flags/us.svg');
+  }
+  &.ci-flag-fr {
+    background-image: url('#{$icon-url}flags/fr.svg');
+  }
+  &.ci-flag-es {
+    background-image: url('#{$icon-url}flags/es.svg');
+  }
+  &.ci-flag-de {
+    background-image: url('#{$icon-url}flags/de.svg');
+  }
+  &.ci-flag-br {
+    background-image: url('#{$icon-url}flags/br.svg');
+  }
+  &.ci-flag-cn {
+    background-image: url('#{$icon-url}flags/cn.svg');
+  }
+  &.ci-flag-kr {
+    background-image: url('#{$icon-url}flags/kr.svg');
+  }
+  &.ci-flag-it {
+    background-image: url('#{$icon-url}flags/it.svg');
+  }
+  &.ci-flag-nl {
+    background-image: url('#{$icon-url}flags/nl.svg');
+  }
+  &.ci-flag-jp {
+    background-image: url('#{$icon-url}flags/jp.svg');
+  }
+}
+
 // Light mode icons (default)
 :root {
   .ci {

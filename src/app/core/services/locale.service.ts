@@ -8,17 +8,80 @@ import { HttpClientService } from './http-client.service';
 import { LoginService } from './login.service';
 import { StorageService } from './storage.service';
 
+/**
+ * Locale → flag mapping is best-effort. Some locales pick one canonical
+ * country (en → United States — DBExec defaults to American English).
+ *
+ * `flagClass`  — the .ci-flag-* modifier from _custom-icons.scss
+ * `shortCode`  — 2-letter uppercase code shown in the compact header
+ *                trigger. Convention: the LANGUAGE part of the locale
+ *                uppercased (en → EN, pt-BR → PT, zh-CN → ZH). Picked
+ *                over the country code so language-only locales (en, fr,
+ *                de) read naturally — a user seeing "EN" recognises
+ *                English regardless of which English-speaking country
+ *                the flag represents.
+ */
 export const SUPPORTED_LOCALES = [
-  { code: 'en', label: 'English' },
-  { code: 'fr', label: 'Français' },
-  { code: 'es', label: 'Español' },
-  { code: 'de', label: 'Deutsch' },
-  { code: 'pt-BR', label: 'Português (BR)' },
-  { code: 'zh-CN', label: '中文 (简体)' },
-  { code: 'ko', label: '한국어' },
-  { code: 'it', label: 'Italiano' },
-  { code: 'nl', label: 'Nederlands' },
-  { code: 'ja', label: '日本語' },
+  {
+    code: 'en',
+    label: 'English',
+    shortCode: 'EN',
+    flagClass: 'ci-flag ci-flag-us',
+  },
+  {
+    code: 'fr',
+    label: 'Français',
+    shortCode: 'FR',
+    flagClass: 'ci-flag ci-flag-fr',
+  },
+  {
+    code: 'es',
+    label: 'Español',
+    shortCode: 'ES',
+    flagClass: 'ci-flag ci-flag-es',
+  },
+  {
+    code: 'de',
+    label: 'Deutsch',
+    shortCode: 'DE',
+    flagClass: 'ci-flag ci-flag-de',
+  },
+  {
+    code: 'pt-BR',
+    label: 'Português (BR)',
+    shortCode: 'PT',
+    flagClass: 'ci-flag ci-flag-br',
+  },
+  {
+    code: 'zh-CN',
+    label: '中文 (简体)',
+    shortCode: 'ZH',
+    flagClass: 'ci-flag ci-flag-cn',
+  },
+  {
+    code: 'ko',
+    label: '한국어',
+    shortCode: 'KO',
+    flagClass: 'ci-flag ci-flag-kr',
+  },
+  {
+    code: 'it',
+    label: 'Italiano',
+    shortCode: 'IT',
+    flagClass: 'ci-flag ci-flag-it',
+  },
+  {
+    code: 'nl',
+    label: 'Nederlands',
+    shortCode: 'NL',
+    flagClass: 'ci-flag ci-flag-nl',
+  },
+  {
+    code: 'ja',
+    label: '日本語',
+    shortCode: 'JA',
+    flagClass: 'ci-flag ci-flag-jp',
+  },
 ] as const;
 
 const SUPPORTED_LOCALE_CODES: ReadonlySet<string> = new Set(

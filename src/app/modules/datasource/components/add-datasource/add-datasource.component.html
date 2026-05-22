@@ -44,7 +44,7 @@
             formControlName="name"
             [label]="'COMMON.NAME' | translate"
             [placeholder]="'COMMON.ENTER_NAME' | translate"
-            icon="pi-database"
+            icon="pi-id-card"
             [required]="true"
             [showError]="
               !!(
@@ -95,17 +95,34 @@
               )
             "
             [errorMessage]="'VALIDATION.ORGANISATION_REQUIRED' | translate"
+            icon="pi-building"
           >
           </app-custom-dropdown>
 
-          <!-- Type Field (disabled) -->
-          <app-custom-input
+          <!-- Database Type Selector — shared dropdown with icon items -->
+          <app-custom-dropdown
             formControlName="type"
             [label]="'COMMON.TYPE' | translate"
-            icon="pi-database"
-            [inputDisabled]="true"
+            [options]="databaseTypes"
+            optionLabel="label"
+            optionValue="value"
+            [filter]="true"
+            filterBy="label"
+            [required]="true"
           >
-          </app-custom-input>
+            <!-- Same template renders both panel rows and the trigger so
+                 the selected database's brand logo (postgres elephant,
+                 mysql dolphin, etc.) is visible in the closed dropdown.
+                 The shared component's leading-icon prop is intentionally
+                 NOT set here — when a triggerTemplate is in play the
+                 leading icon would compete with the brand mark. -->
+            <ng-template let-option>
+              <div class="db-type-option">
+                <i [class]="option.iconClass" aria-hidden="true"></i>
+                <span class="db-type-option-label">{{ option.label }}</span>
+              </div>
+            </ng-template>
+          </app-custom-dropdown>
 
           <!-- Host Field -->
           <app-custom-input

@@ -144,6 +144,72 @@
   }
 }
 
+// Locale trigger — compact "flag + ISO code" pair shown in the header.
+// Stripe/Vercel-style: just enough to identify the active locale, no
+// chevron-eating label. Sized to match the icon buttons around it.
+.locale-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  .ci-flag {
+    width: 18px;
+    height: 13px;
+  }
+
+  .locale-trigger-code {
+    color: var(--text-color);
+    font-size: var(--fs-control);
+    font-weight: var(--fw-semibold);
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+}
+
+// Dense panel rows — Stripe/Linear command-palette feel. Compact
+// (~30px tall), flag on the left, native name in the middle, checkmark
+// on the active row. The checkmark + tinted background together give
+// the selected state visual weight without needing a heavy border.
+.locale-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  // Padding plays with PrimeNG's .p-dropdown-item padding override
+  // below — together they land each row at ~30px tall.
+  padding: 2px 0;
+
+  .ci-flag {
+    width: 20px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .locale-option-label {
+    color: var(--text-color);
+    font-size: var(--fs-control);
+    line-height: 1.3;
+    white-space: nowrap;
+    flex: 1;
+  }
+
+  .locale-option-check {
+    color: var(--primary-color);
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  &.is-active .locale-option-label {
+    font-weight: var(--fw-semibold);
+  }
+}
+
+// NOTE: the actual panel densification rules live in src/styles.scss
+// under .locale-dropdown-panel. They have to be global because the
+// dropdown panel is rendered with appendTo="body" — view-encapsulated
+// styles from this file can't reach an overlay outside the component's
+// DOM subtree.
+
 // ── Search Trigger (Linear/Stripe-style command launcher) ─────────
 .search-trigger {
   display: flex;

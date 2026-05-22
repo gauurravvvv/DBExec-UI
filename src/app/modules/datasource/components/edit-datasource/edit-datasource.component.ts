@@ -23,6 +23,10 @@ import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import {
+  DATABASE_TYPES,
+  DatabaseTypeOption,
+} from '../../constants/database-types.constant';
 import { DatasourceService } from '../../services/datasource.service';
 
 @Component({
@@ -86,6 +90,14 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
   initialFormValues: any = null;
   organisationName: string = '';
   isWarningExpanded: boolean = false;
+
+  // dbType is immutable on edit — kept on the component (not the form) so
+  // it can't be sent in the update payload by accident, and so the
+  // connection-test call carries the *actual* stored engine instead of a
+  // hardcoded 'postgres'. dbTypeOption is the matching constant row,
+  // used to render the read-only icon + label.
+  dbType: string = 'postgres';
+  dbTypeOption: DatabaseTypeOption | null = null;
 
   showSaveConfirm = false;
   saveJustification = '';
@@ -161,7 +173,6 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
         ],
       ],
       description: ['', [Validators.maxLength(500)]],
-      type: [{ value: 'postgres', disabled: true }],
       host: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9.-]+$')]],
       port: [
         '',
@@ -189,10 +200,16 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
     if (data) {
       this.organisationName = data.organisationName || '';
 
+      // dbType is read once from the saved record and used for the
+      // connection-test call + the read-only display row. It cannot
+      // be edited so it isn't part of the form.
+      this.dbType = data.config?.dbType || 'postgres';
+      this.dbTypeOption =
+        DATABASE_TYPES.find(t => t.value === this.dbType) || null;
+
       const formData = {
         name: data.name,
         description: data.description || '',
-        type: data.config?.dbType || 'postgres',
         host: data.config?.hostname || '',
         port: data.config?.port || '',
         database: data.config?.dbName || '',
@@ -258,7 +275,7 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
 
     this.organisationService
       .validateDatasource({
-        type: 'postgres',
+        type: this.dbType,
         host: formValue.host,
         port: formValue.port,
         database: formValue.database,
@@ -308,17 +325,21 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
     if (this.saveJustification.trim()) {
       const formValue = this.datasourceForm.getRawValue();
 
+      // Note: `type` and `organisation` are deliberately NOT sent. Both
+      // are immutable for an existing datasource — changing engine
+      // would invalidate every downstream dataset's SQL, and moving a
+      // datasource across orgs would orphan every dataset/analysis/
+      // dashboard pointing at it. The BE should also reject these on
+      // update; this is defense in depth from the client side.
       const payload = {
         id: this.datasourceId,
         name: formValue.name,
         description: formValue.description,
-        type: formValue.type,
         host: formValue.host,
         port: formValue.port,
         database: formValue.database,
         username: formValue.username,
         password: formValue.password,
-        organisation: this.orgId,
         status: formValue.status ? 1 : 0,
       };
 
