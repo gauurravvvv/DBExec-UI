@@ -1061,6 +1061,64 @@
   }
 }
 
+// ── Schema-tree skeleton shimmer ────────────────────────────────────
+// Rendered in place of the schema list while the bulk
+// getDatasourceStructure call is in flight. Each row mimics one
+// schema entry (chevron-sized icon block + text-sized label block)
+// so the sidebar fills its natural width instead of collapsing to
+// a centered spinner. Pulse animation telegraphs activity without
+// the noise of a spinning indicator.
+.schema-skeleton {
+  padding: var(--space-3, 12px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+
+  .schema-skeleton-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3, 12px);
+    padding: 6px 4px;
+  }
+
+  .skeleton-bar {
+    display: inline-block;
+    height: 12px;
+    border-radius: var(--radius-xs, 3px);
+    background: linear-gradient(
+      90deg,
+      var(--border-color, #e5e7eb) 0%,
+      var(--hover-background, #f3f4f6) 50%,
+      var(--border-color, #e5e7eb) 100%
+    );
+    background-size: 200% 100%;
+    animation: schema-skeleton-pulse 1.4s ease-in-out infinite;
+
+    &--icon {
+      width: 14px;
+      flex: 0 0 14px;
+    }
+
+    &--label {
+      flex: 1 1 auto;
+      max-width: 70%;
+    }
+  }
+
+  // Stagger the rows so the shimmer doesn't pulse in lockstep —
+  // the eye reads "many rows loading" more readily than "one
+  // pattern repeated".
+  .schema-skeleton-row:nth-child(2) .skeleton-bar { animation-delay: 0.1s; }
+  .schema-skeleton-row:nth-child(3) .skeleton-bar { animation-delay: 0.2s; }
+  .schema-skeleton-row:nth-child(4) .skeleton-bar { animation-delay: 0.3s; }
+  .schema-skeleton-row:nth-child(5) .skeleton-bar { animation-delay: 0.4s; }
+}
+
+@keyframes schema-skeleton-pulse {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 // ===================================================================
 // Results Status Bar (floating at bottom of editor)
 // ===================================================================

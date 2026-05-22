@@ -174,16 +174,24 @@
             </p>
           </div>
 
-          <!-- Loading State -->
+          <!-- Loading State — skeleton rows so the sidebar fills its
+               natural space while the bulk schema load is in flight.
+               Less jarring than a centered spinner that collapses the
+               panel; closer to how DBeaver / DataGrip render their
+               schema tree on first connect. -->
           <div
-            class="empty-state"
+            class="schema-skeleton"
             *ngIf="
               selectedDatasourceObj &&
               loadingDatasources[selectedDatasourceObj.id]
             "
+            [attr.aria-label]="'DATASET.LOADING_SCHEMA' | translate"
+            aria-busy="true"
           >
-            <i class="pi pi-spin pi-spinner"></i>
-            <p>{{ 'DATASET.LOADING_SCHEMA' | translate }}</p>
+            <div class="schema-skeleton-row" *ngFor="let i of [1, 2, 3, 4, 5]">
+              <span class="skeleton-bar skeleton-bar--icon"></span>
+              <span class="skeleton-bar skeleton-bar--label"></span>
+            </div>
           </div>
 
           <!-- Schema Structure (only for selected datasource) -->

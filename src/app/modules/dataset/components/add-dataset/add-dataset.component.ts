@@ -1151,88 +1151,105 @@ export class AddDatasetComponent
 
     return new Promise((resolve, reject) => {
       try {
-        // When the user picked a schema in the popup we already know
-        // its name from the URL — skip the schemas-list round-trip
-        // entirely and seed the tree with that one schema. The
-        // tables fetch on expand still hits the BE normally.
-        if (this.scopedSchema) {
-          const tagged: any = {
-            name: 'datasource',
-            schemas: [{ name: this.scopedSchema, tables: [] }],
-          };
-          const dbType = this.getDbTypeFor(dbId);
-          if (dbType) tagged.dbType = dbType;
-          this.store.dispatch(
-            AddDatasetActions.loadSchemaDataSuccess({
-              orgId,
-              dbId: dbIdStr,
-              data: tagged,
-            }),
-          );
-          this.datasourceSchemas[dbId] = tagged;
-          if (token === this.schemaSelectionToken) {
-            this.datasources = Object.values(this.datasourceSchemas);
-            this.monacoIntelliSenseService.setDatasources(this.datasources);
-          }
-          this.loadingDatasources[dbId] = false;
-          this.cdr.markForCheck();
-          // Auto-kick the tables fetch so the user lands on a
-          // populated tree.
-          this.ensureTablesLoaded(dbId, this.scopedSchema);
-          resolve();
-          return;
-        }
+        // Single bulk call — schemas, tables, AND columns in one
+        // round-trip. The BE's getDatasourceStructure controller
+        // walks information_schema (dialect-aware) and returns the
+        // whole tree pre-shaped. Monaco's IntelliSense, the sidebar,
+        // and hover/completion all get populated at once instead of
+        // the previous schemas-first / tables-on-expand / columns-on-
+        // expand cascade — which forced the user to click every row
+        // before completion worked on pasted SQL.
+        //
+        // Uses queryPostNoLoader under the hood so the global loader
+        // stays out of the way; the sidebar shows skeleton rows
+        // while the request is in flight.
+        this.queryService
+          .getDatasourceStructure(dbIdStr, orgId)
+          .subscribe({
+            next: (response: any) => {
+              // Envelope check first — BE returns HTTP 200 with
+              // status:false on application-level failures (bad
+              // datasource, broken connection, etc.). Surface to
+              // user via the standard service helper.
+              if (response && response.status === false) {
+                const msg =
+                  response.message ||
+                  this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA');
+                this.globalService.handleSuccessService(response, false);
+                this.store.dispatch(
+                  AddDatasetActions.loadSchemaDataFailure({
+                    orgId,
+                    dbId: dbIdStr,
+                    error: msg,
+                  }),
+                );
+                this.loadingDatasources[dbId] = false;
+                this.cdr.markForCheck();
+                reject(new Error(msg));
+                return;
+              }
 
-        // No scoped schema — fetch the full schema list. Lazy first
-        // step: schemas only. Tables and columns are fetched on
-        // expand via ensureTablesLoaded / ensureColumnsLoaded.
-        this.datasourceService
-          .listDatasourceSchemas({
-            orgId,
-            datasourceId: dbIdStr,
-          })
-          .then((response: any) => {
-            const schemaData =
-              SchemaTransformerHelper.transformLazySchemasResponse(response);
+              const transformed =
+                SchemaTransformerHelper.transformSchemaResponse(response);
+              // Tag every node as 'loaded' so the lazy paths (which
+              // still drive expand UX) become no-ops. Without this
+              // the sidebar would show "idle" spinners next to fully-
+              // populated rows.
+              const fullyLoadedTree = this.markTreeFullyLoaded(
+                transformed[0],
+                this.getDbTypeFor(dbId),
+              );
 
-            if (schemaData.length > 0) {
-              const dbType = this.getDbTypeFor(dbId);
-              const tagged = dbType
-                ? { ...schemaData[0], dbType }
-                : schemaData[0];
+              // When the user picked a schema in the popup, narrow
+              // the tree to just that schema so the sidebar matches
+              // the editor's scope. The bulk endpoint returns
+              // everything — cheaper to filter in JS than to ship a
+              // separate scoped endpoint.
+              const finalTree = this.scopedSchema
+                ? {
+                    ...fullyLoadedTree,
+                    schemas: fullyLoadedTree.schemas.filter(
+                      (s: any) => s.name === this.scopedSchema,
+                    ),
+                  }
+                : fullyLoadedTree;
+
               this.store.dispatch(
                 AddDatasetActions.loadSchemaDataSuccess({
                   orgId,
                   dbId: dbIdStr,
-                  data: tagged,
+                  data: finalTree,
                 }),
               );
-              this.datasourceSchemas[dbId] = tagged;
-            }
+              this.datasourceSchemas[dbId] = finalTree;
 
-            if (token === this.schemaSelectionToken) {
-              this.datasources = Object.values(this.datasourceSchemas);
-              this.monacoIntelliSenseService.setDatasources(this.datasources);
-            }
+              if (token === this.schemaSelectionToken) {
+                this.datasources = Object.values(this.datasourceSchemas);
+                this.monacoIntelliSenseService.setDatasources(this.datasources);
+                // Scoped-schema may have flipped to available/unavailable
+                // depending on whether the schema name exists in the
+                // returned tree — re-evaluate the editor lock.
+                this.syncEditorReadOnlyState();
+              }
 
-            this.loadingDatasources[dbId] = false;
-            this.cdr.markForCheck();
-            resolve();
-          })
-          .catch((error: any) => {
-            this.store.dispatch(
-              AddDatasetActions.loadSchemaDataFailure({
-                orgId,
-                dbId: dbIdStr,
-                error:
-                  error?.message ||
-                  this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
-              }),
-            );
-
-            this.loadingDatasources[dbId] = false;
-            this.cdr.markForCheck();
-            reject(error);
+              this.loadingDatasources[dbId] = false;
+              this.cdr.markForCheck();
+              resolve();
+            },
+            error: (error: any) => {
+              this.store.dispatch(
+                AddDatasetActions.loadSchemaDataFailure({
+                  orgId,
+                  dbId: dbIdStr,
+                  error:
+                    error?.message ||
+                    this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
+                }),
+              );
+              this.loadingDatasources[dbId] = false;
+              this.cdr.markForCheck();
+              reject(error);
+            },
           });
       } catch (error: any) {
         // Dispatch failure action
@@ -1802,8 +1819,22 @@ export class AddDatasetComponent
    * Kick off the lazy `tables-for-schema` fetch if this schema row
    * hasn't been populated yet. Idempotent: subsequent calls during
    * the same load (or after a successful load) are no-ops.
+   *
+   * With the bulk `getDatasourceStructure` call now driving the
+   * initial load, every schema arrives already populated and this
+   * method's already-loaded guard short-circuits in the common case.
+   * It's still useful as a safety net for any future per-schema
+   * refresh path or for trees that fall through with empty tables.
+   *
+   * `background` toggles the global loader off so manual single-
+   * schema reloads can choose between blocking (default) and quiet
+   * (true) behaviour.
    */
-  private ensureTablesLoaded(dbId: string, schemaName: string): void {
+  private ensureTablesLoaded(
+    dbId: string,
+    schemaName: string,
+    background = false,
+  ): void {
     if (!this.selectedOrg?.id) return;
     const orgId = String(this.selectedOrg.id);
     const dbIdStr = String(dbId);
@@ -1819,6 +1850,20 @@ export class AddDatasetComponent
     ) {
       return;
     }
+    // Already in-flight guard: a parallel pre-warm fetch is enough;
+    // a second click while loading would duplicate the round-trip.
+    if (existing?.tablesStatus === 'loading') {
+      return;
+    }
+    // Flip the per-row status to 'loading' immediately so the sidebar
+    // shows the inline spinner even before the store action propagates
+    // back. Without this the row reads as "idle" for a few hundred ms
+    // and looks frozen.
+    this.replaceSchemaNode(dbId, schemaName, prev => ({
+      ...prev,
+      tablesStatus: 'loading',
+      tablesError: null,
+    }));
 
     this.store.dispatch(
       AddDatasetActions.loadTablesForSchema({
@@ -1829,11 +1874,14 @@ export class AddDatasetComponent
     );
 
     this.datasourceService
-      .listSchemaTables({
-        orgId,
-        datasourceId: dbIdStr,
-        schemaName,
-      })
+      .listSchemaTables(
+        {
+          orgId,
+          datasourceId: dbIdStr,
+          schemaName,
+        },
+        background,
+      )
       .then((response: any) => {
         // BE always returns HTTP 200; check the envelope's `status`
         // field for application-level failure. A typo in the URL
@@ -1909,6 +1957,35 @@ export class AddDatasetComponent
         this.cdr.markForCheck();
       });
   }
+
+  /**
+   * Tag every node in a freshly-arrived bulk-load tree as 'loaded'
+   * (tablesStatus on each schema, columnsStatus on each table). This
+   * keeps the per-row lazy spinners off and short-circuits any
+   * subsequent `ensureTablesLoaded` / `ensureColumnsLoaded` calls
+   * because their already-loaded guards see populated arrays.
+   *
+   * Pure function — returns a new tree object; original input is
+   * not mutated, so callers can keep their own reference if needed.
+   */
+  private markTreeFullyLoaded(tree: any, dbType?: string | null): any {
+    if (!tree) return tree;
+    return {
+      ...tree,
+      ...(dbType ? { dbType } : {}),
+      schemas: (tree.schemas ?? []).map((schema: any) => ({
+        ...schema,
+        tablesStatus: 'loaded',
+        tablesError: null,
+        tables: (schema.tables ?? []).map((table: any) => ({
+          ...table,
+          columnsStatus: 'loaded',
+          columnsError: null,
+        })),
+      })),
+    };
+  }
+
 
   /**
    * Immutably replace one schema row inside the cached tree. Rebuilds

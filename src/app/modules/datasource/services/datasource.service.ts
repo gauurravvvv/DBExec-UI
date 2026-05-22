@@ -166,17 +166,29 @@ export class DatasourceService {
     }
   }
 
-  listDatasourceSchemas(params: any) {
+  /**
+   * The three intro endpoints below take an optional `skipLoader`
+   * flag. When the add-dataset editor opens, we pre-warm the schema
+   * tree (schemas → tables for every schema) in the background so
+   * IntelliSense has data without the user having to click every
+   * row. Those background fetches pass `skipLoader: true` so the
+   * blocking global loader stays out of the way; the sidebar's
+   * per-row inline spinners (driven by tablesStatus) are enough
+   * feedback. User-initiated expansion (or anything that wants the
+   * loader) leaves the flag off.
+   */
+  listDatasourceSchemas(params: any, skipLoader = false) {
     return lastValueFrom(
       this.http.apiGet(
         DATASOURCE.LIST_SCHEMAS_PREFIX +
           `${params.orgId}/${params.datasourceId}` +
           DATASOURCE.LIST_SCHEMAS_SUFFIX,
+        skipLoader ? { skipLoader: true } : undefined,
       ),
     );
   }
 
-  listSchemaTables(params: any) {
+  listSchemaTables(params: any, skipLoader = false) {
     return lastValueFrom(
       this.http.apiGet(
         DATASOURCE.LIST_SCHEMAS_PREFIX +
@@ -184,11 +196,12 @@ export class DatasourceService {
           DATASOURCE.SCHEMAS_SEGMENT +
           params.schemaName +
           DATASOURCE.TABLES_SEGMENT.replace(/\/$/, ''),
+        skipLoader ? { skipLoader: true } : undefined,
       ),
     );
   }
 
-  listTableColumns(params: any) {
+  listTableColumns(params: any, skipLoader = false) {
     return lastValueFrom(
       this.http.apiGet(
         DATASOURCE.LIST_SCHEMAS_PREFIX +
@@ -198,6 +211,7 @@ export class DatasourceService {
           DATASOURCE.TABLES_SEGMENT +
           params.tableName +
           DATASOURCE.COLUMNS_SEGMENT,
+        skipLoader ? { skipLoader: true } : undefined,
       ),
     );
   }
