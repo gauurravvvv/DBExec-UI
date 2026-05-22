@@ -159,7 +159,9 @@
     "BACK": "Voltar",
     "SEARCH_PLACEHOLDER": "Pesquisar...",
     "NO_RESULTS_FOUND": "Nenhum resultado encontrado",
-    "NO_OPTIONS_AVAILABLE": "Nenhuma opção disponível"
+    "NO_OPTIONS_AVAILABLE": "Nenhuma opção disponível",
+    "CONTINUE": "Continuar",
+    "OPTIONAL": "Opcional"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "O nome é obrigatório",
@@ -728,7 +730,15 @@
     "VALIDATION_FAILED": "Falha na validação",
     "VALIDATION_FAILED_RETRY": "Falha na validação. Tente novamente.",
     "VIA_QUERY_BUILDER": "Via construtor de consultas",
-    "VIEW_RESULTS": "Ver resultados"
+    "VIEW_RESULTS": "Ver resultados",
+    "ACTIVE_DIALECT": "Dialeto SQL ativo",
+    "PICK_DATASOURCE": "Escolher fonte de dados",
+    "SCHEMA_PICKER_HINT": "O editor será restrito a este esquema. Tabelas de outros esquemas não estarão visíveis.",
+    "SCHEMA_PICKER_HINT_OPTIONAL": "Deixe em branco para conectar-se a toda a fonte de dados. Escolha um esquema para restringir a barra lateral do editor.",
+    "SCHEMA_PICK_DATASOURCE_FIRST": "Escolha uma fonte de dados acima para selecionar um esquema.",
+    "SEARCH_DATASOURCES": "Buscar fontes de dados…",
+    "NO_DATASOURCES": "Nenhuma fonte de dados encontrada",
+    "SCHEMA": "Schema"
   },
   "ANALYSES": {
     "TITLE": "Análises",

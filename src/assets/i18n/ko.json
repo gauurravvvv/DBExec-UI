@@ -159,7 +159,9 @@
     "BACK": "뒤로",
     "SEARCH_PLACEHOLDER": "검색...",
     "NO_RESULTS_FOUND": "결과를 찾을 수 없습니다",
-    "NO_OPTIONS_AVAILABLE": "사용 가능한 옵션이 없습니다"
+    "NO_OPTIONS_AVAILABLE": "사용 가능한 옵션이 없습니다",
+    "CONTINUE": "계속",
+    "OPTIONAL": "선택사항"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "이름은 필수 항목입니다",
@@ -728,7 +730,15 @@
     "VALIDATION_FAILED": "검증 실패",
     "VALIDATION_FAILED_RETRY": "검증에 실패했습니다. 다시 시도하세요.",
     "VIA_QUERY_BUILDER": "쿼리 빌더를 통해",
-    "VIEW_RESULTS": "결과 보기"
+    "VIEW_RESULTS": "결과 보기",
+    "ACTIVE_DIALECT": "활성 SQL 방언",
+    "PICK_DATASOURCE": "데이터 소스 선택",
+    "SCHEMA_PICKER_HINT": "편집기는 이 스키마로 제한됩니다. 다른 스키마의 테이블은 표시되지 않습니다.",
+    "SCHEMA_PICKER_HINT_OPTIONAL": "비워두면 전체 데이터 소스에 연결됩니다. 스키마를 선택하면 편집기 사이드바가 좁혀집니다.",
+    "SCHEMA_PICK_DATASOURCE_FIRST": "위에서 데이터 소스를 선택하여 스키마를 선택하세요.",
+    "SEARCH_DATASOURCES": "데이터 소스 검색…",
+    "NO_DATASOURCES": "데이터 소스를 찾을 수 없습니다",
+    "SCHEMA": "스키마"
   },
   "ANALYSES": {
     "TITLE": "분석",

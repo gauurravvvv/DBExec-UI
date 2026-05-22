@@ -159,7 +159,9 @@
     "BACK": "返回",
     "SEARCH_PLACEHOLDER": "搜索...",
     "NO_RESULTS_FOUND": "未找到结果",
-    "NO_OPTIONS_AVAILABLE": "无可用选项"
+    "NO_OPTIONS_AVAILABLE": "无可用选项",
+    "CONTINUE": "继续",
+    "OPTIONAL": "可选"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名字为必填项",
@@ -728,7 +730,15 @@
     "VALIDATION_FAILED": "验证失败",
     "VALIDATION_FAILED_RETRY": "验证失败，请重试。",
     "VIA_QUERY_BUILDER": "通过查询构建器",
-    "VIEW_RESULTS": "查看结果"
+    "VIEW_RESULTS": "查看结果",
+    "ACTIVE_DIALECT": "当前 SQL 方言",
+    "PICK_DATASOURCE": "选择数据源",
+    "SCHEMA_PICKER_HINT": "编辑器将限定在该 schema 范围内,其他 schema 的表将不可见。",
+    "SCHEMA_PICKER_HINT_OPTIONAL": "留空则连接到整个数据源。选择 schema 可缩小编辑器侧边栏的范围。",
+    "SCHEMA_PICK_DATASOURCE_FIRST": "请先在上方选择数据源,然后选择 schema。",
+    "SEARCH_DATASOURCES": "搜索数据源…",
+    "NO_DATASOURCES": "未找到数据源",
+    "SCHEMA": "Schema"
   },
   "ANALYSES": {
     "TITLE": "分析",

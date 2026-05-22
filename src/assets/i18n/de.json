@@ -159,7 +159,9 @@
     "BACK": "Zurück",
     "SEARCH_PLACEHOLDER": "Suchen...",
     "NO_RESULTS_FOUND": "Keine Ergebnisse gefunden",
-    "NO_OPTIONS_AVAILABLE": "Keine Optionen verfügbar"
+    "NO_OPTIONS_AVAILABLE": "Keine Optionen verfügbar",
+    "CONTINUE": "Weiter",
+    "OPTIONAL": "Optional"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Vorname ist erforderlich",
@@ -728,7 +730,15 @@
     "VALIDATION_FAILED": "Validierung fehlgeschlagen",
     "VALIDATION_FAILED_RETRY": "Validierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
     "VIA_QUERY_BUILDER": "Über Query Builder",
-    "VIEW_RESULTS": "Ergebnisse anzeigen"
+    "VIEW_RESULTS": "Ergebnisse anzeigen",
+    "ACTIVE_DIALECT": "Aktiver SQL-Dialekt",
+    "PICK_DATASOURCE": "Datenquelle wählen",
+    "SCHEMA_PICKER_HINT": "Der Editor wird auf dieses Schema eingegrenzt. Tabellen aus anderen Schemata sind nicht sichtbar.",
+    "SCHEMA_PICKER_HINT_OPTIONAL": "Leer lassen, um sich mit der gesamten Datenquelle zu verbinden. Schema wählen, um die Seitenleiste des Editors darauf einzuschränken.",
+    "SCHEMA_PICK_DATASOURCE_FIRST": "Wählen Sie oben eine Datenquelle, um ein Schema zu wählen.",
+    "SEARCH_DATASOURCES": "Datenquellen suchen…",
+    "NO_DATASOURCES": "Keine Datenquellen gefunden",
+    "SCHEMA": "Schema"
   },
   "ANALYSES": {
     "TITLE": "Analysen",

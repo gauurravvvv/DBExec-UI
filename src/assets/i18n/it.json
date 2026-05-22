@@ -159,7 +159,9 @@
     "BACK": "Indietro",
     "SEARCH_PLACEHOLDER": "Cerca...",
     "NO_RESULTS_FOUND": "Nessun risultato trovato",
-    "NO_OPTIONS_AVAILABLE": "Nessuna opzione disponibile"
+    "NO_OPTIONS_AVAILABLE": "Nessuna opzione disponibile",
+    "CONTINUE": "Continua",
+    "OPTIONAL": "Opzionale"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Il nome è obbligatorio",
@@ -728,7 +730,15 @@
     "VALIDATION_FAILED": "Validazione fallita",
     "VALIDATION_FAILED_RETRY": "Validazione fallita. Riprova.",
     "VIA_QUERY_BUILDER": "Tramite query builder",
-    "VIEW_RESULTS": "Visualizza risultati"
+    "VIEW_RESULTS": "Visualizza risultati",
+    "ACTIVE_DIALECT": "Dialetto SQL attivo",
+    "PICK_DATASOURCE": "Scegli origine dati",
+    "SCHEMA_PICKER_HINT": "L'editor sarà limitato a questo schema. Le tabelle di altri schemi non saranno visibili.",
+    "SCHEMA_PICKER_HINT_OPTIONAL": "Lascia vuoto per connetterti all'intera origine dati. Scegli uno schema per restringere la barra laterale dell'editor.",
+    "SCHEMA_PICK_DATASOURCE_FIRST": "Scegli un'origine dati sopra per selezionare uno schema.",
+    "SEARCH_DATASOURCES": "Cerca origini dati…",
+    "NO_DATASOURCES": "Nessuna origine dati trovata",
+    "SCHEMA": "Schema"
   },
   "ANALYSES": {
     "TITLE": "Analisi",

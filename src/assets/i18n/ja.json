@@ -159,7 +159,9 @@
     "BACK": "戻る",
     "SEARCH_PLACEHOLDER": "検索...",
     "NO_RESULTS_FOUND": "該当する結果がありません",
-    "NO_OPTIONS_AVAILABLE": "利用可能なオプションがありません"
+    "NO_OPTIONS_AVAILABLE": "利用可能なオプションがありません",
+    "CONTINUE": "続行",
+    "OPTIONAL": "任意"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名は必須です",
@@ -728,7 +730,15 @@
     "VALIDATION_FAILED": "検証に失敗しました",
     "VALIDATION_FAILED_RETRY": "検証に失敗しました。再試行してください。",
     "VIA_QUERY_BUILDER": "クエリビルダー経由",
-    "VIEW_RESULTS": "結果を表示"
+    "VIEW_RESULTS": "結果を表示",
+    "ACTIVE_DIALECT": "アクティブな SQL ダイアレクト",
+    "PICK_DATASOURCE": "データソースを選択",
+    "SCHEMA_PICKER_HINT": "エディタはこのスキーマに限定されます。他のスキーマのテーブルは表示されません。",
+    "SCHEMA_PICKER_HINT_OPTIONAL": "空のままにするとデータソース全体に接続します。スキーマを選択するとエディタのサイドバーが絞り込まれます。",
+    "SCHEMA_PICK_DATASOURCE_FIRST": "上でデータソースを選択するとスキーマを選択できます。",
+    "SEARCH_DATASOURCES": "データソースを検索…",
+    "NO_DATASOURCES": "データソースが見つかりません",
+    "SCHEMA": "スキーマ"
   },
   "ANALYSES": {
     "TITLE": "分析",

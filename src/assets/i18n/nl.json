@@ -159,7 +159,9 @@
     "BACK": "Terug",
     "SEARCH_PLACEHOLDER": "Zoeken...",
     "NO_RESULTS_FOUND": "Geen resultaten gevonden",
-    "NO_OPTIONS_AVAILABLE": "Geen opties beschikbaar"
+    "NO_OPTIONS_AVAILABLE": "Geen opties beschikbaar",
+    "CONTINUE": "Doorgaan",
+    "OPTIONAL": "Optioneel"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Voornaam is verplicht",
@@ -728,7 +730,15 @@
     "VALIDATION_FAILED": "Validatie mislukt",
     "VALIDATION_FAILED_RETRY": "Validatie mislukt. Probeer het opnieuw.",
     "VIA_QUERY_BUILDER": "Via querybouwer",
-    "VIEW_RESULTS": "Resultaten bekijken"
+    "VIEW_RESULTS": "Resultaten bekijken",
+    "ACTIVE_DIALECT": "Actief SQL-dialect",
+    "PICK_DATASOURCE": "Gegevensbron kiezen",
+    "SCHEMA_PICKER_HINT": "De editor wordt beperkt tot dit schema. Tabellen uit andere schema's zijn niet zichtbaar.",
+    "SCHEMA_PICKER_HINT_OPTIONAL": "Laat leeg om verbinding te maken met de hele gegevensbron. Kies een schema om de zijbalk van de editor in te perken.",
+    "SCHEMA_PICK_DATASOURCE_FIRST": "Kies hierboven een gegevensbron om een schema te selecteren.",
+    "SEARCH_DATASOURCES": "Gegevensbronnen zoeken…",
+    "NO_DATASOURCES": "Geen gegevensbronnen gevonden",
+    "SCHEMA": "Schema"
   },
   "ANALYSES": {
     "TITLE": "Analyses",
