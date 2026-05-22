@@ -72,6 +72,7 @@
                 value: sectionForm.get('organisation')?.value,
               })
             "
+            icon="pi-building"
           >
           </app-custom-dropdown>
         </div>
@@ -104,6 +105,7 @@
                 value: sectionForm.get('datasource')?.value,
               })
             "
+            icon="pi-database"
           >
           </app-custom-dropdown>
         </div>
@@ -134,6 +136,7 @@
             (ngModelChange)="
               onTabChange({ value: sectionForm.get('tab')?.value })
             "
+            icon="pi-folder"
           >
           </app-custom-dropdown>
         </div>
@@ -234,6 +237,7 @@
                         groupIndex
                       )
                     "
+                    icon="pi-bookmark"
                   >
                   </app-custom-dropdown>
                 </div>
@@ -297,7 +301,7 @@
                         [placeholder]="
                           'PROMPT_MODULE.ENTER_PROMPT_NAME' | translate
                         "
-                        icon="pi-box"
+                        icon="pi-id-card"
                         [required]="true"
                         [showError]="
                           !!(
@@ -340,6 +344,7 @@
                           )
                         "
                         [errorMessage]="'COMMON.TYPE_REQUIRED' | translate"
+                        icon="pi-th-large"
                       >
                       </app-custom-dropdown>
                     </div>

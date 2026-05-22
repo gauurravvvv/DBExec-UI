@@ -25,6 +25,7 @@
             [(ngModel)]="config.placeholder"
             [label]="'PROMPT_MODULE.PLACEHOLDER_TEXT' | translate"
             [placeholder]="'PROMPT_MODULE.PLACEHOLDER_TEXT_EXAMPLE' | translate"
+            icon="pi-pencil"
           >
           </app-custom-input>
         </div>
@@ -93,6 +94,7 @@
             [(ngModel)]="config.pattern"
             [label]="'PROMPT_MODULE.PATTERN_REGEX' | translate"
             placeholder="e.g., ^[A-Za-z]+$"
+            icon="pi-code"
           >
           </app-custom-input>
           <small class="hint">{{
@@ -169,6 +171,7 @@
             [inputDisabled]="previewConfig.disabled"
             [rows]="previewConfig.rows"
             [autoResize]="previewConfig.autoResize"
+            icon="pi-eye"
           >
           </app-custom-input>
         </ng-container>

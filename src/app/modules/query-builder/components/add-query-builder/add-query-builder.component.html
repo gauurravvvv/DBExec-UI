@@ -43,7 +43,7 @@
             formControlName="name"
             [label]="'COMMON.NAME' | translate"
             [placeholder]="'COMMON.ENTER_NAME' | translate"
-            icon="pi-box"
+            icon="pi-id-card"
             [required]="true"
             [showError]="
               !!(
@@ -89,6 +89,7 @@
             "
             [errorMessage]="'COMMON.ORGANISATION' | translate"
             (onChangeEvent)="onOrganisationChange({ value: $event })"
+            icon="pi-building"
           >
           </app-custom-dropdown>
         </div>
@@ -115,6 +116,7 @@
               )
             "
             [errorMessage]="'COMMON.DATASOURCE' | translate"
+            icon="pi-database"
           >
           </app-custom-dropdown>
         </div>

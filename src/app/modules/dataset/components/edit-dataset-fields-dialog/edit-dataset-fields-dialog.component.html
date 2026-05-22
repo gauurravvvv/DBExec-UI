@@ -10,6 +10,7 @@
             [label]="'DATASET.FIELD_NAME_TO_USE' | translate"
             [placeholder]="'DATASET.COLUMN_NAME' | translate"
             [inputDisabled]="true"
+            icon="pi-id-card"
           >
           </app-custom-input>
         </div>
@@ -22,6 +23,7 @@
             [showError]="!!nameError"
             [errorMessage]="nameError"
             (ngModelChange)="onFieldChange()"
+            icon="pi-id-card"
           >
           </app-custom-input>
           <small class="char-count">
@@ -40,6 +42,7 @@
             [filter]="true"
             [autoDisplayFirst]="false"
             appendTo="body"
+            icon="pi-th-large"
           >
           </app-custom-dropdown>
           <small class="type-hint">

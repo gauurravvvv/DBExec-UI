@@ -42,7 +42,7 @@
           formControlName="name"
           [label]="'COMMON.NAME' | translate"
           [placeholder]="'CONNECTION.ENTER_NAME' | translate"
-          icon="pi-box"
+          icon="pi-id-card"
           [required]="true"
           [showError]="
             !!(
@@ -87,6 +87,7 @@
           "
           [errorMessage]="'VALIDATION.ORGANISATION_REQUIRED' | translate"
           (onChangeEvent)="onOrganisationChange()"
+          icon="pi-building"
         >
         </app-custom-dropdown>
 
@@ -112,6 +113,7 @@
             )
           "
           [errorMessage]="'VALIDATION.DATASOURCE_REQUIRED' | translate"
+          icon="pi-database"
         >
         </app-custom-dropdown>
 

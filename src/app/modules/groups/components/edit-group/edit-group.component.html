@@ -48,7 +48,7 @@
           formControlName="name"
           [label]="'COMMON.NAME' | translate"
           [placeholder]="'COMMON.ENTER_NAME' | translate"
-          icon="pi-key"
+          icon="pi-id-card"
           [required]="true"
           [inputDisabled]="isDefaultGroup"
           [showError]="
@@ -106,6 +106,7 @@
           [filter]="true"
           filterBy="username"
           display="chip"
+          icon="pi-users"
         >
         </app-custom-multiselect>
 
@@ -149,6 +150,7 @@
           [rows]="3"
           [maxLength]="500"
           [required]="true"
+          icon="pi-info-circle"
         ></app-custom-input>
         <small class="char-count">{{ saveJustification.length }}/500</small>
       </div>

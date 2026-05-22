@@ -21,6 +21,7 @@
           [placeholder]="'RLS.SELECT_SCOPE' | translate"
           [autoDisplayFirst]="false"
           (onChangeEvent)="onScopeChange($event)"
+          icon="pi-shield"
         ></app-custom-dropdown>
 
         <app-custom-dropdown
@@ -45,6 +46,7 @@
           [filter]="true"
           [autoDisplayFirst]="false"
           [disabled]="!newScope || scopeTargetsLoading"
+          icon="pi-shield"
         ></app-custom-dropdown>
 
         <button

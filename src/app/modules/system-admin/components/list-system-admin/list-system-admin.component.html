@@ -305,6 +305,7 @@
                   [(ngModel)]="filterValues.username"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'COMMON.SEARCH_USERNAME' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th>
@@ -312,6 +313,7 @@
                   [(ngModel)]="filterValues.firstName"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'COMMON.SEARCH_FIRST_NAME' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th>
@@ -319,6 +321,7 @@
                   [(ngModel)]="filterValues.lastName"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'COMMON.SEARCH_LAST_NAME' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th>
@@ -326,6 +329,7 @@
                   [(ngModel)]="filterValues.email"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'COMMON.SEARCH_EMAIL' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th>
@@ -339,6 +343,7 @@
                   [filter]="false"
                   appendTo="body"
                   (onChangeEvent)="onFilterChange()"
+                  icon="pi-circle-fill"
                 ></app-custom-dropdown>
               </th>
               <th>

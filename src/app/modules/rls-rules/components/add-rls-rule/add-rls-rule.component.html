@@ -42,6 +42,7 @@
             !!(rlsForm.get('name')?.invalid && rlsForm.get('name')?.touched)
           "
           [errorMessage]="getNameError()"
+          icon="pi-id-card"
         >
         </app-custom-input>
 
@@ -49,6 +50,7 @@
           formControlName="description"
           [label]="'COMMON.DESCRIPTION' | translate"
           [placeholder]="'COMMON.ENTER_DESCRIPTION' | translate"
+          icon="pi-align-left"
         >
         </app-custom-input>
 
@@ -75,6 +77,7 @@
             )
           "
           [errorMessage]="'RLS.ORGANISATION_REQUIRED' | translate"
+          icon="pi-building"
         >
         </app-custom-dropdown>
 
@@ -95,6 +98,7 @@
           [autoDisplayFirst]="false"
           [required]="true"
           (onChangeEvent)="onDatasourceChange($event)"
+          icon="pi-database"
         >
         </app-custom-dropdown>
 
@@ -120,6 +124,7 @@
             )
           "
           [errorMessage]="'RLS.DATASET_REQUIRED' | translate"
+          icon="pi-database"
         >
         </app-custom-dropdown>
 
@@ -171,6 +176,7 @@
                   "
                   [errorMessage]="'RLS.COLUMN_REQUIRED' | translate"
                   (onChangeEvent)="onColumnChange(i, $event)"
+                  icon="pi-id-card"
                 ></app-custom-dropdown>
                 <app-custom-dropdown
                   formControlName="operator"
@@ -179,6 +185,7 @@
                   optionValue="value"
                   [autoDisplayFirst]="false"
                   [required]="true"
+                  icon="pi-filter"
                 ></app-custom-dropdown>
                 <button
                   type="button"
@@ -214,6 +221,7 @@
                     )
                   "
                   [errorMessage]="'RLS.VALUES_REQUIRED' | translate"
+                  icon="pi-tag"
                 ></app-custom-multiselect>
               </div>
             </div>

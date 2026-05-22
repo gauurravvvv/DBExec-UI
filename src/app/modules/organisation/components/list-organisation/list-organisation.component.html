@@ -182,6 +182,7 @@
                   [(ngModel)]="filterValues.name"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'ORG.SEARCH_NAME' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th>
@@ -189,6 +190,7 @@
                   [(ngModel)]="filterValues.description"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'ORG.SEARCH_DESCRIPTION' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th>
@@ -202,6 +204,7 @@
                   [filter]="false"
                   appendTo="body"
                   (onChangeEvent)="onFilterChange()"
+                  icon="pi-circle-fill"
                 ></app-custom-dropdown>
               </th>
               <th>

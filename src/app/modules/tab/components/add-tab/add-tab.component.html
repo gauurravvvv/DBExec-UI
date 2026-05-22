@@ -71,6 +71,7 @@
                 value: tabForm.get('organisation')?.value,
               })
             "
+            icon="pi-building"
           >
           </app-custom-dropdown>
         </div>
@@ -100,6 +101,7 @@
             (ngModelChange)="
               onDatasourceChange({ value: tabForm.get('datasource')?.value })
             "
+            icon="pi-database"
           >
           </app-custom-dropdown>
         </div>
@@ -148,7 +150,7 @@
                     formControlName="name"
                     [label]="'COMMON.NAME' | translate"
                     [placeholder]="'TAB.ENTER_TAB_NAME' | translate"
-                    icon="pi-box"
+                    icon="pi-id-card"
                     [required]="true"
                     [showError]="
                       !!(

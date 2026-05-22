@@ -73,6 +73,7 @@
                 value: sectionForm.get('organisation')?.value,
               })
             "
+            icon="pi-building"
           >
           </app-custom-dropdown>
         </div>
@@ -104,6 +105,7 @@
                 value: sectionForm.get('datasource')?.value,
               })
             "
+            icon="pi-database"
           >
           </app-custom-dropdown>
         </div>
@@ -204,6 +206,7 @@
                         groupIndex
                       )
                     "
+                    icon="pi-folder"
                   >
                   </app-custom-dropdown>
                 </div>
@@ -264,7 +267,7 @@
                         [placeholder]="
                           'SECTION_MODULE.ENTER_SECTION_NAME' | translate
                         "
-                        icon="pi-box"
+                        icon="pi-id-card"
                         [required]="true"
                         [showError]="
                           !!(

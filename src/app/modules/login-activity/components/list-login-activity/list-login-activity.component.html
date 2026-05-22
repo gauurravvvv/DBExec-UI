@@ -57,6 +57,7 @@
               [autoDisplayFirst]="false"
               [placeholder]="'COMMON.SELECT_ORGANISATION' | translate"
               (onChangeEvent)="onOrganisationChange()"
+              icon="pi-building"
             ></app-custom-dropdown>
           </div>
         </div>
@@ -127,6 +128,7 @@
                   [(ngModel)]="filterValues.username"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'LOGIN_ACTIVITY.SEARCH_USER' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th>
@@ -140,6 +142,7 @@
                   [placeholder]="'COMMON.ALL' | translate"
                   appendTo="body"
                   (onChangeEvent)="onFilterChange()"
+                  icon="pi-th-large"
                 ></app-custom-dropdown>
               </th>
               <th>
@@ -147,6 +150,7 @@
                   [(ngModel)]="filterValues.organisationName"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'LOGIN_ACTIVITY.SEARCH_ORG' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th><!-- Failure Reason — no filter --></th>
@@ -164,6 +168,7 @@
                   [(ngModel)]="filterValues.ipAddress"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'LOGIN_ACTIVITY.SEARCH_IP' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th><!-- User Agent — no filter --></th>

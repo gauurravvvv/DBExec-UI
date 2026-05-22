@@ -60,6 +60,7 @@
               [floatingLabel]="true"
               filterBy="name"
               (onChangeEvent)="onOrgChange($event)"
+              icon="pi-building"
             >
             </app-custom-dropdown>
           </div>
@@ -80,6 +81,7 @@
               [label]="'COMMON.DATASOURCE' | translate"
               filterBy="name"
               (onChangeEvent)="onDBChange($event)"
+              icon="pi-database"
             >
             </app-custom-dropdown>
           </div>
@@ -228,6 +230,7 @@
                   [(ngModel)]="filterValues.name"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'COMMON.SEARCH_NAME' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th>
@@ -235,6 +238,7 @@
                   [(ngModel)]="filterValues.description"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'COMMON.SEARCH_DESCRIPTION' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th>
@@ -249,6 +253,7 @@
                   [autoDisplayFirst]="false"
                   appendTo="body"
                   (onChangeEvent)="onFilterChange()"
+                  icon="pi-circle-fill"
                 ></app-custom-dropdown>
               </th>
               <th>
@@ -420,6 +425,7 @@
           [rows]="3"
           [maxLength]="500"
           [required]="true"
+          icon="pi-info-circle"
         ></app-custom-input>
         <small class="char-count">{{ deleteJustification.length }}/500</small>
       </div>

@@ -57,6 +57,7 @@
               [autoDisplayFirst]="false"
               [placeholder]="'COMMON.SELECT_ORGANISATION' | translate"
               (onChangeEvent)="onOrganisationChange()"
+              icon="pi-building"
             ></app-custom-dropdown>
           </div>
 
@@ -72,6 +73,7 @@
               [autoDisplayFirst]="false"
               [placeholder]="'AUDIT.ALL_MODULES' | translate"
               (onChangeEvent)="onFilterChange()"
+              icon="pi-box"
             ></app-custom-dropdown>
           </div>
         </div>
@@ -194,6 +196,7 @@
                   [(ngModel)]="filterValues.entityName"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'AUDIT.SEARCH_NAME' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th>
@@ -201,6 +204,7 @@
                   [(ngModel)]="filterValues.username"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'AUDIT.SEARCH_USER' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th>
@@ -214,6 +218,7 @@
                   [placeholder]="'COMMON.ALL' | translate"
                   appendTo="body"
                   (onChangeEvent)="onFilterChange()"
+                  icon="pi-cog"
                 ></app-custom-dropdown>
               </th>
               <th><!-- Version — no filter --></th>
@@ -228,6 +233,7 @@
                   [placeholder]="'COMMON.ALL' | translate"
                   appendTo="body"
                   (onChangeEvent)="onFilterChange()"
+                  icon="pi-circle-fill"
                 ></app-custom-dropdown>
               </th>
               <th>
@@ -244,6 +250,7 @@
                   [(ngModel)]="filterValues.ipAddress"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'AUDIT.SEARCH_IP' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th>
@@ -251,6 +258,7 @@
                   [(ngModel)]="filterValues.justification"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'AUDIT.SEARCH_NAME' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
             </tr>

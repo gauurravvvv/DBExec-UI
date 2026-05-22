@@ -35,10 +35,12 @@
       margin-right: 4px;
     }
 
-    // Dropdown Field
+    // Dropdown Field — fixed width so the trigger doesn't grow/shrink
+    // between short and long selected values. The earlier min:250/max:300
+    // pair produced a visible 50px jitter; one `width` locks both ends.
     .dropdown-field {
-      min-width: 250px;
-      max-width: 300px;
+      flex: 0 0 280px;
+      width: 280px;
 
       .p-float-label {
         width: 100%;

@@ -46,6 +46,7 @@
             !!(rlsForm.get('name')?.invalid && rlsForm.get('name')?.touched)
           "
           [errorMessage]="getNameError()"
+          icon="pi-id-card"
         >
         </app-custom-input>
 
@@ -53,6 +54,7 @@
           formControlName="description"
           [label]="'COMMON.DESCRIPTION' | translate"
           [placeholder]="'COMMON.ENTER_DESCRIPTION' | translate"
+          icon="pi-align-left"
         >
         </app-custom-input>
 
@@ -62,6 +64,7 @@
           [ngModelOptions]="{ standalone: true }"
           [label]="'COMMON.ORGANISATION' | translate"
           [inputDisabled]="true"
+          icon="pi-building"
         ></app-custom-input>
         <input type="hidden" formControlName="organisation" />
 
@@ -115,6 +118,7 @@
                   "
                   [errorMessage]="'RLS.COLUMN_REQUIRED' | translate"
                   (onChangeEvent)="onColumnChange(i, $event)"
+                  icon="pi-id-card"
                 ></app-custom-dropdown>
                 <app-custom-dropdown
                   formControlName="operator"
@@ -123,6 +127,7 @@
                   optionValue="value"
                   [autoDisplayFirst]="false"
                   [required]="true"
+                  icon="pi-filter"
                 ></app-custom-dropdown>
                 <button
                   type="button"
@@ -158,6 +163,7 @@
                     )
                   "
                   [errorMessage]="'RLS.VALUES_REQUIRED' | translate"
+                  icon="pi-tag"
                 ></app-custom-multiselect>
               </div>
             </div>
@@ -196,6 +202,7 @@
           [rows]="3"
           [maxLength]="500"
           [required]="true"
+          icon="pi-info-circle"
         ></app-custom-input>
         <small class="char-count">{{ saveJustification.length }}/500</small>
       </div>

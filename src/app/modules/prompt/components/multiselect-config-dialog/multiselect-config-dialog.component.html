@@ -27,6 +27,7 @@
             [placeholder]="
               'PROMPT_MODULE.PLACEHOLDER_OPTIONS_EXAMPLE' | translate
             "
+            icon="pi-pencil"
           >
           </app-custom-input>
         </div>
@@ -54,6 +55,7 @@
             [label]="'PROMPT_MODULE.MAX_LABELS_BEFORE_COUNT' | translate"
             placeholder="3"
             type="number"
+            icon="pi-hashtag"
           >
           </app-custom-input>
           <small class="hint">{{
@@ -66,6 +68,7 @@
             [(ngModel)]="config.selectedItemsLabel"
             [label]="'PROMPT_MODULE.SELECTED_ITEMS_LABEL' | translate"
             [placeholder]="'{0} items selected'"
+            icon="pi-tag"
           >
           </app-custom-input>
           <small class="hint"
@@ -113,6 +116,7 @@
             [label]="'PROMPT_MODULE.SELECTION_LIMIT' | translate"
             placeholder="5"
             type="number"
+            icon="pi-hashtag"
           >
           </app-custom-input>
         </div>
@@ -170,6 +174,7 @@
             [(ngModel)]="config.emptyMessage"
             [label]="'PROMPT_MODULE.EMPTY_MESSAGE' | translate"
             [placeholder]="'PROMPT_MODULE.EMPTY_MESSAGE_EXAMPLE' | translate"
+            icon="pi-comment"
           >
           </app-custom-input>
         </div>
@@ -179,6 +184,7 @@
             [(ngModel)]="config.emptyFilterMessage"
             [label]="'PROMPT_MODULE.EMPTY_FILTER_MESSAGE' | translate"
             [placeholder]="'PROMPT_MODULE.EMPTY_MESSAGE_EXAMPLE' | translate"
+            icon="pi-comment"
           >
           </app-custom-input>
         </div>
@@ -202,6 +208,7 @@
             [label]="'PROMPT_MODULE.ITEM_HEIGHT' | translate"
             placeholder="38"
             type="number"
+            icon="pi-hashtag"
           >
           </app-custom-input>
         </div>
@@ -246,6 +253,7 @@
             optionLabel="label"
             optionValue="value"
             appendTo="body"
+            icon="pi-tag"
           >
           </app-custom-multiselect>
         </ng-container>

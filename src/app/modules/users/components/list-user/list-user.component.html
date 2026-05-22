@@ -67,6 +67,7 @@
               [floatingLabel]="true"
               filterBy="name"
               (onChangeEvent)="onOrgChange($event)"
+              icon="pi-building"
             >
             </app-custom-dropdown>
           </div>
@@ -341,6 +342,7 @@
                   [(ngModel)]="filterValues.username"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'COMMON.SEARCH_USERNAME' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th>
@@ -348,6 +350,7 @@
                   [(ngModel)]="filterValues.firstName"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'COMMON.SEARCH_FIRST_NAME' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th>
@@ -355,6 +358,7 @@
                   [(ngModel)]="filterValues.lastName"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'COMMON.SEARCH_LAST_NAME' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th>
@@ -362,6 +366,7 @@
                   [(ngModel)]="filterValues.email"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'COMMON.SEARCH_EMAIL' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th>
@@ -381,6 +386,7 @@
                   [autoDisplayFirst]="false"
                   appendTo="body"
                   (onChangeEvent)="onGroupChange($event)"
+                  icon="pi-users"
                 ></app-custom-dropdown>
               </th>
               <th>
@@ -395,6 +401,7 @@
                   [autoDisplayFirst]="false"
                   appendTo="body"
                   (onChangeEvent)="onFilterChange()"
+                  icon="pi-circle-fill"
                 ></app-custom-dropdown>
               </th>
               <th>

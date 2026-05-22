@@ -48,6 +48,7 @@
               [floatingLabel]="true"
               filterBy="name"
               (onChangeEvent)="onOrgChange($event)"
+              icon="pi-building"
             >
             </app-custom-dropdown>
           </div>
@@ -70,6 +71,7 @@
               [autoDisplayFirst]="false"
               [placeholder]="'COMMON.SELECT_DATASOURCE' | translate"
               (onChangeEvent)="onDatasourceChange($event)"
+              icon="pi-database"
             >
             </app-custom-dropdown>
           </div>
@@ -120,6 +122,7 @@
                   [(ngModel)]="filterValues.name"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'COMMON.SEARCH_NAME' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th>
@@ -127,6 +130,7 @@
                   [(ngModel)]="filterValues.datasetName"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'RLS.SEARCH_DATASET' | translate"
+                  icon="pi-search"
                 ></app-custom-input>
               </th>
               <th>
@@ -144,6 +148,7 @@
                   [autoDisplayFirst]="false"
                   appendTo="body"
                   (onChangeEvent)="onFilterChange()"
+                  icon="pi-circle-fill"
                 ></app-custom-dropdown>
               </th>
               <th>

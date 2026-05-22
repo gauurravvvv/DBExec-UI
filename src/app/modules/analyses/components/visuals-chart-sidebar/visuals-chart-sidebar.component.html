@@ -90,9 +90,7 @@
            Drives every chart-type uniformly from getRoleSlots() which
            reads CHART_ROLES in charts.constants. New role types only
            need a label entry in ROLE_LABELS to surface here. -->
-      <ng-container
-        *ngFor="let slot of getRoleSlots(); trackBy: trackByIndex"
-      >
+      <ng-container *ngFor="let slot of getRoleSlots(); trackBy: trackByIndex">
         <!-- Scalar (single-column) role -->
         <ng-container *ngIf="!slot.multi">
           <div
@@ -105,7 +103,10 @@
             <div class="axis-label">
               {{ slot.label }}{{ slot.required ? '' : ' (optional)' }}
             </div>
-            <div class="axis-value" *ngIf="asScalar(getRoleValue(slot.key)) as col">
+            <div
+              class="axis-value"
+              *ngIf="asScalar(getRoleValue(slot.key)) as col"
+            >
               <span>{{ getFieldDisplayName(col) }}</span>
               <i
                 class="pi pi-times clear-btn"

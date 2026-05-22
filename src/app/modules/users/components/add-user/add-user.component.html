@@ -76,7 +76,7 @@
           formControlName="username"
           [label]="'COMMON.USERNAME' | translate"
           [placeholder]="'COMMON.ENTER_USERNAME' | translate"
-          icon="pi-user-edit"
+          icon="pi-user"
           [required]="true"
           [showError]="
             !!(
@@ -133,6 +133,7 @@
           "
           [errorMessage]="'USER.ORGANISATION_REQUIRED' | translate"
           (onChangeEvent)="onOrganisationChange($event)"
+          icon="pi-building"
         >
         </app-custom-dropdown>
 
@@ -155,6 +156,7 @@
             display="chip"
             [filter]="true"
             appendTo="body"
+            icon="pi-users"
           ></app-custom-multiselect>
           <small
             class="error-text"
@@ -182,6 +184,7 @@
             [filter]="false"
             [required]="true"
             appendTo="body"
+            icon="pi-globe"
           ></app-custom-dropdown>
         </div>
       </div>
