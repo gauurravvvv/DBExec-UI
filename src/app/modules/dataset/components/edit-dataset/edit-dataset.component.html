@@ -227,7 +227,7 @@
                 ></i>
                 <i class="pi pi-folder"></i>
                 <span class="schema-name">{{ schema.name }}</span>
-                <span class="table-count"
+                <span class="table-count" *ngIf="schema.tables?.length > 0"
                   >{{ schema.tables.length }}
                   {{ 'DATASET.TABLES' | translate }}</span
                 >
@@ -280,7 +280,7 @@
                     ></i>
                     <i class="pi pi-table"></i>
                     <span class="table-name">{{ table.name }}</span>
-                    <span class="column-count"
+                    <span class="column-count" *ngIf="table.columns?.length > 0"
                       >{{ table.columns.length }}
                       {{ 'DATASET.COLS' | translate }}</span
                     >

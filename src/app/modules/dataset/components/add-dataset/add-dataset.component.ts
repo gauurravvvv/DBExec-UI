@@ -1695,15 +1695,16 @@ export class AddDatasetComponent
     if (!this.selectedOrg?.id) return;
     const orgId = String(this.selectedOrg.id);
     const dbIdStr = String(dbId);
-    const schema = this.datasourceSchemas[dbId]?.schemas?.find(
-      s => s.name === schemaName,
-    ) as any;
-    // schema.tables.length > 0 means we already have the rows; the
-    // store's per-schema `tablesStatus` is the source of truth but
-    // the in-memory copy is fine as a quick guard. Network is the
-    // expensive part; double-checking against the store costs us
-    // one selector subscribe per click, not worth it here.
-    if (schema && Array.isArray(schema.tables) && schema.tables.length > 0) {
+    const tree = this.datasourceSchemas[dbId];
+    const existing = tree?.schemas?.find(s => s.name === schemaName) as any;
+    // Already-loaded guard: if we have tables, skip the fetch.
+    // Network is the expensive part — checking against the in-memory
+    // copy is cheaper than subscribing to the store.
+    if (
+      existing &&
+      Array.isArray(existing.tables) &&
+      existing.tables.length > 0
+    ) {
       return;
     }
 
@@ -1722,16 +1723,18 @@ export class AddDatasetComponent
         schemaName,
       })
       .then((response: any) => {
-        const tables = SchemaTransformerHelper.transformLazyTablesResponse(
-          response,
-        );
-        // Mirror tables into the in-memory tree the sidebar reads
-        // from so the UI updates without a store re-subscribe.
-        if (schema) {
-          schema.tables = tables;
-          this.datasources = Object.values(this.datasourceSchemas);
-          this.monacoIntelliSenseService.setDatasources(this.datasources);
-        }
+        const tables =
+          SchemaTransformerHelper.transformLazyTablesResponse(response);
+        // OnPush + pure pipes mean we MUST swap references at every
+        // level — mutating `schema.tables = newArr` works for the
+        // direct property but the parent schemas array reference
+        // stays the same, so the *ngFor + filterSchemas pipe both
+        // see a cached input and don't re-render. Rebuild the chain.
+        this.replaceSchemaNode(dbId, schemaName, prev => ({
+          ...prev,
+          tables,
+        }));
+
         this.store.dispatch(
           AddDatasetActions.loadTablesForSchemaSuccess({
             orgId,
@@ -1755,6 +1758,55 @@ export class AddDatasetComponent
         );
         this.cdr.markForCheck();
       });
+  }
+
+  /**
+   * Immutably replace one schema row inside the cached tree. Rebuilds
+   * the schemas array reference, the parent tree reference, and
+   * `this.datasourceSchemas` itself so every reference Angular's
+   * change-detector inspects (and every input the pure filterSchemas
+   * / filterTables pipes cache against) actually changes. Also
+   * refreshes the IntelliSense's mirrored copy so column hover /
+   * completion picks up the new tables.
+   */
+  private replaceSchemaNode(
+    dbId: string,
+    schemaName: string,
+    patch: (schema: any) => any,
+  ): void {
+    const tree = this.datasourceSchemas[dbId];
+    if (!tree) return;
+    const idx = tree.schemas?.findIndex((s: any) => s.name === schemaName) ?? -1;
+    if (idx < 0) return;
+    const nextSchemas = tree.schemas.slice();
+    nextSchemas[idx] = patch(tree.schemas[idx]);
+    const nextTree = { ...tree, schemas: nextSchemas };
+    this.datasourceSchemas = {
+      ...this.datasourceSchemas,
+      [dbId]: nextTree,
+    };
+    this.datasources = Object.values(this.datasourceSchemas);
+    this.monacoIntelliSenseService.setDatasources(this.datasources);
+  }
+
+  /**
+   * Same idea as replaceSchemaNode but one level deeper — replaces
+   * one table row inside the matching schema.
+   */
+  private replaceTableNode(
+    dbId: string,
+    schemaName: string,
+    tableName: string,
+    patch: (table: any) => any,
+  ): void {
+    this.replaceSchemaNode(dbId, schemaName, schema => {
+      const idx =
+        schema.tables?.findIndex((t: any) => t.name === tableName) ?? -1;
+      if (idx < 0) return schema;
+      const nextTables = schema.tables.slice();
+      nextTables[idx] = patch(schema.tables[idx]);
+      return { ...schema, tables: nextTables };
+    });
   }
 
   /**
@@ -1795,11 +1847,12 @@ export class AddDatasetComponent
       .then((response: any) => {
         const columns =
           SchemaTransformerHelper.transformLazyColumnsResponse(response);
-        if (table) {
-          table.columns = columns;
-          this.datasources = Object.values(this.datasourceSchemas);
-          this.monacoIntelliSenseService.setDatasources(this.datasources);
-        }
+        // Same immutable-rebuild rationale as ensureTablesLoaded — see
+        // replaceSchemaNode / replaceTableNode comments above.
+        this.replaceTableNode(dbId, schemaName, tableName, prev => ({
+          ...prev,
+          columns,
+        }));
         this.store.dispatch(
           AddDatasetActions.loadColumnsForTableSuccess({
             orgId,
