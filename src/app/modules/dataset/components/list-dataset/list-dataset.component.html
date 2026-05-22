@@ -512,9 +512,9 @@
       </button>
     </div>
     <div class="ds-picker-body">
-      <!-- Step 1: Datasource. Changing this resets the schema
-           selection below; the schema list re-fetches against the
-           new datasource. -->
+      <!-- Step 1: Datasource. Always visible. Changing this resets
+           the schema selection below and re-fetches the schema
+           list against the new datasource. -->
       <app-custom-dropdown
         [(ngModel)]="dsPickerSelected"
         [label]="'COMMON.DATASOURCE' | translate"
@@ -533,71 +533,81 @@
       >
       </app-custom-dropdown>
 
-      <!-- Step 2 (optional): Schema. Only renders once a datasource
-           is selected. Leaving this empty is supported — the
-           editor will open against the whole datasource if no
-           schema is chosen. While loading, shows a spinner row; if
-           the call fails an inline error explains why. -->
-      <ng-container *ngIf="dsPickerSelected">
-        <div
-          class="ds-picker-schema-status"
-          *ngIf="schemaPickerLoading"
+      <!-- Step 2 (optional): Schema. Always rendered so the user
+           sees both fields up front. Disabled until a datasource
+           is picked. Once enabled, populates with that datasource's
+           schemas (re-fetches whenever the datasource changes).
+           Leaving this empty is supported — the editor will open
+           against the whole datasource if no schema is chosen. -->
+      <div class="ds-picker-schema-row">
+        <app-custom-dropdown
+          class="ds-picker-schema-dropdown"
+          [(ngModel)]="schemaPickerSelected"
+          [label]="('DATASET.SCHEMA' | translate) + ' (' + ('COMMON.OPTIONAL' | translate) + ')'"
+          [floatingLabel]="true"
+          [options]="schemaPickerOptions || []"
+          optionLabel="name"
+          [optionValue]="null"
+          [filter]="true"
+          filterBy="name"
+          icon="pi-sitemap"
+          [disabled]="!dsPickerSelected || schemaPickerLoading"
         >
-          <i class="pi pi-spin pi-spinner"></i>
-          <span>{{ 'DATASET.LOADING_SCHEMA' | translate }}</span>
-        </div>
+        </app-custom-dropdown>
+        <!-- Quick clear so the user can wipe a stray selection
+             without re-typing into the filter. Only when there's
+             something to clear. -->
+        <button
+          *ngIf="schemaPickerSelected"
+          type="button"
+          class="ds-picker-schema-clear"
+          (click)="schemaPickerSelected = null"
+          [attr.aria-label]="'COMMON.CLEAR' | translate"
+          [title]="'COMMON.CLEAR' | translate"
+        >
+          <i class="pi pi-times-circle" aria-hidden="true"></i>
+        </button>
+      </div>
 
-        <div
-          class="ds-picker-schema-row"
-          *ngIf="!schemaPickerLoading && schemaPickerOptions"
-        >
-          <app-custom-dropdown
-            class="ds-picker-schema-dropdown"
-            [(ngModel)]="schemaPickerSelected"
-            [label]="('DATASET.SCHEMA' | translate) + ' (' + ('COMMON.OPTIONAL' | translate) + ')'"
-            [floatingLabel]="true"
-            [options]="schemaPickerOptions"
-            optionLabel="name"
-            [optionValue]="null"
-            [filter]="true"
-            filterBy="name"
-            icon="pi-sitemap"
-          >
-          </app-custom-dropdown>
-          <!-- Quick clear so the user can wipe a stray selection
-               without re-typing into the filter. Only renders when
-               there's something to clear. -->
-          <button
-            *ngIf="schemaPickerSelected"
-            type="button"
-            class="ds-picker-schema-clear"
-            (click)="schemaPickerSelected = null"
-            [attr.aria-label]="'COMMON.CLEAR' | translate"
-            [title]="'COMMON.CLEAR' | translate"
-          >
-            <i class="pi pi-times-circle" aria-hidden="true"></i>
-          </button>
-        </div>
+      <!-- Inline status below the schema row. Three mutually-
+           exclusive states: idle (nothing picked yet), loading,
+           or error. Reserves vertical space so the dialog height
+           stays stable across transitions. -->
+      <div
+        class="ds-picker-schema-status"
+        *ngIf="!dsPickerSelected"
+      >
+        <i class="pi pi-info-circle"></i>
+        <span>{{ 'DATASET.SCHEMA_PICK_DATASOURCE_FIRST' | translate }}</span>
+      </div>
 
-        <div
-          class="ds-picker-schema-error"
-          *ngIf="schemaPickerError && !schemaPickerLoading"
-        >
-          <i class="pi pi-exclamation-triangle"></i>
-          <span>{{ schemaPickerError }}</span>
-        </div>
+      <div
+        class="ds-picker-schema-status"
+        *ngIf="dsPickerSelected && schemaPickerLoading"
+      >
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>{{ 'DATASET.LOADING_SCHEMA' | translate }}</span>
+      </div>
 
-        <p
-          class="ds-picker-hint"
-          *ngIf="
-            !schemaPickerLoading &&
-            !schemaPickerError &&
-            schemaPickerOptions?.length
-          "
-        >
-          {{ 'DATASET.SCHEMA_PICKER_HINT_OPTIONAL' | translate }}
-        </p>
-      </ng-container>
+      <div
+        class="ds-picker-schema-error"
+        *ngIf="dsPickerSelected && schemaPickerError && !schemaPickerLoading"
+      >
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>{{ schemaPickerError }}</span>
+      </div>
+
+      <p
+        class="ds-picker-hint"
+        *ngIf="
+          dsPickerSelected &&
+          !schemaPickerLoading &&
+          !schemaPickerError &&
+          schemaPickerOptions?.length
+        "
+      >
+        {{ 'DATASET.SCHEMA_PICKER_HINT_OPTIONAL' | translate }}
+      </p>
     </div>
     <div class="ds-picker-footer">
       <button

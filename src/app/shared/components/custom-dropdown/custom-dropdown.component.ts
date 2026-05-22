@@ -74,6 +74,19 @@ export class CustomDropdownComponent
   @Input() filter = true;
   @Input() filterBy = '';
   @Input() filterPlaceholder = '';
+  /**
+   * Template-driven disabled control. The CVA path
+   * (`setDisabledState`) still works for reactive forms; this `@Input`
+   * lets template-only callers gate the dropdown via `[disabled]=…`
+   * without wiring a FormControl. The setter routes through the
+   * same internal field both surfaces read from.
+   */
+  @Input() set disabled(value: boolean) {
+    this._disabled = !!value;
+  }
+  get disabled(): boolean {
+    return this._disabled;
+  }
   @Input() filterMatchMode:
     | 'contains'
     | 'startsWith'
@@ -207,7 +220,12 @@ export class CustomDropdownComponent
   @Output() onChangeEvent = new EventEmitter<any>();
 
   value: any = null;
-  disabled = false;
+  /**
+   * Backing field for both `@Input() disabled` and the
+   * ControlValueAccessor.setDisabledState() path. Single source of
+   * truth that the template's `[disabled]=disabled` reads from.
+   */
+  private _disabled = false;
   inputId = `dropdown-${Math.random().toString(36).substring(2, 11)}`;
 
   // Server-mode internal state
@@ -361,7 +379,7 @@ export class CustomDropdownComponent
   }
 
   setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    this._disabled = isDisabled;
   }
 
   onValueChange(value: any): void {

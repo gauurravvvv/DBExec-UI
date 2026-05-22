@@ -587,20 +587,36 @@ export class ListDatasetComponent implements OnInit {
   };
 
   /**
+   * Bumped on every datasource change in the popup. The schema
+   * fetcher captures the value at request time and discards its
+   * response if the token has changed — guards against the user
+   * picking datasource A, then quickly switching to B; A's
+   * response (in-flight) would otherwise overwrite B's state.
+   */
+  private dsPickerSchemaToken = 0;
+
+  /**
    * Fires when the datasource dropdown changes. Reset the schema
-   * selection and re-fetch the schema list for the new datasource.
-   * Skips the call if the user cleared the dropdown.
+   * selection / options / error, bump the staleness token, and
+   * re-fetch for the new datasource. Cleared selection (user wiped
+   * the dropdown) leaves the schema field disabled with no fetch.
    */
   onDsPickerDatasourceChange(): void {
+    this.dsPickerSchemaToken++;
     this.schemaPickerSelected = null;
     this.schemaPickerOptions = null;
     this.schemaPickerError = null;
+    this.schemaPickerLoading = false;
     const ds = this.dsPickerSelected;
-    if (!ds?.id || !this.selectedOrg) return;
+    if (!ds?.id || !this.selectedOrg) {
+      this.cdr.markForCheck();
+      return;
+    }
     this.loadSchemasForPicker(String(this.selectedOrg), String(ds.id));
   }
 
   private loadSchemasForPicker(orgId: string, datasourceId: string): void {
+    const token = this.dsPickerSchemaToken;
     this.schemaPickerLoading = true;
     this.schemaPickerOptions = null;
     this.schemaPickerError = null;
@@ -609,6 +625,9 @@ export class ListDatasetComponent implements OnInit {
     this.datasourceService
       .listDatasourceSchemas({ orgId, datasourceId })
       .then((res: any) => {
+        // Discard if the user switched datasources before we got
+        // here. The newer change handler has its own pending fetch.
+        if (token !== this.dsPickerSchemaToken) return;
         if (this.globalService.handleSuccessService(res, false)) {
           // BE returns [{ schema_name, tables: [] }] per
           // src/modules/datasources/controllers/schema/listSchema.ts.
@@ -631,6 +650,7 @@ export class ListDatasetComponent implements OnInit {
         this.cdr.markForCheck();
       })
       .catch((err: any) => {
+        if (token !== this.dsPickerSchemaToken) return;
         this.schemaPickerOptions = [];
         this.schemaPickerError =
           err?.message ||
