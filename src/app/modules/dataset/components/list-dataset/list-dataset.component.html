@@ -533,11 +533,11 @@
       >
       </app-custom-dropdown>
 
-      <!-- Step 2: Schema. Only renders once a datasource is
-           selected. While loading, shows a spinner row; if no
-           schemas come back, shows an inline error so the user
-           knows the BE call failed rather than guessing why
-           Continue is greyed. -->
+      <!-- Step 2 (optional): Schema. Only renders once a datasource
+           is selected. Leaving this empty is supported — the
+           editor will open against the whole datasource if no
+           schema is chosen. While loading, shows a spinner row; if
+           the call fails an inline error explains why. -->
       <ng-container *ngIf="dsPickerSelected">
         <div
           class="ds-picker-schema-status"
@@ -547,19 +547,37 @@
           <span>{{ 'DATASET.LOADING_SCHEMA' | translate }}</span>
         </div>
 
-        <app-custom-dropdown
+        <div
+          class="ds-picker-schema-row"
           *ngIf="!schemaPickerLoading && schemaPickerOptions"
-          [(ngModel)]="schemaPickerSelected"
-          [label]="'DATASET.SCHEMA' | translate"
-          [floatingLabel]="true"
-          [options]="schemaPickerOptions"
-          optionLabel="name"
-          [optionValue]="null"
-          [filter]="true"
-          filterBy="name"
-          icon="pi-sitemap"
         >
-        </app-custom-dropdown>
+          <app-custom-dropdown
+            class="ds-picker-schema-dropdown"
+            [(ngModel)]="schemaPickerSelected"
+            [label]="('DATASET.SCHEMA' | translate) + ' (' + ('COMMON.OPTIONAL' | translate) + ')'"
+            [floatingLabel]="true"
+            [options]="schemaPickerOptions"
+            optionLabel="name"
+            [optionValue]="null"
+            [filter]="true"
+            filterBy="name"
+            icon="pi-sitemap"
+          >
+          </app-custom-dropdown>
+          <!-- Quick clear so the user can wipe a stray selection
+               without re-typing into the filter. Only renders when
+               there's something to clear. -->
+          <button
+            *ngIf="schemaPickerSelected"
+            type="button"
+            class="ds-picker-schema-clear"
+            (click)="schemaPickerSelected = null"
+            [attr.aria-label]="'COMMON.CLEAR' | translate"
+            [title]="'COMMON.CLEAR' | translate"
+          >
+            <i class="pi pi-times-circle" aria-hidden="true"></i>
+          </button>
+        </div>
 
         <div
           class="ds-picker-schema-error"
@@ -577,7 +595,7 @@
             schemaPickerOptions?.length
           "
         >
-          {{ 'DATASET.SCHEMA_PICKER_HINT' | translate }}
+          {{ 'DATASET.SCHEMA_PICKER_HINT_OPTIONAL' | translate }}
         </p>
       </ng-container>
     </div>
@@ -592,7 +610,7 @@
       <button
         pButton
         class="p-button-primary"
-        [disabled]="!dsPickerSelected || !schemaPickerSelected"
+        [disabled]="!dsPickerSelected"
         (click)="onDsPickerContinue()"
       >
         {{ 'COMMON.CONTINUE' | translate }}

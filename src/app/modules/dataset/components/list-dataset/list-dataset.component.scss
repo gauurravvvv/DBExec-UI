@@ -1292,6 +1292,46 @@ td.empty-message-cell {
       display: block;
     }
 
+    // Wrapper for the schema dropdown + its inline clear button.
+    // Flex row so the clear button hugs the right edge without
+    // hijacking the dropdown's full-width layout.
+    .ds-picker-schema-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+
+      .ds-picker-schema-dropdown {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+
+      .ds-picker-schema-clear {
+        flex: 0 0 auto;
+        background: transparent;
+        border: none;
+        color: var(--text-color);
+        opacity: 0.55;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-xs);
+        transition: all var(--motion-fast, 0.15s) ease;
+
+        i {
+          font-size: 16px;
+        }
+
+        &:hover {
+          opacity: 1;
+          background: var(--hover-background);
+          color: var(--error-color, #c62828);
+        }
+      }
+    }
+
     // Spinner row shown while schemas load. Sits in the same vertical
     // slot the schema dropdown will occupy so the dialog doesn't
     // jump when the data resolves.

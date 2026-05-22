@@ -617,11 +617,10 @@ export class ListDatasetComponent implements OnInit {
           this.schemaPickerOptions = rows
             .map((r: any) => ({ name: r.schema_name }))
             .filter((s: any) => !!s.name);
-          if (this.schemaPickerOptions?.length === 1) {
-            // Single-schema datasources (common for org-internal apps)
-            // — auto-select so the user can just hit Continue.
-            this.schemaPickerSelected = this.schemaPickerOptions[0];
-          }
+          // Schema is optional — don't auto-select. If the user
+          // wants to scope to one schema they pick it; if they leave
+          // it blank Continue still works and the editor opens
+          // against the whole datasource.
         } else {
           this.schemaPickerOptions = [];
           this.schemaPickerError =
@@ -642,17 +641,24 @@ export class ListDatasetComponent implements OnInit {
   }
 
   /**
-   * Continue from the popup: route to /datasets/new with both the
-   * datasource and the schema baked into the query string. The add
-   * page filters its sidebar to that schema and uses it as the
-   * default for unqualified table references in the editor.
+   * Continue from the popup: route to /datasets/new with the picked
+   * datasource (mandatory) and the picked schema (optional).
+   *
+   * When a schema is supplied the add page hard-scopes its sidebar
+   * to that schema. When it isn't, the editor connects to the
+   * datasource at the root level and shows every schema the user
+   * has access to — same behaviour as before the schema selector
+   * existed. Continue is enabled the moment a datasource is chosen;
+   * schema is a "narrow the workspace" affordance, not a gate.
    */
   onDsPickerContinue(): void {
-    if (!this.dsPickerSelected?.id || !this.schemaPickerSelected?.name) return;
+    if (!this.dsPickerSelected?.id) return;
     const queryParams: any = {
       datasourceId: this.dsPickerSelected.id,
-      schema: this.schemaPickerSelected.name,
     };
+    if (this.schemaPickerSelected?.name) {
+      queryParams.schema = this.schemaPickerSelected.name;
+    }
     if (this.selectedOrg) queryParams.orgId = this.selectedOrg;
     this.showDsPickerPopup = false;
     this.router.navigate([DATASET.ADD], { queryParams });
