@@ -46,6 +46,8 @@
     "YES": "Sí",
     "NO": "No",
     "CANCEL": "Cancelar",
+    "EXPAND": "Expandir",
+    "COLLAPSE": "Contraer",
     "SAVE": "Guardar",
     "DELETE": "Eliminar",
     "DELETE_COUNT": "Eliminar ({{count}})",

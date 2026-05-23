@@ -111,6 +111,38 @@ export class AddDatasetComponent
     return !!types && Object.keys(types).length > 0;
   }
 
+  /**
+   * Tracks which JSON cells in the result grid the user has
+   * expanded. JSON cells render as a single-line summary by
+   * default so one fat document doesn't make every row in the
+   * grid 6em tall; clicking the expand chevron flips the cell
+   * into a pre-wrapped multi-line view. Key = `${rowIndex}-${col}`
+   * because column names alone aren't unique across rows.
+   * Cleared on each new query result (see executeQuery handlers).
+   */
+  expandedJsonCells = new Set<string>();
+
+  /** Stable key for the expanded-set above. */
+  jsonCellKey(rowIndex: number, col: string): string {
+    return `${rowIndex}-${col}`;
+  }
+
+  /** Toggle the expanded state for one JSON cell. The template
+   *  reads `expandedJsonCells.has(key)` to decide between the
+   *  summary line and the multi-line `<pre>`. */
+  toggleJsonCell(rowIndex: number, col: string): void {
+    const key = this.jsonCellKey(rowIndex, col);
+    if (this.expandedJsonCells.has(key)) {
+      this.expandedJsonCells.delete(key);
+    } else {
+      this.expandedJsonCells.add(key);
+    }
+    // Mutating the Set in place doesn't trip OnPush — re-assign
+    // so the @Input-style equality checks fire. (Cheap; Set
+    // construction over a tiny set is negligible.)
+    this.expandedJsonCells = new Set(this.expandedJsonCells);
+  }
+
   datasources: DatasourceSchema[] = [];
   currentQuery = '';
 
@@ -1618,6 +1650,11 @@ export class AddDatasetComponent
 
     this.isExecutingQuery = true;
     this.lastExecutedQuery = query;
+    // Stale JSON-cell expand state would point at the previous
+    // result's row indices; nuke it before the new rows arrive.
+    if (this.expandedJsonCells.size > 0) {
+      this.expandedJsonCells = new Set();
+    }
 
     const startTime = Date.now();
 

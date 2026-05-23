@@ -1645,14 +1645,60 @@
         font-variant-numeric: tabular-nums;
       }
 
-      // JSON-shape cells. Pre-wrap inside a capped pre so a fat
-      // document doesn't dominate the grid; the column header
-      // search filter still works against the raw value.
+      // JSON-shape cells. Collapsed by default — the .json-summary
+      // span shows a one-liner with the value's shape. Clicking
+      // the chevron expands into the .json-cell <pre> with the
+      // full pretty-printed document.
+      .json-td {
+        // Cap the cell width so even an expanded JSON document
+        // can't push the column to fill the viewport. Horizontal
+        // scrolling inside the .json-cell handles longer lines.
+        max-width: 32em;
+      }
+
+      .json-toggle {
+        background: transparent;
+        border: 0;
+        padding: 2px 4px;
+        margin-right: var(--space-1, 4px);
+        color: var(--secondary-color);
+        cursor: pointer;
+        border-radius: var(--radius-xs, 3px);
+        vertical-align: middle;
+
+        &:hover {
+          color: var(--primary-color);
+          background: var(--hover-background, transparent);
+        }
+
+        i {
+          font-size: 10px;
+        }
+      }
+
+      .json-summary {
+        color: var(--text-color);
+        opacity: 0.85;
+        font-family: var(--font-mono, monospace);
+        font-size: var(--fs-label, 12px);
+        // Truncate gracefully if the user has named keys that
+        // somehow blow past our 3-key cap. Tooltip-on-hover is
+        // unavailable here because the value is a deliberately
+        // condensed summary, not the raw display.
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
+        max-width: calc(100% - 28px);
+        vertical-align: middle;
+      }
+
       .json-cell {
-        max-height: 6em;
+        display: block;
+        max-height: 14em;
         overflow: auto;
-        margin: 0;
-        padding: var(--space-1, 4px) var(--space-2, 8px);
+        margin: var(--space-1, 4px) 0 0;
+        padding: var(--space-2, 8px);
         font-family: var(--font-mono, monospace);
         font-size: var(--fs-label, 12px);
         white-space: pre;

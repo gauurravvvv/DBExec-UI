@@ -46,6 +46,8 @@
     "YES": "Yes",
     "NO": "No",
     "CANCEL": "Cancel",
+    "EXPAND": "Expand",
+    "COLLAPSE": "Collapse",
     "CONTINUE": "Continue",
     "OPTIONAL": "Optional",
     "SAVE": "Save",

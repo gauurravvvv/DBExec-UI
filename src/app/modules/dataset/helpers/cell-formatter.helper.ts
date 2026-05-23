@@ -42,13 +42,17 @@ export type CellKind =
 
 export interface FormattedCell {
   /** Pre-stringified display value. The template renders this as
-   *  text; no further coercion. */
+   *  text; no further coercion. For JSON cells this is the full
+   *  pretty-printed form. */
   display: string;
   /** Logical type for class hooks + alignment. */
   kind: CellKind;
   /** Used by the SCSS .numeric-cell class. Right-aligned only for
    *  number-shaped cells; everything else is left-aligned. */
   align: 'left' | 'right';
+  /** Compact one-line summary used by the popup for the collapsed
+   *  state of JSON cells. Empty string for non-JSON cells. */
+  summary?: string;
 }
 
 const ISO_LIKE_RE = /^\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)?$/;
@@ -114,6 +118,33 @@ function formatBufferValue(bufLike: any): string {
 const TRUNCATED_MARKER = '\n…(truncated)';
 
 /**
+ * Single-line summary for JSON-shaped cells. The full
+ * pretty-printed form lives in `display`; this collapsed form is
+ * what the grid shows by default so one fat document doesn't make
+ * every row in the grid 6em tall. Click-to-expand in the popup
+ * flips to the full `display`.
+ *
+ * Strategy: arrays render as `[N items]`; objects render as
+ * `{ key1, key2, key3, … }` showing up to 3 top-level keys; empty
+ * containers get explicit `[]` / `{}`. Keeps the user's eye on
+ * the *shape* of the value rather than truncating mid-string.
+ */
+function summariseJsonValue(value: unknown): string {
+  if (Array.isArray(value)) {
+    return value.length === 0 ? '[]' : `[${value.length} items]`;
+  }
+  if (value && typeof value === 'object') {
+    const keys = Object.keys(value as Record<string, unknown>);
+    if (keys.length === 0) return '{}';
+    const shown = keys.slice(0, 3).join(', ');
+    return keys.length > 3
+      ? `{ ${shown}, … +${keys.length - 3} }`
+      : `{ ${shown} }`;
+  }
+  return String(value);
+}
+
+/**
  * Main entry point. `type` is the BE-supplied column type hint
  * (e.g. 'bigint', 'integer', 'jsonb'). Optional — when absent we
  * infer from the value's JS type alone.
@@ -160,7 +191,10 @@ export function formatCellValue(value: unknown, type?: string): FormattedCell {
 
   // Plain object (typically pg's parsed JSONB / Snowflake VARIANT
   // returned as JS object). Pretty-print with a soft cap so a
-  // pathologically big document doesn't blow up the grid.
+  // pathologically big document doesn't blow up the grid. The
+  // `summary` field carries the shape-oriented one-liner the popup
+  // shows by default; the full `display` only renders when the
+  // user clicks to expand.
   if (typeof value === 'object') {
     let display: string;
     try {
@@ -171,7 +205,12 @@ export function formatCellValue(value: unknown, type?: string): FormattedCell {
     if (display.length > CELL_JSON_DISPLAY_CAP) {
       display = display.slice(0, CELL_JSON_DISPLAY_CAP) + TRUNCATED_MARKER;
     }
-    return { display, kind: 'json', align: 'left' };
+    return {
+      display,
+      kind: 'json',
+      align: 'left',
+      summary: summariseJsonValue(value),
+    };
   }
 
   // String: drivers return BIGINT / NUMBER / DECIMAL as string to

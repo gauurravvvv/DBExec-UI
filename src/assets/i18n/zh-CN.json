@@ -46,6 +46,8 @@
     "YES": "是",
     "NO": "否",
     "CANCEL": "取消",
+    "EXPAND": "展开",
+    "COLLAPSE": "折叠",
     "SAVE": "保存",
     "DELETE": "删除",
     "DELETE_COUNT": "删除 ({{count}})",

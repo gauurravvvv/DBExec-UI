@@ -46,6 +46,8 @@
     "YES": "Ja",
     "NO": "Nein",
     "CANCEL": "Abbrechen",
+    "EXPAND": "Erweitern",
+    "COLLAPSE": "Einklappen",
     "SAVE": "Speichern",
     "DELETE": "Löschen",
     "DELETE_COUNT": "Löschen ({{count}})",

@@ -46,6 +46,8 @@
     "YES": "예",
     "NO": "아니요",
     "CANCEL": "취소",
+    "EXPAND": "펼치기",
+    "COLLAPSE": "접기",
     "SAVE": "저장",
     "DELETE": "삭제",
     "DELETE_COUNT": "삭제 ({{count}})",

@@ -805,35 +805,70 @@
                   - NULL gets the muted, italicised placeholder via
                     the .null-value class + the translated copy.
               -->
+              <!--
+                One pipe invocation per cell via `*ngIf as`: the
+                pipe runs once and the resulting object is reused
+                for the class binding, the (suppressed-for-JSON)
+                title, and the inner switch. The previous version
+                ran the pipe four times per cell — fine perf-wise
+                with a pure pipe, ugly to read.
+
+                JSON cells render the compact `summary` by default
+                (e.g. `{ id, name, +3 }`) so a fat document doesn't
+                make every row in the grid 6em tall. Clicking the
+                row expands it to the full pretty-printed form.
+              -->
               <ng-container
                 *ngFor="let col of queryResult.columns; trackBy: trackByIndex"
               >
-                <td
-                  [ngClass]="
-                    'cell-' +
-                    (row[col] | cellFormat: queryResult.columnTypes?.[col]).kind
-                  "
-                  [class.numeric-cell]="
-                    (row[col] | cellFormat: queryResult.columnTypes?.[col]).align === 'right'
-                  "
-                  [title]="
-                    (row[col] | cellFormat: queryResult.columnTypes?.[col]).display
-                  "
+                <ng-container
+                  *ngIf="(row[col] | cellFormat: queryResult.columnTypes?.[col]) as cell"
                 >
-                  <ng-container
-                    *ngIf="(row[col] | cellFormat: queryResult.columnTypes?.[col]) as cell"
+                  <td
+                    [class.numeric-cell]="cell.align === 'right'"
+                    [class.json-td]="cell.kind === 'json'"
+                    [ngSwitch]="cell.kind"
                   >
-                    <span *ngIf="cell.kind === 'null'" class="null-value">
-                      {{ 'DATASET.CELL_NULL' | translate }}
-                    </span>
-                    <pre *ngIf="cell.kind === 'json'" class="json-cell">{{
-                      cell.display
-                    }}</pre>
-                    <span *ngIf="cell.kind !== 'null' && cell.kind !== 'json'">
-                      {{ cell.display }}
-                    </span>
-                  </ng-container>
-                </td>
+                    <span
+                      *ngSwitchCase="'null'"
+                      class="null-value"
+                      >{{ 'DATASET.CELL_NULL' | translate }}</span
+                    >
+
+                    <ng-container *ngSwitchCase="'json'">
+                      <ng-container
+                        *ngIf="expandedJsonCells.has(jsonCellKey(rowIndex, col)); else jsonSummary"
+                      >
+                        <button
+                          type="button"
+                          class="json-toggle expanded"
+                          (click)="toggleJsonCell(rowIndex, col)"
+                          [attr.aria-label]="'COMMON.COLLAPSE' | translate"
+                        >
+                          <i class="pi pi-chevron-down"></i>
+                        </button>
+                        <pre class="json-cell">{{ cell.display }}</pre>
+                      </ng-container>
+                      <ng-template #jsonSummary>
+                        <button
+                          type="button"
+                          class="json-toggle"
+                          (click)="toggleJsonCell(rowIndex, col)"
+                          [attr.aria-label]="'COMMON.EXPAND' | translate"
+                        >
+                          <i class="pi pi-chevron-right"></i>
+                        </button>
+                        <span class="json-summary">{{ cell.summary }}</span>
+                      </ng-template>
+                    </ng-container>
+
+                    <span
+                      *ngSwitchDefault
+                      [title]="cell.display"
+                      >{{ cell.display }}</span
+                    >
+                  </td>
+                </ng-container>
               </ng-container>
             </tr>
           </ng-template>

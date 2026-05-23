@@ -46,6 +46,8 @@
     "YES": "はい",
     "NO": "いいえ",
     "CANCEL": "キャンセル",
+    "EXPAND": "展開",
+    "COLLAPSE": "折りたたむ",
     "SAVE": "保存",
     "DELETE": "削除",
     "DELETE_COUNT": "削除 ({{count}})",
