@@ -746,7 +746,9 @@
     "SEARCH_DATASOURCES": "搜索数据源…",
     "NO_DATASOURCES": "未找到数据源",
     "SCHEMA": "Schema",
-    "EDITOR_DISABLED": "编辑器已禁用 — Schema 不可用。"
+    "EDITOR_DISABLED": "编辑器已禁用 — Schema 不可用。",
+    "CELL_NULL": "NULL",
+    "CELL_JSON_TRUNCATED": "(已截断)"
   },
   "ANALYSES": {
     "TITLE": "分析",

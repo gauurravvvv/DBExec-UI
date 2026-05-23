@@ -746,7 +746,9 @@
     "SEARCH_DATASOURCES": "데이터 소스 검색…",
     "NO_DATASOURCES": "데이터 소스를 찾을 수 없습니다",
     "SCHEMA": "스키마",
-    "EDITOR_DISABLED": "편집기가 비활성화됨 — 스키마를 사용할 수 없습니다."
+    "EDITOR_DISABLED": "편집기가 비활성화됨 — 스키마를 사용할 수 없습니다.",
+    "CELL_NULL": "NULL",
+    "CELL_JSON_TRUNCATED": "(잘림)"
   },
   "ANALYSES": {
     "TITLE": "분석",

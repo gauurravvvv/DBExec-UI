@@ -746,7 +746,9 @@
     "SEARCH_DATASOURCES": "Datenquellen suchen…",
     "NO_DATASOURCES": "Keine Datenquellen gefunden",
     "SCHEMA": "Schema",
-    "EDITOR_DISABLED": "Editor deaktiviert – Schema nicht verfügbar."
+    "EDITOR_DISABLED": "Editor deaktiviert – Schema nicht verfügbar.",
+    "CELL_NULL": "NULL",
+    "CELL_JSON_TRUNCATED": "(gekürzt)"
   },
   "ANALYSES": {
     "TITLE": "Analysen",

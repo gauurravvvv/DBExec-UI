@@ -746,7 +746,9 @@
     "SEARCH_DATASOURCES": "Rechercher des sources de données…",
     "NO_DATASOURCES": "Aucune source de données trouvée",
     "SCHEMA": "Schéma",
-    "EDITOR_DISABLED": "Éditeur désactivé — schéma indisponible."
+    "EDITOR_DISABLED": "Éditeur désactivé — schéma indisponible.",
+    "CELL_NULL": "NULL",
+    "CELL_JSON_TRUNCATED": "(tronqué)"
   },
   "ANALYSES": {
     "TITLE": "Analyses",

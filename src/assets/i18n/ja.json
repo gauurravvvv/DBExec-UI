@@ -746,7 +746,9 @@
     "SEARCH_DATASOURCES": "データソースを検索…",
     "NO_DATASOURCES": "データソースが見つかりません",
     "SCHEMA": "スキーマ",
-    "EDITOR_DISABLED": "エディタは無効です — スキーマを利用できません。"
+    "EDITOR_DISABLED": "エディタは無効です — スキーマを利用できません。",
+    "CELL_NULL": "NULL",
+    "CELL_JSON_TRUNCATED": "(省略されました)"
   },
   "ANALYSES": {
     "TITLE": "分析",

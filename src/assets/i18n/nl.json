@@ -746,7 +746,9 @@
     "SEARCH_DATASOURCES": "Gegevensbronnen zoeken…",
     "NO_DATASOURCES": "Geen gegevensbronnen gevonden",
     "SCHEMA": "Schema",
-    "EDITOR_DISABLED": "Editor uitgeschakeld — schema niet beschikbaar."
+    "EDITOR_DISABLED": "Editor uitgeschakeld — schema niet beschikbaar.",
+    "CELL_NULL": "NULL",
+    "CELL_JSON_TRUNCATED": "(afgekapt)"
   },
   "ANALYSES": {
     "TITLE": "Analyses",

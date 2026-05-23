@@ -665,6 +665,8 @@
     "SCHEMA_PICK_DATASOURCE_FIRST": "Pick a datasource above to choose a schema.",
     "SCHEMA_LAZY_MODE_HINT": "Large datasource — columns load when you expand a table.",
     "EDITOR_DISABLED": "Editor disabled — schema unavailable.",
+    "CELL_NULL": "NULL",
+    "CELL_JSON_TRUNCATED": "(truncated)",
     "ADD_FIELD": "Add Field",
     "ANALYSES": "Analyses",
     "BASIC_INFORMATION": "Basic Information",
