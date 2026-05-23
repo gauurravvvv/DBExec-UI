@@ -97,11 +97,22 @@
         >
         </app-custom-toggle>
 
+        <!-- Engine badge — same affordance as add-connection so the
+             editor knows at a glance which engine these creds are
+             for. Mounted just above the credentials block. -->
+        <div class="dbtype-badge" *ngIf="selectedDbType">
+          <i class="pi pi-database" aria-hidden="true"></i>
+          <span>
+            {{ 'CONNECTION.CREDENTIALS_FOR' | translate }}
+            <strong>{{ selectedDbTypeLabel }}</strong>
+          </span>
+        </div>
+
         <!-- DB Username -->
         <app-custom-input
           formControlName="dbUsername"
           [label]="'CONNECTION.DATASOURCE_USERNAME' | translate"
-          [placeholder]="'CONNECTION.ENTER_DATASOURCE_USERNAME' | translate"
+          [placeholder]="usernamePlaceholderKey | translate"
           icon="pi-user"
           [required]="true"
           [showError]="
@@ -118,7 +129,7 @@
         <app-custom-input
           formControlName="dbPassword"
           [label]="'CONNECTION.DATASOURCE_PASSWORD' | translate"
-          [placeholder]="'CONNECTION.ENTER_PASSWORD' | translate"
+          [placeholder]="passwordPlaceholderKey | translate"
           icon="pi-lock"
           [required]="true"
           [showPasswordToggle]="true"

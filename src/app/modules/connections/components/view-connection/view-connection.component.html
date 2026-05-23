@@ -89,6 +89,17 @@
                 <i class="pi pi-user mr-2"></i>
                 {{ connectionData.dbUsername }}
               </p>
+              <!-- Engine badge — surfaces the parent datasource's
+                   dbType so viewers know which engine these creds
+                   are for. Mounted on the username row because that's
+                   the most credential-adjacent info we display. -->
+              <div class="dbtype-badge" *ngIf="selectedDbType">
+                <i class="pi pi-database" aria-hidden="true"></i>
+                <span>
+                  {{ 'CONNECTION.CREDENTIALS_FOR' | translate }}
+                  <strong>{{ selectedDbTypeLabel }}</strong>
+                </span>
+              </div>
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.CREATED_ON' | translate }}</label>

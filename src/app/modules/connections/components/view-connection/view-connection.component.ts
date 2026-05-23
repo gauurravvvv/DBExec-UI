@@ -7,6 +7,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { CONNECTION } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { ConnectionService } from '../../services/connection.service';
 
 @Component({
@@ -22,11 +23,20 @@ export class ViewConnectionComponent implements OnInit {
   showDeleteConfirm = false;
   deleteJustification = '';
 
+  /**
+   * dbType of the parent datasource. Used to render the engine
+   * badge next to the dbUsername row so viewers can see at a
+   * glance which engine the credentials are for. Null until the
+   * lookup lands; badge stays hidden until then.
+   */
+  selectedDbType: string | null = null;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private globalService: GlobalService,
     private connectionService: ConnectionService,
+    private datasourceService: DatasourceService,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -41,8 +51,44 @@ export class ViewConnectionComponent implements OnInit {
     const data = this.connectionService.current();
     if (data) {
       this.connectionData = data;
+      // Fetch the parent datasource so the view can show the
+      // engine badge. Best-effort: a failure here just hides the
+      // badge — the rest of the view is unaffected.
+      const datasourceId = data.datasourceId;
+      if (datasourceId && this.orgId) {
+        this.datasourceService
+          .viewDatasource(this.orgId, datasourceId)
+          .then((res: any) => {
+            if (!this.globalService.handleSuccessService(res, false)) return;
+            this.selectedDbType = res?.data?.config?.dbType ?? null;
+            this.cdr.markForCheck();
+          })
+          .catch(() => {
+            this.selectedDbType = null;
+            this.cdr.markForCheck();
+          });
+      }
     }
     this.cdr.markForCheck();
+  }
+
+  /** Pretty-print map (same as add/edit). */
+  private static readonly DB_TYPE_LABELS: Record<string, string> = {
+    postgres: 'PostgreSQL',
+    mysql: 'MySQL',
+    mariadb: 'MariaDB',
+    mssql: 'Microsoft SQL Server',
+    oracle: 'Oracle',
+    snowflake: 'Snowflake',
+  };
+
+  get selectedDbTypeLabel(): string {
+    const t = (this.selectedDbType || '').toLowerCase();
+    if (!t) return '';
+    return (
+      ViewConnectionComponent.DB_TYPE_LABELS[t] ||
+      t.charAt(0).toUpperCase() + t.slice(1)
+    );
   }
 
   onEdit() {

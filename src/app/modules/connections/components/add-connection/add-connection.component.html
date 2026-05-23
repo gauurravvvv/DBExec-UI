@@ -114,14 +114,26 @@
           "
           [errorMessage]="'VALIDATION.DATASOURCE_REQUIRED' | translate"
           icon="pi-database"
+          (onChangeEvent)="onDatasourceChange()"
         >
         </app-custom-dropdown>
+
+        <!-- Engine badge — surfaces the parent datasource's dbType
+             so the user knows which engine they're entering creds
+             for. Stays out of the way until a datasource is picked. -->
+        <div class="dbtype-badge" *ngIf="selectedDbType">
+          <i class="pi pi-database" aria-hidden="true"></i>
+          <span>
+            {{ 'CONNECTION.CREDENTIALS_FOR' | translate }}
+            <strong>{{ selectedDbTypeLabel }}</strong>
+          </span>
+        </div>
 
         <!-- DB Username -->
         <app-custom-input
           formControlName="dbUsername"
           [label]="'CONNECTION.DATASOURCE_USERNAME' | translate"
-          [placeholder]="'CONNECTION.ENTER_DATASOURCE_USERNAME' | translate"
+          [placeholder]="usernamePlaceholderKey | translate"
           icon="pi-user"
           [required]="true"
           [showError]="
@@ -138,7 +150,7 @@
         <app-custom-input
           formControlName="dbPassword"
           [label]="'CONNECTION.DATASOURCE_PASSWORD' | translate"
-          [placeholder]="'CONNECTION.ENTER_PASSWORD' | translate"
+          [placeholder]="passwordPlaceholderKey | translate"
           icon="pi-lock"
           [required]="true"
           [showPasswordToggle]="true"
