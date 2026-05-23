@@ -750,7 +750,11 @@
     "SCHEMA": "スキーマ",
     "EDITOR_DISABLED": "エディタは無効です — スキーマを利用できません。",
     "CELL_NULL": "NULL",
-    "CELL_JSON_TRUNCATED": "(省略されました)"
+    "CELL_JSON_TRUNCATED": "(省略されました)",
+    "COPY_CELL": "セルをコピー",
+    "COPY_COLUMN": "列をコピー",
+    "COPIED": "クリップボードにコピーしました",
+    "COPY_FAILED": "クリップボードへのコピーに失敗しました"
   },
   "ANALYSES": {
     "TITLE": "分析",

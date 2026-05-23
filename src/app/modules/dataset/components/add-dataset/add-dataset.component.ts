@@ -46,7 +46,10 @@ import {
   QueryExecuteData,
   QueryResult,
 } from '../../helpers/dummy-data.helper';
-import { measureColumnWidths } from '../../helpers/cell-formatter.helper';
+import {
+  formatCellValue,
+  measureColumnWidths,
+} from '../../helpers/cell-formatter.helper';
 import { SchemaTransformerHelper } from '../../helpers/schema-transformer.helper';
 import {
   ContextMenuItem,
@@ -134,6 +137,32 @@ export class AddDatasetComponent
    * result sets.
    */
   columnWidths: Record<string, number> = {};
+
+  /**
+   * Cell-level right-click context menu state. Standard fare in
+   * every database GUI (DBeaver, DataGrip, pgAdmin, TablePlus) —
+   * users reach for it within seconds of trying to grab a value
+   * out of the grid.
+   *
+   * The menu offers two actions:
+   *   - Copy cell    — the displayed value of the right-clicked
+   *                    cell, via formatCellValue so what the user
+   *                    sees on screen is what lands on the clipboard
+   *                    (the BIGINT preserved as string, the ISO
+   *                    date, the JSON pretty-printed body).
+   *   - Copy column  — the displayed values for all rows on the
+   *                    current page, joined with newlines. Useful
+   *                    for "grab all the email addresses out of
+   *                    this query" workflows.
+   *
+   * Position is captured at click time; menu closes on any outside
+   * click (handled by the existing boundCloseContextMenu listener)
+   * or after a menu item is invoked.
+   */
+  showCellContextMenu = false;
+  cellContextMenuTop = 0;
+  cellContextMenuLeft = 0;
+  private cellContextTarget: { rowIndex: number; col: string } | null = null;
 
   /** Stable key for the expanded-set above. */
   jsonCellKey(rowIndex: number, col: string): string {
@@ -404,6 +433,12 @@ export class AddDatasetComponent
   }
 
   ngOnInit(): void {
+    // Restore the user's preferred result-grid page size so a
+    // returning user doesn't have to flip the dropdown from the
+    // default every time. localStorage may be unavailable in
+    // Safari private mode → fail silently.
+    this.loadPersistedPageSize();
+
     // Setup debounce for result filter changes
     this.resultFilterSubject
       .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
@@ -1648,7 +1683,13 @@ export class AddDatasetComponent
     if (!this.lastExecutedQuery) return;
 
     this.resultPage = page;
-    this.resultRows = limit;
+    if (this.resultRows !== limit) {
+      this.resultRows = limit;
+      // User changed page size — persist so the new choice
+      // survives reload. Page changes alone don't persist (those
+      // are session-scoped navigation, not preferences).
+      this.persistPageSize(limit);
+    }
 
     // Build filter object from non-empty filter values
     const filter: { [key: string]: string } = {};
@@ -1659,6 +1700,47 @@ export class AddDatasetComponent
     }
 
     this.executeQueryForDatasource(this.lastExecutedQuery, page, limit, filter);
+  }
+
+  /** localStorage key for the persisted page size. Namespaced to
+   *  avoid collisions with other features that may add their own
+   *  prefs later. */
+  private static readonly PAGE_SIZE_STORAGE_KEY =
+    'dbexec.queryResult.pageSize';
+  /** Whitelist of page-size values we accept from storage. Anything
+   *  outside this set (corruption, an old version with different
+   *  options) falls through to the default. */
+  private static readonly ALLOWED_PAGE_SIZES = [10, 25, 50, 100];
+
+  private loadPersistedPageSize(): void {
+    try {
+      const raw = localStorage.getItem(
+        AddDatasetComponent.PAGE_SIZE_STORAGE_KEY,
+      );
+      if (!raw) return;
+      const parsed = parseInt(raw, 10);
+      if (AddDatasetComponent.ALLOWED_PAGE_SIZES.includes(parsed)) {
+        this.resultRows = parsed;
+      }
+    } catch (_) {
+      // Safari private mode + a couple of locked-down enterprise
+      // configs throw on localStorage access. Treat as "no
+      // persisted value" and keep the default.
+    }
+  }
+
+  private persistPageSize(value: number): void {
+    if (!AddDatasetComponent.ALLOWED_PAGE_SIZES.includes(value)) return;
+    try {
+      localStorage.setItem(
+        AddDatasetComponent.PAGE_SIZE_STORAGE_KEY,
+        String(value),
+      );
+    } catch (_) {
+      // See loadPersistedPageSize — same defensive fallback. The
+      // user's session-level choice still works; only the
+      // cross-session persistence is lost.
+    }
   }
 
   private executeQueryForDatasource(
@@ -2360,6 +2442,104 @@ export class AddDatasetComponent
   closeContextMenu(): void {
     this.showContextMenu = false;
     this.contextMenuDatasource = null;
+    // Cell-level menu shares the global outside-click listener
+    // (see boundCloseContextMenu) so we close it from here too.
+    this.showCellContextMenu = false;
+    this.cellContextTarget = null;
+  }
+
+  /**
+   * Right-click on a result-grid cell. Stashes which cell was
+   * targeted and positions the menu under the cursor. Stops the
+   * event from bubbling so the document-level click handler that
+   * dismisses other menus doesn't fire on this open event.
+   */
+  onCellContextMenu(event: MouseEvent, rowIndex: number, col: string): void {
+    if (!this.queryResult) return;
+    event.preventDefault();
+    event.stopPropagation();
+    // Close any other menu first so we don't end up with two open.
+    this.showContextMenu = false;
+    this.cellContextTarget = { rowIndex, col };
+    this.cellContextMenuLeft = event.clientX;
+    this.cellContextMenuTop = event.clientY;
+    this.showCellContextMenu = true;
+  }
+
+  /**
+   * Copy the displayed value of the right-clicked cell to the
+   * clipboard. Uses formatCellValue so what gets copied matches
+   * what the user sees — BIGINT as the preserved string, dates
+   * in ISO 8601, JSON pretty-printed, NULL as the literal word
+   * "NULL". Skips the navigator.clipboard.writeText permission
+   * dance because the click handler runs inside a user gesture.
+   */
+  async copyCellValue(): Promise<void> {
+    if (!this.cellContextTarget || !this.queryResult) return;
+    const { rowIndex, col } = this.cellContextTarget;
+    const raw = this.queryResult.rows?.[rowIndex]?.[col];
+    const cell = formatCellValue(raw, this.queryResult.columnTypes?.[col]);
+    const text =
+      cell.kind === 'null'
+        ? this.translate.instant('DATASET.CELL_NULL')
+        : cell.display;
+    await this.writeToClipboard(text);
+    this.closeContextMenu();
+  }
+
+  /**
+   * Copy every value in the right-clicked column for the current
+   * page, joined with newlines. Common workflow: "grab all the
+   * email addresses out of this query result" — paste into a
+   * spreadsheet, done.
+   */
+  async copyColumnValues(): Promise<void> {
+    if (!this.cellContextTarget || !this.queryResult) return;
+    const { col } = this.cellContextTarget;
+    const lines = (this.queryResult.rows || []).map(row => {
+      const cell = formatCellValue(
+        row?.[col],
+        this.queryResult?.columnTypes?.[col],
+      );
+      return cell.kind === 'null' ? '' : cell.display;
+    });
+    await this.writeToClipboard(lines.join('\n'));
+    this.closeContextMenu();
+  }
+
+  /**
+   * Wrapper around navigator.clipboard.writeText that handles the
+   * "I'm in an insecure context" fallback (rare in this app since
+   * it ships HTTPS, but cheap to keep). Toasts the result either
+   * way so users know whether the action succeeded.
+   */
+  private async writeToClipboard(text: string): Promise<void> {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        // Fallback for non-secure contexts. Creates a hidden
+        // textarea, selects it, runs document.execCommand('copy').
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'absolute';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      // showInfo is the quiet toast — copy is a frequent action,
+      // a success-coloured banner would be obnoxious.
+      this.globalService.showInfo(this.translate.instant('DATASET.COPIED'));
+    } catch (_) {
+      // Clipboard write can throw on permission denial — surface
+      // the failure rather than silently swallowing.
+      this.globalService.showWarn(
+        this.translate.instant('DATASET.COPY_FAILED'),
+      );
+    }
   }
 
   refreshDatasourceFromContext(): void {

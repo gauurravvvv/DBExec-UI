@@ -750,7 +750,11 @@
     "SCHEMA": "스키마",
     "EDITOR_DISABLED": "편집기가 비활성화됨 — 스키마를 사용할 수 없습니다.",
     "CELL_NULL": "NULL",
-    "CELL_JSON_TRUNCATED": "(잘림)"
+    "CELL_JSON_TRUNCATED": "(잘림)",
+    "COPY_CELL": "셀 복사",
+    "COPY_COLUMN": "열 복사",
+    "COPIED": "클립보드에 복사됨",
+    "COPY_FAILED": "클립보드에 복사할 수 없습니다"
   },
   "ANALYSES": {
     "TITLE": "분석",

@@ -750,7 +750,11 @@
     "SCHEMA": "Schema",
     "EDITOR_DISABLED": "Editor desativado — esquema indisponível.",
     "CELL_NULL": "NULL",
-    "CELL_JSON_TRUNCATED": "(truncado)"
+    "CELL_JSON_TRUNCATED": "(truncado)",
+    "COPY_CELL": "Copiar célula",
+    "COPY_COLUMN": "Copiar coluna",
+    "COPIED": "Copiado para a área de transferência",
+    "COPY_FAILED": "Não foi possível copiar para a área de transferência"
   },
   "ANALYSES": {
     "TITLE": "Análises",

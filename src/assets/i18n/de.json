@@ -750,7 +750,11 @@
     "SCHEMA": "Schema",
     "EDITOR_DISABLED": "Editor deaktiviert – Schema nicht verfügbar.",
     "CELL_NULL": "NULL",
-    "CELL_JSON_TRUNCATED": "(gekürzt)"
+    "CELL_JSON_TRUNCATED": "(gekürzt)",
+    "COPY_CELL": "Zelle kopieren",
+    "COPY_COLUMN": "Spalte kopieren",
+    "COPIED": "In Zwischenablage kopiert",
+    "COPY_FAILED": "Kopieren in die Zwischenablage fehlgeschlagen"
   },
   "ANALYSES": {
     "TITLE": "Analysen",

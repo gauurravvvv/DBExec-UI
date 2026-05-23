@@ -848,6 +848,7 @@
                     [class.numeric-cell]="cell.align === 'right'"
                     [class.json-td]="cell.kind === 'json'"
                     [ngSwitch]="cell.kind"
+                    (contextmenu)="onCellContextMenu($event, rowIndex, col)"
                   >
                     <span
                       *ngSwitchCase="'null'"
@@ -906,6 +907,32 @@
         </p-table>
       </div>
     </div>
+  </div>
+
+  <!--
+    Cell-level right-click menu. Positioned absolutely inside the
+    overlay using clientX/clientY captured at right-click time.
+    Closed by:
+      - clicking any menu item (each command calls closeContextMenu)
+      - clicking outside (document-level boundCloseContextMenu)
+      - closing the popup (the *ngIf="showResultsPopup" parent
+        unmounts the whole subtree)
+  -->
+  <div
+    *ngIf="showCellContextMenu"
+    class="cell-context-menu"
+    [style.top.px]="cellContextMenuTop"
+    [style.left.px]="cellContextMenuLeft"
+    (click)="$event.stopPropagation()"
+  >
+    <button type="button" class="cell-context-item" (click)="copyCellValue()">
+      <i class="pi pi-copy" aria-hidden="true"></i>
+      <span>{{ 'DATASET.COPY_CELL' | translate }}</span>
+    </button>
+    <button type="button" class="cell-context-item" (click)="copyColumnValues()">
+      <i class="pi pi-clone" aria-hidden="true"></i>
+      <span>{{ 'DATASET.COPY_COLUMN' | translate }}</span>
+    </button>
   </div>
 </div>
 

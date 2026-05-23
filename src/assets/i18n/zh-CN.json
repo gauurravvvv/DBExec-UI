@@ -750,7 +750,11 @@
     "SCHEMA": "Schema",
     "EDITOR_DISABLED": "编辑器已禁用 — Schema 不可用。",
     "CELL_NULL": "NULL",
-    "CELL_JSON_TRUNCATED": "(已截断)"
+    "CELL_JSON_TRUNCATED": "(已截断)",
+    "COPY_CELL": "复制单元格",
+    "COPY_COLUMN": "复制列",
+    "COPIED": "已复制到剪贴板",
+    "COPY_FAILED": "无法复制到剪贴板"
   },
   "ANALYSES": {
     "TITLE": "分析",

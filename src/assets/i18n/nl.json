@@ -750,7 +750,11 @@
     "SCHEMA": "Schema",
     "EDITOR_DISABLED": "Editor uitgeschakeld — schema niet beschikbaar.",
     "CELL_NULL": "NULL",
-    "CELL_JSON_TRUNCATED": "(afgekapt)"
+    "CELL_JSON_TRUNCATED": "(afgekapt)",
+    "COPY_CELL": "Cel kopiëren",
+    "COPY_COLUMN": "Kolom kopiëren",
+    "COPIED": "Naar klembord gekopieerd",
+    "COPY_FAILED": "Kan niet naar klembord kopiëren"
   },
   "ANALYSES": {
     "TITLE": "Analyses",
