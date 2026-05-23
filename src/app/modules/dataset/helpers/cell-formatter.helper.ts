@@ -252,3 +252,139 @@ export function formatCellValue(value: unknown, type?: string): FormattedCell {
 
   return { display: String(value), kind: 'text', align: 'left' };
 }
+
+// ── Column-width measurement ────────────────────────────────────────
+//
+// Auto-fit columns to content on result arrival. The popup grid
+// renders with a <colgroup> whose width values come from this
+// helper; PrimeNG honours the colgroup when [resizableColumns] is on
+// and lets the user drag-resize from there.
+//
+// Pure function: takes columns + a sample of rows + the typography
+// hints the popup uses, returns a width-per-column map in pixels.
+// Reads no DOM beyond a hidden offscreen canvas for text measurement
+// (no layout thrash, no element mounting needed).
+
+/** Default measurement context — matches the popup's monospace cell
+ *  font at fs-control. Override when the SCSS changes. */
+export interface ColumnSizingOptions {
+  /** CSS font shorthand the canvas uses. Should mirror the cell's
+   *  computed font for the measurement to match what users see. */
+  font: string;
+  /** Maximum rows sampled per column. The popup paginates server-
+   *  side so we only see the current page; sampling all of them is
+   *  cheap. Kept as a knob in case a future caller wants a tighter
+   *  bound on a very wide grid. */
+  sampleSize: number;
+  /** Lower bound — single-digit numeric columns shouldn't end up
+   *  20px wide where neither header nor value can be read. */
+  minWidth: number;
+  /** Upper bound — pathologically long string values shouldn't push
+   *  one column past the popup viewport. Above this we clip with
+   *  text-overflow: ellipsis (CSS already does this; the cap just
+   *  controls layout). */
+  maxWidth: number;
+  /** Extra horizontal padding the <td> adds around the text. The
+   *  measurement excludes padding, so callers add it on top of the
+   *  measured glyph width to get the actual cell width. */
+  horizontalPaddingPx: number;
+}
+
+export const DEFAULT_COLUMN_SIZING_OPTIONS: ColumnSizingOptions = {
+  // Mirrors the cell's computed font: fs-control (~13px), the
+  // project's mono stack. The exact glyph metrics don't have to be
+  // perfect — we round up at the end — but a near-match makes the
+  // initial widths feel tight rather than loose.
+  font: '13px ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace',
+  sampleSize: 50,
+  minWidth: 80,
+  maxWidth: 320,
+  horizontalPaddingPx: 28,
+};
+
+/** Lazily-created canvas reused across calls. measureText on a
+ *  freshly-created canvas is ~3× slower than on a reused one. */
+let measureCanvas: HTMLCanvasElement | null = null;
+function getMeasureCtx(font: string): CanvasRenderingContext2D | null {
+  if (typeof document === 'undefined') return null; // SSR/test guard
+  if (!measureCanvas) {
+    measureCanvas = document.createElement('canvas');
+  }
+  const ctx = measureCanvas.getContext('2d');
+  if (!ctx) return null;
+  ctx.font = font;
+  return ctx;
+}
+
+/**
+ * Compute a per-column pixel width from the result data so the
+ * grid columns auto-fit their content instead of all sharing equal
+ * width. Header label width is included so a column with a long
+ * name + short values doesn't end up too narrow to read its own
+ * label.
+ *
+ * Returns {} on environments without a canvas (SSR / unit tests
+ * without jsdom-canvas) so callers can safely fall back to the
+ * default equal-share layout.
+ */
+export function measureColumnWidths(
+  columns: string[],
+  rows: any[],
+  columnTypes?: Record<string, string>,
+  optsOverride?: Partial<ColumnSizingOptions>,
+): Record<string, number> {
+  const opts: ColumnSizingOptions = {
+    ...DEFAULT_COLUMN_SIZING_OPTIONS,
+    ...optsOverride,
+  };
+  const ctx = getMeasureCtx(opts.font);
+  if (!ctx) return {};
+
+  const sample = rows.slice(0, opts.sampleSize);
+  const widths: Record<string, number> = {};
+
+  for (const col of columns) {
+    // The column header carries the column name + the small type
+    // chip below it; we measure just the name since the chip uses
+    // fs-micro and is almost always narrower than the column name
+    // at fs-control. Caller can tweak via the headerExtraPadding
+    // option if a future redesign flips the proportion.
+    const headerWidth = ctx.measureText(String(col)).width;
+
+    let valueWidth = 0;
+    for (const row of sample) {
+      const raw = row?.[col];
+      if (raw === null || raw === undefined) continue;
+      // We measure the displayed string, not the raw value, so
+      // BIGINTs preserved as strings, ISO-formatted dates, and
+      // truncated JSON summaries all line up with what users see.
+      // For non-trivial types (object, Date, Buffer) we route
+      // through formatCellValue so the measured glyph width
+      // matches the rendered display. For plain strings/numbers
+      // the toString round-trip is fine and cheaper.
+      let display: string;
+      if (
+        raw && typeof raw === 'object' &&
+        !(raw instanceof Date) // Dates short-circuit via toISOString below
+      ) {
+        // For objects / buffers, run through formatCellValue and use
+        // its `summary` if present (JSON cells render the summary by
+        // default, so widths should be based on the summary).
+        const cell = formatCellValue(raw, columnTypes?.[col]);
+        display = cell.summary || cell.display;
+      } else if (raw instanceof Date) {
+        display = raw.toISOString();
+      } else {
+        display = String(raw);
+      }
+      const w = ctx.measureText(display).width;
+      if (w > valueWidth) valueWidth = w;
+    }
+
+    const measured = Math.max(headerWidth, valueWidth);
+    const withPadding = Math.ceil(measured + opts.horizontalPaddingPx);
+    widths[col] = Math.min(opts.maxWidth, Math.max(opts.minWidth, withPadding));
+  }
+
+  return widths;
+}

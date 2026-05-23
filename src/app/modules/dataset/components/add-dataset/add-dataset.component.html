@@ -744,12 +744,32 @@
           styleClass="p-datatable-sm modern-table"
           [scrollable]="true"
           scrollHeight="flex"
+          [resizableColumns]="true"
+          columnResizeMode="expand"
         >
+          <!--
+            Per-column width hints from measureColumnWidths. Renders
+            once when the result lands; PrimeNG honours the colgroup
+            and lets the user drag-resize from there onward. The
+            frozen # row-number column takes a fixed 60px so the
+            stripe of row indices aligns vertically with the header.
+          -->
+          <ng-template pTemplate="colgroup">
+            <colgroup>
+              <col style="width: 60px" />
+              <col
+                *ngFor="let col of queryResult.columns; trackBy: trackByIndex"
+                [style.width.px]="columnWidths[col] || 160"
+              />
+            </colgroup>
+          </ng-template>
+
           <ng-template pTemplate="header">
             <tr>
               <th style="width: 60px" pFrozenColumn>#</th>
               <th
                 *ngFor="let col of queryResult.columns; trackBy: trackByIndex"
+                pResizableColumn
               >
                 <div class="th-content">
                   {{ col }}

@@ -46,6 +46,7 @@ import {
   QueryExecuteData,
   QueryResult,
 } from '../../helpers/dummy-data.helper';
+import { measureColumnWidths } from '../../helpers/cell-formatter.helper';
 import { SchemaTransformerHelper } from '../../helpers/schema-transformer.helper';
 import {
   ContextMenuItem,
@@ -121,6 +122,18 @@ export class AddDatasetComponent
    * Cleared on each new query result (see executeQuery handlers).
    */
   expandedJsonCells = new Set<string>();
+
+  /**
+   * Per-column pixel width applied to the result grid's <colgroup>.
+   * Computed once per result via measureColumnWidths so columns
+   * auto-fit their content instead of all sharing equal width.
+   * Once applied, PrimeNG's [resizableColumns] lets the user drag
+   * column borders to adjust; we don't write back to this map
+   * during drag (PrimeNG manages the live width via the DOM).
+   * Reset on every new query so stale widths don't bleed across
+   * result sets.
+   */
+  columnWidths: Record<string, number> = {};
 
   /** Stable key for the expanded-set above. */
   jsonCellKey(rowIndex: number, col: string): string {
@@ -1731,6 +1744,16 @@ export class AddDatasetComponent
             executionTime,
             query: data.query,
           };
+
+          // Auto-fit column widths to the content of this result.
+          // Runs once per result, cheap (~ms for 50 sample rows).
+          // After this initial sizing PrimeNG owns the per-column
+          // width via the .p-column-resizer DOM — we don't fight it.
+          this.columnWidths = measureColumnWidths(
+            this.queryResult.columns,
+            this.queryResult.rows,
+            this.queryResult.columnTypes,
+          );
 
           // Auto-open results popup if the query produced a result set
           if (this.queryResult.columns.length > 0) {
