@@ -732,18 +732,18 @@
           #resultsTable
           [value]="queryResult.rows"
           [rows]="resultRows"
-          [paginator]="isPaginationEnabled"
+          [paginator]="isPaginatorNeeded"
           [lazy]="isPaginationEnabled"
           (onLazyLoad)="onResultsLazyLoad($event)"
           [totalRecords]="queryResult.rowCount"
           [rowHover]="true"
           currentPageReportTemplate="{first} - {last} of {totalRecords}"
           [showCurrentPageReport]="true"
-          [rowsPerPageOptions]="[10, 50, 100]"
+          [rowsPerPageOptions]="[10, 25, 50, 100]"
           paginatorDropdownAppendTo="body"
           styleClass="p-datatable-sm modern-table"
           [scrollable]="true"
-          scrollHeight="calc(80vh - 200px)"
+          scrollHeight="flex"
         >
           <ng-template pTemplate="header">
             <tr>

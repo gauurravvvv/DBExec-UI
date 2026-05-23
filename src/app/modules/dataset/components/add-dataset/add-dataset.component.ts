@@ -229,6 +229,20 @@ export class AddDatasetComponent
     return !!this.queryResult;
   }
 
+  /**
+   * Whether to render the paginator chrome (« ‹ 1 › » + page-size
+   * dropdown). Lazy-load + total-count + filtering all still need
+   * `isPaginationEnabled` to keep working in server-side mode; this
+   * getter is purely the "should the chrome be visible" decision.
+   * Hides when the entire result fits on one page so the popup
+   * doesn't show a paginator for a 7-row query.
+   */
+  get isPaginatorNeeded(): boolean {
+    return (
+      !!this.queryResult && (this.queryResult.rowCount ?? 0) > this.resultRows
+    );
+  }
+
   // Change Confirmation Dialog
   showChangeConfirmDialog = false;
   pendingDatasourceChange: any = null;

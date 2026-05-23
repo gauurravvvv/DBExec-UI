@@ -1543,8 +1543,12 @@
         color: var(--text-color);
         font-size: var(--fs-control);
         font-weight: var(--fw-semibold);
-        padding: 0.75rem 1rem;
+        // Tighter than the old 0.75rem 1rem: DBeaver / DataGrip
+        // dense-mode header is roughly 0.55rem high. Keeps the
+        // type-chip readable below the column name.
+        padding: 0.55rem 0.875rem;
         border-bottom: 1px solid var(--border-color);
+        position: relative; // anchor for the .p-column-resizer
 
         .th-content {
           display: flex;
@@ -1593,16 +1597,30 @@
 
       .p-datatable-tbody > tr {
         background: var(--card-background);
-        transition: all var(--motion-fast) ease;
+        transition: background-color var(--motion-fast) ease;
         border-bottom: 1px solid var(--border-color);
 
+        // Zebra striping: every even row gets a near-invisible tint
+        // so the eye can track a single row across wide tables
+        // without losing its place. Strength is intentionally light
+        // (light theme: ~1.5% black tint; dark theme: ~3% white).
+        // Row hover overrides this with var(--hover-background).
+        &:nth-child(even) > td {
+          background: rgba(0, 0, 0, 0.018);
+        }
+
         td {
-          padding: 0.6rem 1rem;
+          // Compact rows: ~30px effective height, matching
+          // DBeaver/DataGrip dense mode. fs-control (~13px) reads
+          // better than fs-h3 here — less typographic weight,
+          // tighter line-height, and lines up with the column
+          // header's fs-control.
+          padding: 0.35rem 0.875rem;
           vertical-align: middle;
           color: var(--text-color);
-          font-size: var(--fs-h3);
+          font-size: var(--fs-control);
           font-family: var(--font-mono);
-          max-width: 300px;
+          max-width: 320px;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -1616,8 +1634,34 @@
           }
         }
 
-        &:hover {
+        &:hover > td {
+          // Hover wins over zebra. !important keeps the override
+          // robust against the :nth-child(even) selector above
+          // which has the same specificity but lower source order.
           background-color: var(--hover-background) !important;
+        }
+      }
+
+      // Dark-theme zebra: the tint flips to a faint white because
+      // a black tint over a dark surface vanishes. Mirrors the
+      // light-theme strength so the visual rhythm is consistent
+      // regardless of theme.
+      :host-context([data-theme='dark']) .p-datatable-tbody > tr:nth-child(even) > td {
+        background: rgba(255, 255, 255, 0.028);
+      }
+
+      // Column resize handle. PrimeNG renders an absolutely-positioned
+      // .p-column-resizer at the right edge of each <th>; we make it
+      // visible on hover with a 2px primary-coloured bar. The grab
+      // cursor is set on the resizer itself by PrimeNG.
+      .p-column-resizer {
+        width: 6px;
+        background: transparent;
+        border-right: 2px solid transparent;
+        transition: border-color var(--motion-fast) ease;
+
+        &:hover {
+          border-right-color: var(--primary-color);
         }
       }
 
