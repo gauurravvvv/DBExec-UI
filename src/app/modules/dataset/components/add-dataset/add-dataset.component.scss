@@ -1635,6 +1635,31 @@
         opacity: 0.6;
       }
 
+      // Cells flagged numeric by the cellFormat pipe (BIGINT,
+      // NUMBER, DECIMAL kept as string to preserve precision —
+      // see helpers/cell-formatter.helper.ts). Right-align and
+      // use tabular numerals so columns of numbers visually line
+      // up at the digit level regardless of glyph width.
+      .numeric-cell {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      // JSON-shape cells. Pre-wrap inside a capped pre so a fat
+      // document doesn't dominate the grid; the column header
+      // search filter still works against the raw value.
+      .json-cell {
+        max-height: 6em;
+        overflow: auto;
+        margin: 0;
+        padding: var(--space-1, 4px) var(--space-2, 8px);
+        font-family: var(--font-mono, monospace);
+        font-size: var(--fs-label, 12px);
+        white-space: pre;
+        background: var(--hover-background, transparent);
+        border-radius: var(--radius-xs, 3px);
+      }
+
       // Column filter inputs
       .p-column-filter {
         font-size: var(--fs-control);

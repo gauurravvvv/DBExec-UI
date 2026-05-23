@@ -12,6 +12,7 @@ import { ListDatasetComponent } from './components/list-dataset/list-dataset.com
 import { SaveDatasetDialogComponent } from './components/save-dataset-dialog/save-dataset-dialog.component';
 import { ViewDatasetComponent } from './components/view-dataset/view-dataset.component';
 import { DatasetRoutingModule } from './dataset-routing.module';
+import { CellFormatPipe } from './pipes/cell-format.pipe';
 import { addDatasetReducer, ADD_DATASET_FEATURE_KEY } from './store';
 
 @NgModule({
@@ -22,6 +23,7 @@ import { addDatasetReducer, ADD_DATASET_FEATURE_KEY } from './store';
     ListDatasetComponent,
     SaveDatasetDialogComponent,
     EditDatasetFieldsDialogComponent,
+    CellFormatPipe,
   ],
   imports: [
     CommonModule,

@@ -97,6 +97,20 @@ export class AddDatasetComponent
   isExecutingQuery = false;
   monacoLoadFailed = false;
   queryResult: QueryResult | null = null;
+
+  /**
+   * True when the BE was able to discover types for at least one
+   * column in the current result. Postgres always returns types
+   * via pg_typeof; other dialects ship an empty `columnTypes` map
+   * (driver field-metadata wiring is a follow-up). Hides the type
+   * chip row in the results popup when no types are available so
+   * the header doesn't read as a wall of em-dashes.
+   */
+  get hasAnyColumnType(): boolean {
+    const types = this.queryResult?.columnTypes;
+    return !!types && Object.keys(types).length > 0;
+  }
+
   datasources: DatasourceSchema[] = [];
   currentQuery = '';
 

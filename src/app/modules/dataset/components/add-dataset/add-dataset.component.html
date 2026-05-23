@@ -754,12 +754,18 @@
                 <div class="th-content">
                   {{ col }}
                   <!--
-                    Always render the type chip so column header heights stay
-                    consistent across rows. Falls back to "—" when the BE
-                    doesn't tell us the type (computed columns, etc.).
+                    Render the type chip only when the BE was able to
+                    discover types for at least one column. Some
+                    dialects don't (yet) ship driver field metadata
+                    through to columnTypes — hiding the whole chip is
+                    cleaner than a wall of em-dashes. Postgres still
+                    fills this in via pg_typeof.
                   -->
-                  <span class="column-datatype">
-                    {{ queryResult.columnTypes?.[col] || '—' }}
+                  <span
+                    class="column-datatype"
+                    *ngIf="hasAnyColumnType && queryResult.columnTypes?.[col]"
+                  >
+                    {{ queryResult.columnTypes?.[col] }}
                   </span>
                 </div>
               </th>
@@ -785,22 +791,50 @@
           <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
             <tr>
               <td pFrozenColumn class="row-number-cell">{{ rowIndex + 1 }}</td>
-              <td
+              <!--
+                Each cell goes through the cellFormat pipe so:
+                  - BIGINT / NUMBER / DECIMAL stay as the original
+                    string (no precision-losing Number cast) and
+                    right-align with the .numeric-cell class.
+                  - MySQL BIT (Buffer-shaped JSON) renders as
+                    true/false or hex, not [object Object].
+                  - Dates produce a deterministic ISO string.
+                  - JSON values pretty-print inside a <pre> with a
+                    capped height so a fat document doesn't dominate
+                    the grid.
+                  - NULL gets the muted, italicised placeholder via
+                    the .null-value class + the translated copy.
+              -->
+              <ng-container
                 *ngFor="let col of queryResult.columns; trackBy: trackByIndex"
-                [title]="row[col]"
               >
-                <span
-                  [ngClass]="{
-                    'null-value': row[col] === null || row[col] === undefined,
-                  }"
+                <td
+                  [ngClass]="
+                    'cell-' +
+                    (row[col] | cellFormat: queryResult.columnTypes?.[col]).kind
+                  "
+                  [class.numeric-cell]="
+                    (row[col] | cellFormat: queryResult.columnTypes?.[col]).align === 'right'
+                  "
+                  [title]="
+                    (row[col] | cellFormat: queryResult.columnTypes?.[col]).display
+                  "
                 >
-                  {{
-                    row[col] !== null && row[col] !== undefined
-                      ? row[col]
-                      : 'NULL'
-                  }}
-                </span>
-              </td>
+                  <ng-container
+                    *ngIf="(row[col] | cellFormat: queryResult.columnTypes?.[col]) as cell"
+                  >
+                    <span *ngIf="cell.kind === 'null'" class="null-value">
+                      {{ 'DATASET.CELL_NULL' | translate }}
+                    </span>
+                    <pre *ngIf="cell.kind === 'json'" class="json-cell">{{
+                      cell.display
+                    }}</pre>
+                    <span *ngIf="cell.kind !== 'null' && cell.kind !== 'json'">
+                      {{ cell.display }}
+                    </span>
+                  </ng-container>
+                </td>
+              </ng-container>
             </tr>
           </ng-template>
 
