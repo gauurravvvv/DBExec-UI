@@ -494,77 +494,13 @@
         </div>
       </div>
 
-      <!-- Results Status Bar (floating at bottom of editor) -->
-      <div
-        class="results-status-bar"
-        *ngIf="selectedDatasourceObj && queryResult"
-      >
-        <div class="status-bar-left">
-          <span
-            class="status-icon"
-            [ngClass]="{
-              error: queryResult.error,
-              success: !queryResult.error,
-            }"
-          >
-            <i
-              class="pi"
-              [ngClass]="
-                queryResult.error ? 'pi-times-circle' : 'pi-check-circle'
-              "
-            ></i>
-          </span>
-          <span class="status-text" *ngIf="queryResult.error">{{
-            'DATASET.QUERY_FAILED' | translate
-          }}</span>
-          <span
-            class="status-text"
-            *ngIf="!queryResult.error && queryResult.rows.length > 0"
-          >
-            {{ queryResult.rowCount }} row(s) in {{ queryResult.executionTime }}
-          </span>
-          <span
-            class="status-text"
-            *ngIf="
-              !queryResult.error &&
-              queryResult.rows.length === 0 &&
-              queryResult.message
-            "
-          >
-            {{ queryResult.message }}
-          </span>
-          <span
-            class="status-text"
-            *ngIf="
-              !queryResult.error &&
-              queryResult.rows.length === 0 &&
-              !queryResult.message
-            "
-          >
-            {{
-              'DATASET.NO_ROWS_RETURNED'
-                | translate: { time: queryResult.executionTime }
-            }}
-          </span>
-        </div>
-        <div class="status-bar-right">
-          <button
-            class="status-bar-btn view-btn"
-            (click)="showResultsPopup = true"
-            [title]="'DATASET.VIEW_RESULTS' | translate"
-          >
-            <i class="pi pi-external-link"></i>
-            {{ 'DATASET.VIEW_RESULTS' | translate }}
-          </button>
-          <button
-            class="status-bar-btn close-btn"
-            (click)="queryResult = null"
-            [title]="'COMMON.DISMISS' | translate"
-          >
-            <i class="pi pi-times"></i>
-          </button>
-        </div>
-      </div>
+      <!--
+        (Removed) Legacy floating "✓ N rows in Xms — View Results — ×"
+        status bar. Its row-count chip duplicated the sheet header's
+        own chip and its View Results button only existed because
+        the old result panel was a modal. The docked result sheet
+        below makes both redundant.
+      -->
 
       <!--
         Results bottom sheet — docks at the bottom of the viewport so the
@@ -630,6 +566,9 @@
               </span>
             </div>
             <div class="popup-header-right">
+              <!-- Action buttons hide when the sheet is collapsed —
+                   the strip can't show a table for them to operate
+                   on, and the chrome belongs on the full panel. -->
               <button
                 pButton
                 [label]="'DATASET.EXPORT_CSV' | translate"
@@ -637,7 +576,11 @@
                 class="p-button-outlined p-button-success p-button-sm export-csv-btn"
                 (click)="exportResultsAsCsv()"
                 [disabled]="isExportingResults"
-                *ngIf="!queryResult.error && queryResult.columns.length > 0"
+                *ngIf="
+                  !queryResult.error &&
+                  queryResult.columns.length > 0 &&
+                  !isResultSheetCollapsed
+                "
               ></button>
               <button
                 pButton
@@ -646,9 +589,14 @@
                 class="p-button-outlined p-button-danger p-button-sm clear-filters-btn"
                 (click)="clearResultFilters()"
                 [disabled]="!isResultFilterActive"
-                *ngIf="!queryResult.error && queryResult.columns.length > 0"
+                *ngIf="
+                  !queryResult.error &&
+                  queryResult.columns.length > 0 &&
+                  !isResultSheetCollapsed
+                "
               ></button>
-              <!-- Expand affordance when sheet is collapsed to its stub -->
+              <!-- Expand affordance — only renders on the collapsed
+                   strip variant of the sheet header. -->
               <button
                 *ngIf="isResultSheetCollapsed"
                 pButton
@@ -658,11 +606,9 @@
                 [pTooltip]="'DATASET.SHOW_RESULTS' | translate"
                 tooltipPosition="bottom"
               ></button>
-              <!-- Hide-to-stub affordance when expanded. We deliberately
-                   don't unmount the sheet — re-running the query would
-                   lose nothing, but keeping the result set around lets
-                   the user iterate on SQL without seeing the panel
-                   flash in and out. -->
+              <!-- Collapse-to-strip when expanded. The result data
+                   stays alive on the component so re-expanding is
+                   instant; only the body div unmounts. -->
               <button
                 *ngIf="!isResultSheetCollapsed"
                 pButton
@@ -670,6 +616,18 @@
                 icon="pi pi-chevron-down"
                 (click)="toggleResultSheet()"
                 [pTooltip]="'DATASET.HIDE_RESULTS' | translate"
+                tooltipPosition="bottom"
+              ></button>
+              <!-- Dismiss — drops the result entirely. Only the
+                   user's next query brings the sheet back. Distinct
+                   from the chevron above which only collapses to
+                   the strip. -->
+              <button
+                pButton
+                class="p-button-text p-button-rounded p-button-sm"
+                icon="pi pi-times"
+                (click)="dismissResultSheet()"
+                [pTooltip]="'COMMON.DISMISS' | translate"
                 tooltipPosition="bottom"
               ></button>
             </div>

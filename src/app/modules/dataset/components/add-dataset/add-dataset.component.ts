@@ -1863,6 +1863,27 @@ export class AddDatasetComponent
   }
 
   /**
+   * Dismiss the sheet entirely. Clears the result so neither the
+   * expanded sheet nor the collapsed strip render. Distinct from
+   * `toggleResultSheet` which keeps the data alive and just hides
+   * the body. Re-running the query brings everything back; until
+   * then the editor pane reclaims the full pane height.
+   *
+   * Doesn't touch the persisted height / collapsed prefs — the
+   * user's preferred LAYOUT survives, only the current data is
+   * cleared.
+   */
+  dismissResultSheet(): void {
+    this.showResultsPopup = false;
+    this.queryResult = null;
+    // expandedJsonCells references row indices in queryResult; drop
+    // them so a fresh result starts with no expanded JSON cells.
+    if (this.expandedJsonCells.size > 0) {
+      this.expandedJsonCells = new Set();
+    }
+  }
+
+  /**
    * Effective sheet height in pixels. Collapsed state returns the
    * stub height; otherwise the user-configured / persisted value.
    * Templated into the host element's `--sheet-height` CSS variable
