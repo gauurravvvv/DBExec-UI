@@ -754,7 +754,10 @@
     "COPY_CELL": "复制单元格",
     "COPY_COLUMN": "复制列",
     "COPIED": "已复制到剪贴板",
-    "COPY_FAILED": "无法复制到剪贴板"
+    "COPY_FAILED": "无法复制到剪贴板",
+    "RESIZE_RESULTS": "调整结果面板大小",
+    "SHOW_RESULTS": "显示结果",
+    "HIDE_RESULTS": "隐藏结果"
   },
   "ANALYSES": {
     "TITLE": "分析",

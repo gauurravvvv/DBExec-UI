@@ -754,7 +754,10 @@
     "COPY_CELL": "Copier la cellule",
     "COPY_COLUMN": "Copier la colonne",
     "COPIED": "Copié dans le presse-papiers",
-    "COPY_FAILED": "Échec de la copie dans le presse-papiers"
+    "COPY_FAILED": "Échec de la copie dans le presse-papiers",
+    "RESIZE_RESULTS": "Redimensionner le panneau des résultats",
+    "SHOW_RESULTS": "Afficher les résultats",
+    "HIDE_RESULTS": "Masquer les résultats"
   },
   "ANALYSES": {
     "TITLE": "Analyses",

@@ -754,7 +754,10 @@
     "COPY_CELL": "セルをコピー",
     "COPY_COLUMN": "列をコピー",
     "COPIED": "クリップボードにコピーしました",
-    "COPY_FAILED": "クリップボードへのコピーに失敗しました"
+    "COPY_FAILED": "クリップボードへのコピーに失敗しました",
+    "RESIZE_RESULTS": "結果パネルのサイズ変更",
+    "SHOW_RESULTS": "結果を表示",
+    "HIDE_RESULTS": "結果を非表示"
   },
   "ANALYSES": {
     "TITLE": "分析",

@@ -754,7 +754,10 @@
     "COPY_CELL": "Cel kopiëren",
     "COPY_COLUMN": "Kolom kopiëren",
     "COPIED": "Naar klembord gekopieerd",
-    "COPY_FAILED": "Kan niet naar klembord kopiëren"
+    "COPY_FAILED": "Kan niet naar klembord kopiëren",
+    "RESIZE_RESULTS": "Resultatenpaneel aanpassen",
+    "SHOW_RESULTS": "Resultaten weergeven",
+    "HIDE_RESULTS": "Resultaten verbergen"
   },
   "ANALYSES": {
     "TITLE": "Analyses",

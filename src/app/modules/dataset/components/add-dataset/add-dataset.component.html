@@ -1,4 +1,7 @@
-<div class="query-editor-wrapper">
+<div
+  class="query-editor-wrapper"
+  [style.padding-bottom.px]="effectiveSheetHeightPx"
+>
   <!-- Header Toolbar -->
   <div class="query-toolbar">
     <div class="toolbar-left">
@@ -615,21 +618,55 @@
 </app-save-dataset-dialog>
 
 <!--
-  Results Popup Overlay — close affordances are the X button and Esc only.
-  Click-outside-to-close was removed because users mid-scroll through long
-  results frequently misclicked the overlay edge and lost their position.
+  Results bottom sheet — docks at the bottom of the viewport so the
+  SQL editor stays visible and interactive above it (DataGrip / Hex /
+  Snowsight pattern). The top edge is a 6px drag handle; ×
+  collapses the sheet to a small stub rather than unmounting, so
+  users don't lose their result set between iterations.
+
+  The sheet's height (px) and collapsed flag are persisted in
+  localStorage so the user's preferred layout survives page reloads.
 -->
-<div class="results-popup-overlay" *ngIf="showResultsPopup && queryResult">
+<div
+  class="results-sheet"
+  *ngIf="showResultsPopup && queryResult"
+  [class.compact]="
+    queryResult.error ||
+    (queryResult.rows.length === 0 &&
+      !isResultFilterActive &&
+      queryResult.columns.length === 0)
+  "
+  [class.collapsed]="isResultSheetCollapsed"
+  [style.height.px]="
+    isResultSheetCollapsed ? null : resultSheetHeightPx
+  "
+>
+  <!--
+    Drag handle: 6px-tall strip across the top of the sheet.
+    mousedown captures pointer, mousemove updates height live,
+    mouseup persists. Keyboard a11y via tabindex + ArrowUp/Down.
+  -->
   <div
-    class="results-popup-container"
-    [class.compact]="
-      queryResult.error ||
-      (queryResult.rows.length === 0 &&
-        !isResultFilterActive &&
-        queryResult.columns.length === 0)
-    "
+    class="results-sheet-handle"
+    *ngIf="!isResultSheetCollapsed"
+    role="separator"
+    aria-orientation="horizontal"
+    tabindex="0"
+    [attr.aria-label]="'DATASET.RESIZE_RESULTS' | translate"
+    (mousedown)="onSheetDragStart($event)"
+    (keydown)="onSheetHandleKeydown($event)"
   >
-    <!-- Popup Header -->
+    <span class="handle-grip" aria-hidden="true"></span>
+  </div>
+
+  <!--
+    Body wrapper. Holds the existing header + content blocks the
+    modal used. When the sheet is collapsed we still render the
+    header (with a single Expand button instead of the full
+    toolbar) so the stub remains useful.
+  -->
+  <div class="results-sheet-inner">
+    <!-- Sheet Header -->
     <div class="results-popup-header">
       <div class="popup-header-left">
         <i class="pi pi-table"></i>
@@ -662,19 +699,37 @@
           [disabled]="!isResultFilterActive"
           *ngIf="!queryResult.error && queryResult.columns.length > 0"
         ></button>
+        <!-- Expand affordance when sheet is collapsed to its stub -->
         <button
+          *ngIf="isResultSheetCollapsed"
           pButton
           class="p-button-text p-button-rounded p-button-sm"
-          icon="pi pi-times"
-          (click)="showResultsPopup = false"
-          [pTooltip]="'COMMON.CLOSE' | translate"
+          icon="pi pi-chevron-up"
+          (click)="toggleResultSheet()"
+          [pTooltip]="'DATASET.SHOW_RESULTS' | translate"
+          tooltipPosition="bottom"
+        ></button>
+        <!-- Hide-to-stub affordance when expanded. We deliberately
+             don't unmount the sheet — re-running the query would
+             lose nothing, but keeping the result set around lets
+             the user iterate on SQL without seeing the panel
+             flash in and out. -->
+        <button
+          *ngIf="!isResultSheetCollapsed"
+          pButton
+          class="p-button-text p-button-rounded p-button-sm"
+          icon="pi pi-chevron-down"
+          (click)="toggleResultSheet()"
+          [pTooltip]="'DATASET.HIDE_RESULTS' | translate"
           tooltipPosition="bottom"
         ></button>
       </div>
     </div>
 
-    <!-- Popup Body -->
-    <div class="results-popup-body">
+    <!-- Sheet Body. Hidden in collapsed mode so only the header
+         strip is visible — the user can still see "n rows in Xms"
+         and the Export / Clear buttons stay reachable. -->
+    <div class="results-popup-body" *ngIf="!isResultSheetCollapsed">
       <!-- Error Message -->
       <div class="results-error-card" *ngIf="queryResult.error">
         <div class="error-icon-wrapper">
@@ -910,13 +965,12 @@
   </div>
 
   <!--
-    Cell-level right-click menu. Positioned absolutely inside the
-    overlay using clientX/clientY captured at right-click time.
-    Closed by:
+    Cell-level right-click menu. Positioned via clientX/clientY
+    captured at right-click time. Lives inside the sheet so it
+    inherits the sheet's z-index and gets unmounted alongside the
+    sheet if the user hides it. Closed by:
       - clicking any menu item (each command calls closeContextMenu)
       - clicking outside (document-level boundCloseContextMenu)
-      - closing the popup (the *ngIf="showResultsPopup" parent
-        unmounts the whole subtree)
   -->
   <div
     *ngIf="showCellContextMenu"

@@ -754,7 +754,10 @@
     "COPY_CELL": "Copiar célula",
     "COPY_COLUMN": "Copiar coluna",
     "COPIED": "Copiado para a área de transferência",
-    "COPY_FAILED": "Não foi possível copiar para a área de transferência"
+    "COPY_FAILED": "Não foi possível copiar para a área de transferência",
+    "RESIZE_RESULTS": "Redimensionar painel de resultados",
+    "SHOW_RESULTS": "Mostrar resultados",
+    "HIDE_RESULTS": "Ocultar resultados"
   },
   "ANALYSES": {
     "TITLE": "Análises",

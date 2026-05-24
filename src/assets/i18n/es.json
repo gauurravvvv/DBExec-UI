@@ -754,7 +754,10 @@
     "COPY_CELL": "Copiar celda",
     "COPY_COLUMN": "Copiar columna",
     "COPIED": "Copiado al portapapeles",
-    "COPY_FAILED": "No se pudo copiar al portapapeles"
+    "COPY_FAILED": "No se pudo copiar al portapapeles",
+    "RESIZE_RESULTS": "Cambiar tamaño del panel de resultados",
+    "SHOW_RESULTS": "Mostrar resultados",
+    "HIDE_RESULTS": "Ocultar resultados"
   },
   "ANALYSES": {
     "TITLE": "Análisis",

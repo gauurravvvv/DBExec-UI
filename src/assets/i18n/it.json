@@ -754,7 +754,10 @@
     "COPY_CELL": "Copia cella",
     "COPY_COLUMN": "Copia colonna",
     "COPIED": "Copiato negli appunti",
-    "COPY_FAILED": "Impossibile copiare negli appunti"
+    "COPY_FAILED": "Impossibile copiare negli appunti",
+    "RESIZE_RESULTS": "Ridimensiona il pannello dei risultati",
+    "SHOW_RESULTS": "Mostra risultati",
+    "HIDE_RESULTS": "Nascondi risultati"
   },
   "ANALYSES": {
     "TITLE": "Analisi",

@@ -1238,28 +1238,105 @@
 // ===================================================================
 // Results Popup Overlay
 // ===================================================================
-.results-popup-overlay {
+// ── Results bottom sheet ────────────────────────────────────────────
+//
+// Anchored to the bottom of the viewport so the SQL editor remains
+// visible and interactive above it (DataGrip / Hex / Snowsight
+// pattern). Height is bound to component state via [style.height.px]
+// so the drag handle can resize it; the collapsed state hides
+// everything except the header strip.
+//
+// No backdrop overlay — modern result viewers don't dim the editor
+// because users iterate on SQL while looking at results. A drop
+// shadow + a 1px top border separates the sheet from the editor
+// instead.
+.results-sheet {
   position: fixed;
-  top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--overlay-background);
-  backdrop-filter: blur(4px);
+  right: 0;
+  bottom: 0;
+  background: var(--card-background);
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -10px 30px var(--shadow-color);
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
   z-index: var(--z-overlay);
-  animation: fadeIn 0.2s ease-out;
+  animation: sheetSlideUp 0.2s ease-out;
 
-  @keyframes fadeIn {
+  // Collapsed = header strip only (~44px). Header still shows the
+  // row-count chip + Export + Show button so the panel stays
+  // useful as a quick-recall stub.
+  &.collapsed {
+    height: auto !important;
+  }
+
+  // Error / empty-result mode shrinks to fit the message card
+  // instead of holding the full default height — a 1-line error
+  // shouldn't take 420px.
+  &.compact {
+    height: auto !important;
+  }
+
+  @keyframes sheetSlideUp {
     from {
-      opacity: 0;
+      transform: translateY(100%);
     }
     to {
-      opacity: 1;
+      transform: translateY(0);
     }
   }
+}
+
+// Drag handle strip at the top of the sheet. 8px tall hit-area for
+// easy grabbing, with a 32px visual "grip" centred so users can
+// see the affordance.
+.results-sheet-handle {
+  position: relative;
+  height: 8px;
+  background: var(--hover-background);
+  cursor: ns-resize;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border-color);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--primary-color-transparent);
+    outline: none;
+
+    .handle-grip {
+      background: var(--primary-color);
+      opacity: 0.8;
+    }
+  }
+
+  .handle-grip {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--secondary-color);
+    opacity: 0.5;
+    transition: all var(--motion-fast) ease;
+  }
+}
+
+// Inner wrapper holds the header + body. Plain flex column.
+.results-sheet-inner {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0; // flex children with overflow need this
+}
+
+// Global cursor override while dragging — prevents text selection
+// and keeps the resize cursor everywhere the mouse moves.
+:global(body.ds-sheet-dragging) {
+  cursor: ns-resize !important;
+  user-select: none !important;
 }
 
 // Cell-level right-click context menu. Tiny floating panel
@@ -1317,37 +1394,12 @@
   }
 }
 
-.results-popup-container {
-  background: var(--card-background);
-  border-radius: var(--radius-lg);
-  box-shadow:
-    var(--shadow-xl),
-    0 0 0 1px var(--border-color);
-  width: 90vw;
-  max-width: 1200px;
-  height: 85vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  animation: slideUp 0.25s ease-out;
-
-  // Compact mode for error/empty states — shrink to fit content
-  &.compact {
-    height: auto;
-    max-height: 85vh;
-  }
-
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px) scale(0.97);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-}
+// Legacy modal container — replaced by .results-sheet above. The
+// .results-popup-header / .results-popup-body class names remain on
+// the inner markup for backwards-compat with the surrounding SCSS
+// (header padding, error/empty cards, table wrapper). Their parent
+// is now the bottom sheet, not a centered modal.
+// (Legacy modal container removed — bottom-sheet rules above replace it.)
 
 .results-popup-header {
   display: flex;
@@ -1585,25 +1637,43 @@
     flex-direction: column;
 
     ::ng-deep .modern-table {
+      // Horizontal scroll for tables whose columns sum wider than
+      // the sheet. The wrapper owns the overflow; the <table>
+      // inside gets its width from the <colgroup>.
       .p-datatable-wrapper {
         background: var(--card-background);
+        overflow-x: auto;
+        overflow-y: auto;
+      }
+
+      // table-layout: fixed makes <colgroup> widths absolute
+      // instead of suggestions. Without this the browser
+      // distributes any "extra" container width across columns
+      // proportionally, which is what produced the lonely-1-in-
+      // 430px-column problem.
+      .p-datatable-table {
+        table-layout: fixed;
+        width: 100%;
       }
 
       .p-datatable-header {
         display: none;
       }
 
+      // Sticky thead. Per-th (not per-thead) because PrimeNG
+      // wraps in a flex container that doesn't allow sticky on
+      // the row itself. background is opaque so body rows can't
+      // bleed through; z-index above the body td.
       .p-datatable-thead > tr > th {
         background: var(--hover-background);
         color: var(--text-color);
         font-size: var(--fs-control);
         font-weight: var(--fw-semibold);
-        // Tighter than the old 0.75rem 1rem: DBeaver / DataGrip
-        // dense-mode header is roughly 0.55rem high. Keeps the
-        // type-chip readable below the column name.
-        padding: 0.55rem 0.875rem;
+        padding: 0.4rem 0.875rem;
         border-bottom: 1px solid var(--border-color);
-        position: relative; // anchor for the .p-column-resizer
+        position: sticky;
+        top: 0;
+        z-index: 2;
 
         .th-content {
           display: flex;
@@ -1648,6 +1718,29 @@
             color: var(--primary-color);
           }
         }
+      }
+
+      // Second-row <th> elements are the per-column filter inputs.
+      // They need to stick BELOW the column-name row so both rows
+      // stay visible during vertical scroll. The exact `top` value
+      // depends on the rendered height of the first row — using
+      // a CSS custom property lets us tune this in one place when
+      // the row padding changes. Default lands at the natural height
+      // of the column-name row + its 1px border.
+      .p-datatable-thead > tr:nth-child(2) > th {
+        top: var(--results-header-row-height, 38px);
+        z-index: 1; // below the primary header row
+        // Tighter padding for the filter row: inputs already have
+        // their own internal padding, so the cell padding can be
+        // minimal without crowding.
+        padding: 0.25rem 0.5rem;
+      }
+
+      // The filter <input> sits flush in its cell; give it a clear
+      // background so it doesn't look transparent over the sticky
+      // header tint.
+      .p-datatable-thead > tr:nth-child(2) > th .p-column-filter {
+        background: var(--card-background);
       }
 
       .p-datatable-tbody > tr {

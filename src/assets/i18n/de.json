@@ -754,7 +754,10 @@
     "COPY_CELL": "Zelle kopieren",
     "COPY_COLUMN": "Spalte kopieren",
     "COPIED": "In Zwischenablage kopiert",
-    "COPY_FAILED": "Kopieren in die Zwischenablage fehlgeschlagen"
+    "COPY_FAILED": "Kopieren in die Zwischenablage fehlgeschlagen",
+    "RESIZE_RESULTS": "Ergebnispanel anpassen",
+    "SHOW_RESULTS": "Ergebnisse anzeigen",
+    "HIDE_RESULTS": "Ergebnisse ausblenden"
   },
   "ANALYSES": {
     "TITLE": "Analysen",

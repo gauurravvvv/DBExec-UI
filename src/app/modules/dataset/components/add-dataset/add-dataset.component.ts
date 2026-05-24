@@ -47,6 +47,7 @@ import {
   QueryResult,
 } from '../../helpers/dummy-data.helper';
 import {
+  flexLastColumn,
   formatCellValue,
   measureColumnWidths,
 } from '../../helpers/cell-formatter.helper';
@@ -257,7 +258,7 @@ export class AddDatasetComponent
   // Save as Dataset Dialog
   showDatasetDialog = false;
 
-  // Results Popup
+  // Results bottom sheet
   showResultsPopup = false;
   resultRows = 25;
   resultPage = 1;
@@ -266,6 +267,31 @@ export class AddDatasetComponent
   private resultFilterSubject = new Subject<void>();
   private lastExecutedQuery = '';
   private lastResultsLazyEvent: any = null;
+
+  /**
+   * Sheet height in pixels. Default lands at ~45% of viewport but
+   * never tinier than 240px (single row + paginator + header) nor
+   * larger than viewport - 100px (keep some editor visible). Drag
+   * handle clamps to the same range. Persisted across sessions
+   * once the user adjusts it.
+   */
+  resultSheetHeightPx = 420;
+
+  /**
+   * When true the sheet collapses to its 40px-tall header strip
+   * — the user can still see row count + Export + Show button.
+   * Re-running the query auto-expands. Persisted across sessions.
+   */
+  isResultSheetCollapsed = false;
+
+  /** Active drag state. While truthy, mousemove updates the
+   *  height live and mouseup persists. */
+  private sheetDragState: {
+    startY: number;
+    startHeight: number;
+    onMove: (ev: MouseEvent) => void;
+    onUp: () => void;
+  } | null = null;
 
   get isPaginationEnabled(): boolean {
     return !!this.queryResult;
@@ -438,6 +464,9 @@ export class AddDatasetComponent
     // default every time. localStorage may be unavailable in
     // Safari private mode → fail silently.
     this.loadPersistedPageSize();
+    // Same idea for the bottom sheet's height + collapsed state.
+    // First-run users get a sensible 45vh default.
+    this.loadPersistedSheetState();
 
     // Setup debounce for result filter changes
     this.resultFilterSubject
@@ -1743,6 +1772,155 @@ export class AddDatasetComponent
     }
   }
 
+  // ── Bottom-sheet drag + persistence ─────────────────────────────
+  private static readonly SHEET_HEIGHT_STORAGE_KEY =
+    'dbexec.queryResult.sheetHeightPx';
+  private static readonly SHEET_COLLAPSED_STORAGE_KEY =
+    'dbexec.queryResult.sheetCollapsed';
+  private static readonly SHEET_MIN_HEIGHT = 240;
+  /** Reserve at least this many pixels of editor visible above the
+   *  sheet so a maximised sheet doesn't hide the SQL the user is
+   *  iterating on. */
+  private static readonly SHEET_MAX_HEIGHT_PADDING = 120;
+
+  private clampSheetHeight(px: number): number {
+    const max = Math.max(
+      AddDatasetComponent.SHEET_MIN_HEIGHT,
+      window.innerHeight - AddDatasetComponent.SHEET_MAX_HEIGHT_PADDING,
+    );
+    return Math.min(max, Math.max(AddDatasetComponent.SHEET_MIN_HEIGHT, px));
+  }
+
+  /** Read persisted sheet height + collapsed state on init. */
+  private loadPersistedSheetState(): void {
+    try {
+      const raw = localStorage.getItem(
+        AddDatasetComponent.SHEET_HEIGHT_STORAGE_KEY,
+      );
+      if (raw) {
+        const parsed = parseInt(raw, 10);
+        if (Number.isFinite(parsed)) {
+          this.resultSheetHeightPx = this.clampSheetHeight(parsed);
+        }
+      } else {
+        // No persisted value yet — pick a sensible default
+        // (45% of viewport, clamped) so the first-time experience
+        // looks intentional rather than tiny or huge.
+        this.resultSheetHeightPx = this.clampSheetHeight(
+          Math.round(window.innerHeight * 0.45),
+        );
+      }
+      const collapsedRaw = localStorage.getItem(
+        AddDatasetComponent.SHEET_COLLAPSED_STORAGE_KEY,
+      );
+      this.isResultSheetCollapsed = collapsedRaw === 'true';
+    } catch (_) {
+      // Same defensive fallback as page-size persistence.
+    }
+  }
+
+  private persistSheetHeight(px: number): void {
+    try {
+      localStorage.setItem(
+        AddDatasetComponent.SHEET_HEIGHT_STORAGE_KEY,
+        String(Math.round(px)),
+      );
+    } catch (_) {
+      /* localStorage may be unavailable */
+    }
+  }
+
+  private persistSheetCollapsed(collapsed: boolean): void {
+    try {
+      localStorage.setItem(
+        AddDatasetComponent.SHEET_COLLAPSED_STORAGE_KEY,
+        collapsed ? 'true' : 'false',
+      );
+    } catch (_) {
+      /* localStorage may be unavailable */
+    }
+  }
+
+  /**
+   * Toggle expanded/collapsed. Closing the modal-style × used to
+   * unmount the entire result set; the bottom-sheet pattern keeps
+   * the data around so users can iterate on their SQL without
+   * watching the result panel flash in and out.
+   */
+  toggleResultSheet(): void {
+    this.isResultSheetCollapsed = !this.isResultSheetCollapsed;
+    this.persistSheetCollapsed(this.isResultSheetCollapsed);
+  }
+
+  /**
+   * Effective sheet height in pixels. Collapsed state returns the
+   * stub height; otherwise the user-configured / persisted value.
+   * Templated into the host element's `--sheet-height` CSS variable
+   * so the editor pane can reserve matching `padding-bottom` and
+   * keep the SQL editor visible above the sheet.
+   */
+  get effectiveSheetHeightPx(): number {
+    if (!this.showResultsPopup || !this.queryResult) return 0;
+    return this.isResultSheetCollapsed ? 44 : this.resultSheetHeightPx;
+  }
+
+  /**
+   * mousedown on the drag handle. Captures the starting Y +
+   * height so mousemove can compute the new height relative to
+   * the drag, not the absolute cursor position. The listeners
+   * attach to the document so dragging past the handle's bounds
+   * (which happens constantly with a 6px-tall target) still works.
+   */
+  onSheetDragStart(event: MouseEvent): void {
+    event.preventDefault();
+    if (this.isResultSheetCollapsed) return;
+    const startY = event.clientY;
+    const startHeight = this.resultSheetHeightPx;
+
+    const onMove = (ev: MouseEvent) => {
+      // Dragging the handle UP grows the sheet; DOWN shrinks it.
+      const delta = startY - ev.clientY;
+      this.resultSheetHeightPx = this.clampSheetHeight(startHeight + delta);
+      this.cdr.markForCheck();
+    };
+
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      this.persistSheetHeight(this.resultSheetHeightPx);
+      this.sheetDragState = null;
+      // Remove the cursor override + body class.
+      document.body.classList.remove('ds-sheet-dragging');
+    };
+
+    this.sheetDragState = { startY, startHeight, onMove, onUp };
+    document.body.classList.add('ds-sheet-dragging');
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  }
+
+  /**
+   * Keyboard a11y for the drag handle. Arrow keys nudge the
+   * height; shift modifier is a larger step so power users can
+   * resize without flailing the arrow key. Persists on each
+   * keypress since there's no clear "release" moment.
+   */
+  onSheetHandleKeydown(event: KeyboardEvent): void {
+    if (this.isResultSheetCollapsed) return;
+    const step = event.shiftKey ? 80 : 20;
+    let next = this.resultSheetHeightPx;
+    if (event.key === 'ArrowUp') {
+      next = this.resultSheetHeightPx + step;
+    } else if (event.key === 'ArrowDown') {
+      next = this.resultSheetHeightPx - step;
+    } else {
+      return;
+    }
+    event.preventDefault();
+    this.resultSheetHeightPx = this.clampSheetHeight(next);
+    this.persistSheetHeight(this.resultSheetHeightPx);
+  }
+
   private executeQueryForDatasource(
     query: string,
     page: number = 1,
@@ -1827,19 +2005,40 @@ export class AddDatasetComponent
             query: data.query,
           };
 
-          // Auto-fit column widths to the content of this result.
-          // Runs once per result, cheap (~ms for 50 sample rows).
-          // After this initial sizing PrimeNG owns the per-column
-          // width via the .p-column-resizer DOM — we don't fight it.
-          this.columnWidths = measureColumnWidths(
+          // Auto-fit column widths to the content of this result,
+          // then flex the last column to absorb leftover container
+          // width so the table fills horizontally. Without the
+          // flex step the table would render at sum(widths) and
+          // leave a wide gap on the right of the popup; the table-
+          // layout: fixed rule alone doesn't grow the columns to
+          // fill, just enforces the colgroup widths.
+          const measured = measureColumnWidths(
             this.queryResult.columns,
             this.queryResult.rows,
             this.queryResult.columnTypes,
           );
+          this.columnWidths = flexLastColumn(
+            measured,
+            this.queryResult.columns,
+            // Use the viewport width as a fair approximation of the
+            // sheet's render width — the sheet spans 100% of the
+            // viewport (position: fixed left:0 right:0). Slightly
+            // pessimistic if a sidebar is visible, but the worst
+            // case is a small horizontal scroll, not visual breakage.
+            window.innerWidth,
+          );
 
-          // Auto-open results popup if the query produced a result set
+          // Auto-open the sheet on a fresh result. If the user
+          // previously collapsed it, a successful query is a
+          // strong signal they want to see the data — expand
+          // automatically. Don't write the new state to storage;
+          // the user's persisted preference still applies the
+          // next time the page loads.
           if (this.queryResult.columns.length > 0) {
             this.showResultsPopup = true;
+            if (this.isResultSheetCollapsed) {
+              this.isResultSheetCollapsed = false;
+            }
           }
 
           this.isExecutingQuery = false;

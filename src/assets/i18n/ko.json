@@ -754,7 +754,10 @@
     "COPY_CELL": "셀 복사",
     "COPY_COLUMN": "열 복사",
     "COPIED": "클립보드에 복사됨",
-    "COPY_FAILED": "클립보드에 복사할 수 없습니다"
+    "COPY_FAILED": "클립보드에 복사할 수 없습니다",
+    "RESIZE_RESULTS": "결과 패널 크기 조정",
+    "SHOW_RESULTS": "결과 표시",
+    "HIDE_RESULTS": "결과 숨기기"
   },
   "ANALYSES": {
     "TITLE": "분석",
