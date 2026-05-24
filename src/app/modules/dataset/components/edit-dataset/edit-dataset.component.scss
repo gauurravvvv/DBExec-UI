@@ -130,26 +130,29 @@
       }
     }
 
-    // Engine badge — see add-dataset.component.scss for the matching
-    // rule. Duplicated here rather than promoted to a shared SCSS file
-    // because the toolbar styles in this module aren't extracted yet.
+    // Engine badge — compact dialect chip, same rule as
+    // add-dataset.component.scss. Quiet by design so it reads as
+    // confirmation, not a CTA.
     .db-type-badge {
       display: inline-flex;
       align-items: center;
-      gap: var(--space-2);
-      padding: 4px 10px;
-      border-radius: 12px;
+      gap: var(--space-1, 4px);
+      padding: 2px 8px;
+      border-radius: var(--radius-pill, 999px);
       background: var(--card-background);
       border: 1px solid var(--border-color);
-      font-size: var(--fs-body-sm, 13px);
+      font-size: var(--fs-label, 12px);
       font-weight: var(--fw-medium, 500);
-      color: var(--text-color);
+      color: var(--secondary-color);
       white-space: nowrap;
       user-select: none;
+      line-height: 1.4;
 
       i {
-        font-size: 16px;
+        font-size: 11px;
         line-height: 1;
+        color: var(--primary-color);
+        opacity: 0.85;
       }
     }
 
@@ -1738,14 +1741,37 @@ td.empty-message-cell {
       }
     }
 
-    // p-button-text + p-button-rounded + p-button-sm renders the
-    // chevron / dismiss as a circular icon-only button. Shrink the
-    // touch target so it doesn't visually outsize the labeled
-    // action buttons.
-    .p-button-rounded.p-button-sm {
-      width: 28px;
-      height: 28px;
+    // Quiet chevron/dismiss — 20px square so the toggle reads
+    // as a glyph affordance, not an action chip. See add-dataset
+    // for the matching rule.
+    .sheet-chevron-btn {
+      width: 20px;
+      height: 20px;
       padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--secondary-color);
+      border-radius: var(--radius-xs, 3px);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--motion-fast) ease;
+
+      i {
+        font-size: 11px;
+        line-height: 1;
+      }
+
+      &:hover {
+        color: var(--text-color);
+        background: var(--hover-background);
+      }
+
+      &--dismiss:hover {
+        color: var(--error-color);
+        background: var(--hover-background);
+      }
     }
 
     .p-button {

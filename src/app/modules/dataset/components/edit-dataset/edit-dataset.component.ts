@@ -138,16 +138,9 @@ export class EditDatasetComponent
     return !!this.queryResult;
   }
 
-  /**
-   * Whether to render the paginator chrome — only when the result
-   * spills past one page. Matches add-dataset's getter so the
-   * collapse / expand behaviour stays in sync.
-   */
-  get isPaginatorNeeded(): boolean {
-    return (
-      !!this.queryResult && (this.queryResult.rowCount ?? 0) > this.resultRows
-    );
-  }
+  // (Removed: isPaginatorNeeded — see add-dataset for the same
+  // change. Paginator is now always-on so the footer doesn't pop
+  // in when a result spills past one page.)
 
   /** True when at least one column has a type hint. Hides the type
    *  chip row when the BE didn't ship types for any column. */

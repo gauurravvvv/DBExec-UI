@@ -544,48 +544,53 @@
                 [pTooltip]="'COMMON.CLEAR' | translate"
                 tooltipPosition="bottom"
               ></button>
-              <!-- Expand affordance — only renders on the collapsed
-                   strip variant of the sheet header. -->
+              <!-- Chevron toggle + dismiss — same affordances as
+                   add-dataset. Custom .sheet-chevron-btn so the
+                   icons read as quiet glyphs, not action chips. -->
               <button
-                *ngIf="isResultSheetCollapsed"
-                pButton
-                class="p-button-text p-button-rounded p-button-sm"
-                icon="pi pi-chevron-up"
+                type="button"
+                class="sheet-chevron-btn"
                 (click)="toggleResultSheet()"
-                [pTooltip]="'DATASET.SHOW_RESULTS' | translate"
+                [pTooltip]="
+                  (isResultSheetCollapsed
+                    ? 'DATASET.SHOW_RESULTS'
+                    : 'DATASET.HIDE_RESULTS'
+                  ) | translate
+                "
                 tooltipPosition="bottom"
-              ></button>
-              <!-- Collapse-to-strip when expanded. The result data
-                   stays alive on the component so re-expanding is
-                   instant; only the body div unmounts. -->
+                [attr.aria-label]="
+                  (isResultSheetCollapsed
+                    ? 'DATASET.SHOW_RESULTS'
+                    : 'DATASET.HIDE_RESULTS'
+                  ) | translate
+                "
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    isResultSheetCollapsed ? 'pi-chevron-up' : 'pi-chevron-down'
+                  "
+                  aria-hidden="true"
+                ></i>
+              </button>
               <button
-                *ngIf="!isResultSheetCollapsed"
-                pButton
-                class="p-button-text p-button-rounded p-button-sm"
-                icon="pi pi-chevron-down"
-                (click)="toggleResultSheet()"
-                [pTooltip]="'DATASET.HIDE_RESULTS' | translate"
-                tooltipPosition="bottom"
-              ></button>
-              <!-- Dismiss — drops the result entirely. Only the
-                   user's next query brings the sheet back. Distinct
-                   from the chevron above which only collapses to
-                   the strip. -->
-              <button
-                pButton
-                class="p-button-text p-button-rounded p-button-sm"
-                icon="pi pi-times"
+                type="button"
+                class="sheet-chevron-btn sheet-chevron-btn--dismiss"
                 (click)="dismissResultSheet()"
                 [pTooltip]="'COMMON.DISMISS' | translate"
                 tooltipPosition="bottom"
-              ></button>
+                [attr.aria-label]="'COMMON.DISMISS' | translate"
+              >
+                <i class="pi pi-times" aria-hidden="true"></i>
+              </button>
             </div>
           </div>
 
-          <!-- Sheet Body. Hidden in collapsed mode so only the header
-               strip is visible — the user can still see "n rows in Xms"
-               and the Export / Clear buttons stay reachable. -->
-          <div class="results-popup-body" *ngIf="!isResultSheetCollapsed">
+          <!-- Sheet Body. [hidden] instead of *ngIf so the
+               PrimeNG <p-table> stays mounted across
+               collapse/expand — *ngIf would unmount and re-fire
+               onLazyLoad against the BE on every expand. -->
+          <div class="results-popup-body" [hidden]="isResultSheetCollapsed">
             <!-- Error Message -->
             <div class="results-error-card" *ngIf="queryResult.error">
               <div class="error-icon-wrapper">
@@ -643,7 +648,7 @@
                 #resultsTable
                 [value]="queryResult.rows"
                 [rows]="resultRows"
-                [paginator]="isPaginatorNeeded"
+                [paginator]="isPaginationEnabled"
                 [lazy]="isPaginationEnabled"
                 (onLazyLoad)="onResultsLazyLoad($event)"
                 [totalRecords]="queryResult.rowCount"

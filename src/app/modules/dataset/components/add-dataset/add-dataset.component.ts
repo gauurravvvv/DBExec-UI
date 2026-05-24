@@ -319,19 +319,13 @@ export class AddDatasetComponent
     return !!this.queryResult;
   }
 
-  /**
-   * Whether to render the paginator chrome (« ‹ 1 › » + page-size
-   * dropdown). Lazy-load + total-count + filtering all still need
-   * `isPaginationEnabled` to keep working in server-side mode; this
-   * getter is purely the "should the chrome be visible" decision.
-   * Hides when the entire result fits on one page so the popup
-   * doesn't show a paginator for a 7-row query.
-   */
-  get isPaginatorNeeded(): boolean {
-    return (
-      !!this.queryResult && (this.queryResult.rowCount ?? 0) > this.resultRows
-    );
-  }
+  // (Removed: isPaginatorNeeded getter that conditionally hid the
+  // paginator on single-page results. With the docked sheet, the
+  // footer's vertical position should be stable between queries —
+  // a 7-row result followed by a 1000-row result shouldn't make
+  // the pagination chrome appear out of nowhere. PrimeNG greys out
+  // the navigation arrows automatically when rowCount fits one
+  // page; the page-size selector + range report stay readable.)
 
   // Change Confirmation Dialog
   showChangeConfirmDialog = false;

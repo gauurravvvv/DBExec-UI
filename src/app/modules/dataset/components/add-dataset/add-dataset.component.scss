@@ -124,22 +124,30 @@
     // (list-datasource list view) so it reads as a familiar token, not
     // an action button.
     .db-type-badge {
+      // Compact dialect chip — quiet by design. Sits between the
+      // datasource name and the action buttons; the user reads it
+      // once to confirm "yes this is the engine I expected" and
+      // then ignores it. Smaller padding + label font keeps it
+      // visually subordinate to the datasource name next to it.
       display: inline-flex;
       align-items: center;
-      gap: var(--space-2);
-      padding: 4px 10px;
-      border-radius: 12px;
+      gap: var(--space-1, 4px);
+      padding: 2px 8px;
+      border-radius: var(--radius-pill, 999px);
       background: var(--card-background);
       border: 1px solid var(--border-color);
-      font-size: var(--fs-body-sm, 13px);
+      font-size: var(--fs-label, 12px);
       font-weight: var(--fw-medium, 500);
-      color: var(--text-color);
+      color: var(--secondary-color);
       white-space: nowrap;
       user-select: none;
+      line-height: 1.4;
 
       i {
-        font-size: 16px;
+        font-size: 11px;
         line-height: 1;
+        color: var(--primary-color);
+        opacity: 0.85;
       }
     }
 
@@ -1358,14 +1366,43 @@
       }
     }
 
-    // p-button-text + p-button-rounded + p-button-sm renders the
-    // chevron / dismiss as a circular icon-only button. Shrink the
-    // touch target so it doesn't visually outsize the labeled
-    // action buttons.
-    .p-button-rounded.p-button-sm {
-      width: 28px;
-      height: 28px;
+    // Custom chevron/dismiss button — quieter than PrimeNG's
+    // p-button so the chevron reads as a glyph affordance, not an
+    // action chip. 20px square with no border, hover-only
+    // background. Sized smaller than the Export/Clear icon
+    // buttons (28px) to establish a visual hierarchy: those are
+    // actions, the chevron is a view toggle.
+    .sheet-chevron-btn {
+      width: 20px;
+      height: 20px;
       padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--secondary-color);
+      border-radius: var(--radius-xs, 3px);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--motion-fast) ease;
+
+      i {
+        font-size: 11px;
+        line-height: 1;
+      }
+
+      &:hover {
+        color: var(--text-color);
+        background: var(--hover-background);
+      }
+
+      // Dismiss variant gets a danger-tinted hover so it reads
+      // as "destructive" while still matching the chevron's
+      // visual weight at rest.
+      &--dismiss:hover {
+        color: var(--error-color);
+        background: var(--hover-background);
+      }
     }
 
     .p-button {
