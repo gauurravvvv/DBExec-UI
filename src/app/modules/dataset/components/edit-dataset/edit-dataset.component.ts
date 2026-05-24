@@ -37,6 +37,11 @@ import {
   QueryExecuteData,
   QueryResult,
 } from '../../helpers/dummy-data.helper';
+import {
+  flexLastColumn,
+  formatCellValue,
+  measureColumnWidths,
+} from '../../helpers/cell-formatter.helper';
 import { SchemaTransformerHelper } from '../../helpers/schema-transformer.helper';
 import {
   ContextMenuItem,
@@ -132,6 +137,56 @@ export class EditDatasetComponent
   get isPaginationEnabled(): boolean {
     return !!this.queryResult;
   }
+
+  /**
+   * Whether to render the paginator chrome — only when the result
+   * spills past one page. Matches add-dataset's getter so the
+   * collapse / expand behaviour stays in sync.
+   */
+  get isPaginatorNeeded(): boolean {
+    return (
+      !!this.queryResult && (this.queryResult.rowCount ?? 0) > this.resultRows
+    );
+  }
+
+  /** True when at least one column has a type hint. Hides the type
+   *  chip row when the BE didn't ship types for any column. */
+  get hasAnyColumnType(): boolean {
+    const types = this.queryResult?.columnTypes;
+    return !!types && Object.keys(types).length > 0;
+  }
+
+  // ── Bottom-sheet state (mirrors add-dataset) ──────────────────────
+  resultSheetHeightPx = 420;
+  isResultSheetCollapsed = false;
+  private sheetDragState: {
+    startY: number;
+    startHeight: number;
+    onMove: (ev: MouseEvent) => void;
+    onUp: () => void;
+  } | null = null;
+
+  /** Per-column pixel width applied to the result grid's <colgroup>. */
+  columnWidths: Record<string, number> = {};
+
+  /** Expanded JSON-cell tracking for the result grid. */
+  expandedJsonCells = new Set<string>();
+
+  /** Cell-level right-click context menu state. */
+  showCellContextMenu = false;
+  cellContextMenuTop = 0;
+  cellContextMenuLeft = 0;
+  private cellContextTarget: { rowIndex: number; col: string } | null = null;
+
+  /** ResizeObserver watching .editor-results-area so column widths
+   *  re-flow when the pane width changes. */
+  private paneResizeObserver: ResizeObserver | null = null;
+  private paneResizeTimer: any = null;
+  private lastObservedPaneWidth = 0;
+
+  /** PrimeNG <p-table> ref so we can reset `.first` between
+   *  successive queries (prevents stale paginator state). */
+  @ViewChild('resultsTable') resultsTable: any;
 
   // IntelliSense provider disposables
   private completionProviderDisposable: any = null;
@@ -249,12 +304,17 @@ export class EditDatasetComponent
     private cdr: ChangeDetectorRef,
     private monacoLoader: MonacoLoaderService,
     private translate: TranslateService,
+    private elementRef: ElementRef<HTMLElement>,
   ) {
     this.userRole = this.globalService.getTokenDetails('role') || '';
     this.showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
   }
 
   ngOnInit(): void {
+    // Restore the user's preferred result-sheet height + collapsed
+    // state so a returning user gets back where they left off.
+    this.loadPersistedSheetState();
+
     // Setup debounce for result filter changes
     this.resultFilterSubject
       .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
@@ -386,10 +446,20 @@ export class EditDatasetComponent
 
   ngAfterViewInit(): void {
     this.loadMonacoEditor();
+    this.installResultPaneResizeObserver();
   }
 
   ngOnDestroy(): void {
     this.resultFilterSubject.complete();
+
+    if (this.paneResizeObserver) {
+      this.paneResizeObserver.disconnect();
+      this.paneResizeObserver = null;
+    }
+    if (this.paneResizeTimer) {
+      clearTimeout(this.paneResizeTimer);
+      this.paneResizeTimer = null;
+    }
 
     if (this.editor) {
       this.editor.dispose();
@@ -767,10 +837,11 @@ export class EditDatasetComponent
    */
   executeQuery(): void {
     if (!this.editor) return;
-    // Block keyboard re-entry while the results popup is open or a query is
-    // already in flight — Monaco keeps focus when the popup overlays it, so
-    // Ctrl+Enter would otherwise fire repeatedly.
-    if (this.showResultsPopup || this.isExecutingQuery) return;
+    // Re-entry guard against double-firing while a query is in
+    // flight. The previous `showResultsPopup ||` clause was a
+    // modal-era leftover; with the docked sheet, Run is expected
+    // to work whether the sheet is open or not.
+    if (this.isExecutingQuery) return;
 
     const selection = this.editor.getSelection();
     const hasSelection = selection && !selection.isEmpty();
@@ -792,11 +863,13 @@ export class EditDatasetComponent
    * Execute complete SQL query from editor
    */
   executeCompleteQuery(): void {
-    if (this.showResultsPopup || this.isExecutingQuery) return;
+    if (this.isExecutingQuery) return;
     const query = this.editor?.getValue() || this.currentQuery;
     this.resultPage = 1;
     this.resultFilterValues = {};
-    this.queryResult = null;
+    // Leave queryResult in place until the new result lands —
+    // avoids the *ngIf flicker that would otherwise unmount the
+    // sheet between queries.
     this.executeQueryForDatasource(query);
   }
 
@@ -805,10 +878,10 @@ export class EditDatasetComponent
    * @param selectedText The selected SQL text to execute
    */
   executeSelectedQuery(selectedText: string): void {
-    if (this.showResultsPopup || this.isExecutingQuery) return;
+    if (this.isExecutingQuery) return;
     this.resultPage = 1;
     this.resultFilterValues = {};
-    this.queryResult = null;
+    // See executeCompleteQuery — same anti-flicker reasoning.
     this.executeQueryForDatasource(selectedText);
   }
 
@@ -1081,6 +1154,7 @@ export class EditDatasetComponent
                 response.message ||
                 this.translate.instant('DATASET.QUERY_EXECUTION_FAILED'),
             };
+            this.surfaceResultSheet();
             this.isExecutingQuery = false;
             this.cdr.markForCheck();
             return;
@@ -1095,6 +1169,7 @@ export class EditDatasetComponent
               executionTime: `${Date.now() - startTime}ms`,
               message: response.message,
             };
+            this.surfaceResultSheet();
             this.isExecutingQuery = false;
             this.cdr.markForCheck();
             return;
@@ -1114,8 +1189,21 @@ export class EditDatasetComponent
             query: data.query,
           };
 
+          // Auto-fit columns to content with last-column flex —
+          // mirrors add-dataset's behaviour.
+          const measured = measureColumnWidths(
+            this.queryResult.columns,
+            this.queryResult.rows,
+            this.queryResult.columnTypes,
+          );
+          this.columnWidths = flexLastColumn(
+            measured,
+            this.queryResult.columns,
+            this.lastObservedPaneWidth || window.innerWidth,
+          );
+
           if (this.queryResult.columns.length > 0) {
-            this.showResultsPopup = true;
+            this.surfaceResultSheet();
           }
 
           this.isExecutingQuery = false;
@@ -1147,11 +1235,260 @@ export class EditDatasetComponent
             executionTime: executionTime,
             error: errorMessage,
           };
+          this.surfaceResultSheet();
 
           this.isExecutingQuery = false;
           this.cdr.markForCheck();
         },
       });
+  }
+
+  // ────────────────────────────────────────────────────────────────
+  // Bottom-sheet behaviour mirrored from add-dataset. See
+  // add-dataset.component.ts for the long-form comments on each
+  // method — same semantics, scoped to this component's lifecycle.
+  // ────────────────────────────────────────────────────────────────
+
+  private static readonly SHEET_HEIGHT_STORAGE_KEY =
+    'dbexec.queryResult.sheetHeightPx';
+  private static readonly SHEET_COLLAPSED_STORAGE_KEY =
+    'dbexec.queryResult.sheetCollapsed';
+  private static readonly SHEET_MIN_HEIGHT = 240;
+  private static readonly SHEET_MAX_HEIGHT_PADDING = 120;
+
+  private clampSheetHeight(px: number): number {
+    const host = this.elementRef.nativeElement.querySelector(
+      '.editor-results-area',
+    ) as HTMLElement | null;
+    const containerHeight =
+      host?.getBoundingClientRect().height ?? window.innerHeight;
+    const max = Math.max(
+      EditDatasetComponent.SHEET_MIN_HEIGHT,
+      containerHeight - EditDatasetComponent.SHEET_MAX_HEIGHT_PADDING,
+    );
+    return Math.min(
+      max,
+      Math.max(EditDatasetComponent.SHEET_MIN_HEIGHT, px),
+    );
+  }
+
+  private loadPersistedSheetState(): void {
+    try {
+      const raw = localStorage.getItem(
+        EditDatasetComponent.SHEET_HEIGHT_STORAGE_KEY,
+      );
+      if (raw) {
+        const parsed = parseInt(raw, 10);
+        if (Number.isFinite(parsed)) {
+          this.resultSheetHeightPx = this.clampSheetHeight(parsed);
+        }
+      } else {
+        this.resultSheetHeightPx = this.clampSheetHeight(
+          Math.round(window.innerHeight * 0.45),
+        );
+      }
+      const collapsedRaw = localStorage.getItem(
+        EditDatasetComponent.SHEET_COLLAPSED_STORAGE_KEY,
+      );
+      this.isResultSheetCollapsed = collapsedRaw === 'true';
+    } catch (_) {
+      /* localStorage may be unavailable */
+    }
+  }
+
+  private persistSheetHeight(px: number): void {
+    try {
+      localStorage.setItem(
+        EditDatasetComponent.SHEET_HEIGHT_STORAGE_KEY,
+        String(Math.round(px)),
+      );
+    } catch (_) {}
+  }
+
+  private persistSheetCollapsed(collapsed: boolean): void {
+    try {
+      localStorage.setItem(
+        EditDatasetComponent.SHEET_COLLAPSED_STORAGE_KEY,
+        collapsed ? 'true' : 'false',
+      );
+    } catch (_) {}
+  }
+
+  toggleResultSheet(): void {
+    this.isResultSheetCollapsed = !this.isResultSheetCollapsed;
+    this.persistSheetCollapsed(this.isResultSheetCollapsed);
+  }
+
+  dismissResultSheet(): void {
+    this.showResultsPopup = false;
+    this.queryResult = null;
+    if (this.expandedJsonCells.size > 0) {
+      this.expandedJsonCells = new Set();
+    }
+  }
+
+  private surfaceResultSheet(): void {
+    this.showResultsPopup = true;
+    if (this.isResultSheetCollapsed) {
+      this.isResultSheetCollapsed = false;
+      this.persistSheetCollapsed(false);
+    }
+    if (this.resultsTable) {
+      this.resultsTable.first = 0;
+    }
+    this.resultPage = 1;
+  }
+
+  onSheetDragStart(event: MouseEvent): void {
+    event.preventDefault();
+    if (this.isResultSheetCollapsed) return;
+    const startY = event.clientY;
+    const startHeight = this.resultSheetHeightPx;
+    const onMove = (ev: MouseEvent) => {
+      const delta = startY - ev.clientY;
+      this.resultSheetHeightPx = this.clampSheetHeight(startHeight + delta);
+      this.cdr.markForCheck();
+    };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      this.persistSheetHeight(this.resultSheetHeightPx);
+      this.sheetDragState = null;
+      document.body.classList.remove('ds-sheet-dragging');
+    };
+    this.sheetDragState = { startY, startHeight, onMove, onUp };
+    document.body.classList.add('ds-sheet-dragging');
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  }
+
+  onSheetHandleKeydown(event: KeyboardEvent): void {
+    if (this.isResultSheetCollapsed) return;
+    const step = event.shiftKey ? 80 : 20;
+    let next = this.resultSheetHeightPx;
+    if (event.key === 'ArrowUp') next = this.resultSheetHeightPx + step;
+    else if (event.key === 'ArrowDown') next = this.resultSheetHeightPx - step;
+    else return;
+    event.preventDefault();
+    this.resultSheetHeightPx = this.clampSheetHeight(next);
+    this.persistSheetHeight(this.resultSheetHeightPx);
+  }
+
+  get effectiveSheetHeightPx(): number {
+    if (!this.showResultsPopup || !this.queryResult) return 0;
+    return this.isResultSheetCollapsed ? 44 : this.resultSheetHeightPx;
+  }
+
+  // ── JSON cell expand/collapse ─────────────────────────────────
+  jsonCellKey(rowIndex: number, col: string): string {
+    return `${rowIndex}-${col}`;
+  }
+
+  toggleJsonCell(rowIndex: number, col: string): void {
+    const key = this.jsonCellKey(rowIndex, col);
+    if (this.expandedJsonCells.has(key)) this.expandedJsonCells.delete(key);
+    else this.expandedJsonCells.add(key);
+    this.expandedJsonCells = new Set(this.expandedJsonCells);
+  }
+
+  // ── Cell context menu (Copy cell / column) ────────────────────
+  onCellContextMenu(event: MouseEvent, rowIndex: number, col: string): void {
+    if (!this.queryResult) return;
+    event.preventDefault();
+    event.stopPropagation();
+    this.showContextMenu = false;
+    this.cellContextTarget = { rowIndex, col };
+    this.cellContextMenuLeft = event.clientX;
+    this.cellContextMenuTop = event.clientY;
+    this.showCellContextMenu = true;
+  }
+
+  async copyCellValue(): Promise<void> {
+    if (!this.cellContextTarget || !this.queryResult) return;
+    const { rowIndex, col } = this.cellContextTarget;
+    const raw = this.queryResult.rows?.[rowIndex]?.[col];
+    const cell = formatCellValue(raw, this.queryResult.columnTypes?.[col]);
+    const text =
+      cell.kind === 'null'
+        ? this.translate.instant('DATASET.CELL_NULL')
+        : cell.display;
+    await this.writeToClipboard(text);
+    this.closeContextMenu();
+  }
+
+  async copyColumnValues(): Promise<void> {
+    if (!this.cellContextTarget || !this.queryResult) return;
+    const { col } = this.cellContextTarget;
+    const lines = (this.queryResult.rows || []).map(row => {
+      const cell = formatCellValue(
+        row?.[col],
+        this.queryResult?.columnTypes?.[col],
+      );
+      return cell.kind === 'null' ? '' : cell.display;
+    });
+    await this.writeToClipboard(lines.join('\n'));
+    this.closeContextMenu();
+  }
+
+  private async writeToClipboard(text: string): Promise<void> {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'absolute';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      this.globalService.showInfo(this.translate.instant('DATASET.COPIED'));
+    } catch (_) {
+      this.globalService.showWarn(
+        this.translate.instant('DATASET.COPY_FAILED'),
+      );
+    }
+  }
+
+  // ── Pane-resize column re-flow ────────────────────────────────
+  private installResultPaneResizeObserver(): void {
+    if (typeof ResizeObserver === 'undefined') return;
+    const pane = this.elementRef.nativeElement.querySelector(
+      '.editor-results-area',
+    ) as HTMLElement | null;
+    if (!pane) return;
+    this.lastObservedPaneWidth = pane.getBoundingClientRect().width;
+    this.paneResizeObserver = new ResizeObserver(entries => {
+      const entry = entries[0];
+      if (!entry) return;
+      const width = entry.contentRect.width;
+      if (Math.abs(width - this.lastObservedPaneWidth) < 50) return;
+      this.lastObservedPaneWidth = width;
+      if (this.paneResizeTimer) clearTimeout(this.paneResizeTimer);
+      this.paneResizeTimer = setTimeout(() => {
+        this.recalculateColumnWidths();
+        this.paneResizeTimer = null;
+      }, 80);
+    });
+    this.paneResizeObserver.observe(pane);
+  }
+
+  private recalculateColumnWidths(): void {
+    if (!this.queryResult || !this.queryResult.columns?.length) return;
+    const measured = measureColumnWidths(
+      this.queryResult.columns,
+      this.queryResult.rows,
+      this.queryResult.columnTypes,
+    );
+    this.columnWidths = flexLastColumn(
+      measured,
+      this.queryResult.columns,
+      this.lastObservedPaneWidth || window.innerWidth,
+    );
+    this.cdr.markForCheck();
   }
 
   onDatasetDialogClose(formData: DatasetFormData | null): void {
@@ -1552,6 +1889,10 @@ export class EditDatasetComponent
   closeContextMenu(): void {
     this.showContextMenu = false;
     this.contextMenuDatasource = null;
+    // Cell-level context menu shares the global outside-click
+    // listener, so close it from here too.
+    this.showCellContextMenu = false;
+    this.cellContextTarget = null;
   }
 
   refreshDatasourceFromContext(): void {
@@ -1564,17 +1905,13 @@ export class EditDatasetComponent
   }
 
   /**
-   * Esc closes the open results popup or context menu without affecting Monaco's
-   * own Esc handling (Monaco gets the key first when the editor has focus, so it
-   * can dismiss its own widgets like the suggestion list before this fires).
+   * Esc dismisses transient overlays only. The docked result
+   * sheet is intentionally NOT bound to Esc — accidental Esc
+   * dropping the result would be a footgun. Use the sheet's
+   * chevron (collapse) or × (dismiss) buttons.
    */
   @HostListener('document:keydown.escape')
   onEscape(): void {
-    if (this.showResultsPopup) {
-      this.showResultsPopup = false;
-      this.cdr.markForCheck();
-      return;
-    }
     if (this.showContextMenu) {
       this.closeContextMenu();
       this.cdr.markForCheck();

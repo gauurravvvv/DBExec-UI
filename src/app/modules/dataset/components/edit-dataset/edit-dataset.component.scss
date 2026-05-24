@@ -372,31 +372,9 @@
   height: 100%;
 
   &.collapsed {
-    width: 60px;
-    min-width: 60px;
-
-    .sidebar-content {
-      position: relative;
-      padding: var(--space-0);
-      height: 100%;
-
-      .sidebar-header,
-      .sidebar-content-inner {
-        display: none;
-      }
-
-      .rotated-title {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%) rotate(-90deg);
-        white-space: nowrap;
-        color: var(--text-color);
-        font-weight: var(--fw-semibold);
-        font-size: var(--fs-body);
-        letter-spacing: 2px;
-      }
-    }
+    width: 0;
+    min-width: 0;
+    border-right: none;
   }
 
   .sidebar-content {
@@ -745,40 +723,8 @@
   }
 }
 
-// ===================================================================
-// Separator with Toggle Button
-// ===================================================================
-.separator {
-  display: flex;
-  align-items: center;
-  padding: 0 2px;
-  background: var(--card-background);
-  border-left: 1px solid var(--border-color);
-  border-right: 1px solid var(--border-color);
-
-  .toggle-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-color);
-    transition: color var(--motion-base) ease;
-    padding: 8px 4px;
-    height: 40px;
-
-    &:hover {
-      color: var(--secondary-color);
-      background: var(--hover-background);
-    }
-
-    i {
-      font-size: var(--fs-body);
-    }
-  }
-}
-
+// (Removed: .separator with toggle-btn — sidebar toggle now lives in
+// the page toolbar via the .a-segment__btn pattern.)
 // ===================================================================
 // Editor and Results Area (Right Panel)
 // ===================================================================
@@ -1028,505 +974,9 @@
 // ===================================================================
 // Results Status Bar (floating at bottom of editor)
 // ===================================================================
-.results-status-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 16px;
-  background-color: var(--card-background);
-  border-top: 1px solid var(--border-color);
-  flex-shrink: 0;
-  min-height: 40px;
-
-  .status-bar-left {
-    display: flex;
-    align-items: center;
-    gap: var(--space-5);
-
-    .status-icon {
-      display: flex;
-      align-items: center;
-
-      i {
-        font-size: var(--fs-h3);
-      }
-
-      &.success i {
-        color: var(--success-color);
-      }
-
-      &.error i {
-        color: var(--error-color);
-      }
-    }
-
-    .status-text {
-      font-size: var(--fs-control);
-      color: var(--text-color);
-      font-weight: var(--fw-medium);
-    }
-  }
-
-  .status-bar-right {
-    display: flex;
-    align-items: center;
-    gap: var(--space-4);
-
-    .status-bar-btn {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      padding: 5px 12px;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: var(--fs-label);
-      font-weight: var(--fw-semibold);
-      cursor: pointer;
-      transition: all var(--motion-base) ease;
-
-      i {
-        font-size: var(--fs-label);
-      }
-
-      &.view-btn {
-        background: var(--primary-color);
-        color: var(--primary-text);
-
-        &:hover {
-          opacity: 0.9;
-          transform: translateY(-1px);
-        }
-      }
-
-      &.close-btn {
-        background: transparent;
-        color: var(--secondary-color);
-        padding: 5px 8px;
-
-        &:hover {
-          background: var(--hover-background);
-          color: var(--text-color);
-        }
-      }
-    }
-  }
-}
-
 // ===================================================================
 // Results Popup Overlay
 // ===================================================================
-.results-popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--overlay-background);
-  backdrop-filter: blur(4px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: var(--z-overlay);
-  animation: popupFadeIn 0.2s ease-out;
-
-  @keyframes popupFadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-}
-
-.results-popup-container {
-  background: var(--card-background);
-  border-radius: var(--radius-lg);
-  box-shadow:
-    var(--shadow-xl),
-    0 0 0 1px var(--border-color);
-  width: 90vw;
-  max-width: 1200px;
-  height: 85vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  animation: slideUp 0.25s ease-out;
-
-  // Compact mode for error/empty states
-  &.compact {
-    height: auto;
-    max-height: 85vh;
-  }
-
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px) scale(0.97);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-}
-
-.results-popup-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 24px;
-  border-bottom: 1px solid var(--border-color);
-  background: var(--hover-background);
-  flex-shrink: 0;
-
-  .popup-header-left {
-    display: flex;
-    align-items: center;
-    gap: var(--space-5);
-
-    > i {
-      font-size: var(--fs-h2);
-      color: var(--primary-color);
-    }
-
-    .popup-title {
-      font-size: var(--fs-h3);
-      font-weight: var(--fw-semibold);
-      color: var(--text-color);
-    }
-
-    .popup-meta {
-      font-size: var(--fs-label);
-      color: var(--secondary-color);
-      padding: 4px 10px;
-      background-color: var(--card-background);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-pill);
-      font-weight: var(--fw-medium);
-    }
-  }
-
-  .popup-header-right {
-    display: flex;
-    align-items: center;
-    gap: var(--space-4);
-
-    .export-csv-btn {
-      font-size: var(--fs-control);
-      padding: 0.4rem 0.8rem;
-      border-radius: var(--radius-sm);
-    }
-
-    .clear-filters-btn {
-      font-size: var(--fs-control);
-      padding: 0.4rem 0.8rem;
-      border-radius: var(--radius-sm);
-    }
-
-    .p-button {
-      color: var(--secondary-color);
-
-      &:hover {
-        color: var(--text-color);
-        background: var(--card-background) !important;
-      }
-    }
-  }
-}
-
-.results-popup-body {
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-
-  // Error Card
-  .results-error-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 32px 32px;
-    text-align: center;
-
-    .error-icon-wrapper {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: var(--error-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-
-      i {
-        font-size: var(--fs-h1);
-        color: var(--error-color);
-      }
-    }
-
-    h4 {
-      margin: 0 0 16px 0;
-      color: var(--text-color);
-      font-size: var(--fs-h1);
-      font-weight: var(--fw-semibold);
-    }
-
-    .error-message-box {
-      max-width: 600px;
-      width: 100%;
-      background: var(--hover-background);
-      border: 1px solid var(--border-color);
-      border-left: 4px solid var(--error-color);
-      border-radius: var(--radius-md);
-      padding: 16px 20px;
-      margin-bottom: 16px;
-      text-align: left;
-
-      code {
-        color: var(--error-color);
-        font-size: var(--fs-body);
-        font-family: var(--font-mono);
-        line-height: 1.6;
-        word-break: break-word;
-        white-space: pre-wrap;
-      }
-    }
-
-    .error-meta {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      color: var(--secondary-color);
-      font-size: var(--fs-control);
-
-      i {
-        font-size: var(--fs-control);
-      }
-    }
-  }
-
-  // Success Card
-  .results-success-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 32px 32px;
-    text-align: center;
-
-    .success-icon-wrapper {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: var(--success-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-
-      i {
-        font-size: var(--fs-h1);
-        color: var(--success-color);
-      }
-    }
-
-    h4 {
-      margin: 0 0 12px 0;
-      color: var(--text-color);
-      font-size: var(--fs-h1);
-      font-weight: var(--fw-semibold);
-    }
-
-    .success-message {
-      margin: 0 0 16px 0;
-      color: var(--secondary-color);
-      font-size: var(--fs-h3);
-      max-width: 400px;
-      line-height: 1.6;
-    }
-
-    .success-meta {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      color: var(--secondary-color);
-      font-size: var(--fs-control);
-
-      i {
-        font-size: var(--fs-control);
-      }
-    }
-  }
-
-  // PrimeNG Table Container
-  .results-table-container {
-    flex: 1;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-
-    ::ng-deep .modern-table {
-      .p-datatable-wrapper {
-        background: var(--card-background);
-      }
-
-      .p-datatable-header {
-        display: none;
-      }
-
-      .p-datatable-thead > tr > th {
-        background: var(--hover-background);
-        color: var(--text-color);
-        font-size: var(--fs-control);
-        font-weight: var(--fw-semibold);
-        padding: 0.75rem 1rem;
-        border-bottom: 1px solid var(--border-color);
-
-        .th-content {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          gap: var(--space-1);
-
-          .column-datatype {
-            font-size: var(--fs-micro);
-            font-weight: var(--fw-regular);
-            color: var(--primary-color);
-            opacity: 0.8;
-            font-family: var(--font-mono);
-            padding: 1px 6px;
-            background: var(--primary-color-transparent);
-            border-radius: var(--radius-xs);
-            cursor: default;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-            display: block;
-          }
-        }
-
-        &:first-child {
-          padding-left: 1.5rem;
-        }
-
-        &:last-child {
-          padding-right: 1.5rem;
-        }
-
-        &:focus {
-          box-shadow: none;
-        }
-
-        &.p-highlight {
-          color: var(--primary-color);
-
-          .p-sortable-column-icon {
-            color: var(--primary-color);
-          }
-        }
-      }
-
-      .p-datatable-tbody > tr {
-        background: var(--card-background);
-        transition: all var(--motion-fast) ease;
-        border-bottom: 1px solid var(--border-color);
-
-        td {
-          padding: 0.6rem 1rem;
-          vertical-align: middle;
-          color: var(--text-color);
-          font-size: var(--fs-h3);
-          font-family: var(--font-mono);
-          max-width: 300px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-
-          &:first-child {
-            padding-left: 1.5rem;
-          }
-
-          &:last-child {
-            padding-right: 1.5rem;
-          }
-        }
-
-        &:hover {
-          background-color: var(--hover-background) !important;
-        }
-      }
-
-      .row-number-cell {
-        color: var(--secondary-color);
-        font-size: var(--fs-control);
-        font-weight: var(--fw-semibold);
-        text-align: center;
-        background: var(--hover-background);
-      }
-
-      .null-value {
-        color: var(--secondary-color);
-        font-style: italic;
-        opacity: 0.6;
-      }
-
-      // Column filter inputs
-      .p-column-filter {
-        font-size: var(--fs-control);
-        padding: 0.4rem 0.6rem;
-        border-radius: var(--radius-xs);
-        border: 1px solid var(--border-color);
-        background: var(--card-background);
-        color: var(--text-color);
-
-        &:focus {
-          border-color: var(--primary-color);
-          box-shadow: 0 0 0 1px var(--primary-color-transparent);
-        }
-
-        &::placeholder {
-          color: var(--secondary-color);
-          font-size: var(--fs-control);
-        }
-      }
-
-      // Paginator
-      .p-paginator {
-        background: var(--card-background);
-        border-top: 1px solid var(--border-color);
-        justify-content: flex-end;
-        padding: 0.75rem 1.5rem;
-
-        .p-paginator-page,
-        .p-paginator-next,
-        .p-paginator-prev,
-        .p-paginator-first,
-        .p-paginator-last {
-          border-radius: var(--radius-sm);
-          color: var(--secondary-color);
-          min-width: 2rem;
-          height: 2rem;
-          margin: 0 0.125rem;
-          font-weight: var(--fw-medium);
-
-          &:hover {
-            background: var(--hover-background);
-            color: var(--text-color);
-          }
-
-          &.p-highlight {
-            background: var(--primary-color);
-            color: var(--primary-text);
-          }
-        }
-      }
-    }
-  }
-}
-
 td.text-center {
   text-align: center;
 }
@@ -1623,10 +1073,6 @@ td.empty-message-cell {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.results-status-bar {
-  animation: fadeIn 0.3s ease-out;
 }
 
 // ===================================================================
@@ -2142,5 +1588,1166 @@ td.empty-message-cell {
         }
       }
     }
+  }
+}
+
+// Cell-level right-click context menu. Tiny floating panel
+// positioned by inline top/left from the right-click event. Lives
+// inside the popup overlay so it stacks correctly above the grid.
+.cell-context-menu {
+  position: fixed;
+  z-index: calc(var(--z-overlay, 1000) + 10);
+  min-width: 180px;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-1, 4px) 0;
+  display: flex;
+  flex-direction: column;
+  animation: cellMenuIn 0.12s ease-out;
+
+  @keyframes cellMenuIn {
+    from {
+      opacity: 0;
+      transform: translateY(-2px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .cell-context-item {
+    background: transparent;
+    border: 0;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 8px);
+    color: var(--text-color);
+    font-size: var(--fs-control);
+    cursor: pointer;
+    text-align: left;
+
+    &:hover {
+      background: var(--hover-background);
+      color: var(--primary-color);
+    }
+
+    i {
+      font-size: 13px;
+      color: var(--secondary-color);
+    }
+
+    &:hover i {
+      color: var(--primary-color);
+    }
+  }
+}
+
+// Legacy modal container — replaced by .results-sheet above. The
+// .results-popup-header / .results-popup-body class names remain on
+// the inner markup for backwards-compat with the surrounding SCSS
+// (header padding, error/empty cards, table wrapper). Their parent
+// is now the bottom sheet, not a centered modal.
+// (Legacy modal container removed — bottom-sheet rules above replace it.)
+
+.results-popup-header {
+  // ~40px tall to match DataGrip / Hex result-panel headers.
+  // Anything taller eats viewport that should belong to the rows
+  // themselves. Buttons inside are p-button-sm (~28px); the strip
+  // padding leaves 6px above + below for breathing room.
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 16px;
+  min-height: 40px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--hover-background);
+  flex-shrink: 0;
+
+  .popup-header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+
+    > i {
+      // Same size as the action buttons' icons so the leading
+      // icon doesn't tower over them.
+      font-size: var(--fs-control);
+      color: var(--primary-color);
+    }
+
+    .popup-title {
+      font-size: var(--fs-body);
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
+      line-height: 1.2;
+    }
+
+    .popup-meta {
+      font-size: var(--fs-label);
+      color: var(--secondary-color);
+      padding: 2px 8px;
+      background-color: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-pill);
+      font-weight: var(--fw-medium);
+      line-height: 1.3;
+    }
+  }
+
+  .popup-header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+
+    // Export CSV + Clear Filters — icon-only rounded buttons that
+    // match the chevron / dismiss visual weight in the 40px header
+    // strip. The labels live in the pTooltip; the icon carries the
+    // meaning. Coloured icons (success green for export, danger red
+    // for clear) keep them distinguishable from the neutral chevron.
+    .export-csv-btn,
+    .clear-filters-btn {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+
+      .p-button-icon {
+        font-size: 13px;
+        margin: 0;
+      }
+    }
+
+    .export-csv-btn {
+      color: var(--success-color);
+
+      &:not(:disabled):hover {
+        color: var(--success-color);
+        background: var(--hover-background) !important;
+      }
+    }
+
+    .clear-filters-btn {
+      color: var(--error-color);
+
+      &:not(:disabled):hover {
+        color: var(--error-color);
+        background: var(--hover-background) !important;
+      }
+    }
+
+    // p-button-text + p-button-rounded + p-button-sm renders the
+    // chevron / dismiss as a circular icon-only button. Shrink the
+    // touch target so it doesn't visually outsize the labeled
+    // action buttons.
+    .p-button-rounded.p-button-sm {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+    }
+
+    .p-button {
+      color: var(--secondary-color);
+
+      &:hover {
+        color: var(--text-color);
+        background: var(--card-background) !important;
+      }
+    }
+  }
+}
+
+.results-popup-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  // Error Card
+  .results-error-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 32px;
+    text-align: center;
+
+    .error-icon-wrapper {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--error-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+
+      i {
+        font-size: var(--fs-h1);
+        color: var(--error-color);
+      }
+    }
+
+    h4 {
+      margin: 0 0 16px 0;
+      color: var(--text-color);
+      font-size: var(--fs-h1);
+      font-weight: var(--fw-semibold);
+    }
+
+    .error-message-box {
+      max-width: 600px;
+      width: 100%;
+      background: var(--hover-background);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--error-color);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      text-align: left;
+
+      code {
+        color: var(--error-color);
+        font-size: var(--fs-body);
+        font-family: var(--font-mono);
+        line-height: 1.6;
+        word-break: break-word;
+        white-space: pre-wrap;
+      }
+    }
+
+    .error-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      color: var(--secondary-color);
+      font-size: var(--fs-control);
+
+      i {
+        font-size: var(--fs-control);
+      }
+    }
+  }
+
+  // Success Card
+  .results-success-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 32px;
+    text-align: center;
+
+    .success-icon-wrapper {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--success-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+
+      i {
+        font-size: var(--fs-h1);
+        color: var(--success-color);
+      }
+    }
+
+    h4 {
+      margin: 0 0 12px 0;
+      color: var(--text-color);
+      font-size: var(--fs-h1);
+      font-weight: var(--fw-semibold);
+    }
+
+    .success-message {
+      margin: 0 0 16px 0;
+      color: var(--secondary-color);
+      font-size: var(--fs-h3);
+      max-width: 400px;
+      line-height: 1.6;
+    }
+
+    .success-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      color: var(--secondary-color);
+      font-size: var(--fs-control);
+
+      i {
+        font-size: var(--fs-control);
+      }
+    }
+  }
+
+  // Empty Results Card
+  .results-empty-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 32px;
+    text-align: center;
+
+    .empty-icon-wrapper {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--hover-background);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+
+      i {
+        font-size: var(--fs-h1);
+        color: var(--secondary-color);
+      }
+    }
+
+    h4 {
+      margin: 0 0 8px 0;
+      color: var(--text-color);
+      font-size: var(--fs-h2);
+      font-weight: var(--fw-semibold);
+    }
+
+    p {
+      margin: var(--space-0);
+      color: var(--secondary-color);
+      font-size: var(--fs-body);
+    }
+  }
+
+  // PrimeNG Table Container
+  .results-table-container {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    ::ng-deep .modern-table {
+      // Horizontal scroll for tables whose columns sum wider than
+      // the sheet. The wrapper owns the overflow; the <table>
+      // inside gets its width from the <colgroup>.
+      .p-datatable-wrapper {
+        background: var(--card-background);
+        overflow-x: auto;
+        overflow-y: auto;
+      }
+
+      // table-layout: fixed makes <colgroup> widths absolute
+      // instead of suggestions. Without this the browser
+      // distributes any "extra" container width across columns
+      // proportionally, which is what produced the lonely-1-in-
+      // 430px-column problem.
+      .p-datatable-table {
+        table-layout: fixed;
+        width: 100%;
+      }
+
+      .p-datatable-header {
+        display: none;
+      }
+
+      // Sticky thead. Per-th (not per-thead) because PrimeNG
+      // wraps in a flex container that doesn't allow sticky on
+      // the row itself. background is opaque so body rows can't
+      // bleed through; z-index above the body td.
+      .p-datatable-thead > tr > th {
+        background: var(--hover-background);
+        color: var(--text-color);
+        font-size: var(--fs-control);
+        font-weight: var(--fw-semibold);
+        padding: 0.4rem 0.875rem;
+        border-bottom: 1px solid var(--border-color);
+        position: sticky;
+        top: 0;
+        z-index: 2;
+
+        .th-content {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: var(--space-1);
+
+          .column-datatype {
+            font-size: var(--fs-micro);
+            font-weight: var(--fw-regular);
+            color: var(--primary-color);
+            opacity: 0.8;
+            font-family: var(--font-mono);
+            padding: 1px 6px;
+            background: var(--primary-color-transparent);
+            border-radius: var(--radius-xs);
+            cursor: default;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            display: block;
+          }
+        }
+
+        &:first-child {
+          padding-left: 1.5rem;
+        }
+
+        &:last-child {
+          padding-right: 1.5rem;
+        }
+
+        &:focus {
+          box-shadow: none;
+        }
+
+        &.p-highlight {
+          color: var(--primary-color);
+
+          .p-sortable-column-icon {
+            color: var(--primary-color);
+          }
+        }
+      }
+
+      // Second-row <th> elements are the per-column filter inputs.
+      // They need to stick BELOW the column-name row so both rows
+      // stay visible during vertical scroll. The exact `top` value
+      // depends on the rendered height of the first row — using
+      // a CSS custom property lets us tune this in one place when
+      // the row padding changes. Default lands at the natural height
+      // of the column-name row + its 1px border.
+      .p-datatable-thead > tr:nth-child(2) > th {
+        top: var(--results-header-row-height, 38px);
+        z-index: 1; // below the primary header row
+        // Tighter padding for the filter row: inputs already have
+        // their own internal padding, so the cell padding can be
+        // minimal without crowding.
+        padding: 0.25rem 0.5rem;
+      }
+
+      // The filter <input> sits flush in its cell; give it a clear
+      // background so it doesn't look transparent over the sticky
+      // header tint.
+      .p-datatable-thead > tr:nth-child(2) > th .p-column-filter {
+        background: var(--card-background);
+      }
+
+      .p-datatable-tbody > tr {
+        background: var(--card-background);
+        transition: background-color var(--motion-fast) ease;
+        border-bottom: 1px solid var(--border-color);
+
+        // Zebra striping: every even row gets a near-invisible tint
+        // so the eye can track a single row across wide tables
+        // without losing its place. Strength is intentionally light
+        // (light theme: ~1.5% black tint; dark theme: ~3% white).
+        // Row hover overrides this with var(--hover-background).
+        &:nth-child(even) > td {
+          background: rgba(0, 0, 0, 0.018);
+        }
+
+        td {
+          // Compact rows: ~30px effective height, matching
+          // DBeaver/DataGrip dense mode. fs-control (~13px) reads
+          // better than fs-h3 here — less typographic weight,
+          // tighter line-height, and lines up with the column
+          // header's fs-control.
+          padding: 0.35rem 0.875rem;
+          vertical-align: middle;
+          color: var(--text-color);
+          font-size: var(--fs-control);
+          font-family: var(--font-mono);
+          max-width: 320px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+
+          &:first-child {
+            padding-left: 1.5rem;
+          }
+
+          &:last-child {
+            padding-right: 1.5rem;
+          }
+        }
+
+        &:hover > td {
+          // Hover wins over zebra. !important keeps the override
+          // robust against the :nth-child(even) selector above
+          // which has the same specificity but lower source order.
+          background-color: var(--hover-background) !important;
+        }
+      }
+
+      // Dark-theme zebra: the tint flips to a faint white because
+      // a black tint over a dark surface vanishes. Mirrors the
+      // light-theme strength so the visual rhythm is consistent
+      // regardless of theme.
+      :host-context([data-theme='dark']) .p-datatable-tbody > tr:nth-child(even) > td {
+        background: rgba(255, 255, 255, 0.028);
+      }
+
+      // Column resize handle. PrimeNG renders an absolutely-positioned
+      // .p-column-resizer at the right edge of each <th>; we make it
+      // visible on hover with a 2px primary-coloured bar. The grab
+      // cursor is set on the resizer itself by PrimeNG.
+      .p-column-resizer {
+        width: 6px;
+        background: transparent;
+        border-right: 2px solid transparent;
+        transition: border-color var(--motion-fast) ease;
+
+        &:hover {
+          border-right-color: var(--primary-color);
+        }
+      }
+
+      // Row-number column. Uses pFrozenColumn (position: sticky)
+      // so it stays visible during horizontal scroll, which means
+      // its background must be opaque on every row — otherwise the
+      // body rows scroll behind it and show through.
+      //
+      // The zebra rule above tints even-row <td>s. We restate the
+      // frozen cell's background per parity here so the # column
+      // stripes in sync with the data cells instead of carrying a
+      // single hover-background tint that floats inconsistently
+      // over alternating row colors. The `.p-frozen-column` part
+      // gives the selector enough specificity to beat the zebra
+      // rule which targets generic `> td`.
+      .row-number-cell {
+        color: var(--secondary-color);
+        font-size: var(--fs-control);
+        font-weight: var(--fw-semibold);
+        text-align: center;
+      }
+
+      .p-datatable-tbody > tr > td.row-number-cell {
+        background: var(--card-background);
+      }
+      .p-datatable-tbody > tr:nth-child(even) > td.row-number-cell {
+        background: var(--hover-background);
+      }
+      .p-datatable-tbody > tr:hover > td.row-number-cell {
+        background: var(--hover-background);
+      }
+      // Dark-theme parity — match the slightly stronger white tint
+      // used by the dark-theme zebra rule above.
+      :host-context([data-theme='dark'])
+        .p-datatable-tbody
+        > tr:nth-child(even)
+        > td.row-number-cell {
+        background: rgba(255, 255, 255, 0.028);
+      }
+
+      .null-value {
+        color: var(--secondary-color);
+        font-style: italic;
+        opacity: 0.6;
+      }
+
+      // Cells flagged numeric by the cellFormat pipe (BIGINT,
+      // NUMBER, DECIMAL kept as string to preserve precision —
+      // see helpers/cell-formatter.helper.ts). Right-align and
+      // use tabular numerals so columns of numbers visually line
+      // up at the digit level regardless of glyph width.
+      .numeric-cell {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      // JSON-shape cells. Collapsed by default — the .json-summary
+      // span shows a one-liner with the value's shape. Clicking
+      // the chevron expands into the .json-cell <pre> with the
+      // full pretty-printed document.
+      .json-td {
+        // Cap the cell width so even an expanded JSON document
+        // can't push the column to fill the viewport. Horizontal
+        // scrolling inside the .json-cell handles longer lines.
+        max-width: 32em;
+      }
+
+      .json-toggle {
+        background: transparent;
+        border: 0;
+        padding: 2px 4px;
+        margin-right: var(--space-1, 4px);
+        color: var(--secondary-color);
+        cursor: pointer;
+        border-radius: var(--radius-xs, 3px);
+        vertical-align: middle;
+
+        &:hover {
+          color: var(--primary-color);
+          background: var(--hover-background, transparent);
+        }
+
+        i {
+          font-size: 10px;
+        }
+      }
+
+      .json-summary {
+        color: var(--text-color);
+        opacity: 0.85;
+        font-family: var(--font-mono, monospace);
+        font-size: var(--fs-label, 12px);
+        // Truncate gracefully if the user has named keys that
+        // somehow blow past our 3-key cap. Tooltip-on-hover is
+        // unavailable here because the value is a deliberately
+        // condensed summary, not the raw display.
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
+        max-width: calc(100% - 28px);
+        vertical-align: middle;
+      }
+
+      .json-cell {
+        display: block;
+        max-height: 14em;
+        overflow: auto;
+        margin: var(--space-1, 4px) 0 0;
+        padding: var(--space-2, 8px);
+        font-family: var(--font-mono, monospace);
+        font-size: var(--fs-label, 12px);
+        white-space: pre;
+        background: var(--hover-background, transparent);
+        border-radius: var(--radius-xs, 3px);
+      }
+
+      // Column filter inputs
+      .p-column-filter {
+        font-size: var(--fs-control);
+        padding: 0.4rem 0.6rem;
+        border-radius: var(--radius-xs);
+        border: 1px solid var(--border-color);
+        background: var(--card-background);
+        color: var(--text-color);
+
+        &:focus {
+          border-color: var(--primary-color);
+          box-shadow: 0 0 0 1px var(--primary-color-transparent);
+        }
+
+        &::placeholder {
+          color: var(--secondary-color);
+          font-size: var(--fs-control);
+        }
+      }
+
+      // Paginator
+      .p-paginator {
+        background: var(--card-background);
+        border-top: 1px solid var(--border-color);
+        justify-content: flex-end;
+        padding: 0.75rem 1.5rem;
+        overflow: visible;
+
+        .p-paginator-page,
+        .p-paginator-next,
+        .p-paginator-prev,
+        .p-paginator-first,
+        .p-paginator-last {
+          border-radius: var(--radius-sm);
+          color: var(--secondary-color);
+          min-width: 2rem;
+          height: 2rem;
+          margin: 0 0.125rem;
+          font-weight: var(--fw-medium);
+
+          &:hover {
+            background: var(--hover-background);
+            color: var(--text-color);
+          }
+
+          &.p-highlight {
+            background: var(--primary-color);
+            color: var(--primary-text);
+          }
+        }
+
+        .p-dropdown {
+          overflow: visible;
+
+          .p-dropdown-panel {
+            z-index: var(--z-modal) !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+td.text-center {
+  text-align: center;
+}
+
+td.empty-message-cell {
+  text-align: center;
+  padding: var(--space-9) !important;
+  color: var(--secondary-color);
+  font-size: var(--fs-h3);
+}
+
+// ===================================================================
+// Responsive Design
+// ===================================================================
+@media (max-width: 768px) {
+  .query-toolbar {
+    flex-direction: column;
+    gap: var(--space-5);
+    align-items: flex-start;
+
+    .toolbar-left {
+      width: 100%;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    .toolbar-right {
+      width: 100%;
+      justify-content: flex-end;
+    }
+
+    .toolbar-hint {
+      display: none;
+    }
+  }
+
+  .datasource-sidebar {
+    position: absolute;
+    z-index: var(--z-dropdown);
+    height: 100%;
+
+    &.collapsed {
+      position: relative;
+    }
+  }
+
+  .results-table {
+    font-size: var(--fs-micro);
+
+    thead th,
+    tbody td {
+      padding: 6px 8px;
+    }
+  }
+
+  .results-section {
+    max-height: 40vh;
+  }
+}
+
+// ===================================================================
+// Dark Theme Enhancements
+// ===================================================================
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--code-editor-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--code-editor-scrollbar);
+  border-radius: var(--radius-sm);
+
+  &:hover {
+    background: var(--code-editor-scrollbar-hover);
+  }
+}
+
+// ===================================================================
+// Animation Utilities
+// ===================================================================
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ===================================================================
+// Print Styles
+// ===================================================================
+@media print {
+  .query-toolbar,
+  .results-header,
+  .help-panel {
+    display: none;
+  }
+
+  .query-editor-wrapper {
+    background-color: var(--card-background);
+  }
+
+  .results-table {
+    thead th {
+      background-color: var(--hover-background);
+      color: var(--text-color);
+    }
+
+    tbody td {
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+    }
+  }
+}
+
+// ===================================================================
+// Tab Bar Styles
+// ===================================================================
+.tab-bar {
+  display: flex;
+  align-items: center;
+  background-color: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 8px;
+  min-height: 42px;
+  flex-shrink: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .tabs-container {
+    display: flex;
+    gap: var(--space-2);
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+  }
+
+  .tab-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: 8px 12px;
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all var(--motion-base) ease;
+    white-space: nowrap;
+    color: var(--text-secondary-color);
+    font-size: var(--fs-control);
+    min-width: fit-content;
+
+    .tab-icon {
+      font-size: var(--fs-body);
+      display: flex;
+      align-items: center;
+    }
+
+    .tab-title {
+      font-weight: var(--fw-medium);
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tab-title-edit-wrapper {
+      display: flex;
+      align-items: center;
+    }
+
+    .tab-title-input {
+      font-weight: var(--fw-medium);
+      max-width: 150px;
+      border: 1px solid var(--primary-color);
+      border-radius: var(--radius-xs);
+      padding: 2px 6px;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      font-size: var(--fs-control);
+      outline: none;
+
+      &:focus {
+        box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+      }
+
+      &.error {
+        border-color: var(--error-color);
+        animation: shake 0.3s ease;
+
+        &:focus {
+          box-shadow: 0 0 0 2px var(--error-bg);
+        }
+      }
+    }
+
+    @keyframes shake {
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+      25% {
+        transform: translateX(-4px);
+      }
+      75% {
+        transform: translateX(4px);
+      }
+    }
+
+    .tab-close {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-1);
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-xs);
+      cursor: pointer;
+      opacity: 0;
+      transition: all var(--motion-base) ease;
+      color: var(--text-secondary-color);
+
+      i {
+        font-size: var(--fs-label);
+      }
+
+      &:hover {
+        background-color: var(--hover-color);
+        color: var(--text-color);
+      }
+    }
+
+    &:hover {
+      background-color: var(--hover-color);
+      color: var(--text-color);
+
+      .tab-close {
+        opacity: 1;
+      }
+    }
+
+    &.active {
+      background-color: var(--background-color);
+      border-bottom-color: var(--primary-color);
+      color: var(--primary-color);
+
+      .tab-close {
+        opacity: 1;
+      }
+    }
+  }
+
+  .btn-new-tab {
+    margin-left: 8px;
+    padding: var(--space-3);
+    min-width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+
+    i {
+      font-size: var(--fs-body);
+    }
+  }
+}
+
+// ===================================================================
+// Context Menu Styles
+// ===================================================================
+.context-menu {
+  position: fixed;
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 8px var(--shadow-color);
+  z-index: var(--z-modal);
+  min-width: 160px;
+  padding: 4px 0;
+  animation: contextMenuFadeIn 0.15s ease;
+
+  .context-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all var(--motion-base) ease;
+    color: var(--text-color);
+    font-size: var(--fs-control);
+
+    i {
+      font-size: var(--fs-body);
+      color: var(--text-secondary-color);
+      width: 16px;
+      text-align: center;
+    }
+
+    &:hover:not(.disabled) {
+      background-color: var(--hover-color);
+      color: var(--primary-color);
+
+      i {
+        color: var(--primary-color);
+      }
+    }
+
+    &.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Change Confirmation Dialog
+.change-confirm-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--overlay-background);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: var(--z-overlay);
+
+  .popup-content {
+    background: var(--card-background);
+    padding: var(--space-8);
+    border-radius: var(--radius-md);
+    width: 500px;
+    box-shadow: 0 4px 6px var(--shadow-color);
+
+    .popup-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+      margin-bottom: 20px;
+
+      .warning-icon {
+        font-size: var(--fs-h1);
+        color: var(--warning-color, var(--warning-color));
+      }
+
+      h3 {
+        margin: var(--space-0);
+        font-size: var(--fs-h2);
+        font-weight: var(--fw-semibold);
+        color: var(--text-color);
+      }
+    }
+
+    .popup-body {
+      margin-bottom: 24px;
+
+      p {
+        margin: var(--space-0);
+        line-height: 1.6;
+        color: var(--text-color);
+      }
+    }
+
+    .popup-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-5);
+
+      button {
+        &.p-button-outlined {
+          border: 1px solid var(--border-color);
+
+          &:hover {
+            background: var(--surface-hover);
+          }
+        }
+
+        &.p-button-secondary {
+          color: var(--text-color);
+        }
+
+        &.p-button-danger {
+          color: var(--danger-color, var(--error-color));
+          border-color: var(--danger-color, var(--error-color));
+
+          &:hover {
+            background: var(--error-bg);
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes contextMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+// ────────────────────────────────────────────────────────────────────
+// Toolbar segmented button (sidebar toggle, etc.)
+//
+// Adapted from the analyses module's .a-segment__btn so the dataset
+// pages match the broader app's panel-toggle pattern. Used by the
+// "Database Explorer" toggle in .toolbar-left.
+//
+// Visual: small pill with icon + label, muted by default, lit up
+// with --primary-color background when is-active. Sits inline at
+// the toolbar's natural baseline.
+// ────────────────────────────────────────────────────────────────────
+.a-segment__btn {
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--border-color);
+  background: var(--card-background);
+  color: var(--secondary-color);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  border-radius: var(--radius-sm);
+  transition:
+    color var(--motion-fast) ease,
+    background var(--motion-fast) ease,
+    border-color var(--motion-fast) ease;
+
+  i {
+    font-size: 12px;
+  }
+
+  &:hover:not(.is-active) {
+    color: var(--text-color);
+    background: var(--hover-background);
+    border-color: var(--primary-color-transparent);
+  }
+
+  &.is-active {
+    color: var(--primary-text, #fff);
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
   }
 }
