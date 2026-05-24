@@ -1320,10 +1320,15 @@
 // (Legacy modal container removed — bottom-sheet rules above replace it.)
 
 .results-popup-header {
+  // ~40px tall to match DataGrip / Hex result-panel headers.
+  // Anything taller eats viewport that should belong to the rows
+  // themselves. Buttons inside are p-button-sm (~28px); the strip
+  // padding leaves 6px above + below for breathing room.
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
+  padding: 6px 16px;
+  min-height: 40px;
   border-bottom: 1px solid var(--border-color);
   background: var(--hover-background);
   flex-shrink: 0;
@@ -1331,45 +1336,61 @@
   .popup-header-left {
     display: flex;
     align-items: center;
-    gap: var(--space-5);
+    gap: var(--space-3);
 
     > i {
-      font-size: var(--fs-h2);
+      // Same size as the action buttons' icons so the leading
+      // icon doesn't tower over them.
+      font-size: var(--fs-control);
       color: var(--primary-color);
     }
 
     .popup-title {
-      font-size: var(--fs-h3);
+      font-size: var(--fs-body);
       font-weight: var(--fw-semibold);
       color: var(--text-color);
+      line-height: 1.2;
     }
 
     .popup-meta {
       font-size: var(--fs-label);
       color: var(--secondary-color);
-      padding: 4px 10px;
+      padding: 2px 8px;
       background-color: var(--card-background);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-pill);
       font-weight: var(--fw-medium);
+      line-height: 1.3;
     }
   }
 
   .popup-header-right {
     display: flex;
     align-items: center;
-    gap: var(--space-4);
+    gap: var(--space-2);
 
-    .export-csv-btn {
-      font-size: var(--fs-control);
-      padding: 0.4rem 0.8rem;
+    .export-csv-btn,
+    .clear-filters-btn {
+      font-size: var(--fs-label);
+      padding: 0.25rem 0.65rem;
       border-radius: var(--radius-sm);
+
+      // PrimeNG's p-button-sm still pads internally — flatten the
+      // icon-to-label gap so the buttons sit closer to the chevron
+      // / dismiss icons next to them.
+      .p-button-icon {
+        font-size: var(--fs-label);
+      }
     }
 
-    .clear-filters-btn {
-      font-size: var(--fs-control);
-      padding: 0.4rem 0.8rem;
-      border-radius: var(--radius-sm);
+    // p-button-text + p-button-rounded + p-button-sm renders the
+    // chevron / dismiss as a circular icon-only button. Shrink the
+    // touch target so it doesn't visually outsize the labeled
+    // action buttons.
+    .p-button-rounded.p-button-sm {
+      width: 28px;
+      height: 28px;
+      padding: 0;
     }
 
     .p-button {
