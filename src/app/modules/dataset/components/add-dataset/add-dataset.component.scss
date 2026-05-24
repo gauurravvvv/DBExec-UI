@@ -363,32 +363,16 @@
   overflow: hidden;
   height: 100%;
 
+  // Collapsed = fully closed. Mirrors the analyses module's
+  // datasource-sidebar pattern: width drops to 0 so the editor
+  // pane reclaims the full width, the border vanishes so the
+  // boundary doesn't linger. The toggle button in the page
+  // toolbar (.a-segment__btn) is the only way to reopen — no
+  // sticky chevron strip or rotated title.
   &.collapsed {
-    width: 60px;
-    min-width: 60px;
-
-    .sidebar-content {
-      position: relative;
-      padding: var(--space-0);
-      height: 100%;
-
-      .sidebar-header,
-      .sidebar-content-inner {
-        display: none;
-      }
-
-      .rotated-title {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%) rotate(-90deg);
-        white-space: nowrap;
-        color: var(--text-color);
-        font-weight: var(--fw-semibold);
-        font-size: var(--fs-body);
-        letter-spacing: 2px;
-      }
-    }
+    width: 0;
+    min-width: 0;
+    border-right: none;
   }
 
   .sidebar-content {
@@ -740,39 +724,9 @@
   }
 }
 
-// ===================================================================
-// Separator with Toggle Button
-// ===================================================================
-.separator {
-  display: flex;
-  align-items: center;
-  padding: 0 2px;
-  background: var(--card-background);
-  border-left: 1px solid var(--border-color);
-  border-right: 1px solid var(--border-color);
-
-  .toggle-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-color);
-    transition: color var(--motion-base) ease;
-    padding: 8px 4px;
-    height: 40px;
-
-    &:hover {
-      color: var(--secondary-color);
-      background: var(--hover-background);
-    }
-
-    i {
-      font-size: var(--fs-body);
-    }
-  }
-}
+// (Removed: .separator with toggle-btn — sidebar toggle now lives
+// in the page toolbar via the .a-segment__btn pattern; see the
+// rule near the bottom of this file.)
 
 // ===================================================================
 // Editor and Results Area (Right Panel)
@@ -1369,17 +1323,38 @@
     align-items: center;
     gap: var(--space-2);
 
+    // Export CSV + Clear Filters — icon-only rounded buttons that
+    // match the chevron / dismiss visual weight in the 40px header
+    // strip. The labels live in the pTooltip; the icon carries the
+    // meaning. Coloured icons (success green for export, danger red
+    // for clear) keep them distinguishable from the neutral chevron.
     .export-csv-btn,
     .clear-filters-btn {
-      font-size: var(--fs-label);
-      padding: 0.25rem 0.65rem;
-      border-radius: var(--radius-sm);
+      width: 28px;
+      height: 28px;
+      padding: 0;
 
-      // PrimeNG's p-button-sm still pads internally — flatten the
-      // icon-to-label gap so the buttons sit closer to the chevron
-      // / dismiss icons next to them.
       .p-button-icon {
-        font-size: var(--fs-label);
+        font-size: 13px;
+        margin: 0;
+      }
+    }
+
+    .export-csv-btn {
+      color: var(--success-color);
+
+      &:not(:disabled):hover {
+        color: var(--success-color);
+        background: var(--hover-background) !important;
+      }
+    }
+
+    .clear-filters-btn {
+      color: var(--error-color);
+
+      &:not(:disabled):hover {
+        color: var(--error-color);
+        background: var(--hover-background) !important;
       }
     }
 
@@ -1752,12 +1727,41 @@
         }
       }
 
+      // Row-number column. Uses pFrozenColumn (position: sticky)
+      // so it stays visible during horizontal scroll, which means
+      // its background must be opaque on every row — otherwise the
+      // body rows scroll behind it and show through.
+      //
+      // The zebra rule above tints even-row <td>s. We restate the
+      // frozen cell's background per parity here so the # column
+      // stripes in sync with the data cells instead of carrying a
+      // single hover-background tint that floats inconsistently
+      // over alternating row colors. The `.p-frozen-column` part
+      // gives the selector enough specificity to beat the zebra
+      // rule which targets generic `> td`.
       .row-number-cell {
         color: var(--secondary-color);
         font-size: var(--fs-control);
         font-weight: var(--fw-semibold);
         text-align: center;
+      }
+
+      .p-datatable-tbody > tr > td.row-number-cell {
+        background: var(--card-background);
+      }
+      .p-datatable-tbody > tr:nth-child(even) > td.row-number-cell {
         background: var(--hover-background);
+      }
+      .p-datatable-tbody > tr:hover > td.row-number-cell {
+        background: var(--hover-background);
+      }
+      // Dark-theme parity — match the slightly stronger white tint
+      // used by the dark-theme zebra rule above.
+      :host-context([data-theme='dark'])
+        .p-datatable-tbody
+        > tr:nth-child(even)
+        > td.row-number-cell {
+        background: rgba(255, 255, 255, 0.028);
       }
 
       .null-value {
@@ -2317,5 +2321,52 @@ td.empty-message-cell {
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────
+// Toolbar segmented button (sidebar toggle, etc.)
+//
+// Adapted from the analyses module's .a-segment__btn so the dataset
+// pages match the broader app's panel-toggle pattern. Used by the
+// "Database Explorer" toggle in .toolbar-left.
+//
+// Visual: small pill with icon + label, muted by default, lit up
+// with --primary-color background when is-active. Sits inline at
+// the toolbar's natural baseline.
+// ────────────────────────────────────────────────────────────────────
+.a-segment__btn {
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--border-color);
+  background: var(--card-background);
+  color: var(--secondary-color);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  border-radius: var(--radius-sm);
+  transition:
+    color var(--motion-fast) ease,
+    background var(--motion-fast) ease,
+    border-color var(--motion-fast) ease;
+
+  i {
+    font-size: 12px;
+  }
+
+  &:hover:not(.is-active) {
+    color: var(--text-color);
+    background: var(--hover-background);
+    border-color: var(--primary-color-transparent);
+  }
+
+  &.is-active {
+    color: var(--primary-text, #fff);
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
   }
 }

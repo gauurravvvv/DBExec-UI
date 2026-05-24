@@ -298,7 +298,11 @@ export const DEFAULT_COLUMN_SIZING_OPTIONS: ColumnSizingOptions = {
   font: '13px ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace',
   sampleSize: 50,
   minWidth: 80,
-  maxWidth: 320,
+  // 420px cap balances "let timestamps + UUIDs render in full"
+  // against "no single column dominates the popup width". Old
+  // value was 320 which clipped 38-char UUIDs at the mono font
+  // even when the popup had plenty of horizontal room.
+  maxWidth: 420,
   horizontalPaddingPx: 28,
 };
 

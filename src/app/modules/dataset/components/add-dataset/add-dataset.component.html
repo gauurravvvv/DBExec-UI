@@ -2,6 +2,23 @@
   <!-- Header Toolbar -->
   <div class="query-toolbar">
     <div class="toolbar-left">
+      <!-- Database Explorer toggle. Segmented-button pattern that
+           matches the analyses module's panel-toggle buttons. The
+           `is-active` class lights up when the sidebar is open;
+           clicking flips it. Replaces the previous chevron strip
+           that sat between the sidebar and the editor and the
+           rotated-text affordance when collapsed (both removed). -->
+      <button
+        type="button"
+        class="a-segment__btn"
+        [class.is-active]="showDatasourceSidebar"
+        (click)="toggleDatasourceSidebar()"
+        [title]="'DATASET.TOGGLE_SIDEBAR' | translate"
+      >
+        <i class="pi pi-sitemap" aria-hidden="true"></i>
+        <span>{{ 'DATASET.DATABASE_EXPLORER' | translate }}</span>
+      </button>
+
       <!-- Datasource is preselected via the list-dataset Add popup
            (?datasourceId=…). The org and datasource dropdowns that
            used to live here are gone; if the user wants to switch
@@ -398,30 +415,15 @@
           </div>
         </div>
 
-        <!-- Rotated Title (When Collapsed) -->
-        <div class="rotated-title" *ngIf="!showDatasourceSidebar">
-          {{ 'DATASET.DATABASE_EXPLORER' | translate }}
-        </div>
       </div>
     </div>
 
-    <!-- Separator with Toggle Button -->
-    <div class="separator">
-      <button
-        class="toggle-btn"
-        (click)="toggleDatasourceSidebar()"
-        [title]="'DATASET.TOGGLE_SIDEBAR' | translate"
-      >
-        <i
-          class="pi"
-          [ngClass]="
-            showDatasourceSidebar ? 'pi-chevron-left' : 'pi-chevron-right'
-          "
-        ></i>
-      </button>
-    </div>
-
-    <!-- Right Content Area - Editor and Results -->
+    <!-- Right Content Area - Editor and Results. The sidebar toggle
+         now lives in the page toolbar (.toolbar-left); the legacy
+         chevron-strip separator + rotated-title-when-collapsed
+         affordance is gone. Collapsing the sidebar now sets its
+         width to 0 so the editor pane gets the reclaimed space
+         directly — matches edit-analysis behaviour. -->
     <div class="editor-results-area">
       <!-- Monaco Editor Section -->
       <div class="editor-section">
@@ -569,11 +571,14 @@
               <!-- Action buttons hide when the sheet is collapsed —
                    the strip can't show a table for them to operate
                    on, and the chrome belongs on the full panel. -->
+              <!-- Export CSV — icon-only with tooltip so the
+                   header strip stays at 40px even with the
+                   button alongside the chevron/× pair. The label
+                   is in the tooltip, not the button face. -->
               <button
                 pButton
-                [label]="'DATASET.EXPORT_CSV' | translate"
                 icon="pi pi-download"
-                class="p-button-outlined p-button-success p-button-sm export-csv-btn"
+                class="p-button-text p-button-rounded p-button-sm export-csv-btn"
                 (click)="exportResultsAsCsv()"
                 [disabled]="isExportingResults"
                 *ngIf="
@@ -581,12 +586,13 @@
                   queryResult.columns.length > 0 &&
                   !isResultSheetCollapsed
                 "
+                [pTooltip]="'DATASET.EXPORT_CSV' | translate"
+                tooltipPosition="bottom"
               ></button>
               <button
                 pButton
-                [label]="'COMMON.CLEAR' | translate"
                 icon="pi pi-filter-slash"
-                class="p-button-outlined p-button-danger p-button-sm clear-filters-btn"
+                class="p-button-text p-button-rounded p-button-sm clear-filters-btn"
                 (click)="clearResultFilters()"
                 [disabled]="!isResultFilterActive"
                 *ngIf="
@@ -594,6 +600,8 @@
                   queryResult.columns.length > 0 &&
                   !isResultSheetCollapsed
                 "
+                [pTooltip]="'COMMON.CLEAR' | translate"
+                tooltipPosition="bottom"
               ></button>
               <!-- Expand affordance — only renders on the collapsed
                    strip variant of the sheet header. -->

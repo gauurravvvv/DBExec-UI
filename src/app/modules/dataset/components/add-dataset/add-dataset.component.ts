@@ -151,6 +151,17 @@ export class AddDatasetComponent
   columnWidths: Record<string, number> = {};
 
   /**
+   * ResizeObserver watching the editor-results-area so the result
+   * grid's column widths re-flow when the pane resizes (sidebar
+   * toggle, browser window, sheet drag). Set in ngAfterViewInit,
+   * disconnected in ngOnDestroy. Debounced via a small timer to
+   * avoid thrashing on a live drag.
+   */
+  private paneResizeObserver: ResizeObserver | null = null;
+  private paneResizeTimer: any = null;
+  private lastObservedPaneWidth = 0;
+
+  /**
    * Cell-level right-click context menu state. Standard fare in
    * every database GUI (DBeaver, DataGrip, pgAdmin, TablePlus) —
    * users reach for it within seconds of trying to grab a value
@@ -968,6 +979,7 @@ export class AddDatasetComponent
 
   ngAfterViewInit(): void {
     this.loadMonacoEditor();
+    this.installResultPaneResizeObserver();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -983,6 +995,15 @@ export class AddDatasetComponent
 
   ngOnDestroy(): void {
     this.resultFilterSubject.complete();
+
+    if (this.paneResizeObserver) {
+      this.paneResizeObserver.disconnect();
+      this.paneResizeObserver = null;
+    }
+    if (this.paneResizeTimer) {
+      clearTimeout(this.paneResizeTimer);
+      this.paneResizeTimer = null;
+    }
 
     if (this.editor) {
       this.editor.dispose();
@@ -1915,6 +1936,60 @@ export class AddDatasetComponent
    * pref over that explicit action would be surprising. They can
    * still collapse afterwards.
    */
+  /**
+   * Hook up a ResizeObserver on .editor-results-area so the
+   * result grid's column widths re-flow when the pane resizes.
+   * Triggers on sidebar toggle, window resize, and sheet drag —
+   * all the cases where the available container width changes.
+   *
+   * Debounced (80ms) so a live drag doesn't recompute widths 60
+   * times a second. Skips work when there's no queryResult OR
+   * when the width hasn't changed by at least 50px (avoids
+   * micro-jitter from sub-pixel layout shifts).
+   */
+  private installResultPaneResizeObserver(): void {
+    if (typeof ResizeObserver === 'undefined') return;
+    const pane = this.elementRef.nativeElement.querySelector(
+      '.editor-results-area',
+    ) as HTMLElement | null;
+    if (!pane) return;
+    this.lastObservedPaneWidth = pane.getBoundingClientRect().width;
+    this.paneResizeObserver = new ResizeObserver(entries => {
+      const entry = entries[0];
+      if (!entry) return;
+      const width = entry.contentRect.width;
+      if (Math.abs(width - this.lastObservedPaneWidth) < 50) return;
+      this.lastObservedPaneWidth = width;
+      if (this.paneResizeTimer) clearTimeout(this.paneResizeTimer);
+      this.paneResizeTimer = setTimeout(() => {
+        this.recalculateColumnWidths();
+        this.paneResizeTimer = null;
+      }, 80);
+    });
+    this.paneResizeObserver.observe(pane);
+  }
+
+  /**
+   * Re-run measureColumnWidths + flexLastColumn against the
+   * current container width. No-op when there's no result. Called
+   * from the ResizeObserver and could also be invoked manually
+   * (post-sheet-drag, for instance) without changing semantics.
+   */
+  private recalculateColumnWidths(): void {
+    if (!this.queryResult || !this.queryResult.columns?.length) return;
+    const measured = measureColumnWidths(
+      this.queryResult.columns,
+      this.queryResult.rows,
+      this.queryResult.columnTypes,
+    );
+    this.columnWidths = flexLastColumn(
+      measured,
+      this.queryResult.columns,
+      this.lastObservedPaneWidth || window.innerWidth,
+    );
+    this.cdr.markForCheck();
+  }
+
   private surfaceResultSheet(): void {
     this.showResultsPopup = true;
     if (this.isResultSheetCollapsed) {
