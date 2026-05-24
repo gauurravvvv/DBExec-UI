@@ -90,6 +90,17 @@ export class AddDatasetComponent
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   @ViewChild('sqlEditorContainer')
   sqlEditorContainer!: ElementRef<HTMLDivElement>;
+  /**
+   * Reference to the PrimeNG result-grid Table so we can call its
+   * `.reset()` between queries. Without this, PrimeNG keeps its
+   * internal "first row index" state across `queryResult` changes,
+   * so running query A (200 rows, viewing page 4) then query B (7
+   * rows) leaves the table pointing at row 75 of a 7-row result —
+   * the grid renders empty until the user clicks page 1. Typed as
+   * any so we don't pull primeng/table into this controller's
+   * import surface (the component already has plenty).
+   */
+  @ViewChild('resultsTable') resultsTable: any;
 
   // Removed ViewChild as we now use dynamic containers per tab
   @Input() datasourceId?: string;
@@ -1438,10 +1449,13 @@ export class AddDatasetComponent
    */
   executeQuery(): void {
     if (!this.editor) return;
-    // Block keyboard re-entry while the results popup is open or a query is
-    // already in flight — Monaco keeps focus when the popup overlays it, so
-    // Ctrl+Enter would otherwise fire repeatedly.
-    if (this.showResultsPopup || this.isExecutingQuery) return;
+    // Re-entry guard against double-firing while a query is already
+    // in flight. The previous version also bailed when
+    // `showResultsPopup` was true — a leftover from the modal era
+    // when the popup stole focus from Monaco. The docked sheet
+    // doesn't steal focus, so users expect Run / Ctrl+Enter to fire
+    // a fresh query whether or not the sheet is open.
+    if (this.isExecutingQuery) return;
 
     const selection = this.editor.getSelection();
     const hasSelection = selection && !selection.isEmpty();
@@ -1463,11 +1477,15 @@ export class AddDatasetComponent
    * Execute complete SQL query from editor
    */
   executeCompleteQuery(): void {
-    if (this.showResultsPopup || this.isExecutingQuery) return;
+    if (this.isExecutingQuery) return;
     const query = this.editor?.getValue() || this.currentQuery;
     this.resultPage = 1;
     this.resultFilterValues = {};
-    this.queryResult = null;
+    // Deliberately leave `queryResult` in place until the new
+    // result lands. Nulling it would unmount the sheet (the
+    // *ngIf="queryResult" branch flips), flicker for the duration
+    // of the round-trip, then mount again. The pre-existing rows
+    // are correctly replaced when the new response arrives.
     this.executeQueryForDatasource(query);
   }
 
@@ -1476,10 +1494,10 @@ export class AddDatasetComponent
    * @param selectedText The selected SQL text to execute
    */
   executeSelectedQuery(selectedText: string): void {
-    if (this.showResultsPopup || this.isExecutingQuery) return;
+    if (this.isExecutingQuery) return;
     this.resultPage = 1;
     this.resultFilterValues = {};
-    this.queryResult = null;
+    // See executeCompleteQuery — same anti-flicker reasoning.
     this.executeQueryForDatasource(selectedText);
   }
 
@@ -1884,6 +1902,38 @@ export class AddDatasetComponent
   }
 
   /**
+   * Surface the sheet for any new result — success, error, or
+   * empty / message-only. The previous code only auto-opened on
+   * the success branch, which meant a failed query produced no
+   * visible feedback when run from a closed sheet, and a query
+   * that returned a status message (DDL etc.) flashed nothing.
+   *
+   * Also flips the collapsed flag back to expanded — and writes
+   * the expand to localStorage so the user's preference syncs
+   * with their actual usage. The reasoning: a user who ran Run
+   * is asking to see the result. Honouring an older "collapsed"
+   * pref over that explicit action would be surprising. They can
+   * still collapse afterwards.
+   */
+  private surfaceResultSheet(): void {
+    this.showResultsPopup = true;
+    if (this.isResultSheetCollapsed) {
+      this.isResultSheetCollapsed = false;
+      this.persistSheetCollapsed(false);
+    }
+    // Snap the table's internal "first row index" back to 0 so a
+    // 200-row → 7-row result transition doesn't leave the grid
+    // showing page 4 of nothing. PrimeNG's <p-table>.first is the
+    // index of the first row of the current page; setting it to 0
+    // is the minimal reset (filter inputs + sort survive — see
+    // .reset() if a fuller wipe is ever wanted).
+    if (this.resultsTable) {
+      this.resultsTable.first = 0;
+    }
+    this.resultPage = 1;
+  }
+
+  /**
    * Effective sheet height in pixels. Collapsed state returns the
    * stub height; otherwise the user-configured / persisted value.
    * Templated into the host element's `--sheet-height` CSS variable
@@ -2003,6 +2053,10 @@ export class AddDatasetComponent
                 response.message ||
                 this.translate.instant('DATASET.QUERY_EXECUTION_FAILED'),
             };
+            // Surface the error in the sheet so the user sees what
+            // failed instead of staring at a Run button that
+            // appeared to do nothing.
+            this.surfaceResultSheet();
             this.isExecutingQuery = false;
             this.cdr.markForCheck();
             return;
@@ -2017,6 +2071,9 @@ export class AddDatasetComponent
               executionTime: `${Date.now() - startTime}ms`,
               message: response.message,
             };
+            // Show the message banner (DDL, "0 rows affected", etc.)
+            // in the sheet even though there are no rows to render.
+            this.surfaceResultSheet();
             this.isExecutingQuery = false;
             this.cdr.markForCheck();
             return;
@@ -2059,17 +2116,8 @@ export class AddDatasetComponent
             window.innerWidth,
           );
 
-          // Auto-open the sheet on a fresh result. If the user
-          // previously collapsed it, a successful query is a
-          // strong signal they want to see the data — expand
-          // automatically. Don't write the new state to storage;
-          // the user's persisted preference still applies the
-          // next time the page loads.
           if (this.queryResult.columns.length > 0) {
-            this.showResultsPopup = true;
-            if (this.isResultSheetCollapsed) {
-              this.isResultSheetCollapsed = false;
-            }
+            this.surfaceResultSheet();
           }
 
           this.isExecutingQuery = false;
@@ -2102,6 +2150,9 @@ export class AddDatasetComponent
             executionTime: executionTime,
             error: errorMessage,
           };
+          // Same reason as the response-status:false branch above
+          // — surface the failure in the sheet so it's visible.
+          this.surfaceResultSheet();
 
           this.isExecutingQuery = false;
           this.cdr.markForCheck();
@@ -2782,17 +2833,16 @@ export class AddDatasetComponent
   }
 
   /**
-   * Esc closes the open results popup or context menu without affecting Monaco's
-   * own Esc handling (Monaco gets the key first when the editor has focus, so it
-   * can dismiss its own widgets like the suggestion list before this fires).
+   * Esc dismisses transient overlays (context menus, popovers).
+   * The docked result sheet is intentionally NOT in this list —
+   * with the modal-era popup, Esc made sense as "close the
+   * overlay above the editor"; in the docked sheet world the
+   * panel is part of the page layout, and an accidental Esc
+   * tap losing the result would be a footgun. Use the chevron
+   * (collapse) or × (dismiss) buttons in the sheet header.
    */
   @HostListener('document:keydown.escape')
   onEscape(): void {
-    if (this.showResultsPopup) {
-      this.showResultsPopup = false;
-      this.cdr.markForCheck();
-      return;
-    }
     if (this.showContextMenu) {
       this.closeContextMenu();
       this.cdr.markForCheck();
