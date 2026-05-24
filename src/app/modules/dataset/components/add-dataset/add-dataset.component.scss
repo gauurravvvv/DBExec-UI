@@ -851,10 +851,16 @@
 // Editor Section
 // ===================================================================
 .editor-section {
-  flex: 1;
+  // flex: 1 1 0 (with explicit min: 0) so the editor area can shrink
+  // when the result sheet below it grows via the drag handle. The
+  // previous 300px floor prevented the user from dragging the sheet
+  // up past the point where the editor would have been forced
+  // smaller. clampSheetHeight on the TS side still keeps at least
+  // 120px of editor visible (SHEET_MAX_HEIGHT_PADDING).
+  flex: 1 1 0;
+  min-height: 120px;
   position: relative;
   overflow: hidden;
-  min-height: 300px;
   display: flex;
   flex-direction: column;
   background-color: var(--background-color);
@@ -1240,27 +1246,26 @@
 // ===================================================================
 // ── Results bottom sheet ────────────────────────────────────────────
 //
-// Anchored to the bottom of the viewport so the SQL editor remains
-// visible and interactive above it (DataGrip / Hex / Snowsight
-// pattern). Height is bound to component state via [style.height.px]
-// so the drag handle can resize it; the collapsed state hides
-// everything except the header strip.
+// Sits inside .editor-results-area as a sibling of .editor-section so
+// it occupies space inside the editor pane only — never overlaps the
+// datasource sidebar or the global app chrome. The editor section
+// gets `flex: 1` (pre-existing); the sheet has a fixed height bound
+// to component state via [style.height.px]. Dragging the top edge
+// changes the sheet height, which shrinks/grows .editor-section
+// proportionally via the flex layout — exactly the DataGrip / Hex
+// behaviour.
 //
-// No backdrop overlay — modern result viewers don't dim the editor
-// because users iterate on SQL while looking at results. A drop
-// shadow + a 1px top border separates the sheet from the editor
-// instead.
+// Width is automatic — the flex parent gives the sheet 100% of the
+// editor-results-area width. No left/right anchoring needed.
 .results-sheet {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: relative;
   background: var(--card-background);
   border-top: 1px solid var(--border-color);
-  box-shadow: 0 -10px 30px var(--shadow-color);
+  box-shadow: 0 -8px 20px var(--shadow-color);
   display: flex;
   flex-direction: column;
-  z-index: var(--z-overlay);
+  flex-shrink: 0;
+  width: 100%;
   animation: sheetSlideUp 0.2s ease-out;
 
   // Collapsed = header strip only (~44px). Header still shows the

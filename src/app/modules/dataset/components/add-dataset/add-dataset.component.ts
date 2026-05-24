@@ -453,6 +453,7 @@ export class AddDatasetComponent
     private cdr: ChangeDetectorRef,
     private monacoLoader: MonacoLoaderService,
     private translate: TranslateService,
+    private elementRef: ElementRef<HTMLElement>,
   ) {
     this.userRole = this.globalService.getTokenDetails('role') || '';
     this.showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
@@ -1784,9 +1785,18 @@ export class AddDatasetComponent
   private static readonly SHEET_MAX_HEIGHT_PADDING = 120;
 
   private clampSheetHeight(px: number): number {
+    // Clamp the sheet to the editor-results-area's available
+    // height, not the viewport, since the sheet lives inside that
+    // pane. Fall back to viewport - padding if we can't measure
+    // (initial render before the host is mounted).
+    const host = this.elementRef.nativeElement.querySelector(
+      '.editor-results-area',
+    ) as HTMLElement | null;
+    const containerHeight =
+      host?.getBoundingClientRect().height ?? window.innerHeight;
     const max = Math.max(
       AddDatasetComponent.SHEET_MIN_HEIGHT,
-      window.innerHeight - AddDatasetComponent.SHEET_MAX_HEIGHT_PADDING,
+      containerHeight - AddDatasetComponent.SHEET_MAX_HEIGHT_PADDING,
     );
     return Math.min(max, Math.max(AddDatasetComponent.SHEET_MIN_HEIGHT, px));
   }
