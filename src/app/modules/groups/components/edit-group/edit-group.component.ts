@@ -36,7 +36,6 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
   saveJustification = '';
 
   categoryId!: string;
-  selectedOrgName = '';
   selectedRoleName = '';
   originalFormValue: any;
   isDefaultGroup = false;
@@ -98,7 +97,6 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
 
     if (!groupData) return;
 
-    this.selectedOrgName = groupData.organisationName || '';
     this.selectedRoleName = groupData.roleName || '';
 
     this.loadUsers({

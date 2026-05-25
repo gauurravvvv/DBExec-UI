@@ -35,15 +35,6 @@
 
     <form [formGroup]="announcementForm" class="admin-form">
       <div class="form-grid">
-        <!-- Organisation (read-only) -->
-        <div class="readonly-field" *ngIf="orgName">
-          <label>{{ 'COMMON.ORGANISATION' | translate }}</label>
-          <div class="readonly-value">
-            <i class="pi pi-building"></i>
-            {{ orgName }}
-          </div>
-        </div>
-
         <!-- Title -->
         <app-custom-input
           formControlName="name"

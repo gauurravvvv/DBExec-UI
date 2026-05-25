@@ -36,7 +36,6 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
   preloadedGroups: any[] | null = null;
   preloadedGroupsTotal: number | null = null;
   announcementId = '';
-  orgName = '';
   maxDescriptionLength = 1000;
   minDate = new Date();
   showPreview = false;
@@ -179,7 +178,6 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
       .then(() => {
         const data = this.announcementService.current();
         if (data) {
-          this.orgName = data.organisationName || '';
           this.initialStatus = data.status;
           this.announcementForm.patchValue({
             name: data.name,
