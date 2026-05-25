@@ -75,31 +75,7 @@
           </span>
         </div>
 
-        <!-- Organisation (SA only) — server-driven -->
-        <app-custom-dropdown
-          *ngIf="showOrganisationDropdown"
-          formControlName="organisation"
-          [label]="'COMMON.ORGANISATION' | translate"
-          [placeholder]="'COMMON.SELECT_ORGANISATION' | translate"
-          [serverMode]="true"
-          [fetcher]="loadOrgsPage"
-          [pageSize]="10"
-          [preloadedItems]="preloadedOrgs"
-          [preloadedTotal]="preloadedOrgsTotal"
-          optionLabel="name"
-          optionValue="id"
-          [filter]="true"
-          filterBy="name"
-          [required]="true"
-          [showError]="
-            !!(
-              announcementForm.get('organisation')?.invalid &&
-              announcementForm.get('organisation')?.touched
-            )
-          "
-          [errorMessage]="'ANNOUNCEMENT.ORGANISATION_REQUIRED' | translate"
-          icon="pi-building"
-        ></app-custom-dropdown>
+
 
         <!-- Target Group — server-mode, scoped to selected organisation -->
         <app-custom-dropdown

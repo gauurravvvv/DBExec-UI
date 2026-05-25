@@ -54,32 +54,7 @@
         >
         </app-custom-input>
 
-        <app-custom-dropdown
-          *ngIf="showOrganisationDropdown"
-          formControlName="organisation"
-          [label]="'COMMON.ORGANISATION' | translate"
-          [placeholder]="'COMMON.SELECT_ORGANISATION' | translate"
-          [serverMode]="true"
-          [fetcher]="loadOrgsPage"
-          [pageSize]="10"
-          [preloadedItems]="preloadedOrgs"
-          [preloadedTotal]="preloadedOrgsTotal"
-          optionLabel="name"
-          optionValue="id"
-          [filter]="true"
-          filterBy="name"
-          [autoDisplayFirst]="false"
-          [required]="true"
-          [showError]="
-            !!(
-              rlsForm.get('organisation')?.invalid &&
-              rlsForm.get('organisation')?.touched
-            )
-          "
-          [errorMessage]="'RLS.ORGANISATION_REQUIRED' | translate"
-          icon="pi-building"
-        >
-        </app-custom-dropdown>
+        
 
         <app-custom-dropdown
           [ngModel]="selectedDatasource"

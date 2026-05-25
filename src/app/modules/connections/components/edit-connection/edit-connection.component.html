@@ -63,17 +63,7 @@
         >
         </app-custom-input>
 
-        <!-- Organisation Field (disabled) -->
-        <app-custom-input
-          *ngIf="showOrganisationDropdown"
-          [ngModel]="selectedOrgName"
-          [ngModelOptions]="{ standalone: true }"
-          [label]="'COMMON.ORGANISATION' | translate"
-          [placeholder]="'COMMON.ORGANISATION' | translate"
-          icon="pi-building"
-          [inputDisabled]="true"
-        >
-        </app-custom-input>
+
 
         <!-- Datasource Field (disabled) -->
         <app-custom-input

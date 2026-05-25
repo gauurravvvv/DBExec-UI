@@ -30,33 +30,7 @@
     <!-- Form Section -->
     <form [formGroup]="accessForm" class="admin-form">
       <div class="form-grid">
-        <!-- Organisation Dropdown — server-driven -->
-        <app-custom-dropdown
-          *ngIf="showOrganisationDropdown"
-          formControlName="organisation"
-          [label]="'COMMON.ORGANISATION' | translate"
-          [placeholder]="'ACCESS.SELECT_ORGANISATION' | translate"
-          [serverMode]="true"
-          [fetcher]="loadOrgsPage"
-          [pageSize]="10"
-          [preloadedItems]="preloadedOrgs"
-          [preloadedTotal]="preloadedOrgsTotal"
-          optionLabel="name"
-          optionValue="id"
-          [filter]="true"
-          filterBy="name"
-          [required]="true"
-          (onChangeEvent)="loadDatasources()"
-          [showError]="
-            !!(
-              accessForm.get('organisation')?.invalid &&
-              accessForm.get('organisation')?.touched
-            )
-          "
-          [errorMessage]="'VALIDATION.ORGANISATION_REQUIRED' | translate"
-          icon="pi-building"
-        >
-        </app-custom-dropdown>
+
 
         <!-- Datasource Dropdown — server-driven -->
         <app-custom-dropdown

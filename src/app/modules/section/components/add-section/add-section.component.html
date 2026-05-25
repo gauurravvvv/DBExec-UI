@@ -45,38 +45,7 @@
     <!-- Form Section -->
     <form [formGroup]="sectionForm" class="admin-form">
       <div class="form-grid">
-        <!-- Organisation and Datasource dropdowns -->
-        <div class="form-field" *ngIf="showOrganisationDropdown">
-          <app-custom-dropdown
-            formControlName="organisation"
-            [label]="'COMMON.ORGANISATION' | translate"
-            [placeholder]="'COMMON.SELECT_ORGANISATION' | translate"
-            [serverMode]="true"
-            [fetcher]="loadOrgsPage"
-            [pageSize]="10"
-            [preloadedItems]="preloadedOrgs"
-            [preloadedTotal]="preloadedOrgsTotal"
-            optionLabel="name"
-            optionValue="id"
-            [filter]="true"
-            filterBy="name"
-            [required]="true"
-            [showError]="
-              !!(
-                sectionForm.get('organisation')?.invalid &&
-                sectionForm.get('organisation')?.touched
-              )
-            "
-            [errorMessage]="'VALIDATION.ORGANISATION_REQUIRED' | translate"
-            (ngModelChange)="
-              onOrganisationChange({
-                value: sectionForm.get('organisation')?.value,
-              })
-            "
-            icon="pi-building"
-          >
-          </app-custom-dropdown>
-        </div>
+
 
         <div class="form-field">
           <app-custom-dropdown

@@ -63,32 +63,7 @@
         >
         </app-custom-input>
 
-        <!-- Organisation Dropdown — server-driven -->
-        <app-custom-dropdown
-          *ngIf="showOrganisationDropdown"
-          formControlName="organisation"
-          [label]="'COMMON.ORGANISATION' | translate"
-          [placeholder]="'COMMON.SELECT_ORGANISATION' | translate"
-          [serverMode]="true"
-          [fetcher]="loadOrgsPage"
-          [pageSize]="10"
-          [preloadedItems]="preloadedOrgs"
-          [preloadedTotal]="preloadedOrgsTotal"
-          optionLabel="name"
-          optionValue="id"
-          [filter]="true"
-          filterBy="name"
-          [required]="true"
-          [showError]="
-            !!(
-              userGroupForm.get('organisation')?.invalid &&
-              userGroupForm.get('organisation')?.touched
-            )
-          "
-          [errorMessage]="'VALIDATION.ORGANISATION_REQUIRED' | translate"
-          icon="pi-building"
-        >
-        </app-custom-dropdown>
+
 
         <!-- Role Dropdown — server-mode, scoped to the form's organisation -->
         <app-custom-dropdown

@@ -82,29 +82,7 @@
       <ng-container *ngIf="stage === 'idle'">
         <div class="form-grid">
           <!-- Org dropdown — sys-admin only -->
-          <div class="form-field" *ngIf="showOrgDropdown">
-            <label>
-              {{ 'COMMON.ORGANISATION' | translate }}
-              <span class="required">*</span>
-            </label>
-            <app-custom-dropdown
-              [(ngModel)]="selectedOrgId"
-              [serverMode]="true"
-              [fetcher]="loadOrgsPage"
-              [pageSize]="10"
-              [preloadedItems]="preloadedOrgs"
-              [preloadedTotal]="preloadedOrgsTotal"
-              optionLabel="name"
-              optionValue="id"
-              [filter]="true"
-              filterBy="name"
-              [placeholder]="'USER.SELECT_ORGANISATION' | translate"
-              [showError]="validationAttempted && !selectedOrgId"
-              [errorMessage]="'USER.ORGANISATION_REQUIRED' | translate"
-              (onChangeEvent)="onOrgChange($event)"
-              icon="pi-building"
-            ></app-custom-dropdown>
-          </div>
+          
 
           <!-- Template download -->
           <div class="form-field">

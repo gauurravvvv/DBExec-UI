@@ -21,14 +21,7 @@
     <!-- Step 0 (system admins only): Organisation. Selecting an
          org cascades a reset: datasource and schema clear, the
          datasource list re-fetches against the new org. -->
-    <div class="form-field" *ngIf="showOrgDropdown">
-      <label>{{ 'COMMON.ORGANISATION' | translate }}</label>
-      <app-custom-dropdown [(ngModel)]="orgSelected" [placeholder]="'COMMON.ORGANISATION' | translate"
-        [floatingLabel]="false" [serverMode]="true" [fetcher]="loadOrgsPage" [pageSize]="10"
-        [preloadedItems]="orgPreloaded" [preloadedTotal]="orgPreloadedTotal" optionLabel="name" [optionValue]="null"
-        [filter]="true" filterBy="name" icon="pi-building" (onChangeEvent)="onOrgChange()">
-      </app-custom-dropdown>
-    </div>
+    
 
     <!-- Step 1: Datasource. Required. Changing this resets the
          schema selection below and re-fetches the schema list. -->
@@ -40,7 +33,7 @@
       <app-custom-dropdown [(ngModel)]="datasourceSelected" [placeholder]="'COMMON.DATASOURCE' | translate"
         [floatingLabel]="false" [serverMode]="true" [fetcher]="loadDsPage" [pageSize]="10"
         [preloadedItems]="dsPreloaded" [preloadedTotal]="dsPreloadedTotal" optionLabel="name" [optionValue]="null"
-        [filter]="true" filterBy="name" icon="pi-database" [disabled]="showOrgDropdown && !orgSelected"
+        [filter]="true" filterBy="name" icon="pi-database"
         (onChangeEvent)="onDatasourceChange()">
       </app-custom-dropdown>
     </div>

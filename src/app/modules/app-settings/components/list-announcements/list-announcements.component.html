@@ -30,25 +30,7 @@
     <div class="content-card">
       <div class="card-toolbar">
         <div class="toolbar-left">
-          <div class="dropdown-field" *ngIf="showOrganisationDropdown">
-            <app-custom-dropdown
-              [(ngModel)]="selectedOrg"
-              [serverMode]="true"
-              [fetcher]="loadOrgsPage"
-              [pageSize]="10"
-              [preloadedItems]="preloadedOrgs"
-              [preloadedTotal]="preloadedOrgsTotal"
-              optionLabel="name"
-              optionValue="id"
-              [filter]="true"
-              [label]="'COMMON.ORGANISATION' | translate"
-              [floatingLabel]="true"
-              filterBy="name"
-              (onChangeEvent)="onOrgChange($event)"
-              icon="pi-building"
-            >
-            </app-custom-dropdown>
-          </div>
+          
         </div>
       </div>
 

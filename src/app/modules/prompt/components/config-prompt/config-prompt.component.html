@@ -75,17 +75,7 @@
             </div>
           </div>
           <div class="form-row full-width">
-            <div class="form-field" *ngIf="showOrganisationDropdown">
-              <app-custom-input
-                [ngModel]="selectedOrgName"
-                [ngModelOptions]="{ standalone: true }"
-                [label]="'COMMON.ORGANISATION' | translate"
-                [placeholder]="'COMMON.ORGANISATION' | translate"
-                icon="pi-building"
-                [inputDisabled]="true"
-              >
-              </app-custom-input>
-            </div>
+            
             <div class="form-field">
               <app-custom-input
                 [ngModel]="selectedDatasourceName"

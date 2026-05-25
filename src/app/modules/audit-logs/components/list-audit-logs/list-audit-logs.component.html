@@ -39,27 +39,7 @@
     <div class="content-card">
       <div class="card-toolbar">
         <div class="toolbar-left">
-          <div class="dropdown-field" *ngIf="isSystemAdmin">
-            <app-custom-dropdown
-              [(ngModel)]="filterValues.organisationId"
-              [serverMode]="true"
-              [fetcher]="loadOrgsPage"
-              [pageSize]="10"
-              [preloadedItems]="preloadedOrgs"
-              [preloadedTotal]="preloadedOrgsTotal"
-              optionLabel="name"
-              optionValue="id"
-              [filter]="true"
-              filterBy="name"
-              [label]="'COMMON.ORGANISATION' | translate"
-              [floatingLabel]="true"
-              [showClear]="true"
-              [autoDisplayFirst]="false"
-              [placeholder]="'COMMON.SELECT_ORGANISATION' | translate"
-              (onChangeEvent)="onOrganisationChange()"
-              icon="pi-building"
-            ></app-custom-dropdown>
-          </div>
+          
 
           <div class="dropdown-field">
             <app-custom-dropdown

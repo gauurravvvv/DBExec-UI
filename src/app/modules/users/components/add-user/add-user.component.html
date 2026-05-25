@@ -109,33 +109,7 @@
         >
         </app-custom-input>
 
-        <!-- Organisation Dropdown — server-driven -->
-        <app-custom-dropdown
-          *ngIf="showOrganisationDropdown"
-          formControlName="organisation"
-          [label]="'COMMON.ORGANISATION' | translate"
-          [placeholder]="'USER.SELECT_ORGANISATION' | translate"
-          [serverMode]="true"
-          [fetcher]="loadOrgsPage"
-          [pageSize]="10"
-          [preloadedItems]="preloadedOrgs"
-          [preloadedTotal]="preloadedOrgsTotal"
-          optionLabel="name"
-          optionValue="id"
-          [filter]="true"
-          filterBy="name"
-          [required]="true"
-          [showError]="
-            !!(
-              userForm.get('organisation')?.invalid &&
-              userForm.get('organisation')?.touched
-            )
-          "
-          [errorMessage]="'USER.ORGANISATION_REQUIRED' | translate"
-          (onChangeEvent)="onOrganisationChange($event)"
-          icon="pi-building"
-        >
-        </app-custom-dropdown>
+
 
         <!-- Groups -->
         <div class="form-field">
