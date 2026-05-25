@@ -2,8 +2,6 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  DestroyRef,
-  inject,
   OnInit,
 } from '@angular/core';
 import {
@@ -50,8 +48,6 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
   saving = this.announcementService.saving;
   loading = this.announcementService.loading;
 
-  private destroyRef = inject(DestroyRef);
-
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -74,9 +70,8 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    this.orgId = this.route.snapshot.paramMap.get('orgId') || '';
     this.announcementId = this.route.snapshot.paramMap.get('id') || '';
-    if (!this.orgId || !this.announcementId) {
+    if (!this.announcementId) {
       this.router.navigate([ANNOUNCEMENT.LIST]);
       return;
     }
@@ -128,8 +123,7 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    if (!this.orgId) return { items: [], total: 0 };
-    const params: any = { orgId: this.orgId, page, limit };
+    const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       const res: any = await this.groupService.listGroups(params);
@@ -151,9 +145,9 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
    * — keeps the label visible without forcing the user to scroll/filter.
    */
   resolveSelectedGroup = async (id: string): Promise<any> => {
-    if (!id || !this.orgId) return null;
+    if (!id) return null;
     try {
-      const res: any = await this.groupService.viewGroup(this.orgId, id);
+      const res: any = await this.groupService.viewGroup(id);
       if (this.globalService.handleSuccessService(res, false)) {
         return res?.data ?? null;
       }
@@ -165,7 +159,7 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
 
   loadGroups(): void {
     this.groupService
-      .listGroups({ orgId: this.orgId, page: DEFAULT_PAGE, limit: 10 })
+      .listGroups({ page: DEFAULT_PAGE, limit: 10 })
       .then(res => {
         if (this.globalService.handleSuccessService(res, false)) {
           const groups = res?.data?.groups ?? [];
@@ -183,7 +177,7 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
   loadAnnouncement(): void {
     this.announcementService.resetCurrent();
     this.announcementService
-      .loadOne(this.announcementId, this.orgId)
+      .loadOne(this.announcementId)
       .then(() => {
         const data = this.announcementService.current();
         if (data) {
@@ -328,7 +322,6 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
       textColor: value.textColor,
       status: value.status,
       republish: value.republish,
-      orgId: this.orgId,
     };
 
     this.announcementService

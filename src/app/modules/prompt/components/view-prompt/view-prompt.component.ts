@@ -42,7 +42,7 @@ export class ViewPromptComponent implements OnInit {
   loadPromptData() {
     this.promptService.resetCurrent();
     this.promptService
-      .loadOne(this.orgId, this.promptId)
+      .loadOne(this.promptId)
       .then(() => {
         const data = this.promptService.current();
         if (data) {
@@ -75,7 +75,7 @@ export class ViewPromptComponent implements OnInit {
   proceedDelete(): void {
     if (this.promptData && this.deleteJustification.trim()) {
       this.promptService
-        .delete(this.orgId, this.promptId, this.deleteJustification.trim())
+        .delete(this.promptId, this.deleteJustification.trim())
         .then(response => {
           this.showDeleteConfirm = false;
           this.deleteJustification = '';

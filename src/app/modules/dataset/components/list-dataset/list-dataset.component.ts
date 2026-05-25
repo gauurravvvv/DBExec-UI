@@ -21,12 +21,10 @@ import {
   DATASET,
   QUERY_BUILDER,
 } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { AnalysisFormData } from 'src/app/modules/analyses/components/save-analyses-dialog/save-analyses-dialog.component';
 import { AnalysesService } from 'src/app/modules/analyses/services/analyses.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { QueryBuilderService } from 'src/app/modules/query-builder/services/query-builder.service';
 import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
 import { DatasetService } from '../../services/dataset.service';
@@ -66,16 +64,11 @@ export class ListDatasetComponent implements OnInit {
   qbSearchTerm = '';
   qbTotalRecords = 0;
   qbActiveIndex = -1;
-  organisations: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
   selectedOrg: any = null;
   selectedDatasource: any = null;
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = false;
   saving = this.datasetService.saving;
 
   today = new Date();
@@ -125,7 +118,6 @@ export class ListDatasetComponent implements OnInit {
   analysisDatasetId: string = '';
 
   constructor(
-    private organisationService: OrganisationService,
     private router: Router,
     private globalService: GlobalService,
     private datasetService: DatasetService,
@@ -167,22 +159,16 @@ export class ListDatasetComponent implements OnInit {
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-        if (params['orgId'] || params['datasourceId'] || params['name']) {
+        this.selectedOrg = this.globalService.getTokenDetails('organisationId');
+        if (params['datasourceId'] || params['name']) {
           this.handleDeepLinking(params);
         } else {
-          if (this.showOrganisationDropdown) {
-            this.loadOrganisations();
-          } else {
-            this.selectedOrg =
-              this.globalService.getTokenDetails('organisationId');
-            this.loadDatasources();
-          }
+          this.loadDatasources();
         }
       });
   }
 
   handleDeepLinking(params: any) {
-    const orgId = params['orgId'] ? params['orgId'] : null;
     const datasourceId = params['datasourceId'] ? params['datasourceId'] : null;
     const name = params['name'];
 
@@ -190,108 +176,15 @@ export class ListDatasetComponent implements OnInit {
       this.filterValues.name = name;
     }
 
-    if (this.showOrganisationDropdown) {
-      const orgPromise = orgId
-        ? this.loadOrganisations(orgId)
-        : this.loadOrganisations();
-
-      orgPromise.then(() => {
-        if (orgId) {
-          if (datasourceId) {
-            this.loadDatasources(datasourceId);
-          } else {
-            this.loadDatasources();
-          }
-        }
-      });
+    if (datasourceId) {
+      this.loadDatasources(datasourceId);
     } else {
-      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
-
-      if (datasourceId) {
-        this.loadDatasources(datasourceId);
-      } else {
-        this.loadDatasources();
-      }
+      this.loadDatasources();
     }
-  }
-
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadOrganisations(preSelectedOrgId?: string): Promise<void> {
-    return new Promise(resolve => {
-      const params = {
-        page: DEFAULT_PAGE,
-        limit: 10,
-      };
-
-      this.organisationService
-        .listOrganisation(params)
-        .then(response => {
-          if (this.globalService.handleSuccessService(response, false)) {
-            const orgs = response?.data?.orgs ?? [];
-            this.preloadedOrgs = orgs;
-            this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-            if (orgs.length > 0) {
-              if (
-                preSelectedOrgId &&
-                orgs.find((o: any) => o.id === preSelectedOrgId)
-              ) {
-                this.selectedOrg = preSelectedOrgId;
-              } else {
-                this.selectedOrg = orgs[0].id;
-              }
-
-              if (!preSelectedOrgId) {
-                this.loadDatasources();
-              }
-            } else {
-              this.selectedOrg = null;
-              this.datasources = [];
-              this.selectedDatasource = null;
-              this.datasets = [];
-              this.filteredDatasets = [];
-              this.totalRecords = 0;
-            }
-          }
-          this.cdr.markForCheck();
-          resolve();
-        })
-        .catch(() => {
-          resolve();
-        });
-    });
-  }
-
-  onOrgChange(orgId: any) {
-    this.selectedOrg = orgId;
-    this.preloadedDatasources = null;
-    this.preloadedDatasourcesTotal = null;
-    this.loadDatasources();
   }
 
   /**
-   * Fetcher for the server-mode datasource dropdown. Org-scoped — no-ops
-   * gracefully if no org is selected.
+   * Fetcher for the server-mode datasource dropdown.
    */
   loadDatasourcesPage = async ({
     search,
@@ -302,8 +195,7 @@ export class ListDatasetComponent implements OnInit {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    if (!this.selectedOrg) return { items: [], total: 0 };
-    const params: any = { orgId: this.selectedOrg, page, limit };
+    const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       const res: any = await this.datasourceService.listDatasource(params);
@@ -350,12 +242,7 @@ export class ListDatasetComponent implements OnInit {
 
   loadDatasources(preSelectedDbId?: string): Promise<void> {
     return new Promise(resolve => {
-      if (!this.selectedOrg) {
-        resolve();
-        return;
-      }
       const params = {
-        orgId: this.selectedOrg,
         page: DEFAULT_PAGE,
         limit: 10,
       };
@@ -386,7 +273,6 @@ export class ListDatasetComponent implements OnInit {
               this.totalRecords = 0;
             }
           } else {
-            this.selectedOrg = null;
             this.datasources = [];
             this.selectedDatasource = null;
             this.datasets = [];
@@ -397,7 +283,6 @@ export class ListDatasetComponent implements OnInit {
           resolve();
         })
         .catch(() => {
-          this.selectedOrg = null;
           this.datasources = [];
           this.selectedDatasource = null;
           this.datasets = [];
@@ -433,7 +318,6 @@ export class ListDatasetComponent implements OnInit {
     const limit = event ? event.rows : this.limit;
 
     const params: any = {
-      orgId: this.selectedOrg,
       datasourceId: this.selectedDatasource,
       page: page,
       limit: limit,
@@ -524,26 +408,11 @@ export class ListDatasetComponent implements OnInit {
     if (!result) return;
     const queryParams: any = { datasourceId: result.datasource?.id };
     if (result.schema) queryParams.schema = result.schema;
-    if (result.orgId) queryParams.orgId = result.orgId;
     this.router.navigate([DATASET.ADD], {
       queryParams,
       state: { datasource: result.datasource },
     });
   }
-
-  /** Pre-seed for the picker dialog's org dropdown — the list
-   *  page's currently-active org as a fully-shaped object the
-   *  custom-dropdown can render. Returns null when there's no
-   *  current org context. */
-  get dsPickerInitialOrg(): any {
-    if (!this.selectedOrg) return null;
-    if (typeof this.selectedOrg === 'object') return this.selectedOrg;
-    const match = this.organisations?.find(
-      (o: any) => String(o.id) === String(this.selectedOrg),
-    );
-    return match || { id: this.selectedOrg };
-  }
-
 
   onAddViaPrompts() {
     this.qbSearchTerm = '';
@@ -687,7 +556,6 @@ export class ListDatasetComponent implements OnInit {
     if (result && this.datasetToDuplicate) {
       this.datasetService
         .duplicateDataset(
-          this.selectedOrg,
           this.datasetToDuplicate.id,
           result.name,
           result.description,
@@ -737,7 +605,7 @@ export class ListDatasetComponent implements OnInit {
         return;
       }
       this.datasetService
-        .bulkDeleteDataset(ids, reason, this.selectedOrg)
+        .bulkDeleteDataset(ids, reason)
         .then((res: any) => {
           if (this.globalService.handleSuccessService(res)) {
             this.selectedDatasets = [];
@@ -754,7 +622,7 @@ export class ListDatasetComponent implements OnInit {
 
     if (this.datasetToDelete) {
       this.datasetService
-        .deleteDataset(this.selectedOrg, this.datasetToDelete, reason)
+        .deleteDataset(this.datasetToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.selectedDatasets = this.selectedDatasets.filter(

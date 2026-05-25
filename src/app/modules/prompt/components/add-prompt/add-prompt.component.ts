@@ -13,11 +13,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/core/constants';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { PROMPT } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { PromptService } from 'src/app/modules/prompt/services/prompt.service';
 import { SectionService } from 'src/app/modules/section/services/section.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
@@ -35,10 +33,6 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
 
   sectionForm!: FormGroup;
   showPassword = false;
-  organisations: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
-  showOrganisationDropdown = false;
   selectedOrg: any = null;
   selectedTab: any = null;
   selectedDatasource: any = null;
@@ -65,7 +59,6 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
     private fb: FormBuilder,
     private router: Router,
     private tabService: TabService,
-    private organisationService: OrganisationService,
     private globalService: GlobalService,
     private datasourceService: DatasourceService,
     private sectionService: SectionService,
@@ -84,14 +77,10 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit() {
-    if (this.showOrganisationDropdown) {
-      this.loadOrganisations();
-    } else {
-      this.selectedOrg = {
-        id: this.globalService.getTokenDetails('organisationId'),
-      };
-      this.loadDatasources();
-    }
+    this.selectedOrg = {
+      id: this.globalService.getTokenDetails('organisationId'),
+    };
+    this.loadDatasources();
 
     this.sectionForm.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -102,25 +91,13 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
 
   initForm() {
     this.sectionForm = this.fb.group({
-      organisation: [
-        {
-          value:
-            this.globalService.getTokenDetails('organisationId'),
-          disabled: false,
-        },
-        Validators.required,
-      ],
-      datasource: [{ value: '', disabled: true }, Validators.required],
+      datasource: [{ value: '', disabled: false }, Validators.required],
       tab: [{ value: '', disabled: true }, Validators.required],
       sectionGroups: this.fb.array([]),
     });
 
     if (this.selectedTab) {
       this.addSectionGroup();
-    }
-
-    if (!this.showOrganisationDropdown) {
-      this.sectionForm.get('datasource')?.enable();
     }
   }
 
@@ -312,52 +289,6 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
     );
   }
 
-  /**
-   * Fetcher for the server-mode organisation dropdown.
-   */
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadOrganisations() {
-    const params = {
-      page: DEFAULT_PAGE,
-      limit: 10,
-    };
-
-    this.organisationService
-      .listOrganisation(params)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const orgs = response?.data?.orgs ?? [];
-          this.organisations = orgs;
-          this.preloadedOrgs = orgs;
-          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-        }
-      })
-      .catch(() => {
-        this.cdr.markForCheck();
-      });
-  }
-
   onSubmit() {
     this.checkForDuplicates();
     if (this.hasDuplicates) {
@@ -368,7 +299,6 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
       const formValue = this.sectionForm.value;
 
       const transformedData = {
-        organisation: formValue.organisation,
         datasource: formValue.datasource,
         tab: formValue.tab,
         prompts: this.transformPrompts(),
@@ -413,9 +343,7 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
     this.clearAllSectionGroups();
 
     // Reset component state
-    this.selectedOrg = this.showOrganisationDropdown
-      ? null
-      : { id: this.globalService.getTokenDetails('organisationId') };
+    this.selectedOrg = { id: this.globalService.getTokenDetails('organisationId') };
     this.selectedDatasource = null;
     this.selectedTab = null;
     this.datasources = [];
@@ -429,46 +357,14 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
     this.duplicateRows = {};
 
     // Re-disable dependent controls
-    this.sectionForm.get('datasource')?.disable();
     this.sectionForm.get('tab')?.disable();
 
-    // Re-enable database for non-system-admin
-    if (!this.showOrganisationDropdown) {
-      this.sectionForm.get('datasource')?.enable();
-      this.loadDatasources();
-    }
-  }
-
-  onOrganisationChange(event: any) {
-    this.selectedOrg = {
-      id: event.value,
-    };
-    this.selectedDatasource = null;
-    this.selectedTab = null;
-    this.preloadedDatasources = null;
-    this.preloadedDatasourcesTotal = null;
-    // Tab dropdown depends on org+datasource — clear stale preload so it
-    // re-fetches under the new org scope on next open.
-    this.preloadedTabs = null;
-    this.preloadedTabsTotal = null;
-
-    const datasourceControl = this.sectionForm.get('datasource');
-    const tabControl = this.sectionForm.get('tab');
-
-    datasourceControl?.enable();
-    tabControl?.disable();
-
-    datasourceControl?.setValue('');
-    tabControl?.setValue('');
-
-    this.clearAllSectionGroups();
+    this.sectionForm.get('datasource')?.enable();
     this.loadDatasources();
   }
 
   private loadDatasources() {
-    if (!this.selectedOrg) return;
     const params = {
-      orgId: this.selectedOrg.id,
       page: DEFAULT_PAGE,
       limit: 10,
     };
@@ -502,8 +398,7 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    if (!this.selectedOrg?.id) return { items: [], total: 0 };
-    const params: any = { orgId: this.selectedOrg.id, page, limit };
+    const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       const res: any = await this.datasourceService.listDatasource(params);
@@ -562,11 +457,10 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    if (!this.selectedOrg?.id || !this.selectedDatasource?.id) {
+    if (!this.selectedDatasource?.id) {
       return { items: [], total: 0 };
     }
     const params: any = {
-      orgId: this.selectedOrg.id,
       datasourceId: this.selectedDatasource.id,
       page,
       limit,
@@ -584,14 +478,11 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
   };
 
   loadTabs() {
-    // Fix #2: Add null check to prevent crash
-    if (!this.selectedOrg || !this.selectedDatasource) {
-      console.warn('loadTabs: selectedOrg or selectedDatasource is null');
+    if (!this.selectedDatasource) {
       return;
     }
 
     const param = {
-      orgId: this.selectedOrg.id,
       datasourceId: this.selectedDatasource.id,
       page: DEFAULT_PAGE,
       limit: 10,
@@ -613,18 +504,11 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
   }
 
   loadSections() {
-    // Fix #3: Add null check to prevent crash
-    if (!this.selectedOrg || !this.selectedDatasource || !this.selectedTab) {
-      console.warn('loadSections: Required selections are missing');
+    if (!this.selectedDatasource || !this.selectedTab) {
       return;
     }
 
-    // Section dropdowns inside the FormArray rely on cross-row dedup via
-    // getAvailableSections(), which needs the full list in memory. Server-mode
-    // pagination would hide rows the dedup needs to consider, so this loader
-    // stays on MAX_LIMIT and the dropdown stays client-side.
     const params = {
-      orgId: this.selectedOrg.id,
       datasourceId: this.selectedDatasource.id,
       tabId: this.selectedTab.id,
       page: DEFAULT_PAGE,

@@ -102,7 +102,7 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
     this.tabError = null;
 
     this.queryBuilderService
-      .getQueryBuilderTabs(this.orgId, this.queryBuilderId)
+      .getQueryBuilderTabs(this.queryBuilderId)
       .then((response: any) => {
         if (response.status) {
           this.tabs = (response.data || []).map(transformTabResponse);
@@ -133,7 +133,7 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
     tab.error = null;
 
     this.queryBuilderService
-      .getTabSections(this.orgId, this.queryBuilderId, String(tab.id))
+      .getTabSections(this.queryBuilderId, String(tab.id))
       .then((response: any) => {
         if (response.status) {
           tab.sections = (response.data || []).map(transformSectionResponse);
@@ -170,7 +170,6 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
 
     this.queryBuilderService
       .getSectionPrompts(
-        this.orgId,
         this.queryBuilderId,
         tabId,
         String(section.id),
@@ -246,7 +245,7 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
   private loadQueryBuilderStructure(): void {
     this.loadingStructure = true;
     this.queryBuilderService
-      .getQueryBuilderStructure(this.orgId, this.queryBuilderId)
+      .getQueryBuilderStructure(this.queryBuilderId)
       .then((response: any) => {
         if (response.status && response.data) {
           this.structureTreeNodes = this.buildTreeNodes(response.data);
@@ -480,7 +479,7 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
 
   private loadQueryBuilderDetails(): void {
     this.queryBuilderService
-      .viewQueryBuilder(this.orgId, this.queryBuilderId)
+      .viewQueryBuilder(this.queryBuilderId)
       .then((response: any) => {
         if (response.status && response.data) {
           this.datasourceId = String(response.data.datasourceId || '');
@@ -516,7 +515,6 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
     if (this.deleteJustification.trim()) {
       this.queryBuilderService
         .delete(
-          this.orgId,
           this.queryBuilderId,
           this.deleteJustification.trim(),
         )

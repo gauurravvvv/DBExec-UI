@@ -15,10 +15,8 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { RLS_RULE } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { RlsRulesService } from '../../services/rls-rules.service';
 
 @Component({
@@ -58,11 +56,6 @@ export class ListRlsRuleComponent implements OnInit {
   ruleToDelete: string | null = null;
   deleteJustification = '';
 
-  organisations: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = false;
 
   statusOptions = [
     { label: this.translate.instant('COMMON.ACTIVE'), value: 1 },
@@ -91,7 +84,6 @@ export class ListRlsRuleComponent implements OnInit {
   constructor(
     private rlsRulesService: RlsRulesService,
     private datasourceService: DatasourceService,
-    private organisationService: OrganisationService,
     private router: Router,
     private globalService: GlobalService,
     private translate: TranslateService,
@@ -104,75 +96,12 @@ export class ListRlsRuleComponent implements OnInit {
         this.loadRules();
       });
 
-    if (this.showOrganisationDropdown) {
-      this.loadOrganisations();
-    } else {
-      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
-      this.loadDatasources();
-    }
-  }
-
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadOrganisations(): Promise<void> {
-    return new Promise(resolve => {
-      this.organisationService
-        .listOrganisation({ page: DEFAULT_PAGE, limit: 10 })
-        .then(response => {
-          if (this.globalService.handleSuccessService(response, false)) {
-            const orgs = response?.data?.orgs ?? [];
-            this.preloadedOrgs = orgs;
-            this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-            if (orgs.length > 0) {
-              this.selectedOrg = orgs[0].id;
-              this.loadDatasources();
-            } else {
-              this.selectedOrg = null;
-              this.datasources = [];
-              this.selectedDatasource = null;
-            }
-          }
-          this.cdr.markForCheck();
-          resolve();
-        })
-        .catch(() => {
-          this.cdr.markForCheck();
-          resolve();
-        });
-    });
-  }
-
-  onOrgChange(orgId: any) {
-    this.selectedOrg = orgId;
-    this.selectedDatasource = null;
-    this.preloadedDatasources = null;
-    this.preloadedDatasourcesTotal = null;
+    this.selectedOrg = this.globalService.getTokenDetails('organisationId');
     this.loadDatasources();
   }
 
   /**
-   * Fetcher for the server-mode datasource dropdown. Org-scoped — no-ops
-   * gracefully if no org is selected.
+   * Fetcher for the server-mode datasource dropdown.
    */
   loadDatasourcesPage = async ({
     search,
@@ -183,8 +112,7 @@ export class ListRlsRuleComponent implements OnInit {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    if (!this.selectedOrg) return { items: [], total: 0 };
-    const params: any = { orgId: this.selectedOrg, page, limit };
+    const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       const res: any = await this.datasourceService.listDatasource(params);
@@ -202,12 +130,7 @@ export class ListRlsRuleComponent implements OnInit {
 
   loadDatasources(): Promise<void> {
     return new Promise(resolve => {
-      if (!this.selectedOrg) {
-        resolve();
-        return;
-      }
       const params = {
-        orgId: this.selectedOrg,
         page: DEFAULT_PAGE,
         limit: 10,
       };
@@ -263,7 +186,7 @@ export class ListRlsRuleComponent implements OnInit {
   }
 
   loadRules(event?: any) {
-    if (!this.selectedOrg || !this.selectedDatasource) return;
+    if (!this.selectedDatasource) return;
 
     if (event) {
       this.lastTableLazyLoadEvent = event;
@@ -296,7 +219,7 @@ export class ListRlsRuleComponent implements OnInit {
     // are ignored by the new BE route — keeping the call site
     // unchanged so the UI shape doesn't shift in the same PR.
     this.rlsRulesService
-      .load(this.selectedOrg, this.selectedDatasource)
+      .load(this.selectedDatasource)
       .then(() => {
         this.cdr.markForCheck();
       })
@@ -342,7 +265,6 @@ export class ListRlsRuleComponent implements OnInit {
     if (this.ruleToDelete && this.deleteJustification.trim()) {
       this.rlsRulesService
         .delete(
-          this.selectedOrg,
           this.ruleToDelete,
           this.deleteJustification.trim(),
         )

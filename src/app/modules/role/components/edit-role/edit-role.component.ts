@@ -14,7 +14,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { ROLE } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { RoleService } from '../../services/role.service';
@@ -30,10 +29,7 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
   permissions: any[] = [];
   permissionControls: { [key: string]: FormControl } = {};
   roleId: string = '';
-  orgId: string = '';
   roleData: any;
-  organisationName: string = '';
-  showOrganisationField = false;
   showSaveConfirm = false;
   saveJustification = '';
 
@@ -61,14 +57,12 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
 
   ngOnInit() {
     this.roleId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
     this.loadRoleData();
   }
 
   initForm() {
     this.roleForm = this.fb.group({
       id: [''],
-      organisation: [''],
       name: ['', [Validators.required, Validators.pattern(REGEX.firstName)]],
       description: [''],
       status: [1],
@@ -77,18 +71,16 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
 
   async loadRoleData() {
     await Promise.all([
-      this.roleService.loadOne(this.orgId, this.roleId),
+      this.roleService.loadOne(this.roleId),
       this.roleService.loadPermissions(),
     ]);
 
     const roleData = this.roleService.current();
     if (roleData) {
       this.roleData = roleData;
-      this.organisationName = this.roleData.organisationName || '';
 
       this.roleForm.patchValue({
         id: this.roleData.id,
-        organisation: this.roleData.organisationId,
         name: this.roleData.name,
         description: this.roleData.description || '',
         status: this.roleData.status,
@@ -165,7 +157,6 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
             id: raw.id,
             name: raw.name,
             description: raw.description || undefined,
-            organisation: raw.organisation,
             selectedPermissions,
             status: raw.status,
           },

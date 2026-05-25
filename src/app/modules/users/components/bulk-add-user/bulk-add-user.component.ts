@@ -7,11 +7,8 @@ import {
   ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { USER } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { UserService } from '../../services/user.service';
 
 interface ValidRow {
@@ -80,94 +77,19 @@ export class BulkAddUserComponent implements OnInit {
   // pattern where errors show after `.touched`).
   validationAttempted = false;
 
-  /** Role-derived: System Admin sees the org dropdown; org-admin/org-user
-   *  have their org locked from the JWT token (same logic as add-user). */
-  showOrgDropdown = false;
-
-  // Org dropdown server-mode plumbing (sys-admin only).
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
-
   validateRes: ValidateResponse['data'] | null = null;
   commitRes: CommitResponse['data'] | null = null;
 
   constructor(
     private userService: UserService,
-    private organisationService: OrganisationService,
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
     private router: Router,
   ) {}
 
   ngOnInit(): void {
-    if (this.showOrgDropdown) {
-      // Sys-admin starts without an org selected; the dropdown panel will
-      // fetch page 1 on first open. We also preload so the dropdown can
-      // render its initial list without a roundtrip.
-      this.preloadInitialOrg();
-    } else {
-      // Org-admin / org-user — their org comes from the JWT and is locked.
-      this.selectedOrgId =
-        this.globalService.getTokenDetails('organisationId') ?? null;
-    }
-  }
-
-  /**
-   * Fetcher for the server-mode org dropdown. Same shape as elsewhere — the
-   * dropdown calls this on open, on filter, and on near-end scroll.
-   */
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  /**
-   * Pre-loads page 1 of orgs so the dropdown panel and the pre-selected
-   * label render without an extra round-trip on first open.
-   */
-  private async preloadInitialOrg(): Promise<void> {
-    try {
-      const res: any = await this.organisationService.listOrganisation({
-        page: DEFAULT_PAGE,
-        limit: 10,
-      });
-      if (this.globalService.handleSuccessService(res, false)) {
-        const orgs = res?.data?.orgs ?? [];
-        this.preloadedOrgs = orgs;
-        this.preloadedOrgsTotal = res?.data?.count ?? orgs.length;
-        this.cdr.markForCheck();
-      }
-    } catch {
-      // Silent — the dropdown will fetch its own page on open as fallback.
-    }
-  }
-
-  /**
-   * Org changed in the dropdown. Reset every downstream piece of state —
-   * file, errors, validation result — because emails/usernames/group names
-   * mean different things in a different org. The user must re-pick the
-   * file and re-validate.
-   */
-  onOrgChange(orgId: any): void {
-    this.selectedOrgId = orgId ?? null;
-    this.resetFileState();
+    this.selectedOrgId =
+      this.globalService.getTokenDetails('organisationId') ?? null;
   }
 
   private resetFileState(): void {
@@ -228,7 +150,6 @@ export class BulkAddUserComponent implements OnInit {
     try {
       const res: ValidateResponse = await this.userService.bulkAddValidate(
         this.pickedFile,
-        this.selectedOrgId,
       );
       if (!this.globalService.handleSuccessService(res, false)) {
         this.stage = 'idle';
@@ -271,7 +192,6 @@ export class BulkAddUserComponent implements OnInit {
     this.cdr.markForCheck();
     try {
       const res: CommitResponse = await this.userService.bulkAddCommit(
-        this.selectedOrgId,
         this.validateRes.valid,
       );
       if (this.globalService.handleSuccessService(res, false)) {

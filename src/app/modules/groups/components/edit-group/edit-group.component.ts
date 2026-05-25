@@ -95,7 +95,7 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
   }
 
   async loadGroupData(): Promise<void> {
-    await this.groupService.loadOne(this.orgId, this.categoryId);
+    await this.groupService.loadOne(this.categoryId);
     const groupData = this.groupService.current();
 
     if (!groupData) return;
@@ -104,7 +104,6 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
     this.selectedRoleName = groupData.roleName || '';
 
     this.loadUsers({
-      orgId: groupData.organisationId,
       page: DEFAULT_PAGE,
       limit: 10,
     });
@@ -151,9 +150,7 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    const orgId = this.orgId;
-    if (!orgId) return { items: [], total: 0 };
-    const params: any = { orgId, page, limit };
+    const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ username: search });
     try {
       const res: any = await this.userService.listUser(params);
@@ -174,9 +171,8 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
    * first page. Called once per missing ID by app-custom-multiselect.
    */
   resolveSelectedUser = async (id: string): Promise<any> => {
-    if (!this.orgId) return null;
     try {
-      const res: any = await this.userService.viewOrgUser(this.orgId, id);
+      const res: any = await this.userService.viewOrgUser(id);
       return res?.data ?? null;
     } catch {
       return null;

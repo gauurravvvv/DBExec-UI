@@ -10,7 +10,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { USER } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
@@ -25,15 +24,11 @@ import { UserService } from '../../services/user.service';
 export class EditUserComponent implements OnInit, HasUnsavedChanges {
   userForm!: FormGroup;
   isCancelClicked = false;
-  organisations: any[] = [];
   groups: any[] = [];
   preloadedGroups: any[] | null = null;
   preloadedGroupsTotal: number | null = null;
   userId: string = '';
-  showOrganisationDropdown = false;
-  selectedOrgName: string = '';
   userData: any;
-  orgId: string = '';
   isLocked: boolean = false;
   showSaveConfirm = false;
   saveJustification = '';
@@ -55,14 +50,12 @@ export class EditUserComponent implements OnInit, HasUnsavedChanges {
 
   ngOnInit() {
     this.userId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
     this.loadGroups();
     this.loadAdminData();
   }
 
   /**
-   * Fetcher for server-mode group multiselect. Org-scoped via this.orgId
-   * (route param) or token fallback.
+   * Fetcher for server-mode group multiselect.
    */
   loadGroupsPage = async ({
     search,
@@ -73,10 +66,7 @@ export class EditUserComponent implements OnInit, HasUnsavedChanges {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    const orgId =
-      this.orgId || this.globalService.getTokenDetails('organisationId');
-    if (!orgId) return { items: [], total: 0 };
-    const params: any = { orgId, page, limit };
+    const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       const res: any = await this.groupService.listGroups(params);
@@ -98,11 +88,8 @@ export class EditUserComponent implements OnInit, HasUnsavedChanges {
    * once per missing ID to fetch its display label.
    */
   resolveSelectedGroup = async (id: string): Promise<any> => {
-    const orgId =
-      this.orgId || this.globalService.getTokenDetails('organisationId');
-    if (!orgId) return null;
     try {
-      const res: any = await this.groupService.viewGroup(orgId, id);
+      const res: any = await this.groupService.viewGroup(id);
       return res?.data ?? null;
     } catch {
       return null;
@@ -110,11 +97,8 @@ export class EditUserComponent implements OnInit, HasUnsavedChanges {
   };
 
   loadGroups() {
-    const orgId =
-      this.orgId || this.globalService.getTokenDetails('organisationId');
-    if (!orgId) return;
     this.groupService
-      .listGroups({ orgId, page: DEFAULT_PAGE, limit: 10 })
+      .listGroups({ page: DEFAULT_PAGE, limit: 10 })
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           const all = response?.data?.groups || [];
@@ -166,14 +150,13 @@ export class EditUserComponent implements OnInit, HasUnsavedChanges {
         ],
       ],
       email: ['', [Validators.required, Validators.email]],
-      organisation: ['', Validators.required],
       status: [],
       groupIds: [[], Validators.required],
     });
   }
 
   async loadAdminData() {
-    await this.userService.loadOne(this.orgId, this.userId);
+    await this.userService.loadOne(this.userId);
     const data = this.userService.current();
     if (data) {
       this.userData = data;
@@ -187,11 +170,9 @@ export class EditUserComponent implements OnInit, HasUnsavedChanges {
         lastName: this.userData.lastName,
         username: this.userData.username,
         email: this.userData.email,
-        organisation: this.userData.organisationId,
         status: this.userData.status,
         groupIds: this.userData.groupIds || [],
       });
-      this.selectedOrgName = this.userData.organisationName;
     }
     this.cdr.markForCheck();
   }
@@ -231,11 +212,9 @@ export class EditUserComponent implements OnInit, HasUnsavedChanges {
       lastName: this.userData.lastName,
       username: this.userData.username,
       email: this.userData.email,
-      organisation: this.userData.organisationId,
       status: this.userData.status,
       groupIds: this.userData.groupIds || [],
     });
-    this.selectedOrgName = this.userData.organisationName;
     this.isCancelClicked = true;
     this.userForm.markAsPristine();
   }

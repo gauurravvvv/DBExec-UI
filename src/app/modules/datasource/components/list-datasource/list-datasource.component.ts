@@ -13,11 +13,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { DATASOURCE } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
 import { DatasourceService } from '../../services/datasource.service';
 
@@ -47,12 +44,7 @@ export class ListDatasourceComponent implements OnInit {
   private searchSubject = new Subject<void>();
   lastTableLazyLoadEvent: any;
 
-  organisations: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
   selectedOrg: any = {};
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = false;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
   selectedDatasource: any = null;
   selectedDatasources: any[] = [];
@@ -63,7 +55,6 @@ export class ListDatasourceComponent implements OnInit {
 
   constructor(
     private datasourceService: DatasourceService,
-    private organisationService: OrganisationService,
     private router: Router,
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
@@ -85,63 +76,7 @@ export class ListDatasourceComponent implements OnInit {
         }
       });
 
-    if (this.showOrganisationDropdown) {
-      this.loadOrganisations();
-    } else {
-      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
-    }
-  }
-
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadOrganisations() {
-    this.organisationService
-      .listOrganisation({ page: DEFAULT_PAGE, limit: 10 })
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const orgs = response?.data?.orgs ?? [];
-          this.preloadedOrgs = orgs;
-          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-          if (orgs.length > 0) {
-            this.selectedOrg = orgs[0].id;
-            if (this.dt) {
-              this.dt.reset();
-            } else {
-              this.listDatasourceAPI(this.selectedOrg);
-            }
-          } else {
-            this.selectedOrg = null;
-          }
-          this.cdr.markForCheck();
-        }
-      });
-  }
-
-  onOrgChange(orgId: any) {
-    this.selectedOrg = orgId;
-    if (this.dt) {
-      this.dt.reset();
-    }
+    this.selectedOrg = this.globalService.getTokenDetails('organisationId');
   }
 
   today = new Date();
@@ -217,15 +152,8 @@ export class ListDatasourceComponent implements OnInit {
     this.listDatasourceAPI();
   }
 
-  listDatasourceAPI(overrideOrgId?: any) {
-    let orgId = overrideOrgId || this.selectedOrg;
-    if (typeof orgId === 'object' && orgId !== null) {
-      orgId = orgId.id;
-    }
-    if (!orgId) return;
-
+  listDatasourceAPI() {
     const params: any = {
-      orgId: orgId,
       page: this.listParams.page,
       limit: this.listParams.limit,
     };
@@ -298,15 +226,10 @@ export class ListDatasourceComponent implements OnInit {
         this.cancelDelete();
         return;
       }
-      let orgId = this.selectedOrg;
-      if (typeof orgId === 'object' && orgId !== null) {
-        orgId = orgId.id;
-      }
       try {
         const res: any = await this.datasourceService.bulkDelete(
           ids,
           reason,
-          orgId,
         );
         if (this.globalService.handleSuccessService(res)) {
           this.selectedDatasources = [];
@@ -322,7 +245,6 @@ export class ListDatasourceComponent implements OnInit {
     if (this.selectedDatasource) {
       try {
         const response: any = await this.datasourceService.delete(
-          this.selectedDatasource.organisationId,
           this.selectedDatasource.id,
           reason,
         );

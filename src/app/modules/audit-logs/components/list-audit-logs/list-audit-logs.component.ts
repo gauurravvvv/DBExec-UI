@@ -11,10 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { DEFAULT_PAGE } from 'src/app/core/constants/global.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
 import { AuditService } from '../../services/audit.service';
 
@@ -51,11 +48,6 @@ export class ListAuditLogsComponent implements OnInit {
   showDetailDialog = false;
   selectedLog: any = null;
 
-  isSystemAdmin = false;
-  organisations: any[] = [];
-  organisationOptions: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
   today = new Date();
 
   filterValues: any = {
@@ -90,7 +82,6 @@ export class ListAuditLogsComponent implements OnInit {
   constructor(
     private auditService: AuditService,
     private globalService: GlobalService,
-    private organisationService: OrganisationService,
     private translate: TranslateService,
   ) {}
 
@@ -99,12 +90,6 @@ export class ListAuditLogsComponent implements OnInit {
       { label: this.translate.instant('AUDIT.SUCCESS'), value: true },
       { label: this.translate.instant('AUDIT.FAILED'), value: false },
     ];
-
-    this.isSystemAdmin = false;
-
-    if (this.isSystemAdmin) {
-      this.loadOrganisations();
-    }
 
     this.searchSubject
       .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
@@ -115,58 +100,6 @@ export class ListAuditLogsComponent implements OnInit {
       });
   }
 
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        const orgs = (res?.data?.orgs ?? []).filter(
-          (o: any) => o.isDefault !== 1,
-        );
-        return { items: orgs, total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadOrganisations() {
-    this.organisationService
-      .listOrganisation({ page: DEFAULT_PAGE, limit: 10 })
-      .then((res: any) => {
-        if (this.globalService.handleSuccessService(res, false)) {
-          this.organisations = res?.data?.orgs ?? [];
-          // Only show non-default organisations (exclude super org)
-          const filtered = this.organisations.filter(
-            (org: any) => org.isDefault !== 1,
-          );
-          this.organisationOptions = filtered.map((org: any) => ({
-            label: org.name,
-            value: org.id,
-          }));
-          this.preloadedOrgs = filtered;
-          this.preloadedOrgsTotal = res?.data?.count ?? filtered.length;
-          // Do not auto-select — let user pick an organisation
-        }
-      })
-      .catch(() => {});
-  }
-
-  onOrganisationChange() {
-    // Reset module filter when org changes
-    this.filterValues.module = null;
-    this.onFilterChange();
-  }
 
   onFilterChange() {
     this.searchSubject.next();
@@ -193,13 +126,12 @@ export class ListAuditLogsComponent implements OnInit {
   }
 
   clearFilters() {
-    const orgId = this.filterValues.organisationId;
     this.filterValues = {
       username: '',
       module: null,
       action: null,
       entityName: '',
-      organisationId: this.isSystemAdmin ? orgId : null,
+      organisationId: null,
       status: null,
       ipAddress: '',
       justification: '',
@@ -406,12 +338,8 @@ export class ListAuditLogsComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (blob: Blob) => {
-          const orgLabel =
-            this.organisationOptions.find(
-              (o: any) => o.value === this.filterValues.organisationId,
-            )?.label || 'Organisation';
           const dateStr = new Date().toISOString().slice(0, 10);
-          const fileName = `Audit_Logs_${orgLabel.replace(/\s+/g, '_')}_${dateStr}.pdf`;
+          const fileName = `Audit_Logs_${dateStr}.pdf`;
 
           const url = window.URL.createObjectURL(blob);
           const link = document.createElement('a');

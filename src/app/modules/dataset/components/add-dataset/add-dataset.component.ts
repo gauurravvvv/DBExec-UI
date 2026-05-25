@@ -33,7 +33,6 @@ import {
   DatabaseTypeOption,
 } from 'src/app/modules/datasource/constants/database-types.constant';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import {
   DIALECT_LINT_DEBOUNCE_MS,
   ENABLE_DIALECT_LINT,
@@ -342,13 +341,7 @@ export class AddDatasetComponent
    *  successive setModelMarkers() calls replace the previous batch. */
   private static readonly DIALECT_LINT_OWNER = 'sql-dialect-lint';
 
-  // Organisation Management
-  organisations: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
   selectedOrg: any = {};
-  userRole: string = '';
-  showOrganisationDropdown: boolean = false;
   availableDatasources: any[] = [];
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
@@ -459,7 +452,6 @@ export class AddDatasetComponent
     private sqlFormatterService: SqlFormatterService,
     private sqlLinterService: SqlLinterService,
     private sqlValidatorService: SqlValidatorService,
-    private organisationService: OrganisationService,
     private globalService: GlobalService,
     private datasetService: DatasetService,
     private router: Router,
@@ -471,8 +463,6 @@ export class AddDatasetComponent
     private translate: TranslateService,
     private elementRef: ElementRef<HTMLElement>,
   ) {
-    this.userRole = this.globalService.getTokenDetails('role') || '';
-    this.showOrganisationDropdown = false;
   }
 
   ngOnInit(): void {
@@ -527,22 +517,9 @@ export class AddDatasetComponent
       this.expandedPaths.add(`${queryDatasourceId}.${querySchema}`);
     }
 
-    if (queryOrgId) {
-      this.selectedOrg = { id: queryOrgId };
-    } else if (this.showOrganisationDropdown) {
-      // Legacy fallback for system admins who deep-linked without the
-      // popup (e.g. browser-history / refresh). The org dropdown is
-      // gone from the template, so we just resolve the first org and
-      // proceed; if there are none, the loadDatasources call below
-      // will show the empty state.
-      this.loadOrganisationsAndPickFirst();
-      this.initializeComponent();
-      return;
-    } else {
-      this.selectedOrg = {
-        id: this.globalService.getTokenDetails('organisationId'),
-      };
-    }
+    this.selectedOrg = {
+      id: queryOrgId || this.globalService.getTokenDetails('organisationId'),
+    };
 
     if (queryDatasourceId) {
       // Preselected path: skip the datasource list page entirely; just
@@ -552,33 +529,6 @@ export class AddDatasetComponent
       this.loadDatasources();
     }
     this.initializeComponent();
-  }
-
-  /**
-   * Legacy fallback when a system admin lands on /datasets/new without
-   * the popup flow (e.g. browser back/refresh that loses the query
-   * params). Loads orgs, picks the first, proceeds. Used to live
-   * inline in ngOnInit; extracted so the popup-driven path can skip
-   * it entirely.
-   */
-  private loadOrganisationsAndPickFirst(): void {
-    const params = { page: DEFAULT_PAGE, limit: 10 };
-    this.organisationService
-      .listOrganisation(params)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const orgs = response?.data?.orgs ?? [];
-          this.organisations = [...orgs];
-          this.preloadedOrgs = orgs;
-          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-          if (orgs.length > 0) {
-            this.selectedOrg = orgs[0];
-            this.loadDatasources();
-          }
-        }
-        this.cdr.markForCheck();
-      })
-      .catch(() => this.cdr.markForCheck());
   }
 
   /**
@@ -617,7 +567,7 @@ export class AddDatasetComponent
     // dialect-aware autocomplete.
     this.isLoadingDatasources = true;
     this.datasourceService
-      .viewDatasource(String(this.selectedOrg.id), datasourceId)
+      .viewDatasource(datasourceId)
       .then((res: any) => {
         this.isLoadingDatasources = false;
         if (this.globalService.handleSuccessService(res, false)) {
@@ -652,58 +602,6 @@ export class AddDatasetComponent
 
     // Close context menus on click outside
     document.addEventListener('click', this.boundCloseContextMenu);
-  }
-
-  /**
-   * Fetcher for the server-mode organisation dropdown.
-   */
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadOrganisations(): void {
-    const params = {
-      page: DEFAULT_PAGE,
-      limit: 10,
-    };
-
-    this.organisationService
-      .listOrganisation(params)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const orgs = response?.data?.orgs ?? [];
-          this.organisations = [...orgs];
-          this.preloadedOrgs = orgs;
-          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-          if (this.organisations.length > 0) {
-            this.selectedOrg = this.organisations[0];
-            this.loadDatasources();
-            this.initializeComponent();
-          }
-        }
-        this.cdr.markForCheck();
-      })
-      .catch(() => {
-        this.cdr.markForCheck();
-      });
   }
 
   onDatasourceChange(event: any): void {
@@ -762,12 +660,9 @@ export class AddDatasetComponent
   }
 
   loadDatasources(): void {
-    if (!this.selectedOrg || !this.selectedOrg.id) return;
-
     this.isLoadingDatasources = true;
     this.selectedDatasourceObj = null;
     const params = {
-      orgId: this.selectedOrg.id,
       page: DEFAULT_PAGE,
       limit: 10,
     };
@@ -811,7 +706,7 @@ export class AddDatasetComponent
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
     if (!this.selectedOrg?.id) return { items: [], total: 0 };
-    const params: any = { orgId: this.selectedOrg.id, page, limit };
+    const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       const res: any = await this.datasourceService.listDatasource(params);
@@ -1337,7 +1232,7 @@ export class AddDatasetComponent
         // stays out of the way; the sidebar shows skeleton rows
         // while the request is in flight.
         this.queryService
-          .getDatasourceStructure(dbIdStr, orgId)
+          .getDatasourceStructure(dbIdStr)
           .subscribe({
             next: (response: any) => {
               // Envelope check first — BE returns HTTP 200 with

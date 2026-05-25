@@ -12,7 +12,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { CONNECTION } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
@@ -28,11 +27,7 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
   private destroyRef = inject(DestroyRef);
 
   connectionForm!: FormGroup;
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = false;
-  orgId: string = '';
   connectionId: string = '';
-  selectedOrgName: string = '';
   selectedDatasourceName: string = '';
   connectionData: any;
   isCancelClicked = false;
@@ -66,7 +61,6 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
 
   ngOnInit(): void {
     this.connectionId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
 
     if (this.connectionId) {
       this.loadConnectionData();
@@ -102,7 +96,6 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
         ],
       ],
       description: [''],
-      organisation: [''],
       datasource: [''],
       status: [false],
       dbUsername: ['', Validators.required],
@@ -111,7 +104,7 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
   }
 
   async loadConnectionData(): Promise<void> {
-    await this.connectionService.loadOne(this.orgId, this.connectionId);
+    await this.connectionService.loadOne(this.connectionId);
     const data = this.connectionService.current();
     if (data) {
       this.connectionData = data;
@@ -120,26 +113,21 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
         id: this.connectionData.id,
         name: this.connectionData.name,
         description: this.connectionData.description,
-        organisation: this.connectionData.organisationId,
         datasource: this.connectionData.datasourceId,
         status: this.connectionData.status,
         dbUsername: this.connectionData.dbUsername,
       });
 
-      this.selectedOrgName = this.connectionData.organisationName || '';
       this.selectedDatasourceName = this.connectionData.datasource?.name || '';
 
       this.connectionForm.markAsPristine();
 
       // Fetch the parent datasource once so the badge + per-
-      // dialect placeholder copy can render. The datasource picker
-      // here is disabled (the parent never changes after the
-      // connection exists), so we only need to look this up on
-      // initial load — no onChange hook required.
+      // dialect placeholder copy can render.
       const datasourceId = this.connectionData.datasourceId;
-      if (datasourceId && this.orgId) {
+      if (datasourceId) {
         this.datasourceService
-          .viewDatasource(this.orgId, datasourceId)
+          .viewDatasource(datasourceId)
           .then((res: any) => {
             if (!this.globalService.handleSuccessService(res, false)) return;
             this.selectedDbType = res?.data?.config?.dbType ?? null;
@@ -234,14 +222,12 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
         id: this.connectionData.id,
         name: this.connectionData.name,
         description: this.connectionData.description,
-        organisation: this.connectionData.organisationId,
         datasource: this.connectionData.datasourceId,
         status: this.connectionData.status,
         dbUsername: this.connectionData.dbUsername,
         dbPassword: '',
       });
 
-      this.selectedOrgName = this.connectionData.organisationName;
       this.isCancelClicked = true;
       this.connectionForm.markAsPristine();
     } else {

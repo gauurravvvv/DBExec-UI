@@ -15,10 +15,8 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { ANALYSES } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
 import { AnalysesService } from '../../services/analyses.service';
 
@@ -53,16 +51,11 @@ export class ListAnalysesComponent implements OnInit {
   analysisToDelete: string | null = null;
   bulkDelete = false;
   deleteJustification = '';
-  organisations: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
   selectedOrg: any = null;
   selectedDatasource: any = null;
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = false;
 
   today = new Date();
 
@@ -99,7 +92,6 @@ export class ListAnalysesComponent implements OnInit {
   }
 
   constructor(
-    private organisationService: OrganisationService,
     private router: Router,
     private globalService: GlobalService,
     private analysesService: AnalysesService,
@@ -128,22 +120,16 @@ export class ListAnalysesComponent implements OnInit {
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-        if (params['orgId'] || params['datasourceId'] || params['name']) {
+        this.selectedOrg = this.globalService.getTokenDetails('organisationId');
+        if (params['datasourceId'] || params['name']) {
           this.handleDeepLinking(params);
         } else {
-          if (this.showOrganisationDropdown) {
-            this.loadOrganisations();
-          } else {
-            this.selectedOrg =
-              this.globalService.getTokenDetails('organisationId');
-            this.loadDatasources();
-          }
+          this.loadDatasources();
         }
       });
   }
 
   handleDeepLinking(params: any) {
-    const orgId = params['orgId'] ? params['orgId'] : null;
     const datasourceId = params['datasourceId'] ? params['datasourceId'] : null;
     const name = params['name'];
 
@@ -151,111 +137,15 @@ export class ListAnalysesComponent implements OnInit {
       this.filterValues.name = name;
     }
 
-    if (this.showOrganisationDropdown) {
-      const orgPromise = orgId
-        ? this.loadOrganisations(orgId)
-        : this.loadOrganisations();
-
-      orgPromise
-        .then(() => {
-          if (orgId) {
-            if (datasourceId) {
-              this.loadDatasources(datasourceId);
-            } else {
-              this.loadDatasources();
-            }
-          }
-        })
-        .catch(() => {});
+    if (datasourceId) {
+      this.loadDatasources(datasourceId);
     } else {
-      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
-
-      if (datasourceId) {
-        this.loadDatasources(datasourceId);
-      } else {
-        this.loadDatasources();
-      }
+      this.loadDatasources();
     }
-  }
-
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadOrganisations(preSelectedOrgId?: string): Promise<void> {
-    return new Promise(resolve => {
-      const params = {
-        page: DEFAULT_PAGE,
-        limit: 10,
-      };
-
-      this.organisationService
-        .listOrganisation(params)
-        .then(response => {
-          if (this.globalService.handleSuccessService(response, false)) {
-            const orgs = response?.data?.orgs ?? [];
-            this.preloadedOrgs = orgs;
-            this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-            if (orgs.length > 0) {
-              if (
-                preSelectedOrgId &&
-                orgs.find((o: any) => o.id === preSelectedOrgId)
-              ) {
-                this.selectedOrg = preSelectedOrgId;
-              } else {
-                this.selectedOrg = orgs[0].id;
-              }
-
-              if (!preSelectedOrgId) {
-                this.loadDatasources();
-              }
-            } else {
-              this.selectedOrg = null;
-              this.datasources = [];
-              this.selectedDatasource = null;
-              this.analyses = [];
-              this.filteredAnalyses = [];
-              this.totalRecords = 0;
-            }
-          }
-          this.cdr.markForCheck();
-          resolve();
-        })
-        .catch(() => {
-          resolve();
-          this.cdr.markForCheck();
-        });
-    });
-  }
-
-  onOrgChange(orgId: any) {
-    this.selectedOrg = orgId;
-    this.preloadedDatasources = null;
-    this.preloadedDatasourcesTotal = null;
-    this.loadDatasources();
   }
 
   /**
-   * Fetcher for the server-mode datasource dropdown. Org-scoped — no-ops
-   * gracefully if no org is selected.
+   * Fetcher for the server-mode datasource dropdown.
    */
   loadDatasourcesPage = async ({
     search,
@@ -266,8 +156,7 @@ export class ListAnalysesComponent implements OnInit {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    if (!this.selectedOrg) return { items: [], total: 0 };
-    const params: any = { orgId: this.selectedOrg, page, limit };
+    const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       const res: any = await this.datasourceService.listDatasource(params);
@@ -315,12 +204,7 @@ export class ListAnalysesComponent implements OnInit {
 
   loadDatasources(preSelectedDbId?: string): Promise<void> {
     return new Promise(resolve => {
-      if (!this.selectedOrg) {
-        resolve();
-        return;
-      }
       const params = {
-        orgId: this.selectedOrg,
         page: DEFAULT_PAGE,
         limit: 10,
       };
@@ -351,7 +235,6 @@ export class ListAnalysesComponent implements OnInit {
               this.totalRecords = 0;
             }
           } else {
-            this.selectedOrg = null;
             this.datasources = [];
             this.selectedDatasource = null;
             this.analyses = [];
@@ -362,7 +245,6 @@ export class ListAnalysesComponent implements OnInit {
           resolve();
         })
         .catch(() => {
-          this.selectedOrg = null;
           this.datasources = [];
           this.selectedDatasource = null;
           this.analyses = [];
@@ -398,9 +280,8 @@ export class ListAnalysesComponent implements OnInit {
     const limit = event ? event.rows : this.limit;
 
     const params: any = {
-      orgId: this.selectedOrg,
       datasourceId: this.selectedDatasource,
-      page: page, // The API expects 'page' not 'pageNumber' based on other components
+      page: page,
       limit: limit,
     };
 
@@ -500,7 +381,7 @@ export class ListAnalysesComponent implements OnInit {
         return;
       }
       this.analysesService
-        .bulkDeleteAnalyses(ids, reason, this.selectedOrg)
+        .bulkDeleteAnalyses(ids, reason)
         .then((res: any) => {
           if (this.globalService.handleSuccessService(res)) {
             this.selectedAnalyses = [];
@@ -517,7 +398,7 @@ export class ListAnalysesComponent implements OnInit {
 
     if (this.analysisToDelete) {
       this.analysesService
-        .deleteAnalyses(this.selectedOrg, this.analysisToDelete, reason)
+        .deleteAnalyses(this.analysisToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.selectedAnalyses = this.selectedAnalyses.filter(

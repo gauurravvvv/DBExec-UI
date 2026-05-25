@@ -13,11 +13,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/core/constants';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { SECTION } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
 import { SectionService } from '../../services/section.service';
 
@@ -35,10 +33,6 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
 
   sectionForm!: FormGroup;
   showPassword = false;
-  organisations: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
-  showOrganisationDropdown = false;
   selectedOrg: any = null;
   selectedDatasource: any = null;
   datasources: any[] = [];
@@ -57,7 +51,6 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
     private fb: FormBuilder,
     private router: Router,
     private tabService: TabService,
-    private organisationService: OrganisationService,
     private globalService: GlobalService,
     private datasourceService: DatasourceService,
     private sectionService: SectionService,
@@ -75,14 +68,10 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit() {
-    if (this.showOrganisationDropdown) {
-      this.loadOrganisations();
-    } else {
-      this.selectedOrg = {
-        id: this.globalService.getTokenDetails('organisationId'),
-      };
-      this.loadDatasources();
-    }
+    this.selectedOrg = {
+      id: this.globalService.getTokenDetails('organisationId'),
+    };
+    this.loadDatasources();
 
     this.sectionForm.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -93,14 +82,6 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
 
   initForm() {
     this.sectionForm = this.fb.group({
-      organisation: [
-        {
-          value:
-            this.globalService.getTokenDetails('organisationId'),
-          disabled: false,
-        },
-        Validators.required,
-      ],
       datasource: [{ value: '', disabled: false }, Validators.required],
       tabGroups: this.fb.array([]),
     });
@@ -314,53 +295,6 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
     );
   }
 
-  /**
-   * Fetcher for the server-mode organisation dropdown.
-   */
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadOrganisations() {
-    const params = {
-      page: DEFAULT_PAGE,
-      limit: 10,
-    };
-
-    this.organisationService
-      .listOrganisation(params)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const orgs = response?.data?.orgs ?? [];
-          this.organisations = [...orgs];
-          this.preloadedOrgs = orgs;
-          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-        }
-        this.cdr.markForCheck();
-      })
-      .catch(() => {
-        this.cdr.markForCheck();
-      });
-  }
-
   onSubmit() {
     this.checkForDuplicates();
     if (this.hasDuplicates) {
@@ -371,7 +305,6 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
       const formValue = this.sectionForm.value;
 
       const transformedData = {
-        organisation: formValue.organisation,
         datasource: formValue.datasource,
         sections: this.transformSections(formValue.tabGroups),
       };
@@ -417,24 +350,8 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
     this.cdr.markForCheck();
   }
 
-  onOrganisationChange(event: any) {
-    this.selectedOrg = {
-      id: event.value,
-    };
-    this.selectedDatasource = null;
-    this.preloadedDatasources = null;
-    this.preloadedDatasourcesTotal = null;
-
-    this.sectionForm.get('datasource')?.setValue('');
-
-    this.clearAllTabs();
-    this.loadDatasources();
-  }
-
   private loadDatasources() {
-    if (!this.selectedOrg) return;
     const params = {
-      orgId: this.selectedOrg.id,
       page: DEFAULT_PAGE,
       limit: 10,
     };
@@ -469,8 +386,7 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    if (!this.selectedOrg?.id) return { items: [], total: 0 };
-    const params: any = { orgId: this.selectedOrg.id, page, limit };
+    const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       const res: any = await this.datasourceService.listDatasource(params);
@@ -501,7 +417,6 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
 
   loadTabs() {
     const param = {
-      orgId: this.selectedOrg.id,
       datasourceId: this.selectedDatasource.id,
       page: DEFAULT_PAGE,
       limit: MAX_LIMIT,

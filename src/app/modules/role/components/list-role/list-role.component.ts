@@ -13,11 +13,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { ROLE } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { RoleService } from '../../services/role.service';
 
 @Component({
@@ -44,12 +41,7 @@ export class ListRoleComponent implements OnInit {
   bulkDelete = false;
   deleteJustification = '';
 
-  organisations: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
   selectedOrgId: any = null;
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = false;
   today = new Date();
 
   statusOptions: { label: string; value: number }[] = [];
@@ -74,7 +66,6 @@ export class ListRoleComponent implements OnInit {
   }
 
   constructor(
-    private organisationService: OrganisationService,
     private router: Router,
     private globalService: GlobalService,
     private roleService: RoleService,
@@ -92,53 +83,8 @@ export class ListRoleComponent implements OnInit {
       .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.loadRoles());
 
-    if (this.showOrganisationDropdown) {
-      this.loadOrganisations();
-    } else {
-      this.selectedOrgId = this.globalService.getTokenDetails('organisationId');
-      this.loadRoles();
-    }
-  }
-
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadOrganisations() {
-    this.organisationService
-      .listOrganisation({ page: DEFAULT_PAGE, limit: 10 })
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const orgs = response?.data?.orgs ?? [];
-          this.preloadedOrgs = orgs;
-          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-          if (orgs.length > 0) {
-            this.selectedOrgId = orgs[0].id;
-            this.loadRoles();
-          } else {
-            this.selectedOrgId = null;
-          }
-        }
-        this.cdr.markForCheck();
-      });
+    this.selectedOrgId = this.globalService.getTokenDetails('organisationId');
+    this.loadRoles();
   }
 
   get selectedCount(): number {
@@ -146,13 +92,6 @@ export class ListRoleComponent implements OnInit {
   }
 
   isRowSelectable = (event: any) => event?.data?.isDefault !== 1;
-
-  onOrgChange(orgId: any) {
-    this.selectedOrgId = orgId;
-    this.selectedRoles = [];
-    this.lastTableLazyLoadEvent = null;
-    this.loadRoles();
-  }
 
   onFilterChange() {
     this.selectedRoles = [];
@@ -217,7 +156,7 @@ export class ListRoleComponent implements OnInit {
       filter.createdDateTo = to.toISOString();
     }
 
-    const params: any = { orgId: this.selectedOrgId, page, limit };
+    const params: any = { page, limit };
     if (Object.keys(filter).length > 0) params.filter = JSON.stringify(filter);
     this.roleService.load(params);
   }
@@ -261,7 +200,7 @@ export class ListRoleComponent implements OnInit {
         return;
       }
       this.roleService
-        .bulkDelete(ids, reason, this.selectedOrgId)
+        .bulkDelete(ids, reason)
         .then((res: any) => {
           if (this.globalService.handleSuccessService(res)) {
             this.selectedRoles = [];
@@ -275,7 +214,7 @@ export class ListRoleComponent implements OnInit {
 
     if (this.roleToDelete) {
       this.roleService
-        .delete(this.selectedOrgId, this.roleToDelete, reason)
+        .delete(this.roleToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.selectedRoles = this.selectedRoles.filter(

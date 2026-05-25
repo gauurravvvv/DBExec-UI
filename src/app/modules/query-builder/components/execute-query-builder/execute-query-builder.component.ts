@@ -226,7 +226,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
     this.tabError.set(null);
 
     this.queryBuilderService
-      .getQueryBuilderTabs(this.orgId, this.queryBuilderId)
+      .getQueryBuilderTabs(this.queryBuilderId)
       .then((response: any) => {
         if (response.status) {
           this.tabs = (response.data || []).map(transformTabResponse);
@@ -267,7 +267,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
     tab.error = null;
 
     this.queryBuilderService
-      .getTabSections(this.orgId, this.queryBuilderId, String(tab.id))
+      .getTabSections(this.queryBuilderId, String(tab.id))
       .then((response: any) => {
         if (response.status) {
           tab.sections = (response.data || []).map(transformSectionResponse);
@@ -311,7 +311,6 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
 
     this.queryBuilderService
       .getSectionPrompts(
-        this.orgId,
         this.queryBuilderId,
         tabId,
         String(section.id),
@@ -432,7 +431,6 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
     this.queryBuilderService
       .execute({
         queryBuilderId: this.queryBuilderId,
-        organisation: this.orgId,
         prompts: this.executePayload.prompts.map(p => {
           const prompt = promptMap.get(p.promptId);
           return {
@@ -772,7 +770,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
    */
   private loadDatasetForEdit(): void {
     this.datasetService
-      .viewDataset(this.orgId, this.editDatasetId!)
+      .viewDataset(this.editDatasetId!)
       .then((response: any) => {
         if (response.status && response.data) {
           const dataset = response.data;
@@ -1048,7 +1046,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
   private loadQueryBuilderStructure(): void {
     this.loadingStructure = true;
     this.queryBuilderService
-      .getQueryBuilderStructure(this.orgId, this.queryBuilderId)
+      .getQueryBuilderStructure(this.queryBuilderId)
       .then((response: any) => {
         if (response.status && response.data) {
           this.structureTreeNodes = this.buildTreeNodes(response.data);

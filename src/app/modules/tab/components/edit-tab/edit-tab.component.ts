@@ -12,7 +12,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { TAB } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { TabService } from '../../services/tab.service';
@@ -30,11 +29,7 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
   saving = this.tabService.saving;
 
   tabForm!: FormGroup;
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = false;
-  orgId: string = '';
   tabId: string = '';
-  selectedOrgName: string = '';
   selectedDatasourceName: string = '';
   tabData: any;
   isCancelClicked = false;
@@ -54,7 +49,6 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
 
   ngOnInit(): void {
     this.tabId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
 
     if (this.tabId) {
       this.loadTabData();
@@ -90,7 +84,6 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
         ],
       ],
       description: [''],
-      organisation: [''],
       datasource: [''],
       status: [false],
     });
@@ -98,7 +91,7 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
 
   async loadTabData(): Promise<void> {
     this.tabService.resetCurrent();
-    await this.tabService.loadOne(this.orgId, this.tabId);
+    await this.tabService.loadOne(this.tabId);
     const data = this.tabService.current();
     if (data) {
       this.tabData = data;
@@ -107,12 +100,10 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
         id: this.tabData.id,
         name: this.tabData.name,
         description: this.tabData.description,
-        organisation: this.tabData.organisationId,
         datasource: this.tabData.datasourceId,
         status: this.tabData.status,
       });
 
-      this.selectedOrgName = this.tabData.organisationName || '';
       this.selectedDatasourceName = this.tabData.datasource?.name || '';
 
       this.tabForm.markAsPristine();
@@ -134,13 +125,12 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
   async proceedSave(): Promise<void> {
     if (this.saveJustification.trim()) {
       try {
-        const { id, name, description, organisation, datasource, status } =
+        const { id, name, description, datasource, status } =
           this.tabForm.getRawValue();
         const response = await this.tabService.update({
           id,
           name,
           description,
-          organisation,
           datasource,
           status: status ? 1 : 0,
           justification: this.saveJustification.trim(),
@@ -185,12 +175,10 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
         id: this.tabData.id,
         name: this.tabData.name,
         description: this.tabData.description,
-        organisation: this.tabData.organisationId,
         datasource: this.tabData.datasourceId,
         status: this.tabData.status,
       });
 
-      this.selectedOrgName = this.tabData.organisationName;
       this.isCancelClicked = true;
       this.tabForm.markAsPristine();
     } else {

@@ -20,12 +20,10 @@ import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { RLS_RULE } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from 'src/app/modules/dataset/services/dataset.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { RlsRulesService } from '../../services/rls-rules.service';
 
 function nonEmptyArray(control: AbstractControl): ValidationErrors | null {
@@ -51,9 +49,6 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
 
   rlsForm!: FormGroup;
 
-  organisations: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
@@ -67,8 +62,6 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
   isLoadingColumnValues: { [columnName: string]: boolean } = {};
 
   selectedDatasource: string = '';
-
-  showOrganisationDropdown = false;
 
   operatorOptions = [
     { label: 'IN', value: 'IN' },
@@ -85,7 +78,6 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     private fb: FormBuilder,
     private router: Router,
     private globalService: GlobalService,
-    private organisationService: OrganisationService,
     private datasourceService: DatasourceService,
     private datasetService: DatasetService,
     private rlsRulesService: RlsRulesService,
@@ -103,16 +95,7 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit() {
-    if (this.showOrganisationDropdown) {
-      this.loadOrganisations();
-    } else {
-      this.rlsForm
-        .get('organisation')
-        ?.setValue(this.globalService.getTokenDetails('organisationId'), {
-          emitEvent: false,
-        });
-      this.loadDatasources();
-    }
+    this.loadDatasources();
   }
 
   initForm() {
@@ -127,36 +110,10 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
         ],
       ],
       description: [''],
-      organisation: [
-        this.globalService.getTokenDetails('organisationId'),
-        Validators.required,
-      ],
       datasetId: ['', Validators.required],
       conditions: this.fb.array([this.createCondition()]),
       isEnabled: [true],
     });
-
-    // Org changes → reload datasources, clear downstream
-    this.rlsForm
-      .get('organisation')
-      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(value => {
-        if (value) {
-          this.selectedDatasource = '';
-          this.datasources = [];
-          this.preloadedDatasources = null;
-          this.preloadedDatasourcesTotal = null;
-          this.datasets = [];
-          this.preloadedDatasets = null;
-          this.preloadedDatasetsTotal = null;
-          this.datasetColumns = [];
-          this.columnValuesCache = {};
-          this.isLoadingColumnValues = {};
-          this.resetConditions();
-          this.rlsForm.patchValue({ datasetId: '' }, { emitEvent: false });
-          this.loadDatasources();
-        }
-      });
 
     // Dataset changes → load columns, reset conditions
     this.rlsForm
@@ -198,54 +155,8 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     this.conditions.push(this.createCondition());
   }
 
-  /**
-   * Fetcher for the server-mode organisation dropdown.
-   */
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadOrganisations() {
-    const params = { page: DEFAULT_PAGE, limit: 10 };
-    this.organisationService
-      .listOrganisation(params)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const orgs = response?.data?.orgs ?? [];
-          this.organisations = orgs;
-          this.preloadedOrgs = orgs;
-          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-          this.cdr.markForCheck();
-        }
-      })
-      .catch(() => {
-        this.cdr.markForCheck();
-      });
-  }
-
   loadDatasources() {
-    const orgId = this.rlsForm.get('organisation')?.value;
-    if (!orgId) return;
-
-    const params = { orgId, page: DEFAULT_PAGE, limit: 10 };
+    const params = { page: DEFAULT_PAGE, limit: 10 };
     this.datasourceService
       .listDatasource(params)
       .then((response: any) => {
@@ -269,8 +180,7 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
   }
 
   /**
-   * Fetcher for the server-mode datasource dropdown. Pulls orgId from the
-   * organisation form control.
+   * Fetcher for the server-mode datasource dropdown.
    */
   loadDatasourcesPage = async ({
     search,
@@ -281,9 +191,7 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    const orgId = this.rlsForm.get('organisation')?.value;
-    if (!orgId) return { items: [], total: 0 };
-    const params: any = { orgId, page, limit };
+    const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       const res: any = await this.datasourceService.listDatasource(params);
@@ -328,10 +236,8 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    const orgId = this.rlsForm.get('organisation')?.value;
-    if (!orgId || !this.selectedDatasource) return { items: [], total: 0 };
+    if (!this.selectedDatasource) return { items: [], total: 0 };
     const params: any = {
-      orgId,
       datasourceId: this.selectedDatasource,
       page,
       limit,
@@ -352,11 +258,9 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
   };
 
   loadDatasets() {
-    const orgId = this.rlsForm.get('organisation')?.value;
-    if (!orgId || !this.selectedDatasource) return;
+    if (!this.selectedDatasource) return;
 
     const params = {
-      orgId,
       datasourceId: this.selectedDatasource,
       page: DEFAULT_PAGE,
       limit: 10,
@@ -381,12 +285,11 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
   }
 
   loadDatasetColumns(): void {
-    const orgId = this.rlsForm.get('organisation')?.value;
     const datasetId = this.rlsForm.get('datasetId')?.value;
-    if (!orgId || !datasetId) return;
+    if (!datasetId) return;
 
     this.datasetService
-      .getDataset(orgId, datasetId)
+      .getDataset(datasetId)
       .then((response: any) => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.datasetColumns = (response.data.datasetFields || []).map(
@@ -407,15 +310,13 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     if (!columnName) return;
     if (this.columnValuesCache[columnName]) return;
 
-    const orgId = this.rlsForm.get('organisation')?.value;
     const datasetId = this.rlsForm.get('datasetId')?.value;
-    if (!orgId || !datasetId) return;
+    if (!datasetId) return;
 
     this.isLoadingColumnValues[columnName] = true;
 
     try {
       const res: any = await this.datasetService.getDistinctColumnValues(
-        orgId,
         datasetId,
         columnName,
       );

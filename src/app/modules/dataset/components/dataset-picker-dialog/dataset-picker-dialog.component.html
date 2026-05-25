@@ -1,29 +1,12 @@
 <!--
   Dataset picker dialog — opens from the dataset list's Add
-  button. Three rows: org (system admins only), datasource
-  (required), schema (optional). Styled to match
-  save-analyses-dialog: title at top, label-above-input rows,
-  outlined Cancel + filled Continue at bottom-right.
-
-  Outside-click handling: the backdrop's click listener calls
-  onBackdropClick which discriminates on event.target — only a
-  click directly on the backdrop dismisses the dialog. The dialog
-  body has no stopPropagation, so document-level listeners (including
-  PrimeNG's dropdown outside-click) fire normally. Dropdown panels
-  render in-place (not appendTo="body") so they inherit the trigger
-  width and a click anywhere else in the dialog correctly counts as
-  "outside" from PrimeNG's view — closes the panel cleanly.
+  button. Two rows: datasource (required), schema (optional).
 -->
 <div class="save-analysis-popup ds-picker-popup" *ngIf="visible" (click)="onBackdropClick($event)">
   <div class="popup-content">
     <h3>{{ 'DATASET.PICK_DATASOURCE' | translate }}</h3>
 
-    <!-- Step 0 (system admins only): Organisation. Selecting an
-         org cascades a reset: datasource and schema clear, the
-         datasource list re-fetches against the new org. -->
-    
-
-    <!-- Step 1: Datasource. Required. Changing this resets the
+    <!-- Datasource. Required. Changing this resets the
          schema selection below and re-fetches the schema list. -->
     <div class="form-field">
       <label>

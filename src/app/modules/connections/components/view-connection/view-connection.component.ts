@@ -47,7 +47,7 @@ export class ViewConnectionComponent implements OnInit {
   }
 
   async loadConnectionDetails() {
-    await this.connectionService.loadOne(this.orgId, this.connectionId);
+    await this.connectionService.loadOne(this.connectionId);
     const data = this.connectionService.current();
     if (data) {
       this.connectionData = data;
@@ -55,9 +55,9 @@ export class ViewConnectionComponent implements OnInit {
       // engine badge. Best-effort: a failure here just hides the
       // badge — the rest of the view is unaffected.
       const datasourceId = data.datasourceId;
-      if (datasourceId && this.orgId) {
+      if (datasourceId) {
         this.datasourceService
-          .viewDatasource(this.orgId, datasourceId)
+          .viewDatasource(datasourceId)
           .then((res: any) => {
             if (!this.globalService.handleSuccessService(res, false)) return;
             this.selectedDbType = res?.data?.config?.dbType ?? null;
@@ -119,7 +119,6 @@ export class ViewConnectionComponent implements OnInit {
   async proceedDelete(): Promise<void> {
     if (this.connectionData && this.deleteJustification.trim()) {
       const response = await this.connectionService.delete(
-        this.orgId,
         this.connectionData.id,
         this.deleteJustification.trim(),
       );

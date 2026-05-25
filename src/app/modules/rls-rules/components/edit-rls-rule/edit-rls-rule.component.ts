@@ -142,12 +142,12 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
 
   loadRuleData(): void {
     this.rlsRulesService
-      .loadOne(this.orgId, this.ruleId)
+      .loadOne(this.ruleId)
       .then(() => {
         const rule = this.rlsRulesService.current();
         if (!rule) return;
 
-        this.loadDatasetColumns(rule.organisationId, rule.datasetId, () => {
+        this.loadDatasetColumns(rule.datasetId, () => {
           this.conditions.clear();
           const savedConditions = rule.conditions?.length
             ? rule.conditions
@@ -155,11 +155,7 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
           savedConditions.forEach((c: any) => {
             this.conditions.push(this.createCondition(c));
             if (c.columnName) {
-              this.loadDistinctValuesForColumn(
-                c.columnName,
-                rule.organisationId,
-                rule.datasetId,
-              );
+              this.loadDistinctValuesForColumn(c.columnName, rule.datasetId);
             }
           });
 
@@ -184,13 +180,11 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
   }
 
   loadDatasetColumns(
-    orgId?: string,
     datasetId?: string,
     callback?: () => void,
   ): void {
-    const org = orgId || this.orgId;
     const dataset = datasetId || this.rlsForm.get('datasetId')?.value;
-    if (!org || !dataset) {
+    if (!dataset) {
       if (callback) callback();
       return;
     }
@@ -198,7 +192,7 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
     this.columnValuesCache = {};
     this.isLoadingColumnValues = {};
     this.datasetService
-      .getDataset(org, dataset)
+      .getDataset(dataset)
       .then((response: any) => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.datasetColumns = (response.data.datasetFields || []).map(
@@ -219,19 +213,16 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
 
   async loadDistinctValuesForColumn(
     columnName: string,
-    orgId?: string,
     datasetId?: string,
   ): Promise<void> {
     if (!columnName || this.columnValuesCache[columnName]) return;
 
-    const org = orgId || this.orgId;
     const dataset = datasetId || this.rlsForm.get('datasetId')?.value;
-    if (!org || !dataset) return;
+    if (!dataset) return;
 
     this.isLoadingColumnValues[columnName] = true;
     try {
       const res: any = await this.datasetService.getDistinctColumnValues(
-        org,
         dataset,
         columnName,
       );

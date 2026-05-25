@@ -40,7 +40,7 @@ export class ViewAnnouncementComponent implements OnInit {
   load(): void {
     this.announcementService.resetCurrent();
     this.announcementService
-      .loadOne(this.announcementId, this.orgId)
+      .loadOne(this.announcementId)
       .catch(() => {})
       .finally(() => this.cdr.markForCheck());
   }
@@ -72,7 +72,7 @@ export class ViewAnnouncementComponent implements OnInit {
 
   proceedDelete(): void {
     this.announcementService
-      .delete(this.announcementId, this.orgId)
+      .delete(this.announcementId)
       .then(res => {
         if (this.globalService.handleSuccessService(res)) {
           this.router.navigate([ANNOUNCEMENT.LIST]);

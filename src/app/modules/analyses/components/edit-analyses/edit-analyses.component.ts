@@ -618,7 +618,7 @@ export class EditAnalysesComponent
    */
   loadAnalysis(): void {
     this.analysesService
-      .getBootstrap(this.orgId, this.analysisId)
+      .getBootstrap(this.analysisId)
       .then(response => {
         if (!this.globalService.handleSuccessService(response, false)) {
           this.cdr.markForCheck();
@@ -675,7 +675,7 @@ export class EditAnalysesComponent
    */
   loadDatasetInfo(): void {
     this.datasetService
-      .getDataset(this.orgId, this.datasetId)
+      .getDataset(this.datasetId)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.datasetDetails = response.data;
@@ -694,7 +694,7 @@ export class EditAnalysesComponent
    */
   loadAnalysisFields(): void {
     this.analysesService
-      .getAnalysisFields(this.orgId, this.analysisId)
+      .getAnalysisFields(this.analysisId)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.analysisFields = response.data?.analysisFields || [];
@@ -826,7 +826,6 @@ export class EditAnalysesComponent
       .runAnalysisQuery({
         datasetId: this.datasetId,
         analysisId: this.analysisId,
-        organisation: this.orgId,
         limit: this.DATA_ROW_LIMIT,
       })
       .then(response => {
@@ -907,7 +906,7 @@ export class EditAnalysesComponent
    */
   loadAllVisuals(): void {
     this.analysesService
-      .listVisualsWithConfig(this.orgId, this.analysisId)
+      .listVisualsWithConfig(this.analysisId)
       .then(response => {
         if (!this.globalService.handleSuccessService(response, false)) return;
 
@@ -1088,7 +1087,7 @@ export class EditAnalysesComponent
     // independently, so we use Promise.allSettled to keep the
     // spinner accurate even if one of the two fails.
     const datasetPromise = this.datasetService
-      .getDataset(this.orgId, this.datasetId)
+      .getDataset(this.datasetId)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.datasetDetails = response.data;
@@ -1100,7 +1099,7 @@ export class EditAnalysesComponent
       });
 
     const analysisPromise = this.analysesService
-      .getAnalysisFields(this.orgId, this.analysisId)
+      .getAnalysisFields(this.analysisId)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.analysisFields = response.data?.analysisFields || [];
@@ -1170,7 +1169,7 @@ export class EditAnalysesComponent
       this.loadAnalysisFields();
       // Also refresh dataset details in case a dataset-level field was edited
       this.datasetService
-        .getDataset(this.orgId, this.datasetId)
+        .getDataset(this.datasetId)
         .then(response => {
           if (this.globalService.handleSuccessService(response, false)) {
             this.datasetDetails = response.data;
@@ -1219,7 +1218,7 @@ export class EditAnalysesComponent
     // cleared, so the post-delete cleanup below can compare against it.
     const deletedColumnKey = this.fieldToDelete.columnToUse;
     this.datasetService
-      .deleteDatasetField(this.orgId, this.datasetId, this.fieldToDelete.id)
+      .deleteDatasetField(this.datasetId, this.fieldToDelete.id)
       .then((response: any) => {
         if (this.globalService.handleSuccessService(response, true)) {
           this.fieldToDelete = null;
@@ -1401,7 +1400,6 @@ export class EditAnalysesComponent
     this.isDeletingFilter = filter.tempId;
     try {
       const res: any = await this.analysesService.deleteFilter(
-        this.orgId,
         filter.tempId,
         reason,
       );
@@ -2398,7 +2396,6 @@ export class EditAnalysesComponent
     this.publishing.set(true);
     this.dashboardService
       .publish({
-        orgId: this.orgId,
         analysisId: this.analysisId,
         mode: payload.mode,
         dashboardId: payload.dashboardId,

@@ -72,9 +72,9 @@ export class SystemAdminHomeComponent implements OnInit {
     this.loadOrganizationData(event?.target.value);
   }
 
-  loadOrganizationData(orgId: string) {
+  loadOrganizationData(_orgId: string) {
     this.homeService
-      .getSystemAdminDashboard(orgId)
+      .getSystemAdminDashboard()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res: any) => {

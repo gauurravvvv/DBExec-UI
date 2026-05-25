@@ -404,7 +404,7 @@ export class ConfigureQueryBuilderComponent implements OnInit, OnDestroy {
       })
       .then(() => {
         this.queryBuilderService
-          .getQueryBuilderConfiguration(this.orgId, this.queryBuilderId)
+          .getQueryBuilderConfiguration(this.queryBuilderId)
           .then(response => {
             if (this.globalService.handleSuccessService(response)) {
               if (response.data && response.data.length > 0) {
@@ -878,7 +878,6 @@ export class ConfigureQueryBuilderComponent implements OnInit, OnDestroy {
     this.queryBuilderService
       .saveQueryBuilderConfiguration(
         queryBuilderConfig,
-        this.orgId,
         this.datasourceId,
         this.queryBuilderId,
       )

@@ -241,11 +241,10 @@ export class AnalysisFilterBarComponent
 
   // ── Service-mode load ─────────────────────────────────────────────
   async loadFilters(): Promise<void> {
-    if (!this.orgId || !this.analysisId) return;
+    if (!this.analysisId) return;
     this.isLoading = true;
     try {
       const { filters, warmed } = await this.optionsCache.open(
-        this.orgId,
         this.analysisId,
       );
       this.internalFilters = (filters || []).filter((f: any) => f.isEnabled);
@@ -268,9 +267,7 @@ export class AnalysisFilterBarComponent
       );
       if (warmed && dropdownFilters.length) {
         for (const f of dropdownFilters) {
-          const result = await this.optionsCache.get(this.analysisId, f.id, {
-            organisation: this.orgId,
-          });
+          const result = await this.optionsCache.get(this.analysisId, f.id);
           this.applyResultToInternalState(f.id, result);
         }
       }
@@ -314,7 +311,6 @@ export class AnalysisFilterBarComponent
           search: args.search || undefined,
           page: args.page,
           pageSize: args.limit,
-          organisation: this.orgId,
         });
         this.applyResultToInternalState(filter.id, result);
         if (!result.ok) return { items: [], total: 0 };

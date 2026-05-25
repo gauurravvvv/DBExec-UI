@@ -11,11 +11,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { DEFAULT_PAGE } from 'src/app/core/constants/global.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { AuditService } from 'src/app/modules/audit-logs/services/audit.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 
 @Component({
   selector: 'app-list-login-activity',
@@ -44,11 +41,6 @@ export class ListLoginActivityComponent implements OnInit {
 
   lastTableLazyLoadEvent: any;
 
-  isSystemAdmin = false;
-  organisations: any[] = [];
-  organisationOptions: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
   today = new Date();
 
   filterValues: any = {
@@ -65,7 +57,6 @@ export class ListLoginActivityComponent implements OnInit {
   constructor(
     private auditService: AuditService,
     private globalService: GlobalService,
-    private organisationService: OrganisationService,
     private translate: TranslateService,
   ) {}
 
@@ -97,12 +88,6 @@ export class ListLoginActivityComponent implements OnInit {
       },
     ];
 
-    this.isSystemAdmin = false;
-
-    if (this.isSystemAdmin) {
-      this.loadOrganisations();
-    }
-
     this.searchSubject
       .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
@@ -110,60 +95,6 @@ export class ListLoginActivityComponent implements OnInit {
           this.loadActivities(this.lastTableLazyLoadEvent);
         }
       });
-  }
-
-  /**
-   * Fetcher for the server-mode organisation filter dropdown. Filters out the
-   * default-internal org so it never shows up in the activity filter.
-   */
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        const all = res?.data?.orgs ?? [];
-        const items = all.filter((org: any) => org.isDefault !== 1);
-        return { items, total: res?.data?.count ?? items.length };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadOrganisations() {
-    this.organisationService
-      .listOrganisation({ page: DEFAULT_PAGE, limit: 10 })
-      .then((res: any) => {
-        if (this.globalService.handleSuccessService(res, false)) {
-          this.organisations = res?.data?.orgs ?? [];
-          const items = this.organisations.filter(
-            (org: any) => org.isDefault !== 1,
-          );
-          this.preloadedOrgs = items;
-          this.preloadedOrgsTotal = res?.data?.count ?? items.length;
-          // Legacy label/value list kept for any callers (e.g. exportActivity
-          // resolves the selected org's display name from this list).
-          this.organisationOptions = items.map((org: any) => ({
-            label: org.name,
-            value: org.id,
-          }));
-        }
-      })
-      .catch(() => {});
-  }
-
-  onOrganisationChange() {
-    this.onFilterChange();
   }
 
   onFilterChange() {
@@ -195,12 +126,11 @@ export class ListLoginActivityComponent implements OnInit {
   }
 
   clearFilters() {
-    const orgId = this.filterValues.organisationId;
     this.filterValues = {
       username: '',
       eventType: null,
       organisationName: '',
-      organisationId: this.isSystemAdmin ? orgId : null,
+      organisationId: null,
       ipAddress: '',
       dateRange: null,
     };
@@ -262,12 +192,8 @@ export class ListLoginActivityComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (blob: Blob) => {
-          const orgLabel =
-            this.organisationOptions.find(
-              (o: any) => o.value === this.filterValues.organisationId,
-            )?.label || 'Organisation';
           const dateStr = new Date().toISOString().slice(0, 10);
-          const fileName = `Login_Activity_${orgLabel.replace(/\s+/g, '_')}_${dateStr}.pdf`;
+          const fileName = `Login_Activity_${dateStr}.pdf`;
 
           const url = window.URL.createObjectURL(blob);
           const link = document.createElement('a');

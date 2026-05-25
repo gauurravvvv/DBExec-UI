@@ -11,7 +11,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { QUERY_BUILDER } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { QueryBuilderService } from '../../services/query-builder.service';
@@ -27,14 +26,11 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
   saving = inject(QueryBuilderService).saving;
 
   queryBuilderForm!: FormGroup;
-  showOrganisationDropdown = false;
-  orgId: string = '';
   queryBuilderId: string = '';
   queryBuilderData: any;
   isCancelClicked = false;
   showSaveConfirm = false;
   saveJustification = '';
-  selectedOrgName: string = '';
   selectedDatasourceName: string = '';
 
   constructor(
@@ -59,7 +55,6 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
 
   ngOnInit() {
     this.queryBuilderId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
 
     if (this.queryBuilderId) {
       this.loadQueryBuilderDetails();
@@ -77,7 +72,6 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
   initForm() {
     this.queryBuilderForm = this.fb.group({
       id: [''],
-      organisation: [''],
       datasource: [''],
       name: [
         '',
@@ -92,14 +86,12 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
       status: [false],
     });
 
-    if (!this.showOrganisationDropdown) {
-      this.queryBuilderForm.get('datasource')?.enable();
-    }
+    this.queryBuilderForm.get('datasource')?.enable();
   }
 
   loadQueryBuilderDetails(): void {
     this.queryBuilderService
-      .viewQueryBuilder(this.orgId, this.queryBuilderId)
+      .viewQueryBuilder(this.queryBuilderId)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.queryBuilderData = response.data;
@@ -107,12 +99,10 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
             id: this.queryBuilderData.id,
             name: this.queryBuilderData.name,
             description: this.queryBuilderData.description,
-            organisation: this.queryBuilderData.organisationId,
             datasource: this.queryBuilderData.datasourceId,
             status: this.queryBuilderData.status,
           });
 
-          this.selectedOrgName = this.queryBuilderData.organisationName || '';
           this.selectedDatasourceName =
             this.queryBuilderData.datasource?.name || '';
 
@@ -176,12 +166,10 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
         id: this.queryBuilderData.id,
         name: this.queryBuilderData.name,
         description: this.queryBuilderData.description,
-        organisation: this.queryBuilderData.organisation,
         datasource: this.queryBuilderData.datasource,
         status: this.queryBuilderData.status,
       });
 
-      this.selectedOrgName = this.queryBuilderData.organisationName;
       this.isCancelClicked = true;
       this.queryBuilderForm.markAsPristine();
     } else {

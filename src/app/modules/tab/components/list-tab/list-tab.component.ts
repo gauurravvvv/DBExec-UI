@@ -15,10 +15,8 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { TAB } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { TabService } from '../../services/tab.service';
 
 @Component({
@@ -43,16 +41,11 @@ export class ListTabComponent implements OnInit {
   bulkDelete = false;
   deleteJustification = '';
   Math = Math;
-  organisations: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
   selectedOrg: any = null;
   selectedDatasource: any = null;
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = false;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
   today = new Date();
@@ -91,7 +84,6 @@ export class ListTabComponent implements OnInit {
 
   constructor(
     private datasourceService: DatasourceService,
-    private organisationService: OrganisationService,
     private tabService: TabService,
     private router: Router,
     private globalService: GlobalService,
@@ -115,30 +107,17 @@ export class ListTabComponent implements OnInit {
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-        if (params['orgId'] || params['datasourceId'] || params['name']) {
+        this.selectedOrg = this.globalService.getTokenDetails('organisationId');
+        if (params['datasourceId'] || params['name']) {
           this.handleDeepLinking(params);
         } else {
-          if (this.showOrganisationDropdown) {
-            this.loadOrganisations();
-          } else {
-            this.selectedOrg =
-              this.globalService.getTokenDetails('organisationId');
-            this.loadDatasources();
-          }
+          this.loadDatasources();
         }
       });
   }
 
-  onOrgChange(orgId: any) {
-    this.selectedOrg = orgId;
-    this.preloadedDatasources = null;
-    this.preloadedDatasourcesTotal = null;
-    this.loadDatasources();
-  }
-
   /**
-   * Fetcher for the server-mode datasource dropdown. Org-scoped — no-ops
-   * gracefully if no org is selected.
+   * Fetcher for the server-mode datasource dropdown.
    */
   loadDatasourcesPage = async ({
     search,
@@ -149,8 +128,7 @@ export class ListTabComponent implements OnInit {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    if (!this.selectedOrg) return { items: [], total: 0 };
-    const params: any = { orgId: this.selectedOrg, page, limit };
+    const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       const res: any = await this.datasourceService.listDatasource(params);
@@ -196,7 +174,6 @@ export class ListTabComponent implements OnInit {
   }
 
   handleDeepLinking(params: any) {
-    const orgId = params['orgId'] ? params['orgId'] : null;
     const datasourceId = params['datasourceId'] ? params['datasourceId'] : null;
     const name = params['name'];
 
@@ -204,103 +181,16 @@ export class ListTabComponent implements OnInit {
       this.filterValues.name = name;
     }
 
-    if (this.showOrganisationDropdown) {
-      // If orgId is present, we try to select it specifically.
-      // If not, we just load default organisations (which triggers default DB load).
-      const orgPromise = orgId
-        ? this.loadOrganisations(orgId)
-        : this.loadOrganisations();
-
-      orgPromise.then(() => {
-        // If we specifically requested an orgId, the loadOrganisations method DOES NOT trigger loadDatasources automatically.
-        // So we must manually trigger it here.
-        if (orgId) {
-          if (datasourceId) {
-            this.loadDatasources(datasourceId);
-          } else {
-            this.loadDatasources();
-          }
-        }
-        // If orgId was NOT requested, loadOrganisations() already triggered loadDatasources(), so we're done.
-      });
+    if (datasourceId) {
+      this.loadDatasources(datasourceId);
     } else {
-      // For non-system admin, org is fixed
-      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
-
-      if (datasourceId) {
-        this.loadDatasources(datasourceId);
-      } else {
-        this.loadDatasources();
-      }
+      this.loadDatasources();
     }
-  }
-
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadOrganisations(preSelectedOrgId?: string): Promise<void> {
-    return new Promise(resolve => {
-      const params = {
-        page: DEFAULT_PAGE,
-        limit: 10,
-      };
-      this.organisationService.listOrganisation(params).then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const orgs = response?.data?.orgs ?? [];
-          this.preloadedOrgs = orgs;
-          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-          if (orgs.length > 0) {
-            if (
-              preSelectedOrgId &&
-              orgs.find((o: any) => o.id === preSelectedOrgId)
-            ) {
-              this.selectedOrg = preSelectedOrgId;
-            } else {
-              this.selectedOrg = orgs[0].id;
-            }
-            // Only load datasources if we are NOT in deep linking flow (handled by caller) OR if we want default behavior
-            if (!preSelectedOrgId) {
-              this.loadDatasources();
-            }
-          } else {
-            this.selectedOrg = null;
-            this.datasources = [];
-            this.selectedDatasource = null;
-          }
-        }
-        this.cdr.markForCheck();
-        resolve();
-      });
-    });
   }
 
   loadDatasources(preSelectedDbId?: string): Promise<void> {
     return new Promise(resolve => {
-      if (!this.selectedOrg) {
-        resolve();
-        return;
-      }
       const params = {
-        orgId: this.selectedOrg,
         page: DEFAULT_PAGE,
         limit: 10,
       };
@@ -328,7 +218,6 @@ export class ListTabComponent implements OnInit {
               this.selectedDatasource = null;
             }
           } else {
-            this.selectedOrg = null;
             this.datasources = [];
             this.selectedDatasource = null;
           }
@@ -336,7 +225,6 @@ export class ListTabComponent implements OnInit {
           resolve();
         })
         .catch(() => {
-          this.selectedOrg = null;
           this.datasources = [];
           this.selectedDatasource = null;
           this.cdr.markForCheck();
@@ -367,7 +255,6 @@ export class ListTabComponent implements OnInit {
     const limit = event ? event.rows : this.limit;
 
     const params: any = {
-      orgId: this.selectedOrg,
       datasourceId: this.selectedDatasource,
       page: page,
       limit: limit,
@@ -451,7 +338,7 @@ export class ListTabComponent implements OnInit {
         return;
       }
       this.tabService
-        .bulkDeleteTab(ids, reason, this.selectedOrg)
+        .bulkDeleteTab(ids, reason)
         .then((res: any) => {
           if (this.globalService.handleSuccessService(res)) {
             this.selectedTabs = [];
@@ -470,7 +357,7 @@ export class ListTabComponent implements OnInit {
 
     if (this.tabToDelete) {
       this.tabService
-        .deleteTab(this.selectedOrg, this.tabToDelete, reason)
+        .deleteTab(this.tabToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.selectedTabs = this.selectedTabs.filter(

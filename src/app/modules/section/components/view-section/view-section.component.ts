@@ -45,7 +45,7 @@ export class ViewSectionComponent implements OnInit {
   loadSectionDetails() {
     this.sectionService.resetCurrent();
     this.sectionService
-      .loadOne(this.orgId, this.sectionId)
+      .loadOne(this.sectionId)
       .then(() => {
         const data = this.sectionService.current();
         if (data) {
@@ -82,7 +82,7 @@ export class ViewSectionComponent implements OnInit {
   proceedDelete(): void {
     if (this.tabData && this.deleteJustification.trim()) {
       this.sectionService
-        .delete(this.orgId, this.tabData.id, this.deleteJustification.trim())
+        .delete(this.tabData.id, this.deleteJustification.trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.deleteJustification = '';

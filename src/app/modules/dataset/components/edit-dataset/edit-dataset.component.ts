@@ -194,11 +194,7 @@ export class EditDatasetComponent
   // Stable bound reference for context menu listener
   private boundCloseContextMenu = this.closeContextMenu.bind(this);
 
-  // Organisation Management
   selectedOrg: any = {};
-  selectedOrgName: string = '';
-  userRole: string = '';
-  showOrganisationDropdown: boolean = false;
   selectedDatasourceObj: any = null;
   selectedDatasourceName: string = '';
 
@@ -299,8 +295,6 @@ export class EditDatasetComponent
     private translate: TranslateService,
     private elementRef: ElementRef<HTMLElement>,
   ) {
-    this.userRole = this.globalService.getTokenDetails('role') || '';
-    this.showOrganisationDropdown = false;
   }
 
   ngOnInit(): void {
@@ -1915,12 +1909,12 @@ export class EditDatasetComponent
    * Fetch dataset data by ID and populate the form
    */
   private fetchDatasetData(): void {
-    if (!this.datasetId || !this.orgId) return;
+    if (!this.datasetId) return;
 
     this.isLoadingDataset = true;
 
     this.datasetService
-      .getDataset(this.orgId, this.datasetId)
+      .getDataset(this.datasetId)
       .then(response => {
         this.isLoadingDataset = false;
 
@@ -1957,7 +1951,6 @@ export class EditDatasetComponent
           this.selectedOrg = {
             id: dataset.organisationId,
           };
-          this.selectedOrgName = dataset.organisationName || '';
 
           // Set database from API response
           this.selectedDatasourceObj = {

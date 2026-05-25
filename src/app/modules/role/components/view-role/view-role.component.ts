@@ -36,7 +36,7 @@ export class ViewRoleComponent implements OnInit {
   }
 
   async loadRole() {
-    await this.roleService.loadOne(this.orgId, this.roleId);
+    await this.roleService.loadOne(this.roleId);
     const data = this.roleService.current();
     if (data) {
       this.roleData = data;

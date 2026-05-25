@@ -10,10 +10,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { DATASOURCE } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
@@ -33,10 +31,6 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
   private destroyRef = inject(DestroyRef);
 
   datasourceForm!: FormGroup;
-  organisations: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
-  private _showOrganisationDropdown = false;
   showPassword: boolean = false;
   databaseTypes = DATABASE_TYPES;
 
@@ -70,12 +64,7 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    this.showOrganisationDropdown = false;
-
     this.initForm();
-    if (this.showOrganisationDropdown) {
-      this.loadOrganisations();
-    }
 
     // Reset connection test when connection fields change. `type` is in
     // the list so switching DB engines also forces a re-test — credentials
@@ -182,16 +171,7 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
       warehouse: [''],
       role: [''],
       schemaName: [''],
-      organisation: [
-        this.globalService.getTokenDetails('organisationId'),
-        Validators.required,
-      ],
     });
-
-    const orgControl = this.datasourceForm.get('organisation');
-    if (this.showOrganisationDropdown) {
-      orgControl?.setValidators([Validators.required]);
-    }
   }
 
   /**
@@ -234,49 +214,6 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
     set('warehouse', isSf);
   }
 
-  /**
-   * Fetcher for the server-mode organisation dropdown.
-   */
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadOrganisations(): void {
-    if (this.showOrganisationDropdown) {
-      const params = {
-        page: DEFAULT_PAGE,
-        limit: 10,
-      };
-      this.organisationService.listOrganisation(params).then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const orgs = response?.data?.orgs ?? [];
-          this.organisations = [...orgs];
-          this.preloadedOrgs = orgs;
-          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-          this.cdr.markForCheck();
-        }
-      });
-    }
-  }
-
   async onSubmit(): Promise<void> {
     if (this.datasourceForm.valid && this.connectionTested) {
       const formValue = this.datasourceForm.getRawValue();
@@ -289,7 +226,6 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
         database: formValue.database,
         username: formValue.username,
         password: formValue.password,
-        organisation: formValue.organisation,
       };
 
       if (isSf) {
@@ -475,23 +411,4 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
     this.showPassword = !this.showPassword;
   }
 
-  set showOrganisationDropdown(value: boolean) {
-    this._showOrganisationDropdown = value;
-    if (this.datasourceForm) {
-      const orgControl = this.datasourceForm.get('organisation');
-
-      if (value) {
-        orgControl?.enable();
-        orgControl?.setValidators([Validators.required]);
-      } else {
-        orgControl?.disable();
-        orgControl?.clearValidators();
-        orgControl?.setValue(null);
-      }
-    }
-  }
-
-  get showOrganisationDropdown(): boolean {
-    return this._showOrganisationDropdown;
-  }
 }

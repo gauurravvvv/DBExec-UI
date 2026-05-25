@@ -170,11 +170,10 @@ export class ViewDatasetComponent implements OnInit {
   }
 
   loadDatasetData() {
-    const orgId = this.route.snapshot.params['orgId'];
     const datasetId = this.route.snapshot.params['id'];
 
     this.datasetService
-      .viewDataset(orgId, datasetId)
+      .viewDataset(datasetId)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.datasetData = response.data;
@@ -229,7 +228,6 @@ export class ViewDatasetComponent implements OnInit {
     if (this.deleteJustification.trim()) {
       this.datasetService
         .deleteDataset(
-          this.datasetData.organisationId,
           this.datasetData.id,
           this.deleteJustification.trim(),
         )
@@ -262,7 +260,6 @@ export class ViewDatasetComponent implements OnInit {
 
     this.datasetService
       .deleteDatasetField(
-        this.datasetData.organisationId,
         this.datasetData.id,
         this.fieldToDelete.id,
       )
@@ -308,7 +305,6 @@ export class ViewDatasetComponent implements OnInit {
     // Call API to get field details first
     this.datasetService
       .viewDatasetField(
-        this.datasetData.organisationId,
         this.datasetData.id,
         field.id,
       )

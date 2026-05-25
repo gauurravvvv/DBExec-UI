@@ -15,10 +15,8 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { DASHBOARD as DB_ROUTES } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
 import { DashboardService } from '../../services/dashboard.service';
 
@@ -58,16 +56,11 @@ export class ListDashboardComponent implements OnInit {
   dashboardToDelete: string | null = null;
   bulkDelete = false;
   deleteJustification = '';
-  organisations: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
   selectedOrg: any = null;
   selectedDatasource: any = null;
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = false;
 
   today = new Date();
 
@@ -100,7 +93,6 @@ export class ListDashboardComponent implements OnInit {
   }
 
   constructor(
-    private organisationService: OrganisationService,
     private router: Router,
     private globalService: GlobalService,
     private dashboardService: DashboardService,
@@ -121,74 +113,12 @@ export class ListDashboardComponent implements OnInit {
         this.loadDashboards();
       });
 
-    if (this.showOrganisationDropdown) {
-      this.loadOrganisations();
-    } else {
-      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
-      this.loadDatasources();
-    }
-  }
-
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadOrganisations(): Promise<void> {
-    return new Promise(resolve => {
-      this.organisationService
-        .listOrganisation({ page: DEFAULT_PAGE, limit: 10 })
-        .then(response => {
-          if (this.globalService.handleSuccessService(response, false)) {
-            const orgs = response?.data?.orgs ?? [];
-            this.preloadedOrgs = orgs;
-            this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-            if (orgs.length > 0) {
-              this.selectedOrg = orgs[0].id;
-              this.loadDatasources();
-            } else {
-              this.selectedOrg = null;
-              this.datasources = [];
-              this.selectedDatasource = null;
-            }
-          }
-          this.cdr.markForCheck();
-          resolve();
-        })
-        .catch(() => {
-          this.cdr.markForCheck();
-          resolve();
-        });
-    });
-  }
-
-  onOrgChange(orgId: any) {
-    this.selectedOrg = orgId;
-    this.preloadedDatasources = null;
-    this.preloadedDatasourcesTotal = null;
+    this.selectedOrg = this.globalService.getTokenDetails('organisationId');
     this.loadDatasources();
   }
 
   /**
-   * Fetcher for the server-mode datasource dropdown. Org-scoped — no-ops
-   * gracefully if no org is selected.
+   * Fetcher for the server-mode datasource dropdown.
    */
   loadDatasourcesPage = async ({
     search,
@@ -199,8 +129,7 @@ export class ListDashboardComponent implements OnInit {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    if (!this.selectedOrg) return { items: [], total: 0 };
-    const params: any = { orgId: this.selectedOrg, page, limit };
+    const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       const res: any = await this.datasourceService.listDatasource(params);
@@ -246,12 +175,7 @@ export class ListDashboardComponent implements OnInit {
 
   loadDatasources(): Promise<void> {
     return new Promise(resolve => {
-      if (!this.selectedOrg) {
-        resolve();
-        return;
-      }
       const params = {
-        orgId: this.selectedOrg,
         page: DEFAULT_PAGE,
         limit: 10,
       };
@@ -272,7 +196,6 @@ export class ListDashboardComponent implements OnInit {
               this.selectedDatasource = null;
             }
           } else {
-            this.selectedOrg = null;
             this.datasources = [];
             this.selectedDatasource = null;
           }
@@ -280,7 +203,6 @@ export class ListDashboardComponent implements OnInit {
           resolve();
         })
         .catch(() => {
-          this.selectedOrg = null;
           this.datasources = [];
           this.selectedDatasource = null;
           this.cdr.markForCheck();
@@ -313,7 +235,6 @@ export class ListDashboardComponent implements OnInit {
     const limit = event ? event.rows : this.limit;
 
     const params: any = {
-      orgId: this.selectedOrg,
       datasourceId: this.selectedDatasource,
       page: page,
       limit: limit,
@@ -390,7 +311,7 @@ export class ListDashboardComponent implements OnInit {
         return;
       }
       this.dashboardService
-        .bulkDelete(ids, reason, this.selectedOrg)
+        .bulkDelete(ids, reason)
         .then((res: any) => {
           if (this.globalService.handleSuccessService(res)) {
             this.selectedDashboards = [];
@@ -408,7 +329,7 @@ export class ListDashboardComponent implements OnInit {
 
     if (this.dashboardToDelete) {
       this.dashboardService
-        .delete(this.selectedOrg, this.dashboardToDelete, reason)
+        .delete(this.dashboardToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.selectedDashboards = this.selectedDashboards.filter(

@@ -15,10 +15,8 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { USER } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
 import { UserService } from '../../services/user.service';
 
@@ -56,18 +54,11 @@ export class ListUserComponent implements OnInit {
   bulkDelete = false;
   deleteJustification = '';
 
-  organisations: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
   groups: any[] = [];
-  // Mirror of preloadedOrgs but for the server-mode Group filter. Cleared and
-  // refilled whenever selectedOrg changes (groups are org-scoped).
   preloadedGroups: any[] | null = null;
   preloadedGroupsTotal: number | null = null;
   selectedOrg: any = null;
   selectedGroup: string | null = null;
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = false;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
   today = new Date();
 
@@ -103,7 +94,6 @@ export class ListUserComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private organisationService: OrganisationService,
     private groupService: GroupService,
     private router: Router,
     private globalService: GlobalService,
@@ -124,69 +114,12 @@ export class ListUserComponent implements OnInit {
         this.loadUsers();
       });
 
-    if (this.showOrganisationDropdown) {
-      this.loadOrganisations();
-    } else {
-      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
-      this.loadGroupOptions();
-    }
+    this.selectedOrg = this.globalService.getTokenDetails('organisationId');
+    this.loadGroupOptions();
   }
 
   /**
-   * Fetcher for the server-mode org dropdown. Called by the dropdown on open,
-   * on filter keystroke (debounced), and on near-end scroll.
-   */
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  /**
-   * Initial bootstrap — fetch the first page of orgs, auto-select the first
-   * and pass the same page to the dropdown as a preload so it doesn't refetch
-   * on first open.
-   */
-  loadOrganisations() {
-    this.organisationService
-      .listOrganisation({ page: DEFAULT_PAGE, limit: 10 })
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const orgs = response?.data?.orgs ?? [];
-          this.preloadedOrgs = orgs;
-          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-          if (orgs.length > 0) {
-            this.selectedOrg = orgs[0].id;
-            this.loadGroupOptions();
-            this.loadUsers();
-          } else {
-            this.selectedOrg = null;
-          }
-        }
-        this.cdr.markForCheck();
-      });
-  }
-
-  /**
-   * Fetcher for the server-mode Group filter dropdown. Gates on selectedOrg
-   * because groups are org-scoped; an open with no org would otherwise pull
-   * groups across the entire fleet.
+   * Fetcher for the server-mode Group filter dropdown.
    */
   loadGroupsPage = async ({
     search,
@@ -197,10 +130,7 @@ export class ListUserComponent implements OnInit {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    const orgId =
-      this.selectedOrg || this.globalService.getTokenDetails('organisationId');
-    if (!orgId) return { items: [], total: 0 };
-    const params: any = { orgId, page, limit };
+    const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       const res: any = await this.groupService.listGroups(params);
@@ -221,11 +151,8 @@ export class ListUserComponent implements OnInit {
    * legacy `groups[]` array stays populated for other code paths.
    */
   loadGroupOptions() {
-    const orgId =
-      this.selectedOrg || this.globalService.getTokenDetails('organisationId');
-    if (!orgId) return;
     this.groupService
-      .listGroups({ orgId, page: DEFAULT_PAGE, limit: 10 })
+      .listGroups({ page: DEFAULT_PAGE, limit: 10 })
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           const groups = response?.data?.groups ?? [];
@@ -242,19 +169,6 @@ export class ListUserComponent implements OnInit {
   }
 
   isRowSelectable = (event: any) => !!event?.data?.canDelete;
-
-  onOrgChange(orgId: any) {
-    this.selectedOrg = orgId;
-    this.selectedGroup = null;
-    this.selectedUsers = [];
-    this.groups = [];
-    // Drop the group dropdown's seed so the next open re-fetches against the
-    // newly selected org instead of showing stale options.
-    this.preloadedGroups = null;
-    this.preloadedGroupsTotal = null;
-    this.loadGroupOptions();
-    this.loadUsers();
-  }
 
   onGroupChange(groupId: string | null) {
     this.selectedGroup = groupId;
@@ -320,7 +234,6 @@ export class ListUserComponent implements OnInit {
     const limit = event ? event.rows : this.limit;
 
     const params: any = {
-      orgId: this.selectedOrg,
       page: page,
       limit: limit,
     };
@@ -394,7 +307,7 @@ export class ListUserComponent implements OnInit {
   }
 
   onUnlock(id: string) {
-    this.userService.unlock(this.selectedOrg, id).then((res: any) => {
+    this.userService.unlock(id).then((res: any) => {
       if (this.globalService.handleSuccessService(res)) {
         if (this.lastTableLazyLoadEvent) {
           this.loadUsers(this.lastTableLazyLoadEvent);
@@ -438,7 +351,7 @@ export class ListUserComponent implements OnInit {
         return;
       }
       this.userService
-        .bulkDelete(ids, reason, this.selectedOrg)
+        .bulkDelete(ids, reason)
         .then((res: any) => {
           if (this.globalService.handleSuccessService(res)) {
             this.selectedUsers = [];
@@ -454,7 +367,7 @@ export class ListUserComponent implements OnInit {
 
     if (this.userToDelete) {
       this.userService
-        .delete(this.userToDelete, this.selectedOrg, reason)
+        .delete(this.userToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.selectedUsers = this.selectedUsers.filter(

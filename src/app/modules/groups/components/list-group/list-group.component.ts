@@ -15,9 +15,7 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { GROUP } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { RoleService } from 'src/app/modules/role/services/role.service';
 import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
 import { GroupService } from '../../services/group.service';
@@ -55,17 +53,9 @@ export class ListGroupComponent implements OnInit {
   selectedOrg: any = null;
   selectedRole: string | null = null;
 
-  // Seeds the org dropdown's server-mode panel on first open and lets it
-  // render the auto-selected org's label without a separate fetch.
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
-
-  // Same idea as preloadedOrgs but for the Role filter dropdown. Refilled
-  // whenever the selected org changes (since roles are org-scoped).
+  // Server-mode preload for the Role filter dropdown.
   preloadedRoles: any[] | null = null;
   preloadedRolesTotal: number | null = null;
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = false;
   today = new Date();
 
   statusOptions: { label: string; value: number }[] = [];
@@ -91,7 +81,6 @@ export class ListGroupComponent implements OnInit {
 
   constructor(
     private groupService: GroupService,
-    private organisationService: OrganisationService,
     private roleService: RoleService,
     private router: Router,
     private globalService: GlobalService,
@@ -111,72 +100,13 @@ export class ListGroupComponent implements OnInit {
         this.loadGroups();
       });
 
-    if (this.showOrganisationDropdown) {
-      this.loadOrganisations();
-    } else {
-      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
-      this.loadRoles();
-      this.loadGroups();
-    }
+    this.selectedOrg = this.globalService.getTokenDetails('organisationId');
+    this.loadRoles();
+    this.loadGroups();
   }
 
   /**
-   * Fetcher passed to app-custom-dropdown in server mode. The dropdown calls
-   * this on open, on filter (debounced inside the dropdown), and on
-   * near-end scroll. Returns one page; the dropdown handles append vs replace.
-   */
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  /**
-   * Initial bootstrap for system-admin view: fetch the first page of orgs so we
-   * can (a) auto-select the first org and (b) seed the server-mode dropdown
-   * with the same page — avoids a duplicate request when the user opens the
-   * panel. Uses the dropdown's normal page size so the seed is reusable.
-   */
-  loadOrganisations() {
-    this.organisationService
-      .listOrganisation({ page: DEFAULT_PAGE, limit: 10 })
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const orgs = response?.data?.orgs ?? [];
-          this.preloadedOrgs = orgs;
-          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-          if (orgs.length > 0) {
-            this.selectedOrg = orgs[0].id;
-            this.loadRoles();
-            this.loadGroups();
-          } else {
-            this.selectedOrg = null;
-          }
-        }
-        this.cdr.markForCheck();
-      });
-  }
-
-  /**
-   * Fetcher for the server-mode Role filter dropdown. roleService.listRoles
-   * takes (orgId, {page, limit, filter}) and maps filter.name through to the
-   * BE — same shape as the Org dropdown above, just gated on a selected org.
+   * Fetcher for the server-mode Role filter dropdown.
    */
   loadRolesPage = async ({
     search,
@@ -187,14 +117,10 @@ export class ListGroupComponent implements OnInit {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    if (!this.selectedOrg) return { items: [], total: 0 };
     const params: any = { page, limit };
     if (search) params.filter = { name: search };
     try {
-      const res: any = await this.roleService.listRoles(
-        this.selectedOrg,
-        params,
-      );
+      const res: any = await this.roleService.listRoles(params);
       if (this.globalService.handleSuccessService(res, false)) {
         return { items: res?.data?.roles ?? [], total: res?.data?.count ?? 0 };
       }
@@ -206,13 +132,11 @@ export class ListGroupComponent implements OnInit {
 
   /**
    * Preload page 1 of roles so the dropdown can render without a fresh fetch
-   * on first open, and so the existing `roles[]` array remains populated for
-   * any code that references it.
+   * on first open.
    */
   loadRoles() {
-    if (!this.selectedOrg) return;
     this.roleService
-      .listRoles(this.selectedOrg, { page: DEFAULT_PAGE, limit: 10 })
+      .listRoles({ page: DEFAULT_PAGE, limit: 10 })
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           const roles = response?.data?.roles ?? [];
@@ -229,19 +153,6 @@ export class ListGroupComponent implements OnInit {
   }
 
   isRowSelectable = (event: any) => event?.data?.isDefault !== 1;
-
-  onOrgChange(orgId: any) {
-    this.selectedOrg = orgId;
-    this.selectedRole = null;
-    this.selectedGroups = [];
-    this.roles = [];
-    // Clear preload so the role dropdown re-fetches against the new org on
-    // next panel open (in addition to the preload we kick off below).
-    this.preloadedRoles = null;
-    this.preloadedRolesTotal = null;
-    this.loadRoles();
-    this.loadGroups();
-  }
 
   onRoleChange(roleId: string | null) {
     this.selectedRole = roleId;
@@ -295,7 +206,6 @@ export class ListGroupComponent implements OnInit {
     const limit = event ? event.rows : this.limit;
 
     const params: any = {
-      orgId: this.selectedOrg,
       page: page,
       limit: limit,
     };
@@ -377,7 +287,7 @@ export class ListGroupComponent implements OnInit {
         return;
       }
       this.groupService
-        .bulkDelete(ids, reason, this.selectedOrg)
+        .bulkDelete(ids, reason)
         .then((res: any) => {
           if (this.globalService.handleSuccessService(res)) {
             this.selectedGroups = [];
@@ -390,7 +300,7 @@ export class ListGroupComponent implements OnInit {
 
     if (this.groupToDelete) {
       this.groupService
-        .delete(this.selectedOrg, this.groupToDelete, reason)
+        .delete(this.groupToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.selectedGroups = this.selectedGroups.filter(

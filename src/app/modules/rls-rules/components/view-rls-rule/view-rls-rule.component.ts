@@ -45,7 +45,7 @@ export class ViewRlsRuleComponent implements OnInit {
 
   loadRuleDetails() {
     this.rlsRulesService
-      .loadOne(this.orgId, this.ruleId)
+      .loadOne(this.ruleId)
       .then(() => {
         this.cdr.markForCheck();
       })
@@ -85,7 +85,7 @@ export class ViewRlsRuleComponent implements OnInit {
     if (!ruleData || !this.deleteJustification.trim()) return;
 
     this.rlsRulesService
-      .delete(this.orgId, ruleData.id, this.deleteJustification.trim())
+      .delete(ruleData.id, this.deleteJustification.trim())
       .then((response: any) => {
         if (this.globalService.handleSuccessService(response)) {
           this.showDeleteConfirm = false;

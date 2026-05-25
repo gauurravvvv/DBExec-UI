@@ -15,10 +15,8 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { CONNECTION } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
 import { ConnectionService } from '../../services/connection.service';
 
@@ -49,16 +47,11 @@ export class ListConnectionComponent implements OnInit {
   deleteJustification = '';
   tabToDelete: string | null = null;
   Math = Math;
-  organisations: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
   selectedOrg: any = null;
   selectedDatasource: any = null;
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = false;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
   today = new Date();
@@ -100,7 +93,6 @@ export class ListConnectionComponent implements OnInit {
 
   constructor(
     private datasourceService: DatasourceService,
-    private organisationService: OrganisationService,
     private connectionService: ConnectionService,
     private router: Router,
     private globalService: GlobalService,
@@ -122,67 +114,12 @@ export class ListConnectionComponent implements OnInit {
         this.loadConnections();
       });
 
-    if (this.showOrganisationDropdown) {
-      this.loadOrganisations();
-    } else {
-      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
-      this.loadDatasources();
-    }
-  }
-
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadOrganisations() {
-    this.organisationService
-      .listOrganisation({ page: DEFAULT_PAGE, limit: 10 })
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const orgs = response?.data?.orgs ?? [];
-          this.preloadedOrgs = orgs;
-          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-          if (orgs.length > 0) {
-            this.selectedOrg = orgs[0].id;
-            this.loadDatasources();
-          } else {
-            this.selectedOrg = null;
-            this.datasources = [];
-            this.selectedDatasource = null;
-          }
-        }
-        this.cdr.markForCheck();
-      });
-  }
-
-  onOrgChange(orgId: any) {
-    this.selectedOrg = orgId;
-    this.preloadedDatasources = null;
-    this.preloadedDatasourcesTotal = null;
+    this.selectedOrg = this.globalService.getTokenDetails('organisationId');
     this.loadDatasources();
   }
 
   /**
-   * Fetcher for the server-mode datasource dropdown. Org-scoped — no-ops
-   * gracefully if no org is selected.
+   * Fetcher for the server-mode datasource dropdown.
    */
   loadDatasourcesPage = async ({
     search,
@@ -193,8 +130,7 @@ export class ListConnectionComponent implements OnInit {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    if (!this.selectedOrg) return { items: [], total: 0 };
-    const params: any = { orgId: this.selectedOrg, page, limit };
+    const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       const res: any = await this.datasourceService.listDatasource(params);
@@ -241,9 +177,7 @@ export class ListConnectionComponent implements OnInit {
   }
 
   loadDatasources() {
-    if (!this.selectedOrg) return;
     const params = {
-      orgId: this.selectedOrg,
       page: DEFAULT_PAGE,
       limit: 10,
     };
@@ -300,7 +234,6 @@ export class ListConnectionComponent implements OnInit {
     const limit = event ? event.rows : this.limit;
 
     const params: any = {
-      orgId: this.selectedOrg,
       datasourceId: this.selectedDatasource,
       page: page,
       limit: limit,
@@ -386,7 +319,6 @@ export class ListConnectionComponent implements OnInit {
         const res: any = await this.connectionService.bulkDelete(
           ids,
           reason,
-          this.selectedOrg,
         );
         if (this.globalService.handleSuccessService(res)) {
           this.selectedConnections = [];
@@ -402,7 +334,6 @@ export class ListConnectionComponent implements OnInit {
     if (this.tabToDelete) {
       try {
         const response: any = await this.connectionService.delete(
-          this.selectedOrg,
           this.tabToDelete,
           reason,
         );

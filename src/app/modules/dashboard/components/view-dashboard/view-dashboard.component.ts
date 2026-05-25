@@ -68,7 +68,6 @@ export class ViewDashboardComponent
   dashboardFetcherFactory = (filter: any): FilterFetcher => {
     return async ({ search, page, limit }) => {
       const response: any = await this._dashboardService.getDistinctFieldValues(
-        this.orgId,
         this.dashboardId,
         {
           fieldName: filter?.columnName,
@@ -227,7 +226,7 @@ export class ViewDashboardComponent
 
   loadDashboard(): void {
     this._dashboardService
-      .render(this.orgId, this.dashboardId)
+      .render(this.dashboardId)
       .then(() => {
         const data = this._dashboardService.rendered();
         if (data) {

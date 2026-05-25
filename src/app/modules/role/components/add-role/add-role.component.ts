@@ -12,13 +12,10 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { ROLE } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { RoleService } from '../../services/role.service';
 
 @Component({
@@ -29,11 +26,7 @@ import { RoleService } from '../../services/role.service';
 })
 export class AddRoleComponent implements OnInit, HasUnsavedChanges {
   roleForm!: FormGroup;
-  organisations: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
   permissions: any[] = [];
-  showOrganisationDropdown = false;
   selectedOrg: any = null;
   permissionControls: { [key: string]: FormControl } = {};
 
@@ -43,7 +36,6 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
     private fb: FormBuilder,
     private router: Router,
     private roleService: RoleService,
-    private organisationService: OrganisationService,
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
     private translate: TranslateService,
@@ -60,66 +52,16 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit() {
-    if (this.showOrganisationDropdown) {
-      this.loadOrganisations();
-    } else {
-      this.selectedOrg = {
-        id: this.globalService.getTokenDetails('organisationId'),
-      };
-      this.loadPermissions();
-    }
+    this.selectedOrg = {
+      id: this.globalService.getTokenDetails('organisationId'),
+    };
+    this.loadPermissions();
   }
 
   initForm() {
     this.roleForm = this.fb.group({
-      organisation: [
-        {
-          value:
-            this.globalService.getTokenDetails('organisationId'),
-          disabled: false,
-        },
-        Validators.required,
-      ],
       name: ['', [Validators.required, Validators.pattern(REGEX.firstName)]],
       description: [''],
-    });
-  }
-
-  /**
-   * Fetcher for the server-mode organisation dropdown.
-   */
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadOrganisations() {
-    const params = { page: DEFAULT_PAGE, limit: 10 };
-    this.organisationService.listOrganisation(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        const orgs = response?.data?.orgs ?? [];
-        this.organisations = [...orgs];
-        this.preloadedOrgs = orgs;
-        this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-        this.cdr.markForCheck();
-      }
     });
   }
 
@@ -148,7 +90,6 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
         .add({
           name: formValues.name,
           description: formValues.description || undefined,
-          organisation: formValues.organisation,
           selectedPermissions,
         })
         .then(response => {
@@ -203,28 +144,13 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
   }
 
   onCancel() {
-    this.roleForm.reset({
-      organisation:
-        this.globalService.getTokenDetails('organisationId'),
-    });
-    this.selectedOrg = null;
+    this.roleForm.reset();
     this.permissions = [];
     this.permissionControls = {};
-    if (!this.showOrganisationDropdown) {
-      this.selectedOrg = {
-        id: this.globalService.getTokenDetails('organisationId'),
-      };
-      this.loadPermissions();
-    }
-  }
-
-  onOrganisationChange(event: any) {
-    this.selectedOrg = event.value ? { id: event.value } : null;
-    this.permissions = [];
-    this.permissionControls = {};
-    if (this.selectedOrg) {
-      this.loadPermissions();
-    }
+    this.selectedOrg = {
+      id: this.globalService.getTokenDetails('organisationId'),
+    };
+    this.loadPermissions();
   }
 
   getPermissionControl(permissionValue: string): FormControl {

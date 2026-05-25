@@ -83,12 +83,9 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
     return this.isFormDirty;
   }
 
-  showOrganisationDropdown = false;
   showPassword: boolean = false;
   datasourceId: string = '';
-  orgId: string = '';
   initialFormValues: any = null;
-  organisationName: string = '';
   isWarningExpanded: boolean = false;
 
   // dbType is immutable on edit — kept on the component (not the form) so
@@ -125,12 +122,9 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
   ) {}
 
   ngOnInit(): void {
-    this.showOrganisationDropdown = false;
-
     this.initForm();
 
     this.datasourceId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
     this.loadDatasourceData();
 
     // Monitor form changes
@@ -188,16 +182,14 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
       ],
       username: ['', Validators.required],
       password: [''],
-      organisation: [{ value: '', disabled: true }],
       status: [true],
     });
   }
 
   async loadDatasourceData(): Promise<void> {
-    await this.datasourceService.loadOne(this.orgId, this.datasourceId);
+    await this.datasourceService.loadOne(this.datasourceId);
     const data = this.datasourceService.current();
     if (data) {
-      this.organisationName = data.organisationName || '';
 
       // dbType is read once from the saved record and used for the
       // connection-test call + the read-only display row. It cannot
@@ -220,7 +212,6 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
         database: data.config?.dbName || '',
         username: data.config?.username || '',
         password: '',
-        organisation: data.organisationId,
         status: data.status === 1,
       };
 

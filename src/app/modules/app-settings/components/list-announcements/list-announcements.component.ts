@@ -15,10 +15,8 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { ANNOUNCEMENT } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { AnnouncementService } from '../../services/announcement.service';
 
 @Component({
@@ -38,18 +36,11 @@ export class ListAnnouncementsComponent implements OnInit {
   loading = this.announcementService.loading;
   saving = this.announcementService.saving;
 
-  organisations: any[] = [];
-  // Server-mode preload for the Organisation toolbar dropdown.
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
   groups: any[] = [];
-  // Server-mode preload for the Group filter dropdown. Cleared whenever
-  // selectedOrg changes since groups are org-scoped.
+  // Server-mode preload for the Group filter dropdown.
   preloadedGroups: any[] | null = null;
   preloadedGroupsTotal: number | null = null;
   selectedOrg: any = null;
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = false;
   today = new Date();
 
   showDeleteConfirm = false;
@@ -81,7 +72,6 @@ export class ListAnnouncementsComponent implements OnInit {
 
   constructor(
     private announcementService: AnnouncementService,
-    private organisationService: OrganisationService,
     private groupService: GroupService,
     private globalService: GlobalService,
     private router: Router,
@@ -99,68 +89,13 @@ export class ListAnnouncementsComponent implements OnInit {
       .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.loadAnnouncements());
 
-    if (this.showOrganisationDropdown) {
-      this.loadOrganisations();
-    } else {
-      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
-      this.loadGroups();
-      this.loadAnnouncements();
-    }
+    this.selectedOrg = this.globalService.getTokenDetails('organisationId');
+    this.loadGroups();
+    this.loadAnnouncements();
   }
 
   /**
-   * Fetcher for the server-mode organisation toolbar dropdown.
-   */
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadOrganisations(): void {
-    const params = { page: DEFAULT_PAGE, limit: 10 };
-    this.organisationService
-      .listOrganisation(params)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const orgs = response?.data?.orgs ?? [];
-          this.organisations = [...orgs];
-          this.preloadedOrgs = orgs;
-          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-          if (this.organisations.length > 0) {
-            this.selectedOrg = this.organisations[0].id;
-            this.loadGroups();
-            this.loadAnnouncements();
-          } else {
-            this.selectedOrg = null;
-          }
-        }
-        this.cdr.markForCheck();
-      })
-      .catch(() => {
-        this.cdr.markForCheck();
-      });
-  }
-
-  /**
-   * Server-mode fetcher for the Group filter dropdown. Gated on selectedOrg
-   * — without it, the BE call would 4xx or return cross-org noise.
+   * Server-mode fetcher for the Group filter dropdown.
    */
   loadGroupsPage = async ({
     search,
@@ -171,8 +106,7 @@ export class ListAnnouncementsComponent implements OnInit {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    if (!this.selectedOrg) return { items: [], total: 0 };
-    const params: any = { orgId: this.selectedOrg, page, limit };
+    const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       const res: any = await this.groupService.listGroups(params);
@@ -189,10 +123,8 @@ export class ListAnnouncementsComponent implements OnInit {
   };
 
   loadGroups(): void {
-    if (!this.selectedOrg) return;
     this.groupService
       .listGroups({
-        orgId: this.selectedOrg,
         page: DEFAULT_PAGE,
         limit: 10,
       })
@@ -208,18 +140,6 @@ export class ListAnnouncementsComponent implements OnInit {
       .catch(() => {
         this.cdr.markForCheck();
       });
-  }
-
-  onOrgChange(orgId: any): void {
-    this.selectedOrg = orgId;
-    this.filterValues.targetGroupId = null;
-    this.groups = [];
-    // Force the next dropdown open to re-fetch against the new org rather
-    // than serving the previous org's seed.
-    this.preloadedGroups = null;
-    this.preloadedGroupsTotal = null;
-    this.loadGroups();
-    this.loadAnnouncements();
   }
 
   onFilterChange(): void {
@@ -251,7 +171,6 @@ export class ListAnnouncementsComponent implements OnInit {
     const limit = event ? event.rows : this.limit;
 
     const params: any = {
-      orgId: this.selectedOrg,
       page,
       limit,
     };
@@ -320,7 +239,7 @@ export class ListAnnouncementsComponent implements OnInit {
   proceedDelete(): void {
     if (!this.toDeleteId) return;
     this.announcementService
-      .delete(this.toDeleteId, this.selectedOrg)
+      .delete(this.toDeleteId)
       .then(res => {
         if (this.globalService.handleSuccessService(res)) {
           this.refreshList();

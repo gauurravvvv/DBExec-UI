@@ -78,7 +78,7 @@ export class ViewDatasourceComponent implements OnInit {
   // Changed from private to public
   async loadDatasourceData(): Promise<void> {
     this.datasourceService.resetCurrent();
-    await this.datasourceService.loadOne(this.orgId, this.dbId);
+    await this.datasourceService.loadOne(this.dbId);
     const data = this.datasourceService.current();
     if (data) {
       this.dbData = data;
@@ -388,7 +388,6 @@ export class ViewDatasourceComponent implements OnInit {
   async proceedDelete(): Promise<void> {
     if (this.dbData && this.deleteJustification.trim()) {
       const response = await this.datasourceService.delete(
-        this.orgId,
         this.dbId,
         this.deleteJustification.trim(),
       );

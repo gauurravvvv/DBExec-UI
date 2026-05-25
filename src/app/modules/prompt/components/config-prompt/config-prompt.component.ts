@@ -43,11 +43,8 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
 
   promptForm!: FormGroup;
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = false;
   orgId: string = '';
   promptId: string = '';
-  selectedOrgName: string = '';
   selectedPromptType: string = '';
   showAddPromptValues: boolean = false;
   selectedDatasourceName: string = '';
@@ -291,7 +288,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   loadPromptData(): void {
     this.promptService.resetCurrent();
     this.promptService
-      .loadOne(this.orgId, this.promptId)
+      .loadOne(this.promptId)
       .then(() => {
         const data = this.promptService.current();
         if (data) {
@@ -311,7 +308,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
           });
 
           // Set display names
-          this.selectedOrgName = this.sectionData.organisationName || '';
           this.selectedDatasourceName = this.sectionData.datasource?.name || '';
           this.selectedTabName = this.sectionData.section.tab.name || '';
           this.selectedSectionName = this.sectionData.section.name || '';
@@ -469,7 +465,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
   async loadConfigData() {
     this.promptService.resetConfig();
-    await this.promptService.loadConfig(this.orgId, this.promptId);
+    await this.promptService.loadConfig(this.promptId);
     const response = this.promptService.config();
     if (response) {
       const config = response.configuration;
@@ -635,7 +631,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         promptValues: [],
       });
 
-      this.selectedOrgName = this.sectionData.organisationName || '';
       this.selectedDatasourceName = this.sectionData.datasource?.name || '';
       this.selectedTabName = this.sectionData.section.tab.name || '';
       this.selectedSectionName = this.sectionData.section.name || '';
@@ -1457,7 +1452,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
    */
   openConfigDialog(): void {
     this.promptService
-      .getAppearance(this.orgId, this.promptId)
+      .getAppearance(this.promptId)
       .then((response: any) => {
         if (this.globalService.handleSuccessService(response, false)) {
           const appearance = response.data?.appearance;

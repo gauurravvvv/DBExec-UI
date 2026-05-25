@@ -145,11 +145,10 @@ export class PublishDashboardDialogComponent implements OnInit, OnChanges {
   }
 
   private async loadExisting() {
-    if (!this.orgId || !this.datasourceId || !this.analysisId) return;
+    if (!this.datasourceId || !this.analysisId) return;
     this.loadingExisting = true;
     try {
       this.existingDashboards = await this.dashboardService.listForAnalysis({
-        orgId: this.orgId,
         datasourceId: this.datasourceId,
         analysisId: this.analysisId,
       });

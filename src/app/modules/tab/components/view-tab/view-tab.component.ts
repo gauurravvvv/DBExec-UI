@@ -40,7 +40,7 @@ export class ViewTabComponent implements OnInit {
 
   async loadTabDetails(): Promise<void> {
     this.tabService.resetCurrent();
-    await this.tabService.loadOne(this.orgId, this.tabId);
+    await this.tabService.loadOne(this.tabId);
     const data = this.tabService.current();
     if (data) {
       this.tabData = data;
@@ -72,7 +72,7 @@ export class ViewTabComponent implements OnInit {
   proceedDelete(): void {
     if (this.tabData && this.deleteJustification.trim()) {
       this.tabService
-        .deleteTab(this.orgId, this.tabData.id, this.deleteJustification.trim())
+        .deleteTab(this.tabData.id, this.deleteJustification.trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.showDeleteConfirm = false;

@@ -41,7 +41,7 @@ export class ViewUserComponent implements OnInit {
   }
 
   async loadAdminData() {
-    await this.userService.loadOne(this.orgId, this.userId);
+    await this.userService.loadOne(this.userId);
     const data = this.userService.current();
     if (data) {
       this.userData = data;
@@ -87,7 +87,6 @@ export class ViewUserComponent implements OnInit {
     if (this.deleteJustification.trim()) {
       const response = await this.userService.delete(
         this.userId,
-        this.orgId,
         this.deleteJustification.trim(),
       );
       if (this.globalService.handleSuccessService(response)) {
@@ -99,7 +98,7 @@ export class ViewUserComponent implements OnInit {
   }
 
   async onUnlock() {
-    const res: any = await this.userService.unlock(this.orgId, this.userId);
+    const res: any = await this.userService.unlock(this.userId);
     if (this.globalService.handleSuccessService(res)) {
       this.loadAdminData();
     }
@@ -112,7 +111,6 @@ export class ViewUserComponent implements OnInit {
   async onPasswordDialogClose(newPassword: string | null) {
     if (newPassword) {
       const response = await this.userService.updatePassword(
-        this.orgId,
         this.userId,
         newPassword,
       );

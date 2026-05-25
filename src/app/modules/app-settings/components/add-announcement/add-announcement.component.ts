@@ -2,11 +2,8 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  DestroyRef,
-  inject,
   OnInit,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
@@ -18,11 +15,9 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { ANNOUNCEMENT } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import {
   AnnouncementPayload,
   AnnouncementService,
@@ -35,19 +30,11 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
-  private destroyRef = inject(DestroyRef);
-
   announcementForm!: FormGroup;
-  organisations: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
   groups: any[] = [];
-  // Server-mode preload for the Target Group dropdown. Refilled when the
-  // organisation field changes.
+  // Server-mode preload for the Target Group dropdown.
   preloadedGroups: any[] | null = null;
   preloadedGroupsTotal: number | null = null;
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = false;
   maxDescriptionLength = 1000;
   minDate = new Date();
   showPreview = false;
@@ -60,7 +47,6 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
     private router: Router,
     private globalService: GlobalService,
     private announcementService: AnnouncementService,
-    private organisationService: OrganisationService,
     private groupService: GroupService,
     private cdr: ChangeDetectorRef,
     private translate: TranslateService,
@@ -77,11 +63,7 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    if (this.showOrganisationDropdown) {
-      this.loadOrganisations();
-    } else {
-      this.loadGroups();
-    }
+    this.loadGroups();
   }
 
   initForm(): void {
@@ -102,12 +84,6 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
             Validators.maxLength(this.maxDescriptionLength),
           ],
         ],
-        organisation: [
-          this.showOrganisationDropdown
-            ? ''
-            : this.globalService.getTokenDetails('organisationId'),
-          Validators.required,
-        ],
         targetGroupId: [null, Validators.required],
         bgColor: ['#0d47a1'],
         textColor: ['#ffffff'],
@@ -116,26 +92,10 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
       },
       { validators: this.dateRangeValidator },
     );
-
-    this.announcementForm
-      .get('organisation')
-      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(value => {
-        this.announcementForm.patchValue(
-          { targetGroupId: null },
-          { emitEvent: false },
-        );
-        this.groups = [];
-        // Clear the seed so the next dropdown open fetches against the new org.
-        this.preloadedGroups = null;
-        this.preloadedGroupsTotal = null;
-        if (value) this.loadGroups();
-      });
   }
 
   /**
-   * Server-mode fetcher for the Target Group dropdown. Pulls the org from
-   * the form so it stays in sync if the user picks a different org first.
+   * Server-mode fetcher for the Target Group dropdown.
    */
   loadGroupsPage = async ({
     search,
@@ -146,9 +106,7 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    const orgId = this.announcementForm.get('organisation')?.value;
-    if (!orgId) return { items: [], total: 0 };
-    const params: any = { orgId, page, limit };
+    const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       const res: any = await this.groupService.listGroups(params);
@@ -173,54 +131,9 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
     return null;
   }
 
-  /**
-   * Fetcher for the server-mode organisation dropdown.
-   */
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadOrganisations(): void {
-    const params = { page: DEFAULT_PAGE, limit: 10 };
-    this.organisationService
-      .listOrganisation(params)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const orgs = response?.data?.orgs ?? [];
-          this.organisations = orgs;
-          this.preloadedOrgs = orgs;
-          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-        }
-        this.cdr.markForCheck();
-      })
-      .catch(() => {
-        this.cdr.markForCheck();
-      });
-  }
-
   loadGroups(): void {
-    const orgId = this.announcementForm.get('organisation')?.value;
-    if (!orgId) return;
     this.groupService
-      .listGroups({ orgId, page: DEFAULT_PAGE, limit: 10 })
+      .listGroups({ page: DEFAULT_PAGE, limit: 10 })
       .then(res => {
         if (this.globalService.handleSuccessService(res, false)) {
           const groups = res?.data?.groups ?? [];
@@ -344,7 +257,6 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
       bgColor: value.bgColor,
       textColor: value.textColor,
       status: 1,
-      orgId: value.organisation,
     };
 
     this.announcementService

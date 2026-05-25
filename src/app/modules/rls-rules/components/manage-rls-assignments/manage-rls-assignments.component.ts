@@ -72,7 +72,7 @@ export class ManageRlsAssignmentsComponent implements OnInit {
     this.isLoadingAssignments = true;
     this.cdr.markForCheck();
     this.rlsRulesService
-      .loadAssignments(this.orgId, this.rule.id)
+      .loadAssignments(this.rule.id)
       .then(() => {
         this.isLoadingAssignments = false;
         this.cdr.markForCheck();
@@ -219,7 +219,7 @@ export class ManageRlsAssignmentsComponent implements OnInit {
 
   removeAssignment(assignment: any): void {
     this.rlsRulesService
-      .deleteAssignment(this.orgId, assignment.id)
+      .deleteAssignment(assignment.id)
       .then((response: any) => {
         if (this.globalService.handleSuccessService(response)) {
           this.loadAssignments();

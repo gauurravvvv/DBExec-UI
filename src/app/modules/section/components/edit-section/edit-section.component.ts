@@ -14,7 +14,6 @@ import { MessageService } from 'primeng/api';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { SECTION } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
@@ -33,11 +32,7 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
   saving = this.sectionService.saving;
 
   sectionForm!: FormGroup;
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = false;
-  orgId: string = '';
   sectionId: string = '';
-  selectedOrgName: string = '';
   selectedDatasourceName: string = '';
   sectionData: any;
   tabs: any[] = [];
@@ -62,7 +57,6 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
 
   ngOnInit(): void {
     this.sectionId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
 
     if (this.sectionId) {
       this.loadSectionData();
@@ -98,7 +92,6 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
         ],
       ],
       description: [''],
-      organisation: [''],
       datasource: [''],
       status: [false],
       tab: ['', Validators.required],
@@ -108,7 +101,7 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
   loadSectionData(): void {
     this.sectionService.resetCurrent();
     this.sectionService
-      .loadOne(this.orgId, this.sectionId)
+      .loadOne(this.sectionId)
       .then(() => {
         const data = this.sectionService.current();
         if (data) {
@@ -118,13 +111,11 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
             id: this.sectionData.id,
             name: this.sectionData.name,
             description: this.sectionData.description,
-            organisation: this.sectionData.organisationId,
             datasource: this.sectionData.datasourceId,
             tab: this.sectionData.tabId,
             status: this.sectionData.status,
           });
 
-          this.selectedOrgName = this.sectionData.organisationName || '';
           this.selectedDatasourceName = this.sectionData.datasource?.name || '';
 
           this.loadTabData();
@@ -151,11 +142,10 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    if (!this.sectionData?.organisationId || !this.sectionData?.datasourceId) {
+    if (!this.sectionData?.datasourceId) {
       return { items: [], total: 0 };
     }
     const params: any = {
-      orgId: this.sectionData.organisationId,
       datasourceId: this.sectionData.datasourceId,
       page,
       limit,
@@ -178,8 +168,7 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
    */
   resolveSelectedTab = async (id: string): Promise<any> => {
     try {
-      const orgId = this.sectionData?.organisationId || this.orgId;
-      const res: any = await this.tabService.viewTab(orgId, id);
+      const res: any = await this.tabService.viewTab(id);
       return res?.data ?? null;
     } catch {
       return null;
@@ -189,7 +178,6 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
   loadTabData() {
     if (!this.sectionData) return;
     const param = {
-      orgId: this.sectionData.organisationId,
       datasourceId: this.sectionData.datasourceId,
       page: DEFAULT_PAGE,
       limit: 10,
@@ -240,13 +228,12 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
 
   proceedSave(): void {
     if (this.saveJustification.trim()) {
-      const { id, name, description, organisation, datasource, tab, status } =
+      const { id, name, description, datasource, tab, status } =
         this.sectionForm.value;
       const payload = {
         id,
         name,
         description,
-        organisation,
         datasource,
         tab,
         status: status ? 1 : 0,
@@ -280,13 +267,11 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
         id: this.sectionData.id,
         name: this.sectionData.name,
         description: this.sectionData.description,
-        organisation: this.sectionData.organisationId,
         datasource: this.sectionData.datasourceId,
         tab: this.sectionData.tabId,
         status: this.sectionData.status,
       });
 
-      this.selectedOrgName = this.sectionData.organisationName;
       this.isCancelClicked = true;
       this.sectionForm.markAsPristine();
       this.cdr.markForCheck();

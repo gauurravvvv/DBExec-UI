@@ -37,7 +37,7 @@ export class ViewGroupComponent implements OnInit {
   }
 
   async loadGroupDetails() {
-    await this.groupService.loadOne(this.orgId, this.groupId);
+    await this.groupService.loadOne(this.groupId);
     this.groupData = this.groupService.current();
     this.cdr.markForCheck();
   }
@@ -71,7 +71,6 @@ export class ViewGroupComponent implements OnInit {
   async proceedDelete(): Promise<void> {
     if (this.groupData && this.deleteJustification.trim()) {
       const response = await this.groupService.delete(
-        this.orgId,
         this.groupData.id,
         this.deleteJustification.trim(),
       );

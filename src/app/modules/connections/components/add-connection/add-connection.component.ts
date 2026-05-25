@@ -13,11 +13,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { CONNECTION } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { ConnectionService } from '../../services/connection.service';
 
 @Component({
@@ -30,9 +28,6 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
   private destroyRef = inject(DestroyRef);
 
   connectionForm!: FormGroup;
-  organisations: any[] = [];
-  preloadedOrgs: any[] | null = null;
-  preloadedOrgsTotal: number | null = null;
   showPassword = false;
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
@@ -45,8 +40,6 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
     return this.isFormDirty;
   }
 
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = false;
   selectedOrg: any = null;
   selectedDatasource: any = null;
 
@@ -62,7 +55,6 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private organisationService: OrganisationService,
     private globalService: GlobalService,
     private datasourceService: DatasourceService,
     private connectionService: ConnectionService,
@@ -73,14 +65,10 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit() {
-    if (this.showOrganisationDropdown) {
-      this.loadOrganisations();
-    } else {
-      this.selectedOrg = {
-        id: this.globalService.getTokenDetails('organisationId'),
-      };
-      this.loadDatasources();
-    }
+    this.selectedOrg = {
+      id: this.globalService.getTokenDetails('organisationId'),
+    };
+    this.loadDatasources();
   }
 
   private initForm() {
@@ -95,10 +83,6 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
         ],
       ],
       description: [''],
-      organisation: [
-        this.globalService.getTokenDetails('organisationId'),
-        Validators.required,
-      ],
       datasource: ['', Validators.required],
       dbUsername: ['', Validators.required],
       dbPassword: ['', Validators.required],
@@ -111,53 +95,8 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
       });
   }
 
-  /**
-   * Fetcher for the server-mode organisation dropdown.
-   */
-  loadOrgsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.organisationService.listOrganisation(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  private loadOrganisations() {
-    const params = {
-      page: DEFAULT_PAGE,
-      limit: 10,
-    };
-
-    this.organisationService.listOrganisation(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        const orgs = response?.data?.orgs ?? [];
-        this.organisations = [...orgs];
-        this.preloadedOrgs = orgs;
-        this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
-      }
-      this.cdr.markForCheck();
-    });
-  }
-
   private loadDatasources() {
-    const orgId = this.connectionForm.get('organisation')?.value;
-    if (!orgId) return;
     const params = {
-      orgId: orgId,
       page: DEFAULT_PAGE,
       limit: 10,
     };
@@ -186,9 +125,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    const orgId = this.connectionForm.get('organisation')?.value;
-    if (!orgId) return { items: [], total: 0 };
-    const params: any = { orgId, page, limit };
+    const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       const res: any = await this.datasourceService.listDatasource(params);
@@ -204,16 +141,6 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
     }
   };
 
-  onOrganisationChange() {
-    this.connectionForm.patchValue({ datasource: null }, { emitEvent: false });
-    this.datasources = [];
-    this.preloadedDatasources = null;
-    this.preloadedDatasourcesTotal = null;
-    this.selectedDbType = null; // datasource cleared → no engine context
-    this.loadDatasources();
-    this.updateFormDirtyState();
-  }
-
   /**
    * Fired when the user picks (or clears) a datasource in the
    * dropdown. We need the parent datasource's `dbType` so the form
@@ -228,13 +155,12 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
    */
   onDatasourceChange(): void {
     const datasourceId = this.connectionForm.get('datasource')?.value;
-    const orgId = this.connectionForm.get('organisation')?.value;
-    if (!datasourceId || !orgId) {
+    if (!datasourceId) {
       this.selectedDbType = null;
       return;
     }
     this.datasourceService
-      .viewDatasource(String(orgId), String(datasourceId))
+      .viewDatasource(String(datasourceId))
       .then((res: any) => {
         if (!this.globalService.handleSuccessService(res, false)) return;
         this.selectedDbType = res?.data?.config?.dbType ?? null;
@@ -327,7 +253,6 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
   private updateFormDirtyState() {
     this.isFormDirty =
       this.connectionForm.dirty ||
-      this.connectionForm.get('organisation')?.value !== '' ||
       this.connectionForm.get('datasource')?.value !== '';
   }
 

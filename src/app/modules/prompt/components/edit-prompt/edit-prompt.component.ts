@@ -14,7 +14,6 @@ import { MessageService } from 'primeng/api';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { PROMPT } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SectionService } from 'src/app/modules/section/services/section.service';
@@ -31,11 +30,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
   private cdr = inject(ChangeDetectorRef);
 
   promptForm!: FormGroup;
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = false;
-  orgId: string = '';
   promptId: string = '';
-  selectedOrgName: string = '';
   selectedDatasourceName: string = '';
   selectedTabName: string = '';
   sectionData: any = null;
@@ -62,7 +57,6 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
 
   ngOnInit(): void {
     this.promptId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
 
     if (this.promptId) {
       this.loadPromptData();
@@ -98,7 +92,6 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
         ],
       ],
       description: [''],
-      organisation: [''],
       datasource: [''],
       tab: [''],
       section: ['', Validators.required],
@@ -109,7 +102,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
   loadPromptData(): void {
     this.promptService.resetCurrent();
     this.promptService
-      .loadOne(this.orgId, this.promptId)
+      .loadOne(this.promptId)
       .then(() => {
         const data = this.promptService.current();
         if (data) {
@@ -119,14 +112,12 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
             id: this.sectionData.id,
             name: this.sectionData.name,
             description: this.sectionData.description,
-            organisation: this.sectionData.organisationId,
             datasource: this.sectionData.datasourceId,
             tab: this.sectionData.section.tab.id,
             section: this.sectionData.section.id,
             status: this.sectionData.status,
           });
 
-          this.selectedOrgName = this.sectionData.organisationName || '';
           this.selectedDatasourceName = this.sectionData.datasource?.name || '';
           this.selectedTabName = this.sectionData.section.tab.name || '';
           this.loadSectionData();
@@ -154,10 +145,8 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
     const tabId = this.sectionData?.section?.tab?.id;
-    const orgId = this.sectionData?.organisationId;
-    if (!orgId || !tabId) return { items: [], total: 0 };
+    if (!tabId) return { items: [], total: 0 };
     const params: any = {
-      orgId,
       tabId,
       page,
       limit,
@@ -183,8 +172,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
    */
   resolveSelectedSection = async (id: string): Promise<any> => {
     try {
-      const orgId = this.sectionData?.organisationId || this.orgId;
-      const res: any = await this.sectionService.viewSection(orgId, id);
+      const res: any = await this.sectionService.viewSection(id);
       return res?.data ?? null;
     } catch {
       return null;
@@ -193,7 +181,6 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
 
   loadSectionData() {
     const param = {
-      orgId: this.sectionData.organisationId,
       tabId: this.sectionData.section.tab.id,
       page: DEFAULT_PAGE,
       limit: 10,
@@ -271,13 +258,11 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
         id: this.sectionData.id,
         name: this.sectionData.name,
         description: this.sectionData.description,
-        organisation: this.sectionData.organisationId,
         section: this.sectionData.section.id,
         datasource: this.sectionData.datasourceId,
         status: this.sectionData.status,
       });
 
-      this.selectedOrgName = this.sectionData.organisationName;
       this.isCancelClicked = true;
       this.promptForm.markAsPristine();
     }

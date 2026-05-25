@@ -61,7 +61,7 @@ export class ViewAnalysesComponent implements OnInit {
 
   loadAnalysis(): void {
     this.analysesService
-      .viewAnalyses(this.orgId, this.analysisId)
+      .viewAnalyses(this.analysisId)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.analysisDetails = response.data;
@@ -80,7 +80,7 @@ export class ViewAnalysesComponent implements OnInit {
 
   loadDatasetInfo(datasetId: string): void {
     this.datasetService
-      .getDataset(this.orgId, datasetId)
+      .getDataset(datasetId)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.datasetDetails = response.data;
@@ -94,7 +94,7 @@ export class ViewAnalysesComponent implements OnInit {
 
   loadAnalysisFields(): void {
     this.analysesService
-      .getAnalysisFields(this.orgId, this.analysisId)
+      .getAnalysisFields(this.analysisId)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.analysisFields = response.data?.analysisFields || [];
@@ -108,7 +108,7 @@ export class ViewAnalysesComponent implements OnInit {
 
   loadVisuals(): void {
     this.analysesService
-      .listVisuals(this.orgId, this.analysisId)
+      .listVisuals(this.analysisId)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.visuals = response.data.visuals || [];
@@ -186,7 +186,6 @@ export class ViewAnalysesComponent implements OnInit {
     if (this.deleteJustification.trim()) {
       this.analysesService
         .deleteAnalyses(
-          this.orgId,
           this.analysisId,
           this.deleteJustification.trim(),
         )
