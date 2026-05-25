@@ -1,4 +1,3 @@
-import { HttpParams } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { ANNOUNCEMENT } from 'src/app/core/constants/api.constant';
@@ -13,7 +12,6 @@ export interface AnnouncementPayload {
   bgColor?: string;
   textColor?: string;
   status?: number;
-  orgId?: string;
 }
 
 export interface UpdateAnnouncementPayload extends Partial<AnnouncementPayload> {
@@ -65,14 +63,12 @@ export class AnnouncementService {
     }
   }
 
-  async loadOne(id: string, orgId?: string) {
+  async loadOne(id: string) {
     this._loading.set(true);
     try {
-      let params = new HttpParams();
-      if (orgId) params = params.set('orgId', orgId);
       const res: any = await lastValueFrom(
         // GET /announcements/:id — single read.
-        this.http.apiGet(ANNOUNCEMENT.GET + id, { params }),
+        this.http.apiGet(ANNOUNCEMENT.GET + id),
       );
       if (res?.status) this._current.set(res.data);
     } catch {
@@ -102,13 +98,11 @@ export class AnnouncementService {
     }
   }
 
-  async delete(id: string, orgId?: string): Promise<any> {
+  async delete(id: string): Promise<any> {
     this._saving.set(true);
     try {
-      let params = new HttpParams();
-      if (orgId) params = params.set('orgId', orgId);
       return await lastValueFrom(
-        this.http.apiDelete(ANNOUNCEMENT.DELETE + id, { params }),
+        this.http.apiDelete(ANNOUNCEMENT.DELETE + id),
       );
     } finally {
       this._saving.set(false);

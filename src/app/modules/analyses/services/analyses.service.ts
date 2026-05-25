@@ -24,22 +24,15 @@ export class AnalysesService {
   constructor(private http: HttpClientService) {}
 
   listDatasets(params: any) {
-    return lastValueFrom(
-      this.http.apiGet(
-        DATASET.LIST +
-          `/${params.orgId}/${params.datasourceId}/${params.pageNumber}/${params.limit}`,
-      ),
-    );
+    return lastValueFrom(this.http.apiGet(DATASET.LIST, { params }));
   }
 
-  deleteDataset(orgId: string, datasetId: string) {
-    return lastValueFrom(
-      this.http.apiDelete(DATASET.DELETE + `${orgId}/${datasetId}`),
-    );
+  deleteDataset(datasetId: string) {
+    return lastValueFrom(this.http.apiDelete(DATASET.DELETE + datasetId));
   }
 
   async addAnalyses(payload: any) {
-    const { name, description, datasetId, organisation, datasource } = payload;
+    const { name, description, datasetId, datasource } = payload;
     this._saving.set(true);
     try {
       return await lastValueFrom(
@@ -47,7 +40,6 @@ export class AnalysesService {
           name,
           description,
           datasetId,
-          organisation,
           datasource,
         }),
       );
@@ -60,15 +52,11 @@ export class AnalysesService {
     return lastValueFrom(this.http.apiGet(ANALYSES.LIST, { params }));
   }
 
-  async deleteAnalyses(
-    orgId: string,
-    analysisId: string,
-    justification?: string,
-  ) {
+  async deleteAnalyses(analysisId: string, justification?: string) {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiDelete(ANALYSES.DELETE + `${orgId}/${analysisId}`, {
+        this.http.apiDelete(ANALYSES.DELETE + analysisId, {
           body: { justification },
         }),
       );
@@ -77,28 +65,19 @@ export class AnalysesService {
     }
   }
 
-  async bulkDeleteAnalyses(
-    ids: string[],
-    justification: string | undefined,
-    orgId: string,
-  ) {
+  async bulkDeleteAnalyses(ids: string[], justification?: string) {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPost(
-          ANALYSES.BULK_DELETE_PREFIX + orgId + ANALYSES.BULK_DELETE_SUFFIX,
-          { ids, justification },
-        ),
+        this.http.apiPost(ANALYSES.BULK_DELETE, { ids, justification }),
       );
     } finally {
       this._saving.set(false);
     }
   }
 
-  viewAnalyses(orgId: string, analysisId: string) {
-    return lastValueFrom(
-      this.http.apiGet(ANALYSES.GET + `${orgId}/${analysisId}`),
-    );
+  viewAnalyses(analysisId: string) {
+    return lastValueFrom(this.http.apiGet(ANALYSES.GET + analysisId));
   }
 
   /**
@@ -109,25 +88,23 @@ export class AnalysesService {
    * this surface only — the legacy endpoints stay alive for other
    * callers that need fuller payloads.
    *
-   * GET /analyses/:orgId/:analysisId/bootstrap
+   * GET /analyses/:analysisId/bootstrap
    */
-  getBootstrap(orgId: string, analysisId: string) {
+  getBootstrap(analysisId: string) {
     return lastValueFrom(
       this.http.apiGet(
-        ANALYSES.BOOTSTRAP_PREFIX +
-          `${orgId}/${analysisId}` +
-          ANALYSES.BOOTSTRAP_SUFFIX,
+        ANALYSES.BOOTSTRAP_PREFIX + analysisId + ANALYSES.BOOTSTRAP_SUFFIX,
       ),
     );
   }
 
   /**
    * List all visuals for an analysis (skeleton data only).
-   * GET /visuals/:orgId/:analysisId
+   * GET /visuals/:analysisId
    */
-  listVisuals(orgId: string, analysisId: string) {
+  listVisuals(analysisId: string) {
     return lastValueFrom(
-      this.http.apiGet(ANALYSES_VISUAL.LIST + `${orgId}/${analysisId}`),
+      this.http.apiGet(ANALYSES_VISUAL.LIST + analysisId),
     );
   }
 
@@ -135,36 +112,25 @@ export class AnalysesService {
    * Hydrated list — every visual ships with its visualConfig
    * already populated. Replaces the N+1 listVisuals + getVisual
    * loop on Edit Analysis first load.
-   * GET /visuals/:orgId/:analysisId?include=config
+   * GET /visuals/:analysisId?include=config
    */
-  listVisualsWithConfig(orgId: string, analysisId: string) {
+  listVisualsWithConfig(analysisId: string) {
     return lastValueFrom(
-      this.http.apiGet(
-        ANALYSES_VISUAL.LIST + `${orgId}/${analysisId}?include=config`,
-      ),
+      this.http.apiGet(ANALYSES_VISUAL.LIST + analysisId + '?include=config'),
     );
   }
 
   async updateAnalyses(payload: any, justification?: string) {
-    const {
-      id,
-      name,
-      description,
-      datasetId,
-      organisation,
-      datasource,
-      visuals,
-    } = payload;
+    const { id, name, description, datasetId, datasource, visuals } = payload;
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        // PUT /analyses/:orgId/:analysisId — id moves to path.
-        this.http.apiPut(ANALYSES.UPDATE + `${organisation}/${id}`, {
+        // PUT /analyses/:analysisId — id moves to path.
+        this.http.apiPut(ANALYSES.UPDATE + id, {
           id,
           name,
           description,
           datasetId,
-          organisation,
           datasource,
           visuals,
           justification,
@@ -195,23 +161,19 @@ export class AnalysesService {
     );
   }
 
-  viewDataset(orgId: string, id: string) {
-    return lastValueFrom(this.http.apiGet(DATASET.GET + `${orgId}/${id}`));
+  viewDataset(id: string) {
+    return lastValueFrom(this.http.apiGet(DATASET.GET + id));
   }
 
   updateDatasetMapping(payload: any) {
-    const { mappingId, datasetId, organisation, columnNameToView } = payload;
-    // PUT /datasets/:orgId/:datasetId/fields/:fieldId
+    const { mappingId, datasetId, columnNameToView } = payload;
+    // PUT /datasets/:datasetId/fields/:fieldId
     return lastValueFrom(
       this.http.apiPut(
-        DATASET.GET +
-          `${organisation}/${datasetId}` +
-          DATASET.FIELD_SEGMENT +
-          mappingId,
+        DATASET.GET + datasetId + DATASET.FIELD_SEGMENT + mappingId,
         {
           mappingId,
           datasetId,
-          organisation,
           columnNameToView,
         },
       ),
@@ -229,12 +191,11 @@ export class AnalysesService {
       datasource,
       username,
       password,
-      organisation,
       isMasterDB,
       status,
     } = payload;
     return lastValueFrom(
-      this.http.apiPut(DATASOURCE.UPDATE + `${organisation}/${id}`, {
+      this.http.apiPut(DATASOURCE.UPDATE + id, {
         id,
         name,
         description,
@@ -244,7 +205,6 @@ export class AnalysesService {
         datasource,
         username,
         password,
-        organisation,
         isMasterDB,
         status,
       }),
@@ -255,7 +215,7 @@ export class AnalysesService {
     return lastValueFrom(
       this.http.apiGet(
         DATASOURCE.LIST_SCHEMAS_PREFIX +
-          `${params.orgId}/${params.datasourceId}` +
+          params.datasourceId +
           DATASOURCE.LIST_SCHEMAS_SUFFIX,
       ),
     );
@@ -265,7 +225,7 @@ export class AnalysesService {
     return lastValueFrom(
       this.http.apiGet(
         DATASOURCE.LIST_SCHEMAS_PREFIX +
-          `${params.orgId}/${params.datasourceId}` +
+          params.datasourceId +
           DATASOURCE.SCHEMAS_SEGMENT +
           params.schemaName +
           DATASOURCE.TABLES_SEGMENT.replace(/\/$/, ''),
@@ -277,7 +237,7 @@ export class AnalysesService {
     return lastValueFrom(
       this.http.apiGet(
         DATASOURCE.LIST_SCHEMAS_PREFIX +
-          `${params.orgId}/${params.datasourceId}` +
+          params.datasourceId +
           DATASOURCE.SCHEMAS_SEGMENT +
           params.schemaName +
           DATASOURCE.TABLES_SEGMENT +
@@ -287,23 +247,18 @@ export class AnalysesService {
     );
   }
 
-  getDataset(orgId: string, datasetId: string) {
-    return lastValueFrom(
-      this.http.apiGet(DATASET.GET + `${orgId}/${datasetId}`),
-    );
+  getDataset(datasetId: string) {
+    return lastValueFrom(this.http.apiGet(DATASET.GET + datasetId));
   }
 
   /**
    * Get combined fields for an analysis (dataset-level + analysis-level)
-   * GET /analyses/get/fields/:orgId/:analysisId
+   * GET /analyses/:analysisId/fields
    */
-  getAnalysisFields(orgId: string, analysisId: string) {
-    // GET /analyses/:orgId/:analysisId/fields
+  getAnalysisFields(analysisId: string) {
     return lastValueFrom(
       this.http.apiGet(
-        ANALYSES.FIELDS_PREFIX +
-          `${orgId}/${analysisId}` +
-          ANALYSES.FIELDS_SUFFIX,
+        ANALYSES.FIELDS_PREFIX + analysisId + ANALYSES.FIELDS_SUFFIX,
       ),
     );
   }
@@ -313,7 +268,7 @@ export class AnalysesService {
    * OR custom field at the dataset/analysis level. The BE decides
    * which path to take based on whether the field has customLogic.
    *
-   * POST /analyses/distinct-values/:orgId/:analysisId
+   * POST /analyses/:analysisId/distinct-values
    * body: { fieldName, search?, page?, pageSize? }
    *
    * Replaces the dataset-scoped getDistinctColumnValues for callers
@@ -322,7 +277,6 @@ export class AnalysesService {
    * analysis-level fields anyway, so the split is intentional.
    */
   getDistinctFieldValues(
-    orgId: string,
     analysisId: string,
     fieldName: string,
     options?: { search?: string; page?: number; pageSize?: number },
@@ -330,7 +284,7 @@ export class AnalysesService {
     return lastValueFrom(
       this.http.apiPost(
         ANALYSES.DISTINCT_VALUES_PREFIX +
-          `${orgId}/${analysisId}` +
+          analysisId +
           ANALYSES.DISTINCT_VALUES_SUFFIX,
         {
           fieldName,
@@ -345,13 +299,12 @@ export class AnalysesService {
   }
 
   updateDataset(payload: any) {
-    const { id, name, description, organisation, datasource, sql } = payload;
+    const { id, name, description, datasource, sql } = payload;
     return lastValueFrom(
-      this.http.apiPut(DATASET.UPDATE + `${organisation}/${id}`, {
+      this.http.apiPut(DATASET.UPDATE + id, {
         id,
         name,
         description,
-        organisation,
         datasource,
         sql,
       }),
@@ -372,23 +325,20 @@ export class AnalysesService {
   async updateFilter(payload: any) {
     this._saving.set(true);
     try {
-      // PUT /analysis-filters/:orgId/:filterId — id moves to path.
+      // PUT /analysis-filters/:filterId — id moves to path.
       return await lastValueFrom(
-        this.http.apiPut(
-          ANALYSIS_FILTER.UPDATE + `${payload.organisation}/${payload.id}`,
-          payload,
-        ),
+        this.http.apiPut(ANALYSIS_FILTER.UPDATE + payload.id, payload),
       );
     } finally {
       this._saving.set(false);
     }
   }
 
-  async deleteFilter(orgId: string, filterId: string, justification?: string) {
+  async deleteFilter(filterId: string, justification?: string) {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiDelete(ANALYSIS_FILTER.DELETE + `${orgId}/${filterId}`, {
+        this.http.apiDelete(ANALYSIS_FILTER.DELETE + filterId, {
           body: { justification },
         }),
       );
@@ -397,9 +347,9 @@ export class AnalysesService {
     }
   }
 
-  listFilters(orgId: string, analysisId: string) {
+  listFilters(analysisId: string) {
     return lastValueFrom(
-      this.http.apiGet(ANALYSIS_FILTER.LIST + `${orgId}/${analysisId}`),
+      this.http.apiGet(ANALYSIS_FILTER.LIST + analysisId),
     );
   }
 
@@ -414,14 +364,6 @@ export class AnalysesService {
    *   { status: true, data: { results: { [filterId]: FilterValuesResult } } }
    */
   getFilterValuesBatch(payload: {
-    // `organisation` is REQUIRED — every other analysis-filter call
-    // sends it (see addFilters, updateFilter, deleteFilter). The BE
-    // VerifyMasterDatabaseMiddleware reads it to resolve the org's
-    // shared-DB connection. Omitting it causes the middleware to fall
-    // through to the loggedInOrgId fallback, which for system admins
-    // on the default org leaves master_db_connection undefined and
-    // crashes the controller.
-    organisation: string;
     analysisId: string;
     // 'open' tells the BE to list + fetch values in one trip;
     // 'fetch' (default) is the lazy per-dropdown form.
@@ -441,17 +383,16 @@ export class AnalysesService {
   /**
    * Run a dataset query in the context of an analysis.
    * Returns data enriched with both dataset-level and analysis-level custom fields.
-   * POST /analyses/run
+   * POST /analyses/:analysisId/run
    */
   async runAnalysisQuery(payload: {
     datasetId: string;
     analysisId: string;
-    organisation: string;
     filters?: any[];
     limit?: number;
   }) {
-    const { datasetId, analysisId, organisation, filters, limit } = payload;
-    const body: any = { organisation, datasetId, analysisId };
+    const { datasetId, analysisId, filters, limit } = payload;
+    const body: any = { datasetId, analysisId };
     if (filters && filters.length > 0) {
       body.filters = filters;
     }
@@ -460,11 +401,10 @@ export class AnalysesService {
     }
     this._running.set(true);
     try {
-      // POST /analyses/:orgId/:analysisId/run
       return await lastValueFrom(
         this.http.apiPost(
           ANALYSES.RUN_QUERY_PREFIX +
-            `${organisation}/${analysisId}` +
+            analysisId +
             ANALYSES.RUN_QUERY_SUFFIX,
           body,
         ),

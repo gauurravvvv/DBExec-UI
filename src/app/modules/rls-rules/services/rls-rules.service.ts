@@ -6,11 +6,11 @@ import { HttpClientService } from 'src/app/core/services/http-client.service';
 /**
  * RLS-rules service. Backed by the snapshot BE routes:
  *
- *  POST   /rls-rules                                  create
- *  GET    /rls-rules/:orgId/datasets/:datasetId       list for a dataset
- *  GET    /rls-rules/:orgId/:ruleId                   read one
- *  PUT    /rls-rules/:orgId/:ruleId                   update
- *  DELETE /rls-rules/:orgId/:ruleId                   delete
+ *  POST   /rls-rules                              create
+ *  GET    /rls-rules/datasets/:datasetId          list for a dataset
+ *  GET    /rls-rules/:ruleId                      read one
+ *  PUT    /rls-rules/:ruleId                      update
+ *  DELETE /rls-rules/:ruleId                      delete
  *
  * Assignments (FE → user/group rule binding) used to live here. Those
  * endpoints never existed on the BE, so the methods were dead — they
@@ -35,16 +35,11 @@ export class RlsRulesService {
 
   constructor(private http: HttpClientService) {}
 
-  async load(orgId: string, datasetId: string) {
+  async load(datasetId: string) {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(
-          RLS_RULE.LIST_FOR_DATASET_PREFIX +
-            orgId +
-            RLS_RULE.LIST_FOR_DATASET_INFIX +
-            datasetId,
-        ),
+        this.http.apiGet(RLS_RULE.LIST_FOR_DATASET_PREFIX + datasetId),
       );
       if (res?.status) {
         const rules = res.data?.rules ?? res.data ?? [];
@@ -58,11 +53,11 @@ export class RlsRulesService {
     }
   }
 
-  async loadOne(orgId: string, ruleId: string) {
+  async loadOne(ruleId: string) {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(RLS_RULE.GET + `${orgId}/${ruleId}`),
+        this.http.apiGet(RLS_RULE.GET + ruleId),
       );
       if (res?.status) this._current.set(res.data);
     } catch {
@@ -84,27 +79,20 @@ export class RlsRulesService {
   async update(payload: any): Promise<any> {
     this._saving.set(true);
     try {
-      // PUT /rls-rules/:orgId/:ruleId — id moves to path.
+      // PUT /rls-rules/:ruleId — id moves to path.
       return await lastValueFrom(
-        this.http.apiPut(
-          RLS_RULE.UPDATE + `${payload.organisation}/${payload.id}`,
-          payload,
-        ),
+        this.http.apiPut(RLS_RULE.UPDATE + payload.id, payload),
       );
     } finally {
       this._saving.set(false);
     }
   }
 
-  async delete(
-    orgId: string,
-    ruleId: string,
-    justification?: string,
-  ): Promise<any> {
+  async delete(ruleId: string, justification?: string): Promise<any> {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiDelete(RLS_RULE.DELETE + `${orgId}/${ruleId}`, {
+        this.http.apiDelete(RLS_RULE.DELETE + ruleId, {
           body: { justification },
         }),
       );
@@ -129,31 +117,26 @@ export class RlsRulesService {
   private notImplemented(): never {
     throw new Error('RLS rule assignments are not implemented yet');
   }
-  loadAssignments(_orgId: string, _ruleId: string): Promise<any> {
+  loadAssignments(_ruleId: string): Promise<any> {
     return this.notImplemented();
   }
   addAssignment(_payload: any): Promise<any> {
     return this.notImplemented();
   }
-  deleteAssignment(_orgId: string, _assignmentId: string): Promise<any> {
+  deleteAssignment(_assignmentId: string): Promise<any> {
     return this.notImplemented();
   }
 
   // ── Legacy promise-based methods (kept for backward compat) ────────────
 
-  listRules(orgId: string, datasetId: string) {
+  listRules(datasetId: string) {
     return lastValueFrom(
-      this.http.apiGet(
-        RLS_RULE.LIST_FOR_DATASET_PREFIX +
-          orgId +
-          RLS_RULE.LIST_FOR_DATASET_INFIX +
-          datasetId,
-      ),
+      this.http.apiGet(RLS_RULE.LIST_FOR_DATASET_PREFIX + datasetId),
     );
   }
 
-  viewRule(orgId: string, ruleId: string) {
-    return lastValueFrom(this.http.apiGet(RLS_RULE.GET + `${orgId}/${ruleId}`));
+  viewRule(ruleId: string) {
+    return lastValueFrom(this.http.apiGet(RLS_RULE.GET + ruleId));
   }
 
   addRule(payload: any) {
@@ -162,16 +145,13 @@ export class RlsRulesService {
 
   updateRule(payload: any) {
     return lastValueFrom(
-      this.http.apiPut(
-        RLS_RULE.UPDATE + `${payload.organisation}/${payload.id}`,
-        payload,
-      ),
+      this.http.apiPut(RLS_RULE.UPDATE + payload.id, payload),
     );
   }
 
-  deleteRule(orgId: string, ruleId: string, justification?: string) {
+  deleteRule(ruleId: string, justification?: string) {
     return lastValueFrom(
-      this.http.apiDelete(RLS_RULE.DELETE + `${orgId}/${ruleId}`, {
+      this.http.apiDelete(RLS_RULE.DELETE + ruleId, {
         body: { justification },
       }),
     );

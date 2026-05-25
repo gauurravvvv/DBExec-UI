@@ -36,11 +36,11 @@ export class RoleService {
     }
   }
 
-  async loadOne(orgId: string, roleId: string) {
+  async loadOne(roleId: string) {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(ROLE.GET + `${orgId}/${roleId}`),
+        this.http.apiGet(ROLE.GET + roleId),
       );
       if (res?.status) this._current.set(res.data);
     } finally {
@@ -75,13 +75,9 @@ export class RoleService {
     }
   }
 
-  async delete(
-    orgId: string,
-    id: string,
-    justification?: string,
-  ): Promise<any> {
+  async delete(id: string, justification?: string): Promise<any> {
     return await lastValueFrom(
-      this.http.apiDelete(ROLE.DELETE + `${orgId}/${id}`, {
+      this.http.apiDelete(ROLE.DELETE + id, {
         body: { justification },
       }),
     );
@@ -89,14 +85,10 @@ export class RoleService {
 
   async bulkDelete(
     ids: string[],
-    justification: string | undefined,
-    orgId: string,
+    justification?: string,
   ): Promise<any> {
     return await lastValueFrom(
-      this.http.apiPost(
-        ROLE.BULK_DELETE_PREFIX + orgId + ROLE.BULK_DELETE_SUFFIX,
-        { ids, justification },
-      ),
+      this.http.apiPost(ROLE.BULK_DELETE, { ids, justification }),
     );
   }
 
@@ -105,11 +97,8 @@ export class RoleService {
   }
 
   // ── Legacy aliases kept for external callers (groups module) ──────────────
-  listRoles(
-    orgId: string,
-    params?: { page?: number; limit?: number; filter?: any },
-  ) {
-    const queryParams: any = { orgId };
+  listRoles(params?: { page?: number; limit?: number; filter?: any }) {
+    const queryParams: any = {};
     if (params?.page) queryParams.page = params.page;
     if (params?.limit) queryParams.limit = params.limit;
     if (params?.filter && Object.keys(params.filter).length > 0) {
@@ -122,14 +111,13 @@ export class RoleService {
     return lastValueFrom(this.http.apiGet(ROLE.LIST_PERMISSIONS));
   }
 
-  viewRole(orgId: string, roleId: string) {
-    return lastValueFrom(this.http.apiGet(ROLE.GET + `${orgId}/${roleId}`));
+  viewRole(roleId: string) {
+    return lastValueFrom(this.http.apiGet(ROLE.GET + roleId));
   }
 
   addRole(data: {
     name: string;
     description?: string;
-    organisation: string;
     selectedPermissions: any[];
   }) {
     return lastValueFrom(this.http.apiPost(ROLE.ADD, data));
@@ -140,7 +128,6 @@ export class RoleService {
       id: string;
       name: string;
       description?: string;
-      organisation: string;
       selectedPermissions: any[];
       status: number;
     },
@@ -151,24 +138,17 @@ export class RoleService {
     );
   }
 
-  deleteRole(orgId: string, id: string, justification?: string) {
+  deleteRole(id: string, justification?: string) {
     return lastValueFrom(
-      this.http.apiDelete(ROLE.DELETE + `${orgId}/${id}`, {
+      this.http.apiDelete(ROLE.DELETE + id, {
         body: { justification },
       }),
     );
   }
 
-  bulkDeleteRole(
-    ids: string[],
-    justification: string | undefined,
-    orgId: string,
-  ) {
+  bulkDeleteRole(ids: string[], justification?: string) {
     return lastValueFrom(
-      this.http.apiPost(
-        ROLE.BULK_DELETE_PREFIX + orgId + ROLE.BULK_DELETE_SUFFIX,
-        { ids, justification },
-      ),
+      this.http.apiPost(ROLE.BULK_DELETE, { ids, justification }),
     );
   }
 }

@@ -10,7 +10,6 @@ import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 export interface ExecuteQueryBuilderRequest {
   queryBuilderId: string;
-  organisation: string;
   prompts: {
     promptId: string;
     type: string;
@@ -60,11 +59,11 @@ export class QueryBuilderService {
     }
   }
 
-  async loadOne(orgId: string, id: string): Promise<void> {
+  async loadOne(id: string): Promise<void> {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(QUERY_BUILDER.GET + `${orgId}/${id}`),
+        this.http.apiGet(QUERY_BUILDER.GET + id),
       );
       if (res?.status) this._current.set(res.data);
     } finally {
@@ -72,21 +71,19 @@ export class QueryBuilderService {
     }
   }
 
-  async loadStructure(orgId: string, id: string): Promise<void> {
+  async loadStructure(id: string): Promise<void> {
     const res: any = await lastValueFrom(
       this.http.apiGet(
-        QUERY_BUILDER.GET + `${orgId}/${id}` + QUERY_BUILDER.STRUCTURE_SUFFIX,
+        QUERY_BUILDER.GET + id + QUERY_BUILDER.STRUCTURE_SUFFIX,
       ),
     );
     if (res?.status) this._structure.set(res.data);
   }
 
-  async loadTabs(orgId: string, queryBuilderId: string): Promise<void> {
+  async loadTabs(queryBuilderId: string): Promise<void> {
     const res: any = await lastValueFrom(
       this.http.apiGet(
-        QUERY_BUILDER.GET +
-          `${orgId}/${queryBuilderId}` +
-          QUERY_BUILDER.TABS_SUFFIX,
+        QUERY_BUILDER.GET + queryBuilderId + QUERY_BUILDER.TABS_SUFFIX,
       ),
     );
     if (res?.status) this._tabs.set(res.data ?? []);
@@ -95,10 +92,9 @@ export class QueryBuilderService {
   async add(form: FormGroup): Promise<any> {
     this._saving.set(true);
     try {
-      const { organisation, datasource, name, description } = form.value;
+      const { datasource, name, description } = form.value;
       return await lastValueFrom(
         this.http.apiPost(QUERY_BUILDER.ADD, {
-          organisation,
           datasource,
           name,
           description,
@@ -112,15 +108,14 @@ export class QueryBuilderService {
   async update(form: FormGroup, justification?: string): Promise<any> {
     this._saving.set(true);
     try {
-      const { id, name, description, organisation, datasource, status } =
+      const { id, name, description, datasource, status } =
         form.getRawValue();
-      // PUT /query-builders/:orgId/:queryBuilderId — id moves to path.
+      // PUT /query-builders/:queryBuilderId — id moves to path.
       return await lastValueFrom(
-        this.http.apiPut(QUERY_BUILDER.UPDATE + `${organisation}/${id}`, {
+        this.http.apiPut(QUERY_BUILDER.UPDATE + id, {
           id,
           name,
           description,
-          organisation,
           datasource,
           status: status ? 1 : 0,
           justification,
@@ -133,19 +128,16 @@ export class QueryBuilderService {
 
   async saveConfig(
     configuration: any,
-    organisation: string,
     datasourceId: string,
     queryBuilderId: string,
   ): Promise<any> {
     this._saving.set(true);
     try {
-      // POST /query-builders/:orgId/:queryBuilderId/config
+      // POST /query-builders/:queryBuilderId/config
       return await lastValueFrom(
         this.http.apiPost(
-          QUERY_BUILDER.GET +
-            `${organisation}/${queryBuilderId}` +
-            QUERY_BUILDER.CONFIG_SUFFIX,
-          { configuration, organisation, datasourceId, queryBuilderId },
+          QUERY_BUILDER.GET + queryBuilderId + QUERY_BUILDER.CONFIG_SUFFIX,
+          { configuration, datasourceId, queryBuilderId },
         ),
       );
     } finally {
@@ -156,11 +148,11 @@ export class QueryBuilderService {
   async execute(payload: ExecuteQueryBuilderRequest): Promise<any> {
     this._executing.set(true);
     try {
-      // POST /query-builders/:orgId/:queryBuilderId/execute
+      // POST /query-builders/:queryBuilderId/execute
       const res: any = await lastValueFrom(
         this.http.apiPost(
           QUERY_BUILDER.GET +
-            `${payload.organisation}/${payload.queryBuilderId}` +
+            payload.queryBuilderId +
             QUERY_BUILDER.EXECUTE_SUFFIX,
           payload,
         ),
@@ -172,43 +164,29 @@ export class QueryBuilderService {
     }
   }
 
-  async delete(
-    orgId: string,
-    id: string,
-    justification?: string,
-  ): Promise<any> {
+  async delete(id: string, justification?: string): Promise<any> {
     return lastValueFrom(
-      this.http.apiDelete(QUERY_BUILDER.DELETE + `${orgId}/${id}`, {
+      this.http.apiDelete(QUERY_BUILDER.DELETE + id, {
         body: { justification },
       }),
     );
   }
 
-  async bulkDelete(
-    ids: string[],
-    justification: string | undefined,
-    orgId: string,
-  ): Promise<any> {
+  async bulkDelete(ids: string[], justification?: string): Promise<any> {
     return lastValueFrom(
-      this.http.apiPost(
-        QUERY_BUILDER.BULK_DELETE_PREFIX +
-          orgId +
-          QUERY_BUILDER.BULK_DELETE_SUFFIX,
-        { ids, justification },
-      ),
+      this.http.apiPost(QUERY_BUILDER.BULK_DELETE, { ids, justification }),
     );
   }
 
   async getTabSections(
-    orgId: string,
     queryBuilderId: string,
     tabId: string,
   ): Promise<any> {
-    // GET /tabs/:orgId/:tabId/sections?queryBuilderId=
+    // GET /tabs/:tabId/sections?queryBuilderId=
     return lastValueFrom(
       this.http.apiGet(
         TAB.SECTIONS_PREFIX +
-          `${orgId}/${tabId}` +
+          tabId +
           TAB.SECTIONS_SUFFIX +
           `?queryBuilderId=${queryBuilderId}`,
       ),
@@ -216,27 +194,26 @@ export class QueryBuilderService {
   }
 
   async getSectionPrompts(
-    orgId: string,
     queryBuilderId: string,
     tabId: string,
     sectionId: string,
   ): Promise<any> {
-    // GET /sections/:orgId/:sectionId/prompts?queryBuilderId=&tabId=
+    // GET /sections/:sectionId/prompts?queryBuilderId=&tabId=
     return lastValueFrom(
       this.http.apiGet(
         SECTION.PROMPTS_PREFIX +
-          `${orgId}/${sectionId}` +
+          sectionId +
           SECTION.PROMPTS_SUFFIX +
           `?queryBuilderId=${queryBuilderId}&tabId=${tabId}`,
       ),
     );
   }
 
-  async getQueryBuilderConfiguration(orgId: string, id: string): Promise<any> {
-    // GET /query-builders/:orgId/:queryBuilderId/config
+  async getQueryBuilderConfiguration(id: string): Promise<any> {
+    // GET /query-builders/:queryBuilderId/config
     return lastValueFrom(
       this.http.apiGet(
-        QUERY_BUILDER.GET + `${orgId}/${id}` + QUERY_BUILDER.CONFIG_SUFFIX,
+        QUERY_BUILDER.GET + id + QUERY_BUILDER.CONFIG_SUFFIX,
       ),
     );
   }
@@ -252,30 +229,23 @@ export class QueryBuilderService {
     return lastValueFrom(this.http.apiGet(QUERY_BUILDER.LIST, { params }));
   }
 
-  deleteQueryBuilder(
-    orgId: string,
-    id: string,
-    justification?: string,
-  ): Promise<any> {
-    return this.delete(orgId, id, justification);
+  deleteQueryBuilder(id: string, justification?: string): Promise<any> {
+    return this.delete(id, justification);
   }
 
   bulkDeleteQueryBuilder(
     ids: string[],
-    justification: string | undefined,
-    orgId: string,
+    justification?: string,
   ): Promise<any> {
-    return this.bulkDelete(ids, justification, orgId);
+    return this.bulkDelete(ids, justification);
   }
 
   addQueryBuilder(queryBuilderForm: FormGroup): Promise<any> {
     return this.add(queryBuilderForm);
   }
 
-  viewQueryBuilder(orgId: string, id: string): Promise<any> {
-    return lastValueFrom(
-      this.http.apiGet(QUERY_BUILDER.GET + `${orgId}/${id}`),
-    );
+  viewQueryBuilder(id: string): Promise<any> {
+    return lastValueFrom(this.http.apiGet(QUERY_BUILDER.GET + id));
   }
 
   updateQueryBuilder(
@@ -287,36 +257,25 @@ export class QueryBuilderService {
 
   saveQueryBuilderConfiguration(
     configuration: any,
-    organisation: string,
     datasourceId: string,
     queryBuilderId: string,
   ): Promise<any> {
-    return this.saveConfig(
-      configuration,
-      organisation,
-      datasourceId,
-      queryBuilderId,
-    );
+    return this.saveConfig(configuration, datasourceId, queryBuilderId);
   }
 
-  getQueryBuilderTabs(orgId: string, queryBuilderId: string): Promise<any> {
+  getQueryBuilderTabs(queryBuilderId: string): Promise<any> {
     return lastValueFrom(
       this.http.apiGet(
-        QUERY_BUILDER.GET +
-          `${orgId}/${queryBuilderId}` +
-          QUERY_BUILDER.TABS_SUFFIX,
+        QUERY_BUILDER.GET + queryBuilderId + QUERY_BUILDER.TABS_SUFFIX,
       ),
     );
   }
 
-  getQueryBuilderStructure(
-    orgId: string,
-    queryBuilderId: string,
-  ): Promise<any> {
+  getQueryBuilderStructure(queryBuilderId: string): Promise<any> {
     return lastValueFrom(
       this.http.apiGet(
         QUERY_BUILDER.GET +
-          `${orgId}/${queryBuilderId}` +
+          queryBuilderId +
           QUERY_BUILDER.STRUCTURE_SUFFIX,
       ),
     );

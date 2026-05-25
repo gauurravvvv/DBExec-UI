@@ -35,11 +35,11 @@ export class GroupService {
     }
   }
 
-  async loadOne(orgId: string, groupId: string) {
+  async loadOne(groupId: string) {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(GROUP.GET + `${orgId}/${groupId}`),
+        this.http.apiGet(GROUP.GET + groupId),
       );
       if (res?.status) this._current.set(res.data);
     } finally {
@@ -50,15 +50,9 @@ export class GroupService {
   async add(form: FormGroup): Promise<any> {
     this._saving.set(true);
     try {
-      const { name, description, organisation, roleId, users } = form.value;
+      const { name, description, roleId, users } = form.value;
       return await lastValueFrom(
-        this.http.apiPost(GROUP.ADD, {
-          name,
-          description,
-          organisation,
-          roleId,
-          users,
-        }),
+        this.http.apiPost(GROUP.ADD, { name, description, roleId, users }),
       );
     } finally {
       this._saving.set(false);
@@ -68,16 +62,15 @@ export class GroupService {
   async edit(form: FormGroup, justification?: string): Promise<any> {
     this._saving.set(true);
     try {
-      const { id, name, description, status, users, organisation, roleId } =
+      const { id, name, description, status, users, roleId } =
         form.getRawValue();
       return await lastValueFrom(
-        this.http.apiPut(GROUP.UPDATE + `${organisation}/${id}`, {
+        this.http.apiPut(GROUP.UPDATE + id, {
           id,
           name,
           description,
           status: status ? 1 : 0,
           users,
-          organisation,
           roleId,
           justification,
         }),
@@ -87,13 +80,9 @@ export class GroupService {
     }
   }
 
-  async delete(
-    orgId: string,
-    id: string,
-    justification?: string,
-  ): Promise<any> {
+  async delete(id: string, justification?: string): Promise<any> {
     return await lastValueFrom(
-      this.http.apiDelete(GROUP.DELETE + `${orgId}/${id}`, {
+      this.http.apiDelete(GROUP.DELETE + id, {
         body: { justification },
       }),
     );
@@ -101,14 +90,10 @@ export class GroupService {
 
   async bulkDelete(
     ids: string[],
-    justification: string | undefined,
-    orgId: string,
+    justification?: string,
   ): Promise<any> {
     return await lastValueFrom(
-      this.http.apiPost(
-        GROUP.BULK_DELETE_PREFIX + orgId + GROUP.BULK_DELETE_SUFFIX,
-        { ids, justification },
-      ),
+      this.http.apiPost(GROUP.BULK_DELETE, { ids, justification }),
     );
   }
 
@@ -121,7 +106,7 @@ export class GroupService {
     return lastValueFrom(this.http.apiGet(GROUP.LIST, { params }));
   }
 
-  viewGroup(orgId: string, groupId: string) {
-    return lastValueFrom(this.http.apiGet(GROUP.GET + `${orgId}/${groupId}`));
+  viewGroup(groupId: string) {
+    return lastValueFrom(this.http.apiGet(GROUP.GET + groupId));
   }
 }

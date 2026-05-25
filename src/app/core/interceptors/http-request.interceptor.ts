@@ -93,10 +93,11 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
     const URL = serverUrl + req.url;
 
-    // Attach auth headers only to API requests
+    // Attach auth headers only to API requests. We do NOT send
+    // x-organization-id — the BE derives the caller's org id from
+    // the signed JWT (AuthMiddleware.res.locals.organisationId). The
+    // FE has no say in which org a request targets.
     const accessToken = StorageService.get(StorageType.ACCESS_TOKEN) || '';
-    const organisationId =
-      StorageService.get(StorageType.ORGANISATION_ID) || '';
 
     // Send the language the user is actually seeing right now —
     // either the persisted locale (from the JWT / storage) or a
@@ -110,7 +111,6 @@ export class HttpRequestInterceptor implements HttpInterceptor {
       'en';
     let headers = req.headers
       .set('x-auth-token', accessToken)
-      .set('x-organization-id', organisationId)
       .set('Accept-Language', locale);
     if (headers.has('X-Skip-Loader')) {
       headers = headers.delete('X-Skip-Loader');

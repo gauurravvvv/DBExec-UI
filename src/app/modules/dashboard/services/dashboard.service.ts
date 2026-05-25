@@ -40,11 +40,11 @@ export class DashboardService {
     }
   }
 
-  async loadOne(orgId: string, id: string): Promise<void> {
+  async loadOne(id: string): Promise<void> {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(DASHBOARD.GET + `${orgId}/${id}`),
+        this.http.apiGet(DASHBOARD.GET + id),
       );
       if (res?.status) this._current.set(res.data);
     } catch {
@@ -54,13 +54,13 @@ export class DashboardService {
     }
   }
 
-  async render(orgId: string, id: string): Promise<void> {
+  async render(id: string): Promise<void> {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        // GET /dashboards/:orgId/:id/render
+        // GET /dashboards/:id/render
         this.http.apiGet(
-          DASHBOARD.RENDER_PREFIX + `${orgId}/${id}` + DASHBOARD.RENDER_SUFFIX,
+          DASHBOARD.RENDER_PREFIX + id + DASHBOARD.RENDER_SUFFIX,
         ),
       );
       if (res?.status) this._rendered.set(res.data);
@@ -81,7 +81,6 @@ export class DashboardService {
    * showing a confirmation before invoking 'existing'.
    */
   async publish(payload: {
-    orgId: string;
     analysisId: string;
     mode: 'new' | 'existing';
     dashboardId?: string;
@@ -91,12 +90,9 @@ export class DashboardService {
   }): Promise<any> {
     this._saving.set(true);
     try {
-      // POST /dashboards/:orgId/publish
+      // POST /dashboards/publish
       return await lastValueFrom(
-        this.http.apiPost(
-          DASHBOARD.PUBLISH_PREFIX + payload.orgId + DASHBOARD.PUBLISH_SUFFIX,
-          payload,
-        ),
+        this.http.apiPost(DASHBOARD.PUBLISH, payload),
       );
     } finally {
       this._saving.set(false);
@@ -111,14 +107,12 @@ export class DashboardService {
    * fan-out, no silent miss past the page cap.
    */
   async listForAnalysis(params: {
-    orgId: string;
     datasourceId: string;
     analysisId: string;
   }): Promise<any[]> {
     const res: any = await lastValueFrom(
       this.http.apiGet(DASHBOARD.LIST, {
         params: {
-          orgId: params.orgId,
           datasourceId: params.datasourceId,
           sourceAnalysisId: params.analysisId,
           limit: 100,
@@ -134,17 +128,14 @@ export class DashboardService {
    * Returns the full enriched row set (server caps with LIMIT).
    */
   async runQuery(payload: {
-    orgId: string;
     dashboardId: string;
     filters?: any[];
     limit?: number;
   }): Promise<any> {
-    // POST /dashboards/:orgId/:id/run
+    // POST /dashboards/:id/run
     return lastValueFrom(
       this.http.apiPost(
-        DASHBOARD.RUN_PREFIX +
-          `${payload.orgId}/${payload.dashboardId}` +
-          DASHBOARD.RUN_SUFFIX,
+        DASHBOARD.RUN_PREFIX + payload.dashboardId + DASHBOARD.RUN_SUFFIX,
         payload,
       ),
     );
@@ -156,7 +147,6 @@ export class DashboardService {
    * analysis-filter-bar fetcher-factory plugs straight in.
    */
   async getDistinctFieldValues(
-    orgId: string,
     dashboardId: string,
     body: {
       fieldName: string;
@@ -165,22 +155,22 @@ export class DashboardService {
       pageSize?: number;
     },
   ): Promise<any> {
-    // POST /dashboards/:orgId/:dashboardId/distinct-values
+    // POST /dashboards/:dashboardId/distinct-values
     return lastValueFrom(
       this.http.apiPost(
         DASHBOARD.DISTINCT_VALUES_PREFIX +
-          `${orgId}/${dashboardId}` +
+          dashboardId +
           DASHBOARD.DISTINCT_VALUES_SUFFIX,
         body,
       ),
     );
   }
 
-  async delete(orgId: string, id: string, justification: string): Promise<any> {
+  async delete(id: string, justification: string): Promise<any> {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiDelete(DASHBOARD.DELETE + `${orgId}/${id}`, {
+        this.http.apiDelete(DASHBOARD.DELETE + id, {
           body: { justification },
         }),
       );
@@ -189,18 +179,11 @@ export class DashboardService {
     }
   }
 
-  async bulkDelete(
-    ids: string[],
-    justification: string | undefined,
-    orgId: string,
-  ): Promise<any> {
+  async bulkDelete(ids: string[], justification?: string): Promise<any> {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPost(
-          DASHBOARD.BULK_DELETE_PREFIX + orgId + DASHBOARD.BULK_DELETE_SUFFIX,
-          { ids, justification },
-        ),
+        this.http.apiPost(DASHBOARD.BULK_DELETE, { ids, justification }),
       );
     } finally {
       this._saving.set(false);

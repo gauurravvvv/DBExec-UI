@@ -20,7 +20,6 @@ export class QueryService {
 
   /** POST /api/v1/queries/execute — run an ad-hoc SQL query. */
   executeQuery(queryData: {
-    orgId: string;
     datasourceId: string;
     query: string;
     page?: number;
@@ -35,16 +34,14 @@ export class QueryService {
    * (schemas → tables → columns). Uses the no-loader variant so the
    * dataset editor's quiet refreshes don't trigger the global spinner.
    */
-  getDatasourceStructure(datasourceId: string, orgId: string): Observable<any> {
+  getDatasourceStructure(datasourceId: string): Observable<any> {
     return this.httpClientService.queryPostNoLoader(QUERY.STRUCTURE, {
       datasourceId,
-      orgId,
     });
   }
 
   /** POST /api/v1/queries/export — export query results as a blob (CSV/XLSX). */
   exportQueryResults(queryData: {
-    orgId: string;
     datasourceId: string;
     query: string;
     filter?: string;

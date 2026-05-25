@@ -38,11 +38,11 @@ export class DatasourceService {
     }
   }
 
-  async loadOne(orgId: string, id: string) {
+  async loadOne(id: string) {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(DATASOURCE.GET + `${orgId}/${id}`),
+        this.http.apiGet(DATASOURCE.GET + id),
       );
       if (res?.status) this._current.set(res.data);
     } finally {
@@ -62,7 +62,6 @@ export class DatasourceService {
         database,
         username,
         password,
-        organisation,
       } = payload;
       return await lastValueFrom(
         this.http.apiPost(DATASOURCE.ADD, {
@@ -74,7 +73,6 @@ export class DatasourceService {
           database,
           username,
           password,
-          organisation,
         }),
       );
     } finally {
@@ -95,12 +93,11 @@ export class DatasourceService {
         database,
         username,
         password,
-        organisation,
         status,
       } = payload;
       return await lastValueFrom(
-        // PUT /datasources/:orgId/:id
-        this.http.apiPut(DATASOURCE.UPDATE + `${organisation}/${id}`, {
+        // PUT /datasources/:id
+        this.http.apiPut(DATASOURCE.UPDATE + id, {
           id,
           name,
           description,
@@ -110,7 +107,6 @@ export class DatasourceService {
           database,
           username,
           password,
-          organisation,
           status,
           justification,
         }),
@@ -120,30 +116,19 @@ export class DatasourceService {
     }
   }
 
-  async delete(
-    orgId: string,
-    id: string,
-    justification?: string,
-  ): Promise<any> {
-    // DELETE /datasources/:orgId/:id — body carries justification.
+  async delete(id: string, justification?: string): Promise<any> {
+    // DELETE /datasources/:id — body carries justification.
     return await lastValueFrom(
-      this.http.apiDelete(DATASOURCE.DELETE + `${orgId}/${id}`, {
+      this.http.apiDelete(DATASOURCE.DELETE + id, {
         body: { justification },
       }),
     );
   }
 
-  async bulkDelete(
-    ids: string[],
-    justification: string | undefined,
-    orgId: string,
-  ): Promise<any> {
-    // POST /datasources/:orgId/bulk-delete
+  async bulkDelete(ids: string[], justification?: string): Promise<any> {
+    // POST /datasources/bulk-delete
     return await lastValueFrom(
-      this.http.apiPost(
-        DATASOURCE.BULK_DELETE_PREFIX + orgId + DATASOURCE.BULK_DELETE_SUFFIX,
-        { ids, justification },
-      ),
+      this.http.apiPost(DATASOURCE.BULK_DELETE, { ids, justification }),
     );
   }
 
@@ -151,12 +136,12 @@ export class DatasourceService {
     this._current.set(null);
   }
 
-  async loadSchemas(orgId: string, datasourceId: string) {
+  async loadSchemas(datasourceId: string) {
     try {
       const res: any = await lastValueFrom(
         this.http.apiGet(
           DATASOURCE.LIST_SCHEMAS_PREFIX +
-            `${orgId}/${datasourceId}` +
+            datasourceId +
             DATASOURCE.LIST_SCHEMAS_SUFFIX,
         ),
       );
@@ -181,7 +166,7 @@ export class DatasourceService {
     return lastValueFrom(
       this.http.apiGet(
         DATASOURCE.LIST_SCHEMAS_PREFIX +
-          `${params.orgId}/${params.datasourceId}` +
+          params.datasourceId +
           DATASOURCE.LIST_SCHEMAS_SUFFIX,
         skipLoader ? { skipLoader: true } : undefined,
       ),
@@ -192,7 +177,7 @@ export class DatasourceService {
     return lastValueFrom(
       this.http.apiGet(
         DATASOURCE.LIST_SCHEMAS_PREFIX +
-          `${params.orgId}/${params.datasourceId}` +
+          params.datasourceId +
           DATASOURCE.SCHEMAS_SEGMENT +
           params.schemaName +
           DATASOURCE.TABLES_SEGMENT.replace(/\/$/, ''),
@@ -205,7 +190,7 @@ export class DatasourceService {
     return lastValueFrom(
       this.http.apiGet(
         DATASOURCE.LIST_SCHEMAS_PREFIX +
-          `${params.orgId}/${params.datasourceId}` +
+          params.datasourceId +
           DATASOURCE.SCHEMAS_SEGMENT +
           params.schemaName +
           DATASOURCE.TABLES_SEGMENT +
@@ -219,14 +204,13 @@ export class DatasourceService {
   async runQuery(params: any): Promise<any> {
     this._queryLoading.set(true);
     try {
-      // POST /datasources/:orgId/:datasourceId/query
+      // POST /datasources/:datasourceId/query
       return await lastValueFrom(
         this.http.apiPost(
           DATASOURCE.RUN_QUERY_PREFIX +
-            `${params.orgId}/${params.datasourceId}` +
+            params.datasourceId +
             DATASOURCE.RUN_QUERY_SUFFIX,
           {
-            orgId: params.orgId,
             datasourceId: params.datasourceId,
             query: params.query,
           },
@@ -242,7 +226,7 @@ export class DatasourceService {
     return lastValueFrom(this.http.apiGet(DATASOURCE.LIST, { params }));
   }
 
-  viewDatasource(orgId: string, id: string) {
-    return lastValueFrom(this.http.apiGet(DATASOURCE.GET + `${orgId}/${id}`));
+  viewDatasource(id: string) {
+    return lastValueFrom(this.http.apiGet(DATASOURCE.GET + id));
   }
 }

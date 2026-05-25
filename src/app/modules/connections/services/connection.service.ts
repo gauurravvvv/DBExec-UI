@@ -35,11 +35,11 @@ export class ConnectionService {
     }
   }
 
-  async loadOne(orgId: string, id: string) {
+  async loadOne(id: string) {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(CONNECTIONS.GET + `${orgId}/${id}`),
+        this.http.apiGet(CONNECTIONS.GET + id),
       );
       if (res?.status) this._current.set(res.data);
     } finally {
@@ -50,17 +50,10 @@ export class ConnectionService {
   async add(form: FormGroup): Promise<any> {
     this._saving.set(true);
     try {
-      const {
-        organisation,
-        datasource,
-        name,
-        description,
-        dbUsername,
-        dbPassword,
-      } = form.value;
+      const { datasource, name, description, dbUsername, dbPassword } =
+        form.value;
       return await lastValueFrom(
         this.http.apiPost(CONNECTIONS.ADD, {
-          organisation,
           datasource,
           name,
           description,
@@ -80,7 +73,6 @@ export class ConnectionService {
         id,
         name,
         description,
-        organisation,
         datasource,
         status,
         dbUsername,
@@ -91,7 +83,6 @@ export class ConnectionService {
           id,
           name,
           description,
-          organisation,
           datasource,
           status: status ? 1 : 0,
           dbUsername,
@@ -104,13 +95,9 @@ export class ConnectionService {
     }
   }
 
-  async delete(
-    orgId: string,
-    id: string,
-    justification?: string,
-  ): Promise<any> {
+  async delete(id: string, justification?: string): Promise<any> {
     return await lastValueFrom(
-      this.http.apiDelete(CONNECTIONS.DELETE + `${orgId}/${id}`, {
+      this.http.apiDelete(CONNECTIONS.DELETE + id, {
         body: { justification },
       }),
     );
@@ -118,16 +105,10 @@ export class ConnectionService {
 
   async bulkDelete(
     ids: string[],
-    justification: string | undefined,
-    orgId: string,
+    justification?: string,
   ): Promise<any> {
     return await lastValueFrom(
-      this.http.apiPost(
-        CONNECTIONS.BULK_DELETE_PREFIX +
-          `${orgId}` +
-          CONNECTIONS.BULK_DELETE_SUFFIX,
-        { ids, justification },
-      ),
+      this.http.apiPost(CONNECTIONS.BULK_DELETE, { ids, justification }),
     );
   }
 
@@ -140,7 +121,7 @@ export class ConnectionService {
     return lastValueFrom(this.http.apiGet(CONNECTIONS.LIST, { params }));
   }
 
-  viewConnection(orgId: string, id: string) {
-    return lastValueFrom(this.http.apiGet(CONNECTIONS.GET + `${orgId}/${id}`));
+  viewConnection(id: string) {
+    return lastValueFrom(this.http.apiGet(CONNECTIONS.GET + id));
   }
 }

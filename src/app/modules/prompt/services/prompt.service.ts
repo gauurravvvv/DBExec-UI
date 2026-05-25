@@ -41,11 +41,11 @@ export class PromptService {
     }
   }
 
-  async loadOne(orgId: string, id: string): Promise<void> {
+  async loadOne(id: string): Promise<void> {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(PROMPT.GET + `${orgId}/${id}`),
+        this.http.apiGet(PROMPT.GET + id),
       );
       if (res?.status) this._current.set(res.data);
     } catch {
@@ -55,10 +55,10 @@ export class PromptService {
     }
   }
 
-  async loadConfig(orgId: string, id: string): Promise<void> {
+  async loadConfig(id: string): Promise<void> {
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(PROMPT.GET + `${orgId}/${id}` + PROMPT.CONFIG_SUFFIX),
+        this.http.apiGet(PROMPT.GET + id + PROMPT.CONFIG_SUFFIX),
       );
       if (res?.status) this._config.set(res.data);
     } catch {
@@ -69,10 +69,9 @@ export class PromptService {
   async add(promptForm: any): Promise<any> {
     this._saving.set(true);
     try {
-      const { organisation, datasource, tab, prompts } = promptForm;
+      const { datasource, tab, prompts } = promptForm;
       return await lastValueFrom(
         this.http.apiPost(PROMPT.ADD, {
-          organisation,
           datasource,
           tab,
           prompts,
@@ -86,21 +85,12 @@ export class PromptService {
   async update(form: FormGroup, justification?: string): Promise<any> {
     this._saving.set(true);
     try {
-      const {
-        id,
-        organisation,
-        datasource,
-        tab,
-        section,
-        name,
-        description,
-        status,
-      } = form.value;
-      // PUT /prompts/:orgId/:promptId
+      const { id, datasource, tab, section, name, description, status } =
+        form.value;
+      // PUT /prompts/:promptId
       return await lastValueFrom(
-        this.http.apiPut(PROMPT.UPDATE + `${organisation}/${id}`, {
+        this.http.apiPut(PROMPT.UPDATE + id, {
           id,
-          organisation,
           datasource,
           tab,
           section,
@@ -118,11 +108,11 @@ export class PromptService {
   async configPrompt(data: any): Promise<any> {
     this._saving.set(true);
     try {
-      // POST /prompts/:orgId/:promptId/config — body still carries
+      // POST /prompts/:promptId/config — body still carries
       // the full payload; the id is taken from the path.
       return await lastValueFrom(
         this.http.apiPost(
-          PROMPT.GET + `${data.organisation}/${data.id}` + PROMPT.CONFIG_SUFFIX,
+          PROMPT.GET + data.id + PROMPT.CONFIG_SUFFIX,
           data,
         ),
       );
@@ -131,15 +121,11 @@ export class PromptService {
     }
   }
 
-  async delete(
-    orgId: string,
-    id: string,
-    justification?: string,
-  ): Promise<any> {
+  async delete(id: string, justification?: string): Promise<any> {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiDelete(PROMPT.DELETE + `${orgId}/${id}`, {
+        this.http.apiDelete(PROMPT.DELETE + id, {
           body: { justification },
         }),
       );
@@ -148,18 +134,11 @@ export class PromptService {
     }
   }
 
-  async bulkDelete(
-    ids: string[],
-    justification: string | undefined,
-    orgId: string,
-  ): Promise<any> {
+  async bulkDelete(ids: string[], justification?: string): Promise<any> {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPost(
-          PROMPT.BULK_DELETE_PREFIX + orgId + PROMPT.BULK_DELETE_SUFFIX,
-          { ids, justification },
-        ),
+        this.http.apiPost(PROMPT.BULK_DELETE, { ids, justification }),
       );
     } finally {
       this._saving.set(false);
@@ -167,14 +146,11 @@ export class PromptService {
   }
 
   async getPromptValuesBySQL(params: any): Promise<any> {
-    // POST /prompts/:orgId/:promptId/values
+    // POST /prompts/:promptId/values
     return lastValueFrom(
       this.http.apiPost(
-        PROMPT.GET +
-          `${params.orgId}/${params.promptId}` +
-          PROMPT.VALUES_SUFFIX,
+        PROMPT.GET + params.promptId + PROMPT.VALUES_SUFFIX,
         {
-          orgId: params.orgId,
           datasourceId: params.datasourceId,
           query: params.query,
         },
@@ -183,14 +159,11 @@ export class PromptService {
   }
 
   async refreshPromptValues(params: any): Promise<any> {
-    // POST /prompts/:orgId/:promptId/refresh-values
+    // POST /prompts/:promptId/refresh-values
     return lastValueFrom(
       this.http.apiPost(
-        PROMPT.GET +
-          `${params.orgId}/${params.promptId}` +
-          PROMPT.REFRESH_VALUES_SUFFIX,
+        PROMPT.GET + params.promptId + PROMPT.REFRESH_VALUES_SUFFIX,
         {
-          organisation: params.orgId,
           datasourceId: params.datasourceId,
           promptId: params.promptId,
         },
@@ -199,24 +172,21 @@ export class PromptService {
   }
 
   async updateAppearance(params: any): Promise<any> {
-    // PUT /prompts/:orgId/:promptId/appearance
+    // PUT /prompts/:promptId/appearance
     return lastValueFrom(
       this.http.apiPut(
-        PROMPT.GET + `${params.orgId}/${params.id}` + PROMPT.APPEARANCE_SUFFIX,
+        PROMPT.GET + params.id + PROMPT.APPEARANCE_SUFFIX,
         {
           id: params.id,
-          organisation: params.orgId,
           appearence: params.appearance,
         },
       ),
     );
   }
 
-  async getAppearance(orgId: string, id: string): Promise<any> {
+  async getAppearance(id: string): Promise<any> {
     return lastValueFrom(
-      this.http.apiGet(
-        PROMPT.GET + `${orgId}/${id}` + PROMPT.APPEARANCE_SUFFIX,
-      ),
+      this.http.apiGet(PROMPT.GET + id + PROMPT.APPEARANCE_SUFFIX),
     );
   }
 
@@ -232,57 +202,37 @@ export class PromptService {
     return lastValueFrom(this.http.apiGet(PROMPT.LIST, { params }));
   }
 
-  deletePrompt(
-    orgId: string,
-    id: string,
-    justification?: string,
-  ): Promise<any> {
+  deletePrompt(id: string, justification?: string): Promise<any> {
     return lastValueFrom(
-      this.http.apiDelete(PROMPT.DELETE + `${orgId}/${id}`, {
+      this.http.apiDelete(PROMPT.DELETE + id, {
         body: { justification },
       }),
     );
   }
 
-  bulkDeletePrompt(
-    ids: string[],
-    justification: string | undefined,
-    orgId: string,
-  ): Promise<any> {
+  bulkDeletePrompt(ids: string[], justification?: string): Promise<any> {
     return lastValueFrom(
-      this.http.apiPost(
-        PROMPT.BULK_DELETE_PREFIX + orgId + PROMPT.BULK_DELETE_SUFFIX,
-        { ids, justification },
-      ),
+      this.http.apiPost(PROMPT.BULK_DELETE, { ids, justification }),
     );
   }
 
   addPrompt(promptForm: any): Promise<any> {
-    const { organisation, datasource, tab, prompts } = promptForm;
+    const { datasource, tab, prompts } = promptForm;
     return lastValueFrom(
-      this.http.apiPost(PROMPT.ADD, { organisation, datasource, tab, prompts }),
+      this.http.apiPost(PROMPT.ADD, { datasource, tab, prompts }),
     );
   }
 
-  viewPrompt(orgId: string, id: string): Promise<any> {
-    return lastValueFrom(this.http.apiGet(PROMPT.GET + `${orgId}/${id}`));
+  viewPrompt(id: string): Promise<any> {
+    return lastValueFrom(this.http.apiGet(PROMPT.GET + id));
   }
 
   updatePrompt(promptForm: FormGroup, justification?: string): Promise<any> {
-    const {
-      id,
-      organisation,
-      datasource,
-      tab,
-      section,
-      name,
-      description,
-      status,
-    } = promptForm.value;
+    const { id, datasource, tab, section, name, description, status } =
+      promptForm.value;
     return lastValueFrom(
-      this.http.apiPut(PROMPT.UPDATE + `${organisation}/${id}`, {
+      this.http.apiPut(PROMPT.UPDATE + id, {
         id,
-        organisation,
         datasource,
         tab,
         section,
@@ -294,21 +244,18 @@ export class PromptService {
     );
   }
 
-  getConfig(orgId: string, id: string): Promise<any> {
+  getConfig(id: string): Promise<any> {
     return lastValueFrom(
-      this.http.apiGet(PROMPT.GET + `${orgId}/${id}` + PROMPT.CONFIG_SUFFIX),
+      this.http.apiGet(PROMPT.GET + id + PROMPT.CONFIG_SUFFIX),
     );
   }
 
   refreshPromptValuesBySQL(params: any): Promise<any> {
-    // POST /prompts/:orgId/:promptId/refresh-values
+    // POST /prompts/:promptId/refresh-values
     return lastValueFrom(
       this.http.apiPost(
-        PROMPT.GET +
-          `${params.orgId}/${params.promptId}` +
-          PROMPT.REFRESH_VALUES_SUFFIX,
+        PROMPT.GET + params.promptId + PROMPT.REFRESH_VALUES_SUFFIX,
         {
-          organisation: params.orgId,
           datasourceId: params.datasourceId,
           promptId: params.promptId,
         },
@@ -316,11 +263,9 @@ export class PromptService {
     );
   }
 
-  getAppearence(orgId: string, id: string): Promise<any> {
+  getAppearence(id: string): Promise<any> {
     return lastValueFrom(
-      this.http.apiGet(
-        PROMPT.GET + `${orgId}/${id}` + PROMPT.APPEARANCE_SUFFIX,
-      ),
+      this.http.apiGet(PROMPT.GET + id + PROMPT.APPEARANCE_SUFFIX),
     );
   }
 }

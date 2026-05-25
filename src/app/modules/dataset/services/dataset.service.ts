@@ -21,15 +21,11 @@ export class DatasetService {
     return lastValueFrom(this.http.apiGet(DATASET.LIST, { params }));
   }
 
-  async deleteDataset(
-    orgId: string,
-    datasetId: string,
-    justification?: string,
-  ) {
+  async deleteDataset(datasetId: string, justification?: string) {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiDelete(DATASET.DELETE + `${orgId}/${datasetId}`, {
+        this.http.apiDelete(DATASET.DELETE + datasetId, {
           body: { justification },
         }),
       );
@@ -38,18 +34,11 @@ export class DatasetService {
     }
   }
 
-  async bulkDeleteDataset(
-    ids: string[],
-    justification: string | undefined,
-    orgId: string,
-  ) {
+  async bulkDeleteDataset(ids: string[], justification?: string) {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPost(
-          DATASET.BULK_DELETE_PREFIX + orgId + DATASET.BULK_DELETE_SUFFIX,
-          { ids, justification },
-        ),
+        this.http.apiPost(DATASET.BULK_DELETE, { ids, justification }),
       );
     } finally {
       this._saving.set(false);
@@ -57,14 +46,13 @@ export class DatasetService {
   }
 
   async addDataset(payload: any) {
-    const { name, description, organisation, datasource, sql } = payload;
+    const { name, description, datasource, sql } = payload;
     this._saving.set(true);
     try {
       return await lastValueFrom(
         this.http.apiPost(DATASET.ADD, {
           name,
           description,
-          organisation,
           datasource,
           sql,
         }),
@@ -88,11 +76,11 @@ export class DatasetService {
   async updateDatasetViaBuilder(payload: any) {
     this._saving.set(true);
     try {
-      // PUT /datasets/:orgId/:datasetId/from-builder
+      // PUT /datasets/:datasetId/from-builder
       return await lastValueFrom(
         this.http.apiPut(
           DATASET.UPDATE_VIA_BUILDER_PREFIX +
-            `${payload.organisation}/${payload.id}` +
+            payload.id +
             DATASET.UPDATE_VIA_BUILDER_SUFFIX,
           payload,
         ),
@@ -127,15 +115,15 @@ export class DatasetService {
     }
   }
 
-  viewDataset(orgId: string, id: string) {
-    return lastValueFrom(this.http.apiGet(DATASET.GET + `${orgId}/${id}`));
+  viewDataset(id: string) {
+    return lastValueFrom(this.http.apiGet(DATASET.GET + id));
   }
 
-  viewDatasetField(orgId: string, datasetId: string, fieldId: string) {
-    // GET /datasets/:orgId/:datasetId/fields/:fieldId
+  viewDatasetField(datasetId: string, fieldId: string) {
+    // GET /datasets/:datasetId/fields/:fieldId
     return lastValueFrom(
       this.http.apiGet(
-        DATASET.GET + `${orgId}/${datasetId}` + DATASET.FIELD_SEGMENT + fieldId,
+        DATASET.GET + datasetId + DATASET.FIELD_SEGMENT + fieldId,
       ),
     );
   }
@@ -144,7 +132,6 @@ export class DatasetService {
     const {
       fieldId,
       datasetId,
-      organisation,
       columnNameToView,
       customLogic,
       used_field_ids,
@@ -154,7 +141,6 @@ export class DatasetService {
     const requestBody: any = {
       fieldId,
       datasetId,
-      organisation,
       columnNameToView,
       used_field_ids,
     };
@@ -168,13 +154,10 @@ export class DatasetService {
 
     this._saving.set(true);
     try {
-      // PUT /datasets/:orgId/:datasetId/fields/:fieldId
+      // PUT /datasets/:datasetId/fields/:fieldId
       return await lastValueFrom(
         this.http.apiPut(
-          DATASET.GET +
-            `${organisation}/${datasetId}` +
-            DATASET.FIELD_SEGMENT +
-            fieldId,
+          DATASET.GET + datasetId + DATASET.FIELD_SEGMENT + fieldId,
           requestBody,
         ),
       );
@@ -194,14 +177,13 @@ export class DatasetService {
       datasource,
       username,
       password,
-      organisation,
       isMasterDB,
       status,
     } = payload;
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPut(DATASOURCE.UPDATE + `${organisation}/${id}`, {
+        this.http.apiPut(DATASOURCE.UPDATE + id, {
           id,
           name,
           description,
@@ -211,7 +193,6 @@ export class DatasetService {
           datasource,
           username,
           password,
-          organisation,
           isMasterDB,
           status,
         }),
@@ -222,22 +203,22 @@ export class DatasetService {
   }
 
   listDatasourceSchemas(params: any) {
-    // GET /datasources/:orgId/:datasourceId/schemas
+    // GET /datasources/:datasourceId/schemas
     return lastValueFrom(
       this.http.apiGet(
         DATASOURCE.LIST_SCHEMAS_PREFIX +
-          `${params.orgId}/${params.datasourceId}` +
+          params.datasourceId +
           DATASOURCE.LIST_SCHEMAS_SUFFIX,
       ),
     );
   }
 
   listSchemaTables(params: any) {
-    // GET /datasources/:orgId/:datasourceId/schemas/:schema/tables
+    // GET /datasources/:datasourceId/schemas/:schema/tables
     return lastValueFrom(
       this.http.apiGet(
         DATASOURCE.LIST_SCHEMAS_PREFIX +
-          `${params.orgId}/${params.datasourceId}` +
+          params.datasourceId +
           DATASOURCE.SCHEMAS_SEGMENT +
           params.schemaName +
           DATASOURCE.TABLES_SEGMENT.replace(/\/$/, ''),
@@ -246,11 +227,11 @@ export class DatasetService {
   }
 
   listTableColumns(params: any) {
-    // GET /datasources/:orgId/:datasourceId/schemas/:schema/tables/:table/columns
+    // GET /datasources/:datasourceId/schemas/:schema/tables/:table/columns
     return lastValueFrom(
       this.http.apiGet(
         DATASOURCE.LIST_SCHEMAS_PREFIX +
-          `${params.orgId}/${params.datasourceId}` +
+          params.datasourceId +
           DATASOURCE.SCHEMAS_SEGMENT +
           params.schemaName +
           DATASOURCE.TABLES_SEGMENT +
@@ -260,22 +241,19 @@ export class DatasetService {
     );
   }
 
-  getDataset(orgId: string, datasetId: string) {
-    return lastValueFrom(
-      this.http.apiGet(DATASET.GET + `${orgId}/${datasetId}`),
-    );
+  getDataset(datasetId: string) {
+    return lastValueFrom(this.http.apiGet(DATASET.GET + datasetId));
   }
 
   async updateDataset(payload: any, justification?: string) {
-    const { id, name, description, organisation, datasource, sql } = payload;
+    const { id, name, description, datasource, sql } = payload;
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPut(DATASET.UPDATE + `${organisation}/${id}`, {
+        this.http.apiPut(DATASET.UPDATE + id, {
           id,
           name,
           description,
-          organisation,
           datasource,
           sql,
           justification,
@@ -287,7 +265,7 @@ export class DatasetService {
   }
 
   async validateCustomField(payload: any) {
-    const { datasetId, organisation, customLogic } = payload;
+    const { datasetId, customLogic } = payload;
     this._saving.set(true);
     try {
       // POST /datasets/:datasetId/fields/validate
@@ -295,7 +273,6 @@ export class DatasetService {
         this.http.apiPost(
           DATASET.ADD_FIELD_PREFIX + datasetId + DATASET.VALIDATE_FIELD_SUFFIX,
           {
-            organisation,
             datasetId,
             customLogic,
           },
@@ -308,7 +285,6 @@ export class DatasetService {
 
   async addCustomField(payload: any) {
     const {
-      organisation,
       datasetId,
       name,
       customLogic,
@@ -317,7 +293,6 @@ export class DatasetService {
       analysisId,
     } = payload;
     const requestBody: any = {
-      organisation,
       datasetId,
       name,
       customLogic,
@@ -341,19 +316,16 @@ export class DatasetService {
   }
 
   async duplicateDataset(
-    orgId: string,
     datasetId: string,
     name: string,
     description: string,
   ) {
     this._saving.set(true);
     try {
-      // POST /datasets/:orgId/:datasetId/duplicate
+      // POST /datasets/:datasetId/duplicate
       return await lastValueFrom(
         this.http.apiPost(
-          DATASET.DUPLICATE_PREFIX +
-            `${orgId}/${datasetId}` +
-            DATASET.DUPLICATE_SUFFIX,
+          DATASET.DUPLICATE_PREFIX + datasetId + DATASET.DUPLICATE_SUFFIX,
           { name, description },
         ),
       );
@@ -363,8 +335,8 @@ export class DatasetService {
   }
 
   runDatasetQuery(payload: any) {
-    const { datasetId, organisation, filters } = payload;
-    const body: any = { organisation, datasetId };
+    const { datasetId, filters } = payload;
+    const body: any = { datasetId };
     if (filters && filters.length > 0) {
       body.filters = filters;
     }
@@ -377,32 +349,25 @@ export class DatasetService {
     );
   }
 
-  getDistinctColumnValues(
-    orgId: string,
-    datasetId: string,
-    columnName: string,
-  ) {
-    // POST /datasets/:orgId/:datasetId/distinct-values
+  getDistinctColumnValues(datasetId: string, columnName: string) {
+    // POST /datasets/:datasetId/distinct-values
     return lastValueFrom(
       this.http.apiPost(
         DATASET.DISTINCT_VALUES_PREFIX +
-          `${orgId}/${datasetId}` +
+          datasetId +
           DATASET.DISTINCT_VALUES_SUFFIX,
         { columnName },
       ),
     );
   }
 
-  async deleteDatasetField(orgId: string, datasetId: string, fieldId: string) {
+  async deleteDatasetField(datasetId: string, fieldId: string) {
     this._saving.set(true);
     try {
-      // DELETE /datasets/:orgId/:datasetId/fields/:fieldId
+      // DELETE /datasets/:datasetId/fields/:fieldId
       return await lastValueFrom(
         this.http.apiDelete(
-          DATASET.GET +
-            `${orgId}/${datasetId}` +
-            DATASET.FIELD_SEGMENT +
-            fieldId,
+          DATASET.GET + datasetId + DATASET.FIELD_SEGMENT + fieldId,
         ),
       );
     } finally {

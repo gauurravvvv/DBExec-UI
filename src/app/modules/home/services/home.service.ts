@@ -13,11 +13,11 @@ export class HomeService {
 
   constructor(private http: HttpClientService) {}
 
-  async loadSystemAdminDashboard(orgId: string) {
+  async loadSystemAdminDashboard() {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(HOME.SYSTEM_ADMIN + `${orgId}`),
+        this.http.apiGet(HOME.SYSTEM_ADMIN),
       );
       if (res?.status) this._dashboard.set(res.data);
       return res;
@@ -31,7 +31,7 @@ export class HomeService {
   }
 
   // Legacy — kept for external compatibility
-  getSystemAdminDashboard(orgId: string) {
-    return this.http.apiGet(HOME.SYSTEM_ADMIN + `${orgId}`);
+  getSystemAdminDashboard() {
+    return this.http.apiGet(HOME.SYSTEM_ADMIN);
   }
 }

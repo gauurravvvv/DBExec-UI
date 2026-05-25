@@ -37,11 +37,11 @@ export class SectionService {
     }
   }
 
-  async loadOne(orgId: string, id: string): Promise<void> {
+  async loadOne(id: string): Promise<void> {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(SECTION.GET + `${orgId}/${id}`),
+        this.http.apiGet(SECTION.GET + id),
       );
       if (res?.status) this._current.set(res.data);
     } catch {
@@ -69,15 +69,11 @@ export class SectionService {
     }
   }
 
-  async delete(
-    orgId: string,
-    id: string,
-    justification?: string,
-  ): Promise<any> {
+  async delete(id: string, justification?: string): Promise<any> {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiDelete(SECTION.DELETE + `${orgId}/${id}`, {
+        this.http.apiDelete(SECTION.DELETE + id, {
           body: { justification },
         }),
       );
@@ -94,47 +90,39 @@ export class SectionService {
     return lastValueFrom(this.http.apiGet(SECTION.LIST, { params }));
   }
 
-  deleteSection(orgId: string, id: string, justification?: string) {
+  deleteSection(id: string, justification?: string) {
     return lastValueFrom(
-      this.http.apiDelete(SECTION.DELETE + `${orgId}/${id}`, {
+      this.http.apiDelete(SECTION.DELETE + id, {
         body: { justification },
       }),
     );
   }
 
-  bulkDeleteSection(
-    ids: string[],
-    justification: string | undefined,
-    orgId: string,
-  ) {
+  bulkDeleteSection(ids: string[], justification?: string) {
     return lastValueFrom(
-      this.http.apiPost(
-        SECTION.BULK_DELETE_PREFIX + orgId + SECTION.BULK_DELETE_SUFFIX,
-        { ids, justification },
-      ),
+      this.http.apiPost(SECTION.BULK_DELETE, { ids, justification }),
     );
   }
 
   addSection(formData: any) {
-    const { organisation, datasource, sections } = formData;
+    const { datasource, sections } = formData;
     return lastValueFrom(
-      this.http.apiPost(SECTION.ADD, { organisation, datasource, sections }),
+      this.http.apiPost(SECTION.ADD, { datasource, sections }),
     );
   }
 
-  viewSection(orgId: string, id: string) {
-    return lastValueFrom(this.http.apiGet(SECTION.GET + `${orgId}/${id}`));
+  viewSection(id: string) {
+    return lastValueFrom(this.http.apiGet(SECTION.GET + id));
   }
 
   updateSection(sectionForm: FormGroup, justification?: string) {
-    const { id, name, description, organisation, datasource, tab, status } =
+    const { id, name, description, datasource, tab, status } =
       sectionForm.value;
     return lastValueFrom(
       this.http.apiPut(SECTION.UPDATE, {
         id,
         name,
         description,
-        organisation,
         datasource,
         tab,
         status: status ? 1 : 0,
