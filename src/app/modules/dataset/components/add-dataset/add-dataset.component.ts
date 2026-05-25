@@ -328,7 +328,6 @@ export class AddDatasetComponent
   // Change Confirmation Dialog
   showChangeConfirmDialog = false;
   pendingDatasourceChange: any = null;
-  pendingOrgChange: any = null;
 
   // IntelliSense provider disposables
   private completionProviderDisposable: any = null;
@@ -758,45 +757,6 @@ export class AddDatasetComponent
   refreshSelectedDatasource(): void {
     if (!this.selectedDatasourceObj || !this.selectedDatasourceObj.id) return;
     this.refreshSingleDatasource(this.selectedDatasourceObj.id);
-  }
-
-  onOrgChange(event: any): void {
-    const newOrg = event.value;
-
-    // Check if editor has unsaved content
-    const editorValue = this.editor ? this.editor.getValue().trim() : '';
-    const hasContent = editorValue.length > 0;
-    const defaultContent = SQL_EDITOR_PLACEHOLDER;
-    const isDefaultContent = editorValue === defaultContent.trim();
-
-    // Only show confirmation if there's actual user content (not empty and not default)
-    if (hasContent && !isDefaultContent) {
-      // Show confirmation dialog
-      this.pendingOrgChange = newOrg;
-      this.showChangeConfirmDialog = true;
-      return;
-    }
-
-    this.proceedWithOrgChange(newOrg);
-  }
-
-  private proceedWithOrgChange(_newOrg: any): void {
-    // Discard any in-flight schema responses tied to the previous org.
-    this.schemaSelectionToken++;
-
-    // Reset editor and results
-    this.resetEditor();
-
-    // Clear existing data
-    this.availableDatasources = [];
-    this.preloadedDatasources = null;
-    this.preloadedDatasourcesTotal = null;
-    this.selectedDatasourceObj = null;
-    this.datasourceSchemas = {};
-    this.expandedPaths.clear();
-
-    // Reload datasources for the new organisation
-    this.loadDatasources();
   }
 
   /**
@@ -1499,16 +1459,11 @@ export class AddDatasetComponent
       this.pendingDatasourceChange = null;
     }
 
-    if (this.pendingOrgChange) {
-      this.proceedWithOrgChange(this.pendingOrgChange);
-      this.pendingOrgChange = null;
-    }
   }
 
   onCancelChange(): void {
     this.showChangeConfirmDialog = false;
     this.pendingDatasourceChange = null;
-    this.pendingOrgChange = null;
   }
 
   private resetEditor(): void {
@@ -2116,10 +2071,6 @@ export class AddDatasetComponent
             if (this.pendingDatasourceChange) {
               this.proceedWithDatasourceChange(this.pendingDatasourceChange);
               this.pendingDatasourceChange = null;
-            }
-            if (this.pendingOrgChange) {
-              this.proceedWithOrgChange(this.pendingOrgChange);
-              this.pendingOrgChange = null;
             }
           }
           this.cdr.markForCheck();

@@ -161,7 +161,6 @@ export class EditDatasetFieldsDialogComponent implements OnChanges {
       fieldId: this.editableField.id,
       datasetId: this.editableField.datasetId,
       columnNameToView: this.editableField.columnToView,
-      organisation: this.editableField.organisationId,
     };
 
     // Include dataType if it changed
