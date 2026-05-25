@@ -20,7 +20,7 @@
 
 A complete SQL workspace in the browser. Connect any of your databases (Postgres, MySQL, MariaDB, MSSQL, Oracle, Snowflake), write SQL with full editor assistance, save results as **Datasets**, layer **Analyses** with charts and filters, publish **Dashboards**, and share — with per-organisation isolation, row-level security, and a full audit trail.
 
-The UI talks to **[DBExec-API](https://github.com/gauurravvvv/DbExec-API)** over a JWT-authenticated REST API.
+The UI talks to **[DBExec-API](https://github.com/gauurravvvv/DBExec-API)** over a JWT-authenticated REST API.
 
 ## The Organisation model — the lens for everything below
 
@@ -84,7 +84,7 @@ Keep this in mind when you read the module list below: when you see "Users", "Da
 ### 1. Prerequisites
 
 - **Node.js 20+**, **npm 10+**
-- A running **[DBExec-API](https://github.com/gauurravvvv/DbExec-API)** instance (default: `http://localhost:3000`)
+- A running **[DBExec-API](https://github.com/gauurravvvv/DBExec-API)** instance (default: `http://localhost:3000`)
 
 ### 2. Clone + install
 
@@ -233,4 +233,4 @@ Monaco + PrimeNG + ECharts dominate the bundle; lazy-loading per module keeps th
 
 ## Related
 
-- [DBExec-API](https://github.com/gauurravvvv/DbExec-API) — Node + Express backend that this UI talks to.
+- [DBExec-API](https://github.com/gauurravvvv/DBExec-API) — Node + Express backend that this UI talks to.
