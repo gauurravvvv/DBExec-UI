@@ -74,7 +74,6 @@ export class EditAnalysesComponent
 {
   private destroyRef = inject(DestroyRef);
   analysisId: string = '';
-  orgId: string = '';
   datasourceId: string = '';
 
   private _isDirty = false;
@@ -385,7 +384,6 @@ export class EditAnalysesComponent
     this.route.params
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-        this.orgId = params['orgId'];
         this.analysisId = params['id'];
         if (this.analysisId) {
           this.loadAnalysis();
@@ -716,7 +714,7 @@ export class EditAnalysesComponent
    */
   private checkCachedDataAndLoad(): void {
     this.store
-      .select(selectDatasetByKey(this.orgId, this.datasetId))
+      .select(selectDatasetByKey(this.datasetId))
       .pipe(first())
       .subscribe(cachedEntry => {
         if (!cachedEntry || !cachedEntry.data) {
@@ -725,7 +723,7 @@ export class EditAnalysesComponent
         } else {
           // Check if data is stale
           this.store
-            .select(selectIsDatasetStale(this.orgId, this.datasetId))
+            .select(selectIsDatasetStale(this.datasetId))
             .pipe(first())
             .subscribe(isStale => {
               if (isStale) {
@@ -754,13 +752,13 @@ export class EditAnalysesComponent
    */
   initializeStoreSelectors(): void {
     this.graphData$ = this.store.select(
-      selectDatasetData(this.orgId, this.datasetId),
+      selectDatasetData(this.datasetId),
     );
     this.datasetStatus$ = this.store.select(
-      selectDatasetStatus(this.orgId, this.datasetId),
+      selectDatasetStatus(this.datasetId),
     );
     this.isDataLoaded$ = this.store.select(
-      selectIsDatasetLoaded(this.orgId, this.datasetId),
+      selectIsDatasetLoaded(this.datasetId),
     );
 
     // Filter slice — mirror the store's configured[] into the
@@ -817,7 +815,6 @@ export class EditAnalysesComponent
   loadDatasetData(): void {
     this.store.dispatch(
       AddAnalysesActions.loadDatasetData({
-        orgId: this.orgId,
         datasetId: this.datasetId,
       }),
     );
@@ -832,7 +829,6 @@ export class EditAnalysesComponent
         if (this.globalService.handleSuccessService(response, false)) {
           this.store.dispatch(
             AddAnalysesActions.loadDatasetDataSuccess({
-              orgId: this.orgId,
               datasetId: this.datasetId,
               data: response.data,
             }),
@@ -840,7 +836,6 @@ export class EditAnalysesComponent
         } else {
           this.store.dispatch(
             AddAnalysesActions.loadDatasetDataFailure({
-              orgId: this.orgId,
               datasetId: this.datasetId,
               error:
                 response?.message ||
@@ -853,7 +848,6 @@ export class EditAnalysesComponent
         console.error('Error running analysis query:', error);
         this.store.dispatch(
           AddAnalysesActions.loadDatasetDataFailure({
-            orgId: this.orgId,
             datasetId: this.datasetId,
             error:
               error?.message ||
@@ -1077,7 +1071,7 @@ export class EditAnalysesComponent
 
   refreshFields(): void {
     if (this.isRefreshingFields) return; // guard against rapid clicks
-    if (!this.orgId || !this.analysisId || !this.datasetId) return;
+    if (!this.analysisId || !this.datasetId) return;
 
     this.isRefreshingFields = true;
     this.cdr.markForCheck();
@@ -1130,7 +1124,6 @@ export class EditAnalysesComponent
         this.store.dispatch(
           AnalysesFilterActions.loadOpen({
             analysisId: this.analysisId,
-            organisation: this.orgId,
           }),
         );
       }
@@ -1157,7 +1150,6 @@ export class EditAnalysesComponent
     this.editFieldData = {
       ...field,
       datasetId: this.datasetId,
-      organisationId: this.orgId,
     };
     this.showCustomFieldDialog = true;
   }
@@ -1342,11 +1334,10 @@ export class EditAnalysesComponent
       // The effect's freshness gate (10-min TTL) means re-opens
       // within the window are a no-op; subsequent opens after TTL
       // refresh in the background.
-      if (this.analysisId && this.orgId) {
+      if (this.analysisId) {
         this.store.dispatch(
           AnalysesFilterActions.loadOpen({
             analysisId: this.analysisId,
-            organisation: this.orgId,
           }),
         );
       }
@@ -1526,7 +1517,6 @@ export class EditAnalysesComponent
     this.store.dispatch(
       AnalysesFilterActions.loadOpen({
         analysisId: this.analysisId,
-        organisation: this.orgId,
       }),
     );
   }
@@ -2330,7 +2320,6 @@ export class EditAnalysesComponent
         name: formData.name,
         description: formData.description,
         datasetId: this.datasetId,
-        organisation: this.orgId,
         datasource: this.datasourceId,
         visuals: visualConfigurations,
       };
@@ -2407,7 +2396,7 @@ export class EditAnalysesComponent
           this.showPublishDialog = false;
           const newId = response?.data?.id;
           if (newId) {
-            this.router.navigate([DASHBOARD.view(this.orgId, newId)]);
+            this.router.navigate([DASHBOARD.view(newId)]);
           }
         }
       })

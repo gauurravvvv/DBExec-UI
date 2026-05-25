@@ -59,7 +59,6 @@ export class ListDashboardComponent implements OnInit {
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
-  selectedOrg: any = null;
   selectedDatasource: any = null;
 
   today = new Date();
@@ -113,7 +112,6 @@ export class ListDashboardComponent implements OnInit {
         this.loadDashboards();
       });
 
-    this.selectedOrg = this.globalService.getTokenDetails('organisationId');
     this.loadDatasources();
   }
 
@@ -221,7 +219,7 @@ export class ListDashboardComponent implements OnInit {
   }
 
   loadDashboards(event?: any) {
-    if (!this.selectedOrg || !this.selectedDatasource) return;
+    if (!this.selectedDatasource) return;
 
     if (event) {
       const prev = this.lastTableLazyLoadEvent;
@@ -277,7 +275,7 @@ export class ListDashboardComponent implements OnInit {
   }
 
   onView(id: string) {
-    this.router.navigate([DB_ROUTES.view(this.selectedOrg, id)]);
+    this.router.navigate([DB_ROUTES.view(id)]);
   }
 
   confirmDelete(id: string) {

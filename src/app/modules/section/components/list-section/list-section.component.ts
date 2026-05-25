@@ -48,7 +48,6 @@ export class ListSectionComponent implements OnInit {
   sections = this.sectionService.sections;
   total = this.sectionService.total;
   loading = this.sectionService.loading;
-  selectedOrg: any = null;
   selectedDatasource: any = null;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
@@ -107,7 +106,6 @@ export class ListSectionComponent implements OnInit {
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-        this.selectedOrg = this.globalService.getTokenDetails('organisationId');
         if (params['datasourceId'] || params['name']) {
           this.handleDeepLinking(params);
         } else {
@@ -301,7 +299,7 @@ export class ListSectionComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([SECTION.edit(this.selectedOrg, id)]);
+    this.router.navigate([SECTION.edit(id)]);
   }
 
   confirmDelete(id: string) {
@@ -383,6 +381,6 @@ export class ListSectionComponent implements OnInit {
   }
 
   onEditSection(section: any) {
-    this.router.navigate([SECTION.edit(this.selectedOrg, section.id)]);
+    this.router.navigate([SECTION.edit(section.id)]);
   }
 }

@@ -94,7 +94,6 @@ export class FilterDialogComponent implements OnChanges {
   @Input() editingFilter: ConfiguredFilter | null = null;
   @Input() datasetFields: any[] = [];
   @Input() datasetId: string = '';
-  @Input() orgId: string = '';
   @Input() analysisId: string = '';
   @Input() configuredFiltersCount: number = 0;
 
@@ -350,7 +349,6 @@ export class FilterDialogComponent implements OnChanges {
       if (this.editingFilter) {
         res = await this.analysesService.updateFilter({
           id: this.editingFilter.tempId,
-          organisation: this.orgId,
           name,
           columnName,
           filterType: this.filterDialogType,
@@ -364,7 +362,6 @@ export class FilterDialogComponent implements OnChanges {
       } else {
         res = await this.analysesService.addFilters({
           analysisId: this.analysisId,
-          organisation: this.orgId,
           filters: [
             {
               name,
@@ -671,7 +668,6 @@ export class FilterDialogComponent implements OnChanges {
     if (
       !this.filterDialogColumn ||
       !this.datasetId ||
-      !this.orgId ||
       !this.analysisId
     )
       return;
@@ -696,7 +692,6 @@ export class FilterDialogComponent implements OnChanges {
       // columns AND custom fields (dataset-level + analysis-level).
       // BE picks the path internally based on the field's customLogic.
       const res: any = await this.analysesService.getDistinctFieldValues(
-        this.orgId,
         this.analysisId,
         colName,
       );

@@ -24,7 +24,6 @@ export class ViewUserComponent implements OnInit {
   userInitials: string = '';
   loggedInUserId = this.globalService.getTokenDetails('userId');
   showChangePasswordDialog = false;
-  orgId: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -36,7 +35,6 @@ export class ViewUserComponent implements OnInit {
 
   ngOnInit() {
     this.userId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
     this.loadAdminData();
   }
 

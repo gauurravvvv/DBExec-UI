@@ -44,7 +44,6 @@ export class ListQueryBuilderComponent implements OnInit {
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
   queryBuilders: any[] = [];
-  selectedOrg: any = null;
   selectedDatasource: any = null;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
@@ -101,7 +100,6 @@ export class ListQueryBuilderComponent implements OnInit {
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-        this.selectedOrg = this.globalService.getTokenDetails('organisationId');
         if (params['datasourceId'] || params['name']) {
           this.handleDeepLinking(params);
         } else {
@@ -316,7 +314,7 @@ export class ListQueryBuilderComponent implements OnInit {
 
   // Not used but kept for reference if direct edit without object is needed
   onEdit(id: string) {
-    this.router.navigate([QUERY_BUILDER.edit(this.selectedOrg, id)]);
+    this.router.navigate([QUERY_BUILDER.edit(id)]);
   }
 
   confirmDelete(id: string) {
@@ -394,23 +392,14 @@ export class ListQueryBuilderComponent implements OnInit {
   }
 
   onEditQueryBuilder(queryBuilder: any) {
-    this.router.navigate([
-      QUERY_BUILDER.edit(this.selectedOrg, queryBuilder.id),
-    ]);
+    this.router.navigate([QUERY_BUILDER.edit(queryBuilder.id)]);
   }
 
   onConfig(id: string) {
-    this.router.navigate([
-      QUERY_BUILDER.CONFIG,
-      this.selectedOrg,
-      this.selectedDatasource,
-      id,
-    ]);
+    this.router.navigate([QUERY_BUILDER.configure(this.selectedDatasource, id)]);
   }
 
   onExecute(id: string) {
-    this.router.navigate([
-      QUERY_BUILDER.run(this.selectedOrg, this.selectedDatasource, id),
-    ]);
+    this.router.navigate([QUERY_BUILDER.run(this.selectedDatasource, id)]);
   }
 }

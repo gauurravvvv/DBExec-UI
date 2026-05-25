@@ -46,59 +46,59 @@ export const selectCacheStats = createSelector(
   }),
 );
 
-// Factory selector: Get dataset entry by orgId and datasetId
-export const selectDatasetByKey = (orgId: string, datasetId: string) =>
+// Factory selector: Get dataset entry by datasetId
+export const selectDatasetByKey = (datasetId: string) =>
   createSelector(selectAllDatasets, (datasets): DatasetEntry | null => {
-    const key = getDatasetKey(orgId, datasetId);
+    const key = getDatasetKey(datasetId);
     return datasets[key] || null;
   });
 
 // Factory selector: Get dataset data
-export const selectDatasetData = (orgId: string, datasetId: string) =>
+export const selectDatasetData = (datasetId: string) =>
   createSelector(
-    selectDatasetByKey(orgId, datasetId),
+    selectDatasetByKey(datasetId),
     (entry): any[] | null => entry?.data || null,
   );
 
 // Factory selector: Get dataset loading status
-export const selectDatasetStatus = (orgId: string, datasetId: string) =>
+export const selectDatasetStatus = (datasetId: string) =>
   createSelector(
-    selectDatasetByKey(orgId, datasetId),
+    selectDatasetByKey(datasetId),
     entry => entry?.status || 'idle',
   );
 
 // Factory selector: Check if dataset is loading
-export const selectIsDatasetLoading = (orgId: string, datasetId: string) =>
+export const selectIsDatasetLoading = (datasetId: string) =>
   createSelector(
-    selectDatasetStatus(orgId, datasetId),
+    selectDatasetStatus(datasetId),
     status => status === 'loading',
   );
 
 // Factory selector: Check if dataset is loaded
-export const selectIsDatasetLoaded = (orgId: string, datasetId: string) =>
+export const selectIsDatasetLoaded = (datasetId: string) =>
   createSelector(
-    selectDatasetStatus(orgId, datasetId),
+    selectDatasetStatus(datasetId),
     status => status === 'loaded',
   );
 
 // Factory selector: Get dataset error
-export const selectDatasetError = (orgId: string, datasetId: string) =>
+export const selectDatasetError = (datasetId: string) =>
   createSelector(
-    selectDatasetByKey(orgId, datasetId),
+    selectDatasetByKey(datasetId),
     entry => entry?.error || null,
   );
 
 // Factory selector: Check if dataset data is stale (older than TTL)
-export const selectIsDatasetStale = (orgId: string, datasetId: string) =>
-  createSelector(selectDatasetByKey(orgId, datasetId), entry => {
+export const selectIsDatasetStale = (datasetId: string) =>
+  createSelector(selectDatasetByKey(datasetId), entry => {
     if (!entry || !entry.loadedAt) return true;
     return isDatasetStale(entry.loadedAt);
   });
 
 // Factory selector: Get dataset loaded time
-export const selectDatasetLoadedAt = (orgId: string, datasetId: string) =>
+export const selectDatasetLoadedAt = (datasetId: string) =>
   createSelector(
-    selectDatasetByKey(orgId, datasetId),
+    selectDatasetByKey(datasetId),
     entry => entry?.loadedAt || null,
   );
 

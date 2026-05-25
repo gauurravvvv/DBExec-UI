@@ -36,7 +36,6 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
   @ViewChild('treeSearchInput') treeSearchInputRef!: ElementRef;
 
   // Route params
-  orgId = '';
   queryBuilderId = '';
   queryBuilderName = '';
 
@@ -78,7 +77,6 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
     private queryBuilderService: QueryBuilderService,
     private translate: TranslateService,
   ) {
-    this.orgId = this.route.snapshot.params['orgId'];
     this.queryBuilderId = this.route.snapshot.params['id'];
   }
 
@@ -490,15 +488,12 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
   }
 
   onEdit(): void {
-    this.router.navigate([QUERY_BUILDER.edit(this.orgId, this.queryBuilderId)]);
+    this.router.navigate([QUERY_BUILDER.edit(this.queryBuilderId)]);
   }
 
   onConfigure(): void {
     this.router.navigate([
-      QUERY_BUILDER.CONFIG,
-      this.orgId,
-      this.datasourceId,
-      this.queryBuilderId,
+      QUERY_BUILDER.configure(this.datasourceId, this.queryBuilderId),
     ]);
   }
 

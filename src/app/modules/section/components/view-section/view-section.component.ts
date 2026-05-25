@@ -23,7 +23,6 @@ export class ViewSectionComponent implements OnInit {
   saving = this.sectionService.saving;
 
   sectionId: string = '';
-  orgId: string = '';
   tabData: any = null;
   showDeleteConfirm = false;
   deleteJustification = '';
@@ -38,7 +37,6 @@ export class ViewSectionComponent implements OnInit {
 
   ngOnInit() {
     this.sectionId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
     this.loadSectionDetails();
   }
 
@@ -59,7 +57,7 @@ export class ViewSectionComponent implements OnInit {
   }
 
   onEdit() {
-    this.router.navigate([SECTION.edit(this.orgId, this.sectionId)]);
+    this.router.navigate([SECTION.edit(this.sectionId)]);
   }
 
   goBack() {

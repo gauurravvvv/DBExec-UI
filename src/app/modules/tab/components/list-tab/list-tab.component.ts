@@ -44,7 +44,6 @@ export class ListTabComponent implements OnInit {
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
-  selectedOrg: any = null;
   selectedDatasource: any = null;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
@@ -107,7 +106,6 @@ export class ListTabComponent implements OnInit {
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-        this.selectedOrg = this.globalService.getTokenDetails('organisationId');
         if (params['datasourceId'] || params['name']) {
           this.handleDeepLinking(params);
         } else {
@@ -304,7 +302,7 @@ export class ListTabComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([TAB.edit(this.selectedOrg, id)]);
+    this.router.navigate([TAB.edit(id)]);
   }
 
   confirmDelete(id: string) {
@@ -392,6 +390,6 @@ export class ListTabComponent implements OnInit {
   }
 
   onEditTab(tab: any) {
-    this.router.navigate([TAB.edit(this.selectedOrg, tab.id)]);
+    this.router.navigate([TAB.edit(tab.id)]);
   }
 }

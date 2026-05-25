@@ -53,7 +53,7 @@ export type FilterFetcher = (args: {
  *    selections (appliedValues, ephemeral form state) and emits
  *    filtersApplied / filtersCleared events upward.
  *
- *  service (legacy): no inputs beyond orgId / analysisId. The bar
+ *  service (legacy): no inputs beyond analysisId. The bar
  *    talks to AnalysesService + FilterOptionsCacheService directly,
  *    same as before the store landed.
  *
@@ -71,7 +71,6 @@ export class AnalysisFilterBarComponent
   implements OnInit, OnChanges, OnDestroy
 {
   // ── Shared inputs ────────────────────────────────────────────────
-  @Input() orgId!: string;
   @Input() analysisId!: string;
   @Output() filtersApplied = new EventEmitter<any[]>();
   @Output() filtersCleared = new EventEmitter<void>();

@@ -17,7 +17,7 @@
           class="btn-primary"
           type="button"
           [disabled]="userId == loggedInUserId"
-          [routerLink]="['/app/users', orgId, userId, 'edit']"
+          [routerLink]="['/app/users', userId, 'edit']"
         >
           <i class="pi pi-pencil"></i> {{ 'COMMON.EDIT' | translate }}
         </button>

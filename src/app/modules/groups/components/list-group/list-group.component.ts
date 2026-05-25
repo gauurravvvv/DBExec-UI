@@ -50,7 +50,6 @@ export class ListGroupComponent implements OnInit {
   bulkDelete = false;
   deleteJustification = '';
   roles: any[] = [];
-  selectedOrg: any = null;
   selectedRole: string | null = null;
 
   // Server-mode preload for the Role filter dropdown.
@@ -100,7 +99,6 @@ export class ListGroupComponent implements OnInit {
         this.loadGroups();
       });
 
-    this.selectedOrg = this.globalService.getTokenDetails('organisationId');
     this.loadRoles();
     this.loadGroups();
   }
@@ -192,8 +190,6 @@ export class ListGroupComponent implements OnInit {
   }
 
   async loadGroups(event?: any) {
-    if (!this.selectedOrg) return;
-
     if (event) {
       const prev = this.lastTableLazyLoadEvent;
       if (prev && (prev.first !== event.first || prev.rows !== event.rows)) {
@@ -253,7 +249,7 @@ export class ListGroupComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([GROUP.edit(this.selectedOrg, id)]);
+    this.router.navigate([GROUP.edit(id)]);
   }
 
   confirmDelete(id: string) {

@@ -60,8 +60,8 @@ export const configPromptReducer = createReducer(
   // Load schema data - set loading status and update access order
   on(
     ConfigPromptActions.loadSchemaData,
-    (state, { orgId, dbId }): ConfigPromptState => {
-      const key = getSchemaKey(orgId, dbId);
+    (state, { dbId }): ConfigPromptState => {
+      const key = getSchemaKey(dbId);
       const now = new Date();
 
       // Update access order
@@ -88,8 +88,8 @@ export const configPromptReducer = createReducer(
   // Load schema data success - store data and handle LRU eviction
   on(
     ConfigPromptActions.loadSchemaDataSuccess,
-    (state, { orgId, dbId, data }): ConfigPromptState => {
-      const key = getSchemaKey(orgId, dbId);
+    (state, { dbId, data }): ConfigPromptState => {
+      const key = getSchemaKey(dbId);
       const now = new Date();
 
       // First, add the new schema
@@ -122,8 +122,8 @@ export const configPromptReducer = createReducer(
   // Load schema data failure
   on(
     ConfigPromptActions.loadSchemaDataFailure,
-    (state, { orgId, dbId, error }): ConfigPromptState => {
-      const key = getSchemaKey(orgId, dbId);
+    (state, { dbId, error }): ConfigPromptState => {
+      const key = getSchemaKey(dbId);
       const now = new Date();
 
       return {
@@ -145,8 +145,8 @@ export const configPromptReducer = createReducer(
   // Set active schema - update access order
   on(
     ConfigPromptActions.setActiveSchema,
-    (state, { orgId, dbId }): ConfigPromptState => {
-      const key = getSchemaKey(orgId, dbId);
+    (state, { dbId }): ConfigPromptState => {
+      const key = getSchemaKey(dbId);
       const now = new Date();
 
       // Update last accessed time if exists
@@ -170,8 +170,8 @@ export const configPromptReducer = createReducer(
   // Clear specific schema
   on(
     ConfigPromptActions.clearSchemaData,
-    (state, { orgId, dbId }): ConfigPromptState => {
-      const key = getSchemaKey(orgId, dbId);
+    (state, { dbId }): ConfigPromptState => {
+      const key = getSchemaKey(dbId);
       const { [key]: _, ...remainingSchemas } = state.schemas;
       return {
         ...state,
@@ -197,8 +197,8 @@ export const configPromptReducer = createReducer(
   // Refresh schema data - clear existing and reload
   on(
     ConfigPromptActions.refreshSchemaData,
-    (state, { orgId, dbId }): ConfigPromptState => {
-      const key = getSchemaKey(orgId, dbId);
+    (state, { dbId }): ConfigPromptState => {
+      const key = getSchemaKey(dbId);
       const now = new Date();
 
       // Clear the existing cached data and set to loading

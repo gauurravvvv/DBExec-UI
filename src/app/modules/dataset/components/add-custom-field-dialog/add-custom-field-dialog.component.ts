@@ -52,7 +52,6 @@ export class AddCustomFieldDialogComponent
   @ViewChild('formulaEditorContainer')
   formulaEditorContainer!: ElementRef<HTMLDivElement>;
   @Input() datasetId: string = '';
-  @Input() organisationId: string = '';
   @Input() datasetFields: any[] = [];
   @Input() editMode: boolean = false;
   @Input() editFieldData: any = null;
@@ -504,7 +503,6 @@ export class AddCustomFieldDialogComponent
       const payload = {
         fieldId: this.editFieldData.id,
         datasetId: this.editFieldData.datasetId,
-        organisation: this.editFieldData.organisationId,
         columnNameToView: this.customField.columnToView,
         customLogic: this.customField.columnToUse,
         used_field_ids: usedCustomFieldIds,
@@ -527,7 +525,6 @@ export class AddCustomFieldDialogComponent
     } else {
       // Add mode - call add API
       const payload: any = {
-        organisation: this.organisationId,
         datasetId: this.datasetId,
         name: this.customField.columnToView,
         customLogic: this.customField.columnToUse,
@@ -744,9 +741,6 @@ export class AddCustomFieldDialogComponent
 
     const payload = {
       datasetId: this.editMode ? this.editFieldData?.datasetId : this.datasetId,
-      organisation: this.editMode
-        ? this.editFieldData?.organisationId
-        : this.organisationId,
       customLogic: this.customField.columnToUse,
     };
 

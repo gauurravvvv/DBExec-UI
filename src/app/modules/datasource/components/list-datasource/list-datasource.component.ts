@@ -44,7 +44,6 @@ export class ListDatasourceComponent implements OnInit {
   private searchSubject = new Subject<void>();
   lastTableLazyLoadEvent: any;
 
-  selectedOrg: any = {};
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
   selectedDatasource: any = null;
   selectedDatasources: any[] = [];
@@ -75,8 +74,6 @@ export class ListDatasourceComponent implements OnInit {
           this.loadDatasources(this.lastTableLazyLoadEvent);
         }
       });
-
-    this.selectedOrg = this.globalService.getTokenDetails('organisationId');
   }
 
   today = new Date();
@@ -193,7 +190,7 @@ export class ListDatasourceComponent implements OnInit {
   }
 
   onEdit(db: any) {
-    this.router.navigate([DATASOURCE.edit(db.organisationId, db.id)]);
+    this.router.navigate([DATASOURCE.edit(db.id)]);
   }
 
   confirmDelete(datasource: any): void {

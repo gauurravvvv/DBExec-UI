@@ -6,14 +6,14 @@ import { ListAnalysesComponent } from './components/list-analyses/list-analyses.
 import { ViewAnalysesComponent } from './components/view-analyses/view-analyses.component';
 
 // REST-shaped routes:
-//   ''                 -> list
-//   ':orgId/:id'       -> detail (view)
-//   ':orgId/:id/edit'  -> edit
+//   ''           -> list
+//   ':id'        -> detail (view)
+//   ':id/edit'   -> edit
 const routes: Routes = [
   { path: '', component: ListAnalysesComponent },
-  { path: ':orgId/:id', component: ViewAnalysesComponent },
+  { path: ':id', component: ViewAnalysesComponent },
   {
-    path: ':orgId/:id/edit',
+    path: ':id/edit',
     component: EditAnalysesComponent,
     canDeactivate: [unsavedChangesGuard],
   },

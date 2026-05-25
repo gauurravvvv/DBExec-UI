@@ -103,7 +103,6 @@ export class AddDatasetComponent
 
   // Removed ViewChild as we now use dynamic containers per tab
   @Input() datasourceId?: string;
-  @Input() orgId?: string;
   @Input() initialQuery?: string;
 
   editor: any;
@@ -341,7 +340,6 @@ export class AddDatasetComponent
    *  successive setModelMarkers() calls replace the previous batch. */
   private static readonly DIALECT_LINT_OWNER = 'sql-dialect-lint';
 
-  selectedOrg: any = {};
   availableDatasources: any[] = [];
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
@@ -500,12 +498,9 @@ export class AddDatasetComponent
         );
       });
 
-    // Resolve the active org. System admins used to pick from a
-    // dropdown; with the popup flow they arrive with both `orgId`
-    // (system-admin context) and `datasourceId` on the query string.
-    // Regular org users get their org from the JWT.
+    // The popup flow forwards `datasourceId` and an optional `schema`
+    // on the query string. The BE derives the org from the JWT.
     const qp = this.route.snapshot.queryParamMap;
-    const queryOrgId = qp.get('orgId');
     const queryDatasourceId = qp.get('datasourceId');
     const querySchema = qp.get('schema');
     if (querySchema) {
@@ -516,10 +511,6 @@ export class AddDatasetComponent
       this.scopedSchema = querySchema;
       this.expandedPaths.add(`${queryDatasourceId}.${querySchema}`);
     }
-
-    this.selectedOrg = {
-      id: queryOrgId || this.globalService.getTokenDetails('organisationId'),
-    };
 
     if (queryDatasourceId) {
       // Preselected path: skip the datasource list page entirely; just
@@ -538,8 +529,6 @@ export class AddDatasetComponent
    * `selectedDatasourceObj.config.dbType`.
    */
   private bootstrapPreselectedDatasource(datasourceId: string): void {
-    if (!this.selectedOrg?.id) return;
-
     // Fast path — the list-dataset popup carries the full datasource
     // record through router state when the user clicks Continue.
     // That record already has id / name / config (with dbType), which
@@ -693,8 +682,7 @@ export class AddDatasetComponent
   }
 
   /**
-   * Fetcher for the server-mode datasource dropdown. Pulls orgId from
-   * selectedOrg (which is the full object in this component).
+   * Fetcher for the server-mode datasource dropdown.
    */
   loadDatasourcesPage = async ({
     search,
@@ -705,7 +693,6 @@ export class AddDatasetComponent
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    if (!this.selectedOrg?.id) return { items: [], total: 0 };
     const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
@@ -740,15 +727,13 @@ export class AddDatasetComponent
   }
 
   refreshSingleDatasource(dbId: string): void {
-    if (!dbId || !this.selectedOrg?.id) return;
+    if (!dbId) return;
 
-    const orgId = this.selectedOrg.id.toString();
     const dbIdStr = dbId.toString();
 
     // Dispatch refresh action to clear cache and reload
     this.store.dispatch(
       AddDatasetActions.refreshSchemaData({
-        orgId,
         dbId: dbIdStr,
       }),
     );
@@ -785,26 +770,19 @@ export class AddDatasetComponent
     const isDefaultContent = editorValue === defaultContent.trim();
 
     // Only show confirmation if there's actual user content (not empty and not default)
-    if (hasContent && !isDefaultContent && this.selectedOrg?.id) {
+    if (hasContent && !isDefaultContent) {
       // Show confirmation dialog
       this.pendingOrgChange = newOrg;
       this.showChangeConfirmDialog = true;
-      // Revert dropdown to current selection
-      setTimeout(() => {
-        this.selectedOrg = this.selectedOrg;
-      }, 0);
       return;
     }
 
     this.proceedWithOrgChange(newOrg);
   }
 
-  private proceedWithOrgChange(newOrg: any): void {
+  private proceedWithOrgChange(_newOrg: any): void {
     // Discard any in-flight schema responses tied to the previous org.
     this.schemaSelectionToken++;
-
-    this.selectedOrg = newOrg;
-    this.orgId = this.selectedOrg.id;
 
     // Reset editor and results
     this.resetEditor();
@@ -1117,15 +1095,14 @@ export class AddDatasetComponent
   }
 
   private async loadDatasourceSchema(dbId: string): Promise<void> {
-    if (!dbId || !this.selectedOrg?.id) return Promise.resolve();
+    if (!dbId) return Promise.resolve();
 
-    const orgId = this.selectedOrg.id.toString();
     const dbIdStr = dbId.toString();
 
     // Check if we have cached data in the store
     return new Promise((resolve, reject) => {
       this.store
-        .select(selectSchemaByKey(orgId, dbIdStr))
+        .select(selectSchemaByKey(dbIdStr))
         .pipe(first())
         .subscribe(cachedEntry => {
           if (!cachedEntry || !cachedEntry.data) {
@@ -1134,7 +1111,7 @@ export class AddDatasetComponent
           } else {
             // Check if data is stale
             this.store
-              .select(selectIsSchemaStale(orgId, dbIdStr))
+              .select(selectIsSchemaStale(dbIdStr))
               .pipe(first())
               .subscribe(isStale => {
                 if (isStale) {
@@ -1200,9 +1177,8 @@ export class AddDatasetComponent
    * Load datasource schema from API and update store
    */
   private async loadDatasourceSchemaFromAPI(dbId: string): Promise<void> {
-    if (!dbId || !this.selectedOrg?.id) return Promise.resolve();
+    if (!dbId) return Promise.resolve();
 
-    const orgId = this.selectedOrg.id.toString();
     const dbIdStr = dbId.toString();
     // Capture the selection token so we can detect a stale response on return.
     const token = this.schemaSelectionToken;
@@ -1212,7 +1188,6 @@ export class AddDatasetComponent
     // Dispatch loading action
     this.store.dispatch(
       AddDatasetActions.loadSchemaData({
-        orgId,
         dbId: dbIdStr,
       }),
     );
@@ -1246,7 +1221,6 @@ export class AddDatasetComponent
                 this.globalService.handleSuccessService(response, false);
                 this.store.dispatch(
                   AddDatasetActions.loadSchemaDataFailure({
-                    orgId,
                     dbId: dbIdStr,
                     error: msg,
                   }),
@@ -1298,7 +1272,6 @@ export class AddDatasetComponent
 
               this.store.dispatch(
                 AddDatasetActions.loadSchemaDataSuccess({
-                  orgId,
                   dbId: dbIdStr,
                   data: finalTree,
                 }),
@@ -1321,7 +1294,6 @@ export class AddDatasetComponent
             error: (error: any) => {
               this.store.dispatch(
                 AddDatasetActions.loadSchemaDataFailure({
-                  orgId,
                   dbId: dbIdStr,
                   error:
                     error?.message ||
@@ -1337,7 +1309,6 @@ export class AddDatasetComponent
         // Dispatch failure action
         this.store.dispatch(
           AddDatasetActions.loadSchemaDataFailure({
-            orgId,
             dbId: dbIdStr,
             error:
               error.message ||
@@ -1570,12 +1541,7 @@ export class AddDatasetComponent
   }
 
   exportResultsAsCsv(): void {
-    if (
-      !this.lastExecutedQuery ||
-      !this.selectedDatasourceObj?.id ||
-      !this.selectedOrg?.id
-    )
-      return;
+    if (!this.lastExecutedQuery || !this.selectedDatasourceObj?.id) return;
 
     this.isExportingResults = true;
 
@@ -1588,7 +1554,6 @@ export class AddDatasetComponent
     }
 
     const payload: any = {
-      orgId: this.selectedOrg.id,
       datasourceId: this.selectedDatasourceObj.id,
       query: this.lastExecutedQuery,
     };
@@ -1976,7 +1941,7 @@ export class AddDatasetComponent
       return;
     }
 
-    if (!this.selectedDatasourceObj?.id || !this.selectedOrg?.id) {
+    if (!this.selectedDatasourceObj?.id) {
       return;
     }
 
@@ -1991,7 +1956,6 @@ export class AddDatasetComponent
     const startTime = Date.now();
 
     const payload: any = {
-      orgId: this.selectedOrg.id,
       datasourceId: this.selectedDatasourceObj.id,
       query: query,
       page: page,
@@ -2136,7 +2100,6 @@ export class AddDatasetComponent
       const payload = {
         name: formData.name,
         description: formData.description,
-        organisation: this.selectedOrg?.id,
         datasource: this.selectedDatasourceObj.id,
         sql,
       };
@@ -2273,8 +2236,6 @@ export class AddDatasetComponent
     schemaName: string,
     background = false,
   ): void {
-    if (!this.selectedOrg?.id) return;
-    const orgId = String(this.selectedOrg.id);
     const dbIdStr = String(dbId);
     const tree = this.datasourceSchemas[dbId];
     const existing = tree?.schemas?.find(s => s.name === schemaName) as any;
@@ -2305,7 +2266,6 @@ export class AddDatasetComponent
 
     this.store.dispatch(
       AddDatasetActions.loadTablesForSchema({
-        orgId,
         dbId: dbIdStr,
         schemaName,
       }),
@@ -2314,7 +2274,6 @@ export class AddDatasetComponent
     this.datasourceService
       .listSchemaTables(
         {
-          orgId,
           datasourceId: dbIdStr,
           schemaName,
         },
@@ -2334,7 +2293,6 @@ export class AddDatasetComponent
           this.globalService.handleSuccessService(response, false);
           this.store.dispatch(
             AddDatasetActions.loadTablesForSchemaFailure({
-              orgId,
               dbId: dbIdStr,
               schemaName,
               error: msg,
@@ -2367,7 +2325,6 @@ export class AddDatasetComponent
 
         this.store.dispatch(
           AddDatasetActions.loadTablesForSchemaSuccess({
-            orgId,
             dbId: dbIdStr,
             schemaName,
             tables: tables.map(t => ({ name: t.name, alias: t.alias })),
@@ -2381,7 +2338,6 @@ export class AddDatasetComponent
           this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA');
         this.store.dispatch(
           AddDatasetActions.loadTablesForSchemaFailure({
-            orgId,
             dbId: dbIdStr,
             schemaName,
             error: msg,
@@ -2531,8 +2487,6 @@ export class AddDatasetComponent
     schemaName: string,
     tableName: string,
   ): void {
-    if (!this.selectedOrg?.id) return;
-    const orgId = String(this.selectedOrg.id);
     const dbIdStr = String(dbId);
     const schema = this.datasourceSchemas[dbId]?.schemas?.find(
       s => s.name === schemaName,
@@ -2544,7 +2498,6 @@ export class AddDatasetComponent
 
     this.store.dispatch(
       AddDatasetActions.loadColumnsForTable({
-        orgId,
         dbId: dbIdStr,
         schemaName,
         tableName,
@@ -2553,7 +2506,6 @@ export class AddDatasetComponent
 
     this.datasourceService
       .listTableColumns({
-        orgId,
         datasourceId: dbIdStr,
         schemaName,
         tableName,
@@ -2569,7 +2521,6 @@ export class AddDatasetComponent
           this.globalService.handleSuccessService(response, false);
           this.store.dispatch(
             AddDatasetActions.loadColumnsForTableFailure({
-              orgId,
               dbId: dbIdStr,
               schemaName,
               tableName,
@@ -2597,7 +2548,6 @@ export class AddDatasetComponent
         }));
         this.store.dispatch(
           AddDatasetActions.loadColumnsForTableSuccess({
-            orgId,
             dbId: dbIdStr,
             schemaName,
             tableName,
@@ -2617,7 +2567,6 @@ export class AddDatasetComponent
           this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA');
         this.store.dispatch(
           AddDatasetActions.loadColumnsForTableFailure({
-            orgId,
             dbId: dbIdStr,
             schemaName,
             tableName,

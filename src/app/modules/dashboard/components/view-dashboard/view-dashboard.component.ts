@@ -47,7 +47,6 @@ export class ViewDashboardComponent
   rendered = this._dashboardService.rendered;
   loading = this._dashboardService.loading;
 
-  orgId = '';
   dashboardId = '';
   dashboard: any = null;
   visuals: Visual[] = [];
@@ -155,7 +154,6 @@ export class ViewDashboardComponent
     this.route.params
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-        this.orgId = params['orgId'];
         this.dashboardId = params['id'];
         if (this.dashboardId) {
           this._dashboardService.resetCurrent();
@@ -313,7 +311,6 @@ export class ViewDashboardComponent
     // /dashboard/run instead of poking the live analyses endpoint.
     // Source analysis edits no longer affect dashboard query results.
     const payload: any = {
-      orgId: this.orgId,
       dashboardId: this.dashboard.id,
       limit: -1,
     };

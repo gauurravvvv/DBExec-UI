@@ -50,7 +50,6 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
   showSaveConfirm = false;
   saveJustification = '';
   ruleId!: string;
-  orgId!: string;
   originalFormValue: any;
   datasetColumns: any[] = [];
   columnValuesCache: {
@@ -86,7 +85,6 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
   ngOnInit(): void {
     this.initForm();
     this.ruleId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
     if (this.ruleId) {
       this.rlsRulesService.resetCurrent();
       this.loadRuleData();
@@ -106,7 +104,6 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
         ],
       ],
       description: [''],
-      organisation: ['', Validators.required],
       datasetId: ['', Validators.required],
       conditions: this.fb.array([this.createCondition()]),
       isEnabled: [true],
@@ -163,7 +160,6 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
             id: rule.id,
             name: rule.name,
             description: rule.description || '',
-            organisation: rule.organisationId,
             datasetId: rule.datasetId,
             isEnabled: rule.isEnabled,
           });

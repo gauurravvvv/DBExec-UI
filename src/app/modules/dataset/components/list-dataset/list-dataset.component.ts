@@ -67,7 +67,6 @@ export class ListDatasetComponent implements OnInit {
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
-  selectedOrg: any = null;
   selectedDatasource: any = null;
   saving = this.datasetService.saving;
 
@@ -159,7 +158,6 @@ export class ListDatasetComponent implements OnInit {
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-        this.selectedOrg = this.globalService.getTokenDetails('organisationId');
         if (params['datasourceId'] || params['name']) {
           this.handleDeepLinking(params);
         } else {
@@ -304,7 +302,7 @@ export class ListDatasetComponent implements OnInit {
   }
 
   loadDatasets(event?: any) {
-    if (!this.selectedOrg || !this.selectedDatasource) return;
+    if (!this.selectedDatasource) return;
 
     if (event) {
       const prev = this.lastTableLazyLoadEvent;
@@ -463,14 +461,13 @@ export class ListDatasetComponent implements OnInit {
   }
 
   private loadQueryBuilders() {
-    if (!this.selectedOrg || !this.selectedDatasource) return;
+    if (!this.selectedDatasource) return;
 
     this.loadingQueryBuilders = true;
     // Command-palette popup: search is debounced + server-side, so the user
     // narrows results by typing. Capped to 50 per page; if there are more,
     // they can refine the query rather than scroll a huge list.
     const params: any = {
-      orgId: this.selectedOrg,
       datasourceId: this.selectedDatasource,
       page: 1,
       limit: 50,
@@ -506,16 +503,12 @@ export class ListDatasetComponent implements OnInit {
   onQueryBuilderSelect(queryBuilder: any) {
     this.showQueryBuilderPopup = false;
     this.router.navigate([
-      QUERY_BUILDER.run(
-        this.selectedOrg,
-        this.selectedDatasource,
-        queryBuilder.id,
-      ),
+      QUERY_BUILDER.run(this.selectedDatasource, queryBuilder.id),
     ]);
   }
 
   onEdit(id: string) {
-    this.router.navigate([DATASET.edit(this.selectedOrg, id)]);
+    this.router.navigate([DATASET.edit(id)]);
   }
 
   useAsAnalysis(id: string) {
@@ -530,7 +523,6 @@ export class ListDatasetComponent implements OnInit {
           name: result.name,
           description: result.description,
           datasetId: this.analysisDatasetId,
-          organisation: this.selectedOrg,
           datasource: this.selectedDatasource,
         })
         .then((response: any) => {

@@ -40,7 +40,6 @@ export class ListAnnouncementsComponent implements OnInit {
   // Server-mode preload for the Group filter dropdown.
   preloadedGroups: any[] | null = null;
   preloadedGroupsTotal: number | null = null;
-  selectedOrg: any = null;
   today = new Date();
 
   showDeleteConfirm = false;
@@ -89,7 +88,6 @@ export class ListAnnouncementsComponent implements OnInit {
       .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.loadAnnouncements());
 
-    this.selectedOrg = this.globalService.getTokenDetails('organisationId');
     this.loadGroups();
     this.loadAnnouncements();
   }
@@ -163,8 +161,6 @@ export class ListAnnouncementsComponent implements OnInit {
   }
 
   loadAnnouncements(event?: any): void {
-    if (!this.selectedOrg) return;
-
     if (event) this.lastTableLazyLoadEvent = event;
 
     const page = event ? Math.floor(event.first / event.rows) + 1 : 1;
@@ -218,11 +214,11 @@ export class ListAnnouncementsComponent implements OnInit {
   }
 
   onView(id: string): void {
-    this.router.navigate([ANNOUNCEMENT.view(this.selectedOrg, id)]);
+    this.router.navigate([ANNOUNCEMENT.view(id)]);
   }
 
   onEdit(id: string): void {
-    this.router.navigate([ANNOUNCEMENT.edit(this.selectedOrg, id)]);
+    this.router.navigate([ANNOUNCEMENT.edit(id)]);
   }
 
   confirmDelete(id: string): void {

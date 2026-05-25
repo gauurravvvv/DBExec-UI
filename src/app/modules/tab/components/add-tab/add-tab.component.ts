@@ -32,7 +32,6 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
 
   tabForm!: FormGroup;
   showPassword = false;
-  selectedOrg: any = null;
   selectedDatasource: any = null;
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
@@ -63,9 +62,6 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit() {
-    this.selectedOrg = {
-      id: this.globalService.getTokenDetails('organisationId'),
-    };
     this.loadDatasources();
 
     // Subscribe to form changes to check for duplicates

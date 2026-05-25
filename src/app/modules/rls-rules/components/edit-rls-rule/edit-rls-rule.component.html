@@ -58,16 +58,6 @@
         >
         </app-custom-input>
 
-        <!-- Organisation (read-only) -->
-        <app-custom-input
-          [ngModel]="orgId"
-          [ngModelOptions]="{ standalone: true }"
-          [label]="'COMMON.ORGANISATION' | translate"
-          [inputDisabled]="true"
-          icon="pi-building"
-        ></app-custom-input>
-        <input type="hidden" formControlName="organisation" />
-
         <input type="hidden" formControlName="datasetId" />
 
         <!-- Filter Conditions -->

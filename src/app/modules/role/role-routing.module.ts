@@ -16,9 +16,9 @@ const routes: Routes = [
     component: AddRoleComponent,
     canDeactivate: [unsavedChangesGuard],
   },
-  { path: ':orgId/:id', component: ViewRoleComponent },
+  { path: ':id', component: ViewRoleComponent },
   {
-    path: ':orgId/:id/edit',
+    path: ':id/edit',
     component: EditRoleComponent,
     canDeactivate: [unsavedChangesGuard],
   },

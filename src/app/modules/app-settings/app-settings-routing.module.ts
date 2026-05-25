@@ -20,12 +20,12 @@ const routes: Routes = [
     data: { title: 'New Announcement' },
   },
   {
-    path: 'announcements/:orgId/:id',
+    path: 'announcements/:id',
     component: ViewAnnouncementComponent,
     data: { title: 'Announcement Details' },
   },
   {
-    path: 'announcements/:orgId/:id/edit',
+    path: 'announcements/:id/edit',
     component: EditAnnouncementComponent,
     canDeactivate: [unsavedChangesGuard],
     data: { title: 'Edit Announcement' },

@@ -43,7 +43,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
 
   promptForm!: FormGroup;
-  orgId: string = '';
   promptId: string = '';
   selectedPromptType: string = '';
   showAddPromptValues: boolean = false;
@@ -142,7 +141,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.promptId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
 
     if (this.promptId) {
       this.loadPromptData();
@@ -340,25 +338,24 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   }
 
   loadSchemaData() {
-    const orgId = this.sectionData.organisationId.toString();
     const dbId = this.sectionData.datasourceId.toString();
 
     this.isLoadingSchema = true;
 
     // Check if we have cached data in the store
     this.store
-      .select(selectSchemaByKey(orgId, dbId))
+      .select(selectSchemaByKey(dbId))
       .pipe(first())
       .subscribe(cachedEntry => {
         if (cachedEntry && cachedEntry.data) {
           // Check if data is stale
           this.store
-            .select(selectIsSchemaStale(orgId, dbId))
+            .select(selectIsSchemaStale(dbId))
             .pipe(first())
             .subscribe(isStale => {
               if (isStale) {
                 // Data is stale, refresh from API
-                this.loadSchemaDataFromAPI(orgId, dbId);
+                this.loadSchemaDataFromAPI(dbId);
               } else {
                 // Use cached data
                 this.applyCachedSchemaData(cachedEntry.data);
@@ -366,7 +363,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
             });
         } else {
           // No cached data, load from API
-          this.loadSchemaDataFromAPI(orgId, dbId);
+          this.loadSchemaDataFromAPI(dbId);
         }
       });
   }
@@ -399,17 +396,15 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   /**
    * Load schema data from API and update store
    */
-  private loadSchemaDataFromAPI(orgId: string, dbId: string): void {
+  private loadSchemaDataFromAPI(dbId: string): void {
     // Dispatch loading action
     this.store.dispatch(
       ConfigPromptActions.loadSchemaData({
-        orgId,
         dbId,
       }),
     );
 
     const params = {
-      orgId: this.sectionData.organisationId,
       datasourceId: this.sectionData.datasourceId,
     };
 
@@ -425,7 +420,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
           // Dispatch success action to cache in store
           this.store.dispatch(
             ConfigPromptActions.loadSchemaDataSuccess({
-              orgId,
               dbId,
               data: { schemas: response.data },
             }),
@@ -440,7 +434,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
           // Dispatch failure action
           this.store.dispatch(
             ConfigPromptActions.loadSchemaDataFailure({
-              orgId,
               dbId,
               error: 'Failed to load schema data',
             }),
@@ -453,7 +446,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         // Dispatch failure action
         this.store.dispatch(
           ConfigPromptActions.loadSchemaDataFailure({
-            orgId,
             dbId,
             error: error.message || 'Failed to load schema data',
           }),
@@ -1569,7 +1561,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     this.promptService
       .updateAppearance({
         id: this.promptId,
-        orgId: this.orgId,
         appearance: config,
       })
       .then((response: any) => {
@@ -1594,7 +1585,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     }
 
     const params = {
-      orgId: this.sectionData.organisationId,
       datasourceId: this.sectionData.datasourceId,
       query: query.trim(),
     };
@@ -1737,7 +1727,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     }
 
     const params = {
-      orgId: this.orgId,
       datasourceId: this.promptForm.get('datasource')?.value,
       promptId: this.promptId,
     };

@@ -23,7 +23,6 @@ import { RlsRulesService } from '../../services/rls-rules.service';
 })
 export class ManageRlsAssignmentsComponent implements OnInit {
   @Input() rule: any;
-  @Input() orgId: string = '';
   @Output() closed = new EventEmitter<void>();
 
   private cdr = inject(ChangeDetectorRef);
@@ -109,8 +108,8 @@ export class ManageRlsAssignmentsComponent implements OnInit {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    if (!this.newScope || !this.orgId) return { items: [], total: 0 };
-    const params: any = { orgId: this.orgId, page, limit };
+    if (!this.newScope) return { items: [], total: 0 };
+    const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       if (this.newScope === 'user') {
@@ -136,7 +135,7 @@ export class ManageRlsAssignmentsComponent implements OnInit {
   };
 
   loadScopeTargets(scope: string): void {
-    const params = { orgId: this.orgId, page: DEFAULT_PAGE, limit: 10 };
+    const params = { page: DEFAULT_PAGE, limit: 10 };
     this.scopeTargetsLoading = true;
 
     if (scope === 'user') {
@@ -196,7 +195,6 @@ export class ManageRlsAssignmentsComponent implements OnInit {
 
     const payload = {
       ruleId: this.rule.id,
-      organisation: this.orgId,
       scope: this.newScope,
       scopeId: this.newScopeId,
     };

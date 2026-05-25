@@ -195,7 +195,6 @@ export class ViewDatasetComponent implements OnInit {
       this.router.navigate(
         [
           QUERY_BUILDER.run(
-            this.datasetData.organisationId,
             this.datasetData.datasourceId,
             this.datasetData.queryBuilderId,
           ),
@@ -209,9 +208,7 @@ export class ViewDatasetComponent implements OnInit {
       );
     } else {
       // Type 1 (SQL-based): navigate to standard edit
-      this.router.navigate([
-        DATASET.edit(this.datasetData.organisationId, this.datasetData.id),
-      ]);
+      this.router.navigate([DATASET.edit(this.datasetData.id)]);
     }
   }
 

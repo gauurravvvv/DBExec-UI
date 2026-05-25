@@ -7,29 +7,29 @@ import { createAction, props } from '@ngrx/store';
 // Load datasource schema data from API
 export const loadSchemaData = createAction(
   '[Add Dataset] Load Schema Data',
-  props<{ orgId: string; dbId: string }>(),
+  props<{ dbId: string }>(),
 );
 
 export const loadSchemaDataSuccess = createAction(
   '[Add Dataset] Load Schema Data Success',
-  props<{ orgId: string; dbId: string; data: any }>(),
+  props<{ dbId: string; data: any }>(),
 );
 
 export const loadSchemaDataFailure = createAction(
   '[Add Dataset] Load Schema Data Failure',
-  props<{ orgId: string; dbId: string; error: string }>(),
+  props<{ dbId: string; error: string }>(),
 );
 
 // Set active schema key
 export const setActiveSchema = createAction(
   '[Add Dataset] Set Active Schema',
-  props<{ orgId: string; dbId: string }>(),
+  props<{ dbId: string }>(),
 );
 
 // Clear specific schema data
 export const clearSchemaData = createAction(
   '[Add Dataset] Clear Schema Data',
-  props<{ orgId: string; dbId: string }>(),
+  props<{ dbId: string }>(),
 );
 
 // Clear all schemas
@@ -38,7 +38,7 @@ export const clearAllSchemas = createAction('[Add Dataset] Clear All Schemas');
 // Refresh schema data (force reload from API)
 export const refreshSchemaData = createAction(
   '[Add Dataset] Refresh Schema Data',
-  props<{ orgId: string; dbId: string }>(),
+  props<{ dbId: string }>(),
 );
 
 // ── Lazy-load: tables for one schema ────────────────────────────────
@@ -48,13 +48,12 @@ export const refreshSchemaData = createAction(
 // dispatches the success / failure variant.
 export const loadTablesForSchema = createAction(
   '[Add Dataset] Load Tables For Schema',
-  props<{ orgId: string; dbId: string; schemaName: string }>(),
+  props<{ dbId: string; schemaName: string }>(),
 );
 
 export const loadTablesForSchemaSuccess = createAction(
   '[Add Dataset] Load Tables For Schema Success',
   props<{
-    orgId: string;
     dbId: string;
     schemaName: string;
     tables: { name: string; alias?: string }[];
@@ -64,7 +63,6 @@ export const loadTablesForSchemaSuccess = createAction(
 export const loadTablesForSchemaFailure = createAction(
   '[Add Dataset] Load Tables For Schema Failure',
   props<{
-    orgId: string;
     dbId: string;
     schemaName: string;
     error: string;
@@ -76,7 +74,6 @@ export const loadTablesForSchemaFailure = createAction(
 export const loadColumnsForTable = createAction(
   '[Add Dataset] Load Columns For Table',
   props<{
-    orgId: string;
     dbId: string;
     schemaName: string;
     tableName: string;
@@ -86,7 +83,6 @@ export const loadColumnsForTable = createAction(
 export const loadColumnsForTableSuccess = createAction(
   '[Add Dataset] Load Columns For Table Success',
   props<{
-    orgId: string;
     dbId: string;
     schemaName: string;
     tableName: string;
@@ -102,7 +98,6 @@ export const loadColumnsForTableSuccess = createAction(
 export const loadColumnsForTableFailure = createAction(
   '[Add Dataset] Load Columns For Table Failure',
   props<{
-    orgId: string;
     dbId: string;
     schemaName: string;
     tableName: string;

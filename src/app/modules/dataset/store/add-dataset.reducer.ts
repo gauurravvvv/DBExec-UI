@@ -63,8 +63,8 @@ export const addDatasetReducer = createReducer(
   // Load schema data - set loading status and update access order
   on(
     AddDatasetActions.loadSchemaData,
-    (state, { orgId, dbId }): AddDatasetState => {
-      const key = getSchemaKey(orgId, dbId);
+    (state, { dbId }): AddDatasetState => {
+      const key = getSchemaKey(dbId);
       const now = new Date();
 
       // Update access order
@@ -91,8 +91,8 @@ export const addDatasetReducer = createReducer(
   // Load schema data success - store data and handle LRU eviction
   on(
     AddDatasetActions.loadSchemaDataSuccess,
-    (state, { orgId, dbId, data }): AddDatasetState => {
-      const key = getSchemaKey(orgId, dbId);
+    (state, { dbId, data }): AddDatasetState => {
+      const key = getSchemaKey(dbId);
       const now = new Date();
 
       // First, add the new schema
@@ -125,8 +125,8 @@ export const addDatasetReducer = createReducer(
   // Load schema data failure
   on(
     AddDatasetActions.loadSchemaDataFailure,
-    (state, { orgId, dbId, error }): AddDatasetState => {
-      const key = getSchemaKey(orgId, dbId);
+    (state, { dbId, error }): AddDatasetState => {
+      const key = getSchemaKey(dbId);
       const now = new Date();
 
       return {
@@ -148,8 +148,8 @@ export const addDatasetReducer = createReducer(
   // Set active schema - update access order
   on(
     AddDatasetActions.setActiveSchema,
-    (state, { orgId, dbId }): AddDatasetState => {
-      const key = getSchemaKey(orgId, dbId);
+    (state, { dbId }): AddDatasetState => {
+      const key = getSchemaKey(dbId);
       const now = new Date();
 
       // Update last accessed time if exists
@@ -173,8 +173,8 @@ export const addDatasetReducer = createReducer(
   // Clear specific schema
   on(
     AddDatasetActions.clearSchemaData,
-    (state, { orgId, dbId }): AddDatasetState => {
-      const key = getSchemaKey(orgId, dbId);
+    (state, { dbId }): AddDatasetState => {
+      const key = getSchemaKey(dbId);
       const { [key]: _, ...remainingSchemas } = state.schemas;
       return {
         ...state,
@@ -200,8 +200,8 @@ export const addDatasetReducer = createReducer(
   // Refresh schema data - clear existing and reload
   on(
     AddDatasetActions.refreshSchemaData,
-    (state, { orgId, dbId }): AddDatasetState => {
-      const key = getSchemaKey(orgId, dbId);
+    (state, { dbId }): AddDatasetState => {
+      const key = getSchemaKey(dbId);
       const now = new Date();
 
       // Clear the existing cached data and set to loading
@@ -228,8 +228,8 @@ export const addDatasetReducer = createReducer(
   // pick up the change.
   on(
     AddDatasetActions.loadTablesForSchema,
-    (state, { orgId, dbId, schemaName }): AddDatasetState =>
-      updateSchemaNode(state, orgId, dbId, schemaName, group => ({
+    (state, { dbId, schemaName }): AddDatasetState =>
+      updateSchemaNode(state, dbId, schemaName, group => ({
         ...group,
         tablesStatus: 'loading',
         tablesError: null,
@@ -237,8 +237,8 @@ export const addDatasetReducer = createReducer(
   ),
   on(
     AddDatasetActions.loadTablesForSchemaSuccess,
-    (state, { orgId, dbId, schemaName, tables }): AddDatasetState =>
-      updateSchemaNode(state, orgId, dbId, schemaName, group => ({
+    (state, { dbId, schemaName, tables }): AddDatasetState =>
+      updateSchemaNode(state, dbId, schemaName, group => ({
         ...group,
         tablesStatus: 'loaded',
         tablesError: null,
@@ -262,8 +262,8 @@ export const addDatasetReducer = createReducer(
   ),
   on(
     AddDatasetActions.loadTablesForSchemaFailure,
-    (state, { orgId, dbId, schemaName, error }): AddDatasetState =>
-      updateSchemaNode(state, orgId, dbId, schemaName, group => ({
+    (state, { dbId, schemaName, error }): AddDatasetState =>
+      updateSchemaNode(state, dbId, schemaName, group => ({
         ...group,
         tablesStatus: 'error',
         tablesError: error,
@@ -273,8 +273,8 @@ export const addDatasetReducer = createReducer(
   // ── Lazy-load: columns for one table ─────────────────────────────
   on(
     AddDatasetActions.loadColumnsForTable,
-    (state, { orgId, dbId, schemaName, tableName }): AddDatasetState =>
-      updateTableNode(state, orgId, dbId, schemaName, tableName, table => ({
+    (state, { dbId, schemaName, tableName }): AddDatasetState =>
+      updateTableNode(state, dbId, schemaName, tableName, table => ({
         ...table,
         columnsStatus: 'loading',
         columnsError: null,
@@ -284,9 +284,9 @@ export const addDatasetReducer = createReducer(
     AddDatasetActions.loadColumnsForTableSuccess,
     (
       state,
-      { orgId, dbId, schemaName, tableName, columns },
+      { dbId, schemaName, tableName, columns },
     ): AddDatasetState =>
-      updateTableNode(state, orgId, dbId, schemaName, tableName, table => ({
+      updateTableNode(state, dbId, schemaName, tableName, table => ({
         ...table,
         columnsStatus: 'loaded',
         columnsError: null,
@@ -300,8 +300,8 @@ export const addDatasetReducer = createReducer(
   ),
   on(
     AddDatasetActions.loadColumnsForTableFailure,
-    (state, { orgId, dbId, schemaName, tableName, error }): AddDatasetState =>
-      updateTableNode(state, orgId, dbId, schemaName, tableName, table => ({
+    (state, { dbId, schemaName, tableName, error }): AddDatasetState =>
+      updateTableNode(state, dbId, schemaName, tableName, table => ({
         ...table,
         columnsStatus: 'error',
         columnsError: error,
@@ -310,19 +310,18 @@ export const addDatasetReducer = createReducer(
 );
 
 /**
- * Immutably update the schema-group identified by (orgId, dbId,
- * schemaName) using the provided patch function. No-op when the
- * cache key or the schema row is missing — callers shouldn't see a
- * lazy-load action for a schema they didn't fetch.
+ * Immutably update the schema-group identified by (dbId, schemaName)
+ * using the provided patch function. No-op when the cache key or the
+ * schema row is missing — callers shouldn't see a lazy-load action
+ * for a schema they didn't fetch.
  */
 function updateSchemaNode(
   state: AddDatasetState,
-  orgId: string,
   dbId: string,
   schemaName: string,
   patch: (group: LazySchemaGroup) => LazySchemaGroup,
 ): AddDatasetState {
-  const key = getSchemaKey(orgId, dbId);
+  const key = getSchemaKey(dbId);
   const entry = state.schemas[key];
   if (!entry || !entry.data) return state;
 
@@ -346,19 +345,18 @@ function updateSchemaNode(
 }
 
 /**
- * Immutably update the table node identified by (orgId, dbId,
- * schemaName, tableName). Same no-op behaviour as updateSchemaNode
- * when the lookup fails.
+ * Immutably update the table node identified by (dbId, schemaName,
+ * tableName). Same no-op behaviour as updateSchemaNode when the
+ * lookup fails.
  */
 function updateTableNode(
   state: AddDatasetState,
-  orgId: string,
   dbId: string,
   schemaName: string,
   tableName: string,
   patch: (table: LazyTableNode) => LazyTableNode,
 ): AddDatasetState {
-  return updateSchemaNode(state, orgId, dbId, schemaName, group => {
+  return updateSchemaNode(state, dbId, schemaName, group => {
     const idx = group.tables.findIndex(t => t.name === tableName);
     if (idx < 0) return group;
     const nextTables = group.tables.slice();

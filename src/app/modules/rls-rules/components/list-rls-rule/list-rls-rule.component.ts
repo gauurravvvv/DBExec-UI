@@ -50,7 +50,6 @@ export class ListRlsRuleComponent implements OnInit {
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
   selectedDatasource: any = null;
-  selectedOrg: any = null;
 
   showDeleteConfirm = false;
   ruleToDelete: string | null = null;
@@ -96,7 +95,6 @@ export class ListRlsRuleComponent implements OnInit {
         this.loadRules();
       });
 
-    this.selectedOrg = this.globalService.getTokenDetails('organisationId');
     this.loadDatasources();
   }
 
@@ -243,7 +241,7 @@ export class ListRlsRuleComponent implements OnInit {
   }
 
   onEdit(rule: any) {
-    this.router.navigate([RLS_RULE.edit(this.selectedOrg, rule.id)]);
+    this.router.navigate([RLS_RULE.edit(rule.id)]);
   }
 
   trackByIndex(index: number): number {

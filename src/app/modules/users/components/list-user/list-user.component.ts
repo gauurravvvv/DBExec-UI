@@ -57,7 +57,6 @@ export class ListUserComponent implements OnInit {
   groups: any[] = [];
   preloadedGroups: any[] | null = null;
   preloadedGroupsTotal: number | null = null;
-  selectedOrg: any = null;
   selectedGroup: string | null = null;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
   today = new Date();
@@ -114,7 +113,6 @@ export class ListUserComponent implements OnInit {
         this.loadUsers();
       });
 
-    this.selectedOrg = this.globalService.getTokenDetails('organisationId');
     this.loadGroupOptions();
   }
 
@@ -220,8 +218,6 @@ export class ListUserComponent implements OnInit {
   }
 
   loadUsers(event?: any) {
-    if (!this.selectedOrg) return;
-
     if (event) {
       const prev = this.lastTableLazyLoadEvent;
       if (prev && (prev.first !== event.first || prev.rows !== event.rows)) {
@@ -317,7 +313,7 @@ export class ListUserComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([USER.edit(this.selectedOrg, id)]);
+    this.router.navigate([USER.edit(id)]);
   }
 
   confirmDelete(id: string) {

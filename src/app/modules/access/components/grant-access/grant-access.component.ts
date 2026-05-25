@@ -176,8 +176,7 @@ export class GrantAccessComponent implements OnInit {
   }
 
   /**
-   * Fetcher for the server-mode datasource dropdown. Pulls orgId from the
-   * organisation form control.
+   * Fetcher for the server-mode datasource dropdown.
    */
   loadDatasourcesPage = async ({
     search,

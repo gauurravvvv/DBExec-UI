@@ -19,7 +19,6 @@ export class ViewRoleComponent implements OnInit {
   roleData: any = null;
   permissions: any[] = [];
   roleId: string = '';
-  orgId: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -31,7 +30,6 @@ export class ViewRoleComponent implements OnInit {
 
   ngOnInit() {
     this.roleId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
     this.loadRole();
   }
 
@@ -54,7 +52,7 @@ export class ViewRoleComponent implements OnInit {
   }
 
   onEdit() {
-    this.router.navigate([ROLE.edit(this.orgId, this.roleId)]);
+    this.router.navigate([ROLE.edit(this.roleId)]);
   }
 
   goBack() {

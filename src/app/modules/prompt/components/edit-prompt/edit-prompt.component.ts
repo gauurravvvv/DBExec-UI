@@ -133,7 +133,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
 
   /**
    * Fetcher for the server-mode section dropdown. Gated on the prompt's
-   * orgId + tabId (loaded via loadPromptData).
+   * tabId (loaded via loadPromptData).
    */
   loadSectionsPage = async ({
     search,

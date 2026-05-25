@@ -20,7 +20,6 @@ export class ViewTabComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   tabId: string = '';
-  orgId: string = '';
   tabData: any = null;
   showDeleteConfirm = false;
   deleteJustification = '';
@@ -34,7 +33,6 @@ export class ViewTabComponent implements OnInit {
 
   ngOnInit() {
     this.tabId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
     this.loadTabDetails();
   }
 
@@ -49,7 +47,7 @@ export class ViewTabComponent implements OnInit {
   }
 
   onEdit() {
-    this.router.navigate([TAB.edit(this.orgId, this.tabId)]);
+    this.router.navigate([TAB.edit(this.tabId)]);
   }
 
   goBack() {

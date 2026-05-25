@@ -25,7 +25,6 @@ export class ViewRlsRuleComponent implements OnInit {
   saving = this.rlsRulesService.saving;
 
   ruleId: string = '';
-  orgId: string = '';
   showDeleteConfirm = false;
   deleteJustification = '';
 
@@ -38,7 +37,6 @@ export class ViewRlsRuleComponent implements OnInit {
 
   ngOnInit() {
     this.ruleId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
     this.rlsRulesService.resetCurrent();
     this.loadRuleDetails();
   }
@@ -55,7 +53,7 @@ export class ViewRlsRuleComponent implements OnInit {
   }
 
   onEdit() {
-    this.router.navigate([RLS_RULE.edit(this.orgId, this.ruleId)]);
+    this.router.navigate([RLS_RULE.edit(this.ruleId)]);
   }
 
   goBack() {

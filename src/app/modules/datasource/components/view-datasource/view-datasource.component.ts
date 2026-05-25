@@ -26,7 +26,6 @@ interface StorageTable {
 })
 export class ViewDatasourceComponent implements OnInit {
   dbId!: string;
-  orgId!: string;
   dbData: any;
   showDeleteConfirm = false;
   deleteJustification = '';
@@ -69,8 +68,7 @@ export class ViewDatasourceComponent implements OnInit {
 
   ngOnInit(): void {
     this.dbId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
-    if (this.dbId && this.orgId) {
+    if (this.dbId) {
       this.loadDatasourceData();
     }
   }
@@ -373,7 +371,7 @@ export class ViewDatasourceComponent implements OnInit {
   }
 
   onEdit(): void {
-    this.router.navigate([DATASOURCE.edit(this.orgId, this.dbData.id)]);
+    this.router.navigate([DATASOURCE.edit(this.dbData.id)]);
   }
 
   confirmDelete(): void {

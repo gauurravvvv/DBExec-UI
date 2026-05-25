@@ -17,7 +17,6 @@ import { GroupService } from '../../services/group.service';
 })
 export class ViewGroupComponent implements OnInit {
   groupId: string = '';
-  orgId: string = '';
   groupData: any = null;
   showDeleteConfirm = false;
   deleteJustification = '';
@@ -32,7 +31,6 @@ export class ViewGroupComponent implements OnInit {
 
   ngOnInit() {
     this.groupId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
     this.loadGroupDetails();
   }
 
@@ -43,9 +41,8 @@ export class ViewGroupComponent implements OnInit {
   }
 
   onEdit() {
-    this.router.navigate([GROUP.edit(this.orgId, this.groupId)], {
+    this.router.navigate([GROUP.edit(this.groupId)], {
       queryParams: {
-        orgId: this.orgId,
         adminId: this.groupId,
       },
     });

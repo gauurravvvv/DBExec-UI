@@ -410,7 +410,6 @@
     <app-add-custom-field-dialog
       [visible]="showCustomFieldDialog"
       [datasetId]="datasetId"
-      [organisationId]="orgId"
       [analysisId]="analysisId"
       [datasetFields]="allFields"
       [editMode]="editFieldMode"
@@ -550,7 +549,6 @@
       [editingFilter]="editingFilter"
       [datasetFields]="allFields"
       [datasetId]="datasetId"
-      [orgId]="orgId"
       [analysisId]="analysisId"
       [configuredFiltersCount]="configuredFilters.length"
       (saved)="onFilterSaved($event)"
@@ -862,7 +860,6 @@
 <!-- Publish Dashboard Dialog -->
 <app-publish-dashboard-dialog
   [visible]="showPublishDialog"
-  [orgId]="orgId"
   [datasourceId]="datasourceId"
   [analysisId]="analysisId"
   [analysisName]="analysisDetails?.name || ''"

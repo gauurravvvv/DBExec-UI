@@ -48,56 +48,56 @@ export const selectCacheStats = createSelector(
   }),
 );
 
-// Factory selector: Get schema entry by orgId and dbId
-export const selectSchemaByKey = (orgId: string, dbId: string) =>
+// Factory selector: Get schema entry by dbId
+export const selectSchemaByKey = (dbId: string) =>
   createSelector(selectAllSchemas, (schemas): SchemaEntry | null => {
-    const key = getSchemaKey(orgId, dbId);
+    const key = getSchemaKey(dbId);
     return schemas[key] || null;
   });
 
 // Factory selector: Get schema data
-export const selectSchemaData = (orgId: string, dbId: string) =>
+export const selectSchemaData = (dbId: string) =>
   createSelector(
-    selectSchemaByKey(orgId, dbId),
+    selectSchemaByKey(dbId),
     (entry): any | null => entry?.data || null,
   );
 
 // Factory selector: Get schema loading status
-export const selectSchemaStatus = (orgId: string, dbId: string) =>
+export const selectSchemaStatus = (dbId: string) =>
   createSelector(
-    selectSchemaByKey(orgId, dbId),
+    selectSchemaByKey(dbId),
     entry => entry?.status || 'idle',
   );
 
 // Factory selector: Check if schema is loading
-export const selectIsSchemaLoading = (orgId: string, dbId: string) =>
+export const selectIsSchemaLoading = (dbId: string) =>
   createSelector(
-    selectSchemaStatus(orgId, dbId),
+    selectSchemaStatus(dbId),
     status => status === 'loading',
   );
 
 // Factory selector: Check if schema is loaded
-export const selectIsSchemaLoaded = (orgId: string, dbId: string) =>
+export const selectIsSchemaLoaded = (dbId: string) =>
   createSelector(
-    selectSchemaStatus(orgId, dbId),
+    selectSchemaStatus(dbId),
     status => status === 'loaded',
   );
 
 // Factory selector: Get schema error
-export const selectSchemaError = (orgId: string, dbId: string) =>
-  createSelector(selectSchemaByKey(orgId, dbId), entry => entry?.error || null);
+export const selectSchemaError = (dbId: string) =>
+  createSelector(selectSchemaByKey(dbId), entry => entry?.error || null);
 
 // Factory selector: Check if schema data is stale (older than TTL)
-export const selectIsSchemaStale = (orgId: string, dbId: string) =>
-  createSelector(selectSchemaByKey(orgId, dbId), entry => {
+export const selectIsSchemaStale = (dbId: string) =>
+  createSelector(selectSchemaByKey(dbId), entry => {
     if (!entry || !entry.loadedAt) return true;
     return isSchemaStale(entry.loadedAt);
   });
 
 // Factory selector: Get schema loaded time
-export const selectSchemaLoadedAt = (orgId: string, dbId: string) =>
+export const selectSchemaLoadedAt = (dbId: string) =>
   createSelector(
-    selectSchemaByKey(orgId, dbId),
+    selectSchemaByKey(dbId),
     entry => entry?.loadedAt || null,
   );
 
@@ -132,16 +132,12 @@ export const selectIsActiveSchemaStale = createSelector(
 );
 
 // ── Lazy-tree selectors ─────────────────────────────────────────────
-// Look up the schema-group node by (orgId, dbId, schemaName). Returns
-// null when the cache entry, the tree, or the schema row is missing.
+// Look up the schema-group node by (dbId, schemaName). Returns null
+// when the cache entry, the tree, or the schema row is missing.
 // Use this in the sidebar to read tablesStatus + tables for one row.
-export const selectSchemaNode = (
-  orgId: string,
-  dbId: string,
-  schemaName: string,
-) =>
+export const selectSchemaNode = (dbId: string, schemaName: string) =>
   createSelector(
-    selectSchemaByKey(orgId, dbId),
+    selectSchemaByKey(dbId),
     (entry): LazySchemaGroup | null => {
       const tree = entry?.data;
       if (!tree) return null;
@@ -149,16 +145,15 @@ export const selectSchemaNode = (
     },
   );
 
-// Look up a single table node by (orgId, dbId, schemaName, tableName).
+// Look up a single table node by (dbId, schemaName, tableName).
 // Returns null when any link in the chain is missing.
 export const selectTableNode = (
-  orgId: string,
   dbId: string,
   schemaName: string,
   tableName: string,
 ) =>
   createSelector(
-    selectSchemaNode(orgId, dbId, schemaName),
+    selectSchemaNode(dbId, schemaName),
     (group): LazyTableNode | null => {
       if (!group) return null;
       return group.tables.find(t => t.name === tableName) ?? null;

@@ -33,7 +33,6 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
 
   sectionForm!: FormGroup;
   showPassword = false;
-  selectedOrg: any = null;
   selectedTab: any = null;
   selectedDatasource: any = null;
   datasources: any[] = [];
@@ -77,9 +76,6 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit() {
-    this.selectedOrg = {
-      id: this.globalService.getTokenDetails('organisationId'),
-    };
     this.loadDatasources();
 
     this.sectionForm.valueChanges
@@ -343,7 +339,6 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
     this.clearAllSectionGroups();
 
     // Reset component state
-    this.selectedOrg = { id: this.globalService.getTokenDetails('organisationId') };
     this.selectedDatasource = null;
     this.selectedTab = null;
     this.datasources = [];
@@ -386,8 +381,7 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
   }
 
   /**
-   * Fetcher for the server-mode datasource dropdown. Pulls orgId from
-   * selectedOrg (object-wrapped in this component).
+   * Fetcher for the server-mode datasource dropdown.
    */
   loadDatasourcesPage = async ({
     search,

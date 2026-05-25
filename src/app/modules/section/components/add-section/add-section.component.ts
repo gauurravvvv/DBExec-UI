@@ -33,7 +33,6 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
 
   sectionForm!: FormGroup;
   showPassword = false;
-  selectedOrg: any = null;
   selectedDatasource: any = null;
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
@@ -68,9 +67,6 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit() {
-    this.selectedOrg = {
-      id: this.globalService.getTokenDetails('organisationId'),
-    };
     this.loadDatasources();
 
     this.sectionForm.valueChanges
@@ -374,8 +370,7 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
   }
 
   /**
-   * Fetcher for the server-mode datasource dropdown. Pulls orgId from
-   * selectedOrg (object-wrapped in this component).
+   * Fetcher for the server-mode datasource dropdown.
    */
   loadDatasourcesPage = async ({
     search,

@@ -142,7 +142,7 @@
               <td pFrozenColumn>
                 <a
                   class="dataset-name-link"
-                  [routerLink]="['/app/rls-rules', selectedOrg, rule.id]"
+                  [routerLink]="['/app/rls-rules', rule.id]"
                 >
                   {{ rule.name }}
                 </a>
@@ -204,7 +204,7 @@
                 <div class="row-actions">
                   <button
                     class="icon-btn edit-btn"
-                    [routerLink]="['/app/rls-rules', selectedOrg, rule.id]"
+                    [routerLink]="['/app/rls-rules', rule.id]"
                     [pTooltip]="'COMMON.VIEW' | translate"
                     tooltipPosition="bottom"
                   >
@@ -270,7 +270,6 @@
 <app-manage-rls-assignments
   *ngIf="showAssignmentsPanel && activeRuleForAssignment"
   [rule]="activeRuleForAssignment"
-  [orgId]="selectedOrg"
   (closed)="onAssignmentsPanelClose()"
 ></app-manage-rls-assignments>
 

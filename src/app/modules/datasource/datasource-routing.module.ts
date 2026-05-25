@@ -7,8 +7,7 @@ import { ListDatasourceComponent } from './components/list-datasource/list-datas
 import { ViewDatasourceComponent } from './components/view-datasource/view-datasource.component';
 
 // REST-shaped routes. Static segments (`new`) come BEFORE
-// `:orgId/:id` so the router doesn't capture the word "new" as an
-// orgId param.
+// `:id` so the router doesn't capture the word "new" as an id param.
 const routes: Routes = [
   { path: '', component: ListDatasourceComponent },
   {
@@ -16,9 +15,9 @@ const routes: Routes = [
     component: AddDatasourceComponent,
     canDeactivate: [unsavedChangesGuard],
   },
-  { path: ':orgId/:id', component: ViewDatasourceComponent },
+  { path: ':id', component: ViewDatasourceComponent },
   {
-    path: ':orgId/:id/edit',
+    path: ':id/edit',
     component: EditDatasourceComponent,
     canDeactivate: [unsavedChangesGuard],
   },

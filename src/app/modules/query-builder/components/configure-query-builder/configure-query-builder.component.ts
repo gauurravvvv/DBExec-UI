@@ -63,7 +63,6 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigureQueryBuilderComponent implements OnInit, OnDestroy {
-  orgId: string = '';
   queryBuilderId: string = '';
   datasourceId: string = '';
   tabsData: TabData[] = [];
@@ -105,7 +104,6 @@ export class ConfigureQueryBuilderComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.queryBuilderId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
     this.datasourceId = this.route.snapshot.params['dbId'];
     this.initializeSections();
     this.getTabsData();
@@ -375,7 +373,6 @@ export class ConfigureQueryBuilderComponent implements OnInit, OnDestroy {
 
   getTabsData() {
     let params = {
-      orgId: this.orgId,
       datasourceId: this.datasourceId,
       page: DEFAULT_PAGE,
       limit: MAX_LIMIT,

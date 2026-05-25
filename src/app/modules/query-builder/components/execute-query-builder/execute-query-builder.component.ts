@@ -83,7 +83,6 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
   @ViewChild('treeSearchInput') treeSearchInputRef!: ElementRef;
 
   // Route params
-  orgId = '';
   datasourceId = '';
   queryBuilderId = '';
   queryBuilderName = '';
@@ -164,7 +163,6 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private translate: TranslateService,
   ) {
-    this.orgId = this.route.snapshot.params['orgId'];
     this.datasourceId = this.route.snapshot.params['dbId'];
     this.queryBuilderId = this.route.snapshot.params['queryBuilderId'];
 
@@ -499,7 +497,6 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
     const startTime = Date.now();
 
     const payload: any = {
-      orgId: this.orgId,
       datasourceId: this.datasourceId,
       query,
       page,
@@ -699,7 +696,6 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
     const payload: any = {
       name,
       description,
-      organisation: this.orgId,
       datasource: this.datasourceId,
       queryBuilderId: this.queryBuilderId,
       prompts,

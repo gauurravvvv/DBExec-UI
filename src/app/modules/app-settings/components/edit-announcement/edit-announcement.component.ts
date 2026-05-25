@@ -32,11 +32,9 @@ import {
 export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
   announcementForm!: FormGroup;
   groups: any[] = [];
-  // Server-mode preload for the Target Group dropdown. The orgId here is
-  // fixed (route param), so this is seeded once on init.
+  // Server-mode preload for the Target Group dropdown.
   preloadedGroups: any[] | null = null;
   preloadedGroupsTotal: number | null = null;
-  orgId = '';
   announcementId = '';
   orgName = '';
   maxDescriptionLength = 1000;

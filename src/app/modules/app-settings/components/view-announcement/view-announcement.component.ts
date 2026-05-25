@@ -17,7 +17,6 @@ import { AnnouncementService } from '../../services/announcement.service';
 })
 export class ViewAnnouncementComponent implements OnInit {
   announcementId = '';
-  orgId = '';
   showDeleteConfirm = false;
 
   current = this.announcementService.current;
@@ -33,7 +32,6 @@ export class ViewAnnouncementComponent implements OnInit {
 
   ngOnInit(): void {
     this.announcementId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
     this.load();
   }
 
@@ -55,7 +53,7 @@ export class ViewAnnouncementComponent implements OnInit {
   }
 
   onEdit(): void {
-    this.router.navigate([ANNOUNCEMENT.edit(this.orgId, this.announcementId)]);
+    this.router.navigate([ANNOUNCEMENT.edit(this.announcementId)]);
   }
 
   goBack(): void {

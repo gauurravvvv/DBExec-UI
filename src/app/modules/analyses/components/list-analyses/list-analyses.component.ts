@@ -54,7 +54,6 @@ export class ListAnalysesComponent implements OnInit {
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
-  selectedOrg: any = null;
   selectedDatasource: any = null;
 
   today = new Date();
@@ -120,7 +119,6 @@ export class ListAnalysesComponent implements OnInit {
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-        this.selectedOrg = this.globalService.getTokenDetails('organisationId');
         if (params['datasourceId'] || params['name']) {
           this.handleDeepLinking(params);
         } else {
@@ -266,7 +264,7 @@ export class ListAnalysesComponent implements OnInit {
   }
 
   loadAnalyses(event?: any) {
-    if (!this.selectedOrg || !this.selectedDatasource) return;
+    if (!this.selectedDatasource) return;
 
     if (event) {
       const prev = this.lastTableLazyLoadEvent;
@@ -343,11 +341,11 @@ export class ListAnalysesComponent implements OnInit {
   }
 
   onView(id: string) {
-    this.router.navigate([ANALYSES.view(this.selectedOrg, id)]);
+    this.router.navigate([ANALYSES.view(id)]);
   }
 
   onEdit(id: string) {
-    this.router.navigate([ANALYSES.edit(this.selectedOrg, id)]);
+    this.router.navigate([ANALYSES.edit(id)]);
   }
 
   confirmDelete(id: string) {

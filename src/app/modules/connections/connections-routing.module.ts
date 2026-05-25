@@ -16,9 +16,9 @@ const routes: Routes = [
     component: AddConnectionComponent,
     canDeactivate: [unsavedChangesGuard],
   },
-  { path: ':orgId/:id', component: ViewConnectionComponent },
+  { path: ':id', component: ViewConnectionComponent },
   {
-    path: ':orgId/:id/edit',
+    path: ':id/edit',
     component: EditConnectionComponent,
     canDeactivate: [unsavedChangesGuard],
   },

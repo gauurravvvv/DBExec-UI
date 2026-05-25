@@ -24,7 +24,6 @@ export class ViewAnalysesComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   analysisId: string = '';
-  orgId: string = '';
   analysisDetails: any = null;
   datasetDetails: any = null;
   analysisFields: any[] = [];
@@ -51,7 +50,6 @@ export class ViewAnalysesComponent implements OnInit {
     this.route.params
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-        this.orgId = params['orgId'];
         this.analysisId = params['id'];
         if (this.analysisId) {
           this.loadAnalysis();
@@ -170,7 +168,7 @@ export class ViewAnalysesComponent implements OnInit {
   }
 
   onEdit(): void {
-    this.router.navigate([ANALYSES.edit(this.orgId, this.analysisId)]);
+    this.router.navigate([ANALYSES.edit(this.analysisId)]);
   }
 
   onDelete(): void {

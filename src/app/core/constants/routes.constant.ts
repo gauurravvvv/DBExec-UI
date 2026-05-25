@@ -4,13 +4,15 @@
 //   NEW  – create page  ('new' replaces the older 'add' verb)
 //   view / edit – helper FUNCTIONS that produce the full nested URL.
 //
-// Why helpers? Old code did router.navigate([USER.EDIT, orgId, id])
-// which assumed the path shape `<base>/edit/<orgId>/<id>`. Under REST
-// the path is `<base>/<orgId>/<id>/edit` — the segments interleave
-// differently. Rather than have every caller assemble strings,
-// each feature exposes typed helpers:
-//   ROLE.view(orgId, id)   -> '/app/roles/<orgId>/<id>'
-//   ROLE.edit(orgId, id)   -> '/app/roles/<orgId>/<id>/edit'
+// Per-org features used to interleave :orgId/:id in the URL because the
+// FE was the org-scoping authority. The BE now derives the org id from
+// the JWT, so the URL needs only :id:
+//   ROLE.view(id)   -> '/app/roles/<id>'
+//   ROLE.edit(id)   -> '/app/roles/<id>/edit'
+//
+// SYSTEM_ADMIN and ORGANISATION still take a single id but represent the
+// system-admin browse-other-org screens; they're unrelated to per-org
+// scoping.
 //
 // `ADD`, `VIEW`, `EDIT` are kept as string aliases pointing at the
 // list base so any leftover callers using `router.navigate([X.LIST])`
@@ -25,8 +27,9 @@ export const AUTH = {
   SET_PASSWORD: '/set-password',
 };
 
-// Helper that produces the standard navigation-constant shape for an
-// org-scoped feature. base is e.g. '/app/users'.
+// Helper that produces the standard navigation-constant shape for a
+// feature whose detail URL uses only :id. With the BE deriving org id
+// from the JWT, every per-org feature falls into this shape.
 function feature(base: string) {
   return {
     LIST: base,
@@ -37,34 +40,19 @@ function feature(base: string) {
     // continue to land on the create form.
     ADD: `${base}/new`,
     // These three intentionally just point at the list base. Callers
-    // that currently use router.navigate([X.EDIT, orgId, id]) must
-    // migrate to router.navigate([X.edit(orgId, id)]). The bare
+    // that currently use router.navigate([X.EDIT, id]) must
+    // migrate to router.navigate([X.edit(id)]). The bare
     // string is preserved so accidental usage doesn't compile-fail.
     VIEW: base,
     EDIT: base,
     // Helpers — preferred form going forward.
-    view: (orgId: string | number, id: string | number) =>
-      `${base}/${orgId}/${id}`,
-    edit: (orgId: string | number, id: string | number) =>
-      `${base}/${orgId}/${id}/edit`,
-  };
-}
-
-// Variant for features whose URL uses only :id (no :orgId).
-function singleIdFeature(base: string) {
-  return {
-    LIST: base,
-    NEW: `${base}/new`,
-    ADD: `${base}/new`,
-    VIEW: base,
-    EDIT: base,
     view: (id: string | number) => `${base}/${id}`,
     edit: (id: string | number) => `${base}/${id}/edit`,
   };
 }
 
-export const SYSTEM_ADMIN = singleIdFeature('/app/admins');
-export const ORGANISATION = singleIdFeature('/app/organisations');
+export const SYSTEM_ADMIN = feature('/app/admins');
+export const ORGANISATION = feature('/app/organisations');
 
 export const GROUP = feature('/app/groups');
 
@@ -86,19 +74,16 @@ export const ANALYSES = {
   LIST: '/app/analyses',
   VIEW: '/app/analyses',
   EDIT: '/app/analyses',
-  view: (orgId: string | number, id: string | number) =>
-    `/app/analyses/${orgId}/${id}`,
-  edit: (orgId: string | number, id: string | number) =>
-    `/app/analyses/${orgId}/${id}/edit`,
+  view: (id: string | number) => `/app/analyses/${id}`,
+  edit: (id: string | number) => `/app/analyses/${id}/edit`,
 };
 
 export const PROMPT = {
   ...feature('/app/prompts'),
-  // Configure callers: prefer PROMPT.configure(orgId, id).
+  // Configure callers: prefer PROMPT.configure(id).
   CONFIG: '/app/prompts',
   CONFIGURE: '/app/prompts',
-  configure: (orgId: string | number, id: string | number) =>
-    `/app/prompts/${orgId}/${id}/configure`,
+  configure: (id: string | number) => `/app/prompts/${id}/configure`,
 };
 
 export const QUERY_BUILDER = {
@@ -106,24 +91,17 @@ export const QUERY_BUILDER = {
   CONFIG: '/app/query-builders',
   CONFIGURE: '/app/query-builders',
   RUN: '/app/query-builders',
-  configure: (
-    orgId: string | number,
-    dbId: string | number,
-    id: string | number,
-  ) => `/app/query-builders/${orgId}/${dbId}/${id}/configure`,
-  run: (
-    orgId: string | number,
-    dbId: string | number,
-    queryBuilderId: string | number,
-  ) => `/app/query-builders/${orgId}/${dbId}/${queryBuilderId}/run`,
+  configure: (dbId: string | number, id: string | number) =>
+    `/app/query-builders/${dbId}/${id}/configure`,
+  run: (dbId: string | number, queryBuilderId: string | number) =>
+    `/app/query-builders/${dbId}/${queryBuilderId}/run`,
 };
 
 // Dashboards are view-only.
 export const DASHBOARD = {
   LIST: '/app/dashboards',
   VIEW: '/app/dashboards',
-  view: (orgId: string | number, id: string | number) =>
-    `/app/dashboards/${orgId}/${id}`,
+  view: (id: string | number) => `/app/dashboards/${id}`,
 };
 
 export const ANNOUNCEMENT = feature('/app/settings/announcements');

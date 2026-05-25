@@ -240,7 +240,6 @@
   *ngIf="showAddCustomFieldDialog"
   [visible]="true"
   [datasetId]="analysisDetails?.datasetId"
-  [organisationId]="orgId"
   [analysisId]="analysisId"
   [datasetFields]="datasetDetails?.datasetFields || []"
   (close)="onAddCustomFieldDialogClose($event)"

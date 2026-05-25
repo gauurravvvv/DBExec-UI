@@ -18,7 +18,6 @@ import { ConnectionService } from '../../services/connection.service';
 })
 export class ViewConnectionComponent implements OnInit {
   connectionId: string = '';
-  orgId: string = '';
   connectionData: any = null;
   showDeleteConfirm = false;
   deleteJustification = '';
@@ -41,7 +40,6 @@ export class ViewConnectionComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.orgId = this.route.snapshot.params['orgId'];
     this.connectionId = this.route.snapshot.params['id'];
     this.loadConnectionDetails();
   }
@@ -92,7 +90,7 @@ export class ViewConnectionComponent implements OnInit {
   }
 
   onEdit() {
-    this.router.navigate([CONNECTION.edit(this.orgId, this.connectionId)]);
+    this.router.navigate([CONNECTION.edit(this.connectionId)]);
   }
 
   goBack() {

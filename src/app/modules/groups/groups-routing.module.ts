@@ -16,9 +16,9 @@ const routes: Routes = [
     component: AddGroupComponent,
     canDeactivate: [unsavedChangesGuard],
   },
-  { path: ':orgId/:id', component: ViewGroupComponent },
+  { path: ':id', component: ViewGroupComponent },
   {
-    path: ':orgId/:id/edit',
+    path: ':id/edit',
     component: EditGroupComponent,
     canDeactivate: [unsavedChangesGuard],
   },

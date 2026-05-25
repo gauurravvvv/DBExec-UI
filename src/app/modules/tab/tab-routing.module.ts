@@ -16,9 +16,9 @@ const routes: Routes = [
     component: AddTabComponent,
     canDeactivate: [unsavedChangesGuard],
   },
-  { path: ':orgId/:id', component: ViewTabComponent },
+  { path: ':id', component: ViewTabComponent },
   {
-    path: ':orgId/:id/edit',
+    path: ':id/edit',
     component: EditTabComponent,
     canDeactivate: [unsavedChangesGuard],
   },

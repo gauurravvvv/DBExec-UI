@@ -1,7 +1,7 @@
 /**
  * Add Analyses State Interface and Initial State
  * This file defines the shape of the state with dynamic dataset keys.
- * Data is stored with key format: dataset_{orgId}_{datasetId}
+ * Data is stored with key format: dataset_{datasetId}
  *
  * Cache Management:
  * - Max 10 datasets cached (LRU eviction)
@@ -43,7 +43,7 @@ export interface AppliedFilterValue {
 
 // Main state interface with dynamic keys
 export interface AddAnalysesState {
-  // Dynamic dataset storage: key format is "dataset_{orgId}_{datasetId}"
+  // Dynamic dataset storage: key format is "dataset_{datasetId}"
   datasets: { [key: string]: DatasetEntry };
   // Currently active dataset key
   activeDatasetKey: string | null;
@@ -62,8 +62,8 @@ export const initialAddAnalysesState: AddAnalysesState = {
 };
 
 // Helper to generate dataset key
-export function getDatasetKey(orgId: string, datasetId: string): string {
-  return `dataset_${orgId}_${datasetId}`;
+export function getDatasetKey(datasetId: string): string {
+  return `dataset_${datasetId}`;
 }
 
 // Helper to check if dataset is stale

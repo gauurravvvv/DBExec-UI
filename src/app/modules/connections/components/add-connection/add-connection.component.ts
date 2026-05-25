@@ -40,7 +40,6 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
     return this.isFormDirty;
   }
 
-  selectedOrg: any = null;
   selectedDatasource: any = null;
 
   /**
@@ -65,9 +64,6 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit() {
-    this.selectedOrg = {
-      id: this.globalService.getTokenDetails('organisationId'),
-    };
     this.loadDatasources();
   }
 
@@ -113,8 +109,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
   }
 
   /**
-   * Fetcher for the server-mode datasource dropdown. Pulls orgId from the
-   * form control so it stays in sync after org changes.
+   * Fetcher for the server-mode datasource dropdown.
    */
   loadDatasourcesPage = async ({
     search,

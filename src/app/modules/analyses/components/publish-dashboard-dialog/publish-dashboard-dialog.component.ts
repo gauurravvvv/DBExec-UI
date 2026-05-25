@@ -49,7 +49,6 @@ export interface PublishDashboardPayload {
 })
 export class PublishDashboardDialogComponent implements OnInit, OnChanges {
   @Input() visible = false;
-  @Input() orgId = '';
   @Input() datasourceId = '';
   @Input() analysisId = '';
   @Input() analysisName = '';

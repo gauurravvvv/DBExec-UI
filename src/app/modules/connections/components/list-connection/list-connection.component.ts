@@ -50,7 +50,6 @@ export class ListConnectionComponent implements OnInit {
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
-  selectedOrg: any = null;
   selectedDatasource: any = null;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
@@ -114,7 +113,6 @@ export class ListConnectionComponent implements OnInit {
         this.loadConnections();
       });
 
-    this.selectedOrg = this.globalService.getTokenDetails('organisationId');
     this.loadDatasources();
   }
 
@@ -282,7 +280,7 @@ export class ListConnectionComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([CONNECTION.edit(this.selectedOrg, id)]);
+    this.router.navigate([CONNECTION.edit(id)]);
   }
 
   confirmDelete(id: string) {

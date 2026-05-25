@@ -173,11 +173,7 @@
               <td pFrozenColumn>
                 <a
                   class="dataset-name-link"
-                  [routerLink]="[
-                    '/app/settings/announcements',
-                    selectedOrg,
-                    a.id,
-                  ]"
+                  [routerLink]="['/app/settings/announcements', a.id]"
                 >
                   {{ a.name }}
                 </a>

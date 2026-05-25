@@ -13,9 +13,9 @@ const routes: Routes = [
     component: AddRlsRuleComponent,
     canDeactivate: [unsavedChangesGuard],
   },
-  { path: ':orgId/:id', component: ViewRlsRuleComponent },
+  { path: ':id', component: ViewRlsRuleComponent },
   {
-    path: ':orgId/:id/edit',
+    path: ':id/edit',
     component: EditRlsRuleComponent,
     canDeactivate: [unsavedChangesGuard],
   },

@@ -1,7 +1,7 @@
 /**
  * Config Prompt State Interface and Initial State
  * This file defines the shape of the state with dynamic datasource schema keys.
- * Data is stored with key format: schema_{orgId}_{dbId}
+ * Data is stored with key format: schema_{dbId}
  *
  * Cache Management:
  * - Max 10 datasource schemas cached (LRU eviction)
@@ -29,7 +29,7 @@ export interface SchemaEntry {
 
 // Main state interface with dynamic keys
 export interface ConfigPromptState {
-  // Dynamic schema storage: key format is "schema_{orgId}_{dbId}"
+  // Dynamic schema storage: key format is "schema_{dbId}"
   schemas: { [key: string]: SchemaEntry };
   // Currently active schema key
   activeSchemaKey: string | null;
@@ -45,8 +45,8 @@ export const initialConfigPromptState: ConfigPromptState = {
 };
 
 // Helper to generate schema key
-export function getSchemaKey(orgId: string, dbId: string): string {
-  return `schema_${orgId}_${dbId}`;
+export function getSchemaKey(dbId: string): string {
+  return `schema_${dbId}`;
 }
 
 // Helper to check if schema is stale

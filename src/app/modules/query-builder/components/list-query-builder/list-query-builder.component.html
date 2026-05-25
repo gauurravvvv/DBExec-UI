@@ -175,11 +175,7 @@
               <td pFrozenColumn>
                 <a
                   class="dataset-name-link"
-                  [routerLink]="[
-                    '/app/query-builders',
-                    selectedOrg,
-                    queryBuilder.id,
-                  ]"
+                  [routerLink]="['/app/query-builders', queryBuilder.id]"
                 >
                   {{ queryBuilder.name }}
                 </a>

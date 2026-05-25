@@ -21,9 +21,9 @@ const routes: Routes = [
     path: 'bulk-add',
     component: BulkAddUserComponent,
   },
-  { path: ':orgId/:id', component: ViewUserComponent },
+  { path: ':id', component: ViewUserComponent },
   {
-    path: ':orgId/:id/edit',
+    path: ':id/edit',
     component: EditUserComponent,
     canDeactivate: [unsavedChangesGuard],
   },

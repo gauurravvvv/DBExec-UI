@@ -23,10 +23,9 @@ export const setActiveAnalysis = createAction(
 
 export const loadOpen = createAction(
   '[Analyses Filter] Load Open',
-  // `organisation` is required by the BE middleware to resolve the
-  // org's shared-DB connection. Every analysis-filter call sends it;
-  // omitting it crashes the BE for system admins on the default org.
-  props<{ analysisId: string; organisation: string }>(),
+  // The BE derives the org from the JWT — no `organisation` prop needed
+  // on the action payload.
+  props<{ analysisId: string }>(),
 );
 
 export const loadOpenSuccess = createAction(
@@ -48,10 +47,9 @@ export const loadOpenFailure = createAction(
 
 export const fetchValues = createAction(
   '[Analyses Filter] Fetch Values',
-  // organisation is required for the same reason as on loadOpen.
+  // The BE derives the org from the JWT — no `organisation` prop needed.
   props<{
     analysisId: string;
-    organisation: string;
     filterId: string;
     search?: string;
     page?: number;

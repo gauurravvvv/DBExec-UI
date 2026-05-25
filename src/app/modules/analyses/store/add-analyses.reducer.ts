@@ -60,8 +60,8 @@ export const addAnalysesReducer = createReducer(
   // Load dataset data - set loading status and update access order
   on(
     AddAnalysesActions.loadDatasetData,
-    (state, { orgId, datasetId }): AddAnalysesState => {
-      const key = getDatasetKey(orgId, datasetId);
+    (state, { datasetId }): AddAnalysesState => {
+      const key = getDatasetKey(datasetId);
       const now = new Date();
 
       // Update access order
@@ -88,8 +88,8 @@ export const addAnalysesReducer = createReducer(
   // Load dataset data success - store data and handle LRU eviction
   on(
     AddAnalysesActions.loadDatasetDataSuccess,
-    (state, { orgId, datasetId, data }): AddAnalysesState => {
-      const key = getDatasetKey(orgId, datasetId);
+    (state, { datasetId, data }): AddAnalysesState => {
+      const key = getDatasetKey(datasetId);
       const now = new Date();
 
       // First, add the new dataset
@@ -122,8 +122,8 @@ export const addAnalysesReducer = createReducer(
   // Load dataset data failure
   on(
     AddAnalysesActions.loadDatasetDataFailure,
-    (state, { orgId, datasetId, error }): AddAnalysesState => {
-      const key = getDatasetKey(orgId, datasetId);
+    (state, { datasetId, error }): AddAnalysesState => {
+      const key = getDatasetKey(datasetId);
       const now = new Date();
 
       return {
@@ -145,8 +145,8 @@ export const addAnalysesReducer = createReducer(
   // Set active dataset - update access order
   on(
     AddAnalysesActions.setActiveDataset,
-    (state, { orgId, datasetId }): AddAnalysesState => {
-      const key = getDatasetKey(orgId, datasetId);
+    (state, { datasetId }): AddAnalysesState => {
+      const key = getDatasetKey(datasetId);
       const now = new Date();
 
       // Update last accessed time if exists
@@ -170,8 +170,8 @@ export const addAnalysesReducer = createReducer(
   // Clear specific dataset
   on(
     AddAnalysesActions.clearDatasetData,
-    (state, { orgId, datasetId }): AddAnalysesState => {
-      const key = getDatasetKey(orgId, datasetId);
+    (state, { datasetId }): AddAnalysesState => {
+      const key = getDatasetKey(datasetId);
       const { [key]: _, ...remainingDatasets } = state.datasets;
       return {
         ...state,

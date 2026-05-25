@@ -20,7 +20,6 @@ export class ViewPromptComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   promptId: string = '';
-  orgId: string = '';
   promptData: any = null;
   showDeleteConfirm = false;
   deleteJustification = '';
@@ -35,7 +34,6 @@ export class ViewPromptComponent implements OnInit {
 
   ngOnInit() {
     this.promptId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
     this.loadPromptData();
   }
 
@@ -56,7 +54,7 @@ export class ViewPromptComponent implements OnInit {
   }
 
   onEdit() {
-    this.router.navigate([PROMPT.edit(this.orgId, this.promptId)]);
+    this.router.navigate([PROMPT.edit(this.promptId)]);
   }
 
   goBack() {

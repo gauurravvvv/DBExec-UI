@@ -36,7 +36,6 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
   saveJustification = '';
 
   categoryId!: string;
-  orgId!: string;
   selectedOrgName = '';
   selectedRoleName = '';
   originalFormValue: any;
@@ -63,7 +62,6 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
     this.initForm();
 
     this.categoryId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
 
     if (this.categoryId) {
       this.loadGroupData();
@@ -137,9 +135,7 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
   }
 
   /**
-   * Fetcher for server-mode users multiselect. The orgId is locked to the
-   * group's org for the lifetime of an edit (group cannot be reassigned to a
-   * different org), so we read it from this.orgId directly.
+   * Fetcher for server-mode users multiselect.
    */
   loadUsersPage = async ({
     search,

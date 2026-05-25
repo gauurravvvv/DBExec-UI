@@ -41,7 +41,6 @@ export class ListRoleComponent implements OnInit {
   bulkDelete = false;
   deleteJustification = '';
 
-  selectedOrgId: any = null;
   today = new Date();
 
   statusOptions: { label: string; value: number }[] = [];
@@ -83,7 +82,6 @@ export class ListRoleComponent implements OnInit {
       .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.loadRoles());
 
-    this.selectedOrgId = this.globalService.getTokenDetails('organisationId');
     this.loadRoles();
   }
 
@@ -117,8 +115,6 @@ export class ListRoleComponent implements OnInit {
   }
 
   loadRoles(event?: any) {
-    if (!this.selectedOrgId) return;
-
     if (event) {
       const prev = this.lastTableLazyLoadEvent;
       if (
@@ -166,7 +162,7 @@ export class ListRoleComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([ROLE.edit(this.selectedOrgId, id)]);
+    this.router.navigate([ROLE.edit(id)]);
   }
 
   confirmDelete(id: string) {

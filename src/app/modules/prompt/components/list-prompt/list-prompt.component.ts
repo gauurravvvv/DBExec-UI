@@ -51,7 +51,6 @@ export class ListPromptComponent implements OnInit {
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
-  selectedOrg: any = null;
   selectedDatasource: any = null;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
@@ -116,7 +115,6 @@ export class ListPromptComponent implements OnInit {
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-        this.selectedOrg = this.globalService.getTokenDetails('organisationId');
         if (params['datasourceId'] || params['name']) {
           this.handleDeepLinking(params);
         } else {
@@ -324,11 +322,11 @@ export class ListPromptComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([PROMPT.edit(this.selectedOrg, id)]);
+    this.router.navigate([PROMPT.edit(id)]);
   }
 
   onConfig(id: string) {
-    this.router.navigate([PROMPT.CONFIG, this.selectedOrg, id]);
+    this.router.navigate([PROMPT.configure(id)]);
   }
 
   confirmDelete(id: string) {

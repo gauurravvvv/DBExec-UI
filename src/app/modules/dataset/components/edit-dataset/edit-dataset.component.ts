@@ -85,7 +85,6 @@ export class EditDatasetComponent
 
   // Dataset ID from route
   datasetId?: string;
-  orgId?: string;
   isLoadingDataset = false;
   datasetName: string = '';
   datasetDescription: string = '';
@@ -194,7 +193,6 @@ export class EditDatasetComponent
   // Stable bound reference for context menu listener
   private boundCloseContextMenu = this.closeContextMenu.bind(this);
 
-  selectedOrg: any = {};
   selectedDatasourceObj: any = null;
   selectedDatasourceName: string = '';
 
@@ -327,17 +325,14 @@ export class EditDatasetComponent
         );
       });
 
-    // Fetch orgId and datasetId from route params
+    // Fetch datasetId from route params
     this.route.params
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
         this.datasetId = params['id'] ? params['id'] : undefined;
-        this.orgId = params['orgId']
-          ? params['orgId']
-          : this.globalService.getTokenDetails('organisationId');
 
         // If datasetId is present, fetch dataset data first
-        if (this.datasetId && this.orgId) {
+        if (this.datasetId) {
           this.fetchDatasetData();
         }
       });
@@ -352,15 +347,13 @@ export class EditDatasetComponent
   }
 
   refreshSingleDatasource(dbId: string): void {
-    if (!dbId || !this.orgId) return;
+    if (!dbId) return;
 
-    const orgId = this.orgId.toString();
     const dbIdStr = dbId.toString();
 
     // Dispatch refresh action to clear cache and reload
     this.store.dispatch(
       AddDatasetActions.refreshSchemaData({
-        orgId,
         dbId: dbIdStr,
       }),
     );
@@ -668,15 +661,14 @@ export class EditDatasetComponent
   }
 
   private async loadDatasourceSchema(dbId: string): Promise<void> {
-    if (!dbId || !this.orgId) return Promise.resolve();
+    if (!dbId) return Promise.resolve();
 
-    const orgId = this.orgId.toString();
     const dbIdStr = dbId.toString();
 
     // Check if we have cached data in the store
     return new Promise((resolve, reject) => {
       this.store
-        .select(selectSchemaByKey(orgId, dbIdStr))
+        .select(selectSchemaByKey(dbIdStr))
         .pipe(first())
         .subscribe(cachedEntry => {
           if (!cachedEntry || !cachedEntry.data) {
@@ -685,7 +677,7 @@ export class EditDatasetComponent
           } else {
             // Check if data is stale
             this.store
-              .select(selectIsSchemaStale(orgId, dbIdStr))
+              .select(selectIsSchemaStale(dbIdStr))
               .pipe(first())
               .subscribe(isStale => {
                 if (isStale) {
@@ -730,9 +722,8 @@ export class EditDatasetComponent
    * Load datasource schema from API and update store
    */
   private async loadDatasourceSchemaFromAPI(dbId: string): Promise<void> {
-    if (!dbId || !this.orgId) return Promise.resolve();
+    if (!dbId) return Promise.resolve();
 
-    const orgId = this.orgId.toString();
     const dbIdStr = dbId.toString();
     const token = this.schemaSelectionToken;
 
@@ -741,7 +732,6 @@ export class EditDatasetComponent
     // Dispatch loading action
     this.store.dispatch(
       AddDatasetActions.loadSchemaData({
-        orgId,
         dbId: dbIdStr,
       }),
     );
@@ -751,7 +741,6 @@ export class EditDatasetComponent
         // Lazy schema-list fetch (see add-dataset for the same pattern).
         this.datasourceService
           .listDatasourceSchemas({
-            orgId,
             datasourceId: dbIdStr,
           })
           .then((response: any) => {
@@ -766,7 +755,6 @@ export class EditDatasetComponent
                 : schemaData[0];
               this.store.dispatch(
                 AddDatasetActions.loadSchemaDataSuccess({
-                  orgId,
                   dbId: dbIdStr,
                   data: tagged,
                 }),
@@ -786,7 +774,6 @@ export class EditDatasetComponent
           .catch((error: any) => {
             this.store.dispatch(
               AddDatasetActions.loadSchemaDataFailure({
-                orgId,
                 dbId: dbIdStr,
                 error:
                   error?.message ||
@@ -802,7 +789,6 @@ export class EditDatasetComponent
         // Dispatch failure action
         this.store.dispatch(
           AddDatasetActions.loadSchemaDataFailure({
-            orgId,
             dbId: dbIdStr,
             error:
               error.message ||
@@ -1011,12 +997,7 @@ export class EditDatasetComponent
   }
 
   exportResultsAsCsv(): void {
-    if (
-      !this.lastExecutedQuery ||
-      !this.selectedDatasourceObj?.id ||
-      !this.selectedOrg?.id
-    )
-      return;
+    if (!this.lastExecutedQuery || !this.selectedDatasourceObj?.id) return;
 
     this.isExportingResults = true;
 
@@ -1029,7 +1010,6 @@ export class EditDatasetComponent
     }
 
     const payload: any = {
-      orgId: this.selectedOrg.id,
       datasourceId: this.selectedDatasourceObj.id,
       query: this.lastExecutedQuery,
     };
@@ -1105,7 +1085,7 @@ export class EditDatasetComponent
       return;
     }
 
-    if (!this.selectedDatasourceObj?.id || !this.selectedOrg?.id) {
+    if (!this.selectedDatasourceObj?.id) {
       return;
     }
 
@@ -1115,7 +1095,6 @@ export class EditDatasetComponent
     const startTime = Date.now();
 
     const payload: any = {
-      orgId: this.selectedOrg.id,
       datasourceId: this.selectedDatasourceObj.id,
       query: query,
       page: page,
@@ -1491,7 +1470,6 @@ export class EditDatasetComponent
         id: this.datasetId,
         name: formData.name,
         description: formData.description,
-        organisation: this.selectedOrg?.id,
         datasource: this.selectedDatasourceObj.id,
         sql,
       };
@@ -1598,8 +1576,6 @@ export class EditDatasetComponent
    * keyed per-component instance, not in a shared service.
    */
   private ensureTablesLoaded(dbId: string, schemaName: string): void {
-    if (!this.selectedOrg?.id) return;
-    const orgId = String(this.selectedOrg.id);
     const dbIdStr = String(dbId);
     const schema = this.datasourceSchemas[dbId]?.schemas?.find(
       s => s.name === schemaName,
@@ -1609,13 +1585,12 @@ export class EditDatasetComponent
     }
     this.store.dispatch(
       AddDatasetActions.loadTablesForSchema({
-        orgId,
         dbId: dbIdStr,
         schemaName,
       }),
     );
     this.datasourceService
-      .listSchemaTables({ orgId, datasourceId: dbIdStr, schemaName })
+      .listSchemaTables({ datasourceId: dbIdStr, schemaName })
       .then((response: any) => {
         // BE returns HTTP 200 with `status: false` for app-level
         // failures (e.g. schema not found). Surface the message in
@@ -1628,7 +1603,6 @@ export class EditDatasetComponent
           this.globalService.handleSuccessService(response, false);
           this.store.dispatch(
             AddDatasetActions.loadTablesForSchemaFailure({
-              orgId,
               dbId: dbIdStr,
               schemaName,
               error: msg,
@@ -1653,7 +1627,6 @@ export class EditDatasetComponent
         }));
         this.store.dispatch(
           AddDatasetActions.loadTablesForSchemaSuccess({
-            orgId,
             dbId: dbIdStr,
             schemaName,
             tables: tables.map(t => ({ name: t.name, alias: t.alias })),
@@ -1667,7 +1640,6 @@ export class EditDatasetComponent
           this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA');
         this.store.dispatch(
           AddDatasetActions.loadTablesForSchemaFailure({
-            orgId,
             dbId: dbIdStr,
             schemaName,
             error: msg,
@@ -1730,8 +1702,6 @@ export class EditDatasetComponent
     schemaName: string,
     tableName: string,
   ): void {
-    if (!this.selectedOrg?.id) return;
-    const orgId = String(this.selectedOrg.id);
     const dbIdStr = String(dbId);
     const schema = this.datasourceSchemas[dbId]?.schemas?.find(
       s => s.name === schemaName,
@@ -1742,7 +1712,6 @@ export class EditDatasetComponent
     }
     this.store.dispatch(
       AddDatasetActions.loadColumnsForTable({
-        orgId,
         dbId: dbIdStr,
         schemaName,
         tableName,
@@ -1750,7 +1719,6 @@ export class EditDatasetComponent
     );
     this.datasourceService
       .listTableColumns({
-        orgId,
         datasourceId: dbIdStr,
         schemaName,
         tableName,
@@ -1763,7 +1731,6 @@ export class EditDatasetComponent
           this.globalService.handleSuccessService(response, false);
           this.store.dispatch(
             AddDatasetActions.loadColumnsForTableFailure({
-              orgId,
               dbId: dbIdStr,
               schemaName,
               tableName,
@@ -1789,7 +1756,6 @@ export class EditDatasetComponent
         }));
         this.store.dispatch(
           AddDatasetActions.loadColumnsForTableSuccess({
-            orgId,
             dbId: dbIdStr,
             schemaName,
             tableName,
@@ -1809,7 +1775,6 @@ export class EditDatasetComponent
           this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA');
         this.store.dispatch(
           AddDatasetActions.loadColumnsForTableFailure({
-            orgId,
             dbId: dbIdStr,
             schemaName,
             tableName,
@@ -1926,7 +1891,6 @@ export class EditDatasetComponent
             this.router.navigate(
               [
                 QUERY_BUILDER.run(
-                  dataset.organisationId,
                   dataset.datasourceId,
                   dataset.queryBuilderId,
                 ),
@@ -1946,11 +1910,6 @@ export class EditDatasetComponent
           this.datasetName = dataset.name || '';
           this.datasetDescription = dataset.description || '';
           this.datasetStatus = dataset.status || 1;
-
-          // Set organisation from API response
-          this.selectedOrg = {
-            id: dataset.organisationId,
-          };
 
           // Set database from API response
           this.selectedDatasourceObj = {

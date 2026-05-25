@@ -27,7 +27,6 @@ import { RoleService } from '../../services/role.service';
 export class AddRoleComponent implements OnInit, HasUnsavedChanges {
   roleForm!: FormGroup;
   permissions: any[] = [];
-  selectedOrg: any = null;
   permissionControls: { [key: string]: FormControl } = {};
 
   saving = this.roleService.saving;
@@ -52,9 +51,6 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit() {
-    this.selectedOrg = {
-      id: this.globalService.getTokenDetails('organisationId'),
-    };
     this.loadPermissions();
   }
 
@@ -147,9 +143,6 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
     this.roleForm.reset();
     this.permissions = [];
     this.permissionControls = {};
-    this.selectedOrg = {
-      id: this.globalService.getTokenDetails('organisationId'),
-    };
     this.loadPermissions();
   }
 
