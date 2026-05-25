@@ -19,7 +19,6 @@ import { MessageService } from 'primeng/api';
 import { Observable, Subject, TimeoutError } from 'rxjs';
 import { debounceTime, first, timeout } from 'rxjs/operators';
 import { DATASET, QUERY_BUILDER } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { IAPIResponse } from 'src/app/core/models/global.model';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -292,8 +291,7 @@ export class EditDatasetComponent
     private monacoLoader: MonacoLoaderService,
     private translate: TranslateService,
     private elementRef: ElementRef<HTMLElement>,
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
     // Restore the user's preferred result-sheet height + collapsed
@@ -748,8 +746,7 @@ export class EditDatasetComponent
               SchemaTransformerHelper.transformLazySchemasResponse(response);
 
             if (schemaData.length > 0) {
-              const dbType =
-                this.selectedDatasourceObj?.config?.dbType ?? null;
+              const dbType = this.selectedDatasourceObj?.config?.dbType ?? null;
               const tagged = dbType
                 ? { ...schemaData[0], dbType }
                 : schemaData[0];
@@ -1232,10 +1229,7 @@ export class EditDatasetComponent
       EditDatasetComponent.SHEET_MIN_HEIGHT,
       containerHeight - EditDatasetComponent.SHEET_MAX_HEIGHT_PADDING,
     );
-    return Math.min(
-      max,
-      Math.max(EditDatasetComponent.SHEET_MIN_HEIGHT, px),
-    );
+    return Math.min(max, Math.max(EditDatasetComponent.SHEET_MIN_HEIGHT, px));
   }
 
   private loadPersistedSheetState(): void {
@@ -1889,12 +1883,7 @@ export class EditDatasetComponent
           // Type 2 (Prompt-based): redirect to execute-query-builder in edit mode
           if (dataset.type === 2 && dataset.queryBuilderId) {
             this.router.navigate(
-              [
-                QUERY_BUILDER.run(
-                  dataset.datasourceId,
-                  dataset.queryBuilderId,
-                ),
-              ],
+              [QUERY_BUILDER.run(dataset.datasourceId, dataset.queryBuilderId)],
               {
                 queryParams: {
                   editDatasetId: dataset.id,

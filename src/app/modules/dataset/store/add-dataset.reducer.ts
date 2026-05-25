@@ -61,32 +61,29 @@ export const addDatasetReducer = createReducer(
   initialAddDatasetState,
 
   // Load schema data - set loading status and update access order
-  on(
-    AddDatasetActions.loadSchemaData,
-    (state, { dbId }): AddDatasetState => {
-      const key = getSchemaKey(dbId);
-      const now = new Date();
+  on(AddDatasetActions.loadSchemaData, (state, { dbId }): AddDatasetState => {
+    const key = getSchemaKey(dbId);
+    const now = new Date();
 
-      // Update access order
-      const newAccessOrder = updateAccessOrder(state.accessOrder, key);
+    // Update access order
+    const newAccessOrder = updateAccessOrder(state.accessOrder, key);
 
-      return {
-        ...state,
-        activeSchemaKey: key,
-        accessOrder: newAccessOrder,
-        schemas: {
-          ...state.schemas,
-          [key]: {
-            data: state.schemas[key]?.data || null,
-            status: 'loading',
-            error: null,
-            loadedAt: state.schemas[key]?.loadedAt || null,
-            lastAccessedAt: now,
-          },
+    return {
+      ...state,
+      activeSchemaKey: key,
+      accessOrder: newAccessOrder,
+      schemas: {
+        ...state.schemas,
+        [key]: {
+          data: state.schemas[key]?.data || null,
+          status: 'loading',
+          error: null,
+          loadedAt: state.schemas[key]?.loadedAt || null,
+          lastAccessedAt: now,
         },
-      };
-    },
-  ),
+      },
+    };
+  }),
 
   // Load schema data success - store data and handle LRU eviction
   on(
@@ -146,45 +143,39 @@ export const addDatasetReducer = createReducer(
   ),
 
   // Set active schema - update access order
-  on(
-    AddDatasetActions.setActiveSchema,
-    (state, { dbId }): AddDatasetState => {
-      const key = getSchemaKey(dbId);
-      const now = new Date();
+  on(AddDatasetActions.setActiveSchema, (state, { dbId }): AddDatasetState => {
+    const key = getSchemaKey(dbId);
+    const now = new Date();
 
-      // Update last accessed time if exists
-      const existingEntry = state.schemas[key];
-      const updatedSchemas = existingEntry
-        ? {
-            ...state.schemas,
-            [key]: { ...existingEntry, lastAccessedAt: now },
-          }
-        : state.schemas;
+    // Update last accessed time if exists
+    const existingEntry = state.schemas[key];
+    const updatedSchemas = existingEntry
+      ? {
+          ...state.schemas,
+          [key]: { ...existingEntry, lastAccessedAt: now },
+        }
+      : state.schemas;
 
-      return {
-        ...state,
-        activeSchemaKey: key,
-        accessOrder: updateAccessOrder(state.accessOrder, key),
-        schemas: updatedSchemas,
-      };
-    },
-  ),
+    return {
+      ...state,
+      activeSchemaKey: key,
+      accessOrder: updateAccessOrder(state.accessOrder, key),
+      schemas: updatedSchemas,
+    };
+  }),
 
   // Clear specific schema
-  on(
-    AddDatasetActions.clearSchemaData,
-    (state, { dbId }): AddDatasetState => {
-      const key = getSchemaKey(dbId);
-      const { [key]: _, ...remainingSchemas } = state.schemas;
-      return {
-        ...state,
-        schemas: remainingSchemas,
-        accessOrder: state.accessOrder.filter(k => k !== key),
-        activeSchemaKey:
-          state.activeSchemaKey === key ? null : state.activeSchemaKey,
-      };
-    },
-  ),
+  on(AddDatasetActions.clearSchemaData, (state, { dbId }): AddDatasetState => {
+    const key = getSchemaKey(dbId);
+    const { [key]: _, ...remainingSchemas } = state.schemas;
+    return {
+      ...state,
+      schemas: remainingSchemas,
+      accessOrder: state.accessOrder.filter(k => k !== key),
+      activeSchemaKey:
+        state.activeSchemaKey === key ? null : state.activeSchemaKey,
+    };
+  }),
 
   // Clear all schemas
   on(
@@ -249,7 +240,8 @@ export const addDatasetReducer = createReducer(
           const existing = group.tables.find(
             existing => existing.name === t.name,
           );
-          if (existing) return { ...existing, alias: t.alias ?? existing.alias };
+          if (existing)
+            return { ...existing, alias: t.alias ?? existing.alias };
           return {
             name: t.name,
             alias: t.alias,
@@ -282,10 +274,7 @@ export const addDatasetReducer = createReducer(
   ),
   on(
     AddDatasetActions.loadColumnsForTableSuccess,
-    (
-      state,
-      { dbId, schemaName, tableName, columns },
-    ): AddDatasetState =>
+    (state, { dbId, schemaName, tableName, columns }): AddDatasetState =>
       updateTableNode(state, dbId, schemaName, tableName, table => ({
         ...table,
         columnsStatus: 'loaded',

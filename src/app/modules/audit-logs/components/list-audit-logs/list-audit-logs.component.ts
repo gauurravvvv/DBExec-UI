@@ -99,7 +99,6 @@ export class ListAuditLogsComponent implements OnInit {
       });
   }
 
-
   onFilterChange() {
     this.searchSubject.next();
   }

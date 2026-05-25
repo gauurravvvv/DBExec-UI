@@ -103,10 +103,7 @@ export class ConnectionService {
     );
   }
 
-  async bulkDelete(
-    ids: string[],
-    justification?: string,
-  ): Promise<any> {
+  async bulkDelete(ids: string[], justification?: string): Promise<any> {
     return await lastValueFrom(
       this.http.apiPost(CONNECTIONS.BULK_DELETE, { ids, justification }),
     );

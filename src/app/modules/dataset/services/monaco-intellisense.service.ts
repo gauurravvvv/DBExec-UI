@@ -1,9 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DatabaseTypeValue } from '../../datasource/constants/database-types.constant';
-import {
-  COMMON_SQL_SNIPPETS,
-  getDialectSpec,
-} from '../config/sql-dialects';
+import { COMMON_SQL_SNIPPETS, getDialectSpec } from '../config/sql-dialects';
 import {
   DatasourceSchema,
   TableColumn,
@@ -2083,9 +2080,7 @@ export class MonacoIntelliSenseService {
     // Long-tail function names harvested from lang-sql (currently only
     // MSSQL ships this list). No docs available — fall through to a
     // bare-name tooltip so the user at least knows it's a function.
-    if (
-      dialect.extraFunctionNames.some(n => n.toUpperCase() === upper)
-    ) {
+    if (dialect.extraFunctionNames.some(n => n.toUpperCase() === upper)) {
       return {
         contents: [{ value: `**${upper}**` }, { value: '_SQL function_' }],
       };

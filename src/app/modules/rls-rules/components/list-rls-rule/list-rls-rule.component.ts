@@ -55,7 +55,6 @@ export class ListRlsRuleComponent implements OnInit {
   ruleToDelete: string | null = null;
   deleteJustification = '';
 
-
   statusOptions = [
     { label: this.translate.instant('COMMON.ACTIVE'), value: 1 },
     { label: this.translate.instant('COMMON.INACTIVE'), value: 0 },
@@ -262,10 +261,7 @@ export class ListRlsRuleComponent implements OnInit {
   proceedDelete() {
     if (this.ruleToDelete && this.deleteJustification.trim()) {
       this.rlsRulesService
-        .delete(
-          this.ruleToDelete,
-          this.deleteJustification.trim(),
-        )
+        .delete(this.ruleToDelete, this.deleteJustification.trim())
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response)) {
             if (this.lastTableLazyLoadEvent) {

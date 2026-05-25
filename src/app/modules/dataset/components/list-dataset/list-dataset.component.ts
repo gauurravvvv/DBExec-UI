@@ -400,7 +400,9 @@ export class ListDatasetComponent implements OnInit {
    * page can skip refetching it.
    */
   onDsPickerDialogClose(
-    result: import('../dataset-picker-dialog/dataset-picker-dialog.component').DatasetPickerResult | null,
+    result:
+      | import('../dataset-picker-dialog/dataset-picker-dialog.component').DatasetPickerResult
+      | null,
   ): void {
     this.showDsPickerPopup = false;
     if (!result) return;

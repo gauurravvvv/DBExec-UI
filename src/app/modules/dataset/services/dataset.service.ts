@@ -315,11 +315,7 @@ export class DatasetService {
     }
   }
 
-  async duplicateDataset(
-    datasetId: string,
-    name: string,
-    description: string,
-  ) {
+  async duplicateDataset(datasetId: string, name: string, description: string) {
     this._saving.set(true);
     try {
       // POST /datasets/:datasetId/duplicate

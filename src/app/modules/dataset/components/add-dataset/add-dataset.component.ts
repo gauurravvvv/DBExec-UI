@@ -23,7 +23,6 @@ import { Observable, Subject, TimeoutError } from 'rxjs';
 import { debounceTime, first, timeout } from 'rxjs/operators';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { DATASET } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { IAPIResponse } from 'src/app/core/models/global.model';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -459,8 +458,7 @@ export class AddDatasetComponent
     private monacoLoader: MonacoLoaderService,
     private translate: TranslateService,
     private elementRef: ElementRef<HTMLElement>,
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
     // Restore the user's preferred result-grid page size so a
@@ -542,7 +540,8 @@ export class AddDatasetComponent
       navState?.datasource ??
       // Angular replays state via window.history.state on refresh of
       // the same SPA navigation; also check that fallback.
-      (window.history?.state?.datasource ?? null);
+      window.history?.state?.datasource ??
+      null;
 
     if (stateDs?.id && String(stateDs.id) === String(datasourceId)) {
       this.applyPreselectedDatasource(stateDs);
@@ -1015,8 +1014,7 @@ export class AddDatasetComponent
     if (!this.editor) return;
     const model = this.editor.getModel();
     if (!model) return;
-    const dbType =
-      this.selectedDatasourceObj?.config?.dbType ?? null;
+    const dbType = this.selectedDatasourceObj?.config?.dbType ?? null;
     const markers = this.sqlLinterService.lint(model.getValue(), dbType);
     monaco.editor.setModelMarkers(
       model,
@@ -1122,10 +1120,12 @@ export class AddDatasetComponent
    */
   private getDbTypeFor(dbId: string): string | null {
     const fromList =
-      this.availableDatasources?.find((d: any) => String(d?.id) === String(dbId))
-        ?.config?.dbType ??
-      this.preloadedDatasources?.find((d: any) => String(d?.id) === String(dbId))
-        ?.config?.dbType;
+      this.availableDatasources?.find(
+        (d: any) => String(d?.id) === String(dbId),
+      )?.config?.dbType ??
+      this.preloadedDatasources?.find(
+        (d: any) => String(d?.id) === String(dbId),
+      )?.config?.dbType;
     if (fromList) return fromList;
     if (String(this.selectedDatasourceObj?.id) === String(dbId)) {
       return this.selectedDatasourceObj?.config?.dbType ?? null;
@@ -1166,105 +1166,101 @@ export class AddDatasetComponent
         // Uses queryPostNoLoader under the hood so the global loader
         // stays out of the way; the sidebar shows skeleton rows
         // while the request is in flight.
-        this.queryService
-          .getDatasourceStructure(dbIdStr)
-          .subscribe({
-            next: (response: any) => {
-              // Envelope check first — BE returns HTTP 200 with
-              // status:false on application-level failures (bad
-              // datasource, broken connection, etc.). Surface to
-              // user via the standard service helper.
-              if (response && response.status === false) {
-                const msg =
-                  response.message ||
-                  this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA');
-                this.globalService.handleSuccessService(response, false);
-                this.store.dispatch(
-                  AddDatasetActions.loadSchemaDataFailure({
-                    dbId: dbIdStr,
-                    error: msg,
-                  }),
-                );
-                this.loadingDatasources[dbId] = false;
-                this.cdr.markForCheck();
-                reject(new Error(msg));
-                return;
-              }
-
-              const { datasources: transformed, mode } =
-                SchemaTransformerHelper.transformSchemaResponseWithMode(
-                  response,
-                );
-              // Mode = 'eager': columns shipped inline; every node
-              // gets tablesStatus + columnsStatus = 'loaded' so the
-              // lazy expand paths become no-ops.
-              // Mode = 'lazy': BE auto-degraded (warehouse-scale
-              // database). Schemas + tables are present; columns
-              // are NOT. Mark tables loaded but columns idle so
-              // ensureColumnsLoaded fires per-table on first
-              // expand / IntelliSense reference. Track the mode on
-              // the tree so the sidebar can hint at it.
-              const loadedTree =
-                mode === 'eager'
-                  ? this.markTreeFullyLoaded(
-                      transformed[0],
-                      this.getDbTypeFor(dbId),
-                    )
-                  : this.markTreeTablesOnlyLoaded(
-                      transformed[0],
-                      this.getDbTypeFor(dbId),
-                    );
-              this.schemaTreeMode[dbId] = mode;
-
-              // When the user picked a schema in the popup, narrow
-              // the tree to just that schema so the sidebar matches
-              // the editor's scope. The bulk endpoint returns
-              // everything — cheaper to filter in JS than to ship a
-              // separate scoped endpoint.
-              const finalTree = this.scopedSchema
-                ? {
-                    ...loadedTree,
-                    schemas: loadedTree.schemas.filter(
-                      (s: any) => s.name === this.scopedSchema,
-                    ),
-                  }
-                : loadedTree;
-
-              this.store.dispatch(
-                AddDatasetActions.loadSchemaDataSuccess({
-                  dbId: dbIdStr,
-                  data: finalTree,
-                }),
-              );
-              this.datasourceSchemas[dbId] = finalTree;
-
-              if (token === this.schemaSelectionToken) {
-                this.datasources = Object.values(this.datasourceSchemas);
-                this.monacoIntelliSenseService.setDatasources(this.datasources);
-                // Scoped-schema may have flipped to available/unavailable
-                // depending on whether the schema name exists in the
-                // returned tree — re-evaluate the editor lock.
-                this.syncEditorReadOnlyState();
-              }
-
-              this.loadingDatasources[dbId] = false;
-              this.cdr.markForCheck();
-              resolve();
-            },
-            error: (error: any) => {
+        this.queryService.getDatasourceStructure(dbIdStr).subscribe({
+          next: (response: any) => {
+            // Envelope check first — BE returns HTTP 200 with
+            // status:false on application-level failures (bad
+            // datasource, broken connection, etc.). Surface to
+            // user via the standard service helper.
+            if (response && response.status === false) {
+              const msg =
+                response.message ||
+                this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA');
+              this.globalService.handleSuccessService(response, false);
               this.store.dispatch(
                 AddDatasetActions.loadSchemaDataFailure({
                   dbId: dbIdStr,
-                  error:
-                    error?.message ||
-                    this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
+                  error: msg,
                 }),
               );
               this.loadingDatasources[dbId] = false;
               this.cdr.markForCheck();
-              reject(error);
-            },
-          });
+              reject(new Error(msg));
+              return;
+            }
+
+            const { datasources: transformed, mode } =
+              SchemaTransformerHelper.transformSchemaResponseWithMode(response);
+            // Mode = 'eager': columns shipped inline; every node
+            // gets tablesStatus + columnsStatus = 'loaded' so the
+            // lazy expand paths become no-ops.
+            // Mode = 'lazy': BE auto-degraded (warehouse-scale
+            // database). Schemas + tables are present; columns
+            // are NOT. Mark tables loaded but columns idle so
+            // ensureColumnsLoaded fires per-table on first
+            // expand / IntelliSense reference. Track the mode on
+            // the tree so the sidebar can hint at it.
+            const loadedTree =
+              mode === 'eager'
+                ? this.markTreeFullyLoaded(
+                    transformed[0],
+                    this.getDbTypeFor(dbId),
+                  )
+                : this.markTreeTablesOnlyLoaded(
+                    transformed[0],
+                    this.getDbTypeFor(dbId),
+                  );
+            this.schemaTreeMode[dbId] = mode;
+
+            // When the user picked a schema in the popup, narrow
+            // the tree to just that schema so the sidebar matches
+            // the editor's scope. The bulk endpoint returns
+            // everything — cheaper to filter in JS than to ship a
+            // separate scoped endpoint.
+            const finalTree = this.scopedSchema
+              ? {
+                  ...loadedTree,
+                  schemas: loadedTree.schemas.filter(
+                    (s: any) => s.name === this.scopedSchema,
+                  ),
+                }
+              : loadedTree;
+
+            this.store.dispatch(
+              AddDatasetActions.loadSchemaDataSuccess({
+                dbId: dbIdStr,
+                data: finalTree,
+              }),
+            );
+            this.datasourceSchemas[dbId] = finalTree;
+
+            if (token === this.schemaSelectionToken) {
+              this.datasources = Object.values(this.datasourceSchemas);
+              this.monacoIntelliSenseService.setDatasources(this.datasources);
+              // Scoped-schema may have flipped to available/unavailable
+              // depending on whether the schema name exists in the
+              // returned tree — re-evaluate the editor lock.
+              this.syncEditorReadOnlyState();
+            }
+
+            this.loadingDatasources[dbId] = false;
+            this.cdr.markForCheck();
+            resolve();
+          },
+          error: (error: any) => {
+            this.store.dispatch(
+              AddDatasetActions.loadSchemaDataFailure({
+                dbId: dbIdStr,
+                error:
+                  error?.message ||
+                  this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
+              }),
+            );
+            this.loadingDatasources[dbId] = false;
+            this.cdr.markForCheck();
+            reject(error);
+          },
+        });
       } catch (error: any) {
         // Dispatch failure action
         this.store.dispatch(
@@ -1458,7 +1454,6 @@ export class AddDatasetComponent
       this.proceedWithDatasourceChange(this.pendingDatasourceChange);
       this.pendingDatasourceChange = null;
     }
-
   }
 
   onCancelChange(): void {
@@ -1583,8 +1578,7 @@ export class AddDatasetComponent
   /** localStorage key for the persisted page size. Namespaced to
    *  avoid collisions with other features that may add their own
    *  prefs later. */
-  private static readonly PAGE_SIZE_STORAGE_KEY =
-    'dbexec.queryResult.pageSize';
+  private static readonly PAGE_SIZE_STORAGE_KEY = 'dbexec.queryResult.pageSize';
   /** Whitelist of page-size values we accept from storage. Anything
    *  outside this set (corruption, an old version with different
    *  options) falls through to the default. */
@@ -2339,10 +2333,7 @@ export class AddDatasetComponent
    * row (or the first time Monaco's IntelliSense / hover needs that
    * table's columns). This is the warehouse-scale path.
    */
-  private markTreeTablesOnlyLoaded(
-    tree: any,
-    dbType?: string | null,
-  ): any {
+  private markTreeTablesOnlyLoaded(tree: any, dbType?: string | null): any {
     if (!tree) return tree;
     return {
       ...tree,
@@ -2361,7 +2352,6 @@ export class AddDatasetComponent
     };
   }
 
-
   /**
    * Immutably replace one schema row inside the cached tree. Rebuilds
    * the schemas array reference, the parent tree reference, and
@@ -2378,7 +2368,8 @@ export class AddDatasetComponent
   ): void {
     const tree = this.datasourceSchemas[dbId];
     if (!tree) return;
-    const idx = tree.schemas?.findIndex((s: any) => s.name === schemaName) ?? -1;
+    const idx =
+      tree.schemas?.findIndex((s: any) => s.name === schemaName) ?? -1;
     if (idx < 0) return;
     const nextSchemas = tree.schemas.slice();
     nextSchemas[idx] = patch(tree.schemas[idx]);

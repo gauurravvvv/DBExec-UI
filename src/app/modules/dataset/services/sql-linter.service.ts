@@ -50,7 +50,10 @@ export class SqlLinterService {
    * fails outright — caller should treat a zero-marker result the same
    * as "no errors found".
    */
-  lint(text: string, dbType: DatabaseTypeValue | string | null): SqlLintMarker[] {
+  lint(
+    text: string,
+    dbType: DatabaseTypeValue | string | null,
+  ): SqlLintMarker[] {
     if (!text || !text.trim()) return [];
 
     const dialect = getDialectSpec(dbType);
@@ -71,7 +74,7 @@ export class SqlLinterService {
     const lineStarts = computeLineStarts(text);
 
     tree.iterate({
-      enter: (node) => {
+      enter: node => {
         if (markers.length >= MAX_MARKERS) return false;
         if (!node.type.isError) return;
         // Lezer error nodes can be zero-width when the parser missed a
@@ -83,7 +86,8 @@ export class SqlLinterService {
         const end = positionToLineCol(to, lineStarts);
         markers.push({
           severity:
-            (typeof monaco !== 'undefined' && monaco?.MarkerSeverity?.Error) ?? 8,
+            (typeof monaco !== 'undefined' && monaco?.MarkerSeverity?.Error) ??
+            8,
           message: 'SQL syntax error',
           startLineNumber: start.line,
           startColumn: start.column,

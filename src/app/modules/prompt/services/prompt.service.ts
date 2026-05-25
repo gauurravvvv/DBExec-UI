@@ -44,9 +44,7 @@ export class PromptService {
   async loadOne(id: string): Promise<void> {
     this._loading.set(true);
     try {
-      const res: any = await lastValueFrom(
-        this.http.apiGet(PROMPT.GET + id),
-      );
+      const res: any = await lastValueFrom(this.http.apiGet(PROMPT.GET + id));
       if (res?.status) this._current.set(res.data);
     } catch {
       this._current.set(null);
@@ -111,10 +109,7 @@ export class PromptService {
       // POST /prompts/:promptId/config — body still carries
       // the full payload; the id is taken from the path.
       return await lastValueFrom(
-        this.http.apiPost(
-          PROMPT.GET + data.id + PROMPT.CONFIG_SUFFIX,
-          data,
-        ),
+        this.http.apiPost(PROMPT.GET + data.id + PROMPT.CONFIG_SUFFIX, data),
       );
     } finally {
       this._saving.set(false);
@@ -148,13 +143,10 @@ export class PromptService {
   async getPromptValuesBySQL(params: any): Promise<any> {
     // POST /prompts/:promptId/values
     return lastValueFrom(
-      this.http.apiPost(
-        PROMPT.GET + params.promptId + PROMPT.VALUES_SUFFIX,
-        {
-          datasourceId: params.datasourceId,
-          query: params.query,
-        },
-      ),
+      this.http.apiPost(PROMPT.GET + params.promptId + PROMPT.VALUES_SUFFIX, {
+        datasourceId: params.datasourceId,
+        query: params.query,
+      }),
     );
   }
 
@@ -174,13 +166,10 @@ export class PromptService {
   async updateAppearance(params: any): Promise<any> {
     // PUT /prompts/:promptId/appearance
     return lastValueFrom(
-      this.http.apiPut(
-        PROMPT.GET + params.id + PROMPT.APPEARANCE_SUFFIX,
-        {
-          id: params.id,
-          appearence: params.appearance,
-        },
-      ),
+      this.http.apiPut(PROMPT.GET + params.id + PROMPT.APPEARANCE_SUFFIX, {
+        id: params.id,
+        appearence: params.appearance,
+      }),
     );
   }
 

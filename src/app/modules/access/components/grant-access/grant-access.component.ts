@@ -257,9 +257,7 @@ export class GrantAccessComponent implements OnInit {
     if (!connectionId) return;
 
     try {
-      const response = await this.acessService.loadAccessDetails(
-        connectionId,
-      );
+      const response = await this.acessService.loadAccessDetails(connectionId);
       if (this.globalService.handleSuccessService(response, false)) {
         const data = response.data;
         this.users = [...(data.users || [])];

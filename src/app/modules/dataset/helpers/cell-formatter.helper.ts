@@ -55,7 +55,8 @@ export interface FormattedCell {
   summary?: string;
 }
 
-const ISO_LIKE_RE = /^\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)?$/;
+const ISO_LIKE_RE =
+  /^\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)?$/;
 const NUMERIC_RE = /^-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?$/;
 
 /** Type-string hints from the BE columnTypes map that mean
@@ -368,7 +369,8 @@ export function measureColumnWidths(
       // the toString round-trip is fine and cheaper.
       let display: string;
       if (
-        raw && typeof raw === 'object' &&
+        raw &&
+        typeof raw === 'object' &&
         !(raw instanceof Date) // Dates short-circuit via toISOString below
       ) {
         // For objects / buffers, run through formatCellValue and use

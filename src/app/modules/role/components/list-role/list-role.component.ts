@@ -209,17 +209,15 @@ export class ListRoleComponent implements OnInit {
     }
 
     if (this.roleToDelete) {
-      this.roleService
-        .delete(this.roleToDelete, reason)
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.selectedRoles = this.selectedRoles.filter(
-              r => r.id !== this.roleToDelete,
-            );
-            this.refreshList();
-          }
-          this.cdr.markForCheck();
-        });
+      this.roleService.delete(this.roleToDelete, reason).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
+          this.selectedRoles = this.selectedRoles.filter(
+            r => r.id !== this.roleToDelete,
+          );
+          this.refreshList();
+        }
+        this.cdr.markForCheck();
+      });
     }
     this.closeDeletePopup();
   }

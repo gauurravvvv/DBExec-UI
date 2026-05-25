@@ -106,7 +106,10 @@ export class SchemaTransformerHelper {
     if (Array.isArray(inner)) {
       schemasData = inner;
       mode = 'eager';
-    } else if (inner && Array.isArray((inner as ApiSchemaTreeEnvelope).schemas)) {
+    } else if (
+      inner &&
+      Array.isArray((inner as ApiSchemaTreeEnvelope).schemas)
+    ) {
       schemasData = (inner as ApiSchemaTreeEnvelope).schemas;
       mode = (inner as ApiSchemaTreeEnvelope).mode || 'eager';
     } else {

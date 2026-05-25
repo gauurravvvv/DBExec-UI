@@ -396,7 +396,9 @@ export class ListQueryBuilderComponent implements OnInit {
   }
 
   onConfig(id: string) {
-    this.router.navigate([QUERY_BUILDER.configure(this.selectedDatasource, id)]);
+    this.router.navigate([
+      QUERY_BUILDER.configure(this.selectedDatasource, id),
+    ]);
   }
 
   onExecute(id: string) {

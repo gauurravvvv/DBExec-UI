@@ -665,12 +665,7 @@ export class FilterDialogComponent implements OnChanges {
   }
 
   async loadColumnDistinctValues(): Promise<void> {
-    if (
-      !this.filterDialogColumn ||
-      !this.datasetId ||
-      !this.analysisId
-    )
-      return;
+    if (!this.filterDialogColumn || !this.datasetId || !this.analysisId) return;
 
     const colName =
       this.filterDialogColumn.columnName ||

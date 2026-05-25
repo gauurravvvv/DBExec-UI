@@ -2,7 +2,11 @@
   Dataset picker dialog — opens from the dataset list's Add
   button. Two rows: datasource (required), schema (optional).
 -->
-<div class="save-analysis-popup ds-picker-popup" *ngIf="visible" (click)="onBackdropClick($event)">
+<div
+  class="save-analysis-popup ds-picker-popup"
+  *ngIf="visible"
+  (click)="onBackdropClick($event)"
+>
   <div class="popup-content">
     <h3>{{ 'DATASET.PICK_DATASOURCE' | translate }}</h3>
 
@@ -13,11 +17,22 @@
         {{ 'COMMON.DATASOURCE' | translate }}
         <span class="required">*</span>
       </label>
-      <app-custom-dropdown [(ngModel)]="datasourceSelected" [placeholder]="'COMMON.DATASOURCE' | translate"
-        [floatingLabel]="false" [serverMode]="true" [fetcher]="loadDsPage" [pageSize]="10"
-        [preloadedItems]="dsPreloaded" [preloadedTotal]="dsPreloadedTotal" optionLabel="name" [optionValue]="null"
-        [filter]="true" filterBy="name" icon="pi-database"
-        (onChangeEvent)="onDatasourceChange()">
+      <app-custom-dropdown
+        [(ngModel)]="datasourceSelected"
+        [placeholder]="'COMMON.DATASOURCE' | translate"
+        [floatingLabel]="false"
+        [serverMode]="true"
+        [fetcher]="loadDsPage"
+        [pageSize]="10"
+        [preloadedItems]="dsPreloaded"
+        [preloadedTotal]="dsPreloadedTotal"
+        optionLabel="name"
+        [optionValue]="null"
+        [filter]="true"
+        filterBy="name"
+        icon="pi-database"
+        (onChangeEvent)="onDatasourceChange()"
+      >
       </app-custom-dropdown>
     </div>
 
@@ -31,13 +46,28 @@
         <span class="optional-tag">({{ 'COMMON.OPTIONAL' | translate }})</span>
       </label>
       <div class="ds-picker-schema-row">
-        <app-custom-dropdown class="ds-picker-schema-dropdown" [(ngModel)]="schemaSelected"
-          [placeholder]="'DATASET.SCHEMA' | translate" [floatingLabel]="false" [options]="schemaOptions || []"
-          optionLabel="name" [optionValue]="null" [filter]="true" filterBy="name" icon="pi-sitemap"
-          [disabled]="!datasourceSelected || schemaLoading">
+        <app-custom-dropdown
+          class="ds-picker-schema-dropdown"
+          [(ngModel)]="schemaSelected"
+          [placeholder]="'DATASET.SCHEMA' | translate"
+          [floatingLabel]="false"
+          [options]="schemaOptions || []"
+          optionLabel="name"
+          [optionValue]="null"
+          [filter]="true"
+          filterBy="name"
+          icon="pi-sitemap"
+          [disabled]="!datasourceSelected || schemaLoading"
+        >
         </app-custom-dropdown>
-        <button *ngIf="schemaSelected" type="button" class="ds-picker-schema-clear" (click)="clearSchema()"
-          [attr.aria-label]="'COMMON.CLEAR' | translate" [title]="'COMMON.CLEAR' | translate">
+        <button
+          *ngIf="schemaSelected"
+          type="button"
+          class="ds-picker-schema-clear"
+          (click)="clearSchema()"
+          [attr.aria-label]="'COMMON.CLEAR' | translate"
+          [title]="'COMMON.CLEAR' | translate"
+        >
           <i class="pi pi-times-circle" aria-hidden="true"></i>
         </button>
       </div>
@@ -53,25 +83,42 @@
         <i class="pi pi-spin pi-spinner"></i>
         {{ 'DATASET.LOADING_SCHEMA' | translate }}
       </small>
-      <small class="form-hint error" *ngIf="datasourceSelected && schemaError && !schemaLoading">
+      <small
+        class="form-hint error"
+        *ngIf="datasourceSelected && schemaError && !schemaLoading"
+      >
         <i class="pi pi-exclamation-triangle"></i>
         {{ schemaError }}
       </small>
-      <small class="form-hint" *ngIf="
+      <small
+        class="form-hint"
+        *ngIf="
           datasourceSelected &&
           !schemaLoading &&
           !schemaError &&
           schemaOptions?.length
-        ">
+        "
+      >
         {{ 'DATASET.SCHEMA_PICKER_HINT_OPTIONAL' | translate }}
       </small>
     </div>
 
     <div class="popup-actions">
-      <button pButton type="button" [label]="'COMMON.CANCEL' | translate" class="p-button-outlined btn-cancel"
-        (click)="onCancel()"></button>
-      <button pButton type="button" [label]="'COMMON.CONTINUE' | translate" class="p-button-primary btn-save"
-        [disabled]="!datasourceSelected" (click)="onContinue()">
+      <button
+        pButton
+        type="button"
+        [label]="'COMMON.CANCEL' | translate"
+        class="p-button-outlined btn-cancel"
+        (click)="onCancel()"
+      ></button>
+      <button
+        pButton
+        type="button"
+        [label]="'COMMON.CONTINUE' | translate"
+        class="p-button-primary btn-save"
+        [disabled]="!datasourceSelected"
+        (click)="onContinue()"
+      >
         <i class="pi pi-arrow-right mr-2"></i>
       </button>
     </div>

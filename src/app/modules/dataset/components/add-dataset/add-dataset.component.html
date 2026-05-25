@@ -247,7 +247,7 @@
               *ngFor="
                 let schema of datasourceSchemas[selectedDatasourceObj.id]
                   ?.schemas || []
-                    | filterSchemas: schemaSearchText:scopedSchema;
+                  | filterSchemas: schemaSearchText : scopedSchema;
                 trackBy: trackByName
               "
               class="schema-item"
@@ -422,7 +422,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
 
@@ -448,7 +447,9 @@
           <i class="pi pi-lock" aria-hidden="true"></i>
           <div class="banner-text">
             <strong>{{ 'DATASET.EDITOR_DISABLED' | translate }}</strong>
-            <span *ngIf="scopedSchemaErrorMessage">{{ scopedSchemaErrorMessage }}</span>
+            <span *ngIf="scopedSchemaErrorMessage">{{
+              scopedSchemaErrorMessage
+            }}</span>
           </div>
         </div>
 
@@ -532,9 +533,7 @@
             queryResult.columns.length === 0)
         "
         [class.collapsed]="isResultSheetCollapsed"
-        [style.height.px]="
-          isResultSheetCollapsed ? null : resultSheetHeightPx
-        "
+        [style.height.px]="isResultSheetCollapsed ? null : resultSheetHeightPx"
       >
         <!--
           Drag handle: 6px-tall strip across the top of the sheet.
@@ -572,7 +571,8 @@
                 class="popup-meta"
                 *ngIf="!queryResult.error && queryResult.columns.length > 0"
               >
-                {{ queryResult.rowCount }} row(s) in {{ queryResult.executionTime }}
+                {{ queryResult.rowCount }} row(s) in
+                {{ queryResult.executionTime }}
               </span>
             </div>
             <div class="popup-header-right">
@@ -749,7 +749,10 @@
                   <colgroup>
                     <col style="width: 60px" />
                     <col
-                      *ngFor="let col of queryResult.columns; trackBy: trackByIndex"
+                      *ngFor="
+                        let col of queryResult.columns;
+                        trackBy: trackByIndex
+                      "
                       [style.width.px]="columnWidths[col] || 160"
                     />
                   </colgroup>
@@ -759,7 +762,10 @@
                   <tr>
                     <th style="width: 60px" pFrozenColumn>#</th>
                     <th
-                      *ngFor="let col of queryResult.columns; trackBy: trackByIndex"
+                      *ngFor="
+                        let col of queryResult.columns;
+                        trackBy: trackByIndex
+                      "
                       pResizableColumn
                     >
                       <div class="th-content">
@@ -774,7 +780,9 @@
                         -->
                         <span
                           class="column-datatype"
-                          *ngIf="hasAnyColumnType && queryResult.columnTypes?.[col]"
+                          *ngIf="
+                            hasAnyColumnType && queryResult.columnTypes?.[col]
+                          "
                         >
                           {{ queryResult.columnTypes?.[col] }}
                         </span>
@@ -785,7 +793,10 @@
                   <tr>
                     <th pFrozenColumn></th>
                     <th
-                      *ngFor="let col of queryResult.columns; trackBy: trackByIndex"
+                      *ngFor="
+                        let col of queryResult.columns;
+                        trackBy: trackByIndex
+                      "
                     >
                       <input
                         pInputText
@@ -801,7 +812,9 @@
 
                 <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
                   <tr>
-                    <td pFrozenColumn class="row-number-cell">{{ rowIndex + 1 }}</td>
+                    <td pFrozenColumn class="row-number-cell">
+                      {{ rowIndex + 1 }}
+                    </td>
                     <!--
                       Each cell goes through the cellFormat pipe so:
                         - BIGINT / NUMBER / DECIMAL stay as the original
@@ -830,32 +843,45 @@
                       row expands it to the full pretty-printed form.
                     -->
                     <ng-container
-                      *ngFor="let col of queryResult.columns; trackBy: trackByIndex"
+                      *ngFor="
+                        let col of queryResult.columns;
+                        trackBy: trackByIndex
+                      "
                     >
                       <ng-container
-                        *ngIf="(row[col] | cellFormat: queryResult.columnTypes?.[col]) as cell"
+                        *ngIf="
+                          row[col]
+                            | cellFormat: queryResult.columnTypes?.[col] as cell
+                        "
                       >
                         <td
                           [class.numeric-cell]="cell.align === 'right'"
                           [class.json-td]="cell.kind === 'json'"
                           [ngSwitch]="cell.kind"
-                          (contextmenu)="onCellContextMenu($event, rowIndex, col)"
+                          (contextmenu)="
+                            onCellContextMenu($event, rowIndex, col)
+                          "
                         >
-                          <span
-                            *ngSwitchCase="'null'"
-                            class="null-value"
-                            >{{ 'DATASET.CELL_NULL' | translate }}</span
-                          >
+                          <span *ngSwitchCase="'null'" class="null-value">{{
+                            'DATASET.CELL_NULL' | translate
+                          }}</span>
 
                           <ng-container *ngSwitchCase="'json'">
                             <ng-container
-                              *ngIf="expandedJsonCells.has(jsonCellKey(rowIndex, col)); else jsonSummary"
+                              *ngIf="
+                                expandedJsonCells.has(
+                                  jsonCellKey(rowIndex, col)
+                                );
+                                else jsonSummary
+                              "
                             >
                               <button
                                 type="button"
                                 class="json-toggle expanded"
                                 (click)="toggleJsonCell(rowIndex, col)"
-                                [attr.aria-label]="'COMMON.COLLAPSE' | translate"
+                                [attr.aria-label]="
+                                  'COMMON.COLLAPSE' | translate
+                                "
                               >
                                 <i class="pi pi-chevron-down"></i>
                               </button>
@@ -870,15 +896,15 @@
                               >
                                 <i class="pi pi-chevron-right"></i>
                               </button>
-                              <span class="json-summary">{{ cell.summary }}</span>
+                              <span class="json-summary">{{
+                                cell.summary
+                              }}</span>
                             </ng-template>
                           </ng-container>
 
-                          <span
-                            *ngSwitchDefault
-                            [title]="cell.display"
-                            >{{ cell.display }}</span
-                          >
+                          <span *ngSwitchDefault [title]="cell.display">{{
+                            cell.display
+                          }}</span>
                         </td>
                       </ng-container>
                     </ng-container>
@@ -915,11 +941,19 @@
           [style.left.px]="cellContextMenuLeft"
           (click)="$event.stopPropagation()"
         >
-          <button type="button" class="cell-context-item" (click)="copyCellValue()">
+          <button
+            type="button"
+            class="cell-context-item"
+            (click)="copyCellValue()"
+          >
             <i class="pi pi-copy" aria-hidden="true"></i>
             <span>{{ 'DATASET.COPY_CELL' | translate }}</span>
           </button>
-          <button type="button" class="cell-context-item" (click)="copyColumnValues()">
+          <button
+            type="button"
+            class="cell-context-item"
+            (click)="copyColumnValues()"
+          >
             <i class="pi pi-clone" aria-hidden="true"></i>
             <span>{{ 'DATASET.COPY_COLUMN' | translate }}</span>
           </button>
@@ -973,7 +1007,6 @@
   (close)="onDatasetDialogClose($event)"
 >
 </app-save-dataset-dialog>
-
 
 <!-- Hidden File Input for SQL Import -->
 <input type="file" #fileInput hidden (change)="onFileSelected($event)" />

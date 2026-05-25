@@ -1817,9 +1817,10 @@ export function buildSankeyChartOption(
         // users expect (hovering a flow lights up its source + target).
         // The user-controlled toggle lets them swap to a different focus mode.
         emphasis: {
-          focus: config.sankeyFocusAdjacency === false
-            ? (config.emphasis || 'none')
-            : 'adjacency',
+          focus:
+            config.sankeyFocusAdjacency === false
+              ? config.emphasis || 'none'
+              : 'adjacency',
         },
         lineStyle: {
           color: 'gradient',
@@ -2383,7 +2384,10 @@ export function buildRadarChartOption(data: any[] | any, config: any): any {
 }
 
 // ========= Candlestick Chart =========
-export function buildCandlestickChartOption(data: any[] | any, config: any): any {
+export function buildCandlestickChartOption(
+  data: any[] | any,
+  config: any,
+): any {
   // The new OHLC transformer returns `{categories, values}` where values is
   // an array of `[open, close, low, high]` 4-tuples (ECharts canonical
   // ordering, see https://echarts.apache.org/en/option.html#series-candlestick.data).

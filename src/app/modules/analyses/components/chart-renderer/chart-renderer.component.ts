@@ -78,28 +78,46 @@ export class ChartRendererComponent implements OnChanges {
 
   private hasRoleValue(visual: any, role: string): boolean {
     switch (role) {
-      case 'xAxis': return !!visual.xAxisColumn;
-      case 'yAxis': return !!visual.yAxisColumn;
-      case 'zAxis': return !!visual.zAxisColumn;
-      case 'open': return !!visual.openColumn;
-      case 'high': return !!visual.highColumn;
-      case 'low': return !!visual.lowColumn;
-      case 'close': return !!visual.closeColumn;
-      case 'sample': return !!visual.sampleColumn;
-      case 'parent': return !!visual.parentColumn;
-      case 'lng': return !!visual.lngColumn;
-      case 'lat': return !!visual.latColumn;
-      case 'time': return !!visual.timeColumn;
+      case 'xAxis':
+        return !!visual.xAxisColumn;
+      case 'yAxis':
+        return !!visual.yAxisColumn;
+      case 'zAxis':
+        return !!visual.zAxisColumn;
+      case 'open':
+        return !!visual.openColumn;
+      case 'high':
+        return !!visual.highColumn;
+      case 'low':
+        return !!visual.lowColumn;
+      case 'close':
+        return !!visual.closeColumn;
+      case 'sample':
+        return !!visual.sampleColumn;
+      case 'parent':
+        return !!visual.parentColumn;
+      case 'lng':
+        return !!visual.lngColumn;
+      case 'lat':
+        return !!visual.latColumn;
+      case 'time':
+        return !!visual.timeColumn;
       case 'indicators':
-        return Array.isArray(visual.indicatorColumns) &&
-          visual.indicatorColumns.length > 0;
+        return (
+          Array.isArray(visual.indicatorColumns) &&
+          visual.indicatorColumns.length > 0
+        );
       case 'dimensions':
-        return Array.isArray(visual.dimensionColumns) &&
-          visual.dimensionColumns.length > 0;
+        return (
+          Array.isArray(visual.dimensionColumns) &&
+          visual.dimensionColumns.length > 0
+        );
       case 'valueColumns':
-        return Array.isArray(visual.valueColumns) &&
-          visual.valueColumns.length > 0;
-      default: return false;
+        return (
+          Array.isArray(visual.valueColumns) && visual.valueColumns.length > 0
+        );
+      default:
+        return false;
     }
   }
 

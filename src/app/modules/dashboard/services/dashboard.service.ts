@@ -91,9 +91,7 @@ export class DashboardService {
     this._saving.set(true);
     try {
       // POST /dashboards/publish
-      return await lastValueFrom(
-        this.http.apiPost(DASHBOARD.PUBLISH, payload),
-      );
+      return await lastValueFrom(this.http.apiPost(DASHBOARD.PUBLISH, payload));
     } finally {
       this._saving.set(false);
     }

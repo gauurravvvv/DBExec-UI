@@ -308,11 +308,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
     const tabId = parentTab ? String(parentTab.id) : '';
 
     this.queryBuilderService
-      .getSectionPrompts(
-        this.queryBuilderId,
-        tabId,
-        String(section.id),
-      )
+      .getSectionPrompts(this.queryBuilderId, tabId, String(section.id))
       .then((response: any) => {
         if (response.status) {
           section.prompts = (response.data || []).map(transformPromptResponse);

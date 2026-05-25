@@ -243,9 +243,7 @@ export class AnalysisFilterBarComponent
     if (!this.analysisId) return;
     this.isLoading = true;
     try {
-      const { filters, warmed } = await this.optionsCache.open(
-        this.analysisId,
-      );
+      const { filters, warmed } = await this.optionsCache.open(this.analysisId);
       this.internalFilters = (filters || []).filter((f: any) => f.isEnabled);
 
       for (const f of this.internalFilters) {

@@ -103,9 +103,7 @@ export class AnalysesService {
    * GET /visuals/:analysisId
    */
   listVisuals(analysisId: string) {
-    return lastValueFrom(
-      this.http.apiGet(ANALYSES_VISUAL.LIST + analysisId),
-    );
+    return lastValueFrom(this.http.apiGet(ANALYSES_VISUAL.LIST + analysisId));
   }
 
   /**
@@ -348,9 +346,7 @@ export class AnalysesService {
   }
 
   listFilters(analysisId: string) {
-    return lastValueFrom(
-      this.http.apiGet(ANALYSIS_FILTER.LIST + analysisId),
-    );
+    return lastValueFrom(this.http.apiGet(ANALYSIS_FILTER.LIST + analysisId));
   }
 
   /**
@@ -403,9 +399,7 @@ export class AnalysesService {
     try {
       return await lastValueFrom(
         this.http.apiPost(
-          ANALYSES.RUN_QUERY_PREFIX +
-            analysisId +
-            ANALYSES.RUN_QUERY_SUFFIX,
+          ANALYSES.RUN_QUERY_PREFIX + analysisId + ANALYSES.RUN_QUERY_SUFFIX,
           body,
         ),
       );

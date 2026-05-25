@@ -860,7 +860,10 @@ export class ChartDataTransformerService {
         .filter(n => n.name);
     }
     // Build a name → node map, then attach children to their parents.
-    const nodes = new Map<string, { name: string; value: number; children: any[] }>();
+    const nodes = new Map<
+      string,
+      { name: string; value: number; children: any[] }
+    >();
     rawData.forEach(row => {
       const name = this.formatLabelValue(row[xAxisColumn]);
       const value = this.toNumber(row[yAxisColumn]);

@@ -88,10 +88,7 @@ export class GroupService {
     );
   }
 
-  async bulkDelete(
-    ids: string[],
-    justification?: string,
-  ): Promise<any> {
+  async bulkDelete(ids: string[], justification?: string): Promise<any> {
     return await lastValueFrom(
       this.http.apiPost(GROUP.BULK_DELETE, { ids, justification }),
     );

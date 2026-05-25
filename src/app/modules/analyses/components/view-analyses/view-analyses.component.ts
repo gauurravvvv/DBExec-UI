@@ -183,10 +183,7 @@ export class ViewAnalysesComponent implements OnInit {
   proceedDelete(): void {
     if (this.deleteJustification.trim()) {
       this.analysesService
-        .deleteAnalyses(
-          this.analysisId,
-          this.deleteJustification.trim(),
-        )
+        .deleteAnalyses(this.analysisId, this.deleteJustification.trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.showDeleteConfirm = false;

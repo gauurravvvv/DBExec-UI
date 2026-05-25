@@ -84,19 +84,17 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
       'warehouse',
       'role',
       'schemaName',
-    ].forEach(
-      field => {
-        this.datasourceForm
-          .get(field)
-          ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe(() => {
-            this.connectionTested = false;
-            this.connectionTestResult = null;
-            this.connectionTestError = null;
-            this.testRequestId++;
-          });
-      },
-    );
+    ].forEach(field => {
+      this.datasourceForm
+        .get(field)
+        ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => {
+          this.connectionTested = false;
+          this.connectionTestResult = null;
+          this.connectionTestError = null;
+          this.testRequestId++;
+        });
+    });
 
     // Type-change side effects: (a) swap field validators, (b) smart
     // port pre-fill. Snowflake skips the port-fill since it has no port.
@@ -113,7 +111,9 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
         const currentPort = portControl.value;
         const isEmpty = currentPort === '' || currentPort == null;
         const isKnownDefault = this.databaseTypes.some(
-          t => t.defaultPort !== null && String(t.defaultPort) === String(currentPort),
+          t =>
+            t.defaultPort !== null &&
+            String(t.defaultPort) === String(currentPort),
         );
         if (isEmpty || isKnownDefault) {
           portControl.setValue(matched.defaultPort, { emitEvent: false });
@@ -190,16 +190,10 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
    */
   private applyTypeValidators(value: string | null): void {
     const isSf = isSnowflakeType(value);
-    const set = (
-      name: string,
-      required: boolean,
-      extras: any[] = [],
-    ): void => {
+    const set = (name: string, required: boolean, extras: any[] = []): void => {
       const ctrl = this.datasourceForm.get(name);
       if (!ctrl) return;
-      ctrl.setValidators(
-        required ? [Validators.required, ...extras] : extras,
-      );
+      ctrl.setValidators(required ? [Validators.required, ...extras] : extras);
       ctrl.updateValueAndValidity({ emitEvent: false });
     };
     // host + port → required for TypeORM engines, optional for Snowflake
@@ -410,5 +404,4 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
     event.preventDefault();
     this.showPassword = !this.showPassword;
   }
-
 }

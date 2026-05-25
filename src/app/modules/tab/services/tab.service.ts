@@ -40,9 +40,7 @@ export class TabService {
   async loadOne(tabId: string): Promise<void> {
     this._loading.set(true);
     try {
-      const res: any = await lastValueFrom(
-        this.http.apiGet(TAB.GET + tabId),
-      );
+      const res: any = await lastValueFrom(this.http.apiGet(TAB.GET + tabId));
       if (res?.status) this._current.set(res.data);
     } finally {
       this._loading.set(false);
@@ -116,8 +114,7 @@ export class TabService {
   }
 
   updateTab(tabForm: FormGroup, justification?: string) {
-    const { id, name, description, datasource, status } =
-      tabForm.getRawValue();
+    const { id, name, description, datasource, status } = tabForm.getRawValue();
     return lastValueFrom(
       this.http.apiPut(TAB.UPDATE, {
         id,

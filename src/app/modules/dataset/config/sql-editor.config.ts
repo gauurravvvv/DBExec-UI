@@ -109,7 +109,6 @@ export const MONACO_EDITOR_OPTIONS = {
   },
 };
 
-
 /**
  * Context analysis patterns for intelligent autocomplete
  */

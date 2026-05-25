@@ -2145,51 +2145,72 @@ import type { ChartRolesSpec } from '../models/visual.model';
 
 export const CHART_ROLES: Record<string, ChartRolesSpec> = {
   // ── Bar family (single series) ──
-  'bar-vertical':   { required: ['xAxis', 'yAxis'], optional: [] },
+  'bar-vertical': { required: ['xAxis', 'yAxis'], optional: [] },
   'bar-horizontal': { required: ['xAxis', 'yAxis'], optional: [] },
-  'pictorial-bar':  { required: ['xAxis', 'yAxis'], optional: [] },
-  'waterfall':      { required: ['xAxis', 'yAxis'], optional: [] },
-  'bar-polar':      { required: ['xAxis', 'yAxis'], optional: [] },
+  'pictorial-bar': { required: ['xAxis', 'yAxis'], optional: [] },
+  waterfall: { required: ['xAxis', 'yAxis'], optional: [] },
+  'bar-polar': { required: ['xAxis', 'yAxis'], optional: [] },
 
   // ── Bar family (multi-series) ──
   // 2D / stacked / normalized need at least one extra value column beyond yAxis.
   // We model this as: xAxis = category, yAxis = first value, valueColumns = the rest.
-  'bar-vertical-2d':           { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
-  'bar-horizontal-2d':         { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
-  'bar-vertical-stacked':      { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
-  'bar-horizontal-stacked':    { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
-  'bar-vertical-normalized':   { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
-  'bar-horizontal-normalized': { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
+  'bar-vertical-2d': {
+    required: ['xAxis', 'yAxis'],
+    optional: ['valueColumns'],
+  },
+  'bar-horizontal-2d': {
+    required: ['xAxis', 'yAxis'],
+    optional: ['valueColumns'],
+  },
+  'bar-vertical-stacked': {
+    required: ['xAxis', 'yAxis'],
+    optional: ['valueColumns'],
+  },
+  'bar-horizontal-stacked': {
+    required: ['xAxis', 'yAxis'],
+    optional: ['valueColumns'],
+  },
+  'bar-vertical-normalized': {
+    required: ['xAxis', 'yAxis'],
+    optional: ['valueColumns'],
+  },
+  'bar-horizontal-normalized': {
+    required: ['xAxis', 'yAxis'],
+    optional: ['valueColumns'],
+  },
 
   // ── Line / area ──
   // Single-series by default; valueColumns is optional to enable multi-line / multi-area.
-  'line':            { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
-  'line-stacked':    { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
-  'line-step':       { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
-  'area':            { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
-  'area-stacked':    { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
-  'area-normalized': { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
+  line: { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
+  'line-stacked': { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
+  'line-step': { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
+  area: { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
+  'area-stacked': { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
+  'area-normalized': {
+    required: ['xAxis', 'yAxis'],
+    optional: ['valueColumns'],
+  },
 
   // ── Pie family ──
-  'pie':          { required: ['xAxis', 'yAxis'], optional: [] },
+  pie: { required: ['xAxis', 'yAxis'], optional: [] },
   'pie-advanced': { required: ['xAxis', 'yAxis'], optional: [] },
-  'pie-grid':     { required: ['xAxis', 'yAxis'], optional: [] },
-  'donut':        { required: ['xAxis', 'yAxis'], optional: [] },
-  'half-donut':   { required: ['xAxis', 'yAxis'], optional: [] },
-  'nested-pie':   { required: ['xAxis', 'yAxis'], optional: [] },
-  'rose':         { required: ['xAxis', 'yAxis'], optional: [] },
+  'pie-grid': { required: ['xAxis', 'yAxis'], optional: [] },
+  donut: { required: ['xAxis', 'yAxis'], optional: [] },
+  'half-donut': { required: ['xAxis', 'yAxis'], optional: [] },
+  'nested-pie': { required: ['xAxis', 'yAxis'], optional: [] },
+  rose: { required: ['xAxis', 'yAxis'], optional: [] },
 
   // ── Gauge / number / table ──
-  'gauge':        { required: ['xAxis', 'yAxis'], optional: [] },
+  gauge: { required: ['xAxis', 'yAxis'], optional: [] },
   'linear-gauge': { required: ['xAxis', 'yAxis'], optional: [] },
-  'number-card':  { required: ['yAxis'],          optional: ['xAxis'] },
-  'table':        { required: [],                 optional: [] },
+  'number-card': { required: ['yAxis'], optional: ['xAxis'] },
+  table: { required: [], optional: [] },
 
   // ── Scatter family ──
-  'scatter':        { required: ['xAxis', 'yAxis'], optional: [] },
+  scatter: { required: ['xAxis', 'yAxis'], optional: [] },
   'effect-scatter': { required: ['xAxis', 'yAxis'], optional: [] },
-  'bubble':         { required: ['xAxis', 'yAxis'], optional: ['zAxis'] },
-  'polar':          { required: ['xAxis', 'yAxis'], optional: [] },
+  bubble: { required: ['xAxis', 'yAxis'], optional: ['zAxis'] },
+  polar: { required: ['xAxis', 'yAxis'], optional: [] },
 
   // ── Heat map ──
   'heat-map': { required: ['xAxis', 'yAxis', 'zAxis'], optional: [] },
@@ -2198,52 +2219,55 @@ export const CHART_ROLES: Record<string, ChartRolesSpec> = {
   'box-chart': { required: ['xAxis', 'sample'], optional: [] },
 
   // ── Candlestick — OHLC ──
-  'candlestick': { required: ['xAxis', 'open', 'high', 'low', 'close'], optional: [] },
+  candlestick: {
+    required: ['xAxis', 'open', 'high', 'low', 'close'],
+    optional: [],
+  },
 
   // ── Hierarchical ──
   // Name + value + parent. parent of root rows is null/empty string.
-  'tree-map':  { required: ['xAxis', 'yAxis'], optional: ['parent'] },
-  'sunburst':  { required: ['xAxis', 'yAxis'], optional: ['parent'] },
-  'tree':      { required: ['xAxis'],          optional: ['yAxis', 'parent'] },
+  'tree-map': { required: ['xAxis', 'yAxis'], optional: ['parent'] },
+  sunburst: { required: ['xAxis', 'yAxis'], optional: ['parent'] },
+  tree: { required: ['xAxis'], optional: ['yAxis', 'parent'] },
 
   // ── Radar ──
   // One column per indicator (axis). Multi-select.
-  'radar': { required: ['xAxis', 'indicators'], optional: [] },
+  radar: { required: ['xAxis', 'indicators'], optional: [] },
 
   // ── Parallel ──
   // Ordered list of N dimension columns.
-  'parallel': { required: ['dimensions'], optional: ['xAxis'] },
+  parallel: { required: ['dimensions'], optional: ['xAxis'] },
 
   // ── Funnel ──
-  'funnel': { required: ['xAxis', 'yAxis'], optional: [] },
+  funnel: { required: ['xAxis', 'yAxis'], optional: [] },
 
   // ── Node + link ──
-  'sankey':     { required: ['xAxis', 'yAxis'], optional: ['zAxis'] }, // x=source, y=target, z=value
-  'graph':      { required: ['xAxis', 'yAxis'], optional: ['zAxis'] },
+  sankey: { required: ['xAxis', 'yAxis'], optional: ['zAxis'] }, // x=source, y=target, z=value
+  graph: { required: ['xAxis', 'yAxis'], optional: ['zAxis'] },
   'flow-lines': { required: ['xAxis', 'yAxis'], optional: ['zAxis'] },
-  'graphgl':    { required: ['xAxis', 'yAxis'], optional: ['zAxis'] },
+  graphgl: { required: ['xAxis', 'yAxis'], optional: ['zAxis'] },
 
   // ── Theme river ──
   // time + category + value. Falls back to row-index for time if unset.
   'theme-river': { required: ['xAxis', 'yAxis'], optional: ['time'] },
 
   // ── Geo / map ──
-  'world-map':   { required: ['xAxis', 'yAxis'], optional: [] }, // x=region name, y=value
-  'globe':       { required: ['lng', 'lat'],     optional: ['yAxis'] },
-  'lines3d':     { required: ['lng', 'lat'],     optional: [] },
-  'polygons3d':  { required: ['xAxis', 'lng', 'lat'], optional: [] },
-  'map3d':       { required: ['xAxis', 'yAxis'], optional: ['zAxis'] },
+  'world-map': { required: ['xAxis', 'yAxis'], optional: [] }, // x=region name, y=value
+  globe: { required: ['lng', 'lat'], optional: ['yAxis'] },
+  lines3d: { required: ['lng', 'lat'], optional: [] },
+  polygons3d: { required: ['xAxis', 'lng', 'lat'], optional: [] },
+  map3d: { required: ['xAxis', 'yAxis'], optional: ['zAxis'] },
 
   // ── 3D cartesian ──
-  'bar3d':     { required: ['xAxis', 'yAxis', 'zAxis'], optional: [] },
-  'line3d':    { required: ['xAxis', 'yAxis', 'zAxis'], optional: [] },
-  'scatter3d': { required: ['xAxis', 'yAxis', 'zAxis'], optional: [] },
-  'surface':   { required: ['xAxis', 'yAxis', 'zAxis'], optional: [] },
+  bar3d: { required: ['xAxis', 'yAxis', 'zAxis'], optional: [] },
+  line3d: { required: ['xAxis', 'yAxis', 'zAxis'], optional: [] },
+  scatter3d: { required: ['xAxis', 'yAxis', 'zAxis'], optional: [] },
+  surface: { required: ['xAxis', 'yAxis', 'zAxis'], optional: [] },
 
   // ── GL ──
-  'scattergl': { required: ['xAxis', 'yAxis'], optional: [] },
-  'linesgl':   { required: ['lng', 'lat'],     optional: [] },
-  'flowgl':    { required: ['lng', 'lat'],     optional: [] },
+  scattergl: { required: ['xAxis', 'yAxis'], optional: [] },
+  linesgl: { required: ['lng', 'lat'], optional: [] },
+  flowgl: { required: ['lng', 'lat'], optional: [] },
 };
 
 /**
@@ -2251,9 +2275,13 @@ export const CHART_ROLES: Record<string, ChartRolesSpec> = {
  * for any chart-id not explicitly mapped so unknown / future chart ids fall
  * through gracefully.
  */
-export function getChartRoles(chartType: string | null | undefined): ChartRolesSpec {
+export function getChartRoles(
+  chartType: string | null | undefined,
+): ChartRolesSpec {
   if (!chartType) return { required: [], optional: [] };
-  return CHART_ROLES[chartType] ?? { required: ['xAxis', 'yAxis'], optional: [] };
+  return (
+    CHART_ROLES[chartType] ?? { required: ['xAxis', 'yAxis'], optional: [] }
+  );
 }
 
 const NO_AXIS_CHART_TYPES = [

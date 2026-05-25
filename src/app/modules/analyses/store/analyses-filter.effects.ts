@@ -121,74 +121,73 @@ export class AnalysesFilterEffects {
   fetchValues$ = createEffect(() =>
     this.actions$.pipe(
       ofType(A.fetchValues),
-      mergeMap(
-        ({ analysisId, filterId, search, page, pageSize }) =>
-          from(
-            this.analysesService.getFilterValuesBatch({
-              analysisId,
-              mode: 'fetch' as any,
-              requests: [
-                {
-                  filterId,
-                  search: search || undefined,
-                  page: page ?? 1,
-                  pageSize,
-                },
-              ],
-            }),
-          ).pipe(
-            map((res: any) => {
-              const raw = res?.data?.results?.[filterId];
-              if (!res?.status || !raw) {
-                return A.fetchValuesFailure({
-                  analysisId,
-                  filterId,
-                  search: search ?? '',
-                  page: page ?? 1,
-                  error: {
-                    code: 'sql_error',
-                    message: res?.message || 'Failed to fetch filter values',
-                  },
-                });
-              }
-              // Per-filter error vs success — encode each into the
-              // matching action so the reducer doesn't have to peek
-              // inside the entry to decide.
-              if (raw.ok === false) {
-                return A.fetchValuesFailure({
-                  analysisId,
-                  filterId,
-                  search: search ?? '',
-                  page: page ?? 1,
-                  error: {
-                    code: (raw.error as any) || 'sql_error',
-                    message: raw.message || 'Filter values unavailable',
-                  },
-                });
-              }
-              return A.fetchValuesSuccess({
+      mergeMap(({ analysisId, filterId, search, page, pageSize }) =>
+        from(
+          this.analysesService.getFilterValuesBatch({
+            analysisId,
+            mode: 'fetch' as any,
+            requests: [
+              {
+                filterId,
+                search: search || undefined,
+                page: page ?? 1,
+                pageSize,
+              },
+            ],
+          }),
+        ).pipe(
+          map((res: any) => {
+            const raw = res?.data?.results?.[filterId];
+            if (!res?.status || !raw) {
+              return A.fetchValuesFailure({
                 analysisId,
                 filterId,
                 search: search ?? '',
                 page: page ?? 1,
-                entry: beResultToEntry(raw),
+                error: {
+                  code: 'sql_error',
+                  message: res?.message || 'Failed to fetch filter values',
+                },
               });
-            }),
-            catchError(err =>
-              of(
-                A.fetchValuesFailure({
-                  analysisId,
-                  filterId,
-                  search: search ?? '',
-                  page: page ?? 1,
-                  error: {
-                    code: 'sql_error',
-                    message: err?.message || 'Network error',
-                  },
-                }),
-              ),
+            }
+            // Per-filter error vs success — encode each into the
+            // matching action so the reducer doesn't have to peek
+            // inside the entry to decide.
+            if (raw.ok === false) {
+              return A.fetchValuesFailure({
+                analysisId,
+                filterId,
+                search: search ?? '',
+                page: page ?? 1,
+                error: {
+                  code: (raw.error as any) || 'sql_error',
+                  message: raw.message || 'Filter values unavailable',
+                },
+              });
+            }
+            return A.fetchValuesSuccess({
+              analysisId,
+              filterId,
+              search: search ?? '',
+              page: page ?? 1,
+              entry: beResultToEntry(raw),
+            });
+          }),
+          catchError(err =>
+            of(
+              A.fetchValuesFailure({
+                analysisId,
+                filterId,
+                search: search ?? '',
+                page: page ?? 1,
+                error: {
+                  code: 'sql_error',
+                  message: err?.message || 'Network error',
+                },
+              }),
             ),
           ),
+        ),
       ),
     ),
   );

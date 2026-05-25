@@ -1105,15 +1105,27 @@
   // Stagger the rows so the shimmer doesn't pulse in lockstep —
   // the eye reads "many rows loading" more readily than "one
   // pattern repeated".
-  .schema-skeleton-row:nth-child(2) .skeleton-bar { animation-delay: 0.1s; }
-  .schema-skeleton-row:nth-child(3) .skeleton-bar { animation-delay: 0.2s; }
-  .schema-skeleton-row:nth-child(4) .skeleton-bar { animation-delay: 0.3s; }
-  .schema-skeleton-row:nth-child(5) .skeleton-bar { animation-delay: 0.4s; }
+  .schema-skeleton-row:nth-child(2) .skeleton-bar {
+    animation-delay: 0.1s;
+  }
+  .schema-skeleton-row:nth-child(3) .skeleton-bar {
+    animation-delay: 0.2s;
+  }
+  .schema-skeleton-row:nth-child(4) .skeleton-bar {
+    animation-delay: 0.3s;
+  }
+  .schema-skeleton-row:nth-child(5) .skeleton-bar {
+    animation-delay: 0.4s;
+  }
 }
 
 @keyframes schema-skeleton-pulse {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 // (Legacy .results-status-bar removed — its UI is now part of the
@@ -1745,7 +1757,10 @@
       // a black tint over a dark surface vanishes. Mirrors the
       // light-theme strength so the visual rhythm is consistent
       // regardless of theme.
-      :host-context([data-theme='dark']) .p-datatable-tbody > tr:nth-child(even) > td {
+      :host-context([data-theme='dark'])
+        .p-datatable-tbody
+        > tr:nth-child(even)
+        > td {
         background: rgba(255, 255, 255, 0.028);
       }
 

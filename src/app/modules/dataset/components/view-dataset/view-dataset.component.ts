@@ -224,10 +224,7 @@ export class ViewDatasetComponent implements OnInit {
   proceedDelete() {
     if (this.deleteJustification.trim()) {
       this.datasetService
-        .deleteDataset(
-          this.datasetData.id,
-          this.deleteJustification.trim(),
-        )
+        .deleteDataset(this.datasetData.id, this.deleteJustification.trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.deleteJustification = '';
@@ -256,10 +253,7 @@ export class ViewDatasetComponent implements OnInit {
     if (!this.fieldToDelete) return;
 
     this.datasetService
-      .deleteDatasetField(
-        this.datasetData.id,
-        this.fieldToDelete.id,
-      )
+      .deleteDatasetField(this.datasetData.id, this.fieldToDelete.id)
       .then((response: any) => {
         this.showDeleteFieldConfirm = false;
         if (this.globalService.handleSuccessService(response, true)) {
@@ -301,10 +295,7 @@ export class ViewDatasetComponent implements OnInit {
 
     // Call API to get field details first
     this.datasetService
-      .viewDatasetField(
-        this.datasetData.id,
-        field.id,
-      )
+      .viewDatasetField(this.datasetData.id, field.id)
       .then((response: any) => {
         this.isLoadingField = false;
         if (this.globalService.handleSuccessService(response, false)) {

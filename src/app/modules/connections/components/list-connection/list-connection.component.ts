@@ -314,10 +314,7 @@ export class ListConnectionComponent implements OnInit {
         return;
       }
       try {
-        const res: any = await this.connectionService.bulkDelete(
-          ids,
-          reason,
-        );
+        const res: any = await this.connectionService.bulkDelete(ids, reason);
         if (this.globalService.handleSuccessService(res)) {
           this.selectedConnections = [];
           this.refreshList();

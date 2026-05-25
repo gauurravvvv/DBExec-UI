@@ -751,9 +751,7 @@ export class EditAnalysesComponent
    * instead of the old loadExistingFilters() local fetch.
    */
   initializeStoreSelectors(): void {
-    this.graphData$ = this.store.select(
-      selectDatasetData(this.datasetId),
-    );
+    this.graphData$ = this.store.select(selectDatasetData(this.datasetId));
     this.datasetStatus$ = this.store.select(
       selectDatasetStatus(this.datasetId),
     );
@@ -1708,27 +1706,44 @@ export class EditAnalysesComponent
    */
   private hasRoleValue(visual: any, role: RoleKey): boolean {
     switch (role) {
-      case 'xAxis': return !!visual.xAxisColumn;
-      case 'yAxis': return !!visual.yAxisColumn;
-      case 'zAxis': return !!visual.zAxisColumn;
-      case 'open': return !!visual.openColumn;
-      case 'high': return !!visual.highColumn;
-      case 'low': return !!visual.lowColumn;
-      case 'close': return !!visual.closeColumn;
-      case 'sample': return !!visual.sampleColumn;
-      case 'parent': return !!visual.parentColumn;
-      case 'lng': return !!visual.lngColumn;
-      case 'lat': return !!visual.latColumn;
-      case 'time': return !!visual.timeColumn;
+      case 'xAxis':
+        return !!visual.xAxisColumn;
+      case 'yAxis':
+        return !!visual.yAxisColumn;
+      case 'zAxis':
+        return !!visual.zAxisColumn;
+      case 'open':
+        return !!visual.openColumn;
+      case 'high':
+        return !!visual.highColumn;
+      case 'low':
+        return !!visual.lowColumn;
+      case 'close':
+        return !!visual.closeColumn;
+      case 'sample':
+        return !!visual.sampleColumn;
+      case 'parent':
+        return !!visual.parentColumn;
+      case 'lng':
+        return !!visual.lngColumn;
+      case 'lat':
+        return !!visual.latColumn;
+      case 'time':
+        return !!visual.timeColumn;
       case 'indicators':
-        return Array.isArray(visual.indicatorColumns) &&
-          visual.indicatorColumns.length > 0;
+        return (
+          Array.isArray(visual.indicatorColumns) &&
+          visual.indicatorColumns.length > 0
+        );
       case 'dimensions':
-        return Array.isArray(visual.dimensionColumns) &&
-          visual.dimensionColumns.length > 0;
+        return (
+          Array.isArray(visual.dimensionColumns) &&
+          visual.dimensionColumns.length > 0
+        );
       case 'valueColumns':
-        return Array.isArray(visual.valueColumns) &&
-          visual.valueColumns.length > 0;
+        return (
+          Array.isArray(visual.valueColumns) && visual.valueColumns.length > 0
+        );
     }
   }
 
@@ -1904,27 +1919,53 @@ export class EditAnalysesComponent
     columnName: string,
   ): void {
     switch (role) {
-      case 'xAxis': visual.xAxisColumn = columnName; break;
-      case 'yAxis': visual.yAxisColumn = columnName; break;
-      case 'zAxis': visual.zAxisColumn = columnName; break;
-      case 'open': visual.openColumn = columnName; break;
-      case 'high': visual.highColumn = columnName; break;
-      case 'low': visual.lowColumn = columnName; break;
-      case 'close': visual.closeColumn = columnName; break;
-      case 'sample': visual.sampleColumn = columnName; break;
-      case 'parent': visual.parentColumn = columnName; break;
-      case 'lng': visual.lngColumn = columnName; break;
-      case 'lat': visual.latColumn = columnName; break;
-      case 'time': visual.timeColumn = columnName; break;
+      case 'xAxis':
+        visual.xAxisColumn = columnName;
+        break;
+      case 'yAxis':
+        visual.yAxisColumn = columnName;
+        break;
+      case 'zAxis':
+        visual.zAxisColumn = columnName;
+        break;
+      case 'open':
+        visual.openColumn = columnName;
+        break;
+      case 'high':
+        visual.highColumn = columnName;
+        break;
+      case 'low':
+        visual.lowColumn = columnName;
+        break;
+      case 'close':
+        visual.closeColumn = columnName;
+        break;
+      case 'sample':
+        visual.sampleColumn = columnName;
+        break;
+      case 'parent':
+        visual.parentColumn = columnName;
+        break;
+      case 'lng':
+        visual.lngColumn = columnName;
+        break;
+      case 'lat':
+        visual.latColumn = columnName;
+        break;
+      case 'time':
+        visual.timeColumn = columnName;
+        break;
       case 'indicators': {
-        if (!Array.isArray(visual.indicatorColumns)) visual.indicatorColumns = [];
+        if (!Array.isArray(visual.indicatorColumns))
+          visual.indicatorColumns = [];
         if (!visual.indicatorColumns.includes(columnName)) {
           visual.indicatorColumns = [...visual.indicatorColumns, columnName];
         }
         break;
       }
       case 'dimensions': {
-        if (!Array.isArray(visual.dimensionColumns)) visual.dimensionColumns = [];
+        if (!Array.isArray(visual.dimensionColumns))
+          visual.dimensionColumns = [];
         if (!visual.dimensionColumns.includes(columnName)) {
           visual.dimensionColumns = [...visual.dimensionColumns, columnName];
         }

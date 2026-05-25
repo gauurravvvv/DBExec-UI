@@ -40,9 +40,7 @@ export class SectionService {
   async loadOne(id: string): Promise<void> {
     this._loading.set(true);
     try {
-      const res: any = await lastValueFrom(
-        this.http.apiGet(SECTION.GET + id),
-      );
+      const res: any = await lastValueFrom(this.http.apiGet(SECTION.GET + id));
       if (res?.status) this._current.set(res.data);
     } catch {
       this._current.set(null);

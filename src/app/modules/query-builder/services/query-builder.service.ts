@@ -73,9 +73,7 @@ export class QueryBuilderService {
 
   async loadStructure(id: string): Promise<void> {
     const res: any = await lastValueFrom(
-      this.http.apiGet(
-        QUERY_BUILDER.GET + id + QUERY_BUILDER.STRUCTURE_SUFFIX,
-      ),
+      this.http.apiGet(QUERY_BUILDER.GET + id + QUERY_BUILDER.STRUCTURE_SUFFIX),
     );
     if (res?.status) this._structure.set(res.data);
   }
@@ -108,8 +106,7 @@ export class QueryBuilderService {
   async update(form: FormGroup, justification?: string): Promise<any> {
     this._saving.set(true);
     try {
-      const { id, name, description, datasource, status } =
-        form.getRawValue();
+      const { id, name, description, datasource, status } = form.getRawValue();
       // PUT /query-builders/:queryBuilderId — id moves to path.
       return await lastValueFrom(
         this.http.apiPut(QUERY_BUILDER.UPDATE + id, {
@@ -178,10 +175,7 @@ export class QueryBuilderService {
     );
   }
 
-  async getTabSections(
-    queryBuilderId: string,
-    tabId: string,
-  ): Promise<any> {
+  async getTabSections(queryBuilderId: string, tabId: string): Promise<any> {
     // GET /tabs/:tabId/sections?queryBuilderId=
     return lastValueFrom(
       this.http.apiGet(
@@ -212,9 +206,7 @@ export class QueryBuilderService {
   async getQueryBuilderConfiguration(id: string): Promise<any> {
     // GET /query-builders/:queryBuilderId/config
     return lastValueFrom(
-      this.http.apiGet(
-        QUERY_BUILDER.GET + id + QUERY_BUILDER.CONFIG_SUFFIX,
-      ),
+      this.http.apiGet(QUERY_BUILDER.GET + id + QUERY_BUILDER.CONFIG_SUFFIX),
     );
   }
 
@@ -233,10 +225,7 @@ export class QueryBuilderService {
     return this.delete(id, justification);
   }
 
-  bulkDeleteQueryBuilder(
-    ids: string[],
-    justification?: string,
-  ): Promise<any> {
+  bulkDeleteQueryBuilder(ids: string[], justification?: string): Promise<any> {
     return this.bulkDelete(ids, justification);
   }
 
@@ -274,9 +263,7 @@ export class QueryBuilderService {
   getQueryBuilderStructure(queryBuilderId: string): Promise<any> {
     return lastValueFrom(
       this.http.apiGet(
-        QUERY_BUILDER.GET +
-          queryBuilderId +
-          QUERY_BUILDER.STRUCTURE_SUFFIX,
+        QUERY_BUILDER.GET + queryBuilderId + QUERY_BUILDER.STRUCTURE_SUFFIX,
       ),
     );
   }

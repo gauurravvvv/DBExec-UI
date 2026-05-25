@@ -19,7 +19,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { DATASOURCE } from 'src/app/core/constants/routes.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
@@ -190,7 +189,6 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
     await this.datasourceService.loadOne(this.datasourceId);
     const data = this.datasourceService.current();
     if (data) {
-
       // dbType is read once from the saved record and used for the
       // connection-test call + the read-only display row. It cannot
       // be edited so it isn't part of the form.

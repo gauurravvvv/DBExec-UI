@@ -175,10 +175,7 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
       });
   }
 
-  loadDatasetColumns(
-    datasetId?: string,
-    callback?: () => void,
-  ): void {
+  loadDatasetColumns(datasetId?: string, callback?: () => void): void {
     const dataset = datasetId || this.rlsForm.get('datasetId')?.value;
     if (!dataset) {
       if (callback) callback();

@@ -101,9 +101,7 @@ export class AnnouncementService {
   async delete(id: string): Promise<any> {
     this._saving.set(true);
     try {
-      return await lastValueFrom(
-        this.http.apiDelete(ANNOUNCEMENT.DELETE + id),
-      );
+      return await lastValueFrom(this.http.apiDelete(ANNOUNCEMENT.DELETE + id));
     } finally {
       this._saving.set(false);
     }

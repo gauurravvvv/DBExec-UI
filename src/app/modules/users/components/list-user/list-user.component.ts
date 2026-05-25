@@ -362,17 +362,15 @@ export class ListUserComponent implements OnInit {
     }
 
     if (this.userToDelete) {
-      this.userService
-        .delete(this.userToDelete, reason)
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.selectedUsers = this.selectedUsers.filter(
-              u => u.id !== this.userToDelete,
-            );
-            this.refreshList();
-          }
-          this.cdr.markForCheck();
-        });
+      this.userService.delete(this.userToDelete, reason).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
+          this.selectedUsers = this.selectedUsers.filter(
+            u => u.id !== this.userToDelete,
+          );
+          this.refreshList();
+        }
+        this.cdr.markForCheck();
+      });
     }
     this.closeDeletePopup();
   }

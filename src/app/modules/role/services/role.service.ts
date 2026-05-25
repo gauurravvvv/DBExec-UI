@@ -39,9 +39,7 @@ export class RoleService {
   async loadOne(roleId: string) {
     this._loading.set(true);
     try {
-      const res: any = await lastValueFrom(
-        this.http.apiGet(ROLE.GET + roleId),
-      );
+      const res: any = await lastValueFrom(this.http.apiGet(ROLE.GET + roleId));
       if (res?.status) this._current.set(res.data);
     } finally {
       this._loading.set(false);
@@ -83,10 +81,7 @@ export class RoleService {
     );
   }
 
-  async bulkDelete(
-    ids: string[],
-    justification?: string,
-  ): Promise<any> {
+  async bulkDelete(ids: string[], justification?: string): Promise<any> {
     return await lastValueFrom(
       this.http.apiPost(ROLE.BULK_DELETE, { ids, justification }),
     );

@@ -76,17 +76,11 @@ export const selectIsDatasetLoading = (datasetId: string) =>
 
 // Factory selector: Check if dataset is loaded
 export const selectIsDatasetLoaded = (datasetId: string) =>
-  createSelector(
-    selectDatasetStatus(datasetId),
-    status => status === 'loaded',
-  );
+  createSelector(selectDatasetStatus(datasetId), status => status === 'loaded');
 
 // Factory selector: Get dataset error
 export const selectDatasetError = (datasetId: string) =>
-  createSelector(
-    selectDatasetByKey(datasetId),
-    entry => entry?.error || null,
-  );
+  createSelector(selectDatasetByKey(datasetId), entry => entry?.error || null);
 
 // Factory selector: Check if dataset data is stale (older than TTL)
 export const selectIsDatasetStale = (datasetId: string) =>

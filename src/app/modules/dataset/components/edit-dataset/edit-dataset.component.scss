@@ -2114,7 +2114,10 @@ td.empty-message-cell {
       // a black tint over a dark surface vanishes. Mirrors the
       // light-theme strength so the visual rhythm is consistent
       // regardless of theme.
-      :host-context([data-theme='dark']) .p-datatable-tbody > tr:nth-child(even) > td {
+      :host-context([data-theme='dark'])
+        .p-datatable-tbody
+        > tr:nth-child(even)
+        > td {
         background: rgba(255, 255, 255, 0.028);
       }
 
@@ -2729,7 +2732,6 @@ td.empty-message-cell {
     transform: scale(1);
   }
 }
-
 
 // ────────────────────────────────────────────────────────────────────
 // Toolbar segmented button (sidebar toggle, etc.)

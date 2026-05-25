@@ -64,24 +64,15 @@ export const selectSchemaData = (dbId: string) =>
 
 // Factory selector: Get schema loading status
 export const selectSchemaStatus = (dbId: string) =>
-  createSelector(
-    selectSchemaByKey(dbId),
-    entry => entry?.status || 'idle',
-  );
+  createSelector(selectSchemaByKey(dbId), entry => entry?.status || 'idle');
 
 // Factory selector: Check if schema is loading
 export const selectIsSchemaLoading = (dbId: string) =>
-  createSelector(
-    selectSchemaStatus(dbId),
-    status => status === 'loading',
-  );
+  createSelector(selectSchemaStatus(dbId), status => status === 'loading');
 
 // Factory selector: Check if schema is loaded
 export const selectIsSchemaLoaded = (dbId: string) =>
-  createSelector(
-    selectSchemaStatus(dbId),
-    status => status === 'loaded',
-  );
+  createSelector(selectSchemaStatus(dbId), status => status === 'loaded');
 
 // Factory selector: Get schema error
 export const selectSchemaError = (dbId: string) =>
@@ -96,10 +87,7 @@ export const selectIsSchemaStale = (dbId: string) =>
 
 // Factory selector: Get schema loaded time
 export const selectSchemaLoadedAt = (dbId: string) =>
-  createSelector(
-    selectSchemaByKey(dbId),
-    entry => entry?.loadedAt || null,
-  );
+  createSelector(selectSchemaByKey(dbId), entry => entry?.loadedAt || null);
 
 // Select active schema entry
 export const selectActiveSchema = createSelector(
@@ -136,14 +124,11 @@ export const selectIsActiveSchemaStale = createSelector(
 // when the cache entry, the tree, or the schema row is missing.
 // Use this in the sidebar to read tablesStatus + tables for one row.
 export const selectSchemaNode = (dbId: string, schemaName: string) =>
-  createSelector(
-    selectSchemaByKey(dbId),
-    (entry): LazySchemaGroup | null => {
-      const tree = entry?.data;
-      if (!tree) return null;
-      return tree.schemas.find(s => s.name === schemaName) ?? null;
-    },
-  );
+  createSelector(selectSchemaByKey(dbId), (entry): LazySchemaGroup | null => {
+    const tree = entry?.data;
+    if (!tree) return null;
+    return tree.schemas.find(s => s.name === schemaName) ?? null;
+  });
 
 // Look up a single table node by (dbId, schemaName, tableName).
 // Returns null when any link in the chain is missing.

@@ -16,9 +16,7 @@ export class HomeService {
   async loadSystemAdminDashboard() {
     this._loading.set(true);
     try {
-      const res: any = await lastValueFrom(
-        this.http.apiGet(HOME.SYSTEM_ADMIN),
-      );
+      const res: any = await lastValueFrom(this.http.apiGet(HOME.SYSTEM_ADMIN));
       if (res?.status) this._dashboard.set(res.data);
       return res;
     } finally {

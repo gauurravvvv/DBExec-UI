@@ -62,24 +62,15 @@ export const selectSchemaData = (dbId: string) =>
 
 // Factory selector: Get schema loading status
 export const selectSchemaStatus = (dbId: string) =>
-  createSelector(
-    selectSchemaByKey(dbId),
-    entry => entry?.status || 'idle',
-  );
+  createSelector(selectSchemaByKey(dbId), entry => entry?.status || 'idle');
 
 // Factory selector: Check if schema is loading
 export const selectIsSchemaLoading = (dbId: string) =>
-  createSelector(
-    selectSchemaStatus(dbId),
-    status => status === 'loading',
-  );
+  createSelector(selectSchemaStatus(dbId), status => status === 'loading');
 
 // Factory selector: Check if schema is loaded
 export const selectIsSchemaLoaded = (dbId: string) =>
-  createSelector(
-    selectSchemaStatus(dbId),
-    status => status === 'loaded',
-  );
+  createSelector(selectSchemaStatus(dbId), status => status === 'loaded');
 
 // Factory selector: Get schema error
 export const selectSchemaError = (dbId: string) =>
@@ -94,10 +85,7 @@ export const selectIsSchemaStale = (dbId: string) =>
 
 // Factory selector: Get schema loaded time
 export const selectSchemaLoadedAt = (dbId: string) =>
-  createSelector(
-    selectSchemaByKey(dbId),
-    entry => entry?.loadedAt || null,
-  );
+  createSelector(selectSchemaByKey(dbId), entry => entry?.loadedAt || null);
 
 // Select active schema entry
 export const selectActiveSchema = createSelector(

@@ -167,11 +167,7 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
     const tabId = parentTab ? String(parentTab.id) : '';
 
     this.queryBuilderService
-      .getSectionPrompts(
-        this.queryBuilderId,
-        tabId,
-        String(section.id),
-      )
+      .getSectionPrompts(this.queryBuilderId, tabId, String(section.id))
       .then((response: any) => {
         if (response.status) {
           section.prompts = (response.data || []).map(transformPromptResponse);
@@ -509,10 +505,7 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
   proceedDelete(): void {
     if (this.deleteJustification.trim()) {
       this.queryBuilderService
-        .delete(
-          this.queryBuilderId,
-          this.deleteJustification.trim(),
-        )
+        .delete(this.queryBuilderId, this.deleteJustification.trim())
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response)) {
             this.router.navigate([QUERY_BUILDER.LIST]);

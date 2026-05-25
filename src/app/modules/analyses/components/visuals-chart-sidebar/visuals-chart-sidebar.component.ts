@@ -173,27 +173,53 @@ export class VisualsChartSidebarComponent {
    */
   setRoleOnVisual(visual: any, role: RoleKey, columnName: string): void {
     switch (role) {
-      case 'xAxis': visual.xAxisColumn = columnName; break;
-      case 'yAxis': visual.yAxisColumn = columnName; break;
-      case 'zAxis': visual.zAxisColumn = columnName; break;
-      case 'open': visual.openColumn = columnName; break;
-      case 'high': visual.highColumn = columnName; break;
-      case 'low': visual.lowColumn = columnName; break;
-      case 'close': visual.closeColumn = columnName; break;
-      case 'sample': visual.sampleColumn = columnName; break;
-      case 'parent': visual.parentColumn = columnName; break;
-      case 'lng': visual.lngColumn = columnName; break;
-      case 'lat': visual.latColumn = columnName; break;
-      case 'time': visual.timeColumn = columnName; break;
+      case 'xAxis':
+        visual.xAxisColumn = columnName;
+        break;
+      case 'yAxis':
+        visual.yAxisColumn = columnName;
+        break;
+      case 'zAxis':
+        visual.zAxisColumn = columnName;
+        break;
+      case 'open':
+        visual.openColumn = columnName;
+        break;
+      case 'high':
+        visual.highColumn = columnName;
+        break;
+      case 'low':
+        visual.lowColumn = columnName;
+        break;
+      case 'close':
+        visual.closeColumn = columnName;
+        break;
+      case 'sample':
+        visual.sampleColumn = columnName;
+        break;
+      case 'parent':
+        visual.parentColumn = columnName;
+        break;
+      case 'lng':
+        visual.lngColumn = columnName;
+        break;
+      case 'lat':
+        visual.latColumn = columnName;
+        break;
+      case 'time':
+        visual.timeColumn = columnName;
+        break;
       case 'indicators': {
-        if (!Array.isArray(visual.indicatorColumns)) visual.indicatorColumns = [];
+        if (!Array.isArray(visual.indicatorColumns))
+          visual.indicatorColumns = [];
         if (!visual.indicatorColumns.includes(columnName)) {
           visual.indicatorColumns = [...visual.indicatorColumns, columnName];
         }
         break;
       }
       case 'dimensions': {
-        if (!Array.isArray(visual.dimensionColumns)) visual.dimensionColumns = [];
+        if (!Array.isArray(visual.dimensionColumns))
+          visual.dimensionColumns = [];
         if (!visual.dimensionColumns.includes(columnName)) {
           visual.dimensionColumns = [...visual.dimensionColumns, columnName];
         }
@@ -211,21 +237,51 @@ export class VisualsChartSidebarComponent {
 
   private clearRoleOnVisual(visual: any, role: RoleKey): void {
     switch (role) {
-      case 'xAxis': visual.xAxisColumn = null; break;
-      case 'yAxis': visual.yAxisColumn = null; break;
-      case 'zAxis': visual.zAxisColumn = null; break;
-      case 'open': visual.openColumn = null; break;
-      case 'high': visual.highColumn = null; break;
-      case 'low': visual.lowColumn = null; break;
-      case 'close': visual.closeColumn = null; break;
-      case 'sample': visual.sampleColumn = null; break;
-      case 'parent': visual.parentColumn = null; break;
-      case 'lng': visual.lngColumn = null; break;
-      case 'lat': visual.latColumn = null; break;
-      case 'time': visual.timeColumn = null; break;
-      case 'indicators': visual.indicatorColumns = []; break;
-      case 'dimensions': visual.dimensionColumns = []; break;
-      case 'valueColumns': visual.valueColumns = []; break;
+      case 'xAxis':
+        visual.xAxisColumn = null;
+        break;
+      case 'yAxis':
+        visual.yAxisColumn = null;
+        break;
+      case 'zAxis':
+        visual.zAxisColumn = null;
+        break;
+      case 'open':
+        visual.openColumn = null;
+        break;
+      case 'high':
+        visual.highColumn = null;
+        break;
+      case 'low':
+        visual.lowColumn = null;
+        break;
+      case 'close':
+        visual.closeColumn = null;
+        break;
+      case 'sample':
+        visual.sampleColumn = null;
+        break;
+      case 'parent':
+        visual.parentColumn = null;
+        break;
+      case 'lng':
+        visual.lngColumn = null;
+        break;
+      case 'lat':
+        visual.latColumn = null;
+        break;
+      case 'time':
+        visual.timeColumn = null;
+        break;
+      case 'indicators':
+        visual.indicatorColumns = [];
+        break;
+      case 'dimensions':
+        visual.dimensionColumns = [];
+        break;
+      case 'valueColumns':
+        visual.valueColumns = [];
+        break;
     }
   }
 
@@ -238,21 +294,36 @@ export class VisualsChartSidebarComponent {
     const v = this.focusedVisual as any;
     if (!v) return null;
     switch (role) {
-      case 'xAxis': return v.xAxisColumn ?? null;
-      case 'yAxis': return v.yAxisColumn ?? null;
-      case 'zAxis': return v.zAxisColumn ?? null;
-      case 'open': return v.openColumn ?? null;
-      case 'high': return v.highColumn ?? null;
-      case 'low': return v.lowColumn ?? null;
-      case 'close': return v.closeColumn ?? null;
-      case 'sample': return v.sampleColumn ?? null;
-      case 'parent': return v.parentColumn ?? null;
-      case 'lng': return v.lngColumn ?? null;
-      case 'lat': return v.latColumn ?? null;
-      case 'time': return v.timeColumn ?? null;
-      case 'indicators': return v.indicatorColumns ?? [];
-      case 'dimensions': return v.dimensionColumns ?? [];
-      case 'valueColumns': return v.valueColumns ?? [];
+      case 'xAxis':
+        return v.xAxisColumn ?? null;
+      case 'yAxis':
+        return v.yAxisColumn ?? null;
+      case 'zAxis':
+        return v.zAxisColumn ?? null;
+      case 'open':
+        return v.openColumn ?? null;
+      case 'high':
+        return v.highColumn ?? null;
+      case 'low':
+        return v.lowColumn ?? null;
+      case 'close':
+        return v.closeColumn ?? null;
+      case 'sample':
+        return v.sampleColumn ?? null;
+      case 'parent':
+        return v.parentColumn ?? null;
+      case 'lng':
+        return v.lngColumn ?? null;
+      case 'lat':
+        return v.latColumn ?? null;
+      case 'time':
+        return v.timeColumn ?? null;
+      case 'indicators':
+        return v.indicatorColumns ?? [];
+      case 'dimensions':
+        return v.dimensionColumns ?? [];
+      case 'valueColumns':
+        return v.valueColumns ?? [];
     }
   }
 

@@ -38,9 +38,7 @@ export class UserService {
   async loadOne(id: string) {
     this._loading.set(true);
     try {
-      const res: any = await lastValueFrom(
-        this.http.apiGet(USER.GET + id),
-      );
+      const res: any = await lastValueFrom(this.http.apiGet(USER.GET + id));
       if (res?.status) this._current.set(res.data);
     } finally {
       this._loading.set(false);
@@ -63,9 +61,7 @@ export class UserService {
    * `valid[]` array from the validate response verbatim.
    */
   async bulkAddCommit(users: any[]): Promise<any> {
-    return lastValueFrom(
-      this.http.apiPost(USER.BULK_ADD_COMMIT, { users }),
-    );
+    return lastValueFrom(this.http.apiPost(USER.BULK_ADD_COMMIT, { users }));
   }
 
   async add(form: FormGroup): Promise<any> {
@@ -118,10 +114,7 @@ export class UserService {
     );
   }
 
-  async bulkDelete(
-    ids: string[],
-    justification?: string,
-  ): Promise<any> {
+  async bulkDelete(ids: string[], justification?: string): Promise<any> {
     return await lastValueFrom(
       this.http.apiPost(USER.BULK_DELETE, { ids, justification }),
     );
@@ -129,10 +122,7 @@ export class UserService {
 
   async unlock(id: string): Promise<any> {
     return await lastValueFrom(
-      this.http.apiPost(
-        USER.UNLOCK_PREFIX + id + USER.UNLOCK_SUFFIX,
-        {},
-      ),
+      this.http.apiPost(USER.UNLOCK_PREFIX + id + USER.UNLOCK_SUFFIX, {}),
     );
   }
 
