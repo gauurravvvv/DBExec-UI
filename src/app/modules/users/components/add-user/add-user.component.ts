@@ -4,7 +4,13 @@ import {
   Component,
   OnInit,
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
@@ -86,7 +92,10 @@ export class AddUserComponent implements OnInit, HasUnsavedChanges {
         ],
       ],
       email: ['', [Validators.required, Validators.email]],
-      groupIds: [[], Validators.required],
+      // `Validators.required` treats `[]` as valid (only null/undefined/''
+      // fail it), so the form would silently accept zero-group users.
+      // Use a min-count check that fails when the selection is empty.
+      groupIds: [[], minArrayLength(1)],
       locale: ['en', Validators.required],
     });
   }
@@ -207,4 +216,18 @@ export class AddUserComponent implements OnInit, HasUnsavedChanges {
       return this.translate.instant('VALIDATION.USERNAME_PATTERN');
     return '';
   }
+}
+
+/**
+ * Validator that fails when an array-valued control has fewer than
+ * `min` selections. Returns `{ minCount: { min, actual } }` on
+ * failure so templates can surface a localised message keyed off the
+ * `minCount` error name.
+ */
+function minArrayLength(min: number) {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+    if (Array.isArray(value) && value.length >= min) return null;
+    return { minCount: { min, actual: Array.isArray(value) ? value.length : 0 } };
+  };
 }

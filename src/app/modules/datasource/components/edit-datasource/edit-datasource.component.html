@@ -13,20 +13,20 @@
           pButton
           type="button"
           [label]="'COMMON.CANCEL' | translate"
-          class="p-button-outlined p-button-danger"
+          class="p-button-outlined btn-cancel"
           [disabled]="!isFormDirty"
           (click)="onCancel()"
         ></button>
         <button
           pButton
-          class="p-button-outlined"
+          class="p-button-primary btn-save"
           type="submit"
           [label]="'COMMON.SAVE' | translate"
-          icon="pi pi-save"
-          iconPos="left"
           (click)="onSubmit()"
           [disabled]="!isFormValid() || saving()"
-        ></button>
+        >
+          <i class="pi pi-save mr-2"></i>
+        </button>
       </div>
     </div>
 

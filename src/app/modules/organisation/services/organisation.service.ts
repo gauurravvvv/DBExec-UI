@@ -398,4 +398,23 @@ export class OrganisationService {
   }) {
     return lastValueFrom(this.http.apiPost(DATASOURCE.VALIDATE, payload));
   }
+
+  /**
+   * validateMasterDb — tests Postgres connectivity for an org's master
+   * DB before saving the organisation. Gated server-side by the
+   * `orgManagement` permission (System Admin only). Distinct from
+   * validateDatasource() which is gated by `setupDB` and is not
+   * available to the System Admin under the V2 permission set.
+   */
+  validateMasterDb(payload: {
+    host: string;
+    port: number;
+    database: string;
+    username: string;
+    password: string;
+  }) {
+    return lastValueFrom(
+      this.http.apiPost(ORGANISATION.VALIDATE_MASTER_DB, payload),
+    );
+  }
 }

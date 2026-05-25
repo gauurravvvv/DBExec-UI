@@ -53,6 +53,7 @@ export const ORGANISATION = {
   BULK_DELETE: '/orgs/bulk-delete',
   REFRESH_MASTER_DB_PREFIX: '/orgs/', // POST /orgs/:id/refresh-master-db
   REFRESH_MASTER_DB_SUFFIX: '/refresh-master-db',
+  VALIDATE_MASTER_DB: '/orgs/validate-master-db',
 };
 
 export const USER = {

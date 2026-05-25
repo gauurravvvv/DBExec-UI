@@ -66,7 +66,7 @@ export class RoleService {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPut(ROLE.UPDATE, { ...data, justification }),
+        this.http.apiPut(ROLE.UPDATE + data.id, { ...data, justification }),
       );
     } finally {
       this._saving.set(false);
@@ -129,7 +129,7 @@ export class RoleService {
     justification?: string,
   ) {
     return lastValueFrom(
-      this.http.apiPut(ROLE.UPDATE, { ...data, justification }),
+      this.http.apiPut(ROLE.UPDATE + data.id, { ...data, justification }),
     );
   }
 

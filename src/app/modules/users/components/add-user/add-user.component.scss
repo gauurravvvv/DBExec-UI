@@ -207,7 +207,11 @@
 
         .error-message {
           color: var(--error-color);
-          font-size: var(--fs-body);
+          // Match the size used by app-custom-input /
+          // app-custom-dropdown / app-custom-multiselect so the
+          // inline multiselect-required error matches every other
+          // field's validation message.
+          font-size: var(--fs-label);
           margin-top: 0.25rem;
           display: block;
         }
@@ -504,5 +508,33 @@
         }
       }
     }
+  }
+}
+
+// Locale dropdown option — mirrors the brand-icon item pattern
+// used by the Database Type dropdown in Add Datasource. Flag glyph
+// on the left, native language name on the right. The custom-dropdown
+// renders the trigger inside .p-dropdown-label and panel rows inside
+// .p-dropdown-item; both contain our <ng-template> projection, so
+// the same .locale-option markup styles in both places.
+:host ::ng-deep .locale-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 2px 0;
+
+  .ci-flag {
+    width: 20px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .locale-option-label {
+    color: var(--text-color);
+    font-size: var(--fs-control);
+    line-height: 1.3;
+    white-space: nowrap;
+    flex: 1;
   }
 }

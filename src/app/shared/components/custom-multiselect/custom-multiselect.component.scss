@@ -227,6 +227,16 @@
     border-radius: var(--radius-sm) !important;
     box-shadow: var(--shadow-md) !important;
     margin-top: 2px !important;
+    // Pin the panel to the trigger's width. PrimeNG sets an inline
+    // `min-width: <triggerWidth>` on the panel host when it aligns the
+    // overlay; without a matching `max-width` the panel auto-grows
+    // when long chip labels or long option text are present, making
+    // the multiselect panel visually wider than the matching role
+    // (single-select) dropdown panel above it. Clamping `max-width`
+    // to `100%` of the panel's own min-width-anchored box keeps the
+    // panel width == trigger width regardless of option content.
+    max-width: var(--p-multiselect-panel-min-width, 100%) !important;
+    box-sizing: border-box !important;
 
     .p-multiselect-header {
       background: var(--card-background) !important;

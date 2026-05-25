@@ -218,6 +218,17 @@ export class EditDatasetComponent
   // load callbacks compare against this to discard stale state writes.
   private schemaSelectionToken = 0;
 
+  /**
+   * Per-datasource mode flag the BE returns with the bulk schema
+   * payload. Matches the add-dataset pattern:
+   *   `eager` = small/medium database, BE shipped the full tree
+   *             (schemas + tables + columns) in one round-trip.
+   *   `lazy`  = warehouse-scale database, BE auto-degraded to schemas
+   *             + tables only. Per-table column fetch fires on first
+   *             expand / IntelliSense reference.
+   */
+  schemaTreeMode: { [dbId: string]: 'eager' | 'lazy' } = {};
+
   // NgRx Store Observables for schema caching
   private schemaDataObservables: Map<string, Observable<any | null>> =
     new Map();
@@ -723,6 +734,7 @@ export class EditDatasetComponent
     if (!dbId) return Promise.resolve();
 
     const dbIdStr = dbId.toString();
+    // Capture the selection token so we can detect a stale response on return.
     const token = this.schemaSelectionToken;
 
     this.loadingDatasources[dbId] = true;
@@ -736,28 +748,64 @@ export class EditDatasetComponent
 
     return new Promise((resolve, reject) => {
       try {
-        // Lazy schema-list fetch (see add-dataset for the same pattern).
-        this.datasourceService
-          .listDatasourceSchemas({
-            datasourceId: dbIdStr,
-          })
-          .then((response: any) => {
-            const schemaData =
-              SchemaTransformerHelper.transformLazySchemasResponse(response);
-
-            if (schemaData.length > 0) {
-              const dbType = this.selectedDatasourceObj?.config?.dbType ?? null;
-              const tagged = dbType
-                ? { ...schemaData[0], dbType }
-                : schemaData[0];
+        // Single bulk call — schemas, tables, AND columns in one
+        // round-trip. The BE's getDatasourceStructure controller
+        // walks information_schema (dialect-aware) and returns the
+        // whole tree pre-shaped. Monaco's IntelliSense, the sidebar,
+        // and hover/completion all get populated at once instead of
+        // the previous schemas-first / tables-on-expand / columns-on-
+        // expand cascade — which forced the user to click every row
+        // before completion worked on pasted SQL.
+        //
+        // Mirrors the loader used by add-dataset so both screens
+        // behave identically on first paint.
+        this.queryService.getDatasourceStructure(dbIdStr).subscribe({
+          next: (response: any) => {
+            // Envelope check first — BE returns HTTP 200 with
+            // status:false on application-level failures (bad
+            // datasource, broken connection, etc.). Surface to the
+            // user via the standard service helper.
+            if (response && response.status === false) {
+              const msg =
+                response.message ||
+                this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA');
+              this.globalService.handleSuccessService(response, false);
               this.store.dispatch(
-                AddDatasetActions.loadSchemaDataSuccess({
+                AddDatasetActions.loadSchemaDataFailure({
                   dbId: dbIdStr,
-                  data: tagged,
+                  error: msg,
                 }),
               );
-              this.datasourceSchemas[dbId] = tagged;
+              this.loadingDatasources[dbId] = false;
+              this.cdr.markForCheck();
+              reject(new Error(msg));
+              return;
             }
+
+            const { datasources: transformed, mode } =
+              SchemaTransformerHelper.transformSchemaResponseWithMode(response);
+            // Mode = 'eager': columns shipped inline; every node
+            // gets tablesStatus + columnsStatus = 'loaded' so the
+            // lazy expand paths become no-ops.
+            // Mode = 'lazy': BE auto-degraded (warehouse-scale
+            // database). Schemas + tables are present; columns
+            // are NOT. Mark tables loaded but columns idle so
+            // ensureColumnsLoaded fires per-table on first
+            // expand / IntelliSense reference.
+            const dbType = this.getDbTypeFor(dbId);
+            const loadedTree =
+              mode === 'eager'
+                ? this.markTreeFullyLoaded(transformed[0], dbType)
+                : this.markTreeTablesOnlyLoaded(transformed[0], dbType);
+            this.schemaTreeMode[dbId] = mode;
+
+            this.store.dispatch(
+              AddDatasetActions.loadSchemaDataSuccess({
+                dbId: dbIdStr,
+                data: loadedTree,
+              }),
+            );
+            this.datasourceSchemas[dbId] = loadedTree;
 
             if (token === this.schemaSelectionToken) {
               this.datasources = Object.values(this.datasourceSchemas);
@@ -767,8 +815,8 @@ export class EditDatasetComponent
             this.loadingDatasources[dbId] = false;
             this.cdr.markForCheck();
             resolve();
-          })
-          .catch((error: any) => {
+          },
+          error: (error: any) => {
             this.store.dispatch(
               AddDatasetActions.loadSchemaDataFailure({
                 dbId: dbIdStr,
@@ -781,7 +829,8 @@ export class EditDatasetComponent
             this.loadingDatasources[dbId] = false;
             this.cdr.markForCheck();
             reject(error);
-          });
+          },
+        });
       } catch (error: any) {
         // Dispatch failure action
         this.store.dispatch(
@@ -798,6 +847,68 @@ export class EditDatasetComponent
         reject(error);
       }
     });
+  }
+
+  /**
+   * Resolve the dbType of a datasource id. In edit mode the dataset
+   * is locked to a single datasource, so we only need to consult
+   * `selectedDatasourceObj` — the add-dataset version's broader
+   * fallback (preloadedDatasources / availableDatasources) doesn't
+   * apply here.
+   */
+  private getDbTypeFor(dbId: string): string | null {
+    if (String(this.selectedDatasourceObj?.id) === String(dbId)) {
+      return this.selectedDatasourceObj?.config?.dbType ?? null;
+    }
+    return null;
+  }
+
+  /**
+   * Walk the freshly-loaded tree and stamp every schema's
+   * `tablesStatus` + every table's `columnsStatus` to 'loaded' so
+   * subsequent `ensureTablesLoaded` / `ensureColumnsLoaded` calls
+   * become no-ops. Pure — returns a new tree object.
+   */
+  private markTreeFullyLoaded(tree: any, dbType?: string | null): any {
+    if (!tree) return tree;
+    return {
+      ...tree,
+      ...(dbType ? { dbType } : {}),
+      schemas: (tree.schemas ?? []).map((schema: any) => ({
+        ...schema,
+        tablesStatus: 'loaded',
+        tablesError: null,
+        tables: (schema.tables ?? []).map((table: any) => ({
+          ...table,
+          columnsStatus: 'loaded',
+          columnsError: null,
+        })),
+      })),
+    };
+  }
+
+  /**
+   * Lazy-mode counterpart: tables present, columns absent. Mark
+   * tables loaded but leave column status idle so the per-table
+   * column fetch fires on first expand / IntelliSense reference.
+   */
+  private markTreeTablesOnlyLoaded(tree: any, dbType?: string | null): any {
+    if (!tree) return tree;
+    return {
+      ...tree,
+      ...(dbType ? { dbType } : {}),
+      schemas: (tree.schemas ?? []).map((schema: any) => ({
+        ...schema,
+        tablesStatus: 'loaded',
+        tablesError: null,
+        tables: (schema.tables ?? []).map((table: any) => ({
+          ...table,
+          columnsStatus: 'idle',
+          columnsError: null,
+          columns: table.columns ?? [],
+        })),
+      })),
+    };
   }
 
   /**

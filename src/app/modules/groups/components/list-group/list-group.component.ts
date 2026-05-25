@@ -100,7 +100,9 @@ export class ListGroupComponent implements OnInit {
       });
 
     this.loadRoles();
-    this.loadGroups();
+    // First fetch is driven by the <p-table [lazy]> component which
+    // fires (onLazyLoad) on initial render with the correct paging
+    // args. Calling loadGroups() here too would duplicate the request.
   }
 
   /**

@@ -352,8 +352,7 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     const reqId = ++this.testRequestId;
 
     this.organisationService
-      .validateDatasource({
-        type: 'postgres',
+      .validateMasterDb({
         host: formValue.dbHost,
         port: formValue.dbPort,
         database: formValue.dbName,

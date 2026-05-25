@@ -127,14 +127,13 @@
             [placeholder]="'USER.SELECT_GROUPS' | translate"
             display="chip"
             [filter]="true"
-            appendTo="body"
             icon="pi-users"
           ></app-custom-multiselect>
           <small
-            class="error-text"
+            class="error-message"
             *ngIf="
               userForm.get('groupIds')?.touched &&
-              userForm.get('groupIds')?.errors?.['required']
+              userForm.get('groupIds')?.errors?.['minCount']
             "
           >
             {{ 'USER.GROUP_REQUIRED' | translate }}
@@ -153,11 +152,28 @@
             optionLabel="label"
             optionValue="code"
             [placeholder]="'USER.SELECT_LANGUAGE' | translate"
-            [filter]="false"
+            [filter]="true"
+            filterBy="label"
             [required]="true"
-            appendTo="body"
-            icon="pi-globe"
-          ></app-custom-dropdown>
+          >
+            <!-- Selected-item trigger: flag + native language name.
+                 Mirrors the brand-icon trigger pattern used by the
+                 Database Type dropdown in Add Datasource. -->
+            <ng-template #selectedItemTemplate let-locale>
+              <div class="locale-option">
+                <i [class]="locale.flagClass" aria-hidden="true"></i>
+                <span class="locale-option-label">{{ locale.label }}</span>
+              </div>
+            </ng-template>
+            <!-- Panel rows: same flag + label markup so the open
+                 dropdown reads the same as the trigger. -->
+            <ng-template #itemTemplate let-locale>
+              <div class="locale-option">
+                <i [class]="locale.flagClass" aria-hidden="true"></i>
+                <span class="locale-option-label">{{ locale.label }}</span>
+              </div>
+            </ng-template>
+          </app-custom-dropdown>
         </div>
       </div>
     </form>

@@ -61,7 +61,9 @@ export class SectionService {
   async update(payload: any): Promise<any> {
     this._saving.set(true);
     try {
-      return await lastValueFrom(this.http.apiPut(SECTION.UPDATE, payload));
+      return await lastValueFrom(
+        this.http.apiPut(SECTION.UPDATE + payload.id, payload),
+      );
     } finally {
       this._saving.set(false);
     }
@@ -117,7 +119,7 @@ export class SectionService {
     const { id, name, description, datasource, tab, status } =
       sectionForm.value;
     return lastValueFrom(
-      this.http.apiPut(SECTION.UPDATE, {
+      this.http.apiPut(SECTION.UPDATE + id, {
         id,
         name,
         description,

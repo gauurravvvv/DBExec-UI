@@ -79,7 +79,7 @@ export class ConnectionService {
         dbPassword,
       } = form.getRawValue();
       return await lastValueFrom(
-        this.http.apiPut(CONNECTIONS.UPDATE, {
+        this.http.apiPut(CONNECTIONS.UPDATE + id, {
           id,
           name,
           description,

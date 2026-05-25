@@ -42,6 +42,16 @@ export class LoginService implements OnDestroy {
           result.data.sessionInactivityTimeout.toString(),
         );
       }
+
+      // Stash announcements returned by the login response so the
+      // header can render them without a separate /announcements/current
+      // call on mount, on every route change, and every 60s. Default
+      // to an empty array for default-org users (system admins) so
+      // downstream reads don't need a null guard.
+      StorageService.set(
+        StorageType.ANNOUNCEMENTS,
+        JSON.stringify(result.data.announcements ?? []),
+      );
     }
     return result;
   }

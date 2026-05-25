@@ -11,9 +11,9 @@ import {
   ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { auditTime, filter } from 'rxjs/operators';
+import { StorageType } from 'src/app/core/constants/storage-type.constant';
 import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import {
@@ -65,7 +65,6 @@ export class HeaderComponent implements OnInit {
   private typewriterTimer: ReturnType<typeof setTimeout> | null = null;
   private rotateTimer: ReturnType<typeof setInterval> | null = null;
   private readonly ROTATE_INTERVAL_MS = 8000;
-  private readonly POLL_INTERVAL_MS = 60_000;
 
   showNotificationMenu = false;
   unreadNotifications = 2;
@@ -147,41 +146,34 @@ export class HeaderComponent implements OnInit {
     this.updateUnreadCount();
 
     if (this.userRole !== ROLES.SYSTEM_ADMIN) {
-      this.fetchAnnouncements();
-      // Refetch on route change (debounced) — picks up new/expired/dismissed banners
-      this.router.events
-        .pipe(
-          filter(e => e instanceof NavigationEnd),
-          auditTime(500),
-          takeUntilDestroyed(this.destroyRef),
-        )
-        .subscribe(() => this.fetchAnnouncements());
-      // Background poll as a safety net for time-window expiry / new banners
-      const pollTimer = setInterval(
-        () => this.fetchAnnouncements(),
-        this.POLL_INTERVAL_MS,
-      );
-      this.destroyRef.onDestroy(() => clearInterval(pollTimer));
+      // Announcements are now delivered in the login response and
+      // stashed in storage. No polling, no route-change refetch —
+      // dismissals update storage in-place and admin-side mutations
+      // take effect on the user's next login.
+      this.loadAnnouncementsFromStorage();
     }
   }
 
-  private fetchAnnouncements() {
-    this.announcementService
-      .getActive()
-      .then(res => {
-        if (!res?.status || !Array.isArray(res?.data)) return;
-        this.mergeAnnouncements(
-          res.data.map((a: any) => ({
-            id: a.id,
-            name: a.name,
-            description: a.description,
-            bgColor: a.bgColor || '#0d47a1',
-            textColor: a.textColor || '#ffffff',
-          })),
-        );
-        this.cdr.markForCheck();
-      })
-      .catch(() => {});
+  private loadAnnouncementsFromStorage() {
+    const raw = StorageService.get(StorageType.ANNOUNCEMENTS);
+    if (!raw) return;
+    let parsed: any[] = [];
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      return;
+    }
+    if (!Array.isArray(parsed)) return;
+    this.mergeAnnouncements(
+      parsed.map((a: any) => ({
+        id: a.id,
+        name: a.name,
+        description: a.description,
+        bgColor: a.bgColor || '#0d47a1',
+        textColor: a.textColor || '#ffffff',
+      })),
+    );
+    this.cdr.markForCheck();
   }
 
   /**
@@ -426,6 +418,10 @@ export class HeaderComponent implements OnInit {
           this.currentAnnouncementIndex = snapshotIndex;
           this.startTypewriter();
           this.scheduleRotation();
+        } else {
+          // Persist the dismissal so a hard refresh doesn't bring it
+          // back from the login-time snapshot in storage.
+          this.persistAnnouncements();
         }
         this.cdr.markForCheck();
       })
@@ -436,6 +432,13 @@ export class HeaderComponent implements OnInit {
         this.scheduleRotation();
         this.cdr.markForCheck();
       });
+  }
+
+  private persistAnnouncements() {
+    StorageService.set(
+      StorageType.ANNOUNCEMENTS,
+      JSON.stringify(this.announcements),
+    );
   }
 
   nextAnnouncement() {

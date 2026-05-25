@@ -7,7 +7,7 @@ export const PERMISSIONS = {
   // User Management
   USER_MANAGEMENT: 'userManagement',
   ROLE_MANAGEMENT: 'roleManagement',
-  USER_GROUP: 'userGroupManagement',
+  USER_GROUP: 'groupManagement',
 
   // Data Management
   SETUP_DB: 'setupDB',

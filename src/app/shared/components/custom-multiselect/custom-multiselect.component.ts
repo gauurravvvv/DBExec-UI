@@ -172,6 +172,14 @@ export class CustomMultiselectComponent
       this.serverPage = 1;
       this.cacheSelectedItemsFromOptions();
       this.ensureSelectedInOptions();
+      // OnPush parents can pass `preloadedItems` after their own async
+      // load resolves (add-user / edit-user call loadGroups() then
+      // markForCheck). Without an inner markForCheck here, the inner
+      // <p-multiSelect>'s [options] binding isn't re-evaluated until
+      // the next CD tick — so the dropdown stays empty until the user
+      // interacts. Force a check so the preloaded list shows up
+      // immediately.
+      this.cdr.markForCheck();
     }
   }
 

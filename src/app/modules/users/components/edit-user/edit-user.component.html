@@ -122,14 +122,13 @@
             [placeholder]="'USER.SELECT_GROUPS' | translate"
             display="chip"
             [filter]="true"
-            appendTo="body"
             icon="pi-users"
           ></app-custom-multiselect>
           <small
-            class="error-text"
+            class="error-message"
             *ngIf="
               userForm.get('groupIds')?.touched &&
-              userForm.get('groupIds')?.errors?.['required']
+              userForm.get('groupIds')?.errors?.['minCount']
             "
           >
             {{ 'USER.GROUP_REQUIRED' | translate }}

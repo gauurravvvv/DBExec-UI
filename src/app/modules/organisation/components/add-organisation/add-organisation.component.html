@@ -206,7 +206,7 @@
         </div>
       </div>
 
-      <!-- Step 2: Master Datasource -->
+      <!-- Step 2: Master Database -->
       <div *ngIf="currentStep === 1" class="step-2-layout">
         <!-- Left Column: Form Fields -->
         <div class="step-2-left">
@@ -370,19 +370,17 @@
             >
             </app-custom-input>
 
-            <div class="form-field">
-              <label>{{ 'ORG.ADMIN_LOCALE' | translate }}</label>
-              <app-custom-dropdown
-                formControlName="adminLocale"
-                [options]="locales"
-                optionLabel="label"
-                optionValue="code"
-                [placeholder]="'ORG.ADMIN_LOCALE_PLACEHOLDER' | translate"
-                [filter]="false"
-                appendTo="body"
-                icon="pi-globe"
-              ></app-custom-dropdown>
-            </div>
+            <app-custom-dropdown
+              formControlName="adminLocale"
+              [label]="'ORG.ADMIN_LOCALE' | translate"
+              [options]="locales"
+              optionLabel="label"
+              optionValue="code"
+              [placeholder]="'ORG.ADMIN_LOCALE_PLACEHOLDER' | translate"
+              [filter]="false"
+              appendTo="body"
+              icon="pi-globe"
+            ></app-custom-dropdown>
 
             <p class="admin-setup-note">
               <i class="pi pi-info-circle"></i>

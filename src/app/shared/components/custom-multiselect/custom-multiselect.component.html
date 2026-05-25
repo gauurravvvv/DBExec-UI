@@ -31,7 +31,6 @@
           [virtualScroll]="virtualScroll"
           [virtualScrollItemSize]="virtualScrollItemSize"
           [style]="{ width: '100%' }"
-          [panelStyle]="{ width: '100%' }"
           [placeholder]="placeholder"
           [display]="display"
           [disabled]="disabled"
@@ -85,7 +84,6 @@
           [virtualScroll]="virtualScroll"
           [virtualScrollItemSize]="virtualScrollItemSize"
           [style]="{ width: '100%' }"
-          [panelStyle]="{ width: '100%' }"
           [placeholder]="placeholder"
           [display]="display"
           [disabled]="disabled"
@@ -112,7 +110,7 @@
       aria-hidden="true"
     ></i>
     <p-multiSelect
-      [options]="options"
+      [options]="serverMode ? serverOptions : options"
       [optionLabel]="optionLabel"
       [optionValue]="$any(optionValue)"
       [(ngModel)]="value"
@@ -128,17 +126,20 @@
       [scrollHeight]="scrollHeight"
       [emptyMessage]="resolvedEmptyMessage"
       [filterPlaceHolder]="resolvedFilterPlaceholder"
-      [emptyFilterMessage]="resolvedEmptyFilterMessage"
+      [emptyFilterMessage]="
+        serverLoading ? resolvedLoadingMessage : resolvedEmptyFilterMessage
+      "
       [virtualScroll]="virtualScroll"
       [virtualScrollItemSize]="virtualScrollItemSize"
       [style]="{ width: '100%' }"
-      [panelStyle]="{ width: '100%' }"
       [placeholder]="placeholder"
       [display]="display"
       [disabled]="disabled"
       [ngClass]="{ 'ng-invalid ng-dirty': showError }"
       (onChange)="onValueChange($event.value)"
       (onBlur)="onBlur()"
+      (onPanelShow)="onPanelShow()"
+      (onFilter)="onServerFilter($event)"
       [appendTo]="appendTo"
     >
     </p-multiSelect>

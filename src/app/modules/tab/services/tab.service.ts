@@ -59,7 +59,9 @@ export class TabService {
   async update(payload: any): Promise<any> {
     this._saving.set(true);
     try {
-      return await lastValueFrom(this.http.apiPut(TAB.UPDATE, payload));
+      return await lastValueFrom(
+        this.http.apiPut(TAB.UPDATE + payload.id, payload),
+      );
     } finally {
       this._saving.set(false);
     }
@@ -116,7 +118,7 @@ export class TabService {
   updateTab(tabForm: FormGroup, justification?: string) {
     const { id, name, description, datasource, status } = tabForm.getRawValue();
     return lastValueFrom(
-      this.http.apiPut(TAB.UPDATE, {
+      this.http.apiPut(TAB.UPDATE + id, {
         id,
         name,
         description,

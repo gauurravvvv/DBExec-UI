@@ -89,7 +89,9 @@ export class ListAnnouncementsComponent implements OnInit {
       .subscribe(() => this.loadAnnouncements());
 
     this.loadGroups();
-    this.loadAnnouncements();
+    // First fetch is driven by the <p-table [lazy]> component which
+    // fires (onLazyLoad) on initial render. Calling loadAnnouncements()
+    // here too would duplicate the request.
   }
 
   /**

@@ -81,8 +81,9 @@ export class ListRoleComponent implements OnInit {
     this.filter$
       .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.loadRoles());
-
-    this.loadRoles();
+    // First fetch is driven by the <p-table [lazy]> component which
+    // fires (onLazyLoad) on initial render with the correct paging
+    // args. Calling loadRoles() here too would duplicate the request.
   }
 
   get selectedCount(): number {
