@@ -46,8 +46,6 @@ export class ListLoginActivityComponent implements OnInit {
   filterValues: any = {
     username: '',
     eventType: null,
-    organisationName: '',
-    organisationId: null,
     ipAddress: '',
     dateRange: null,
   };
@@ -112,8 +110,6 @@ export class ListLoginActivityComponent implements OnInit {
     return (
       !!this.filterValues.username ||
       !!this.filterValues.eventType ||
-      !!this.filterValues.organisationName ||
-      !!this.filterValues.organisationId ||
       !!this.filterValues.ipAddress ||
       !!this.filterValues.dateRange
     );
@@ -129,8 +125,6 @@ export class ListLoginActivityComponent implements OnInit {
     this.filterValues = {
       username: '',
       eventType: null,
-      organisationName: '',
-      organisationId: null,
       ipAddress: '',
       dateRange: null,
     };
@@ -164,10 +158,6 @@ export class ListLoginActivityComponent implements OnInit {
       filter.username = this.filterValues.username;
     if (this.filterValues.eventType)
       filter.eventType = this.filterValues.eventType;
-    if (this.filterValues.organisationName)
-      filter.organisationName = this.filterValues.organisationName;
-    if (this.filterValues.organisationId)
-      filter.organisationId = this.filterValues.organisationId;
     if (this.filterValues.ipAddress)
       filter.ipAddress = this.filterValues.ipAddress;
     if (this.filterValues.dateRange?.[0])

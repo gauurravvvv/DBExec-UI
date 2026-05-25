@@ -75,11 +75,6 @@
                   {{ 'LOGIN_ACTIVITY.EVENT' | translate }}
                 </div>
               </th>
-              <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">
-                  {{ 'COMMON.ORGANISATION' | translate }}
-                </div>
-              </th>
               <th style="min-width: 14rem">
                 <div class="th-content">
                   {{ 'LOGIN_ACTIVITY.FAILURE_REASON' | translate }}
@@ -125,14 +120,6 @@
                   icon="pi-th-large"
                 ></app-custom-dropdown>
               </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.organisationName"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'LOGIN_ACTIVITY.SEARCH_ORG' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
               <th><!-- Failure Reason — no filter --></th>
               <th>
                 <app-custom-daterange
@@ -170,11 +157,6 @@
                 </span>
               </td>
               <td>
-                <span class="description-text">{{
-                  activity.organisationName || '-'
-                }}</span>
-              </td>
-              <td>
                 <span
                   class="description-text"
                   *ngIf="activity.failureReason"
@@ -207,7 +189,7 @@
           </ng-template>
           <ng-template pTemplate="emptymessage">
             <tr class="empty-row">
-              <td colspan="7" class="empty-message-cell">
+              <td colspan="6" class="empty-message-cell">
                 <div class="empty-state-inline">
                   <i class="pi pi-search empty-state-icon"></i>
                   <span class="empty-state-text">

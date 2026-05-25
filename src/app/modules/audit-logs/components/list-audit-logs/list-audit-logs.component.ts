@@ -55,7 +55,6 @@ export class ListAuditLogsComponent implements OnInit {
     module: null,
     action: null,
     entityName: '',
-    organisationId: null,
     status: null,
     ipAddress: '',
     justification: '',
@@ -117,7 +116,6 @@ export class ListAuditLogsComponent implements OnInit {
       !!this.filterValues.module ||
       !!this.filterValues.action ||
       !!this.filterValues.entityName ||
-      !!this.filterValues.organisationId ||
       this.filterValues.status !== null ||
       !!this.filterValues.ipAddress ||
       !!this.filterValues.justification ||
@@ -131,7 +129,6 @@ export class ListAuditLogsComponent implements OnInit {
       module: null,
       action: null,
       entityName: '',
-      organisationId: null,
       status: null,
       ipAddress: '',
       justification: '',
@@ -307,8 +304,6 @@ export class ListAuditLogsComponent implements OnInit {
     if (this.filterValues.action) filter.action = this.filterValues.action;
     if (this.filterValues.entityName)
       filter.entityName = this.filterValues.entityName;
-    if (this.filterValues.organisationId)
-      filter.organisationId = this.filterValues.organisationId;
     if (this.filterValues.status !== null)
       filter.status = this.filterValues.status;
     if (this.filterValues.ipAddress)
