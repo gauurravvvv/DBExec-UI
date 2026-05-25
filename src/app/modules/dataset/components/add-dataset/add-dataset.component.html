@@ -2,21 +2,29 @@
   <!-- Header Toolbar -->
   <div class="query-toolbar">
     <div class="toolbar-left">
-      <!-- Database Explorer toggle. Segmented-button pattern that
-           matches the analyses module's panel-toggle buttons. The
-           `is-active` class lights up when the sidebar is open;
-           clicking flips it. Replaces the previous chevron strip
-           that sat between the sidebar and the editor and the
-           rotated-text affordance when collapsed (both removed). -->
+      <!-- Database Explorer toggle. Icon-only chevron that points
+           "outward" — left when the sidebar is open (click to close
+           it leftward) and right when collapsed (click to push it
+           open rightward). Matches the universal sidebar-toggle
+           convention (VS Code, JetBrains, Figma) so users don't
+           need a label to read it. The tooltip carries the verbal
+           cue for first-time / a11y users. -->
       <button
         type="button"
-        class="a-segment__btn"
-        [class.is-active]="showDatasourceSidebar"
+        class="sidebar-toggle-btn"
         (click)="toggleDatasourceSidebar()"
-        [title]="'DATASET.TOGGLE_SIDEBAR' | translate"
+        [pTooltip]="'DATASET.TOGGLE_SIDEBAR' | translate"
+        tooltipPosition="bottom"
+        [attr.aria-label]="'DATASET.TOGGLE_SIDEBAR' | translate"
+        [attr.aria-expanded]="showDatasourceSidebar"
       >
-        <i class="pi pi-sitemap" aria-hidden="true"></i>
-        <span>{{ 'DATASET.DATABASE_EXPLORER' | translate }}</span>
+        <i
+          class="pi"
+          [ngClass]="
+            showDatasourceSidebar ? 'pi-chevron-left' : 'pi-chevron-right'
+          "
+          aria-hidden="true"
+        ></i>
       </button>
 
       <!-- Datasource is preselected via the list-dataset Add popup

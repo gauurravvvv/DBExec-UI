@@ -2372,38 +2372,32 @@ td.empty-message-cell {
 // with --primary-color background when is-active. Sits inline at
 // the toolbar's natural baseline.
 // ────────────────────────────────────────────────────────────────────
-.a-segment__btn {
-  height: 28px;
-  padding: 0 10px;
-  border: 1px solid var(--border-color);
-  background: var(--card-background);
+// Sidebar toggle — small icon-only chevron in the toolbar.
+// Mirrors the universal "drawer toggle" convention from VS Code,
+// JetBrains IDEs, Figma, etc.: chevron points the direction the
+// panel would move on click. No label — the tooltip carries the
+// verbal cue.
+.sidebar-toggle-btn {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: var(--secondary-color);
-  font-size: var(--fs-label);
-  font-weight: var(--fw-medium);
+  border-radius: var(--radius-xs, 3px);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  border-radius: var(--radius-sm);
-  transition:
-    color var(--motion-fast) ease,
-    background var(--motion-fast) ease,
-    border-color var(--motion-fast) ease;
+  justify-content: center;
+  transition: all var(--motion-fast) ease;
 
   i {
     font-size: 12px;
+    line-height: 1;
   }
 
-  &:hover:not(.is-active) {
-    color: var(--text-color);
+  &:hover {
+    color: var(--primary-color);
     background: var(--hover-background);
-    border-color: var(--primary-color-transparent);
-  }
-
-  &.is-active {
-    color: var(--primary-text, #fff);
-    background: var(--primary-color);
-    border-color: var(--primary-color);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
   }
 }
