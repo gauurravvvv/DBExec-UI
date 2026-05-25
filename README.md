@@ -22,6 +22,35 @@ A complete SQL workspace in the browser. Connect any of your databases (Postgres
 
 The UI talks to **[DBExec-API](https://github.com/gauurravvvv/DbExec-API)** over a JWT-authenticated REST API.
 
+## The Organisation model — the lens for everything below
+
+Every screen in the app is scoped to an **Organisation**. An organisation isn't a tag — it's a fully isolated container. Each organisation has its own database on the backend, with its own users, groups, roles, datasources, datasets, analyses, dashboards, and audit log. Two organisations can't see each other's anything.
+
+```
+   ╔════════════════════════════╗      ╔════════════════════════════╗
+   ║   Organisation A           ║      ║   Organisation B           ║
+   ║   ─────────────────        ║      ║   ─────────────────        ║
+   ║   • Users (A only)         ║      ║   • Users (B only)         ║
+   ║   • Groups, Roles, RLS     ║      ║   • Groups, Roles, RLS     ║
+   ║   • Datasources            ║      ║   • Datasources            ║
+   ║   • Datasets               ║      ║   • Datasets               ║
+   ║   • Analyses, Dashboards   ║      ║   • Analyses, Dashboards   ║
+   ║   • Audit log              ║      ║   • Audit log              ║
+   ╚════════════════════════════╝      ╚════════════════════════════╝
+```
+
+Concretely, in the UI:
+
+- **The JWT in `localStorage` pins you to one organisation.** Every API call carries it; the backend opens that organisation's database and serves you data from there. There's no `?orgId=` query param to remember — it's already baked in.
+- **Three roles:**
+  - **SYSTEM-ADMIN** — operates above organisations. Sees the org list, creates new orgs, manages super admins. Most product screens (datasets, analyses) are still org-scoped for them; they enter an org's context to use them.
+  - **ORG-ADMIN** — manages everything inside one organisation: users, groups, roles, RLS, datasources, etc.
+  - **ORG-USER** — uses datasets, runs analyses, views dashboards within their org. Bounded by RLS rules and access grants.
+- **Route guards enforce this.** `authGuard` checks the JWT; `roleGuard` gates routes like `/app/organisations` to `SYSTEM-ADMIN` only.
+- **No cross-org primitives.** Two organisations can have a user with the same email, a dataset with the same name, even a datasource pointing at the same external host — they never see or collide with each other.
+
+Keep this in mind when you read the module list below: when you see "Users", "Datasets", "Audit log", they all mean *the current organisation's* users, datasets, audit log — not a shared global pool.
+
 ### Core surfaces
 
 | Area | What lives here |
