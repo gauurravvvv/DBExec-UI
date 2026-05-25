@@ -3,11 +3,7 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button
-          pButton
-          class="p-button-text p-button-plain back-button"
-          (click)="goBack()"
-        >
+        <button pButton class="p-button-text p-button-plain back-button" (click)="goBack()">
           <i class="pi pi-arrow-left back-icon"></i>
         </button>
         <h2>{{ 'DATASET.DATASET_DETAILS' | translate }}</h2>
@@ -42,8 +38,8 @@
               <label>{{ 'COMMON.DESCRIPTION' | translate }}</label>
               <p>
                 {{
-                  datasetData.description ||
-                    ('DATASET.NO_DESCRIPTION' | translate)
+                datasetData.description ||
+                ('DATASET.NO_DESCRIPTION' | translate)
                 }}
               </p>
             </div>
@@ -51,30 +47,24 @@
               <label>{{ 'COMMON.TYPE' | translate }}</label>
               <p>
                 {{
-                  datasetData.type === 1
-                    ? ('DATASET.SQL_BASED' | translate)
-                    : ('DATASET.PROMPT_BASED' | translate)
+                datasetData.type === 1
+                ? ('DATASET.SQL_BASED' | translate)
+                : ('DATASET.PROMPT_BASED' | translate)
                 }}
               </p>
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.STATUS' | translate }}</label>
-              <span
-                class="status-badge"
-                [class.active]="datasetData.status === 1"
-              >
-                <i
-                  class="pi"
-                  [ngClass]="
+              <span class="status-badge" [class.active]="datasetData.status === 1">
+                <i class="pi" [ngClass]="
                     datasetData.status === 1
                       ? 'pi-check-circle'
                       : 'pi-times-circle'
-                  "
-                ></i>
+                  "></i>
                 {{
-                  datasetData.status === 1
-                    ? ('COMMON.ACTIVE' | translate)
-                    : ('COMMON.INACTIVE' | translate)
+                datasetData.status === 1
+                ? ('COMMON.ACTIVE' | translate)
+                : ('COMMON.INACTIVE' | translate)
                 }}
               </span>
             </div>
@@ -103,10 +93,7 @@
         </div>
 
         <!-- Query Builder Configuration (Type 2 only) -->
-        <div
-          class="info-section full-width"
-          *ngIf="datasetData.type === 2 && datasetData.queryBuilderId"
-        >
+        <div class="info-section full-width" *ngIf="datasetData.type === 2 && datasetData.queryBuilderId">
           <div class="section-header">
             <h3>
               <i class="pi pi-sliders-h mr-2"></i>
@@ -119,44 +106,32 @@
               <p class="with-icon">
                 <i class="pi pi-sitemap mr-2"></i>
                 {{
-                  datasetData.queryBuilderName ||
-                    'Query Builder #' + datasetData.queryBuilderId
+                datasetData.queryBuilderName ||
+                'Query Builder #' + datasetData.queryBuilderId
                 }}
               </p>
             </div>
           </div>
 
           <!-- Grouped Display: Tab + Accordion (matches Execution Config popup) -->
-          <div
-            class="qb-config-display"
-            *ngIf="datasetData.promptConfig?.display?.length > 0"
-          >
+          <div class="qb-config-display" *ngIf="datasetData.promptConfig?.display?.length > 0">
             <p-tabView [scrollable]="true" styleClass="qb-config-tabs">
-              <p-tabPanel
-                *ngFor="
+              <p-tabPanel *ngFor="
                   let tab of datasetData.promptConfig.display;
                   trackBy: trackByIndex
-                "
-                [header]="tab.tabName"
-              >
+                " [header]="tab.tabName">
                 <p-accordion [multiple]="true">
-                  <p-accordionTab
-                    *ngFor="let section of tab.sections; trackBy: trackByIndex"
-                    [header]="section.sectionName"
-                    [selected]="true"
-                  >
+                  <p-accordionTab *ngFor="let section of tab.sections; trackBy: trackByIndex"
+                    [header]="section.sectionName" [selected]="true">
                     <div class="result-table">
-                      <div
-                        class="result-row"
-                        *ngFor="
+                      <div class="result-row" *ngFor="
                           let prompt of section.prompts;
                           trackBy: trackByName
-                        "
-                      >
+                        ">
                         <span class="result-name">{{ prompt.name }}</span>
                         <span class="result-value">{{
                           formatPromptValue(prompt)
-                        }}</span>
+                          }}</span>
                       </div>
                     </div>
                   </p-accordionTab>
@@ -166,24 +141,18 @@
           </div>
 
           <!-- Fallback: flat prompts list (old format without display grouping) -->
-          <div
-            class="qb-config-display"
-            *ngIf="
+          <div class="qb-config-display" *ngIf="
               !datasetData.promptConfig?.display &&
               datasetData.promptConfig?.prompts?.length > 0
-            "
-          >
+            ">
             <div class="result-table">
-              <div
-                class="result-row"
-                *ngFor="
+              <div class="result-row" *ngFor="
                   let p of datasetData.promptConfig.prompts;
                   trackBy: trackByIndex
-                "
-              >
+                ">
                 <span class="result-name">{{
                   p.name || 'Prompt #' + p.promptId
-                }}</span>
+                  }}</span>
                 <span class="result-value">{{ formatPromptValue(p) }}</span>
               </div>
             </div>
@@ -196,28 +165,18 @@
             <h3>
               <i class="pi pi-code mr-2"></i>
               {{
-                datasetData.type === 2
-                  ? ('DATASET.GENERATED_SQL_QUERY' | translate)
-                  : ('DATASET.SQL_QUERY' | translate)
+              datasetData.type === 2
+              ? ('DATASET.GENERATED_SQL_QUERY' | translate)
+              : ('DATASET.SQL_QUERY' | translate)
               }}
             </h3>
             <div class="sql-actions">
-              <button
-                pButton
-                class="p-button-text btn-export"
-                (click)="copySQLToClipboard()"
-                [pTooltip]="'DATASET.COPY_SQL' | translate"
-                tooltipPosition="top"
-              >
+              <button pButton class="p-button-text btn-export" (click)="copySQLToClipboard()"
+                [pTooltip]="'DATASET.COPY_SQL' | translate" tooltipPosition="top">
                 <i class="pi pi-copy"></i>
               </button>
-              <button
-                pButton
-                class="p-button-text btn-export"
-                (click)="downloadSQL()"
-                [pTooltip]="'DATASET.DOWNLOAD_SQL' | translate"
-                tooltipPosition="top"
-              >
+              <button pButton class="p-button-text btn-export" (click)="downloadSQL()"
+                [pTooltip]="'DATASET.DOWNLOAD_SQL' | translate" tooltipPosition="top">
                 <i class="pi pi-download"></i>
               </button>
             </div>
@@ -235,7 +194,7 @@
               {{ 'DATASET.FIELDS' | translate }}
               <span class="count-badge">{{
                 datasetData.datasetFields?.length || 0
-              }}</span>
+                }}</span>
             </h3>
             <button class="btn-add-field" (click)="openAddCustomFieldDialog()">
               <i class="pi pi-plus"></i>
@@ -243,62 +202,38 @@
             </button>
           </div>
           <div class="column-mapping-container">
-            <div
-              *ngIf="
+            <div *ngIf="
                 datasetData?.datasetFields &&
                   datasetData?.datasetFields.length > 0;
                 else noMappings
-              "
-            >
+              ">
               <div class="mapping-list">
-                <div
-                  class="mapping-item"
-                  *ngFor="
+                <div class="mapping-item" *ngFor="
                     let entity of datasetData.datasetFields;
                     let i = index;
                     trackBy: trackById
-                  "
-                  [class.custom-field]="entity.type === 2"
-                >
+                  " [class.custom-field]="entity.type === 2">
                   <span class="field-number">{{ i + 1 }}</span>
                   <div class="field-content">
                     <span class="column-view">{{ entity.columnToView }}</span>
                     <span class="column-use">{{ entity.columnToUse }}</span>
                   </div>
-                  <span
-                    class="field-datatype"
-                    *ngIf="entity.dataType"
-                    [pTooltip]="
+                  <span class="field-datatype" *ngIf="entity.dataType" [pTooltip]="
                       ('DATASET.SOURCE' | translate) + ': ' + entity.dataType
-                    "
-                    tooltipPosition="top"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="getDataTypeIcon(entity.dataType)"
-                    ></i>
+                    " tooltipPosition="top">
+                    <i class="pi" [ngClass]="getDataTypeIcon(entity.dataType)"></i>
                     <span class="datatype-label">{{
                       getDataTypeLabel(entity.dataType)
-                    }}</span>
+                      }}</span>
                   </span>
                   <div class="field-actions">
-                    <button
-                      pButton
-                      class="p-button-text p-button-sm btn-edit"
-                      (click)="openEditFieldDialog(entity, i)"
-                      [pTooltip]="'DATASET.EDIT_FIELD' | translate"
-                      tooltipPosition="top"
-                    >
+                    <button pButton class="p-button-text p-button-sm btn-edit" (click)="openEditFieldDialog(entity, i)"
+                      [pTooltip]="'DATASET.EDIT_FIELD' | translate" tooltipPosition="top">
                       <i class="pi pi-pencil"></i>
                     </button>
-                    <button
-                      pButton
-                      class="p-button-text p-button-sm p-button-danger btn-delete"
-                      (click)="confirmDeleteField(entity, i)"
-                      [pTooltip]="'DATASET.DELETE_FIELD' | translate"
-                      tooltipPosition="top"
-                      [disabled]="entity.type !== 2"
-                    >
+                    <button pButton class="p-button-text p-button-sm p-button-danger btn-delete"
+                      (click)="confirmDeleteField(entity, i)" [pTooltip]="'DATASET.DELETE_FIELD' | translate"
+                      tooltipPosition="top" [disabled]="entity.type !== 2">
                       <i class="pi pi-trash"></i>
                     </button>
                   </div>
@@ -321,25 +256,19 @@
             {{ 'DATASET.ANALYSES' | translate }}
             <span class="count-badge">{{
               datasetData.analyses?.length || 0
-            }}</span>
+              }}</span>
           </h3>
           <div class="fields-list">
-            <div
-              class="field-item"
-              *ngFor="
+            <div class="field-item" *ngFor="
                 let analysis of datasetData.analyses;
                 trackBy: trackByName
-              "
-            >
+              ">
               <i class="pi pi-chart-line"></i>
               {{ analysis.name || analysis }}
             </div>
-            <div
-              *ngIf="
+            <div *ngIf="
                 !datasetData?.analyses || datasetData?.analyses.length === 0
-              "
-              class="no-data"
-            >
+              " class="no-data">
               {{ 'DATASET.NO_ANALYSES_FOUND' | translate }}
             </div>
           </div>
@@ -350,34 +279,20 @@
 </div>
 
 <!-- Edit Fields Dialog -->
-<app-edit-dataset-fields-dialog
-  [visible]="showEditFieldsDialog"
-  [field]="selectedField"
-  [fieldIndex]="selectedFieldIndex"
-  (close)="onEditFieldDialogClose($event)"
->
+<app-edit-dataset-fields-dialog [visible]="showEditFieldsDialog" [field]="selectedField"
+  [fieldIndex]="selectedFieldIndex" (close)="onEditFieldDialogClose($event)">
 </app-edit-dataset-fields-dialog>
 
 <!-- Add Custom Field Dialog -->
-<app-add-custom-field-dialog
-  [visible]="showAddCustomFieldDialog"
-  [datasetId]="datasetData?.id"
-  [organisationId]="datasetData?.organisationId"
-  [datasetFields]="datasetData?.datasetFields || []"
-  (close)="onAddCustomFieldDialogClose($event)"
->
+<app-add-custom-field-dialog [visible]="showAddCustomFieldDialog" [datasetId]="datasetData?.id"
+[datasetFields]="datasetData?.datasetFields || []"
+  (close)="onAddCustomFieldDialogClose($event)">
 </app-add-custom-field-dialog>
 
 <!-- Edit Custom Field Dialog -->
-<app-add-custom-field-dialog
-  [visible]="showEditCustomFieldDialog"
-  [datasetId]="datasetData?.id"
-  [organisationId]="datasetData?.organisationId"
-  [datasetFields]="datasetData?.datasetFields || []"
-  [editMode]="true"
-  [editFieldData]="selectedField"
-  (close)="onEditCustomFieldDialogClose($event)"
->
+<app-add-custom-field-dialog [visible]="showEditCustomFieldDialog" [datasetId]="datasetData?.id"
+[datasetFields]="datasetData?.datasetFields || []" [editMode]="true"
+  [editFieldData]="selectedField" (close)="onEditCustomFieldDialogClose($event)">
 </app-add-custom-field-dialog>
 
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
@@ -412,17 +327,10 @@
       </ul>
 
       <div class="justification-section">
-        <label for="deleteJustification"
-          >{{ 'COMMON.JUSTIFICATION' | translate }}
-          <span class="required">*</span></label
-        >
-        <textarea
-          id="deleteJustification"
-          [(ngModel)]="deleteJustification"
-          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
-          rows="3"
-          maxlength="500"
-        ></textarea>
+        <label for="deleteJustification">{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label>
+        <textarea id="deleteJustification" [(ngModel)]="deleteJustification"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate" rows="3" maxlength="500"></textarea>
         <small class="char-count">{{ deleteJustification.length }}/500</small>
       </div>
     </div>
@@ -433,11 +341,7 @@
         <i class="pi pi-times"></i>
         {{ 'COMMON.CANCEL' | translate }}
       </button>
-      <button
-        class="btn-confirm"
-        (click)="proceedDelete()"
-        [disabled]="!deleteJustification.trim()"
-      >
+      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="!deleteJustification.trim()">
         <i class="pi pi-trash"></i>
         {{ 'COMMON.DELETE' | translate }}
       </button>
