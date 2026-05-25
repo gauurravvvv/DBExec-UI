@@ -30,8 +30,7 @@ export class EditUserComponent implements OnInit, HasUnsavedChanges {
   preloadedGroups: any[] | null = null;
   preloadedGroupsTotal: number | null = null;
   userId: string = '';
-  showOrganisationDropdown =
-    this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
   selectedOrgName: string = '';
   userData: any;
   orgId: string = '';

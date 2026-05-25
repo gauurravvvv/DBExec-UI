@@ -33,8 +33,7 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
   preloadedOrgs: any[] | null = null;
   preloadedOrgsTotal: number | null = null;
   permissions: any[] = [];
-  showOrganisationDropdown =
-    this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
   selectedOrg: any = null;
   permissionControls: { [key: string]: FormControl } = {};
 
@@ -76,9 +75,7 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
       organisation: [
         {
           value:
-            this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN
-              ? ''
-              : this.globalService.getTokenDetails('organisationId'),
+            this.globalService.getTokenDetails('organisationId'),
           disabled: false,
         },
         Validators.required,
@@ -208,9 +205,7 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
   onCancel() {
     this.roleForm.reset({
       organisation:
-        this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN
-          ? ''
-          : this.globalService.getTokenDetails('organisationId'),
+        this.globalService.getTokenDetails('organisationId'),
     });
     this.selectedOrg = null;
     this.permissions = [];

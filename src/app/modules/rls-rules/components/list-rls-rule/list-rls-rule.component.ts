@@ -62,7 +62,7 @@ export class ListRlsRuleComponent implements OnInit {
   preloadedOrgs: any[] | null = null;
   preloadedOrgsTotal: number | null = null;
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
 
   statusOptions = [
     { label: this.translate.instant('COMMON.ACTIVE'), value: 1 },

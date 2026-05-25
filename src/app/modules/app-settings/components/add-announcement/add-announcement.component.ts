@@ -47,7 +47,7 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
   preloadedGroups: any[] | null = null;
   preloadedGroupsTotal: number | null = null;
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
   maxDescriptionLength = 1000;
   minDate = new Date();
   showPreview = false;

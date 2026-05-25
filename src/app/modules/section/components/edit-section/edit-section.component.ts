@@ -34,7 +34,7 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
 
   sectionForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
   orgId: string = '';
   sectionId: string = '';
   selectedOrgName: string = '';

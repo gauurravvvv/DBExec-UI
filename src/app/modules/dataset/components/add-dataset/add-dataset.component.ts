@@ -472,7 +472,7 @@ export class AddDatasetComponent
     private elementRef: ElementRef<HTMLElement>,
   ) {
     this.userRole = this.globalService.getTokenDetails('role') || '';
-    this.showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
+    this.showOrganisationDropdown = false;
   }
 
   ngOnInit(): void {

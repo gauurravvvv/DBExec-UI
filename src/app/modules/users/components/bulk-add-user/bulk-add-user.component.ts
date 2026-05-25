@@ -82,8 +82,7 @@ export class BulkAddUserComponent implements OnInit {
 
   /** Role-derived: System Admin sees the org dropdown; org-admin/org-user
    *  have their org locked from the JWT token (same logic as add-user). */
-  showOrgDropdown =
-    this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
+  showOrgDropdown = false;
 
   // Org dropdown server-mode plumbing (sys-admin only).
   preloadedOrgs: any[] | null = null;

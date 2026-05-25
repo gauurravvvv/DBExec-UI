@@ -59,7 +59,7 @@ export class ListPromptComponent implements OnInit {
   selectedOrg: any = null;
   selectedDatasource: any = null;
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
   today = new Date();

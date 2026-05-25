@@ -41,8 +41,7 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
   // Server-mode preload for the Role dropdown. Refilled on org change.
   preloadedRoles: any[] | null = null;
   preloadedRolesTotal: number | null = null;
-  showOrganisationDropdown =
-    this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
 
   saving = this.groupService.saving;
 
@@ -90,9 +89,7 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
       ],
       description: [''],
       organisation: [
-        this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN
-          ? ''
-          : this.globalService.getTokenDetails('organisationId'),
+        this.globalService.getTokenDetails('organisationId'),
         Validators.required,
       ],
       roleId: ['', Validators.required],

@@ -97,8 +97,7 @@ export class ListLoginActivityComponent implements OnInit {
       },
     ];
 
-    this.isSystemAdmin =
-      this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
+    this.isSystemAdmin = false;
 
     if (this.isSystemAdmin) {
       this.loadOrganisations();

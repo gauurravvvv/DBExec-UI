@@ -67,7 +67,7 @@ export class ListUserComponent implements OnInit {
   selectedOrg: any = null;
   selectedGroup: string | null = null;
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
   today = new Date();
 

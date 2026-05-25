@@ -32,8 +32,7 @@ export class AddUserComponent implements OnInit, HasUnsavedChanges {
   groups: any[] = [];
   preloadedGroups: any[] | null = null;
   preloadedGroupsTotal: number | null = null;
-  showOrganisationDropdown =
-    this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
 
   readonly locales = SUPPORTED_LOCALES as unknown as any[];
 
@@ -99,9 +98,7 @@ export class AddUserComponent implements OnInit, HasUnsavedChanges {
       ],
       email: ['', [Validators.required, Validators.email]],
       organisation: [
-        this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN
-          ? ''
-          : this.globalService.getTokenDetails('organisationId'),
+        this.globalService.getTokenDetails('organisationId'),
         Validators.required,
       ],
       groupIds: [[], Validators.required],

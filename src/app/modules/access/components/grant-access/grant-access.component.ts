@@ -41,8 +41,7 @@ export class GrantAccessComponent implements OnInit {
   preloadedConnections: any[] | null = null;
   preloadedConnectionsTotal: number | null = null;
   groups: any[] = [];
-  showOrganisationDropdown =
-    this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
   users: any[] = [];
 
   constructor(
@@ -70,15 +69,10 @@ export class GrantAccessComponent implements OnInit {
   }
 
   initForm() {
-    const isSystemAdmin =
-      this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
     const organisationId = this.globalService.getTokenDetails('organisationId');
 
     this.accessForm = this.fb.group({
-      organisation: [
-        isSystemAdmin ? null : organisationId,
-        Validators.required,
-      ],
+      organisation: [organisationId, Validators.required],
       datasource: [null, Validators.required],
       connection: [null, Validators.required],
       users: [[]],

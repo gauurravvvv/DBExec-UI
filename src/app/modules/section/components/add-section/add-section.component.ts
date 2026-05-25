@@ -38,8 +38,7 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
   organisations: any[] = [];
   preloadedOrgs: any[] | null = null;
   preloadedOrgsTotal: number | null = null;
-  showOrganisationDropdown =
-    this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
   selectedOrg: any = null;
   selectedDatasource: any = null;
   datasources: any[] = [];
@@ -97,9 +96,7 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
       organisation: [
         {
           value:
-            this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN
-              ? ''
-              : this.globalService.getTokenDetails('organisationId'),
+            this.globalService.getTokenDetails('organisationId'),
           disabled: false,
         },
         Validators.required,

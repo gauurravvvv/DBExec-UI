@@ -70,8 +70,7 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    this.showOrganisationDropdown =
-      this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
+    this.showOrganisationDropdown = false;
 
     this.initForm();
     if (this.showOrganisationDropdown) {
@@ -184,9 +183,7 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
       role: [''],
       schemaName: [''],
       organisation: [
-        this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN
-          ? ''
-          : this.globalService.getTokenDetails('organisationId'),
+        this.globalService.getTokenDetails('organisationId'),
         Validators.required,
       ],
     });

@@ -49,7 +49,7 @@ export class ListAnnouncementsComponent implements OnInit {
   preloadedGroupsTotal: number | null = null;
   selectedOrg: any = null;
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
   today = new Date();
 
   showDeleteConfirm = false;

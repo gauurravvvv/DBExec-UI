@@ -52,7 +52,7 @@ export class ListDatasourceComponent implements OnInit {
   preloadedOrgsTotal: number | null = null;
   selectedOrg: any = {};
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
   selectedDatasource: any = null;
   selectedDatasources: any[] = [];

@@ -67,7 +67,7 @@ export class ListDashboardComponent implements OnInit {
   selectedOrg: any = null;
   selectedDatasource: any = null;
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
 
   today = new Date();
 

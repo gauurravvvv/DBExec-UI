@@ -75,7 +75,7 @@ export class ListDatasetComponent implements OnInit {
   selectedOrg: any = null;
   selectedDatasource: any = null;
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
   saving = this.datasetService.saving;
 
   today = new Date();

@@ -65,7 +65,7 @@ export class ListGroupComponent implements OnInit {
   preloadedRoles: any[] | null = null;
   preloadedRolesTotal: number | null = null;
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
   today = new Date();
 
   statusOptions: { label: string; value: number }[] = [];

@@ -29,7 +29,7 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
 
   connectionForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
   orgId: string = '';
   connectionId: string = '';
   selectedOrgName: string = '';

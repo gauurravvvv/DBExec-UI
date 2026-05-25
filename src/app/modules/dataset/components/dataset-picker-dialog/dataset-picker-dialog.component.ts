@@ -100,8 +100,7 @@ export class DatasetPickerDialogComponent implements OnChanges {
 
   /** System admin → org dropdown is visible. Org-scoped users
    *  skip it entirely. */
-  showOrgDropdown =
-    this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
+  showOrgDropdown = false;
 
   @HostListener('document:keydown.escape', ['$event'])
   handleEscape(event: KeyboardEvent): void {

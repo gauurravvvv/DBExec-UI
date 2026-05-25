@@ -100,8 +100,7 @@ export class ListAuditLogsComponent implements OnInit {
       { label: this.translate.instant('AUDIT.FAILED'), value: false },
     ];
 
-    this.isSystemAdmin =
-      this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
+    this.isSystemAdmin = false;
 
     if (this.isSystemAdmin) {
       this.loadOrganisations();

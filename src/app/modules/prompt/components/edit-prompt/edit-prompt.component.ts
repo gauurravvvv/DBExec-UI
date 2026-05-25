@@ -32,7 +32,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
 
   promptForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
   orgId: string = '';
   promptId: string = '';
   selectedOrgName: string = '';

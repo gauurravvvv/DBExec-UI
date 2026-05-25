@@ -27,8 +27,7 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
   saving = inject(QueryBuilderService).saving;
 
   queryBuilderForm!: FormGroup;
-  showOrganisationDropdown =
-    this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
   orgId: string = '';
   queryBuilderId: string = '';
   queryBuilderData: any;

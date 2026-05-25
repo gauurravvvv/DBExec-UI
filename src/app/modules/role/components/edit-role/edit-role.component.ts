@@ -33,8 +33,7 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
   orgId: string = '';
   roleData: any;
   organisationName: string = '';
-  showOrganisationField =
-    this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
+  showOrganisationField = false;
   showSaveConfirm = false;
   saveJustification = '';
 

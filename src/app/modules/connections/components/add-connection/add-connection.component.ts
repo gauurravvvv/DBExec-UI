@@ -46,7 +46,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
   }
 
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
+  showOrganisationDropdown = false;
   selectedOrg: any = null;
   selectedDatasource: any = null;
 
@@ -96,9 +96,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
       ],
       description: [''],
       organisation: [
-        this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN
-          ? ''
-          : this.globalService.getTokenDetails('organisationId'),
+        this.globalService.getTokenDetails('organisationId'),
         Validators.required,
       ],
       datasource: ['', Validators.required],
