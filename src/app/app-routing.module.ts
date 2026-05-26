@@ -36,7 +36,11 @@ const routes: Routes = [
             m => m.SystemAdminModule,
           ),
         canActivate: [roleGuard],
-        data: { roles: ['SYSTEM-ADMIN'], title: 'PAGE_TITLES.SYSTEM_ADMINS' },
+        data: {
+          roles: ['SYSTEM-ADMIN'],
+          permission: PERMISSIONS.SYSTEM_ADMIN,
+          title: 'PAGE_TITLES.SYSTEM_ADMINS',
+        },
       },
       {
         path: 'organisations',
@@ -45,7 +49,11 @@ const routes: Routes = [
             m => m.OrganisationModule,
           ),
         canActivate: [roleGuard],
-        data: { roles: ['SYSTEM-ADMIN'], title: 'PAGE_TITLES.ORGANISATIONS' },
+        data: {
+          roles: ['SYSTEM-ADMIN'],
+          permission: PERMISSIONS.ORG_MANAGEMENT,
+          title: 'PAGE_TITLES.ORGANISATIONS',
+        },
       },
       {
         path: 'users',

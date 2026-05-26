@@ -6,7 +6,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { BehaviorSubject } from 'rxjs';
 import { StorageType } from '../constants/storage-type.constant';
-import { ROLES } from '../constants/user.constant';
 import { IAPIResponse } from '../models/global.model';
 import { StorageService } from './storage.service';
 
@@ -176,11 +175,18 @@ export class GlobalService {
 
   /**
    * Returns true if the logged-in user has the given permission value
-   * anywhere in their permissions tree. Super admins always return true.
+   * anywhere in their permissions tree.
+   *
+   * There is no SYSTEM_ADMIN bypass — the platform System Admin is
+   * subject to the same JWT-encoded permission set as every other
+   * role. Their tree only carries the V2 platform values (home /
+   * systemAdmin / orgManagement / auditLogs / loginActivity /
+   * announcementManagement / appSettings); UI gating for per-org
+   * features (USER_MANAGEMENT, DATASET, DASHBOARD, etc.) correctly
+   * resolves to false for them. The BE enforces the same contract
+   * via VerifyPermissionMiddleware, so the UI and API stay aligned.
    */
   hasPermission(permissionValue: string): boolean {
-    const userRole = this.getTokenDetails('role');
-    if (userRole === ROLES.SYSTEM_ADMIN) return true;
     const permissions = this.getTokenDetails('permission');
     if (!permissions || !Array.isArray(permissions)) return false;
     return this.checkPermissionTree(permissions, permissionValue);

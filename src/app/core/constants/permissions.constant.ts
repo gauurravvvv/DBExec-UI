@@ -4,7 +4,11 @@
  * These same strings are used by VerifyPermissionMiddleware on the backend.
  */
 export const PERMISSIONS = {
-  // User Management
+  // Platform / System Admin (V2 set — see BE systemAdminV2.ts)
+  SYSTEM_ADMIN: 'systemAdmin',
+  ORG_MANAGEMENT: 'orgManagement',
+
+  // User Management (per-org)
   USER_MANAGEMENT: 'userManagement',
   ROLE_MANAGEMENT: 'roleManagement',
   USER_GROUP: 'groupManagement',

@@ -15,9 +15,20 @@ function getHomeByRole(role: string): string {
 }
 
 /**
- * UI-only route guard based on client-decoded JWT role.
- * This prevents navigation to unauthorized pages but is NOT a security boundary —
- * the server enforces role-based access on every API call.
+ * UI-only route guard based on the client-decoded JWT role + permission tree.
+ *
+ * Prevents navigation to unauthorized pages — NOT a security boundary.
+ * The server enforces role + permission checks on every API call via
+ * VerifyPermissionMiddleware.
+ *
+ * There is no SYSTEM_ADMIN bypass here. The V2 permission set (see
+ * BE `systemAdminV2.ts`) limits the platform System Admin to a small
+ * set of values (home / systemAdmin / orgManagement / auditLogs /
+ * loginActivity / announcementManagement / appSettings) — anything
+ * else (per-org routes like /users, /groups, /datasources) is
+ * intentionally outside their reach, and the guard treats them like
+ * any other role: walk the permission tree, redirect to their home
+ * if the route's required permission isn't present.
  */
 export const roleGuard: CanActivateFn = (route, state) => {
   const globalService = inject(GlobalService);
@@ -28,11 +39,6 @@ export const roleGuard: CanActivateFn = (route, state) => {
   if (!userRole) {
     router.navigate([AUTH_ROUTES.LOGIN]);
     return false;
-  }
-
-  // System admin bypasses all checks
-  if (userRole === ROLES.SYSTEM_ADMIN) {
-    return true;
   }
 
   const allowedRoles: string[] = route.data['roles'];
