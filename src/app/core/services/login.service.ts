@@ -102,10 +102,6 @@ export class LoginService implements OnDestroy {
     );
   }
 
-  cliAuthorize(code: string, action: 'authorize' | 'deny'): Observable<any> {
-    return this.http.apiPost(AUTH.CLI_AUTHORIZE, { code, action });
-  }
-
   logout(): Observable<any> {
     return this.http.apiPost(AUTH.LOGOUT, {});
   }

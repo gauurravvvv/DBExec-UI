@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { authGuard } from 'src/app/core/guards/auth.guard';
-import { CliAuthComponent } from './components/cli-auth/cli-auth.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { LoginComponent } from './components/login/login.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
@@ -29,10 +28,5 @@ export const AUTH_ROUTES: Routes = [
     path: 'set-password',
     component: SetPasswordComponent,
     data: { title: 'PAGE_TITLES.SET_PASSWORD' },
-  },
-  {
-    path: 'cli-auth',
-    component: CliAuthComponent,
-    data: { title: 'PAGE_TITLES.CLI_AUTH' },
   },
 ];

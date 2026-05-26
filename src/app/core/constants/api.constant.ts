@@ -23,7 +23,6 @@ export const AUTH = {
   SET_PASSWORD: '/auth/set-password',
   VERIFY_SETUP_TOKEN: '/auth/verify-setup-token',
   RESEND_SETUP_LINK: '/auth/resend-setup-link',
-  CLI_AUTHORIZE: '/auth/cli/authorize',
 };
 
 export const HOME = {
