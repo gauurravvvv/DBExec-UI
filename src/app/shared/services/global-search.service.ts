@@ -1,7 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { lastValueFrom, Subject } from 'rxjs';
 import { GLOBAL_SEARCH } from 'src/app/core/constants';
-import { GlobalService } from 'src/app/core/services/global.service';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({
@@ -17,10 +16,7 @@ export class GlobalSearchService {
   readonly results = this._results.asReadonly();
   readonly loading = this._loading.asReadonly();
 
-  constructor(
-    private http: HttpClientService,
-    private globalService: GlobalService,
-  ) {}
+  constructor(private http: HttpClientService) {}
 
   openSearch() {
     this.openSearchSubject.next();
@@ -28,14 +24,13 @@ export class GlobalSearchService {
 
   async globalSearch(param: any) {
     const { key } = param;
-    const organisationId = this.globalService.getTokenDetails('organisationId');
+    // Org id sourced from the signed JWT on the server — no client
+    // override needed (and SanitizeOrgInputMiddleware would strip it
+    // anyway).
     this._loading.set(true);
     try {
       const response = await lastValueFrom(
-        this.http.apiPost(GLOBAL_SEARCH.SEARCH, {
-          organisation: organisationId,
-          key,
-        }),
+        this.http.apiPost(GLOBAL_SEARCH.SEARCH, { key }),
       );
       return response;
     } finally {

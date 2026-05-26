@@ -162,7 +162,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     this.promptForm = this.fb.group({
       id: [''],
       name: ['', [Validators.required, Validators.pattern('^[a-zA-Z\\s-]+$')]],
-      organisation: [''],
       datasource: [''],
       tab: [''],
       section: [''],
@@ -295,7 +294,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
           this.promptForm.patchValue({
             id: this.sectionData.id,
             name: this.sectionData.name,
-            organisation: this.sectionData.organisationId,
             datasource: this.sectionData.datasourceId,
             tab: this.sectionData.section.tab.id,
             section: this.sectionData.section.id,
@@ -610,7 +608,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       this.promptForm.patchValue({
         id: this.sectionData.id,
         name: this.sectionData.name,
-        organisation: this.sectionData.organisationId,
         datasource: this.sectionData.datasourceId,
         tab: this.sectionData.section.tab.id,
         section: this.sectionData.section.id,
