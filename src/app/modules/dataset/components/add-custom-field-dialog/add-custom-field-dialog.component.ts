@@ -93,7 +93,9 @@ export class AddCustomFieldDialogComponent
   private completionProviderDisposable: any = null;
   isLoadingEditor = false;
   monacoLoadFailed = false;
-  private currentTheme: string = 'vs-dark';
+  // Light default — Monaco's setTheme is global; a dark default could
+  // leak into other editors. getCurrentMonacoTheme() corrects at init.
+  private currentTheme: string = 'vs';
   private themeObserver: MutationObserver | null = null;
   private languageRegistered = false;
 
@@ -311,12 +313,19 @@ export class AddCustomFieldDialogComponent
         this.editor.dispose();
       }
 
+      // Re-read the live theme right before create (Monaco theme is
+      // global; avoids inheriting a stale theme from another editor).
+      this.currentTheme = getCurrentMonacoTheme();
+
       // Create Monaco Editor instance
       this.editor = monaco.editor.create(container, {
         ...FORMULA_EDITOR_OPTIONS,
         value: this.customField.columnToUse || '',
         theme: this.currentTheme,
       });
+
+      // Assert the global theme after create to correct any leak.
+      monaco.editor.setTheme(this.currentTheme);
 
       // Setup content change listener
       this.editor.onDidChangeModelContent(() => {

@@ -37,7 +37,6 @@ import {
   QueryResult,
 } from '../../helpers/dummy-data.helper';
 import {
-  flexLastColumn,
   formatCellValue,
   measureColumnWidths,
 } from '../../helpers/cell-formatter.helper';
@@ -100,9 +99,14 @@ export class EditDatasetComponent
   datasources: DatasourceSchema[] = [];
   currentQuery = '';
 
-  // Theme monitoring
+  // Theme monitoring. Default to the app's light theme ('vs'), not
+  // 'vs-dark' — Monaco's setTheme is GLOBAL, so a stale dark default
+  // here could leak into the editor when it re-creates on a
+  // navigate-away-and-back (the editor mounts before the theme is
+  // re-asserted). getCurrentTheme() corrects this at create time, but
+  // the safe default avoids a dark flash / stuck-dark editor.
   private themeObserver: MutationObserver | null = null;
-  private currentTheme: string = 'vs-dark';
+  private currentTheme: string = 'vs';
 
   // Database sidebar
   showDatasourceSidebar = true;
@@ -534,12 +538,25 @@ export class EditDatasetComponent
 
         const initialValue = this.initialQuery || SQL_EDITOR_PLACEHOLDER;
 
+        // Re-read the live theme right before creating. Monaco's theme
+        // is global state, so on a navigate-away-and-back the editor
+        // can otherwise inherit whatever theme the last-created editor
+        // (on another screen) left behind. Recomputing here + asserting
+        // setTheme below keeps the editor in sync with the app.
+        this.currentTheme = this.getCurrentTheme();
+
         // Create Monaco Editor instance
         this.editor = monaco.editor.create(container, {
           ...MONACO_EDITOR_OPTIONS,
           value: initialValue,
           theme: this.currentTheme,
         });
+
+        // Assert the theme globally after create. `create()`'s `theme`
+        // option sets the global theme, but doing it explicitly here
+        // makes the intent obvious and corrects any leak from another
+        // Monaco instance mounted on a previously-visited screen.
+        monaco.editor.setTheme(this.currentTheme);
         this.currentQuery = initialValue;
 
         // Add Ctrl+Enter handler for query execution
@@ -1263,17 +1280,13 @@ export class EditDatasetComponent
             query: data.query,
           };
 
-          // Auto-fit columns to content with last-column flex —
-          // mirrors add-dataset's behaviour.
-          const measured = measureColumnWidths(
+          // Auto-fit columns to content. Columns keep their natural
+          // measured widths; the trailing strip stays blank if total
+          // is narrower than the container. Mirrors add-dataset.
+          this.columnWidths = measureColumnWidths(
             this.queryResult.columns,
             this.queryResult.rows,
             this.queryResult.columnTypes,
-          );
-          this.columnWidths = flexLastColumn(
-            measured,
-            this.queryResult.columns,
-            this.lastObservedPaneWidth || window.innerWidth,
           );
 
           if (this.queryResult.columns.length > 0) {
@@ -1549,15 +1562,10 @@ export class EditDatasetComponent
 
   private recalculateColumnWidths(): void {
     if (!this.queryResult || !this.queryResult.columns?.length) return;
-    const measured = measureColumnWidths(
+    this.columnWidths = measureColumnWidths(
       this.queryResult.columns,
       this.queryResult.rows,
       this.queryResult.columnTypes,
-    );
-    this.columnWidths = flexLastColumn(
-      measured,
-      this.queryResult.columns,
-      this.lastObservedPaneWidth || window.innerWidth,
     );
     this.cdr.markForCheck();
   }
@@ -2011,10 +2019,15 @@ export class EditDatasetComponent
           this.datasetDescription = dataset.description || '';
           this.datasetStatus = dataset.status || 1;
 
-          // Set database from API response
+          // Set database from API response. Spread the full
+          // datasource payload (rather than just {id, name}) so the
+          // `config.dbType` is available to the
+          // selectedDbTypeOption getter — without it the engine
+          // badge ("PostgreSQL" chip) silently disappears.
           this.selectedDatasourceObj = {
             id: dataset.datasourceId,
             name: dataset.datasource?.name,
+            ...(dataset.datasource || {}),
           };
           this.selectedDatasourceName = dataset.datasource?.name || '';
           this.expandedPaths.add(dataset.datasourceId);

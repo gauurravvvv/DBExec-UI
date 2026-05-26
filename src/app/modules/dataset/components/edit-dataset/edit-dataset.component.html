@@ -23,16 +23,15 @@
         ></i>
       </button>
 
-      <!-- Datasource Input (readonly) -->
-      <app-custom-input
-        [ngModel]="selectedDatasourceName"
-        [ngModelOptions]="{ standalone: true }"
-        [label]="'COMMON.DATASOURCE' | translate"
-        [placeholder]="'COMMON.DATASOURCE' | translate"
-        icon="pi-database"
-        [inputDisabled]="true"
-      >
-      </app-custom-input>
+      <!-- Selected datasource name. Compact chip-style, read-only —
+           matches add-dataset's .ds-info layout so the toolbar
+           reads as a single horizontal strip. The dataset's
+           datasource is fixed at create time and cannot be changed
+           from this screen. -->
+      <div class="ds-info" *ngIf="selectedDatasourceObj">
+        <i class="pi pi-database ds-info-icon" aria-hidden="true"></i>
+        <span class="ds-info-name">{{ selectedDatasourceObj.name }}</span>
+      </div>
 
       <!-- Active engine badge — locked to the dataset's owning
            datasource. Shown so the user knows which dialect the

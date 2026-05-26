@@ -45,7 +45,6 @@ import {
   QueryResult,
 } from '../../helpers/dummy-data.helper';
 import {
-  flexLastColumn,
   formatCellValue,
   measureColumnWidths,
 } from '../../helpers/cell-formatter.helper';
@@ -208,9 +207,12 @@ export class AddDatasetComponent
   datasources: DatasourceSchema[] = [];
   currentQuery = '';
 
-  // Theme monitoring
+  // Theme monitoring. Default to the app's light theme ('vs'), not
+  // 'vs-dark' — Monaco's setTheme is GLOBAL, so a stale dark default
+  // could leak into the editor when it re-creates. getCurrentTheme()
+  // corrects this at create time; the light default avoids a flash.
   private themeObserver: MutationObserver | null = null;
-  private currentTheme: string = 'vs-dark';
+  private currentTheme: string = 'vs';
 
   // Bound listener reference (for proper removeEventListener)
   private boundCloseContextMenu = this.closeContextMenu.bind(this);
@@ -918,12 +920,20 @@ export class AddDatasetComponent
         // arrived via ?schema=X and that schema 404'd before the
         // editor mounted, start the editor locked so they don't
         // type a query that can't execute.
+        // Re-read the live theme right before create — Monaco's theme
+        // is global, so the editor can otherwise inherit a stale theme
+        // left by an editor on a previously-visited screen.
+        this.currentTheme = this.getCurrentTheme();
+
         this.editor = monaco.editor.create(container, {
           ...MONACO_EDITOR_OPTIONS,
           value: initialValue,
           theme: this.currentTheme,
           readOnly: this.scopedSchemaUnavailable,
         });
+
+        // Assert the global theme after create to correct any leak.
+        monaco.editor.setTheme(this.currentTheme);
         this.currentQuery = initialValue;
 
         // Focus the editor
@@ -1773,22 +1783,18 @@ export class AddDatasetComponent
   }
 
   /**
-   * Re-run measureColumnWidths + flexLastColumn against the
-   * current container width. No-op when there's no result. Called
-   * from the ResizeObserver and could also be invoked manually
-   * (post-sheet-drag, for instance) without changing semantics.
+   * Re-run measureColumnWidths against the current data. Columns sit
+   * at their natural measured widths — if total < container, the
+   * trailing strip is empty (matches DBeaver / DataGrip). No
+   * last-column inflation: that produced a multi-hundred-px "location"
+   * column when other columns were narrow, which read as broken.
    */
   private recalculateColumnWidths(): void {
     if (!this.queryResult || !this.queryResult.columns?.length) return;
-    const measured = measureColumnWidths(
+    this.columnWidths = measureColumnWidths(
       this.queryResult.columns,
       this.queryResult.rows,
       this.queryResult.columnTypes,
-    );
-    this.columnWidths = flexLastColumn(
-      measured,
-      this.queryResult.columns,
-      this.lastObservedPaneWidth || window.innerWidth,
     );
     this.cdr.markForCheck();
   }
@@ -1972,25 +1978,16 @@ export class AddDatasetComponent
 
           // Auto-fit column widths to the content of this result,
           // then flex the last column to absorb leftover container
-          // width so the table fills horizontally. Without the
-          // flex step the table would render at sum(widths) and
-          // leave a wide gap on the right of the popup; the table-
-          // layout: fixed rule alone doesn't grow the columns to
-          // fill, just enforces the colgroup widths.
-          const measured = measureColumnWidths(
+          // Columns sit at their natural measured widths. If the
+          // total is narrower than the container, the trailing strip
+          // stays blank — same as DBeaver / DataGrip. The previous
+          // flexLastColumn step inflated the rightmost column to
+          // absorb leftover space, which read as broken when the
+          // other columns were narrow (e.g. id + name + location).
+          this.columnWidths = measureColumnWidths(
             this.queryResult.columns,
             this.queryResult.rows,
             this.queryResult.columnTypes,
-          );
-          this.columnWidths = flexLastColumn(
-            measured,
-            this.queryResult.columns,
-            // Use the viewport width as a fair approximation of the
-            // sheet's render width — the sheet spans 100% of the
-            // viewport (position: fixed left:0 right:0). Slightly
-            // pessimistic if a sidebar is visible, but the worst
-            // case is a small horizontal scroll, not visual breakage.
-            window.innerWidth,
           );
 
           if (this.queryResult.columns.length > 0) {

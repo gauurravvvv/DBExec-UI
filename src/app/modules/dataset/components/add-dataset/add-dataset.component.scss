@@ -1609,14 +1609,26 @@
         overflow-y: auto;
       }
 
-      // table-layout: fixed makes <colgroup> widths absolute
-      // instead of suggestions. Without this the browser
-      // distributes any "extra" container width across columns
-      // proportionally, which is what produced the lonely-1-in-
-      // 430px-column problem.
+      // table-layout: fixed makes <colgroup> widths absolute.
+      // width: auto + align-self: flex-start sizes the <table>
+      // to sum(col-widths) instead of wrapper width.
+      //
+      // The .p-datatable-wrapper is `display: flex; flex-direction:
+      // column`. The cross-axis is horizontal, and its default
+      // `align-items: stretch` would stretch the <table> to the
+      // wrapper's full width — which would let the browser
+      // proportionally distribute that extra width across the
+      // colgroup (and make the rightmost column hog 1100+ px on
+      // narrow data). `align-self: flex-start` opts the table out
+      // of cross-axis stretch so it renders at its natural width.
+      //
+      // If sum(col-widths) < wrapper, the trailing strip stays
+      // blank (DBeaver / DataGrip style). If it's wider, the
+      // wrapper handles horizontal scroll.
       .p-datatable-table {
         table-layout: fixed;
-        width: 100%;
+        width: auto;
+        align-self: flex-start;
       }
 
       .p-datatable-header {
@@ -1683,6 +1695,16 @@
         }
       }
 
+      // The frozen # header sits above non-frozen sticky headers
+      // on horizontal scroll. Without this lift, every <th> shares
+      // z-index 2; equal z-index falls back to DOM order, so
+      // non-frozen columns paint OVER the frozen # column when they
+      // scroll left under it. Bumping the frozen header to 3
+      // restores the expected layering.
+      .p-datatable-thead > tr > th.p-frozen-column {
+        z-index: 3;
+      }
+
       // Second-row <th> elements are the per-column filter inputs.
       // They need to stick BELOW the column-name row so both rows
       // stay visible during vertical scroll. The exact `top` value
@@ -1697,6 +1719,14 @@
         // their own internal padding, so the cell padding can be
         // minimal without crowding.
         padding: 0.25rem 0.5rem;
+      }
+
+      // Filter-row frozen cell also needs to sit above non-frozen
+      // filter cells on horizontal scroll. One step below the
+      // header-row frozen cell so the column-name header still
+      // paints on top of the filter row on vertical scroll.
+      .p-datatable-thead > tr:nth-child(2) > th.p-frozen-column {
+        z-index: 2;
       }
 
       // The filter <input> sits flush in its cell; give it a clear

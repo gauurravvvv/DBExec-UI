@@ -98,14 +98,20 @@ export const MONACO_EDITOR_OPTIONS = {
   contextmenu: true,
 
   // Scrollbar
+  //
+  // 3px to match the result-table scrollbars (defined in styles.scss).
+  // The visual rhythm across editor + result table stays consistent —
+  // both surfaces use the same hairline rounded pill. Shadows off
+  // because they add no value on a 3px slider (the fade gradient
+  // would overpower the bar itself).
   scrollbar: {
     vertical: 'visible' as const,
     horizontal: 'visible' as const,
-    useShadows: true,
+    useShadows: false,
     verticalHasArrows: false,
     horizontalHasArrows: false,
-    verticalScrollbarSize: 10,
-    horizontalScrollbarSize: 10,
+    verticalScrollbarSize: 3,
+    horizontalScrollbarSize: 3,
   },
 };
 

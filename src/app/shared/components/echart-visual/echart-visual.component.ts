@@ -66,6 +66,11 @@ export class EchartVisualComponent
 
   private previousConfigSnapshot = '';
   private hasRenderedOnce = false;
+  // Track component counts across renders so updateChartOption can detect a
+  // structural shrink (dataZoom removed, series count dropped) that merge-mode
+  // setOption can't express, and fall back to a full replace for that update.
+  private prevZoomCount = 0;
+  private prevSeriesCount = 0;
 
   constructor(private cdr: ChangeDetectorRef) {}
 
@@ -139,9 +144,28 @@ export class EchartVisualComponent
       this.chartConfig || {},
       this.chartType,
     );
-    if (!this.hasRenderedOnce) {
-      // First render: hand the full option to the directive's [options]
-      // binding so ECharts builds its initial state.
+
+    // Detect a structural shrink that merge-mode setOption can't express.
+    // ngx-echarts [merge] calls setOption(opt, { notMerge: false }); under
+    // merge, passing `dataZoom: []` does NOT remove an existing slider —
+    // ECharts keeps the prior component. The same is true for series count
+    // dropping (e.g. a stacked chart losing a series). When we detect the
+    // dataZoom component going from present to empty, or the series count
+    // decreasing, fall back to a full [options] replace so the removed
+    // components actually disappear. Pure config tweaks (the common case)
+    // still take the cheap merge path.
+    const zoomCount = Array.isArray(opt.dataZoom) ? opt.dataZoom.length : 0;
+    const seriesCount = Array.isArray(opt.series) ? opt.series.length : 0;
+    const structuralShrink =
+      (this.prevZoomCount > 0 && zoomCount === 0) ||
+      seriesCount < this.prevSeriesCount;
+    this.prevZoomCount = zoomCount;
+    this.prevSeriesCount = seriesCount;
+
+    if (!this.hasRenderedOnce || structuralShrink) {
+      // First render OR structural shrink: hand the full option to the
+      // directive's [options] binding so ECharts rebuilds state and drops
+      // any components no longer present.
       this.chartOption = opt;
       this.hasRenderedOnce = true;
     } else {

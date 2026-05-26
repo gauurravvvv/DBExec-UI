@@ -45,6 +45,27 @@ function getColors(colorScheme: string): string[] {
 }
 
 /**
+ * Build a series-level `emphasis` object from the shared config.
+ *
+ * `focus` defaults per series type (bar/line/scatter want 'series',
+ * hierarchical types like treemap want 'self'), so the caller passes
+ * the type-appropriate fallback.
+ *
+ * `scale` is the "Hover Scale" toggle in the Properties pane — when on,
+ * ECharts grows the hovered data item (symbol/sector) on hover. Stamp it
+ * explicitly as a boolean (not only when true): chart updates merge via
+ * setOption(opt, false), so omitting `scale` when the toggle is off would
+ * let a previously-set `scale: true` persist — the toggle would enable
+ * hover-zoom but never disable it.
+ */
+function buildEmphasis(config: any, defaultFocus = 'series'): any {
+  return {
+    focus: config.emphasis || defaultFocus,
+    scale: config.emphasisScale === true,
+  };
+}
+
+/**
  * Build a 3D axis (xAxis3D / yAxis3D / zAxis3D) with our typography
  * tokens applied to the axis name, tick labels, tick lines, and the
  * splitLine grid. ECharts defaults to its own font + dark colours
@@ -370,7 +391,13 @@ function buildAnimation(config: any): any {
  * Reference: https://echarts.apache.org/en/option.html#series-scatter.large
  */
 function buildPerfFlags(config: any): any {
-  if (config?.performanceMode === false) return {};
+  // Return an explicit `large: false` (not {}) when disabled. Chart updates
+  // merge via setOption(opt, false); an empty object would let a previously
+  // rendered `large: true` persist, so the Performance toggle would enable
+  // batch rendering but never disable it.
+  if (config?.performanceMode === false) {
+    return { large: false };
+  }
   return {
     large: true,
     largeThreshold: config?.largeThreshold ?? 2000,
@@ -448,8 +475,12 @@ function buildCategoryAxis(
   if (config.barCategoryGap != null && config.barCategoryGap !== '') {
     result.barCategoryGap = config.barCategoryGap;
   }
-  if (isX && config.inverseX) result.inverse = true;
-  if (!isX && config.inverseY) result.inverse = true;
+  // Always stamp `inverse` explicitly (true OR false). Chart updates go
+  // through setOption(opt, false) (merge mode), so omitting the key when
+  // the toggle is off leaves ECharts holding the previous `inverse: true`
+  // — the axis would flip on but never flip back. Coercing to a boolean
+  // every render makes the toggle fully two-way.
+  result.inverse = isX ? !!config.inverseX : !!config.inverseY;
   return result;
 }
 
@@ -492,8 +523,9 @@ function buildValueAxis(config: any, axis: 'x' | 'y'): any {
     max: config.yScaleMax,
     nice: true,
   };
-  if (isX && config.inverseX) result.inverse = true;
-  if (!isX && config.inverseY) result.inverse = true;
+  // Always stamp `inverse` explicitly — see buildCategoryAxis for why
+  // (merge-mode setOption would otherwise pin a stale `inverse: true`).
+  result.inverse = isX ? !!config.inverseX : !!config.inverseY;
   return result;
 }
 
@@ -644,13 +676,23 @@ export function buildBarChartOption(
   };
 
   const barSeriesBase: any = {};
-  if (config.barWidth) barSeriesBase.barWidth = config.barWidth;
-  if (config.barMaxWidth) barSeriesBase.barMaxWidth = config.barMaxWidth;
-  if (config.barMinWidth) barSeriesBase.barMinWidth = config.barMinWidth;
-  if (config.showBackground) barSeriesBase.showBackground = true;
+  // Stamp width bounds explicitly: a cleared field maps to `null` (ECharts
+  // reads null as "auto"). Chart updates merge via setOption(opt, false),
+  // so omitting the key when emptied would pin the previous width — the
+  // control would set a width but never clear it. null resets cleanly.
+  barSeriesBase.barWidth = config.barWidth || null;
+  barSeriesBase.barMaxWidth = config.barMaxWidth || null;
+  barSeriesBase.barMinWidth = config.barMinWidth || null;
+  barSeriesBase.showBackground = !!config.showBackground;
   // `clip: false` lets bars extend past the grid edge — useful for
   // dataZoom interactions where partially-visible bars matter.
   if (config.clip !== undefined) barSeriesBase.clip = config.clip;
+  // Performance flags (large mode + progressive). The Properties pane
+  // exposes these for bar/line/scatter; spread them onto the shared bar
+  // series base so every bar variant (single/multi/stacked/normalized)
+  // honours the toggle. buildPerfFlags returns large:false when disabled,
+  // which resets cleanly under merge-mode setOption.
+  Object.assign(barSeriesBase, buildPerfFlags(config));
 
   if (isMulti) {
     const sourceData = multiData && multiData.length > 0 ? multiData : data;
@@ -665,7 +707,7 @@ export function buildBarChartOption(
         name: s.name,
         type: 'bar',
         stack: 'total',
-        emphasis: { focus: config.emphasis || 'series' },
+        emphasis: buildEmphasis(config, 'series'),
         data: s.values.map((v, i) =>
           totals[i] ? +((v / totals[i]) * 100).toFixed(1) : 0,
         ),
@@ -705,7 +747,7 @@ export function buildBarChartOption(
             }
           : {}),
         data: s.values,
-        emphasis: { focus: config.emphasis || 'series' },
+        emphasis: buildEmphasis(config, 'series'),
         label: buildDataLabel(config, isHorizontal ? 'right' : 'top'),
         barGap: config.barGap || '30%',
         barCategoryGap: config.barCategoryGap || '20%',
@@ -758,6 +800,7 @@ export function buildBarChartOption(
               }
             : null,
         ), // null = invisible + excluded from tooltip
+        emphasis: buildEmphasis(config, 'series'),
         label: buildDataLabel(config, isHorizontal ? 'right' : 'top'),
         barGap: config.barGap || '30%',
         barCategoryGap: config.barCategoryGap || '20%',
@@ -790,6 +833,7 @@ export function buildBarChartOption(
           name: 'Value',
           type: 'bar',
           data: coloredValues,
+          emphasis: buildEmphasis(config, 'series'),
           label: buildDataLabel(config, isHorizontal ? 'right' : 'top'),
           barGap: config.barGap || '30%',
           barCategoryGap: config.barCategoryGap || '20%',
@@ -817,8 +861,12 @@ export function buildBarChartOption(
   }
 
   const barZoom = buildDataZoom(config, isHorizontal ? 'y' : 'x');
+  // Always assign — an empty array clears any previously-rendered zoom.
+  // Chart updates merge via setOption(opt, false); omitting the key when
+  // the toggle is off would leave ECharts holding the prior slider, so the
+  // Data Zoom toggle would turn on but never off.
+  option.dataZoom = barZoom;
   if (barZoom.length) {
-    option.dataZoom = barZoom;
     // Add space for the dataZoom slider below/beside the grid
     if (!isHorizontal) {
       option.grid.bottom = (option.grid.bottom || 15) + 35;
@@ -875,7 +923,7 @@ export function buildLineChartOption(
         config.rangeFillOpacity > 0
           ? { opacity: config.rangeFillOpacity }
           : undefined,
-      emphasis: { focus: config.emphasis || 'series' },
+      emphasis: buildEmphasis(config, 'series'),
       ...(config.endLabel ? { endLabel: { show: true } } : {}),
       ...(config.sampling && config.sampling !== 'none'
         ? { sampling: config.sampling }
@@ -897,6 +945,10 @@ export function buildLineChartOption(
   if (config.dataZoom) {
     option.dataZoom = buildDataZoom(config);
     option.grid.bottom = (option.grid.bottom || 30) + 40;
+  } else {
+    // Clear explicitly so merge-mode setOption doesn't keep a stale slider
+    // when the Data Zoom toggle is turned off.
+    option.dataZoom = [];
   }
 
   return option;
@@ -937,7 +989,7 @@ export function buildAreaChartOption(
       width: config.lineWidth || 2,
       type: config.lineStyleType || 'solid',
     },
-    emphasis: { focus: config.emphasis || 'series' },
+    emphasis: buildEmphasis(config, 'series'),
     ...(config.endLabel ? { endLabel: { show: true } } : {}),
     ...(config.sampling && config.sampling !== 'none'
       ? { sampling: config.sampling }
@@ -992,6 +1044,10 @@ export function buildAreaChartOption(
   if (config.dataZoom) {
     option.dataZoom = buildDataZoom(config);
     option.grid.bottom = (option.grid.bottom || 30) + 40;
+  } else {
+    // Clear explicitly so merge-mode setOption doesn't keep a stale slider
+    // when the Data Zoom toggle is turned off.
+    option.dataZoom = [];
   }
 
   return option;
@@ -1110,6 +1166,7 @@ export function buildPieChartOption(
         },
         emphasis: {
           focus: config.emphasis || 'self',
+          ...(config.emphasisScale === true ? { scale: true } : {}),
           itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.2)' },
         },
       },
@@ -1542,7 +1599,7 @@ export function buildBubbleChartOption(data: any[], config: any): any {
       if (rMax === rMin) return (minR + maxR) / 2;
       return minR + ((r - rMin) / (rMax - rMin)) * (maxR - minR);
     },
-    emphasis: { focus: config.emphasis || 'series' },
+    emphasis: buildEmphasis(config, 'series'),
   }));
 
   if (config.gradient) {
@@ -1619,6 +1676,7 @@ export function buildScatterChartOption(
         label: buildDataLabel(config),
         emphasis: {
           focus: config.emphasis || 'series',
+          ...(config.emphasisScale === true ? { scale: true } : {}),
           itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.3)' },
         },
       },
@@ -1631,8 +1689,10 @@ export function buildScatterChartOption(
   }
 
   const zoom = buildDataZoom(config, 'x');
+  // Always assign — empty array clears a stale slider under merge-mode
+  // setOption when Data Zoom is toggled off.
+  option.dataZoom = zoom;
   if (zoom.length) {
-    option.dataZoom = zoom;
     option.grid.bottom = (option.grid.bottom || 30) + 40;
   }
 
@@ -1935,8 +1995,10 @@ export function buildWaterfallChartOption(data: any[], config: any): any {
   };
 
   const zoom = buildDataZoom(config, 'x');
+  // Always assign — empty array clears a stale slider under merge-mode
+  // setOption when Data Zoom is toggled off.
+  option.dataZoom = zoom;
   if (zoom.length) {
-    option.dataZoom = zoom;
     option.grid.bottom = (option.grid.bottom || 30) + 40;
   }
 
@@ -2233,6 +2295,7 @@ export function buildThemeRiverChartOption(data: any[], config: any): any {
         },
         emphasis: {
           focus: config.emphasis || 'self',
+          ...(config.emphasisScale === true ? { scale: true } : {}),
           itemStyle: { shadowBlur: 20, shadowColor: 'rgba(0, 0, 0, 0.3)' },
         },
       },

@@ -122,7 +122,28 @@ import { Visual } from '../../models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VisualConfigSidebarComponent implements DoCheck {
-  @Input() focusedVisual!: Visual;
+  private _focusedVisual!: Visual;
+
+  /**
+   * The visual whose properties this sidebar edits.
+   *
+   * Setter normalizes display-critical config defaults the moment a
+   * visual is focused. The chart builder already falls back to the
+   * 'default' palette when `colorScheme` is unset, but the Color Scheme
+   * dropdown binds to the raw value — an unset value rendered a blank
+   * dropdown even though the chart drew with the default palette. Seeding
+   * the value here keeps the control and the chart in agreement and
+   * persists the explicit choice with the analysis.
+   */
+  @Input() set focusedVisual(value: Visual) {
+    this._focusedVisual = value;
+    if (value?.config && !value.config.colorScheme) {
+      value.config.colorScheme = 'default';
+    }
+  }
+  get focusedVisual(): Visual {
+    return this._focusedVisual;
+  }
   /**
    * All dataset + analysis fields for the current analysis. Used by the
    * Table visual's column picker so the user can choose which fields

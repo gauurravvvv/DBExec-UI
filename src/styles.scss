@@ -286,6 +286,48 @@ textarea,
   background-color: $theme-grey-3;
 }
 
+// ── Monaco editor scrollbars ─────────────────────────────────────────
+//
+// Monaco renders its own DOM-based scrollbars (not native, not
+// ::-webkit-scrollbar) inside `.monaco-scrollable-element`. The
+// default theme ships a hard-cornered, muddy-grey slider that looks
+// out of place against the light card surface. These rules round
+// the slider, tone it to the app's neutral palette, and add a hover
+// state that matches the listing-page scrollbars at line ~444.
+//
+// Selectors are global (rather than component-scoped) so every
+// place we mount Monaco — add-dataset, edit-dataset,
+// add-custom-field-dialog, sql-query-dialog — picks up the same
+// look without per-component ::ng-deep duplication.
+//
+// `!important` is unfortunate but Monaco sets these inline via JS
+// based on its `editor.scrollbar.*` theme tokens; CSS rules without
+// !important are overridden on every render pass.
+.monaco-editor {
+  .monaco-scrollable-element > .scrollbar > .slider {
+    border-radius: 999px !important;
+    background: var(--border-strong, rgba(0, 0, 0, 0.25)) !important;
+    transition: background var(--motion-fast, 150ms) ease;
+  }
+
+  // Darken on hover (anywhere over the scrollbar track) + during
+  // active drag. Monaco only toggles .slider.active on mousedown, so
+  // we also listen on the parent .scrollbar's :hover to give
+  // immediate feedback when the user moves toward the bar — matching
+  // the table-wrapper scrollbar's interactive behaviour.
+  .monaco-scrollable-element > .scrollbar:hover > .slider,
+  .monaco-scrollable-element > .scrollbar > .slider:hover,
+  .monaco-scrollable-element > .scrollbar > .slider.active {
+    background: var(--text-subtle, rgba(0, 0, 0, 0.45)) !important;
+  }
+
+  // Hide Monaco's own corner / arrow widgets (we don't enable them
+  // in the editor config; rule stays as defensive belt-and-braces).
+  .monaco-scrollable-element > .scrollbar > .arrow-background {
+    display: none !important;
+  }
+}
+
 .edit-button {
   background: #119fda !important;
 }

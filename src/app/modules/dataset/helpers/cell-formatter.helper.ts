@@ -394,35 +394,3 @@ export function measureColumnWidths(
 
   return widths;
 }
-
-/**
- * After measureColumnWidths returns, optionally expand the LAST
- * column to absorb any leftover container width. Matches Excel /
- * Google Sheets / Numbers behaviour: the last (typically
- * most-descriptive) column uses whatever room is left after the
- * narrower columns have what they need.
- *
- * No-op if the columns already sum wider than the container
- * (horizontal scroll territory) or if there are no columns.
- *
- * `reservedPx` accounts for fixed-width chrome on the table —
- * the # row-number column (60px in the popup) and a small
- * scrollbar buffer.
- */
-export function flexLastColumn(
-  widths: Record<string, number>,
-  columns: string[],
-  containerWidth: number,
-  reservedPx = 60 + 16,
-): Record<string, number> {
-  if (columns.length === 0) return widths;
-  const sum = columns.reduce((acc, c) => acc + (widths[c] || 0), 0);
-  const available = containerWidth - reservedPx;
-  if (sum >= available) return widths;
-  const lastCol = columns[columns.length - 1];
-  const deficit = available - sum;
-  return {
-    ...widths,
-    [lastCol]: (widths[lastCol] || 0) + deficit,
-  };
-}

@@ -127,7 +127,9 @@ export class SqlQueryDialogComponent
   private signatureHelpDisposable: any = null;
   isLoadingEditor = true;
   monacoLoadFailed = false;
-  private currentTheme: string = 'vs-dark';
+  // Light default — Monaco's setTheme is global; a dark default could
+  // leak into other editors. getCurrentTheme() corrects at init.
+  private currentTheme: string = 'vs';
   private themeObserver: MutationObserver | null = null;
 
   constructor(
@@ -269,12 +271,19 @@ export class SqlQueryDialogComponent
           this.editor.dispose();
         }
 
+        // Re-read the live theme right before create (Monaco theme is
+        // global; avoids inheriting a stale theme from another editor).
+        this.currentTheme = this.getCurrentTheme();
+
         // Create Monaco Editor instance
         this.editor = monaco.editor.create(container, {
           ...MONACO_EDITOR_OPTIONS,
           value: this.sqlQuery || '',
           theme: this.currentTheme,
         });
+
+        // Assert the global theme after create to correct any leak.
+        monaco.editor.setTheme(this.currentTheme);
 
         // Setup content change listener
         this.editor.onDidChangeModelContent(() => {

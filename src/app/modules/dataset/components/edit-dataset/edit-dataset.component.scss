@@ -130,6 +130,34 @@
       }
     }
 
+    // Read-only datasource name displayed in the toolbar. Mirrors
+    // add-dataset.component.scss so both screens render the same
+    // compact chip + icon — the dataset's datasource is fixed at
+    // create time and cannot be changed from this screen.
+    .ds-info {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 4px 10px;
+      font-size: var(--fs-body, 14px);
+      font-weight: var(--fw-medium, 500);
+      color: var(--text-color);
+      max-width: 360px;
+      white-space: nowrap;
+      overflow: hidden;
+
+      .ds-info-icon {
+        color: var(--primary-color);
+        flex-shrink: 0;
+      }
+
+      .ds-info-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px;
+      }
+    }
+
     // Engine badge — compact dialect chip, same rule as
     // add-dataset.component.scss. Quiet by design so it reads as
     // confirmation, not a CTA.
@@ -805,10 +833,19 @@
 // Editor Section
 // ===================================================================
 .editor-section {
-  flex: 1;
+  // flex: 1 1 0 (with explicit min: 0 via the 120px floor) so the
+  // editor area can shrink when the result sheet below it grows via
+  // the drag handle. A 300px floor here used to prevent the sheet
+  // from getting the room it needs: when the sheet height + 300px
+  // editor + toolbar exceeded the editor-results-area, the sheet
+  // overflowed the bottom of the viewport and the paginator was
+  // clipped off-screen. clampSheetHeight on the TS side keeps at
+  // least 120px of editor visible (SHEET_MAX_HEIGHT_PADDING), so the
+  // editor never fully disappears. Matches add-dataset.
+  flex: 1 1 0;
+  min-height: 120px;
   position: relative;
   overflow: hidden;
-  min-height: 300px;
   display: flex;
   flex-direction: column;
   background-color: var(--background-color);
@@ -1649,12 +1686,99 @@ td.empty-message-cell {
   }
 }
 
-// Legacy modal container — replaced by .results-sheet above. The
-// .results-popup-header / .results-popup-body class names remain on
-// the inner markup for backwards-compat with the surrounding SCSS
-// (header padding, error/empty cards, table wrapper). Their parent
-// is now the bottom sheet, not a centered modal.
-// (Legacy modal container removed — bottom-sheet rules above replace it.)
+// Bottom-sheet container for the Query Results panel — mirrors
+// add-dataset.component.scss so both screens look and feel the same.
+// The HTML template already renders the .results-sheet markup; this
+// block supplies the styling.
+//
+// Width is automatic — the flex parent gives the sheet 100% of the
+// editor-results-area width. No left/right anchoring needed.
+.results-sheet {
+  position: relative;
+  background: var(--card-background);
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -8px 20px var(--shadow-color);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 100%;
+  animation: sheetSlideUp 0.2s ease-out;
+
+  // Collapsed = header strip only (~44px). Header still shows the
+  // row-count chip + Export + Show button so the panel stays
+  // useful as a quick-recall stub.
+  &.collapsed {
+    height: auto !important;
+  }
+
+  // Error / empty-result mode shrinks to fit the message card
+  // instead of holding the full default height — a 1-line error
+  // shouldn't take 420px.
+  &.compact {
+    height: auto !important;
+  }
+
+  @keyframes sheetSlideUp {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+}
+
+// Drag handle strip at the top of the sheet. 8px tall hit-area for
+// easy grabbing, with a 32px visual "grip" centred so users can
+// see the affordance.
+.results-sheet-handle {
+  position: relative;
+  height: 8px;
+  background: var(--hover-background);
+  cursor: ns-resize;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border-color);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--primary-color-transparent);
+    outline: none;
+
+    .handle-grip {
+      background: var(--primary-color);
+      opacity: 0.8;
+    }
+  }
+
+  .handle-grip {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--secondary-color);
+    opacity: 0.5;
+    transition: all var(--motion-fast) ease;
+  }
+}
+
+// Inner wrapper holds the header + body. Plain flex column.
+.results-sheet-inner {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0; // flex children with overflow need this
+}
+
+// Global cursor override while dragging — prevents text selection
+// and keeps the resize cursor everywhere the mouse moves.
+:global(body.ds-sheet-dragging) {
+  cursor: ns-resize !important;
+  user-select: none !important;
+}
 
 .results-popup-header {
   // ~40px tall to match DataGrip / Hex result-panel headers.
@@ -1967,13 +2091,26 @@ td.empty-message-cell {
       }
 
       // table-layout: fixed makes <colgroup> widths absolute
-      // instead of suggestions. Without this the browser
-      // distributes any "extra" container width across columns
-      // proportionally, which is what produced the lonely-1-in-
-      // 430px-column problem.
+      // table-layout: fixed makes <colgroup> widths absolute.
+      // width: auto + align-self: flex-start sizes the <table>
+      // to sum(col-widths) instead of wrapper width.
+      //
+      // The .p-datatable-wrapper is `display: flex; flex-direction:
+      // column`. The cross-axis is horizontal, and its default
+      // `align-items: stretch` would stretch the <table> to the
+      // wrapper's full width — which would let the browser
+      // proportionally distribute that extra width across the
+      // colgroup (and make the rightmost column hog 1100+ px on
+      // narrow data). `align-self: flex-start` opts the table out
+      // of cross-axis stretch so it renders at its natural width.
+      //
+      // If sum(col-widths) < wrapper, the trailing strip stays
+      // blank (DBeaver / DataGrip style). If it's wider, the
+      // wrapper handles horizontal scroll.
       .p-datatable-table {
         table-layout: fixed;
-        width: 100%;
+        width: auto;
+        align-self: flex-start;
       }
 
       .p-datatable-header {
@@ -2040,6 +2177,16 @@ td.empty-message-cell {
         }
       }
 
+      // The frozen # header sits above non-frozen sticky headers
+      // on horizontal scroll. Without this lift, every <th> shares
+      // z-index 2; equal z-index falls back to DOM order, so
+      // non-frozen columns paint OVER the frozen # column when they
+      // scroll left under it. Bumping the frozen header to 3
+      // restores the expected layering.
+      .p-datatable-thead > tr > th.p-frozen-column {
+        z-index: 3;
+      }
+
       // Second-row <th> elements are the per-column filter inputs.
       // They need to stick BELOW the column-name row so both rows
       // stay visible during vertical scroll. The exact `top` value
@@ -2054,6 +2201,12 @@ td.empty-message-cell {
         // their own internal padding, so the cell padding can be
         // minimal without crowding.
         padding: 0.25rem 0.5rem;
+      }
+
+      // Filter-row frozen cell sits above non-frozen filter cells
+      // on horizontal scroll, mirroring the header-row lift above.
+      .p-datatable-thead > tr:nth-child(2) > th.p-frozen-column {
+        z-index: 2;
       }
 
       // The filter <input> sits flush in its cell; give it a clear

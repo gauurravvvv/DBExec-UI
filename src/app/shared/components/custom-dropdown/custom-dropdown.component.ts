@@ -368,6 +368,25 @@ export class CustomDropdownComponent
     // blank. Re-marking after the current tick gives the inner
     // dropdown a chance to pick up the bound model.
     Promise.resolve().then(() => this.cdr.markForCheck());
+
+    // Static (non-server) path: a real value arriving AFTER the inner
+    // p-dropdown mounted is the visual-config-sidebar case — the sidebar
+    // opens, the dropdowns mount with value=null (so ngAfterViewInit's
+    // flush early-returns), then [(ngModel)] propagates the config value
+    // here via writeValue. markForCheck alone schedules CD but PrimeNG
+    // does NOT re-match the now-set value against its already-resolved
+    // (blank) selected label. Re-stamp the binding so the label paints
+    // without the user having to open the panel. Guarded to a genuine
+    // value change to avoid a redundant flush on every snapshot tick.
+    if (
+      !this.serverMode &&
+      value !== prev &&
+      value !== null &&
+      value !== undefined &&
+      value !== ''
+    ) {
+      this.flushValueBinding(value);
+    }
   }
 
   registerOnChange(fn: (value: any) => void): void {
@@ -457,18 +476,28 @@ export class CustomDropdownComponent
    * refreshSelectedItem instead). Guarded so it does not fire
    * during the initial mount when value is null/undefined/empty.
    */
-  private flushValueBinding(): void {
+  private flushValueBinding(target?: any): void {
     if (this.serverMode) return;
-    if (this.value === null || this.value === undefined || this.value === '') {
+    // Re-stamp the explicitly intended value. Callers that know the target
+    // (writeValue) pass it in — `this.value` can be transiently clobbered
+    // back to null by the inner <p-dropdown>'s own ngModel round-trip
+    // (its initial onModelChange emits null as options/value reconcile),
+    // so relying on `this.value` inside the deferred callback would restore
+    // null and leave the label blank. The captured target is authoritative.
+    const intended = target !== undefined ? target : this.value;
+    if (
+      intended === null ||
+      intended === undefined ||
+      intended === ''
+    ) {
       return;
     }
     // Defer past the current CD pass so the inner dropdown has
     // settled with the current options before we re-stamp.
     setTimeout(() => {
-      const cached = this.value;
       this.value = null;
       this.cdr.detectChanges();
-      this.value = cached;
+      this.value = intended;
       this.cdr.detectChanges();
     }, 0);
   }
