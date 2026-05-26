@@ -10,6 +10,25 @@ import { MessageService } from 'primeng/api';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
+/**
+ * HttpErrorInterceptor — surfaces low-level transport failures only.
+ *
+ * Application-level errors (BAD_REQUEST / NOT_FOUND / FORBIDDEN /
+ * ALREADY_EXISTS / SERVER_ERROR) that carry our standard envelope
+ * are converted back to success emissions by HttpRequestInterceptor
+ * so component-level handlers keep using
+ * `if (response.code === 200) ... else { ... }` unchanged. Anything
+ * that reaches this catchError is therefore either:
+ *
+ *   - status === 0      — network failure (CORS, server down)
+ *   - status === 440    — session expired (HttpRequestInterceptor
+ *                         owns the refresh-token dance; we silence
+ *                         the toast here so the modal can speak)
+ *   - status >= 500
+ *     without an envelope — BE crashed before the response writer
+ *                           ran (uncaught throw, OOM, dead worker)
+ *   - non-HTTP errors   — RxJS / JS exceptions inside operators
+ */
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
   constructor(private messageService: MessageService) {}

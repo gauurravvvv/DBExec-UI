@@ -206,7 +206,44 @@ export class HttpRequestInterceptor implements HttpInterceptor {
       }
       return this.handle440Error(req, next);
     }
+
+    // Envelope-carrying HTTP errors (BE now sets the real HTTP status
+    // code; the body still ships `{ status, code, message, data }`).
+    // Re-emit as a success so existing callers that read
+    // `response.code !== 200` in a `.then(res => ...)` block keep
+    // working. Network errors (status 0) and crashes that didn't
+    // produce our envelope still flow to the global error
+    // interceptor's toast path.
+    if (this.isEnvelopeError(error)) {
+      return of(
+        new HttpResponse({
+          body: error.error,
+          status: 200,
+          statusText: 'OK',
+          url: req.url,
+        }),
+      );
+    }
+
     return throwError(error);
+  }
+
+  /**
+   * True when the HttpErrorResponse body matches our standard
+   * envelope shape. Used to convert real HTTP error responses back
+   * into success-channel emissions so the FE's existing handlers
+   * (`if (response.code === 200) ... else ...`) keep working
+   * unchanged after the BE switched from always-200 to real HTTP
+   * status codes.
+   */
+  private isEnvelopeError(error: any): boolean {
+    if (!(error instanceof HttpErrorResponse)) return false;
+    const body = error.error;
+    if (!body || typeof body !== 'object') return false;
+    // Code must be present and numeric — distinguishes our envelope
+    // from non-API error bodies (e.g. plain-text, HTML, network
+    // failure with empty body).
+    return typeof body.code === 'number' && typeof body.status === 'boolean';
   }
 
   private handle440Error(
