@@ -108,6 +108,16 @@ export interface Visual {
   /** Display title of the visual */
   title: string;
 
+  /**
+   * i18n key that produced the current `title`, when the title was set
+   * automatically (new visual = ANALYSES.UNTITLED_VISUAL, picked chart
+   * type = CHART_TYPES.<CID>.NAME). Cleared the moment the user edits
+   * the title manually — so user-typed titles never get clobbered by
+   * a language switch. The translate consumer reads this and re-resolves
+   * the title on `onLangChange`.
+   */
+  titleKey?: string | null;
+
   /** Width in pixels (computed from widthRatio) */
   width: number;
 
@@ -258,7 +268,14 @@ export interface FieldLabels {
 export function createVisual(id: string, config: any): Visual {
   return {
     id,
+    // Default English value lives here as a no-Angular fallback for
+    // any caller that constructs visuals outside the editor (tests,
+    // placeholder, hydration before TranslateService is ready).
+    // `edit-analyses.addVisual()` overwrites this with the active
+    // locale's translation and stamps `titleKey` so it can be
+    // re-translated on language switch.
     title: 'Untitled Visual',
+    titleKey: 'ANALYSES.UNTITLED_VISUAL',
     width: 400, // Will be computed from widthRatio
     height: 350, // Will be computed from heightRatio
     widthRatio: 0.5, // 50% of available space (2 visuals per row)

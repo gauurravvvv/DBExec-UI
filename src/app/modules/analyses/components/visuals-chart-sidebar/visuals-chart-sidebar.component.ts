@@ -187,7 +187,12 @@ export class VisualsChartSidebarComponent implements OnInit, OnDestroy {
   setVisualChartType(chartType: any): void {
     if (this.focusedVisual) {
       this.focusedVisual.chartType = chartType.id;
-      this.focusedVisual.title = chartType.name;
+      // `chartType.name` is now an i18n key (CHART_TYPES.<CID>.NAME).
+      // Resolve it for display AND stamp `titleKey` so a language switch
+      // can re-translate the title in place — unless the user typed
+      // their own, in which case the title editor clears `titleKey`.
+      this.focusedVisual.titleKey = chartType.name;
+      this.focusedVisual.title = this.translate.instant(chartType.name);
       this.chartTypeSelected.emit();
     }
   }

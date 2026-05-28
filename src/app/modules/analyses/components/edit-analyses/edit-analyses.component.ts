@@ -389,6 +389,18 @@ export class EditAnalysesComponent
           this.loadAnalysis();
         }
       });
+
+    // Re-translate auto-named visual titles when the language changes.
+    // Each visual that still carries a `titleKey` (= user has not typed
+    // their own title) gets its `title` resolved against the new locale
+    // in place, so "Untitled Visual" / chart-type names track the UI.
+    this.translate.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        for (const v of this.visuals) {
+          if (v.titleKey) v.title = this.translate.instant(v.titleKey);
+        }
+      });
   }
 
   ngAfterViewInit(): void {
@@ -1526,6 +1538,12 @@ export class EditAnalysesComponent
       String(this.visualCounter),
       getDefaultChartConfig(),
     );
+    // createVisual leaves an English fallback as `title`; immediately
+    // replace with the active locale's translation and keep `titleKey`
+    // set so a language switch can re-translate while the user hasn't
+    // renamed it. The user editing the title clears `titleKey`.
+    visual.titleKey = 'ANALYSES.UNTITLED_VISUAL';
+    visual.title = this.translate.instant(visual.titleKey);
 
     // Default grid size: 12 columns (half width), 6 rows
     this.visuals.push(visual);
@@ -1762,7 +1780,8 @@ export class EditAnalysesComponent
     const target = visual || this.getFocusedVisual();
     if (target) {
       target.chartType = null;
-      target.title = this.translate.instant('ANALYSES.UNTITLED_VISUAL');
+      target.titleKey = 'ANALYSES.UNTITLED_VISUAL';
+      target.title = this.translate.instant(target.titleKey);
       target.xAxisColumn = null;
       target.yAxisColumn = null;
       target.zAxisColumn = null;
@@ -1783,6 +1802,12 @@ export class EditAnalysesComponent
 
   finishEditTitle(): void {
     this.markDirty();
+    // User has typed their own title — clear `titleKey` so a later
+    // language switch doesn't overwrite it back to the localized
+    // auto-name. Re-clearing the chart type (via clearChartType) is
+    // the only way to restore the auto-naming behaviour.
+    const target = this.visuals.find(v => v.id === this.editingTitleId);
+    if (target) target.titleKey = null;
     this.editingTitleId = null;
   }
 
