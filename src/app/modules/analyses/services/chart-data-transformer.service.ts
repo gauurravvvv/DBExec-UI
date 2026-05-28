@@ -975,26 +975,46 @@ export class ChartDataTransformerService {
   }
 
   /**
-   * Radar — `[{name, value: [v1, v2, ...vK]}]`. `xAxisColumn` is the series
-   * name; each row becomes one polygon. `indicatorColumns` defines the K
-   * radar axes (in order). Each indicator's max is derived from the column.
+   * Radar — `{indicators: [{name, max}], series: [{name, value:[v1..vK]}]}`.
+   *
+   * `xAxisColumn` defines the grouping (one polygon per distinct category) and
+   * `indicatorColumns` defines the K radar axes. Each indicator value is the
+   * SUM of that column for the rows in the group (matches the bar/line family
+   * aggregation default — see `transformToBar` etc.). The indicator's max is
+   * also derived from the grouped values, so the axis scale tracks the
+   * aggregated polygons, not the raw rows.
+   *
+   * Previously this returned one polygon per raw row, which produced ~N
+   * overlapping shapes (5040 for the demo dataset) and looked like noise.
    */
   private transformToRadar(rawData: any[], mapping: ChartDataMapping): any {
     const { xAxisColumn, indicatorColumns } = mapping;
     if (!xAxisColumn || !indicatorColumns?.length) {
       return { indicators: [], series: [] };
     }
-    const indicators = indicatorColumns.map(col => {
-      const max = Math.max(
-        0,
-        ...rawData.map(r => this.toNumber(r[col])).filter(v => isFinite(v)),
-      );
+
+    // Group rows by xAxisColumn → indicator values are summed within group.
+    const groups = new Map<string, number[]>();
+    for (const row of rawData) {
+      const key = this.formatLabelValue(row[xAxisColumn]);
+      let bucket = groups.get(key);
+      if (!bucket) {
+        bucket = indicatorColumns.map(() => 0);
+        groups.set(key, bucket);
+      }
+      indicatorColumns.forEach((col, i) => {
+        const v = this.toNumber(row[col]);
+        if (isFinite(v)) bucket![i] += v;
+      });
+    }
+
+    const series = Array.from(groups, ([name, value]) => ({ name, value }));
+
+    const indicators = indicatorColumns.map((col, i) => {
+      const max = Math.max(0, ...series.map(s => s.value[i]).filter(isFinite));
       return { name: col, max: max || 1 };
     });
-    const series = rawData.map(row => ({
-      name: this.formatLabelValue(row[xAxisColumn]),
-      value: indicatorColumns.map(col => this.toNumber(row[col])),
-    }));
+
     return { indicators, series };
   }
 
