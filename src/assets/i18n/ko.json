@@ -163,7 +163,10 @@
     "NO_RESULTS_FOUND": "결과를 찾을 수 없습니다",
     "NO_OPTIONS_AVAILABLE": "사용 가능한 옵션이 없습니다",
     "CONTINUE": "계속",
-    "OPTIONAL": "선택사항"
+    "OPTIONAL": "선택사항",
+    "APPLY": "적용",
+    "REMOVE": "제거",
+    "TRY_ADJUST_FILTERS": "필터를 조정해 보세요"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "이름은 필수 항목입니다",
@@ -1256,7 +1259,9 @@
     "TABLE_NO_DATA": "표시할 데이터가 없습니다",
     "TABLE_NO_MATCHING_ROWS": "일치하는 행이 없습니다",
     "A11Y_DATA_PANELS": "데이터 패널",
-    "A11Y_BUILD_PANELS": "빌드 패널"
+    "A11Y_BUILD_PANELS": "빌드 패널",
+    "ADD_COLUMN": "열 추가",
+    "ASSIGN_AXES_HINT": "이 차트를 렌더링하려면 축을 지정하세요"
   },
   "DASHBOARD": {
     "TITLE": "대시보드",

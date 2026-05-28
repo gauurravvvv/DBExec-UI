@@ -247,7 +247,17 @@
         class="config-section"
         *ngIf="supportsLegend(focusedVisual.chartType)"
       >
-        <div class="section-title">{{ 'ANALYSES.LEGEND' | translate }}</div>
+        <!-- Section title sits above the legend controls, but the only
+             always-visible control here is the Show Legend toggle. When
+             the legend is off there is no body for the title to label —
+             hiding it collapses the section visually to just the toggle
+             row, which is what the user expects (no orphan heading). -->
+        <div
+          class="section-title"
+          *ngIf="focusedVisual.config.legend"
+        >
+          {{ 'ANALYSES.LEGEND' | translate }}
+        </div>
         <div class="config-row">
           <label>{{ 'ANALYSES.SHOW_LEGEND' | translate }}</label>
           <app-custom-toggle

@@ -163,7 +163,10 @@
     "NO_RESULTS_FOUND": "未找到结果",
     "NO_OPTIONS_AVAILABLE": "无可用选项",
     "CONTINUE": "继续",
-    "OPTIONAL": "可选"
+    "OPTIONAL": "可选",
+    "APPLY": "应用",
+    "REMOVE": "移除",
+    "TRY_ADJUST_FILTERS": "尝试调整筛选器"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名字为必填项",
@@ -1256,7 +1259,9 @@
     "TABLE_NO_DATA": "无数据可显示",
     "TABLE_NO_MATCHING_ROWS": "无匹配行",
     "A11Y_DATA_PANELS": "数据面板",
-    "A11Y_BUILD_PANELS": "构建面板"
+    "A11Y_BUILD_PANELS": "构建面板",
+    "ADD_COLUMN": "添加列",
+    "ASSIGN_AXES_HINT": "分配轴以渲染此图表"
   },
   "DASHBOARD": {
     "TITLE": "仪表盘",

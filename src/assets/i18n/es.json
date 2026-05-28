@@ -163,7 +163,10 @@
     "NO_RESULTS_FOUND": "No se encontraron resultados",
     "NO_OPTIONS_AVAILABLE": "No hay opciones disponibles",
     "CONTINUE": "Continuar",
-    "OPTIONAL": "Opcional"
+    "OPTIONAL": "Opcional",
+    "APPLY": "Aplicar",
+    "REMOVE": "Quitar",
+    "TRY_ADJUST_FILTERS": "Intente ajustar los filtros"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "El nombre es obligatorio",
@@ -1256,7 +1259,9 @@
     "TABLE_NO_DATA": "No hay datos para mostrar",
     "TABLE_NO_MATCHING_ROWS": "No hay filas coincidentes",
     "A11Y_DATA_PANELS": "Paneles de datos",
-    "A11Y_BUILD_PANELS": "Paneles de construcción"
+    "A11Y_BUILD_PANELS": "Paneles de construcción",
+    "ADD_COLUMN": "Añadir columna",
+    "ASSIGN_AXES_HINT": "Asigne ejes para mostrar este gráfico"
   },
   "DASHBOARD": {
     "TITLE": "Paneles",

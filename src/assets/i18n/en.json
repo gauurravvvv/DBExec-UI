@@ -67,7 +67,7 @@
     "TYPE": "Type",
     "SELECT_RANGE": "Select range",
     "NO_RECORD_FOUND": "No such record found",
-    "TRY_ADJUST_FILTERS": "Try adjusting your filters or clearing them to see all records.",
+    "TRY_ADJUST_FILTERS": "Try adjusting filters",
     "CONFIRM_DELETE": "Confirm Delete",
     "CONFIRM_UPDATE": "Confirm Update",
     "JUSTIFICATION": "Justification",
@@ -164,7 +164,9 @@
     "INCLUDE_ALL": "Include All",
     "CONFIRM": "Confirm",
     "COPY_TO_CLIPBOARD": "Copy to clipboard",
-    "BACK": "Back"
+    "BACK": "Back",
+    "APPLY": "Apply",
+    "REMOVE": "Remove"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "First name is required",
@@ -837,7 +839,7 @@
     "AREA_OPACITY": "Area Opacity",
     "AREA_OPTIONS": "Area Options",
     "ASPECT_SCALE": "Aspect Scale",
-    "ASSIGN_AXES_HINT": "Pick fields for {{axes}} from the sidebar to render the chart.",
+    "ASSIGN_AXES_HINT": "Assign axes to render this chart",
     "AUTO": "auto",
     "AUTO_OR_NUMBER": "auto or number",
     "AUTO_ROTATE": "Auto Rotate",
@@ -1300,7 +1302,8 @@
     "TABLE_NO_DATA": "No data to display",
     "TABLE_NO_MATCHING_ROWS": "No matching rows",
     "A11Y_DATA_PANELS": "Data panels",
-    "A11Y_BUILD_PANELS": "Build panels"
+    "A11Y_BUILD_PANELS": "Build panels",
+    "ADD_COLUMN": "Add Column"
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",

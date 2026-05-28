@@ -163,7 +163,10 @@
     "NO_RESULTS_FOUND": "該当する結果がありません",
     "NO_OPTIONS_AVAILABLE": "利用可能なオプションがありません",
     "CONTINUE": "続行",
-    "OPTIONAL": "任意"
+    "OPTIONAL": "任意",
+    "APPLY": "適用",
+    "REMOVE": "削除",
+    "TRY_ADJUST_FILTERS": "フィルターを調整してください"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名は必須です",
@@ -1256,7 +1259,9 @@
     "TABLE_NO_DATA": "表示するデータがありません",
     "TABLE_NO_MATCHING_ROWS": "一致する行がありません",
     "A11Y_DATA_PANELS": "データ パネル",
-    "A11Y_BUILD_PANELS": "ビルド パネル"
+    "A11Y_BUILD_PANELS": "ビルド パネル",
+    "ADD_COLUMN": "列を追加",
+    "ASSIGN_AXES_HINT": "このグラフを表示するには軸を割り当てます"
   },
   "DASHBOARD": {
     "TITLE": "ダッシュボード",

@@ -163,7 +163,10 @@
     "NO_RESULTS_FOUND": "Geen resultaten gevonden",
     "NO_OPTIONS_AVAILABLE": "Geen opties beschikbaar",
     "CONTINUE": "Doorgaan",
-    "OPTIONAL": "Optioneel"
+    "OPTIONAL": "Optioneel",
+    "APPLY": "Toepassen",
+    "REMOVE": "Verwijderen",
+    "TRY_ADJUST_FILTERS": "Probeer filters aan te passen"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Voornaam is verplicht",
@@ -1256,7 +1259,9 @@
     "TABLE_NO_DATA": "Geen gegevens om weer te geven",
     "TABLE_NO_MATCHING_ROWS": "Geen overeenkomende rijen",
     "A11Y_DATA_PANELS": "Gegevenspanelen",
-    "A11Y_BUILD_PANELS": "Bouwpanelen"
+    "A11Y_BUILD_PANELS": "Bouwpanelen",
+    "ADD_COLUMN": "Kolom toevoegen",
+    "ASSIGN_AXES_HINT": "Wijs assen toe om dit diagram weer te geven"
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",

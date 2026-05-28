@@ -163,7 +163,10 @@
     "NO_RESULTS_FOUND": "Keine Ergebnisse gefunden",
     "NO_OPTIONS_AVAILABLE": "Keine Optionen verfügbar",
     "CONTINUE": "Weiter",
-    "OPTIONAL": "Optional"
+    "OPTIONAL": "Optional",
+    "APPLY": "Anwenden",
+    "REMOVE": "Entfernen",
+    "TRY_ADJUST_FILTERS": "Versuchen Sie die Filter anzupassen"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Vorname ist erforderlich",
@@ -1256,7 +1259,9 @@
     "TABLE_NO_DATA": "Keine Daten verfügbar",
     "TABLE_NO_MATCHING_ROWS": "Keine passenden Zeilen",
     "A11Y_DATA_PANELS": "Datenbereiche",
-    "A11Y_BUILD_PANELS": "Bereiche erstellen"
+    "A11Y_BUILD_PANELS": "Bereiche erstellen",
+    "ADD_COLUMN": "Spalte hinzufügen",
+    "ASSIGN_AXES_HINT": "Achsen zuweisen, um dieses Diagramm anzuzeigen"
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",

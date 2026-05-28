@@ -163,7 +163,10 @@
     "NO_RESULTS_FOUND": "Nessun risultato trovato",
     "NO_OPTIONS_AVAILABLE": "Nessuna opzione disponibile",
     "CONTINUE": "Continua",
-    "OPTIONAL": "Opzionale"
+    "OPTIONAL": "Opzionale",
+    "APPLY": "Applica",
+    "REMOVE": "Rimuovi",
+    "TRY_ADJUST_FILTERS": "Prova a regolare i filtri"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Il nome è obbligatorio",
@@ -1256,7 +1259,9 @@
     "TABLE_NO_DATA": "Nessun dato da visualizzare",
     "TABLE_NO_MATCHING_ROWS": "Nessuna riga corrispondente",
     "A11Y_DATA_PANELS": "Pannelli dati",
-    "A11Y_BUILD_PANELS": "Pannelli di costruzione"
+    "A11Y_BUILD_PANELS": "Pannelli di costruzione",
+    "ADD_COLUMN": "Aggiungi colonna",
+    "ASSIGN_AXES_HINT": "Assegna gli assi per visualizzare questo grafico"
   },
   "DASHBOARD": {
     "TITLE": "Dashboard",
