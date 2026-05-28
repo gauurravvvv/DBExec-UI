@@ -1389,24 +1389,37 @@ export function buildGaugeChartOption(data: any[], config: any): any {
   }));
 
   // Auto-fit the gauge scale to the data when the user hasn't set an explicit
-  // max. Previously max defaulted to a hardcoded 100 and read the wrong config
-  // keys (config.min/max instead of the gaugeMinValue/gaugeMaxValue the
-  // Properties pane writes), so a real measure (e.g. summed sales in the
-  // millions) pinned the needle far past the 0–100 dial. Round the data max up
-  // to a "nice" number so the dial ends on a clean tick.
+  // max. The Properties pane writes config.min and config.max (see the
+  // visual-config-sidebar Gauge Series Options block, ~line 896/905), but
+  // those keys carry a stale default of 0/100 from DEFAULT_CHART_CONFIG; a
+  // user who never opens the gauge config can't end up with a dial that
+  // matches a summed measure in the millions. The previous fix unilaterally
+  // ignored config.min/config.max, which silently disabled both UI inputs.
+  //
+  // Strategy now: round the data max up to a "nice" number for the
+  // auto-fit case, and honour the user's explicit min/max once it differs
+  // from the legacy defaults (0/100). gaugeMinValue / gaugeMaxValue (the
+  // never-shipped keys) are still accepted for forward compatibility.
   const dataMax = Math.max(...gaugeData.map(d => Number(d.value) || 0), 1);
   const niceMax = (() => {
     const pow = Math.pow(10, Math.floor(Math.log10(dataMax)));
     return Math.ceil(dataMax / pow) * pow;
   })();
-  // Use ONLY the Properties-pane keys (gaugeMinValue/gaugeMaxValue). The
-  // legacy config.min/config.max carry a stale default of 0/100 from
-  // DEFAULT_CHART_CONFIG, so falling back to them pinned every gauge to a
-  // 0–100 dial regardless of data. When the user hasn't set an explicit max,
-  // auto-fit to the rounded data max instead.
-  const gaugeMin = config.gaugeMinValue != null ? config.gaugeMinValue : 0;
-  const gaugeMax =
-    config.gaugeMaxValue != null ? config.gaugeMaxValue : niceMax;
+
+  const minOverride =
+    config.gaugeMinValue != null
+      ? config.gaugeMinValue
+      : config.min != null && config.min !== 0
+        ? config.min
+        : null;
+  const maxOverride =
+    config.gaugeMaxValue != null
+      ? config.gaugeMaxValue
+      : config.max != null && config.max !== 100
+        ? config.max
+        : null;
+  const gaugeMin = minOverride != null ? minOverride : 0;
+  const gaugeMax = maxOverride != null ? maxOverride : niceMax;
 
   return {
     color: getColors(config.colorScheme),
@@ -1531,6 +1544,10 @@ export function buildHeatMapChartOption(data: any[], config: any): any {
       },
     },
     ...buildLegendWithTitle(config),
+    // Heat-map shares the standard toolbox affordance (save image, restore,
+    // data-view, zoom). Previously the toggle in the Properties pane was a
+    // no-op because the builder omitted `toolbox` entirely.
+    toolbox: buildToolbox(config),
     // Heatmap needs extra bottom for the visualMap legend (the
     // gradient color bar that lives below the chart). Stack on top
     // of buildGrid's containLabel which handles tick label space.
