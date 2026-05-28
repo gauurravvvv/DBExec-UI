@@ -150,7 +150,7 @@ export class ChartDataTransformerService {
 
       // 3D charts need [[x, y, z], ...] coordinate format
       if (THREE_D_CHART_TYPES.includes(chartType)) {
-        return this.transformTo3DFormat(rawData, mapping);
+        return this.transformTo3DFormat(rawData, mapping, chartType);
       }
 
       // ── New per-family transformers (Phase 2) ────────────────────────
@@ -699,14 +699,58 @@ export class ChartDataTransformerService {
 
   /**
    * Transform data to 3D coordinate format: [[x, y, z], ...]
-   * Used for bar3d, line3d, scatter3d chart types
+   * Used for bar3d, line3d, scatter3d chart types.
+   *
+   * bar3D uses category axes on x and y, so the values must be the raw category
+   * strings rather than `toNumber()` (which collapses every string to NaN→0 and
+   * piled all 1000 rows on cell [0,0,…]). For line3d / scatter3d the axes are
+   * numeric, so we still coerce to number. When the x/y columns are categorical
+   * we also AGGREGATE by (x,y) — summing z — so a 4-region × 4-product dataset
+   * produces 16 bars instead of 1000 overlapping ones.
    */
   private transformTo3DFormat(
     rawData: any[],
     mapping: ChartDataMapping,
+    chartType?: string,
   ): any[] {
     if (!mapping.xAxisColumn || !mapping.yAxisColumn) {
       return [];
+    }
+
+    // Detect categorical x/y from the first non-null value.
+    const xSample = rawData.find(r => r[mapping.xAxisColumn!] != null)?.[
+      mapping.xAxisColumn!
+    ];
+    const ySample = rawData.find(r => r[mapping.yAxisColumn!] != null)?.[
+      mapping.yAxisColumn!
+    ];
+    const xIsCategory = typeof xSample === 'string' && isNaN(Number(xSample));
+    const yIsCategory = typeof ySample === 'string' && isNaN(Number(ySample));
+
+    // Only bar3D uses category axes; line3D / scatter3D have value axes and
+    // expect numeric data. Don't promote string data into a category-axis
+    // aggregation for those — that would only stack everything at (0,0).
+    if (chartType === 'bar3d' && (xIsCategory || yIsCategory)) {
+      // Aggregate by (x,y) group, summing z.
+      const groups = new Map<string, [any, any, number]>();
+      for (const row of rawData) {
+        const xRaw = row[mapping.xAxisColumn!];
+        const yRaw = row[mapping.yAxisColumn!];
+        const x = xIsCategory ? String(xRaw ?? '') : this.toNumber(xRaw);
+        const y = yIsCategory ? String(yRaw ?? '') : this.toNumber(yRaw);
+        const z = mapping.zAxisColumn
+          ? this.toNumber(row[mapping.zAxisColumn])
+          : 0;
+        if (!isFinite(z)) continue;
+        const key = `${x} ${y}`;
+        const prev = groups.get(key);
+        if (prev) {
+          prev[2] += z;
+        } else {
+          groups.set(key, [x, y, z]);
+        }
+      }
+      return Array.from(groups.values());
     }
 
     return rawData
@@ -914,19 +958,22 @@ export class ChartDataTransformerService {
    */
   private transformToHierarchy(rawData: any[], mapping: ChartDataMapping): any {
     const { xAxisColumn, yAxisColumn, parentColumn } = mapping;
-    if (!xAxisColumn || !yAxisColumn) {
+    if (!xAxisColumn) {
       return [];
     }
     if (!parentColumn) {
       // Flat fallback (no hierarchy). AGGREGATE by name — previously this
       // mapped every raw row 1:1, so a treemap/sunburst over e.g. 1000 rows of
       // 4 products produced 1000 tiny slivers instead of 4 summed tiles. Sum
-      // the value per distinct name so each category is one node.
+      // the value per distinct name so each category is one node. When
+      // yAxisColumn is absent (e.g. tree chart with just xAxis), use a row
+      // count so the tree builder still has nodes to render.
       const agg = new Map<string, number>();
       rawData.forEach(row => {
         const name = this.formatLabelValue(row[xAxisColumn]);
         if (!name || name === '(empty)') return;
-        agg.set(name, (agg.get(name) || 0) + this.toNumber(row[yAxisColumn]));
+        const v = yAxisColumn ? this.toNumber(row[yAxisColumn]) : 1;
+        agg.set(name, (agg.get(name) || 0) + v);
       });
       return Array.from(agg.entries()).map(([name, value]) => ({
         name,
@@ -940,7 +987,9 @@ export class ChartDataTransformerService {
     >();
     rawData.forEach(row => {
       const name = this.formatLabelValue(row[xAxisColumn]);
-      const value = this.toNumber(row[yAxisColumn]);
+      // When yAxis isn't mapped (tree chart with just xAxis + parent), each
+      // row contributes a count of 1.
+      const value = yAxisColumn ? this.toNumber(row[yAxisColumn]) : 1;
       if (!name || name === '(empty)') return;
       if (nodes.has(name)) {
         // Aggregate duplicate-named rows
