@@ -14,8 +14,9 @@
         [suffix]="suffix"
         [readonly]="readonly"
         [disabled]="disabled || numberDisabled"
-        [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+        [ngClass]="{ 'ng-invalid ng-dirty': isInvalid }"
         (onInput)="onValueChange($event.value)"
+        (ngModelChange)="onValueChange($event)"
         (onBlur)="onBlur()"
         [inputId]="inputId"
         styleClass="w-full"
@@ -44,8 +45,9 @@
         [suffix]="suffix"
         [readonly]="readonly"
         [disabled]="disabled || numberDisabled"
-        [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+        [ngClass]="{ 'ng-invalid ng-dirty': isInvalid }"
         (onInput)="onValueChange($event.value)"
+        (ngModelChange)="onValueChange($event)"
         (onBlur)="onBlur()"
         styleClass="w-full"
       >
@@ -65,13 +67,17 @@
     [suffix]="suffix"
     [readonly]="readonly"
     [disabled]="disabled || numberDisabled"
-    [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+    [ngClass]="{ 'ng-invalid ng-dirty': isInvalid }"
     (onInput)="onValueChange($event.value)"
+    (ngModelChange)="onValueChange($event)"
     (onBlur)="onBlur()"
     styleClass="w-full"
   >
   </p-inputNumber>
-  <small class="error-message" *ngIf="showError && errorMessage">
-    {{ errorMessage }}
+  <!-- Inline error: bounds violation OR caller-supplied error. Bounds
+       error blocks propagation so the chart keeps the last good value
+       while the user is typing 9999. -->
+  <small class="error-message" *ngIf="visibleError">
+    {{ visibleError }}
   </small>
 </div>

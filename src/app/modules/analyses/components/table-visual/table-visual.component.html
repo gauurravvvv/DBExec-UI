@@ -6,7 +6,7 @@
   <!-- Empty state when no data -->
   <div class="table-visual__empty" *ngIf="!data?.length">
     <i class="pi pi-database"></i>
-    <p>No data to display</p>
+    <p>{{ 'ANALYSES.TABLE_NO_DATA' | translate }}</p>
   </div>
 
   <!-- Empty state when data exists but no columns are selected. Tables
@@ -65,7 +65,7 @@
         >
           <div class="empty-state-inline">
             <i class="pi pi-search empty-state-icon"></i>
-            <span class="empty-state-text">No matching rows</span>
+            <span class="empty-state-text">{{ 'ANALYSES.TABLE_NO_MATCHING_ROWS' | translate }}</span>
           </div>
         </td>
       </tr>

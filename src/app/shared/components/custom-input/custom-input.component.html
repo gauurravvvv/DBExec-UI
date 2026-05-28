@@ -19,9 +19,8 @@
       [readonly]="readonly"
       [rows]="rows"
       [autoResize]="autoResize"
-      [attr.maxlength]="maxLength"
       [attr.minlength]="minLength"
-      [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+      [ngClass]="{ 'ng-invalid ng-dirty': isInvalid }"
       (input)="onInputChange($event)"
       (blur)="onBlur()"
     >
@@ -44,13 +43,12 @@
           [value]="value"
           [disabled]="disabled || inputDisabled"
           [readonly]="readonly"
-          [attr.maxlength]="maxLength"
           [attr.minlength]="minLength"
           [attr.id]="inputId || null"
           [attr.autocomplete]="autocomplete || null"
           [attr.aria-label]="ariaLabel || null"
           [class]="styleClass"
-          [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+          [ngClass]="{ 'ng-invalid ng-dirty': isInvalid }"
           (input)="onInputChange($event)"
           (blur)="onBlur()"
         />
@@ -70,22 +68,29 @@
         [value]="value"
         [disabled]="disabled || inputDisabled"
         [readonly]="readonly"
-        [attr.maxlength]="maxLength"
         [attr.minlength]="minLength"
         [attr.id]="inputId || null"
         [attr.autocomplete]="autocomplete || null"
         [attr.aria-label]="ariaLabel || null"
         [class]="styleClass"
-        [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+        [ngClass]="{ 'ng-invalid ng-dirty': isInvalid }"
         (input)="onInputChange($event)"
         (blur)="onBlur()"
       />
     </ng-template>
   </ng-template>
-  <small class="hint-message" *ngIf="hint && !(showError && errorMessage)">
+  <small class="hint-message" *ngIf="hint && !visibleError">
     {{ hint }}
   </small>
-  <small class="error-message" *ngIf="showError && errorMessage">
-    {{ errorMessage }}
+  <!-- Inline length error (blocks propagation to parent ngModel until
+       the user trims back to ≤ maxLength). Same UX as app-custom-number
+       bounds errors. -->
+  <small class="error-message" *ngIf="visibleError">
+    {{ visibleError }}
+  </small>
+  <!-- Character counter (only when maxLength is set). Sits flush right
+       so the user always sees how close they are to the cap. -->
+  <small class="char-counter" *ngIf="maxLength != null && !visibleError">
+    {{ charCounter }}
   </small>
 </div>

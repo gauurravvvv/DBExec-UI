@@ -49,7 +49,7 @@
           class="chart-category-section"
           *ngFor="let category of getChartCategories(); trackBy: trackByIndex"
         >
-          <div class="category-label">{{ category }}</div>
+          <div class="category-label">{{ category | translate }}</div>
           <div class="chart-type-grid">
             <div
               class="chart-type-card"
@@ -59,13 +59,13 @@
               "
               [class.selected]="focusedVisual.chartType === chartType.id"
               (click)="setVisualChartType(chartType)"
-              [pTooltip]="chartType.description"
+              [pTooltip]="chartType.description | translate"
               tooltipPosition="bottom"
             >
               <div class="chart-icon" [class.rotate]="chartType.rotate">
                 <i [class]="chartType.icon"></i>
               </div>
-              <div class="chart-name">{{ chartType.name }}</div>
+              <div class="chart-name">{{ chartType.name | translate }}</div>
             </div>
           </div>
         </div>
@@ -101,7 +101,8 @@
             (click)="startAxisSelection(slot.key)"
           >
             <div class="axis-label">
-              {{ slot.label }}{{ slot.required ? '' : ' (optional)' }}
+              {{ slot.label | translate
+              }}{{ slot.required ? '' : ' ' + ('ANALYSES.OPTIONAL_SUFFIX' | translate) }}
             </div>
             <div
               class="axis-value"
@@ -134,7 +135,8 @@
             [class.optional]="!slot.required"
           >
             <div class="axis-label">
-              {{ slot.label }}{{ slot.required ? '' : ' (optional)' }}
+              {{ slot.label | translate
+              }}{{ slot.required ? '' : ' ' + ('ANALYSES.OPTIONAL_SUFFIX' | translate) }}
             </div>
             <div class="axis-chips">
               <span

@@ -239,7 +239,17 @@
     "ORG_PATTERN": "조직 이름은 문자 또는 숫자로 시작해야 합니다",
     "USERNAME_PATTERN_DETAILED": "사용자 이름은 문자로 시작하고 문자, 숫자, 점, 밑줄 또는 하이픈만 포함해야 합니다",
     "INVALID_PASSWORD_FORMAT": "잘못된 비밀번호 형식",
-    "EMAIL_INVALID_ADDRESS": "유효한 이메일 주소를 입력하세요"
+    "EMAIL_INVALID_ADDRESS": "유효한 이메일 주소를 입력하세요",
+    "MAX_CHARACTERS": "최대 {{max}}자까지 입력할 수 있습니다",
+    "MIN_CHARACTERS": "최소 {{min}}자 이상 입력하세요",
+    "VALUE_BETWEEN": "값은 {{min}}과(와) {{max}} 사이여야 합니다",
+    "VALUE_GTE": "값은 {{min}} 이상이어야 합니다",
+    "VALUE_LTE": "값은 {{max}} 이하여야 합니다",
+    "PERCENT_GTE": "백분율 값은 {{min}}% 이상이어야 합니다",
+    "PERCENT_LTE": "백분율 값은 {{max}}% 이하여야 합니다",
+    "PX_GTE": "픽셀 값은 {{min}} 이상이어야 합니다",
+    "PX_LTE": "픽셀 값은 {{max}} 이하여야 합니다",
+    "DIMENSION_SHAPE": "{{shapes}} 사용"
   },
   "HEADER": {
     "SEARCH_PLACEHOLDER": "검색...",
@@ -770,19 +780,19 @@
     "ADD_VISUAL": "시각화 추가",
     "ADD_VISUAL_HINT": "시작하려면 \"시각화 추가\"를 클릭하세요",
     "ALIGNMENT": "정렬",
-    "ALLOW_SELECT": "Allow Select",
-    "AMBIENT_LIGHT_INTENSITY": "Ambient Light Intensity",
+    "ALLOW_SELECT": "선택 허용",
+    "AMBIENT_LIGHT_INTENSITY": "주변광 강도",
     "ANALYSIS_DETAILS": "분석 상세 정보",
     "ANALYSIS_FIELDS": "분석 필드",
     "ANALYSIS_NAME": "분석 이름",
-    "ANCHOR_SIZE": "Anchor Size",
+    "ANCHOR_SIZE": "앵커 크기",
     "ANIMATED_EFFECT": "애니메이션 효과",
     "ANIMATION": "애니메이션",
-    "APPEND_TO_BODY": "Append Tooltip to Body",
-    "AREA_BASELINE": "Area Baseline",
+    "APPEND_TO_BODY": "툴팁을 Body 에 추가",
+    "AREA_BASELINE": "영역 기준선",
     "AREA_OPACITY": "영역 불투명도",
     "AREA_OPTIONS": "영역 옵션",
-    "ASPECT_SCALE": "Aspect Scale",
+    "ASPECT_SCALE": "종횡비 스케일",
     "ASSIGN": "차트를 보려면 축에 데이터 필드를 할당하세요",
     "AUTO": "자동",
     "AUTO_OR_NUMBER": "자동 또는 숫자",
@@ -791,16 +801,16 @@
     "AUTO_SCALE": "자동 크기 조정",
     "AVOID_LABEL_OVERLAP": "레이블 겹침 방지",
     "AXIS": "축",
-    "AXIS_EXPAND_COUNT": "Axis Expand Count",
-    "AXIS_EXPANDABLE": "Axis Expandable",
+    "AXIS_EXPAND_COUNT": "축 확장 수",
+    "AXIS_EXPANDABLE": "축 확장 가능",
     "AXIS_LINE_ROUND_CAP": "축 선 둥근 끝",
     "AXIS_LINE_WIDTH": "축 선 너비",
     "AXIS_POINTER": "축 포인터",
     "BAR_GAP": "막대 간격",
-    "BAR_MAX_WIDTH": "Bar Max Width",
-    "BAR_MIN_WIDTH": "Bar Min Width",
+    "BAR_MAX_WIDTH": "최대 막대 너비",
+    "BAR_MIN_WIDTH": "최소 막대 너비",
     "BAR_OPTIONS": "막대 옵션",
-    "BAR_SIZING": "Bar Sizing",
+    "BAR_SIZING": "막대 크기",
     "BAR_WIDTH": "막대 너비",
     "BASIC_INFORMATION": "기본 정보",
     "BEAR_BORDER_COLOR": "하락 테두리 색상",
@@ -808,14 +818,14 @@
     "BORDER_RADIUS": "테두리 반경",
     "BORDER_WIDTH": "테두리 너비",
     "BOUNDARY_GAP": "경계 간격",
-    "BOUNDARY_GAP_PERCENT": "Boundary Gap (%)",
+    "BOUNDARY_GAP_PERCENT": "경계 여백 (%)",
     "BOX_PLOT_OPTIONS": "상자 그림 옵션",
     "BUBBLE_OPTIONS": "버블 옵션",
     "BULL_BORDER_COLOR": "상승 테두리 색상",
     "BULL_UP_COLOR": "상승 (양봉) 색상",
-    "CALCULABLE": "Calculable",
+    "CALCULABLE": "계산 가능",
     "CANDLESTICK_OPTIONS": "캔들스틱 옵션",
-    "CANDLESTICK_PERF": "Candlestick Performance",
+    "CANDLESTICK_PERF": "캔들스틱 성능",
     "CARD_DISPLAY": "카드 표시",
     "CATEGORY": "카테고리",
     "CATEGORY_GAP": "카테고리 간격",
@@ -826,9 +836,9 @@
     "CLICK_FIELD_FROM_LEFT_PANEL": "왼쪽 패널에서 필드를 클릭하세요",
     "CLICK_TO_CONFIGURE": "비주얼 패널에서 유형을 선택하세요",
     "CLICK_TO_SELECT_FIELD": "필드를 선택하려면 클릭하세요",
-    "CLIP_TO_GRID": "Clip to Grid",
+    "CLIP_TO_GRID": "그리드에 클립",
     "CLOCKWISE": "시계 방향",
-    "COLOR_MAPPING_BY": "Color Mapping By",
+    "COLOR_MAPPING_BY": "색상 매핑 기준",
     "COLOR_SCHEME": "색상 구성",
     "COLUMN": "필드",
     "CONFIRM_DELETE_BULK": "선택한 {{count}}개의 분석을 삭제하시겠습니까?",
@@ -853,7 +863,7 @@
     "DATA_MAPPING": "데이터 매핑",
     "DATA_ZOOM": "데이터 줌",
     "DATASET_FIELDS": "데이터셋 필드",
-    "DATA_ZOOM_OPTIONS": "Data Zoom Options",
+    "DATA_ZOOM_OPTIONS": "데이터 줌 옵션",
     "DATE_AND_TIME": "날짜 및 시간",
     "DATE_FORMAT": "날짜 형식",
     "DATE_ONLY": "날짜만",
@@ -1168,12 +1178,12 @@
     "DEFAULT_20_PERCENT": "20%",
     "DEFAULT_30_PERCENT": "30%",
     "DEFAULT_90_PERCENT": "90%",
-    "DETAIL_FORMATTER": "Detail Formatter",
-    "EMPHASIS": "Emphasis",
-    "ENABLE_LARGE_MODE": "Enable Large Mode",
+    "DETAIL_FORMATTER": "세부 포맷터",
+    "EMPHASIS": "강조",
+    "ENABLE_LARGE_MODE": "대용량 모드 활성화",
     "EXAMPLE_50_PERCENT": "예: 50%",
     "FIELDS": "필드",
-    "FILL_FROM": "Fill From",
+    "FILL_FROM": "채우기 시작",
     "TABLE_OPTIONS": "테이블 옵션",
     "TABLE_COMPACT": "컴팩트 밀도",
     "TABLE_STRIPED": "줄무늬 행",
@@ -1196,52 +1206,57 @@
     "FILTER_DIALOG_SUBTITLE": "이 필터의 모양과 동작을 구성합니다.",
     "FILTER_CLEAR_ALL_TOOLTIP": "모든 필터 재설정",
     "FILTER_CLEAR_NONE_TOOLTIP": "지울 필터가 없습니다",
-    "FILTER_MODE": "Filter Mode",
+    "FILTER_MODE": "필터 모드",
     "FILTER_MORE": "추가 필터",
-    "FILTER_SECTION_SOURCE": "원본",
+    "FILTER_SECTION_SOURCE": "소스",
     "FILTER_SECTION_BEHAVIOUR": "동작",
     "FILTER_SECTION_DEFAULT": "기본값",
     "FILTER_SAVE_DISABLED_HINT": "필드, 필터 유형, 컨트롤을 선택하면 저장할 수 있습니다.",
-    "FOCUS_MODE": "Focus Mode",
-    "FUNNEL_LABELS": "Funnel Labels",
-    "GAUGE_DETAIL": "Gauge Detail",
-    "GRAPH_EXTRAS": "Graph Extras",
-    "HIGHLIGHT_ADJACENCY": "Highlight Adjacency",
-    "HOVER_SCALE": "Hover Scale",
-    "LABEL_LINE_LENGTH": "Label Line Length",
-    "LABEL_LINE_LENGTH_2": "Label Line Length 2",
-    "LABEL_ROTATION": "Label Rotation",
-    "LARGE_THRESHOLD": "Large Mode Threshold",
-    "LAYOUT_ITERATIONS": "Layout Iterations",
-    "LINE_EFFECT": "Line Effect",
-    "LIVE_FORCE_LAYOUT": "Live Force Layout",
-    "MAIN_LIGHT_INTENSITY": "Main Light Intensity",
-    "MAP_EXTRAS": "Map Extras",
-    "MIN_SHOW_LABEL_ANGLE": "Min Label Angle",
-    "NAME_PROPERTY": "Name Property",
-    "PARALLEL_INTERACTION": "Parallel Interaction",
-    "PERFORMANCE_MODE": "Performance Mode",
-    "PERIOD_SEC": "Period (sec)",
-    "PIE_REFINEMENTS": "Pie Refinements",
-    "POST_EFFECT": "Post Effect",
-    "PROGRESSIVE_CHUNK": "Progressive Chunk",
-    "ROTATE_CIRCULAR_LABELS": "Rotate Circular Labels",
-    "SANKEY_LAYOUT": "Sankey Layout",
-    "SCENE_3D": "3D Scene",
-    "SHADING_MODE": "Shading Mode",
-    "SHOW_ANCHOR": "Show Anchor",
-    "SHOW_EFFECT": "Show Effect",
-    "SHOW_UPPER_LABEL": "Show Upper Label",
-    "SLICE_BORDER_WIDTH": "Slice Border Width",
-    "SQUARE_RATIO": "Square Ratio",
-    "SUNBURST_LABELS": "Sunburst Labels",
-    "THEME_RIVER_EXTRAS": "Theme River Extras",
-    "THROTTLE_MS": "Throttle (ms)",
-    "TOOLTIP_EXTRAS": "Tooltip Extras",
-    "TREEMAP_COLOR_MAPPING": "Treemap Color Mapping",
-    "VALUE_PRECISION": "Value Precision",
-    "VISUAL_DIMENSION": "Visual Dimension",
-    "VISUAL_MAP": "Visual Map"
+    "FOCUS_MODE": "포커스 모드",
+    "FUNNEL_LABELS": "퍼널 레이블",
+    "GAUGE_DETAIL": "게이지 세부 정보",
+    "GRAPH_EXTRAS": "그래프 추가 옵션",
+    "HIGHLIGHT_ADJACENCY": "인접 강조",
+    "HOVER_SCALE": "호버 스케일",
+    "LABEL_LINE_LENGTH": "레이블 선 길이",
+    "LABEL_LINE_LENGTH_2": "레이블 선 길이 2",
+    "LABEL_ROTATION": "레이블 회전",
+    "LARGE_THRESHOLD": "대용량 모드 임계값",
+    "LAYOUT_ITERATIONS": "레이아웃 반복",
+    "LINE_EFFECT": "선 효과",
+    "LIVE_FORCE_LAYOUT": "라이브 포스 레이아웃",
+    "MAIN_LIGHT_INTENSITY": "주광 강도",
+    "MAP_EXTRAS": "지도 추가 옵션",
+    "MIN_SHOW_LABEL_ANGLE": "최소 레이블 각도",
+    "NAME_PROPERTY": "이름 속성",
+    "PARALLEL_INTERACTION": "병렬 상호작용",
+    "PERFORMANCE_MODE": "성능 모드",
+    "PERIOD_SEC": "주기 (초)",
+    "PIE_REFINEMENTS": "원형 차트 세부 옵션",
+    "POST_EFFECT": "포스트 효과",
+    "PROGRESSIVE_CHUNK": "프로그레시브 청크",
+    "ROTATE_CIRCULAR_LABELS": "원형 레이블 회전",
+    "SANKEY_LAYOUT": "산키 레이아웃",
+    "SCENE_3D": "3D 장면",
+    "SHADING_MODE": "음영 모드",
+    "SHOW_ANCHOR": "앵커 표시",
+    "SHOW_EFFECT": "효과 표시",
+    "SHOW_UPPER_LABEL": "상위 레이블 표시",
+    "SLICE_BORDER_WIDTH": "슬라이스 테두리 두께",
+    "SQUARE_RATIO": "정사각형 비율",
+    "SUNBURST_LABELS": "선버스트 레이블",
+    "THEME_RIVER_EXTRAS": "테마 강 추가 옵션",
+    "THROTTLE_MS": "스로틀 (ms)",
+    "TOOLTIP_EXTRAS": "툴팁 추가 옵션",
+    "TREEMAP_COLOR_MAPPING": "트리맵 색상 매핑",
+    "VALUE_PRECISION": "값 정밀도",
+    "VISUAL_DIMENSION": "시각적 차원",
+    "VISUAL_MAP": "시각적 맵",
+    "OPTIONAL_SUFFIX": "(선택)",
+    "TABLE_NO_DATA": "표시할 데이터가 없습니다",
+    "TABLE_NO_MATCHING_ROWS": "일치하는 행이 없습니다",
+    "A11Y_DATA_PANELS": "데이터 패널",
+    "A11Y_BUILD_PANELS": "빌드 패널"
   },
   "DASHBOARD": {
     "TITLE": "대시보드",
@@ -2019,5 +2034,505 @@
     "IDLE_SECONDS_REMAINING": "초 남음",
     "LOGOUT_NOW": "지금 로그아웃",
     "STAY_LOGGED_IN": "로그인 유지"
+  },
+  "CHART_OPTIONS": {
+    "LINE_STEP": {
+      "NONE": "없음",
+      "START": "시작",
+      "MIDDLE": "중간",
+      "END": "끝"
+    },
+    "FUNNEL_SORT": {
+      "DESCENDING": "내림차순",
+      "ASCENDING": "오름차순",
+      "NONE": "없음"
+    },
+    "FUNNEL_ALIGN": {
+      "CENTER": "가운데",
+      "LEFT": "왼쪽",
+      "RIGHT": "오른쪽"
+    },
+    "TREEMAP_NODE_CLICK": {
+      "FALSE": "비활성화",
+      "ZOOMTONODE": "확대",
+      "LINK": "링크"
+    },
+    "SUNBURST_NODE_CLICK": {
+      "FALSE": "비활성화",
+      "ROOTTONODE": "루트에서 노드",
+      "LINK": "링크"
+    },
+    "EFFECT_SHOW_ON": {
+      "RENDER": "렌더링",
+      "EMPHASIS": "강조"
+    },
+    "SAMPLING": {
+      "NONE": "없음",
+      "LTTB": "LTTB",
+      "AVERAGE": "평균",
+      "MAX": "최대",
+      "MIN": "최소",
+      "SUM": "합계"
+    },
+    "SHOW_ALL_SYMBOL": {
+      "AUTO": "자동",
+      "TRUE": "예",
+      "FALSE": "아니요"
+    },
+    "STACK_STRATEGY": {
+      "SAMESIGN": "같은 부호",
+      "ALL": "전체",
+      "POSITIVE": "양수",
+      "NEGATIVE": "음수"
+    },
+    "RIPPLE_BRUSH_TYPE": {
+      "STROKE": "선",
+      "FILL": "채우기"
+    },
+    "FUNNEL_ORIENT": {
+      "VERTICAL": "수직",
+      "HORIZONTAL": "수평"
+    },
+    "SUNBURST_SORT": {
+      "DESC": "내림차순",
+      "ASC": "오름차순",
+      "NONE": "없음"
+    },
+    "PICTORIAL_REPEAT_DIRECTION": {
+      "START": "시작",
+      "END": "끝"
+    },
+    "EMPHASIS_FOCUS": {
+      "NONE": "없음",
+      "SELF": "Self",
+      "SERIES": "계열",
+      "ADJACENCY": "인접",
+      "ANCESTOR": "조상",
+      "DESCENDANT": "자손"
+    },
+    "VISUAL_MAP_ORIENT": {
+      "HORIZONTAL": "수평",
+      "VERTICAL": "수직"
+    },
+    "VISUAL_MAP_TYPE": {
+      "CONTINUOUS": "연속",
+      "PIECEWISE": "구간별"
+    },
+    "DATA_ZOOM_TYPE": {
+      "INSIDE": "내부만",
+      "SLIDER": "슬라이더만",
+      "BOTH": "모두"
+    },
+    "DATA_ZOOM_FILTER_MODE": {
+      "FILTER": "필터",
+      "WEAKFILTER": "약한 필터",
+      "EMPTY": "비어 있음",
+      "NONE": "없음"
+    },
+    "AREA_ORIGIN": {
+      "AUTO": "자동",
+      "START": "시작",
+      "END": "끝"
+    },
+    "SUNBURST_LABEL_ROTATE": {
+      "RADIAL": "Radial",
+      "TANGENTIAL": "접선",
+      "0": "수평 (0°)"
+    },
+    "COLOR_MAPPING_BY": {
+      "VALUE": "값",
+      "INDEX": "인덱스",
+      "ID": "ID"
+    },
+    "FUNNEL_LABEL_POSITION": {
+      "INSIDE": "내부",
+      "OUTSIDE": "외부",
+      "RIGHT": "오른쪽",
+      "LEFT": "왼쪽",
+      "TOP": "위",
+      "BOTTOM": "아래"
+    },
+    "THEME_RIVER_LABEL_POSITION": {
+      "LEFT": "왼쪽",
+      "RIGHT": "오른쪽"
+    },
+    "SHADING_MODE": {
+      "COLOR": "색상",
+      "LAMBERT": "램버트",
+      "REALISTIC": "사실적"
+    },
+    "LEGEND_POSITIONS": {
+      "BELOW": "아래"
+    },
+    "LEGEND_TYPES": {
+      "PLAIN": "기본",
+      "SCROLL": "스크롤"
+    },
+    "LABEL_POSITIONS": {
+      "TOP": "위",
+      "INSIDELEFT": "내부 왼쪽",
+      "INSIDERIGHT": "내부 오른쪽",
+      "INSIDETOP": "내부 위",
+      "INSIDEBOTTOM": "내부 아래"
+    },
+    "TOOLTIP_TRIGGERS": {
+      "ITEM": "항목",
+      "AXIS": "축"
+    },
+    "AXIS_POINTER_TYPES": {
+      "LINE": "선",
+      "SHADOW": "그림자",
+      "CROSS": "십자"
+    },
+    "GRID_LINE_STYLES": {
+      "SOLID": "실선",
+      "DASHED": "점선",
+      "DOTTED": "점"
+    },
+    "ANIMATION_EASINGS": {
+      "LINEAR": "선형",
+      "CUBICOUT": "Cubic Out",
+      "ELASTICOUT": "Elastic Out",
+      "BOUNCEOUT": "Bounce Out",
+      "QUADRATICINOUT": "Quadratic In/Out",
+      "EXPONENTIALOUT": "Exponential Out"
+    },
+    "LINE_STYLE_TYPES": {
+      "SOLID": "실선",
+      "DASHED": "점선",
+      "DOTTED": "점"
+    },
+    "SYMBOL_SHAPES": {
+      "CIRCLE": "원",
+      "RECT": "사각형",
+      "ROUNDRECT": "둥근 사각형",
+      "TRIANGLE": "삼각형",
+      "DIAMOND": "다이아몬드",
+      "PIN": "핀",
+      "ARROW": "화살표"
+    },
+    "PIE_LABEL_POSITIONS": {
+      "INSIDE": "내부"
+    },
+    "PIE_SELECTED_MODES": {
+      "SINGLE": "단일",
+      "MULTIPLE": "복수",
+      "SERIES": "계열"
+    },
+    "PIE_ROSE_TYPES": {
+      "NONE": "없음",
+      "RADIUS": "반지름",
+      "AREA": "영역"
+    },
+    "RADAR_SHAPES": {
+      "POLYGON": "다각형",
+      "CIRCLE": "원"
+    },
+    "GRAPH_LAYOUTS": {
+      "FORCE": "포스",
+      "CIRCULAR": "원형"
+    },
+    "TREE_ORIENTATIONS": {
+      "TB": "위에서 아래로",
+      "BT": "아래에서 위로",
+      "LR": "왼쪽에서 오른쪽으로",
+      "RL": "오른쪽에서 왼쪽으로"
+    },
+    "TREE_LAYOUTS": {
+      "ORTHOGONAL": "Orthogonal"
+    },
+    "TREE_EDGE_SHAPES": {
+      "CURVE": "곡선",
+      "POLYLINE": "폴리라인"
+    },
+    "GRAPH_EDGE_SYMBOLS": {
+      "NONE": "없음",
+      "CIRCLE": "원",
+      "ARROW": "화살표"
+    },
+    "PICTORIAL_SYMBOL_POSITIONS": {
+      "CENTER": "가운데"
+    },
+    "SANKEY_NODE_ALIGNS": {
+      "JUSTIFY": "양쪽 맞춤",
+      "LEFT": "왼쪽",
+      "RIGHT": "오른쪽"
+    },
+    "PICTORIAL_SYMBOLS": {
+      "ROUNDRECT": "둥근 사각형",
+      "CIRCLE": "원",
+      "RECT": "사각형",
+      "TRIANGLE": "삼각형",
+      "DIAMOND": "다이아몬드",
+      "ARROW": "화살표"
+    }
+  },
+  "CHART_TYPES": {
+    "CATEGORIES": {
+      "BAR_CHARTS": "막대 차트",
+      "LINE_CHARTS": "선 차트",
+      "AREA_CHARTS": "영역 차트",
+      "PIE_CHARTS": "원형 차트",
+      "GAUGES": "게이지",
+      "CARDS": "카드",
+      "MAPS": "지도",
+      "SCATTER": "분산",
+      "STATISTICAL": "통계",
+      "FUNNEL": "퍼널",
+      "HIERARCHICAL": "계층",
+      "FLOW": "플로우",
+      "SPECIAL": "특수",
+      "FINANCIAL": "금융",
+      "3D_CHARTS": "3D 차트"
+    },
+    "BAR_VERTICAL": {
+      "NAME": "막대 차트",
+      "DESCRIPTION": "Displays data using vertical bars to compare values across categories"
+    },
+    "BAR_HORIZONTAL": {
+      "NAME": "가로 막대",
+      "DESCRIPTION": "Shows data with horizontal bars, ideal for long category names"
+    },
+    "BAR_VERTICAL_2D": {
+      "NAME": "그룹화 세로",
+      "DESCRIPTION": "Compares multiple data series side-by-side within each category"
+    },
+    "BAR_HORIZONTAL_2D": {
+      "NAME": "그룹화 가로",
+      "DESCRIPTION": "Displays multiple series horizontally for easy comparison across groups"
+    },
+    "BAR_VERTICAL_STACKED": {
+      "NAME": "누적 세로",
+      "DESCRIPTION": "Shows part-to-whole relationships by stacking bars vertically"
+    },
+    "BAR_HORIZONTAL_STACKED": {
+      "NAME": "누적 가로",
+      "DESCRIPTION": "Presents stacked data horizontally to show composition and totals"
+    },
+    "BAR_VERTICAL_NORMALIZED": {
+      "NAME": "정규화 세로",
+      "DESCRIPTION": "Displays proportions as percentages with bars normalized to 100%"
+    },
+    "BAR_HORIZONTAL_NORMALIZED": {
+      "NAME": "정규화 가로",
+      "DESCRIPTION": "Shows percentage distribution horizontally across categories"
+    },
+    "LINE": {
+      "NAME": "선 차트",
+      "DESCRIPTION": "Visualizes trends and changes over continuous data or time"
+    },
+    "POLAR": {
+      "NAME": "극 차트",
+      "DESCRIPTION": "Displays multivariate data on a circular grid for pattern comparison"
+    },
+    "AREA": {
+      "NAME": "영역 차트",
+      "DESCRIPTION": "Shows trends over time with filled areas under the line"
+    },
+    "AREA_STACKED": {
+      "NAME": "Stacked Area",
+      "DESCRIPTION": "Illustrates cumulative totals and individual contributions over time"
+    },
+    "AREA_NORMALIZED": {
+      "NAME": "Normalized Area",
+      "DESCRIPTION": "Displays proportional trends normalized to 100% at each point"
+    },
+    "PIE": {
+      "NAME": "원형 차트",
+      "DESCRIPTION": "Shows parts of a whole as slices of a circular chart"
+    },
+    "PIE_ADVANCED": {
+      "NAME": "Advanced Pie",
+      "DESCRIPTION": "Enhanced pie chart with legend, labels, and calculated totals"
+    },
+    "PIE_GRID": {
+      "NAME": "Pie Grid",
+      "DESCRIPTION": "Displays multiple pie charts in a grid for comparison"
+    },
+    "DONUT": {
+      "NAME": "도넛 차트",
+      "DESCRIPTION": "Circular chart with center cutout, ideal for displaying key metrics"
+    },
+    "GAUGE": {
+      "NAME": "게이지",
+      "DESCRIPTION": "Shows a single value on a radial scale with min and max ranges"
+    },
+    "LINEAR_GAUGE": {
+      "NAME": "Linear Gauge",
+      "DESCRIPTION": "Displays progress or value along a horizontal or vertical bar"
+    },
+    "NUMBER_CARD": {
+      "NAME": "Number Cards",
+      "DESCRIPTION": "Presents key metrics as large, prominent numerical displays"
+    },
+    "TABLE": {
+      "NAME": "표",
+      "DESCRIPTION": "Tabular view of the raw rows; sortable columns, virtual scroll for large datasets"
+    },
+    "HEAT_MAP": {
+      "NAME": "Heat Map",
+      "DESCRIPTION": "Uses color intensity to represent values in a matrix layout"
+    },
+    "TREE_MAP": {
+      "NAME": "Tree Map",
+      "DESCRIPTION": "Visualizes hierarchical data using nested rectangles sized by value"
+    },
+    "BUBBLE": {
+      "NAME": "버블 차트",
+      "DESCRIPTION": "Plots three dimensions using X, Y position and bubble size"
+    },
+    "BOX_CHART": {
+      "NAME": "Box Chart",
+      "DESCRIPTION": "Shows data distribution through quartiles, median, and outliers"
+    },
+    "SCATTER": {
+      "NAME": "분산형",
+      "DESCRIPTION": "Plots individual data points by X and Y values to reveal patterns and correlations"
+    },
+    "EFFECT_SCATTER": {
+      "NAME": "Ripple Scatter",
+      "DESCRIPTION": "Scatter plot with animated ripple effects to highlight data points"
+    },
+    "FUNNEL": {
+      "NAME": "퍼널 차트",
+      "DESCRIPTION": "Visualizes progressive reduction of data through stages, ideal for conversion pipelines"
+    },
+    "SUNBURST": {
+      "NAME": "Sunburst Chart",
+      "DESCRIPTION": "Displays hierarchical data as concentric rings, showing part-to-whole relationships"
+    },
+    "TREE": {
+      "NAME": "Tree Diagram",
+      "DESCRIPTION": "Visualizes parent-child relationships in a branching tree structure"
+    },
+    "SANKEY": {
+      "NAME": "Sankey Diagram",
+      "DESCRIPTION": "Shows flow and quantity between nodes, ideal for energy, budget, or traffic analysis"
+    },
+    "GRAPH": {
+      "NAME": "Network Graph",
+      "DESCRIPTION": "Displays relationships between entities as a force-directed network diagram"
+    },
+    "LINE_STACKED": {
+      "NAME": "Stacked Line",
+      "DESCRIPTION": "Shows cumulative trends by stacking multiple data series on a line chart"
+    },
+    "LINE_STEP": {
+      "NAME": "Step Line",
+      "DESCRIPTION": "Displays data as a step function with sharp transitions between values"
+    },
+    "HALF_DONUT": {
+      "NAME": "Half Donut",
+      "DESCRIPTION": "Semi-circle donut chart showing proportions in a 180-degree arc"
+    },
+    "NESTED_PIE": {
+      "NAME": "Nested Pie",
+      "DESCRIPTION": "Multi-ring pie chart with inner summary and outer detail rings"
+    },
+    "ROSE": {
+      "NAME": "Rose Chart",
+      "DESCRIPTION": "Nightingale rose chart where slices vary in radius to show magnitude differences"
+    },
+    "WATERFALL": {
+      "NAME": "Waterfall Chart",
+      "DESCRIPTION": "Shows cumulative effect of sequential positive and negative values on a total"
+    },
+    "PICTORIAL_BAR": {
+      "NAME": "Pictorial Bar",
+      "DESCRIPTION": "Bar chart using custom shapes and symbols instead of plain rectangles"
+    },
+    "BAR_POLAR": {
+      "NAME": "Polar Bar",
+      "DESCRIPTION": "Bar chart rendered in polar/circular coordinates for radial comparison"
+    },
+    "THEME_RIVER": {
+      "NAME": "Theme River",
+      "DESCRIPTION": "Displays thematic data changes over time as a flowing river visualization"
+    },
+    "RADAR": {
+      "NAME": "레이더 차트",
+      "DESCRIPTION": "Displays multivariate data on a radial grid, ideal for comparing performance across dimensions"
+    },
+    "CANDLESTICK": {
+      "NAME": "Candlestick Chart",
+      "DESCRIPTION": "Shows open, high, low, close values for financial time series data"
+    },
+    "PARALLEL": {
+      "NAME": "Parallel Coordinates",
+      "DESCRIPTION": "Visualizes multi-dimensional data by drawing parallel vertical axes with connected lines"
+    },
+    "BAR3D": {
+      "NAME": "Bar 3D",
+      "DESCRIPTION": "Three-dimensional bar chart for spatial data comparison"
+    },
+    "LINE3D": {
+      "NAME": "Line 3D",
+      "DESCRIPTION": "Three-dimensional line chart for visualizing trajectories and paths in 3D space"
+    },
+    "SCATTER3D": {
+      "NAME": "Scatter 3D",
+      "DESCRIPTION": "Three-dimensional scatter plot for exploring relationships across three variables"
+    },
+    "SURFACE": {
+      "NAME": "Surface Chart",
+      "DESCRIPTION": "Renders continuous 3D surfaces from mathematical equations or data grids"
+    },
+    "GLOBE": {
+      "NAME": "Globe",
+      "DESCRIPTION": "Interactive 3D globe visualization for geospatial data points"
+    },
+    "GRAPHGL": {
+      "NAME": "Graph GL",
+      "DESCRIPTION": "WebGL-accelerated network graph for large-scale relationship data with GPU rendering"
+    },
+    "SCATTERGL": {
+      "NAME": "Scatter GL",
+      "DESCRIPTION": "WebGL-accelerated scatter plot for rendering millions of data points efficiently"
+    },
+    "LINESGL": {
+      "NAME": "Lines GL",
+      "DESCRIPTION": "WebGL-accelerated line rendering for large-scale polyline datasets"
+    },
+    "MAP3D": {
+      "NAME": "Map 3D",
+      "DESCRIPTION": "Three-dimensional geographic map visualization with height-encoded data"
+    },
+    "FLOWGL": {
+      "NAME": "Flow GL",
+      "DESCRIPTION": "WebGL-accelerated vector field flow visualization for wind, current, or magnetic field data"
+    },
+    "WORLD_MAP": {
+      "NAME": "세계 지도",
+      "DESCRIPTION": "Choropleth world map using color intensity to show values by country or region"
+    },
+    "FLOW_LINES": {
+      "NAME": "Flow Lines",
+      "DESCRIPTION": "Animated directed flow lines between nodes, visualizing movement and connections on a flat canvas"
+    },
+    "LINES3D": {
+      "NAME": "Lines 3D",
+      "DESCRIPTION": "Animated polyline arcs rendered on a 3D globe using longitude/latitude coordinates"
+    },
+    "POLYGONS3D": {
+      "NAME": "Polygons 3D",
+      "DESCRIPTION": "Extruded 3D polygon regions rendered on a globe, grouped by name with longitude/latitude vertices"
+    }
+  },
+  "ROLE_LABELS": {
+    "X_AXIS": "X축",
+    "Y_AXIS": "Y축",
+    "Z_AXIS": "Z축",
+    "OPEN": "시가",
+    "HIGH": "고가",
+    "LOW": "저가",
+    "CLOSE": "종가",
+    "SAMPLE": "샘플 (원시값)",
+    "PARENT": "부모 (계층)",
+    "INDICATORS": "지표 열",
+    "DIMENSIONS": "차원 열",
+    "VALUE_COLUMNS": "값 열",
+    "LONGITUDE": "경도",
+    "LATITUDE": "위도",
+    "TIME": "시간"
   }
 }

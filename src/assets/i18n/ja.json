@@ -239,7 +239,17 @@
     "ORG_PATTERN": "組織名は文字または数字で始まる必要があります",
     "USERNAME_PATTERN_DETAILED": "ユーザー名は文字で始まり、文字、数字、ドット、アンダースコア、ハイフンのみを含む必要があります",
     "INVALID_PASSWORD_FORMAT": "無効なパスワード形式",
-    "EMAIL_INVALID_ADDRESS": "有効なメールアドレスを入力してください"
+    "EMAIL_INVALID_ADDRESS": "有効なメールアドレスを入力してください",
+    "MAX_CHARACTERS": "最大 {{max}} 文字までです",
+    "MIN_CHARACTERS": "最低 {{min}} 文字必要です",
+    "VALUE_BETWEEN": "値は {{min}} から {{max}} の間にしてください",
+    "VALUE_GTE": "値は {{min}} 以上にしてください",
+    "VALUE_LTE": "値は {{max}} 以下にしてください",
+    "PERCENT_GTE": "パーセント値は {{min}}% 以上にしてください",
+    "PERCENT_LTE": "パーセント値は {{max}}% 以下にしてください",
+    "PX_GTE": "ピクセル値は {{min}} 以上にしてください",
+    "PX_LTE": "ピクセル値は {{max}} 以下にしてください",
+    "DIMENSION_SHAPE": "{{shapes}} を使用してください"
   },
   "HEADER": {
     "SEARCH_PLACEHOLDER": "検索...",
@@ -770,37 +780,37 @@
     "ADD_VISUAL": "ビジュアルを追加",
     "ADD_VISUAL_HINT": "「ビジュアルを追加」をクリックして開始してください",
     "ALIGNMENT": "配置",
-    "ALLOW_SELECT": "Allow Select",
-    "AMBIENT_LIGHT_INTENSITY": "Ambient Light Intensity",
+    "ALLOW_SELECT": "選択を許可",
+    "AMBIENT_LIGHT_INTENSITY": "環境光の強度",
     "ANALYSIS_DETAILS": "分析の詳細",
     "ANALYSIS_FIELDS": "分析フィールド",
     "ANALYSIS_NAME": "分析名",
-    "ANCHOR_SIZE": "Anchor Size",
+    "ANCHOR_SIZE": "アンカーサイズ",
     "ANIMATED_EFFECT": "アニメーション効果",
     "ANIMATION": "アニメーション",
-    "APPEND_TO_BODY": "Append Tooltip to Body",
-    "AREA_BASELINE": "Area Baseline",
+    "APPEND_TO_BODY": "ツールチップを Body に追加",
+    "AREA_BASELINE": "エリア基準線",
     "AREA_OPACITY": "エリア不透明度",
     "AREA_OPTIONS": "エリアオプション",
-    "ASPECT_SCALE": "Aspect Scale",
+    "ASPECT_SCALE": "アスペクトスケール",
     "ASSIGN": "データフィールドを軸に割り当ててチャートを表示します",
-    "AUTO": "auto",
+    "AUTO": "自動",
     "AUTO_OR_NUMBER": "autoまたは数値",
     "AUTO_ROTATE": "自動回転",
     "AUTO_ROTATE_GLOBE": "地球儀の自動回転",
     "AUTO_SCALE": "自動スケール",
     "AVOID_LABEL_OVERLAP": "ラベルの重なりを回避",
     "AXIS": "軸",
-    "AXIS_EXPAND_COUNT": "Axis Expand Count",
-    "AXIS_EXPANDABLE": "Axis Expandable",
+    "AXIS_EXPAND_COUNT": "軸展開数",
+    "AXIS_EXPANDABLE": "軸の展開可",
     "AXIS_LINE_ROUND_CAP": "軸線の丸キャップ",
     "AXIS_LINE_WIDTH": "軸線の幅",
     "AXIS_POINTER": "軸ポインター",
     "BAR_GAP": "棒グラフの間隔",
-    "BAR_MAX_WIDTH": "Bar Max Width",
-    "BAR_MIN_WIDTH": "Bar Min Width",
+    "BAR_MAX_WIDTH": "最大バー幅",
+    "BAR_MIN_WIDTH": "最小バー幅",
     "BAR_OPTIONS": "棒グラフオプション",
-    "BAR_SIZING": "Bar Sizing",
+    "BAR_SIZING": "バーサイズ",
     "BAR_WIDTH": "棒の幅",
     "BASIC_INFORMATION": "基本情報",
     "BEAR_BORDER_COLOR": "陰線の枠線色",
@@ -808,14 +818,14 @@
     "BORDER_RADIUS": "角丸半径",
     "BORDER_WIDTH": "枠線の幅",
     "BOUNDARY_GAP": "境界ギャップ",
-    "BOUNDARY_GAP_PERCENT": "Boundary Gap (%)",
+    "BOUNDARY_GAP_PERCENT": "境界余白 (%)",
     "BOX_PLOT_OPTIONS": "箱ひげ図オプション",
     "BUBBLE_OPTIONS": "バブルオプション",
     "BULL_BORDER_COLOR": "陽線の枠線色",
     "BULL_UP_COLOR": "陽線（上昇）色",
-    "CALCULABLE": "Calculable",
+    "CALCULABLE": "計算可能",
     "CANDLESTICK_OPTIONS": "ローソク足オプション",
-    "CANDLESTICK_PERF": "Candlestick Performance",
+    "CANDLESTICK_PERF": "ローソク足パフォーマンス",
     "CARD_DISPLAY": "カード表示",
     "CATEGORY": "カテゴリ",
     "CATEGORY_GAP": "カテゴリ間隔",
@@ -826,9 +836,9 @@
     "CLICK_FIELD_FROM_LEFT_PANEL": "左パネルからフィールドをクリック",
     "CLICK_TO_CONFIGURE": "ビジュアルパネルからタイプを選択",
     "CLICK_TO_SELECT_FIELD": "クリックしてフィールドを選択",
-    "CLIP_TO_GRID": "Clip to Grid",
+    "CLIP_TO_GRID": "グリッドに切り取る",
     "CLOCKWISE": "時計回り",
-    "COLOR_MAPPING_BY": "Color Mapping By",
+    "COLOR_MAPPING_BY": "色マッピング基準",
     "COLOR_SCHEME": "カラースキーム",
     "COLUMN": "フィールド",
     "CONFIRM_DELETE_BULK": "選択した{{count}}件の分析を削除してもよろしいですか？",
@@ -853,7 +863,7 @@
     "DATA_MAPPING": "データマッピング",
     "DATA_ZOOM": "データズーム",
     "DATASET_FIELDS": "データセットフィールド",
-    "DATA_ZOOM_OPTIONS": "Data Zoom Options",
+    "DATA_ZOOM_OPTIONS": "データズームオプション",
     "DATE_AND_TIME": "日時",
     "DATE_FORMAT": "日付形式",
     "DATE_ONLY": "日付のみ",
@@ -1168,12 +1178,12 @@
     "DEFAULT_20_PERCENT": "20%",
     "DEFAULT_30_PERCENT": "30%",
     "DEFAULT_90_PERCENT": "90%",
-    "DETAIL_FORMATTER": "Detail Formatter",
-    "EMPHASIS": "Emphasis",
-    "ENABLE_LARGE_MODE": "Enable Large Mode",
+    "DETAIL_FORMATTER": "詳細フォーマッター",
+    "EMPHASIS": "強調",
+    "ENABLE_LARGE_MODE": "ラージモードを有効化",
     "EXAMPLE_50_PERCENT": "例: 50%",
     "FIELDS": "フィールド",
-    "FILL_FROM": "Fill From",
+    "FILL_FROM": "塗りつぶし開始",
     "TABLE_OPTIONS": "テーブルオプション",
     "TABLE_COMPACT": "コンパクト表示",
     "TABLE_STRIPED": "縞模様の行",
@@ -1196,52 +1206,57 @@
     "FILTER_DIALOG_SUBTITLE": "このフィルターの外観と動作を設定します。",
     "FILTER_CLEAR_ALL_TOOLTIP": "すべてのフィルターをリセット",
     "FILTER_CLEAR_NONE_TOOLTIP": "クリアするフィルターがありません",
-    "FILTER_MODE": "Filter Mode",
+    "FILTER_MODE": "フィルターモード",
     "FILTER_MORE": "その他のフィルター",
     "FILTER_SECTION_SOURCE": "ソース",
     "FILTER_SECTION_BEHAVIOUR": "動作",
     "FILTER_SECTION_DEFAULT": "デフォルト値",
     "FILTER_SAVE_DISABLED_HINT": "フィールド、フィルタータイプ、コントロールを選択すると保存できます。",
-    "FOCUS_MODE": "Focus Mode",
-    "FUNNEL_LABELS": "Funnel Labels",
-    "GAUGE_DETAIL": "Gauge Detail",
-    "GRAPH_EXTRAS": "Graph Extras",
-    "HIGHLIGHT_ADJACENCY": "Highlight Adjacency",
-    "HOVER_SCALE": "Hover Scale",
-    "LABEL_LINE_LENGTH": "Label Line Length",
-    "LABEL_LINE_LENGTH_2": "Label Line Length 2",
-    "LABEL_ROTATION": "Label Rotation",
-    "LARGE_THRESHOLD": "Large Mode Threshold",
-    "LAYOUT_ITERATIONS": "Layout Iterations",
-    "LINE_EFFECT": "Line Effect",
-    "LIVE_FORCE_LAYOUT": "Live Force Layout",
-    "MAIN_LIGHT_INTENSITY": "Main Light Intensity",
-    "MAP_EXTRAS": "Map Extras",
-    "MIN_SHOW_LABEL_ANGLE": "Min Label Angle",
-    "NAME_PROPERTY": "Name Property",
-    "PARALLEL_INTERACTION": "Parallel Interaction",
-    "PERFORMANCE_MODE": "Performance Mode",
-    "PERIOD_SEC": "Period (sec)",
-    "PIE_REFINEMENTS": "Pie Refinements",
-    "POST_EFFECT": "Post Effect",
-    "PROGRESSIVE_CHUNK": "Progressive Chunk",
-    "ROTATE_CIRCULAR_LABELS": "Rotate Circular Labels",
-    "SANKEY_LAYOUT": "Sankey Layout",
-    "SCENE_3D": "3D Scene",
-    "SHADING_MODE": "Shading Mode",
-    "SHOW_ANCHOR": "Show Anchor",
-    "SHOW_EFFECT": "Show Effect",
-    "SHOW_UPPER_LABEL": "Show Upper Label",
-    "SLICE_BORDER_WIDTH": "Slice Border Width",
-    "SQUARE_RATIO": "Square Ratio",
-    "SUNBURST_LABELS": "Sunburst Labels",
-    "THEME_RIVER_EXTRAS": "Theme River Extras",
-    "THROTTLE_MS": "Throttle (ms)",
-    "TOOLTIP_EXTRAS": "Tooltip Extras",
-    "TREEMAP_COLOR_MAPPING": "Treemap Color Mapping",
-    "VALUE_PRECISION": "Value Precision",
-    "VISUAL_DIMENSION": "Visual Dimension",
-    "VISUAL_MAP": "Visual Map"
+    "FOCUS_MODE": "フォーカスモード",
+    "FUNNEL_LABELS": "ファネルラベル",
+    "GAUGE_DETAIL": "ゲージ詳細",
+    "GRAPH_EXTRAS": "グラフ追加設定",
+    "HIGHLIGHT_ADJACENCY": "隣接を強調",
+    "HOVER_SCALE": "ホバースケール",
+    "LABEL_LINE_LENGTH": "ラベル線の長さ",
+    "LABEL_LINE_LENGTH_2": "ラベル線の長さ 2",
+    "LABEL_ROTATION": "ラベル回転",
+    "LARGE_THRESHOLD": "ラージモードのしきい値",
+    "LAYOUT_ITERATIONS": "レイアウト反復回数",
+    "LINE_EFFECT": "線エフェクト",
+    "LIVE_FORCE_LAYOUT": "ライブフォースレイアウト",
+    "MAIN_LIGHT_INTENSITY": "主光源の強度",
+    "MAP_EXTRAS": "マップ追加設定",
+    "MIN_SHOW_LABEL_ANGLE": "最小ラベル角度",
+    "NAME_PROPERTY": "名前プロパティ",
+    "PARALLEL_INTERACTION": "並列インタラクション",
+    "PERFORMANCE_MODE": "パフォーマンスモード",
+    "PERIOD_SEC": "期間 (秒)",
+    "PIE_REFINEMENTS": "円グラフの調整",
+    "POST_EFFECT": "ポストエフェクト",
+    "PROGRESSIVE_CHUNK": "プログレッシブチャンク",
+    "ROTATE_CIRCULAR_LABELS": "円形ラベルを回転",
+    "SANKEY_LAYOUT": "サンキーレイアウト",
+    "SCENE_3D": "3D シーン",
+    "SHADING_MODE": "シェーディングモード",
+    "SHOW_ANCHOR": "アンカーを表示",
+    "SHOW_EFFECT": "エフェクトを表示",
+    "SHOW_UPPER_LABEL": "上部ラベルを表示",
+    "SLICE_BORDER_WIDTH": "スライス境界幅",
+    "SQUARE_RATIO": "正方形比率",
+    "SUNBURST_LABELS": "サンバーストラベル",
+    "THEME_RIVER_EXTRAS": "テーマリバー追加設定",
+    "THROTTLE_MS": "スロットル (ms)",
+    "TOOLTIP_EXTRAS": "ツールチップ追加設定",
+    "TREEMAP_COLOR_MAPPING": "ツリーマップ色マッピング",
+    "VALUE_PRECISION": "値の精度",
+    "VISUAL_DIMENSION": "ビジュアル次元",
+    "VISUAL_MAP": "ビジュアルマップ",
+    "OPTIONAL_SUFFIX": "(オプション)",
+    "TABLE_NO_DATA": "表示するデータがありません",
+    "TABLE_NO_MATCHING_ROWS": "一致する行がありません",
+    "A11Y_DATA_PANELS": "データ パネル",
+    "A11Y_BUILD_PANELS": "ビルド パネル"
   },
   "DASHBOARD": {
     "TITLE": "ダッシュボード",
@@ -2019,5 +2034,505 @@
     "IDLE_SECONDS_REMAINING": "秒で終了",
     "LOGOUT_NOW": "今すぐログアウト",
     "STAY_LOGGED_IN": "ログインを継続"
+  },
+  "CHART_OPTIONS": {
+    "LINE_STEP": {
+      "NONE": "なし",
+      "START": "開始",
+      "MIDDLE": "中央",
+      "END": "終了"
+    },
+    "FUNNEL_SORT": {
+      "DESCENDING": "降順",
+      "ASCENDING": "昇順",
+      "NONE": "なし"
+    },
+    "FUNNEL_ALIGN": {
+      "CENTER": "中央",
+      "LEFT": "左",
+      "RIGHT": "右"
+    },
+    "TREEMAP_NODE_CLICK": {
+      "FALSE": "無効",
+      "ZOOMTONODE": "ズームイン",
+      "LINK": "リンク"
+    },
+    "SUNBURST_NODE_CLICK": {
+      "FALSE": "無効",
+      "ROOTTONODE": "ルートからノード",
+      "LINK": "リンク"
+    },
+    "EFFECT_SHOW_ON": {
+      "RENDER": "描画",
+      "EMPHASIS": "強調"
+    },
+    "SAMPLING": {
+      "NONE": "なし",
+      "LTTB": "LTTB",
+      "AVERAGE": "平均",
+      "MAX": "最大",
+      "MIN": "最小",
+      "SUM": "合計"
+    },
+    "SHOW_ALL_SYMBOL": {
+      "AUTO": "自動",
+      "TRUE": "はい",
+      "FALSE": "いいえ"
+    },
+    "STACK_STRATEGY": {
+      "SAMESIGN": "同符号",
+      "ALL": "すべて",
+      "POSITIVE": "正",
+      "NEGATIVE": "負"
+    },
+    "RIPPLE_BRUSH_TYPE": {
+      "STROKE": "線",
+      "FILL": "塗り"
+    },
+    "FUNNEL_ORIENT": {
+      "VERTICAL": "垂直",
+      "HORIZONTAL": "水平"
+    },
+    "SUNBURST_SORT": {
+      "DESC": "降順",
+      "ASC": "昇順",
+      "NONE": "なし"
+    },
+    "PICTORIAL_REPEAT_DIRECTION": {
+      "START": "開始",
+      "END": "終了"
+    },
+    "EMPHASIS_FOCUS": {
+      "NONE": "なし",
+      "SELF": "Self",
+      "SERIES": "系列",
+      "ADJACENCY": "隣接",
+      "ANCESTOR": "祖先",
+      "DESCENDANT": "子孫"
+    },
+    "VISUAL_MAP_ORIENT": {
+      "HORIZONTAL": "水平",
+      "VERTICAL": "垂直"
+    },
+    "VISUAL_MAP_TYPE": {
+      "CONTINUOUS": "連続",
+      "PIECEWISE": "区分的"
+    },
+    "DATA_ZOOM_TYPE": {
+      "INSIDE": "内側のみ",
+      "SLIDER": "スライダーのみ",
+      "BOTH": "両方"
+    },
+    "DATA_ZOOM_FILTER_MODE": {
+      "FILTER": "フィルター",
+      "WEAKFILTER": "弱フィルター",
+      "EMPTY": "空",
+      "NONE": "なし"
+    },
+    "AREA_ORIGIN": {
+      "AUTO": "自動",
+      "START": "開始",
+      "END": "終了"
+    },
+    "SUNBURST_LABEL_ROTATE": {
+      "RADIAL": "Radial",
+      "TANGENTIAL": "接線",
+      "0": "水平 (0°)"
+    },
+    "COLOR_MAPPING_BY": {
+      "VALUE": "値",
+      "INDEX": "インデックス",
+      "ID": "ID"
+    },
+    "FUNNEL_LABEL_POSITION": {
+      "INSIDE": "内側",
+      "OUTSIDE": "外側",
+      "RIGHT": "右",
+      "LEFT": "左",
+      "TOP": "上",
+      "BOTTOM": "下"
+    },
+    "THEME_RIVER_LABEL_POSITION": {
+      "LEFT": "左",
+      "RIGHT": "右"
+    },
+    "SHADING_MODE": {
+      "COLOR": "色",
+      "LAMBERT": "ランバート",
+      "REALISTIC": "リアル"
+    },
+    "LEGEND_POSITIONS": {
+      "BELOW": "下"
+    },
+    "LEGEND_TYPES": {
+      "PLAIN": "プレーン",
+      "SCROLL": "スクロール"
+    },
+    "LABEL_POSITIONS": {
+      "TOP": "上",
+      "INSIDELEFT": "内側左",
+      "INSIDERIGHT": "内側右",
+      "INSIDETOP": "内側上",
+      "INSIDEBOTTOM": "内側下"
+    },
+    "TOOLTIP_TRIGGERS": {
+      "ITEM": "アイテム",
+      "AXIS": "軸"
+    },
+    "AXIS_POINTER_TYPES": {
+      "LINE": "線",
+      "SHADOW": "影",
+      "CROSS": "クロス"
+    },
+    "GRID_LINE_STYLES": {
+      "SOLID": "実線",
+      "DASHED": "破線",
+      "DOTTED": "点線"
+    },
+    "ANIMATION_EASINGS": {
+      "LINEAR": "リニア",
+      "CUBICOUT": "Cubic Out",
+      "ELASTICOUT": "Elastic Out",
+      "BOUNCEOUT": "Bounce Out",
+      "QUADRATICINOUT": "Quadratic In/Out",
+      "EXPONENTIALOUT": "Exponential Out"
+    },
+    "LINE_STYLE_TYPES": {
+      "SOLID": "実線",
+      "DASHED": "破線",
+      "DOTTED": "点線"
+    },
+    "SYMBOL_SHAPES": {
+      "CIRCLE": "円",
+      "RECT": "矩形",
+      "ROUNDRECT": "角丸矩形",
+      "TRIANGLE": "三角形",
+      "DIAMOND": "ひし形",
+      "PIN": "ピン",
+      "ARROW": "矢印"
+    },
+    "PIE_LABEL_POSITIONS": {
+      "INSIDE": "内側"
+    },
+    "PIE_SELECTED_MODES": {
+      "SINGLE": "単一",
+      "MULTIPLE": "複数",
+      "SERIES": "系列"
+    },
+    "PIE_ROSE_TYPES": {
+      "NONE": "なし",
+      "RADIUS": "半径",
+      "AREA": "エリア"
+    },
+    "RADAR_SHAPES": {
+      "POLYGON": "多角形",
+      "CIRCLE": "円"
+    },
+    "GRAPH_LAYOUTS": {
+      "FORCE": "フォース",
+      "CIRCULAR": "円形"
+    },
+    "TREE_ORIENTATIONS": {
+      "TB": "上から下",
+      "BT": "下から上",
+      "LR": "左から右",
+      "RL": "右から左"
+    },
+    "TREE_LAYOUTS": {
+      "ORTHOGONAL": "Orthogonal"
+    },
+    "TREE_EDGE_SHAPES": {
+      "CURVE": "曲線",
+      "POLYLINE": "折れ線"
+    },
+    "GRAPH_EDGE_SYMBOLS": {
+      "NONE": "なし",
+      "CIRCLE": "円",
+      "ARROW": "矢印"
+    },
+    "PICTORIAL_SYMBOL_POSITIONS": {
+      "CENTER": "中央"
+    },
+    "SANKEY_NODE_ALIGNS": {
+      "JUSTIFY": "ジャスティファイ",
+      "LEFT": "左",
+      "RIGHT": "右"
+    },
+    "PICTORIAL_SYMBOLS": {
+      "ROUNDRECT": "角丸矩形",
+      "CIRCLE": "円",
+      "RECT": "矩形",
+      "TRIANGLE": "三角形",
+      "DIAMOND": "ひし形",
+      "ARROW": "矢印"
+    }
+  },
+  "CHART_TYPES": {
+    "CATEGORIES": {
+      "BAR_CHARTS": "棒グラフ",
+      "LINE_CHARTS": "折れ線グラフ",
+      "AREA_CHARTS": "エリアグラフ",
+      "PIE_CHARTS": "円グラフ",
+      "GAUGES": "ゲージ",
+      "CARDS": "カード",
+      "MAPS": "地図",
+      "SCATTER": "散布図",
+      "STATISTICAL": "統計",
+      "FUNNEL": "ファネル",
+      "HIERARCHICAL": "階層",
+      "FLOW": "フロー",
+      "SPECIAL": "特殊",
+      "FINANCIAL": "金融",
+      "3D_CHARTS": "3D グラフ"
+    },
+    "BAR_VERTICAL": {
+      "NAME": "棒グラフ",
+      "DESCRIPTION": "Displays data using vertical bars to compare values across categories"
+    },
+    "BAR_HORIZONTAL": {
+      "NAME": "水平棒グラフ",
+      "DESCRIPTION": "Shows data with horizontal bars, ideal for long category names"
+    },
+    "BAR_VERTICAL_2D": {
+      "NAME": "グループ化縦棒",
+      "DESCRIPTION": "Compares multiple data series side-by-side within each category"
+    },
+    "BAR_HORIZONTAL_2D": {
+      "NAME": "グループ化横棒",
+      "DESCRIPTION": "Displays multiple series horizontally for easy comparison across groups"
+    },
+    "BAR_VERTICAL_STACKED": {
+      "NAME": "積み上げ縦棒",
+      "DESCRIPTION": "Shows part-to-whole relationships by stacking bars vertically"
+    },
+    "BAR_HORIZONTAL_STACKED": {
+      "NAME": "積み上げ横棒",
+      "DESCRIPTION": "Presents stacked data horizontally to show composition and totals"
+    },
+    "BAR_VERTICAL_NORMALIZED": {
+      "NAME": "正規化縦棒",
+      "DESCRIPTION": "Displays proportions as percentages with bars normalized to 100%"
+    },
+    "BAR_HORIZONTAL_NORMALIZED": {
+      "NAME": "正規化横棒",
+      "DESCRIPTION": "Shows percentage distribution horizontally across categories"
+    },
+    "LINE": {
+      "NAME": "折れ線グラフ",
+      "DESCRIPTION": "Visualizes trends and changes over continuous data or time"
+    },
+    "POLAR": {
+      "NAME": "極座標グラフ",
+      "DESCRIPTION": "Displays multivariate data on a circular grid for pattern comparison"
+    },
+    "AREA": {
+      "NAME": "エリアチャート",
+      "DESCRIPTION": "Shows trends over time with filled areas under the line"
+    },
+    "AREA_STACKED": {
+      "NAME": "Stacked Area",
+      "DESCRIPTION": "Illustrates cumulative totals and individual contributions over time"
+    },
+    "AREA_NORMALIZED": {
+      "NAME": "Normalized Area",
+      "DESCRIPTION": "Displays proportional trends normalized to 100% at each point"
+    },
+    "PIE": {
+      "NAME": "円グラフ",
+      "DESCRIPTION": "Shows parts of a whole as slices of a circular chart"
+    },
+    "PIE_ADVANCED": {
+      "NAME": "Advanced Pie",
+      "DESCRIPTION": "Enhanced pie chart with legend, labels, and calculated totals"
+    },
+    "PIE_GRID": {
+      "NAME": "Pie Grid",
+      "DESCRIPTION": "Displays multiple pie charts in a grid for comparison"
+    },
+    "DONUT": {
+      "NAME": "ドーナツグラフ",
+      "DESCRIPTION": "Circular chart with center cutout, ideal for displaying key metrics"
+    },
+    "GAUGE": {
+      "NAME": "ゲージ",
+      "DESCRIPTION": "Shows a single value on a radial scale with min and max ranges"
+    },
+    "LINEAR_GAUGE": {
+      "NAME": "Linear Gauge",
+      "DESCRIPTION": "Displays progress or value along a horizontal or vertical bar"
+    },
+    "NUMBER_CARD": {
+      "NAME": "Number Cards",
+      "DESCRIPTION": "Presents key metrics as large, prominent numerical displays"
+    },
+    "TABLE": {
+      "NAME": "テーブル",
+      "DESCRIPTION": "Tabular view of the raw rows; sortable columns, virtual scroll for large datasets"
+    },
+    "HEAT_MAP": {
+      "NAME": "Heat Map",
+      "DESCRIPTION": "Uses color intensity to represent values in a matrix layout"
+    },
+    "TREE_MAP": {
+      "NAME": "Tree Map",
+      "DESCRIPTION": "Visualizes hierarchical data using nested rectangles sized by value"
+    },
+    "BUBBLE": {
+      "NAME": "バブルチャート",
+      "DESCRIPTION": "Plots three dimensions using X, Y position and bubble size"
+    },
+    "BOX_CHART": {
+      "NAME": "Box Chart",
+      "DESCRIPTION": "Shows data distribution through quartiles, median, and outliers"
+    },
+    "SCATTER": {
+      "NAME": "散布図",
+      "DESCRIPTION": "Plots individual data points by X and Y values to reveal patterns and correlations"
+    },
+    "EFFECT_SCATTER": {
+      "NAME": "Ripple Scatter",
+      "DESCRIPTION": "Scatter plot with animated ripple effects to highlight data points"
+    },
+    "FUNNEL": {
+      "NAME": "ファネルチャート",
+      "DESCRIPTION": "Visualizes progressive reduction of data through stages, ideal for conversion pipelines"
+    },
+    "SUNBURST": {
+      "NAME": "Sunburst Chart",
+      "DESCRIPTION": "Displays hierarchical data as concentric rings, showing part-to-whole relationships"
+    },
+    "TREE": {
+      "NAME": "Tree Diagram",
+      "DESCRIPTION": "Visualizes parent-child relationships in a branching tree structure"
+    },
+    "SANKEY": {
+      "NAME": "Sankey Diagram",
+      "DESCRIPTION": "Shows flow and quantity between nodes, ideal for energy, budget, or traffic analysis"
+    },
+    "GRAPH": {
+      "NAME": "Network Graph",
+      "DESCRIPTION": "Displays relationships between entities as a force-directed network diagram"
+    },
+    "LINE_STACKED": {
+      "NAME": "Stacked Line",
+      "DESCRIPTION": "Shows cumulative trends by stacking multiple data series on a line chart"
+    },
+    "LINE_STEP": {
+      "NAME": "Step Line",
+      "DESCRIPTION": "Displays data as a step function with sharp transitions between values"
+    },
+    "HALF_DONUT": {
+      "NAME": "Half Donut",
+      "DESCRIPTION": "Semi-circle donut chart showing proportions in a 180-degree arc"
+    },
+    "NESTED_PIE": {
+      "NAME": "Nested Pie",
+      "DESCRIPTION": "Multi-ring pie chart with inner summary and outer detail rings"
+    },
+    "ROSE": {
+      "NAME": "Rose Chart",
+      "DESCRIPTION": "Nightingale rose chart where slices vary in radius to show magnitude differences"
+    },
+    "WATERFALL": {
+      "NAME": "Waterfall Chart",
+      "DESCRIPTION": "Shows cumulative effect of sequential positive and negative values on a total"
+    },
+    "PICTORIAL_BAR": {
+      "NAME": "Pictorial Bar",
+      "DESCRIPTION": "Bar chart using custom shapes and symbols instead of plain rectangles"
+    },
+    "BAR_POLAR": {
+      "NAME": "Polar Bar",
+      "DESCRIPTION": "Bar chart rendered in polar/circular coordinates for radial comparison"
+    },
+    "THEME_RIVER": {
+      "NAME": "Theme River",
+      "DESCRIPTION": "Displays thematic data changes over time as a flowing river visualization"
+    },
+    "RADAR": {
+      "NAME": "レーダーチャート",
+      "DESCRIPTION": "Displays multivariate data on a radial grid, ideal for comparing performance across dimensions"
+    },
+    "CANDLESTICK": {
+      "NAME": "Candlestick Chart",
+      "DESCRIPTION": "Shows open, high, low, close values for financial time series data"
+    },
+    "PARALLEL": {
+      "NAME": "Parallel Coordinates",
+      "DESCRIPTION": "Visualizes multi-dimensional data by drawing parallel vertical axes with connected lines"
+    },
+    "BAR3D": {
+      "NAME": "Bar 3D",
+      "DESCRIPTION": "Three-dimensional bar chart for spatial data comparison"
+    },
+    "LINE3D": {
+      "NAME": "Line 3D",
+      "DESCRIPTION": "Three-dimensional line chart for visualizing trajectories and paths in 3D space"
+    },
+    "SCATTER3D": {
+      "NAME": "Scatter 3D",
+      "DESCRIPTION": "Three-dimensional scatter plot for exploring relationships across three variables"
+    },
+    "SURFACE": {
+      "NAME": "Surface Chart",
+      "DESCRIPTION": "Renders continuous 3D surfaces from mathematical equations or data grids"
+    },
+    "GLOBE": {
+      "NAME": "Globe",
+      "DESCRIPTION": "Interactive 3D globe visualization for geospatial data points"
+    },
+    "GRAPHGL": {
+      "NAME": "Graph GL",
+      "DESCRIPTION": "WebGL-accelerated network graph for large-scale relationship data with GPU rendering"
+    },
+    "SCATTERGL": {
+      "NAME": "Scatter GL",
+      "DESCRIPTION": "WebGL-accelerated scatter plot for rendering millions of data points efficiently"
+    },
+    "LINESGL": {
+      "NAME": "Lines GL",
+      "DESCRIPTION": "WebGL-accelerated line rendering for large-scale polyline datasets"
+    },
+    "MAP3D": {
+      "NAME": "Map 3D",
+      "DESCRIPTION": "Three-dimensional geographic map visualization with height-encoded data"
+    },
+    "FLOWGL": {
+      "NAME": "Flow GL",
+      "DESCRIPTION": "WebGL-accelerated vector field flow visualization for wind, current, or magnetic field data"
+    },
+    "WORLD_MAP": {
+      "NAME": "世界地図",
+      "DESCRIPTION": "Choropleth world map using color intensity to show values by country or region"
+    },
+    "FLOW_LINES": {
+      "NAME": "Flow Lines",
+      "DESCRIPTION": "Animated directed flow lines between nodes, visualizing movement and connections on a flat canvas"
+    },
+    "LINES3D": {
+      "NAME": "Lines 3D",
+      "DESCRIPTION": "Animated polyline arcs rendered on a 3D globe using longitude/latitude coordinates"
+    },
+    "POLYGONS3D": {
+      "NAME": "Polygons 3D",
+      "DESCRIPTION": "Extruded 3D polygon regions rendered on a globe, grouped by name with longitude/latitude vertices"
+    }
+  },
+  "ROLE_LABELS": {
+    "X_AXIS": "X 軸",
+    "Y_AXIS": "Y 軸",
+    "Z_AXIS": "Z 軸",
+    "OPEN": "始値",
+    "HIGH": "高値",
+    "LOW": "安値",
+    "CLOSE": "終値",
+    "SAMPLE": "サンプル (生値)",
+    "PARENT": "親 (階層)",
+    "INDICATORS": "インジケーター列",
+    "DIMENSIONS": "ディメンション列",
+    "VALUE_COLUMNS": "値列",
+    "LONGITUDE": "経度",
+    "LATITUDE": "緯度",
+    "TIME": "時間"
   }
 }

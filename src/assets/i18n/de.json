@@ -239,7 +239,17 @@
     "ORG_PATTERN": "Organisationsname muss mit einem Buchstaben oder einer Zahl beginnen",
     "USERNAME_PATTERN_DETAILED": "Benutzername muss mit einem Buchstaben beginnen und darf nur Buchstaben, Zahlen, Punkte, Unterstriche oder Bindestriche enthalten",
     "INVALID_PASSWORD_FORMAT": "Ungültiges Passwortformat",
-    "EMAIL_INVALID_ADDRESS": "Bitte geben Sie eine gültige E-Mail-Adresse ein"
+    "EMAIL_INVALID_ADDRESS": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+    "MAX_CHARACTERS": "Maximal {{max}} Zeichen erlaubt",
+    "MIN_CHARACTERS": "Mindestens {{min}} Zeichen erforderlich",
+    "VALUE_BETWEEN": "Wert muss zwischen {{min}} und {{max}} liegen",
+    "VALUE_GTE": "Wert muss ≥ {{min}} sein",
+    "VALUE_LTE": "Wert muss ≤ {{max}} sein",
+    "PERCENT_GTE": "Prozentwert muss ≥ {{min}}% sein",
+    "PERCENT_LTE": "Prozentwert muss ≤ {{max}}% sein",
+    "PX_GTE": "Pixelwert muss ≥ {{min}} sein",
+    "PX_LTE": "Pixelwert muss ≤ {{max}} sein",
+    "DIMENSION_SHAPE": "Verwenden Sie {{shapes}}"
   },
   "HEADER": {
     "SEARCH_PLACEHOLDER": "Suchen...",
@@ -770,19 +780,19 @@
     "ADD_VISUAL": "Visualisierung hinzufügen",
     "ADD_VISUAL_HINT": "Klicken Sie auf \"Visualisierung hinzufügen\", um zu beginnen",
     "ALIGNMENT": "Ausrichtung",
-    "ALLOW_SELECT": "Allow Select",
-    "AMBIENT_LIGHT_INTENSITY": "Ambient Light Intensity",
+    "ALLOW_SELECT": "Auswahl zulassen",
+    "AMBIENT_LIGHT_INTENSITY": "Umgebungslicht-Intensität",
     "ANALYSIS_DETAILS": "Analysedetails",
     "ANALYSIS_FIELDS": "Analysefelder",
     "ANALYSIS_NAME": "Analysename",
-    "ANCHOR_SIZE": "Anchor Size",
+    "ANCHOR_SIZE": "Anker-Größe",
     "ANIMATED_EFFECT": "Animierter Effekt",
     "ANIMATION": "Animation",
-    "APPEND_TO_BODY": "Append Tooltip to Body",
-    "AREA_BASELINE": "Area Baseline",
+    "APPEND_TO_BODY": "Tooltip an Body anhängen",
+    "AREA_BASELINE": "Flächen-Basislinie",
     "AREA_OPACITY": "Flächen-Deckkraft",
     "AREA_OPTIONS": "Flächenoptionen",
-    "ASPECT_SCALE": "Aspect Scale",
+    "ASPECT_SCALE": "Seitenverhältnis",
     "ASSIGN": "Weisen Sie Datenfelder den Achsen zu, um Ihr Diagramm zu sehen",
     "AUTO": "auto",
     "AUTO_OR_NUMBER": "auto oder Zahl",
@@ -791,16 +801,16 @@
     "AUTO_SCALE": "Automatisch skalieren",
     "AVOID_LABEL_OVERLAP": "Beschriftungsüberlappung vermeiden",
     "AXIS": "Achse",
-    "AXIS_EXPAND_COUNT": "Axis Expand Count",
-    "AXIS_EXPANDABLE": "Axis Expandable",
+    "AXIS_EXPAND_COUNT": "Achsen-Erweiterungsanzahl",
+    "AXIS_EXPANDABLE": "Achse erweiterbar",
     "AXIS_LINE_ROUND_CAP": "Achsenlinie abgerundete Enden",
     "AXIS_LINE_WIDTH": "Achsenlinienbreite",
     "AXIS_POINTER": "Achsenzeiger",
     "BAR_GAP": "Balkenabstand",
-    "BAR_MAX_WIDTH": "Bar Max Width",
-    "BAR_MIN_WIDTH": "Bar Min Width",
+    "BAR_MAX_WIDTH": "Max. Balkenbreite",
+    "BAR_MIN_WIDTH": "Min. Balkenbreite",
     "BAR_OPTIONS": "Balkenoptionen",
-    "BAR_SIZING": "Bar Sizing",
+    "BAR_SIZING": "Balkengröße",
     "BAR_WIDTH": "Balkenbreite",
     "BASIC_INFORMATION": "Grundinformationen",
     "BEAR_BORDER_COLOR": "Bären-Rahmenfarbe",
@@ -808,14 +818,14 @@
     "BORDER_RADIUS": "Rahmenradius",
     "BORDER_WIDTH": "Rahmenbreite",
     "BOUNDARY_GAP": "Randabstand",
-    "BOUNDARY_GAP_PERCENT": "Boundary Gap (%)",
+    "BOUNDARY_GAP_PERCENT": "Randabstand (%)",
     "BOX_PLOT_OPTIONS": "Boxplot-Optionen",
     "BUBBLE_OPTIONS": "Blasenoptionen",
     "BULL_BORDER_COLOR": "Bullen-Rahmenfarbe",
     "BULL_UP_COLOR": "Bullen- (Aufwärts-) Farbe",
-    "CALCULABLE": "Calculable",
+    "CALCULABLE": "Berechenbar",
     "CANDLESTICK_OPTIONS": "Kerzendiagramm-Optionen",
-    "CANDLESTICK_PERF": "Candlestick Performance",
+    "CANDLESTICK_PERF": "Kerzendiagramm-Leistung",
     "CARD_DISPLAY": "Kartenanzeige",
     "CATEGORY": "Kategorie",
     "CATEGORY_GAP": "Kategorieabstand",
@@ -826,9 +836,9 @@
     "CLICK_FIELD_FROM_LEFT_PANEL": "Klicken Sie auf ein Feld im linken Bereich",
     "CLICK_TO_CONFIGURE": "Wählen Sie einen Typ aus dem Visuals-Panel",
     "CLICK_TO_SELECT_FIELD": "Klicken, um Feld auszuwählen",
-    "CLIP_TO_GRID": "Clip to Grid",
+    "CLIP_TO_GRID": "Auf Raster zuschneiden",
     "CLOCKWISE": "Im Uhrzeigersinn",
-    "COLOR_MAPPING_BY": "Color Mapping By",
+    "COLOR_MAPPING_BY": "Farbzuordnung nach",
     "COLOR_SCHEME": "Farbschema",
     "COLUMN": "Feld",
     "CONFIRM_DELETE_BULK": "Sind Sie sicher, dass Sie die ausgewählten {{count}} Analysen löschen möchten?",
@@ -853,7 +863,7 @@
     "DATA_MAPPING": "Datenzuordnung",
     "DATA_ZOOM": "Datenzoom",
     "DATASET_FIELDS": "Datensatzfelder",
-    "DATA_ZOOM_OPTIONS": "Data Zoom Options",
+    "DATA_ZOOM_OPTIONS": "Daten-Zoom-Optionen",
     "DATE_AND_TIME": "Datum und Uhrzeit",
     "DATE_FORMAT": "Datumsformat",
     "DATE_ONLY": "Nur Datum",
@@ -1163,17 +1173,17 @@
     "Y_AXIS_LABEL": "Y-Achsen-Beschriftung",
     "Y_AXIS_NAME": "Y-Achsen-Name",
     "Z_AXIS": "Z-Achse",
-    "DEFAULT_0_PERCENT": "0%",
-    "DEFAULT_100_PERCENT": "100%",
-    "DEFAULT_20_PERCENT": "20%",
-    "DEFAULT_30_PERCENT": "30%",
-    "DEFAULT_90_PERCENT": "90%",
-    "DETAIL_FORMATTER": "Detail Formatter",
-    "EMPHASIS": "Emphasis",
-    "ENABLE_LARGE_MODE": "Enable Large Mode",
+    "DEFAULT_0_PERCENT": "0 %",
+    "DEFAULT_100_PERCENT": "100 %",
+    "DEFAULT_20_PERCENT": "20 %",
+    "DEFAULT_30_PERCENT": "30 %",
+    "DEFAULT_90_PERCENT": "90 %",
+    "DETAIL_FORMATTER": "Detail-Formatierer",
+    "EMPHASIS": "Hervorhebung",
+    "ENABLE_LARGE_MODE": "Großmodus aktivieren",
     "EXAMPLE_50_PERCENT": "z. B. 50%",
     "FIELDS": "Felder",
-    "FILL_FROM": "Fill From",
+    "FILL_FROM": "Füllen von",
     "TABLE_OPTIONS": "Tabellenoptionen",
     "TABLE_COMPACT": "Kompakte Dichte",
     "TABLE_STRIPED": "Gestreifte Zeilen",
@@ -1196,52 +1206,57 @@
     "FILTER_DIALOG_SUBTITLE": "Konfiguriere Aussehen und Verhalten dieses Filters.",
     "FILTER_CLEAR_ALL_TOOLTIP": "Alle Filter zurücksetzen",
     "FILTER_CLEAR_NONE_TOOLTIP": "Keine Filter zum Zurücksetzen",
-    "FILTER_MODE": "Filter Mode",
+    "FILTER_MODE": "Filtermodus",
     "FILTER_MORE": "Weitere Filter",
     "FILTER_SECTION_SOURCE": "Quelle",
     "FILTER_SECTION_BEHAVIOUR": "Verhalten",
     "FILTER_SECTION_DEFAULT": "Standardwert",
     "FILTER_SAVE_DISABLED_HINT": "Wählen Sie Feld, Filtertyp und Steuerelement aus, um Speichern zu aktivieren.",
-    "FOCUS_MODE": "Focus Mode",
-    "FUNNEL_LABELS": "Funnel Labels",
-    "GAUGE_DETAIL": "Gauge Detail",
-    "GRAPH_EXTRAS": "Graph Extras",
-    "HIGHLIGHT_ADJACENCY": "Highlight Adjacency",
-    "HOVER_SCALE": "Hover Scale",
-    "LABEL_LINE_LENGTH": "Label Line Length",
-    "LABEL_LINE_LENGTH_2": "Label Line Length 2",
-    "LABEL_ROTATION": "Label Rotation",
-    "LARGE_THRESHOLD": "Large Mode Threshold",
-    "LAYOUT_ITERATIONS": "Layout Iterations",
-    "LINE_EFFECT": "Line Effect",
-    "LIVE_FORCE_LAYOUT": "Live Force Layout",
-    "MAIN_LIGHT_INTENSITY": "Main Light Intensity",
-    "MAP_EXTRAS": "Map Extras",
-    "MIN_SHOW_LABEL_ANGLE": "Min Label Angle",
-    "NAME_PROPERTY": "Name Property",
-    "PARALLEL_INTERACTION": "Parallel Interaction",
-    "PERFORMANCE_MODE": "Performance Mode",
-    "PERIOD_SEC": "Period (sec)",
-    "PIE_REFINEMENTS": "Pie Refinements",
-    "POST_EFFECT": "Post Effect",
-    "PROGRESSIVE_CHUNK": "Progressive Chunk",
-    "ROTATE_CIRCULAR_LABELS": "Rotate Circular Labels",
-    "SANKEY_LAYOUT": "Sankey Layout",
-    "SCENE_3D": "3D Scene",
-    "SHADING_MODE": "Shading Mode",
-    "SHOW_ANCHOR": "Show Anchor",
-    "SHOW_EFFECT": "Show Effect",
-    "SHOW_UPPER_LABEL": "Show Upper Label",
-    "SLICE_BORDER_WIDTH": "Slice Border Width",
-    "SQUARE_RATIO": "Square Ratio",
-    "SUNBURST_LABELS": "Sunburst Labels",
-    "THEME_RIVER_EXTRAS": "Theme River Extras",
-    "THROTTLE_MS": "Throttle (ms)",
-    "TOOLTIP_EXTRAS": "Tooltip Extras",
-    "TREEMAP_COLOR_MAPPING": "Treemap Color Mapping",
-    "VALUE_PRECISION": "Value Precision",
-    "VISUAL_DIMENSION": "Visual Dimension",
-    "VISUAL_MAP": "Visual Map"
+    "FOCUS_MODE": "Fokusmodus",
+    "FUNNEL_LABELS": "Trichter-Beschriftungen",
+    "GAUGE_DETAIL": "Messgerät-Detail",
+    "GRAPH_EXTRAS": "Graph-Extras",
+    "HIGHLIGHT_ADJACENCY": "Nachbarschaft hervorheben",
+    "HOVER_SCALE": "Hover-Skalierung",
+    "LABEL_LINE_LENGTH": "Beschriftungslinien-Länge",
+    "LABEL_LINE_LENGTH_2": "Beschriftungslinien-Länge 2",
+    "LABEL_ROTATION": "Beschriftungs-Rotation",
+    "LARGE_THRESHOLD": "Großmodus-Schwellenwert",
+    "LAYOUT_ITERATIONS": "Layout-Iterationen",
+    "LINE_EFFECT": "Linieneffekt",
+    "LIVE_FORCE_LAYOUT": "Live-Force-Layout",
+    "MAIN_LIGHT_INTENSITY": "Hauptlicht-Intensität",
+    "MAP_EXTRAS": "Karten-Extras",
+    "MIN_SHOW_LABEL_ANGLE": "Min. Beschriftungs-Winkel",
+    "NAME_PROPERTY": "Name-Eigenschaft",
+    "PARALLEL_INTERACTION": "Parallele Interaktion",
+    "PERFORMANCE_MODE": "Leistungsmodus",
+    "PERIOD_SEC": "Periode (s)",
+    "PIE_REFINEMENTS": "Tortendiagramm-Feinabstimmung",
+    "POST_EFFECT": "Nacheffekt",
+    "PROGRESSIVE_CHUNK": "Progressive-Chunk",
+    "ROTATE_CIRCULAR_LABELS": "Kreisförmige Beschriftungen drehen",
+    "SANKEY_LAYOUT": "Sankey-Layout",
+    "SCENE_3D": "3D-Szene",
+    "SHADING_MODE": "Schattierungsmodus",
+    "SHOW_ANCHOR": "Anker anzeigen",
+    "SHOW_EFFECT": "Effekt anzeigen",
+    "SHOW_UPPER_LABEL": "Obere Beschriftung anzeigen",
+    "SLICE_BORDER_WIDTH": "Segment-Randbreite",
+    "SQUARE_RATIO": "Quadrat-Verhältnis",
+    "SUNBURST_LABELS": "Sunburst-Beschriftungen",
+    "THEME_RIVER_EXTRAS": "Themen-Fluss-Extras",
+    "THROTTLE_MS": "Drosselung (ms)",
+    "TOOLTIP_EXTRAS": "Tooltip-Extras",
+    "TREEMAP_COLOR_MAPPING": "Treemap-Farbzuordnung",
+    "VALUE_PRECISION": "Werte-Präzision",
+    "VISUAL_DIMENSION": "Visuelle Dimension",
+    "VISUAL_MAP": "Visuelle Karte",
+    "OPTIONAL_SUFFIX": "(optional)",
+    "TABLE_NO_DATA": "Keine Daten verfügbar",
+    "TABLE_NO_MATCHING_ROWS": "Keine passenden Zeilen",
+    "A11Y_DATA_PANELS": "Datenbereiche",
+    "A11Y_BUILD_PANELS": "Bereiche erstellen"
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",
@@ -2019,5 +2034,505 @@
     "IDLE_SECONDS_REMAINING": "Sekunden verbleibend",
     "LOGOUT_NOW": "Jetzt abmelden",
     "STAY_LOGGED_IN": "Angemeldet bleiben"
+  },
+  "CHART_OPTIONS": {
+    "LINE_STEP": {
+      "NONE": "Keine",
+      "START": "Anfang",
+      "MIDDLE": "Mitte",
+      "END": "Ende"
+    },
+    "FUNNEL_SORT": {
+      "DESCENDING": "Absteigend",
+      "ASCENDING": "Aufsteigend",
+      "NONE": "Keine"
+    },
+    "FUNNEL_ALIGN": {
+      "CENTER": "Zentriert",
+      "LEFT": "Links",
+      "RIGHT": "Rechts"
+    },
+    "TREEMAP_NODE_CLICK": {
+      "FALSE": "Deaktiviert",
+      "ZOOMTONODE": "Vergrößern",
+      "LINK": "Link"
+    },
+    "SUNBURST_NODE_CLICK": {
+      "FALSE": "Deaktiviert",
+      "ROOTTONODE": "Wurzel zum Knoten",
+      "LINK": "Link"
+    },
+    "EFFECT_SHOW_ON": {
+      "RENDER": "Render",
+      "EMPHASIS": "Hervorhebung"
+    },
+    "SAMPLING": {
+      "NONE": "Keine",
+      "LTTB": "LTTB",
+      "AVERAGE": "Durchschnitt",
+      "MAX": "Max",
+      "MIN": "Min",
+      "SUM": "Summe"
+    },
+    "SHOW_ALL_SYMBOL": {
+      "AUTO": "Auto",
+      "TRUE": "Ja",
+      "FALSE": "Nein"
+    },
+    "STACK_STRATEGY": {
+      "SAMESIGN": "Gleiches Vorzeichen",
+      "ALL": "Alle",
+      "POSITIVE": "Positiv",
+      "NEGATIVE": "Negativ"
+    },
+    "RIPPLE_BRUSH_TYPE": {
+      "STROKE": "Kontur",
+      "FILL": "Füllung"
+    },
+    "FUNNEL_ORIENT": {
+      "VERTICAL": "Vertikal",
+      "HORIZONTAL": "Horizontal"
+    },
+    "SUNBURST_SORT": {
+      "DESC": "Absteigend",
+      "ASC": "Aufsteigend",
+      "NONE": "Keine"
+    },
+    "PICTORIAL_REPEAT_DIRECTION": {
+      "START": "Anfang",
+      "END": "Ende"
+    },
+    "EMPHASIS_FOCUS": {
+      "NONE": "Keine",
+      "SELF": "Self",
+      "SERIES": "Serie",
+      "ADJACENCY": "Nachbarschaft",
+      "ANCESTOR": "Vorgänger",
+      "DESCENDANT": "Nachfolger"
+    },
+    "VISUAL_MAP_ORIENT": {
+      "HORIZONTAL": "Horizontal",
+      "VERTICAL": "Vertikal"
+    },
+    "VISUAL_MAP_TYPE": {
+      "CONTINUOUS": "Stetig",
+      "PIECEWISE": "Stückweise"
+    },
+    "DATA_ZOOM_TYPE": {
+      "INSIDE": "Nur innen",
+      "SLIDER": "Nur Schieberegler",
+      "BOTH": "Beide"
+    },
+    "DATA_ZOOM_FILTER_MODE": {
+      "FILTER": "Filter",
+      "WEAKFILTER": "Schwacher Filter",
+      "EMPTY": "Leer",
+      "NONE": "Keine"
+    },
+    "AREA_ORIGIN": {
+      "AUTO": "Auto",
+      "START": "Anfang",
+      "END": "Ende"
+    },
+    "SUNBURST_LABEL_ROTATE": {
+      "RADIAL": "Radial",
+      "TANGENTIAL": "Tangential",
+      "0": "Horizontal (0°)"
+    },
+    "COLOR_MAPPING_BY": {
+      "VALUE": "Wert",
+      "INDEX": "Index",
+      "ID": "ID"
+    },
+    "FUNNEL_LABEL_POSITION": {
+      "INSIDE": "Innen",
+      "OUTSIDE": "Außen",
+      "RIGHT": "Rechts",
+      "LEFT": "Links",
+      "TOP": "Oben",
+      "BOTTOM": "Unten"
+    },
+    "THEME_RIVER_LABEL_POSITION": {
+      "LEFT": "Links",
+      "RIGHT": "Rechts"
+    },
+    "SHADING_MODE": {
+      "COLOR": "Farbe",
+      "LAMBERT": "Lambert",
+      "REALISTIC": "Realistisch"
+    },
+    "LEGEND_POSITIONS": {
+      "BELOW": "Unten"
+    },
+    "LEGEND_TYPES": {
+      "PLAIN": "Einfach",
+      "SCROLL": "Scrollen"
+    },
+    "LABEL_POSITIONS": {
+      "TOP": "Oben",
+      "INSIDELEFT": "Innen links",
+      "INSIDERIGHT": "Innen rechts",
+      "INSIDETOP": "Innen oben",
+      "INSIDEBOTTOM": "Innen unten"
+    },
+    "TOOLTIP_TRIGGERS": {
+      "ITEM": "Element",
+      "AXIS": "Achse"
+    },
+    "AXIS_POINTER_TYPES": {
+      "LINE": "Linie",
+      "SHADOW": "Schatten",
+      "CROSS": "Fadenkreuz"
+    },
+    "GRID_LINE_STYLES": {
+      "SOLID": "Durchgehend",
+      "DASHED": "Gestrichelt",
+      "DOTTED": "Gepunktet"
+    },
+    "ANIMATION_EASINGS": {
+      "LINEAR": "Linear",
+      "CUBICOUT": "Cubic Out",
+      "ELASTICOUT": "Elastic Out",
+      "BOUNCEOUT": "Bounce Out",
+      "QUADRATICINOUT": "Quadratic In/Out",
+      "EXPONENTIALOUT": "Exponential Out"
+    },
+    "LINE_STYLE_TYPES": {
+      "SOLID": "Durchgehend",
+      "DASHED": "Gestrichelt",
+      "DOTTED": "Gepunktet"
+    },
+    "SYMBOL_SHAPES": {
+      "CIRCLE": "Kreis",
+      "RECT": "Rechteck",
+      "ROUNDRECT": "Rundes Rechteck",
+      "TRIANGLE": "Dreieck",
+      "DIAMOND": "Raute",
+      "PIN": "Pin",
+      "ARROW": "Pfeil"
+    },
+    "PIE_LABEL_POSITIONS": {
+      "INSIDE": "Innen"
+    },
+    "PIE_SELECTED_MODES": {
+      "SINGLE": "Einzeln",
+      "MULTIPLE": "Mehrere",
+      "SERIES": "Serie"
+    },
+    "PIE_ROSE_TYPES": {
+      "NONE": "Keine",
+      "RADIUS": "Radius",
+      "AREA": "Fläche"
+    },
+    "RADAR_SHAPES": {
+      "POLYGON": "Polygon",
+      "CIRCLE": "Kreis"
+    },
+    "GRAPH_LAYOUTS": {
+      "FORCE": "Kraft",
+      "CIRCULAR": "Kreisförmig"
+    },
+    "TREE_ORIENTATIONS": {
+      "TB": "Oben nach unten",
+      "BT": "Unten nach oben",
+      "LR": "Links nach rechts",
+      "RL": "Rechts nach links"
+    },
+    "TREE_LAYOUTS": {
+      "ORTHOGONAL": "Orthogonal"
+    },
+    "TREE_EDGE_SHAPES": {
+      "CURVE": "Kurve",
+      "POLYLINE": "Polylinie"
+    },
+    "GRAPH_EDGE_SYMBOLS": {
+      "NONE": "Keine",
+      "CIRCLE": "Kreis",
+      "ARROW": "Pfeil"
+    },
+    "PICTORIAL_SYMBOL_POSITIONS": {
+      "CENTER": "Zentriert"
+    },
+    "SANKEY_NODE_ALIGNS": {
+      "JUSTIFY": "Justieren",
+      "LEFT": "Links",
+      "RIGHT": "Rechts"
+    },
+    "PICTORIAL_SYMBOLS": {
+      "ROUNDRECT": "Rundes Rechteck",
+      "CIRCLE": "Kreis",
+      "RECT": "Rechteck",
+      "TRIANGLE": "Dreieck",
+      "DIAMOND": "Raute",
+      "ARROW": "Pfeil"
+    }
+  },
+  "CHART_TYPES": {
+    "CATEGORIES": {
+      "BAR_CHARTS": "Balkendiagramme",
+      "LINE_CHARTS": "Liniendiagramme",
+      "AREA_CHARTS": "Flächendiagramme",
+      "PIE_CHARTS": "Kreisdiagramme",
+      "GAUGES": "Messinstrumente",
+      "CARDS": "Karten",
+      "MAPS": "Karten",
+      "SCATTER": "Streudiagramme",
+      "STATISTICAL": "Statistisch",
+      "FUNNEL": "Trichter",
+      "HIERARCHICAL": "Hierarchisch",
+      "FLOW": "Fluss",
+      "SPECIAL": "Spezial",
+      "FINANCIAL": "Finanzdiagramme",
+      "3D_CHARTS": "3D-Diagramme"
+    },
+    "BAR_VERTICAL": {
+      "NAME": "Balkendiagramm",
+      "DESCRIPTION": "Displays data using vertical bars to compare values across categories"
+    },
+    "BAR_HORIZONTAL": {
+      "NAME": "Horizontales Balkendiagramm",
+      "DESCRIPTION": "Shows data with horizontal bars, ideal for long category names"
+    },
+    "BAR_VERTICAL_2D": {
+      "NAME": "Gruppiert vertikal",
+      "DESCRIPTION": "Compares multiple data series side-by-side within each category"
+    },
+    "BAR_HORIZONTAL_2D": {
+      "NAME": "Gruppiert horizontal",
+      "DESCRIPTION": "Displays multiple series horizontally for easy comparison across groups"
+    },
+    "BAR_VERTICAL_STACKED": {
+      "NAME": "Gestapelt vertikal",
+      "DESCRIPTION": "Shows part-to-whole relationships by stacking bars vertically"
+    },
+    "BAR_HORIZONTAL_STACKED": {
+      "NAME": "Gestapelt horizontal",
+      "DESCRIPTION": "Presents stacked data horizontally to show composition and totals"
+    },
+    "BAR_VERTICAL_NORMALIZED": {
+      "NAME": "Normalisiert vertikal",
+      "DESCRIPTION": "Displays proportions as percentages with bars normalized to 100%"
+    },
+    "BAR_HORIZONTAL_NORMALIZED": {
+      "NAME": "Normalisiert horizontal",
+      "DESCRIPTION": "Shows percentage distribution horizontally across categories"
+    },
+    "LINE": {
+      "NAME": "Liniendiagramm",
+      "DESCRIPTION": "Visualizes trends and changes over continuous data or time"
+    },
+    "POLAR": {
+      "NAME": "Polardiagramm",
+      "DESCRIPTION": "Displays multivariate data on a circular grid for pattern comparison"
+    },
+    "AREA": {
+      "NAME": "Flächendiagramm",
+      "DESCRIPTION": "Shows trends over time with filled areas under the line"
+    },
+    "AREA_STACKED": {
+      "NAME": "Stacked Area",
+      "DESCRIPTION": "Illustrates cumulative totals and individual contributions over time"
+    },
+    "AREA_NORMALIZED": {
+      "NAME": "Normalized Area",
+      "DESCRIPTION": "Displays proportional trends normalized to 100% at each point"
+    },
+    "PIE": {
+      "NAME": "Kreisdiagramm",
+      "DESCRIPTION": "Shows parts of a whole as slices of a circular chart"
+    },
+    "PIE_ADVANCED": {
+      "NAME": "Advanced Pie",
+      "DESCRIPTION": "Enhanced pie chart with legend, labels, and calculated totals"
+    },
+    "PIE_GRID": {
+      "NAME": "Pie Grid",
+      "DESCRIPTION": "Displays multiple pie charts in a grid for comparison"
+    },
+    "DONUT": {
+      "NAME": "Donutdiagramm",
+      "DESCRIPTION": "Circular chart with center cutout, ideal for displaying key metrics"
+    },
+    "GAUGE": {
+      "NAME": "Messgerät",
+      "DESCRIPTION": "Shows a single value on a radial scale with min and max ranges"
+    },
+    "LINEAR_GAUGE": {
+      "NAME": "Linear Gauge",
+      "DESCRIPTION": "Displays progress or value along a horizontal or vertical bar"
+    },
+    "NUMBER_CARD": {
+      "NAME": "Number Cards",
+      "DESCRIPTION": "Presents key metrics as large, prominent numerical displays"
+    },
+    "TABLE": {
+      "NAME": "Tabelle",
+      "DESCRIPTION": "Tabular view of the raw rows; sortable columns, virtual scroll for large datasets"
+    },
+    "HEAT_MAP": {
+      "NAME": "Heat Map",
+      "DESCRIPTION": "Uses color intensity to represent values in a matrix layout"
+    },
+    "TREE_MAP": {
+      "NAME": "Tree Map",
+      "DESCRIPTION": "Visualizes hierarchical data using nested rectangles sized by value"
+    },
+    "BUBBLE": {
+      "NAME": "Blasendiagramm",
+      "DESCRIPTION": "Plots three dimensions using X, Y position and bubble size"
+    },
+    "BOX_CHART": {
+      "NAME": "Box Chart",
+      "DESCRIPTION": "Shows data distribution through quartiles, median, and outliers"
+    },
+    "SCATTER": {
+      "NAME": "Streudiagramm",
+      "DESCRIPTION": "Plots individual data points by X and Y values to reveal patterns and correlations"
+    },
+    "EFFECT_SCATTER": {
+      "NAME": "Ripple Scatter",
+      "DESCRIPTION": "Scatter plot with animated ripple effects to highlight data points"
+    },
+    "FUNNEL": {
+      "NAME": "Trichterdiagramm",
+      "DESCRIPTION": "Visualizes progressive reduction of data through stages, ideal for conversion pipelines"
+    },
+    "SUNBURST": {
+      "NAME": "Sunburst Chart",
+      "DESCRIPTION": "Displays hierarchical data as concentric rings, showing part-to-whole relationships"
+    },
+    "TREE": {
+      "NAME": "Tree Diagram",
+      "DESCRIPTION": "Visualizes parent-child relationships in a branching tree structure"
+    },
+    "SANKEY": {
+      "NAME": "Sankey Diagram",
+      "DESCRIPTION": "Shows flow and quantity between nodes, ideal for energy, budget, or traffic analysis"
+    },
+    "GRAPH": {
+      "NAME": "Network Graph",
+      "DESCRIPTION": "Displays relationships between entities as a force-directed network diagram"
+    },
+    "LINE_STACKED": {
+      "NAME": "Stacked Line",
+      "DESCRIPTION": "Shows cumulative trends by stacking multiple data series on a line chart"
+    },
+    "LINE_STEP": {
+      "NAME": "Step Line",
+      "DESCRIPTION": "Displays data as a step function with sharp transitions between values"
+    },
+    "HALF_DONUT": {
+      "NAME": "Half Donut",
+      "DESCRIPTION": "Semi-circle donut chart showing proportions in a 180-degree arc"
+    },
+    "NESTED_PIE": {
+      "NAME": "Nested Pie",
+      "DESCRIPTION": "Multi-ring pie chart with inner summary and outer detail rings"
+    },
+    "ROSE": {
+      "NAME": "Rose Chart",
+      "DESCRIPTION": "Nightingale rose chart where slices vary in radius to show magnitude differences"
+    },
+    "WATERFALL": {
+      "NAME": "Waterfall Chart",
+      "DESCRIPTION": "Shows cumulative effect of sequential positive and negative values on a total"
+    },
+    "PICTORIAL_BAR": {
+      "NAME": "Pictorial Bar",
+      "DESCRIPTION": "Bar chart using custom shapes and symbols instead of plain rectangles"
+    },
+    "BAR_POLAR": {
+      "NAME": "Polar Bar",
+      "DESCRIPTION": "Bar chart rendered in polar/circular coordinates for radial comparison"
+    },
+    "THEME_RIVER": {
+      "NAME": "Theme River",
+      "DESCRIPTION": "Displays thematic data changes over time as a flowing river visualization"
+    },
+    "RADAR": {
+      "NAME": "Radardiagramm",
+      "DESCRIPTION": "Displays multivariate data on a radial grid, ideal for comparing performance across dimensions"
+    },
+    "CANDLESTICK": {
+      "NAME": "Candlestick Chart",
+      "DESCRIPTION": "Shows open, high, low, close values for financial time series data"
+    },
+    "PARALLEL": {
+      "NAME": "Parallel Coordinates",
+      "DESCRIPTION": "Visualizes multi-dimensional data by drawing parallel vertical axes with connected lines"
+    },
+    "BAR3D": {
+      "NAME": "Bar 3D",
+      "DESCRIPTION": "Three-dimensional bar chart for spatial data comparison"
+    },
+    "LINE3D": {
+      "NAME": "Line 3D",
+      "DESCRIPTION": "Three-dimensional line chart for visualizing trajectories and paths in 3D space"
+    },
+    "SCATTER3D": {
+      "NAME": "Scatter 3D",
+      "DESCRIPTION": "Three-dimensional scatter plot for exploring relationships across three variables"
+    },
+    "SURFACE": {
+      "NAME": "Surface Chart",
+      "DESCRIPTION": "Renders continuous 3D surfaces from mathematical equations or data grids"
+    },
+    "GLOBE": {
+      "NAME": "Globe",
+      "DESCRIPTION": "Interactive 3D globe visualization for geospatial data points"
+    },
+    "GRAPHGL": {
+      "NAME": "Graph GL",
+      "DESCRIPTION": "WebGL-accelerated network graph for large-scale relationship data with GPU rendering"
+    },
+    "SCATTERGL": {
+      "NAME": "Scatter GL",
+      "DESCRIPTION": "WebGL-accelerated scatter plot for rendering millions of data points efficiently"
+    },
+    "LINESGL": {
+      "NAME": "Lines GL",
+      "DESCRIPTION": "WebGL-accelerated line rendering for large-scale polyline datasets"
+    },
+    "MAP3D": {
+      "NAME": "Map 3D",
+      "DESCRIPTION": "Three-dimensional geographic map visualization with height-encoded data"
+    },
+    "FLOWGL": {
+      "NAME": "Flow GL",
+      "DESCRIPTION": "WebGL-accelerated vector field flow visualization for wind, current, or magnetic field data"
+    },
+    "WORLD_MAP": {
+      "NAME": "Weltkarte",
+      "DESCRIPTION": "Choropleth world map using color intensity to show values by country or region"
+    },
+    "FLOW_LINES": {
+      "NAME": "Flow Lines",
+      "DESCRIPTION": "Animated directed flow lines between nodes, visualizing movement and connections on a flat canvas"
+    },
+    "LINES3D": {
+      "NAME": "Lines 3D",
+      "DESCRIPTION": "Animated polyline arcs rendered on a 3D globe using longitude/latitude coordinates"
+    },
+    "POLYGONS3D": {
+      "NAME": "Polygons 3D",
+      "DESCRIPTION": "Extruded 3D polygon regions rendered on a globe, grouped by name with longitude/latitude vertices"
+    }
+  },
+  "ROLE_LABELS": {
+    "X_AXIS": "X-Achse",
+    "Y_AXIS": "Y-Achse",
+    "Z_AXIS": "Z-Achse",
+    "OPEN": "Eröffnung",
+    "HIGH": "Hoch",
+    "LOW": "Tief",
+    "CLOSE": "Schluss",
+    "SAMPLE": "Stichprobe (Rohwerte)",
+    "PARENT": "Übergeordnet (Hierarchie)",
+    "INDICATORS": "Indikator-Spalten",
+    "DIMENSIONS": "Dimensions-Spalten",
+    "VALUE_COLUMNS": "Wert-Spalten",
+    "LONGITUDE": "Längengrad",
+    "LATITUDE": "Breitengrad",
+    "TIME": "Zeit"
   }
 }

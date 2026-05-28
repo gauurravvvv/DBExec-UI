@@ -137,6 +137,7 @@
         <div class="config-group" *ngIf="focusedVisual.config.showXAxisLabel">
           <app-custom-input
             [(ngModel)]="focusedVisual.config.xAxisLabel"
+              [maxLength]="50"
             [placeholder]="'ANALYSES.X_AXIS_LABEL' | translate"
             icon="pi-tag"
           >
@@ -152,6 +153,7 @@
         <div class="config-group" *ngIf="focusedVisual.config.showYAxisLabel">
           <app-custom-input
             [(ngModel)]="focusedVisual.config.yAxisLabel"
+              [maxLength]="50"
             [placeholder]="'ANALYSES.Y_AXIS_LABEL' | translate"
             icon="pi-tag"
           >
@@ -419,6 +421,7 @@
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.barWidth"
+              [dimension]="{ allowAuto: true, allowPx: true, allowPercent: true, pxMin: 1, pxMax: 200, percentMin: 1, percentMax: 100 }"
               [label]="'ANALYSES.BAR_WIDTH' | translate"
               [placeholder]="'ANALYSES.AUTO' | translate"
               icon="pi-hashtag"
@@ -428,6 +431,7 @@
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.barGap"
+              [dimension]="{ allowPercent: true, percentMin: -100, percentMax: 100 }"
               [label]="'ANALYSES.BAR_GAP' | translate"
               [placeholder]="'ANALYSES.DEFAULT_30_PERCENT' | translate"
               icon="pi-hashtag"
@@ -437,6 +441,7 @@
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.barCategoryGap"
+              [dimension]="{ allowPercent: true, percentMin: 0, percentMax: 100 }"
               [label]="'ANALYSES.CATEGORY_GAP' | translate"
               [placeholder]="'ANALYSES.DEFAULT_20_PERCENT' | translate"
               icon="pi-hashtag"
@@ -879,6 +884,8 @@
             <label>{{ 'ANALYSES.MIN_VALUE' | translate }}</label>
             <app-custom-number
               [(ngModel)]="focusedVisual.config.min"
+              [min]="-1000000000000"
+              [max]="1000000000000"
               [showButtons]="true"
             ></app-custom-number>
           </div>
@@ -886,12 +893,15 @@
             <label>{{ 'ANALYSES.MAX_VALUE' | translate }}</label>
             <app-custom-number
               [(ngModel)]="focusedVisual.config.max"
+              [min]="-1000000000000"
+              [max]="1000000000000"
               [showButtons]="true"
             ></app-custom-number>
           </div>
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.units"
+              [maxLength]="12"
               [label]="'ANALYSES.UNITS' | translate"
               icon="pi-tag"
             >
@@ -1354,6 +1364,7 @@
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.funnelMinSize"
+              [dimension]="{ allowPercent: true, percentMin: 0, percentMax: 100 }"
               [label]="'ANALYSES.MIN_SIZE' | translate"
               [placeholder]="'ANALYSES.DEFAULT_0_PERCENT' | translate"
               icon="pi-hashtag"
@@ -1363,6 +1374,7 @@
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.funnelMaxSize"
+              [dimension]="{ allowPercent: true, percentMin: 0, percentMax: 100 }"
               [label]="'ANALYSES.MAX_SIZE' | translate"
               [placeholder]="'ANALYSES.DEFAULT_100_PERCENT' | translate"
               icon="pi-hashtag"
@@ -1399,6 +1411,7 @@
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.sunburstRadius"
+              [dimension]="{ allowPercent: true, percentMin: 1, percentMax: 100 }"
               [label]="'ANALYSES.OUTER_RADIUS' | translate"
               [placeholder]="'ANALYSES.DEFAULT_90_PERCENT' | translate"
               icon="pi-hashtag"
@@ -1729,6 +1742,7 @@
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.treeEdgeForkPosition"
+              [dimension]="{ allowPercent: true, percentMin: 0, percentMax: 100 }"
               [label]="'ANALYSES.EDGE_FORK_POSITION' | translate"
               [placeholder]="'ANALYSES.EXAMPLE_50_PERCENT' | translate"
               icon="pi-hashtag"
@@ -1810,6 +1824,7 @@
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.pictorialSymbolMargin"
+              [dimension]="{ allowAuto: true, allowPercent: true, allowBareNumber: true, percentMin: -50, percentMax: 50, bareMin: -50, bareMax: 50 }"
               [label]="'ANALYSES.SYMBOL_MARGIN' | translate"
               [placeholder]="'ANALYSES.AUTO_OR_NUMBER' | translate"
               icon="pi-hashtag"
@@ -1927,6 +1942,7 @@
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.candleBarWidth"
+              [dimension]="{ allowAuto: true, allowPx: true, allowPercent: true, pxMin: 1, pxMax: 200, percentMin: 1, percentMax: 100 }"
               [label]="'ANALYSES.BAR_WIDTH' | translate"
               [placeholder]="'ANALYSES.AUTO_OR_NUMBER' | translate"
               icon="pi-hashtag"
@@ -2122,6 +2138,8 @@
             <label>{{ 'ANALYSES.VISUAL_MAP_MIN' | translate }}</label>
             <app-custom-number
               [(ngModel)]="focusedVisual.config.worldMapVisualMapMin"
+              [min]="-1000000000000"
+              [max]="1000000000000"
               [showButtons]="true"
               [placeholder]="'ANALYSES.AUTO' | translate"
             ></app-custom-number>
@@ -2130,6 +2148,8 @@
             <label>{{ 'ANALYSES.VISUAL_MAP_MAX' | translate }}</label>
             <app-custom-number
               [(ngModel)]="focusedVisual.config.worldMapVisualMapMax"
+              [min]="-1000000000000"
+              [max]="1000000000000"
               [showButtons]="true"
               [placeholder]="'ANALYSES.AUTO' | translate"
             ></app-custom-number>
@@ -2396,6 +2416,8 @@
             <label>{{ 'ANALYSES.MIN' | translate }}</label>
             <app-custom-number
               [(ngModel)]="focusedVisual.config.visualMapMin"
+              [min]="-1000000000000"
+              [max]="1000000000000"
               [showButtons]="false"
             ></app-custom-number>
           </div>
@@ -2403,6 +2425,8 @@
             <label>{{ 'ANALYSES.MAX' | translate }}</label>
             <app-custom-number
               [(ngModel)]="focusedVisual.config.visualMapMax"
+              [min]="-1000000000000"
+              [max]="1000000000000"
               [showButtons]="false"
             ></app-custom-number>
           </div>
@@ -2510,6 +2534,7 @@
           <label>{{ 'ANALYSES.BAR_MAX_WIDTH' | translate }}</label>
           <app-custom-input
             [(ngModel)]="focusedVisual.config.barMaxWidth"
+              [dimension]="{ allowAuto: true, allowPx: true, allowPercent: true, pxMin: 1, pxMax: 200, percentMin: 1, percentMax: 100 }"
             placeholder="auto / 32px / 30%"
             icon="pi-hashtag"
           ></app-custom-input>
@@ -2518,6 +2543,7 @@
           <label>{{ 'ANALYSES.BAR_MIN_WIDTH' | translate }}</label>
           <app-custom-input
             [(ngModel)]="focusedVisual.config.barMinWidth"
+              [dimension]="{ allowAuto: true, allowPx: true, allowPercent: true, pxMin: 1, pxMax: 200, percentMin: 1, percentMax: 100 }"
             placeholder="auto / 4px"
             icon="pi-hashtag"
           ></app-custom-input>
@@ -2737,6 +2763,7 @@
           <label>{{ 'ANALYSES.DETAIL_FORMATTER' | translate }}</label>
           <app-custom-input
             [(ngModel)]="focusedVisual.config.gaugeDetailFormatter"
+              [maxLength]="40"
             placeholder="{value}%"
             icon="pi-code"
           ></app-custom-input>

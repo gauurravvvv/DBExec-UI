@@ -23,7 +23,7 @@
 
     <!-- Center: segmented panel toggles (grouped pairs) -->
     <div class="a-toolbar__center">
-      <div class="a-segment" role="group" aria-label="Data panels">
+      <div class="a-segment" role="group" [attr.aria-label]="'ANALYSES.A11Y_DATA_PANELS' | translate">
         <button
           type="button"
           class="a-segment__btn"
@@ -43,7 +43,7 @@
           <span>{{ 'ANALYSES.FILTERS' | translate }}</span>
         </button>
       </div>
-      <div class="a-segment" role="group" aria-label="Build panels">
+      <div class="a-segment" role="group" [attr.aria-label]="'ANALYSES.A11Y_BUILD_PANELS' | translate">
         <button
           type="button"
           class="a-segment__btn"

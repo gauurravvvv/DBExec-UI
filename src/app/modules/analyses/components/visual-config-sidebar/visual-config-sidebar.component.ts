@@ -1,12 +1,17 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   DoCheck,
   EventEmitter,
   Input,
   NgZone,
+  OnDestroy,
+  OnInit,
   Output,
 } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 import {
   ANIMATION_EASINGS,
   AREA_ORIGIN_OPTIONS,
@@ -121,7 +126,7 @@ import { Visual } from '../../models';
   styleUrls: ['./visual-config-sidebar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class VisualConfigSidebarComponent implements DoCheck {
+export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy {
   private _focusedVisual!: Visual;
 
   /**
@@ -253,7 +258,102 @@ export class VisualConfigSidebarComponent implements DoCheck {
    */
   private configSnapshot = '';
 
-  constructor(private ngZone: NgZone) {}
+  /**
+   * Dropdown option arrays hold i18n keys in their `label` (e.g.
+   * `'CHART_OPTIONS.LINE_STEP.NONE'`). Resolving keys at the template
+   * via `| translate` doesn't apply, because PrimeNG's `[optionLabel]`
+   * reads the raw string from the data array. We instead materialise
+   * a translated copy of every option array here at init and again
+   * whenever the language changes, swapping the raw arrays out for
+   * resolved ones. The template binds to the same fields so no markup
+   * changes are needed.
+   */
+  private langSubscription?: Subscription;
+
+  constructor(
+    private ngZone: NgZone,
+    private translate: TranslateService,
+    private cdr: ChangeDetectorRef,
+  ) {}
+
+  ngOnInit(): void {
+    this.localizeDropdownOptions();
+    this.langSubscription = this.translate.onLangChange.subscribe(() => {
+      this.localizeDropdownOptions();
+      // Force a CD pass — the option arrays we just swapped are
+      // upstream of OnPush change detection. Without this, the
+      // dropdowns keep showing the previous language's labels until
+      // the next user interaction.
+      this.cdr.markForCheck();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.langSubscription?.unsubscribe();
+  }
+
+  /** Resolve every i18n-keyed `label` to the active locale. */
+  private localizeDropdownOptions(): void {
+    const localize = <T extends { label: string; value: unknown }>(arr: T[]): T[] =>
+      arr.map(
+        (o) =>
+          ({ ...o, label: this.translate.instant(o.label) }) as T,
+      );
+    // Original 24 arrays
+    this.lineStepOptions = localize(LINE_STEP_OPTIONS);
+    this.funnelSortOptions = localize(FUNNEL_SORT_OPTIONS);
+    this.funnelAlignOptions = localize(FUNNEL_ALIGN_OPTIONS);
+    this.treemapNodeClickOptions = localize(TREEMAP_NODE_CLICK_OPTIONS);
+    this.sunburstNodeClickOptions = localize(SUNBURST_NODE_CLICK_OPTIONS);
+    this.effectShowOnOptions = localize(EFFECT_SHOW_ON_OPTIONS);
+    this.samplingOptions = localize(SAMPLING_OPTIONS);
+    this.showAllSymbolOptions = localize(SHOW_ALL_SYMBOL_OPTIONS);
+    this.stackStrategyOptions = localize(STACK_STRATEGY_OPTIONS);
+    this.rippleBrushTypeOptions = localize(RIPPLE_BRUSH_TYPE_OPTIONS);
+    this.funnelOrientOptions = localize(FUNNEL_ORIENT_OPTIONS);
+    this.sunburstSortOptions = localize(SUNBURST_SORT_OPTIONS);
+    this.pictorialRepeatDirectionOptions = localize(
+      PICTORIAL_REPEAT_DIRECTION_OPTIONS,
+    );
+    this.emphasisFocusOptions = localize(EMPHASIS_FOCUS_OPTIONS);
+    this.visualMapOrientOptions = localize(VISUAL_MAP_ORIENT_OPTIONS);
+    this.visualMapTypeOptions = localize(VISUAL_MAP_TYPE_OPTIONS);
+    this.dataZoomTypeOptions = localize(DATA_ZOOM_TYPE_OPTIONS);
+    this.dataZoomFilterModeOptions = localize(DATA_ZOOM_FILTER_MODE_OPTIONS);
+    this.areaOriginOptions = localize(AREA_ORIGIN_OPTIONS);
+    this.sunburstLabelRotateOptions = localize(SUNBURST_LABEL_ROTATE_OPTIONS);
+    this.colorMappingByOptions = localize(COLOR_MAPPING_BY_OPTIONS);
+    this.funnelLabelPositionOptions = localize(FUNNEL_LABEL_POSITION_OPTIONS);
+    this.themeRiverLabelPositionOptions = localize(
+      THEME_RIVER_LABEL_POSITION_OPTIONS,
+    );
+    this.shadingModeOptions = localize(SHADING_MODE_OPTIONS);
+    // Wave 2 — non-_OPTIONS arrays (legend/labels/symbols/etc.)
+    this.legendPositions = localize(LEGEND_POSITIONS);
+    this.legendTypes = localize(LEGEND_TYPES);
+    this.labelPositions = localize(LABEL_POSITIONS);
+    this.tooltipTriggers = localize(TOOLTIP_TRIGGERS);
+    this.axisPointerTypes = localize(AXIS_POINTER_TYPES);
+    this.gridLineStyles = localize(GRID_LINE_STYLES);
+    this.emphasisModes = localize(EMPHASIS_MODES);
+    this.animationEasings = localize(ANIMATION_EASINGS);
+    this.lineStyleTypes = localize(LINE_STYLE_TYPES);
+    this.symbolShapes = localize(SYMBOL_SHAPES);
+    this.pieLabelPositions = localize(PIE_LABEL_POSITIONS);
+    this.pieSelectedModes = localize(PIE_SELECTED_MODES);
+    this.pieRoseTypes = localize(PIE_ROSE_TYPES);
+    this.radarShapes = localize(RADAR_SHAPES);
+    this.graphLayouts = localize(GRAPH_LAYOUTS);
+    this.treeOrientations = localize(TREE_ORIENTATIONS);
+    this.treeLayouts = localize(TREE_LAYOUTS);
+    this.sankeyOrientations = localize(SANKEY_ORIENTATIONS);
+    this.pictorialSymbols = localize(PICTORIAL_SYMBOLS);
+    this.treeEdgeShapes = localize(TREE_EDGE_SHAPES);
+    this.graphEdgeSymbols = localize(GRAPH_EDGE_SYMBOLS);
+    this.boxplotLayouts = localize(BOXPLOT_LAYOUTS);
+    this.pictorialSymbolPositions = localize(PICTORIAL_SYMBOL_POSITIONS);
+    this.sankeyNodeAligns = localize(SANKEY_NODE_ALIGNS);
+  }
 
   ngDoCheck(): void {
     if (!this.focusedVisual) return;

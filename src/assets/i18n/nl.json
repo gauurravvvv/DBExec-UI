@@ -239,7 +239,17 @@
     "ORG_PATTERN": "Organisatienaam moet beginnen met een letter of cijfer",
     "USERNAME_PATTERN_DETAILED": "Gebruikersnaam moet beginnen met een letter en mag alleen letters, cijfers, punten, underscores of streepjes bevatten",
     "INVALID_PASSWORD_FORMAT": "Ongeldig wachtwoordformaat",
-    "EMAIL_INVALID_ADDRESS": "Voer een geldig e-mailadres in"
+    "EMAIL_INVALID_ADDRESS": "Voer een geldig e-mailadres in",
+    "MAX_CHARACTERS": "Maximaal {{max}} tekens toegestaan",
+    "MIN_CHARACTERS": "Minimaal {{min}} tekens vereist",
+    "VALUE_BETWEEN": "Waarde moet tussen {{min}} en {{max}} liggen",
+    "VALUE_GTE": "Waarde moet ≥ {{min}} zijn",
+    "VALUE_LTE": "Waarde moet ≤ {{max}} zijn",
+    "PERCENT_GTE": "Procentwaarde moet ≥ {{min}}% zijn",
+    "PERCENT_LTE": "Procentwaarde moet ≤ {{max}}% zijn",
+    "PX_GTE": "Pixelwaarde moet ≥ {{min}} zijn",
+    "PX_LTE": "Pixelwaarde moet ≤ {{max}} zijn",
+    "DIMENSION_SHAPE": "Gebruik {{shapes}}"
   },
   "HEADER": {
     "SEARCH_PLACEHOLDER": "Zoeken...",
@@ -770,19 +780,19 @@
     "ADD_VISUAL": "Visueel element toevoegen",
     "ADD_VISUAL_HINT": "Klik op \"Visueel element toevoegen\" om te beginnen",
     "ALIGNMENT": "Uitlijning",
-    "ALLOW_SELECT": "Allow Select",
-    "AMBIENT_LIGHT_INTENSITY": "Ambient Light Intensity",
+    "ALLOW_SELECT": "Selectie toestaan",
+    "AMBIENT_LIGHT_INTENSITY": "Omgevingslicht-intensiteit",
     "ANALYSIS_DETAILS": "Analysedetails",
     "ANALYSIS_FIELDS": "Analysevelden",
     "ANALYSIS_NAME": "Analysenaam",
-    "ANCHOR_SIZE": "Anchor Size",
+    "ANCHOR_SIZE": "Anker-grootte",
     "ANIMATED_EFFECT": "Geanimeerd effect",
     "ANIMATION": "Animatie",
-    "APPEND_TO_BODY": "Append Tooltip to Body",
-    "AREA_BASELINE": "Area Baseline",
+    "APPEND_TO_BODY": "Tooltip aan body toevoegen",
+    "AREA_BASELINE": "Vlak-basislijn",
     "AREA_OPACITY": "Gebiedsdekking",
     "AREA_OPTIONS": "Gebiedsopties",
-    "ASPECT_SCALE": "Aspect Scale",
+    "ASPECT_SCALE": "Verhoudingsschaal",
     "ASSIGN": "Wijs gegevensvelden toe aan assen om uw grafiek te zien",
     "AUTO": "auto",
     "AUTO_OR_NUMBER": "auto of nummer",
@@ -791,16 +801,16 @@
     "AUTO_SCALE": "Automatisch schalen",
     "AVOID_LABEL_OVERLAP": "Labeloverlap vermijden",
     "AXIS": "As",
-    "AXIS_EXPAND_COUNT": "Axis Expand Count",
-    "AXIS_EXPANDABLE": "Axis Expandable",
+    "AXIS_EXPAND_COUNT": "As-uitbreidingsaantal",
+    "AXIS_EXPANDABLE": "As uitbreidbaar",
     "AXIS_LINE_ROUND_CAP": "Aslijn ronde kap",
     "AXIS_LINE_WIDTH": "Aslijnbreedte",
     "AXIS_POINTER": "Asaanwijzer",
     "BAR_GAP": "Balkafstand",
-    "BAR_MAX_WIDTH": "Bar Max Width",
-    "BAR_MIN_WIDTH": "Bar Min Width",
+    "BAR_MAX_WIDTH": "Max. staafbreedte",
+    "BAR_MIN_WIDTH": "Min. staafbreedte",
     "BAR_OPTIONS": "Balkopties",
-    "BAR_SIZING": "Bar Sizing",
+    "BAR_SIZING": "Staafgrootte",
     "BAR_WIDTH": "Balkbreedte",
     "BASIC_INFORMATION": "Basisinformatie",
     "BEAR_BORDER_COLOR": "Bear-randkleur",
@@ -808,14 +818,14 @@
     "BORDER_RADIUS": "Randradius",
     "BORDER_WIDTH": "Randbreedte",
     "BOUNDARY_GAP": "Grensgat",
-    "BOUNDARY_GAP_PERCENT": "Boundary Gap (%)",
+    "BOUNDARY_GAP_PERCENT": "Randafstand (%)",
     "BOX_PLOT_OPTIONS": "Boxplotopties",
     "BUBBLE_OPTIONS": "Bellenopties",
     "BULL_BORDER_COLOR": "Bull-randkleur",
     "BULL_UP_COLOR": "Bull (stijging) kleur",
-    "CALCULABLE": "Calculable",
+    "CALCULABLE": "Berekenbaar",
     "CANDLESTICK_OPTIONS": "Kandelaaropties",
-    "CANDLESTICK_PERF": "Candlestick Performance",
+    "CANDLESTICK_PERF": "Kandelaar-prestaties",
     "CARD_DISPLAY": "Kaartweergave",
     "CATEGORY": "Categorie",
     "CATEGORY_GAP": "Categorieafstand",
@@ -826,9 +836,9 @@
     "CLICK_FIELD_FROM_LEFT_PANEL": "Klik op een veld in het linkerpaneel",
     "CLICK_TO_CONFIGURE": "Kies een type uit het Visuals-paneel",
     "CLICK_TO_SELECT_FIELD": "Klik om veld te selecteren",
-    "CLIP_TO_GRID": "Clip to Grid",
+    "CLIP_TO_GRID": "Op raster bijsnijden",
     "CLOCKWISE": "Kloksgewijs",
-    "COLOR_MAPPING_BY": "Color Mapping By",
+    "COLOR_MAPPING_BY": "Kleurtoewijzing op",
     "COLOR_SCHEME": "Kleurenschema",
     "COLUMN": "Veld",
     "CONFIRM_DELETE_BULK": "Weet u zeker dat u de geselecteerde {{count}} analyses wilt verwijderen?",
@@ -853,7 +863,7 @@
     "DATA_MAPPING": "Gegevenstoewijzing",
     "DATA_ZOOM": "Gegevenszoom",
     "DATASET_FIELDS": "Datasetvelden",
-    "DATA_ZOOM_OPTIONS": "Data Zoom Options",
+    "DATA_ZOOM_OPTIONS": "Gegevenszoom-opties",
     "DATE_AND_TIME": "Datum en tijd",
     "DATE_FORMAT": "Datumformaat",
     "DATE_ONLY": "Alleen datum",
@@ -1005,7 +1015,7 @@
     "OPERATOR_NOT_EQUALS": "Is niet gelijk aan",
     "OPERATOR_STARTS_WITH": "Begint met",
     "OPTIONAL": "Optioneel",
-    "ORIENTATION": "Orientatie",
+    "ORIENTATION": "Oriëntatie",
     "OUTER_RADIUS": "Buitenradius",
     "PAD_ANGLE": "Opvulhoek",
     "PARALLEL_OPTIONS": "Parallelle opties",
@@ -1163,17 +1173,17 @@
     "Y_AXIS_LABEL": "Y-aslabel",
     "Y_AXIS_NAME": "Y-asnaam",
     "Z_AXIS": "Z-as",
-    "DEFAULT_0_PERCENT": "0%",
-    "DEFAULT_100_PERCENT": "100%",
-    "DEFAULT_20_PERCENT": "20%",
-    "DEFAULT_30_PERCENT": "30%",
-    "DEFAULT_90_PERCENT": "90%",
-    "DETAIL_FORMATTER": "Detail Formatter",
-    "EMPHASIS": "Emphasis",
-    "ENABLE_LARGE_MODE": "Enable Large Mode",
+    "DEFAULT_0_PERCENT": "0 %",
+    "DEFAULT_100_PERCENT": "100 %",
+    "DEFAULT_20_PERCENT": "20 %",
+    "DEFAULT_30_PERCENT": "30 %",
+    "DEFAULT_90_PERCENT": "90 %",
+    "DETAIL_FORMATTER": "Detail-opmaker",
+    "EMPHASIS": "Nadruk",
+    "ENABLE_LARGE_MODE": "Grote modus inschakelen",
     "EXAMPLE_50_PERCENT": "bijv. 50%",
     "FIELDS": "Velden",
-    "FILL_FROM": "Fill From",
+    "FILL_FROM": "Vullen vanaf",
     "TABLE_OPTIONS": "Tabelopties",
     "TABLE_COMPACT": "Compacte dichtheid",
     "TABLE_STRIPED": "Gestreepte rijen",
@@ -1196,52 +1206,57 @@
     "FILTER_DIALOG_SUBTITLE": "Stel in hoe dit filter eruitziet en zich gedraagt.",
     "FILTER_CLEAR_ALL_TOOLTIP": "Alle filters opnieuw instellen",
     "FILTER_CLEAR_NONE_TOOLTIP": "Geen filters om te wissen",
-    "FILTER_MODE": "Filter Mode",
+    "FILTER_MODE": "Filtermodus",
     "FILTER_MORE": "Meer filters",
     "FILTER_SECTION_SOURCE": "Bron",
     "FILTER_SECTION_BEHAVIOUR": "Gedrag",
     "FILTER_SECTION_DEFAULT": "Standaardwaarde",
     "FILTER_SAVE_DISABLED_HINT": "Kies een veld, filtertype en besturingselement om Opslaan in te schakelen.",
-    "FOCUS_MODE": "Focus Mode",
-    "FUNNEL_LABELS": "Funnel Labels",
-    "GAUGE_DETAIL": "Gauge Detail",
-    "GRAPH_EXTRAS": "Graph Extras",
-    "HIGHLIGHT_ADJACENCY": "Highlight Adjacency",
-    "HOVER_SCALE": "Hover Scale",
-    "LABEL_LINE_LENGTH": "Label Line Length",
-    "LABEL_LINE_LENGTH_2": "Label Line Length 2",
-    "LABEL_ROTATION": "Label Rotation",
-    "LARGE_THRESHOLD": "Large Mode Threshold",
-    "LAYOUT_ITERATIONS": "Layout Iterations",
-    "LINE_EFFECT": "Line Effect",
-    "LIVE_FORCE_LAYOUT": "Live Force Layout",
-    "MAIN_LIGHT_INTENSITY": "Main Light Intensity",
-    "MAP_EXTRAS": "Map Extras",
-    "MIN_SHOW_LABEL_ANGLE": "Min Label Angle",
-    "NAME_PROPERTY": "Name Property",
-    "PARALLEL_INTERACTION": "Parallel Interaction",
-    "PERFORMANCE_MODE": "Performance Mode",
-    "PERIOD_SEC": "Period (sec)",
-    "PIE_REFINEMENTS": "Pie Refinements",
-    "POST_EFFECT": "Post Effect",
-    "PROGRESSIVE_CHUNK": "Progressive Chunk",
-    "ROTATE_CIRCULAR_LABELS": "Rotate Circular Labels",
-    "SANKEY_LAYOUT": "Sankey Layout",
-    "SCENE_3D": "3D Scene",
-    "SHADING_MODE": "Shading Mode",
-    "SHOW_ANCHOR": "Show Anchor",
-    "SHOW_EFFECT": "Show Effect",
-    "SHOW_UPPER_LABEL": "Show Upper Label",
-    "SLICE_BORDER_WIDTH": "Slice Border Width",
-    "SQUARE_RATIO": "Square Ratio",
-    "SUNBURST_LABELS": "Sunburst Labels",
-    "THEME_RIVER_EXTRAS": "Theme River Extras",
-    "THROTTLE_MS": "Throttle (ms)",
-    "TOOLTIP_EXTRAS": "Tooltip Extras",
-    "TREEMAP_COLOR_MAPPING": "Treemap Color Mapping",
-    "VALUE_PRECISION": "Value Precision",
-    "VISUAL_DIMENSION": "Visual Dimension",
-    "VISUAL_MAP": "Visual Map"
+    "FOCUS_MODE": "Focus-modus",
+    "FUNNEL_LABELS": "Trechter-labels",
+    "GAUGE_DETAIL": "Meter-detail",
+    "GRAPH_EXTRAS": "Grafiek-extra's",
+    "HIGHLIGHT_ADJACENCY": "Aangrenzing markeren",
+    "HOVER_SCALE": "Hover-schaal",
+    "LABEL_LINE_LENGTH": "Labellijn-lengte",
+    "LABEL_LINE_LENGTH_2": "Labellijn-lengte 2",
+    "LABEL_ROTATION": "Labelrotatie",
+    "LARGE_THRESHOLD": "Drempel grote modus",
+    "LAYOUT_ITERATIONS": "Lay-out-iteraties",
+    "LINE_EFFECT": "Lijneffect",
+    "LIVE_FORCE_LAYOUT": "Live force-lay-out",
+    "MAIN_LIGHT_INTENSITY": "Hoofdlicht-intensiteit",
+    "MAP_EXTRAS": "Kaart-extra's",
+    "MIN_SHOW_LABEL_ANGLE": "Min. label-hoek",
+    "NAME_PROPERTY": "Naam-eigenschap",
+    "PARALLEL_INTERACTION": "Parallelle interactie",
+    "PERFORMANCE_MODE": "Prestatiemodus",
+    "PERIOD_SEC": "Periode (s)",
+    "PIE_REFINEMENTS": "Cirkeldiagram-verfijningen",
+    "POST_EFFECT": "Post-effect",
+    "PROGRESSIVE_CHUNK": "Progressief blok",
+    "ROTATE_CIRCULAR_LABELS": "Cirkellabels draaien",
+    "SANKEY_LAYOUT": "Sankey-indeling",
+    "SCENE_3D": "3D-scène",
+    "SHADING_MODE": "Schaduwmodus",
+    "SHOW_ANCHOR": "Anker tonen",
+    "SHOW_EFFECT": "Effect tonen",
+    "SHOW_UPPER_LABEL": "Bovenste label tonen",
+    "SLICE_BORDER_WIDTH": "Sectorrand-breedte",
+    "SQUARE_RATIO": "Vierkante verhouding",
+    "SUNBURST_LABELS": "Sunburst-labels",
+    "THEME_RIVER_EXTRAS": "Theme River-extra's",
+    "THROTTLE_MS": "Beperking (ms)",
+    "TOOLTIP_EXTRAS": "Tooltip-extra's",
+    "TREEMAP_COLOR_MAPPING": "Treemap-kleurtoewijzing",
+    "VALUE_PRECISION": "Waardeprecisie",
+    "VISUAL_DIMENSION": "Visuele dimensie",
+    "VISUAL_MAP": "Visuele kaart",
+    "OPTIONAL_SUFFIX": "(optioneel)",
+    "TABLE_NO_DATA": "Geen gegevens om weer te geven",
+    "TABLE_NO_MATCHING_ROWS": "Geen overeenkomende rijen",
+    "A11Y_DATA_PANELS": "Gegevenspanelen",
+    "A11Y_BUILD_PANELS": "Bouwpanelen"
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",
@@ -2019,5 +2034,505 @@
     "IDLE_SECONDS_REMAINING": "seconden resterend",
     "LOGOUT_NOW": "Nu uitloggen",
     "STAY_LOGGED_IN": "Ingelogd blijven"
+  },
+  "CHART_OPTIONS": {
+    "LINE_STEP": {
+      "NONE": "Geen",
+      "START": "Begin",
+      "MIDDLE": "Midden",
+      "END": "Einde"
+    },
+    "FUNNEL_SORT": {
+      "DESCENDING": "Aflopend",
+      "ASCENDING": "Oplopend",
+      "NONE": "Geen"
+    },
+    "FUNNEL_ALIGN": {
+      "CENTER": "Midden",
+      "LEFT": "Links",
+      "RIGHT": "Rechts"
+    },
+    "TREEMAP_NODE_CLICK": {
+      "FALSE": "Uitgeschakeld",
+      "ZOOMTONODE": "Inzoomen",
+      "LINK": "Link"
+    },
+    "SUNBURST_NODE_CLICK": {
+      "FALSE": "Uitgeschakeld",
+      "ROOTTONODE": "Wortel naar knooppunt",
+      "LINK": "Link"
+    },
+    "EFFECT_SHOW_ON": {
+      "RENDER": "Render",
+      "EMPHASIS": "Nadruk"
+    },
+    "SAMPLING": {
+      "NONE": "Geen",
+      "LTTB": "LTTB",
+      "AVERAGE": "Gemiddelde",
+      "MAX": "Max",
+      "MIN": "Min",
+      "SUM": "Som"
+    },
+    "SHOW_ALL_SYMBOL": {
+      "AUTO": "Auto",
+      "TRUE": "Ja",
+      "FALSE": "Nee"
+    },
+    "STACK_STRATEGY": {
+      "SAMESIGN": "Zelfde teken",
+      "ALL": "Alle",
+      "POSITIVE": "Positief",
+      "NEGATIVE": "Negatief"
+    },
+    "RIPPLE_BRUSH_TYPE": {
+      "STROKE": "Lijn",
+      "FILL": "Vulling"
+    },
+    "FUNNEL_ORIENT": {
+      "VERTICAL": "Verticaal",
+      "HORIZONTAL": "Horizontaal"
+    },
+    "SUNBURST_SORT": {
+      "DESC": "Aflopend",
+      "ASC": "Oplopend",
+      "NONE": "Geen"
+    },
+    "PICTORIAL_REPEAT_DIRECTION": {
+      "START": "Begin",
+      "END": "Einde"
+    },
+    "EMPHASIS_FOCUS": {
+      "NONE": "Geen",
+      "SELF": "Self",
+      "SERIES": "Serie",
+      "ADJACENCY": "Aangrenzend",
+      "ANCESTOR": "Voorouder",
+      "DESCENDANT": "Afstammeling"
+    },
+    "VISUAL_MAP_ORIENT": {
+      "HORIZONTAL": "Horizontaal",
+      "VERTICAL": "Verticaal"
+    },
+    "VISUAL_MAP_TYPE": {
+      "CONTINUOUS": "Continu",
+      "PIECEWISE": "Stuksgewijs"
+    },
+    "DATA_ZOOM_TYPE": {
+      "INSIDE": "Alleen binnen",
+      "SLIDER": "Alleen schuifregelaar",
+      "BOTH": "Beide"
+    },
+    "DATA_ZOOM_FILTER_MODE": {
+      "FILTER": "Filter",
+      "WEAKFILTER": "Zwak filter",
+      "EMPTY": "Leeg",
+      "NONE": "Geen"
+    },
+    "AREA_ORIGIN": {
+      "AUTO": "Auto",
+      "START": "Begin",
+      "END": "Einde"
+    },
+    "SUNBURST_LABEL_ROTATE": {
+      "RADIAL": "Radial",
+      "TANGENTIAL": "Tangentieel",
+      "0": "Horizontaal (0°)"
+    },
+    "COLOR_MAPPING_BY": {
+      "VALUE": "Waarde",
+      "INDEX": "Index",
+      "ID": "ID"
+    },
+    "FUNNEL_LABEL_POSITION": {
+      "INSIDE": "Binnen",
+      "OUTSIDE": "Buiten",
+      "RIGHT": "Rechts",
+      "LEFT": "Links",
+      "TOP": "Boven",
+      "BOTTOM": "Onder"
+    },
+    "THEME_RIVER_LABEL_POSITION": {
+      "LEFT": "Links",
+      "RIGHT": "Rechts"
+    },
+    "SHADING_MODE": {
+      "COLOR": "Kleur",
+      "LAMBERT": "Lambert",
+      "REALISTIC": "Realistisch"
+    },
+    "LEGEND_POSITIONS": {
+      "BELOW": "Onder"
+    },
+    "LEGEND_TYPES": {
+      "PLAIN": "Eenvoudig",
+      "SCROLL": "Schuiven"
+    },
+    "LABEL_POSITIONS": {
+      "TOP": "Boven",
+      "INSIDELEFT": "Binnen links",
+      "INSIDERIGHT": "Binnen rechts",
+      "INSIDETOP": "Binnen boven",
+      "INSIDEBOTTOM": "Binnen onder"
+    },
+    "TOOLTIP_TRIGGERS": {
+      "ITEM": "Item",
+      "AXIS": "As"
+    },
+    "AXIS_POINTER_TYPES": {
+      "LINE": "Lijn",
+      "SHADOW": "Schaduw",
+      "CROSS": "Kruis"
+    },
+    "GRID_LINE_STYLES": {
+      "SOLID": "Doorlopend",
+      "DASHED": "Gestreept",
+      "DOTTED": "Gestippeld"
+    },
+    "ANIMATION_EASINGS": {
+      "LINEAR": "Lineair",
+      "CUBICOUT": "Cubic Out",
+      "ELASTICOUT": "Elastic Out",
+      "BOUNCEOUT": "Bounce Out",
+      "QUADRATICINOUT": "Quadratic In/Out",
+      "EXPONENTIALOUT": "Exponential Out"
+    },
+    "LINE_STYLE_TYPES": {
+      "SOLID": "Doorlopend",
+      "DASHED": "Gestreept",
+      "DOTTED": "Gestippeld"
+    },
+    "SYMBOL_SHAPES": {
+      "CIRCLE": "Cirkel",
+      "RECT": "Rechthoek",
+      "ROUNDRECT": "Afgeronde rechth.",
+      "TRIANGLE": "Driehoek",
+      "DIAMOND": "Ruit",
+      "PIN": "Punaise",
+      "ARROW": "Pijl"
+    },
+    "PIE_LABEL_POSITIONS": {
+      "INSIDE": "Binnen"
+    },
+    "PIE_SELECTED_MODES": {
+      "SINGLE": "Enkel",
+      "MULTIPLE": "Meerdere",
+      "SERIES": "Serie"
+    },
+    "PIE_ROSE_TYPES": {
+      "NONE": "Geen",
+      "RADIUS": "Straal",
+      "AREA": "Gebied"
+    },
+    "RADAR_SHAPES": {
+      "POLYGON": "Veelhoek",
+      "CIRCLE": "Cirkel"
+    },
+    "GRAPH_LAYOUTS": {
+      "FORCE": "Kracht",
+      "CIRCULAR": "Cirkelvormig"
+    },
+    "TREE_ORIENTATIONS": {
+      "TB": "Boven naar onder",
+      "BT": "Onder naar boven",
+      "LR": "Links naar rechts",
+      "RL": "Rechts naar links"
+    },
+    "TREE_LAYOUTS": {
+      "ORTHOGONAL": "Orthogonal"
+    },
+    "TREE_EDGE_SHAPES": {
+      "CURVE": "Kromme",
+      "POLYLINE": "Polylijn"
+    },
+    "GRAPH_EDGE_SYMBOLS": {
+      "NONE": "Geen",
+      "CIRCLE": "Cirkel",
+      "ARROW": "Pijl"
+    },
+    "PICTORIAL_SYMBOL_POSITIONS": {
+      "CENTER": "Midden"
+    },
+    "SANKEY_NODE_ALIGNS": {
+      "JUSTIFY": "Uitlijnen",
+      "LEFT": "Links",
+      "RIGHT": "Rechts"
+    },
+    "PICTORIAL_SYMBOLS": {
+      "ROUNDRECT": "Afgeronde rechth.",
+      "CIRCLE": "Cirkel",
+      "RECT": "Rechthoek",
+      "TRIANGLE": "Driehoek",
+      "DIAMOND": "Ruit",
+      "ARROW": "Pijl"
+    }
+  },
+  "CHART_TYPES": {
+    "CATEGORIES": {
+      "BAR_CHARTS": "Staafdiagrammen",
+      "LINE_CHARTS": "Lijndiagrammen",
+      "AREA_CHARTS": "Vlakdiagrammen",
+      "PIE_CHARTS": "Cirkeldiagrammen",
+      "GAUGES": "Meters",
+      "CARDS": "Kaarten",
+      "MAPS": "Kaarten",
+      "SCATTER": "Spreidings",
+      "STATISTICAL": "Statistisch",
+      "FUNNEL": "Trechter",
+      "HIERARCHICAL": "Hiërarchisch",
+      "FLOW": "Stroom",
+      "SPECIAL": "Speciaal",
+      "FINANCIAL": "Financieel",
+      "3D_CHARTS": "3D-diagrammen"
+    },
+    "BAR_VERTICAL": {
+      "NAME": "Staafdiagram",
+      "DESCRIPTION": "Displays data using vertical bars to compare values across categories"
+    },
+    "BAR_HORIZONTAL": {
+      "NAME": "Horizontale staaf",
+      "DESCRIPTION": "Shows data with horizontal bars, ideal for long category names"
+    },
+    "BAR_VERTICAL_2D": {
+      "NAME": "Gegroepeerd verticaal",
+      "DESCRIPTION": "Compares multiple data series side-by-side within each category"
+    },
+    "BAR_HORIZONTAL_2D": {
+      "NAME": "Gegroepeerd horizontaal",
+      "DESCRIPTION": "Displays multiple series horizontally for easy comparison across groups"
+    },
+    "BAR_VERTICAL_STACKED": {
+      "NAME": "Gestapeld verticaal",
+      "DESCRIPTION": "Shows part-to-whole relationships by stacking bars vertically"
+    },
+    "BAR_HORIZONTAL_STACKED": {
+      "NAME": "Gestapeld horizontaal",
+      "DESCRIPTION": "Presents stacked data horizontally to show composition and totals"
+    },
+    "BAR_VERTICAL_NORMALIZED": {
+      "NAME": "Genormaliseerd verticaal",
+      "DESCRIPTION": "Displays proportions as percentages with bars normalized to 100%"
+    },
+    "BAR_HORIZONTAL_NORMALIZED": {
+      "NAME": "Genormaliseerd horizontaal",
+      "DESCRIPTION": "Shows percentage distribution horizontally across categories"
+    },
+    "LINE": {
+      "NAME": "Lijndiagram",
+      "DESCRIPTION": "Visualizes trends and changes over continuous data or time"
+    },
+    "POLAR": {
+      "NAME": "Polair diagram",
+      "DESCRIPTION": "Displays multivariate data on a circular grid for pattern comparison"
+    },
+    "AREA": {
+      "NAME": "Vlakdiagram",
+      "DESCRIPTION": "Shows trends over time with filled areas under the line"
+    },
+    "AREA_STACKED": {
+      "NAME": "Stacked Area",
+      "DESCRIPTION": "Illustrates cumulative totals and individual contributions over time"
+    },
+    "AREA_NORMALIZED": {
+      "NAME": "Normalized Area",
+      "DESCRIPTION": "Displays proportional trends normalized to 100% at each point"
+    },
+    "PIE": {
+      "NAME": "Cirkeldiagram",
+      "DESCRIPTION": "Shows parts of a whole as slices of a circular chart"
+    },
+    "PIE_ADVANCED": {
+      "NAME": "Advanced Pie",
+      "DESCRIPTION": "Enhanced pie chart with legend, labels, and calculated totals"
+    },
+    "PIE_GRID": {
+      "NAME": "Pie Grid",
+      "DESCRIPTION": "Displays multiple pie charts in a grid for comparison"
+    },
+    "DONUT": {
+      "NAME": "Donutdiagram",
+      "DESCRIPTION": "Circular chart with center cutout, ideal for displaying key metrics"
+    },
+    "GAUGE": {
+      "NAME": "Meter",
+      "DESCRIPTION": "Shows a single value on a radial scale with min and max ranges"
+    },
+    "LINEAR_GAUGE": {
+      "NAME": "Linear Gauge",
+      "DESCRIPTION": "Displays progress or value along a horizontal or vertical bar"
+    },
+    "NUMBER_CARD": {
+      "NAME": "Number Cards",
+      "DESCRIPTION": "Presents key metrics as large, prominent numerical displays"
+    },
+    "TABLE": {
+      "NAME": "Tabel",
+      "DESCRIPTION": "Tabular view of the raw rows; sortable columns, virtual scroll for large datasets"
+    },
+    "HEAT_MAP": {
+      "NAME": "Heat Map",
+      "DESCRIPTION": "Uses color intensity to represent values in a matrix layout"
+    },
+    "TREE_MAP": {
+      "NAME": "Tree Map",
+      "DESCRIPTION": "Visualizes hierarchical data using nested rectangles sized by value"
+    },
+    "BUBBLE": {
+      "NAME": "Bellendiagram",
+      "DESCRIPTION": "Plots three dimensions using X, Y position and bubble size"
+    },
+    "BOX_CHART": {
+      "NAME": "Box Chart",
+      "DESCRIPTION": "Shows data distribution through quartiles, median, and outliers"
+    },
+    "SCATTER": {
+      "NAME": "Spreidingsdiagram",
+      "DESCRIPTION": "Plots individual data points by X and Y values to reveal patterns and correlations"
+    },
+    "EFFECT_SCATTER": {
+      "NAME": "Ripple Scatter",
+      "DESCRIPTION": "Scatter plot with animated ripple effects to highlight data points"
+    },
+    "FUNNEL": {
+      "NAME": "Trechterdiagram",
+      "DESCRIPTION": "Visualizes progressive reduction of data through stages, ideal for conversion pipelines"
+    },
+    "SUNBURST": {
+      "NAME": "Sunburst Chart",
+      "DESCRIPTION": "Displays hierarchical data as concentric rings, showing part-to-whole relationships"
+    },
+    "TREE": {
+      "NAME": "Tree Diagram",
+      "DESCRIPTION": "Visualizes parent-child relationships in a branching tree structure"
+    },
+    "SANKEY": {
+      "NAME": "Sankey Diagram",
+      "DESCRIPTION": "Shows flow and quantity between nodes, ideal for energy, budget, or traffic analysis"
+    },
+    "GRAPH": {
+      "NAME": "Network Graph",
+      "DESCRIPTION": "Displays relationships between entities as a force-directed network diagram"
+    },
+    "LINE_STACKED": {
+      "NAME": "Stacked Line",
+      "DESCRIPTION": "Shows cumulative trends by stacking multiple data series on a line chart"
+    },
+    "LINE_STEP": {
+      "NAME": "Step Line",
+      "DESCRIPTION": "Displays data as a step function with sharp transitions between values"
+    },
+    "HALF_DONUT": {
+      "NAME": "Half Donut",
+      "DESCRIPTION": "Semi-circle donut chart showing proportions in a 180-degree arc"
+    },
+    "NESTED_PIE": {
+      "NAME": "Nested Pie",
+      "DESCRIPTION": "Multi-ring pie chart with inner summary and outer detail rings"
+    },
+    "ROSE": {
+      "NAME": "Rose Chart",
+      "DESCRIPTION": "Nightingale rose chart where slices vary in radius to show magnitude differences"
+    },
+    "WATERFALL": {
+      "NAME": "Waterfall Chart",
+      "DESCRIPTION": "Shows cumulative effect of sequential positive and negative values on a total"
+    },
+    "PICTORIAL_BAR": {
+      "NAME": "Pictorial Bar",
+      "DESCRIPTION": "Bar chart using custom shapes and symbols instead of plain rectangles"
+    },
+    "BAR_POLAR": {
+      "NAME": "Polar Bar",
+      "DESCRIPTION": "Bar chart rendered in polar/circular coordinates for radial comparison"
+    },
+    "THEME_RIVER": {
+      "NAME": "Theme River",
+      "DESCRIPTION": "Displays thematic data changes over time as a flowing river visualization"
+    },
+    "RADAR": {
+      "NAME": "Radardiagram",
+      "DESCRIPTION": "Displays multivariate data on a radial grid, ideal for comparing performance across dimensions"
+    },
+    "CANDLESTICK": {
+      "NAME": "Candlestick Chart",
+      "DESCRIPTION": "Shows open, high, low, close values for financial time series data"
+    },
+    "PARALLEL": {
+      "NAME": "Parallel Coordinates",
+      "DESCRIPTION": "Visualizes multi-dimensional data by drawing parallel vertical axes with connected lines"
+    },
+    "BAR3D": {
+      "NAME": "Bar 3D",
+      "DESCRIPTION": "Three-dimensional bar chart for spatial data comparison"
+    },
+    "LINE3D": {
+      "NAME": "Line 3D",
+      "DESCRIPTION": "Three-dimensional line chart for visualizing trajectories and paths in 3D space"
+    },
+    "SCATTER3D": {
+      "NAME": "Scatter 3D",
+      "DESCRIPTION": "Three-dimensional scatter plot for exploring relationships across three variables"
+    },
+    "SURFACE": {
+      "NAME": "Surface Chart",
+      "DESCRIPTION": "Renders continuous 3D surfaces from mathematical equations or data grids"
+    },
+    "GLOBE": {
+      "NAME": "Globe",
+      "DESCRIPTION": "Interactive 3D globe visualization for geospatial data points"
+    },
+    "GRAPHGL": {
+      "NAME": "Graph GL",
+      "DESCRIPTION": "WebGL-accelerated network graph for large-scale relationship data with GPU rendering"
+    },
+    "SCATTERGL": {
+      "NAME": "Scatter GL",
+      "DESCRIPTION": "WebGL-accelerated scatter plot for rendering millions of data points efficiently"
+    },
+    "LINESGL": {
+      "NAME": "Lines GL",
+      "DESCRIPTION": "WebGL-accelerated line rendering for large-scale polyline datasets"
+    },
+    "MAP3D": {
+      "NAME": "Map 3D",
+      "DESCRIPTION": "Three-dimensional geographic map visualization with height-encoded data"
+    },
+    "FLOWGL": {
+      "NAME": "Flow GL",
+      "DESCRIPTION": "WebGL-accelerated vector field flow visualization for wind, current, or magnetic field data"
+    },
+    "WORLD_MAP": {
+      "NAME": "Wereldkaart",
+      "DESCRIPTION": "Choropleth world map using color intensity to show values by country or region"
+    },
+    "FLOW_LINES": {
+      "NAME": "Flow Lines",
+      "DESCRIPTION": "Animated directed flow lines between nodes, visualizing movement and connections on a flat canvas"
+    },
+    "LINES3D": {
+      "NAME": "Lines 3D",
+      "DESCRIPTION": "Animated polyline arcs rendered on a 3D globe using longitude/latitude coordinates"
+    },
+    "POLYGONS3D": {
+      "NAME": "Polygons 3D",
+      "DESCRIPTION": "Extruded 3D polygon regions rendered on a globe, grouped by name with longitude/latitude vertices"
+    }
+  },
+  "ROLE_LABELS": {
+    "X_AXIS": "X-as",
+    "Y_AXIS": "Y-as",
+    "Z_AXIS": "Z-as",
+    "OPEN": "Open",
+    "HIGH": "Hoog",
+    "LOW": "Laag",
+    "CLOSE": "Slot",
+    "SAMPLE": "Steekproef (ruwe waarden)",
+    "PARENT": "Bovenliggend (hiërarchie)",
+    "INDICATORS": "Indicatorkolommen",
+    "DIMENSIONS": "Dimensiekolommen",
+    "VALUE_COLUMNS": "Waardekolommen",
+    "LONGITUDE": "Lengtegraad",
+    "LATITUDE": "Breedtegraad",
+    "TIME": "Tijd"
   }
 }

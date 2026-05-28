@@ -108,6 +108,17 @@
     color: var(--error-color);
     font-size: var(--fs-label);
   }
+
+  /* Character counter — small grey "12 / 50" beneath the input,
+     aligned right. Hidden when an error is showing (error takes
+     priority). */
+  .char-counter {
+    color: var(--text-color);
+    opacity: 0.45;
+    font-size: var(--fs-label);
+    text-align: right;
+    margin-top: -2px;
+  }
 }
 
 :host ::ng-deep {

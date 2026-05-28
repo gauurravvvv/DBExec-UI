@@ -301,6 +301,32 @@ function buildLegendWithTitle(config: any): any {
   return result;
 }
 
+/**
+ * Format a value the way the tooltip should display it. Honours the
+ * user's "Value Precision" setting (config.tooltipPrecision, 0–6).
+ * Non-numeric / non-finite values pass through untouched so string
+ * labels render as-is. Callers that build a custom `tooltip.formatter`
+ * MUST route numeric values through this helper — ECharts' built-in
+ * `valueFormatter` is only consulted by the DEFAULT renderer and is
+ * skipped when a chart supplies its own formatter function.
+ *
+ * Exported so other files can reuse the same rounding rule if they
+ * ever assemble tooltips off the main builder path (none today, but
+ * cheap insurance).
+ */
+function formatTooltipValue(config: any, value: any): any {
+  if (typeof config.tooltipPrecision !== 'number') return value;
+  if (typeof value === 'number' && isFinite(value)) {
+    return value.toFixed(config.tooltipPrecision);
+  }
+  // numeric strings can sneak in from SQL numerics — round those too
+  if (typeof value === 'string' && value !== '') {
+    const n = Number(value);
+    if (isFinite(n)) return n.toFixed(config.tooltipPrecision);
+  }
+  return value;
+}
+
 function buildTooltip(config: any, defaultTrigger: string = 'item'): any {
   const trigger = config.tooltipTrigger || defaultTrigger;
   // `appendToBody: true` reparents the tooltip DOM under document.body,
@@ -325,14 +351,14 @@ function buildTooltip(config: any, defaultTrigger: string = 'item'): any {
     },
     extraCssText: 'box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);',
   };
-  // Precision: when set, ECharts will round numeric values in the
-  // tooltip to N decimal places. Only applies when no custom formatter
-  // is supplied (custom formatters take precedence).
+  // Precision: when set, ECharts rounds numeric values in the tooltip
+  // to N decimal places. `valueFormatter` is consulted by ECharts'
+  // DEFAULT tooltip renderer only — chart-specific `tooltip.formatter`
+  // overrides (heatmap, scatter, bubble, treemap, candlestick, etc.)
+  // bypass it entirely. Those callsites use `formatTooltipValue()`
+  // (below) to honour the same precision.
   if (typeof config.tooltipPrecision === 'number') {
-    tooltip.valueFormatter = (v: any) => {
-      if (typeof v !== 'number') return v;
-      return v.toFixed(config.tooltipPrecision);
-    };
+    tooltip.valueFormatter = (v: any) => formatTooltipValue(config, v);
   }
   if (config.axisPointerType && config.axisPointerType !== 'none') {
     tooltip.axisPointer = {
@@ -351,7 +377,14 @@ function buildGrid(config: any): any {
   // NAME (positioned via nameGap below the labels). Adding extra
   // padding here on top of containLabel double-counts and squeezes
   // the actual chart area.
-  const baseBottom = config.showXAxisLabel !== false ? 25 : 10;
+  let baseBottom = config.showXAxisLabel !== false ? 25 : 10;
+  // When X labels are rotated, the axis name lives below the rotated
+  // labels (we grow nameGap in buildCategoryAxis). Reserve extra room
+  // at the bottom so the axis name doesn't clip the chart card.
+  const rot = config.xAxisLabelRotate || 0;
+  if (rot > 15 && config.showXAxisLabel !== false) {
+    baseBottom += Math.round(20 * Math.sin((rot * Math.PI) / 180));
+  }
   const pos = config.legend ? config.legendPosition || 'right' : '';
 
   return {
@@ -424,16 +457,36 @@ function buildCategoryAxis(
   axis: 'x' | 'y',
 ): any {
   const isX = axis === 'x';
+  // `show` (hide the whole axis) and tick rotation stay keyed to the PHYSICAL
+  // axis — the "Show X/Y Axis" toggles act on screen position.
   const showAxis = isX ? config.xAxis !== false : config.yAxis !== false;
-  const showLabel = isX ? config.showXAxisLabel : config.showYAxisLabel;
-  const label = isX ? config.xAxisLabel : config.yAxisLabel;
+  // The axis NAME follows the data ROLE, not the physical position. This is
+  // the category axis, so it always carries the category-role label
+  // (the UI's X-Axis field) gated by Show X Axis Name — otherwise a
+  // horizontal bar (category on the Y axis) showed the value label "Value"
+  // over the category axis and vice-versa (names were swapped).
+  const showLabel = config.showXAxisLabel;
+  const label = config.xAxisLabel;
 
   // nameGap positions the axis name relative to the axis line.
-  // ECharts already accounts for the rotated tick label height when
-  // it lays out the axis name, so we only need a small visual gap
-  // here. Don't add big numbers — that pushes the name off the
-  // bottom of the chart card.
-  const nameGap = isX ? 28 : 55;
+  // ECharts does NOT measure rotated label height into nameGap, so a
+  // 90° rotation makes labels grow downward but the name stays glued
+  // to the axis — landing AMONG the tick labels. Grow the gap with
+  // rotation: vertical (90°) labels need roughly max-label-width worth
+  // of space below the axis line. Approx 7px per character; cap at
+  // 110px so the name doesn't push off the card. Horizontal (0°)
+  // labels keep the compact default. The factor sin(angle) interpolates
+  // smoothly between the two extremes (≈0.87 at 60°, 1.0 at 90°).
+  const rot = isX ? config.xAxisLabelRotate || 0 : 0;
+  let isLabelGap = 28;
+  if (isX && rot > 15 && (categories || []).length) {
+    const maxLen = Math.max(
+      ...categories.map((c) => (c == null ? 0 : String(c).length)),
+    );
+    const rotated = Math.min(maxLen * 7, 110) * Math.sin((rot * Math.PI) / 180);
+    isLabelGap = Math.round(28 + rotated);
+  }
+  const nameGap = isX ? isLabelGap : 55;
 
   const result: any = {
     type: 'category',
@@ -486,21 +539,27 @@ function buildCategoryAxis(
 
 function buildValueAxis(config: any, axis: 'x' | 'y'): any {
   const isX = axis === 'x';
+  // `show` stays keyed to physical position; the NAME follows the data role.
+  // This is the value axis, so it always carries the value-role label (the
+  // UI's Y-Axis field) gated by Show Y Axis Name — regardless of whether the
+  // value axis is drawn horizontally (horizontal bars) or vertically.
   const showAxis = isX ? config.xAxis !== false : config.yAxis !== false;
-  const showLabel = isX ? config.showXAxisLabel : config.showYAxisLabel;
-  const label = isX ? config.xAxisLabel : config.yAxisLabel;
+  const showLabel = config.showYAxisLabel;
+  const label = config.yAxisLabel;
   const result: any = {
     type: 'value',
     show: showAxis,
     name: showLabel ? label : '',
     nameLocation: 'middle',
     // X axis: small gap below the tick labels.
-    // Y axis: larger gap because Y tick labels rotate naturally to
-    // the side and the axis name reads vertically (so the gap is
-    // measured along the axis line direction).
-    // Both kept as fixed values; containLabel handles the actual
-    // tick label space in the grid.
-    nameGap: isX ? 28 : 45,
+    // Y axis: the name reads vertically and sits LEFT of the tick
+    // labels — its gap must clear the widest formatted number, or the
+    // name (e.g. "Value") visually overlaps the labels ("2,000,000").
+    // A flat 45px wasn't enough for grouped millions. We can't know
+    // exact label width without measuring, so use a comfortable
+    // default (60) that fits up to ~9-char numbers; chart-specific
+    // builders can override after the fact for narrower formatters.
+    nameGap: isX ? 28 : 60,
     nameTextStyle: {
       ...CHART_TYPOGRAPHY.axisName,
       fontFamily: CHART_TYPOGRAPHY.fontFamily,
@@ -608,40 +667,52 @@ function buildToolbox(config: any): any {
 function buildDataZoom(config: any, axis: 'x' | 'y' = 'x'): any[] {
   if (!config.dataZoom) return [];
   const index = axis === 'x' ? { xAxisIndex: 0 } : { yAxisIndex: 0 };
-  // Position the slider outside the grid with enough room
+  // Position the slider outside the grid with enough room. `bottom: 2` sat
+  // the horizontal slider flush against the visual card's bottom edge, where
+  // it got visually clipped; lift it to 10 so the full slider (handles +
+  // track) clears the card border. The grid bottom reservation at the bar/
+  // line/area call sites is increased to match so the slider never overlaps
+  // the axis labels.
   const positionProp =
-    axis === 'y' ? { right: 5, width: 20 } : { bottom: 2, height: 20 };
+    axis === 'y' ? { right: 8, width: 20 } : { bottom: 10, height: 18 };
   // Throttle filter recompute. Without throttle, every wheel tick triggers
   // a full data-axis recompute — ~16ms × 60fps = a continuous load on the
   // main thread. 100ms is the value ECharts itself uses in their docs.
   const throttle = config.dataZoomThrottle ?? 100;
   const filterMode = config.dataZoomFilterMode || 'filter';
-  return [
-    {
-      type: 'slider',
-      ...index,
-      ...positionProp,
-      throttle,
-      filterMode,
-      // Match the app's primary blue (#2196f3). ECharts does not read
-      // CSS custom properties, so values are hard-coded but should track
-      // --primary-color in theme-variables.scss if it ever changes.
-      borderColor: '#e5e7eb',
-      backgroundColor: '#fafafa',
-      fillerColor: 'rgba(33, 150, 243, 0.12)',
-      handleStyle: { color: '#2196f3', borderColor: '#2196f3' },
-      moveHandleStyle: { color: '#2196f3' },
-      emphasis: {
-        handleStyle: { color: '#1976d2', borderColor: '#1976d2' },
-        moveHandleStyle: { color: '#1976d2' },
-      },
-      textStyle: {
-        ...CHART_TYPOGRAPHY.axisLabel,
-        fontFamily: CHART_TYPOGRAPHY.fontFamily,
-      },
+  // Which zoom controls to emit — driven by the "Type" dropdown in the
+  // Properties pane (Inside only / Slider only / Both). Previously the
+  // dropdown was a no-op: buildDataZoom always returned both a slider AND an
+  // inside zoom regardless of config.dataZoomType. Default 'both' preserves
+  // the prior behaviour when the user hasn't picked.
+  const zoomType = config.dataZoomType || 'both';
+  const slider = {
+    type: 'slider',
+    ...index,
+    ...positionProp,
+    throttle,
+    filterMode,
+    // Match the app's primary blue (#2196f3). ECharts does not read
+    // CSS custom properties, so values are hard-coded but should track
+    // --primary-color in theme-variables.scss if it ever changes.
+    borderColor: '#e5e7eb',
+    backgroundColor: '#fafafa',
+    fillerColor: 'rgba(33, 150, 243, 0.12)',
+    handleStyle: { color: '#2196f3', borderColor: '#2196f3' },
+    moveHandleStyle: { color: '#2196f3' },
+    emphasis: {
+      handleStyle: { color: '#1976d2', borderColor: '#1976d2' },
+      moveHandleStyle: { color: '#1976d2' },
     },
-    { type: 'inside', ...index, throttle, filterMode },
-  ];
+    textStyle: {
+      ...CHART_TYPOGRAPHY.axisLabel,
+      fontFamily: CHART_TYPOGRAPHY.fontFamily,
+    },
+  };
+  const inside = { type: 'inside', ...index, throttle, filterMode };
+  if (zoomType === 'slider') return [slider];
+  if (zoomType === 'inside') return [inside];
+  return [slider, inside];
 }
 
 // ========= Bar Chart =========
@@ -720,20 +791,27 @@ export function buildBarChartOption(
           : undefined,
         itemStyle: borderRadius ? { borderRadius } : undefined,
       }));
+      // Build axes through the shared helpers so the Properties pane's
+      // axis toggles (Show X/Y, Grid Lines, Inverse, Auto Scale, names,
+      // rotation) all apply to normalized charts too — then layer the
+      // normalized-specific value-axis overrides (0–100 range + % labels)
+      // on top. Previously these axes were built inline as bare
+      // {type, data, max:100} objects, which silently ignored every axis
+      // property the user toggled.
+      const pctValueAxis = (axis: 'x' | 'y') => {
+        const base = buildValueAxis(config, axis);
+        return {
+          ...base,
+          max: 100,
+          axisLabel: { ...(base.axisLabel || {}), formatter: '{value}%' },
+        };
+      };
       if (isHorizontal) {
-        option.yAxis = { type: 'category', data: categories };
-        option.xAxis = {
-          type: 'value',
-          max: 100,
-          axisLabel: { formatter: '{value}%' },
-        };
+        option.yAxis = buildCategoryAxis(config, categories, 'y');
+        option.xAxis = pctValueAxis('x');
       } else {
-        option.xAxis = { type: 'category', data: categories };
-        option.yAxis = {
-          type: 'value',
-          max: 100,
-          axisLabel: { formatter: '{value}%' },
-        };
+        option.xAxis = buildCategoryAxis(config, categories, 'x');
+        option.yAxis = pctValueAxis('y');
       }
     } else {
       option.series = seriesList.map(s => ({
@@ -814,14 +892,14 @@ export function buildBarChartOption(
         formatter: function (params: any) {
           if (!Array.isArray(params)) {
             // Item trigger — single item
-            return params.seriesName + ': ' + params.value;
+            return params.seriesName + ': ' + formatTooltipValue(config, params.value);
           }
           // Axis trigger — filter out null/undefined entries
           const valid = params.filter((p: any) => p.value != null);
           if (valid.length === 0) return '';
           let result = valid[0].axisValueLabel || '';
           valid.forEach((p: any) => {
-            result += '<br/>' + p.marker + ' ' + p.seriesName + ': ' + p.value;
+            result += '<br/>' + p.marker + ' ' + p.seriesName + ': ' + formatTooltipValue(config, p.value);
           });
           return result;
         },
@@ -1183,7 +1261,7 @@ export function buildPieChartOption(
       top: 'middle',
       formatter: (name: string) => {
         const item = pieData.find(d => d.name === name);
-        return item ? `${name}: ${item.value}` : name;
+        return item ? `${name}: ${formatTooltipValue(config, item.value)}` : name;
       },
     };
     option.series[0].center = ['35%', '50%'];
@@ -1310,6 +1388,26 @@ export function buildGaugeChartOption(data: any[], config: any): any {
     value: d.value,
   }));
 
+  // Auto-fit the gauge scale to the data when the user hasn't set an explicit
+  // max. Previously max defaulted to a hardcoded 100 and read the wrong config
+  // keys (config.min/max instead of the gaugeMinValue/gaugeMaxValue the
+  // Properties pane writes), so a real measure (e.g. summed sales in the
+  // millions) pinned the needle far past the 0–100 dial. Round the data max up
+  // to a "nice" number so the dial ends on a clean tick.
+  const dataMax = Math.max(...gaugeData.map(d => Number(d.value) || 0), 1);
+  const niceMax = (() => {
+    const pow = Math.pow(10, Math.floor(Math.log10(dataMax)));
+    return Math.ceil(dataMax / pow) * pow;
+  })();
+  // Use ONLY the Properties-pane keys (gaugeMinValue/gaugeMaxValue). The
+  // legacy config.min/config.max carry a stale default of 0/100 from
+  // DEFAULT_CHART_CONFIG, so falling back to them pinned every gauge to a
+  // 0–100 dial regardless of data. When the user hasn't set an explicit max,
+  // auto-fit to the rounded data max instead.
+  const gaugeMin = config.gaugeMinValue != null ? config.gaugeMinValue : 0;
+  const gaugeMax =
+    config.gaugeMaxValue != null ? config.gaugeMaxValue : niceMax;
+
   return {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
@@ -1317,11 +1415,11 @@ export function buildGaugeChartOption(data: any[], config: any): any {
     series: [
       {
         type: 'gauge',
-        min: config.min || 0,
-        max: config.max || 100,
+        min: gaugeMin,
+        max: gaugeMax,
         startAngle: config.gaugeStartAngle ?? 225,
         endAngle: config.gaugeEndAngle ?? -45,
-        splitNumber: config.splitNumber ?? 10,
+        splitNumber: config.gaugeSplitNumber ?? config.splitNumber ?? 10,
         axisTick: {
           show: config.gaugeShowScale !== false,
           splitNumber: config.tickSplitNumber ?? 5,
@@ -1425,11 +1523,11 @@ export function buildHeatMapChartOption(data: any[], config: any): any {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
-      show: !config.tooltipDisabled,
+      ...buildTooltip(config, 'item'),
       position: 'top',
       formatter: (params: any) => {
         const d = params.data || params.value;
-        return `${xCategories[d[0]]} / ${yCategories[d[1]]}: ${d[2]}`;
+        return `${xCategories[d[0]]} / ${yCategories[d[1]]}: ${formatTooltipValue(config, d[2])}`;
       },
     },
     ...buildLegendWithTitle(config),
@@ -1499,6 +1597,19 @@ export function buildHeatMapChartOption(data: any[], config: any): any {
         label: {
           show: config.heatmapShowLabels !== false || config.showDataLabel,
           fontSize: config.labelFontSize || 11,
+          // Compact the cell value: raw floats like 342381.8999999999 ran far
+          // past the cell width and collided with neighbours/axis labels.
+          // Render as a short K/M-suffixed number so it fits in the cell.
+          formatter: (p: any) => {
+            const val = Array.isArray(p.value) ? p.value[2] : p.value;
+            const n = Number(val);
+            if (!isFinite(n)) return '';
+            const abs = Math.abs(n);
+            if (abs >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+            if (abs >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+            if (abs >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+            return String(Math.round(n));
+          },
         },
         emphasis: {
           itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.3)' },
@@ -1529,8 +1640,8 @@ export function buildTreeMapChartOption(data: any[], config: any): any {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
-      show: !config.tooltipDisabled,
-      formatter: (params: any) => `${params.name}: ${params.value}`,
+      ...buildTooltip(config, 'item'),
+      formatter: (params: any) => `${params.name}: ${formatTooltipValue(config, params.value)}`,
     },
     series: [
       {
@@ -1611,10 +1722,10 @@ export function buildBubbleChartOption(data: any[], config: any): any {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
-      show: !config.tooltipDisabled,
+      ...buildTooltip(config, 'item'),
       formatter: (params: any) => {
         const d = params.data || params.value;
-        return `${params.seriesName}<br/>X: ${d[0]}, Y: ${d[1]}, Size: ${d[2]}`;
+        return `${params.seriesName}<br/>X: ${formatTooltipValue(config, d[0])}, Y: ${formatTooltipValue(config, d[1])}, Size: ${formatTooltipValue(config, d[2])}`;
       },
     },
     ...buildLegendWithTitle(config),
@@ -1633,54 +1744,52 @@ export function buildScatterChartOption(
 ): any {
   const isEffect = chartType === 'effect-scatter';
 
-  const scatterData = data.map(d => ({
-    name: String(d.name),
-    value: [String(d.name), d.value],
+  // Scatter is a true XY plot. The transformer hands us the same numeric
+  // {name, series:[{x,y,r}]} shape as bubble (one group per category), so we
+  // plot each point at [x, y] on TWO value axes. The previous version used
+  // the category name as X and a per-category count as Y on a category x-axis,
+  // which flattened every point onto a single horizontal line.
+  const series = data.map((group: any) => ({
+    name: String(group.name),
+    type: isEffect ? 'effectScatter' : 'scatter',
+    data: (group.series || []).map((pt: any) => [pt.x, pt.y]),
+    symbol: config.scatterSymbolShape || 'circle',
+    symbolSize: config.scatterSymbolSize || 10,
+    ...(isEffect
+      ? {
+          rippleEffect: {
+            brushType: config.effectRippleBrushType || 'stroke',
+            scale: config.effectRippleScale ?? 3,
+            number: config.effectRippleNumber ?? 3,
+            period: config.effectRipplePeriod ?? 4,
+          },
+          showEffectOn: config.effectShowOn || 'render',
+        }
+      : buildPerfFlags(config)),
+    label: buildDataLabel(config),
+    emphasis: {
+      focus: config.emphasis || 'series',
+      ...(config.emphasisScale === true ? { scale: true } : {}),
+      itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.3)' },
+    },
   }));
-
-  const categories = data.map(d => String(d.name));
 
   const option: any = {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
-      show: !config.tooltipDisabled,
-      trigger: 'item',
+      ...buildTooltip(config, 'item'),
       formatter: (params: any) => {
-        const d = params.data;
-        return `${d.name}: ${d.value[1]}`;
+        const d = params.value || params.data;
+        return `${params.seriesName}<br/>X: ${formatTooltipValue(config, d[0])}, Y: ${formatTooltipValue(config, d[1])}`;
       },
     },
     ...buildLegendWithTitle(config),
     grid: buildGrid(config),
     toolbox: buildToolbox(config),
-    xAxis: buildCategoryAxis(config, categories, 'x'),
+    xAxis: buildValueAxis(config, 'x'),
     yAxis: buildValueAxis(config, 'y'),
-    series: [
-      {
-        type: isEffect ? 'effectScatter' : 'scatter',
-        data: scatterData,
-        symbol: config.scatterSymbolShape || 'circle',
-        symbolSize: config.scatterSymbolSize || 10,
-        ...(isEffect
-          ? {
-              rippleEffect: {
-                brushType: config.effectRippleBrushType || 'stroke',
-                scale: config.effectRippleScale ?? 3,
-                number: config.effectRippleNumber ?? 3,
-                period: config.effectRipplePeriod ?? 4,
-              },
-              showEffectOn: config.effectShowOn || 'render',
-            }
-          : buildPerfFlags(config)),
-        label: buildDataLabel(config),
-        emphasis: {
-          focus: config.emphasis || 'series',
-          ...(config.emphasisScale === true ? { scale: true } : {}),
-          itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.3)' },
-        },
-      },
-    ],
+    series,
   };
 
   if (config.gradient && option.series) {
@@ -1784,8 +1893,8 @@ export function buildSunburstChartOption(data: any[], config: any): any {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
-      show: !config.tooltipDisabled,
-      formatter: (params: any) => `${params.name}: ${params.value}`,
+      ...buildTooltip(config, 'item'),
+      formatter: (params: any) => `${params.name}: ${formatTooltipValue(config, params.value)}`,
     },
     toolbox: buildToolbox(config),
     series: [
@@ -1857,8 +1966,7 @@ export function buildSankeyChartOption(
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
-      show: !config.tooltipDisabled,
-      trigger: 'item',
+      ...buildTooltip(config, 'item'),
       triggerOn: 'mousemove',
     },
     toolbox: buildToolbox(config),
@@ -1939,8 +2047,7 @@ export function buildWaterfallChartOption(data: any[], config: any): any {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
-      show: !config.tooltipDisabled,
-      trigger: 'axis',
+      ...buildTooltip(config, 'axis'),
       axisPointer: { type: 'shadow' },
       formatter: (params: any) => {
         const idx = params[0].dataIndex;
@@ -1950,7 +2057,7 @@ export function buildWaterfallChartOption(data: any[], config: any): any {
         const neg =
           typeof negativeData[idx] === 'number' ? negativeData[idx] : 0;
         const val = (pos as number) - (neg as number);
-        return `${cat}: ${val >= 0 ? '+' : ''}${val}`;
+        return `${cat}: ${val >= 0 ? '+' : ''}${formatTooltipValue(config, val)}`;
       },
     },
     legend: { show: false },
@@ -2067,11 +2174,11 @@ export function buildBoxPlotChartOption(data: any[], config: any): any {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
-      show: !config.tooltipDisabled,
-      trigger: 'item',
+      ...buildTooltip(config, 'item'),
       formatter: (params: any) => {
         const d = params.data;
-        return `${params.name}<br/>Min: ${d[0]}<br/>Q1: ${d[1]}<br/>Median: ${d[2]}<br/>Q3: ${d[3]}<br/>Max: ${d[4]}`;
+        const f = (v: any) => formatTooltipValue(config, v);
+        return `${params.name}<br/>Min: ${f(d[0])}<br/>Q1: ${f(d[1])}<br/>Median: ${f(d[2])}<br/>Q3: ${f(d[3])}<br/>Max: ${f(d[4])}`;
       },
     },
     ...buildLegendWithTitle(config),
@@ -2109,9 +2216,7 @@ export function buildGraphChartOption(
   return {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
-    tooltip: {
-      show: !config.tooltipDisabled,
-    },
+    tooltip: buildTooltip(config, 'item'),
     toolbox: buildToolbox(config),
     ...buildLegendWithTitle(config),
     series: [
@@ -2202,10 +2307,9 @@ export function buildTreeChartOption(data: any[], config: any): any {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
-      show: !config.tooltipDisabled,
-      trigger: 'item',
+      ...buildTooltip(config, 'item'),
       formatter: (params: any) =>
-        `${params.name}${params.value ? ': ' + params.value : ''}`,
+        `${params.name}${params.value ? ': ' + formatTooltipValue(config, params.value) : ''}`,
     },
     toolbox: buildToolbox(config),
     series: [
@@ -2271,10 +2375,7 @@ export function buildThemeRiverChartOption(data: any[], config: any): any {
   return {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
-    tooltip: {
-      show: !config.tooltipDisabled,
-      trigger: 'axis',
-    },
+    tooltip: buildTooltip(config, 'axis'),
     legend: buildLegend(config),
     toolbox: buildToolbox(config),
     singleAxis: {
@@ -2328,7 +2429,16 @@ export function buildPictorialBarChartOption(data: any[], config: any): any {
         symbolPosition: config.pictorialSymbolPosition || 'start',
         symbolClip: config.pictorialSymbolClip !== false,
         symbolRepeatDirection: config.pictorialSymbolRepeatDirection || 'start',
-        symbolMargin: config.pictorialRepeat ? 2 : 'auto',
+        // pictorialSymbolMargin (user override) wins; fall back to the
+        // repeat-aware default (2px between repeated symbols, 'auto' for the
+        // single-symbol case). Without this read, the Properties pane's
+        // "Symbol Margin" input was a no-op.
+        symbolMargin:
+          config.pictorialSymbolMargin != null && config.pictorialSymbolMargin !== ''
+            ? config.pictorialSymbolMargin
+            : config.pictorialRepeat
+              ? 2
+              : 'auto',
         barCategoryGap: '40%',
         label: buildDataLabel(config, 'top'),
       },
@@ -2484,7 +2594,8 @@ export function buildCandlestickChartOption(
       formatter: (params: any) => {
         const d = params[0];
         if (!d) return '';
-        return `${d.name}<br/>Open: ${d.data[0]}<br/>Close: ${d.data[1]}<br/>Low: ${d.data[2]}<br/>High: ${d.data[3]}`;
+        const f = (v: any) => formatTooltipValue(config, v);
+        return `${d.name}<br/>Open: ${f(d.data[0])}<br/>Close: ${f(d.data[1])}<br/>Low: ${f(d.data[2])}<br/>High: ${f(d.data[3])}`;
       },
     },
     grid: buildGrid(config),
@@ -2779,11 +2890,11 @@ export function buildGlobeChartOption(data: any[], config: any): any {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
-      show: !config.tooltipDisabled,
+      ...buildTooltip(config, 'item'),
       formatter: (params: any) => {
         const idx = params.dataIndex;
         const name = tooltipNames[idx] || '';
-        const val = params.value?.[2] ?? '';
+        const val = formatTooltipValue(config, params.value?.[2] ?? '');
         return name ? `${name}: ${val}` : `${val}`;
       },
     },
@@ -2997,9 +3108,9 @@ export function buildMap3DChartOption(data: any[], config: any): any {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
-      show: !config.tooltipDisabled,
+      ...buildTooltip(config, 'item'),
       formatter: (params: any) =>
-        `${params.name || categories[params.value?.[0]] || ''}: ${params.value?.[2] ?? ''}`,
+        `${params.name || categories[params.value?.[0]] || ''}: ${formatTooltipValue(config, params.value?.[2] ?? '')}`,
     },
     visualMap: {
       show: config.showVisualMap !== false,
@@ -3072,9 +3183,8 @@ export function buildWorldMapChartOption(data: any[], config: any): any {
   return {
     ...buildAnimation(config),
     tooltip: {
-      show: !config.tooltipDisabled,
-      trigger: 'item',
-      formatter: (params: any) => `${params.name}: ${params.value ?? 'N/A'}`,
+      ...buildTooltip(config, 'item'),
+      formatter: (params: any) => `${params.name}: ${params.value == null ? 'N/A' : formatTooltipValue(config, params.value)}`,
     },
     visualMap: {
       min: minVal,
@@ -3193,16 +3303,23 @@ export function buildFlowLinesChartOption(
   });
 
   const maxVal = Math.max(...links.map((l: any) => l.value ?? 1), 1);
-  const showEffect = config.flowLinesEffect !== false;
+  // The Properties pane's "Show Effect" toggle binds `flowLinesEffectExtra`,
+  // but the builder only read `flowLinesEffect` — so the toggle (and the
+  // Period/Trail/Symbol sub-controls it gates) did nothing. Honour the UI key,
+  // falling back to the legacy key, then default on.
+  const showEffect =
+    config.flowLinesEffectExtra !== undefined
+      ? config.flowLinesEffectExtra !== false
+      : config.flowLinesEffect !== false;
 
   return {
     ...buildAnimation(config),
     tooltip: {
-      show: !config.tooltipDisabled,
+      ...buildTooltip(config, 'item'),
       formatter: (params: any) => {
         if (params.seriesType === 'scatter') return String(params.name);
         const link = links[params.dataIndex];
-        if (link) return `${link.source} → ${link.target}: ${link.value ?? 1}`;
+        if (link) return `${link.source} → ${link.target}: ${formatTooltipValue(config, link.value ?? 1)}`;
         return '';
       },
     },
@@ -3292,10 +3409,15 @@ export function buildFlowGLChartOption(data: any[], config: any): any {
     color: colors,
     ...buildAnimation(config),
     tooltip: {
-      show: !config.tooltipDisabled,
+      ...buildTooltip(config, 'item'),
       formatter: (params: any) => {
         const d = params.data?.value || params.value;
-        return `Position: (${d[0].toFixed(2)}, ${d[1].toFixed(2)})<br/>Magnitude: ${d[2].toFixed(3)}`;
+        // User precision wins when set; otherwise fall back to the
+        // 2/3-decimal defaults that read well for a vector field.
+        const hasPrec = typeof config.tooltipPrecision === 'number';
+        const fpos = (v: number) => hasPrec ? formatTooltipValue(config, v) : v.toFixed(2);
+        const fmag = (v: number) => hasPrec ? formatTooltipValue(config, v) : v.toFixed(3);
+        return `Position: (${fpos(d[0])}, ${fpos(d[1])})<br/>Magnitude: ${fmag(d[2])}`;
       },
     },
     grid: buildGrid(config),

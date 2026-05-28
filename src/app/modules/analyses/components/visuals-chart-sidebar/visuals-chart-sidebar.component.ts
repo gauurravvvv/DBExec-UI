@@ -1,10 +1,15 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
+  OnDestroy,
+  OnInit,
   Output,
 } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 import {
   CHART_TYPES,
   getChartRoles,
@@ -37,22 +42,27 @@ interface RoleSlot {
  * Human-readable label for each role. Centralised here so future
  * localisation (i18n keys) only has to change one place.
  */
+/**
+ * i18n keys for each role. The chart-picker template pipes
+ * `slot.label | translate` so PrimeNG / Angular renders the active
+ * locale's string. Keys live under `ROLE_LABELS.*` in every locale JSON.
+ */
 const ROLE_LABELS: Record<RoleKey, string> = {
-  xAxis: 'X-Axis',
-  yAxis: 'Y-Axis',
-  zAxis: 'Z-Axis',
-  open: 'Open',
-  high: 'High',
-  low: 'Low',
-  close: 'Close',
-  sample: 'Sample (raw values)',
-  parent: 'Parent (hierarchy)',
-  indicators: 'Indicator Columns',
-  dimensions: 'Dimension Columns',
-  valueColumns: 'Value Columns',
-  lng: 'Longitude',
-  lat: 'Latitude',
-  time: 'Time',
+  xAxis: 'ROLE_LABELS.X_AXIS',
+  yAxis: 'ROLE_LABELS.Y_AXIS',
+  zAxis: 'ROLE_LABELS.Z_AXIS',
+  open: 'ROLE_LABELS.OPEN',
+  high: 'ROLE_LABELS.HIGH',
+  low: 'ROLE_LABELS.LOW',
+  close: 'ROLE_LABELS.CLOSE',
+  sample: 'ROLE_LABELS.SAMPLE',
+  parent: 'ROLE_LABELS.PARENT',
+  indicators: 'ROLE_LABELS.INDICATORS',
+  dimensions: 'ROLE_LABELS.DIMENSIONS',
+  valueColumns: 'ROLE_LABELS.VALUE_COLUMNS',
+  lng: 'ROLE_LABELS.LONGITUDE',
+  lat: 'ROLE_LABELS.LATITUDE',
+  time: 'ROLE_LABELS.TIME',
 };
 
 const LIST_VALUED_ROLES: ReadonlySet<RoleKey> = new Set<RoleKey>([
@@ -69,7 +79,35 @@ const LIST_VALUED_ROLES: ReadonlySet<RoleKey> = new Set<RoleKey>([
   styleUrls: ['./visuals-chart-sidebar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class VisualsChartSidebarComponent {
+export class VisualsChartSidebarComponent implements OnInit, OnDestroy {
+  /**
+   * The chart picker is OnPush and renders chart cards from cached
+   * category maps. The `| translate` pipe re-evaluates on language
+   * change but only when CD visits this view — which doesn't happen
+   * here without a parent prompt. Subscribe to onLangChange and
+   * markForCheck explicitly so chart names/categories refresh in place.
+   */
+  private langSubscription?: Subscription;
+
+  constructor(
+    private translate: TranslateService,
+    private cdr: ChangeDetectorRef,
+  ) {}
+
+  ngOnInit(): void {
+    this.langSubscription = this.translate.onLangChange.subscribe(() => {
+      // The chart-category cache groups chart cards by their `category`
+      // key — a translation-key string, identical across locales — so
+      // it doesn't need rebuilding. We just need a CD pass so the pipe
+      // re-evaluates against the new language.
+      this.cdr.markForCheck();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.langSubscription?.unsubscribe();
+  }
+
   @Input() focusedVisual!: Visual;
   @Input() focusedVisualId: string | null = null;
   @Input() isDataLoaded = false;

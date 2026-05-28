@@ -1,9 +1,10 @@
 <div class="echart-visual-container">
-  <!-- GL gate: hide the chart until echarts-gl has loaded (no-op for
-       non-GL charts). Without this gate, GL chart types render before
-       their series classes are registered and ECharts throws. -->
+  <!-- Render gate: hide the chart until BOTH echarts-gl has loaded (GL types)
+       AND the GeoJSON map has been registered (map/geo types). No-op for
+       ordinary charts. Without this, GL series throw on missing classes and
+       map series render against an unregistered map name (blank). -->
   <div
-    *ngIf="glReady; else glLoading"
+    *ngIf="renderReady; else glLoading"
     echarts
     [options]="chartOption"
     [merge]="mergeOption"

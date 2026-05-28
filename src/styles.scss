@@ -3120,11 +3120,19 @@ body {
   max-width: 320px !important;
 }
 
+// The panel is the visible options box INSIDE the overlay. PrimeNG
+// has already sized the overlay correctly (min-width = trigger width,
+// max-width = 320px from the rule above) so the panel just needs to
+// fill it. The previous `max-width: 320px !important` on the panel
+// itself caused a mismatch in dialogs where the trigger > 320px:
+// the overlay sized to (say) 518px, but the panel inside it clamped
+// to 320px — visible as a narrow options box floating in a wider
+// dropdown frame in the filter-dialog vs. the dataset-picker-dialog
+// (which uses inline rendering, no overlay).
 .p-dropdown-panel,
 .p-multiselect-panel {
   box-sizing: border-box;
   width: 100%;
-  max-width: 320px !important;
 }
 
 // Truncate option labels with ellipsis so they can't push the overlay

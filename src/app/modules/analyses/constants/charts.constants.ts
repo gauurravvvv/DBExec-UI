@@ -1,495 +1,446 @@
 export const CHART_TYPES = [
   {
     id: 'bar-vertical',
-    name: 'Bar Chart',
+    name: 'CHART_TYPES.BAR_VERTICAL.NAME',
     icon: 'pi pi-chart-bar',
-    category: 'Bar Charts',
-    description:
-      'Displays data using vertical bars to compare values across categories',
+    category: 'CHART_TYPES.CATEGORIES.BAR_CHARTS',
+    description: 'CHART_TYPES.BAR_VERTICAL.DESCRIPTION',
   },
   {
     id: 'bar-horizontal',
-    name: 'Horizontal Bar',
+    name: 'CHART_TYPES.BAR_HORIZONTAL.NAME',
     icon: 'pi pi-chart-bar',
-    category: 'Bar Charts',
-    description:
-      'Shows data with horizontal bars, ideal for long category names',
+    category: 'CHART_TYPES.CATEGORIES.BAR_CHARTS',
+    description: 'CHART_TYPES.BAR_HORIZONTAL.DESCRIPTION',
     rotate: true,
   },
   {
     id: 'bar-vertical-2d',
-    name: 'Grouped Vertical',
+    name: 'CHART_TYPES.BAR_VERTICAL_2D.NAME',
     icon: 'pi pi-chart-bar',
-    category: 'Bar Charts',
-    description:
-      'Compares multiple data series side-by-side within each category',
+    category: 'CHART_TYPES.CATEGORIES.BAR_CHARTS',
+    description: 'CHART_TYPES.BAR_VERTICAL_2D.DESCRIPTION',
   },
   {
     id: 'bar-horizontal-2d',
-    name: 'Grouped Horizontal',
+    name: 'CHART_TYPES.BAR_HORIZONTAL_2D.NAME',
     icon: 'pi pi-chart-bar',
-    category: 'Bar Charts',
-    description:
-      'Displays multiple series horizontally for easy comparison across groups',
+    category: 'CHART_TYPES.CATEGORIES.BAR_CHARTS',
+    description: 'CHART_TYPES.BAR_HORIZONTAL_2D.DESCRIPTION',
     rotate: true,
   },
   {
     id: 'bar-vertical-stacked',
-    name: 'Stacked Vertical',
+    name: 'CHART_TYPES.BAR_VERTICAL_STACKED.NAME',
     icon: 'pi pi-server',
-    category: 'Bar Charts',
-    description:
-      'Shows part-to-whole relationships by stacking bars vertically',
+    category: 'CHART_TYPES.CATEGORIES.BAR_CHARTS',
+    description: 'CHART_TYPES.BAR_VERTICAL_STACKED.DESCRIPTION',
   },
   {
     id: 'bar-horizontal-stacked',
-    name: 'Stacked Horizontal',
+    name: 'CHART_TYPES.BAR_HORIZONTAL_STACKED.NAME',
     icon: 'pi pi-server',
-    category: 'Bar Charts',
-    description:
-      'Presents stacked data horizontally to show composition and totals',
+    category: 'CHART_TYPES.CATEGORIES.BAR_CHARTS',
+    description: 'CHART_TYPES.BAR_HORIZONTAL_STACKED.DESCRIPTION',
   },
   {
     id: 'bar-vertical-normalized',
-    name: 'Normalized Vertical',
+    name: 'CHART_TYPES.BAR_VERTICAL_NORMALIZED.NAME',
     icon: 'pi pi-percentage',
-    category: 'Bar Charts',
-    description:
-      'Displays proportions as percentages with bars normalized to 100%',
+    category: 'CHART_TYPES.CATEGORIES.BAR_CHARTS',
+    description: 'CHART_TYPES.BAR_VERTICAL_NORMALIZED.DESCRIPTION',
   },
   {
     id: 'bar-horizontal-normalized',
-    name: 'Normalized Horizontal',
+    name: 'CHART_TYPES.BAR_HORIZONTAL_NORMALIZED.NAME',
     icon: 'pi pi-percentage',
-    category: 'Bar Charts',
-    description: 'Shows percentage distribution horizontally across categories',
+    category: 'CHART_TYPES.CATEGORIES.BAR_CHARTS',
+    description: 'CHART_TYPES.BAR_HORIZONTAL_NORMALIZED.DESCRIPTION',
     rotate: true,
   },
 
   // Line Charts
   {
     id: 'line',
-    name: 'Line Chart',
+    name: 'CHART_TYPES.LINE.NAME',
     icon: 'pi pi-chart-line',
-    category: 'Line Charts',
-    description: 'Visualizes trends and changes over continuous data or time',
+    category: 'CHART_TYPES.CATEGORIES.LINE_CHARTS',
+    description: 'CHART_TYPES.LINE.DESCRIPTION',
   },
   {
     id: 'polar',
-    name: 'Polar Chart',
+    name: 'CHART_TYPES.POLAR.NAME',
     icon: 'pi pi-compass',
-    category: 'Line Charts',
-    description:
-      'Displays multivariate data on a circular grid for pattern comparison',
+    category: 'CHART_TYPES.CATEGORIES.LINE_CHARTS',
+    description: 'CHART_TYPES.POLAR.DESCRIPTION',
   },
 
   // Area Charts
   {
     id: 'area',
-    name: 'Area Chart',
+    name: 'CHART_TYPES.AREA.NAME',
     icon: 'pi pi-chart-line',
-    category: 'Area Charts',
-    description: 'Shows trends over time with filled areas under the line',
+    category: 'CHART_TYPES.CATEGORIES.AREA_CHARTS',
+    description: 'CHART_TYPES.AREA.DESCRIPTION',
   },
   {
     id: 'area-stacked',
-    name: 'Stacked Area',
+    name: 'CHART_TYPES.AREA_STACKED.NAME',
     icon: 'pi pi-chart-line',
-    category: 'Area Charts',
-    description:
-      'Illustrates cumulative totals and individual contributions over time',
+    category: 'CHART_TYPES.CATEGORIES.AREA_CHARTS',
+    description: 'CHART_TYPES.AREA_STACKED.DESCRIPTION',
   },
   {
     id: 'area-normalized',
-    name: 'Normalized Area',
+    name: 'CHART_TYPES.AREA_NORMALIZED.NAME',
     icon: 'pi pi-percentage',
-    category: 'Area Charts',
-    description:
-      'Displays proportional trends normalized to 100% at each point',
+    category: 'CHART_TYPES.CATEGORIES.AREA_CHARTS',
+    description: 'CHART_TYPES.AREA_NORMALIZED.DESCRIPTION',
   },
 
   // Pie Charts
   {
     id: 'pie',
-    name: 'Pie Chart',
+    name: 'CHART_TYPES.PIE.NAME',
     icon: 'pi pi-chart-pie',
-    category: 'Pie Charts',
-    description: 'Shows parts of a whole as slices of a circular chart',
+    category: 'CHART_TYPES.CATEGORIES.PIE_CHARTS',
+    description: 'CHART_TYPES.PIE.DESCRIPTION',
   },
   {
     id: 'pie-advanced',
-    name: 'Advanced Pie',
+    name: 'CHART_TYPES.PIE_ADVANCED.NAME',
     icon: 'pi pi-chart-pie',
-    category: 'Pie Charts',
-    description:
-      'Enhanced pie chart with legend, labels, and calculated totals',
+    category: 'CHART_TYPES.CATEGORIES.PIE_CHARTS',
+    description: 'CHART_TYPES.PIE_ADVANCED.DESCRIPTION',
   },
   {
     id: 'pie-grid',
-    name: 'Pie Grid',
+    name: 'CHART_TYPES.PIE_GRID.NAME',
     icon: 'pi pi-th-large',
-    category: 'Pie Charts',
-    description: 'Displays multiple pie charts in a grid for comparison',
+    category: 'CHART_TYPES.CATEGORIES.PIE_CHARTS',
+    description: 'CHART_TYPES.PIE_GRID.DESCRIPTION',
   },
   {
     id: 'donut',
-    name: 'Donut Chart',
+    name: 'CHART_TYPES.DONUT.NAME',
     icon: 'pi pi-circle-fill',
-    category: 'Pie Charts',
-    description:
-      'Circular chart with center cutout, ideal for displaying key metrics',
+    category: 'CHART_TYPES.CATEGORIES.PIE_CHARTS',
+    description: 'CHART_TYPES.DONUT.DESCRIPTION',
   },
 
   // Gauges
   {
     id: 'gauge',
-    name: 'Gauge',
+    name: 'CHART_TYPES.GAUGE.NAME',
     icon: 'pi pi-stopwatch',
-    category: 'Gauges',
-    description:
-      'Shows a single value on a radial scale with min and max ranges',
+    category: 'CHART_TYPES.CATEGORIES.GAUGES',
+    description: 'CHART_TYPES.GAUGE.DESCRIPTION',
   },
   {
     id: 'linear-gauge',
-    name: 'Linear Gauge',
+    name: 'CHART_TYPES.LINEAR_GAUGE.NAME',
     icon: 'pi pi-sliders-h',
-    category: 'Gauges',
-    description:
-      'Displays progress or value along a horizontal or vertical bar',
+    category: 'CHART_TYPES.CATEGORIES.GAUGES',
+    description: 'CHART_TYPES.LINEAR_GAUGE.DESCRIPTION',
   },
 
   // Other Charts
   {
     id: 'number-card',
-    name: 'Number Cards',
+    name: 'CHART_TYPES.NUMBER_CARD.NAME',
     icon: 'pi pi-hashtag',
-    category: 'Cards',
-    description: 'Presents key metrics as large, prominent numerical displays',
+    category: 'CHART_TYPES.CATEGORIES.CARDS',
+    description: 'CHART_TYPES.NUMBER_CARD.DESCRIPTION',
   },
   {
     id: 'table',
-    name: 'Table',
+    name: 'CHART_TYPES.TABLE.NAME',
     icon: 'pi pi-table',
-    category: 'Cards',
-    description:
-      'Tabular view of the raw rows; sortable columns, virtual scroll for large datasets',
+    category: 'CHART_TYPES.CATEGORIES.CARDS',
+    description: 'CHART_TYPES.TABLE.DESCRIPTION',
   },
   {
     id: 'heat-map',
-    name: 'Heat Map',
+    name: 'CHART_TYPES.HEAT_MAP.NAME',
     icon: 'pi pi-th-large',
-    category: 'Maps',
-    description: 'Uses color intensity to represent values in a matrix layout',
+    category: 'CHART_TYPES.CATEGORIES.MAPS',
+    description: 'CHART_TYPES.HEAT_MAP.DESCRIPTION',
   },
   {
     id: 'tree-map',
-    name: 'Tree Map',
+    name: 'CHART_TYPES.TREE_MAP.NAME',
     icon: 'pi pi-sitemap',
-    category: 'Maps',
-    description:
-      'Visualizes hierarchical data using nested rectangles sized by value',
+    category: 'CHART_TYPES.CATEGORIES.MAPS',
+    description: 'CHART_TYPES.TREE_MAP.DESCRIPTION',
   },
   {
     id: 'bubble',
-    name: 'Bubble Chart',
+    name: 'CHART_TYPES.BUBBLE.NAME',
     icon: 'pi pi-circle-fill',
-    category: 'Scatter',
-    description: 'Plots three dimensions using X, Y position and bubble size',
+    category: 'CHART_TYPES.CATEGORIES.SCATTER',
+    description: 'CHART_TYPES.BUBBLE.DESCRIPTION',
   },
   {
     id: 'box-chart',
-    name: 'Box Chart',
+    name: 'CHART_TYPES.BOX_CHART.NAME',
     icon: 'pi pi-window-minimize',
-    category: 'Statistical',
-    description:
-      'Shows data distribution through quartiles, median, and outliers',
+    category: 'CHART_TYPES.CATEGORIES.STATISTICAL',
+    description: 'CHART_TYPES.BOX_CHART.DESCRIPTION',
   },
 
   // Scatter Charts
   {
     id: 'scatter',
-    name: 'Scatter Plot',
+    name: 'CHART_TYPES.SCATTER.NAME',
     icon: 'pi pi-circle',
-    category: 'Scatter',
-    description:
-      'Plots individual data points by X and Y values to reveal patterns and correlations',
+    category: 'CHART_TYPES.CATEGORIES.SCATTER',
+    description: 'CHART_TYPES.SCATTER.DESCRIPTION',
   },
   {
     id: 'effect-scatter',
-    name: 'Ripple Scatter',
+    name: 'CHART_TYPES.EFFECT_SCATTER.NAME',
     icon: 'pi pi-circle',
-    category: 'Scatter',
-    description:
-      'Scatter plot with animated ripple effects to highlight data points',
+    category: 'CHART_TYPES.CATEGORIES.SCATTER',
+    description: 'CHART_TYPES.EFFECT_SCATTER.DESCRIPTION',
   },
 
   // Funnel Charts
   {
     id: 'funnel',
-    name: 'Funnel Chart',
+    name: 'CHART_TYPES.FUNNEL.NAME',
     icon: 'pi pi-sort-amount-down-alt',
-    category: 'Funnel',
-    description:
-      'Visualizes progressive reduction of data through stages, ideal for conversion pipelines',
+    category: 'CHART_TYPES.CATEGORIES.FUNNEL',
+    description: 'CHART_TYPES.FUNNEL.DESCRIPTION',
   },
 
   // Hierarchical Charts
   {
     id: 'sunburst',
-    name: 'Sunburst Chart',
+    name: 'CHART_TYPES.SUNBURST.NAME',
     icon: 'pi pi-sun',
-    category: 'Hierarchical',
-    description:
-      'Displays hierarchical data as concentric rings, showing part-to-whole relationships',
+    category: 'CHART_TYPES.CATEGORIES.HIERARCHICAL',
+    description: 'CHART_TYPES.SUNBURST.DESCRIPTION',
   },
   {
     id: 'tree',
-    name: 'Tree Diagram',
+    name: 'CHART_TYPES.TREE.NAME',
     icon: 'pi pi-sitemap',
-    category: 'Hierarchical',
-    description:
-      'Visualizes parent-child relationships in a branching tree structure',
+    category: 'CHART_TYPES.CATEGORIES.HIERARCHICAL',
+    description: 'CHART_TYPES.TREE.DESCRIPTION',
   },
 
   // Flow Charts
   {
     id: 'sankey',
-    name: 'Sankey Diagram',
+    name: 'CHART_TYPES.SANKEY.NAME',
     icon: 'pi pi-arrows-h',
-    category: 'Flow',
-    description:
-      'Shows flow and quantity between nodes, ideal for energy, budget, or traffic analysis',
+    category: 'CHART_TYPES.CATEGORIES.FLOW',
+    description: 'CHART_TYPES.SANKEY.DESCRIPTION',
   },
   {
     id: 'graph',
-    name: 'Network Graph',
+    name: 'CHART_TYPES.GRAPH.NAME',
     icon: 'pi pi-share-alt',
-    category: 'Flow',
-    description:
-      'Displays relationships between entities as a force-directed network diagram',
+    category: 'CHART_TYPES.CATEGORIES.FLOW',
+    description: 'CHART_TYPES.GRAPH.DESCRIPTION',
   },
 
   // Line Chart Variants
   {
     id: 'line-stacked',
-    name: 'Stacked Line',
+    name: 'CHART_TYPES.LINE_STACKED.NAME',
     icon: 'pi pi-chart-line',
-    category: 'Line Charts',
-    description:
-      'Shows cumulative trends by stacking multiple data series on a line chart',
+    category: 'CHART_TYPES.CATEGORIES.LINE_CHARTS',
+    description: 'CHART_TYPES.LINE_STACKED.DESCRIPTION',
   },
   {
     id: 'line-step',
-    name: 'Step Line',
+    name: 'CHART_TYPES.LINE_STEP.NAME',
     icon: 'pi pi-chart-line',
-    category: 'Line Charts',
-    description:
-      'Displays data as a step function with sharp transitions between values',
+    category: 'CHART_TYPES.CATEGORIES.LINE_CHARTS',
+    description: 'CHART_TYPES.LINE_STEP.DESCRIPTION',
   },
 
   // Pie Chart Variants
   {
     id: 'half-donut',
-    name: 'Half Donut',
+    name: 'CHART_TYPES.HALF_DONUT.NAME',
     icon: 'pi pi-chart-pie',
-    category: 'Pie Charts',
-    description:
-      'Semi-circle donut chart showing proportions in a 180-degree arc',
+    category: 'CHART_TYPES.CATEGORIES.PIE_CHARTS',
+    description: 'CHART_TYPES.HALF_DONUT.DESCRIPTION',
   },
   {
     id: 'nested-pie',
-    name: 'Nested Pie',
+    name: 'CHART_TYPES.NESTED_PIE.NAME',
     icon: 'pi pi-circle-fill',
-    category: 'Pie Charts',
-    description:
-      'Multi-ring pie chart with inner summary and outer detail rings',
+    category: 'CHART_TYPES.CATEGORIES.PIE_CHARTS',
+    description: 'CHART_TYPES.NESTED_PIE.DESCRIPTION',
   },
   {
     id: 'rose',
-    name: 'Rose Chart',
+    name: 'CHART_TYPES.ROSE.NAME',
     icon: 'pi pi-sun',
-    category: 'Pie Charts',
-    description:
-      'Nightingale rose chart where slices vary in radius to show magnitude differences',
+    category: 'CHART_TYPES.CATEGORIES.PIE_CHARTS',
+    description: 'CHART_TYPES.ROSE.DESCRIPTION',
   },
 
   // Bar Chart Variants
   {
     id: 'waterfall',
-    name: 'Waterfall Chart',
+    name: 'CHART_TYPES.WATERFALL.NAME',
     icon: 'pi pi-sort-amount-down',
-    category: 'Bar Charts',
-    description:
-      'Shows cumulative effect of sequential positive and negative values on a total',
+    category: 'CHART_TYPES.CATEGORIES.BAR_CHARTS',
+    description: 'CHART_TYPES.WATERFALL.DESCRIPTION',
   },
   {
     id: 'pictorial-bar',
-    name: 'Pictorial Bar',
+    name: 'CHART_TYPES.PICTORIAL_BAR.NAME',
     icon: 'pi pi-image',
-    category: 'Bar Charts',
-    description:
-      'Bar chart using custom shapes and symbols instead of plain rectangles',
+    category: 'CHART_TYPES.CATEGORIES.BAR_CHARTS',
+    description: 'CHART_TYPES.PICTORIAL_BAR.DESCRIPTION',
   },
   {
     id: 'bar-polar',
-    name: 'Polar Bar',
+    name: 'CHART_TYPES.BAR_POLAR.NAME',
     icon: 'pi pi-compass',
-    category: 'Bar Charts',
-    description:
-      'Bar chart rendered in polar/circular coordinates for radial comparison',
+    category: 'CHART_TYPES.CATEGORIES.BAR_CHARTS',
+    description: 'CHART_TYPES.BAR_POLAR.DESCRIPTION',
   },
 
   // Special Charts
   {
     id: 'theme-river',
-    name: 'Theme River',
+    name: 'CHART_TYPES.THEME_RIVER.NAME',
     icon: 'pi pi-bolt',
-    category: 'Special',
-    description:
-      'Displays thematic data changes over time as a flowing river visualization',
+    category: 'CHART_TYPES.CATEGORIES.SPECIAL',
+    description: 'CHART_TYPES.THEME_RIVER.DESCRIPTION',
   },
   {
     id: 'radar',
-    name: 'Radar Chart',
+    name: 'CHART_TYPES.RADAR.NAME',
     icon: 'pi pi-compass',
-    category: 'Statistical',
-    description:
-      'Displays multivariate data on a radial grid, ideal for comparing performance across dimensions',
+    category: 'CHART_TYPES.CATEGORIES.STATISTICAL',
+    description: 'CHART_TYPES.RADAR.DESCRIPTION',
   },
   {
     id: 'candlestick',
-    name: 'Candlestick Chart',
+    name: 'CHART_TYPES.CANDLESTICK.NAME',
     icon: 'pi pi-pause',
-    category: 'Financial',
-    description:
-      'Shows open, high, low, close values for financial time series data',
+    category: 'CHART_TYPES.CATEGORIES.FINANCIAL',
+    description: 'CHART_TYPES.CANDLESTICK.DESCRIPTION',
   },
   {
     id: 'parallel',
-    name: 'Parallel Coordinates',
+    name: 'CHART_TYPES.PARALLEL.NAME',
     icon: 'pi pi-bars',
-    category: 'Statistical',
-    description:
-      'Visualizes multi-dimensional data by drawing parallel vertical axes with connected lines',
+    category: 'CHART_TYPES.CATEGORIES.STATISTICAL',
+    description: 'CHART_TYPES.PARALLEL.DESCRIPTION',
   },
 
   // 3D Charts (require echarts-gl)
   {
     id: 'bar3d',
-    name: 'Bar 3D',
+    name: 'CHART_TYPES.BAR3D.NAME',
     icon: 'pi pi-th-large',
-    category: '3D Charts',
-    description: 'Three-dimensional bar chart for spatial data comparison',
+    category: 'CHART_TYPES.CATEGORIES.3D_CHARTS',
+    description: 'CHART_TYPES.BAR3D.DESCRIPTION',
   },
   {
     id: 'line3d',
-    name: 'Line 3D',
+    name: 'CHART_TYPES.LINE3D.NAME',
     icon: 'pi pi-share-alt',
-    category: '3D Charts',
-    description:
-      'Three-dimensional line chart for visualizing trajectories and paths in 3D space',
+    category: 'CHART_TYPES.CATEGORIES.3D_CHARTS',
+    description: 'CHART_TYPES.LINE3D.DESCRIPTION',
   },
   {
     id: 'scatter3d',
-    name: 'Scatter 3D',
+    name: 'CHART_TYPES.SCATTER3D.NAME',
     icon: 'pi pi-circle',
-    category: '3D Charts',
-    description:
-      'Three-dimensional scatter plot for exploring relationships across three variables',
+    category: 'CHART_TYPES.CATEGORIES.3D_CHARTS',
+    description: 'CHART_TYPES.SCATTER3D.DESCRIPTION',
   },
   {
     id: 'surface',
-    name: 'Surface Chart',
+    name: 'CHART_TYPES.SURFACE.NAME',
     icon: 'pi pi-map',
-    category: '3D Charts',
-    description:
-      'Renders continuous 3D surfaces from mathematical equations or data grids',
+    category: 'CHART_TYPES.CATEGORIES.3D_CHARTS',
+    description: 'CHART_TYPES.SURFACE.DESCRIPTION',
   },
   {
     id: 'globe',
-    name: 'Globe',
+    name: 'CHART_TYPES.GLOBE.NAME',
     icon: 'pi pi-globe',
-    category: '3D Charts',
-    description:
-      'Interactive 3D globe visualization for geospatial data points',
+    category: 'CHART_TYPES.CATEGORIES.3D_CHARTS',
+    description: 'CHART_TYPES.GLOBE.DESCRIPTION',
   },
   {
     id: 'graphgl',
-    name: 'Graph GL',
+    name: 'CHART_TYPES.GRAPHGL.NAME',
     icon: 'pi pi-share-alt',
-    category: '3D Charts',
-    description:
-      'WebGL-accelerated network graph for large-scale relationship data with GPU rendering',
+    category: 'CHART_TYPES.CATEGORIES.3D_CHARTS',
+    description: 'CHART_TYPES.GRAPHGL.DESCRIPTION',
   },
   {
     id: 'scattergl',
-    name: 'Scatter GL',
+    name: 'CHART_TYPES.SCATTERGL.NAME',
     icon: 'pi pi-circle',
-    category: '3D Charts',
-    description:
-      'WebGL-accelerated scatter plot for rendering millions of data points efficiently',
+    category: 'CHART_TYPES.CATEGORIES.3D_CHARTS',
+    description: 'CHART_TYPES.SCATTERGL.DESCRIPTION',
   },
   {
     id: 'linesgl',
-    name: 'Lines GL',
+    name: 'CHART_TYPES.LINESGL.NAME',
     icon: 'pi pi-chart-line',
-    category: '3D Charts',
-    description:
-      'WebGL-accelerated line rendering for large-scale polyline datasets',
+    category: 'CHART_TYPES.CATEGORIES.3D_CHARTS',
+    description: 'CHART_TYPES.LINESGL.DESCRIPTION',
   },
   {
     id: 'map3d',
-    name: 'Map 3D',
+    name: 'CHART_TYPES.MAP3D.NAME',
     icon: 'pi pi-map',
-    category: '3D Charts',
-    description:
-      'Three-dimensional geographic map visualization with height-encoded data',
+    category: 'CHART_TYPES.CATEGORIES.3D_CHARTS',
+    description: 'CHART_TYPES.MAP3D.DESCRIPTION',
   },
   {
     id: 'flowgl',
-    name: 'Flow GL',
+    name: 'CHART_TYPES.FLOWGL.NAME',
     icon: 'pi pi-arrows-alt',
-    category: '3D Charts',
-    description:
-      'WebGL-accelerated vector field flow visualization for wind, current, or magnetic field data',
+    category: 'CHART_TYPES.CATEGORIES.3D_CHARTS',
+    description: 'CHART_TYPES.FLOWGL.DESCRIPTION',
   },
 
   // 2D Geographic Maps
   {
     id: 'world-map',
-    name: 'World Map',
+    name: 'CHART_TYPES.WORLD_MAP.NAME',
     icon: 'pi pi-globe',
-    category: 'Maps',
-    description:
-      'Choropleth world map using color intensity to show values by country or region',
+    category: 'CHART_TYPES.CATEGORIES.MAPS',
+    description: 'CHART_TYPES.WORLD_MAP.DESCRIPTION',
   },
 
   // 2D Flow Lines
   {
     id: 'flow-lines',
-    name: 'Flow Lines',
+    name: 'CHART_TYPES.FLOW_LINES.NAME',
     icon: 'pi pi-arrow-right-arrow-left',
-    category: 'Flow',
-    description:
-      'Animated directed flow lines between nodes, visualizing movement and connections on a flat canvas',
+    category: 'CHART_TYPES.CATEGORIES.FLOW',
+    description: 'CHART_TYPES.FLOW_LINES.DESCRIPTION',
   },
 
   // 3D Globe overlay charts
   {
     id: 'lines3d',
-    name: 'Lines 3D',
+    name: 'CHART_TYPES.LINES3D.NAME',
     icon: 'pi pi-chart-line',
-    category: '3D Charts',
-    description:
-      'Animated polyline arcs rendered on a 3D globe using longitude/latitude coordinates',
+    category: 'CHART_TYPES.CATEGORIES.3D_CHARTS',
+    description: 'CHART_TYPES.LINES3D.DESCRIPTION',
   },
   {
     id: 'polygons3d',
-    name: 'Polygons 3D',
+    name: 'CHART_TYPES.POLYGONS3D.NAME',
     icon: 'pi pi-map',
-    category: '3D Charts',
-    description:
-      'Extruded 3D polygon regions rendered on a globe, grouped by name with longitude/latitude vertices',
+    category: 'CHART_TYPES.CATEGORIES.3D_CHARTS',
+    description: 'CHART_TYPES.POLYGONS3D.DESCRIPTION',
   },
 ];
 
@@ -498,253 +449,253 @@ export { ECHARTS_THEME_OPTIONS as COLOR_SCHEMES } from '../../../shared/helpers/
 // ECharts-native dropdown options
 
 export const LEGEND_POSITIONS = [
-  { label: 'Top', value: 'top' },
-  { label: 'Right', value: 'right' },
-  { label: 'Bottom', value: 'below' },
-  { label: 'Left', value: 'left' },
+  { label: 'CHART_OPTIONS.FUNNEL_LABEL_POSITION.TOP', value: 'top' },
+  { label: 'CHART_OPTIONS.FUNNEL_ALIGN.RIGHT', value: 'right' },
+  { label: 'CHART_OPTIONS.LEGEND_POSITIONS.BELOW', value: 'below' },
+  { label: 'CHART_OPTIONS.FUNNEL_ALIGN.LEFT', value: 'left' },
 ];
 
 export const LEGEND_TYPES = [
-  { label: 'Plain', value: 'plain' },
-  { label: 'Scroll', value: 'scroll' },
+  { label: 'CHART_OPTIONS.LEGEND_TYPES.PLAIN', value: 'plain' },
+  { label: 'CHART_OPTIONS.LEGEND_TYPES.SCROLL', value: 'scroll' },
 ];
 
 export const LABEL_POSITIONS = [
-  { label: 'Top', value: 'top' },
-  { label: 'Right', value: 'right' },
-  { label: 'Bottom', value: 'bottom' },
-  { label: 'Left', value: 'left' },
-  { label: 'Inside', value: 'inside' },
-  { label: 'Inside Left', value: 'insideLeft' },
-  { label: 'Inside Right', value: 'insideRight' },
-  { label: 'Inside Top', value: 'insideTop' },
-  { label: 'Inside Bottom', value: 'insideBottom' },
+  { label: 'CHART_OPTIONS.LABEL_POSITIONS.TOP', value: 'top' },
+  { label: 'CHART_OPTIONS.FUNNEL_LABEL_POSITION.RIGHT', value: 'right' },
+  { label: 'CHART_OPTIONS.FUNNEL_LABEL_POSITION.BOTTOM', value: 'bottom' },
+  { label: 'CHART_OPTIONS.FUNNEL_LABEL_POSITION.LEFT', value: 'left' },
+  { label: 'CHART_OPTIONS.FUNNEL_LABEL_POSITION.INSIDE', value: 'inside' },
+  { label: 'CHART_OPTIONS.LABEL_POSITIONS.INSIDELEFT', value: 'insideLeft' },
+  { label: 'CHART_OPTIONS.LABEL_POSITIONS.INSIDERIGHT', value: 'insideRight' },
+  { label: 'CHART_OPTIONS.LABEL_POSITIONS.INSIDETOP', value: 'insideTop' },
+  { label: 'CHART_OPTIONS.LABEL_POSITIONS.INSIDEBOTTOM', value: 'insideBottom' },
 ];
 
 export const TOOLTIP_TRIGGERS = [
-  { label: 'Item', value: 'item' },
-  { label: 'Axis', value: 'axis' },
-  { label: 'None', value: 'none' },
+  { label: 'CHART_OPTIONS.TOOLTIP_TRIGGERS.ITEM', value: 'item' },
+  { label: 'CHART_OPTIONS.TOOLTIP_TRIGGERS.AXIS', value: 'axis' },
+  { label: 'CHART_OPTIONS.LINE_STEP.NONE', value: 'none' },
 ];
 
 export const AXIS_POINTER_TYPES = [
-  { label: 'Line', value: 'line' },
-  { label: 'Shadow', value: 'shadow' },
-  { label: 'Cross', value: 'cross' },
-  { label: 'None', value: 'none' },
+  { label: 'CHART_OPTIONS.AXIS_POINTER_TYPES.LINE', value: 'line' },
+  { label: 'CHART_OPTIONS.AXIS_POINTER_TYPES.SHADOW', value: 'shadow' },
+  { label: 'CHART_OPTIONS.AXIS_POINTER_TYPES.CROSS', value: 'cross' },
+  { label: 'CHART_OPTIONS.FUNNEL_SORT.NONE', value: 'none' },
 ];
 
 export const GRID_LINE_STYLES = [
-  { label: 'Solid', value: 'solid' },
-  { label: 'Dashed', value: 'dashed' },
-  { label: 'Dotted', value: 'dotted' },
+  { label: 'CHART_OPTIONS.GRID_LINE_STYLES.SOLID', value: 'solid' },
+  { label: 'CHART_OPTIONS.GRID_LINE_STYLES.DASHED', value: 'dashed' },
+  { label: 'CHART_OPTIONS.GRID_LINE_STYLES.DOTTED', value: 'dotted' },
 ];
 
 export const EMPHASIS_MODES = [
-  { label: 'None', value: 'none' },
-  { label: 'Self', value: 'self' },
-  { label: 'Series', value: 'series' },
+  { label: 'CHART_OPTIONS.SAMPLING.NONE', value: 'none' },
+  { label: 'CHART_OPTIONS.EMPHASIS_FOCUS.SELF', value: 'self' },
+  { label: 'CHART_OPTIONS.EMPHASIS_FOCUS.SERIES', value: 'series' },
 ];
 
 export const ANIMATION_EASINGS = [
-  { label: 'Linear', value: 'linear' },
-  { label: 'Cubic Out', value: 'cubicOut' },
-  { label: 'Elastic Out', value: 'elasticOut' },
-  { label: 'Bounce Out', value: 'bounceOut' },
-  { label: 'Quadratic In/Out', value: 'quadraticInOut' },
-  { label: 'Exponential Out', value: 'exponentialOut' },
+  { label: 'CHART_OPTIONS.ANIMATION_EASINGS.LINEAR', value: 'linear' },
+  { label: 'CHART_OPTIONS.ANIMATION_EASINGS.CUBICOUT', value: 'cubicOut' },
+  { label: 'CHART_OPTIONS.ANIMATION_EASINGS.ELASTICOUT', value: 'elasticOut' },
+  { label: 'CHART_OPTIONS.ANIMATION_EASINGS.BOUNCEOUT', value: 'bounceOut' },
+  { label: 'CHART_OPTIONS.ANIMATION_EASINGS.QUADRATICINOUT', value: 'quadraticInOut' },
+  { label: 'CHART_OPTIONS.ANIMATION_EASINGS.EXPONENTIALOUT', value: 'exponentialOut' },
 ];
 
 // Line/Area chart ECharts options
 export const LINE_STEP_OPTIONS = [
-  { label: 'None', value: 'none' },
-  { label: 'Start', value: 'start' },
-  { label: 'Middle', value: 'middle' },
-  { label: 'End', value: 'end' },
+  { label: 'CHART_OPTIONS.SUNBURST_SORT.NONE', value: 'none' },
+  { label: 'CHART_OPTIONS.LINE_STEP.START', value: 'start' },
+  { label: 'CHART_OPTIONS.LINE_STEP.MIDDLE', value: 'middle' },
+  { label: 'CHART_OPTIONS.LINE_STEP.END', value: 'end' },
 ];
 
 export const LINE_STYLE_TYPES = [
-  { label: 'Solid', value: 'solid' },
-  { label: 'Dashed', value: 'dashed' },
-  { label: 'Dotted', value: 'dotted' },
+  { label: 'CHART_OPTIONS.LINE_STYLE_TYPES.SOLID', value: 'solid' },
+  { label: 'CHART_OPTIONS.LINE_STYLE_TYPES.DASHED', value: 'dashed' },
+  { label: 'CHART_OPTIONS.LINE_STYLE_TYPES.DOTTED', value: 'dotted' },
 ];
 
 export const SYMBOL_SHAPES = [
-  { label: 'Circle', value: 'circle' },
-  { label: 'Rectangle', value: 'rect' },
-  { label: 'Round Rect', value: 'roundRect' },
-  { label: 'Triangle', value: 'triangle' },
-  { label: 'Diamond', value: 'diamond' },
-  { label: 'Pin', value: 'pin' },
-  { label: 'Arrow', value: 'arrow' },
-  { label: 'None', value: 'none' },
+  { label: 'CHART_OPTIONS.SYMBOL_SHAPES.CIRCLE', value: 'circle' },
+  { label: 'CHART_OPTIONS.SYMBOL_SHAPES.RECT', value: 'rect' },
+  { label: 'CHART_OPTIONS.SYMBOL_SHAPES.ROUNDRECT', value: 'roundRect' },
+  { label: 'CHART_OPTIONS.SYMBOL_SHAPES.TRIANGLE', value: 'triangle' },
+  { label: 'CHART_OPTIONS.SYMBOL_SHAPES.DIAMOND', value: 'diamond' },
+  { label: 'CHART_OPTIONS.SYMBOL_SHAPES.PIN', value: 'pin' },
+  { label: 'CHART_OPTIONS.SYMBOL_SHAPES.ARROW', value: 'arrow' },
+  { label: 'CHART_OPTIONS.EMPHASIS_FOCUS.NONE', value: 'none' },
 ];
 
 // Pie chart ECharts options
 export const PIE_LABEL_POSITIONS = [
-  { label: 'Outside', value: 'outside' },
-  { label: 'Inside', value: 'inside' },
-  { label: 'Center', value: 'center' },
+  { label: 'CHART_OPTIONS.FUNNEL_LABEL_POSITION.OUTSIDE', value: 'outside' },
+  { label: 'CHART_OPTIONS.PIE_LABEL_POSITIONS.INSIDE', value: 'inside' },
+  { label: 'CHART_OPTIONS.FUNNEL_ALIGN.CENTER', value: 'center' },
 ];
 
 export const PIE_SELECTED_MODES = [
-  { label: 'None', value: 'none' },
-  { label: 'Single', value: 'single' },
-  { label: 'Multiple', value: 'multiple' },
-  { label: 'Series', value: 'series' },
+  { label: 'CHART_OPTIONS.DATA_ZOOM_FILTER_MODE.NONE', value: 'none' },
+  { label: 'CHART_OPTIONS.PIE_SELECTED_MODES.SINGLE', value: 'single' },
+  { label: 'CHART_OPTIONS.PIE_SELECTED_MODES.MULTIPLE', value: 'multiple' },
+  { label: 'CHART_OPTIONS.PIE_SELECTED_MODES.SERIES', value: 'series' },
 ];
 
 export const PIE_ROSE_TYPES = [
-  { label: 'None', value: 'none' },
-  { label: 'Radius', value: 'radius' },
-  { label: 'Area', value: 'area' },
+  { label: 'CHART_OPTIONS.PIE_ROSE_TYPES.NONE', value: 'none' },
+  { label: 'CHART_OPTIONS.PIE_ROSE_TYPES.RADIUS', value: 'radius' },
+  { label: 'CHART_OPTIONS.PIE_ROSE_TYPES.AREA', value: 'area' },
 ];
 
 // Funnel chart options
 export const FUNNEL_SORT_OPTIONS = [
-  { label: 'Descending', value: 'descending' },
-  { label: 'Ascending', value: 'ascending' },
-  { label: 'None', value: 'none' },
+  { label: 'CHART_OPTIONS.FUNNEL_SORT.DESCENDING', value: 'descending' },
+  { label: 'CHART_OPTIONS.FUNNEL_SORT.ASCENDING', value: 'ascending' },
+  { label: 'CHART_OPTIONS.FUNNEL_SORT.NONE', value: 'none' },
 ];
 
 export const FUNNEL_ALIGN_OPTIONS = [
-  { label: 'Center', value: 'center' },
-  { label: 'Left', value: 'left' },
-  { label: 'Right', value: 'right' },
+  { label: 'CHART_OPTIONS.FUNNEL_ALIGN.CENTER', value: 'center' },
+  { label: 'CHART_OPTIONS.THEME_RIVER_LABEL_POSITION.LEFT', value: 'left' },
+  { label: 'CHART_OPTIONS.THEME_RIVER_LABEL_POSITION.RIGHT', value: 'right' },
 ];
 
 // Radar chart options
 export const RADAR_SHAPES = [
-  { label: 'Polygon', value: 'polygon' },
-  { label: 'Circle', value: 'circle' },
+  { label: 'CHART_OPTIONS.RADAR_SHAPES.POLYGON', value: 'polygon' },
+  { label: 'CHART_OPTIONS.RADAR_SHAPES.CIRCLE', value: 'circle' },
 ];
 
 // Graph chart options
 export const GRAPH_LAYOUTS = [
-  { label: 'Force', value: 'force' },
-  { label: 'Circular', value: 'circular' },
+  { label: 'CHART_OPTIONS.GRAPH_LAYOUTS.FORCE', value: 'force' },
+  { label: 'CHART_OPTIONS.GRAPH_LAYOUTS.CIRCULAR', value: 'circular' },
 ];
 
 // Tree chart options
 export const TREE_ORIENTATIONS = [
-  { label: 'Top to Bottom', value: 'TB' },
-  { label: 'Bottom to Top', value: 'BT' },
-  { label: 'Left to Right', value: 'LR' },
-  { label: 'Right to Left', value: 'RL' },
+  { label: 'CHART_OPTIONS.TREE_ORIENTATIONS.TB', value: 'TB' },
+  { label: 'CHART_OPTIONS.TREE_ORIENTATIONS.BT', value: 'BT' },
+  { label: 'CHART_OPTIONS.TREE_ORIENTATIONS.LR', value: 'LR' },
+  { label: 'CHART_OPTIONS.TREE_ORIENTATIONS.RL', value: 'RL' },
 ];
 
 export const TREE_LAYOUTS = [
-  { label: 'Orthogonal', value: 'orthogonal' },
-  { label: 'Radial', value: 'radial' },
+  { label: 'CHART_OPTIONS.TREE_LAYOUTS.ORTHOGONAL', value: 'orthogonal' },
+  { label: 'CHART_OPTIONS.SUNBURST_LABEL_ROTATE.RADIAL', value: 'radial' },
 ];
 
 // Sankey chart options
 export const SANKEY_ORIENTATIONS = [
-  { label: 'Horizontal', value: 'horizontal' },
-  { label: 'Vertical', value: 'vertical' },
+  { label: 'CHART_OPTIONS.FUNNEL_ORIENT.HORIZONTAL', value: 'horizontal' },
+  { label: 'CHART_OPTIONS.FUNNEL_ORIENT.VERTICAL', value: 'vertical' },
 ];
 
 // Tree chart edge shapes
 export const TREE_EDGE_SHAPES = [
-  { label: 'Curve', value: 'curve' },
-  { label: 'Polyline', value: 'polyline' },
+  { label: 'CHART_OPTIONS.TREE_EDGE_SHAPES.CURVE', value: 'curve' },
+  { label: 'CHART_OPTIONS.TREE_EDGE_SHAPES.POLYLINE', value: 'polyline' },
 ];
 
 // Graph chart edge symbols
 export const GRAPH_EDGE_SYMBOLS = [
-  { label: 'None', value: 'none' },
-  { label: 'Circle', value: 'circle' },
-  { label: 'Arrow', value: 'arrow' },
+  { label: 'CHART_OPTIONS.GRAPH_EDGE_SYMBOLS.NONE', value: 'none' },
+  { label: 'CHART_OPTIONS.GRAPH_EDGE_SYMBOLS.CIRCLE', value: 'circle' },
+  { label: 'CHART_OPTIONS.GRAPH_EDGE_SYMBOLS.ARROW', value: 'arrow' },
 ];
 
 // Treemap node click actions
 export const TREEMAP_NODE_CLICK_OPTIONS = [
-  { label: 'Disabled', value: 'false' },
-  { label: 'Zoom In', value: 'zoomToNode' },
-  { label: 'Link', value: 'link' },
+  { label: 'CHART_OPTIONS.TREEMAP_NODE_CLICK.FALSE', value: 'false' },
+  { label: 'CHART_OPTIONS.TREEMAP_NODE_CLICK.ZOOMTONODE', value: 'zoomToNode' },
+  { label: 'CHART_OPTIONS.TREEMAP_NODE_CLICK.LINK', value: 'link' },
 ];
 
 // Sunburst node click actions
 export const SUNBURST_NODE_CLICK_OPTIONS = [
-  { label: 'Disabled', value: 'false' },
-  { label: 'Root to Node', value: 'rootToNode' },
-  { label: 'Link', value: 'link' },
+  { label: 'CHART_OPTIONS.SUNBURST_NODE_CLICK.FALSE', value: 'false' },
+  { label: 'CHART_OPTIONS.SUNBURST_NODE_CLICK.ROOTTONODE', value: 'rootToNode' },
+  { label: 'CHART_OPTIONS.SUNBURST_NODE_CLICK.LINK', value: 'link' },
 ];
 
 // Box plot layout orientations
 export const BOXPLOT_LAYOUTS = [
-  { label: 'Horizontal', value: 'horizontal' },
-  { label: 'Vertical', value: 'vertical' },
+  { label: 'CHART_OPTIONS.VISUAL_MAP_ORIENT.HORIZONTAL', value: 'horizontal' },
+  { label: 'CHART_OPTIONS.VISUAL_MAP_ORIENT.VERTICAL', value: 'vertical' },
 ];
 
 // Pictorial bar symbol positions
 export const PICTORIAL_SYMBOL_POSITIONS = [
-  { label: 'Start', value: 'start' },
-  { label: 'Center', value: 'center' },
-  { label: 'End', value: 'end' },
+  { label: 'CHART_OPTIONS.PICTORIAL_REPEAT_DIRECTION.START', value: 'start' },
+  { label: 'CHART_OPTIONS.PICTORIAL_SYMBOL_POSITIONS.CENTER', value: 'center' },
+  { label: 'CHART_OPTIONS.PICTORIAL_REPEAT_DIRECTION.END', value: 'end' },
 ];
 
 // Effect scatter show-on options
 export const EFFECT_SHOW_ON_OPTIONS = [
-  { label: 'Render', value: 'render' },
-  { label: 'Emphasis', value: 'emphasis' },
+  { label: 'CHART_OPTIONS.EFFECT_SHOW_ON.RENDER', value: 'render' },
+  { label: 'CHART_OPTIONS.EFFECT_SHOW_ON.EMPHASIS', value: 'emphasis' },
 ];
 
 // Sankey node alignment options
 export const SANKEY_NODE_ALIGNS = [
-  { label: 'Justify', value: 'justify' },
-  { label: 'Left', value: 'left' },
-  { label: 'Right', value: 'right' },
+  { label: 'CHART_OPTIONS.SANKEY_NODE_ALIGNS.JUSTIFY', value: 'justify' },
+  { label: 'CHART_OPTIONS.SANKEY_NODE_ALIGNS.LEFT', value: 'left' },
+  { label: 'CHART_OPTIONS.SANKEY_NODE_ALIGNS.RIGHT', value: 'right' },
 ];
 
 // Line/Area sampling options
 export const SAMPLING_OPTIONS = [
-  { label: 'None', value: 'none' },
-  { label: 'LTTB', value: 'lttb' },
-  { label: 'Average', value: 'average' },
-  { label: 'Max', value: 'max' },
-  { label: 'Min', value: 'min' },
-  { label: 'Sum', value: 'sum' },
+  { label: 'CHART_OPTIONS.SAMPLING.NONE', value: 'none' },
+  { label: 'CHART_OPTIONS.SAMPLING.LTTB', value: 'lttb' },
+  { label: 'CHART_OPTIONS.SAMPLING.AVERAGE', value: 'average' },
+  { label: 'CHART_OPTIONS.SAMPLING.MAX', value: 'max' },
+  { label: 'CHART_OPTIONS.SAMPLING.MIN', value: 'min' },
+  { label: 'CHART_OPTIONS.SAMPLING.SUM', value: 'sum' },
 ];
 
 // Line/Area showAllSymbol options
 export const SHOW_ALL_SYMBOL_OPTIONS = [
-  { label: 'Auto', value: 'auto' },
-  { label: 'Yes', value: 'true' },
-  { label: 'No', value: 'false' },
+  { label: 'CHART_OPTIONS.SHOW_ALL_SYMBOL.AUTO', value: 'auto' },
+  { label: 'CHART_OPTIONS.SHOW_ALL_SYMBOL.TRUE', value: 'true' },
+  { label: 'CHART_OPTIONS.SHOW_ALL_SYMBOL.FALSE', value: 'false' },
 ];
 
 // Bar stack strategy options
 export const STACK_STRATEGY_OPTIONS = [
-  { label: 'Same Sign', value: 'samesign' },
-  { label: 'All', value: 'all' },
-  { label: 'Positive', value: 'positive' },
-  { label: 'Negative', value: 'negative' },
+  { label: 'CHART_OPTIONS.STACK_STRATEGY.SAMESIGN', value: 'samesign' },
+  { label: 'CHART_OPTIONS.STACK_STRATEGY.ALL', value: 'all' },
+  { label: 'CHART_OPTIONS.STACK_STRATEGY.POSITIVE', value: 'positive' },
+  { label: 'CHART_OPTIONS.STACK_STRATEGY.NEGATIVE', value: 'negative' },
 ];
 
 // Scatter ripple brush type options
 export const RIPPLE_BRUSH_TYPE_OPTIONS = [
-  { label: 'Stroke', value: 'stroke' },
-  { label: 'Fill', value: 'fill' },
+  { label: 'CHART_OPTIONS.RIPPLE_BRUSH_TYPE.STROKE', value: 'stroke' },
+  { label: 'CHART_OPTIONS.RIPPLE_BRUSH_TYPE.FILL', value: 'fill' },
 ];
 
 // Funnel orientation options
 export const FUNNEL_ORIENT_OPTIONS = [
-  { label: 'Vertical', value: 'vertical' },
-  { label: 'Horizontal', value: 'horizontal' },
+  { label: 'CHART_OPTIONS.FUNNEL_ORIENT.VERTICAL', value: 'vertical' },
+  { label: 'CHART_OPTIONS.FUNNEL_ORIENT.HORIZONTAL', value: 'horizontal' },
 ];
 
 // Sunburst sort options
 export const SUNBURST_SORT_OPTIONS = [
-  { label: 'Descending', value: 'desc' },
-  { label: 'Ascending', value: 'asc' },
-  { label: 'None', value: 'none' },
+  { label: 'CHART_OPTIONS.SUNBURST_SORT.DESC', value: 'desc' },
+  { label: 'CHART_OPTIONS.SUNBURST_SORT.ASC', value: 'asc' },
+  { label: 'CHART_OPTIONS.SUNBURST_SORT.NONE', value: 'none' },
 ];
 
 // Pictorial bar symbol repeat direction
 export const PICTORIAL_REPEAT_DIRECTION_OPTIONS = [
-  { label: 'Start', value: 'start' },
-  { label: 'End', value: 'end' },
+  { label: 'CHART_OPTIONS.AREA_ORIGIN.START', value: 'start' },
+  { label: 'CHART_OPTIONS.AREA_ORIGIN.END', value: 'end' },
 ];
 
 // ─── New dropdown option lists for Phase 4b ────────────────────────────────
@@ -752,53 +703,53 @@ export const PICTORIAL_REPEAT_DIRECTION_OPTIONS = [
 // data-zoom filter mode, sankey label edge, etc.) added to the sidebar.
 
 export const EMPHASIS_FOCUS_OPTIONS = [
-  { label: 'None', value: 'none' },
-  { label: 'Self', value: 'self' },
-  { label: 'Series', value: 'series' },
-  { label: 'Adjacency', value: 'adjacency' }, // sankey/graph
-  { label: 'Ancestor', value: 'ancestor' }, // sunburst
-  { label: 'Descendant', value: 'descendant' }, // sunburst
+  { label: 'CHART_OPTIONS.EMPHASIS_FOCUS.NONE', value: 'none' },
+  { label: 'CHART_OPTIONS.EMPHASIS_FOCUS.SELF', value: 'self' },
+  { label: 'CHART_OPTIONS.EMPHASIS_FOCUS.SERIES', value: 'series' },
+  { label: 'CHART_OPTIONS.EMPHASIS_FOCUS.ADJACENCY', value: 'adjacency' }, // sankey/graph
+  { label: 'CHART_OPTIONS.EMPHASIS_FOCUS.ANCESTOR', value: 'ancestor' }, // sunburst
+  { label: 'CHART_OPTIONS.EMPHASIS_FOCUS.DESCENDANT', value: 'descendant' }, // sunburst
 ];
 
 export const VISUAL_MAP_ORIENT_OPTIONS = [
-  { label: 'Horizontal', value: 'horizontal' },
-  { label: 'Vertical', value: 'vertical' },
+  { label: 'CHART_OPTIONS.VISUAL_MAP_ORIENT.HORIZONTAL', value: 'horizontal' },
+  { label: 'CHART_OPTIONS.VISUAL_MAP_ORIENT.VERTICAL', value: 'vertical' },
 ];
 
 export const VISUAL_MAP_TYPE_OPTIONS = [
-  { label: 'Continuous', value: 'continuous' },
-  { label: 'Piecewise', value: 'piecewise' },
+  { label: 'CHART_OPTIONS.VISUAL_MAP_TYPE.CONTINUOUS', value: 'continuous' },
+  { label: 'CHART_OPTIONS.VISUAL_MAP_TYPE.PIECEWISE', value: 'piecewise' },
 ];
 
 export const DATA_ZOOM_TYPE_OPTIONS = [
-  { label: 'Inside only', value: 'inside' },
-  { label: 'Slider only', value: 'slider' },
-  { label: 'Both', value: 'both' },
+  { label: 'CHART_OPTIONS.DATA_ZOOM_TYPE.INSIDE', value: 'inside' },
+  { label: 'CHART_OPTIONS.DATA_ZOOM_TYPE.SLIDER', value: 'slider' },
+  { label: 'CHART_OPTIONS.DATA_ZOOM_TYPE.BOTH', value: 'both' },
 ];
 
 export const DATA_ZOOM_FILTER_MODE_OPTIONS = [
-  { label: 'Filter', value: 'filter' },
-  { label: 'Weak filter', value: 'weakFilter' },
-  { label: 'Empty', value: 'empty' },
-  { label: 'None', value: 'none' },
+  { label: 'CHART_OPTIONS.DATA_ZOOM_FILTER_MODE.FILTER', value: 'filter' },
+  { label: 'CHART_OPTIONS.DATA_ZOOM_FILTER_MODE.WEAKFILTER', value: 'weakFilter' },
+  { label: 'CHART_OPTIONS.DATA_ZOOM_FILTER_MODE.EMPTY', value: 'empty' },
+  { label: 'CHART_OPTIONS.DATA_ZOOM_FILTER_MODE.NONE', value: 'none' },
 ];
 
 export const AREA_ORIGIN_OPTIONS = [
-  { label: 'Auto', value: 'auto' },
-  { label: 'Start', value: 'start' },
-  { label: 'End', value: 'end' },
+  { label: 'CHART_OPTIONS.AREA_ORIGIN.AUTO', value: 'auto' },
+  { label: 'CHART_OPTIONS.AREA_ORIGIN.START', value: 'start' },
+  { label: 'CHART_OPTIONS.AREA_ORIGIN.END', value: 'end' },
 ];
 
 export const SUNBURST_LABEL_ROTATE_OPTIONS = [
-  { label: 'Radial', value: 'radial' },
-  { label: 'Tangential', value: 'tangential' },
-  { label: 'Horizontal (0°)', value: 0 },
+  { label: 'CHART_OPTIONS.SUNBURST_LABEL_ROTATE.RADIAL', value: 'radial' },
+  { label: 'CHART_OPTIONS.SUNBURST_LABEL_ROTATE.TANGENTIAL', value: 'tangential' },
+  { label: 'CHART_OPTIONS.SUNBURST_LABEL_ROTATE.0', value: 0 },
 ];
 
 export const COLOR_MAPPING_BY_OPTIONS = [
-  { label: 'Value', value: 'value' },
-  { label: 'Index', value: 'index' },
-  { label: 'ID', value: 'id' },
+  { label: 'CHART_OPTIONS.COLOR_MAPPING_BY.VALUE', value: 'value' },
+  { label: 'CHART_OPTIONS.COLOR_MAPPING_BY.INDEX', value: 'index' },
+  { label: 'CHART_OPTIONS.COLOR_MAPPING_BY.ID', value: 'id' },
 ];
 
 export const MAP_NAME_PROPERTY_HINTS = [
@@ -809,33 +760,33 @@ export const MAP_NAME_PROPERTY_HINTS = [
 ];
 
 export const FUNNEL_LABEL_POSITION_OPTIONS = [
-  { label: 'Inside', value: 'inside' },
-  { label: 'Outside', value: 'outside' },
-  { label: 'Right', value: 'right' },
-  { label: 'Left', value: 'left' },
-  { label: 'Top', value: 'top' },
-  { label: 'Bottom', value: 'bottom' },
+  { label: 'CHART_OPTIONS.FUNNEL_LABEL_POSITION.INSIDE', value: 'inside' },
+  { label: 'CHART_OPTIONS.FUNNEL_LABEL_POSITION.OUTSIDE', value: 'outside' },
+  { label: 'CHART_OPTIONS.FUNNEL_LABEL_POSITION.RIGHT', value: 'right' },
+  { label: 'CHART_OPTIONS.FUNNEL_LABEL_POSITION.LEFT', value: 'left' },
+  { label: 'CHART_OPTIONS.FUNNEL_LABEL_POSITION.TOP', value: 'top' },
+  { label: 'CHART_OPTIONS.FUNNEL_LABEL_POSITION.BOTTOM', value: 'bottom' },
 ];
 
 export const THEME_RIVER_LABEL_POSITION_OPTIONS = [
-  { label: 'Left', value: 'left' },
-  { label: 'Right', value: 'right' },
+  { label: 'CHART_OPTIONS.THEME_RIVER_LABEL_POSITION.LEFT', value: 'left' },
+  { label: 'CHART_OPTIONS.THEME_RIVER_LABEL_POSITION.RIGHT', value: 'right' },
 ];
 
 export const SHADING_MODE_OPTIONS = [
-  { label: 'Color', value: 'color' },
-  { label: 'Lambert', value: 'lambert' },
-  { label: 'Realistic', value: 'realistic' },
+  { label: 'CHART_OPTIONS.SHADING_MODE.COLOR', value: 'color' },
+  { label: 'CHART_OPTIONS.SHADING_MODE.LAMBERT', value: 'lambert' },
+  { label: 'CHART_OPTIONS.SHADING_MODE.REALISTIC', value: 'realistic' },
 ];
 
 // Pictorial bar chart options
 export const PICTORIAL_SYMBOLS = [
-  { label: 'Round Rect', value: 'roundRect' },
-  { label: 'Circle', value: 'circle' },
-  { label: 'Rectangle', value: 'rect' },
-  { label: 'Triangle', value: 'triangle' },
-  { label: 'Diamond', value: 'diamond' },
-  { label: 'Arrow', value: 'arrow' },
+  { label: 'CHART_OPTIONS.PICTORIAL_SYMBOLS.ROUNDRECT', value: 'roundRect' },
+  { label: 'CHART_OPTIONS.PICTORIAL_SYMBOLS.CIRCLE', value: 'circle' },
+  { label: 'CHART_OPTIONS.PICTORIAL_SYMBOLS.RECT', value: 'rect' },
+  { label: 'CHART_OPTIONS.PICTORIAL_SYMBOLS.TRIANGLE', value: 'triangle' },
+  { label: 'CHART_OPTIONS.PICTORIAL_SYMBOLS.DIAMOND', value: 'diamond' },
+  { label: 'CHART_OPTIONS.PICTORIAL_SYMBOLS.ARROW', value: 'arrow' },
 ];
 
 // Default chart configuration with all possible ECharts options
@@ -854,7 +805,13 @@ export const DEFAULT_CHART_CONFIG = {
   yAxisLabel: 'Value',
   xAxisLabelRotate: 0, // axisLabel.rotate (0-90)
   niceScale: false, // yAxis.nice (was roundDomains)
-  autoScale: true, // yAxis.scale
+  // yAxis.scale — default OFF so value axes start at zero. With scale:true
+  // ECharts pins the axis min to the data minimum, which renders the
+  // smallest bar with zero height (it sits exactly on the baseline and
+  // disappears) — a misleading non-zero-baseline. Users can still opt in
+  // via the "Auto Scale" toggle for line/scatter where a zoomed value
+  // window is desirable.
+  autoScale: false, // yAxis.scale
   boundaryGap: true, // xAxis.boundaryGap
   inverseX: false, // xAxis.inverse
   inverseY: false, // yAxis.inverse
@@ -909,7 +866,11 @@ export const DEFAULT_CHART_CONFIG = {
   symbolSize: 4, // series.symbolSize
   lineWidth: 2, // series.lineStyle.width
   connectNulls: false, // series.connectNulls
-  rangeFillOpacity: 0.15, // series.areaStyle.opacity (for line with area)
+  // series.areaStyle.opacity. Default 0 = NO fill, so a plain "line" chart is
+  // just a line. A non-zero default put a 0.15 area fill under every line
+  // chart, making it look like an area chart. The dedicated area chart types
+  // set their own opacity; users can raise this for a subtle line fill.
+  rangeFillOpacity: 0,
   endLabel: false, // series.endLabel.show
   sampling: 'none', // series.sampling: 'none' | 'lttb' | 'average' | 'max' | 'min' | 'sum'
   showAllSymbol: 'auto', // series.showAllSymbol: 'auto' | true | false

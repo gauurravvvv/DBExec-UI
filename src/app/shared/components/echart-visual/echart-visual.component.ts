@@ -11,9 +11,46 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
+import * as echarts from 'echarts';
 import { requiresGl } from '../../../modules/analyses/constants/charts.constants';
 import { buildChartOption } from '../../helpers/echarts-option-builder';
 import { loadEchartsGl } from '../../modules/shared-charts.module';
+
+/**
+ * Chart types that render on a registered GeoJSON map. The `world.json`
+ * asset ships in src/assets/maps but was never registered with ECharts via
+ * registerMap(), so map/geo3D series silently produced no geometry. We
+ * lazy-load + register it once, process-wide, the first time such a chart
+ * mounts.
+ */
+const MAP_CHART_TYPES = new Set([
+  'world-map',
+  'map3d',
+  'polygons3d',
+  'globe',
+  'lines3d',
+  'flowgl',
+  'linesgl',
+]);
+
+let mapRegistration: Promise<void> | null = null;
+
+function ensureWorldMapRegistered(): Promise<void> {
+  if (mapRegistration) return mapRegistration;
+  mapRegistration = fetch('assets/maps/world.json')
+    .then(r => r.json())
+    .then(geo => {
+      // Register under both names the builders reference: plain `world`
+      // (world-map / globe) and `polygons3d_world` (geo3D map3d/polygons3d).
+      echarts.registerMap('world', geo as any);
+      echarts.registerMap('polygons3d_world', geo as any);
+    })
+    .catch(() => {
+      // Don't wedge rendering if the asset is missing — the chart will fall
+      // back to an empty map rather than hang on the gate forever.
+    });
+  return mapRegistration;
+}
 
 @Component({
   selector: 'app-echart-visual',
@@ -49,6 +86,17 @@ export class EchartVisualComponent
    * rendering with missing GL series classes (which would throw).
    */
   glReady = true;
+  /**
+   * Map-registration gate, twin of glReady. Stays false for map/geo chart
+   * types until the GeoJSON has been fetched + registerMap() has run, so a
+   * choropleth/geo3D series never renders against an unregistered map name.
+   */
+  mapReady = true;
+
+  /** Render only when both async prerequisites (GL libs + map data) are ready. */
+  get renderReady(): boolean {
+    return this.glReady && this.mapReady;
+  }
 
   /**
    * Init options passed to `echarts.init`. `useDirtyRect: true` switches the
@@ -76,6 +124,7 @@ export class EchartVisualComponent
 
   ngOnInit(): void {
     this.ensureGlLoaded();
+    this.ensureMapLoaded();
     this.updateChartOption();
     this.previousConfigSnapshot = JSON.stringify(this.chartConfig);
   }
@@ -83,6 +132,7 @@ export class EchartVisualComponent
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['chartType']) {
       this.ensureGlLoaded();
+      this.ensureMapLoaded();
     }
     if (
       changes['data'] ||
@@ -138,6 +188,24 @@ export class EchartVisualComponent
     });
   }
 
+  /**
+   * For map/geo chart types, register the world GeoJSON before rendering.
+   * No-op for everything else. Mirrors the GL gate.
+   */
+  private ensureMapLoaded(): void {
+    if (!MAP_CHART_TYPES.has(this.chartType)) {
+      this.mapReady = true;
+      return;
+    }
+    this.mapReady = false;
+    ensureWorldMapRegistered().then(() => {
+      this.mapReady = true;
+      // Rebuild now that the map exists so the series binds to real geometry.
+      this.updateChartOption();
+      this.cdr.markForCheck();
+    });
+  }
+
   private updateChartOption(): void {
     const opt = buildChartOption(
       this.data,
@@ -156,9 +224,13 @@ export class EchartVisualComponent
     // still take the cheap merge path.
     const zoomCount = Array.isArray(opt.dataZoom) ? opt.dataZoom.length : 0;
     const seriesCount = Array.isArray(opt.series) ? opt.series.length : 0;
+    // Any DECREASE in dataZoom component count (e.g. Type: Both→Slider drops
+    // 2→1, or toggling off drops →0) can't be expressed by merge-mode
+    // setOption — it merges arrays by index and leaves the surplus component
+    // in place (so 'slider' showed [slider, inside]). Treat any shrink as a
+    // structural change and do a full [options] replace.
     const structuralShrink =
-      (this.prevZoomCount > 0 && zoomCount === 0) ||
-      seriesCount < this.prevSeriesCount;
+      zoomCount < this.prevZoomCount || seriesCount < this.prevSeriesCount;
     this.prevZoomCount = zoomCount;
     this.prevSeriesCount = seriesCount;
 

@@ -239,7 +239,17 @@
     "ORG_PATTERN": "组织名称必须以字母或数字开头",
     "USERNAME_PATTERN_DETAILED": "用户名必须以字母开头，只能包含字母、数字、点、下划线或连字符",
     "INVALID_PASSWORD_FORMAT": "密码格式无效",
-    "EMAIL_INVALID_ADDRESS": "请输入有效的电子邮件地址"
+    "EMAIL_INVALID_ADDRESS": "请输入有效的电子邮件地址",
+    "MAX_CHARACTERS": "最多允许 {{max}} 个字符",
+    "MIN_CHARACTERS": "至少需要 {{min}} 个字符",
+    "VALUE_BETWEEN": "值必须在 {{min}} 到 {{max}} 之间",
+    "VALUE_GTE": "值必须 ≥ {{min}}",
+    "VALUE_LTE": "值必须 ≤ {{max}}",
+    "PERCENT_GTE": "百分比值必须 ≥ {{min}}%",
+    "PERCENT_LTE": "百分比值必须 ≤ {{max}}%",
+    "PX_GTE": "像素值必须 ≥ {{min}}",
+    "PX_LTE": "像素值必须 ≤ {{max}}",
+    "DIMENSION_SHAPE": "请使用 {{shapes}}"
   },
   "HEADER": {
     "SEARCH_PLACEHOLDER": "搜索...",
@@ -770,19 +780,19 @@
     "ADD_VISUAL": "添加可视化",
     "ADD_VISUAL_HINT": "点击「添加可视化」开始",
     "ALIGNMENT": "对齐",
-    "ALLOW_SELECT": "Allow Select",
-    "AMBIENT_LIGHT_INTENSITY": "Ambient Light Intensity",
+    "ALLOW_SELECT": "允许选择",
+    "AMBIENT_LIGHT_INTENSITY": "环境光强度",
     "ANALYSIS_DETAILS": "分析详情",
     "ANALYSIS_FIELDS": "分析字段",
     "ANALYSIS_NAME": "分析名称",
-    "ANCHOR_SIZE": "Anchor Size",
+    "ANCHOR_SIZE": "锚点大小",
     "ANIMATED_EFFECT": "动画效果",
     "ANIMATION": "动画",
-    "APPEND_TO_BODY": "Append Tooltip to Body",
-    "AREA_BASELINE": "Area Baseline",
+    "APPEND_TO_BODY": "将提示附加到 Body",
+    "AREA_BASELINE": "区域基线",
     "AREA_OPACITY": "区域不透明度",
     "AREA_OPTIONS": "面积图选项",
-    "ASPECT_SCALE": "Aspect Scale",
+    "ASPECT_SCALE": "宽高比缩放",
     "ASSIGN": "将数据字段分配到轴以查看图表",
     "AUTO": "自动",
     "AUTO_OR_NUMBER": "自动或数字",
@@ -791,16 +801,16 @@
     "AUTO_SCALE": "自动缩放",
     "AVOID_LABEL_OVERLAP": "避免标签重叠",
     "AXIS": "轴",
-    "AXIS_EXPAND_COUNT": "Axis Expand Count",
-    "AXIS_EXPANDABLE": "Axis Expandable",
+    "AXIS_EXPAND_COUNT": "轴展开数量",
+    "AXIS_EXPANDABLE": "轴可展开",
     "AXIS_LINE_ROUND_CAP": "轴线圆头",
     "AXIS_LINE_WIDTH": "轴线宽度",
     "AXIS_POINTER": "坐标轴指示器",
     "BAR_GAP": "柱间距",
-    "BAR_MAX_WIDTH": "Bar Max Width",
-    "BAR_MIN_WIDTH": "Bar Min Width",
+    "BAR_MAX_WIDTH": "柱状图最大宽度",
+    "BAR_MIN_WIDTH": "柱状图最小宽度",
     "BAR_OPTIONS": "柱状图选项",
-    "BAR_SIZING": "Bar Sizing",
+    "BAR_SIZING": "柱状图尺寸",
     "BAR_WIDTH": "柱宽",
     "BASIC_INFORMATION": "基本信息",
     "BEAR_BORDER_COLOR": "阴线边框颜色",
@@ -808,14 +818,14 @@
     "BORDER_RADIUS": "圆角半径",
     "BORDER_WIDTH": "边框宽度",
     "BOUNDARY_GAP": "边界间隔",
-    "BOUNDARY_GAP_PERCENT": "Boundary Gap (%)",
+    "BOUNDARY_GAP_PERCENT": "边界间隙 (%)",
     "BOX_PLOT_OPTIONS": "箱线图选项",
     "BUBBLE_OPTIONS": "气泡图选项",
     "BULL_BORDER_COLOR": "阳线边框颜色",
     "BULL_UP_COLOR": "阳线（上涨）颜色",
-    "CALCULABLE": "Calculable",
+    "CALCULABLE": "可计算",
     "CANDLESTICK_OPTIONS": "K线图选项",
-    "CANDLESTICK_PERF": "Candlestick Performance",
+    "CANDLESTICK_PERF": "K线图性能",
     "CARD_DISPLAY": "卡片显示",
     "CATEGORY": "分类",
     "CATEGORY_GAP": "类目间距",
@@ -826,9 +836,9 @@
     "CLICK_FIELD_FROM_LEFT_PANEL": "从左侧面板点击字段",
     "CLICK_TO_CONFIGURE": "从可视化面板中选择一种类型",
     "CLICK_TO_SELECT_FIELD": "点击选择字段",
-    "CLIP_TO_GRID": "Clip to Grid",
+    "CLIP_TO_GRID": "裁剪到网格",
     "CLOCKWISE": "顺时针",
-    "COLOR_MAPPING_BY": "Color Mapping By",
+    "COLOR_MAPPING_BY": "颜色映射依据",
     "COLOR_SCHEME": "配色方案",
     "COLUMN": "字段",
     "CONFIRM_DELETE_BULK": "确定要删除已选中的 {{count}} 个分析吗？",
@@ -853,7 +863,7 @@
     "DATA_MAPPING": "数据映射",
     "DATA_ZOOM": "数据缩放",
     "DATASET_FIELDS": "数据集字段",
-    "DATA_ZOOM_OPTIONS": "Data Zoom Options",
+    "DATA_ZOOM_OPTIONS": "数据缩放选项",
     "DATE_AND_TIME": "日期和时间",
     "DATE_FORMAT": "日期格式",
     "DATE_ONLY": "仅日期",
@@ -956,7 +966,7 @@
     "MAJOR_SEGMENTS": "主要分段",
     "MAP_DATA_FIELDS": "映射数据字段以查看图表",
     "MATCH_OPERATOR": "匹配运算符",
-    "MAX": "最大值",
+    "MAX": "最大",
     "MAX_BOX_WIDTH": "最大箱宽",
     "MAX_BUBBLE_SIZE": "最大气泡大小",
     "MAX_LABEL_LENGTH": "最大标签长度",
@@ -964,7 +974,7 @@
     "MAX_SIZE": "最大尺寸",
     "MAX_VALUE": "最大值",
     "MAXIMIZE": "最大化",
-    "MIN": "最小值",
+    "MIN": "最小",
     "MIN_BOX_WIDTH": "最小箱宽",
     "MIN_BUBBLE_SIZE": "最小气泡大小",
     "MIN_SECTOR_ANGLE": "最小扇区角度",
@@ -1101,7 +1111,7 @@
     "SMOOTHNESS": "平滑度 (0-1)",
     "SORT": "排序",
     "SORT_ORDER": "排序方式",
-    "SOURCE": "来源",
+    "SOURCE": "源",
     "SOURCE_INFORMATION": "来源信息",
     "SOURCE_TARGET_VALUE": "来源、目标和值",
     "STACK_STRATEGY": "堆叠策略",
@@ -1168,12 +1178,12 @@
     "DEFAULT_20_PERCENT": "20%",
     "DEFAULT_30_PERCENT": "30%",
     "DEFAULT_90_PERCENT": "90%",
-    "DETAIL_FORMATTER": "Detail Formatter",
-    "EMPHASIS": "Emphasis",
-    "ENABLE_LARGE_MODE": "Enable Large Mode",
+    "DETAIL_FORMATTER": "详情格式化器",
+    "EMPHASIS": "强调",
+    "ENABLE_LARGE_MODE": "启用大数据模式",
     "EXAMPLE_50_PERCENT": "例如 50%",
     "FIELDS": "字段",
-    "FILL_FROM": "Fill From",
+    "FILL_FROM": "填充起点",
     "TABLE_OPTIONS": "表格选项",
     "TABLE_COMPACT": "紧凑密度",
     "TABLE_STRIPED": "条纹行",
@@ -1196,52 +1206,57 @@
     "FILTER_DIALOG_SUBTITLE": "配置此筛选器的外观和行为。",
     "FILTER_CLEAR_ALL_TOOLTIP": "重置所有筛选器",
     "FILTER_CLEAR_NONE_TOOLTIP": "没有可清除的筛选器",
-    "FILTER_MODE": "Filter Mode",
+    "FILTER_MODE": "过滤模式",
     "FILTER_MORE": "更多筛选器",
-    "FILTER_SECTION_SOURCE": "来源",
+    "FILTER_SECTION_SOURCE": "源",
     "FILTER_SECTION_BEHAVIOUR": "行为",
     "FILTER_SECTION_DEFAULT": "默认值",
     "FILTER_SAVE_DISABLED_HINT": "选择字段、筛选类型和控件以启用“保存”。",
-    "FOCUS_MODE": "Focus Mode",
-    "FUNNEL_LABELS": "Funnel Labels",
-    "GAUGE_DETAIL": "Gauge Detail",
-    "GRAPH_EXTRAS": "Graph Extras",
-    "HIGHLIGHT_ADJACENCY": "Highlight Adjacency",
-    "HOVER_SCALE": "Hover Scale",
-    "LABEL_LINE_LENGTH": "Label Line Length",
-    "LABEL_LINE_LENGTH_2": "Label Line Length 2",
-    "LABEL_ROTATION": "Label Rotation",
-    "LARGE_THRESHOLD": "Large Mode Threshold",
-    "LAYOUT_ITERATIONS": "Layout Iterations",
-    "LINE_EFFECT": "Line Effect",
-    "LIVE_FORCE_LAYOUT": "Live Force Layout",
-    "MAIN_LIGHT_INTENSITY": "Main Light Intensity",
-    "MAP_EXTRAS": "Map Extras",
-    "MIN_SHOW_LABEL_ANGLE": "Min Label Angle",
-    "NAME_PROPERTY": "Name Property",
-    "PARALLEL_INTERACTION": "Parallel Interaction",
-    "PERFORMANCE_MODE": "Performance Mode",
-    "PERIOD_SEC": "Period (sec)",
-    "PIE_REFINEMENTS": "Pie Refinements",
-    "POST_EFFECT": "Post Effect",
-    "PROGRESSIVE_CHUNK": "Progressive Chunk",
-    "ROTATE_CIRCULAR_LABELS": "Rotate Circular Labels",
-    "SANKEY_LAYOUT": "Sankey Layout",
-    "SCENE_3D": "3D Scene",
-    "SHADING_MODE": "Shading Mode",
-    "SHOW_ANCHOR": "Show Anchor",
-    "SHOW_EFFECT": "Show Effect",
-    "SHOW_UPPER_LABEL": "Show Upper Label",
-    "SLICE_BORDER_WIDTH": "Slice Border Width",
-    "SQUARE_RATIO": "Square Ratio",
-    "SUNBURST_LABELS": "Sunburst Labels",
-    "THEME_RIVER_EXTRAS": "Theme River Extras",
-    "THROTTLE_MS": "Throttle (ms)",
-    "TOOLTIP_EXTRAS": "Tooltip Extras",
-    "TREEMAP_COLOR_MAPPING": "Treemap Color Mapping",
-    "VALUE_PRECISION": "Value Precision",
-    "VISUAL_DIMENSION": "Visual Dimension",
-    "VISUAL_MAP": "Visual Map"
+    "FOCUS_MODE": "聚焦模式",
+    "FUNNEL_LABELS": "漏斗图标签",
+    "GAUGE_DETAIL": "仪表盘详情",
+    "GRAPH_EXTRAS": "图额外选项",
+    "HIGHLIGHT_ADJACENCY": "高亮相邻",
+    "HOVER_SCALE": "悬停缩放",
+    "LABEL_LINE_LENGTH": "标签线长度",
+    "LABEL_LINE_LENGTH_2": "标签线长度 2",
+    "LABEL_ROTATION": "标签旋转",
+    "LARGE_THRESHOLD": "大数据模式阈值",
+    "LAYOUT_ITERATIONS": "布局迭代次数",
+    "LINE_EFFECT": "线条效果",
+    "LIVE_FORCE_LAYOUT": "实时力导向布局",
+    "MAIN_LIGHT_INTENSITY": "主光源强度",
+    "MAP_EXTRAS": "地图额外选项",
+    "MIN_SHOW_LABEL_ANGLE": "最小标签角度",
+    "NAME_PROPERTY": "名称属性",
+    "PARALLEL_INTERACTION": "并行交互",
+    "PERFORMANCE_MODE": "性能模式",
+    "PERIOD_SEC": "周期 (秒)",
+    "PIE_REFINEMENTS": "饼图精细选项",
+    "POST_EFFECT": "后期效果",
+    "PROGRESSIVE_CHUNK": "渐进式分块",
+    "ROTATE_CIRCULAR_LABELS": "旋转圆形标签",
+    "SANKEY_LAYOUT": "桑基图布局",
+    "SCENE_3D": "3D 场景",
+    "SHADING_MODE": "着色模式",
+    "SHOW_ANCHOR": "显示锚点",
+    "SHOW_EFFECT": "显示效果",
+    "SHOW_UPPER_LABEL": "显示上方标签",
+    "SLICE_BORDER_WIDTH": "切片边框宽度",
+    "SQUARE_RATIO": "正方形比例",
+    "SUNBURST_LABELS": "旭日图标签",
+    "THEME_RIVER_EXTRAS": "主题河流额外选项",
+    "THROTTLE_MS": "节流 (ms)",
+    "TOOLTIP_EXTRAS": "提示框额外选项",
+    "TREEMAP_COLOR_MAPPING": "矩形树图颜色映射",
+    "VALUE_PRECISION": "数值精度",
+    "VISUAL_DIMENSION": "视觉维度",
+    "VISUAL_MAP": "视觉映射",
+    "OPTIONAL_SUFFIX": "（可选）",
+    "TABLE_NO_DATA": "无数据可显示",
+    "TABLE_NO_MATCHING_ROWS": "无匹配行",
+    "A11Y_DATA_PANELS": "数据面板",
+    "A11Y_BUILD_PANELS": "构建面板"
   },
   "DASHBOARD": {
     "TITLE": "仪表盘",
@@ -2019,5 +2034,505 @@
     "IDLE_SECONDS_REMAINING": "秒后注销",
     "LOGOUT_NOW": "立即注销",
     "STAY_LOGGED_IN": "保持登录"
+  },
+  "CHART_OPTIONS": {
+    "LINE_STEP": {
+      "NONE": "无",
+      "START": "开始",
+      "MIDDLE": "中间",
+      "END": "结束"
+    },
+    "FUNNEL_SORT": {
+      "DESCENDING": "降序",
+      "ASCENDING": "升序",
+      "NONE": "无"
+    },
+    "FUNNEL_ALIGN": {
+      "CENTER": "居中",
+      "LEFT": "左",
+      "RIGHT": "右"
+    },
+    "TREEMAP_NODE_CLICK": {
+      "FALSE": "禁用",
+      "ZOOMTONODE": "放大",
+      "LINK": "链接"
+    },
+    "SUNBURST_NODE_CLICK": {
+      "FALSE": "禁用",
+      "ROOTTONODE": "根到节点",
+      "LINK": "链接"
+    },
+    "EFFECT_SHOW_ON": {
+      "RENDER": "渲染",
+      "EMPHASIS": "强调"
+    },
+    "SAMPLING": {
+      "NONE": "无",
+      "LTTB": "LTTB",
+      "AVERAGE": "平均值",
+      "MAX": "最大值",
+      "MIN": "最小值",
+      "SUM": "总和"
+    },
+    "SHOW_ALL_SYMBOL": {
+      "AUTO": "自动",
+      "TRUE": "是",
+      "FALSE": "否"
+    },
+    "STACK_STRATEGY": {
+      "SAMESIGN": "同号",
+      "ALL": "全部",
+      "POSITIVE": "正",
+      "NEGATIVE": "负"
+    },
+    "RIPPLE_BRUSH_TYPE": {
+      "STROKE": "描边",
+      "FILL": "填充"
+    },
+    "FUNNEL_ORIENT": {
+      "VERTICAL": "垂直",
+      "HORIZONTAL": "水平"
+    },
+    "SUNBURST_SORT": {
+      "DESC": "降序",
+      "ASC": "升序",
+      "NONE": "无"
+    },
+    "PICTORIAL_REPEAT_DIRECTION": {
+      "START": "开始",
+      "END": "结束"
+    },
+    "EMPHASIS_FOCUS": {
+      "NONE": "无",
+      "SELF": "Self",
+      "SERIES": "系列",
+      "ADJACENCY": "邻接",
+      "ANCESTOR": "祖先",
+      "DESCENDANT": "后代"
+    },
+    "VISUAL_MAP_ORIENT": {
+      "HORIZONTAL": "水平",
+      "VERTICAL": "垂直"
+    },
+    "VISUAL_MAP_TYPE": {
+      "CONTINUOUS": "连续",
+      "PIECEWISE": "分段"
+    },
+    "DATA_ZOOM_TYPE": {
+      "INSIDE": "仅内部",
+      "SLIDER": "仅滑块",
+      "BOTH": "两者"
+    },
+    "DATA_ZOOM_FILTER_MODE": {
+      "FILTER": "过滤",
+      "WEAKFILTER": "弱过滤",
+      "EMPTY": "空",
+      "NONE": "无"
+    },
+    "AREA_ORIGIN": {
+      "AUTO": "自动",
+      "START": "开始",
+      "END": "结束"
+    },
+    "SUNBURST_LABEL_ROTATE": {
+      "RADIAL": "Radial",
+      "TANGENTIAL": "切向",
+      "0": "水平 (0°)"
+    },
+    "COLOR_MAPPING_BY": {
+      "VALUE": "值",
+      "INDEX": "索引",
+      "ID": "ID"
+    },
+    "FUNNEL_LABEL_POSITION": {
+      "INSIDE": "内部",
+      "OUTSIDE": "外部",
+      "RIGHT": "右",
+      "LEFT": "左",
+      "TOP": "顶部",
+      "BOTTOM": "底部"
+    },
+    "THEME_RIVER_LABEL_POSITION": {
+      "LEFT": "左",
+      "RIGHT": "右"
+    },
+    "SHADING_MODE": {
+      "COLOR": "颜色",
+      "LAMBERT": "兰伯特",
+      "REALISTIC": "真实"
+    },
+    "LEGEND_POSITIONS": {
+      "BELOW": "底部"
+    },
+    "LEGEND_TYPES": {
+      "PLAIN": "普通",
+      "SCROLL": "滚动"
+    },
+    "LABEL_POSITIONS": {
+      "TOP": "顶部",
+      "INSIDELEFT": "内部左",
+      "INSIDERIGHT": "内部右",
+      "INSIDETOP": "内部顶",
+      "INSIDEBOTTOM": "内部底"
+    },
+    "TOOLTIP_TRIGGERS": {
+      "ITEM": "项",
+      "AXIS": "轴"
+    },
+    "AXIS_POINTER_TYPES": {
+      "LINE": "线",
+      "SHADOW": "阴影",
+      "CROSS": "十字"
+    },
+    "GRID_LINE_STYLES": {
+      "SOLID": "实线",
+      "DASHED": "虚线",
+      "DOTTED": "点线"
+    },
+    "ANIMATION_EASINGS": {
+      "LINEAR": "线性",
+      "CUBICOUT": "Cubic Out",
+      "ELASTICOUT": "Elastic Out",
+      "BOUNCEOUT": "Bounce Out",
+      "QUADRATICINOUT": "Quadratic In/Out",
+      "EXPONENTIALOUT": "Exponential Out"
+    },
+    "LINE_STYLE_TYPES": {
+      "SOLID": "实线",
+      "DASHED": "虚线",
+      "DOTTED": "点线"
+    },
+    "SYMBOL_SHAPES": {
+      "CIRCLE": "圆",
+      "RECT": "矩形",
+      "ROUNDRECT": "圆角矩形",
+      "TRIANGLE": "三角形",
+      "DIAMOND": "菱形",
+      "PIN": "图钉",
+      "ARROW": "箭头"
+    },
+    "PIE_LABEL_POSITIONS": {
+      "INSIDE": "内部"
+    },
+    "PIE_SELECTED_MODES": {
+      "SINGLE": "单一",
+      "MULTIPLE": "多个",
+      "SERIES": "系列"
+    },
+    "PIE_ROSE_TYPES": {
+      "NONE": "无",
+      "RADIUS": "半径",
+      "AREA": "面积"
+    },
+    "RADAR_SHAPES": {
+      "POLYGON": "多边形",
+      "CIRCLE": "圆"
+    },
+    "GRAPH_LAYOUTS": {
+      "FORCE": "力导向",
+      "CIRCULAR": "圆形"
+    },
+    "TREE_ORIENTATIONS": {
+      "TB": "从上到下",
+      "BT": "从下到上",
+      "LR": "从左到右",
+      "RL": "从右到左"
+    },
+    "TREE_LAYOUTS": {
+      "ORTHOGONAL": "Orthogonal"
+    },
+    "TREE_EDGE_SHAPES": {
+      "CURVE": "曲线",
+      "POLYLINE": "折线"
+    },
+    "GRAPH_EDGE_SYMBOLS": {
+      "NONE": "无",
+      "CIRCLE": "圆",
+      "ARROW": "箭头"
+    },
+    "PICTORIAL_SYMBOL_POSITIONS": {
+      "CENTER": "居中"
+    },
+    "SANKEY_NODE_ALIGNS": {
+      "JUSTIFY": "两端对齐",
+      "LEFT": "左",
+      "RIGHT": "右"
+    },
+    "PICTORIAL_SYMBOLS": {
+      "ROUNDRECT": "圆角矩形",
+      "CIRCLE": "圆",
+      "RECT": "矩形",
+      "TRIANGLE": "三角形",
+      "DIAMOND": "菱形",
+      "ARROW": "箭头"
+    }
+  },
+  "CHART_TYPES": {
+    "CATEGORIES": {
+      "BAR_CHARTS": "柱状图",
+      "LINE_CHARTS": "折线图",
+      "AREA_CHARTS": "面积图",
+      "PIE_CHARTS": "饼图",
+      "GAUGES": "仪表盘",
+      "CARDS": "卡片",
+      "MAPS": "地图",
+      "SCATTER": "散点图",
+      "STATISTICAL": "统计图",
+      "FUNNEL": "漏斗图",
+      "HIERARCHICAL": "层级图",
+      "FLOW": "流向图",
+      "SPECIAL": "特殊图",
+      "FINANCIAL": "金融图",
+      "3D_CHARTS": "3D 图表"
+    },
+    "BAR_VERTICAL": {
+      "NAME": "柱状图",
+      "DESCRIPTION": "Displays data using vertical bars to compare values across categories"
+    },
+    "BAR_HORIZONTAL": {
+      "NAME": "水平柱状图",
+      "DESCRIPTION": "Shows data with horizontal bars, ideal for long category names"
+    },
+    "BAR_VERTICAL_2D": {
+      "NAME": "分组柱状图",
+      "DESCRIPTION": "Compares multiple data series side-by-side within each category"
+    },
+    "BAR_HORIZONTAL_2D": {
+      "NAME": "分组水平柱状图",
+      "DESCRIPTION": "Displays multiple series horizontally for easy comparison across groups"
+    },
+    "BAR_VERTICAL_STACKED": {
+      "NAME": "堆叠柱状图",
+      "DESCRIPTION": "Shows part-to-whole relationships by stacking bars vertically"
+    },
+    "BAR_HORIZONTAL_STACKED": {
+      "NAME": "堆叠水平柱状图",
+      "DESCRIPTION": "Presents stacked data horizontally to show composition and totals"
+    },
+    "BAR_VERTICAL_NORMALIZED": {
+      "NAME": "归一化柱状图",
+      "DESCRIPTION": "Displays proportions as percentages with bars normalized to 100%"
+    },
+    "BAR_HORIZONTAL_NORMALIZED": {
+      "NAME": "归一化水平柱状图",
+      "DESCRIPTION": "Shows percentage distribution horizontally across categories"
+    },
+    "LINE": {
+      "NAME": "折线图",
+      "DESCRIPTION": "Visualizes trends and changes over continuous data or time"
+    },
+    "POLAR": {
+      "NAME": "极坐标图",
+      "DESCRIPTION": "Displays multivariate data on a circular grid for pattern comparison"
+    },
+    "AREA": {
+      "NAME": "面积图",
+      "DESCRIPTION": "Shows trends over time with filled areas under the line"
+    },
+    "AREA_STACKED": {
+      "NAME": "Stacked Area",
+      "DESCRIPTION": "Illustrates cumulative totals and individual contributions over time"
+    },
+    "AREA_NORMALIZED": {
+      "NAME": "Normalized Area",
+      "DESCRIPTION": "Displays proportional trends normalized to 100% at each point"
+    },
+    "PIE": {
+      "NAME": "饼图",
+      "DESCRIPTION": "Shows parts of a whole as slices of a circular chart"
+    },
+    "PIE_ADVANCED": {
+      "NAME": "Advanced Pie",
+      "DESCRIPTION": "Enhanced pie chart with legend, labels, and calculated totals"
+    },
+    "PIE_GRID": {
+      "NAME": "Pie Grid",
+      "DESCRIPTION": "Displays multiple pie charts in a grid for comparison"
+    },
+    "DONUT": {
+      "NAME": "环形图",
+      "DESCRIPTION": "Circular chart with center cutout, ideal for displaying key metrics"
+    },
+    "GAUGE": {
+      "NAME": "仪表盘",
+      "DESCRIPTION": "Shows a single value on a radial scale with min and max ranges"
+    },
+    "LINEAR_GAUGE": {
+      "NAME": "Linear Gauge",
+      "DESCRIPTION": "Displays progress or value along a horizontal or vertical bar"
+    },
+    "NUMBER_CARD": {
+      "NAME": "Number Cards",
+      "DESCRIPTION": "Presents key metrics as large, prominent numerical displays"
+    },
+    "TABLE": {
+      "NAME": "表格",
+      "DESCRIPTION": "Tabular view of the raw rows; sortable columns, virtual scroll for large datasets"
+    },
+    "HEAT_MAP": {
+      "NAME": "Heat Map",
+      "DESCRIPTION": "Uses color intensity to represent values in a matrix layout"
+    },
+    "TREE_MAP": {
+      "NAME": "Tree Map",
+      "DESCRIPTION": "Visualizes hierarchical data using nested rectangles sized by value"
+    },
+    "BUBBLE": {
+      "NAME": "气泡图",
+      "DESCRIPTION": "Plots three dimensions using X, Y position and bubble size"
+    },
+    "BOX_CHART": {
+      "NAME": "Box Chart",
+      "DESCRIPTION": "Shows data distribution through quartiles, median, and outliers"
+    },
+    "SCATTER": {
+      "NAME": "散点图",
+      "DESCRIPTION": "Plots individual data points by X and Y values to reveal patterns and correlations"
+    },
+    "EFFECT_SCATTER": {
+      "NAME": "Ripple Scatter",
+      "DESCRIPTION": "Scatter plot with animated ripple effects to highlight data points"
+    },
+    "FUNNEL": {
+      "NAME": "漏斗图",
+      "DESCRIPTION": "Visualizes progressive reduction of data through stages, ideal for conversion pipelines"
+    },
+    "SUNBURST": {
+      "NAME": "Sunburst Chart",
+      "DESCRIPTION": "Displays hierarchical data as concentric rings, showing part-to-whole relationships"
+    },
+    "TREE": {
+      "NAME": "Tree Diagram",
+      "DESCRIPTION": "Visualizes parent-child relationships in a branching tree structure"
+    },
+    "SANKEY": {
+      "NAME": "Sankey Diagram",
+      "DESCRIPTION": "Shows flow and quantity between nodes, ideal for energy, budget, or traffic analysis"
+    },
+    "GRAPH": {
+      "NAME": "Network Graph",
+      "DESCRIPTION": "Displays relationships between entities as a force-directed network diagram"
+    },
+    "LINE_STACKED": {
+      "NAME": "Stacked Line",
+      "DESCRIPTION": "Shows cumulative trends by stacking multiple data series on a line chart"
+    },
+    "LINE_STEP": {
+      "NAME": "Step Line",
+      "DESCRIPTION": "Displays data as a step function with sharp transitions between values"
+    },
+    "HALF_DONUT": {
+      "NAME": "Half Donut",
+      "DESCRIPTION": "Semi-circle donut chart showing proportions in a 180-degree arc"
+    },
+    "NESTED_PIE": {
+      "NAME": "Nested Pie",
+      "DESCRIPTION": "Multi-ring pie chart with inner summary and outer detail rings"
+    },
+    "ROSE": {
+      "NAME": "Rose Chart",
+      "DESCRIPTION": "Nightingale rose chart where slices vary in radius to show magnitude differences"
+    },
+    "WATERFALL": {
+      "NAME": "Waterfall Chart",
+      "DESCRIPTION": "Shows cumulative effect of sequential positive and negative values on a total"
+    },
+    "PICTORIAL_BAR": {
+      "NAME": "Pictorial Bar",
+      "DESCRIPTION": "Bar chart using custom shapes and symbols instead of plain rectangles"
+    },
+    "BAR_POLAR": {
+      "NAME": "Polar Bar",
+      "DESCRIPTION": "Bar chart rendered in polar/circular coordinates for radial comparison"
+    },
+    "THEME_RIVER": {
+      "NAME": "Theme River",
+      "DESCRIPTION": "Displays thematic data changes over time as a flowing river visualization"
+    },
+    "RADAR": {
+      "NAME": "雷达图",
+      "DESCRIPTION": "Displays multivariate data on a radial grid, ideal for comparing performance across dimensions"
+    },
+    "CANDLESTICK": {
+      "NAME": "Candlestick Chart",
+      "DESCRIPTION": "Shows open, high, low, close values for financial time series data"
+    },
+    "PARALLEL": {
+      "NAME": "Parallel Coordinates",
+      "DESCRIPTION": "Visualizes multi-dimensional data by drawing parallel vertical axes with connected lines"
+    },
+    "BAR3D": {
+      "NAME": "Bar 3D",
+      "DESCRIPTION": "Three-dimensional bar chart for spatial data comparison"
+    },
+    "LINE3D": {
+      "NAME": "Line 3D",
+      "DESCRIPTION": "Three-dimensional line chart for visualizing trajectories and paths in 3D space"
+    },
+    "SCATTER3D": {
+      "NAME": "Scatter 3D",
+      "DESCRIPTION": "Three-dimensional scatter plot for exploring relationships across three variables"
+    },
+    "SURFACE": {
+      "NAME": "Surface Chart",
+      "DESCRIPTION": "Renders continuous 3D surfaces from mathematical equations or data grids"
+    },
+    "GLOBE": {
+      "NAME": "Globe",
+      "DESCRIPTION": "Interactive 3D globe visualization for geospatial data points"
+    },
+    "GRAPHGL": {
+      "NAME": "Graph GL",
+      "DESCRIPTION": "WebGL-accelerated network graph for large-scale relationship data with GPU rendering"
+    },
+    "SCATTERGL": {
+      "NAME": "Scatter GL",
+      "DESCRIPTION": "WebGL-accelerated scatter plot for rendering millions of data points efficiently"
+    },
+    "LINESGL": {
+      "NAME": "Lines GL",
+      "DESCRIPTION": "WebGL-accelerated line rendering for large-scale polyline datasets"
+    },
+    "MAP3D": {
+      "NAME": "Map 3D",
+      "DESCRIPTION": "Three-dimensional geographic map visualization with height-encoded data"
+    },
+    "FLOWGL": {
+      "NAME": "Flow GL",
+      "DESCRIPTION": "WebGL-accelerated vector field flow visualization for wind, current, or magnetic field data"
+    },
+    "WORLD_MAP": {
+      "NAME": "世界地图",
+      "DESCRIPTION": "Choropleth world map using color intensity to show values by country or region"
+    },
+    "FLOW_LINES": {
+      "NAME": "Flow Lines",
+      "DESCRIPTION": "Animated directed flow lines between nodes, visualizing movement and connections on a flat canvas"
+    },
+    "LINES3D": {
+      "NAME": "Lines 3D",
+      "DESCRIPTION": "Animated polyline arcs rendered on a 3D globe using longitude/latitude coordinates"
+    },
+    "POLYGONS3D": {
+      "NAME": "Polygons 3D",
+      "DESCRIPTION": "Extruded 3D polygon regions rendered on a globe, grouped by name with longitude/latitude vertices"
+    }
+  },
+  "ROLE_LABELS": {
+    "X_AXIS": "X 轴",
+    "Y_AXIS": "Y 轴",
+    "Z_AXIS": "Z 轴",
+    "OPEN": "开盘",
+    "HIGH": "最高",
+    "LOW": "最低",
+    "CLOSE": "收盘",
+    "SAMPLE": "样本（原始值）",
+    "PARENT": "父级（层次）",
+    "INDICATORS": "指标列",
+    "DIMENSIONS": "维度列",
+    "VALUE_COLUMNS": "值列",
+    "LONGITUDE": "经度",
+    "LATITUDE": "纬度",
+    "TIME": "时间"
   }
 }

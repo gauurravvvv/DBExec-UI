@@ -92,8 +92,19 @@ export class ChartDataTransformerService {
         return this.transformToHeatMapFormat(rawData, mapping);
       }
 
-      // Bubble chart requires x, y, r format with 3 dimensions
-      if (chartType === BUBBLE_CHART_TYPE) {
+      // Bubble + scatter share the numeric X/Y transform. Scatter and
+      // effect-scatter are true XY plots: both axes must be continuous and
+      // each row is a point at (xColumn, yColumn). Without this they fell
+      // through to the default single-series (category) transform, which
+      // bucketed X as a category and collapsed Y to a per-category count —
+      // so every point landed on a flat line. transformToBubbleFormat
+      // defaults the radius (r=10) when no z-axis is mapped, which is exactly
+      // what a plain scatter needs.
+      if (
+        chartType === BUBBLE_CHART_TYPE ||
+        chartType === 'scatter' ||
+        chartType === 'effect-scatter'
+      ) {
         return this.transformToBubbleFormat(rawData, mapping);
       }
 
@@ -109,6 +120,14 @@ export class ChartDataTransformerService {
 
       // Graph chart uses same 3-field format as sankey
       if (chartType === GRAPH_CHART_TYPE) {
+        return this.transformToSankeyFormat(rawData, mapping);
+      }
+
+      // Graph GL (WebGL-accelerated network) is the same node+link shape as
+      // the regular graph — it had a builder (buildGraphGLChartOption) but no
+      // transform case, so it fell through to the single-series transform and
+      // produced no graphGL series. Route it to the sankey/graph transform.
+      if (chartType === 'graphgl') {
         return this.transformToSankeyFormat(rawData, mapping);
       }
 
@@ -191,6 +210,33 @@ export class ChartDataTransformerService {
         return this.transformToVectorField(rawData, mapping);
       }
 
+      // Number-card — a single KPI value. It maps only yAxis (no category
+      // axis), so the standard single-series transform (which groups by
+      // xAxisColumn) yielded nothing and the card showed "No data available".
+      // Aggregate the value column to one total. When xAxis IS also mapped we
+      // still emit per-category rows so a multi-card layout can group by it.
+      if (chartType === 'number-card') {
+        const yCol = mapping.yAxisColumn;
+        if (!yCol) return [];
+        const yNumeric = this.isColumnNumeric(rawData, yCol);
+        if (mapping.xAxisColumn) {
+          const agg = new Map<string, number>();
+          rawData.forEach(row => {
+            const name = this.formatLabelValue(row[mapping.xAxisColumn!]);
+            const val = yNumeric ? this.toNumber(row[yCol]) : 1;
+            agg.set(name, (agg.get(name) || 0) + val);
+          });
+          return Array.from(agg.entries()).map(([name, value]) => ({
+            name,
+            value,
+          }));
+        }
+        const total = yNumeric
+          ? rawData.reduce((s, row) => s + this.toNumber(row[yCol]), 0)
+          : rawData.length;
+        return [{ name: yCol, value: total }];
+      }
+
       // Standard 2-field transformation
       const singleSeries = this.transformToSingleSeries(rawData, mapping);
 
@@ -267,7 +313,13 @@ export class ChartDataTransformerService {
       const value = data[i][columnName];
       if (value !== null && value !== undefined && value !== '') {
         sampleCount++;
-        if (typeof value === 'number' && !isNaN(value) && isFinite(value)) {
+        // Accept both real numbers AND numeric strings. SQL drivers return
+        // Postgres NUMERIC/DECIMAL columns as strings over JSON, so a strict
+        // `typeof === 'number'` test wrongly classified numeric columns
+        // (e.g. marketing/revenue) as categorical — which made scatter group
+        // every row into its own single-point series.
+        const num = typeof value === 'number' ? value : Number(value);
+        if (!isNaN(num) && isFinite(num)) {
           numericCount++;
         }
       }
@@ -471,7 +523,14 @@ export class ChartDataTransformerService {
     const categoryMap = new Map<string, any[]>();
 
     rawData.forEach((row, rowIdx) => {
-      const category = this.formatLabelValue(row[mapping.xAxisColumn!]);
+      // When X is numeric (the true XY scatter/bubble case) every row is a
+      // distinct point — grouping by the X value would create one
+      // single-point series per row (hundreds of series, each a different
+      // colour). Put them all in ONE series instead. Only group into
+      // separate (coloured) series when X is categorical.
+      const category = isXNumeric
+        ? 'points'
+        : this.formatLabelValue(row[mapping.xAxisColumn!]);
       const x = isXNumeric ? this.toNumber(row[mapping.xAxisColumn!]) : rowIdx;
       const y = this.toNumber(row[mapping.yAxisColumn!]);
       const r = mapping.zAxisColumn
@@ -759,6 +818,14 @@ export class ChartDataTransformerService {
       return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);
     }
 
+    // number-card needs only a value (yAxis) — it shows a single metric, no
+    // category axis. Requiring xAxis too left it permanently on "No data
+    // available" when the user mapped only the value field (which is all its
+    // role spec asks for: required ['yAxis'], optional ['xAxis']).
+    if (visual.chartType === 'number-card') {
+      return !!visual.yAxisColumn;
+    }
+
     return !!(visual.xAxisColumn && visual.yAxisColumn);
   }
 
@@ -851,13 +918,20 @@ export class ChartDataTransformerService {
       return [];
     }
     if (!parentColumn) {
-      // Legacy flat fallback so visuals without a parent column keep rendering.
-      return rawData
-        .map(row => ({
-          name: this.formatLabelValue(row[xAxisColumn]),
-          value: this.toNumber(row[yAxisColumn]),
-        }))
-        .filter(n => n.name);
+      // Flat fallback (no hierarchy). AGGREGATE by name — previously this
+      // mapped every raw row 1:1, so a treemap/sunburst over e.g. 1000 rows of
+      // 4 products produced 1000 tiny slivers instead of 4 summed tiles. Sum
+      // the value per distinct name so each category is one node.
+      const agg = new Map<string, number>();
+      rawData.forEach(row => {
+        const name = this.formatLabelValue(row[xAxisColumn]);
+        if (!name || name === '(empty)') return;
+        agg.set(name, (agg.get(name) || 0) + this.toNumber(row[yAxisColumn]));
+      });
+      return Array.from(agg.entries()).map(([name, value]) => ({
+        name,
+        value,
+      }));
     }
     // Build a name → node map, then attach children to their parents.
     const nodes = new Map<
