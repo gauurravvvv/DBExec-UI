@@ -242,16 +242,16 @@
         </ng-container>
       </div>
 
-      <!-- ===== Legend ===== -->
+      <!-- ===== Legend =====
+           Section title only renders when the legend is ON. The Show
+           Legend toggle is always visible (so users can turn it back on
+           without leaving the Properties pane). When the legend is off
+           the section collapses to a single toggle row labelled
+           "Show Legend" — no orphan heading above an empty body. -->
       <div
         class="config-section"
         *ngIf="supportsLegend(focusedVisual.chartType)"
       >
-        <!-- Section title sits above the legend controls, but the only
-             always-visible control here is the Show Legend toggle. When
-             the legend is off there is no body for the title to label —
-             hiding it collapses the section visually to just the toggle
-             row, which is what the user expects (no orphan heading). -->
         <div
           class="section-title"
           *ngIf="focusedVisual.config.legend"
