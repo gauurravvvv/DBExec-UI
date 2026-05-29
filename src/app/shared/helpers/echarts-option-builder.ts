@@ -1261,8 +1261,13 @@ export function buildPieChartOption(
 
   // Advanced pie: add detail legend with values
   if (isAdvanced) {
+    // The advanced pie variant adds a detail legend (name + value).
+    // Previously this hardcoded `show: true`, which silently overrode
+    // the user's Show Legend toggle — `config.legend = false` would
+    // wipe the chart legend on every other family but leave it
+    // visible here. Honour `config.legend`.
     option.legend = {
-      show: true,
+      show: config.legend !== false,
       type: config.legendType || 'scroll',
       orient: 'vertical',
       right: 10,
