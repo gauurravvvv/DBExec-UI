@@ -2225,6 +2225,8 @@ export function buildBoxPlotChartOption(data: any[], config: any): any {
       },
     },
     ...buildLegendWithTitle(config),
+    // Box plot previously omitted toolbox — toggle was a silent no-op.
+    toolbox: buildToolbox(config),
     grid: buildGrid(config),
     series: [
       {
