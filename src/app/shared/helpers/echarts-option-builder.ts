@@ -1678,6 +1678,10 @@ export function buildTreeMapChartOption(data: any[], config: any): any {
       ...buildTooltip(config, 'item'),
       formatter: (params: any) => `${params.name}: ${formatTooltipValue(config, params.value)}`,
     },
+    // Treemap previously omitted the toolbox key, so the Properties pane
+    // toolbox toggle was a silent no-op only on tree-map (and only on
+    // tree-map — every other chart family emits it).
+    toolbox: buildToolbox(config),
     series: [
       {
         type: 'treemap',
@@ -1764,6 +1768,10 @@ export function buildBubbleChartOption(data: any[], config: any): any {
       },
     },
     ...buildLegendWithTitle(config),
+    // Bubble previously omitted the toolbox key, so the Properties pane
+    // toolbox toggle was a silent no-op only on bubble. Emit it like
+    // every other XY chart family.
+    toolbox: buildToolbox(config),
     grid: buildGrid(config),
     xAxis: buildValueAxis(config, 'x'),
     yAxis: buildValueAxis(config, 'y'),
