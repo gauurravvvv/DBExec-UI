@@ -2643,6 +2643,8 @@ export function buildCandlestickChartOption(
         return `${d.name}<br/>Open: ${f(d.data[0])}<br/>Close: ${f(d.data[1])}<br/>Low: ${f(d.data[2])}<br/>High: ${f(d.data[3])}`;
       },
     },
+    // Candlestick previously omitted toolbox.
+    toolbox: buildToolbox(config),
     grid: buildGrid(config),
     xAxis: {
       type: 'category',
@@ -2733,6 +2735,8 @@ export function buildParallelChartOption(data: any[] | any, config: any): any {
     ...buildAnimation(config),
     tooltip: buildTooltip(config, 'item'),
     ...buildLegendWithTitle(config),
+    // Parallel previously omitted toolbox.
+    toolbox: buildToolbox(config),
     parallelAxis,
     parallel: (() => {
       const pos = config.legend ? config.legendPosition || 'right' : '';
