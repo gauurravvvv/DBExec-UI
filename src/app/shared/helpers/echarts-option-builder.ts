@@ -1357,6 +1357,11 @@ export function buildPolarChartOption(data: any[], config: any): any {
     ...buildAnimation(config),
     tooltip: buildTooltip(config),
     ...buildLegendWithTitle(config),
+    // Polar charts are a polar/radar coord system; before this fix the
+    // builder omitted `toolbox`, so the Properties pane toolbox toggle
+    // was a silent no-op on polar (and only on polar in the radar
+    // family). Emit toolbox like every other chart family.
+    toolbox: buildToolbox(config),
     radar: {
       indicator,
       shape: config.radarShape || 'polygon',
