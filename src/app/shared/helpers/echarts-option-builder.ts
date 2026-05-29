@@ -477,7 +477,13 @@ function buildCategoryAxis(
   // 110px so the name doesn't push off the card. Horizontal (0°)
   // labels keep the compact default. The factor sin(angle) interpolates
   // smoothly between the two extremes (≈0.87 at 60°, 1.0 at 90°).
-  const rot = isX ? config.xAxisLabelRotate || 0 : 0;
+  //
+  // `xAxisLabelRotate` is named after the UI control ("X Label Rotation"),
+  // but its semantic intent is to rotate the *category* labels — they're
+  // the ones that get long and need angling. For a horizontal bar the
+  // category axis is physical-Y, so honour the rotation there too;
+  // value-axis numbers never rotate (handled in buildValueAxis).
+  const rot = config.xAxisLabelRotate || 0;
   let isLabelGap = 28;
   if (isX && rot > 15 && (categories || []).length) {
     const maxLen = Math.max(
@@ -506,7 +512,9 @@ function buildCategoryAxis(
     },
     axisLine: { lineStyle: { color: CHART_TYPOGRAPHY.colors.axis } },
     axisLabel: {
-      rotate: isX ? config.xAxisLabelRotate || 0 : 0,
+      // Always rotate category labels (regardless of physical X vs Y).
+      // See nameGap comment above for the why.
+      rotate: config.xAxisLabelRotate || 0,
       overflow: (isX ? config.trimXAxisTicks : config.trimYAxisTicks)
         ? 'truncate'
         : 'none',
