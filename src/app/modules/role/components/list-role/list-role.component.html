@@ -179,7 +179,7 @@
                 </span>
               </td>
               <td>
-                <span class="date-text" [pTooltip]="role.createdOn | date: 'dd MMM yyyy, HH:mm:ss'" tooltipPosition="top">{{
+                <span class="date-text" [pTooltip]="(role.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''" tooltipPosition="top">{{
                   role.createdOn | relativeTime
                 }}</span>
               </td>

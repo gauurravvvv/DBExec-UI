@@ -199,7 +199,7 @@
                 </span>
               </td>
               <td>
-                <span class="date-text" [pTooltip]="queryBuilder.createdOn | date: 'dd MMM yyyy, HH:mm:ss'" tooltipPosition="top">{{
+                <span class="date-text" [pTooltip]="(queryBuilder.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''" tooltipPosition="top">{{
                   queryBuilder.createdOn | relativeTime
                 }}</span>
               </td>
