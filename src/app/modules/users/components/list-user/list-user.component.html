@@ -476,7 +476,7 @@
                 >
                   {{
                     user.lastLogin
-                      ? (user.lastLogin | date: 'dd MMM yyyy, HH:mm')
+                      ? (user.lastLogin | relativeTime)
                       : ('USER.NEVER_LOGGED_IN' | translate)
                   }}
                 </span>

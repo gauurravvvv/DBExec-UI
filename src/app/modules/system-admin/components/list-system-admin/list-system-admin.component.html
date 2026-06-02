@@ -428,7 +428,7 @@
                 >
                   {{
                     admin.lastLogin
-                      ? (admin.lastLogin | date: 'dd MMM yyyy, HH:mm')
+                      ? (admin.lastLogin | relativeTime)
                       : ('COMMON.NEVER' | translate)
                   }}
                 </span>
