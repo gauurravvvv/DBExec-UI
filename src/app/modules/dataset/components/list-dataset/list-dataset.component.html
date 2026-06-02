@@ -294,7 +294,7 @@
                   class="date-text"
                   [title]="dataset.createdOn | date: 'dd MMM yyyy, HH:mm:ss'"
                 >
-                  {{ dataset.createdOn | date: 'dd MMM yyyy, HH:mm' }}
+                  {{ dataset.createdOn | relativeTime }}
                 </span>
               </td>
               <td>

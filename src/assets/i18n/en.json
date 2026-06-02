@@ -166,7 +166,11 @@
     "COPY_TO_CLIPBOARD": "Copy to clipboard",
     "BACK": "Back",
     "APPLY": "Apply",
-    "REMOVE": "Remove"
+    "REMOVE": "Remove",
+    "RELATIVE_TIME": {
+      "A_FEW_SECONDS_AGO": "a few seconds ago",
+      "A_FEW_SECONDS_FROM_NOW": "in a few seconds"
+    }
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "First name is required",

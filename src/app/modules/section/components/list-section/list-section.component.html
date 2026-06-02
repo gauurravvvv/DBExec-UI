@@ -229,8 +229,8 @@
                 </span>
               </td>
               <td>
-                <span class="date-text">{{
-                  section.createdOn | date: 'medium'
+                <span class="date-text" [pTooltip]="section.createdOn | date: 'dd MMM yyyy, HH:mm:ss'" tooltipPosition="top">{{
+                  section.createdOn | relativeTime
                 }}</span>
               </td>
               <td>

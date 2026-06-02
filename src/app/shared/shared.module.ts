@@ -28,6 +28,7 @@ import {
   FilterSchemasPipe,
   FilterTablesPipe,
 } from './pipes/filter-schemas.pipe';
+import { RelativeTimePipe } from './pipes/relative-time.pipe';
 import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
 
 @NgModule({
@@ -55,6 +56,7 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     FileSizePipe,
     FilterSchemasPipe,
     FilterTablesPipe,
+    RelativeTimePipe,
     ReplaceUnderscoresPipe,
   ],
   imports: [
@@ -88,6 +90,7 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     FileSizePipe,
     FilterSchemasPipe,
     FilterTablesPipe,
+    RelativeTimePipe,
     ReplaceUnderscoresPipe,
     TranslateModule,
   ],

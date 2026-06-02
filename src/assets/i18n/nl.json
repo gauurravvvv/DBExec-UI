@@ -166,7 +166,11 @@
     "OPTIONAL": "Optioneel",
     "APPLY": "Toepassen",
     "REMOVE": "Verwijderen",
-    "TRY_ADJUST_FILTERS": "Probeer filters aan te passen"
+    "TRY_ADJUST_FILTERS": "Probeer filters aan te passen",
+    "RELATIVE_TIME": {
+      "A_FEW_SECONDS_AGO": "enkele seconden geleden",
+      "A_FEW_SECONDS_FROM_NOW": "over enkele seconden"
+    }
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Voornaam is verplicht",

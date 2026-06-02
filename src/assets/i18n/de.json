@@ -166,7 +166,11 @@
     "OPTIONAL": "Optional",
     "APPLY": "Anwenden",
     "REMOVE": "Entfernen",
-    "TRY_ADJUST_FILTERS": "Versuchen Sie die Filter anzupassen"
+    "TRY_ADJUST_FILTERS": "Versuchen Sie die Filter anzupassen",
+    "RELATIVE_TIME": {
+      "A_FEW_SECONDS_AGO": "vor wenigen Sekunden",
+      "A_FEW_SECONDS_FROM_NOW": "in wenigen Sekunden"
+    }
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Vorname ist erforderlich",

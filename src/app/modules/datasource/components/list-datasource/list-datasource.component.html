@@ -313,7 +313,7 @@
                   class="date-text"
                   [title]="db.createdOn | date: 'dd MMM yyyy, HH:mm:ss'"
                 >
-                  {{ db.createdOn | date: 'dd MMM yyyy, HH:mm' }}
+                  {{ db.createdOn | relativeTime }}
                 </span>
               </td>
               <td>

@@ -312,7 +312,7 @@
                   class="date-text"
                   [title]="connection.createdOn | date: 'dd MMM yyyy, HH:mm:ss'"
                 >
-                  {{ connection.createdOn | date: 'dd MMM yyyy, HH:mm' }}
+                  {{ connection.createdOn | relativeTime }}
                 </span>
               </td>
               <td>

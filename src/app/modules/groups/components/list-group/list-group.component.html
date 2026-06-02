@@ -302,7 +302,7 @@
                   class="date-text"
                   [title]="group.createdOn | date: 'dd MMM yyyy, HH:mm:ss'"
                 >
-                  {{ group.createdOn | date: 'dd MMM yyyy, HH:mm' }}
+                  {{ group.createdOn | relativeTime }}
                 </span>
               </td>
               <td>

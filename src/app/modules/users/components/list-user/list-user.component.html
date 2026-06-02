@@ -486,7 +486,7 @@
                   class="date-text"
                   [title]="user.createdOn | date: 'dd MMM yyyy, HH:mm:ss'"
                 >
-                  {{ user.createdOn | date: 'dd MMM yyyy, HH:mm' }}
+                  {{ user.createdOn | relativeTime }}
                 </span>
               </td>
               <td>

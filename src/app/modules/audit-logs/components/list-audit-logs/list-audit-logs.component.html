@@ -291,7 +291,7 @@
                   class="date-text"
                   [title]="log.createdOn | date: 'dd MMM yyyy, HH:mm:ss'"
                 >
-                  {{ log.createdOn | date: 'dd MMM yyyy, HH:mm' }}
+                  {{ log.createdOn | relativeTime }}
                 </span>
               </td>
               <td>
@@ -405,7 +405,7 @@
       <div class="info-item">
         <span class="info-label">{{ 'AUDIT.TIMESTAMP' | translate }}</span>
         <span class="info-value">{{
-          selectedLog.createdOn | date: 'medium'
+          selectedLog.createdOn | relativeTime
         }}</span>
       </div>
       <div class="info-item">

@@ -166,7 +166,11 @@
     "OPTIONAL": "可选",
     "APPLY": "应用",
     "REMOVE": "移除",
-    "TRY_ADJUST_FILTERS": "尝试调整筛选器"
+    "TRY_ADJUST_FILTERS": "尝试调整筛选器",
+    "RELATIVE_TIME": {
+      "A_FEW_SECONDS_AGO": "几秒前",
+      "A_FEW_SECONDS_FROM_NOW": "几秒后"
+    }
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名字为必填项",

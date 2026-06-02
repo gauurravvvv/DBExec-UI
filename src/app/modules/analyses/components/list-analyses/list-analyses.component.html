@@ -311,7 +311,7 @@
                   class="date-text"
                   [title]="analysis.createdOn | date: 'dd MMM yyyy, HH:mm:ss'"
                 >
-                  {{ analysis.createdOn | date: 'dd MMM yyyy, HH:mm' }}
+                  {{ analysis.createdOn | relativeTime }}
                 </span>
               </td>
               <td>

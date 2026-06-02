@@ -166,7 +166,11 @@
     "OPTIONAL": "선택사항",
     "APPLY": "적용",
     "REMOVE": "제거",
-    "TRY_ADJUST_FILTERS": "필터를 조정해 보세요"
+    "TRY_ADJUST_FILTERS": "필터를 조정해 보세요",
+    "RELATIVE_TIME": {
+      "A_FEW_SECONDS_AGO": "몇 초 전",
+      "A_FEW_SECONDS_FROM_NOW": "몇 초 후"
+    }
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "이름은 필수 항목입니다",

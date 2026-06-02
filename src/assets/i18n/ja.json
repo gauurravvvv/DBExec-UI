@@ -166,7 +166,11 @@
     "OPTIONAL": "任意",
     "APPLY": "適用",
     "REMOVE": "削除",
-    "TRY_ADJUST_FILTERS": "フィルターを調整してください"
+    "TRY_ADJUST_FILTERS": "フィルターを調整してください",
+    "RELATIVE_TIME": {
+      "A_FEW_SECONDS_AGO": "数秒前",
+      "A_FEW_SECONDS_FROM_NOW": "数秒後"
+    }
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名は必須です",

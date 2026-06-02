@@ -307,7 +307,7 @@
                   class="date-text"
                   [title]="dashboard.createdOn | date: 'dd MMM yyyy, HH:mm:ss'"
                 >
-                  {{ dashboard.createdOn | date: 'dd MMM yyyy, HH:mm' }}
+                  {{ dashboard.createdOn | relativeTime }}
                 </span>
               </td>
               <td>

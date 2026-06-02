@@ -166,7 +166,11 @@
     "OPTIONAL": "Opzionale",
     "APPLY": "Applica",
     "REMOVE": "Rimuovi",
-    "TRY_ADJUST_FILTERS": "Prova a regolare i filtri"
+    "TRY_ADJUST_FILTERS": "Prova a regolare i filtri",
+    "RELATIVE_TIME": {
+      "A_FEW_SECONDS_AGO": "pochi secondi fa",
+      "A_FEW_SECONDS_FROM_NOW": "tra pochi secondi"
+    }
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Il nome è obbligatorio",
