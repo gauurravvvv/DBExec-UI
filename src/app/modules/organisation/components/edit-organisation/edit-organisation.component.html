@@ -48,10 +48,10 @@
           class="p-button-primary btn-save"
           type="submit"
           [label]="'COMMON.SAVE' | translate"
-          icon="pi pi-save"
+          [icon]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-save'"
           iconPos="left"
           (click)="onSubmit()"
-          [disabled]="!isFormValid()"
+          [disabled]="!isFormValid() || saving()"
         ></button>
       </div>
     </div>
@@ -99,7 +99,11 @@
       </div>
     </div>
 
-    <form [formGroup]="orgForm" class="admin-form mt-4">
+    <!-- Centered branded loader while the GET that hydrates the
+         form is in flight. The page header + breadcrumb stay
+         visible above so the user can navigate away mid-load. -->
+    <app-content-loader *ngIf="loading() && !orgData"></app-content-loader>
+    <form *ngIf="orgData" [formGroup]="orgForm" class="admin-form mt-4">
       <!-- Step 1: Organisation Details -->
       <div *ngIf="currentStep === 0" class="step-1-layout">
         <div class="step-1-left">
@@ -659,9 +663,12 @@
       <button
         class="btn-confirm"
         (click)="proceedSave()"
-        [disabled]="!saveJustification.trim()"
+        [disabled]="!saveJustification.trim() || saving()"
       >
-        <i class="pi pi-check"></i>
+        <i
+          class="pi"
+          [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-check'"
+        ></i>
         {{ 'COMMON.UPDATE' | translate }}
       </button>
     </div>

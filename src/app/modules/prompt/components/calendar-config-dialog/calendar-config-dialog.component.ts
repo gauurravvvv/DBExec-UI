@@ -58,6 +58,10 @@ export interface CalendarConfig {
 export class CalendarConfigDialogComponent implements OnChanges {
   @Input() visible = false;
   @Input() currentConfig: Partial<CalendarConfig> = {};
+  // Mirrors the parent's saving signal so the Apply button can
+  // spin + disable while the parent's updateAppearance PUT is in
+  // flight. Same pattern as save-dataset-dialog.
+  @Input() saving = false;
 
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() close = new EventEmitter<void>();

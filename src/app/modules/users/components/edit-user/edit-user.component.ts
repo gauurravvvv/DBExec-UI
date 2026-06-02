@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import {
@@ -27,7 +28,14 @@ import { UserService } from '../../services/user.service';
   styleUrls: ['./edit-user.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditUserComponent implements OnInit, HasUnsavedChanges {
+export class EditUserComponent
+  implements OnInit, OnDestroy, HasUnsavedChanges
+{
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.userService.cancelReads();
+  }
+
   userForm!: FormGroup;
   isCancelClicked = false;
   groups: any[] = [];
@@ -40,6 +48,8 @@ export class EditUserComponent implements OnInit, HasUnsavedChanges {
   saveJustification = '';
 
   saving = this.userService.saving;
+  // Drives the skeleton form swap on initial GET.
+  loading = this.userService.loading;
 
   constructor(
     private fb: FormBuilder,
@@ -199,17 +209,31 @@ export class EditUserComponent implements OnInit, HasUnsavedChanges {
 
   async proceedSave() {
     if (this.saveJustification.trim()) {
-      const response = await this.userService.update(
+      // Fire the request first (service.update uses getRawValue, so
+      // disable order is less critical, but stay consistent) then
+      // lock the form for the duration of the PUT.
+      const request = this.userService.update(
         this.userForm,
         this.saveJustification.trim(),
       );
-      if (this.globalService.handleSuccessService(response)) {
-        this.showSaveConfirm = false;
-        this.saveJustification = '';
-        this.userForm.markAsPristine();
-        this.router.navigate([USER.LIST]);
+      this.userForm.disable({ emitEvent: false });
+      try {
+        const response = await request;
+        if (this.globalService.handleSuccessService(response)) {
+          this.showSaveConfirm = false;
+          this.saveJustification = '';
+          this.userForm.markAsPristine();
+          this.router.navigate([USER.LIST]);
+        }
+      } finally {
+        this.userForm.enable({ emitEvent: false });
+        // Re-apply the per-page rule: locked accounts keep the
+        // status toggle disabled.
+        if (this.isLocked) {
+          this.userForm.get('status')?.disable({ emitEvent: false });
+        }
+        this.cdr.markForCheck();
       }
-      this.cdr.markForCheck();
     }
   }
 

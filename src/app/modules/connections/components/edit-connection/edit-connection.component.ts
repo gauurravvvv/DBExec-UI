@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -23,7 +24,14 @@ import { ConnectionService } from '../../services/connection.service';
   styleUrls: ['./edit-connection.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
+export class EditConnectionComponent
+  implements OnInit, OnDestroy, HasUnsavedChanges
+{
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.connectionService.cancelReads();
+  }
+
   private destroyRef = inject(DestroyRef);
 
   connectionForm!: FormGroup;
@@ -45,6 +53,8 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
   selectedDbType: string | null = null;
 
   saving = this.connectionService.saving;
+  // Drives the form vs skeleton swap on initial GET.
+  loading = this.connectionService.loading;
 
   constructor(
     private fb: FormBuilder,
@@ -202,17 +212,26 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
 
   async proceedSave(): Promise<void> {
     if (this.saveJustification.trim()) {
-      const response = await this.connectionService.update(
+      // Fire the request first (service.update uses getRawValue,
+      // disable order safe, kept consistent with the rollout) then
+      // lock the form for the duration of the PUT.
+      const request = this.connectionService.update(
         this.connectionForm,
         this.saveJustification.trim(),
       );
-      if (this.globalService.handleSuccessService(response)) {
-        this.showSaveConfirm = false;
-        this.saveJustification = '';
-        this.connectionForm.markAsPristine();
-        this.router.navigate([CONNECTION.LIST]);
+      this.connectionForm.disable({ emitEvent: false });
+      try {
+        const response = await request;
+        if (this.globalService.handleSuccessService(response)) {
+          this.showSaveConfirm = false;
+          this.saveJustification = '';
+          this.connectionForm.markAsPristine();
+          this.router.navigate([CONNECTION.LIST]);
+        }
+      } finally {
+        this.connectionForm.enable({ emitEvent: false });
+        this.cdr.markForCheck();
       }
-      this.cdr.markForCheck();
     }
   }
 

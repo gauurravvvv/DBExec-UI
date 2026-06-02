@@ -24,7 +24,7 @@
         <button
           class="btn-danger"
           type="button"
-          [disabled]="!userData?.canDelete"
+          [disabled]="!userData?.canDelete || isDeleting(userId)"
           [pTooltip]="
             !userData?.canDelete
               ? ('COMMON.NO_DELETE_PERMISSION' | translate)
@@ -33,13 +33,20 @@
           tooltipPosition="bottom"
           (click)="confirmDelete()"
         >
-          <i class="pi pi-trash"></i> {{ 'COMMON.DELETE' | translate }}
+          <i
+            class="pi"
+            [ngClass]="isDeleting(userId) ? 'pi-spin pi-spinner' : 'pi-trash'"
+          ></i>
+          {{ 'COMMON.DELETE' | translate }}
         </button>
       </div>
     </div>
 
+    <!-- Centered branded loader while the GET is in flight. -->
+    <app-content-loader *ngIf="loading() && !userData"></app-content-loader>
+
     <!-- Profile Section -->
-    <div class="profile-container">
+    <div class="profile-container" *ngIf="userData">
       <div class="details-grid">
         <!-- First Row: Avatar and Personal Info -->
         <div class="first-row">
@@ -144,8 +151,16 @@
                   (click)="onUnlock()"
                   [pTooltip]="'COMMON.UNLOCK_ACCOUNT' | translate"
                   tooltipPosition="bottom"
+                  [disabled]="isUnlocking(userId)"
                 >
-                  <i class="pi pi-lock-open"></i>
+                  <i
+                    class="pi"
+                    [ngClass]="
+                      isUnlocking(userId)
+                        ? 'pi-spin pi-spinner'
+                        : 'pi-lock-open'
+                    "
+                  ></i>
                   {{ 'COMMON.UNLOCK' | translate }}
                 </button>
               </span>
@@ -220,9 +235,12 @@
       <button
         class="btn-confirm"
         (click)="proceedDelete()"
-        [disabled]="!deleteJustification.trim()"
+        [disabled]="!deleteJustification.trim() || isDeleting(userId)"
       >
-        <i class="pi pi-trash"></i>
+        <i
+          class="pi"
+          [ngClass]="isDeleting(userId) ? 'pi-spin pi-spinner' : 'pi-trash'"
+        ></i>
         {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>

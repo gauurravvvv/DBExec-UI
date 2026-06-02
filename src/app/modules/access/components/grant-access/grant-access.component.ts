@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -21,7 +22,12 @@ import { AccessService } from '../../services/access.service';
   styleUrls: ['./grant-access.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GrantAccessComponent implements OnInit {
+export class GrantAccessComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.acessService.cancelReads();
+  }
+
   private destroyRef = inject(DestroyRef);
 
   saving = this.acessService.saving;
@@ -205,10 +211,13 @@ export class GrantAccessComponent implements OnInit {
 
   async onSubmit() {
     if (this.accessForm.valid) {
+      // Snapshot the form value BEFORE disabling — form.disable hides
+      // disabled controls from .value, so reading it post-disable
+      // would strip the payload.
+      const payload = this.accessForm.value;
+      this.accessForm.disable({ emitEvent: false });
       try {
-        const response = await this.acessService.grantAccess(
-          this.accessForm.value,
-        );
+        const response = await this.acessService.grantAccess(payload);
         if (this.globalService.handleSuccessService(response)) {
           this.onCancel();
         }
@@ -217,6 +226,8 @@ export class GrantAccessComponent implements OnInit {
           this.translate.instant('ACCESS.ERROR_GRANTING_ACCESS'),
           error,
         );
+      } finally {
+        this.accessForm.enable({ emitEvent: false });
       }
     }
   }

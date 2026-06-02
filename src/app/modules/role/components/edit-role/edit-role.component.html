@@ -26,15 +26,24 @@
           type="submit"
           [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
-          [disabled]="roleForm.invalid || !isFormDirty || saving()"
+          [disabled]="
+            roleForm.invalid || !isFormDirty || saving() || !roleData
+          "
         >
-          <i class="pi pi-save mr-2"></i>
+          <i
+            class="pi mr-2"
+            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
+          ></i>
         </button>
       </div>
     </div>
 
+    <!-- Centered branded loader while the GET is in flight. Header
+         chrome (back button) stays clickable. -->
+    <app-content-loader *ngIf="loading() && !roleData"></app-content-loader>
+
     <!-- Form Section -->
-    <form [formGroup]="roleForm" class="admin-form">
+    <form *ngIf="roleData" [formGroup]="roleForm" class="admin-form">
       <div class="basic-info-section">
         <!-- Role Name -->
         <app-custom-input
@@ -73,6 +82,18 @@
           >
           </app-custom-toggle>
         </div>
+      </div>
+
+      <!-- Permissions loader while LIST_PERMISSIONS is in flight. The
+           parallel form fields above stay interactive. -->
+      <div
+        class="permissions-section"
+        *ngIf="loadingPermissions() && permissions.length === 0"
+      >
+        <label class="section-title">{{
+          'ROLE.SCREEN_PERMISSIONS' | translate
+        }}</label>
+        <app-content-loader minHeight="240px"></app-content-loader>
       </div>
 
       <!-- Permissions Section -->
@@ -161,7 +182,10 @@
         (click)="proceedSave()"
         [disabled]="!saveJustification.trim() || saving()"
       >
-        <i class="pi pi-check"></i>
+        <i
+          class="pi"
+          [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-check'"
+        ></i>
         {{ 'COMMON.UPDATE' | translate }}
       </button>
     </div>

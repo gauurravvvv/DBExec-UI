@@ -8,17 +8,30 @@
         </button>
         <h2>{{ 'DATASET.DATASET_DETAILS' | translate }}</h2>
       </div>
-      <div class="header-actions">
+      <div class="header-actions" *ngIf="datasetData">
         <button class="btn-primary" (click)="onEdit()">
           <i class="pi pi-pencil"></i>
           {{ 'COMMON.EDIT' | translate }}
         </button>
-        <button class="btn-danger" type="button" (click)="confirmDelete()">
-          <i class="pi pi-trash"></i>
+        <button
+          class="btn-danger"
+          type="button"
+          [disabled]="isDeleting(datasetData.id)"
+          (click)="confirmDelete()"
+        >
+          <i
+            class="pi"
+            [ngClass]="
+              isDeleting(datasetData.id) ? 'pi-spin pi-spinner' : 'pi-trash'
+            "
+          ></i>
           {{ 'COMMON.DELETE' | translate }}
         </button>
       </div>
     </div>
+
+    <!-- Centered branded loader while the GET is in flight. -->
+    <app-content-loader *ngIf="loading() && !datasetData"></app-content-loader>
 
     <!-- Content Section -->
     <div class="content-section" *ngIf="datasetData">
@@ -341,8 +354,22 @@
         <i class="pi pi-times"></i>
         {{ 'COMMON.CANCEL' | translate }}
       </button>
-      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="!deleteJustification.trim()">
-        <i class="pi pi-trash"></i>
+      <button
+        class="btn-confirm"
+        (click)="proceedDelete()"
+        [disabled]="
+          !deleteJustification.trim() ||
+          (datasetData && isDeleting(datasetData.id))
+        "
+      >
+        <i
+          class="pi"
+          [ngClass]="
+            datasetData && isDeleting(datasetData.id)
+              ? 'pi-spin pi-spinner'
+              : 'pi-trash'
+          "
+        ></i>
         {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>

@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -37,7 +38,12 @@ interface AdminData {
   styleUrls: ['./view-system-admin.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ViewSystemAdminComponent implements OnInit {
+export class ViewSystemAdminComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.systemAdminService.cancelReads();
+  }
+
   private destroyRef = inject(DestroyRef);
 
   adminId: string = '';
@@ -49,6 +55,12 @@ export class ViewSystemAdminComponent implements OnInit {
   showDeleteConfirm = false;
   deleteJustification = '';
   showChangePasswordDialog = false;
+  // Signals piped through to the template — `loading` drives the
+  // skeleton card on initial GET; `isDeleting` lights up the page's
+  // Delete button + confirm popup while the per-row DELETE runs.
+  loading = this.systemAdminService.loading;
+  changingPassword = this.systemAdminService.changingPassword;
+  isDeleting = (id: string): boolean => this.systemAdminService.isDeleting(id);
 
   constructor(
     private route: ActivatedRoute,

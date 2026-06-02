@@ -11,7 +11,7 @@
           'GROUP.DEFAULT' | translate
         }}</span>
       </div>
-      <div class="header-actions">
+      <div class="header-actions" *ngIf="groupData">
         <button class="btn-primary" (click)="onEdit()">
           <i class="pi pi-pencil"></i>
           {{
@@ -24,12 +24,22 @@
           *ngIf="groupData?.isDefault !== 1"
           class="btn-danger"
           type="button"
+          [disabled]="isDeleting(groupData.id)"
           (click)="confirmDelete()"
         >
-          <i class="pi pi-trash"></i> {{ 'COMMON.DELETE' | translate }}
+          <i
+            class="pi"
+            [ngClass]="
+              isDeleting(groupData.id) ? 'pi-spin pi-spinner' : 'pi-trash'
+            "
+          ></i>
+          {{ 'COMMON.DELETE' | translate }}
         </button>
       </div>
     </div>
+
+    <!-- Centered branded loader while the GET is in flight. -->
+    <app-content-loader *ngIf="loading() && !groupData"></app-content-loader>
 
     <!-- Content Section -->
     <div class="content-section" *ngIf="groupData">
@@ -196,9 +206,19 @@
       <button
         class="btn-confirm"
         (click)="proceedDelete()"
-        [disabled]="!deleteJustification.trim()"
+        [disabled]="
+          !deleteJustification.trim() ||
+          (groupData && isDeleting(groupData.id))
+        "
       >
-        <i class="pi pi-trash"></i>
+        <i
+          class="pi"
+          [ngClass]="
+            groupData && isDeleting(groupData.id)
+              ? 'pi-spin pi-spinner'
+              : 'pi-trash'
+          "
+        ></i>
         {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>

@@ -30,6 +30,10 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
   @Input() initialDescription = '';
   @Input() dialogTitle = '';
   @Input() showJustification = false;
+  // Drives the Save button's spinner. Parent passes
+  // analysesService.saving so the dialog shows in-progress without
+  // the global blocker.
+  @Input() saving = false;
   @Output() close = new EventEmitter<AnalysisFormData | null>();
 
   analysisForm!: FormGroup;
@@ -61,6 +65,16 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
         description: this.initialDescription,
       });
       this.saveJustification = '';
+    }
+
+    // Mirror the parent's saving state onto the form so its fields
+    // lock in lockstep with the Save button's spinner.
+    if (this.analysisForm) {
+      if (this.saving && this.analysisForm.enabled) {
+        this.analysisForm.disable({ emitEvent: false });
+      } else if (!this.saving && this.analysisForm.disabled) {
+        this.analysisForm.enable({ emitEvent: false });
+      }
     }
   }
 

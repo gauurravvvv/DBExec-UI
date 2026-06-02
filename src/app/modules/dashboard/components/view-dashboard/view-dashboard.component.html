@@ -70,14 +70,14 @@
       </div>
     </div>
 
-    <!-- Loading State -->
-    <div class="loading-section" *ngIf="loading()">
-      <i class="pi pi-spin pi-spinner"></i>
-      <p>{{ 'DASHBOARD.LOADING_DASHBOARD' | translate }}</p>
-    </div>
+    <!-- Centered branded loader while the dashboard renders. -->
+    <app-content-loader *ngIf="loading() || rendering()"></app-content-loader>
 
     <!-- Content Section — sidebar on the left, canvas filling the rest. -->
-    <div class="content-section" *ngIf="!loading() && dashboard">
+    <div
+      class="content-section"
+      *ngIf="!loading() && !rendering() && dashboard"
+    >
       <!--
         Filter sidebar — mirrors the Edit Analysis chrome (260px panel,
         sticky header with title + count badge, divider, scrollable

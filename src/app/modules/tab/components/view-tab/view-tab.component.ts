@@ -3,6 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   inject,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -16,7 +17,12 @@ import { TabService } from '../../services/tab.service';
   styleUrls: ['./view-tab.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ViewTabComponent implements OnInit {
+export class ViewTabComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.tabService.cancelReads();
+  }
+
   private cdr = inject(ChangeDetectorRef);
 
   tabId: string = '';

@@ -140,6 +140,8 @@ export class SetPasswordComponent implements OnInit {
     if (this.setPasswordForm.valid) {
       this.error.set('');
       this.loading.set(true);
+      // Lock the form while setPassword is in flight.
+      this.setPasswordForm.disable({ emitEvent: false });
       try {
         const { newPassword } = this.setPasswordForm.value;
         const res: any = await this.loginService.setPassword(
@@ -160,6 +162,7 @@ export class SetPasswordComponent implements OnInit {
         );
       } finally {
         this.loading.set(false);
+        this.setPasswordForm.enable({ emitEvent: false });
       }
     }
   }

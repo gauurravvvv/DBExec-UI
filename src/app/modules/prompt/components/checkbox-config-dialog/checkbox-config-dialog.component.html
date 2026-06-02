@@ -244,8 +244,16 @@
       <i class="pi pi-times"></i>
       {{ 'COMMON.CANCEL' | translate }}
     </button>
-    <button class="btn-primary" type="button" (click)="onSave()">
-      <i class="pi pi-check"></i>
+    <button
+      class="btn-primary"
+      type="button"
+      (click)="onSave()"
+      [disabled]="saving"
+    >
+      <i
+        class="pi"
+        [ngClass]="saving ? 'pi-spin pi-spinner' : 'pi-check'"
+      ></i>
       {{ 'PROMPT_MODULE.APPLY' | translate }}
     </button>
   </ng-template>

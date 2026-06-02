@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -21,7 +22,14 @@ import { SystemAdminService } from '../../services/system-admin.service';
   styleUrls: ['./edit-system-admin.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditSystemAdminComponent implements OnInit, HasUnsavedChanges {
+export class EditSystemAdminComponent
+  implements OnInit, OnDestroy, HasUnsavedChanges
+{
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.systemAdminService.cancelReads();
+  }
+
   private destroyRef = inject(DestroyRef);
 
   adminForm!: FormGroup;
@@ -32,6 +40,11 @@ export class EditSystemAdminComponent implements OnInit, HasUnsavedChanges {
   showSaveConfirm = false;
   saveJustification = '';
   saving = this.systemAdminService.saving;
+  // `loading` gates the form vs the skeleton — once the GET resolves
+  // and `adminData` is populated, the real form takes over and the
+  // skeleton disappears. Page chrome (header, back, save buttons)
+  // stays visible the whole time.
+  loading = this.systemAdminService.loading;
 
   // Add getter for form dirty state
   get isFormDirty(): boolean {
@@ -134,15 +147,30 @@ export class EditSystemAdminComponent implements OnInit, HasUnsavedChanges {
 
   async proceedSave(): Promise<void> {
     if (this.saveJustification.trim()) {
-      const response: any = await this.systemAdminService.update(
+      // Fire the request first (service.update uses getRawValue, so
+      // disable order is less critical, but stay consistent with the
+      // rest of the rollout) then lock the form.
+      const request = this.systemAdminService.update(
         this.adminForm,
         this.saveJustification.trim(),
       );
-      if (this.globalService.handleSuccessService(response)) {
-        this.showSaveConfirm = false;
-        this.saveJustification = '';
-        this.adminForm.markAsPristine();
-        this.router.navigate([SYSTEM_ADMIN.LIST]);
+      this.adminForm.disable({ emitEvent: false });
+      try {
+        const response: any = await request;
+        if (this.globalService.handleSuccessService(response)) {
+          this.showSaveConfirm = false;
+          this.saveJustification = '';
+          this.adminForm.markAsPristine();
+          this.router.navigate([SYSTEM_ADMIN.LIST]);
+        }
+      } finally {
+        this.adminForm.enable({ emitEvent: false });
+        // Re-apply the per-page rule that locks the status toggle
+        // when the admin account is locked — form.enable() would
+        // otherwise re-enable it.
+        if (this.isLocked) {
+          this.adminForm.get('status')?.disable({ emitEvent: false });
+        }
       }
     }
   }

@@ -76,12 +76,6 @@
           [lazy]="true"
           (onLazyLoad)="loadPrompts($event)"
           [totalRecords]="total()"
-          [globalFilterFields]="[
-            'name',
-            'description',
-            'tab.name',
-            'section.name',
-          ]"
           [rowHover]="true"
           dataKey="id"
           [(selection)]="selectedPrompts"

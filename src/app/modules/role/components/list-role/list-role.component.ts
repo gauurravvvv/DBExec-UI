@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -23,13 +24,21 @@ import { RoleService } from '../../services/role.service';
   styleUrls: ['./list-role.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListRoleComponent implements OnInit {
+export class ListRoleComponent implements OnInit, OnDestroy {
   @ViewChild('dt') dt!: Table;
 
   // Signal refs from service
   roles = this.roleService.roles;
   total = this.roleService.total;
   loading = this.roleService.loading;
+
+  // Per-row spinner helpers — template asks for the id and the service
+  // tells us whether THAT row's delete is in flight. Other rows stay
+  // clickable. Bulk delete derives its state from the selection.
+  isDeleting = (id: string): boolean => this.roleService.isDeleting(id);
+  get isBulkDeleting(): boolean {
+    return this.selectedRoles.some(r => this.roleService.isDeleting(r.id));
+  }
 
   limit = 10;
   lastTableLazyLoadEvent: any;
@@ -84,6 +93,12 @@ export class ListRoleComponent implements OnInit {
     // First fetch is driven by the <p-table [lazy]> component which
     // fires (onLazyLoad) on initial render with the correct paging
     // args. Calling loadRoles() here too would duplicate the request.
+  }
+
+  ngOnDestroy() {
+    // Cancel any in-flight list GET so leaving the list mid-fetch
+    // doesn't keep the request running until the BE answers.
+    this.roleService.cancelReads();
   }
 
   get selectedCount(): number {

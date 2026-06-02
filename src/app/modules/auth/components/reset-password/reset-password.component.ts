@@ -171,6 +171,11 @@ export class ResetPasswordComponent implements OnInit {
     if (this.isFormValid) {
       this.error.set('');
       this.loading.set(true);
+      // Lock both the password form AND the 6 OTP controls (separate
+      // FormControls outside the FormGroup) so nothing is editable
+      // while the POST is in flight.
+      this.resetPasswordForm.disable({ emitEvent: false });
+      this.otpControls.forEach(c => c.disable({ emitEvent: false }));
       try {
         const otp = this.otpValue;
         const res: any = await this.loginService.resetPassword(
@@ -190,6 +195,8 @@ export class ResetPasswordComponent implements OnInit {
         );
       } finally {
         this.loading.set(false);
+        this.resetPasswordForm.enable({ emitEvent: false });
+        this.otpControls.forEach(c => c.enable({ emitEvent: false }));
       }
     }
   }

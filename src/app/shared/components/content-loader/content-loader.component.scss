@@ -1,0 +1,30 @@
+// Loader fills the remaining vertical space of its flex-column
+// parent so the spinner lands at the visual centre of the page
+// content card (below the header, above the footer/page-bottom),
+// not just in its own natural-height row.
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+}
+
+.content-loader {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 24px;
+}
+
+.content-loader__icon {
+  font-size: 32px;
+  color: var(--primary-color, #2563eb);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content-loader__icon {
+    animation: none !important;
+  }
+}

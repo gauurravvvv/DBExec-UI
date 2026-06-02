@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import {
@@ -24,7 +25,7 @@ import { RoleService } from '../../services/role.service';
   styleUrls: ['./edit-role.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditRoleComponent implements OnInit, HasUnsavedChanges {
+export class EditRoleComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   roleForm!: FormGroup;
   permissions: any[] = [];
   permissionControls: { [key: string]: FormControl } = {};
@@ -34,6 +35,10 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
   saveJustification = '';
 
   saving = this.roleService.saving;
+  // `loading` gates the form; `loadingPermissions` gates the toggle
+  // grid below. Both run in parallel via Promise.all in loadRoleData.
+  loading = this.roleService.loading;
+  loadingPermissions = this.roleService.loadingPermissions;
 
   constructor(
     private fb: FormBuilder,
@@ -58,6 +63,12 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
   ngOnInit() {
     this.roleId = this.route.snapshot.params['id'];
     this.loadRoleData();
+  }
+
+  ngOnDestroy() {
+    // Abort in-flight loadOne + loadPermissions if the user navigates
+    // away before they resolve. Saves stay running deliberately.
+    this.roleService.cancelReads();
   }
 
   initForm() {
@@ -151,6 +162,12 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
         this.permissions,
       );
       const raw = this.roleForm.getRawValue();
+      // Lock the form AND the permission toggles (outside the
+      // FormGroup) so nothing is editable during the PUT.
+      this.roleForm.disable({ emitEvent: false });
+      Object.values(this.permissionControls).forEach(c =>
+        c.disable({ emitEvent: false }),
+      );
       this.roleService
         .edit(
           {
@@ -170,6 +187,18 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
             this.router.navigate([ROLE.LIST]);
           }
           this.cdr.markForCheck();
+        })
+        .finally(() => {
+          this.roleForm.enable({ emitEvent: false });
+          Object.values(this.permissionControls).forEach(c =>
+            c.enable({ emitEvent: false }),
+          );
+          // Default roles keep their fields locked after save.
+          if (this.isDefault) {
+            this.roleForm.get('name')?.disable({ emitEvent: false });
+            this.roleForm.get('description')?.disable({ emitEvent: false });
+            this.roleForm.get('status')?.disable({ emitEvent: false });
+          }
         });
     }
   }

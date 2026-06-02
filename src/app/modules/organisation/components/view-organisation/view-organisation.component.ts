@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -71,17 +72,32 @@ interface OrganisationData {
   styleUrls: ['./view-organisation.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ViewOrganisationComponent implements OnInit {
+export class ViewOrganisationComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.organisationService.cancelReads();
+  }
+
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
   organisationId!: string;
-  organisationData!: OrganisationData;
+  // Read directly from the service signal so the page re-renders the
+  // moment the org is loaded — no manual cdr.markForCheck() needed.
+  organisationData: OrganisationData | null = null;
+  // Drives the skeleton card while the initial GET is in flight. The
+  // OrganisationService's `loading` signal lights up via load() and
+  // clears in `finally`, so we just mirror it for the template.
+  loading = this.organisationService.loading;
   avatarBackground: string = '#2196F3';
   organisationInitials: string = '';
   showDeleteConfirm: boolean = false;
   deleteJustification = '';
+  // Per-action local flags so the buttons can show their own spinner
+  // and disabled state while their call is in flight, without
+  // affecting any other affordance on the page.
   isRefreshingMasterDb: boolean = false;
+  isDeleting: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -99,16 +115,19 @@ export class ViewOrganisationComponent implements OnInit {
       });
   }
 
-  loadOrganisationData() {
-    this.organisationService
-      .viewOrganisation(this.organisationId)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.organisationData = response.data;
-          this.setOrganisationInitials();
-          this.cdr.markForCheck();
-        }
-      });
+  async loadOrganisationData() {
+    // Signal-based loadOne — flips service.loading() true → fetches with
+    // skipLoader:true → flips loading() false. The skeleton card in the
+    // template is gated on that signal, so the page renders the
+    // placeholder immediately and swaps to the real layout when data
+    // arrives without flashing a global blocker.
+    await this.organisationService.loadOne(this.organisationId);
+    const data = this.organisationService.current();
+    if (data) {
+      this.organisationData = data;
+      this.setOrganisationInitials();
+      this.cdr.markForCheck();
+    }
   }
 
   setOrganisationInitials() {
@@ -132,19 +151,23 @@ export class ViewOrganisationComponent implements OnInit {
   }
 
   proceedDelete() {
-    if (this.deleteJustification.trim()) {
-      this.organisationService
-        .deleteOrganisation(
-          this.organisationId,
-          this.deleteJustification.trim(),
-        )
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.deleteJustification = '';
-            this.router.navigate([ORGANISATION.LIST]);
-          }
-        });
-    }
+    if (!this.deleteJustification.trim()) return;
+    // Use the signal-based delete so the page's "Delete" button can
+    // mirror service.isDeleting(id) — drives a per-button spinner +
+    // disabled state while the request is in flight.
+    this.isDeleting = true;
+    this.organisationService
+      .delete(this.organisationId, this.deleteJustification.trim())
+      .then(response => {
+        if (this.globalService.handleSuccessService(response)) {
+          this.deleteJustification = '';
+          this.router.navigate([ORGANISATION.LIST]);
+        }
+      })
+      .finally(() => {
+        this.isDeleting = false;
+        this.cdr.markForCheck();
+      });
   }
 
   refreshMasterDb() {

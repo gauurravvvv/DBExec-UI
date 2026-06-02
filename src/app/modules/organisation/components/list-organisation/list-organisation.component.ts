@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -27,7 +28,12 @@ type OrgSortField = 'name' | 'status' | 'createdOn';
   styleUrls: ['./list-organisation.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListOrganisationComponent implements OnInit {
+export class ListOrganisationComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.organisationService.cancelReads();
+  }
+
   private destroyRef = inject(DestroyRef);
 
   @ViewChild('dt') dt!: Table;
@@ -229,8 +235,11 @@ export class ListOrganisationComponent implements OnInit {
         this.cancelDelete();
         return;
       }
+      // Use the signal-based `bulkDelete` so the service stamps each
+      // selected id into `_deleting` — the template can light up a
+      // per-row spinner via `orgService.isDeleting(id)`.
       this.organisationService
-        .bulkDeleteOrganisation(ids, reason)
+        .bulkDelete(ids, reason)
         .then((res: any) => {
           if (this.globalService.handleSuccessService(res)) {
             this.selectedOrgs = [];
@@ -262,8 +271,11 @@ export class ListOrganisationComponent implements OnInit {
   }
 
   onDelete(orgId: string) {
+    // Signal-based `delete` flips `_deleting[orgId]` while in flight so
+    // the row's delete button spins. The rest of the table stays
+    // clickable — only that row is "busy".
     this.organisationService
-      .deleteOrganisation(orgId, this.deleteJustification.trim())
+      .delete(orgId, this.deleteJustification.trim())
       .then((res: any) => {
         if (this.globalService.handleSuccessService(res)) {
           this.selectedOrgs = this.selectedOrgs.filter(o => o.id !== orgId);
@@ -271,5 +283,18 @@ export class ListOrganisationComponent implements OnInit {
         }
         this.cdr.markForCheck();
       });
+  }
+
+  // Template uses this to check if a specific row's delete button
+  // should show its spinner. Reading the signal in the getter makes it
+  // change-detect cleanly.
+  isDeleting = (id: string): boolean => this.organisationService.isDeleting(id);
+
+  // True while any selected row is being deleted — drives the bulk
+  // Delete button's spinner.
+  get isBulkDeleting(): boolean {
+    return this.selectedOrgs.some(o =>
+      this.organisationService.isDeleting(o.id),
+    );
   }
 }

@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -22,10 +23,21 @@ import { OrganisationService } from '../../services/organisation.service';
   styleUrls: ['./edit-organisation.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
+export class EditOrganisationComponent
+  implements OnInit, OnDestroy, HasUnsavedChanges
+{
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.organisationService.cancelReads();
+  }
+
   private destroyRef = inject(DestroyRef);
 
   saving = this.organisationService.saving;
+  // Drives the skeleton form while the GET that hydrates the form is
+  // in flight. Sourced from the service so toggling it elsewhere
+  // (cache invalidation, refetch on focus) flows through automatically.
+  loading = this.organisationService.loading;
 
   orgForm!: FormGroup;
   isFormDirty = false;
@@ -208,11 +220,21 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
     );
   }
 
-  private loadOrganisationData() {
-    this.organisationService
-      .viewOrganisation(this.organisationId)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
+  private async loadOrganisationData() {
+    // Signal-based loadOne flips service.loading() true → fetches with
+    // skipLoader:true → flips it false. The template's skeleton-form
+    // mirrors that signal so the user sees a shape-correct placeholder
+    // immediately, no global blocker.
+    await this.organisationService.loadOne(this.organisationId);
+    const data = this.organisationService.current();
+    if (data) {
+      const response = { status: true, data } as any;
+      this.handleLoadedOrg(response);
+    }
+  }
+
+  private handleLoadedOrg(response: any) {
+    if (this.globalService.handleSuccessService(response, false)) {
           this.orgData = response.data;
           this.hasMasterDb = !!this.orgData.masterDbConfig;
 
@@ -252,7 +274,6 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
           // Organisation name cannot be changed after creation
           this.orgForm.get('name')?.disable();
         }
-      });
   }
 
   // Step validation
@@ -537,8 +558,15 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
 
   proceedSave(): void {
     if (this.saveJustification.trim()) {
-      this.organisationService
-        .edit(this.orgForm, this.saveJustification.trim())
+      // Order matters: fire the request first (service reads
+      // orgForm.value synchronously) then disable the form so the
+      // user can't edit fields while the PUT is in flight.
+      const request = this.organisationService.edit(
+        this.orgForm,
+        this.saveJustification.trim(),
+      );
+      this.orgForm.disable({ emitEvent: false });
+      request
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response)) {
             this.showSaveConfirm = false;
@@ -547,6 +575,9 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
             this.orgForm.markAsPristine();
             this.router.navigate([ORGANISATION.LIST]);
           }
+        })
+        .finally(() => {
+          this.orgForm.enable({ emitEvent: false });
         });
     }
   }

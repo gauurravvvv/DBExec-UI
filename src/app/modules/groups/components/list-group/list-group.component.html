@@ -12,7 +12,8 @@
           *ngIf="selectedCount > 0"
           pButton
           [label]="('COMMON.DELETE' | translate) + ' (' + selectedCount + ')'"
-          icon="pi pi-trash"
+          [icon]="isBulkDeleting ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+          [disabled]="isBulkDeleting"
           (click)="confirmBulkDelete()"
           class="p-button-raised p-button-danger modern-button"
         ></button>
@@ -54,7 +55,8 @@
           [lazy]="true"
           (onLazyLoad)="loadGroups($event)"
           [totalRecords]="total()"
-          [globalFilterFields]="['name', 'description', 'status']"
+          [loading]="loading()"
+          [showLoader]="false"
           [rowHover]="true"
           dataKey="id"
           [(selection)]="selectedGroups"
@@ -328,13 +330,28 @@
                         : ('COMMON.DELETE' | translate)
                     "
                     tooltipPosition="bottom"
-                    [disabled]="group.isDefault === 1"
+                    [disabled]="group.isDefault === 1 || isDeleting(group.id)"
                   >
-                    <i class="pi pi-trash"></i>
+                    <i
+                      class="pi"
+                      [ngClass]="
+                        isDeleting(group.id) ? 'pi-spin pi-spinner' : 'pi-trash'
+                      "
+                    ></i>
                   </button>
                 </div>
               </td>
             </tr>
+          </ng-template>
+          <!-- Skeleton rows while the lazy GET is in flight. -->
+          <ng-template pTemplate="loadingbody">
+            <tr
+              *ngFor="let _ of [].constructor(10); let i = index"
+              appSkeletonRow
+              [columns]="5"
+              [showCheckbox]="true"
+              [showActions]="true"
+            ></tr>
           </ng-template>
           <ng-template pTemplate="emptymessage">
             <tr class="empty-row">
@@ -429,9 +446,23 @@
       <button
         class="btn-confirm"
         (click)="proceedDelete()"
-        [disabled]="!deleteJustification.trim()"
+        [disabled]="
+          !deleteJustification.trim() ||
+          (bulkDelete
+            ? isBulkDeleting
+            : !!(groupToDelete && isDeleting(groupToDelete)))
+        "
       >
-        <i class="pi pi-trash"></i>
+        <i
+          class="pi"
+          [ngClass]="
+            (bulkDelete
+              ? isBulkDeleting
+              : !!(groupToDelete && isDeleting(groupToDelete)))
+              ? 'pi-spin pi-spinner'
+              : 'pi-trash'
+          "
+        ></i>
         {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>

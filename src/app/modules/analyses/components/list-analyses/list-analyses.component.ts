@@ -103,6 +103,17 @@ export class ListAnalysesComponent implements OnInit {
     return this.analysesService.saving;
   }
 
+  // Local loading flag — wraps the listAnalyses fetch so the table's
+  // skeleton template gets a stable boolean. Per-row delete spinner
+  // helpers come from the service's _deleting map.
+  loadingList = false;
+  isDeleting = (id: string): boolean => this.analysesService.isDeleting(id);
+  get isBulkDeleting(): boolean {
+    return this.selectedAnalyses.some((a: any) =>
+      this.analysesService.isDeleting(a.id),
+    );
+  }
+
   ngOnInit() {
     this.statusOptions = [
       { label: this.translate.instant('COMMON.ACTIVE'), value: 1 },
@@ -318,6 +329,8 @@ export class ListAnalysesComponent implements OnInit {
     const sortParam = this.sortHelper.serialize();
     if (sortParam) params.sort = sortParam;
 
+    this.loadingList = true;
+    this.cdr.markForCheck();
     this.analysesService
       .listAnalyses(params)
       .then(response => {
@@ -330,12 +343,14 @@ export class ListAnalysesComponent implements OnInit {
           this.filteredAnalyses = [];
           this.totalRecords = 0;
         }
+        this.loadingList = false;
         this.cdr.markForCheck();
       })
       .catch(() => {
         this.analyses = [];
         this.filteredAnalyses = [];
         this.totalRecords = 0;
+        this.loadingList = false;
         this.cdr.markForCheck();
       });
   }

@@ -3,6 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   inject,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -16,7 +17,12 @@ import { RlsRulesService } from '../../services/rls-rules.service';
   styleUrls: ['./view-rls-rule.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ViewRlsRuleComponent implements OnInit {
+export class ViewRlsRuleComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.rlsRulesService.cancelReads();
+  }
+
   private cdr = inject(ChangeDetectorRef);
 
   // Signal refs

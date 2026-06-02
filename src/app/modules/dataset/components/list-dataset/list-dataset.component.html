@@ -12,7 +12,8 @@
           *ngIf="selectedCount > 0"
           pButton
           [label]="('COMMON.DELETE' | translate) + ' (' + selectedCount + ')'"
-          icon="pi pi-trash"
+          [icon]="isBulkDeleting ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+          [disabled]="isBulkDeleting"
           (click)="confirmBulkDelete()"
           class="p-button-raised p-button-danger modern-button"
         ></button>
@@ -77,7 +78,8 @@
           [lazy]="true"
           (onLazyLoad)="loadDatasets($event)"
           [totalRecords]="totalRecords"
-          [globalFilterFields]="['name', 'description', 'status']"
+          [loading]="loadingList"
+          [showLoader]="false"
           [rowHover]="true"
           dataKey="id"
           [(selection)]="selectedDatasets"
@@ -312,8 +314,16 @@
                     (click)="confirmDelete(dataset.id)"
                     [pTooltip]="'COMMON.DELETE' | translate"
                     tooltipPosition="bottom"
+                    [disabled]="isDeleting(dataset.id)"
                   >
-                    <i class="pi pi-trash"></i>
+                    <i
+                      class="pi"
+                      [ngClass]="
+                        isDeleting(dataset.id)
+                          ? 'pi-spin pi-spinner'
+                          : 'pi-trash'
+                      "
+                    ></i>
                   </button>
                   <button
                     class="icon-btn more-btn"
@@ -326,6 +336,16 @@
                 </div>
               </td>
             </tr>
+          </ng-template>
+          <!-- Skeleton rows while the lazy GET is in flight. -->
+          <ng-template pTemplate="loadingbody">
+            <tr
+              *ngFor="let _ of [].constructor(10); let i = index"
+              appSkeletonRow
+              [columns]="4"
+              [showCheckbox]="true"
+              [showActions]="true"
+            ></tr>
           </ng-template>
           <ng-template pTemplate="emptymessage">
             <tr class="empty-row">
@@ -419,9 +439,23 @@
       <button
         class="btn-confirm"
         (click)="proceedDelete()"
-        [disabled]="!deleteJustification.trim()"
+        [disabled]="
+          !deleteJustification.trim() ||
+          (bulkDelete
+            ? isBulkDeleting
+            : !!(datasetToDelete && isDeleting(datasetToDelete)))
+        "
       >
-        <i class="pi pi-trash"></i>
+        <i
+          class="pi"
+          [ngClass]="
+            (bulkDelete
+              ? isBulkDeleting
+              : !!(datasetToDelete && isDeleting(datasetToDelete)))
+              ? 'pi-spin pi-spinner'
+              : 'pi-trash'
+          "
+        ></i>
         {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>

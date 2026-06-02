@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,7 +16,12 @@ import { DatasetService } from '../../services/dataset.service';
   styleUrls: ['./view-dataset.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ViewDatasetComponent implements OnInit {
+export class ViewDatasetComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.datasetService.cancelReads();
+  }
+
   datasetData: any;
   showDeleteConfirm = false;
   deleteJustification = '';
@@ -29,6 +35,9 @@ export class ViewDatasetComponent implements OnInit {
   isLoadingField = false;
 
   saving = this.datasetService.saving;
+  // Drives the skeleton card on initial GET + per-id delete spinner.
+  loading = this.datasetService.loading;
+  isDeleting = (id: string): boolean => this.datasetService.isDeleting(id);
 
   constructor(
     private route: ActivatedRoute,
@@ -169,20 +178,15 @@ export class ViewDatasetComponent implements OnInit {
     this.loadDatasetData();
   }
 
-  loadDatasetData() {
+  async loadDatasetData() {
     const datasetId = this.route.snapshot.params['id'];
-
-    this.datasetService
-      .viewDataset(datasetId)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.datasetData = response.data;
-        }
-        this.cdr.markForCheck();
-      })
-      .catch(() => {
-        this.cdr.markForCheck();
-      });
+    // Use the signal-based loadOne — drives the skeleton card via
+    // the service's `loading` signal (no global blocker).
+    const response: any = await this.datasetService.loadOne(datasetId);
+    if (this.globalService.handleSuccessService(response, false)) {
+      this.datasetData = this.datasetService.current();
+    }
+    this.cdr.markForCheck();
   }
 
   goBack() {

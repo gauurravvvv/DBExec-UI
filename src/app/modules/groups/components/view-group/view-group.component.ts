@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,11 +16,19 @@ import { GroupService } from '../../services/group.service';
   styleUrls: ['./view-group.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ViewGroupComponent implements OnInit {
+export class ViewGroupComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.groupService.cancelReads();
+  }
+
   groupId: string = '';
   groupData: any = null;
   showDeleteConfirm = false;
   deleteJustification = '';
+  // Skeleton gating + per-group delete spinner.
+  loading = this.groupService.loading;
+  isDeleting = (id: string): boolean => this.groupService.isDeleting(id);
 
   constructor(
     private route: ActivatedRoute,

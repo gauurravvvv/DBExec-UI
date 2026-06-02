@@ -74,10 +74,19 @@ export class AddSystemAdminComponent implements OnInit, HasUnsavedChanges {
 
   async onSubmit(): Promise<void> {
     if (this.adminForm.valid) {
-      const response: any = await this.systemAdminService.add(this.adminForm);
-      if (this.globalService.handleSuccessService(response)) {
-        this.adminForm.markAsPristine();
-        this.router.navigate([SYSTEM_ADMIN.LIST]);
+      // Fire the request first (service reads adminForm.value
+      // synchronously) then lock the form so the user can't edit
+      // fields while the POST is in flight.
+      const request = this.systemAdminService.add(this.adminForm);
+      this.adminForm.disable({ emitEvent: false });
+      try {
+        const response: any = await request;
+        if (this.globalService.handleSuccessService(response)) {
+          this.adminForm.markAsPristine();
+          this.router.navigate([SYSTEM_ADMIN.LIST]);
+        }
+      } finally {
+        this.adminForm.enable({ emitEvent: false });
       }
     } else {
       // Mark all fields as touched to trigger validation messages

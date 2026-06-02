@@ -3158,4 +3158,41 @@ body {
     white-space: nowrap;
   }
 }
+// ================================================================
+// Skeleton placeholders — global polish for p-skeleton.
+// PrimeNG ships a 1.2s shimmer; we slow it down, soften the base
+// tone, and widen the highlight band so the motion reads as gentle
+// breathing rather than a strobe. Applies anywhere <p-skeleton>
+// is used (list rows, view pages, edit forms).
+// ================================================================
+.p-skeleton {
+  background-color: rgba(15, 23, 42, 0.06);
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.55) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation-duration: 1.8s !important;
+    animation-timing-function: ease-in-out !important;
+  }
+}
+
+// Round skeletons (avatars, icons) pick up the same shimmer.
+.p-skeleton.p-skeleton-circle {
+  border-radius: 50%;
+}
+
+// Respect users who turn animations off — accessibility.
+@media (prefers-reduced-motion: reduce) {
+  .p-skeleton::after {
+    animation: none !important;
+  }
+}
+
 /* trigger-rebuild 1779393582 */

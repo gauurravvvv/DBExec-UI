@@ -11,6 +11,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -72,7 +73,14 @@ import { DatasourceService } from '../../services/datasource.service';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
+export class EditDatasourceComponent
+  implements OnInit, OnDestroy, HasUnsavedChanges
+{
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.datasourceService.cancelReads();
+  }
+
   private destroyRef = inject(DestroyRef);
 
   datasourceForm!: FormGroup;
@@ -108,6 +116,12 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
   private testRequestId = 0;
 
   saving = this.datasourceService.saving;
+  // Drives the form vs skeleton swap on initial GET.
+  loading = this.datasourceService.loading;
+  // True once loadOne resolves and we've patched the form — the
+  // skeleton hides and the form takes over. Decoupled from `loading`
+  // so quick refreshes don't flash the skeleton.
+  datasourceLoaded = false;
 
   constructor(
     private fb: FormBuilder,
@@ -220,6 +234,7 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
       // Connection is already valid since the DB was fetched successfully
       this.connectionTested = true;
       this.connectionTestResult = 'success';
+      this.datasourceLoaded = true;
       this.cdr.markForCheck();
     }
   }
@@ -337,16 +352,23 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
         status: formValue.status ? 1 : 0,
       };
 
-      const response = await this.datasourceService.update(
-        payload,
-        this.saveJustification.trim(),
-      );
-      if (this.globalService.handleSuccessService(response)) {
-        this.showSaveConfirm = false;
-        this.saveJustification = '';
-        this.isFormDirty = false;
-        this.datasourceForm.markAsPristine();
-        this.router.navigate([DATASOURCE.LIST]);
+      // Payload was already extracted via getRawValue(), so we can
+      // safely disable the whole form before firing the PUT.
+      this.datasourceForm.disable({ emitEvent: false });
+      try {
+        const response = await this.datasourceService.update(
+          payload,
+          this.saveJustification.trim(),
+        );
+        if (this.globalService.handleSuccessService(response)) {
+          this.showSaveConfirm = false;
+          this.saveJustification = '';
+          this.isFormDirty = false;
+          this.datasourceForm.markAsPristine();
+          this.router.navigate([DATASOURCE.LIST]);
+        }
+      } finally {
+        this.datasourceForm.enable({ emitEvent: false });
       }
     }
   }

@@ -20,7 +20,7 @@
         <div class="input-group">
           <app-custom-input [(ngModel)]="editableField.columnToView" [label]="'DATASET.FIELD_NAME_TO_SHOW' | translate"
             [placeholder]="'DATASET.DISPLAY_NAME' | translate" [maxLength]="MAX_NAME_LENGTH" [showError]="!!nameError"
-            [errorMessage]="nameError" (ngModelChange)="onFieldChange()" icon="pi-id-card">
+            [errorMessage]="nameError" (ngModelChange)="onFieldChange()" [inputDisabled]="isSubmitting" icon="pi-id-card">
           </app-custom-input>
           <small class="char-count">
             {{ editableField.columnToView?.length || 0 }}/{{ MAX_NAME_LENGTH }}
@@ -30,7 +30,7 @@
           <app-custom-dropdown [options]="analyticalTypes" [ngModel]="editableField.dataType"
             (ngModelChange)="onDataTypeChange($event)" [label]="'DATASET.DATA_TYPE' | translate" optionLabel="label"
             optionValue="value" [placeholder]="'DATASET.SELECT_DATA_TYPE' | translate" [filter]="true"
-            [autoDisplayFirst]="false" icon="pi-th-large">
+            [autoDisplayFirst]="false" [disabled]="isSubmitting" icon="pi-th-large">
           </app-custom-dropdown>
           <small class="type-hint">
             {{ 'DATASET.DATA_TYPE_HINT' | translate }}
@@ -43,7 +43,8 @@
           (click)="onCancel()" [disabled]="isSubmitting"></button>
         <button pButton type="button" [label]="'COMMON.SAVE' | translate" class="p-button-primary btn-save"
           (click)="onSubmit()" [disabled]="!isSaveEnabled || isSubmitting">
-          <i class="pi pi-save mr-2"></i>
+          <i class="pi mr-2"
+            [ngClass]="isSubmitting ? 'pi-spin pi-spinner' : 'pi-save'"></i>
         </button>
       </div>
     </div>

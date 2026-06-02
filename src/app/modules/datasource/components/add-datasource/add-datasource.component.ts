@@ -234,10 +234,17 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
         payload.port = formValue.port;
       }
 
-      const response = await this.datasourceService.add(payload);
-      if (this.globalService.handleSuccessService(response)) {
-        this.datasourceForm.markAsPristine();
-        this.router.navigate([DATASOURCE.LIST]);
+      // Payload was already extracted via getRawValue() above, so we
+      // can safely disable the whole form before firing the POST.
+      this.datasourceForm.disable({ emitEvent: false });
+      try {
+        const response = await this.datasourceService.add(payload);
+        if (this.globalService.handleSuccessService(response)) {
+          this.datasourceForm.markAsPristine();
+          this.router.navigate([DATASOURCE.LIST]);
+        }
+      } finally {
+        this.datasourceForm.enable({ emitEvent: false });
       }
     }
   }

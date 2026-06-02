@@ -27,15 +27,28 @@
           type="submit"
           [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
-          [disabled]="connectionForm.invalid || !isFormDirty"
+          [disabled]="
+            connectionForm.invalid || !isFormDirty || saving() || !connectionData
+          "
         >
-          <i class="pi pi-save mr-2"></i>
+          <i
+            class="pi mr-2"
+            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
+          ></i>
         </button>
       </div>
     </div>
 
+    <!-- Centered branded loader while the GET is in flight. -->
+    <app-content-loader *ngIf="loading() && !connectionData"></app-content-loader>
+
     <!-- Form Section -->
-    <form [formGroup]="connectionForm" class="admin-form" #formContainer>
+    <form
+      *ngIf="connectionData"
+      [formGroup]="connectionForm"
+      class="admin-form"
+      #formContainer
+    >
       <div class="form-grid">
         <!-- Name Field -->
         <app-custom-input
@@ -173,9 +186,12 @@
       <button
         class="btn-confirm"
         (click)="proceedSave()"
-        [disabled]="!saveJustification.trim()"
+        [disabled]="!saveJustification.trim() || saving()"
       >
-        <i class="pi pi-check"></i>
+        <i
+          class="pi"
+          [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-check'"
+        ></i>
         {{ 'COMMON.UPDATE' | translate }}
       </button>
     </div>

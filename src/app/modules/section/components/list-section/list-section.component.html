@@ -75,7 +75,6 @@
           [lazy]="true"
           (onLazyLoad)="loadSections($event)"
           [totalRecords]="total()"
-          [globalFilterFields]="['name', 'description', 'tab.name']"
           [rowHover]="true"
           dataKey="id"
           [(selection)]="selectedSections"

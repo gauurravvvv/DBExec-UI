@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
+import { EmptyError, Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { ANNOUNCEMENT } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
@@ -27,6 +27,13 @@ export class AnnouncementService {
   private _loading = signal(false);
   private _saving = signal(false);
 
+  // Reads pipe through this Subject so callers (view/edit/list/add
+  // announcement ngOnDestroy) can cancel in-flight GETs. Mutations
+  // and dismiss don't pipe through. loadActive is fired by the header
+  // (long-lived), so it doesn't pipe through either — only navigation-
+  // tied reads (load, loadOne) cancel.
+  private _cancelReads$ = new Subject<void>();
+
   readonly announcements = this._announcements.asReadonly();
   readonly total = this._total.asReadonly();
   readonly active = this._active.asReadonly();
@@ -49,13 +56,16 @@ export class AnnouncementService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(ANNOUNCEMENT.LIST, { params }),
+        this.http
+          .apiGet(ANNOUNCEMENT.LIST, { params })
+          .pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) {
         this._announcements.set(res.data?.announcements ?? []);
         this._total.set(res.data?.count ?? 0);
       }
-    } catch {
+    } catch (err) {
+      if (err instanceof EmptyError) return;
       this._announcements.set([]);
       this._total.set(0);
     } finally {
@@ -68,14 +78,25 @@ export class AnnouncementService {
     try {
       const res: any = await lastValueFrom(
         // GET /announcements/:id — single read.
-        this.http.apiGet(ANNOUNCEMENT.GET + id),
+        this.http
+          .apiGet(ANNOUNCEMENT.GET + id)
+          .pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) this._current.set(res.data);
-    } catch {
+    } catch (err) {
+      if (err instanceof EmptyError) return;
       this._current.set(null);
     } finally {
       this._loading.set(false);
     }
+  }
+
+  /**
+   * Cancel any in-flight read GETs. Components call this from
+   * ngOnDestroy so the XHR is aborted when the user navigates away.
+   */
+  cancelReads() {
+    this._cancelReads$.next();
   }
 
   async add(payload: AnnouncementPayload): Promise<any> {

@@ -12,7 +12,8 @@
           *ngIf="selectedCount > 0"
           pButton
           [label]="('COMMON.DELETE' | translate) + ' (' + selectedCount + ')'"
-          icon="pi pi-trash"
+          [icon]="isBulkDeleting ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+          [disabled]="isBulkDeleting"
           (click)="confirmBulkDelete()"
           class="p-button-raised p-button-danger modern-button"
         ></button>
@@ -50,7 +51,6 @@
           [lazy]="true"
           (onLazyLoad)="loadOrganisations($event)"
           [totalRecords]="total()"
-          [globalFilterFields]="['name', 'description', 'status']"
           [rowHover]="true"
           dataKey="id"
           [(selection)]="selectedOrgs"
@@ -62,6 +62,8 @@
           [scrollable]="true"
           scrollHeight="flex"
           [tableStyle]="{ 'min-width': '65rem' }"
+          [loading]="loading()"
+          [showLoader]="false"
         >
           <ng-template pTemplate="header">
             <tr>
@@ -221,6 +223,19 @@
               </th>
             </tr>
           </ng-template>
+          <!-- Skeleton rows while the lazy-load API is in flight. The
+               <p-table>'s [loading]="loading()" Input swaps in this
+               template instead of the empty/body state, leaving the
+               rest of the page (header/filters/pagination) interactive. -->
+          <ng-template pTemplate="loadingbody">
+            <tr
+              *ngFor="let _ of [].constructor(10); let i = index"
+              appSkeletonRow
+              [columns]="4"
+              [showCheckbox]="true"
+              [showActions]="true"
+            ></tr>
+          </ng-template>
           <ng-template pTemplate="body" let-org>
             <tr class="modern-row">
               <td pFrozenColumn>
@@ -282,10 +297,17 @@
                   <button
                     class="icon-btn delete-btn"
                     (click)="confirmDelete(org.id)"
+                    [disabled]="isDeleting(org.id)"
                     [pTooltip]="'COMMON.DELETE' | translate"
                     tooltipPosition="bottom"
                   >
-                    <i class="pi pi-trash"></i>
+                    <!-- Per-row spinner: only THIS row's delete shows
+                         busy state; everything else (other rows, edit
+                         button, filters) stays clickable. -->
+                    <i
+                      class="pi"
+                      [ngClass]="isDeleting(org.id) ? 'pi-spin pi-spinner' : 'pi-trash'"
+                    ></i>
                   </button>
                 </div>
               </td>

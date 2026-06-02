@@ -1,8 +1,21 @@
 import { Injectable, signal } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
+import { EmptyError, Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { DATASOURCE } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
+/**
+ * DatasourceService — list/view/CUD for datasources + schema/table/
+ * column listings used by the dataset editor.
+ *
+ * Loading-state follows the rollout convention: `loading` for reads,
+ * `saving` for writes, `_deleting` as a per-id record so each row's
+ * delete button can spin independently. Every signal-based call passes
+ * `{ skipLoader: true }` so the legacy global blocker stays out of
+ * this module — templates render skeleton placeholders + button-level
+ * spinners while the signals are true. Test-Connection lives in
+ * OrganisationService.validateDatasource (already skipLoader-clean
+ * from Phase 1).
+ */
 @Injectable({ providedIn: 'root' })
 export class DatasourceService {
   private _datasources = signal<any[]>([]);
@@ -12,6 +25,12 @@ export class DatasourceService {
   private _saving = signal(false);
   private _schemas = signal<any[]>([]);
   private _queryLoading = signal(false);
+  private _deleting = signal<Record<string, boolean>>({});
+
+  // Reads pipe through this Subject so callers (view/edit/list/add
+  // datasource ngOnDestroy) can cancel in-flight GETs when the user
+  // navigates away. Mutations + runQuery don't pipe through this.
+  private _cancelReads$ = new Subject<void>();
 
   readonly datasources = this._datasources.asReadonly();
   readonly total = this._total.asReadonly();
@@ -20,6 +39,17 @@ export class DatasourceService {
   readonly saving = this._saving.asReadonly();
   readonly schemas = this._schemas.asReadonly();
   readonly queryLoading = this._queryLoading.asReadonly();
+  readonly deleting = this._deleting.asReadonly();
+
+  isDeleting(id: string): boolean {
+    return !!this._deleting()[id];
+  }
+  private setDeleting(id: string, on: boolean): void {
+    const map = { ...this._deleting() };
+    if (on) map[id] = true;
+    else delete map[id];
+    this._deleting.set(map);
+  }
 
   constructor(private http: HttpClientService) {}
 
@@ -27,12 +57,16 @@ export class DatasourceService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(DATASOURCE.LIST, { params }),
+        this.http
+          .apiGet(DATASOURCE.LIST, { params, skipLoader: true })
+          .pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) {
         this._datasources.set(res.data.datasources ?? []);
         this._total.set(res.data.count ?? 0);
       }
+    } catch (err) {
+      if (!(err instanceof EmptyError)) throw err;
     } finally {
       this._loading.set(false);
     }
@@ -42,9 +76,13 @@ export class DatasourceService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(DATASOURCE.GET + id),
+        this.http
+          .apiGet(DATASOURCE.GET + id, { skipLoader: true })
+          .pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) this._current.set(res.data);
+    } catch (err) {
+      if (!(err instanceof EmptyError)) throw err;
     } finally {
       this._loading.set(false);
     }
@@ -64,16 +102,20 @@ export class DatasourceService {
         password,
       } = payload;
       return await lastValueFrom(
-        this.http.apiPost(DATASOURCE.ADD, {
-          name,
-          description,
-          type,
-          host,
-          port,
-          database,
-          username,
-          password,
-        }),
+        this.http.apiPost(
+          DATASOURCE.ADD,
+          {
+            name,
+            description,
+            type,
+            host,
+            port,
+            database,
+            username,
+            password,
+          },
+          { skipLoader: true },
+        ),
       );
     } finally {
       this._saving.set(false);
@@ -97,19 +139,23 @@ export class DatasourceService {
       } = payload;
       return await lastValueFrom(
         // PUT /datasources/:id
-        this.http.apiPut(DATASOURCE.UPDATE + id, {
-          id,
-          name,
-          description,
-          type,
-          host,
-          port,
-          database,
-          username,
-          password,
-          status,
-          justification,
-        }),
+        this.http.apiPut(
+          DATASOURCE.UPDATE + id,
+          {
+            id,
+            name,
+            description,
+            type,
+            host,
+            port,
+            database,
+            username,
+            password,
+            status,
+            justification,
+          },
+          { skipLoader: true },
+        ),
       );
     } finally {
       this._saving.set(false);
@@ -118,19 +164,35 @@ export class DatasourceService {
 
   async delete(id: string, justification?: string): Promise<any> {
     // DELETE /datasources/:id — body carries justification.
-    return await lastValueFrom(
-      this.http.apiDelete(DATASOURCE.DELETE + id, {
-        body: { justification },
-      }),
-    );
+    this.setDeleting(id, true);
+    try {
+      return await lastValueFrom(
+        this.http.apiDelete(DATASOURCE.DELETE + id, {
+          body: { justification },
+          skipLoader: true,
+        }),
+      );
+    } finally {
+      this.setDeleting(id, false);
+    }
   }
 
   async bulkDelete(ids: string[], justification?: string): Promise<any> {
     // POST /datasources/bulk-delete
-    return await lastValueFrom(
-      this.http.apiPost(DATASOURCE.BULK_DELETE, { ids, justification }),
-    );
+    ids.forEach(id => this.setDeleting(id, true));
+    try {
+      return await lastValueFrom(
+        this.http.apiPost(
+          DATASOURCE.BULK_DELETE,
+          { ids, justification },
+          { skipLoader: true },
+        ),
+      );
+    } finally {
+      ids.forEach(id => this.setDeleting(id, false));
+    }
   }
+
 
   resetCurrent() {
     this._current.set(null);
@@ -139,16 +201,28 @@ export class DatasourceService {
   async loadSchemas(datasourceId: string) {
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(
-          DATASOURCE.LIST_SCHEMAS_PREFIX +
-            datasourceId +
-            DATASOURCE.LIST_SCHEMAS_SUFFIX,
-        ),
+        this.http
+          .apiGet(
+            DATASOURCE.LIST_SCHEMAS_PREFIX +
+              datasourceId +
+              DATASOURCE.LIST_SCHEMAS_SUFFIX,
+            { skipLoader: true },
+          )
+          .pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) this._schemas.set(res.data ?? []);
-    } catch {
+    } catch (err) {
+      if (err instanceof EmptyError) return;
       this._schemas.set([]);
     }
+  }
+
+  /**
+   * Cancel any in-flight read GETs. Components call this from
+   * ngOnDestroy so the XHR is aborted when the user navigates away.
+   */
+  cancelReads() {
+    this._cancelReads$.next();
   }
 
   /**
@@ -214,6 +288,7 @@ export class DatasourceService {
             datasourceId: params.datasourceId,
             query: params.query,
           },
+          { skipLoader: true },
         ),
       );
     } finally {
@@ -221,12 +296,19 @@ export class DatasourceService {
     }
   }
 
-  // Legacy methods for external callers
+  // Legacy methods for external callers — all pass skipLoader so
+  // they don't kick the global blocker. Callers (access manager
+  // dropdowns, dashboard filter dropdown, etc.) drive their own
+  // loading state.
   listDatasource(params: any) {
-    return lastValueFrom(this.http.apiGet(DATASOURCE.LIST, { params }));
+    return lastValueFrom(
+      this.http.apiGet(DATASOURCE.LIST, { params, skipLoader: true }),
+    );
   }
 
   viewDatasource(id: string) {
-    return lastValueFrom(this.http.apiGet(DATASOURCE.GET + id));
+    return lastValueFrom(
+      this.http.apiGet(DATASOURCE.GET + id, { skipLoader: true }),
+    );
   }
 }

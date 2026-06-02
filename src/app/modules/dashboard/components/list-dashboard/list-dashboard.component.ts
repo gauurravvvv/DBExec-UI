@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -28,11 +29,16 @@ type DashboardSortField = 'name' | 'status' | 'createdOn';
   styleUrls: ['./list-dashboard.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListDashboardComponent implements OnInit {
+export class ListDashboardComponent implements OnInit, OnDestroy {
   refreshList() {
     if (this.lastTableLazyLoadEvent) {
       this.loadDashboards();
     }
+  }
+
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.dashboardService.cancelReads();
   }
 
   @ViewChild('dt') dt!: Table;
@@ -48,6 +54,14 @@ export class ListDashboardComponent implements OnInit {
   totalRecords = this.dashboardService.total;
   loading = this.dashboardService.loading;
   saving = this.dashboardService.saving;
+
+  // Per-row spinner helpers.
+  isDeleting = (id: string): boolean => this.dashboardService.isDeleting(id);
+  get isBulkDeleting(): boolean {
+    return this.selectedDashboards.some(d =>
+      this.dashboardService.isDeleting(d.id),
+    );
+  }
 
   selectedDashboards: any[] = [];
   sortHelper = new ListSortHelper<DashboardSortField>();

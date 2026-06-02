@@ -113,6 +113,10 @@ export class SqlQueryDialogComponent
   @Input() visible = false;
   @Input() schemaData: any[] = []; // Schema structure with tables and columns
   @Input() currentSchema: string = '';
+  // Mirrors the parent's saving signal so the Execute button can
+  // spin + disable while the parent's getPromptValuesBySQL POST is
+  // in flight.
+  @Input() executing = false;
   @Output() close = new EventEmitter<void>();
   @Output() execute = new EventEmitter<string>();
 

@@ -623,6 +623,7 @@
   [visible]="showSqlDialog"
   [schemaData]="staticSchemaData"
   [currentSchema]="promptForm.get('schema')?.value?.name"
+  [executing]="sqlExecuting"
   (close)="closeSqlDialog()"
   (execute)="executeSqlQuery($event)"
 >
@@ -634,6 +635,7 @@
   [(visible)]="showDropdownConfigDialog"
   [promptValues]="promptForm.get('promptValues')?.value || []"
   [currentConfig]="dropdownConfig"
+  [saving]="saving()"
   (close)="showDropdownConfigDialog = false"
   (save)="onDropdownConfigSaved($event)"
 >
@@ -645,6 +647,7 @@
   [(visible)]="showMultiselectConfigDialog"
   [promptValues]="promptForm.get('promptValues')?.value || []"
   [currentConfig]="multiselectConfig"
+  [saving]="saving()"
   (close)="showMultiselectConfigDialog = false"
   (save)="onMultiselectConfigSaved($event)"
 >
@@ -656,6 +659,7 @@
   [(visible)]="showCheckboxConfigDialog"
   [promptValues]="promptForm.get('promptValues')?.value || []"
   [currentConfig]="checkboxConfig"
+  [saving]="saving()"
   (close)="showCheckboxConfigDialog = false"
   (save)="onCheckboxConfigSaved($event)"
 >
@@ -667,6 +671,7 @@
   [(visible)]="showRadioConfigDialog"
   [promptValues]="promptForm.get('promptValues')?.value || []"
   [currentConfig]="radioConfig"
+  [saving]="saving()"
   (close)="showRadioConfigDialog = false"
   (save)="onRadioConfigSaved($event)"
 >
@@ -677,6 +682,7 @@
   *ngIf="showTextConfigDialog"
   [(visible)]="showTextConfigDialog"
   [currentConfig]="textConfig"
+  [saving]="saving()"
   (close)="showTextConfigDialog = false"
   (save)="onTextConfigSaved($event)"
 >
@@ -687,6 +693,7 @@
   *ngIf="showNumberConfigDialog"
   [(visible)]="showNumberConfigDialog"
   [currentConfig]="numberConfig"
+  [saving]="saving()"
   (close)="showNumberConfigDialog = false"
   (save)="onNumberConfigSaved($event)"
 >
@@ -697,6 +704,7 @@
   *ngIf="showDateRangeConfigDialog"
   [(visible)]="showDateRangeConfigDialog"
   [currentConfig]="dateRangeConfig"
+  [saving]="saving()"
   (close)="showDateRangeConfigDialog = false"
   (save)="onDateRangeConfigSaved($event)"
 >
@@ -707,6 +715,7 @@
   *ngIf="showCalendarConfigDialog"
   [(visible)]="showCalendarConfigDialog"
   [currentConfig]="calendarConfig"
+  [saving]="saving()"
   (close)="showCalendarConfigDialog = false"
   (save)="onCalendarConfigSaved($event)"
 >
@@ -717,6 +726,7 @@
   *ngIf="showRangeSliderConfigDialog"
   [(visible)]="showRangeSliderConfigDialog"
   [currentConfig]="rangeSliderConfig"
+  [saving]="saving()"
   (close)="showRangeSliderConfigDialog = false"
   (save)="onRangeSliderConfigSaved($event)"
 >

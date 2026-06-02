@@ -386,12 +386,22 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
 
   onSubmit(): void {
     if (this.isFormValid()) {
-      this.organisationService.add(this.orgForm).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.isFormDirty = false;
-          this.router.navigate([ORGANISATION.LIST]);
-        }
-      });
+      // Order matters: kick off the service call first (it reads
+      // orgForm.value synchronously) and only THEN disable the form.
+      // form.disable() hides disabled controls from .value, so
+      // disabling before the call would strip the payload.
+      const request = this.organisationService.add(this.orgForm);
+      this.orgForm.disable({ emitEvent: false });
+      request
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.isFormDirty = false;
+            this.router.navigate([ORGANISATION.LIST]);
+          }
+        })
+        .finally(() => {
+          this.orgForm.enable({ emitEvent: false });
+        });
     }
   }
 

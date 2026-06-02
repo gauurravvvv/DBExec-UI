@@ -23,9 +23,12 @@
           type="submit"
           [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
-          [disabled]="!isFormValid() || saving()"
+          [disabled]="!isFormValid() || saving() || !datasourceLoaded"
         >
-          <i class="pi pi-save mr-2"></i>
+          <i
+            class="pi mr-2"
+            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
+          ></i>
         </button>
       </div>
     </div>
@@ -68,8 +71,17 @@
       </div>
     </div>
 
+    <!-- Centered branded loader while the GET is in flight. Page
+         chrome (back, warning banner) stays usable; once
+         datasourceLoaded the real form renders below. -->
+    <app-content-loader *ngIf="loading() && !datasourceLoaded"></app-content-loader>
+
     <!-- Form Section -->
-    <form [formGroup]="datasourceForm" class="admin-form">
+    <form
+      *ngIf="datasourceLoaded"
+      [formGroup]="datasourceForm"
+      class="admin-form"
+    >
       <div class="form-grid">
         <!-- Name Field -->
         <app-custom-input
@@ -297,7 +309,10 @@
         (click)="proceedSave()"
         [disabled]="!saveJustification.trim() || saving()"
       >
-        <i class="pi pi-check"></i>
+        <i
+          class="pi"
+          [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-check'"
+        ></i>
         {{ 'COMMON.UPDATE' | translate }}
       </button>
     </div>

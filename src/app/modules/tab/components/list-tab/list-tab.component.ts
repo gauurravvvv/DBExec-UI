@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -25,7 +26,12 @@ import { TabService } from '../../services/tab.service';
   styleUrls: ['./list-tab.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListTabComponent implements OnInit {
+export class ListTabComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.tabService.cancelReads();
+  }
+
   @ViewChild('dt') dt!: Table;
 
   private destroyRef = inject(DestroyRef);

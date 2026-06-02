@@ -34,6 +34,9 @@ export interface NumberConfig {
 export class NumberConfigDialogComponent implements OnChanges {
   @Input() visible = false;
   @Input() currentConfig: Partial<NumberConfig> = {};
+  // Mirrors the parent's saving signal so the Apply button can
+  // spin + disable while the parent's updateAppearance PUT runs.
+  @Input() saving = false;
 
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() close = new EventEmitter<void>();

@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -25,7 +26,12 @@ import { SectionService } from '../../services/section.service';
   styleUrls: ['./list-section.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListSectionComponent implements OnInit {
+export class ListSectionComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.sectionService.cancelReads();
+  }
+
   @ViewChild('dt') dt!: Table;
 
   private destroyRef = inject(DestroyRef);

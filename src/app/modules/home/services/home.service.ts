@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
+import { EmptyError, Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { HOME } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
@@ -7,6 +7,10 @@ import { HttpClientService } from 'src/app/core/services/http-client.service';
 export class HomeService {
   private _dashboard = signal<any>(null);
   private _loading = signal(false);
+
+  // Reads pipe through this Subject so callers (home ngOnDestroy)
+  // can cancel in-flight GETs when the user navigates away.
+  private _cancelReads$ = new Subject<void>();
 
   readonly dashboard = this._dashboard.asReadonly();
   readonly loading = this._loading.asReadonly();
@@ -16,12 +20,27 @@ export class HomeService {
   async loadSystemAdminDashboard() {
     this._loading.set(true);
     try {
-      const res: any = await lastValueFrom(this.http.apiGet(HOME.SYSTEM_ADMIN));
+      const res: any = await lastValueFrom(
+        this.http
+          .apiGet(HOME.SYSTEM_ADMIN)
+          .pipe(takeUntil(this._cancelReads$)),
+      );
       if (res?.status) this._dashboard.set(res.data);
       return res;
+    } catch (err) {
+      if (!(err instanceof EmptyError)) throw err;
+      return undefined;
     } finally {
       this._loading.set(false);
     }
+  }
+
+  /**
+   * Cancel any in-flight read GETs. Components call this from
+   * ngOnDestroy so the XHR is aborted when the user navigates away.
+   */
+  cancelReads() {
+    this._cancelReads$.next();
   }
 
   resetDashboard() {

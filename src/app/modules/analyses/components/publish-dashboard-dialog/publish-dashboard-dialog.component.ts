@@ -84,6 +84,17 @@ export class PublishDashboardDialogComponent implements OnInit, OnChanges {
       this.reset();
       this.loadExisting();
     }
+    // Mirror the parent's saving state onto the form so its fields
+    // lock in lockstep with the Publish button's spinner. Without
+    // this the user could keep editing name/description while the
+    // POST is in flight.
+    if (this.form) {
+      if (this.saving && this.form.enabled) {
+        this.form.disable({ emitEvent: false });
+      } else if (!this.saving && this.form.disabled) {
+        this.form.enable({ emitEvent: false });
+      }
+    }
   }
 
   private initForm() {

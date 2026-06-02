@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -24,7 +25,14 @@ import { GroupService } from '../../services/group.service';
   styleUrls: ['./edit-group.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditGroupComponent implements OnInit, HasUnsavedChanges {
+export class EditGroupComponent
+  implements OnInit, OnDestroy, HasUnsavedChanges
+{
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.groupService.cancelReads();
+  }
+
   private destroyRef = inject(DestroyRef);
 
   groupForm!: FormGroup;
@@ -41,6 +49,11 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
   isDefaultGroup = false;
 
   saving = this.groupService.saving;
+  // `loading` gates the form vs the skeleton; `groupLoaded` becomes
+  // true once originalFormValue is populated so the template can
+  // swap from skeleton to real form.
+  loading = this.groupService.loading;
+  groupLoaded = false;
 
   hasUnsavedChanges(): boolean {
     return this.isFormDirty;
@@ -127,6 +140,7 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
     this.originalFormValue = this.groupForm.getRawValue();
     this.isFormDirty = false;
     this.groupForm.markAsPristine();
+    this.groupLoaded = true;
     this.cdr.markForCheck();
   }
 
@@ -201,16 +215,34 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
 
   async proceedSave(): Promise<void> {
     if (this.saveJustification.trim()) {
-      const response = await this.groupService.edit(
+      // Fire the request first (service.edit uses getRawValue, which
+      // bypasses disable, but stay consistent with the rest of the
+      // rollout for ordering) then lock the form.
+      const request = this.groupService.edit(
         this.groupForm,
         this.saveJustification.trim(),
       );
-      if (this.globalService.handleSuccessService(response)) {
-        this.showSaveConfirm = false;
-        this.saveJustification = '';
-        this.isFormDirty = false;
-        this.groupForm.markAsPristine();
-        this.router.navigate([GROUP.LIST]);
+      this.groupForm.disable({ emitEvent: false });
+      try {
+        const response = await request;
+        if (this.globalService.handleSuccessService(response)) {
+          this.showSaveConfirm = false;
+          this.saveJustification = '';
+          this.isFormDirty = false;
+          this.groupForm.markAsPristine();
+          this.router.navigate([GROUP.LIST]);
+        }
+      } finally {
+        this.groupForm.enable({ emitEvent: false });
+        // Re-apply the per-page locks: roleId is always disabled
+        // (cannot change a group's role on edit), and default
+        // groups have name/description/status locked too.
+        this.groupForm.get('roleId')?.disable({ emitEvent: false });
+        if (this.isDefaultGroup) {
+          this.groupForm.get('name')?.disable({ emitEvent: false });
+          this.groupForm.get('description')?.disable({ emitEvent: false });
+          this.groupForm.get('status')?.disable({ emitEvent: false });
+        }
       }
     }
   }

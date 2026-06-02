@@ -26,7 +26,7 @@
         </button>
         <button
           class="btn-danger"
-          [disabled]="!adminData?.canDelete"
+          [disabled]="!adminData?.canDelete || isDeleting(adminId)"
           [pTooltip]="
             !adminData?.canDelete
               ? adminData?.isDefault === 1
@@ -37,15 +37,21 @@
           tooltipPosition="bottom"
           (click)="confirmDelete(adminId)"
         >
-          <i class="pi pi-trash"></i>
+          <i
+            class="pi"
+            [ngClass]="isDeleting(adminId) ? 'pi-spin pi-spinner' : 'pi-trash'"
+          ></i>
           {{ 'COMMON.DELETE' | translate }}
         </button>
       </div>
     </div>
 
+    <!-- Centered branded loader while the GET is in flight. -->
+    <app-content-loader *ngIf="loading() && !adminData"></app-content-loader>
+
     <!-- Main Content Card -->
 
-    <div class="admin-details-grid">
+    <div class="admin-details-grid" *ngIf="adminData">
       <!-- 1. Identity Section (Left) -->
       <div class="identity-section">
         <div class="avatar-section">
@@ -56,25 +62,25 @@
             {{ adminInitials }}
           </div>
           <h3 class="admin-name">
-            {{ adminData?.firstName }} {{ adminData?.lastName }}
+            {{ adminData.firstName }} {{ adminData.lastName }}
           </h3>
-          <p class="admin-username">&#64;{{ adminData?.username }}</p>
+          <p class="admin-username">&#64;{{ adminData.username }}</p>
           <div class="status-wrapper">
             <span
               class="status-badge"
-              [class.active]="!adminData?.isLocked && adminData?.status === 1"
-              [class.locked]="adminData?.isLocked"
+              [class.active]="!adminData.isLocked && adminData.status === 1"
+              [class.locked]="adminData.isLocked"
             >
               {{
-                adminData?.isLocked
+                adminData.isLocked
                   ? ('COMMON.LOCKED' | translate)
-                  : adminData?.status === 1
+                  : adminData.status === 1
                     ? ('COMMON.ACTIVE' | translate)
                     : ('COMMON.INACTIVE' | translate)
               }}
             </span>
             <button
-              *ngIf="adminData?.isLocked"
+              *ngIf="adminData.isLocked"
               class="btn-unlock"
               (click)="onUnlock()"
               [pTooltip]="'COMMON.UNLOCK_ACCOUNT' | translate"
@@ -96,7 +102,7 @@
           <div class="meta-item">
             <span class="label">{{ 'COMMON.MEMBER_SINCE' | translate }}</span>
             <span class="value">{{
-              adminData?.createdOn | date: 'mediumDate'
+              adminData.createdOn | date: 'mediumDate'
             }}</span>
           </div>
         </div>
@@ -117,14 +123,14 @@
                 ><i class="pi pi-user"></i>
                 {{ 'COMMON.FIRST_NAME' | translate }}</span
               >
-              <span class="value">{{ adminData?.firstName }}</span>
+              <span class="value">{{ adminData.firstName }}</span>
             </div>
             <div class="detail-row">
               <span class="label"
                 ><i class="pi pi-user"></i>
                 {{ 'COMMON.LAST_NAME' | translate }}</span
               >
-              <span class="value">{{ adminData?.lastName }}</span>
+              <span class="value">{{ adminData.lastName }}</span>
             </div>
           </div>
 
@@ -136,7 +142,7 @@
                 ><i class="pi pi-envelope"></i>
                 {{ 'COMMON.EMAIL' | translate }}</span
               >
-              <span class="value">{{ adminData?.email }}</span>
+              <span class="value">{{ adminData.email }}</span>
             </div>
             <div class="detail-row">
               <span class="label"
@@ -144,7 +150,7 @@
                 {{ 'COMMON.MOBILE' | translate }}</span
               >
               <span class="value">{{
-                adminData?.mobile || ('COMMON.NOT_PROVIDED' | translate)
+                adminData.mobile || ('COMMON.NOT_PROVIDED' | translate)
               }}</span>
             </div>
           </div>
@@ -157,14 +163,14 @@
                 ><i class="pi pi-building"></i>
                 {{ 'COMMON.NAME' | translate }}</span
               >
-              <span class="value">{{ adminData?.organisationName }}</span>
+              <span class="value">{{ adminData.organisationName }}</span>
             </div>
             <div class="detail-row">
               <span class="label"
                 ><i class="pi pi-id-card"></i>
                 {{ 'COMMON.ORG_ID' | translate }}</span
               >
-              <span class="value">#{{ adminData?.organisationId }}</span>
+              <span class="value">#{{ adminData.organisationId }}</span>
             </div>
           </div>
 
@@ -177,8 +183,8 @@
                 {{ 'COMMON.LAST_LOGIN' | translate }}</span
               >
               <span class="value">{{
-                adminData?.lastLogin
-                  ? (adminData?.lastLogin | date: 'medium')
+                adminData.lastLogin
+                  ? (adminData.lastLogin | date: 'medium')
                   : ('COMMON.NEVER' | translate)
               }}</span>
             </div>
@@ -188,7 +194,7 @@
                 {{ 'COMMON.DEFAULT_USER' | translate }}</span
               >
               <span class="value">{{
-                adminData?.isDefault === 1
+                adminData.isDefault === 1
                   ? ('COMMON.YES' | translate)
                   : ('COMMON.NO' | translate)
               }}</span>
@@ -256,9 +262,12 @@
       <button
         class="btn-confirm"
         (click)="proceedDelete()"
-        [disabled]="!deleteJustification.trim()"
+        [disabled]="!deleteJustification.trim() || isDeleting(adminId)"
       >
-        <i class="pi pi-trash"></i>
+        <i
+          class="pi"
+          [ngClass]="isDeleting(adminId) ? 'pi-spin pi-spinner' : 'pi-trash'"
+        ></i>
         {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>

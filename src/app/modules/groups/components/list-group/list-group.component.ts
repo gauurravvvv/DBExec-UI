@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -28,7 +29,12 @@ type GroupSortField = 'name' | 'status' | 'createdOn';
   styleUrls: ['./list-group.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListGroupComponent implements OnInit {
+export class ListGroupComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.groupService.cancelReads();
+  }
+
   @ViewChild('dt') dt!: Table;
 
   private destroyRef = inject(DestroyRef);
@@ -40,6 +46,13 @@ export class ListGroupComponent implements OnInit {
   groups = this.groupService.groups;
   total = this.groupService.total;
   loading = this.groupService.loading;
+
+  // Per-row spinner helpers — template asks for the id and the service
+  // tells us whether THAT row's delete is in flight.
+  isDeleting = (id: string): boolean => this.groupService.isDeleting(id);
+  get isBulkDeleting(): boolean {
+    return this.selectedGroups.some(g => this.groupService.isDeleting(g.id));
+  }
 
   selectedGroups: any[] = [];
 

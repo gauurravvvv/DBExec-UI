@@ -22,7 +22,10 @@
           (click)="onSubmit()"
           [disabled]="accessForm.invalid || saving()"
         >
-          <i class="pi pi-save mr-2"></i>
+          <i
+            class="pi mr-2"
+            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
+          ></i>
         </button>
       </div>
     </div>
@@ -84,8 +87,18 @@
         >
         </app-custom-dropdown>
 
+        <!-- Skeleton placeholders for the groups + users multiselects
+             while the access-details GET resolves on connection change.
+             Hidden once loading is done so the real controls below
+             take over. The form is fully usable; only these two
+             scope-dependent controls swap. -->
+        <ng-container *ngIf="loading()">
+          <app-content-loader minHeight="180px"></app-content-loader>
+        </ng-container>
+
         <!-- Groups Multiselect -->
         <app-custom-multiselect
+          *ngIf="!loading()"
           formControlName="groups"
           [label]="'COMMON.GROUPS' | translate"
           [placeholder]="'ACCESS.SELECT_GROUPS' | translate"
@@ -108,6 +121,7 @@
 
         <!-- Users Multiselect -->
         <app-custom-multiselect
+          *ngIf="!loading()"
           formControlName="users"
           [label]="'COMMON.USERS' | translate"
           [placeholder]="'ACCESS.SELECT_USERS' | translate"

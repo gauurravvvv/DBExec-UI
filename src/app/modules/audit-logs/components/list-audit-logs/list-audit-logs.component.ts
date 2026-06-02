@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -23,11 +24,16 @@ type AuditLogSortField = 'action' | 'createdOn';
   styleUrls: ['./list-audit-logs.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListAuditLogsComponent implements OnInit {
+export class ListAuditLogsComponent implements OnInit, OnDestroy {
   refreshList() {
     if (this.lastTableLazyLoadEvent) {
       this.loadLogs(this.lastTableLazyLoadEvent);
     }
+  }
+
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.auditService.cancelReads();
   }
 
   private destroyRef = inject(DestroyRef);

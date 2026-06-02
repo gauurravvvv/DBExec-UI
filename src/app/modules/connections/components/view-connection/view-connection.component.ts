@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -16,11 +17,19 @@ import { ConnectionService } from '../../services/connection.service';
   styleUrls: ['./view-connection.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ViewConnectionComponent implements OnInit {
+export class ViewConnectionComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.connectionService.cancelReads();
+  }
+
   connectionId: string = '';
   connectionData: any = null;
   showDeleteConfirm = false;
   deleteJustification = '';
+  // Drives the skeleton card on initial GET + per-id delete spinner.
+  loading = this.connectionService.loading;
+  isDeleting = (id: string): boolean => this.connectionService.isDeleting(id);
 
   /**
    * dbType of the parent datasource. Used to render the engine

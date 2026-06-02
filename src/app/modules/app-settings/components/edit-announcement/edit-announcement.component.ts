@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import {
@@ -29,7 +30,14 @@ import {
   styleUrls: ['./edit-announcement.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
+export class EditAnnouncementComponent
+  implements OnInit, OnDestroy, HasUnsavedChanges
+{
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.announcementService.cancelReads();
+  }
+
   announcementForm!: FormGroup;
   groups: any[] = [];
   // Server-mode preload for the Target Group dropdown.

@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -26,7 +27,12 @@ type DatasourceSortField = 'name' | 'type' | 'status' | 'createdOn';
   styleUrls: ['./list-datasource.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListDatasourceComponent implements OnInit {
+export class ListDatasourceComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.datasourceService.cancelReads();
+  }
+
   private destroyRef = inject(DestroyRef);
 
   @ViewChild('dt') dt!: Table;
@@ -35,6 +41,14 @@ export class ListDatasourceComponent implements OnInit {
   datasources = this.datasourceService.datasources;
   total = this.datasourceService.total;
   loading = this.datasourceService.loading;
+
+  // Per-row spinner helpers — each row reads its own state.
+  isDeleting = (id: string): boolean => this.datasourceService.isDeleting(id);
+  get isBulkDeleting(): boolean {
+    return this.selectedDatasources.some((d: any) =>
+      this.datasourceService.isDeleting(d.id),
+    );
+  }
 
   listParams: any = {
     limit: 10,

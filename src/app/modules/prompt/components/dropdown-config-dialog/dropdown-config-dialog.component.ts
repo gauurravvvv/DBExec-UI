@@ -39,6 +39,9 @@ export class DropdownConfigDialogComponent implements OnChanges {
   @Input() visible = false;
   @Input() promptValues: any[] = [];
   @Input() currentConfig: Partial<DropdownConfig> = {};
+  // Mirrors the parent's saving signal so the Apply button can
+  // spin + disable while the parent's updateAppearance PUT runs.
+  @Input() saving = false;
 
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() close = new EventEmitter<void>();

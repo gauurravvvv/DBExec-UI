@@ -4,6 +4,7 @@ import {
   computed,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
   signal,
 } from '@angular/core';
@@ -23,7 +24,7 @@ import { ProfileService } from '../../services/profile.service';
   styleUrls: ['./view-profile.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ViewProfileComponent implements OnInit {
+export class ViewProfileComponent implements OnInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
 
   profile = this.profileService.profile;
@@ -45,6 +46,11 @@ export class ViewProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.profileService.loadProfile();
+  }
+
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.profileService.cancelReads();
   }
 
   get initials(): string {

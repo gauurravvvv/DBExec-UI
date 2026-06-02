@@ -853,6 +853,7 @@
   [initialDescription]="analysisDetails?.description"
   [dialogTitle]="'ANALYSES.UPDATE_ANALYSIS' | translate"
   [showJustification]="true"
+  [saving]="saving()"
   (close)="handleSaveDialogClose($event)"
 >
 </app-save-analyses-dialog>

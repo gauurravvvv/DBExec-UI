@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { lastValueFrom } from 'rxjs';
+import { EmptyError, Subject, lastValueFrom, takeUntil } from 'rxjs';
 import {
   DATASET,
   DATASOURCE,
@@ -8,40 +8,144 @@ import {
 } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
+/**
+ * DatasetService — list/view/CUD for datasets + their custom fields +
+ * the schema/table/column lookups the SQL editor uses.
+ *
+ * Loading-state for the migrated methods follows the rollout
+ * convention: `loading` for list/view, `saving` for writes,
+ * `_deleting` as a per-id record so each row's delete button can
+ * spin independently. Signal-driven methods all pass
+ * `{ skipLoader: true }`.
+ *
+ * Several methods on this service are still consumed by the old
+ * dataset editor (and by analyses) which depends on the global
+ * blocker for the schema/table/column fetches + the validate field
+ * + the formula validation. Those keep the legacy behavior until
+ * each consumer is migrated.
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class DatasetService {
+  private _datasets = signal<any[]>([]);
+  private _total = signal(0);
+  private _current = signal<any>(null);
+  private _loading = signal(false);
   private _saving = signal(false);
+  private _deleting = signal<Record<string, boolean>>({});
+
+  // Reads pipe through this Subject so callers (view/edit/list/add
+  // dataset ngOnDestroy) can cancel in-flight GETs. Mutations,
+  // runDatasetQuery, and schema/table/column lookups don't pipe through.
+  private _cancelReads$ = new Subject<void>();
+
+  readonly datasets = this._datasets.asReadonly();
+  readonly total = this._total.asReadonly();
+  readonly current = this._current.asReadonly();
+  readonly loading = this._loading.asReadonly();
   readonly saving = this._saving.asReadonly();
+  readonly deleting = this._deleting.asReadonly();
+
+  isDeleting(id: string): boolean {
+    return !!this._deleting()[id];
+  }
+  private setDeleting(id: string, on: boolean): void {
+    const map = { ...this._deleting() };
+    if (on) map[id] = true;
+    else delete map[id];
+    this._deleting.set(map);
+  }
 
   constructor(private http: HttpClientService) {}
 
+  // ── Signal-based list/view (skeleton-aware) ───────────────────────────
+  async load(params: any) {
+    this._loading.set(true);
+    try {
+      const res: any = await lastValueFrom(
+        this.http
+          .apiGet(DATASET.LIST, { params, skipLoader: true })
+          .pipe(takeUntil(this._cancelReads$)),
+      );
+      if (res?.status) {
+        this._datasets.set(res.data.datasets ?? res.data ?? []);
+        this._total.set(res.data.count ?? 0);
+      }
+    } catch (err) {
+      if (!(err instanceof EmptyError)) throw err;
+    } finally {
+      this._loading.set(false);
+    }
+  }
+
+  async loadOne(id: string) {
+    this._loading.set(true);
+    try {
+      const res: any = await lastValueFrom(
+        this.http
+          .apiGet(DATASET.GET + id, { skipLoader: true })
+          .pipe(takeUntil(this._cancelReads$)),
+      );
+      if (res?.status) this._current.set(res.data);
+      return res;
+    } catch (err) {
+      if (!(err instanceof EmptyError)) throw err;
+      return undefined;
+    } finally {
+      this._loading.set(false);
+    }
+  }
+
+  /**
+   * Cancel any in-flight read GETs. Components call this from
+   * ngOnDestroy so the XHR is aborted when the user navigates away.
+   */
+  cancelReads() {
+    this._cancelReads$.next();
+  }
+
+  resetCurrent() {
+    this._current.set(null);
+  }
+
+  // ── Legacy methods (still used by some callers) ──────────────────────
+  // The list-dataset component still calls listDatasets but wraps it
+  // in its own loadingList flag → so we pass skipLoader here too.
+  // Other modules that consume listDatasets (analyses dataset picker,
+  // etc.) similarly drive their own spinners.
   listDatasets(params: any) {
-    return lastValueFrom(this.http.apiGet(DATASET.LIST, { params }));
+    return lastValueFrom(
+      this.http.apiGet(DATASET.LIST, { params, skipLoader: true }),
+    );
   }
 
   async deleteDataset(datasetId: string, justification?: string) {
-    this._saving.set(true);
+    this.setDeleting(datasetId, true);
     try {
       return await lastValueFrom(
         this.http.apiDelete(DATASET.DELETE + datasetId, {
           body: { justification },
+          skipLoader: true,
         }),
       );
     } finally {
-      this._saving.set(false);
+      this.setDeleting(datasetId, false);
     }
   }
 
   async bulkDeleteDataset(ids: string[], justification?: string) {
-    this._saving.set(true);
+    ids.forEach(id => this.setDeleting(id, true));
     try {
       return await lastValueFrom(
-        this.http.apiPost(DATASET.BULK_DELETE, { ids, justification }),
+        this.http.apiPost(
+          DATASET.BULK_DELETE,
+          { ids, justification },
+          { skipLoader: true },
+        ),
       );
     } finally {
-      this._saving.set(false);
+      ids.forEach(id => this.setDeleting(id, false));
     }
   }
 
@@ -50,12 +154,16 @@ export class DatasetService {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPost(DATASET.ADD, {
-          name,
-          description,
-          datasource,
-          sql,
-        }),
+        this.http.apiPost(
+          DATASET.ADD,
+          {
+            name,
+            description,
+            datasource,
+            sql,
+          },
+          { skipLoader: true },
+        ),
       );
     } finally {
       this._saving.set(false);
@@ -66,7 +174,9 @@ export class DatasetService {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPost(DATASET.ADD_VIA_BUILDER, payload),
+        this.http.apiPost(DATASET.ADD_VIA_BUILDER, payload, {
+          skipLoader: true,
+        }),
       );
     } finally {
       this._saving.set(false);
@@ -83,6 +193,7 @@ export class DatasetService {
             payload.id +
             DATASET.UPDATE_VIA_BUILDER_SUFFIX,
           payload,
+          { skipLoader: true },
         ),
       );
     } finally {
@@ -91,7 +202,9 @@ export class DatasetService {
   }
 
   viewSystemAdmin(id: string) {
-    return lastValueFrom(this.http.apiGet(SYSTEM_ADMIN.GET + `${id}`));
+    return lastValueFrom(
+      this.http.apiGet(SYSTEM_ADMIN.GET + `${id}`, { skipLoader: true }),
+    );
   }
 
   async updateSystemAdmin(systemAdminForm: FormGroup) {
@@ -100,15 +213,19 @@ export class DatasetService {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPut(SYSTEM_ADMIN.UPDATE + id, {
-          id,
-          firstName,
-          lastName,
-          username,
-          email,
-          mobile,
-          status: status ? 1 : 0,
-        }),
+        this.http.apiPut(
+          SYSTEM_ADMIN.UPDATE + id,
+          {
+            id,
+            firstName,
+            lastName,
+            username,
+            email,
+            mobile,
+            status: status ? 1 : 0,
+          },
+          { skipLoader: true },
+        ),
       );
     } finally {
       this._saving.set(false);
@@ -116,7 +233,9 @@ export class DatasetService {
   }
 
   viewDataset(id: string) {
-    return lastValueFrom(this.http.apiGet(DATASET.GET + id));
+    return lastValueFrom(
+      this.http.apiGet(DATASET.GET + id, { skipLoader: true }),
+    );
   }
 
   viewDatasetField(datasetId: string, fieldId: string) {
@@ -124,6 +243,7 @@ export class DatasetService {
     return lastValueFrom(
       this.http.apiGet(
         DATASET.GET + datasetId + DATASET.FIELD_SEGMENT + fieldId,
+        { skipLoader: true },
       ),
     );
   }
@@ -159,6 +279,7 @@ export class DatasetService {
         this.http.apiPut(
           DATASET.GET + datasetId + DATASET.FIELD_SEGMENT + fieldId,
           requestBody,
+          { skipLoader: true },
         ),
       );
     } finally {
@@ -183,19 +304,23 @@ export class DatasetService {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPut(DATASOURCE.UPDATE + id, {
-          id,
-          name,
-          description,
-          type,
-          host,
-          port,
-          datasource,
-          username,
-          password,
-          isMasterDB,
-          status,
-        }),
+        this.http.apiPut(
+          DATASOURCE.UPDATE + id,
+          {
+            id,
+            name,
+            description,
+            type,
+            host,
+            port,
+            datasource,
+            username,
+            password,
+            isMasterDB,
+            status,
+          },
+          { skipLoader: true },
+        ),
       );
     } finally {
       this._saving.set(false);
@@ -209,6 +334,7 @@ export class DatasetService {
         DATASOURCE.LIST_SCHEMAS_PREFIX +
           params.datasourceId +
           DATASOURCE.LIST_SCHEMAS_SUFFIX,
+        { skipLoader: true },
       ),
     );
   }
@@ -222,6 +348,7 @@ export class DatasetService {
           DATASOURCE.SCHEMAS_SEGMENT +
           params.schemaName +
           DATASOURCE.TABLES_SEGMENT.replace(/\/$/, ''),
+        { skipLoader: true },
       ),
     );
   }
@@ -237,12 +364,15 @@ export class DatasetService {
           DATASOURCE.TABLES_SEGMENT +
           params.tableName +
           DATASOURCE.COLUMNS_SEGMENT,
+        { skipLoader: true },
       ),
     );
   }
 
   getDataset(datasetId: string) {
-    return lastValueFrom(this.http.apiGet(DATASET.GET + datasetId));
+    return lastValueFrom(
+      this.http.apiGet(DATASET.GET + datasetId, { skipLoader: true }),
+    );
   }
 
   async updateDataset(payload: any, justification?: string) {
@@ -250,14 +380,18 @@ export class DatasetService {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPut(DATASET.UPDATE + id, {
-          id,
-          name,
-          description,
-          datasource,
-          sql,
-          justification,
-        }),
+        this.http.apiPut(
+          DATASET.UPDATE + id,
+          {
+            id,
+            name,
+            description,
+            datasource,
+            sql,
+            justification,
+          },
+          { skipLoader: true },
+        ),
       );
     } finally {
       this._saving.set(false);
@@ -276,6 +410,7 @@ export class DatasetService {
             datasetId,
             customLogic,
           },
+          { skipLoader: true },
         ),
       );
     } finally {
@@ -308,6 +443,7 @@ export class DatasetService {
         this.http.apiPost(
           DATASET.ADD_FIELD_PREFIX + datasetId + DATASET.ADD_FIELD_SUFFIX,
           requestBody,
+          { skipLoader: true },
         ),
       );
     } finally {
@@ -323,6 +459,7 @@ export class DatasetService {
         this.http.apiPost(
           DATASET.DUPLICATE_PREFIX + datasetId + DATASET.DUPLICATE_SUFFIX,
           { name, description },
+          { skipLoader: true },
         ),
       );
     } finally {
@@ -341,6 +478,7 @@ export class DatasetService {
       this.http.apiPost(
         DATASET.RUN_QUERY_PREFIX + datasetId + DATASET.RUN_QUERY_SUFFIX,
         body,
+        { skipLoader: true },
       ),
     );
   }
@@ -353,6 +491,7 @@ export class DatasetService {
           datasetId +
           DATASET.DISTINCT_VALUES_SUFFIX,
         { columnName },
+        { skipLoader: true },
       ),
     );
   }
@@ -364,6 +503,7 @@ export class DatasetService {
       return await lastValueFrom(
         this.http.apiDelete(
           DATASET.GET + datasetId + DATASET.FIELD_SEGMENT + fieldId,
+          { skipLoader: true },
         ),
       );
     } finally {

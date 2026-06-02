@@ -75,10 +75,13 @@
       </button>
       <button
         class="btn-confirm"
-        [disabled]="datasetForm.invalid"
+        [disabled]="datasetForm.invalid || saving"
         (click)="onSubmit()"
       >
-        <i class="pi pi-save"></i>
+        <i
+          class="pi"
+          [ngClass]="saving ? 'pi-spin pi-spinner' : 'pi-save'"
+        ></i>
         {{ 'DATASET.SAVE_DATASET' | translate }}
       </button>
     </div>

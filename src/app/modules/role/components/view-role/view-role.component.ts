@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,10 +16,12 @@ import { RoleService } from '../../services/role.service';
   styleUrls: ['./view-role.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ViewRoleComponent implements OnInit {
+export class ViewRoleComponent implements OnInit, OnDestroy {
   roleData: any = null;
   permissions: any[] = [];
   roleId: string = '';
+  // Drives the centered content-loader while the initial GET is in flight.
+  loading = this.roleService.loading;
 
   constructor(
     private route: ActivatedRoute,
@@ -31,6 +34,13 @@ export class ViewRoleComponent implements OnInit {
   ngOnInit() {
     this.roleId = this.route.snapshot.params['id'];
     this.loadRole();
+  }
+
+  ngOnDestroy() {
+    // Abort any in-flight loadOne GET so navigating away mid-load
+    // doesn't leave a request running that lands in a destroyed
+    // component and clobbers the next page's roleService.current().
+    this.roleService.cancelReads();
   }
 
   async loadRole() {

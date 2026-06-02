@@ -166,10 +166,19 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
 
   async onSubmit() {
     if (this.canSubmit()) {
-      const response = await this.groupService.add(this.userGroupForm);
-      if (this.globalService.handleSuccessService(response)) {
-        this.userGroupForm.markAsPristine();
-        this.router.navigate([GROUP.LIST]);
+      // Fire the request first (service reads userGroupForm.value)
+      // then lock the form so the user can't edit fields while the
+      // POST is in flight.
+      const request = this.groupService.add(this.userGroupForm);
+      this.userGroupForm.disable({ emitEvent: false });
+      try {
+        const response = await request;
+        if (this.globalService.handleSuccessService(response)) {
+          this.userGroupForm.markAsPristine();
+          this.router.navigate([GROUP.LIST]);
+        }
+      } finally {
+        this.userGroupForm.enable({ emitEvent: false });
       }
     }
   }

@@ -43,9 +43,13 @@ export class ViewDashboardComponent
   private destroyRef = inject(DestroyRef);
   private _dashboardService = inject(DashboardService);
 
-  // Signal refs from service
+  // Signal refs from service. `rendering` covers the heavier
+  // render() call; `isDeleting(id)` drives the per-dashboard delete
+  // spinner if/when this page exposes a delete button.
   rendered = this._dashboardService.rendered;
   loading = this._dashboardService.loading;
+  rendering = this._dashboardService.rendering;
+  isDeleting = (id: string): boolean => this._dashboardService.isDeleting(id);
 
   dashboardId = '';
   dashboard: any = null;
@@ -167,6 +171,8 @@ export class ViewDashboardComponent
   }
 
   ngOnDestroy(): void {
+    // Abort in-flight reads if the user navigates away.
+    this._dashboardService.cancelReads();
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }

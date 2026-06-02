@@ -12,7 +12,8 @@
           *ngIf="selectedCount > 0"
           pButton
           [label]="('COMMON.DELETE' | translate) + ' (' + selectedCount + ')'"
-          icon="pi pi-trash"
+          [icon]="isBulkDeleting ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+          [disabled]="isBulkDeleting"
           (click)="confirmBulkDelete()"
           class="p-button-raised p-button-danger modern-button"
         ></button>
@@ -62,7 +63,20 @@
           [scrollable]="true"
           scrollHeight="flex"
           [tableStyle]="{ 'min-width': '93rem' }"
+          [loading]="loading()"
+          [showLoader]="false"
         >
+          <!-- Skeleton rows while the lazy-load is in flight — page chrome
+               (header, filters, add button, pagination) stays interactive. -->
+          <ng-template pTemplate="loadingbody">
+            <tr
+              *ngFor="let _ of [].constructor(10); let i = index"
+              appSkeletonRow
+              [columns]="7"
+              [showCheckbox]="true"
+              [showActions]="true"
+            ></tr>
+          </ng-template>
           <ng-template pTemplate="header">
             <tr>
               <th style="width: 2.75rem; min-width: 2.75rem" pFrozenColumn>
@@ -447,10 +461,16 @@
                     *ngIf="admin.isLocked"
                     class="icon-btn unlock-btn"
                     (click)="onUnlock(admin.id)"
+                    [disabled]="isUnlocking(admin.id)"
                     [pTooltip]="'COMMON.UNLOCK_ACCOUNT' | translate"
                     tooltipPosition="bottom"
                   >
-                    <i class="pi pi-lock-open"></i>
+                    <i
+                      class="pi"
+                      [ngClass]="
+                        isUnlocking(admin.id) ? 'pi-spin pi-spinner' : 'pi-lock-open'
+                      "
+                    ></i>
                   </button>
                   <button
                     class="icon-btn edit-btn"
@@ -464,7 +484,7 @@
                   <button
                     class="icon-btn delete-btn"
                     (click)="confirmDelete(admin.id)"
-                    [disabled]="!admin.canDelete"
+                    [disabled]="!admin.canDelete || isDeleting(admin.id)"
                     [pTooltip]="
                       !admin.canDelete
                         ? admin.isDefault === 1
@@ -474,7 +494,12 @@
                     "
                     tooltipPosition="bottom"
                   >
-                    <i class="pi pi-trash"></i>
+                    <i
+                      class="pi"
+                      [ngClass]="
+                        isDeleting(admin.id) ? 'pi-spin pi-spinner' : 'pi-trash'
+                      "
+                    ></i>
                   </button>
                 </div>
               </td>
@@ -573,9 +598,19 @@
       <button
         class="btn-confirm"
         (click)="proceedDelete()"
-        [disabled]="!deleteJustification.trim()"
+        [disabled]="
+          !deleteJustification.trim() ||
+          (bulkDelete ? isBulkDeleting : !!adminIdToDelete && isDeleting(adminIdToDelete))
+        "
       >
-        <i class="pi pi-trash"></i>
+        <i
+          class="pi"
+          [ngClass]="
+            (bulkDelete ? isBulkDeleting : !!adminIdToDelete && isDeleting(adminIdToDelete))
+              ? 'pi-spin pi-spinner'
+              : 'pi-trash'
+          "
+        ></i>
         {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>

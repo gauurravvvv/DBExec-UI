@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { lastValueFrom } from 'rxjs';
+import { EmptyError, Subject, lastValueFrom, takeUntil } from 'rxjs';
 import {
   QUERY_BUILDER,
   SECTION,
@@ -32,6 +32,11 @@ export class QueryBuilderService {
   private _saving = signal(false);
   private _executing = signal(false);
 
+  // Reads pipe through this Subject so callers (view/edit/list/add
+  // query-builder ngOnDestroy) can cancel in-flight GETs. Mutations
+  // and execute() don't pipe through.
+  private _cancelReads$ = new Subject<void>();
+
   readonly queryBuilders = this._queryBuilders.asReadonly();
   readonly total = this._total.asReadonly();
   readonly current = this._current.asReadonly();
@@ -48,12 +53,16 @@ export class QueryBuilderService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(QUERY_BUILDER.LIST, { params }),
+        this.http
+          .apiGet(QUERY_BUILDER.LIST, { params })
+          .pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) {
         this._queryBuilders.set(res.data.queryBuilders ?? []);
         this._total.set(res.data.count ?? 0);
       }
+    } catch (err) {
+      if (!(err instanceof EmptyError)) throw err;
     } finally {
       this._loading.set(false);
     }
@@ -63,28 +72,52 @@ export class QueryBuilderService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(QUERY_BUILDER.GET + id),
+        this.http
+          .apiGet(QUERY_BUILDER.GET + id)
+          .pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) this._current.set(res.data);
+    } catch (err) {
+      if (!(err instanceof EmptyError)) throw err;
     } finally {
       this._loading.set(false);
     }
   }
 
   async loadStructure(id: string): Promise<void> {
-    const res: any = await lastValueFrom(
-      this.http.apiGet(QUERY_BUILDER.GET + id + QUERY_BUILDER.STRUCTURE_SUFFIX),
-    );
-    if (res?.status) this._structure.set(res.data);
+    try {
+      const res: any = await lastValueFrom(
+        this.http
+          .apiGet(QUERY_BUILDER.GET + id + QUERY_BUILDER.STRUCTURE_SUFFIX)
+          .pipe(takeUntil(this._cancelReads$)),
+      );
+      if (res?.status) this._structure.set(res.data);
+    } catch (err) {
+      if (!(err instanceof EmptyError)) throw err;
+    }
   }
 
   async loadTabs(queryBuilderId: string): Promise<void> {
-    const res: any = await lastValueFrom(
-      this.http.apiGet(
-        QUERY_BUILDER.GET + queryBuilderId + QUERY_BUILDER.TABS_SUFFIX,
-      ),
-    );
-    if (res?.status) this._tabs.set(res.data ?? []);
+    try {
+      const res: any = await lastValueFrom(
+        this.http
+          .apiGet(
+            QUERY_BUILDER.GET + queryBuilderId + QUERY_BUILDER.TABS_SUFFIX,
+          )
+          .pipe(takeUntil(this._cancelReads$)),
+      );
+      if (res?.status) this._tabs.set(res.data ?? []);
+    } catch (err) {
+      if (!(err instanceof EmptyError)) throw err;
+    }
+  }
+
+  /**
+   * Cancel any in-flight read GETs. Components call this from
+   * ngOnDestroy so the XHR is aborted when the user navigates away.
+   */
+  cancelReads() {
+    this._cancelReads$.next();
   }
 
   async add(form: FormGroup): Promise<any> {

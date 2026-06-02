@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -28,7 +29,12 @@ type ConnectionSortField = 'name' | 'status' | 'createdOn';
   styleUrls: ['./list-connection.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListConnectionComponent implements OnInit {
+export class ListConnectionComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.connectionService.cancelReads();
+  }
+
   private destroyRef = inject(DestroyRef);
 
   @ViewChild('dt') dt!: Table;
@@ -73,6 +79,14 @@ export class ListConnectionComponent implements OnInit {
   connections = this.connectionService.connections;
   totalRecords = this.connectionService.total;
   loading = this.connectionService.loading;
+
+  // Per-row spinner helpers.
+  isDeleting = (id: string): boolean => this.connectionService.isDeleting(id);
+  get isBulkDeleting(): boolean {
+    return this.selectedConnections.some((c: any) =>
+      this.connectionService.isDeleting(c.id),
+    );
+  }
 
   get selectedCount(): number {
     return this.selectedConnections?.length || 0;

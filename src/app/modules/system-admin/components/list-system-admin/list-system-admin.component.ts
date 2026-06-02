@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -33,7 +34,12 @@ type SystemAdminSortField =
   styleUrls: ['./list-system-admin.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListSystemAdminComponent implements OnInit {
+export class ListSystemAdminComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.systemAdminService.cancelReads();
+  }
+
   private destroyRef = inject(DestroyRef);
 
   Math = Math;
@@ -45,6 +51,18 @@ export class ListSystemAdminComponent implements OnInit {
   admins = this.systemAdminService.admins;
   total = this.systemAdminService.total;
   loading = this.systemAdminService.loading;
+
+  // Per-row spinner helpers — template asks for the id and the service
+  // tells us whether THAT row's delete / unlock is in flight. Other
+  // rows stay clickable.
+  isDeleting = (id: string): boolean => this.systemAdminService.isDeleting(id);
+  isUnlocking = (id: string): boolean =>
+    this.systemAdminService.isUnlocking(id);
+  get isBulkDeleting(): boolean {
+    return this.selectedAdmins.some(a =>
+      this.systemAdminService.isDeleting(a.id),
+    );
+  }
 
   selectedAdmins: any[] = [];
   sortHelper = new ListSortHelper<SystemAdminSortField>();

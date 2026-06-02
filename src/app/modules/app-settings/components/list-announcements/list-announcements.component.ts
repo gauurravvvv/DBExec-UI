@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -25,7 +26,12 @@ import { AnnouncementService } from '../../services/announcement.service';
   styleUrls: ['./list-announcements.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListAnnouncementsComponent implements OnInit {
+export class ListAnnouncementsComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.announcementService.cancelReads();
+  }
+
   @ViewChild('dt') dt!: Table;
 
   limit = 10;

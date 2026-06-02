@@ -145,12 +145,21 @@ export class AddUserComponent implements OnInit, HasUnsavedChanges {
 
   async onSubmit() {
     if (this.userForm.valid) {
-      const response = await this.userService.add(this.userForm);
-      if (this.globalService.handleSuccessService(response)) {
-        this.userForm.markAsPristine();
-        this.router.navigate([USER.LIST]);
+      // Fire the request first (service reads userForm.value) then
+      // lock the form so the user can't edit fields while the POST
+      // is in flight.
+      const request = this.userService.add(this.userForm);
+      this.userForm.disable({ emitEvent: false });
+      try {
+        const response = await request;
+        if (this.globalService.handleSuccessService(response)) {
+          this.userForm.markAsPristine();
+          this.router.navigate([USER.LIST]);
+        }
+      } finally {
+        this.userForm.enable({ emitEvent: false });
+        this.cdr.markForCheck();
       }
-      this.cdr.markForCheck();
     } else {
       Object.keys(this.userForm.controls).forEach(key => {
         const control = this.userForm.get(key);

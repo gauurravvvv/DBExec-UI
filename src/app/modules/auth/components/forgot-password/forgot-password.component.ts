@@ -72,6 +72,9 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     if (this.forgotPasswordForm.valid) {
       this.error.set('');
       this.loading.set(true);
+      // Lock the form while the POST is in flight so the user can't
+      // edit fields mid-request and re-fire submit.
+      this.forgotPasswordForm.disable({ emitEvent: false });
       try {
         const res: any = await this.loginService.generateOTP(
           this.forgotPasswordForm,
@@ -86,6 +89,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
         this.error.set(err?.message || 'Failed to send OTP. Please try again.');
       } finally {
         this.loading.set(false);
+        this.forgotPasswordForm.enable({ emitEvent: false });
       }
     }
   }

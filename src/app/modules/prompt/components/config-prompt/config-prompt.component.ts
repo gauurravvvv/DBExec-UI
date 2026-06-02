@@ -59,6 +59,11 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   editingChipValue: string | null = null;
   @ViewChild('chipInput') chipInput!: ElementRef;
   saving = this.promptService.saving;
+  // Local flag for the SQL-query dialog's Execute button so it can
+  // show a spinner while getPromptValuesBySQL is in flight. Tracked
+  // separately from `saving` (which covers updateAppearance) because
+  // both can run concurrently.
+  sqlExecuting = false;
   configData: any = null;
   columnNameControl = new FormControl('');
   showSuggestions = false;
@@ -1585,6 +1590,8 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       query: query.trim(),
     };
 
+    this.sqlExecuting = true;
+    this.cdr.markForCheck();
     this.promptService
       .getPromptValuesBySQL(params)
       .then(response => {
@@ -1622,9 +1629,11 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
             }
           }
         }
+        this.sqlExecuting = false;
         this.cdr.markForCheck();
       })
       .catch(() => {
+        this.sqlExecuting = false;
         this.cdr.markForCheck();
       });
   }
@@ -1763,6 +1772,8 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // Abort in-flight reads if the user navigates away.
+    this.promptService.cancelReads();
     if (this.hideDelay) clearTimeout(this.hideDelay);
     if (this.hideJoinDelay) clearTimeout(this.hideJoinDelay);
   }

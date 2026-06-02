@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
+import { EmptyError, Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { RLS_RULE } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
@@ -26,6 +26,10 @@ export class RlsRulesService {
   private _saving = signal(false);
   private _total = signal(0);
 
+  // Reads pipe through this Subject so callers (view/edit/list/add
+  // rls-rule ngOnDestroy) can cancel in-flight GETs.
+  private _cancelReads$ = new Subject<void>();
+
   readonly rules = this._rules.asReadonly();
   readonly assignments = this._assignments.asReadonly();
   readonly current = this._current.asReadonly();
@@ -39,14 +43,17 @@ export class RlsRulesService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(RLS_RULE.LIST_FOR_DATASET_PREFIX + datasetId),
+        this.http
+          .apiGet(RLS_RULE.LIST_FOR_DATASET_PREFIX + datasetId)
+          .pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) {
         const rules = res.data?.rules ?? res.data ?? [];
         this._rules.set(rules);
         this._total.set(res.data?.count ?? rules.length);
       }
-    } catch {
+    } catch (err) {
+      if (err instanceof EmptyError) return;
       this._rules.set([]);
     } finally {
       this._loading.set(false);
@@ -57,14 +64,25 @@ export class RlsRulesService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(RLS_RULE.GET + ruleId),
+        this.http
+          .apiGet(RLS_RULE.GET + ruleId)
+          .pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) this._current.set(res.data);
-    } catch {
+    } catch (err) {
+      if (err instanceof EmptyError) return;
       this._current.set(null);
     } finally {
       this._loading.set(false);
     }
+  }
+
+  /**
+   * Cancel any in-flight read GETs. Components call this from
+   * ngOnDestroy so the XHR is aborted when the user navigates away.
+   */
+  cancelReads() {
+    this._cancelReads$.next();
   }
 
   async add(payload: any): Promise<any> {

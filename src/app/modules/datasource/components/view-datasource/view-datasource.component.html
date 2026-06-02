@@ -12,21 +12,35 @@
         </button>
         <h2>{{ 'DATASOURCE.VIEW_TITLE' | translate }}</h2>
       </div>
-      <div class="header-actions">
+      <div class="header-actions" *ngIf="dbData">
         <button class="btn-secondary" (click)="loadDatasourceData()">
-          <i class="pi pi-refresh"></i>
+          <i
+            class="pi"
+            [ngClass]="loading() ? 'pi-spin pi-spinner' : 'pi-refresh'"
+          ></i>
           {{ 'COMMON.REFRESH' | translate }}
         </button>
         <button class="btn-primary" type="button" (click)="onEdit()">
           <i class="pi pi-pencil"></i>
           {{ 'COMMON.EDIT' | translate }}
         </button>
-        <button class="btn-danger" type="button" (click)="confirmDelete()">
-          <i class="pi pi-trash"></i>
+        <button
+          class="btn-danger"
+          type="button"
+          [disabled]="isDeleting(dbId)"
+          (click)="confirmDelete()"
+        >
+          <i
+            class="pi"
+            [ngClass]="isDeleting(dbId) ? 'pi-spin pi-spinner' : 'pi-trash'"
+          ></i>
           {{ 'COMMON.DELETE' | translate }}
         </button>
       </div>
     </div>
+
+    <!-- Centered branded loader while the GET is in flight. -->
+    <app-content-loader *ngIf="loading() && !dbData"></app-content-loader>
 
     <!-- Content Section -->
     <div class="content-section" *ngIf="dbData">
@@ -404,9 +418,12 @@
       <button
         class="btn-confirm"
         (click)="proceedDelete()"
-        [disabled]="!deleteJustification.trim()"
+        [disabled]="!deleteJustification.trim() || isDeleting(dbId)"
       >
-        <i class="pi pi-trash"></i>
+        <i
+          class="pi"
+          [ngClass]="isDeleting(dbId) ? 'pi-spin pi-spinner' : 'pi-trash'"
+        ></i>
         {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>

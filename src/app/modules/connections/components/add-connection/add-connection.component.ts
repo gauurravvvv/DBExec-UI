@@ -225,10 +225,18 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
 
   async onSubmit() {
     if (this.connectionForm.valid) {
-      const response = await this.connectionService.add(this.connectionForm);
-      if (this.globalService.handleSuccessService(response)) {
-        this.isFormDirty = false;
-        this.router.navigate([CONNECTION.LIST]);
+      // Fire the request first (service reads connectionForm.value)
+      // then lock the form so the user can't edit fields mid-POST.
+      const request = this.connectionService.add(this.connectionForm);
+      this.connectionForm.disable({ emitEvent: false });
+      try {
+        const response = await request;
+        if (this.globalService.handleSuccessService(response)) {
+          this.isFormDirty = false;
+          this.router.navigate([CONNECTION.LIST]);
+        }
+      } finally {
+        this.connectionForm.enable({ emitEvent: false });
       }
     }
   }

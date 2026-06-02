@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -35,13 +36,26 @@ type UserSortField =
   styleUrls: ['./list-user.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListUserComponent implements OnInit {
+export class ListUserComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.userService.cancelReads();
+  }
+
   @ViewChild('dt') dt!: Table;
 
   // Signal refs from service
   users = this.userService.users;
   total = this.userService.total;
   loading = this.userService.loading;
+
+  // Per-row spinner helpers — each row's delete/unlock button reads
+  // its own state, so other rows stay clickable.
+  isDeleting = (id: string): boolean => this.userService.isDeleting(id);
+  isUnlocking = (id: string): boolean => this.userService.isUnlocking(id);
+  get isBulkDeleting(): boolean {
+    return this.selectedUsers.some(u => this.userService.isDeleting(u.id));
+  }
 
   limit = 10;
   lastTableLazyLoadEvent: any;

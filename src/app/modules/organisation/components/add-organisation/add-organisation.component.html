@@ -48,10 +48,10 @@
           class="p-button-primary btn-save"
           type="submit"
           [label]="'COMMON.SAVE' | translate"
-          icon="pi pi-save"
+          [icon]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-save'"
           iconPos="left"
           (click)="onSubmit()"
-          [disabled]="!isFormValid()"
+          [disabled]="!isFormValid() || saving()"
         ></button>
       </div>
     </div>

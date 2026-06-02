@@ -17,8 +17,15 @@ export class LoginService implements OnDestroy {
 
   async login(loginForm: UntypedFormGroup): Promise<any> {
     const { organisation, username, password } = loginForm.value;
+    // skipLoader: true — each auth page drives its own button-level
+    // spinner (loading = signal(false) in the component), so the
+    // legacy global blocker would just flash on top.
     const result: any = await lastValueFrom(
-      this.http.apiPost(AUTH.LOGIN, { organisation, username, password }),
+      this.http.apiPost(
+        AUTH.LOGIN,
+        { organisation, username, password },
+        { skipLoader: true },
+      ),
     );
     if (result.status) {
       // Store access token and refresh token
@@ -59,11 +66,15 @@ export class LoginService implements OnDestroy {
   generateOTP(forgotPasswordForm: UntypedFormGroup) {
     const { organisation, username, email } = forgotPasswordForm.value;
     return lastValueFrom(
-      this.http.apiPost(AUTH.GENERATE_OTP, {
-        organisation,
-        username,
-        email,
-      }),
+      this.http.apiPost(
+        AUTH.GENERATE_OTP,
+        {
+          organisation,
+          username,
+          email,
+        },
+        { skipLoader: true },
+      ),
     );
   }
 
@@ -75,44 +86,67 @@ export class LoginService implements OnDestroy {
   ) {
     const { otp: formOtp, newPassword } = loginForm.value;
     return lastValueFrom(
-      this.http.apiPost(AUTH.RESET_PASSWORD, {
-        id,
-        orgId,
-        otp: otp || formOtp,
-        password: newPassword,
-      }),
+      this.http.apiPost(
+        AUTH.RESET_PASSWORD,
+        {
+          id,
+          orgId,
+          otp: otp || formOtp,
+          password: newPassword,
+        },
+        { skipLoader: true },
+      ),
     );
   }
 
   setPassword(password: string, id: string, orgId: string, token: string) {
     return lastValueFrom(
-      this.http.apiPost(AUTH.SET_PASSWORD, { id, orgId, token, password }),
+      this.http.apiPost(
+        AUTH.SET_PASSWORD,
+        { id, orgId, token, password },
+        { skipLoader: true },
+      ),
     );
   }
 
   verifySetupToken(id: string, orgId: string, token: string) {
     return lastValueFrom(
-      this.http.apiPost(AUTH.VERIFY_SETUP_TOKEN, { id, orgId, token }),
+      this.http.apiPost(
+        AUTH.VERIFY_SETUP_TOKEN,
+        { id, orgId, token },
+        { skipLoader: true },
+      ),
     );
   }
 
   resendSetupLink(id: string, orgId: string) {
     return lastValueFrom(
-      this.http.apiPost(AUTH.RESEND_SETUP_LINK, { id, orgId }),
+      this.http.apiPost(
+        AUTH.RESEND_SETUP_LINK,
+        { id, orgId },
+        { skipLoader: true },
+      ),
     );
   }
 
   logout(): Observable<any> {
-    return this.http.apiPost(AUTH.LOGOUT, {});
+    return this.http.apiPost(AUTH.LOGOUT, {}, { skipLoader: true });
   }
 
   refreshAccessToken(): Observable<any> {
     const refreshToken = StorageService.get(StorageType.REFRESH_TOKEN);
     const organisation = StorageService.get(StorageType.ORGANISATION);
-    return this.http.apiPost(AUTH.REFRESH_TOKEN, {
-      refreshToken,
-      organisation,
-    });
+    // refreshAccessToken is invoked silently by the interceptor and
+    // by the proactive timer below — it must never trigger the global
+    // blocker. skipLoader stays true here regardless of caller.
+    return this.http.apiPost(
+      AUTH.REFRESH_TOKEN,
+      {
+        refreshToken,
+        organisation,
+      },
+      { skipLoader: true },
+    );
   }
 
   public setAccessToken(accessToken: string) {

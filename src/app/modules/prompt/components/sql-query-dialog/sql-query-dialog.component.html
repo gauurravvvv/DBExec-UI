@@ -75,7 +75,8 @@
       [label]="'PROMPT_MODULE.EXECUTE_AND_LOAD' | translate"
       class="p-button-primary btn-save"
       (click)="onExecute()"
-      [disabled]="!sqlQuery.trim()"
+      [disabled]="!sqlQuery.trim() || executing"
+      [loading]="executing"
     ></button>
   </ng-template>
 </p-dialog>

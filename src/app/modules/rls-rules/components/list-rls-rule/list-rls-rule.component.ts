@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -25,11 +26,16 @@ import { RlsRulesService } from '../../services/rls-rules.service';
   styleUrls: ['./list-rls-rule.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListRlsRuleComponent implements OnInit {
+export class ListRlsRuleComponent implements OnInit, OnDestroy {
   refreshList() {
     if (this.lastTableLazyLoadEvent) {
       this.loadRules(this.lastTableLazyLoadEvent);
     }
+  }
+
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.rlsRulesService.cancelReads();
   }
 
   @ViewChild('dt') dt!: Table;

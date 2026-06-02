@@ -1,4 +1,8 @@
-<div class="view-organisation-wrapper" *ngIf="organisationData">
+<!-- Page chrome (back button, title, action buttons) renders immediately
+     so the user has something to look at and can navigate away if they
+     change their mind. Only the data-bearing body switches between
+     skeleton and real content based on loading() / organisationData. -->
+<div class="view-organisation-wrapper">
   <div class="view-organisation-container">
     <!-- Header Section -->
     <div class="page-header">
@@ -12,7 +16,7 @@
         </button>
         <h2>{{ 'ORG.STEP_ORG_DETAILS' | translate }}</h2>
       </div>
-      <div class="header-actions flex gap-2">
+      <div class="header-actions flex gap-2" *ngIf="organisationData">
         <button
           class="btn-primary"
           [routerLink]="['/app/organisations', organisationId, 'edit']"
@@ -20,12 +24,23 @@
           <i class="pi pi-pencil"></i>
           {{ 'COMMON.EDIT' | translate }}
         </button>
-        <button class="btn-danger" (click)="confirmDelete(organisationId)">
-          <i class="pi pi-trash"></i>
+        <button
+          class="btn-danger"
+          [disabled]="isDeleting"
+          (click)="confirmDelete(organisationId)"
+        >
+          <i
+            class="pi"
+            [ngClass]="isDeleting ? 'pi-spin pi-spinner' : 'pi-trash'"
+          ></i>
           {{ 'COMMON.DELETE' | translate }}
         </button>
       </div>
     </div>
+
+    <!-- Centered branded loader while the GET is in flight. -->
+    <app-content-loader *ngIf="loading() && !organisationData"></app-content-loader>
+    <ng-container *ngIf="organisationData">
 
     <!-- Profile Section -->
     <div class="profile-container">
@@ -462,6 +477,7 @@
         </div>
       </div>
     </div>
+    </ng-container>
   </div>
 </div>
 
@@ -517,9 +533,12 @@
       <button
         class="btn-confirm"
         (click)="proceedDelete()"
-        [disabled]="!deleteJustification.trim()"
+        [disabled]="!deleteJustification.trim() || isDeleting"
       >
-        <i class="pi pi-trash"></i>
+        <i
+          class="pi"
+          [ngClass]="isDeleting ? 'pi-spin pi-spinner' : 'pi-trash'"
+        ></i>
         {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>

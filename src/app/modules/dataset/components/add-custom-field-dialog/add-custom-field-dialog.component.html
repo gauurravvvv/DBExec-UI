@@ -162,6 +162,7 @@
             icon="pi-tag"
             [required]="true"
             (ngModelChange)="onFieldNameChange()"
+            [inputDisabled]="isSubmitting"
           ></app-custom-input>
           <!-- Derived chip so the user understands the dual concept:
                this label is *also* the formula handle other fields use
@@ -194,6 +195,7 @@
             appendTo="body"
             (ngModelChange)="onDataTypeChange()"
             icon="pi-th-large"
+            [disabled]="isSubmitting"
           ></app-custom-dropdown>
         </div>
       </div>
@@ -234,6 +236,7 @@
             [rows]="8"
             (ngModelChange)="onFormulaChange()"
             icon="pi-id-card"
+            [inputDisabled]="isSubmitting"
           ></app-custom-input>
         </div>
 

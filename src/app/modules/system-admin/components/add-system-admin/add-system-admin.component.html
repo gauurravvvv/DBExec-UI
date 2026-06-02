@@ -29,7 +29,13 @@
           (click)="onSubmit()"
           [disabled]="adminForm.invalid || saving()"
         >
-          <i class="pi pi-save mr-2"></i>
+          <!-- Native button-level spinner so the global blocker stays
+               off; user can still see the form + tweak fields while the
+               POST is in flight (button is disabled, others aren't). -->
+          <i
+            class="pi mr-2"
+            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
+          ></i>
         </button>
       </div>
     </div>

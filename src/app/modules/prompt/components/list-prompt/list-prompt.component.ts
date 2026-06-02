@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -25,7 +26,12 @@ import { PromptService } from '../../services/prompt.service';
   styleUrls: ['./list-prompt.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListPromptComponent implements OnInit {
+export class ListPromptComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.promptService.cancelReads();
+  }
+
   @ViewChild('dt') dt!: Table;
 
   private destroyRef = inject(DestroyRef);

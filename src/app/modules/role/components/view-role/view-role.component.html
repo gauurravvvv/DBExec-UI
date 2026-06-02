@@ -1,6 +1,7 @@
-<div class="view-role-wrapper" *ngIf="roleData">
+<div class="view-role-wrapper">
   <div class="view-role-container">
-    <!-- Header Section -->
+    <!-- Header Section — visible immediately so the back button works
+         while the GET is still in flight. -->
     <div class="page-header">
       <div class="left-section">
         <button pButton class="p-button-text back-button" (click)="goBack()">
@@ -8,15 +9,20 @@
         </button>
         <h2>{{ 'ROLE.VIEW_TITLE' | translate }}</h2>
       </div>
-      <div class="header-actions" *ngIf="roleData?.isDefault !== 1">
+      <div class="header-actions" *ngIf="roleData && roleData?.isDefault !== 1">
         <button class="btn-primary" type="button" (click)="onEdit()">
           <i class="pi pi-pencil"></i> {{ 'COMMON.EDIT' | translate }}
         </button>
       </div>
     </div>
 
+    <!-- Centered branded loader while the GET is in flight. Page
+         chrome above (back button, title) stays clickable so the
+         user can bail out if they change their mind. -->
+    <app-content-loader *ngIf="loading() && !roleData"></app-content-loader>
+
     <!-- Profile Section -->
-    <div class="profile-container">
+    <div class="profile-container" *ngIf="roleData">
       <div class="details-grid">
         <!-- First Row: Role icon + Role Info -->
         <div class="first-row">

@@ -30,6 +30,10 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
   @Input() initialDescription = '';
   @Input() dialogTitle = '';
   @Input() showJustification = false;
+  // Drives the confirm button's spinner — parent passes the
+  // datasetService.saving signal (or any boolean) so the dialog can
+  // show progress while the POST/PUT runs without the global blocker.
+  @Input() saving = false;
   @Output() close = new EventEmitter<DatasetFormData | null>();
 
   datasetForm!: FormGroup;
@@ -70,6 +74,18 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
         justificationControl?.clearValidators();
       }
       justificationControl?.updateValueAndValidity();
+    }
+
+    // Mirror the parent's saving state onto the form so its fields
+    // lock in lockstep with the Save button's spinner. Without this
+    // the user could keep typing in the dialog while the parent's
+    // POST/PUT is in flight.
+    if (this.datasetForm) {
+      if (this.saving && this.datasetForm.enabled) {
+        this.datasetForm.disable({ emitEvent: false });
+      } else if (!this.saving && this.datasetForm.disabled) {
+        this.datasetForm.enable({ emitEvent: false });
+      }
     }
   }
 

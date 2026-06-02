@@ -25,7 +25,10 @@
           (click)="onSubmit()"
           [disabled]="roleForm.invalid || saving()"
         >
-          <i class="pi pi-save mr-2"></i>
+          <i
+            class="pi mr-2"
+            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
+          ></i>
         </button>
       </div>
     </div>
@@ -56,6 +59,19 @@
           icon="pi-align-left"
         >
         </app-custom-input>
+      </div>
+
+      <!-- Permissions skeleton while LIST_PERMISSIONS is in flight.
+           Same outer container/title so the page doesn't reflow when
+           the real toggles render. -->
+      <div
+        class="permissions-section"
+        *ngIf="loadingPermissions() && permissions.length === 0"
+      >
+        <label class="section-title">{{
+          'ROLE.SCREEN_PERMISSIONS' | translate
+        }}</label>
+        <app-content-loader minHeight="240px"></app-content-loader>
       </div>
 
       <!-- Permissions Section -->

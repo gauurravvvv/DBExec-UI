@@ -12,17 +12,32 @@
         </button>
         <h2>{{ 'ANALYSES.ANALYSIS_DETAILS' | translate }}</h2>
       </div>
-      <div class="header-actions">
+      <div class="header-actions" *ngIf="analysisDetails">
         <button class="btn-primary" (click)="onEdit()">
           <i class="pi pi-pencil"></i>
           {{ 'COMMON.EDIT' | translate }}
         </button>
-        <button class="btn-danger" type="button" (click)="onDelete()">
-          <i class="pi pi-trash"></i>
+        <button
+          class="btn-danger"
+          type="button"
+          [disabled]="isDeleting(analysisDetails.id)"
+          (click)="onDelete()"
+        >
+          <i
+            class="pi"
+            [ngClass]="
+              isDeleting(analysisDetails.id)
+                ? 'pi-spin pi-spinner'
+                : 'pi-trash'
+            "
+          ></i>
           {{ 'COMMON.DELETE' | translate }}
         </button>
       </div>
     </div>
+
+    <!-- Centered branded loader while the GET is in flight. -->
+    <app-content-loader *ngIf="loading() && !analysisDetails"></app-content-loader>
 
     <!-- Content Section -->
     <div class="content-section" *ngIf="analysisDetails">
@@ -301,9 +316,19 @@
       <button
         class="btn-confirm"
         (click)="proceedDelete()"
-        [disabled]="!deleteJustification.trim() || saving()"
+        [disabled]="
+          !deleteJustification.trim() ||
+          (analysisDetails && isDeleting(analysisDetails.id))
+        "
       >
-        <i class="pi pi-trash"></i>
+        <i
+          class="pi"
+          [ngClass]="
+            analysisDetails && isDeleting(analysisDetails.id)
+              ? 'pi-spin pi-spinner'
+              : 'pi-trash'
+          "
+        ></i>
         {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>

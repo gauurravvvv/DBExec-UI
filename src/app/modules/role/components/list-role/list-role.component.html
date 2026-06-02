@@ -12,7 +12,8 @@
           *ngIf="selectedCount > 0"
           pButton
           [label]="'COMMON.DELETE_COUNT' | translate: { count: selectedCount }"
-          icon="pi pi-trash"
+          [icon]="isBulkDeleting ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+          [disabled]="isBulkDeleting"
           (click)="confirmBulkDelete()"
           class="p-button-raised p-button-danger modern-button"
         ></button>
@@ -54,6 +55,8 @@
           [lazy]="true"
           (onLazyLoad)="loadRoles($event)"
           [totalRecords]="total()"
+          [loading]="loading()"
+          [showLoader]="false"
           [rowHover]="true"
           dataKey="id"
           [(selection)]="selectedRoles"
@@ -207,13 +210,30 @@
                         : ('COMMON.DELETE' | translate)
                     "
                     tooltipPosition="bottom"
-                    [disabled]="role.isDefault === 1"
+                    [disabled]="role.isDefault === 1 || isDeleting(role.id)"
                   >
-                    <i class="pi pi-trash"></i>
+                    <i
+                      class="pi"
+                      [ngClass]="
+                        isDeleting(role.id) ? 'pi-spin pi-spinner' : 'pi-trash'
+                      "
+                    ></i>
                   </button>
                 </div>
               </td>
             </tr>
+          </ng-template>
+          <!-- Skeleton rows while the lazy GET is in flight. Replaces
+               the legacy global blocker for this module; header +
+               filters + pagination stay visible. -->
+          <ng-template pTemplate="loadingbody">
+            <tr
+              *ngFor="let _ of [].constructor(10); let i = index"
+              appSkeletonRow
+              [columns]="4"
+              [showCheckbox]="true"
+              [showActions]="true"
+            ></tr>
           </ng-template>
           <ng-template pTemplate="emptymessage">
             <tr class="empty-row">
@@ -306,9 +326,21 @@
       <button
         class="btn-confirm"
         (click)="proceedDelete()"
-        [disabled]="!deleteJustification.trim()"
+        [disabled]="
+          !deleteJustification.trim() ||
+          (bulkDelete ? isBulkDeleting : !!(roleToDelete && isDeleting(roleToDelete)))
+        "
       >
-        <i class="pi pi-trash"></i>
+        <!-- Bulk path spins while any selected row is mid-delete; single
+             path spins while the row in question is mid-delete. -->
+        <i
+          class="pi"
+          [ngClass]="
+            (bulkDelete ? isBulkDeleting : !!(roleToDelete && isDeleting(roleToDelete)))
+              ? 'pi-spin pi-spinner'
+              : 'pi-trash'
+          "
+        ></i>
         {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>

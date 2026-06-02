@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import {
@@ -24,12 +25,16 @@ import { RoleService } from '../../services/role.service';
   styleUrls: ['./add-role.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AddRoleComponent implements OnInit, HasUnsavedChanges {
+export class AddRoleComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   roleForm!: FormGroup;
   permissions: any[] = [];
   permissionControls: { [key: string]: FormControl } = {};
 
   saving = this.roleService.saving;
+  // Drives the permissions skeleton while LIST_PERMISSIONS is loading;
+  // form fields (name, description) render immediately so the user can
+  // start typing before the permission tree arrives.
+  loadingPermissions = this.roleService.loadingPermissions;
 
   constructor(
     private fb: FormBuilder,
@@ -52,6 +57,11 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
 
   ngOnInit() {
     this.loadPermissions();
+  }
+
+  ngOnDestroy() {
+    // Abort loadPermissions if the user backs out before it resolves.
+    this.roleService.cancelReads();
   }
 
   initForm() {
@@ -82,6 +92,13 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
       }
 
       const formValues = this.roleForm.value;
+      // Lock both the form AND the permission toggle controls (which
+      // live outside the FormGroup in `permissionControls`) so nothing
+      // is editable while the POST is in flight.
+      this.roleForm.disable({ emitEvent: false });
+      Object.values(this.permissionControls).forEach(c =>
+        c.disable({ emitEvent: false }),
+      );
       this.roleService
         .add({
           name: formValues.name,
@@ -93,6 +110,15 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
             this.roleForm.markAsPristine();
             this.router.navigate([ROLE.LIST]);
           }
+        })
+        .finally(() => {
+          this.roleForm.enable({ emitEvent: false });
+          Object.values(this.permissionControls).forEach(c =>
+            c.enable({ emitEvent: false }),
+          );
+          // 'home' permission is locked via the template
+          // ([disabled]="permission.value === 'home'"), not on the
+          // FormControl, so no re-disable needed here.
         });
     } else {
       Object.keys(this.roleForm.controls).forEach(key => {

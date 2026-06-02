@@ -69,6 +69,12 @@ export class LoginComponent implements OnInit {
     }
     this.loginError.set('');
     this.loading.set(true);
+    // Lock the form while the POST is in flight. Without this the
+    // user could keep typing after hitting Enter, which would make
+    // [disabled]=loginForm.invalid flip to enabled mid-request and
+    // re-fire onSubmit. emitEvent:false keeps the valueChanges
+    // pipeline quiet during the lock/unlock pair.
+    this.loginForm.disable({ emitEvent: false });
     try {
       const res: any = await this.loginService.login(this.loginForm);
       if (this.globalService.handleSuccessService(res, true, false)) {
@@ -90,6 +96,7 @@ export class LoginComponent implements OnInit {
       );
     } finally {
       this.loading.set(false);
+      this.loginForm.enable({ emitEvent: false });
     }
   }
 

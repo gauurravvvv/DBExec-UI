@@ -69,6 +69,17 @@ export class ListDatasetComponent implements OnInit {
   preloadedDatasourcesTotal: number | null = null;
   selectedDatasource: any = null;
   saving = this.datasetService.saving;
+  // Local loading flag — the list still calls the legacy
+  // listDatasets() (a non-signal method) so we track it here. Set
+  // around the fetch and used by the p-table for the skeleton.
+  loadingList = false;
+  // Per-row spinner helpers.
+  isDeleting = (id: string): boolean => this.datasetService.isDeleting(id);
+  get isBulkDeleting(): boolean {
+    return this.selectedDatasets.some((d: any) =>
+      this.datasetService.isDeleting(d.id),
+    );
+  }
 
   today = new Date();
 
@@ -352,6 +363,8 @@ export class ListDatasetComponent implements OnInit {
     const sortParam = this.sortHelper.serialize();
     if (sortParam) params.sort = sortParam;
 
+    this.loadingList = true;
+    this.cdr.markForCheck();
     this.datasetService
       .listDatasets(params)
       .then(response => {
@@ -364,12 +377,14 @@ export class ListDatasetComponent implements OnInit {
           this.filteredDatasets = [];
           this.totalRecords = 0;
         }
+        this.loadingList = false;
         this.cdr.markForCheck();
       })
       .catch(() => {
         this.datasets = [];
         this.filteredDatasets = [];
         this.totalRecords = 0;
+        this.loadingList = false;
         this.cdr.markForCheck();
       });
   }

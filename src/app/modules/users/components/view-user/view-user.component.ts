@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,7 +16,12 @@ import { UserService } from '../../services/user.service';
   styleUrls: ['./view-user.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ViewUserComponent implements OnInit {
+export class ViewUserComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.userService.cancelReads();
+  }
+
   userId: string = '';
   userData: any;
   showDeleteConfirm = false;
@@ -24,6 +30,13 @@ export class ViewUserComponent implements OnInit {
   userInitials: string = '';
   loggedInUserId = this.globalService.getTokenDetails('userId');
   showChangePasswordDialog = false;
+  // Skeleton gating + per-action spinners; matches the system-admin
+  // view-page shape (page chrome visible, body swaps to skeleton card
+  // while the GET is in flight).
+  loading = this.userService.loading;
+  changingPassword = this.userService.changingPassword;
+  isDeleting = (id: string): boolean => this.userService.isDeleting(id);
+  isUnlocking = (id: string): boolean => this.userService.isUnlocking(id);
 
   constructor(
     private route: ActivatedRoute,

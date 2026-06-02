@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -24,11 +25,19 @@ interface StorageTable {
   styleUrls: ['./view-datasource.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ViewDatasourceComponent implements OnInit {
+export class ViewDatasourceComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.datasourceService.cancelReads();
+  }
+
   dbId!: string;
   dbData: any;
   showDeleteConfirm = false;
   deleteJustification = '';
+  // Drives the skeleton card on initial GET + per-id delete spinner.
+  loading = this.datasourceService.loading;
+  isDeleting = (id: string): boolean => this.datasourceService.isDeleting(id);
   showTableDetails = false;
   selectedTable: any = null;
   selectedSchema: any = null;

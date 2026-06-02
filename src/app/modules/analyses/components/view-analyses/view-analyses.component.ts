@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -19,7 +20,12 @@ import { AnalysesService } from '../../services/analyses.service';
   styleUrls: ['./view-analyses.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ViewAnalysesComponent implements OnInit {
+export class ViewAnalysesComponent implements OnInit, OnDestroy {
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.analysesService.cancelReads();
+  }
+
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
@@ -45,6 +51,9 @@ export class ViewAnalysesComponent implements OnInit {
   get saving() {
     return this.analysesService.saving;
   }
+  // Drives the skeleton card on initial GET + per-id delete spinner.
+  loading = this.analysesService.loading;
+  isDeleting = (id: string): boolean => this.analysesService.isDeleting(id);
 
   ngOnInit(): void {
     this.route.params
@@ -57,23 +66,23 @@ export class ViewAnalysesComponent implements OnInit {
       });
   }
 
-  loadAnalysis(): void {
-    this.analysesService
-      .viewAnalyses(this.analysisId)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.analysisDetails = response.data;
-          if (response.data.datasetId) {
-            this.loadDatasetInfo(response.data.datasetId);
-          }
-          this.loadAnalysisFields();
-          this.loadVisuals();
+  async loadAnalysis(): Promise<void> {
+    try {
+      // Signal-based loadOne drives the skeleton card via
+      // analysesService.loading — no global blocker on this page.
+      const response: any = await this.analysesService.loadOne(this.analysisId);
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.analysisDetails = this.analysesService.current();
+        if (this.analysisDetails?.datasetId) {
+          this.loadDatasetInfo(this.analysisDetails.datasetId);
         }
-        this.cdr.markForCheck();
-      })
-      .catch(() => {
-        this.cdr.markForCheck();
-      });
+        this.loadAnalysisFields();
+        this.loadVisuals();
+      }
+      this.cdr.markForCheck();
+    } catch {
+      this.cdr.markForCheck();
+    }
   }
 
   loadDatasetInfo(datasetId: string): void {

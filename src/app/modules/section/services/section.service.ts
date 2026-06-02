@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { lastValueFrom } from 'rxjs';
+import { EmptyError, Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { SECTION } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
@@ -14,6 +14,10 @@ export class SectionService {
   private _loading = signal(false);
   private _saving = signal(false);
 
+  // Reads pipe through this Subject so callers (view/edit/list/add
+  // section ngOnDestroy) can cancel in-flight GETs.
+  private _cancelReads$ = new Subject<void>();
+
   readonly sections = this._sections.asReadonly();
   readonly total = this._total.asReadonly();
   readonly current = this._current.asReadonly();
@@ -26,12 +30,16 @@ export class SectionService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(SECTION.LIST, { params }),
+        this.http
+          .apiGet(SECTION.LIST, { params })
+          .pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) {
         this._sections.set(res.data.sections ?? []);
         this._total.set(res.data.count ?? 0);
       }
+    } catch (err) {
+      if (!(err instanceof EmptyError)) throw err;
     } finally {
       this._loading.set(false);
     }
@@ -40,13 +48,26 @@ export class SectionService {
   async loadOne(id: string): Promise<void> {
     this._loading.set(true);
     try {
-      const res: any = await lastValueFrom(this.http.apiGet(SECTION.GET + id));
+      const res: any = await lastValueFrom(
+        this.http
+          .apiGet(SECTION.GET + id)
+          .pipe(takeUntil(this._cancelReads$)),
+      );
       if (res?.status) this._current.set(res.data);
-    } catch {
+    } catch (err) {
+      if (err instanceof EmptyError) return;
       this._current.set(null);
     } finally {
       this._loading.set(false);
     }
+  }
+
+  /**
+   * Cancel any in-flight read GETs. Components call this from
+   * ngOnDestroy so the XHR is aborted when the user navigates away.
+   */
+  cancelReads() {
+    this._cancelReads$.next();
   }
 
   async add(payload: any): Promise<any> {
