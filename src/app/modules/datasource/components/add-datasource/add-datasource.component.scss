@@ -513,7 +513,7 @@
 
     &.p-inputswitch-checked {
       .p-inputswitch-slider {
-        background: var(--success-color) !important;
+        background: var(--primary-color) !important;
 
         &:before {
           transform: translateX(1.5rem) !important;
@@ -530,7 +530,7 @@
 
       &.p-inputswitch-checked:hover {
         .p-inputswitch-slider {
-          background: var(--success-color) !important;
+          background: var(--primary-color) !important;
           opacity: 0.9;
         }
       }
