@@ -1421,7 +1421,8 @@
       "BACK_TO_LOGIN": "Torna all'accesso",
       "ERROR_GENERIC": "Non è stato possibile preparare la sessione.",
       "DETAILS_LABEL": "Dettagli",
-      "TIMEOUT_DETAIL": "Richiesta scaduta"
+      "TIMEOUT_DETAIL": "Richiesta scaduta",
+      "MALFORMED_DETAIL": "Dati di sessione non validi"
     }
   },
   "PASSWORD": {

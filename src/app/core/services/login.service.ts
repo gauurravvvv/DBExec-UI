@@ -105,24 +105,33 @@ export class LoginService implements OnDestroy {
   }
 
   /**
-   * Phase 2 — fetch the full session payload. Owns all the storage
-   * + signal writes that the old monolithic login used to do
-   * (permissions, role, theme, branding, announcements, full user,
-   * sessionInactivityTimeout).
+   * Phase 2 — fetch the full session payload. PURE: returns an
+   * outcome, never mutates storage or signals. The caller decides
+   * whether to commit by invoking `applyBootstrap(data)`. This
+   * separation lets the relay component's race guard reject a late
+   * response (after the 30s hard timeout fired) without having to
+   * undo half-applied side effects.
    *
-   * Returns a small discriminated outcome the relay component can
-   * route on:
-   *   - { ok: true, data }                       → bootstrap succeeded
+   * Returns a small discriminated outcome:
+   *   - { ok: true, data }                       → fetched ok, apply when ready
    *   - { ok: false, kind: 'app', message }      → BE returned status:false
    *   - { ok: false, kind: 'transient', status, message }
    *                                              → network down OR 5xx
    *   - { ok: false, kind: 'fatal', status, message }
    *                                              → any other HTTP error
    *
-   * The `kind` field is what drives auto-retry (only `transient`
-   * qualifies). The raw server `message` is kept on the outcome
-   * for the relay's "Details" line; the user-facing copy is the
-   * friendly i18n string in every case.
+   * Transient detection covers BOTH paths:
+   *   - The legitimate exception path (status === 0 / 5xx HTTP error
+   *     reaching the catch block), AND
+   *   - The interceptor-rewrite path: the project's HTTP interceptor
+   *     turns any envelope-shaped error into a 200 success with
+   *     `{ status: false, code: 5xx, ... }` in the body. Without the
+   *     code check here, a real 5xx would never trigger the silent
+   *     retry — it'd land in the `kind: 'app'` branch.
+   *
+   * The raw server `message` is preserved on every outcome for the
+   * relay's "Details" line; user-facing copy is the friendly i18n
+   * string in every case.
    */
   async bootstrapSession(): Promise<{
     ok: boolean;
@@ -136,19 +145,27 @@ export class LoginService implements OnDestroy {
         this.http.apiGet(AUTH.SESSION, { skipLoader: true }),
       );
       if (result?.status) {
-        this.applyBootstrap(result.data || {});
         return { ok: true, data: result.data };
       }
-      // BE returned a structured failure (status: false). That's
-      // never transient — it's a business-level rejection
-      // (session-expired, org-not-found, etc.). Don't retry.
-      return { ok: false, kind: 'app', message: result?.message };
+      // Envelope-rewrite path: interceptor mapped a real HTTP error
+      // into a 200 success whose body carries the original status
+      // code. 5xx codes here mean the server tried and failed —
+      // treat as transient so the relay's silent retry fires.
+      const code: number =
+        typeof result?.code === 'number' ? result.code : -1;
+      const isTransient = code >= 500 && code < 600;
+      return {
+        ok: false,
+        kind: isTransient ? 'transient' : 'app',
+        status: code,
+        message: result?.message,
+      };
     } catch (err: any) {
-      // HttpErrorResponse — status === 0 means the request never
-      // reached the server (offline / CORS / DNS / mid-flight
-      // abort). 5xx means the server tried and failed. Both are
-      // worth one silent retry. Everything else (4xx) is fatal
-      // for the bootstrap — a fresh attempt won't help.
+      // Genuine exception path — HttpErrorResponse that didn't carry
+      // our envelope shape (network failure with empty body / non-
+      // API response / etc.). status === 0 is offline/CORS/DNS;
+      // 5xx is server-side failure. Both transient. Anything else
+      // is fatal — a fresh attempt won't help.
       const status: number =
         typeof err?.status === 'number' ? err.status : -1;
       const isTransient = status === 0 || (status >= 500 && status < 600);
@@ -162,12 +179,18 @@ export class LoginService implements OnDestroy {
   }
 
   /**
-   * Apply a successful bootstrap payload. Pulled out of
-   * `bootstrapSession` so the success path stays linear and the
-   * outcome wrapper above can stay declarative.
+   * Commit a phase-2 bootstrap payload. Idempotent. The relay
+   * component calls this AFTER its race guard accepts the outcome
+   * — so a late response that arrives post-timeout never lands.
+   *
+   * Validates the response shape defensively: a malformed payload
+   * (no `user` at all) means the BE is broken; bail out rather
+   * than silently writing empty strings to storage and leaving the
+   * session in a half-set state.
    */
-  private applyBootstrap(d: any): void {
-    const user = d.user || {};
+  applyBootstrap(d: any): boolean {
+    if (!d || typeof d !== 'object' || !d.user) return false;
+    const user = d.user;
 
     StorageService.set(StorageType.ROLE, d.role || user.role || '');
     StorageService.set(
@@ -212,6 +235,7 @@ export class LoginService implements OnDestroy {
     StorageService.remove(StorageType.RELAY_FIRST_NAME);
     StorageService.remove(StorageType.RELAY_LAST_NAME);
     StorageService.remove(StorageType.RELAY_IS_FIRST_LOGIN);
+    return true;
   }
 
   generateOTP(forgotPasswordForm: UntypedFormGroup) {
@@ -329,10 +353,15 @@ export class LoginService implements OnDestroy {
           this.themeService.applyFromLogin(response.data?.theme);
           this.brandingService.applyFromLogin(response.data?.branding);
           // Re-hydrate the rest of the session in the background.
-          // Errors are swallowed here — the user is already on
-          // their previous URL and reactive 440 will recover if
-          // the token genuinely is bad.
-          this.bootstrapSession().catch(() => {});
+          // bootstrapSession() is now pure — apply explicitly on
+          // success. Errors are swallowed because the user is
+          // already on their previous URL and reactive 440 will
+          // recover if the token genuinely is bad.
+          this.bootstrapSession()
+            .then((outcome) => {
+              if (outcome.ok) this.applyBootstrap(outcome.data);
+            })
+            .catch(() => {});
         }
       },
       error: () => {

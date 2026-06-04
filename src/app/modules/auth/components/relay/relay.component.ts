@@ -1,12 +1,14 @@
 import {
-  AfterViewInit,
+  AfterRenderPhase,
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   ElementRef,
   HostListener,
   OnDestroy,
   OnInit,
   ViewChild,
+  afterNextRender,
   computed,
   effect,
   inject,
@@ -38,26 +40,34 @@ import { StorageService } from 'src/app/core/services/storage.service';
  *               already a request in flight, and a second one would
  *               race the first.
  *
- *   ready     — phase-2 returned ok. 400 ms hold with the check icon
- *               + "You're in", then navigate to the role's home.
+ *   ready     — phase-2 returned ok and we committed the bootstrap.
+ *               400 ms hold with the check icon + "You're in",
+ *               then navigate to the role's home.
  *
  *   error     — phase-2 failed (or hit the 30 s hard timeout). Shows
  *               a friendly i18n message, the raw server message in a
  *               muted Details line, and BOTH Retry + Back-to-login.
  *               Retry is auto-focused; Esc bails to login.
  *
+ * Race-guard contract with LoginService:
+ *   - bootstrapSession() is PURE: it fetches and returns an outcome.
+ *     The relay decides whether to commit by calling applyBootstrap.
+ *   - A late response that arrives after the 30 s hard timeout, or
+ *     after the user clicked Back-to-login, is dropped here without
+ *     mutating storage. That's why side effects don't live inside
+ *     bootstrapSession.
+ *
  * Resilience:
- *   - On the FIRST transient failure (network down / 5xx) the
- *     component silently retries once after 500 ms before showing
- *     anything. Saves the user from a "couldn't set up your
- *     session" banner on a single dev-server hiccup.
+ *   - On the FIRST transient failure (network down / 5xx, including
+ *     the interceptor-rewritten envelope case) the component
+ *     silently retries once after 500 ms before showing anything.
  *   - A 30 s hard timeout forces `error` if the request hangs
  *     forever (proxy stall / frozen DB connection).
  *
  * Routing safety:
  *   - Direct visits (no phase-1 storage) bounce to /login.
- *   - On unmount, all timers (slow / timeout / nav) are cleared so a
- *     mid-flight navigation can't fire a `setState` after destroy.
+ *   - On unmount we set `destroyed`, clear all timers, and every
+ *     timer body re-checks it before mutating state.
  *
  * Visual layout: anchored top-left wordmark, centred greeting card
  * (initials avatar + bold-firstName greeting + status + spinner/
@@ -69,17 +79,24 @@ const HARD_TIMEOUT_MS = 30000;
 const SILENT_RETRY_DELAY_MS = 500;
 const READY_HOLD_MS = 400;
 
+// Private-use-area marker for splitting the localised greeting
+// around the firstName placeholder. Using PUA codepoints means we
+// can never collide with any character a real translator might
+// type, no matter how creative the locale's punctuation gets.
+const NAME_MARKER = 'NAME';
+
 @Component({
   selector: 'app-relay',
   templateUrl: './relay.component.html',
   styleUrls: ['./relay.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RelayComponent implements OnInit, OnDestroy, AfterViewInit {
+export class RelayComponent implements OnInit, OnDestroy {
   private readonly loginService = inject(LoginService);
   private readonly router = inject(Router);
   private readonly globalService = inject(GlobalService);
   private readonly translate = inject(TranslateService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly state = signal<'loading' | 'slow' | 'ready' | 'error'>('loading');
 
@@ -92,7 +109,9 @@ export class RelayComponent implements OnInit, OnDestroy, AfterViewInit {
   readonly errorDetails = signal<string>('');
 
   /** Bumped on every TranslateService lang change so the
-   *  greetingPrefix / greetingSuffix computeds re-fire. */
+   *  greetingPrefix / greetingSuffix computeds re-fire. The
+   *  computeds read this signal explicitly so the dependency is
+   *  load-bearing — don't remove the read. */
   private readonly langTick = signal(0);
   private langSub?: Subscription;
 
@@ -100,17 +119,26 @@ export class RelayComponent implements OnInit, OnDestroy, AfterViewInit {
     this.isFirstLogin() ? 'AUTH.RELAY.WELCOME' : 'AUTH.RELAY.WELCOME_BACK',
   );
 
-  readonly greetingParams = computed(() => ({ firstName: this.firstName() }));
-
+  /** Translated greeting split around its firstName placeholder.
+   *  The template renders prefix + <strong>firstName</strong> +
+   *  suffix as separate text nodes — never feeding the firstName
+   *  value into an HTML sink. */
   private readonly greetingParts = computed<[string, string]>(() => {
+    // Load-bearing read — keeps the computed subscribed to lang
+    // changes so a delayed applyTempLocale() refreshes the split.
     this.langTick();
-    const marker = 'NAME';
     const expanded = this.translate.instant(this.greetingKey(), {
-      firstName: marker,
+      firstName: NAME_MARKER,
     });
-    const idx = expanded.indexOf(marker);
-    if (idx < 0) return [expanded, ''];
-    return [expanded.slice(0, idx), expanded.slice(idx + marker.length)];
+    const idx = typeof expanded === 'string' ? expanded.indexOf(NAME_MARKER) : -1;
+    if (idx < 0) {
+      // Locale string didn't include the placeholder, or
+      // translate.instant returned the key unchanged because the
+      // translations haven't loaded yet. Surface the raw string
+      // as the prefix; the firstName <strong> still renders.
+      return [typeof expanded === 'string' ? expanded : '', ''];
+    }
+    return [expanded.slice(0, idx), expanded.slice(idx + NAME_MARKER.length)];
   });
 
   readonly greetingPrefix = computed(() => this.greetingParts()[0]);
@@ -135,23 +163,38 @@ export class RelayComponent implements OnInit, OnDestroy, AfterViewInit {
   private retryDelayTimer: ReturnType<typeof setTimeout> | null = null;
 
   // Tracks whether we've already used the one-shot silent retry.
-  // Reset on every manual Retry so the user gets the same
-  // forgiveness budget if they bail out and come back.
+  // Reset on every manual Retry AND on every successful bootstrap
+  // so the budget is fresh next time the component re-runs.
   private silentRetryUsed = false;
 
-  // Guard for the auto-focus effect — only focus on first entry
-  // into `error`, not on every re-render while in `error`.
-  private lastFocusedAffordance: 'error' | null = null;
+  // Flipped in ngOnDestroy. Every async callback re-checks this
+  // before mutating state — guards against setState-after-destroy
+  // when a navigation or refresh races a pending timer.
+  private destroyed = false;
+
+  // Used to focus Retry only on the first entry into `error`,
+  // not on every re-render while already in `error`.
+  private focusedError = false;
 
   constructor() {
+    // Focus the Retry button when we transition into `error`.
+    // afterNextRender waits for the *ngIf to insert the button into
+    // the DOM, eliminating the setTimeout-0 race the previous
+    // implementation used. Runs in the next paint phase, so the
+    // user sees the button focused on the same frame it appears.
     effect(() => {
       const s = this.state();
-      if (s === 'error' && this.lastFocusedAffordance !== 'error') {
-        this.lastFocusedAffordance = 'error';
-        // Defer past the *ngIf insertion.
-        setTimeout(() => this.retryBtnRef?.nativeElement?.focus(), 0);
+      if (s === 'error' && !this.focusedError) {
+        this.focusedError = true;
+        afterNextRender(
+          () => {
+            if (this.destroyed) return;
+            this.retryBtnRef?.nativeElement?.focus();
+          },
+          { phase: AfterRenderPhase.Read },
+        );
       } else if (s !== 'error') {
-        this.lastFocusedAffordance = null;
+        this.focusedError = false;
       }
     });
   }
@@ -178,17 +221,18 @@ export class RelayComponent implements OnInit, OnDestroy, AfterViewInit {
     this.kickBootstrap();
   }
 
-  ngAfterViewInit(): void {
-    // No-op for now.
-  }
-
   ngOnDestroy(): void {
+    this.destroyed = true;
     this.clearTimers();
     this.langSub?.unsubscribe();
   }
 
-  /** Esc → Back to login, but only once affordances are visible. */
-  @HostListener('document:keydown.escape')
+  /** Esc → Back to login, but only once affordances are visible.
+   *  Scoped to the component host (not document) — the relay
+   *  covers the whole viewport so this still catches every Esc the
+   *  user could intend for it, without polluting the global keymap
+   *  when the relay isn't mounted. */
+  @HostListener('keydown.escape')
   onEscape(): void {
     if (this.state() === 'slow' || this.state() === 'error') {
       this.backToLogin();
@@ -220,6 +264,7 @@ export class RelayComponent implements OnInit, OnDestroy, AfterViewInit {
     // Back-to-login affordance once the request has been in flight
     // longer than feels comfortable. Doesn't cancel the request.
     this.slowTimer = setTimeout(() => {
+      if (this.destroyed) return;
       if (this.state() === 'loading') this.state.set('slow');
     }, SLOW_THRESHOLD_MS);
 
@@ -227,17 +272,18 @@ export class RelayComponent implements OnInit, OnDestroy, AfterViewInit {
     // all (proxy stall / DB hang / etc.). We don't actually abort
     // the underlying HTTP call (would need AbortController plumbing
     // through HttpClient); we just stop waiting for it and surface
-    // the error UI. Any late-arriving response is ignored via the
-    // state guard below.
+    // the error UI. Any late-arriving response is dropped by the
+    // race guard in runBootstrap below, and applyBootstrap is
+    // never called — so the user never gets storage writes after
+    // they've already seen the error UI.
     this.hardTimeoutTimer = setTimeout(() => {
+      if (this.destroyed) return;
       const s = this.state();
       if (s === 'loading' || s === 'slow') {
-        // Use the translated "Request timed out" string as the
-        // details line so the user reads something meaningful in
-        // their locale instead of the literal word "timeout".
-        this.errorDetails.set(
-          this.translate.instant('AUTH.RELAY.TIMEOUT_DETAIL'),
-        );
+        this.errorDetails.set(this.translateOrFallback(
+          'AUTH.RELAY.TIMEOUT_DETAIL',
+          'Request timed out',
+        ));
         this.state.set('error');
       }
     }, HARD_TIMEOUT_MS);
@@ -247,28 +293,47 @@ export class RelayComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private runBootstrap(): void {
     this.loginService.bootstrapSession().then((outcome) => {
-      // Race guard — if the hard timeout already fired, ignore the
-      // late response. The user is already looking at the error
-      // surface; flipping back to `ready` here would be jarring
-      // and lose the recovery affordances.
+      if (this.destroyed) return;
+
+      // Race guard — if the hard timeout already fired, drop the
+      // outcome on the floor. We never call applyBootstrap here,
+      // so storage / signals stay in their pre-error state.
       if (this.state() === 'error') return;
 
       if (outcome.ok) {
+        // Commit the side effects only after the race guard
+        // accepts the outcome. applyBootstrap is idempotent and
+        // self-validating.
+        const applied = this.loginService.applyBootstrap(outcome.data);
+        if (!applied) {
+          // Malformed response — treat as fatal. No retry; a fresh
+          // attempt against the same broken BE would just loop.
+          this.clearTimers();
+          this.errorDetails.set(this.translateOrFallback(
+            'AUTH.RELAY.MALFORMED_DETAIL',
+            'Malformed session payload',
+          ));
+          this.state.set('error');
+          return;
+        }
         this.clearTimers();
+        this.silentRetryUsed = false; // refresh budget for future runs
         this.state.set('ready');
-        this.navTimer = setTimeout(() => this.navigateHome(), READY_HOLD_MS);
+        this.navTimer = setTimeout(() => {
+          if (!this.destroyed) this.navigateHome();
+        }, READY_HOLD_MS);
         return;
       }
 
-      // One silent auto-retry for transient failures (network down
-      // or 5xx). Tiny delay so a momentary DNS / proxy hiccup
-      // doesn't get spammed.
+      // One silent auto-retry for transient failures (network down,
+      // 5xx HTTP, or 5xx envelope-rewritten by the interceptor).
+      // Tiny delay so a momentary DNS / proxy hiccup doesn't get
+      // spammed.
       if (outcome.kind === 'transient' && !this.silentRetryUsed) {
         this.silentRetryUsed = true;
-        this.retryDelayTimer = setTimeout(
-          () => this.runBootstrap(),
-          SILENT_RETRY_DELAY_MS,
-        );
+        this.retryDelayTimer = setTimeout(() => {
+          if (!this.destroyed) this.runBootstrap();
+        }, SILENT_RETRY_DELAY_MS);
         return;
       }
 
@@ -276,6 +341,14 @@ export class RelayComponent implements OnInit, OnDestroy, AfterViewInit {
       this.errorDetails.set(outcome.message || '');
       this.state.set('error');
     });
+  }
+
+  /** translate.instant returns the key itself when translations
+   *  haven't loaded yet. Surface a sensible fallback instead so the
+   *  user never sees a bare i18n key in the UI. */
+  private translateOrFallback(key: string, fallback: string): string {
+    const v = this.translate.instant(key);
+    return typeof v === 'string' && v !== key ? v : fallback;
   }
 
   private navigateHome(): void {

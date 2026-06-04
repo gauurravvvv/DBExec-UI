@@ -1421,7 +1421,8 @@
       "BACK_TO_LOGIN": "Voltar para o login",
       "ERROR_GENERIC": "Não conseguimos preparar sua sessão.",
       "DETAILS_LABEL": "Detalhes",
-      "TIMEOUT_DETAIL": "Tempo limite excedido"
+      "TIMEOUT_DETAIL": "Tempo limite excedido",
+      "MALFORMED_DETAIL": "Dados de sessão inválidos"
     }
   },
   "PASSWORD": {

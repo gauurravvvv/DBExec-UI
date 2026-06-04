@@ -108,10 +108,17 @@
   letter-spacing: -0.01em;
   line-height: 1.3;
   color: var(--text-strong);
-  ::ng-deep .relay__greeting-name {
-    font-weight: var(--fw-semibold, 600);
-    color: var(--text-strong);
-  }
+  // Long firstNames wrap gracefully — keep the second-line tail
+  // from clipping out on very narrow viewports.
+  overflow-wrap: anywhere;
+}
+
+// The bolded firstName sits inside .relay__greeting as a real
+// <strong> in this component's own template, so view-encapsulation
+// scopes it correctly without ::ng-deep.
+.relay__greeting-name {
+  font-weight: var(--fw-semibold, 600);
+  color: var(--text-strong);
 }
 
 // ── Status copy ──────────────────────────────────────────────

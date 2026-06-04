@@ -1421,7 +1421,8 @@
       "BACK_TO_LOGIN": "Zurück zur Anmeldung",
       "ERROR_GENERIC": "Ihre Sitzung konnte nicht eingerichtet werden.",
       "DETAILS_LABEL": "Details",
-      "TIMEOUT_DETAIL": "Zeitüberschreitung bei der Anfrage"
+      "TIMEOUT_DETAIL": "Zeitüberschreitung bei der Anfrage",
+      "MALFORMED_DETAIL": "Ungültige Sitzungsdaten"
     }
   },
   "PASSWORD": {

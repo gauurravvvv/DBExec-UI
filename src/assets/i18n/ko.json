@@ -1421,7 +1421,8 @@
       "BACK_TO_LOGIN": "로그인으로 돌아가기",
       "ERROR_GENERIC": "세션을 준비하지 못했습니다.",
       "DETAILS_LABEL": "세부 정보",
-      "TIMEOUT_DETAIL": "요청 시간이 초과되었습니다"
+      "TIMEOUT_DETAIL": "요청 시간이 초과되었습니다",
+      "MALFORMED_DETAIL": "잘못된 세션 데이터"
     }
   },
   "PASSWORD": {
