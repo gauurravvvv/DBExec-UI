@@ -16,7 +16,9 @@ interface ValidRow {
   email: string;
   username: string;
   firstName: string;
-  lastName: string;
+  // Optional — many cultures use a single mononym. Empty cell in
+  // the CSV is normalised to null at the BE.
+  lastName?: string | null;
   groupIds: string[];
   groupNames: string[];
   locale: string;

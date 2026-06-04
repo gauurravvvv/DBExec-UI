@@ -89,14 +89,12 @@ export class EditSystemAdminComponent
           Validators.pattern(REGEX.firstName),
         ],
       ],
+      // lastName is OPTIONAL — many cultures use a single mononym.
+      // Drop required + minLength; keep pattern + maxLength so an
+      // explicitly typed value still has to be well-formed.
       lastName: [
         '',
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(30),
-          Validators.pattern(REGEX.lastName),
-        ],
+        [Validators.maxLength(30), Validators.pattern(REGEX.lastName)],
       ],
       username: [
         '',
