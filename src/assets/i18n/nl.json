@@ -1419,7 +1419,9 @@
       "READY": "Je bent erin.",
       "RETRY": "Opnieuw proberen",
       "BACK_TO_LOGIN": "Terug naar aanmelden",
-      "ERROR_GENERIC": "We konden je sessie niet voorbereiden."
+      "ERROR_GENERIC": "We konden je sessie niet voorbereiden.",
+      "DETAILS_LABEL": "Details",
+      "TIMEOUT_DETAIL": "Time-out van verzoek"
     }
   },
   "PASSWORD": {

@@ -1419,7 +1419,9 @@
       "READY": "Ya estás dentro.",
       "RETRY": "Reintentar",
       "BACK_TO_LOGIN": "Volver al inicio de sesión",
-      "ERROR_GENERIC": "No pudimos preparar tu sesión."
+      "ERROR_GENERIC": "No pudimos preparar tu sesión.",
+      "DETAILS_LABEL": "Detalles",
+      "TIMEOUT_DETAIL": "Tiempo de espera agotado"
     }
   },
   "PASSWORD": {

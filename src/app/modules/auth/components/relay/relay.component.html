@@ -7,15 +7,17 @@
                      content only)
     .relay__bottom → fixed footer line (© DBExec · year)
 
-  The card stays minimal — wordmark moved OUT to the page chrome
-  so the card itself only carries the greeting hierarchy. Anchored
-  chrome bounds the page so the empty space reads as room to
-  breathe instead of unfinished surface.
+  Affordance policy:
+    - loading: nothing extra.
+    - slow:    Back-to-login only. Retry would race the in-flight
+               request, so we deliberately hide it here.
+    - ready:   nothing extra (about to navigate).
+    - error:   Retry + Back-to-login. A friendly i18n message is
+               always shown above; the raw server message (if any)
+               appears in a muted Details line below for the user
+               to copy into a bug report.
 -->
 <div class="relay" role="status" aria-live="polite">
-  <!-- Top-left brand anchor. Same visual language as the auth shell
-       topbar, but smaller and positioned absolutely so it doesn't
-       fight with the centred greeting. -->
   <div class="relay__top" aria-hidden="true">
     <i class="ci ci-app-icon relay__top-mark"></i>
     <span class="relay__top-wordmark"
@@ -49,14 +51,23 @@
       <span *ngSwitchCase="'loading'">{{ 'AUTH.RELAY.SETTING_UP' | translate }}</span>
       <span *ngSwitchCase="'slow'">{{ 'AUTH.RELAY.STILL_WORKING' | translate }}</span>
       <span *ngSwitchCase="'ready'">{{ 'AUTH.RELAY.READY' | translate }}</span>
-      <span *ngSwitchCase="'error'">{{
-        errorMessage() || ('AUTH.RELAY.ERROR_GENERIC' | translate)
-      }}</span>
+      <span *ngSwitchCase="'error'">{{ 'AUTH.RELAY.ERROR_GENERIC' | translate }}</span>
     </p>
 
-    <!-- Ring vs check — exclusive. Ring spins while loading; the
-         check appears once ready. Error has neither (affordances
-         carry the meaning). -->
+    <!-- Server-supplied detail. Muted, smaller, only shown when we
+         have one. Lets ops copy a meaningful line into a bug
+         report without polluting the primary error copy. -->
+    <p
+      class="relay__details"
+      *ngIf="state() === 'error' && errorDetails()"
+    >
+      {{ 'AUTH.RELAY.DETAILS_LABEL' | translate }}:
+      <span>{{ errorDetails() }}</span>
+    </p>
+
+    <!-- Ring vs check — exclusive. Ring spins while loading/slow;
+         the check appears once ready. Error has neither (the
+         affordances carry the meaning). -->
     <div
       class="relay__ring"
       *ngIf="state() === 'loading' || state() === 'slow'"
@@ -70,12 +81,16 @@
       <i class="pi pi-check"></i>
     </div>
 
-    <!-- Retry + back-to-login appear after the 10-second stall and
-         on any phase-2 error. Hidden during the happy path so the
-         loading state remains a single confident frame. The Retry
-         button is autofocused when this region first appears, and
-         Esc anywhere triggers Back-to-login. -->
-    <div class="relay__actions" *ngIf="state() === 'slow' || state() === 'error'">
+    <!-- slow: just Back-to-login (no Retry — would race the
+         in-flight request). -->
+    <div class="relay__actions" *ngIf="state() === 'slow'">
+      <button type="button" class="relay__btn" (click)="backToLogin()">
+        {{ 'AUTH.RELAY.BACK_TO_LOGIN' | translate }}
+      </button>
+    </div>
+
+    <!-- error: Retry (auto-focused, primary) + Back-to-login. -->
+    <div class="relay__actions" *ngIf="state() === 'error'">
       <button
         #retryBtn
         type="button"
@@ -90,8 +105,6 @@
     </div>
   </div>
 
-  <!-- Footer line. Bounds the bottom edge of the page without
-       competing with the centred card. -->
   <div class="relay__bottom" aria-hidden="true">
     © DBExec · {{ year }}
   </div>

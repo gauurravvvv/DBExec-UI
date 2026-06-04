@@ -108,62 +108,110 @@ export class LoginService implements OnDestroy {
    * Phase 2 — fetch the full session payload. Owns all the storage
    * + signal writes that the old monolithic login used to do
    * (permissions, role, theme, branding, announcements, full user,
-   * sessionInactivityTimeout). Returns the raw API result so the
-   * relay component can read `.status`, `.message`, etc.
+   * sessionInactivityTimeout).
+   *
+   * Returns a small discriminated outcome the relay component can
+   * route on:
+   *   - { ok: true, data }                       → bootstrap succeeded
+   *   - { ok: false, kind: 'app', message }      → BE returned status:false
+   *   - { ok: false, kind: 'transient', status, message }
+   *                                              → network down OR 5xx
+   *   - { ok: false, kind: 'fatal', status, message }
+   *                                              → any other HTTP error
+   *
+   * The `kind` field is what drives auto-retry (only `transient`
+   * qualifies). The raw server `message` is kept on the outcome
+   * for the relay's "Details" line; the user-facing copy is the
+   * friendly i18n string in every case.
    */
-  async bootstrapSession(): Promise<any> {
-    const result: any = await lastValueFrom(
-      this.http.apiGet(AUTH.SESSION, { skipLoader: true }),
-    );
-    if (result.status) {
-      const d = result.data || {};
-      const user = d.user || {};
-
-      StorageService.set(StorageType.ROLE, d.role || user.role || '');
-      StorageService.set(
-        StorageType.ORGANISATION_ID,
-        user.organisationId || '',
+  async bootstrapSession(): Promise<{
+    ok: boolean;
+    kind?: 'app' | 'transient' | 'fatal';
+    status?: number;
+    data?: any;
+    message?: string;
+  }> {
+    try {
+      const result: any = await lastValueFrom(
+        this.http.apiGet(AUTH.SESSION, { skipLoader: true }),
       );
-      StorageService.set(
-        StorageType.ORGANISATION,
-        user.organisationName || StorageService.get(StorageType.ORGANISATION),
-      );
-
-      if (d.sessionInactivityTimeout) {
-        StorageService.set(
-          StorageType.SESSION_INACTIVITY_TIMEOUT,
-          d.sessionInactivityTimeout.toString(),
-        );
+      if (result?.status) {
+        this.applyBootstrap(result.data || {});
+        return { ok: true, data: result.data };
       }
-
-      // Same announcements-on-mount contract as the old monolithic
-      // login — empty array default so downstream reads don't need
-      // a null guard.
-      StorageService.set(
-        StorageType.ANNOUNCEMENTS,
-        JSON.stringify(d.announcements ?? []),
-      );
-
-      // Apply theme + branding. `null` (system-admin path) clears
-      // any previously injected style and reverts to the SCSS
-      // defaults.
-      this.themeService.applyFromLogin(d.theme);
-      this.brandingService.applyFromLogin(d.branding);
-
-      // Phase-2 ships the user's locale too — reapply (idempotent
-      // if phase 1 already set it; matters when bootstrapSession
-      // is invoked from the refresh path without a prior login).
-      if (user.locale) {
-        this.localeService.applyTempLocale(user.locale);
-      }
-
-      // Drop the short-lived relay fields now that the bootstrap
-      // is complete.
-      StorageService.remove(StorageType.RELAY_FIRST_NAME);
-      StorageService.remove(StorageType.RELAY_LAST_NAME);
-      StorageService.remove(StorageType.RELAY_IS_FIRST_LOGIN);
+      // BE returned a structured failure (status: false). That's
+      // never transient — it's a business-level rejection
+      // (session-expired, org-not-found, etc.). Don't retry.
+      return { ok: false, kind: 'app', message: result?.message };
+    } catch (err: any) {
+      // HttpErrorResponse — status === 0 means the request never
+      // reached the server (offline / CORS / DNS / mid-flight
+      // abort). 5xx means the server tried and failed. Both are
+      // worth one silent retry. Everything else (4xx) is fatal
+      // for the bootstrap — a fresh attempt won't help.
+      const status: number =
+        typeof err?.status === 'number' ? err.status : -1;
+      const isTransient = status === 0 || (status >= 500 && status < 600);
+      return {
+        ok: false,
+        kind: isTransient ? 'transient' : 'fatal',
+        status,
+        message: err?.error?.message || err?.message,
+      };
     }
-    return result;
+  }
+
+  /**
+   * Apply a successful bootstrap payload. Pulled out of
+   * `bootstrapSession` so the success path stays linear and the
+   * outcome wrapper above can stay declarative.
+   */
+  private applyBootstrap(d: any): void {
+    const user = d.user || {};
+
+    StorageService.set(StorageType.ROLE, d.role || user.role || '');
+    StorageService.set(
+      StorageType.ORGANISATION_ID,
+      user.organisationId || '',
+    );
+    StorageService.set(
+      StorageType.ORGANISATION,
+      user.organisationName || StorageService.get(StorageType.ORGANISATION),
+    );
+
+    if (d.sessionInactivityTimeout) {
+      StorageService.set(
+        StorageType.SESSION_INACTIVITY_TIMEOUT,
+        d.sessionInactivityTimeout.toString(),
+      );
+    }
+
+    // Same announcements-on-mount contract as the old monolithic
+    // login — empty array default so downstream reads don't need
+    // a null guard.
+    StorageService.set(
+      StorageType.ANNOUNCEMENTS,
+      JSON.stringify(d.announcements ?? []),
+    );
+
+    // Apply theme + branding. `null` (system-admin path) clears
+    // any previously injected style and reverts to the SCSS
+    // defaults.
+    this.themeService.applyFromLogin(d.theme);
+    this.brandingService.applyFromLogin(d.branding);
+
+    // Phase-2 ships the user's locale too — reapply (idempotent
+    // if phase 1 already set it; matters when bootstrapSession
+    // is invoked from the refresh path without a prior login).
+    if (user.locale) {
+      this.localeService.applyTempLocale(user.locale);
+    }
+
+    // Drop the short-lived relay fields now that the bootstrap is
+    // complete.
+    StorageService.remove(StorageType.RELAY_FIRST_NAME);
+    StorageService.remove(StorageType.RELAY_LAST_NAME);
+    StorageService.remove(StorageType.RELAY_IS_FIRST_LOGIN);
   }
 
   generateOTP(forgotPasswordForm: UntypedFormGroup) {

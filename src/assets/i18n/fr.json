@@ -1419,7 +1419,9 @@
       "READY": "Vous y êtes.",
       "RETRY": "Réessayer",
       "BACK_TO_LOGIN": "Retour à la connexion",
-      "ERROR_GENERIC": "Impossible de préparer votre session."
+      "ERROR_GENERIC": "Impossible de préparer votre session.",
+      "DETAILS_LABEL": "Détails",
+      "TIMEOUT_DETAIL": "Délai d'attente dépassé"
     }
   },
   "PASSWORD": {

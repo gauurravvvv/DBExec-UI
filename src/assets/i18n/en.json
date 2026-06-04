@@ -1461,7 +1461,9 @@
       "READY": "You're in.",
       "RETRY": "Try again",
       "BACK_TO_LOGIN": "Back to login",
-      "ERROR_GENERIC": "We couldn't set up your session."
+      "ERROR_GENERIC": "We couldn't set up your session.",
+      "DETAILS_LABEL": "Details",
+      "TIMEOUT_DETAIL": "Request timed out"
     }
   },
   "PASSWORD": {

@@ -1419,7 +1419,9 @@
       "READY": "Ci sei.",
       "RETRY": "Riprova",
       "BACK_TO_LOGIN": "Torna all'accesso",
-      "ERROR_GENERIC": "Non è stato possibile preparare la sessione."
+      "ERROR_GENERIC": "Non è stato possibile preparare la sessione.",
+      "DETAILS_LABEL": "Dettagli",
+      "TIMEOUT_DETAIL": "Richiesta scaduta"
     }
   },
   "PASSWORD": {

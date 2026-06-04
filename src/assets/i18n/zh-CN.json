@@ -1419,7 +1419,9 @@
       "READY": "已就绪。",
       "RETRY": "重试",
       "BACK_TO_LOGIN": "返回登录",
-      "ERROR_GENERIC": "无法为您准备会话。"
+      "ERROR_GENERIC": "无法为您准备会话。",
+      "DETAILS_LABEL": "详细信息",
+      "TIMEOUT_DETAIL": "请求超时"
     }
   },
   "PASSWORD": {
