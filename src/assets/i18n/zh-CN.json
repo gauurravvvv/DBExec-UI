@@ -1943,7 +1943,10 @@
     "RESET_TO_DEFAULT": "重置为默认",
     "RESET_CONFIRM_TITLE": "将主题重置为默认?",
     "RESET_CONFIRM_MESSAGE": "所有品牌色覆盖将被清除。用户下次登录时将看到 DBExec 默认调色板。",
-    "RE_LOGIN_HINT": "更改将在其他用户下次登录时生效。"
+    "RE_LOGIN_HINT": "更改将在其他用户下次登录时生效。",
+    "RESET_INFO_DEFAULT_PALETTE": "所有品牌颜色将恢复为 DBExec 默认值。",
+    "RESET_INFO_OTHER_USERS": "其他用户将在下次登录时看到默认调色板。",
+    "RESET_INFO_RECUSTOMISE": "您可以随时重新自定义主题。"
   },
   "ANNOUNCEMENT": {
     "TITLE": "Announcements",

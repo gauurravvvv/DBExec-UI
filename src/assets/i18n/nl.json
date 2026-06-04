@@ -1943,7 +1943,10 @@
     "RESET_TO_DEFAULT": "Standaardwaarden herstellen",
     "RESET_CONFIRM_TITLE": "Thema terugzetten naar standaardwaarden?",
     "RESET_CONFIRM_MESSAGE": "Alle merkkleur-overschrijvingen worden gewist. De volgende keer dat gebruikers inloggen, zien ze het standaard DBExec-palet.",
-    "RE_LOGIN_HINT": "Wijzigingen worden voor andere gebruikers actief bij hun volgende aanmelding."
+    "RE_LOGIN_HINT": "Wijzigingen worden voor andere gebruikers actief bij hun volgende aanmelding.",
+    "RESET_INFO_DEFAULT_PALETTE": "Alle merkkleuren keren terug naar de DBExec-standaarden.",
+    "RESET_INFO_OTHER_USERS": "Andere gebruikers zien het standaardpalet bij hun volgende aanmelding.",
+    "RESET_INFO_RECUSTOMISE": "Je kunt het thema op elk moment opnieuw aanpassen."
   },
   "ANNOUNCEMENT": {
     "TITLE": "Announcements",

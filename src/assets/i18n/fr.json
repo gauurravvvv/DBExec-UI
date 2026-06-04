@@ -1943,7 +1943,10 @@
     "RESET_TO_DEFAULT": "Réinitialiser par défaut",
     "RESET_CONFIRM_TITLE": "Réinitialiser le thème par défaut ?",
     "RESET_CONFIRM_MESSAGE": "Toutes les surcharges de couleur de marque seront effacées. À la prochaine connexion, les utilisateurs verront la palette DBExec par défaut.",
-    "RE_LOGIN_HINT": "Les modifications s’appliquent aux autres utilisateurs à leur prochaine connexion."
+    "RE_LOGIN_HINT": "Les modifications s’appliquent aux autres utilisateurs à leur prochaine connexion.",
+    "RESET_INFO_DEFAULT_PALETTE": "Toutes les couleurs de marque reviennent aux valeurs par défaut de DBExec.",
+    "RESET_INFO_OTHER_USERS": "Les autres utilisateurs verront la palette par défaut à leur prochaine connexion.",
+    "RESET_INFO_RECUSTOMISE": "Vous pouvez repersonnaliser le thème à tout moment."
   },
   "ANNOUNCEMENT": {
     "TITLE": "Announcements",

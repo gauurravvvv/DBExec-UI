@@ -3267,7 +3267,14 @@ body {
 // ================================================================
 .color-row {
   display: flex;
-  align-items: flex-end; // align swatch with the input row, not the label
+  // Anchor by the TOP, not the bottom. align-items: flex-end used to
+  // glue the swatch to the input's text row by leveraging the fact
+  // that the input was the column's bottom edge — but the moment an
+  // error or hint line appears underneath the input, the column
+  // grows taller and the swatch drops with it. Top-anchor + a fixed
+  // offset that matches the label height keeps the swatch glued to
+  // the input's vertical centre no matter what's below.
+  align-items: flex-start;
   gap: var(--space-3);
 
   app-custom-input {
@@ -3280,7 +3287,12 @@ body {
     position: relative;
     width: 24px;
     height: 24px;
-    margin-bottom: 7px; // baseline-align with the input's text row
+    // Offset = label height (~21px) + label→input gap (~4px) +
+    // (input height − swatch height) / 2 (~10px) ≈ 35px. Tuned by
+    // eye to match the input field's vertical centre with the
+    // shared --font-ui / --fs-body / --space-4 tokens used by
+    // app-custom-input. If those change, this value needs a retune.
+    margin-top: 35px;
     border-radius: var(--radius-xs);
     box-shadow:
       inset 0 0 0 1px rgba(0, 0, 0, 0.08),

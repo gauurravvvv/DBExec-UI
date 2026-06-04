@@ -1943,7 +1943,10 @@
     "RESET_TO_DEFAULT": "Restaurar padrão",
     "RESET_CONFIRM_TITLE": "Restaurar o tema para os padrões?",
     "RESET_CONFIRM_MESSAGE": "Todas as sobreposições de cor da marca serão removidas. No próximo acesso, os usuários verão a paleta padrão do DBExec.",
-    "RE_LOGIN_HINT": "As alterações entram em vigor para outros usuários no próximo login."
+    "RE_LOGIN_HINT": "As alterações entram em vigor para outros usuários no próximo login.",
+    "RESET_INFO_DEFAULT_PALETTE": "Todas as cores da marca voltam aos padrões do DBExec.",
+    "RESET_INFO_OTHER_USERS": "Os outros usuários verão a paleta padrão no próximo login.",
+    "RESET_INFO_RECUSTOMISE": "Você pode personalizar o tema novamente a qualquer momento."
   },
   "ANNOUNCEMENT": {
     "TITLE": "Announcements",

@@ -1943,7 +1943,10 @@
     "RESET_TO_DEFAULT": "デフォルトに戻す",
     "RESET_CONFIRM_TITLE": "テーマをデフォルトに戻しますか?",
     "RESET_CONFIRM_MESSAGE": "すべてのブランドカラー設定がクリアされます。次回ログイン時に DBExec のデフォルトパレットが表示されます。",
-    "RE_LOGIN_HINT": "変更は他のユーザーが次回ログインした際に反映されます。"
+    "RE_LOGIN_HINT": "変更は他のユーザーが次回ログインした際に反映されます。",
+    "RESET_INFO_DEFAULT_PALETTE": "すべてのブランドカラーが DBExec のデフォルトに戻ります。",
+    "RESET_INFO_OTHER_USERS": "他のユーザーは次回のサインイン時にデフォルトのパレットを見ます。",
+    "RESET_INFO_RECUSTOMISE": "テーマはいつでも再度カスタマイズできます。"
   },
   "ANNOUNCEMENT": {
     "TITLE": "Announcements",

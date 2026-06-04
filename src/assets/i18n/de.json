@@ -1943,7 +1943,10 @@
     "RESET_TO_DEFAULT": "Auf Standard zurücksetzen",
     "RESET_CONFIRM_TITLE": "Design auf Standard zurücksetzen?",
     "RESET_CONFIRM_MESSAGE": "Alle Markenfarben-Überschreibungen werden entfernt. Beim nächsten Anmelden sehen die Nutzer die Standardpalette von DBExec.",
-    "RE_LOGIN_HINT": "Änderungen werden für andere Nutzer bei der nächsten Anmeldung wirksam."
+    "RE_LOGIN_HINT": "Änderungen werden für andere Nutzer bei der nächsten Anmeldung wirksam.",
+    "RESET_INFO_DEFAULT_PALETTE": "Alle Markenfarben werden auf die DBExec-Standardwerte zurückgesetzt.",
+    "RESET_INFO_OTHER_USERS": "Andere Benutzer sehen die Standardpalette bei ihrer nächsten Anmeldung.",
+    "RESET_INFO_RECUSTOMISE": "Sie können das Theme jederzeit erneut anpassen."
   },
   "ANNOUNCEMENT": {
     "TITLE": "Announcements",

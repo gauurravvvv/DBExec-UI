@@ -1985,7 +1985,10 @@
     "RESET_TO_DEFAULT": "Reset to default",
     "RESET_CONFIRM_TITLE": "Reset theme to defaults?",
     "RESET_CONFIRM_MESSAGE": "All brand colour overrides will be cleared. The next time users sign in they will see the default DBExec palette.",
-    "RE_LOGIN_HINT": "Changes apply to other users on their next sign-in."
+    "RE_LOGIN_HINT": "Changes apply to other users on their next sign-in.",
+    "RESET_INFO_DEFAULT_PALETTE": "All brand colours revert to the DBExec defaults.",
+    "RESET_INFO_OTHER_USERS": "Other users see the default palette on their next sign-in.",
+    "RESET_INFO_RECUSTOMISE": "You can re-customise the theme any time."
   },
   "ANNOUNCEMENT": {
     "TITLE": "Announcements",

@@ -170,8 +170,10 @@
   </div>
 </div>
 
-<!-- Reset confirmation popup — same template as the other settings
-     confirm dialogs so the visual language stays consistent. -->
+<!-- Reset confirmation popup — mirrors the standard delete/save
+     confirm dialogs used in listing modules (datasource, role,
+     etc.) so the visual language stays consistent. Same shell,
+     same header chip, same info-list pattern, same actions. -->
 <div class="confirmation-popup" *ngIf="showResetConfirm">
   <div class="popup-content">
     <div class="popup-header">
@@ -183,6 +185,23 @@
 
     <div class="standard-delete-section">
       <p class="delete-intro">{{ 'THEME.RESET_CONFIRM_MESSAGE' | translate }}</p>
+
+      <!-- Info list — three rows describing what reset does, same
+           rhythm the listing-module delete popups use. -->
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'THEME.RESET_INFO_DEFAULT_PALETTE' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'THEME.RESET_INFO_OTHER_USERS' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'THEME.RESET_INFO_RECUSTOMISE' | translate }}</span>
+        </li>
+      </ul>
     </div>
 
     <div class="popup-actions">
@@ -197,7 +216,7 @@
       >
         <i
           class="pi"
-          [ngClass]="resetting() ? 'pi-spin pi-spinner' : 'pi-check'"
+          [ngClass]="resetting() ? 'pi-spin pi-spinner' : 'pi-refresh'"
         ></i>
         {{ 'COMMON.CONFIRM' | translate }}
       </button>

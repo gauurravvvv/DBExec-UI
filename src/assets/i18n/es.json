@@ -1943,7 +1943,10 @@
     "RESET_TO_DEFAULT": "Restablecer valores predeterminados",
     "RESET_CONFIRM_TITLE": "¿Restablecer el tema a los valores predeterminados?",
     "RESET_CONFIRM_MESSAGE": "Se eliminarán todas las anulaciones de color de marca. La próxima vez que los usuarios inicien sesión, verán la paleta predeterminada de DBExec.",
-    "RE_LOGIN_HINT": "Los cambios se aplican a los demás usuarios en su próximo inicio de sesión."
+    "RE_LOGIN_HINT": "Los cambios se aplican a los demás usuarios en su próximo inicio de sesión.",
+    "RESET_INFO_DEFAULT_PALETTE": "Todos los colores de marca vuelven a los predeterminados de DBExec.",
+    "RESET_INFO_OTHER_USERS": "Los demás usuarios verán la paleta predeterminada en su próximo inicio de sesión.",
+    "RESET_INFO_RECUSTOMISE": "Puedes volver a personalizar el tema en cualquier momento."
   },
   "ANNOUNCEMENT": {
     "TITLE": "Announcements",
