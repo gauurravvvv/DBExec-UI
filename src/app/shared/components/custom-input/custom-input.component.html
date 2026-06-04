@@ -79,18 +79,17 @@
       />
     </ng-template>
   </ng-template>
-  <small class="hint-message" *ngIf="hint && !visibleError">
-    {{ hint }}
-  </small>
-  <!-- Inline length error (blocks propagation to parent ngModel until
-       the user trims back to ≤ maxLength). Same UX as app-custom-number
-       bounds errors. -->
+  <!-- Hint + counter share one row: hint takes its natural width on
+       the left, counter sits flush right via margin-left:auto. When
+       only one is present the row still flows correctly. The error
+       takes priority and replaces the entire meta row. -->
   <small class="error-message" *ngIf="visibleError">
     {{ visibleError }}
   </small>
-  <!-- Character counter (only when maxLength is set). Sits flush right
-       so the user always sees how close they are to the cap. -->
-  <small class="char-counter" *ngIf="maxLength != null && !visibleError">
-    {{ charCounter }}
-  </small>
+  <div class="meta-row" *ngIf="!visibleError && (hint || maxLength != null)">
+    <small class="hint-message" *ngIf="hint">{{ hint }}</small>
+    <small class="char-counter" *ngIf="maxLength != null">
+      {{ charCounter }}
+    </small>
+  </div>
 </div>

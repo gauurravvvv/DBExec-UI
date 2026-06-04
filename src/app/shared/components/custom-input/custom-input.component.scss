@@ -117,7 +117,21 @@
     opacity: 0.45;
     font-size: var(--fs-label);
     text-align: right;
-    margin-top: -2px;
+    // Pushed to the right of the meta row; the hint (if present)
+    // sits on the left and the counter follows on the same line.
+    margin-left: auto;
+  }
+
+  /* One-row container for hint + counter. Replaces the stacked
+     pair the template used to produce. Behaves correctly with
+     either one present alone. */
+  .meta-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3, 8px);
+    width: 100%;
+    // The form-field's parent `gap` already provides vertical
+    // breathing room; no extra margin-top here.
   }
 }
 
