@@ -48,12 +48,13 @@
     font-family: var(--font-brand);
     color: var(--text-color);
 
+    // The "Exec" highlight is the DBExec product wordmark and stays
+    // hardcoded — it does NOT pick up the org's primary colour the
+    // way the rest of the app does. Per the org-theme contract, only
+    // workspace surfaces are themed; the product identity in the
+    // topbar (and the login page) remains constant across tenants.
     .highlight {
-      background: linear-gradient(
-        135deg,
-        var(--primary-color),
-        var(--primary-light)
-      );
+      background: linear-gradient(135deg, #2196f3, #42a5f5);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;

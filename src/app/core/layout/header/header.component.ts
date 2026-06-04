@@ -22,6 +22,7 @@ import {
 } from 'src/app/core/services/locale.service';
 import { LoginService } from 'src/app/core/services/login.service';
 import { StorageService } from 'src/app/core/services/storage.service';
+import { ThemeService } from 'src/app/core/services/theme.service';
 import { AddAnalysesActions } from 'src/app/modules/analyses/store';
 import { AnnouncementService } from 'src/app/modules/app-settings/services/announcement.service';
 import { GlobalSearchService } from '../../../shared/services/global-search.service';
@@ -124,6 +125,7 @@ export class HeaderComponent implements OnInit {
     private loginService: LoginService,
     private announcementService: AnnouncementService,
     private localeService: LocaleService,
+    private themeService: ThemeService,
   ) {
     this.destroyRef.onDestroy(() => {
       if (this.typewriterTimer) clearTimeout(this.typewriterTimer);
@@ -256,6 +258,11 @@ export class HeaderComponent implements OnInit {
   private clearSessionAndNavigate() {
     this.store.dispatch(AddAnalysesActions.clearAllDatasets());
     StorageService.clear();
+    // Drop the injected org theme so the login page paints with the
+    // default DBExec palette. Without this the previous org's brand
+    // colours bleed onto the unauthenticated auth screens until the
+    // tab is hard-reloaded.
+    this.themeService.clear();
     this.router.navigate(['/login']);
   }
 

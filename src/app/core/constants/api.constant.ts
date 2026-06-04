@@ -264,6 +264,12 @@ export const GLOBAL_SEARCH = {
   SEARCH: '/search',
 };
 
+export const THEME = {
+  GET: '/theme',
+  SAVE: '/theme',
+  RESET: '/theme/reset',
+};
+
 export const ANNOUNCEMENT = {
   LIST: '/announcements',
   ADD: '/announcements',

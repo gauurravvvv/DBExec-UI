@@ -19,6 +19,7 @@ import { LoadingService } from '../services/loading.service';
 import { LoginService } from '../services/login.service';
 import { SessionExpiredService } from '../services/session-expired.service';
 import { StorageService } from '../services/storage.service';
+import { ThemeService } from '../services/theme.service';
 
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
@@ -58,6 +59,10 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
   private get translate(): TranslateService {
     return this.injector.get(TranslateService);
+  }
+
+  private get themeService(): ThemeService {
+    return this.injector.get(ThemeService);
   }
 
   constructor(
@@ -261,6 +266,9 @@ export class HttpRequestInterceptor implements HttpInterceptor {
           if (response.status && response.data?.accessToken) {
             const newToken = response.data.accessToken;
             this.loginService.setAccessToken(newToken);
+            // Keep the injected CSS variables in sync with the BE-
+            // resolved theme at refresh time. `null` clears.
+            this.themeService.applyFromLogin(response.data?.theme);
             this.refreshTokenSubject.next(newToken);
             // Retry the original request with the new token
             return next.handle(this.addToken(req, newToken));

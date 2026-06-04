@@ -19,6 +19,7 @@ import { LocaleService } from './core/services/locale.service';
 import { LoginService } from './core/services/login.service';
 import { SessionExpiredService } from './core/services/session-expired.service';
 import { StorageService } from './core/services/storage.service';
+import { ThemeService } from './core/services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -45,6 +46,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private titleService: Title,
     private translate: TranslateService,
     private localeService: LocaleService,
+    private themeService: ThemeService,
   ) {
     const savedTheme = StorageService.get(StorageType.THEME);
     if (!savedTheme) {
@@ -64,6 +66,16 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.primengConfig.ripple = true;
+
+    // Bootstrap kick — when an existing access token is found in
+    // storage (tab refresh, direct URL entry), fire one refresh-token
+    // call so the BE returns a fresh access token AND the current
+    // org theme. The refresh success path applies the theme through
+    // the existing wiring; a brief flash of the default DBExec
+    // palette during the ~200 ms RTT is acceptable and usually masked
+    // by the page skeleton. No localStorage copy of the theme is
+    // kept — the BE is the single source of truth.
+    this.loginService.bootstrapTokenRefresh();
 
     // Session expired (refresh token invalidated)
     this.sessionExpiredService.onSessionExpired
@@ -218,6 +230,9 @@ export class AppComponent implements OnInit, OnDestroy {
     // the user's persisted preference even if the URL doesn't carry
     // the param anymore.
     this.localeService.clearTempLocale();
+    // Clear injected theme so the login page (and the next user) get
+    // the default palette until their own theme loads.
+    this.themeService.clear();
     this.router.navigate(['/login']);
   }
 }

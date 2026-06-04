@@ -100,32 +100,50 @@
           icon="pi-users"
         ></app-custom-dropdown>
 
-        <!-- Colors -->
+        <!-- Colours — hex text input paired with a native colour
+             swatch. Shares the .color-row / .color-swatch chrome
+             with the Theme settings page so both forms feel like
+             siblings. -->
         <div class="color-row">
-          <div class="color-picker-field">
-            <label>{{ 'ANNOUNCEMENT.BACKGROUND' | translate }}</label>
-            <div class="color-picker-inline">
-              <p-colorPicker
-                formControlName="bgColor"
-                appendTo="body"
-              ></p-colorPicker>
-              <span class="color-value">{{
-                announcementForm.get('bgColor')?.value
-              }}</span>
-            </div>
-          </div>
-          <div class="color-picker-field">
-            <label>{{ 'ANNOUNCEMENT.TEXT' | translate }}</label>
-            <div class="color-picker-inline">
-              <p-colorPicker
-                formControlName="textColor"
-                appendTo="body"
-              ></p-colorPicker>
-              <span class="color-value">{{
-                announcementForm.get('textColor')?.value
-              }}</span>
-            </div>
-          </div>
+          <app-custom-input
+            formControlName="bgColor"
+            [label]="'ANNOUNCEMENT.BACKGROUND' | translate"
+            placeholder="#0d47a1"
+            icon="pi-palette"
+          ></app-custom-input>
+          <label
+            class="color-swatch"
+            [style.background-color]="swatchValue('bgColor')"
+          >
+            <input
+              type="color"
+              [value]="swatchValue('bgColor')"
+              (input)="onColorPicked('bgColor', $any($event.target).value)"
+              aria-hidden="true"
+              tabindex="-1"
+            />
+          </label>
+        </div>
+
+        <div class="color-row">
+          <app-custom-input
+            formControlName="textColor"
+            [label]="'ANNOUNCEMENT.TEXT' | translate"
+            placeholder="#ffffff"
+            icon="pi-pencil"
+          ></app-custom-input>
+          <label
+            class="color-swatch"
+            [style.background-color]="swatchValue('textColor')"
+          >
+            <input
+              type="color"
+              [value]="swatchValue('textColor')"
+              (input)="onColorPicked('textColor', $any($event.target).value)"
+              aria-hidden="true"
+              tabindex="-1"
+            />
+          </label>
         </div>
 
         <!-- Preview Button -->

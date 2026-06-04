@@ -37,6 +37,7 @@ export const PERMISSIONS = {
   // App Settings
   APP_SETTINGS: 'appSettings',
   ANNOUNCEMENT_MANAGEMENT: 'announcementManagement',
+  THEME_MANAGEMENT: 'themeManagement',
 } as const;
 
 export type PermissionValue = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

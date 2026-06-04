@@ -4,6 +4,7 @@ import { unsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { AddAnnouncementComponent } from './components/add-announcement/add-announcement.component';
 import { EditAnnouncementComponent } from './components/edit-announcement/edit-announcement.component';
 import { ListAnnouncementsComponent } from './components/list-announcements/list-announcements.component';
+import { ThemeSettingsComponent } from './components/theme-settings/theme-settings.component';
 import { ViewAnnouncementComponent } from './components/view-announcement/view-announcement.component';
 
 const routes: Routes = [
@@ -29,6 +30,12 @@ const routes: Routes = [
     component: EditAnnouncementComponent,
     canDeactivate: [unsavedChangesGuard],
     data: { title: 'Edit Announcement' },
+  },
+  {
+    path: 'theme',
+    component: ThemeSettingsComponent,
+    canDeactivate: [unsavedChangesGuard],
+    data: { title: 'Theme' },
   },
 ];
 

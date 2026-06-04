@@ -101,31 +101,49 @@
           icon="pi-users"
         ></app-custom-dropdown>
 
-        <!-- Colors + Status -->
+        <!-- Colours + Status — colours are hex inputs paired with
+             native swatches (same chrome as Theme settings); status
+             toggle keeps its place on the row. -->
         <div class="color-status-row">
-          <div class="color-picker-field">
-            <label>{{ 'ANNOUNCEMENT.BACKGROUND' | translate }}</label>
-            <div class="color-picker-inline">
-              <p-colorPicker
-                formControlName="bgColor"
-                appendTo="body"
-              ></p-colorPicker>
-              <span class="color-value">{{
-                announcementForm.get('bgColor')?.value
-              }}</span>
-            </div>
+          <div class="color-row">
+            <app-custom-input
+              formControlName="bgColor"
+              [label]="'ANNOUNCEMENT.BACKGROUND' | translate"
+              placeholder="#0d47a1"
+              icon="pi-palette"
+            ></app-custom-input>
+            <label
+              class="color-swatch"
+              [style.background-color]="swatchValue('bgColor')"
+            >
+              <input
+                type="color"
+                [value]="swatchValue('bgColor')"
+                (input)="onColorPicked('bgColor', $any($event.target).value)"
+                aria-hidden="true"
+                tabindex="-1"
+              />
+            </label>
           </div>
-          <div class="color-picker-field">
-            <label>{{ 'ANNOUNCEMENT.TEXT' | translate }}</label>
-            <div class="color-picker-inline">
-              <p-colorPicker
-                formControlName="textColor"
-                appendTo="body"
-              ></p-colorPicker>
-              <span class="color-value">{{
-                announcementForm.get('textColor')?.value
-              }}</span>
-            </div>
+          <div class="color-row">
+            <app-custom-input
+              formControlName="textColor"
+              [label]="'ANNOUNCEMENT.TEXT' | translate"
+              placeholder="#ffffff"
+              icon="pi-pencil"
+            ></app-custom-input>
+            <label
+              class="color-swatch"
+              [style.background-color]="swatchValue('textColor')"
+            >
+              <input
+                type="color"
+                [value]="swatchValue('textColor')"
+                (input)="onColorPicked('textColor', $any($event.target).value)"
+                aria-hidden="true"
+                tabindex="-1"
+              />
+            </label>
           </div>
           <app-custom-toggle
             formControlName="status"

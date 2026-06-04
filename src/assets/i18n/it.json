@@ -27,6 +27,7 @@
     "loginActivity": "Attività di accesso",
     "appSettings": "Impostazioni",
     "announcementManagement": "Annunci",
+    "themeManagement": "Tema",
     "myProfile": "Il mio profilo",
     "userMapper": "Mappatore utenti",
     "datasetBinder": "Raccoglitore Dataset",
@@ -1910,6 +1911,23 @@
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
     "ORGANISATION_REQUIRED": "Organisation is required"
+  },
+  "THEME": {
+    "PAGE_TITLE": "Tema",
+    "DEFAULT_BADGE": "Predefinito",
+    "PRIMARY": "Colore del marchio",
+    "PRIMARY_PLACEHOLDER": "#2196f3",
+    "PRIMARY_HOVER": "Colore del marchio (hover)",
+    "PRIMARY_LIGHT": "Colore del marchio (chiaro)",
+    "PRIMARY_TEXT": "Testo sul marchio",
+    "PRIMARY_TEXT_PLACEHOLDER": "white, black o #hex",
+    "HEX_PLACEHOLDER": "#rrggbb",
+    "HEX_REQUIRED": "Il colore del marchio deve essere un hex valido (#rgb o #rrggbb)",
+    "HEX_INVALID": "Deve essere un hex valido (#rgb o #rrggbb)",
+    "RESET_TO_DEFAULT": "Ripristina predefiniti",
+    "RESET_CONFIRM_TITLE": "Ripristinare il tema ai valori predefiniti?",
+    "RESET_CONFIRM_MESSAGE": "Tutte le sostituzioni del colore del marchio verranno rimosse. Al successivo accesso, gli utenti vedranno la tavolozza predefinita di DBExec.",
+    "RE_LOGIN_HINT": "Le modifiche si applicano agli altri utenti al loro prossimo accesso."
   },
   "ANNOUNCEMENT": {
     "TITLE": "Announcements",

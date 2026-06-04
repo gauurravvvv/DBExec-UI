@@ -1,0 +1,206 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <!-- Header — title-only on the left (no back button, no icon)
+         because theme is a single settings page reached directly
+         from the sidebar; there's no listing to back to. Action
+         buttons sit on the right, matching add-user. -->
+    <div class="page-header">
+      <div class="left-section">
+        <h2>{{ 'THEME.PAGE_TITLE' | translate }}</h2>
+        <span *ngIf="isDefault" class="default-badge">{{
+          'THEME.DEFAULT_BADGE' | translate
+        }}</span>
+      </div>
+      <div class="action-buttons">
+        <!-- Reset opens a confirmation popup. Hidden while the row is
+             already the default — nothing to reset. -->
+        <button
+          *ngIf="!isDefault"
+          pButton
+          type="button"
+          [label]="'THEME.RESET_TO_DEFAULT' | translate"
+          class="p-button-outlined btn-cancel"
+          [disabled]="resetting()"
+          (click)="openResetConfirm()"
+        >
+          <i
+            class="pi mr-2"
+            [ngClass]="resetting() ? 'pi-spin pi-spinner' : 'pi-refresh'"
+          ></i>
+        </button>
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          [label]="'COMMON.SAVE' | translate"
+          [disabled]="themeForm.invalid || !isFormDirty || saving()"
+          (click)="onSave()"
+        >
+          <i
+            class="pi mr-2"
+            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
+          ></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Centered loader while the initial GET resolves; page chrome
+         above stays clickable so the admin can navigate away. -->
+    <app-content-loader
+      *ngIf="loading() && !themeForm.value.primary"
+    ></app-content-loader>
+
+    <!-- Form -->
+    <form
+      *ngIf="!loading() || themeForm.value.primary"
+      [formGroup]="themeForm"
+      class="admin-form"
+    >
+      <div class="form-grid">
+        <!-- Each colour field pairs the hex text input with a native
+             <input type="color"> swatch. The two are bound to the
+             same form control: typing a hex updates the swatch's
+             value attribute via swatchValue(), and picking from the
+             swatch writes back through onColorPicked(). aria-hidden
+             on the swatch keeps screen readers focused on the labelled
+             text input. -->
+
+        <!-- Primary brand colour — the only required field. -->
+        <div class="color-row">
+          <app-custom-input
+            formControlName="primary"
+            [label]="'THEME.PRIMARY' | translate"
+            [placeholder]="'THEME.PRIMARY_PLACEHOLDER' | translate"
+            icon="pi-palette"
+            [required]="true"
+            [showError]="
+              !!(
+                themeForm.get('primary')?.invalid &&
+                themeForm.get('primary')?.touched
+              )
+            "
+            [errorMessage]="'THEME.HEX_REQUIRED' | translate"
+          ></app-custom-input>
+          <label class="color-swatch" [style.background-color]="swatchValue('primary')">
+            <input
+              type="color"
+              [value]="swatchValue('primary')"
+              (input)="onColorPicked('primary', $any($event.target).value)"
+              aria-hidden="true"
+              tabindex="-1"
+            />
+          </label>
+        </div>
+
+        <div class="color-row">
+          <app-custom-input
+            formControlName="primaryHover"
+            [label]="'THEME.PRIMARY_HOVER' | translate"
+            [placeholder]="'THEME.HEX_PLACEHOLDER' | translate"
+            icon="pi-palette"
+            [showError]="
+              !!(
+                themeForm.get('primaryHover')?.invalid &&
+                themeForm.get('primaryHover')?.touched
+              )
+            "
+            [errorMessage]="'THEME.HEX_INVALID' | translate"
+          ></app-custom-input>
+          <label class="color-swatch" [style.background-color]="swatchValue('primaryHover')">
+            <input
+              type="color"
+              [value]="swatchValue('primaryHover')"
+              (input)="onColorPicked('primaryHover', $any($event.target).value)"
+              aria-hidden="true"
+              tabindex="-1"
+            />
+          </label>
+        </div>
+
+        <div class="color-row">
+          <app-custom-input
+            formControlName="primaryLight"
+            [label]="'THEME.PRIMARY_LIGHT' | translate"
+            [placeholder]="'THEME.HEX_PLACEHOLDER' | translate"
+            icon="pi-palette"
+            [showError]="
+              !!(
+                themeForm.get('primaryLight')?.invalid &&
+                themeForm.get('primaryLight')?.touched
+              )
+            "
+            [errorMessage]="'THEME.HEX_INVALID' | translate"
+          ></app-custom-input>
+          <label class="color-swatch" [style.background-color]="swatchValue('primaryLight')">
+            <input
+              type="color"
+              [value]="swatchValue('primaryLight')"
+              (input)="onColorPicked('primaryLight', $any($event.target).value)"
+              aria-hidden="true"
+              tabindex="-1"
+            />
+          </label>
+        </div>
+
+        <div class="color-row">
+          <app-custom-input
+            formControlName="primaryText"
+            [label]="'THEME.PRIMARY_TEXT' | translate"
+            [placeholder]="'THEME.PRIMARY_TEXT_PLACEHOLDER' | translate"
+            icon="pi-pencil"
+          ></app-custom-input>
+          <label class="color-swatch" [style.background-color]="swatchValue('primaryText')">
+            <input
+              type="color"
+              [value]="swatchValue('primaryText')"
+              (input)="onColorPicked('primaryText', $any($event.target).value)"
+              aria-hidden="true"
+              tabindex="-1"
+            />
+          </label>
+        </div>
+      </div>
+
+      <!-- Re-login hint, not a button. Tells the admin what to expect. -->
+      <p class="theme-hint">
+        <i class="pi pi-info-circle"></i>
+        {{ 'THEME.RE_LOGIN_HINT' | translate }}
+      </p>
+    </form>
+  </div>
+</div>
+
+<!-- Reset confirmation popup — same template as the other settings
+     confirm dialogs so the visual language stays consistent. -->
+<div class="confirmation-popup" *ngIf="showResetConfirm">
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-refresh"></i>
+      </div>
+      <h3>{{ 'THEME.RESET_CONFIRM_TITLE' | translate }}</h3>
+    </div>
+
+    <div class="standard-delete-section">
+      <p class="delete-intro">{{ 'THEME.RESET_CONFIRM_MESSAGE' | translate }}</p>
+    </div>
+
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelReset()">
+        <i class="pi pi-times"></i>
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm"
+        (click)="proceedReset()"
+        [disabled]="resetting()"
+      >
+        <i
+          class="pi"
+          [ngClass]="resetting() ? 'pi-spin pi-spinner' : 'pi-check'"
+        ></i>
+        {{ 'COMMON.CONFIRM' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

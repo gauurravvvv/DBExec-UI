@@ -27,6 +27,7 @@
     "loginActivity": "Anmeldeaktivität",
     "appSettings": "Einstellungen",
     "announcementManagement": "Ankündigungen",
+    "themeManagement": "Designs",
     "myProfile": "Mein Profil",
     "userMapper": "Benutzer-Mapper",
     "datasetBinder": "Dataset-Verknüpfung",
@@ -1910,6 +1911,23 @@
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
     "ORGANISATION_REQUIRED": "Organisation is required"
+  },
+  "THEME": {
+    "PAGE_TITLE": "Design",
+    "DEFAULT_BADGE": "Standard",
+    "PRIMARY": "Markenfarbe",
+    "PRIMARY_PLACEHOLDER": "#2196f3",
+    "PRIMARY_HOVER": "Markenfarbe (Hover)",
+    "PRIMARY_LIGHT": "Markenfarbe (hell)",
+    "PRIMARY_TEXT": "Text auf Markenfarbe",
+    "PRIMARY_TEXT_PLACEHOLDER": "white, black oder #hex",
+    "HEX_PLACEHOLDER": "#rrggbb",
+    "HEX_REQUIRED": "Die Markenfarbe muss ein gültiger Hex-Wert sein (#rgb oder #rrggbb)",
+    "HEX_INVALID": "Muss ein gültiger Hex-Wert sein (#rgb oder #rrggbb)",
+    "RESET_TO_DEFAULT": "Auf Standard zurücksetzen",
+    "RESET_CONFIRM_TITLE": "Design auf Standard zurücksetzen?",
+    "RESET_CONFIRM_MESSAGE": "Alle Markenfarben-Überschreibungen werden entfernt. Beim nächsten Anmelden sehen die Nutzer die Standardpalette von DBExec.",
+    "RE_LOGIN_HINT": "Änderungen werden für andere Nutzer bei der nächsten Anmeldung wirksam."
   },
   "ANNOUNCEMENT": {
     "TITLE": "Announcements",

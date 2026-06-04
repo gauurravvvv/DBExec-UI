@@ -27,6 +27,7 @@
     "loginActivity": "Login Activity",
     "appSettings": "App Settings",
     "announcementManagement": "Announcements",
+    "themeManagement": "Theme",
     "myProfile": "My Profile",
     "userMapper": "User Mapper",
     "datasetBinder": "Dataset Binder",
@@ -1952,6 +1953,23 @@
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
     "ORGANISATION_REQUIRED": "Organisation is required"
+  },
+  "THEME": {
+    "PAGE_TITLE": "Theme",
+    "DEFAULT_BADGE": "Default",
+    "PRIMARY": "Brand colour",
+    "PRIMARY_PLACEHOLDER": "#2196f3",
+    "PRIMARY_HOVER": "Brand colour (hover)",
+    "PRIMARY_LIGHT": "Brand colour (light)",
+    "PRIMARY_TEXT": "Text on brand",
+    "PRIMARY_TEXT_PLACEHOLDER": "white, black, or #hex",
+    "HEX_PLACEHOLDER": "#rrggbb",
+    "HEX_REQUIRED": "Brand colour must be a valid hex (#rgb or #rrggbb)",
+    "HEX_INVALID": "Must be a valid hex (#rgb or #rrggbb)",
+    "RESET_TO_DEFAULT": "Reset to default",
+    "RESET_CONFIRM_TITLE": "Reset theme to defaults?",
+    "RESET_CONFIRM_MESSAGE": "All brand colour overrides will be cleared. The next time users sign in they will see the default DBExec palette.",
+    "RE_LOGIN_HINT": "Changes apply to other users on their next sign-in."
   },
   "ANNOUNCEMENT": {
     "TITLE": "Announcements",

@@ -5,6 +5,7 @@ import { AUTH } from 'src/app/core/constants/api.constant';
 import { StorageType } from 'src/app/core/constants/storage-type.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 import { StorageService } from 'src/app/core/services/storage.service';
+import { ThemeService } from 'src/app/core/services/theme.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +14,10 @@ export class LoginService implements OnDestroy {
   isForgetPasswordForm = false;
   private refreshTimer: any = null;
 
-  constructor(private http: HttpClientService) {}
+  constructor(
+    private http: HttpClientService,
+    private themeService: ThemeService,
+  ) {}
 
   async login(loginForm: UntypedFormGroup): Promise<any> {
     const { organisation, username, password } = loginForm.value;
@@ -59,6 +63,14 @@ export class LoginService implements OnDestroy {
         StorageType.ANNOUNCEMENTS,
         JSON.stringify(result.data.announcements ?? []),
       );
+
+      // Inject the org's CSS variables synchronously so the very next
+      // navigation paints with the correct brand colour. `null` (the
+      // system-admin path) strips any leftover injected style and
+      // reverts to the SCSS defaults. Done here rather than in the
+      // login component so every caller of LoginService.login gets
+      // the same behaviour for free.
+      this.themeService.applyFromLogin(result.data?.theme);
     }
     return result;
   }
@@ -154,6 +166,36 @@ export class LoginService implements OnDestroy {
     this.scheduleTokenRefresh(accessToken);
   }
 
+  /**
+   * Fire a single refresh-token call at app bootstrap (tab refresh,
+   * direct URL entry) when an access token already exists. The
+   * existing refreshAccessToken success path stamps the fresh token
+   * and applies the BE-resolved theme to the CSS variable injector,
+   * so this is the only call needed to re-hydrate the session.
+   *
+   * If no access token is present (unauthenticated landing on /login)
+   * this is a no-op. If the refresh fails, the reactive 440 path
+   * picks it up on the next request.
+   */
+  public bootstrapTokenRefresh(): void {
+    const accessToken = StorageService.get(StorageType.ACCESS_TOKEN);
+    const refreshToken = StorageService.get(StorageType.REFRESH_TOKEN);
+    if (!accessToken || !refreshToken) return;
+
+    this.refreshAccessToken().subscribe({
+      next: (response: any) => {
+        if (response.status && response.data?.accessToken) {
+          this.setAccessToken(response.data.accessToken);
+          this.themeService.applyFromLogin(response.data?.theme);
+        }
+      },
+      error: () => {
+        // Silent — the reactive 440 handler will pick this up on the
+        // next outbound request.
+      },
+    });
+  }
+
   public setRefreshToken(refreshToken: string) {
     StorageService.set(StorageType.REFRESH_TOKEN, refreshToken);
   }
@@ -194,6 +236,10 @@ export class LoginService implements OnDestroy {
           next: (response: any) => {
             if (response.status && response.data?.accessToken) {
               this.setAccessToken(response.data.accessToken);
+              // Keep the injected CSS variables in sync with whatever
+              // the BE resolved at refresh time (the org admin may
+              // have changed branding mid-session). `null` clears.
+              this.themeService.applyFromLogin(response.data?.theme);
             }
           },
           error: () => {

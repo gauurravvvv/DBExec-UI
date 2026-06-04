@@ -27,6 +27,7 @@
     "loginActivity": "Actividad de inicio de sesión",
     "appSettings": "Configuración",
     "announcementManagement": "Anuncios",
+    "themeManagement": "Tema",
     "myProfile": "Mi perfil",
     "userMapper": "Mapeador de usuarios",
     "datasetBinder": "Vinculador de Dataset",
@@ -1910,6 +1911,23 @@
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
     "ORGANISATION_REQUIRED": "Organisation is required"
+  },
+  "THEME": {
+    "PAGE_TITLE": "Tema",
+    "DEFAULT_BADGE": "Predeterminado",
+    "PRIMARY": "Color de marca",
+    "PRIMARY_PLACEHOLDER": "#2196f3",
+    "PRIMARY_HOVER": "Color de marca (hover)",
+    "PRIMARY_LIGHT": "Color de marca (claro)",
+    "PRIMARY_TEXT": "Texto sobre la marca",
+    "PRIMARY_TEXT_PLACEHOLDER": "white, black o #hex",
+    "HEX_PLACEHOLDER": "#rrggbb",
+    "HEX_REQUIRED": "El color de marca debe ser un hex válido (#rgb o #rrggbb)",
+    "HEX_INVALID": "Debe ser un hex válido (#rgb o #rrggbb)",
+    "RESET_TO_DEFAULT": "Restablecer valores predeterminados",
+    "RESET_CONFIRM_TITLE": "¿Restablecer el tema a los valores predeterminados?",
+    "RESET_CONFIRM_MESSAGE": "Se eliminarán todas las anulaciones de color de marca. La próxima vez que los usuarios inicien sesión, verán la paleta predeterminada de DBExec.",
+    "RE_LOGIN_HINT": "Los cambios se aplican a los demás usuarios en su próximo inicio de sesión."
   },
   "ANNOUNCEMENT": {
     "TITLE": "Announcements",

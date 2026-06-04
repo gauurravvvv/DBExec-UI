@@ -261,6 +261,10 @@ $icon-url: '../icons/';
     &.ci-bell {
       content: url($icon-url + 'bell.svg');
     }
+    // Theme settings — paint palette (svgrepo.com).
+    &.ci-palette {
+      content: url($icon-url + 'theme-palette.svg');
+    }
   }
 }
 

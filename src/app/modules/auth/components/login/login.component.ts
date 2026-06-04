@@ -79,6 +79,9 @@ export class LoginComponent implements OnInit {
       const res: any = await this.loginService.login(this.loginForm);
       if (this.globalService.handleSuccessService(res, true, false)) {
         const role = this.globalService.getTokenDetails('role');
+        // Theme injection happens inside LoginService.login on every
+        // successful sign-in; the component no longer needs to call
+        // applyFromLogin separately.
         const homeRoute =
           role === ROLES.SYSTEM_ADMIN
             ? HOME_ROUTES.SYSTEM_ADMIN

@@ -27,6 +27,7 @@
     "loginActivity": "登录活动",
     "appSettings": "应用设置",
     "announcementManagement": "公告管理",
+    "themeManagement": "主题",
     "myProfile": "我的资料",
     "userMapper": "用户映射器",
     "datasetBinder": "数据集绑定器",
@@ -1910,6 +1911,23 @@
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
     "ORGANISATION_REQUIRED": "Organisation is required"
+  },
+  "THEME": {
+    "PAGE_TITLE": "主题",
+    "DEFAULT_BADGE": "默认",
+    "PRIMARY": "品牌色",
+    "PRIMARY_PLACEHOLDER": "#2196f3",
+    "PRIMARY_HOVER": "品牌色 (悬停)",
+    "PRIMARY_LIGHT": "品牌色 (浅)",
+    "PRIMARY_TEXT": "品牌色上的文本",
+    "PRIMARY_TEXT_PLACEHOLDER": "white、black 或 #hex",
+    "HEX_PLACEHOLDER": "#rrggbb",
+    "HEX_REQUIRED": "品牌色必须是有效的 hex (#rgb 或 #rrggbb)",
+    "HEX_INVALID": "必须是有效的 hex (#rgb 或 #rrggbb)",
+    "RESET_TO_DEFAULT": "重置为默认",
+    "RESET_CONFIRM_TITLE": "将主题重置为默认?",
+    "RESET_CONFIRM_MESSAGE": "所有品牌色覆盖将被清除。用户下次登录时将看到 DBExec 默认调色板。",
+    "RE_LOGIN_HINT": "更改将在其他用户下次登录时生效。"
   },
   "ANNOUNCEMENT": {
     "TITLE": "Announcements",

@@ -27,6 +27,7 @@
     "loginActivity": "Inlogactiviteit",
     "appSettings": "Instellingen",
     "announcementManagement": "Aankondigingen",
+    "themeManagement": "Thema",
     "myProfile": "Mijn profiel",
     "userMapper": "Gebruikersmapper",
     "datasetBinder": "Dataset-koppeling",
@@ -1910,6 +1911,23 @@
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
     "ORGANISATION_REQUIRED": "Organisation is required"
+  },
+  "THEME": {
+    "PAGE_TITLE": "Thema",
+    "DEFAULT_BADGE": "Standaard",
+    "PRIMARY": "Merkkleur",
+    "PRIMARY_PLACEHOLDER": "#2196f3",
+    "PRIMARY_HOVER": "Merkkleur (hover)",
+    "PRIMARY_LIGHT": "Merkkleur (licht)",
+    "PRIMARY_TEXT": "Tekst op merkkleur",
+    "PRIMARY_TEXT_PLACEHOLDER": "white, black of #hex",
+    "HEX_PLACEHOLDER": "#rrggbb",
+    "HEX_REQUIRED": "Merkkleur moet een geldige hex zijn (#rgb of #rrggbb)",
+    "HEX_INVALID": "Moet een geldige hex zijn (#rgb of #rrggbb)",
+    "RESET_TO_DEFAULT": "Standaardwaarden herstellen",
+    "RESET_CONFIRM_TITLE": "Thema terugzetten naar standaardwaarden?",
+    "RESET_CONFIRM_MESSAGE": "Alle merkkleur-overschrijvingen worden gewist. De volgende keer dat gebruikers inloggen, zien ze het standaard DBExec-palet.",
+    "RE_LOGIN_HINT": "Wijzigingen worden voor andere gebruikers actief bij hun volgende aanmelding."
   },
   "ANNOUNCEMENT": {
     "TITLE": "Announcements",

@@ -139,6 +139,95 @@ textarea,
   font-size: var(--fs-body) !important;
 }
 
+// ================================================================
+// Theme-reactive primary buttons.
+//
+// PrimeNG's compiled CSS bakes the brand colour into `.p-button`'s
+// `background`/`border-color`/hover/active rules as literal hex
+// (`#3f51b5` etc), so org-theme overrides on `--primary-color` at
+// runtime don't repaint these surfaces. We re-point the default
+// primary variant at the CSS variable, but only for the non-
+// semantic variants — danger / success / warning / info / secondary
+// keep their own palette (a red Delete button should stay red even
+// after an org changes its brand to green).
+//
+// Same treatment for the in-app aliases (`.btn-save`, `.btn-add`,
+// `.btn-confirm`, `.btn-primary`) so per-module SCSS that uses
+// hardcoded brand hex stays in sync.
+//
+// Outlined / text / link variants are NOT touched because they
+// inherit the brand colour via foreground (text / border) which
+// the existing PrimeNG vars already cascade correctly from CSS
+// `var(--primary-color)`.
+// ================================================================
+.p-button:not(.p-button-outlined):not(.p-button-text):not(.p-button-link):not(.p-button-secondary):not(.p-button-success):not(.p-button-warning):not(.p-button-danger):not(.p-button-help):not(.p-button-info),
+.p-button.p-button-primary {
+  background: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: var(--primary-text) !important;
+
+  &:enabled:hover,
+  &:not(button):not(a):not(.p-disabled):hover {
+    background: var(--primary-hover) !important;
+    border-color: var(--primary-hover) !important;
+    color: var(--primary-text) !important;
+  }
+
+  &:enabled:focus,
+  &:not(button):not(a):not(.p-disabled):focus {
+    box-shadow:
+      0 0 0 2px var(--card-background),
+      0 0 0 4px var(--primary-color-transparent) !important;
+  }
+
+  &:enabled:active,
+  &:not(button):not(a):not(.p-disabled):active {
+    background: var(--primary-hover) !important;
+    border-color: var(--primary-hover) !important;
+  }
+}
+
+// In-app aliases — these classes are sprinkled across module SCSS
+// (add-user, edit-announcement, role popups, etc.) and historically
+// resolved to a gradient using `var(--primary-color)` + `var(--primary-hover)`.
+// Because the per-module rules already used the CSS variables, they
+// pick up org-theme changes correctly. We DO NOT redeclare them here
+// — overriding would lose module-specific tweaks (gradient angle,
+// shadow tint) that earn their keep at the page level.
+//
+// The one exception is dialog/popup confirm buttons that some
+// modules style as plain solid (no gradient). Re-point those.
+.btn-confirm:not(.btn-danger) {
+  background: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: var(--primary-text) !important;
+
+  &:hover:not(:disabled) {
+    background: var(--primary-hover) !important;
+    border-color: var(--primary-hover) !important;
+  }
+}
+
+// Outlined and text variants — only the foreground colour needs to
+// move with the brand. PrimeNG's compiled rule sets `color: #3f51b5`
+// (hardcoded) on `.p-button-outlined` and `.p-button-text`, which
+// means the label and border stay indigo regardless of the CSS var.
+.p-button.p-button-outlined:not(.p-button-secondary):not(.p-button-success):not(.p-button-warning):not(.p-button-danger):not(.p-button-help):not(.p-button-info),
+.p-button.p-button-text:not(.p-button-secondary):not(.p-button-success):not(.p-button-warning):not(.p-button-danger):not(.p-button-help):not(.p-button-info) {
+  color: var(--primary-color) !important;
+}
+
+.p-button.p-button-outlined:not(.p-button-secondary):not(.p-button-success):not(.p-button-warning):not(.p-button-danger):not(.p-button-help):not(.p-button-info) {
+  border-color: var(--primary-color) !important;
+
+  &:enabled:hover,
+  &:not(button):not(a):not(.p-disabled):hover {
+    background: var(--primary-color-transparent) !important;
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+  }
+}
+
 // Datepicker overlay — calendar cells, weekday headers, year picker
 // all default to 1rem. Drop to body so the overlay matches form inputs.
 .p-datepicker table,
@@ -3158,6 +3247,76 @@ body {
     white-space: nowrap;
   }
 }
+// ================================================================
+// Colour picker field — shared affordance for any form that asks
+// the admin to pick a hex value (theme settings, announcement
+// background/text colour, future palette pickers).
+//
+// Layout: a flex row pairing the existing `<app-custom-input>` (or
+// any text input) with a compact 24×24 swatch chip on the right.
+// The chip is a `<label>` wrapping a hidden `<input type="color">`
+// so the click target is the whole chip and the chrome is consistent
+// across browsers (UA pickers render differently otherwise). Size +
+// radius match the design system's small affordances; visual weight
+// is kept light so the field still reads as a labelled text input
+// with a helper, not as two equal controls competing.
+//
+// The picker's value is wired bidirectionally with the form control
+// via the host component (onColorPicked / swatchValue methods); this
+// stylesheet only handles the chrome.
+// ================================================================
+.color-row {
+  display: flex;
+  align-items: flex-end; // align swatch with the input row, not the label
+  gap: var(--space-3);
+
+  app-custom-input {
+    flex: 1 1 auto;
+    min-width: 0; // so the label/value never push the swatch off-row
+  }
+
+  .color-swatch {
+    flex: 0 0 auto;
+    position: relative;
+    width: 24px;
+    height: 24px;
+    margin-bottom: 7px; // baseline-align with the input's text row
+    border-radius: var(--radius-xs);
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 0, 0, 0.08),
+      0 0 0 1px var(--border-color);
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform var(--motion-base) ease,
+      box-shadow var(--motion-base) ease;
+
+    &:hover {
+      transform: scale(1.08);
+      box-shadow:
+        inset 0 0 0 1px rgba(0, 0, 0, 0.08),
+        0 0 0 1px var(--primary-color);
+    }
+
+    &:focus-within {
+      box-shadow:
+        inset 0 0 0 1px rgba(0, 0, 0, 0.08),
+        0 0 0 2px var(--primary-color);
+    }
+
+    input[type='color'] {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      background: transparent;
+    }
+  }
+}
+
 // ================================================================
 // Skeleton placeholders — global polish for p-skeleton.
 // PrimeNG ships a 1.2s shimmer; we slow it down, soften the base

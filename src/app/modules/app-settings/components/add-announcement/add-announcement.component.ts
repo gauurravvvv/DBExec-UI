@@ -294,4 +294,30 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
       });
     return '';
   }
+
+  // ── Colour-picker bridge ───────────────────────────────────
+  // Native <input type="color"> always emits 6-char #rrggbb. We
+  // write it straight into the reactive form control and mark dirty
+  // so the Save button enables. Same helper used by theme settings.
+  onColorPicked(controlName: string, value: string): void {
+    this.announcementForm.get(controlName)?.setValue(value);
+    this.announcementForm.get(controlName)?.markAsDirty();
+  }
+
+  // Resolve a form value to a value the native picker accepts. UA
+  // pickers reject 3-char shorthand and named colours, so we
+  // normalise: a valid 6-char hex passes through, a 3-char hex is
+  // expanded, anything else falls back to neutral grey so the
+  // picker is still openable.
+  swatchValue(controlName: string): string {
+    const raw = String(
+      this.announcementForm.get(controlName)?.value ?? '',
+    ).trim();
+    if (/^#[0-9a-fA-F]{6}$/.test(raw)) return raw.toLowerCase();
+    if (/^#[0-9a-fA-F]{3}$/.test(raw)) {
+      const m = raw.slice(1);
+      return `#${m[0]}${m[0]}${m[1]}${m[1]}${m[2]}${m[2]}`.toLowerCase();
+    }
+    return '#cccccc';
+  }
 }

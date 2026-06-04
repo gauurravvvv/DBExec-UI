@@ -1,0 +1,253 @@
+// Reuse the .add-admin-wrapper / .add-admin-container chrome from the
+// rest of the settings module. Only the in-page bits unique to the
+// theme form live here.
+
+
+.default-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  margin-left: var(--space-4);
+  border-radius: var(--radius-xs);
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-wider);
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-muted);
+}
+
+// Match add-user: form fields stack vertically and the column
+// takes 50% of the container, collapsing to 100% on narrow viewports.
+.admin-form {
+  .form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    width: 50%;
+    margin-bottom: 0;
+    padding-bottom: 24px;
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+}
+
+// `.color-row` + `.color-swatch` chrome lives in src/styles.scss so
+// every form that asks the admin to pick a hex value uses identical
+// visual weight. Component-level overrides are intentionally absent.
+
+// Hint banner sits below the form-grid and must visually align with
+// the 50%-wide column above. `display: flex` (not inline-flex) +
+// explicit width keep it from stretching across the card on wide
+// viewports; the 768px breakpoint mirrors the form-grid's collapse
+// rule so the hint widens with the form on tablets/phones.
+.theme-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 50%;
+  margin: var(--space-4) var(--space-0) var(--space-0);
+  padding: var(--space-4) var(--space-5);
+  border-left: 3px solid var(--primary-color);
+  background: var(--primary-color-transparent);
+  color: var(--text-muted);
+  font-size: var(--fs-control);
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+  i { color: var(--primary-color); }
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
+// Re-use the existing add-admin-wrapper outer shell. The wrapper class
+// is set on the root in the HTML.
+.add-admin-wrapper {
+  height: 100%;
+  .add-admin-container {
+    background: var(--card-background);
+    border-radius: var(--radius-md);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-8);
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      position: sticky;
+      top: 0;
+      background: var(--card-background);
+      z-index: var(--z-base);
+
+      .left-section {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+
+        .back-button {
+          padding: var(--space-0) !important;
+          width: 36px;
+          height: 36px;
+          color: var(--text-color);
+        }
+
+        h2 {
+          margin: 0;
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
+          color: var(--text-color);
+        }
+      }
+
+      // Header action buttons — same chrome as add-user / edit-
+      // announcement so the settings module reads as one family.
+      // Save lifts on hover; Reset stays neutral until clicked.
+      .action-buttons {
+        display: flex;
+        gap: var(--space-5);
+        align-items: center;
+
+        .btn-cancel {
+          background: var(--card-background) !important;
+          border: 1px solid var(--border-color) !important;
+          color: var(--text-color) !important;
+          padding: 0.65rem 1.25rem;
+          border-radius: var(--radius-sm) !important;
+          font-weight: var(--fw-semibold);
+          box-shadow: var(--shadow-sm);
+
+          &:hover:not(:disabled) {
+            background: var(--hover-background) !important;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+
+        .btn-save {
+          background: linear-gradient(
+            135deg,
+            var(--primary-color),
+            var(--primary-hover)
+          ) !important;
+          color: var(--primary-text) !important;
+          border: none !important;
+          padding: 0.65rem 1.25rem;
+          border-radius: var(--radius-sm) !important;
+          font-weight: var(--fw-semibold);
+          box-shadow: 0 4px 10px var(--primary-color-transparent);
+          transition: all var(--motion-base) ease;
+
+          &:hover:not(:disabled) {
+            opacity: 1;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: var(--secondary-color) !important;
+            box-shadow: none;
+          }
+
+          i {
+            font-size: var(--fs-body);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Reset confirmation popup — same shape used by announcement / role
+// confirmations elsewhere.
+.confirmation-popup {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-background);
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .popup-content {
+    background: var(--card-background);
+    border-radius: var(--radius-md);
+    padding: var(--space-8);
+    width: min(420px, 92vw);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .popup-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    margin-bottom: var(--space-6);
+
+    .popup-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--warning-bg);
+      color: var(--warning-color);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: var(--fs-h2);
+      font-weight: var(--fw-semibold);
+    }
+  }
+
+  .standard-delete-section .delete-intro {
+    margin: 0 0 var(--space-7);
+    color: var(--text-muted);
+  }
+
+  .popup-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-4);
+
+    .btn-cancel,
+    .btn-confirm {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-6);
+      border-radius: var(--radius-sm);
+      font-weight: var(--fw-semibold);
+      cursor: pointer;
+      transition: all var(--motion-base) ease;
+    }
+
+    .btn-cancel {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      &:hover { background: var(--hover-background); }
+    }
+
+    .btn-confirm {
+      background: var(--primary-color);
+      border: 1px solid var(--primary-color);
+      color: var(--primary-text);
+      &:hover:not(:disabled) { background: var(--primary-hover); }
+      &:disabled { opacity: 0.6; cursor: not-allowed; }
+    }
+  }
+}

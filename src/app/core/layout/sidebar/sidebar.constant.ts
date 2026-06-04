@@ -30,6 +30,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
   { value: 'dashboard', route: '/app/dashboards' },
   { value: 'rlsRules', route: '/app/rls-rules' },
   { value: 'announcementManagement', route: '/app/settings/announcements' },
+  { value: 'themeManagement', route: '/app/settings/theme' },
 ];
 
 export const HOME_ROUTES = {

@@ -27,6 +27,7 @@
     "loginActivity": "로그인 활동",
     "appSettings": "앱 설정",
     "announcementManagement": "공지 관리",
+    "themeManagement": "테마",
     "myProfile": "내 프로필",
     "userMapper": "사용자 매퍼",
     "datasetBinder": "Dataset 바인더",
@@ -1910,6 +1911,23 @@
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
     "ORGANISATION_REQUIRED": "Organisation is required"
+  },
+  "THEME": {
+    "PAGE_TITLE": "테마",
+    "DEFAULT_BADGE": "기본",
+    "PRIMARY": "브랜드 색상",
+    "PRIMARY_PLACEHOLDER": "#2196f3",
+    "PRIMARY_HOVER": "브랜드 색상 (호버)",
+    "PRIMARY_LIGHT": "브랜드 색상 (밝게)",
+    "PRIMARY_TEXT": "브랜드 위 텍스트",
+    "PRIMARY_TEXT_PLACEHOLDER": "white, black 또는 #hex",
+    "HEX_PLACEHOLDER": "#rrggbb",
+    "HEX_REQUIRED": "브랜드 색상은 유효한 hex (#rgb 또는 #rrggbb) 여야 합니다",
+    "HEX_INVALID": "유효한 hex (#rgb 또는 #rrggbb) 여야 합니다",
+    "RESET_TO_DEFAULT": "기본값으로 재설정",
+    "RESET_CONFIRM_TITLE": "테마를 기본값으로 재설정하시겠습니까?",
+    "RESET_CONFIRM_MESSAGE": "모든 브랜드 색상 재정의가 지워집니다. 사용자가 다음에 로그인하면 DBExec 기본 팔레트가 표시됩니다.",
+    "RE_LOGIN_HINT": "변경 사항은 다른 사용자의 다음 로그인 시 적용됩니다."
   },
   "ANNOUNCEMENT": {
     "TITLE": "Announcements",

@@ -27,6 +27,7 @@
     "loginActivity": "Atividade de login",
     "appSettings": "Configurações",
     "announcementManagement": "Anúncios",
+    "themeManagement": "Tema",
     "myProfile": "Meu perfil",
     "userMapper": "Mapeador de usuários",
     "datasetBinder": "Vinculador de Dataset",
@@ -1910,6 +1911,23 @@
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
     "ORGANISATION_REQUIRED": "Organisation is required"
+  },
+  "THEME": {
+    "PAGE_TITLE": "Tema",
+    "DEFAULT_BADGE": "Padrão",
+    "PRIMARY": "Cor da marca",
+    "PRIMARY_PLACEHOLDER": "#2196f3",
+    "PRIMARY_HOVER": "Cor da marca (hover)",
+    "PRIMARY_LIGHT": "Cor da marca (clara)",
+    "PRIMARY_TEXT": "Texto sobre a marca",
+    "PRIMARY_TEXT_PLACEHOLDER": "white, black ou #hex",
+    "HEX_PLACEHOLDER": "#rrggbb",
+    "HEX_REQUIRED": "A cor da marca deve ser um hex válido (#rgb ou #rrggbb)",
+    "HEX_INVALID": "Deve ser um hex válido (#rgb ou #rrggbb)",
+    "RESET_TO_DEFAULT": "Restaurar padrão",
+    "RESET_CONFIRM_TITLE": "Restaurar o tema para os padrões?",
+    "RESET_CONFIRM_MESSAGE": "Todas as sobreposições de cor da marca serão removidas. No próximo acesso, os usuários verão a paleta padrão do DBExec.",
+    "RE_LOGIN_HINT": "As alterações entram em vigor para outros usuários no próximo login."
   },
   "ANNOUNCEMENT": {
     "TITLE": "Announcements",

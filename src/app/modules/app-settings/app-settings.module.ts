@@ -7,6 +7,7 @@ import { AppSettingsRoutingModule } from './app-settings-routing.module';
 import { AddAnnouncementComponent } from './components/add-announcement/add-announcement.component';
 import { EditAnnouncementComponent } from './components/edit-announcement/edit-announcement.component';
 import { ListAnnouncementsComponent } from './components/list-announcements/list-announcements.component';
+import { ThemeSettingsComponent } from './components/theme-settings/theme-settings.component';
 import { ViewAnnouncementComponent } from './components/view-announcement/view-announcement.component';
 
 @NgModule({
@@ -15,6 +16,7 @@ import { ViewAnnouncementComponent } from './components/view-announcement/view-a
     AddAnnouncementComponent,
     EditAnnouncementComponent,
     ViewAnnouncementComponent,
+    ThemeSettingsComponent,
   ],
   imports: [
     CommonModule,
