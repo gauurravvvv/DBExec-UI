@@ -2619,5 +2619,17 @@
     "LONGITUDE": "Longitude",
     "LATITUDE": "Latitude",
     "TIME": "Time"
+  },
+  "BRANDING": {
+    "PAGE_TITLE": "Branding",
+    "SHOW_WATERMARK": "Show watermark",
+    "WATERMARK_TEXT": "Watermark text",
+    "WATERMARK_PLACEHOLDER": "Powered by Acme",
+    "WATERMARK_HINT": "Shown in the bottom-right corner",
+    "BACKGROUND_COLOR": "Background colour",
+    "TEXT_COLOR": "Text colour",
+    "HEX_INVALID": "Must be a valid hex (#rgb or #rrggbb)",
+    "PREVIEW": "Preview",
+    "RE_LOGIN_HINT": "Changes apply to other users on their next sign-in."
   }
 }

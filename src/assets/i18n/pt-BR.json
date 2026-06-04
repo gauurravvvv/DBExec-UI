@@ -2577,5 +2577,17 @@
     "LONGITUDE": "Longitude",
     "LATITUDE": "Latitude",
     "TIME": "Tempo"
+  },
+  "BRANDING": {
+    "PAGE_TITLE": "Identidade",
+    "SHOW_WATERMARK": "Mostrar marca d'água",
+    "WATERMARK_TEXT": "Texto da marca d'água",
+    "WATERMARK_PLACEHOLDER": "Desenvolvido por Acme",
+    "WATERMARK_HINT": "Exibida no canto inferior direito",
+    "BACKGROUND_COLOR": "Cor de fundo",
+    "TEXT_COLOR": "Cor do texto",
+    "HEX_INVALID": "Deve ser um hex válido (#rgb ou #rrggbb)",
+    "PREVIEW": "Pré-visualização",
+    "RE_LOGIN_HINT": "As alterações serão aplicadas aos outros usuários em seu próximo login."
   }
 }

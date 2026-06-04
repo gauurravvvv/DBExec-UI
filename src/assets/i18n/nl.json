@@ -2577,5 +2577,17 @@
     "LONGITUDE": "Lengtegraad",
     "LATITUDE": "Breedtegraad",
     "TIME": "Tijd"
+  },
+  "BRANDING": {
+    "PAGE_TITLE": "Branding",
+    "SHOW_WATERMARK": "Watermerk weergeven",
+    "WATERMARK_TEXT": "Watermerktekst",
+    "WATERMARK_PLACEHOLDER": "Powered by Acme",
+    "WATERMARK_HINT": "Wordt rechtsonder weergegeven",
+    "BACKGROUND_COLOR": "Achtergrondkleur",
+    "TEXT_COLOR": "Tekstkleur",
+    "HEX_INVALID": "Moet een geldige hex zijn (#rgb of #rrggbb)",
+    "PREVIEW": "Voorbeeld",
+    "RE_LOGIN_HINT": "Wijzigingen worden bij andere gebruikers van kracht bij hun volgende aanmelding."
   }
 }

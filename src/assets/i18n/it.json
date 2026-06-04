@@ -2577,5 +2577,17 @@
     "LONGITUDE": "Longitudine",
     "LATITUDE": "Latitudine",
     "TIME": "Tempo"
+  },
+  "BRANDING": {
+    "PAGE_TITLE": "Branding",
+    "SHOW_WATERMARK": "Mostra filigrana",
+    "WATERMARK_TEXT": "Testo della filigrana",
+    "WATERMARK_PLACEHOLDER": "Powered by Acme",
+    "WATERMARK_HINT": "Mostrata in basso a destra",
+    "BACKGROUND_COLOR": "Colore di sfondo",
+    "TEXT_COLOR": "Colore del testo",
+    "HEX_INVALID": "Deve essere un esadecimale valido (#rgb o #rrggbb)",
+    "PREVIEW": "Anteprima",
+    "RE_LOGIN_HINT": "Le modifiche verranno applicate agli altri utenti al loro prossimo accesso."
   }
 }

@@ -2577,5 +2577,17 @@
     "LONGITUDE": "经度",
     "LATITUDE": "纬度",
     "TIME": "时间"
+  },
+  "BRANDING": {
+    "PAGE_TITLE": "品牌",
+    "SHOW_WATERMARK": "显示水印",
+    "WATERMARK_TEXT": "水印文字",
+    "WATERMARK_PLACEHOLDER": "Powered by Acme",
+    "WATERMARK_HINT": "显示在右下角",
+    "BACKGROUND_COLOR": "背景颜色",
+    "TEXT_COLOR": "文字颜色",
+    "HEX_INVALID": "必须是有效的十六进制颜色（#rgb 或 #rrggbb）",
+    "PREVIEW": "预览",
+    "RE_LOGIN_HINT": "其他用户下次登录时更改将生效。"
   }
 }

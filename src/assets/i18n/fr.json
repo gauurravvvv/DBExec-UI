@@ -2577,5 +2577,17 @@
     "LONGITUDE": "Longitude",
     "LATITUDE": "Latitude",
     "TIME": "Temps"
+  },
+  "BRANDING": {
+    "PAGE_TITLE": "Marque",
+    "SHOW_WATERMARK": "Afficher le filigrane",
+    "WATERMARK_TEXT": "Texte du filigrane",
+    "WATERMARK_PLACEHOLDER": "Propulsé par Acme",
+    "WATERMARK_HINT": "Affiché en bas à droite",
+    "BACKGROUND_COLOR": "Couleur d'arrière-plan",
+    "TEXT_COLOR": "Couleur du texte",
+    "HEX_INVALID": "Doit être un code hex valide (#rgb ou #rrggbb)",
+    "PREVIEW": "Aperçu",
+    "RE_LOGIN_HINT": "Les modifications s'appliqueront aux autres utilisateurs à leur prochaine connexion."
   }
 }

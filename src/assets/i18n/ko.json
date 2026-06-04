@@ -2577,5 +2577,17 @@
     "LONGITUDE": "경도",
     "LATITUDE": "위도",
     "TIME": "시간"
+  },
+  "BRANDING": {
+    "PAGE_TITLE": "브랜딩",
+    "SHOW_WATERMARK": "워터마크 표시",
+    "WATERMARK_TEXT": "워터마크 텍스트",
+    "WATERMARK_PLACEHOLDER": "Powered by Acme",
+    "WATERMARK_HINT": "오른쪽 하단에 표시됩니다",
+    "BACKGROUND_COLOR": "배경색",
+    "TEXT_COLOR": "텍스트 색상",
+    "HEX_INVALID": "유효한 16진수여야 합니다 (#rgb 또는 #rrggbb)",
+    "PREVIEW": "미리보기",
+    "RE_LOGIN_HINT": "변경 사항은 다른 사용자의 다음 로그인 시 적용됩니다."
   }
 }

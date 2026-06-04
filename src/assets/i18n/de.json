@@ -2577,5 +2577,17 @@
     "LONGITUDE": "Längengrad",
     "LATITUDE": "Breitengrad",
     "TIME": "Zeit"
+  },
+  "BRANDING": {
+    "PAGE_TITLE": "Branding",
+    "SHOW_WATERMARK": "Wasserzeichen anzeigen",
+    "WATERMARK_TEXT": "Wasserzeichentext",
+    "WATERMARK_PLACEHOLDER": "Powered by Acme",
+    "WATERMARK_HINT": "Wird unten rechts angezeigt",
+    "BACKGROUND_COLOR": "Hintergrundfarbe",
+    "TEXT_COLOR": "Textfarbe",
+    "HEX_INVALID": "Muss ein gültiger Hex-Wert sein (#rgb oder #rrggbb)",
+    "PREVIEW": "Vorschau",
+    "RE_LOGIN_HINT": "Änderungen werden für andere Benutzer beim nächsten Anmelden wirksam."
   }
 }
