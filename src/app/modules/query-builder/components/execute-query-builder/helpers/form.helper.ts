@@ -30,6 +30,21 @@ export function createPromptFormControl(prompt: ExecutePrompt): FormControl {
     case 'number':
       validators.push(Validators.pattern(/^-?\d*\.?\d*$/));
       break;
+    case 'text': {
+      // Text prompts can declare min/max character bounds in their
+      // appearance config. Wire them into the reactive form so the
+      // submit guard (validateSection) sees them — the underlying
+      // `app-custom-input` propagates over-length values up here
+      // where Validators.maxLength flags the control invalid.
+      const a = prompt.config?.appearance;
+      if (typeof a?.minLength === 'number' && a.minLength > 0) {
+        validators.push(Validators.minLength(a.minLength));
+      }
+      if (typeof a?.maxLength === 'number' && a.maxLength > 0) {
+        validators.push(Validators.maxLength(a.maxLength));
+      }
+      break;
+    }
     case 'daterange':
     case 'rangeslider':
       validators.push(rangeValidator);
@@ -143,6 +158,14 @@ export function getErrorMessage(
   }
   if (control.hasError('pattern')) {
     return `${promptName} must be a valid number`;
+  }
+  if (control.hasError('minlength')) {
+    const required = control.getError('minlength')?.requiredLength;
+    return `${promptName} must be at least ${required} characters`;
+  }
+  if (control.hasError('maxlength')) {
+    const required = control.getError('maxlength')?.requiredLength;
+    return `${promptName} must be at most ${required} characters`;
   }
   if (control.hasError('rangeInvalid')) {
     return control.getError('rangeInvalid');
