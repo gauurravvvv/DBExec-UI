@@ -34,7 +34,8 @@
     "dbSchema": "数据库架构",
     "dbRole": "数据库角色",
     "dbTable": "数据库表",
-    "qExecutor": "Q Executor"
+    "qExecutor": "Q Executor",
+    "brandingManagement": "品牌"
   },
   "COMMON": {
     "ACTIVE": "活跃",

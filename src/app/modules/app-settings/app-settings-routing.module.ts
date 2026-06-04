@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { unsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { AddAnnouncementComponent } from './components/add-announcement/add-announcement.component';
+import { BrandingSettingsComponent } from './components/branding-settings/branding-settings.component';
 import { EditAnnouncementComponent } from './components/edit-announcement/edit-announcement.component';
 import { ListAnnouncementsComponent } from './components/list-announcements/list-announcements.component';
 import { ThemeSettingsComponent } from './components/theme-settings/theme-settings.component';
@@ -36,6 +37,12 @@ const routes: Routes = [
     component: ThemeSettingsComponent,
     canDeactivate: [unsavedChangesGuard],
     data: { title: 'Theme' },
+  },
+  {
+    path: 'branding',
+    component: BrandingSettingsComponent,
+    canDeactivate: [unsavedChangesGuard],
+    data: { title: 'Branding' },
   },
 ];
 

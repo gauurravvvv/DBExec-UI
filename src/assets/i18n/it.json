@@ -34,7 +34,8 @@
     "dbSchema": "Schema DB",
     "dbRole": "Ruolo DB",
     "dbTable": "Tabella DB",
-    "qExecutor": "Q Executor"
+    "qExecutor": "Q Executor",
+    "brandingManagement": "Branding"
   },
   "COMMON": {
     "ACTIVE": "Attivo",

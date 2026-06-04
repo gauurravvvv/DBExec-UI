@@ -34,7 +34,8 @@
     "dbSchema": "DBスキーマ",
     "dbRole": "DBロール",
     "dbTable": "DBテーブル",
-    "qExecutor": "Q Executor"
+    "qExecutor": "Q Executor",
+    "brandingManagement": "ブランディング"
   },
   "COMMON": {
     "ACTIVE": "有効",
