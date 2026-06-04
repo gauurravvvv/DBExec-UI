@@ -1345,7 +1345,8 @@
     "FORGOT_PASSWORD": "비밀번호 찾기",
     "RESET_PASSWORD": "비밀번호 재설정",
     "SET_PASSWORD": "비밀번호 설정",
-    "NOT_FOUND": "페이지를 찾을 수 없습니다"
+    "NOT_FOUND": "페이지를 찾을 수 없습니다",
+    "RELAY": "로그인 중"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "데이터 소스\n관리 경험을 향상시키세요",
@@ -1409,7 +1410,17 @@
     "GO_TO_LOGIN": "로그인으로 이동",
     "SOMETHING_WENT_WRONG": "문제가 발생했습니다",
     "ENTER_8_CHAR_CODE": "터미널의 8자리 코드를 입력하세요.",
-    "SELECT_LANGUAGE": "언어 선택"
+    "SELECT_LANGUAGE": "언어 선택",
+    "RELAY": {
+      "WELCOME_BACK": "다시 오신 것을 환영합니다, {{firstName}}님",
+      "WELCOME": "환영합니다, {{firstName}}님",
+      "SETTING_UP": "워크스페이스를 준비하고 있습니다…",
+      "STILL_WORKING": "잠시만 더 기다려 주세요…",
+      "READY": "준비되었습니다.",
+      "RETRY": "다시 시도",
+      "BACK_TO_LOGIN": "로그인으로 돌아가기",
+      "ERROR_GENERIC": "세션을 준비하지 못했습니다."
+    }
   },
   "PASSWORD": {
     "REQUIRED": "비밀번호는 필수입니다",
@@ -2162,9 +2173,9 @@
       "END": "끝"
     },
     "SUNBURST_LABEL_ROTATE": {
+      "0": "수평 (0°)",
       "RADIAL": "Radial",
-      "TANGENTIAL": "접선",
-      "0": "수평 (0°)"
+      "TANGENTIAL": "접선"
     },
     "COLOR_MAPPING_BY": {
       "VALUE": "값",

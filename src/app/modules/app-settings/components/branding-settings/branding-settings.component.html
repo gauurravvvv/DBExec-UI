@@ -1,0 +1,162 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <div class="page-header">
+      <div class="left-section">
+        <h2>{{ 'BRANDING.PAGE_TITLE' | translate }}</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          [label]="'COMMON.SAVE' | translate"
+          [disabled]="brandingForm.invalid || !isFormDirty || saving()"
+          (click)="onSave()"
+        >
+          <i
+            class="pi mr-2"
+            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
+          ></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Centered loader while the initial GET resolves; page chrome
+         stays clickable so the admin can navigate away. -->
+    <app-content-loader
+      *ngIf="loading() && !brandingForm.value.watermarkText"
+    ></app-content-loader>
+
+    <form
+      *ngIf="!loading() || brandingForm.value.watermarkText"
+      [formGroup]="brandingForm"
+      class="admin-form"
+    >
+      <div class="form-grid">
+        <!-- Master switch. When off, the three dependent fields are
+             hidden but their persisted values are kept on the BE so a
+             later re-enable doesn't lose them. -->
+        <app-custom-toggle
+          formControlName="showWatermark"
+          [label]="'BRANDING.SHOW_WATERMARK' | translate"
+          [trueValue]="true"
+          [falseValue]="false"
+          [trueLabel]="'COMMON.ENABLED' | translate"
+          [falseLabel]="'COMMON.DISABLED' | translate"
+        ></app-custom-toggle>
+
+        <!-- Dependent fields, only meaningful when enabled. We hide
+             rather than disable so the form's `invalid` state behaves
+             cleanly with the dynamic validators in the component. -->
+        <ng-container *ngIf="brandingForm.value.showWatermark">
+          <app-custom-input
+            formControlName="watermarkText"
+            [label]="'BRANDING.WATERMARK_TEXT' | translate"
+            [placeholder]="'BRANDING.WATERMARK_PLACEHOLDER' | translate"
+            icon="pi-pencil"
+            [required]="true"
+            [maxLength]="maxTextLength"
+            [hint]="
+              ('BRANDING.WATERMARK_HINT' | translate) +
+              ' (' +
+              minTextLength +
+              '–' +
+              maxTextLength +
+              ')'
+            "
+            [showError]="
+              !!(
+                brandingForm.get('watermarkText')?.invalid &&
+                brandingForm.get('watermarkText')?.touched
+              )
+            "
+            [errorMessage]="getTextError()"
+          ></app-custom-input>
+
+          <div class="color-row">
+            <app-custom-input
+              formControlName="watermarkBgColor"
+              [label]="'BRANDING.BACKGROUND_COLOR' | translate"
+              [placeholder]="'#0d47a1'"
+              icon="pi-palette"
+              [required]="true"
+              [showError]="
+                !!(
+                  brandingForm.get('watermarkBgColor')?.invalid &&
+                  brandingForm.get('watermarkBgColor')?.touched
+                )
+              "
+              [errorMessage]="'BRANDING.HEX_INVALID' | translate"
+            ></app-custom-input>
+            <label
+              class="color-swatch"
+              [style.background-color]="swatchValue('watermarkBgColor')"
+            >
+              <input
+                type="color"
+                [value]="swatchValue('watermarkBgColor')"
+                (input)="
+                  onColorPicked('watermarkBgColor', $any($event.target).value)
+                "
+                aria-hidden="true"
+                tabindex="-1"
+              />
+            </label>
+          </div>
+
+          <div class="color-row">
+            <app-custom-input
+              formControlName="watermarkTextColor"
+              [label]="'BRANDING.TEXT_COLOR' | translate"
+              [placeholder]="'#ffffff'"
+              icon="pi-pencil"
+              [required]="true"
+              [showError]="
+                !!(
+                  brandingForm.get('watermarkTextColor')?.invalid &&
+                  brandingForm.get('watermarkTextColor')?.touched
+                )
+              "
+              [errorMessage]="'BRANDING.HEX_INVALID' | translate"
+            ></app-custom-input>
+            <label
+              class="color-swatch"
+              [style.background-color]="swatchValue('watermarkTextColor')"
+            >
+              <input
+                type="color"
+                [value]="swatchValue('watermarkTextColor')"
+                (input)="
+                  onColorPicked('watermarkTextColor', $any($event.target).value)
+                "
+                aria-hidden="true"
+                tabindex="-1"
+              />
+            </label>
+          </div>
+
+          <!-- Live preview pill — shows exactly how the watermark will
+               render on the bottom-right of every page, painted with
+               the current form values. -->
+          <div class="watermark-preview">
+            <span class="preview-label">{{
+              'BRANDING.PREVIEW' | translate
+            }}</span>
+            <span
+              class="watermark-pill"
+              [style.background-color]="swatchValue('watermarkBgColor')"
+              [style.color]="swatchValue('watermarkTextColor')"
+            >
+              {{ brandingForm.value.watermarkText || ('BRANDING.WATERMARK_PLACEHOLDER' | translate) }}
+            </span>
+          </div>
+        </ng-container>
+      </div>
+
+      <p class="theme-hint">
+        <i class="pi pi-info-circle"></i>
+        {{ 'BRANDING.RE_LOGIN_HINT' | translate }}
+      </p>
+    </form>
+  </div>
+</div>

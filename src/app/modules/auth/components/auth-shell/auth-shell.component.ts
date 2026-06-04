@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { LOGIN_PAGE_OPTIONS } from 'src/app/core/constants/global.constant';
+import { BrandingService } from 'src/app/core/services/branding.service';
 import { ThemeService } from 'src/app/core/services/theme.service';
 import { environment } from 'src/environments/environment';
 
@@ -25,17 +26,22 @@ interface Feature {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthShellComponent implements OnInit {
-  constructor(private themeService: ThemeService) {}
+  constructor(
+    private themeService: ThemeService,
+    private brandingService: BrandingService,
+  ) {}
 
   /**
    * Auth screens are always rendered with the default DBExec palette
-   * regardless of which org last had a session in this tab. Clearing
-   * here is belt-and-braces — every logout path also calls clear(),
-   * but a direct visit to /login (deep link, bookmark, history) skips
-   * those paths, so the shell guarantees a clean slate.
+   * and never show the watermark, regardless of which org last had a
+   * session in this tab. Clearing both signals here is belt-and-
+   * braces — every logout path also calls clear(), but a direct visit
+   * to /login (deep link, bookmark, history) skips those paths, so
+   * the shell guarantees a clean slate.
    */
   ngOnInit(): void {
     this.themeService.clear();
+    this.brandingService.clear();
   }
 
   /** Card title — e.g. "Welcome back". */

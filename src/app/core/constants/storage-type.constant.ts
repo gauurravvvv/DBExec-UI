@@ -13,6 +13,12 @@ export enum StorageType {
   // from the login response so the header doesn't have to poll
   // /announcements/current. Updated by dismiss + admin-side mutations.
   ANNOUNCEMENTS = 'announcements',
+  // Phase-1 relay payload — populated by login() and consumed by the
+  // /auth/relay component to render the greeting before phase 2
+  // returns. Cleared once the relay navigates to home.
+  RELAY_FIRST_NAME = 'relay-first-name',
+  RELAY_LAST_NAME = 'relay-last-name',
+  RELAY_IS_FIRST_LOGIN = 'relay-is-first-login',
 }
 
 export enum SessionStorageType {

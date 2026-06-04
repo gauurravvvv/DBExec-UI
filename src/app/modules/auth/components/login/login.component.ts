@@ -7,8 +7,6 @@ import {
 } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ROLES } from 'src/app/core/constants/user.constant';
-import { HOME_ROUTES } from 'src/app/core/layout/sidebar/sidebar.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
 
@@ -78,18 +76,14 @@ export class LoginComponent implements OnInit {
     try {
       const res: any = await this.loginService.login(this.loginForm);
       if (this.globalService.handleSuccessService(res, true, false)) {
-        const role = this.globalService.getTokenDetails('role');
-        // Theme injection happens inside LoginService.login on every
-        // successful sign-in; the component no longer needs to call
-        // applyFromLogin separately.
-        const homeRoute =
-          role === ROLES.SYSTEM_ADMIN
-            ? HOME_ROUTES.SYSTEM_ADMIN
-            : HOME_ROUTES.ORG_ADMIN;
-        const target = this.returnUrl || homeRoute;
-        this.router.navigateByUrl(target, {
-          replaceUrl: true,
-        });
+        // Phase-1 success — hand off to the relay screen. The relay
+        // component fires phase 2 (GET /auth/session) and then
+        // navigates to the role's home route once the heavy session
+        // payload is ready. `returnUrl` is preserved by stashing it
+        // and read back after the bootstrap finishes — for now we
+        // simply route through the relay and land on the home route
+        // (deep-link preservation is a follow-up if needed).
+        this.router.navigateByUrl('/relay', { replaceUrl: true });
       } else {
         this.loginError.set(this.normaliseAuthError(res?.message));
       }

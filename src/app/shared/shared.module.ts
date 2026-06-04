@@ -30,6 +30,7 @@ import {
 } from './pipes/filter-schemas.pipe';
 import { SkeletonTableRowsComponent } from './components/skeleton/skeleton-table.component';
 import { ContentLoaderComponent } from './components/content-loader/content-loader.component';
+import { BrandingWatermarkComponent } from './components/branding-watermark/branding-watermark.component';
 import { RelativeTimePipe } from './pipes/relative-time.pipe';
 import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
 
@@ -62,6 +63,7 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     ReplaceUnderscoresPipe,
     SkeletonTableRowsComponent,
     ContentLoaderComponent,
+    BrandingWatermarkComponent,
   ],
   imports: [
     CommonModule,
@@ -98,6 +100,7 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     ReplaceUnderscoresPipe,
     SkeletonTableRowsComponent,
     ContentLoaderComponent,
+    BrandingWatermarkComponent,
     TranslateModule,
   ],
 })

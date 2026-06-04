@@ -1,0 +1,18 @@
+<!--
+  Single-line watermark. `*ngIf` returns nothing when branding isn't
+  set or the org has the watermark turned off, so the host element
+  produces no rendered surface at all in those cases.
+
+  Background + text colour bind inline so the BE-supplied hex values
+  win over the SCSS defaults. When the values are nullish the SCSS
+  fallback (translucent white pill / muted text) takes over.
+-->
+<span
+  *ngIf="label() as text"
+  class="watermark"
+  role="contentinfo"
+  [style.background]="bg()"
+  [style.color]="color()"
+>
+  {{ text }}
+</span>

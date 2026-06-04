@@ -31,6 +31,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
   { value: 'rlsRules', route: '/app/rls-rules' },
   { value: 'announcementManagement', route: '/app/settings/announcements' },
   { value: 'themeManagement', route: '/app/settings/theme' },
+  { value: 'brandingManagement', route: '/app/settings/branding' },
 ];
 
 export const HOME_ROUTES = {

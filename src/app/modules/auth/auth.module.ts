@@ -12,6 +12,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { AuthShellComponent } from './components/auth-shell/auth-shell.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { LoginComponent } from './components/login/login.component';
+import { RelayComponent } from './components/relay/relay.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { SetPasswordComponent } from './components/set-password/set-password.component';
 
@@ -19,6 +20,7 @@ import { SetPasswordComponent } from './components/set-password/set-password.com
   declarations: [
     AuthShellComponent,
     LoginComponent,
+    RelayComponent,
     ForgotPasswordComponent,
     ResetPasswordComponent,
     SetPasswordComponent,

@@ -1,0 +1,60 @@
+// Bottom-right overlay. The host is `position: fixed` so it never
+// participates in layout flow, and `pointer-events: none` so the chip
+// can't intercept clicks on the underlying app. Z-index sits at the
+// "elevated" plane (= 10): above page content, below dropdowns (100),
+// overlays (1000), modals (1100), and toasts (1200), so the watermark
+// never overlaps anything functionally important.
+:host {
+  position: fixed;
+  bottom: 12px;
+  right: 16px;
+  pointer-events: none;
+  z-index: var(--z-elevated);
+  user-select: none;
+  font-family: var(--font-ui);
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-medium);
+  color: var(--text-muted);
+  opacity: 0.55;
+  letter-spacing: var(--ls-wide);
+  transition: opacity var(--motion-base) ease;
+}
+
+:host(:hover) {
+  opacity: 1;
+}
+
+.watermark {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+// Auth pages render with the SCSS defaults (auth-shell clears the
+// theme on mount), but as a belt-and-braces never-show-on-login rule
+// we also gate visibility via the host being absent from the auth
+// route tree. The host is only mounted in app.component.html which
+// is the authenticated app shell.
+
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    transition: none;
+  }
+}
+
+// On narrow viewports drop into the corner with a smaller footprint.
+@media (max-width: 600px) {
+  :host {
+    bottom: 8px;
+    right: 8px;
+    font-size: 10px;
+  }
+  .watermark {
+    padding: 3px 8px;
+  }
+}

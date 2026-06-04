@@ -1387,7 +1387,8 @@
     "FORGOT_PASSWORD": "Forgot Password",
     "RESET_PASSWORD": "Reset Password",
     "SET_PASSWORD": "Set Password",
-    "NOT_FOUND": "Page Not Found"
+    "NOT_FOUND": "Page Not Found",
+    "RELAY": "Signing in"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Elevate Your Datasource\nManagement Experience",
@@ -1451,7 +1452,17 @@
     "GO_TO_LOGIN": "Go to Login",
     "SOMETHING_WENT_WRONG": "Something Went Wrong",
     "ENTER_8_CHAR_CODE": "Please enter the 8-character code from your terminal.",
-    "SELECT_LANGUAGE": "Select Language"
+    "SELECT_LANGUAGE": "Select Language",
+    "RELAY": {
+      "WELCOME_BACK": "Welcome back, {{firstName}}",
+      "WELCOME": "Welcome, {{firstName}}",
+      "SETTING_UP": "Setting up your workspace…",
+      "STILL_WORKING": "Just a moment longer…",
+      "READY": "You're in.",
+      "RETRY": "Try again",
+      "BACK_TO_LOGIN": "Back to login",
+      "ERROR_GENERIC": "We couldn't set up your session."
+    }
   },
   "PASSWORD": {
     "REQUIRED": "Password is required",
@@ -2204,9 +2215,9 @@
       "END": "End"
     },
     "SUNBURST_LABEL_ROTATE": {
+      "0": "Horizontal (0°)",
       "RADIAL": "Radial",
-      "TANGENTIAL": "Tangential",
-      "0": "Horizontal (0°)"
+      "TANGENTIAL": "Tangential"
     },
     "COLOR_MAPPING_BY": {
       "VALUE": "Value",

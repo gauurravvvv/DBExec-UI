@@ -1345,7 +1345,8 @@
     "FORGOT_PASSWORD": "パスワードを忘れた",
     "RESET_PASSWORD": "パスワードのリセット",
     "SET_PASSWORD": "パスワード設定",
-    "NOT_FOUND": "ページが見つかりません"
+    "NOT_FOUND": "ページが見つかりません",
+    "RELAY": "ログイン中"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "データソース管理体験を\n向上させましょう",
@@ -1409,7 +1410,17 @@
     "GO_TO_LOGIN": "ログインへ",
     "SOMETHING_WENT_WRONG": "問題が発生しました",
     "ENTER_8_CHAR_CODE": "端末の8文字のコードを入力してください。",
-    "SELECT_LANGUAGE": "言語を選択"
+    "SELECT_LANGUAGE": "言語を選択",
+    "RELAY": {
+      "WELCOME_BACK": "おかえりなさい、{{firstName}} さん",
+      "WELCOME": "ようこそ、{{firstName}} さん",
+      "SETTING_UP": "ワークスペースを準備しています…",
+      "STILL_WORKING": "もう少しお待ちください…",
+      "READY": "準備完了です。",
+      "RETRY": "もう一度試す",
+      "BACK_TO_LOGIN": "ログインに戻る",
+      "ERROR_GENERIC": "セッションを準備できませんでした。"
+    }
   },
   "PASSWORD": {
     "REQUIRED": "パスワードは必須です",
@@ -2162,9 +2173,9 @@
       "END": "終了"
     },
     "SUNBURST_LABEL_ROTATE": {
+      "0": "水平 (0°)",
       "RADIAL": "Radial",
-      "TANGENTIAL": "接線",
-      "0": "水平 (0°)"
+      "TANGENTIAL": "接線"
     },
     "COLOR_MAPPING_BY": {
       "VALUE": "値",

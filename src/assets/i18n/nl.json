@@ -1345,7 +1345,8 @@
     "FORGOT_PASSWORD": "Wachtwoord vergeten",
     "RESET_PASSWORD": "Wachtwoord resetten",
     "SET_PASSWORD": "Wachtwoord instellen",
-    "NOT_FOUND": "Pagina niet gevonden"
+    "NOT_FOUND": "Pagina niet gevonden",
+    "RELAY": "Aanmelden"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Verbeter uw ervaring met\ngegevensbronbeheer",
@@ -1409,7 +1410,17 @@
     "GO_TO_LOGIN": "Ga naar inloggen",
     "SOMETHING_WENT_WRONG": "Er is iets misgegaan",
     "ENTER_8_CHAR_CODE": "Voer de 8-tekens code van uw terminal in.",
-    "SELECT_LANGUAGE": "Taal selecteren"
+    "SELECT_LANGUAGE": "Taal selecteren",
+    "RELAY": {
+      "WELCOME_BACK": "Welkom terug, {{firstName}}",
+      "WELCOME": "Welkom, {{firstName}}",
+      "SETTING_UP": "Je werkruimte wordt voorbereid…",
+      "STILL_WORKING": "Nog even geduld…",
+      "READY": "Je bent erin.",
+      "RETRY": "Opnieuw proberen",
+      "BACK_TO_LOGIN": "Terug naar aanmelden",
+      "ERROR_GENERIC": "We konden je sessie niet voorbereiden."
+    }
   },
   "PASSWORD": {
     "REQUIRED": "Wachtwoord is vereist",
@@ -2162,9 +2173,9 @@
       "END": "Einde"
     },
     "SUNBURST_LABEL_ROTATE": {
+      "0": "Horizontaal (0°)",
       "RADIAL": "Radial",
-      "TANGENTIAL": "Tangentieel",
-      "0": "Horizontaal (0°)"
+      "TANGENTIAL": "Tangentieel"
     },
     "COLOR_MAPPING_BY": {
       "VALUE": "Waarde",

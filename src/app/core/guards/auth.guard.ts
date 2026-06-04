@@ -8,7 +8,18 @@ import {
 import { LoginService } from 'src/app/core/services/login.service';
 import { GlobalService } from '../services/global.service';
 
-const AUTH_ONLY_ROUTES = ['/login', '/forgot-password', '/reset-password'];
+// Routes a NOT-logged-in user is allowed to visit. Visiting any of
+// these while already logged in bounces back to the role's home.
+const UNAUTHENTICATED_ONLY_ROUTES = [
+  '/login',
+  '/forgot-password',
+  '/reset-password',
+];
+
+// /relay is auth-area but logged-in-only — the user JUST logged in
+// via phase 1 and is on their way to home. We treat it as a normal
+// authenticated route: must be logged in, never bounce away.
+const POST_LOGIN_ROUTES = ['/relay'];
 
 function getDefaultRouteByRole(globalService: GlobalService): string {
   const role = globalService.getTokenDetails('role');
@@ -26,8 +37,19 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const globalService = inject(GlobalService);
 
-  const isAuthPage = AUTH_ONLY_ROUTES.some(r => state.url.startsWith(r));
-  if (isAuthPage) {
+  // /relay: must be authenticated (phase 1 set the access token);
+  // never redirect away even though we're "logged in".
+  const isPostLogin = POST_LOGIN_ROUTES.some(r => state.url.startsWith(r));
+  if (isPostLogin) {
+    if (authService.isLoggedIn()) return true;
+    router.navigate(['/login']);
+    return false;
+  }
+
+  const isUnauthOnly = UNAUTHENTICATED_ONLY_ROUTES.some(r =>
+    state.url.startsWith(r),
+  );
+  if (isUnauthOnly) {
     if (authService.isLoggedIn()) {
       const homeRoute = getDefaultRouteByRole(globalService);
       router.navigate([homeRoute]);

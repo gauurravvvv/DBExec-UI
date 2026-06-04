@@ -1,0 +1,301 @@
+// Relay screen — Option A: anchored chrome.
+//
+// Layout primitives:
+//   - .relay        : full-viewport flex container, centres the card.
+//   - .relay__top   : absolutely positioned top-left brand anchor.
+//   - .relay__card  : centred greeting card (no surface, no border).
+//   - .relay__bottom: absolutely positioned footer line.
+//
+// Visual budget unchanged: brand-only accents (avatar tint, ring
+// arc, check), single-curve motion, reduced-motion fade fallback.
+// The radial gradient under the card adds a faint sense of depth
+// without competing with the chrome.
+
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--surface-page, #fafafa);
+  color: var(--text-strong, #1a1a1a);
+  font-family: var(--font-ui);
+  background-image: radial-gradient(
+    circle at 50% 45%,
+    rgba(var(--primary-color-rgb, 33, 150, 243), 0.06) 0%,
+    transparent 60%
+  );
+}
+
+.relay {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+// ── Top-left brand anchor ────────────────────────────────────
+.relay__top {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-strong, #1a1a1a);
+  font-weight: var(--fw-semibold, 600);
+  letter-spacing: -0.01em;
+  // Subtle fade so the chrome doesn't compete with the centred
+  // greeting on first paint.
+  animation: relay-fade 240ms ease-out 60ms both;
+}
+
+.relay__top-mark {
+  font-size: 18px;
+  color: var(--primary-color);
+}
+
+.relay__top-wordmark {
+  font-size: 15px;
+}
+
+.relay__top-wordmark-accent {
+  color: var(--primary-color);
+}
+
+// ── Centred card ─────────────────────────────────────────────
+.relay__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 420px;
+  animation: relay-in 240ms ease-out both;
+}
+
+// ── Avatar ───────────────────────────────────────────────────
+.relay__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(
+    var(--primary-color-rgb, 33, 150, 243),
+    0.12
+  );
+  color: var(--primary-color);
+  font-weight: var(--fw-semibold, 600);
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+.relay__avatar-initials {
+  line-height: 1;
+}
+
+// ── Greeting ─────────────────────────────────────────────────
+.relay__greeting {
+  font-size: var(--fs-h2, 24px);
+  font-weight: var(--fw-regular, 400);
+  margin: 0;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: var(--text-strong);
+  ::ng-deep .relay__greeting-name {
+    font-weight: var(--fw-semibold, 600);
+    color: var(--text-strong);
+  }
+}
+
+// ── Status copy ──────────────────────────────────────────────
+.relay__status {
+  font-size: var(--fs-body, 14px);
+  color: var(--text-muted, #6b7280);
+  margin: 0;
+  min-height: 1.4em;
+  transition: color 160ms ease-out;
+
+  span {
+    animation: relay-fade 160ms ease-out both;
+    display: inline-block;
+  }
+}
+
+.relay__status--error {
+  color: var(--danger-color, #d33);
+}
+
+// ── Ring spinner ─────────────────────────────────────────────
+.relay__ring {
+  width: 24px;
+  height: 24px;
+  position: relative;
+  margin-top: 4px;
+}
+
+.relay__ring-track,
+.relay__ring-arc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+}
+
+.relay__ring-track {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.relay__ring-arc {
+  border-top-color: var(--primary-color);
+  animation: relay-spin 0.9s linear infinite;
+}
+
+// ── Ready check ──────────────────────────────────────────────
+.relay__check {
+  width: 28px;
+  height: 28px;
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  font-size: 18px;
+  animation: relay-check 220ms ease-out both;
+}
+
+// ── Affordances ──────────────────────────────────────────────
+.relay__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  animation: relay-fade 200ms ease-out both;
+}
+
+.relay__btn {
+  appearance: none;
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
+  background: transparent;
+  color: var(--text-strong);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: var(--fs-body, 14px);
+  font-weight: var(--fw-medium, 500);
+  cursor: pointer;
+  transition: background 160ms ease-out, border-color 160ms ease-out;
+
+  &:hover {
+    background: var(--surface-subtle, rgba(0, 0, 0, 0.04));
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+}
+
+.relay__btn--primary {
+  background: var(--primary-color);
+  color: var(--primary-text, #fff);
+  border-color: transparent;
+
+  &:hover {
+    background: var(--primary-hover, var(--primary-color));
+  }
+}
+
+// ── Footer line ──────────────────────────────────────────────
+// Bounds the bottom edge of the page so the empty surface above
+// reads as deliberate space rather than unfinished layout.
+.relay__bottom {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted, #6b7280);
+  letter-spacing: 0.02em;
+  opacity: 0.7;
+  animation: relay-fade 240ms ease-out 120ms both;
+}
+
+// ── Narrow viewports ─────────────────────────────────────────
+@media (max-width: 600px) {
+  .relay__top {
+    top: 14px;
+    left: 16px;
+  }
+  .relay__bottom {
+    bottom: 12px;
+    font-size: 11px;
+  }
+}
+
+// ── Keyframes ────────────────────────────────────────────────
+@keyframes relay-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes relay-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes relay-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes relay-check {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// ── Reduced motion ───────────────────────────────────────────
+@media (prefers-reduced-motion: reduce) {
+  .relay__card,
+  .relay__top,
+  .relay__bottom,
+  .relay__actions,
+  .relay__status span {
+    animation: relay-fade 200ms ease-out both;
+  }
+  .relay__ring-arc {
+    animation: none;
+    border-top-color: transparent;
+    border-color: var(--primary-color);
+    opacity: 0.5;
+  }
+  .relay__check {
+    animation: relay-fade 200ms ease-out both;
+  }
+}

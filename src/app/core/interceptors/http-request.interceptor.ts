@@ -19,6 +19,7 @@ import { LoadingService } from '../services/loading.service';
 import { LoginService } from '../services/login.service';
 import { SessionExpiredService } from '../services/session-expired.service';
 import { StorageService } from '../services/storage.service';
+import { BrandingService } from '../services/branding.service';
 import { ThemeService } from '../services/theme.service';
 
 @Injectable()
@@ -63,6 +64,10 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
   private get themeService(): ThemeService {
     return this.injector.get(ThemeService);
+  }
+
+  private get brandingService(): BrandingService {
+    return this.injector.get(BrandingService);
   }
 
   constructor(
@@ -266,9 +271,11 @@ export class HttpRequestInterceptor implements HttpInterceptor {
           if (response.status && response.data?.accessToken) {
             const newToken = response.data.accessToken;
             this.loginService.setAccessToken(newToken);
-            // Keep the injected CSS variables in sync with the BE-
-            // resolved theme at refresh time. `null` clears.
+            // Keep the injected CSS variables and watermark in sync
+            // with what the BE resolved at refresh time. `null` on
+            // either clears that domain.
             this.themeService.applyFromLogin(response.data?.theme);
+            this.brandingService.applyFromLogin(response.data?.branding);
             this.refreshTokenSubject.next(newToken);
             // Retry the original request with the new token
             return next.handle(this.addToken(req, newToken));

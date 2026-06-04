@@ -38,6 +38,7 @@ export const PERMISSIONS = {
   APP_SETTINGS: 'appSettings',
   ANNOUNCEMENT_MANAGEMENT: 'announcementManagement',
   THEME_MANAGEMENT: 'themeManagement',
+  BRANDING_MANAGEMENT: 'brandingManagement',
 } as const;
 
 export type PermissionValue = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

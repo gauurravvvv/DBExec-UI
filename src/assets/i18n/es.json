@@ -1345,7 +1345,8 @@
     "FORGOT_PASSWORD": "Contraseña olvidada",
     "RESET_PASSWORD": "Restablecer contraseña",
     "SET_PASSWORD": "Establecer contraseña",
-    "NOT_FOUND": "Página no encontrada"
+    "NOT_FOUND": "Página no encontrada",
+    "RELAY": "Iniciando sesión"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Mejore su experiencia de\ngestión de fuentes de datos",
@@ -1409,7 +1410,17 @@
     "GO_TO_LOGIN": "Ir al inicio de sesión",
     "SOMETHING_WENT_WRONG": "Algo salió mal",
     "ENTER_8_CHAR_CODE": "Ingrese el código de 8 caracteres de su terminal.",
-    "SELECT_LANGUAGE": "Seleccionar idioma"
+    "SELECT_LANGUAGE": "Seleccionar idioma",
+    "RELAY": {
+      "WELCOME_BACK": "Hola de nuevo, {{firstName}}",
+      "WELCOME": "Bienvenido, {{firstName}}",
+      "SETTING_UP": "Preparando tu espacio de trabajo…",
+      "STILL_WORKING": "Un momento más…",
+      "READY": "Ya estás dentro.",
+      "RETRY": "Reintentar",
+      "BACK_TO_LOGIN": "Volver al inicio de sesión",
+      "ERROR_GENERIC": "No pudimos preparar tu sesión."
+    }
   },
   "PASSWORD": {
     "REQUIRED": "La contraseña es obligatoria",
@@ -2162,9 +2173,9 @@
       "END": "Fin"
     },
     "SUNBURST_LABEL_ROTATE": {
+      "0": "Horizontal (0°)",
       "RADIAL": "Radial",
-      "TANGENTIAL": "Tangencial",
-      "0": "Horizontal (0°)"
+      "TANGENTIAL": "Tangencial"
     },
     "COLOR_MAPPING_BY": {
       "VALUE": "Valor",

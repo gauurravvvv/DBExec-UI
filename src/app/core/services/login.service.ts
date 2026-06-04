@@ -1,12 +1,38 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, Injector, OnDestroy } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { lastValueFrom, Observable } from 'rxjs';
 import { AUTH } from 'src/app/core/constants/api.constant';
 import { StorageType } from 'src/app/core/constants/storage-type.constant';
+import { BrandingService } from 'src/app/core/services/branding.service';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
+import { LocaleService } from 'src/app/core/services/locale.service';
 import { StorageService } from 'src/app/core/services/storage.service';
 import { ThemeService } from 'src/app/core/services/theme.service';
 
+/**
+ * LoginService — entry point for the two-phase login flow.
+ *
+ *   phase 1 — `login(form)` → POST /auth/login
+ *     Verifies credentials, returns access + refresh tokens and the
+ *     minimal payload the relay screen needs (first/last name,
+ *     locale, isFirstLogin). Persists the relay-only fields in
+ *     storage so the relay component can read them synchronously
+ *     on mount, and applies the user's locale immediately so the
+ *     relay's "Welcome" copy is localised on first paint.
+ *
+ *   phase 2 — `bootstrapSession()` → GET /auth/session
+ *     Returns the full session payload (permissions, role, theme,
+ *     branding, announcements, sessionInactivityTimeout, full user
+ *     profile). Called by the relay component once it's mounted,
+ *     and by the bootstrap-on-refresh path so a hard reload also
+ *     re-hydrates the session without going through the relay
+ *     screen.
+ *
+ * Token refresh (proactive + reactive) keeps shipping theme + branding
+ * inline so a mid-session refresh repaints without an extra /session
+ * round-trip. Permissions are not re-shipped on refresh — the JWT
+ * itself carries them and a permission change requires a fresh login.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -17,8 +43,24 @@ export class LoginService implements OnDestroy {
   constructor(
     private http: HttpClientService,
     private themeService: ThemeService,
+    private brandingService: BrandingService,
+    // LocaleService depends on LoginService (it reads the JWT and
+    // calls logout on bad locale switches), so a direct constructor
+    // injection here would form a cycle. Resolve it lazily via the
+    // root injector — same pattern the HTTP interceptor uses for
+    // ThemeService.
+    private injector: Injector,
   ) {}
 
+  private get localeService(): LocaleService {
+    return this.injector.get(LocaleService);
+  }
+
+  /**
+   * Phase 1 — verify credentials, stash tokens, prep the relay
+   * screen. On success the caller routes to /auth/relay; on
+   * failure the caller renders the inline error on the login form.
+   */
   async login(loginForm: UntypedFormGroup): Promise<any> {
     const { organisation, username, password } = loginForm.value;
     // skipLoader: true — each auth page drives its own button-level
@@ -32,45 +74,94 @@ export class LoginService implements OnDestroy {
       ),
     );
     if (result.status) {
-      // Store access token and refresh token
+      // Tokens — needed for the phase-2 /auth/session call.
       this.setAccessToken(result.data.accessToken);
       this.setRefreshToken(result.data.refreshToken);
 
-      // Store other details
-      StorageService.set(StorageType.ROLE, result.data.user.role);
+      // Org name is still needed for the refresh-token endpoint
+      // (which is unauthenticated and uses org+refreshToken as the
+      // bootstrap pair). The user typed it on the form.
+      StorageService.set(StorageType.ORGANISATION, organisation);
+
+      // Relay-only fields — read once by the relay component and
+      // cleared when phase 2 completes. Kept out of the main user
+      // blob to make their short lifecycle obvious.
+      const u = result.data.user || {};
+      StorageService.set(StorageType.RELAY_FIRST_NAME, u.firstName || '');
+      StorageService.set(StorageType.RELAY_LAST_NAME, u.lastName || '');
+      StorageService.set(
+        StorageType.RELAY_IS_FIRST_LOGIN,
+        u.isFirstLogin ? 'true' : 'false',
+      );
+
+      // Apply the user's saved locale immediately so the relay's
+      // greeting and status copy render in the right language from
+      // the first paint, before phase 2 returns.
+      if (u.locale) {
+        this.localeService.applyTempLocale(u.locale);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Phase 2 — fetch the full session payload. Owns all the storage
+   * + signal writes that the old monolithic login used to do
+   * (permissions, role, theme, branding, announcements, full user,
+   * sessionInactivityTimeout). Returns the raw API result so the
+   * relay component can read `.status`, `.message`, etc.
+   */
+  async bootstrapSession(): Promise<any> {
+    const result: any = await lastValueFrom(
+      this.http.apiGet(AUTH.SESSION, { skipLoader: true }),
+    );
+    if (result.status) {
+      const d = result.data || {};
+      const user = d.user || {};
+
+      StorageService.set(StorageType.ROLE, d.role || user.role || '');
       StorageService.set(
         StorageType.ORGANISATION_ID,
-        result.data.user.organisationId,
+        user.organisationId || '',
       );
       StorageService.set(
         StorageType.ORGANISATION,
-        result.data.user.organisationName,
+        user.organisationName || StorageService.get(StorageType.ORGANISATION),
       );
 
-      if (result.data.sessionInactivityTimeout) {
+      if (d.sessionInactivityTimeout) {
         StorageService.set(
           StorageType.SESSION_INACTIVITY_TIMEOUT,
-          result.data.sessionInactivityTimeout.toString(),
+          d.sessionInactivityTimeout.toString(),
         );
       }
 
-      // Stash announcements returned by the login response so the
-      // header can render them without a separate /announcements/current
-      // call on mount, on every route change, and every 60s. Default
-      // to an empty array for default-org users (system admins) so
-      // downstream reads don't need a null guard.
+      // Same announcements-on-mount contract as the old monolithic
+      // login — empty array default so downstream reads don't need
+      // a null guard.
       StorageService.set(
         StorageType.ANNOUNCEMENTS,
-        JSON.stringify(result.data.announcements ?? []),
+        JSON.stringify(d.announcements ?? []),
       );
 
-      // Inject the org's CSS variables synchronously so the very next
-      // navigation paints with the correct brand colour. `null` (the
-      // system-admin path) strips any leftover injected style and
-      // reverts to the SCSS defaults. Done here rather than in the
-      // login component so every caller of LoginService.login gets
-      // the same behaviour for free.
-      this.themeService.applyFromLogin(result.data?.theme);
+      // Apply theme + branding. `null` (system-admin path) clears
+      // any previously injected style and reverts to the SCSS
+      // defaults.
+      this.themeService.applyFromLogin(d.theme);
+      this.brandingService.applyFromLogin(d.branding);
+
+      // Phase-2 ships the user's locale too — reapply (idempotent
+      // if phase 1 already set it; matters when bootstrapSession
+      // is invoked from the refresh path without a prior login).
+      if (user.locale) {
+        this.localeService.applyTempLocale(user.locale);
+      }
+
+      // Drop the short-lived relay fields now that the bootstrap
+      // is complete.
+      StorageService.remove(StorageType.RELAY_FIRST_NAME);
+      StorageService.remove(StorageType.RELAY_LAST_NAME);
+      StorageService.remove(StorageType.RELAY_IS_FIRST_LOGIN);
     }
     return result;
   }
@@ -168,13 +259,14 @@ export class LoginService implements OnDestroy {
 
   /**
    * Fire a single refresh-token call at app bootstrap (tab refresh,
-   * direct URL entry) when an access token already exists. The
-   * existing refreshAccessToken success path stamps the fresh token
-   * and applies the BE-resolved theme to the CSS variable injector,
-   * so this is the only call needed to re-hydrate the session.
+   * direct URL entry) when an access token already exists. After
+   * the token refreshes successfully, immediately re-fetch the
+   * session payload so permissions / theme / branding /
+   * announcements re-hydrate without going through the relay
+   * screen (which is reserved for the post-login transition only).
    *
    * If no access token is present (unauthenticated landing on /login)
-   * this is a no-op. If the refresh fails, the reactive 440 path
+   * this is a no-op. If either call fails, the reactive 440 path
    * picks it up on the next request.
    */
   public bootstrapTokenRefresh(): void {
@@ -187,6 +279,12 @@ export class LoginService implements OnDestroy {
         if (response.status && response.data?.accessToken) {
           this.setAccessToken(response.data.accessToken);
           this.themeService.applyFromLogin(response.data?.theme);
+          this.brandingService.applyFromLogin(response.data?.branding);
+          // Re-hydrate the rest of the session in the background.
+          // Errors are swallowed here — the user is already on
+          // their previous URL and reactive 440 will recover if
+          // the token genuinely is bad.
+          this.bootstrapSession().catch(() => {});
         }
       },
       error: () => {
@@ -236,10 +334,12 @@ export class LoginService implements OnDestroy {
           next: (response: any) => {
             if (response.status && response.data?.accessToken) {
               this.setAccessToken(response.data.accessToken);
-              // Keep the injected CSS variables in sync with whatever
-              // the BE resolved at refresh time (the org admin may
-              // have changed branding mid-session). `null` clears.
+              // Keep the injected CSS variables and the watermark in
+              // sync with whatever the BE resolved at refresh time
+              // (the org admin may have changed either between sessions).
+              // `null` on either clears.
               this.themeService.applyFromLogin(response.data?.theme);
+              this.brandingService.applyFromLogin(response.data?.branding);
             }
           },
           error: () => {

@@ -1,0 +1,98 @@
+<!--
+  Relay screen — anchored chrome (Option A).
+
+  Layout:
+    .relay__top    → fixed top-left wordmark + mark
+    .relay__card   → centred greeting card (no surface, brand
+                     content only)
+    .relay__bottom → fixed footer line (© DBExec · year)
+
+  The card stays minimal — wordmark moved OUT to the page chrome
+  so the card itself only carries the greeting hierarchy. Anchored
+  chrome bounds the page so the empty space reads as room to
+  breathe instead of unfinished surface.
+-->
+<div class="relay" role="status" aria-live="polite">
+  <!-- Top-left brand anchor. Same visual language as the auth shell
+       topbar, but smaller and positioned absolutely so it doesn't
+       fight with the centred greeting. -->
+  <div class="relay__top" aria-hidden="true">
+    <i class="ci ci-app-icon relay__top-mark"></i>
+    <span class="relay__top-wordmark"
+      >DB<span class="relay__top-wordmark-accent">Exec</span></span
+    >
+  </div>
+
+  <div class="relay__card">
+    <div class="relay__avatar" aria-hidden="true">
+      <span class="relay__avatar-initials">{{ initials() }}</span>
+    </div>
+
+    <!-- We can't trust user-controlled firstName through
+         [innerHTML], so the greeting is assembled via interpolation
+         only. To get the bold-name effect we split the translated
+         string around its {{firstName}} placeholder and bind each
+         half plus a <strong> in between — keeping the firstName
+         value out of any HTML sink. The component exposes
+         greetingPrefix() and greetingSuffix() to do that split. -->
+    <h1 class="relay__greeting">
+      <span>{{ greetingPrefix() }}</span
+      ><strong class="relay__greeting-name">{{ firstName() }}</strong
+      ><span>{{ greetingSuffix() }}</span>
+    </h1>
+
+    <p
+      class="relay__status"
+      [class.relay__status--error]="state() === 'error'"
+      [ngSwitch]="state()"
+    >
+      <span *ngSwitchCase="'loading'">{{ 'AUTH.RELAY.SETTING_UP' | translate }}</span>
+      <span *ngSwitchCase="'slow'">{{ 'AUTH.RELAY.STILL_WORKING' | translate }}</span>
+      <span *ngSwitchCase="'ready'">{{ 'AUTH.RELAY.READY' | translate }}</span>
+      <span *ngSwitchCase="'error'">{{
+        errorMessage() || ('AUTH.RELAY.ERROR_GENERIC' | translate)
+      }}</span>
+    </p>
+
+    <!-- Ring vs check — exclusive. Ring spins while loading; the
+         check appears once ready. Error has neither (affordances
+         carry the meaning). -->
+    <div
+      class="relay__ring"
+      *ngIf="state() === 'loading' || state() === 'slow'"
+      aria-hidden="true"
+    >
+      <span class="relay__ring-track"></span>
+      <span class="relay__ring-arc"></span>
+    </div>
+
+    <div class="relay__check" *ngIf="state() === 'ready'" aria-hidden="true">
+      <i class="pi pi-check"></i>
+    </div>
+
+    <!-- Retry + back-to-login appear after the 10-second stall and
+         on any phase-2 error. Hidden during the happy path so the
+         loading state remains a single confident frame. The Retry
+         button is autofocused when this region first appears, and
+         Esc anywhere triggers Back-to-login. -->
+    <div class="relay__actions" *ngIf="state() === 'slow' || state() === 'error'">
+      <button
+        #retryBtn
+        type="button"
+        class="relay__btn relay__btn--primary"
+        (click)="retry()"
+      >
+        {{ 'AUTH.RELAY.RETRY' | translate }}
+      </button>
+      <button type="button" class="relay__btn" (click)="backToLogin()">
+        {{ 'AUTH.RELAY.BACK_TO_LOGIN' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Footer line. Bounds the bottom edge of the page without
+       competing with the centred card. -->
+  <div class="relay__bottom" aria-hidden="true">
+    © DBExec · {{ year }}
+  </div>
+</div>

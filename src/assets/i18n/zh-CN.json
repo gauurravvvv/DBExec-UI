@@ -1345,7 +1345,8 @@
     "FORGOT_PASSWORD": "忘记密码",
     "RESET_PASSWORD": "重置密码",
     "SET_PASSWORD": "设置密码",
-    "NOT_FOUND": "页面未找到"
+    "NOT_FOUND": "页面未找到",
+    "RELAY": "正在登录"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "提升您的数据源\n管理体验",
@@ -1409,7 +1410,17 @@
     "GO_TO_LOGIN": "前往登录",
     "SOMETHING_WENT_WRONG": "出了点问题",
     "ENTER_8_CHAR_CODE": "请输入终端中的8位代码。",
-    "SELECT_LANGUAGE": "选择语言"
+    "SELECT_LANGUAGE": "选择语言",
+    "RELAY": {
+      "WELCOME_BACK": "{{firstName}}，欢迎回来",
+      "WELCOME": "{{firstName}}，欢迎",
+      "SETTING_UP": "正在为您准备工作区…",
+      "STILL_WORKING": "请再稍候片刻…",
+      "READY": "已就绪。",
+      "RETRY": "重试",
+      "BACK_TO_LOGIN": "返回登录",
+      "ERROR_GENERIC": "无法为您准备会话。"
+    }
   },
   "PASSWORD": {
     "REQUIRED": "密码是必需的",
@@ -2162,9 +2173,9 @@
       "END": "结束"
     },
     "SUNBURST_LABEL_ROTATE": {
+      "0": "水平 (0°)",
       "RADIAL": "Radial",
-      "TANGENTIAL": "切向",
-      "0": "水平 (0°)"
+      "TANGENTIAL": "切向"
     },
     "COLOR_MAPPING_BY": {
       "VALUE": "值",

@@ -1345,7 +1345,8 @@
     "FORGOT_PASSWORD": "Passwort vergessen",
     "RESET_PASSWORD": "Passwort zurücksetzen",
     "SET_PASSWORD": "Passwort festlegen",
-    "NOT_FOUND": "Seite nicht gefunden"
+    "NOT_FOUND": "Seite nicht gefunden",
+    "RELAY": "Anmeldung läuft"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Verbessern Sie Ihr Datenquellen-\nManagement-Erlebnis",
@@ -1409,7 +1410,17 @@
     "GO_TO_LOGIN": "Zur Anmeldung",
     "SOMETHING_WENT_WRONG": "Etwas ist schiefgelaufen",
     "ENTER_8_CHAR_CODE": "Bitte geben Sie den 8-stelligen Code aus Ihrem Terminal ein.",
-    "SELECT_LANGUAGE": "Sprache wählen"
+    "SELECT_LANGUAGE": "Sprache wählen",
+    "RELAY": {
+      "WELCOME_BACK": "Willkommen zurück, {{firstName}}",
+      "WELCOME": "Willkommen, {{firstName}}",
+      "SETTING_UP": "Arbeitsbereich wird vorbereitet…",
+      "STILL_WORKING": "Einen Moment noch…",
+      "READY": "Sie sind drin.",
+      "RETRY": "Erneut versuchen",
+      "BACK_TO_LOGIN": "Zurück zur Anmeldung",
+      "ERROR_GENERIC": "Ihre Sitzung konnte nicht eingerichtet werden."
+    }
   },
   "PASSWORD": {
     "REQUIRED": "Passwort ist erforderlich",
@@ -2162,9 +2173,9 @@
       "END": "Ende"
     },
     "SUNBURST_LABEL_ROTATE": {
+      "0": "Horizontal (0°)",
       "RADIAL": "Radial",
-      "TANGENTIAL": "Tangential",
-      "0": "Horizontal (0°)"
+      "TANGENTIAL": "Tangential"
     },
     "COLOR_MAPPING_BY": {
       "VALUE": "Wert",

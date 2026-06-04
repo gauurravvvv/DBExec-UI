@@ -16,6 +16,10 @@
 
 export const AUTH = {
   LOGIN: '/auth/login',
+  // Phase-2 session bootstrap — returns the full payload the relay
+  // screen and the bootstrap-on-refresh path need to render the
+  // authenticated app shell.
+  SESSION: '/auth/session',
   LOGOUT: '/auth/logout',
   REFRESH_TOKEN: '/auth/refresh',
   GENERATE_OTP: '/auth/generate-otp',
@@ -268,6 +272,11 @@ export const THEME = {
   GET: '/theme',
   SAVE: '/theme',
   RESET: '/theme/reset',
+};
+
+export const BRANDING = {
+  GET: '/branding',
+  SAVE: '/branding',
 };
 
 export const ANNOUNCEMENT = {

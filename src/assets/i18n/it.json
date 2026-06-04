@@ -1345,7 +1345,8 @@
     "FORGOT_PASSWORD": "Password dimenticata",
     "RESET_PASSWORD": "Reimposta password",
     "SET_PASSWORD": "Imposta password",
-    "NOT_FOUND": "Pagina non trovata"
+    "NOT_FOUND": "Pagina non trovata",
+    "RELAY": "Accesso in corso"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Migliora la tua esperienza\ndi gestione delle sorgenti dati",
@@ -1409,7 +1410,17 @@
     "GO_TO_LOGIN": "Vai al login",
     "SOMETHING_WENT_WRONG": "Qualcosa è andato storto",
     "ENTER_8_CHAR_CODE": "Inserisci il codice di 8 caratteri dal tuo terminale.",
-    "SELECT_LANGUAGE": "Seleziona lingua"
+    "SELECT_LANGUAGE": "Seleziona lingua",
+    "RELAY": {
+      "WELCOME_BACK": "Bentornato, {{firstName}}",
+      "WELCOME": "Benvenuto, {{firstName}}",
+      "SETTING_UP": "Preparazione del tuo spazio di lavoro…",
+      "STILL_WORKING": "Ancora un momento…",
+      "READY": "Ci sei.",
+      "RETRY": "Riprova",
+      "BACK_TO_LOGIN": "Torna all'accesso",
+      "ERROR_GENERIC": "Non è stato possibile preparare la sessione."
+    }
   },
   "PASSWORD": {
     "REQUIRED": "La password è obbligatoria",
@@ -2162,9 +2173,9 @@
       "END": "Fine"
     },
     "SUNBURST_LABEL_ROTATE": {
+      "0": "Orizzontale (0°)",
       "RADIAL": "Radial",
-      "TANGENTIAL": "Tangenziale",
-      "0": "Orizzontale (0°)"
+      "TANGENTIAL": "Tangenziale"
     },
     "COLOR_MAPPING_BY": {
       "VALUE": "Valore",

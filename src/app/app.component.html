@@ -1,5 +1,14 @@
 <router-outlet></router-outlet>
 
+<!--
+  Bottom-right "Powered by …" overlay. Mounted once at the root so it
+  paints on every authenticated screen automatically; renders nothing
+  when the theme signal is null (auth screens, system admin) or when
+  the org has the watermark turned off in their theme settings.
+  position: fixed + pointer-events: none means it never blocks UI.
+-->
+<app-branding-watermark></app-branding-watermark>
+
 <div class="spinner-container" *ngIf="loading()">
   <div class="spinner"></div>
 </div>

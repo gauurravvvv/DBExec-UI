@@ -1345,7 +1345,8 @@
     "FORGOT_PASSWORD": "Mot de passe oublié",
     "RESET_PASSWORD": "Réinitialiser le mot de passe",
     "SET_PASSWORD": "Définir le mot de passe",
-    "NOT_FOUND": "Page introuvable"
+    "NOT_FOUND": "Page introuvable",
+    "RELAY": "Connexion"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Améliorez votre expérience\nde gestion de sources de données",
@@ -1409,7 +1410,17 @@
     "GO_TO_LOGIN": "Aller à la connexion",
     "SOMETHING_WENT_WRONG": "Une erreur est survenue",
     "ENTER_8_CHAR_CODE": "Veuillez saisir le code à 8 caractères de votre terminal.",
-    "SELECT_LANGUAGE": "Sélectionner la langue"
+    "SELECT_LANGUAGE": "Sélectionner la langue",
+    "RELAY": {
+      "WELCOME_BACK": "Bon retour, {{firstName}}",
+      "WELCOME": "Bienvenue, {{firstName}}",
+      "SETTING_UP": "Préparation de votre espace de travail…",
+      "STILL_WORKING": "Encore un instant…",
+      "READY": "Vous y êtes.",
+      "RETRY": "Réessayer",
+      "BACK_TO_LOGIN": "Retour à la connexion",
+      "ERROR_GENERIC": "Impossible de préparer votre session."
+    }
   },
   "PASSWORD": {
     "REQUIRED": "Le mot de passe est requis",
@@ -2162,9 +2173,9 @@
       "END": "Fin"
     },
     "SUNBURST_LABEL_ROTATE": {
+      "0": "Horizontal (0°)",
       "RADIAL": "Radial",
-      "TANGENTIAL": "Tangentiel",
-      "0": "Horizontal (0°)"
+      "TANGENTIAL": "Tangentiel"
     },
     "COLOR_MAPPING_BY": {
       "VALUE": "Valeur",

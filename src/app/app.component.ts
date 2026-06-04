@@ -19,6 +19,7 @@ import { LocaleService } from './core/services/locale.service';
 import { LoginService } from './core/services/login.service';
 import { SessionExpiredService } from './core/services/session-expired.service';
 import { StorageService } from './core/services/storage.service';
+import { BrandingService } from './core/services/branding.service';
 import { ThemeService } from './core/services/theme.service';
 
 @Component({
@@ -47,6 +48,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private translate: TranslateService,
     private localeService: LocaleService,
     private themeService: ThemeService,
+    private brandingService: BrandingService,
   ) {
     const savedTheme = StorageService.get(StorageType.THEME);
     if (!savedTheme) {
@@ -230,9 +232,11 @@ export class AppComponent implements OnInit, OnDestroy {
     // the user's persisted preference even if the URL doesn't carry
     // the param anymore.
     this.localeService.clearTempLocale();
-    // Clear injected theme so the login page (and the next user) get
-    // the default palette until their own theme loads.
+    // Clear injected theme and watermark so the login page (and the
+    // next user) get the default palette until their own theme +
+    // branding load.
     this.themeService.clear();
+    this.brandingService.clear();
     this.router.navigate(['/login']);
   }
 }

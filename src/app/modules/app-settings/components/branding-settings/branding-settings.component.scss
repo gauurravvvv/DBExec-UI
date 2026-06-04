@@ -1,0 +1,139 @@
+// Reuse the .add-admin-wrapper chrome that other settings pages use
+// so Branding visually matches Theme + Announcements.
+
+.admin-form {
+  .form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    width: 50%;
+    margin-bottom: 0;
+    padding-bottom: 24px;
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+}
+
+// Inline preview of the watermark pill — exact chrome used by the
+// real overlay so what the admin sees here is what every user gets.
+.watermark-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+
+  .watermark-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-medium);
+    letter-spacing: var(--ls-wide);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+
+  .preview-label {
+    font-size: var(--fs-label);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wider);
+  }
+}
+
+.theme-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 50%;
+  margin: var(--space-4) var(--space-0) var(--space-0);
+  padding: var(--space-4) var(--space-5);
+  border-left: 3px solid var(--primary-color);
+  background: var(--primary-color-transparent);
+  color: var(--text-muted);
+  font-size: var(--fs-control);
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+
+  i {
+    color: var(--primary-color);
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
+.add-admin-wrapper {
+  height: 100%;
+  .add-admin-container {
+    background: var(--card-background);
+    border-radius: var(--radius-md);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-8);
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      position: sticky;
+      top: 0;
+      background: var(--card-background);
+      z-index: var(--z-base);
+
+      .left-section {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+
+        h2 {
+          margin: 0;
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
+          color: var(--text-color);
+        }
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: var(--space-5);
+        align-items: center;
+
+        .btn-save {
+          background: linear-gradient(
+            135deg,
+            var(--primary-color),
+            var(--primary-hover)
+          ) !important;
+          color: var(--primary-text) !important;
+          border: none !important;
+          padding: 0.65rem 1.25rem;
+          border-radius: var(--radius-sm) !important;
+          font-weight: var(--fw-semibold);
+          box-shadow: 0 4px 10px var(--primary-color-transparent);
+          transition: all var(--motion-base) ease;
+
+          &:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: var(--secondary-color) !important;
+            box-shadow: none;
+          }
+
+          i {
+            font-size: var(--fs-body);
+          }
+        }
+      }
+    }
+  }
+}
