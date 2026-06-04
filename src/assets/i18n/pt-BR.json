@@ -1422,7 +1422,8 @@
       "ERROR_GENERIC": "Não conseguimos preparar sua sessão.",
       "DETAILS_LABEL": "Detalhes",
       "TIMEOUT_DETAIL": "Tempo limite excedido",
-      "MALFORMED_DETAIL": "Dados de sessão inválidos"
+      "MALFORMED_DETAIL": "Dados de sessão inválidos",
+      "ESC_CONFIRM": "Pressione Esc novamente para cancelar"
     }
   },
   "PASSWORD": {

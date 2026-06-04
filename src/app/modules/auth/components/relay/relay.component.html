@@ -103,6 +103,18 @@
         {{ 'AUTH.RELAY.BACK_TO_LOGIN' | translate }}
       </button>
     </div>
+
+    <!-- Esc-confirm hint. Shown for ESC_CONFIRM_WINDOW_MS after the
+         first Esc press while affordances are visible. Press Esc
+         again within the window to actually leave. -->
+    <p
+      class="relay__esc-hint"
+      *ngIf="escArmed()"
+      role="status"
+      aria-live="polite"
+    >
+      {{ 'AUTH.RELAY.ESC_CONFIRM' | translate }}
+    </p>
   </div>
 
   <div class="relay__bottom" aria-hidden="true">

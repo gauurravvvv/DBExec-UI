@@ -57,6 +57,27 @@ export class LoginService implements OnDestroy {
   }
 
   /**
+   * Single chokepoint for applying the "auth artefacts" — theme,
+   * branding, and optionally locale — that arrive with any auth
+   * response (login, refresh-token, /auth/session). Idempotent.
+   *
+   * Centralised here so the four call sites (LoginService.login,
+   * applyBootstrap, bootstrapTokenRefresh, scheduleTokenRefresh,
+   * plus the HTTP interceptor's 440 path) cannot drift apart when
+   * a future signal joins the set. Callers that don't have a locale
+   * to apply can omit it.
+   */
+  public applyAuthArtefacts(
+    theme: any,
+    branding: any,
+    locale?: string,
+  ): void {
+    this.themeService.applyFromLogin(theme);
+    this.brandingService.applyFromLogin(branding);
+    if (locale) this.localeService.applyTempLocale(locale);
+  }
+
+  /**
    * Phase 1 — verify credentials, stash tokens, prep the relay
    * screen. On success the caller routes to /auth/relay; on
    * failure the caller renders the inline error on the login form.
@@ -96,10 +117,10 @@ export class LoginService implements OnDestroy {
 
       // Apply the user's saved locale immediately so the relay's
       // greeting and status copy render in the right language from
-      // the first paint, before phase 2 returns.
-      if (u.locale) {
-        this.localeService.applyTempLocale(u.locale);
-      }
+      // the first paint, before phase 2 returns. Theme + branding
+      // arrive in phase 2 — pass null here so the helper signature
+      // stays uniform.
+      this.applyAuthArtefacts(null, null, u.locale);
     }
     return result;
   }
@@ -217,18 +238,10 @@ export class LoginService implements OnDestroy {
       JSON.stringify(d.announcements ?? []),
     );
 
-    // Apply theme + branding. `null` (system-admin path) clears
-    // any previously injected style and reverts to the SCSS
-    // defaults.
-    this.themeService.applyFromLogin(d.theme);
-    this.brandingService.applyFromLogin(d.branding);
-
-    // Phase-2 ships the user's locale too — reapply (idempotent
-    // if phase 1 already set it; matters when bootstrapSession
-    // is invoked from the refresh path without a prior login).
-    if (user.locale) {
-      this.localeService.applyTempLocale(user.locale);
-    }
+    // Theme + branding + (re)locale, all through the single
+    // chokepoint. `null` theme/branding (system-admin path)
+    // clears any previously injected style.
+    this.applyAuthArtefacts(d.theme, d.branding, user.locale);
 
     // Drop the short-lived relay fields now that the bootstrap is
     // complete.
@@ -350,8 +363,10 @@ export class LoginService implements OnDestroy {
       next: (response: any) => {
         if (response.status && response.data?.accessToken) {
           this.setAccessToken(response.data.accessToken);
-          this.themeService.applyFromLogin(response.data?.theme);
-          this.brandingService.applyFromLogin(response.data?.branding);
+          this.applyAuthArtefacts(
+            response.data?.theme,
+            response.data?.branding,
+          );
           // Re-hydrate the rest of the session in the background.
           // bootstrapSession() is now pure — apply explicitly on
           // success. Errors are swallowed because the user is
@@ -411,12 +426,12 @@ export class LoginService implements OnDestroy {
           next: (response: any) => {
             if (response.status && response.data?.accessToken) {
               this.setAccessToken(response.data.accessToken);
-              // Keep the injected CSS variables and the watermark in
-              // sync with whatever the BE resolved at refresh time
-              // (the org admin may have changed either between sessions).
-              // `null` on either clears.
-              this.themeService.applyFromLogin(response.data?.theme);
-              this.brandingService.applyFromLogin(response.data?.branding);
+              // Keep theme + watermark in sync with whatever the BE
+              // resolved at refresh time. `null` on either clears.
+              this.applyAuthArtefacts(
+                response.data?.theme,
+                response.data?.branding,
+              );
             }
           },
           error: () => {

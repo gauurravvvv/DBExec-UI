@@ -74,10 +74,14 @@ import { StorageService } from 'src/app/core/services/storage.service';
  * check + affordances), bottom footer line. Motion is single-curve;
  * `prefers-reduced-motion` collapses spins/scales to opacity fades.
  */
-const SLOW_THRESHOLD_MS = 6000;
-const HARD_TIMEOUT_MS = 30000;
-const SILENT_RETRY_DELAY_MS = 500;
-const READY_HOLD_MS = 400;
+// Exported so tests can stub them and ops can re-tune without
+// re-bundling sources. Kept at module scope (not on the class) so
+// they're tree-shakable and trivially replaceable.
+export const SLOW_THRESHOLD_MS = 6000;
+export const HARD_TIMEOUT_MS = 30000;
+export const SILENT_RETRY_DELAY_MS = 500;
+export const READY_HOLD_MS = 400;
+export const ESC_CONFIRM_WINDOW_MS = 3000;
 
 // Private-use-area marker for splitting the localised greeting
 // around the firstName placeholder. Using PUA codepoints means we
@@ -176,6 +180,13 @@ export class RelayComponent implements OnInit, OnDestroy {
   // not on every re-render while already in `error`.
   private focusedError = false;
 
+  // Two-stage Esc confirm. Modern apps don't bail out of a sign-in
+  // on a single keypress (Esc is the most common accidental press
+  // on laptops). First Esc reveals the confirm hint; the user has
+  // ESC_CONFIRM_WINDOW_MS to press again to actually leave.
+  readonly escArmed = signal<boolean>(false);
+  private escDisarmTimer: ReturnType<typeof setTimeout> | null = null;
+
   constructor() {
     // Focus the Retry button when we transition into `error`.
     // afterNextRender waits for the *ngIf to insert the button into
@@ -224,18 +235,44 @@ export class RelayComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroyed = true;
     this.clearTimers();
+    this.clearEscTimer();
     this.langSub?.unsubscribe();
   }
 
-  /** Esc → Back to login, but only once affordances are visible.
-   *  Scoped to the component host (not document) — the relay
-   *  covers the whole viewport so this still catches every Esc the
-   *  user could intend for it, without polluting the global keymap
-   *  when the relay isn't mounted. */
-  @HostListener('keydown.escape')
+  /** Esc → Back to login, but only once affordances are visible
+   *  and only after a confirmation window. First press arms the
+   *  hint; second press within ESC_CONFIRM_WINDOW_MS bails. Stops
+   *  accidental session loss from a stray Esc, especially common
+   *  during the `slow` state when the user might be Esc-ing a
+   *  browser autofill prompt or an unrelated overlay.
+   *
+   *  Listens at the document level because the relay's host is a
+   *  non-focusable div — host-scoped listeners would only fire
+   *  when the host itself has focus, which it doesn't by default.
+   *  Angular automatically removes this listener on component
+   *  destroy, so there's no global-keymap leakage. */
+  @HostListener('document:keydown.escape')
   onEscape(): void {
-    if (this.state() === 'slow' || this.state() === 'error') {
+    const s = this.state();
+    if (s !== 'slow' && s !== 'error') return;
+
+    if (this.escArmed()) {
+      // Second press within the window — actually bail.
+      this.clearEscTimer();
       this.backToLogin();
+      return;
+    }
+
+    this.escArmed.set(true);
+    this.escDisarmTimer = setTimeout(() => {
+      if (!this.destroyed) this.escArmed.set(false);
+    }, ESC_CONFIRM_WINDOW_MS);
+  }
+
+  private clearEscTimer(): void {
+    if (this.escDisarmTimer) {
+      clearTimeout(this.escDisarmTimer);
+      this.escDisarmTimer = null;
     }
   }
 
@@ -338,9 +375,30 @@ export class RelayComponent implements OnInit, OnDestroy {
       }
 
       this.clearTimers();
-      this.errorDetails.set(outcome.message || '');
+      this.errorDetails.set(this.sanitiseDetail(outcome.message));
       this.state.set('error');
     });
+  }
+
+  /** Conservative safelist for the Details line. The BE message
+   *  is shown verbatim only when it looks like a clean,
+   *  user-presentable phrase: ≤120 chars, no curly braces, no
+   *  angle brackets, no UUID-looking blobs (which usually leak
+   *  internal ids). Anything else collapses to empty — the
+   *  friendly i18n message above carries the full meaning. */
+  private sanitiseDetail(raw: string | undefined): string {
+    if (!raw) return '';
+    const s = raw.trim();
+    if (s.length === 0 || s.length > 120) return '';
+    if (/[<>{}]/.test(s)) return '';
+    // 8-4-4-4-12 hex with dashes → looks like a UUID; drop the
+    // whole message rather than try to redact, since the surround
+    // is usually unhelpful too ("User <uuid> not found in org
+    // <uuid>").
+    if (/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(s)) {
+      return '';
+    }
+    return s;
   }
 
   /** translate.instant returns the key itself when translations

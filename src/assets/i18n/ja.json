@@ -1422,7 +1422,8 @@
       "ERROR_GENERIC": "セッションを準備できませんでした。",
       "DETAILS_LABEL": "詳細",
       "TIMEOUT_DETAIL": "リクエストがタイムアウトしました",
-      "MALFORMED_DETAIL": "セッションデータが不正です"
+      "MALFORMED_DETAIL": "セッションデータが不正です",
+      "ESC_CONFIRM": "もう一度 Esc を押すとキャンセルします"
     }
   },
   "PASSWORD": {

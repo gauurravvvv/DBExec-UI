@@ -1422,7 +1422,8 @@
       "ERROR_GENERIC": "无法为您准备会话。",
       "DETAILS_LABEL": "详细信息",
       "TIMEOUT_DETAIL": "请求超时",
-      "MALFORMED_DETAIL": "会话数据无效"
+      "MALFORMED_DETAIL": "会话数据无效",
+      "ESC_CONFIRM": "再次按 Esc 取消"
     }
   },
   "PASSWORD": {

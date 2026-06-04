@@ -1422,7 +1422,8 @@
       "ERROR_GENERIC": "Impossible de préparer votre session.",
       "DETAILS_LABEL": "Détails",
       "TIMEOUT_DETAIL": "Délai d'attente dépassé",
-      "MALFORMED_DETAIL": "Données de session invalides"
+      "MALFORMED_DETAIL": "Données de session invalides",
+      "ESC_CONFIRM": "Appuyez à nouveau sur Échap pour annuler"
     }
   },
   "PASSWORD": {

@@ -1422,7 +1422,8 @@
       "ERROR_GENERIC": "No pudimos preparar tu sesión.",
       "DETAILS_LABEL": "Detalles",
       "TIMEOUT_DETAIL": "Tiempo de espera agotado",
-      "MALFORMED_DETAIL": "Datos de sesión no válidos"
+      "MALFORMED_DETAIL": "Datos de sesión no válidos",
+      "ESC_CONFIRM": "Pulse Esc de nuevo para cancelar"
     }
   },
   "PASSWORD": {

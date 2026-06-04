@@ -1422,7 +1422,8 @@
       "ERROR_GENERIC": "We konden je sessie niet voorbereiden.",
       "DETAILS_LABEL": "Details",
       "TIMEOUT_DETAIL": "Time-out van verzoek",
-      "MALFORMED_DETAIL": "Ongeldige sessiegegevens"
+      "MALFORMED_DETAIL": "Ongeldige sessiegegevens",
+      "ESC_CONFIRM": "Druk nogmaals op Esc om te annuleren"
     }
   },
   "PASSWORD": {

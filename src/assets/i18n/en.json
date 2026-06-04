@@ -1464,7 +1464,8 @@
       "ERROR_GENERIC": "We couldn't set up your session.",
       "DETAILS_LABEL": "Details",
       "TIMEOUT_DETAIL": "Request timed out",
-      "MALFORMED_DETAIL": "Malformed session payload"
+      "MALFORMED_DETAIL": "Malformed session payload",
+      "ESC_CONFIRM": "Press Esc again to cancel"
     }
   },
   "PASSWORD": {

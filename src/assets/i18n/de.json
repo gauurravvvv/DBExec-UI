@@ -1422,7 +1422,8 @@
       "ERROR_GENERIC": "Ihre Sitzung konnte nicht eingerichtet werden.",
       "DETAILS_LABEL": "Details",
       "TIMEOUT_DETAIL": "Zeitüberschreitung bei der Anfrage",
-      "MALFORMED_DETAIL": "Ungültige Sitzungsdaten"
+      "MALFORMED_DETAIL": "Ungültige Sitzungsdaten",
+      "ESC_CONFIRM": "Esc erneut drücken zum Abbrechen"
     }
   },
   "PASSWORD": {

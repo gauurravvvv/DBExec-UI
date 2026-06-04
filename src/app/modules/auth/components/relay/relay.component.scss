@@ -18,11 +18,6 @@
   background: var(--surface-page, #fafafa);
   color: var(--text-strong, #1a1a1a);
   font-family: var(--font-ui);
-  background-image: radial-gradient(
-    circle at 50% 45%,
-    rgba(var(--primary-color-rgb, 33, 150, 243), 0.06) 0%,
-    transparent 60%
-  );
 }
 
 .relay {
@@ -34,6 +29,23 @@
   min-height: 100vh;
   padding: 24px;
   box-sizing: border-box;
+
+  // Brand-tinted radial gradient under the centred card. Lives on
+  // a pseudo-element so it can share the card's fade-in timing
+  // (240ms ease-out) rather than appearing fully formed before
+  // the card lands. pointer-events:none so it never intercepts.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      circle at 50% 45%,
+      rgba(var(--primary-color-rgb, 33, 150, 243), 0.06) 0%,
+      transparent 60%
+    );
+    animation: relay-fade 240ms ease-out both;
+  }
 }
 
 // ── Top-left brand anchor ────────────────────────────────────
@@ -119,6 +131,14 @@
 .relay__greeting-name {
   font-weight: var(--fw-semibold, 600);
   color: var(--text-strong);
+  // Keep the name itself unbreakable so it can't split mid-word
+  // on narrow viewports. The greeting prefix/suffix wrap freely
+  // around it. (For ZH/JA where a sentence-final mark immediately
+  // follows the name, this still allows the punctuation to flow
+  // onto the next line — but it can't be orphaned because the
+  // mark is in the suffix text node, which CJK line-breaking
+  // rules naturally keep attached to the preceding character.)
+  white-space: nowrap;
 }
 
 // ── Status copy ──────────────────────────────────────────────
@@ -239,6 +259,18 @@
   &:hover {
     background: var(--primary-hover, var(--primary-color));
   }
+}
+
+// Esc-confirm hint. Sits below the affordance row, muted, fades
+// in on first Esc, fades out when the confirm window expires.
+// The component-level signal handles visibility (*ngIf removes
+// the element entirely), so the fade is purely entry-only.
+.relay__esc-hint {
+  font-size: 12px;
+  color: var(--text-muted, #6b7280);
+  margin: 4px 0 0;
+  opacity: 0.85;
+  animation: relay-fade 160ms ease-out both;
 }
 
 // ── Footer line ──────────────────────────────────────────────
