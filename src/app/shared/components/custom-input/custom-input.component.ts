@@ -85,16 +85,10 @@ export class CustomInputComponent implements ControlValueAccessor {
    * stops further keystrokes once the cap is hit, but a paste of an
    * over-long string lands as a single input event with the full text.
    * We don't truncate silently — we keep the over-long text visible
-   * (so the user can see/fix it) and propagate the raw value to the
-   * parent ngModel so its own `Validators.maxLength` / `minLength`
-   * mark the form control invalid. The inline lengthError below is
-   * just a hint for the user; the source of truth for "is this
-   * form submittable?" is the reactive validator on the parent.
-   *
-   * Dimension constraints (echarts dimension strings) still BLOCK
-   * propagation, because the shape rejection can't be expressed as
-   * a built-in Angular validator the consumer would set — see
-   * `validateDimension` for the carve-out.
+   * (so the user can see/fix it) but BLOCK propagation to the parent
+   * ngModel, the same as `app-custom-number` does for numeric bounds.
+   * As soon as the user trims it back to ≤ maxLength, the suppressed
+   * value flows.
    */
   lengthError = '';
 
@@ -254,26 +248,17 @@ export class CustomInputComponent implements ControlValueAccessor {
     const input = event.target as HTMLInputElement;
     const raw = input.value;
     this.value = raw; // keep the bad text on screen so the user can fix it
-
-    if (this.dimension) {
-      // Dimension constraint can't be expressed as a built-in
-      // Angular validator the consumer can wire, so we BLOCK on
-      // out-of-shape values — same legacy behaviour. Parent keeps
-      // its last in-shape value until the user fixes the input.
-      const err = this.validateDimension(raw);
-      this.lengthError = err;
-      if (!err) this.onChange(raw);
-      this.cdr.markForCheck();
-      return;
+    // Dimension constraint takes precedence — it's a shape+range check,
+    // not a char count. Falls back to length validation when no
+    // dimension is declared.
+    const err = this.dimension
+      ? this.validateDimension(raw)
+      : this.validateLength(raw);
+    this.lengthError = err;
+    if (!err) {
+      // In range — propagate. Out of range — block; parent keeps last good value.
+      this.onChange(raw);
     }
-
-    // Length errors are still surfaced inline as a hint, but we
-    // ALWAYS propagate the raw value so the parent reactive form
-    // (with Validators.maxLength / minLength) can mark its own
-    // control invalid and disable submit buttons. Silently
-    // blocking would defeat the parent's validator.
-    this.lengthError = this.validateLength(raw);
-    this.onChange(raw);
     this.cdr.markForCheck();
   }
 
