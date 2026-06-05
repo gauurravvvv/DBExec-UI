@@ -12,6 +12,19 @@ import { lastValueFrom } from 'rxjs';
 import { NOTIFICATION } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
+/** Known event types. Kept in sync with the BE NOTIFICATION_TYPES
+ *  enum; the union accepts `string` so an unknown type from a newer
+ *  BE renders as a generic fallback row instead of crashing the
+ *  dropdown. */
+export type NotificationType = 'group_added' | 'group_removed' | string;
+
+export interface NotificationMeta {
+  groupId?: string;
+  groupName?: string;
+  actorId?: string;
+  actorName?: string;
+}
+
 /**
  * Wire shape returned by the BE list endpoint. `meta` is the
  * structured event data the FE uses to localise the row at render
@@ -20,10 +33,10 @@ import { HttpClientService } from 'src/app/core/services/http-client.service';
  */
 export interface NotificationRow {
   id: string;
-  type: 'group_added' | 'group_removed' | string;
+  type: NotificationType;
   title: string;
   body: string | null;
-  meta: { groupId?: string; groupName?: string; actorId?: string } | null;
+  meta: NotificationMeta | null;
   readAt: string | null;
   createdOn: string;
 }
@@ -50,13 +63,11 @@ export class NotificationService implements OnDestroy {
 
   private readonly _unreadCount = signal(0);
   private readonly _items = signal<NotificationRow[]>([]);
-  private readonly _loading = signal(false);
 
   readonly unreadCount = this._unreadCount.asReadonly();
   readonly items = this._items.asReadonly();
-  readonly loading = this._loading.asReadonly();
 
-  /** Convenience for the badge — "9+" once we exceed two digits. */
+  /** Convenience for the badge — "99+" once we exceed two digits. */
   readonly badgeLabel = computed(() => {
     const n = this._unreadCount();
     if (n <= 0) return '';
@@ -67,6 +78,13 @@ export class NotificationService implements OnDestroy {
   private pollTimer: ReturnType<typeof setInterval> | null = null;
   private started = false;
   private readonly onVisibilityChange = () => this.handleVisibilityChange();
+
+  // Race guard. The bell-click path optimistically zeroes the badge
+  // and fires read-all, but a 60s poll started seconds earlier may
+  // still be in flight with a stale count. We stamp the time of the
+  // most recent local write (markAllRead or openBell) and any poll
+  // response older than that is discarded — its data is known stale.
+  private lastLocalMutationAt = 0;
 
   constructor(@Inject(DOCUMENT) private readonly doc: Document) {
     this.destroyRef.onDestroy(() => this.stop());
@@ -103,15 +121,16 @@ export class NotificationService implements OnDestroy {
    *  badge update so the user sees the dot disappear immediately. */
   async openBell(): Promise<void> {
     // Optimistic: clear the badge before the network round-trip.
-    // If read-all fails the next poll re-syncs.
+    // Stamp the local-mutation clock so any in-flight poll started
+    // before this click can't stomp the zero back to a stale value.
+    this.lastLocalMutationAt = Date.now();
     this._unreadCount.set(0);
     await Promise.all([this.refreshList(), this.markAllRead()]);
   }
 
-  /** Fetch the list (no read-all). Used by the dropdown when the
-   *  user pulls to refresh, if ever wired. */
+  /** Fetch the list (no read-all). Used on bell-open and as a
+   *  re-sync after a failed markAllRead. */
   async refreshList(): Promise<void> {
-    this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
         this.http.apiGet(NOTIFICATION.LIST, { skipLoader: true }),
@@ -121,17 +140,21 @@ export class NotificationService implements OnDestroy {
       }
     } catch {
       // Swallow — the bell can show a stale list rather than crash.
-    } finally {
-      this._loading.set(false);
     }
   }
 
   /** Single-shot unread count check. Cheap; safe to fire-and-forget. */
   async refreshUnreadCount(): Promise<void> {
+    // Snapshot the local-mutation clock at request start. If a more
+    // recent local mutation lands while we wait, the response is
+    // stale and must be discarded — otherwise a poll that left the
+    // wire before openBell() can re-paint the badge with non-zero.
+    const startedAt = Date.now();
     try {
       const res: any = await lastValueFrom(
         this.http.apiGet(NOTIFICATION.UNREAD_COUNT, { skipLoader: true }),
       );
+      if (this.lastLocalMutationAt > startedAt) return;
       if (res?.status && typeof res.data?.count === 'number') {
         this._unreadCount.set(res.data.count);
       }
@@ -143,8 +166,14 @@ export class NotificationService implements OnDestroy {
 
   /** POST /read-all. The dropdown's row-styling reads `readAt`,
    *  so once this returns we also update the in-memory list so
-   *  rows lose their unread dot without another GET. */
+   *  rows lose their unread dot without another GET.
+   *
+   *  Optimistic policy: caller (openBell) has already set the badge
+   *  to 0. On SUCCESS we update in-memory readAt timestamps. On
+   *  FAILURE we re-sync from the server so the badge and rows match
+   *  whatever the BE actually thinks is unread. */
   async markAllRead(): Promise<void> {
+    this.lastLocalMutationAt = Date.now();
     try {
       const res: any = await lastValueFrom(
         this.http.apiPost(NOTIFICATION.READ_ALL, {}, { skipLoader: true }),
@@ -155,9 +184,14 @@ export class NotificationService implements OnDestroy {
           rows.map(r => (r.readAt ? r : { ...r, readAt: now })),
         );
         this._unreadCount.set(0);
+        return;
       }
+      // BE returned status:false — re-sync from server truth.
+      await this.refreshUnreadCount();
     } catch {
-      // Swallow — badge stays optimistically 0; next poll re-syncs.
+      // Network failed — re-sync. If that ALSO fails, the next 60s
+      // poll will eventually catch up.
+      await this.refreshUnreadCount();
     }
   }
 

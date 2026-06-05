@@ -81,8 +81,9 @@
       <!-- Notifications — badge reads from NotificationService.
            Click opens the dropdown AND triggers a read-all in the
            service (UX requirement: any unread are cleared on bell
-           click). -->
+           click). Hidden for SYSTEM-ADMIN (no per-org binding). -->
       <button
+        *ngIf="showNotificationBell"
         class="icon-btn notification-btn"
         (click)="toggleNotificationMenu($event)"
         [attr.aria-label]="'HEADER.NOTIFICATIONS' | translate"
@@ -213,8 +214,9 @@
   </div>
 </div>
 
-<!-- Notification Menu -->
+<!-- Notification Menu — only ever opens for non-SYSTEM-ADMIN. -->
 <div
+  *ngIf="showNotificationBell"
   class="notification-menu"
   [class.show]="showNotificationMenu"
   #notificationMenu

@@ -100,13 +100,12 @@ export class HeaderComponent implements OnInit {
     this.localeService.initFromToken();
     this.currentLocale = this.localeService.currentLocale;
 
-    // Start the notification poller. The service handles
-    // visibility-aware throttling internally and is a no-op on
-    // re-entry (idempotent), so calling here is safe even if the
-    // header re-mounts.
-    this.notificationService.start();
-
     if (this.userRole !== ROLES.SYSTEM_ADMIN) {
+      // Notifications are per-org; SYSTEM-ADMIN has no org context
+      // so the BE would 401 on every poll. Skip the poller entirely.
+      // Service is idempotent so re-mount is safe.
+      this.notificationService.start();
+
       // Announcements are now delivered in the login response and
       // stashed in storage. No polling, no route-change refetch —
       // dismissals update storage in-place and admin-side mutations
@@ -256,6 +255,13 @@ export class HeaderComponent implements OnInit {
    *  in the template to flip between the list and the empty state. */
   get hasNotifications(): boolean {
     return this.notificationService.items().length > 0;
+  }
+
+  /** Notifications are a per-org concept; the platform System
+   *  Admin has no org binding so the bell is hidden entirely for
+   *  them. Mirrors the start() gate in ngOnInit. */
+  get showNotificationBell(): boolean {
+    return this.userRole !== ROLES.SYSTEM_ADMIN;
   }
 
   /** Bell click: open (or close) the dropdown. On open we fetch
