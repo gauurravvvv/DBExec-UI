@@ -2612,5 +2612,11 @@
     "HEX_INVALID": "Debe ser un hex válido (#rgb o #rrggbb)",
     "PREVIEW": "Vista previa",
     "RE_LOGIN_HINT": "Los cambios se aplicarán a otros usuarios en su próximo inicio de sesión."
+  },
+  "NOTIFICATION": {
+    "GROUP_ADDED_TITLE": "Asignado a un grupo",
+    "GROUP_ADDED_BODY": "Has sido asignado a {{groupName}}.",
+    "GROUP_REMOVED_TITLE": "Eliminado de un grupo",
+    "GROUP_REMOVED_BODY": "Has sido eliminado de {{groupName}}."
   }
 }

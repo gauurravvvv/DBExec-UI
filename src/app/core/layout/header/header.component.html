@@ -78,15 +78,19 @@
         </ng-template>
       </app-custom-dropdown>
 
-      <!-- Notifications -->
+      <!-- Notifications — badge reads from NotificationService.
+           Click opens the dropdown AND triggers a read-all in the
+           service (UX requirement: any unread are cleared on bell
+           click). -->
       <button
         class="icon-btn notification-btn"
         (click)="toggleNotificationMenu($event)"
+        [attr.aria-label]="'HEADER.NOTIFICATIONS' | translate"
       >
         <i class="pi pi-bell"></i>
-        <span class="badge" *ngIf="unreadNotifications > 0">{{
-          unreadNotifications
-        }}</span>
+        <span class="badge" *ngIf="notificationService.unreadCount() > 0">
+          {{ notificationService.badgeLabel() }}
+        </span>
       </button>
 
       <!-- Divider -->
@@ -227,22 +231,45 @@
     </button>
   </div>
   <div class="notification-list" *ngIf="hasNotifications; else noNotifications">
+    <!-- Each row is read-only (UX requirement: no per-row click
+         navigation). Unread vs read styling comes from the
+         readAt timestamp returned by the BE; the bell-open
+         already flipped them all to read so this is mostly a
+         tail for the "new arrival while panel was open" case. -->
     <div
       class="notification-item"
-      *ngFor="let notification of notifications; trackBy: trackById"
-      [class.unread]="!notification.read"
-      (click)="markAsRead(notification, $event)"
+      *ngFor="let n of notificationService.items(); trackBy: trackById"
+      [class.unread]="!n.readAt"
     >
       <div class="notification-icon">
-        <i class="pi" [ngClass]="notification.icon"></i>
+        <i
+          class="pi"
+          [ngClass]="
+            n.type === 'group_removed' ? 'pi-user-minus' : 'pi-user-plus'
+          "
+        ></i>
       </div>
       <div class="notification-content">
-        <p class="message">{{ notification.message }}</p>
-        <span class="time">{{ notification.time | date: 'shortTime' }}</span>
+        <p class="message-title">
+          {{
+            (n.type === 'group_removed'
+              ? 'NOTIFICATION.GROUP_REMOVED_TITLE'
+              : 'NOTIFICATION.GROUP_ADDED_TITLE') | translate
+          }}
+        </p>
+        <p class="message">
+          {{
+            (n.type === 'group_removed'
+              ? 'NOTIFICATION.GROUP_REMOVED_BODY'
+              : 'NOTIFICATION.GROUP_ADDED_BODY')
+              | translate: { groupName: n.meta?.groupName || '' }
+          }}
+        </p>
+        <span
+          class="time"
+          [title]="n.createdOn | date: 'medium'"
+        >{{ n.createdOn | relativeTime }}</span>
       </div>
-      <button class="close-btn" (click)="removeNotification(notification.id)">
-        <i class="pi pi-times"></i>
-      </button>
     </div>
   </div>
   <ng-template #noNotifications>

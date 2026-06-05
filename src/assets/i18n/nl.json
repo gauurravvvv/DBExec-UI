@@ -2612,5 +2612,11 @@
     "HEX_INVALID": "Moet een geldige hex zijn (#rgb of #rrggbb)",
     "PREVIEW": "Voorbeeld",
     "RE_LOGIN_HINT": "Wijzigingen worden bij andere gebruikers van kracht bij hun volgende aanmelding."
+  },
+  "NOTIFICATION": {
+    "GROUP_ADDED_TITLE": "Toegewezen aan een groep",
+    "GROUP_ADDED_BODY": "Je bent toegewezen aan {{groupName}}.",
+    "GROUP_REMOVED_TITLE": "Verwijderd uit een groep",
+    "GROUP_REMOVED_BODY": "Je bent verwijderd uit {{groupName}}."
   }
 }

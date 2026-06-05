@@ -21,6 +21,7 @@ import {
   SUPPORTED_LOCALES,
 } from 'src/app/core/services/locale.service';
 import { LoginService } from 'src/app/core/services/login.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 import { StorageService } from 'src/app/core/services/storage.service';
 import { ThemeService } from 'src/app/core/services/theme.service';
 import { AddAnalysesActions } from 'src/app/modules/analyses/store';
@@ -68,53 +69,6 @@ export class HeaderComponent implements OnInit {
   private readonly ROTATE_INTERVAL_MS = 8000;
 
   showNotificationMenu = false;
-  unreadNotifications = 2;
-  notifications = [
-    {
-      id: '1',
-      message: 'New environment "Production" has been created',
-      time: new Date(),
-      read: false,
-      icon: 'pi-globe',
-    },
-    {
-      id: '2',
-      message: 'Datasource "Main DB" is now connected',
-      time: new Date(Date.now() - 3600000),
-      read: true,
-      icon: 'pi-database',
-    },
-    {
-      id: '3',
-      message:
-        'User "John Doe" has been added to the Development team with admin privileges',
-      time: new Date(Date.now() - 7200000),
-      read: false,
-      icon: 'pi-user-plus',
-    },
-    {
-      id: '4',
-      message: 'Backup completed successfully for "Analytics DB"',
-      time: new Date(Date.now() - 86400000),
-      read: true,
-      icon: 'pi-check-circle',
-    },
-    {
-      id: '5',
-      message: 'Security update: 2 new access policies have been implemented',
-      time: new Date(Date.now() - 172800000),
-      read: true,
-      icon: 'pi-shield',
-    },
-    {
-      id: '6',
-      message:
-        'System maintenance scheduled for tomorrow at 02:00 AM UTCSystem maintenance scheduled for tomorrow at 02:00 AM UTCSystem maintenance scheduled for tomorrow at 02:00 AM UTC',
-      time: new Date(Date.now() - 259200000),
-      read: false,
-      icon: 'pi-clock',
-    },
-  ];
 
   constructor(
     private router: Router,
@@ -126,6 +80,7 @@ export class HeaderComponent implements OnInit {
     private announcementService: AnnouncementService,
     private localeService: LocaleService,
     private themeService: ThemeService,
+    public notificationService: NotificationService,
   ) {
     this.destroyRef.onDestroy(() => {
       if (this.typewriterTimer) clearTimeout(this.typewriterTimer);
@@ -145,7 +100,11 @@ export class HeaderComponent implements OnInit {
     this.localeService.initFromToken();
     this.currentLocale = this.localeService.currentLocale;
 
-    this.updateUnreadCount();
+    // Start the notification poller. The service handles
+    // visibility-aware throttling internally and is a no-op on
+    // re-entry (idempotent), so calling here is safe even if the
+    // header re-mounts.
+    this.notificationService.start();
 
     if (this.userRole !== ROLES.SYSTEM_ADMIN) {
       // Announcements are now delivered in the login response and
@@ -293,36 +252,32 @@ export class HeaderComponent implements OnInit {
     this.router.navigate(['/app/profile']);
   }
 
+  /** True when the dropdown has at least one row to render. Bound
+   *  in the template to flip between the list and the empty state. */
   get hasNotifications(): boolean {
-    return this.notifications.length > 0;
+    return this.notificationService.items().length > 0;
   }
 
+  /** Bell click: open (or close) the dropdown. On open we fetch
+   *  the last-30-days feed AND mark every unread row read in a
+   *  single round-trip via the service. The unread badge clears
+   *  optimistically so the user sees the dot disappear instantly. */
   toggleNotificationMenu(event: Event) {
     event.stopPropagation();
-    this.showNotificationMenu = !this.showNotificationMenu;
-  }
-
-  markAllAsRead() {
-    this.notifications.forEach(notification => {
-      notification.read = true;
-    });
-    this.unreadNotifications = 0;
-  }
-
-  removeNotification(id: string) {
-    // call delete notification API
-  }
-
-  private updateUnreadCount() {
-    this.unreadNotifications = this.notifications.filter(n => !n.read).length;
-  }
-
-  markAsRead(notification: any, event: Event) {
-    event.stopPropagation();
-    if (!notification.read) {
-      notification.read = true;
-      this.updateUnreadCount();
+    const wasOpen = this.showNotificationMenu;
+    this.showNotificationMenu = !wasOpen;
+    if (!wasOpen) {
+      // fire-and-forget — service handles its own errors.
+      this.notificationService.openBell();
     }
+  }
+
+  /** Optional "Mark all read" link in the dropdown header. After
+   *  the bell-open auto-read this is mostly cosmetic, but it's
+   *  useful when the user opens the dropdown without unread rows
+   *  and a new one arrives via the next 60s poll while it's open. */
+  markAllAsRead() {
+    this.notificationService.markAllRead();
   }
 
   toggleFullscreen() {

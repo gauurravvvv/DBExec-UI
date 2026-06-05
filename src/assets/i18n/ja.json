@@ -2612,5 +2612,11 @@
     "HEX_INVALID": "有効な16進数 (#rgb または #rrggbb) を入力してください",
     "PREVIEW": "プレビュー",
     "RE_LOGIN_HINT": "変更は他のユーザーの次回サインイン時に適用されます。"
+  },
+  "NOTIFICATION": {
+    "GROUP_ADDED_TITLE": "グループに割り当てられました",
+    "GROUP_ADDED_BODY": "{{groupName}} に割り当てられました。",
+    "GROUP_REMOVED_TITLE": "グループから削除されました",
+    "GROUP_REMOVED_BODY": "{{groupName}} から削除されました。"
   }
 }

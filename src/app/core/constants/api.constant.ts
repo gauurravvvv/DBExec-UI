@@ -329,3 +329,12 @@ export const RLS_RULE = {
   // GET /rls-rules/datasets/:datasetId
   LIST_FOR_DATASET_PREFIX: '/rls-rules/datasets/',
 };
+
+export const NOTIFICATION = {
+  // GET — last 30 days for the logged-in user
+  LIST: '/notifications',
+  // GET — { count } for the bell badge
+  UNREAD_COUNT: '/notifications/unread-count',
+  // POST — mark every unread row read for the logged-in user
+  READ_ALL: '/notifications/read-all',
+};

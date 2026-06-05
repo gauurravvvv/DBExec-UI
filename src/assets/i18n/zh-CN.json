@@ -2612,5 +2612,11 @@
     "HEX_INVALID": "必须是有效的十六进制颜色（#rgb 或 #rrggbb）",
     "PREVIEW": "预览",
     "RE_LOGIN_HINT": "其他用户下次登录时更改将生效。"
+  },
+  "NOTIFICATION": {
+    "GROUP_ADDED_TITLE": "已被分配到组",
+    "GROUP_ADDED_BODY": "您已被分配到 {{groupName}}。",
+    "GROUP_REMOVED_TITLE": "已从组中移除",
+    "GROUP_REMOVED_BODY": "您已从 {{groupName}} 中被移除。"
   }
 }
