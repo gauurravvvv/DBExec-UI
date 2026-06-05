@@ -32,6 +32,8 @@ export const SIDEBAR_ITEMS_ROUTES = [
   { value: 'announcementManagement', route: '/app/settings/announcements' },
   { value: 'themeManagement', route: '/app/settings/theme' },
   { value: 'brandingManagement', route: '/app/settings/branding' },
+  { value: 'securityPolicy', route: '/app/settings/security-policy' },
+  { value: 'emailConfiguration', route: '/app/settings/email-configuration' },
 ];
 
 export const HOME_ROUTES = {

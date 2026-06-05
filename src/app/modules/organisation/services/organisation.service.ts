@@ -115,23 +115,13 @@ export class OrganisationService {
         dbUsername,
         dbPassword,
         adminEmail,
-        maxLoginAttempts,
-        accountLockDurationHours,
-        passwordHistoryLimit,
-        sessionInactivityTimeout,
-        emailProvider,
-        smtpHost,
-        smtpPort,
-        smtpUser,
-        smtpPassword,
-        smtpFrom,
-        sesRegion,
-        sesAccessKeyId,
-        sesSecretAccessKey,
-        sesFrom,
         adminLocale,
       } = orgForm.value;
 
+      // Security + email config are owned by the per-org OrgPolicy
+      // entity and configured by the Org Admin under App Settings —
+      // the System Admin's "Add Organisation" form no longer collects
+      // them.
       const payload: any = {
         name,
         description,
@@ -142,25 +132,7 @@ export class OrganisationService {
         dbPassword,
         adminEmail,
         adminLocale,
-        maxLoginAttempts,
-        accountLockDurationHours,
-        passwordHistoryLimit,
-        sessionInactivityTimeout,
-        emailProvider,
       };
-
-      if (emailProvider === 'SMTP') {
-        payload.smtpHost = smtpHost;
-        payload.smtpPort = smtpPort;
-        payload.smtpUser = smtpUser;
-        if (smtpPassword) payload.smtpPassword = smtpPassword;
-        payload.smtpFrom = smtpFrom;
-      } else if (emailProvider === 'SES') {
-        payload.sesRegion = sesRegion;
-        payload.sesAccessKeyId = sesAccessKeyId;
-        if (sesSecretAccessKey) payload.sesSecretAccessKey = sesSecretAccessKey;
-        payload.sesFrom = sesFrom;
-      }
 
       // Mutations opt out of the global loader — the Save button shows
       // its own spinner via `saving()`, leaving the rest of the form
@@ -185,20 +157,6 @@ export class OrganisationService {
         dbName,
         dbUsername,
         dbPassword,
-        maxLoginAttempts,
-        accountLockDurationHours,
-        passwordHistoryLimit,
-        sessionInactivityTimeout,
-        emailProvider,
-        smtpHost,
-        smtpPort,
-        smtpUser,
-        smtpPassword,
-        smtpFrom,
-        sesRegion,
-        sesAccessKeyId,
-        sesSecretAccessKey,
-        sesFrom,
       } = orgForm.getRawValue();
 
       const payload: any = {
@@ -215,27 +173,6 @@ export class OrganisationService {
       if (dbName) payload.dbName = dbName;
       if (dbUsername) payload.dbUsername = dbUsername;
       if (dbPassword) payload.dbPassword = dbPassword;
-
-      // Security config
-      payload.maxLoginAttempts = maxLoginAttempts;
-      payload.accountLockDurationHours = accountLockDurationHours;
-      payload.passwordHistoryLimit = passwordHistoryLimit;
-      payload.sessionInactivityTimeout = sessionInactivityTimeout;
-
-      // Email config
-      payload.emailProvider = emailProvider;
-      if (emailProvider === 'SMTP') {
-        payload.smtpHost = smtpHost;
-        payload.smtpPort = smtpPort;
-        payload.smtpUser = smtpUser;
-        if (smtpPassword) payload.smtpPassword = smtpPassword;
-        payload.smtpFrom = smtpFrom;
-      } else if (emailProvider === 'SES') {
-        payload.sesRegion = sesRegion;
-        payload.sesAccessKeyId = sesAccessKeyId;
-        if (sesSecretAccessKey) payload.sesSecretAccessKey = sesSecretAccessKey;
-        payload.sesFrom = sesFrom;
-      }
 
       return await lastValueFrom(
         this.http.apiPut(ORGANISATION.UPDATE + payload.id, payload, {
@@ -304,24 +241,13 @@ export class OrganisationService {
       dbUsername,
       dbPassword,
       adminEmail,
-      maxLoginAttempts,
-      accountLockDurationHours,
-      passwordHistoryLimit,
-      sessionInactivityTimeout,
-      emailProvider,
-      smtpHost,
-      smtpPort,
-      smtpUser,
-      smtpPassword,
-      smtpFrom,
-      sesRegion,
-      sesAccessKeyId,
-      sesSecretAccessKey,
-      sesFrom,
+      adminLocale,
     } = orgForm.value;
 
     // Encryption: per-org key generated server-side; the FE doesn't
-    // send anything related to algorithm or pepper.
+    // send anything related to algorithm or pepper. Security + email
+    // policy are owned by per-org OrgPolicy (managed by Org Admin)
+    // and are not sent from the System Admin's create-org form.
     const payload: any = {
       name,
       description,
@@ -331,25 +257,8 @@ export class OrganisationService {
       dbUsername,
       dbPassword,
       adminEmail,
-      maxLoginAttempts,
-      accountLockDurationHours,
-      passwordHistoryLimit,
-      sessionInactivityTimeout,
-      emailProvider,
+      adminLocale,
     };
-
-    if (emailProvider === 'SMTP') {
-      payload.smtpHost = smtpHost;
-      payload.smtpPort = smtpPort;
-      payload.smtpUser = smtpUser;
-      if (smtpPassword) payload.smtpPassword = smtpPassword;
-      payload.smtpFrom = smtpFrom;
-    } else if (emailProvider === 'SES') {
-      payload.sesRegion = sesRegion;
-      payload.sesAccessKeyId = sesAccessKeyId;
-      if (sesSecretAccessKey) payload.sesSecretAccessKey = sesSecretAccessKey;
-      payload.sesFrom = sesFrom;
-    }
 
     return lastValueFrom(
       this.http.apiPost(ORGANISATION.ADD, payload, { skipLoader: true }),
@@ -366,20 +275,6 @@ export class OrganisationService {
       dbName,
       dbUsername,
       dbPassword,
-      maxLoginAttempts,
-      accountLockDurationHours,
-      passwordHistoryLimit,
-      sessionInactivityTimeout,
-      emailProvider,
-      smtpHost,
-      smtpPort,
-      smtpUser,
-      smtpPassword,
-      smtpFrom,
-      sesRegion,
-      sesAccessKeyId,
-      sesSecretAccessKey,
-      sesFrom,
     } = orgForm.getRawValue();
 
     const payload: any = {
@@ -396,27 +291,6 @@ export class OrganisationService {
     if (dbName) payload.dbName = dbName;
     if (dbUsername) payload.dbUsername = dbUsername;
     if (dbPassword) payload.dbPassword = dbPassword;
-
-    // Security config
-    payload.maxLoginAttempts = maxLoginAttempts;
-    payload.accountLockDurationHours = accountLockDurationHours;
-    payload.passwordHistoryLimit = passwordHistoryLimit;
-    payload.sessionInactivityTimeout = sessionInactivityTimeout;
-
-    // Email config
-    payload.emailProvider = emailProvider;
-    if (emailProvider === 'SMTP') {
-      payload.smtpHost = smtpHost;
-      payload.smtpPort = smtpPort;
-      payload.smtpUser = smtpUser;
-      if (smtpPassword) payload.smtpPassword = smtpPassword;
-      payload.smtpFrom = smtpFrom;
-    } else if (emailProvider === 'SES') {
-      payload.sesRegion = sesRegion;
-      payload.sesAccessKeyId = sesAccessKeyId;
-      if (sesSecretAccessKey) payload.sesSecretAccessKey = sesSecretAccessKey;
-      payload.sesFrom = sesFrom;
-    }
 
     return lastValueFrom(
       this.http.apiPut(ORGANISATION.UPDATE + payload.id, payload, {

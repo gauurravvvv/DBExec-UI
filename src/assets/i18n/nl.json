@@ -35,7 +35,9 @@
     "dbRole": "DB-rol",
     "dbTable": "DB-tabel",
     "qExecutor": "Q Executor",
-    "brandingManagement": "Branding"
+    "brandingManagement": "Branding",
+    "securityPolicy": "Beveiligingsbeleid",
+    "emailConfiguration": "E-mailconfiguratie"
   },
   "COMMON": {
     "ACTIVE": "Actief",
@@ -459,7 +461,10 @@
     "ENCRYPTION_AUTO_ACK_DESC": "Ik begrijp dat DBExec encryptiesleutels namens mij genereert en beheert voor deze organisatie. De masterkey staat op de applicatieserver, gescheiden van de database.",
     "ENCRYPTION_AUTO_ACK_ERROR": "Bevestig de encryptieconfiguratie voordat u doorgaat.",
     "ENCRYPTION_AUTO_REVIEW_NOTE": "Er wordt een nieuwe AES-256-GCM-sleutel gegenereerd voor deze organisatie. De masterkey van het platform omhult deze.",
-    "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (per organisatie automatisch gegenereerde sleutel)"
+    "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (per organisatie automatisch gegenereerde sleutel)",
+    "SECURITY_EMAIL_MOVED_NOTE": "Beveiligings- en e-mailconfiguratie worden beheerd door de organisatiebeheerder onder App-instellingen.",
+    "SECURITY_AND_EMAIL": "Beveiliging & e-mail",
+    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "Beveiligings- en e-mailconfiguratie worden beheerd door de organisatiebeheerder onder App-instellingen."
   },
   "ROLE": {
     "TITLE": "Rollen",
@@ -2618,5 +2623,42 @@
     "GROUP_ADDED_BODY": "Je bent toegewezen aan {{groupName}}.",
     "GROUP_REMOVED_TITLE": "Verwijderd uit een groep",
     "GROUP_REMOVED_BODY": "Je bent verwijderd uit {{groupName}}."
+  },
+  "MENU": {
+    "SECURITY_POLICY": "Beveiligingsbeleid",
+    "EMAIL_CONFIG": "E-mailconfiguratie"
+  },
+  "APP_SETTINGS": {
+    "SECURITY_POLICY": {
+      "TITLE": "Beveiligingsbeleid",
+      "SUBTITLE": "Aanmeldpogingen, vergrendelingen, wachtwoordgeschiedenis en sessietime-outs.",
+      "MAX_LOGIN_ATTEMPTS": "Maximaal aantal inlogpogingen",
+      "ACCOUNT_LOCK_DURATION": "Accountvergrendelingsduur (uren)",
+      "PASSWORD_HISTORY_LIMIT": "Limiet wachtwoordgeschiedenis",
+      "SESSION_INACTIVITY_TIMEOUT": "Time-out sessie-inactiviteit (minuten)",
+      "SAVE": "Wijzigingen opslaan",
+      "SAVED": "Beveiligingsbeleid bijgewerkt"
+    },
+    "EMAIL_CONFIG": {
+      "TITLE": "E-mailconfiguratie",
+      "SUBTITLE": "Uitgaande e-mailprovider voor uitnodigingen en wachtwoordherstel.",
+      "PROVIDER": "E-mailprovider",
+      "PROVIDER_NONE": "Geen",
+      "PROVIDER_SMTP": "SMTP",
+      "PROVIDER_SES": "AWS SES",
+      "SMTP_HOST": "SMTP-host",
+      "SMTP_PORT": "SMTP-poort",
+      "SMTP_USER": "SMTP-gebruikersnaam",
+      "SMTP_PASSWORD": "SMTP-wachtwoord",
+      "SMTP_FROM": "Afzenderadres",
+      "SES_REGION": "AWS-regio",
+      "SES_ACCESS_KEY": "Toegangssleutel-ID",
+      "SES_SECRET_KEY": "Geheime toegangssleutel",
+      "SES_FROM": "Afzenderadres",
+      "CONFIGURED": "Geconfigureerd",
+      "LEAVE_BLANK": "Laat leeg om de huidige waarde te behouden",
+      "SAVE": "Wijzigingen opslaan",
+      "SAVED": "E-mailconfiguratie bijgewerkt"
+    }
   }
 }

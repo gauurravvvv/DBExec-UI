@@ -1,0 +1,212 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <div class="page-header">
+      <div class="left-section">
+        <h2>{{ 'APP_SETTINGS.EMAIL_CONFIG.TITLE' | translate }}</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          [label]="'APP_SETTINGS.EMAIL_CONFIG.SAVE' | translate"
+          [disabled]="emailForm.invalid || !isFormDirty || saving()"
+          (click)="onSave()"
+        >
+          <i
+            class="pi mr-2"
+            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
+          ></i>
+        </button>
+      </div>
+    </div>
+
+    <p class="page-subtitle">
+      {{ 'APP_SETTINGS.EMAIL_CONFIG.SUBTITLE' | translate }}
+    </p>
+
+    <app-content-loader
+      *ngIf="loading() && emailForm.pristine"
+    ></app-content-loader>
+
+    <form [formGroup]="emailForm" class="admin-form mt-4">
+      <div class="form-group-section">
+        <div class="group-header">
+          <i class="pi pi-envelope"></i>
+          <span>{{ 'APP_SETTINGS.EMAIL_CONFIG.PROVIDER' | translate }}</span>
+        </div>
+
+        <div class="email-provider-toggle">
+          <button
+            type="button"
+            class="provider-btn"
+            [class.active]="selectedProvider === 'NONE'"
+            (click)="setProvider('NONE')"
+          >
+            <i class="pi pi-cog"></i>
+            {{ 'APP_SETTINGS.EMAIL_CONFIG.PROVIDER_NONE' | translate }}
+          </button>
+          <button
+            type="button"
+            class="provider-btn"
+            [class.active]="selectedProvider === 'SMTP'"
+            (click)="setProvider('SMTP')"
+          >
+            <i class="pi pi-server"></i>
+            {{ 'APP_SETTINGS.EMAIL_CONFIG.PROVIDER_SMTP' | translate }}
+          </button>
+          <button
+            type="button"
+            class="provider-btn"
+            [class.active]="selectedProvider === 'SES'"
+            (click)="setProvider('SES')"
+          >
+            <i class="pi pi-cloud"></i>
+            {{ 'APP_SETTINGS.EMAIL_CONFIG.PROVIDER_SES' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- SMTP -->
+      <div *ngIf="selectedProvider === 'SMTP'" class="form-group-section">
+        <div class="form-grid">
+          <app-custom-input
+            formControlName="smtpHost"
+            [label]="'APP_SETTINGS.EMAIL_CONFIG.SMTP_HOST' | translate"
+            icon="pi-desktop"
+            [required]="true"
+            [showError]="
+              !!(
+                emailForm.get('smtpHost')?.invalid &&
+                emailForm.get('smtpHost')?.touched
+              )
+            "
+            [errorMessage]="getFieldError('smtpHost')"
+          ></app-custom-input>
+
+          <app-custom-input
+            formControlName="smtpPort"
+            [label]="'APP_SETTINGS.EMAIL_CONFIG.SMTP_PORT' | translate"
+            type="number"
+            icon="pi-hashtag"
+            [required]="true"
+            [showError]="
+              !!(
+                emailForm.get('smtpPort')?.invalid &&
+                emailForm.get('smtpPort')?.touched
+              )
+            "
+            [errorMessage]="getFieldError('smtpPort')"
+          ></app-custom-input>
+
+          <app-custom-input
+            formControlName="smtpUser"
+            [label]="'APP_SETTINGS.EMAIL_CONFIG.SMTP_USER' | translate"
+            icon="pi-user"
+            [required]="true"
+            [showError]="
+              !!(
+                emailForm.get('smtpUser')?.invalid &&
+                emailForm.get('smtpUser')?.touched
+              )
+            "
+            [errorMessage]="getFieldError('smtpUser')"
+          ></app-custom-input>
+
+          <div class="secret-field">
+            <app-custom-input
+              formControlName="smtpPassword"
+              [label]="'APP_SETTINGS.EMAIL_CONFIG.SMTP_PASSWORD' | translate"
+              icon="pi-lock"
+              [showPasswordToggle]="true"
+              [placeholder]="
+                'APP_SETTINGS.EMAIL_CONFIG.LEAVE_BLANK' | translate
+              "
+            ></app-custom-input>
+            <span class="configured-badge" *ngIf="smtpPasswordConfigured">
+              <i class="pi pi-check-circle"></i>
+              {{ 'APP_SETTINGS.EMAIL_CONFIG.CONFIGURED' | translate }}
+            </span>
+          </div>
+
+          <app-custom-input
+            formControlName="smtpFrom"
+            [label]="'APP_SETTINGS.EMAIL_CONFIG.SMTP_FROM' | translate"
+            icon="pi-at"
+            [required]="true"
+            [showError]="
+              !!(
+                emailForm.get('smtpFrom')?.invalid &&
+                emailForm.get('smtpFrom')?.touched
+              )
+            "
+            [errorMessage]="getFieldError('smtpFrom')"
+          ></app-custom-input>
+        </div>
+      </div>
+
+      <!-- SES -->
+      <div *ngIf="selectedProvider === 'SES'" class="form-group-section">
+        <div class="form-grid">
+          <app-custom-input
+            formControlName="sesRegion"
+            [label]="'APP_SETTINGS.EMAIL_CONFIG.SES_REGION' | translate"
+            icon="pi-globe"
+            [required]="true"
+            [showError]="
+              !!(
+                emailForm.get('sesRegion')?.invalid &&
+                emailForm.get('sesRegion')?.touched
+              )
+            "
+            [errorMessage]="getFieldError('sesRegion')"
+          ></app-custom-input>
+
+          <app-custom-input
+            formControlName="sesAccessKeyId"
+            [label]="'APP_SETTINGS.EMAIL_CONFIG.SES_ACCESS_KEY' | translate"
+            icon="pi-key"
+            [required]="true"
+            [showError]="
+              !!(
+                emailForm.get('sesAccessKeyId')?.invalid &&
+                emailForm.get('sesAccessKeyId')?.touched
+              )
+            "
+            [errorMessage]="getFieldError('sesAccessKeyId')"
+          ></app-custom-input>
+
+          <div class="secret-field">
+            <app-custom-input
+              formControlName="sesSecretAccessKey"
+              [label]="'APP_SETTINGS.EMAIL_CONFIG.SES_SECRET_KEY' | translate"
+              icon="pi-lock"
+              [showPasswordToggle]="true"
+              [placeholder]="
+                'APP_SETTINGS.EMAIL_CONFIG.LEAVE_BLANK' | translate
+              "
+            ></app-custom-input>
+            <span class="configured-badge" *ngIf="sesSecretAccessKeyConfigured">
+              <i class="pi pi-check-circle"></i>
+              {{ 'APP_SETTINGS.EMAIL_CONFIG.CONFIGURED' | translate }}
+            </span>
+          </div>
+
+          <app-custom-input
+            formControlName="sesFrom"
+            [label]="'APP_SETTINGS.EMAIL_CONFIG.SES_FROM' | translate"
+            icon="pi-at"
+            [required]="true"
+            [showError]="
+              !!(
+                emailForm.get('sesFrom')?.invalid &&
+                emailForm.get('sesFrom')?.touched
+              )
+            "
+            [errorMessage]="getFieldError('sesFrom')"
+          ></app-custom-input>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

@@ -35,7 +35,9 @@
     "dbRole": "数据库角色",
     "dbTable": "数据库表",
     "qExecutor": "Q Executor",
-    "brandingManagement": "品牌"
+    "brandingManagement": "品牌",
+    "securityPolicy": "安全策略",
+    "emailConfiguration": "邮件配置"
   },
   "COMMON": {
     "ACTIVE": "活跃",
@@ -459,7 +461,10 @@
     "ENCRYPTION_AUTO_ACK_DESC": "我理解 DBExec 将代表我为本组织生成并管理加密密钥。主密钥保存在应用服务器上，与数据库分开。",
     "ENCRYPTION_AUTO_ACK_ERROR": "继续之前请确认加密配置。",
     "ENCRYPTION_AUTO_REVIEW_NOTE": "将为本组织生成新的 AES-256-GCM 密钥。平台主密钥将其封装。",
-    "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM（按组织自动生成的密钥）"
+    "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM（按组织自动生成的密钥）",
+    "SECURITY_EMAIL_MOVED_NOTE": "安全和邮件配置由组织管理员在“应用设置”中管理。",
+    "SECURITY_AND_EMAIL": "安全与邮件",
+    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "安全和邮件配置由组织管理员在“应用设置”中管理。"
   },
   "ROLE": {
     "TITLE": "角色",
@@ -2618,5 +2623,42 @@
     "GROUP_ADDED_BODY": "您已被分配到 {{groupName}}。",
     "GROUP_REMOVED_TITLE": "已从组中移除",
     "GROUP_REMOVED_BODY": "您已从 {{groupName}} 中被移除。"
+  },
+  "MENU": {
+    "SECURITY_POLICY": "安全策略",
+    "EMAIL_CONFIG": "邮件配置"
+  },
+  "APP_SETTINGS": {
+    "SECURITY_POLICY": {
+      "TITLE": "安全策略",
+      "SUBTITLE": "登录尝试、锁定、密码历史记录和会话超时。",
+      "MAX_LOGIN_ATTEMPTS": "最大登录尝试次数",
+      "ACCOUNT_LOCK_DURATION": "账户锁定时长（小时）",
+      "PASSWORD_HISTORY_LIMIT": "密码历史记录限制",
+      "SESSION_INACTIVITY_TIMEOUT": "会话非活动超时（分钟）",
+      "SAVE": "保存更改",
+      "SAVED": "安全策略已更新"
+    },
+    "EMAIL_CONFIG": {
+      "TITLE": "邮件配置",
+      "SUBTITLE": "用于发送邀请和密码重置的出站邮件提供商。",
+      "PROVIDER": "邮件提供商",
+      "PROVIDER_NONE": "无",
+      "PROVIDER_SMTP": "SMTP",
+      "PROVIDER_SES": "AWS SES",
+      "SMTP_HOST": "SMTP 主机",
+      "SMTP_PORT": "SMTP 端口",
+      "SMTP_USER": "SMTP 用户名",
+      "SMTP_PASSWORD": "SMTP 密码",
+      "SMTP_FROM": "发件人地址",
+      "SES_REGION": "AWS 区域",
+      "SES_ACCESS_KEY": "访问密钥 ID",
+      "SES_SECRET_KEY": "私有访问密钥",
+      "SES_FROM": "发件人地址",
+      "CONFIGURED": "已配置",
+      "LEAVE_BLANK": "留空以保留当前值",
+      "SAVE": "保存更改",
+      "SAVED": "邮件配置已更新"
+    }
   }
 }

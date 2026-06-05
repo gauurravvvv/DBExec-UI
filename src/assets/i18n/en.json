@@ -35,7 +35,9 @@
     "dbRole": "DB Role",
     "dbTable": "DB Table",
     "qExecutor": "Q Executor",
-    "brandingManagement": "Branding"
+    "brandingManagement": "Branding",
+    "securityPolicy": "Security Policy",
+    "emailConfiguration": "Email Configuration"
   },
   "COMMON": {
     "ACTIVE": "Active",
@@ -459,7 +461,10 @@
     "ENCRYPTION_AUTO_ACK_DESC": "I understand that DBExec will generate and manage encryption keys for this organisation on my behalf. The master key lives on the application server, separate from the database.",
     "ENCRYPTION_AUTO_ACK_ERROR": "Please acknowledge the encryption configuration before proceeding.",
     "ENCRYPTION_AUTO_REVIEW_NOTE": "A fresh AES-256-GCM key will be generated for this organisation. The platform master key wraps it.",
-    "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (auto-generated per-org key)"
+    "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (auto-generated per-org key)",
+    "SECURITY_EMAIL_MOVED_NOTE": "Security and email configuration are managed by the organisation admin under App Settings.",
+    "SECURITY_AND_EMAIL": "Security & Email",
+    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "Security and email configuration are managed by the organisation admin under App Settings."
   },
   "ROLE": {
     "TITLE": "Roles",
@@ -2660,5 +2665,42 @@
     "GROUP_ADDED_BODY": "You have been assigned to {{groupName}}.",
     "GROUP_REMOVED_TITLE": "Removed from a Group",
     "GROUP_REMOVED_BODY": "You have been removed from {{groupName}}."
+  },
+  "MENU": {
+    "SECURITY_POLICY": "Security Policy",
+    "EMAIL_CONFIG": "Email Configuration"
+  },
+  "APP_SETTINGS": {
+    "SECURITY_POLICY": {
+      "TITLE": "Security Policy",
+      "SUBTITLE": "Sign-in attempts, lockouts, password history, and session timeouts.",
+      "MAX_LOGIN_ATTEMPTS": "Max login attempts",
+      "ACCOUNT_LOCK_DURATION": "Account lock duration (hours)",
+      "PASSWORD_HISTORY_LIMIT": "Password history limit",
+      "SESSION_INACTIVITY_TIMEOUT": "Session inactivity timeout (minutes)",
+      "SAVE": "Save changes",
+      "SAVED": "Security policy updated"
+    },
+    "EMAIL_CONFIG": {
+      "TITLE": "Email Configuration",
+      "SUBTITLE": "Outbound email provider used for invitations and password resets.",
+      "PROVIDER": "Email provider",
+      "PROVIDER_NONE": "None",
+      "PROVIDER_SMTP": "SMTP",
+      "PROVIDER_SES": "AWS SES",
+      "SMTP_HOST": "SMTP host",
+      "SMTP_PORT": "SMTP port",
+      "SMTP_USER": "SMTP username",
+      "SMTP_PASSWORD": "SMTP password",
+      "SMTP_FROM": "From address",
+      "SES_REGION": "AWS region",
+      "SES_ACCESS_KEY": "Access key ID",
+      "SES_SECRET_KEY": "Secret access key",
+      "SES_FROM": "From address",
+      "CONFIGURED": "Configured",
+      "LEAVE_BLANK": "Leave blank to keep current value",
+      "SAVE": "Save changes",
+      "SAVED": "Email configuration updated"
+    }
   }
 }

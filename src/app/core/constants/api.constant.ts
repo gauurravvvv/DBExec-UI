@@ -330,6 +330,12 @@ export const RLS_RULE = {
   LIST_FOR_DATASET_PREFIX: '/rls-rules/datasets/',
 };
 
+export const ORG_POLICY = {
+  GET: '/api/v1/org-policy',
+  UPDATE_SECURITY: '/api/v1/org-policy/security',
+  UPDATE_EMAIL: '/api/v1/org-policy/email',
+};
+
 export const NOTIFICATION = {
   // GET — last 30 days for the logged-in user
   LIST: '/notifications',

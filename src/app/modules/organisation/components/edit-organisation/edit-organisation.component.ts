@@ -55,7 +55,8 @@ export class EditOrganisationComponent
   showSaveConfirm = false;
   saveJustification = '';
 
-  // Stepper
+  // Stepper — security/email moved to App Settings (per-org OrgPolicy).
+  // Edit Organisation now has at most two steps: org details, master DB.
   currentStep = 0;
 
   // Connection test
@@ -125,43 +126,8 @@ export class EditOrganisationComponent
       ],
       dbUsername: ['', [Validators.required]],
       dbPassword: [''],
-      // Security config
-      maxLoginAttempts: [
-        5,
-        [Validators.required, Validators.min(3), Validators.max(10)],
-      ],
-      accountLockDurationHours: [
-        1,
-        [Validators.required, Validators.min(0), Validators.max(24)],
-      ],
-      passwordHistoryLimit: [
-        5,
-        [Validators.required, Validators.min(1), Validators.max(24)],
-      ],
-      sessionInactivityTimeout: [
-        30,
-        [Validators.required, Validators.min(5), Validators.max(1440)],
-      ],
-      // Email config
-      emailProvider: [null],
-      smtpHost: [''],
-      smtpPort: [587],
-      smtpUser: [''],
-      smtpPassword: [''],
-      smtpFrom: [''],
-      sesRegion: [''],
-      sesAccessKeyId: [''],
-      sesSecretAccessKey: [''],
-      sesFrom: [''],
+      // Security + email policy moved to per-org OrgPolicy (App Settings).
     });
-
-    // Update email field validators when provider changes
-    this.orgForm
-      .get('emailProvider')
-      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(provider => {
-        this.updateEmailValidators(provider);
-      });
 
     this.orgForm.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -170,7 +136,6 @@ export class EditOrganisationComponent
           this.isCancelClicked = false;
         }
         const currentValue = this.orgForm.getRawValue();
-        const config = this.orgData?.orgConfig;
         const originalValue: any = {
           id: this.orgData?.id,
           name: this.orgData?.name,
@@ -181,20 +146,6 @@ export class EditOrganisationComponent
           dbName: this.orgData?.masterDbConfig?.dbName || '',
           dbUsername: this.orgData?.masterDbConfig?.username || '',
           dbPassword: '',
-          maxLoginAttempts: config?.maxLoginAttempts ?? 5,
-          accountLockDurationHours: config?.accountLockDurationHours ?? 1,
-          passwordHistoryLimit: config?.passwordHistoryLimit ?? 5,
-          sessionInactivityTimeout: config?.sessionInactivityTimeout ?? 30,
-          emailProvider: config?.emailProvider || null,
-          smtpHost: config?.smtpHost || '',
-          smtpPort: config?.smtpPort || 587,
-          smtpUser: config?.smtpUser || '',
-          smtpPassword: '',
-          smtpFrom: config?.smtpFrom || '',
-          sesRegion: config?.sesRegion || '',
-          sesAccessKeyId: config?.sesAccessKeyId || '',
-          sesSecretAccessKey: '',
-          sesFrom: config?.sesFrom || '',
         };
 
         this.isFormDirty = Object.keys(currentValue).some(
@@ -235,45 +186,26 @@ export class EditOrganisationComponent
 
   private handleLoadedOrg(response: any) {
     if (this.globalService.handleSuccessService(response, false)) {
-          this.orgData = response.data;
-          this.hasMasterDb = !!this.orgData.masterDbConfig;
+      this.orgData = response.data;
+      this.hasMasterDb = !!this.orgData.masterDbConfig;
 
-          this.orgForm.patchValue({
-            id: this.orgData.id,
-            name: this.orgData.name,
-            description: this.orgData.description,
-            status: this.orgData.status,
-            dbHost: this.orgData.masterDbConfig?.hostname || '',
-            dbPort: this.orgData.masterDbConfig?.port || '',
-            dbName: this.orgData.masterDbConfig?.dbName || '',
-            dbUsername: this.orgData.masterDbConfig?.username || '',
-            dbPassword: '',
-          });
+      this.orgForm.patchValue({
+        id: this.orgData.id,
+        name: this.orgData.name,
+        description: this.orgData.description,
+        status: this.orgData.status,
+        dbHost: this.orgData.masterDbConfig?.hostname || '',
+        dbPort: this.orgData.masterDbConfig?.port || '',
+        dbName: this.orgData.masterDbConfig?.dbName || '',
+        dbUsername: this.orgData.masterDbConfig?.username || '',
+        dbPassword: '',
+      });
 
-          const config = this.orgData.orgConfig;
-          if (config) {
-            this.orgForm.patchValue({
-              maxLoginAttempts: config.maxLoginAttempts ?? 5,
-              accountLockDurationHours: config.accountLockDurationHours ?? 1,
-              passwordHistoryLimit: config.passwordHistoryLimit ?? 5,
-              sessionInactivityTimeout: config.sessionInactivityTimeout ?? 30,
-              emailProvider: config.emailProvider || null,
-              smtpHost: config.smtpHost || '',
-              smtpPort: config.smtpPort || 587,
-              smtpUser: config.smtpUser || '',
-              smtpPassword: '', // Never returned from API
-              smtpFrom: config.smtpFrom || '',
-              sesRegion: config.sesRegion || '',
-              sesAccessKeyId: config.sesAccessKeyId || '',
-              sesSecretAccessKey: '', // Never returned from API
-              sesFrom: config.sesFrom || '',
-            });
-          }
-          this.isFormDirty = false;
+      this.isFormDirty = false;
 
-          // Organisation name cannot be changed after creation
-          this.orgForm.get('name')?.disable();
-        }
+      // Organisation name cannot be changed after creation
+      this.orgForm.get('name')?.disable();
+    }
   }
 
   // Step validation
@@ -312,131 +244,22 @@ export class EditOrganisationComponent
     return this.isDbConnectionFieldsValid();
   }
 
-  get selectedEmailProvider(): string | null {
-    return this.orgForm.get('emailProvider')?.value;
-  }
-
-  updateEmailValidators(provider: string | null) {
-    const smtpFields = ['smtpHost', 'smtpPort', 'smtpUser', 'smtpFrom'];
-    const sesFields = ['sesRegion', 'sesAccessKeyId', 'sesFrom'];
-    const allFields = [...smtpFields, ...sesFields];
-
-    // Clear all first
-    allFields.forEach(f => {
-      this.orgForm.get(f)?.clearValidators();
-      this.orgForm.get(f)?.updateValueAndValidity({ emitEvent: false });
-    });
-
-    if (provider === 'SMTP') {
-      this.orgForm
-        .get('smtpHost')
-        ?.setValidators([Validators.required, Validators.maxLength(255)]);
-      this.orgForm
-        .get('smtpPort')
-        ?.setValidators([
-          Validators.required,
-          Validators.min(1),
-          Validators.max(65535),
-        ]);
-      this.orgForm
-        .get('smtpUser')
-        ?.setValidators([Validators.required, Validators.maxLength(255)]);
-      this.orgForm
-        .get('smtpFrom')
-        ?.setValidators([Validators.required, Validators.email]);
-    } else if (provider === 'SES') {
-      this.orgForm
-        .get('sesRegion')
-        ?.setValidators([
-          Validators.required,
-          Validators.maxLength(50),
-          Validators.pattern(/^[a-z]{2}-[a-z]+-\d{1,2}$/),
-        ]);
-      this.orgForm
-        .get('sesAccessKeyId')
-        ?.setValidators([
-          Validators.required,
-          Validators.minLength(16),
-          Validators.maxLength(128),
-        ]);
-      this.orgForm
-        .get('sesFrom')
-        ?.setValidators([Validators.required, Validators.email]);
-    }
-
-    allFields.forEach(f => {
-      this.orgForm.get(f)?.updateValueAndValidity({ emitEvent: false });
-    });
-  }
-
-  getEmailFieldError(fieldName: string): string {
-    const control = this.orgForm.get(fieldName);
-    if (!control?.errors || !control.touched) return '';
-    if (control.errors['required'])
-      return this.translate.instant('VALIDATION.FIELD_REQUIRED');
-    if (control.errors['email'])
-      return this.translate.instant('VALIDATION.EMAIL_INVALID');
-    if (control.errors['maxlength'])
-      return this.translate.instant('VALIDATION.MAX_LENGTH', {
-        length: control.errors['maxlength'].requiredLength,
-      });
-    if (control.errors['minlength'])
-      return this.translate.instant('VALIDATION.MIN_LENGTH', {
-        length: control.errors['minlength'].requiredLength,
-      });
-    if (control.errors['min'])
-      return this.translate.instant('VALIDATION.MIN_VALUE', {
-        value: control.errors['min'].min,
-      });
-    if (control.errors['max'])
-      return this.translate.instant('VALIDATION.MAX_VALUE', {
-        value: control.errors['max'].max,
-      });
-    if (control.errors['pattern'])
-      return this.translate.instant('VALIDATION.INVALID_FORMAT_REGION');
-    return '';
-  }
-
-  isStep3Valid(): boolean {
-    const securityValid = [
-      'maxLoginAttempts',
-      'accountLockDurationHours',
-      'passwordHistoryLimit',
-      'sessionInactivityTimeout',
-    ].every(f => this.orgForm.get(f)?.valid);
-    return securityValid;
-  }
-
   // Step navigation
   nextStep() {
-    if (this.currentStep === 0 && this.isStep1Valid()) {
-      if (this.hasMasterDb) {
-        this.currentStep = 1;
-      } else {
-        this.currentStep = 2;
-      }
-    } else if (this.currentStep === 1) {
-      this.currentStep = 2;
+    if (this.currentStep === 0 && this.isStep1Valid() && this.hasMasterDb) {
+      this.currentStep = 1;
     }
   }
 
   previousStep() {
-    if (this.currentStep === 2 && !this.hasMasterDb) {
-      this.currentStep = 0;
-    } else if (this.currentStep > 0) {
+    if (this.currentStep > 0) {
       this.currentStep--;
     }
   }
 
   onStepClick(step: number) {
     if (step < this.currentStep) {
-      if (step === 0) {
-        this.currentStep = 0;
-      } else if (step === 1 && this.hasMasterDb) {
-        this.currentStep = 1;
-      } else if (step === 2) {
-        this.currentStep = 2;
-      }
+      this.currentStep = step;
     } else if (
       step === 1 &&
       this.currentStep === 0 &&
@@ -444,15 +267,6 @@ export class EditOrganisationComponent
       this.hasMasterDb
     ) {
       this.currentStep = 1;
-    } else if (
-      step === 2 &&
-      this.currentStep === 0 &&
-      this.isStep1Valid() &&
-      !this.hasMasterDb
-    ) {
-      this.currentStep = 2;
-    } else if (step === 2 && this.currentStep === 1) {
-      this.currentStep = 2;
     }
   }
 
@@ -583,7 +397,6 @@ export class EditOrganisationComponent
   }
 
   onCancel() {
-    const config = this.orgData?.orgConfig;
     this.orgForm.patchValue({
       id: this.orgData.id,
       name: this.orgData.name,
@@ -594,20 +407,6 @@ export class EditOrganisationComponent
       dbName: this.orgData.masterDbConfig?.dbName || '',
       dbUsername: this.orgData.masterDbConfig?.username || '',
       dbPassword: '',
-      maxLoginAttempts: config?.maxLoginAttempts ?? 5,
-      accountLockDurationHours: config?.accountLockDurationHours ?? 1,
-      passwordHistoryLimit: config?.passwordHistoryLimit ?? 5,
-      sessionInactivityTimeout: config?.sessionInactivityTimeout ?? 30,
-      emailProvider: config?.emailProvider || null,
-      smtpHost: config?.smtpHost || '',
-      smtpPort: config?.smtpPort || 587,
-      smtpUser: config?.smtpUser || '',
-      smtpPassword: '',
-      smtpFrom: config?.smtpFrom || '',
-      sesRegion: config?.sesRegion || '',
-      sesAccessKeyId: config?.sesAccessKeyId || '',
-      sesSecretAccessKey: '',
-      sesFrom: config?.sesFrom || '',
     });
     this.orgForm.markAsPristine();
     this.isCancelClicked = true;
@@ -651,22 +450,6 @@ export class EditOrganisationComponent
     if (control?.errors?.['maxlength'])
       return this.translate.instant('VALIDATION.DESCRIPTION_MAX_LENGTH', {
         length: control.errors['maxlength'].requiredLength,
-      });
-    return '';
-  }
-
-  getSecurityFieldError(fieldName: string): string {
-    const control = this.orgForm.get(fieldName);
-    if (!control?.errors || !control.touched) return '';
-    if (control.errors['required'])
-      return this.translate.instant('VALIDATION.FIELD_REQUIRED');
-    if (control.errors['min'])
-      return this.translate.instant('VALIDATION.MIN_VALUE', {
-        value: control.errors['min'].min,
-      });
-    if (control.errors['max'])
-      return this.translate.instant('VALIDATION.MAX_VALUE', {
-        value: control.errors['max'].max,
       });
     return '';
   }

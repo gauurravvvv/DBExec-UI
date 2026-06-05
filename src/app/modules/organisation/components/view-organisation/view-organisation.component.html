@@ -231,181 +231,22 @@
           </div>
         </div>
 
-        <!-- Security & Email Row -->
-        <div class="second-row" *ngIf="organisationData.orgConfig">
-          <!-- Security Settings -->
-          <div class="detail-group">
+        <!-- Security + email config moved to the per-org OrgPolicy
+             entity, managed by the Org Admin under App Settings.
+             System Admin only sees an informational note here. -->
+        <div class="second-row">
+          <div class="detail-group org-policy-managed">
             <h4>
               <i class="pi pi-shield"></i>
-              {{ 'ORG.SECURITY_SETTINGS' | translate }}
+              {{ 'ORG.SECURITY_AND_EMAIL' | translate }}
             </h4>
+            <p class="org-policy-note">
+              <i class="pi pi-info-circle"></i>
+              {{ 'ORG.SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN' | translate }}
+            </p>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-lock"></i>
-                {{ 'ORG.MAX_LOGIN_ATTEMPTS' | translate }}
-              </span>
-              <span class="value">{{
-                organisationData.orgConfig.maxLoginAttempts
-              }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-clock"></i>
-                {{ 'ORG.ACCOUNT_LOCK_DURATION_LABEL' | translate }}
-              </span>
-              <span class="value">
-                {{
-                  organisationData.orgConfig.accountLockDurationHours === 0
-                    ? ('ORG.PERMANENT_LOCK' | translate)
-                    : ('ORG.HOURS_VALUE'
-                      | translate
-                        : {
-                            value:
-                              organisationData.orgConfig
-                                .accountLockDurationHours,
-                          })
-                }}
-              </span>
-            </div>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-history"></i>
-                {{ 'ORG.PASSWORD_HISTORY_LIMIT' | translate }}
-              </span>
-              <span class="value">{{
-                'ORG.PASSWORDS_VALUE'
-                  | translate
-                    : { value: organisationData.orgConfig.passwordHistoryLimit }
-              }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-sign-out"></i>
-                {{ 'ORG.IDLE_SESSION_TIMEOUT_LABEL' | translate }}
-              </span>
-              <span class="value">{{
-                'ORG.MINUTES_VALUE'
-                  | translate
-                    : {
-                        value:
-                          organisationData.orgConfig.sessionInactivityTimeout,
-                      }
-              }}</span>
-            </div>
-          </div>
-
-          <!-- Email & Encryption -->
-          <div class="detail-group">
-            <h4>
-              <i class="pi pi-envelope"></i>
-              {{ 'ORG.EMAIL_CONFIGURATION' | translate }}
-            </h4>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-cog"></i>
-                {{ 'ORG.EMAIL_PROVIDER' | translate }}
-              </span>
-              <span class="value">
-                <span
-                  class="provider-badge"
-                  [ngClass]="
-                    organisationData.orgConfig.emailProvider?.toLowerCase() ||
-                    'none'
-                  "
-                >
-                  {{
-                    organisationData.orgConfig.emailProvider ||
-                      ('ORG.GLOBAL_DEFAULT' | translate)
-                  }}
-                </span>
-              </span>
-            </div>
-
-            <!-- SMTP Details -->
-            <ng-container
-              *ngIf="organisationData.orgConfig.emailProvider === 'SMTP'"
-            >
-              <div class="detail-item">
-                <span class="label">
-                  <i class="pi pi-server"></i>
-                  {{ 'ORG.SMTP_HOST' | translate }}
-                </span>
-                <span class="value">{{
-                  organisationData.orgConfig.smtpHost || '—'
-                }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">
-                  <i class="pi pi-hashtag"></i>
-                  {{ 'ORG.SMTP_PORT' | translate }}
-                </span>
-                <span class="value">{{
-                  organisationData.orgConfig.smtpPort || '—'
-                }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">
-                  <i class="pi pi-user"></i>
-                  {{ 'ORG.SMTP_USERNAME' | translate }}
-                </span>
-                <span class="value">{{
-                  organisationData.orgConfig.smtpUser || '—'
-                }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">
-                  <i class="pi pi-at"></i>
-                  {{ 'ORG.FROM_EMAIL' | translate }}
-                </span>
-                <span class="value">{{
-                  organisationData.orgConfig.smtpFrom || '—'
-                }}</span>
-              </div>
-            </ng-container>
-
-            <!-- SES Details -->
-            <ng-container
-              *ngIf="organisationData.orgConfig.emailProvider === 'SES'"
-            >
-              <div class="detail-item">
-                <span class="label">
-                  <i class="pi pi-globe"></i>
-                  {{ 'ORG.AWS_REGION' | translate }}
-                </span>
-                <span class="value">{{
-                  organisationData.orgConfig.sesRegion || '—'
-                }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">
-                  <i class="pi pi-key"></i>
-                  {{ 'ORG.ACCESS_KEY_ID' | translate }}
-                </span>
-                <span class="value masked-value">{{
-                  organisationData.orgConfig.sesAccessKeyId
-                    ? (organisationData.orgConfig.sesAccessKeyId
-                        | slice: 0 : 4) + '••••••••'
-                    : '—'
-                }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="label">
-                  <i class="pi pi-at"></i>
-                  {{ 'ORG.FROM_EMAIL' | translate }}
-                </span>
-                <span class="value">{{
-                  organisationData.orgConfig.sesFrom || '—'
-                }}</span>
-              </div>
-            </ng-container>
-
-            <!-- Encryption Info — the per-org key is generated and
-                 managed server-side. We don't show key material; just
-                 confirm the algorithm. -->
-            <div class="encryption-divider"></div>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-shield"></i>
                 {{ 'ORG.ENCRYPTION_ALGORITHM' | translate }}
               </span>
               <span class="value">{{

@@ -7,7 +7,9 @@ import { AppSettingsRoutingModule } from './app-settings-routing.module';
 import { AddAnnouncementComponent } from './components/add-announcement/add-announcement.component';
 import { BrandingSettingsComponent } from './components/branding-settings/branding-settings.component';
 import { EditAnnouncementComponent } from './components/edit-announcement/edit-announcement.component';
+import { EmailConfigurationComponent } from './components/email-configuration/email-configuration.component';
 import { ListAnnouncementsComponent } from './components/list-announcements/list-announcements.component';
+import { SecurityPolicyComponent } from './components/security-policy/security-policy.component';
 import { ThemeSettingsComponent } from './components/theme-settings/theme-settings.component';
 import { ViewAnnouncementComponent } from './components/view-announcement/view-announcement.component';
 
@@ -19,6 +21,8 @@ import { ViewAnnouncementComponent } from './components/view-announcement/view-a
     ViewAnnouncementComponent,
     ThemeSettingsComponent,
     BrandingSettingsComponent,
+    SecurityPolicyComponent,
+    EmailConfigurationComponent,
   ],
   imports: [
     CommonModule,

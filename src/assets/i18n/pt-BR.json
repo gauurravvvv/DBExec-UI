@@ -35,7 +35,9 @@
     "dbRole": "Função DB",
     "dbTable": "Tabela DB",
     "qExecutor": "Q Executor",
-    "brandingManagement": "Identidade"
+    "brandingManagement": "Identidade",
+    "securityPolicy": "Política de segurança",
+    "emailConfiguration": "Configuração de e-mail"
   },
   "COMMON": {
     "ACTIVE": "Ativo",
@@ -459,7 +461,10 @@
     "ENCRYPTION_AUTO_ACK_DESC": "Entendo que o DBExec gerará e gerenciará as chaves de criptografia para esta organização em meu nome. A chave mestra fica no servidor da aplicação, separada do banco de dados.",
     "ENCRYPTION_AUTO_ACK_ERROR": "Confirme a configuração de criptografia antes de continuar.",
     "ENCRYPTION_AUTO_REVIEW_NOTE": "Uma nova chave AES-256-GCM será gerada para esta organização. A chave mestra da plataforma a envolve.",
-    "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (chave por organização gerada automaticamente)"
+    "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (chave por organização gerada automaticamente)",
+    "SECURITY_EMAIL_MOVED_NOTE": "A configuração de segurança e e-mail é gerenciada pelo administrador da organização nas configurações do aplicativo.",
+    "SECURITY_AND_EMAIL": "Segurança e e-mail",
+    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "A configuração de segurança e e-mail é gerenciada pelo administrador da organização nas configurações do aplicativo."
   },
   "ROLE": {
     "TITLE": "Funções",
@@ -2618,5 +2623,42 @@
     "GROUP_ADDED_BODY": "Você foi atribuído a {{groupName}}.",
     "GROUP_REMOVED_TITLE": "Removido de um grupo",
     "GROUP_REMOVED_BODY": "Você foi removido de {{groupName}}."
+  },
+  "MENU": {
+    "SECURITY_POLICY": "Política de segurança",
+    "EMAIL_CONFIG": "Configuração de e-mail"
+  },
+  "APP_SETTINGS": {
+    "SECURITY_POLICY": {
+      "TITLE": "Política de segurança",
+      "SUBTITLE": "Tentativas de login, bloqueios, histórico de senhas e tempos limite de sessão.",
+      "MAX_LOGIN_ATTEMPTS": "Tentativas máximas de login",
+      "ACCOUNT_LOCK_DURATION": "Duração do bloqueio da conta (horas)",
+      "PASSWORD_HISTORY_LIMIT": "Limite do histórico de senhas",
+      "SESSION_INACTIVITY_TIMEOUT": "Tempo limite de inatividade da sessão (minutos)",
+      "SAVE": "Salvar alterações",
+      "SAVED": "Política de segurança atualizada"
+    },
+    "EMAIL_CONFIG": {
+      "TITLE": "Configuração de e-mail",
+      "SUBTITLE": "Provedor de e-mail de saída usado para convites e redefinições de senha.",
+      "PROVIDER": "Provedor de e-mail",
+      "PROVIDER_NONE": "Nenhum",
+      "PROVIDER_SMTP": "SMTP",
+      "PROVIDER_SES": "AWS SES",
+      "SMTP_HOST": "Host SMTP",
+      "SMTP_PORT": "Porta SMTP",
+      "SMTP_USER": "Usuário SMTP",
+      "SMTP_PASSWORD": "Senha SMTP",
+      "SMTP_FROM": "Endereço do remetente",
+      "SES_REGION": "Região AWS",
+      "SES_ACCESS_KEY": "ID da chave de acesso",
+      "SES_SECRET_KEY": "Chave de acesso secreta",
+      "SES_FROM": "Endereço do remetente",
+      "CONFIGURED": "Configurado",
+      "LEAVE_BLANK": "Deixe em branco para manter o valor atual",
+      "SAVE": "Salvar alterações",
+      "SAVED": "Configuração de e-mail atualizada"
+    }
   }
 }

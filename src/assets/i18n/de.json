@@ -35,7 +35,9 @@
     "dbRole": "DB-Rolle",
     "dbTable": "DB-Tabelle",
     "qExecutor": "Q Executor",
-    "brandingManagement": "Branding"
+    "brandingManagement": "Branding",
+    "securityPolicy": "Sicherheitsrichtlinie",
+    "emailConfiguration": "E-Mail-Konfiguration"
   },
   "COMMON": {
     "ACTIVE": "Aktiv",
@@ -459,7 +461,10 @@
     "ENCRYPTION_AUTO_ACK_DESC": "Ich bestätige, dass DBExec Verschlüsselungsschlüssel für diese Organisation in meinem Namen generiert und verwaltet. Der Master-Schlüssel liegt auf dem Anwendungsserver, getrennt von der Datenbank.",
     "ENCRYPTION_AUTO_ACK_ERROR": "Bitte bestätigen Sie die Verschlüsselungskonfiguration, bevor Sie fortfahren.",
     "ENCRYPTION_AUTO_REVIEW_NOTE": "Ein neuer AES-256-GCM-Schlüssel wird für diese Organisation generiert. Der Plattform-Master-Schlüssel umschließt ihn.",
-    "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (automatisch generierter Org-Schlüssel)"
+    "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (automatisch generierter Org-Schlüssel)",
+    "SECURITY_EMAIL_MOVED_NOTE": "Sicherheits- und E-Mail-Konfiguration werden vom Organisationsadministrator unter „App-Einstellungen“ verwaltet.",
+    "SECURITY_AND_EMAIL": "Sicherheit & E-Mail",
+    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "Sicherheits- und E-Mail-Konfiguration werden vom Organisationsadministrator unter „App-Einstellungen“ verwaltet."
   },
   "ROLE": {
     "TITLE": "Rollen",
@@ -2618,5 +2623,42 @@
     "GROUP_ADDED_BODY": "Sie wurden {{groupName}} zugewiesen.",
     "GROUP_REMOVED_TITLE": "Aus einer Gruppe entfernt",
     "GROUP_REMOVED_BODY": "Sie wurden aus {{groupName}} entfernt."
+  },
+  "MENU": {
+    "SECURITY_POLICY": "Sicherheitsrichtlinie",
+    "EMAIL_CONFIG": "E-Mail-Konfiguration"
+  },
+  "APP_SETTINGS": {
+    "SECURITY_POLICY": {
+      "TITLE": "Sicherheitsrichtlinie",
+      "SUBTITLE": "Anmeldeversuche, Sperren, Passwortverlauf und Sitzungszeitüberschreitungen.",
+      "MAX_LOGIN_ATTEMPTS": "Maximale Anmeldeversuche",
+      "ACCOUNT_LOCK_DURATION": "Kontosperrdauer (Stunden)",
+      "PASSWORD_HISTORY_LIMIT": "Passwortverlauf-Limit",
+      "SESSION_INACTIVITY_TIMEOUT": "Sitzungs-Inaktivitäts-Timeout (Minuten)",
+      "SAVE": "Änderungen speichern",
+      "SAVED": "Sicherheitsrichtlinie aktualisiert"
+    },
+    "EMAIL_CONFIG": {
+      "TITLE": "E-Mail-Konfiguration",
+      "SUBTITLE": "Ausgehender E-Mail-Anbieter für Einladungen und Passwort-Resets.",
+      "PROVIDER": "E-Mail-Anbieter",
+      "PROVIDER_NONE": "Keiner",
+      "PROVIDER_SMTP": "SMTP",
+      "PROVIDER_SES": "AWS SES",
+      "SMTP_HOST": "SMTP-Host",
+      "SMTP_PORT": "SMTP-Port",
+      "SMTP_USER": "SMTP-Benutzername",
+      "SMTP_PASSWORD": "SMTP-Passwort",
+      "SMTP_FROM": "Absenderadresse",
+      "SES_REGION": "AWS-Region",
+      "SES_ACCESS_KEY": "Access Key ID",
+      "SES_SECRET_KEY": "Secret Access Key",
+      "SES_FROM": "Absenderadresse",
+      "CONFIGURED": "Konfiguriert",
+      "LEAVE_BLANK": "Leer lassen, um den aktuellen Wert beizubehalten",
+      "SAVE": "Änderungen speichern",
+      "SAVED": "E-Mail-Konfiguration aktualisiert"
+    }
   }
 }

@@ -39,6 +39,8 @@ export const PERMISSIONS = {
   ANNOUNCEMENT_MANAGEMENT: 'announcementManagement',
   THEME_MANAGEMENT: 'themeManagement',
   BRANDING_MANAGEMENT: 'brandingManagement',
+  SECURITY_POLICY: 'securityPolicy',
+  EMAIL_CONFIGURATION: 'emailConfiguration',
 } as const;
 
 export type PermissionValue = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

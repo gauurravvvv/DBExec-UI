@@ -1,0 +1,167 @@
+// Mirrors the chrome used by branding-settings + security-policy so
+// all three App Settings pages have identical look + feel.
+
+.admin-form {
+  .form-group-section {
+    margin-bottom: var(--space-6);
+  }
+
+  .group-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+
+    i {
+      color: var(--primary-color);
+    }
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-6);
+    width: 80%;
+    padding-bottom: 24px;
+
+    @media (max-width: 768px) {
+      width: 100%;
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+.email-provider-toggle {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+
+  .provider-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0.65rem 1.25rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    background: var(--card-background);
+    color: var(--text-color);
+    cursor: pointer;
+    font-weight: var(--fw-medium);
+    transition: all var(--motion-base) ease;
+
+    &:hover {
+      border-color: var(--primary-color);
+    }
+
+    &.active {
+      border-color: var(--primary-color);
+      background: var(--primary-color-transparent);
+      color: var(--primary-color);
+    }
+
+    i {
+      font-size: var(--fs-body);
+    }
+  }
+}
+
+.secret-field {
+  position: relative;
+
+  .configured-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--fs-label);
+    color: var(--success-color, #16a34a);
+    padding: 2px 8px;
+    border-radius: var(--radius-pill);
+    background: rgba(22, 163, 74, 0.08);
+
+    i {
+      font-size: var(--fs-label);
+    }
+  }
+}
+
+.page-subtitle {
+  margin: var(--space-0) var(--space-0) var(--space-4);
+  color: var(--text-muted);
+  font-size: var(--fs-control);
+}
+
+.add-admin-wrapper {
+  height: 100%;
+  .add-admin-container {
+    background: var(--card-background);
+    border-radius: var(--radius-md);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-8);
+    overflow: auto;
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-2);
+
+      .left-section {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+
+        h2 {
+          margin: 0;
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
+          color: var(--text-color);
+        }
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: var(--space-5);
+        align-items: center;
+
+        .btn-save {
+          background: linear-gradient(
+            135deg,
+            var(--primary-color),
+            var(--primary-hover)
+          ) !important;
+          color: var(--primary-text) !important;
+          border: none !important;
+          padding: 0.65rem 1.25rem;
+          border-radius: var(--radius-sm) !important;
+          font-weight: var(--fw-semibold);
+          box-shadow: 0 4px 10px var(--primary-color-transparent);
+          transition: all var(--motion-base) ease;
+
+          &:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: var(--secondary-color) !important;
+            box-shadow: none;
+          }
+
+          i {
+            font-size: var(--fs-body);
+          }
+        }
+      }
+    }
+  }
+}

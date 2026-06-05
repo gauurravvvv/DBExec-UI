@@ -1,0 +1,92 @@
+// Reuses the same .add-admin-wrapper chrome as the theme + branding
+// pages so all three feel like one settings family.
+
+.admin-form {
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-6);
+    width: 70%;
+    padding-bottom: 24px;
+
+    @media (max-width: 768px) {
+      width: 100%;
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+.page-subtitle {
+  margin: var(--space-0) var(--space-0) var(--space-4);
+  color: var(--text-muted);
+  font-size: var(--fs-control);
+}
+
+.add-admin-wrapper {
+  height: 100%;
+  .add-admin-container {
+    background: var(--card-background);
+    border-radius: var(--radius-md);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-8);
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-2);
+
+      .left-section {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+
+        h2 {
+          margin: 0;
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
+          color: var(--text-color);
+        }
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: var(--space-5);
+        align-items: center;
+
+        .btn-save {
+          background: linear-gradient(
+            135deg,
+            var(--primary-color),
+            var(--primary-hover)
+          ) !important;
+          color: var(--primary-text) !important;
+          border: none !important;
+          padding: 0.65rem 1.25rem;
+          border-radius: var(--radius-sm) !important;
+          font-weight: var(--fw-semibold);
+          box-shadow: 0 4px 10px var(--primary-color-transparent);
+          transition: all var(--motion-base) ease;
+
+          &:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: var(--secondary-color) !important;
+            box-shadow: none;
+          }
+
+          i {
+            font-size: var(--fs-body);
+          }
+        }
+      }
+    }
+  }
+}

@@ -32,7 +32,7 @@
           (click)="previousStep()"
         ></button>
         <button
-          *ngIf="currentStep === 0 || (hasMasterDb && currentStep === 1)"
+          *ngIf="hasMasterDb && currentStep === 0"
           pButton
           type="button"
           [label]="'ORG.NEXT' | translate"
@@ -40,10 +40,10 @@
           iconPos="right"
           (click)="nextStep()"
           class="p-button-primary btn-save"
-          [disabled]="currentStep === 0 ? !isStep1Valid() : false"
+          [disabled]="!isStep1Valid()"
         ></button>
         <button
-          *ngIf="currentStep === 2"
+          *ngIf="(!hasMasterDb && currentStep === 0) || (hasMasterDb && currentStep === 1)"
           pButton
           class="p-button-primary btn-save"
           type="submit"
@@ -75,26 +75,11 @@
         class="step"
         *ngIf="hasMasterDb"
         [class.active]="currentStep === 1"
-        [class.completed]="currentStep > 1"
         (click)="onStepClick(1)"
       >
-        <div class="step-dot">
-          <i class="pi pi-check" *ngIf="currentStep > 1"></i>
-          <span *ngIf="currentStep <= 1">2</span>
-        </div>
+        <div class="step-dot">2</div>
         <span class="step-label">{{
           'ORG.STEP_MASTER_DATASOURCE' | translate
-        }}</span>
-      </div>
-      <div class="step-line"></div>
-      <div
-        class="step"
-        [class.active]="currentStep === 2"
-        (click)="onStepClick(2)"
-      >
-        <div class="step-dot">{{ hasMasterDb ? '3' : '2' }}</div>
-        <span class="step-label">{{
-          'ORG.STEP_SECURITY_EMAIL' | translate
         }}</span>
       </div>
     </div>
@@ -169,10 +154,7 @@
               </p>
               <p class="update-info-text">
                 <i class="pi pi-circle-fill"></i>
-                {{
-                  'ORG.ENCRYPTION_REVIEW_STEP'
-                    | translate: { step: hasMasterDb ? '3' : '2' }
-                }}
+                {{ 'ORG.SECURITY_EMAIL_MOVED_NOTE' | translate }}
               </p>
             </div>
           </div>
@@ -344,281 +326,6 @@
               <p class="update-info-text">
                 <i class="pi pi-circle-fill"></i>
                 {{ 'ORG.UPDATE_INFO_3' | translate }}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 3: Security & Email Configuration -->
-      <div *ngIf="currentStep === 2" class="step-3-layout">
-        <div class="step-3-left">
-          <!-- Security Settings -->
-          <div class="form-group-section">
-            <div class="group-header">
-              <i class="pi pi-shield"></i>
-              <span>{{ 'ORG.SECURITY_SETTINGS' | translate }}</span>
-            </div>
-            <div class="db-fields-row">
-              <app-custom-input
-                formControlName="maxLoginAttempts"
-                [label]="'ORG.MAX_LOGIN_ATTEMPTS' | translate"
-                type="number"
-                icon="pi-hashtag"
-                [required]="true"
-                [tooltip]="'ORG.MAX_LOGIN_ATTEMPTS_TOOLTIP' | translate"
-                [showError]="
-                  !!(
-                    orgForm.get('maxLoginAttempts')?.invalid &&
-                    orgForm.get('maxLoginAttempts')?.touched
-                  )
-                "
-                [errorMessage]="getSecurityFieldError('maxLoginAttempts')"
-              ></app-custom-input>
-              <app-custom-input
-                formControlName="accountLockDurationHours"
-                [label]="'ORG.ACCOUNT_LOCK_DURATION' | translate"
-                type="number"
-                icon="pi-history"
-                [required]="true"
-                [tooltip]="'ORG.ACCOUNT_LOCK_DURATION_TOOLTIP' | translate"
-                [showError]="
-                  !!(
-                    orgForm.get('accountLockDurationHours')?.invalid &&
-                    orgForm.get('accountLockDurationHours')?.touched
-                  )
-                "
-                [errorMessage]="
-                  getSecurityFieldError('accountLockDurationHours')
-                "
-              ></app-custom-input>
-            </div>
-            <div class="db-fields-row">
-              <app-custom-input
-                formControlName="passwordHistoryLimit"
-                [label]="'ORG.PASSWORD_HISTORY_LIMIT' | translate"
-                type="number"
-                icon="pi-history"
-                [required]="true"
-                [tooltip]="'ORG.PASSWORD_HISTORY_LIMIT_TOOLTIP' | translate"
-                [showError]="
-                  !!(
-                    orgForm.get('passwordHistoryLimit')?.invalid &&
-                    orgForm.get('passwordHistoryLimit')?.touched
-                  )
-                "
-                [errorMessage]="getSecurityFieldError('passwordHistoryLimit')"
-              ></app-custom-input>
-              <app-custom-input
-                formControlName="sessionInactivityTimeout"
-                [label]="'ORG.IDLE_SESSION_TIMEOUT' | translate"
-                type="number"
-                icon="pi-clock"
-                [required]="true"
-                [tooltip]="'ORG.IDLE_SESSION_TIMEOUT_TOOLTIP' | translate"
-                [showError]="
-                  !!(
-                    orgForm.get('sessionInactivityTimeout')?.invalid &&
-                    orgForm.get('sessionInactivityTimeout')?.touched
-                  )
-                "
-                [errorMessage]="
-                  getSecurityFieldError('sessionInactivityTimeout')
-                "
-              ></app-custom-input>
-            </div>
-          </div>
-
-          <!-- Email Configuration -->
-          <div class="form-group-section">
-            <div class="group-header">
-              <i class="pi pi-envelope"></i>
-              <span>{{ 'ORG.EMAIL_CONFIGURATION' | translate }}</span>
-            </div>
-
-            <!-- Provider toggle -->
-            <div class="email-provider-toggle">
-              <button
-                type="button"
-                class="provider-btn"
-                [class.active]="!selectedEmailProvider"
-                (click)="orgForm.get('emailProvider')?.setValue(null)"
-              >
-                <i class="pi pi-cog"></i> {{ 'ORG.SYSTEM_DEFAULT' | translate }}
-              </button>
-              <button
-                type="button"
-                class="provider-btn"
-                [class.active]="selectedEmailProvider === 'SMTP'"
-                (click)="orgForm.get('emailProvider')?.setValue('SMTP')"
-              >
-                <i class="pi pi-server"></i> {{ 'ORG.CUSTOM_SMTP' | translate }}
-              </button>
-              <button
-                type="button"
-                class="provider-btn"
-                [class.active]="selectedEmailProvider === 'SES'"
-                (click)="orgForm.get('emailProvider')?.setValue('SES')"
-              >
-                <i class="pi pi-cloud"></i>
-                {{ 'ORG.CUSTOM_AWS_SES' | translate }}
-              </button>
-            </div>
-
-            <!-- SMTP fields -->
-            <div *ngIf="selectedEmailProvider === 'SMTP'" class="email-fields">
-              <div class="db-fields-row">
-                <app-custom-input
-                  formControlName="smtpHost"
-                  [label]="'ORG.SMTP_HOST' | translate"
-                  [placeholder]="'ORG.SMTP_HOST_PLACEHOLDER' | translate"
-                  icon="pi-desktop"
-                  [required]="true"
-                  [showError]="
-                    !!(
-                      orgForm.get('smtpHost')?.invalid &&
-                      orgForm.get('smtpHost')?.touched
-                    )
-                  "
-                  [errorMessage]="getEmailFieldError('smtpHost')"
-                ></app-custom-input>
-                <app-custom-input
-                  formControlName="smtpPort"
-                  [label]="'ORG.SMTP_PORT' | translate"
-                  [placeholder]="'ORG.SMTP_PORT_PLACEHOLDER' | translate"
-                  type="number"
-                  icon="pi-hashtag"
-                  [required]="true"
-                  [showError]="
-                    !!(
-                      orgForm.get('smtpPort')?.invalid &&
-                      orgForm.get('smtpPort')?.touched
-                    )
-                  "
-                  [errorMessage]="getEmailFieldError('smtpPort')"
-                ></app-custom-input>
-              </div>
-              <div class="db-fields-row">
-                <app-custom-input
-                  formControlName="smtpUser"
-                  [label]="'ORG.SMTP_USERNAME' | translate"
-                  [placeholder]="'ORG.SMTP_USERNAME_PLACEHOLDER' | translate"
-                  icon="pi-user"
-                  [required]="true"
-                  [showError]="
-                    !!(
-                      orgForm.get('smtpUser')?.invalid &&
-                      orgForm.get('smtpUser')?.touched
-                    )
-                  "
-                  [errorMessage]="getEmailFieldError('smtpUser')"
-                ></app-custom-input>
-                <app-custom-input
-                  formControlName="smtpPassword"
-                  [label]="'ORG.SMTP_PASSWORD' | translate"
-                  [placeholder]="'ORG.LEAVE_BLANK_KEEP_CURRENT' | translate"
-                  icon="pi-lock"
-                  [showPasswordToggle]="true"
-                ></app-custom-input>
-              </div>
-              <app-custom-input
-                formControlName="smtpFrom"
-                [label]="'ORG.FROM_EMAIL' | translate"
-                [placeholder]="'ORG.FROM_EMAIL_PLACEHOLDER' | translate"
-                icon="pi-at"
-                [required]="true"
-                [showError]="
-                  !!(
-                    orgForm.get('smtpFrom')?.invalid &&
-                    orgForm.get('smtpFrom')?.touched
-                  )
-                "
-                [errorMessage]="getEmailFieldError('smtpFrom')"
-              ></app-custom-input>
-            </div>
-
-            <!-- SES fields -->
-            <div *ngIf="selectedEmailProvider === 'SES'" class="email-fields">
-              <app-custom-input
-                formControlName="sesRegion"
-                [label]="'ORG.AWS_REGION' | translate"
-                [placeholder]="'ORG.AWS_REGION_PLACEHOLDER' | translate"
-                icon="pi-globe"
-                [required]="true"
-                [showError]="
-                  !!(
-                    orgForm.get('sesRegion')?.invalid &&
-                    orgForm.get('sesRegion')?.touched
-                  )
-                "
-                [errorMessage]="getEmailFieldError('sesRegion')"
-              ></app-custom-input>
-              <div class="db-fields-row">
-                <app-custom-input
-                  formControlName="sesAccessKeyId"
-                  [label]="'ORG.ACCESS_KEY_ID' | translate"
-                  [placeholder]="'ORG.ACCESS_KEY_ID_PLACEHOLDER' | translate"
-                  icon="pi-key"
-                  [required]="true"
-                  [showError]="
-                    !!(
-                      orgForm.get('sesAccessKeyId')?.invalid &&
-                      orgForm.get('sesAccessKeyId')?.touched
-                    )
-                  "
-                  [errorMessage]="getEmailFieldError('sesAccessKeyId')"
-                ></app-custom-input>
-                <app-custom-input
-                  formControlName="sesSecretAccessKey"
-                  [label]="'ORG.SECRET_ACCESS_KEY' | translate"
-                  [placeholder]="'ORG.LEAVE_BLANK_KEEP_CURRENT' | translate"
-                  icon="pi-lock"
-                  [showPasswordToggle]="true"
-                ></app-custom-input>
-              </div>
-              <app-custom-input
-                formControlName="sesFrom"
-                [label]="'ORG.FROM_EMAIL' | translate"
-                [placeholder]="'ORG.FROM_EMAIL_PLACEHOLDER' | translate"
-                icon="pi-at"
-                [required]="true"
-                [showError]="
-                  !!(
-                    orgForm.get('sesFrom')?.invalid &&
-                    orgForm.get('sesFrom')?.touched
-                  )
-                "
-                [errorMessage]="getEmailFieldError('sesFrom')"
-              ></app-custom-input>
-            </div>
-
-            <!-- No provider message -->
-            <div *ngIf="!selectedEmailProvider" class="no-provider-message">
-              <i class="pi pi-info-circle"></i>
-              <span>{{ 'ORG.SYSTEM_DEFAULT_EMAIL_NOTE' | translate }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="step-3-right">
-          <!-- Encryption Info (read-only, moved from Step 1) -->
-          <div class="readonly-info-container" *ngIf="orgData">
-            <div class="readonly-info-title">
-              <i class="pi pi-shield"></i>
-              {{ 'ORG.ENCRYPTION_CONFIGURATION' | translate }}
-            </div>
-            <div class="readonly-info-card">
-              <div class="info-row">
-                <span class="info-label">{{
-                  'ORG.ENCRYPTION_METHOD' | translate
-                }}</span>
-                <span class="info-value">{{
-                  'ORG.REVIEW_ENCRYPTION_VALUE' | translate
-                }}</span>
-              </div>
-              <p class="readonly-note">
-                <i class="pi pi-lock"></i>
-                {{ 'ORG.ENCRYPTION_AUTO_REVIEW_NOTE' | translate }}
               </p>
             </div>
           </div>

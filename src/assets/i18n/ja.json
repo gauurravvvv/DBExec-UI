@@ -35,7 +35,9 @@
     "dbRole": "DBロール",
     "dbTable": "DBテーブル",
     "qExecutor": "Q Executor",
-    "brandingManagement": "ブランディング"
+    "brandingManagement": "ブランディング",
+    "securityPolicy": "セキュリティポリシー",
+    "emailConfiguration": "メール設定"
   },
   "COMMON": {
     "ACTIVE": "有効",
@@ -459,7 +461,10 @@
     "ENCRYPTION_AUTO_ACK_DESC": "DBExecが当組織の暗号化鍵を代わりに生成・管理することを理解しています。マスター鍵はデータベースとは別にアプリケーションサーバーに保管されます。",
     "ENCRYPTION_AUTO_ACK_ERROR": "続行する前に暗号化設定をご確認ください。",
     "ENCRYPTION_AUTO_REVIEW_NOTE": "この組織用に新しいAES-256-GCM鍵を生成します。プラットフォームのマスター鍵で包みます。",
-    "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM（組織ごとの自動生成鍵）"
+    "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM（組織ごとの自動生成鍵）",
+    "SECURITY_EMAIL_MOVED_NOTE": "セキュリティとメールの設定は、アプリ設定で組織管理者が管理します。",
+    "SECURITY_AND_EMAIL": "セキュリティとメール",
+    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "セキュリティとメールの設定は、アプリ設定で組織管理者が管理します。"
   },
   "ROLE": {
     "TITLE": "役割",
@@ -2618,5 +2623,42 @@
     "GROUP_ADDED_BODY": "{{groupName}} に割り当てられました。",
     "GROUP_REMOVED_TITLE": "グループから削除されました",
     "GROUP_REMOVED_BODY": "{{groupName}} から削除されました。"
+  },
+  "MENU": {
+    "SECURITY_POLICY": "セキュリティポリシー",
+    "EMAIL_CONFIG": "メール設定"
+  },
+  "APP_SETTINGS": {
+    "SECURITY_POLICY": {
+      "TITLE": "セキュリティポリシー",
+      "SUBTITLE": "ログイン試行、ロックアウト、パスワード履歴、セッションタイムアウト。",
+      "MAX_LOGIN_ATTEMPTS": "最大ログイン試行回数",
+      "ACCOUNT_LOCK_DURATION": "アカウントロック期間（時間）",
+      "PASSWORD_HISTORY_LIMIT": "パスワード履歴の制限",
+      "SESSION_INACTIVITY_TIMEOUT": "セッション非アクティブタイムアウト（分）",
+      "SAVE": "変更を保存",
+      "SAVED": "セキュリティポリシーを更新しました"
+    },
+    "EMAIL_CONFIG": {
+      "TITLE": "メール設定",
+      "SUBTITLE": "招待とパスワードリセットに使用する送信メールプロバイダー。",
+      "PROVIDER": "メールプロバイダー",
+      "PROVIDER_NONE": "なし",
+      "PROVIDER_SMTP": "SMTP",
+      "PROVIDER_SES": "AWS SES",
+      "SMTP_HOST": "SMTP ホスト",
+      "SMTP_PORT": "SMTP ポート",
+      "SMTP_USER": "SMTP ユーザー名",
+      "SMTP_PASSWORD": "SMTP パスワード",
+      "SMTP_FROM": "送信元アドレス",
+      "SES_REGION": "AWS リージョン",
+      "SES_ACCESS_KEY": "アクセスキー ID",
+      "SES_SECRET_KEY": "シークレットアクセスキー",
+      "SES_FROM": "送信元アドレス",
+      "CONFIGURED": "設定済み",
+      "LEAVE_BLANK": "現在の値を維持するには空のままにします",
+      "SAVE": "変更を保存",
+      "SAVED": "メール設定を更新しました"
+    }
   }
 }

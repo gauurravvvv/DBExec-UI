@@ -1,0 +1,104 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <div class="page-header">
+      <div class="left-section">
+        <h2>{{ 'APP_SETTINGS.SECURITY_POLICY.TITLE' | translate }}</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          [label]="'APP_SETTINGS.SECURITY_POLICY.SAVE' | translate"
+          [disabled]="securityForm.invalid || !isFormDirty || saving()"
+          (click)="onSave()"
+        >
+          <i
+            class="pi mr-2"
+            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
+          ></i>
+        </button>
+      </div>
+    </div>
+
+    <p class="page-subtitle">
+      {{ 'APP_SETTINGS.SECURITY_POLICY.SUBTITLE' | translate }}
+    </p>
+
+    <app-content-loader
+      *ngIf="loading() && securityForm.pristine"
+    ></app-content-loader>
+
+    <form [formGroup]="securityForm" class="admin-form mt-4">
+      <div class="form-grid">
+        <app-custom-input
+          formControlName="maxLoginAttempts"
+          [label]="
+            'APP_SETTINGS.SECURITY_POLICY.MAX_LOGIN_ATTEMPTS' | translate
+          "
+          type="number"
+          icon="pi-hashtag"
+          [required]="true"
+          [showError]="
+            !!(
+              securityForm.get('maxLoginAttempts')?.invalid &&
+              securityForm.get('maxLoginAttempts')?.touched
+            )
+          "
+          [errorMessage]="getFieldError('maxLoginAttempts')"
+        ></app-custom-input>
+
+        <app-custom-input
+          formControlName="accountLockDurationHours"
+          [label]="
+            'APP_SETTINGS.SECURITY_POLICY.ACCOUNT_LOCK_DURATION' | translate
+          "
+          type="number"
+          icon="pi-history"
+          [required]="true"
+          [showError]="
+            !!(
+              securityForm.get('accountLockDurationHours')?.invalid &&
+              securityForm.get('accountLockDurationHours')?.touched
+            )
+          "
+          [errorMessage]="getFieldError('accountLockDurationHours')"
+        ></app-custom-input>
+
+        <app-custom-input
+          formControlName="passwordHistoryLimit"
+          [label]="
+            'APP_SETTINGS.SECURITY_POLICY.PASSWORD_HISTORY_LIMIT' | translate
+          "
+          type="number"
+          icon="pi-history"
+          [required]="true"
+          [showError]="
+            !!(
+              securityForm.get('passwordHistoryLimit')?.invalid &&
+              securityForm.get('passwordHistoryLimit')?.touched
+            )
+          "
+          [errorMessage]="getFieldError('passwordHistoryLimit')"
+        ></app-custom-input>
+
+        <app-custom-input
+          formControlName="sessionInactivityTimeout"
+          [label]="
+            'APP_SETTINGS.SECURITY_POLICY.SESSION_INACTIVITY_TIMEOUT' | translate
+          "
+          type="number"
+          icon="pi-clock"
+          [required]="true"
+          [showError]="
+            !!(
+              securityForm.get('sessionInactivityTimeout')?.invalid &&
+              securityForm.get('sessionInactivityTimeout')?.touched
+            )
+          "
+          [errorMessage]="getFieldError('sessionInactivityTimeout')"
+        ></app-custom-input>
+      </div>
+    </form>
+  </div>
+</div>

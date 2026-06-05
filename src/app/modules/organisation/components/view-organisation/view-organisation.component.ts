@@ -22,24 +22,6 @@ interface OrganisationConfig {
   maxGroups: number;
 }
 
-interface OrgConfig {
-  /** @deprecated legacy column. Always null for orgs created after the
-   *  envelope-encryption migration; some legacy rows still carry it. */
-  encryptionAlgorithm?: string | null;
-  maxLoginAttempts: number;
-  accountLockDurationHours: number;
-  passwordHistoryLimit: number;
-  sessionInactivityTimeout: number;
-  emailProvider: string | null;
-  smtpHost: string | null;
-  smtpPort: number | null;
-  smtpUser: string | null;
-  smtpFrom: string | null;
-  sesRegion: string | null;
-  sesAccessKeyId: string | null;
-  sesFrom: string | null;
-}
-
 interface MasterDbConfig {
   hostname: string;
   port: number;
@@ -61,9 +43,6 @@ interface OrganisationData {
   connectionsCount: number;
   dbStatus: 'connected' | 'not_configured' | 'connection_failed';
   masterDbConfig: MasterDbConfig;
-  orgConfig: OrgConfig;
-  /** @deprecated legacy top-level mirror of orgConfig.encryptionAlgorithm. */
-  encryptionAlgorithm?: string | null;
 }
 
 @Component({

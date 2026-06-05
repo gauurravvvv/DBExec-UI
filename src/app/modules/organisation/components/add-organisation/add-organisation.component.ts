@@ -109,47 +109,13 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
       dbPassword: ['', [Validators.required]],
       adminEmail: ['', [Validators.required, Validators.email]],
       adminLocale: ['en', Validators.required],
-      // Security config
-      maxLoginAttempts: [
-        5,
-        [Validators.required, Validators.min(3), Validators.max(10)],
-      ],
-      accountLockDurationHours: [
-        1,
-        [Validators.required, Validators.min(0), Validators.max(24)],
-      ],
-      passwordHistoryLimit: [
-        5,
-        [Validators.required, Validators.min(1), Validators.max(24)],
-      ],
-      sessionInactivityTimeout: [
-        30,
-        [Validators.required, Validators.min(5), Validators.max(1440)],
-      ],
-      // Email config
-      emailProvider: [null],
-      smtpHost: [''],
-      smtpPort: [587],
-      smtpUser: [''],
-      smtpPassword: [''],
-      smtpFrom: [''],
-      sesRegion: [''],
-      sesAccessKeyId: [''],
-      sesSecretAccessKey: [''],
-      sesFrom: [''],
+      // Security + email policy now live on the per-org OrgPolicy
+      // entity and are managed by the Org Admin under App Settings.
+      // They are deliberately NOT collected at org creation time.
       // Acknowledgments
-      confirmationChecked: [false],
       dbAcknowledgment: [false],
       schemaAcknowledgment: [false],
     });
-
-    // Update email field validators when provider changes
-    this.orgForm
-      .get('emailProvider')
-      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(provider => {
-        this.updateEmailValidators(provider);
-      });
 
     // Reset connection test when DB fields change. Bumping the request id
     // invalidates any in-flight response so it can't apply stale state.
@@ -171,11 +137,9 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
   isStep1Valid(): boolean {
     const nameValid = this.orgForm.get('name')?.valid || false;
     const descValid = this.orgForm.get('description')?.valid || false;
-    // Encryption is server-managed — the only acknowledgment we still
-    // gate on is the high-level confirmation checkbox.
-    return (
-      nameValid && descValid && this.orgForm.get('confirmationChecked')?.value
-    );
+    // Encryption is server-managed and no admin acknowledgement is
+    // gathered any more — step 1 just gates on name + description.
+    return nameValid && descValid;
   }
 
   isDbConnectionFieldsValid(): boolean {
@@ -187,105 +151,9 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     return this.isDbConnectionFieldsValid();
   }
 
-  get selectedEmailProvider(): string | null {
-    return this.orgForm.get('emailProvider')?.value;
-  }
-
-  updateEmailValidators(provider: string | null) {
-    const smtpFields = ['smtpHost', 'smtpPort', 'smtpUser', 'smtpFrom'];
-    const sesFields = ['sesRegion', 'sesAccessKeyId', 'sesFrom'];
-    const allFields = [...smtpFields, ...sesFields];
-
-    allFields.forEach(f => {
-      this.orgForm.get(f)?.clearValidators();
-      this.orgForm.get(f)?.updateValueAndValidity({ emitEvent: false });
-    });
-
-    if (provider === 'SMTP') {
-      this.orgForm
-        .get('smtpHost')
-        ?.setValidators([Validators.required, Validators.maxLength(255)]);
-      this.orgForm
-        .get('smtpPort')
-        ?.setValidators([
-          Validators.required,
-          Validators.min(1),
-          Validators.max(65535),
-        ]);
-      this.orgForm
-        .get('smtpUser')
-        ?.setValidators([Validators.required, Validators.maxLength(255)]);
-      this.orgForm
-        .get('smtpFrom')
-        ?.setValidators([Validators.required, Validators.email]);
-    } else if (provider === 'SES') {
-      this.orgForm
-        .get('sesRegion')
-        ?.setValidators([
-          Validators.required,
-          Validators.maxLength(50),
-          Validators.pattern(/^[a-z]{2}-[a-z]+-\d{1,2}$/),
-        ]);
-      this.orgForm
-        .get('sesAccessKeyId')
-        ?.setValidators([
-          Validators.required,
-          Validators.minLength(16),
-          Validators.maxLength(128),
-        ]);
-      this.orgForm
-        .get('sesFrom')
-        ?.setValidators([Validators.required, Validators.email]);
-    }
-
-    allFields.forEach(f => {
-      this.orgForm.get(f)?.updateValueAndValidity({ emitEvent: false });
-    });
-  }
-
-  getEmailFieldError(fieldName: string): string {
-    const control = this.orgForm.get(fieldName);
-    if (!control?.errors || !control.touched) return '';
-    if (control.errors['required'])
-      return this.translate.instant('VALIDATION.FIELD_REQUIRED');
-    if (control.errors['email'])
-      return this.translate.instant('VALIDATION.EMAIL_INVALID');
-    if (control.errors['maxlength'])
-      return this.translate.instant('VALIDATION.MAX_LENGTH', {
-        length: control.errors['maxlength'].requiredLength,
-      });
-    if (control.errors['minlength'])
-      return this.translate.instant('VALIDATION.MIN_LENGTH', {
-        length: control.errors['minlength'].requiredLength,
-      });
-    if (control.errors['min'])
-      return this.translate.instant('VALIDATION.MIN_VALUE', {
-        value: control.errors['min'].min,
-      });
-    if (control.errors['max'])
-      return this.translate.instant('VALIDATION.MAX_VALUE', {
-        value: control.errors['max'].max,
-      });
-    if (control.errors['pattern'])
-      return this.translate.instant('VALIDATION.INVALID_FORMAT_REGION');
-    return '';
-  }
-
-  isStep3Valid(): boolean {
-    const securityValid = [
-      'maxLoginAttempts',
-      'accountLockDurationHours',
-      'passwordHistoryLimit',
-      'sessionInactivityTimeout',
-    ].every(f => this.orgForm.get(f)?.valid);
-    return securityValid;
-  }
-
   nextStep() {
     if (this.currentStep === 0 && this.isStep1Valid()) {
       this.currentStep = 1;
-    } else if (this.currentStep === 1) {
-      this.currentStep = 2;
     }
   }
 
@@ -320,8 +188,6 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
       this.currentStep = step;
     } else if (step === 1 && this.currentStep === 0 && this.isStep1Valid()) {
       this.currentStep = 1;
-    } else if (step === 2 && this.currentStep === 1) {
-      this.currentStep = 2;
     }
   }
 
@@ -418,15 +284,7 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     Object.keys(this.orgForm.controls).forEach(key => {
       this.orgForm.get(key)?.setValue('');
     });
-    // Restore security defaults
     this.orgForm.patchValue({
-      maxLoginAttempts: 5,
-      accountLockDurationHours: 1,
-      passwordHistoryLimit: 5,
-      sessionInactivityTimeout: 30,
-      emailProvider: null,
-      smtpPort: 587,
-      confirmationChecked: false,
       dbAcknowledgment: false,
       schemaAcknowledgment: false,
     });
@@ -440,7 +298,6 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
   isFormValid(): boolean {
     return (
       this.orgForm.valid &&
-      this.orgForm.get('confirmationChecked')?.value &&
       this.orgForm.get('dbAcknowledgment')?.value &&
       this.orgForm.get('schemaAcknowledgment')?.value &&
       this.connectionTested()
@@ -475,22 +332,6 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     if (control?.errors?.['maxlength'])
       return this.translate.instant('VALIDATION.DESCRIPTION_MAX_LENGTH', {
         length: control.errors['maxlength'].requiredLength,
-      });
-    return '';
-  }
-
-  getSecurityFieldError(fieldName: string): string {
-    const control = this.orgForm.get(fieldName);
-    if (!control?.errors || !control.touched) return '';
-    if (control.errors['required'])
-      return this.translate.instant('VALIDATION.FIELD_REQUIRED');
-    if (control.errors['min'])
-      return this.translate.instant('VALIDATION.MIN_VALUE', {
-        value: control.errors['min'].min,
-      });
-    if (control.errors['max'])
-      return this.translate.instant('VALIDATION.MAX_VALUE', {
-        value: control.errors['max'].max,
       });
     return '';
   }
