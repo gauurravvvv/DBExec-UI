@@ -313,7 +313,9 @@
     "CANNOT_EDIT_DEFAULT": "O administrador de sistema padrão não pode ser editado",
     "CANNOT_EDIT_SELF": "Você não pode editar seu próprio registro de administrador de sistema por aqui",
     "CANNOT_UNLOCK_DEFAULT": "O administrador de sistema padrão não pode ser desbloqueado por aqui",
-    "CANNOT_UNLOCK_SELF": "Você não pode desbloquear sua própria conta por aqui"
+    "CANNOT_UNLOCK_SELF": "Você não pode desbloquear sua própria conta por aqui",
+    "DEFAULT_BADGE": "Padrão",
+    "YOU_BADGE": "Você"
   },
   "ORG": {
     "TITLE": "Organizações",

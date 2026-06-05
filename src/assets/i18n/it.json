@@ -313,7 +313,9 @@
     "CANNOT_EDIT_DEFAULT": "L'amministratore di sistema predefinito non può essere modificato",
     "CANNOT_EDIT_SELF": "Non puoi modificare il tuo record di amministratore di sistema da qui",
     "CANNOT_UNLOCK_DEFAULT": "L'amministratore di sistema predefinito non può essere sbloccato da qui",
-    "CANNOT_UNLOCK_SELF": "Non puoi sbloccare il tuo account da qui"
+    "CANNOT_UNLOCK_SELF": "Non puoi sbloccare il tuo account da qui",
+    "DEFAULT_BADGE": "Predefinito",
+    "YOU_BADGE": "Tu"
   },
   "ORG": {
     "TITLE": "Organizzazioni",

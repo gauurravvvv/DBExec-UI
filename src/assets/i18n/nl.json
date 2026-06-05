@@ -313,7 +313,9 @@
     "CANNOT_EDIT_DEFAULT": "De standaard-systeembeheerder kan niet worden bewerkt",
     "CANNOT_EDIT_SELF": "Je kunt je eigen systeembeheerder-record hier niet bewerken",
     "CANNOT_UNLOCK_DEFAULT": "De standaard-systeembeheerder kan hier niet worden ontgrendeld",
-    "CANNOT_UNLOCK_SELF": "Je kunt je eigen account hier niet ontgrendelen"
+    "CANNOT_UNLOCK_SELF": "Je kunt je eigen account hier niet ontgrendelen",
+    "DEFAULT_BADGE": "Standaard",
+    "YOU_BADGE": "Jij"
   },
   "ORG": {
     "TITLE": "Organisaties",

@@ -313,7 +313,9 @@
     "CANNOT_EDIT_DEFAULT": "The default system admin cannot be edited",
     "CANNOT_EDIT_SELF": "You cannot edit your own system admin record from here",
     "CANNOT_UNLOCK_DEFAULT": "The default system admin cannot be unlocked from here",
-    "CANNOT_UNLOCK_SELF": "You cannot unlock your own account from here"
+    "CANNOT_UNLOCK_SELF": "You cannot unlock your own account from here",
+    "DEFAULT_BADGE": "Default",
+    "YOU_BADGE": "You"
   },
   "ORG": {
     "TITLE": "Organisations",

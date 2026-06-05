@@ -313,7 +313,9 @@
     "CANNOT_EDIT_DEFAULT": "Der Standard-System-Administrator kann nicht bearbeitet werden",
     "CANNOT_EDIT_SELF": "Sie können Ihren eigenen System-Administrator-Datensatz hier nicht bearbeiten",
     "CANNOT_UNLOCK_DEFAULT": "Der Standard-System-Administrator kann hier nicht entsperrt werden",
-    "CANNOT_UNLOCK_SELF": "Sie können Ihr eigenes Konto hier nicht entsperren"
+    "CANNOT_UNLOCK_SELF": "Sie können Ihr eigenes Konto hier nicht entsperren",
+    "DEFAULT_BADGE": "Standard",
+    "YOU_BADGE": "Sie"
   },
   "ORG": {
     "TITLE": "Organisationen",

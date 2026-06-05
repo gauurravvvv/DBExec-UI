@@ -313,7 +313,9 @@
     "CANNOT_EDIT_DEFAULT": "默认系统管理员无法编辑",
     "CANNOT_EDIT_SELF": "您不能从此处编辑自己的系统管理员记录",
     "CANNOT_UNLOCK_DEFAULT": "默认系统管理员无法从此处解锁",
-    "CANNOT_UNLOCK_SELF": "您不能从此处解锁自己的账户"
+    "CANNOT_UNLOCK_SELF": "您不能从此处解锁自己的账户",
+    "DEFAULT_BADGE": "默认",
+    "YOU_BADGE": "你"
   },
   "ORG": {
     "TITLE": "组织",

@@ -313,7 +313,9 @@
     "CANNOT_EDIT_DEFAULT": "기본 시스템 관리자는 편집할 수 없습니다",
     "CANNOT_EDIT_SELF": "본인의 시스템 관리자 레코드는 이 화면에서 편집할 수 없습니다",
     "CANNOT_UNLOCK_DEFAULT": "기본 시스템 관리자는 이 화면에서 잠금 해제할 수 없습니다",
-    "CANNOT_UNLOCK_SELF": "본인 계정은 이 화면에서 잠금 해제할 수 없습니다"
+    "CANNOT_UNLOCK_SELF": "본인 계정은 이 화면에서 잠금 해제할 수 없습니다",
+    "DEFAULT_BADGE": "기본",
+    "YOU_BADGE": "본인"
   },
   "ORG": {
     "TITLE": "조직",

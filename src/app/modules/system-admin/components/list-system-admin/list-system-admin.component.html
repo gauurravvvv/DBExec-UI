@@ -392,12 +392,27 @@
                 ></p-tableCheckbox>
               </td>
               <td pFrozenColumn>
-                <a
-                  class="dataset-name-link"
-                  [routerLink]="['/app/admins', admin.id]"
-                >
-                  {{ admin.username }}
-                </a>
+                <span class="username-cell">
+                  <a
+                    class="dataset-name-link"
+                    [routerLink]="['/app/admins', admin.id]"
+                  >
+                    {{ admin.username }}
+                  </a>
+                  <!-- Identity badges — mirror the GitHub / Linear /
+                       Stripe convention for owner / current-user
+                       rows. The disabled action buttons already
+                       communicate the constraint; these badges
+                       explain WHY without requiring a hover. -->
+                  <span
+                    *ngIf="admin.isDefault === 1"
+                    class="row-badge row-badge--default"
+                  >{{ 'SYSTEM_ADMIN.DEFAULT_BADGE' | translate }}</span>
+                  <span
+                    *ngIf="admin.id === loggedInUserId"
+                    class="row-badge row-badge--self"
+                  >{{ 'SYSTEM_ADMIN.YOU_BADGE' | translate }}</span>
+                </span>
               </td>
               <td>
                 <span class="description-text">{{ admin.firstName }}</span>

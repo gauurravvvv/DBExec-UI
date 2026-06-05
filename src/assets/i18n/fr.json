@@ -313,7 +313,9 @@
     "CANNOT_EDIT_DEFAULT": "L'administrateur système par défaut ne peut pas être modifié",
     "CANNOT_EDIT_SELF": "Vous ne pouvez pas modifier votre propre fiche d'administrateur système depuis cet écran",
     "CANNOT_UNLOCK_DEFAULT": "L'administrateur système par défaut ne peut pas être déverrouillé depuis cet écran",
-    "CANNOT_UNLOCK_SELF": "Vous ne pouvez pas déverrouiller votre propre compte depuis cet écran"
+    "CANNOT_UNLOCK_SELF": "Vous ne pouvez pas déverrouiller votre propre compte depuis cet écran",
+    "DEFAULT_BADGE": "Par défaut",
+    "YOU_BADGE": "Vous"
   },
   "ORG": {
     "TITLE": "Organisations",
