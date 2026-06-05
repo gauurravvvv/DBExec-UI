@@ -172,7 +172,9 @@
     "RELATIVE_TIME": {
       "A_FEW_SECONDS_AGO": "몇 초 전",
       "A_FEW_SECONDS_FROM_NOW": "몇 초 후"
-    }
+    },
+    "DEFAULT_BADGE": "기본",
+    "YOU_BADGE": "본인"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "이름은 필수 항목입니다",
@@ -537,7 +539,13 @@
     "CONTACT_INFORMATION": "연락처 정보",
     "ACCOUNT_INFORMATION": "계정 정보",
     "LANGUAGE": "언어",
-    "SELECT_LANGUAGE": "언어 선택"
+    "SELECT_LANGUAGE": "언어 선택",
+    "CANNOT_EDIT_DEFAULT": "기본 사용자는 편집할 수 없습니다",
+    "CANNOT_EDIT_SELF": "본인의 사용자 레코드는 이 화면에서 편집할 수 없습니다",
+    "CANNOT_DELETE_DEFAULT": "기본 사용자는 삭제할 수 없습니다",
+    "CANNOT_DELETE_SELF": "본인을 삭제할 수 없습니다",
+    "CANNOT_UNLOCK_DEFAULT": "기본 사용자는 이 화면에서 잠금 해제할 수 없습니다",
+    "CANNOT_UNLOCK_SELF": "본인 계정은 이 화면에서 잠금 해제할 수 없습니다"
   },
   "DATASOURCE": {
     "TITLE": "데이터소스",

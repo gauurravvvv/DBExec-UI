@@ -13,11 +13,22 @@
         <h2>{{ 'USER.VIEW_TITLE' | translate }}</h2>
       </div>
       <div class="header-actions">
+        <!-- Edit / Delete gated on BE-returned flags so deep-link
+             reloads get the right state. Tooltip distinguishes the
+             default-user lock from the self-action lock. -->
         <button
           class="btn-primary"
           type="button"
-          [disabled]="userId == loggedInUserId"
-          [routerLink]="['/app/users', userId, 'edit']"
+          [disabled]="!userData?.canEdit"
+          [pTooltip]="
+            !userData?.canEdit
+              ? (userData?.isDefault === 1
+                  ? ('USER.CANNOT_EDIT_DEFAULT' | translate)
+                  : ('USER.CANNOT_EDIT_SELF' | translate))
+              : ('COMMON.EDIT' | translate)
+          "
+          tooltipPosition="bottom"
+          (click)="userData?.canEdit && goToEdit()"
         >
           <i class="pi pi-pencil"></i> {{ 'COMMON.EDIT' | translate }}
         </button>
@@ -27,7 +38,9 @@
           [disabled]="!userData?.canDelete || isDeleting(userId)"
           [pTooltip]="
             !userData?.canDelete
-              ? ('COMMON.NO_DELETE_PERMISSION' | translate)
+              ? (userData?.isDefault === 1
+                  ? ('USER.CANNOT_DELETE_DEFAULT' | translate)
+                  : ('USER.CANNOT_DELETE_SELF' | translate))
               : ('COMMON.DELETE' | translate)
           "
           tooltipPosition="bottom"

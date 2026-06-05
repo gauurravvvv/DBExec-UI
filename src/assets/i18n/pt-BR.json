@@ -172,7 +172,9 @@
     "RELATIVE_TIME": {
       "A_FEW_SECONDS_AGO": "há alguns segundos",
       "A_FEW_SECONDS_FROM_NOW": "em alguns segundos"
-    }
+    },
+    "DEFAULT_BADGE": "Padrão",
+    "YOU_BADGE": "Você"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "O nome é obrigatório",
@@ -537,7 +539,13 @@
     "CONTACT_INFORMATION": "Informações de contato",
     "ACCOUNT_INFORMATION": "Informações da conta",
     "LANGUAGE": "Idioma",
-    "SELECT_LANGUAGE": "Selecionar idioma"
+    "SELECT_LANGUAGE": "Selecionar idioma",
+    "CANNOT_EDIT_DEFAULT": "O usuário padrão não pode ser editado",
+    "CANNOT_EDIT_SELF": "Você não pode editar seu próprio registro de usuário por aqui",
+    "CANNOT_DELETE_DEFAULT": "O usuário padrão não pode ser excluído",
+    "CANNOT_DELETE_SELF": "Você não pode excluir a si mesmo",
+    "CANNOT_UNLOCK_DEFAULT": "O usuário padrão não pode ser desbloqueado por aqui",
+    "CANNOT_UNLOCK_SELF": "Você não pode desbloquear sua própria conta por aqui"
   },
   "DATASOURCE": {
     "TITLE": "Fontes de dados",

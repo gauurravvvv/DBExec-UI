@@ -149,16 +149,25 @@
               <td>
                 <p-tableCheckbox
                   [value]="role"
-                  [disabled]="role.isDefault === 1"
+                  [disabled]="!role.canDelete"
                 ></p-tableCheckbox>
               </td>
               <td>
-                <a
-                  class="dataset-name-link"
-                  [routerLink]="['/app/roles', role.id]"
-                >
-                  {{ role.name }}
-                </a>
+                <span class="role-name-cell">
+                  <a
+                    class="dataset-name-link"
+                    [routerLink]="['/app/roles', role.id]"
+                  >
+                    {{ role.name }}
+                  </a>
+                  <!-- Default-role badge — brand-tinted, signals
+                       the row is seeded and immutable. Same
+                       convention as users / system-admin lists. -->
+                  <span
+                    *ngIf="role.isDefault === 1"
+                    class="row-badge row-badge--default"
+                  >{{ 'COMMON.DEFAULT_BADGE' | translate }}</span>
+                </span>
               </td>
               <td>
                 <span class="description-text" [title]="role.description">{{
@@ -192,12 +201,12 @@
                     class="icon-btn edit-btn"
                     (click)="onEdit(role.id)"
                     [pTooltip]="
-                      role.isDefault === 1
+                      !role.canEdit
                         ? ('ROLE.CANNOT_EDIT_DEFAULT' | translate)
                         : ('COMMON.EDIT' | translate)
                     "
                     tooltipPosition="bottom"
-                    [disabled]="role.isDefault === 1"
+                    [disabled]="!role.canEdit"
                   >
                     <i class="pi pi-pencil"></i>
                   </button>
@@ -205,12 +214,12 @@
                     class="icon-btn delete-btn"
                     (click)="confirmDelete(role.id)"
                     [pTooltip]="
-                      role.isDefault === 1
+                      !role.canDelete
                         ? ('ROLE.CANNOT_DELETE_DEFAULT' | translate)
                         : ('COMMON.DELETE' | translate)
                     "
                     tooltipPosition="bottom"
-                    [disabled]="role.isDefault === 1 || isDeleting(role.id)"
+                    [disabled]="!role.canDelete || isDeleting(role.id)"
                   >
                     <i
                       class="pi"

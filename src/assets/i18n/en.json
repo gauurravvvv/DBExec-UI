@@ -172,7 +172,9 @@
     "RELATIVE_TIME": {
       "A_FEW_SECONDS_AGO": "a few seconds ago",
       "A_FEW_SECONDS_FROM_NOW": "in a few seconds"
-    }
+    },
+    "DEFAULT_BADGE": "Default",
+    "YOU_BADGE": "You"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "First name is required",
@@ -571,7 +573,13 @@
     "BULK_ADD_PROCEED": "Proceed",
     "BULK_ADD_CREATED_SUCCESS": "users created successfully",
     "BULK_ADD_CREATED_FAILED": "users could not be created",
-    "BULK_ADD_RACE_FAILURES": "Failures during creation"
+    "BULK_ADD_RACE_FAILURES": "Failures during creation",
+    "CANNOT_EDIT_DEFAULT": "The default user cannot be edited",
+    "CANNOT_EDIT_SELF": "You cannot edit your own user record from here",
+    "CANNOT_DELETE_DEFAULT": "The default user cannot be deleted",
+    "CANNOT_DELETE_SELF": "You cannot delete yourself",
+    "CANNOT_UNLOCK_DEFAULT": "The default user cannot be unlocked from here",
+    "CANNOT_UNLOCK_SELF": "You cannot unlock your own account from here"
   },
   "DATASOURCE": {
     "TITLE": "Datasources",

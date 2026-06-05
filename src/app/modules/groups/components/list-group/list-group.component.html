@@ -260,12 +260,20 @@
                 ></p-tableCheckbox>
               </td>
               <td pFrozenColumn>
-                <a
-                  class="dataset-name-link"
-                  [routerLink]="['/app/groups', group.id]"
-                >
-                  {{ group.name }}
-                </a>
+                <span class="group-name-cell">
+                  <a
+                    class="dataset-name-link"
+                    [routerLink]="['/app/groups', group.id]"
+                  >
+                    {{ group.name }}
+                  </a>
+                  <!-- Default-group badge — brand-tinted. Same
+                       convention as users / roles / system-admin. -->
+                  <span
+                    *ngIf="group.isDefault === 1"
+                    class="row-badge row-badge--default"
+                  >{{ 'COMMON.DEFAULT_BADGE' | translate }}</span>
+                </span>
               </td>
               <td>
                 <span

@@ -172,7 +172,9 @@
     "RELATIVE_TIME": {
       "A_FEW_SECONDS_AGO": "几秒前",
       "A_FEW_SECONDS_FROM_NOW": "几秒后"
-    }
+    },
+    "DEFAULT_BADGE": "默认",
+    "YOU_BADGE": "你"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名字为必填项",
@@ -537,7 +539,13 @@
     "CONTACT_INFORMATION": "联系信息",
     "ACCOUNT_INFORMATION": "账户信息",
     "LANGUAGE": "语言",
-    "SELECT_LANGUAGE": "选择语言"
+    "SELECT_LANGUAGE": "选择语言",
+    "CANNOT_EDIT_DEFAULT": "默认用户无法编辑",
+    "CANNOT_EDIT_SELF": "您不能从此处编辑自己的用户记录",
+    "CANNOT_DELETE_DEFAULT": "默认用户无法删除",
+    "CANNOT_DELETE_SELF": "您不能删除自己",
+    "CANNOT_UNLOCK_DEFAULT": "默认用户无法从此处解锁",
+    "CANNOT_UNLOCK_SELF": "您不能从此处解锁自己的账户"
   },
   "DATASOURCE": {
     "TITLE": "数据源",

@@ -172,7 +172,9 @@
     "RELATIVE_TIME": {
       "A_FEW_SECONDS_AGO": "vor wenigen Sekunden",
       "A_FEW_SECONDS_FROM_NOW": "in wenigen Sekunden"
-    }
+    },
+    "DEFAULT_BADGE": "Standard",
+    "YOU_BADGE": "Sie"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Vorname ist erforderlich",
@@ -537,7 +539,13 @@
     "CONTACT_INFORMATION": "Kontaktinformationen",
     "ACCOUNT_INFORMATION": "Kontoinformationen",
     "LANGUAGE": "Sprache",
-    "SELECT_LANGUAGE": "Sprache wählen"
+    "SELECT_LANGUAGE": "Sprache wählen",
+    "CANNOT_EDIT_DEFAULT": "Der Standardbenutzer kann nicht bearbeitet werden",
+    "CANNOT_EDIT_SELF": "Sie können Ihren eigenen Benutzerdatensatz hier nicht bearbeiten",
+    "CANNOT_DELETE_DEFAULT": "Der Standardbenutzer kann nicht gelöscht werden",
+    "CANNOT_DELETE_SELF": "Sie können sich nicht selbst löschen",
+    "CANNOT_UNLOCK_DEFAULT": "Der Standardbenutzer kann hier nicht entsperrt werden",
+    "CANNOT_UNLOCK_SELF": "Sie können Ihr eigenes Konto hier nicht entsperren"
   },
   "DATASOURCE": {
     "TITLE": "Datenquellen",

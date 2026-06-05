@@ -175,22 +175,32 @@ export class EditUserComponent
   async loadAdminData() {
     await this.userService.loadOne(this.userId);
     const data = this.userService.current();
-    if (data) {
-      this.userData = data;
-      this.isLocked = !!this.userData.isLocked;
-      if (this.isLocked) {
-        this.userForm.get('status')?.disable();
-      }
-      this.userForm.patchValue({
-        id: this.userData.id,
-        firstName: this.userData.firstName,
-        lastName: this.userData.lastName,
-        username: this.userData.username,
-        email: this.userData.email,
-        status: this.userData.status,
-        groupIds: this.userData.groupIds || [],
-      });
+    if (!data) return;
+
+    // Deep-link guard: if the BE marks the record uneditable
+    // (default user OR self), bounce back to the view page rather
+    // than render a form that would 400 on save. The list / view
+    // buttons already gate on canEdit; this catches direct URL
+    // access and stale link reloads.
+    if (data.canEdit === false) {
+      this.router.navigate(['/app/users', this.userId]);
+      return;
     }
+
+    this.userData = data;
+    this.isLocked = !!this.userData.isLocked;
+    if (this.isLocked) {
+      this.userForm.get('status')?.disable();
+    }
+    this.userForm.patchValue({
+      id: this.userData.id,
+      firstName: this.userData.firstName,
+      lastName: this.userData.lastName,
+      username: this.userData.username,
+      email: this.userData.email,
+      status: this.userData.status,
+      groupIds: this.userData.groupIds || [],
+    });
     this.cdr.markForCheck();
   }
 

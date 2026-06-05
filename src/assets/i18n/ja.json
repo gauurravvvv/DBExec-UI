@@ -172,7 +172,9 @@
     "RELATIVE_TIME": {
       "A_FEW_SECONDS_AGO": "数秒前",
       "A_FEW_SECONDS_FROM_NOW": "数秒後"
-    }
+    },
+    "DEFAULT_BADGE": "デフォルト",
+    "YOU_BADGE": "自分"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名は必須です",
@@ -537,7 +539,13 @@
     "CONTACT_INFORMATION": "連絡先情報",
     "ACCOUNT_INFORMATION": "アカウント情報",
     "LANGUAGE": "言語",
-    "SELECT_LANGUAGE": "言語を選択"
+    "SELECT_LANGUAGE": "言語を選択",
+    "CANNOT_EDIT_DEFAULT": "デフォルトユーザーは編集できません",
+    "CANNOT_EDIT_SELF": "自分のユーザーレコードはこの画面から編集できません",
+    "CANNOT_DELETE_DEFAULT": "デフォルトユーザーは削除できません",
+    "CANNOT_DELETE_SELF": "自分自身を削除することはできません",
+    "CANNOT_UNLOCK_DEFAULT": "デフォルトユーザーはこの画面からロック解除できません",
+    "CANNOT_UNLOCK_SELF": "自分のアカウントはこの画面からロック解除できません"
   },
   "DATASOURCE": {
     "TITLE": "データソース",

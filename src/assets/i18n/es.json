@@ -172,7 +172,9 @@
     "RELATIVE_TIME": {
       "A_FEW_SECONDS_AGO": "hace unos segundos",
       "A_FEW_SECONDS_FROM_NOW": "dentro de unos segundos"
-    }
+    },
+    "DEFAULT_BADGE": "Predeterminado",
+    "YOU_BADGE": "Tú"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "El nombre es obligatorio",
@@ -537,7 +539,13 @@
     "CONTACT_INFORMATION": "Información de contacto",
     "ACCOUNT_INFORMATION": "Información de la cuenta",
     "LANGUAGE": "Idioma",
-    "SELECT_LANGUAGE": "Seleccionar idioma"
+    "SELECT_LANGUAGE": "Seleccionar idioma",
+    "CANNOT_EDIT_DEFAULT": "El usuario predeterminado no se puede editar",
+    "CANNOT_EDIT_SELF": "No puedes editar tu propio registro de usuario desde aquí",
+    "CANNOT_DELETE_DEFAULT": "El usuario predeterminado no se puede eliminar",
+    "CANNOT_DELETE_SELF": "No puedes eliminarte a ti mismo",
+    "CANNOT_UNLOCK_DEFAULT": "El usuario predeterminado no se puede desbloquear desde aquí",
+    "CANNOT_UNLOCK_SELF": "No puedes desbloquear tu propia cuenta desde aquí"
   },
   "DATASOURCE": {
     "TITLE": "Fuentes de datos",

@@ -85,6 +85,13 @@ export class ViewUserComponent implements OnInit, OnDestroy {
     this.avatarBackground = colors[randomIndex];
   }
 
+  /** Wired up by the Edit button; gated by `userData?.canEdit` in
+   *  the template so this never fires for default-user / self
+   *  cases. */
+  goToEdit() {
+    this.router.navigate(['/app/users', this.userId, 'edit']);
+  }
+
   confirmDelete() {
     this.showDeleteConfirm = true;
   }

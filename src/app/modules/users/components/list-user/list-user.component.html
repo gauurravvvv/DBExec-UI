@@ -417,12 +417,25 @@
                 ></p-tableCheckbox>
               </td>
               <td pFrozenColumn>
-                <a
-                  class="dataset-name-link"
-                  [routerLink]="['/app/users', user.id]"
-                >
-                  {{ user.username }}
-                </a>
+                <span class="username-cell">
+                  <a
+                    class="dataset-name-link"
+                    [routerLink]="['/app/users', user.id]"
+                  >
+                    {{ user.username }}
+                  </a>
+                  <!-- Identity badges — mirror the system-admin
+                       list convention so the row's locked state
+                       is visible at a glance, not just on hover. -->
+                  <span
+                    *ngIf="user.isDefault === 1"
+                    class="row-badge row-badge--default"
+                  >{{ 'COMMON.DEFAULT_BADGE' | translate }}</span>
+                  <span
+                    *ngIf="user.id === loggedInUserId"
+                    class="row-badge row-badge--self"
+                  >{{ 'COMMON.YOU_BADGE' | translate }}</span>
+                </span>
               </td>
               <td>
                 <span class="description-text">{{ user.firstName }}</span>
@@ -493,13 +506,23 @@
               </td>
               <td>
                 <div class="row-actions">
+                  <!-- Unlock — gated on canUnlock from BE. Default
+                       user lock state is managed via onboarding /
+                       break-glass; self-unlock is impossible (locked
+                       account is logged out) but kept symmetric. -->
                   <button
                     *ngIf="user.isLocked"
                     class="icon-btn unlock-btn"
                     (click)="onUnlock(user.id)"
-                    [pTooltip]="'COMMON.UNLOCK_ACCOUNT' | translate"
+                    [disabled]="!user.canUnlock || isUnlocking(user.id)"
+                    [pTooltip]="
+                      !user.canUnlock
+                        ? (user.isDefault === 1
+                            ? ('USER.CANNOT_UNLOCK_DEFAULT' | translate)
+                            : ('USER.CANNOT_UNLOCK_SELF' | translate))
+                        : ('COMMON.UNLOCK_ACCOUNT' | translate)
+                    "
                     tooltipPosition="bottom"
-                    [disabled]="isUnlocking(user.id)"
                   >
                     <i
                       class="pi"
@@ -510,10 +533,20 @@
                       "
                     ></i>
                   </button>
+                  <!-- Edit — gated on canEdit (not default, not
+                       self). Self changes go through /profile;
+                       default user is immutable. -->
                   <button
                     class="icon-btn edit-btn"
                     (click)="onEdit(user.id)"
-                    [pTooltip]="'COMMON.EDIT' | translate"
+                    [disabled]="!user.canEdit"
+                    [pTooltip]="
+                      !user.canEdit
+                        ? (user.isDefault === 1
+                            ? ('USER.CANNOT_EDIT_DEFAULT' | translate)
+                            : ('USER.CANNOT_EDIT_SELF' | translate))
+                        : ('COMMON.EDIT' | translate)
+                    "
                     tooltipPosition="bottom"
                   >
                     <i class="pi pi-pencil"></i>
@@ -523,7 +556,9 @@
                     (click)="confirmDelete(user.id)"
                     [pTooltip]="
                       !user.canDelete
-                        ? ('COMMON.NO_DELETE_PERMISSION' | translate)
+                        ? (user.isDefault === 1
+                            ? ('USER.CANNOT_DELETE_DEFAULT' | translate)
+                            : ('USER.CANNOT_DELETE_SELF' | translate))
                         : ('COMMON.DELETE' | translate)
                     "
                     tooltipPosition="bottom"

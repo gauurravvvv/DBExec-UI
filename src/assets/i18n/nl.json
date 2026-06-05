@@ -172,7 +172,9 @@
     "RELATIVE_TIME": {
       "A_FEW_SECONDS_AGO": "enkele seconden geleden",
       "A_FEW_SECONDS_FROM_NOW": "over enkele seconden"
-    }
+    },
+    "DEFAULT_BADGE": "Standaard",
+    "YOU_BADGE": "Jij"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Voornaam is verplicht",
@@ -537,7 +539,13 @@
     "CONTACT_INFORMATION": "Contactinformatie",
     "ACCOUNT_INFORMATION": "Accountinformatie",
     "LANGUAGE": "Taal",
-    "SELECT_LANGUAGE": "Taal selecteren"
+    "SELECT_LANGUAGE": "Taal selecteren",
+    "CANNOT_EDIT_DEFAULT": "De standaardgebruiker kan niet worden bewerkt",
+    "CANNOT_EDIT_SELF": "Je kunt je eigen gebruikersrecord hier niet bewerken",
+    "CANNOT_DELETE_DEFAULT": "De standaardgebruiker kan niet worden verwijderd",
+    "CANNOT_DELETE_SELF": "Je kunt jezelf niet verwijderen",
+    "CANNOT_UNLOCK_DEFAULT": "De standaardgebruiker kan hier niet worden ontgrendeld",
+    "CANNOT_UNLOCK_SELF": "Je kunt je eigen account hier niet ontgrendelen"
   },
   "DATASOURCE": {
     "TITLE": "Databronnen",
