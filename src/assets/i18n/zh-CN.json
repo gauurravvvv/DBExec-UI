@@ -503,7 +503,13 @@
     "USERS_MAPPING": "用户映射",
     "NO_USERS_FOUND": "未找到用户",
     "DATASOURCE_AND_CONNECTIONS": "数据源与连接",
-    "NO_DATASOURCE_CONNECTION_FOUND": "未找到数据源连接"
+    "NO_DATASOURCE_CONNECTION_FOUND": "未找到数据源连接",
+    "LOCKED_MEMBERS": "锁定的成员",
+    "LOCKED_PRIMARY_ADMIN": "主管理员不能从此组中移除。",
+    "LOCKED_SELF": "编辑期间您无法将自己从此组中移除。",
+    "LOCKED_SELF_PRIMARY": "您是主管理员，无法从此组中移除。",
+    "PRIMARY_ADMIN": "主管理员",
+    "YOU": "你"
   },
   "USER": {
     "TITLE": "用户",

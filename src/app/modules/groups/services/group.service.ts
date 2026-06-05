@@ -105,11 +105,26 @@ export class GroupService {
     }
   }
 
-  async edit(form: FormGroup, justification?: string): Promise<any> {
+  /**
+   * Update an existing group.
+   *
+   * `usersOverride` lets the caller bypass the form's `users`
+   * control and send a precomputed full member list. The edit-group
+   * component uses this to reassemble locked members (bootstrap
+   * admin, logged-in user) with the manageable picker selections —
+   * the BE requires the COMPLETE membership set per save, and the
+   * picker only exposes the manageable subset.
+   */
+  async edit(
+    form: FormGroup,
+    justification?: string,
+    usersOverride?: string[],
+  ): Promise<any> {
     this._saving.set(true);
     try {
       const { id, name, description, status, users, roleId } =
         form.getRawValue();
+      const finalUsers = usersOverride ?? users;
       return await lastValueFrom(
         this.http.apiPut(
           GROUP.UPDATE + id,
@@ -118,7 +133,7 @@ export class GroupService {
             name,
             description,
             status: status ? 1 : 0,
-            users,
+            users: finalUsers,
             roleId,
             justification,
           },

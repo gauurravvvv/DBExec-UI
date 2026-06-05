@@ -503,7 +503,13 @@
     "USERS_MAPPING": "Users Mapping",
     "NO_USERS_FOUND": "No users found",
     "DATASOURCE_AND_CONNECTIONS": "Datasource and Connections",
-    "NO_DATASOURCE_CONNECTION_FOUND": "No datasource connection found"
+    "NO_DATASOURCE_CONNECTION_FOUND": "No datasource connection found",
+    "LOCKED_MEMBERS": "Locked members",
+    "LOCKED_PRIMARY_ADMIN": "The primary admin cannot be removed from this group.",
+    "LOCKED_SELF": "You cannot remove yourself from this group while editing.",
+    "LOCKED_SELF_PRIMARY": "You are the primary admin and cannot be removed from this group.",
+    "PRIMARY_ADMIN": "Primary admin",
+    "YOU": "You"
   },
   "USER": {
     "TITLE": "Users",

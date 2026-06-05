@@ -503,7 +503,13 @@
     "USERS_MAPPING": "ユーザーマッピング",
     "NO_USERS_FOUND": "ユーザーが見つかりません",
     "DATASOURCE_AND_CONNECTIONS": "データソースと接続",
-    "NO_DATASOURCE_CONNECTION_FOUND": "データソース接続が見つかりません"
+    "NO_DATASOURCE_CONNECTION_FOUND": "データソース接続が見つかりません",
+    "LOCKED_MEMBERS": "ロック中のメンバー",
+    "LOCKED_PRIMARY_ADMIN": "プライマリ管理者はこのグループから削除できません。",
+    "LOCKED_SELF": "編集中に自分自身をこのグループから削除することはできません。",
+    "LOCKED_SELF_PRIMARY": "あなたはプライマリ管理者であり、このグループから削除できません。",
+    "PRIMARY_ADMIN": "プライマリ管理者",
+    "YOU": "自分"
   },
   "USER": {
     "TITLE": "ユーザー",

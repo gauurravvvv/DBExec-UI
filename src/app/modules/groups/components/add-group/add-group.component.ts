@@ -121,8 +121,17 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
   }
 
   /**
-   * Fetcher for server-mode users multiselect. Org-scoped via form control.
-   * Filters to active users only — matches legacy behavior.
+   * Fetcher for server-mode users multiselect. Org-scoped via form
+   * control. Filters to active users only — matches legacy
+   * behavior.
+   *
+   * `excludeDefault=true` — the bootstrap admin (user.isDefault=1)
+   *   is structurally locked to the Administrator group. Hiding
+   *   them from this picker prevents the BE invariant rejection
+   *   that would otherwise fire on save.
+   * `excludeSelf=true` — admins can't accidentally place themselves
+   *   into a new group at create-time; same reasoning applies to
+   *   the edit flow.
    */
   loadUsersPage = async ({
     search,
@@ -133,7 +142,12 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
+    const params: any = {
+      page,
+      limit,
+      excludeDefault: true,
+      excludeSelf: true,
+    };
     if (search) params.filter = JSON.stringify({ username: search });
     try {
       const res: any = await this.userService.listUser(params);
@@ -151,7 +165,12 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
 
   loadUsers() {
     this.userService
-      .listUser({ page: DEFAULT_PAGE, limit: 10 })
+      .listUser({
+        page: DEFAULT_PAGE,
+        limit: 10,
+        excludeDefault: true,
+        excludeSelf: true,
+      })
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           const all = response?.data?.users || [];

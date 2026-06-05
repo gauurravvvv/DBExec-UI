@@ -503,7 +503,13 @@
     "USERS_MAPPING": "Gebruikerskoppeling",
     "NO_USERS_FOUND": "Geen gebruikers gevonden",
     "DATASOURCE_AND_CONNECTIONS": "Databron en verbindingen",
-    "NO_DATASOURCE_CONNECTION_FOUND": "Geen databronverbinding gevonden"
+    "NO_DATASOURCE_CONNECTION_FOUND": "Geen databronverbinding gevonden",
+    "LOCKED_MEMBERS": "Vergrendelde leden",
+    "LOCKED_PRIMARY_ADMIN": "De primaire beheerder kan niet uit deze groep worden verwijderd.",
+    "LOCKED_SELF": "Je kunt jezelf niet uit deze groep verwijderen tijdens het bewerken.",
+    "LOCKED_SELF_PRIMARY": "Je bent de primaire beheerder en kunt niet uit deze groep worden verwijderd.",
+    "PRIMARY_ADMIN": "Primaire beheerder",
+    "YOU": "Jij"
   },
   "USER": {
     "TITLE": "Gebruikers",

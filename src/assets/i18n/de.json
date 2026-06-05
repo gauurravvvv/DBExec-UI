@@ -503,7 +503,13 @@
     "USERS_MAPPING": "Benutzerzuordnung",
     "NO_USERS_FOUND": "Keine Benutzer gefunden",
     "DATASOURCE_AND_CONNECTIONS": "Datenquelle und Verbindungen",
-    "NO_DATASOURCE_CONNECTION_FOUND": "Keine Datenquellenverbindung gefunden"
+    "NO_DATASOURCE_CONNECTION_FOUND": "Keine Datenquellenverbindung gefunden",
+    "LOCKED_MEMBERS": "Gesperrte Mitglieder",
+    "LOCKED_PRIMARY_ADMIN": "Der primäre Administrator kann nicht aus dieser Gruppe entfernt werden.",
+    "LOCKED_SELF": "Sie können sich während der Bearbeitung nicht selbst aus dieser Gruppe entfernen.",
+    "LOCKED_SELF_PRIMARY": "Sie sind der primäre Administrator und können nicht aus dieser Gruppe entfernt werden.",
+    "PRIMARY_ADMIN": "Primärer Admin",
+    "YOU": "Sie"
   },
   "USER": {
     "TITLE": "Benutzer",

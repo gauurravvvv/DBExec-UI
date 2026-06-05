@@ -48,6 +48,24 @@ export class EditGroupComponent
   originalFormValue: any;
   isDefaultGroup = false;
 
+  // Members locked out of the multiselect:
+  //  - the bootstrap admin (user.isDefault === 1) when this is the
+  //    default Administrator group (BE invariant requires them to
+  //    stay in that group)
+  //  - the logged-in user themselves (prevent self-eviction from
+  //    Administrator and other accidental scope changes)
+  //
+  // Stored as full {id, username, isPrimaryAdmin, isSelf} objects
+  // so the template can render the right tooltip and the save flow
+  // can reassemble the full payload. Always kept OUT of the form
+  // control's `users` array; reassembled on save.
+  lockedMembers: Array<{
+    id: string;
+    username: string;
+    isPrimaryAdmin: boolean;
+    isSelf: boolean;
+  }> = [];
+
   saving = this.groupService.saving;
   // `loading` gates the form vs the skeleton; `groupLoaded` becomes
   // true once originalFormValue is populated so the template can
@@ -110,24 +128,60 @@ export class EditGroupComponent
     if (!groupData) return;
 
     this.selectedRoleName = groupData.roleName || '';
+    this.isDefaultGroup = groupData.isDefault === 1;
 
+    // Partition the loaded members into locked vs manageable. Two
+    // rules drive locking:
+    //   1. Bootstrap admin (user.isDefault === 1) — only relevant
+    //      to the default Administrator group, where the BE
+    //      invariant requires them to remain. For non-default
+    //      groups the BE rejects them outright, so they shouldn't
+    //      be in userGroups to begin with.
+    //   2. Logged-in user — locked everywhere so an admin can't
+    //      eject themselves from a group mid-edit and lose access
+    //      to permissions they need to finish the change.
+    const loggedInUserId: string =
+      this.globalService.getTokenDetails('id') || '';
+
+    const lockedIds = new Set<string>();
+    this.lockedMembers = [];
+    for (const mapping of groupData.userGroups || []) {
+      const u = mapping.user;
+      if (!u) continue;
+      const isPrimaryAdmin = u.isDefault === 1;
+      const isSelf = u.id === loggedInUserId;
+      if (isPrimaryAdmin || isSelf) {
+        lockedIds.add(u.id);
+        this.lockedMembers.push({
+          id: u.id,
+          username: u.username,
+          isPrimaryAdmin,
+          isSelf,
+        });
+      }
+    }
+
+    // Picker only handles the manageable subset. The save flow
+    // reassembles the full member set before sending.
+    const manageableIds = (groupData.userGroups || [])
+      .map((mapping: any) => mapping.userId)
+      .filter((id: string) => !lockedIds.has(id));
+
+    // Kick the initial picker page now that we know whether we're
+    // on the default group (controls excludeDefault).
     this.loadUsers({
       page: DEFAULT_PAGE,
       limit: 10,
+      excludeDefault: !this.isDefaultGroup,
+      excludeSelf: true,
     });
-
-    const userIds = (groupData.userGroups || []).map(
-      (mapping: any) => mapping.userId,
-    );
-
-    this.isDefaultGroup = groupData.isDefault === 1;
 
     this.groupForm.patchValue({
       id: groupData.id,
       name: groupData.name,
       description: groupData.description,
       roleId: groupData.roleId,
-      users: userIds,
+      users: manageableIds,
       status: groupData.status,
     });
 
@@ -146,6 +200,13 @@ export class EditGroupComponent
 
   /**
    * Fetcher for server-mode users multiselect.
+   *
+   * Always excludes the logged-in user (paired with the locked-
+   * self badge above the picker). Excludes the bootstrap admin
+   * for non-default groups (their membership is structurally
+   * forbidden by the BE invariant); the default group lets them
+   * through the query but they're shown via the locked badge, not
+   * via the picker.
    */
   loadUsersPage = async ({
     search,
@@ -156,7 +217,12 @@ export class EditGroupComponent
     page: number;
     limit: number;
   }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
+    const params: any = {
+      page,
+      limit,
+      excludeDefault: !this.isDefaultGroup,
+      excludeSelf: true,
+    };
     if (search) params.filter = JSON.stringify({ username: search });
     try {
       const res: any = await this.userService.listUser(params);
@@ -215,12 +281,28 @@ export class EditGroupComponent
 
   async proceedSave(): Promise<void> {
     if (this.saveJustification.trim()) {
+      // Reassemble the full member set: locked members (bootstrap
+      // admin and/or logged-in user) PLUS whatever the manageable
+      // picker currently holds. The BE expects the complete
+      // membership list per save and treats anyone missing from
+      // it as removed — without this merge, locked members would
+      // silently disappear.
+      const manageable: string[] =
+        this.groupForm.get('users')?.value || [];
+      const usersPayload = [
+        ...this.lockedMembers.map(m => m.id),
+        ...manageable.filter(
+          id => !this.lockedMembers.some(m => m.id === id),
+        ),
+      ];
+
       // Fire the request first (service.edit uses getRawValue, which
       // bypasses disable, but stay consistent with the rest of the
       // rollout for ordering) then lock the form.
       const request = this.groupService.edit(
         this.groupForm,
         this.saveJustification.trim(),
+        usersPayload,
       );
       this.groupForm.disable({ emitEvent: false });
       try {

@@ -113,7 +113,15 @@ export class ManageRlsAssignmentsComponent implements OnInit {
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       if (this.newScope === 'user') {
-        const res: any = await this.userService.listUser(params);
+        // Exclude the bootstrap admin from RLS scope assignment —
+        // they're a structural account, not a person you'd target
+        // with row-level filters. Listing them would clutter the
+        // picker and a save that included them would be reasonable
+        // but semantically odd.
+        const res: any = await this.userService.listUser({
+          ...params,
+          excludeDefault: true,
+        });
         if (this.globalService.handleSuccessService(res, false)) {
           const users = (res?.data?.users ?? []).map((u: any) => ({
             ...u,
@@ -139,8 +147,10 @@ export class ManageRlsAssignmentsComponent implements OnInit {
     this.scopeTargetsLoading = true;
 
     if (scope === 'user') {
+      // Exclude the bootstrap admin (same reasoning as
+      // loadScopeTargetsPage above).
       this.userService
-        .listUser(params)
+        .listUser({ ...params, excludeDefault: true })
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response, false)) {
             const users = (response?.data?.users ?? []).map((u: any) => ({

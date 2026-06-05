@@ -503,7 +503,13 @@
     "USERS_MAPPING": "Affectation des utilisateurs",
     "NO_USERS_FOUND": "Aucun utilisateur trouvé",
     "DATASOURCE_AND_CONNECTIONS": "Source de données et connexions",
-    "NO_DATASOURCE_CONNECTION_FOUND": "Aucune connexion de source de données trouvée"
+    "NO_DATASOURCE_CONNECTION_FOUND": "Aucune connexion de source de données trouvée",
+    "LOCKED_MEMBERS": "Membres verrouillés",
+    "LOCKED_PRIMARY_ADMIN": "L'administrateur principal ne peut pas être retiré de ce groupe.",
+    "LOCKED_SELF": "Vous ne pouvez pas vous retirer vous-même de ce groupe pendant l'édition.",
+    "LOCKED_SELF_PRIMARY": "Vous êtes l'administrateur principal et ne pouvez pas être retiré de ce groupe.",
+    "PRIMARY_ADMIN": "Admin principal",
+    "YOU": "Vous"
   },
   "USER": {
     "TITLE": "Utilisateurs",

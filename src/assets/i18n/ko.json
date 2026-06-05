@@ -503,7 +503,13 @@
     "USERS_MAPPING": "사용자 매핑",
     "NO_USERS_FOUND": "사용자를 찾을 수 없습니다",
     "DATASOURCE_AND_CONNECTIONS": "데이터소스 및 커넥션",
-    "NO_DATASOURCE_CONNECTION_FOUND": "데이터소스 커넥션을 찾을 수 없습니다"
+    "NO_DATASOURCE_CONNECTION_FOUND": "데이터소스 커넥션을 찾을 수 없습니다",
+    "LOCKED_MEMBERS": "잠긴 멤버",
+    "LOCKED_PRIMARY_ADMIN": "기본 관리자는 이 그룹에서 제거할 수 없습니다.",
+    "LOCKED_SELF": "편집 중에 자신을 이 그룹에서 제거할 수 없습니다.",
+    "LOCKED_SELF_PRIMARY": "기본 관리자이므로 이 그룹에서 제거할 수 없습니다.",
+    "PRIMARY_ADMIN": "기본 관리자",
+    "YOU": "본인"
   },
   "USER": {
     "TITLE": "사용자",
