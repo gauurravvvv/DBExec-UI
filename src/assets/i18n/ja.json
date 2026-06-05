@@ -309,7 +309,11 @@
     "VIEW_TITLE": "システム管理者の詳細",
     "DELETE_SINGLE": "このシステム管理者を削除してもよろしいですか？",
     "DELETE_BULK": "<strong>{{count}}</strong>件の選択されたシステム管理者を削除してもよろしいですか？",
-    "UPDATE_CONFIRM": "このシステム管理者を更新してもよろしいですか？"
+    "UPDATE_CONFIRM": "このシステム管理者を更新してもよろしいですか？",
+    "CANNOT_EDIT_DEFAULT": "デフォルトのシステム管理者は編集できません",
+    "CANNOT_EDIT_SELF": "自分のシステム管理者レコードはこの画面から編集できません",
+    "CANNOT_UNLOCK_DEFAULT": "デフォルトのシステム管理者はこの画面からロック解除できません",
+    "CANNOT_UNLOCK_SELF": "自分のアカウントはこの画面からロック解除できません"
   },
   "ORG": {
     "TITLE": "組織",

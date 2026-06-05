@@ -309,7 +309,11 @@
     "VIEW_TITLE": "System Admin Details",
     "DELETE_SINGLE": "Are you sure you want to delete this system admin?",
     "DELETE_BULK": "Are you sure you want to delete <strong>{{count}}</strong> selected system admin(s)?",
-    "UPDATE_CONFIRM": "Are you sure you want to update this system admin?"
+    "UPDATE_CONFIRM": "Are you sure you want to update this system admin?",
+    "CANNOT_EDIT_DEFAULT": "The default system admin cannot be edited",
+    "CANNOT_EDIT_SELF": "You cannot edit your own system admin record from here",
+    "CANNOT_UNLOCK_DEFAULT": "The default system admin cannot be unlocked from here",
+    "CANNOT_UNLOCK_SELF": "You cannot unlock your own account from here"
   },
   "ORG": {
     "TITLE": "Organisations",

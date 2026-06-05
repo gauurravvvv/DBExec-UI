@@ -309,7 +309,11 @@
     "VIEW_TITLE": "Systemadministrator-Details",
     "DELETE_SINGLE": "Sind Sie sicher, dass Sie diesen Systemadministrator löschen möchten?",
     "DELETE_BULK": "Sind Sie sicher, dass Sie <strong>{{count}}</strong> ausgewählte(n) Systemadministrator(en) löschen möchten?",
-    "UPDATE_CONFIRM": "Sind Sie sicher, dass Sie diesen Systemadministrator aktualisieren möchten?"
+    "UPDATE_CONFIRM": "Sind Sie sicher, dass Sie diesen Systemadministrator aktualisieren möchten?",
+    "CANNOT_EDIT_DEFAULT": "Der Standard-System-Administrator kann nicht bearbeitet werden",
+    "CANNOT_EDIT_SELF": "Sie können Ihren eigenen System-Administrator-Datensatz hier nicht bearbeiten",
+    "CANNOT_UNLOCK_DEFAULT": "Der Standard-System-Administrator kann hier nicht entsperrt werden",
+    "CANNOT_UNLOCK_SELF": "Sie können Ihr eigenes Konto hier nicht entsperren"
   },
   "ORG": {
     "TITLE": "Organisationen",

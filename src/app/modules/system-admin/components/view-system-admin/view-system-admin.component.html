@@ -16,10 +16,23 @@
       </div>
 
       <div class="header-actions flex gap-2">
+        <!-- Edit — gated on canEdit from BE so a hard-reload deep
+             link gets the right state. The disabled attribute stops
+             the click before the routerLink can navigate; tooltip
+             distinguishes the default-admin lock from the self-edit
+             lock. -->
         <button
           class="btn-primary"
-          [disabled]="adminId == loggedInUserId"
-          [routerLink]="['/app/admins', adminId, 'edit']"
+          [disabled]="!adminData?.canEdit"
+          [pTooltip]="
+            !adminData?.canEdit
+              ? (adminData?.isDefault === 1
+                  ? ('SYSTEM_ADMIN.CANNOT_EDIT_DEFAULT' | translate)
+                  : ('SYSTEM_ADMIN.CANNOT_EDIT_SELF' | translate))
+              : ('COMMON.EDIT' | translate)
+          "
+          tooltipPosition="bottom"
+          (click)="adminData?.canEdit && goToEdit()"
         >
           <i class="pi pi-pencil"></i>
           {{ 'COMMON.EDIT' | translate }}

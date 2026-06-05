@@ -457,12 +457,21 @@
               </td>
               <td>
                 <div class="row-actions">
+                  <!-- Unlock — gated on canUnlock (BE: not default,
+                       not self). Default admin's lock is recovered
+                       via the break-glass procedure, not the API. -->
                   <button
                     *ngIf="admin.isLocked"
                     class="icon-btn unlock-btn"
                     (click)="onUnlock(admin.id)"
-                    [disabled]="isUnlocking(admin.id)"
-                    [pTooltip]="'COMMON.UNLOCK_ACCOUNT' | translate"
+                    [disabled]="!admin.canUnlock || isUnlocking(admin.id)"
+                    [pTooltip]="
+                      !admin.canUnlock
+                        ? (admin.isDefault === 1
+                            ? ('SYSTEM_ADMIN.CANNOT_UNLOCK_DEFAULT' | translate)
+                            : ('SYSTEM_ADMIN.CANNOT_UNLOCK_SELF' | translate))
+                        : ('COMMON.UNLOCK_ACCOUNT' | translate)
+                    "
                     tooltipPosition="bottom"
                   >
                     <i
@@ -472,11 +481,20 @@
                       "
                     ></i>
                   </button>
+                  <!-- Edit — gated on canEdit (BE: not default, not
+                       self). Self changes go through /profile;
+                       default admin is immutable. -->
                   <button
                     class="icon-btn edit-btn"
                     (click)="onEdit(admin.id)"
-                    [disabled]="admin.id == loggedInUserId"
-                    [pTooltip]="'COMMON.EDIT' | translate"
+                    [disabled]="!admin.canEdit"
+                    [pTooltip]="
+                      !admin.canEdit
+                        ? (admin.isDefault === 1
+                            ? ('SYSTEM_ADMIN.CANNOT_EDIT_DEFAULT' | translate)
+                            : ('SYSTEM_ADMIN.CANNOT_EDIT_SELF' | translate))
+                        : ('COMMON.EDIT' | translate)
+                    "
                     tooltipPosition="bottom"
                   >
                     <i class="pi pi-pencil"></i>

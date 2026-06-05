@@ -309,7 +309,11 @@
     "VIEW_TITLE": "시스템 관리자 상세 정보",
     "DELETE_SINGLE": "이 시스템 관리자를 삭제하시겠습니까?",
     "DELETE_BULK": "선택한 <strong>{{count}}</strong>명의 시스템 관리자를 삭제하시겠습니까?",
-    "UPDATE_CONFIRM": "이 시스템 관리자를 업데이트하시겠습니까?"
+    "UPDATE_CONFIRM": "이 시스템 관리자를 업데이트하시겠습니까?",
+    "CANNOT_EDIT_DEFAULT": "기본 시스템 관리자는 편집할 수 없습니다",
+    "CANNOT_EDIT_SELF": "본인의 시스템 관리자 레코드는 이 화면에서 편집할 수 없습니다",
+    "CANNOT_UNLOCK_DEFAULT": "기본 시스템 관리자는 이 화면에서 잠금 해제할 수 없습니다",
+    "CANNOT_UNLOCK_SELF": "본인 계정은 이 화면에서 잠금 해제할 수 없습니다"
   },
   "ORG": {
     "TITLE": "조직",

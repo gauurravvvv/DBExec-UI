@@ -309,7 +309,11 @@
     "VIEW_TITLE": "Detalhes do administrador do sistema",
     "DELETE_SINGLE": "Tem certeza de que deseja excluir este administrador do sistema?",
     "DELETE_BULK": "Tem certeza de que deseja excluir <strong>{{count}}</strong> administrador do sistema(es) selecionado(s)?",
-    "UPDATE_CONFIRM": "Tem certeza de que deseja atualizar este administrador do sistema?"
+    "UPDATE_CONFIRM": "Tem certeza de que deseja atualizar este administrador do sistema?",
+    "CANNOT_EDIT_DEFAULT": "O administrador de sistema padrão não pode ser editado",
+    "CANNOT_EDIT_SELF": "Você não pode editar seu próprio registro de administrador de sistema por aqui",
+    "CANNOT_UNLOCK_DEFAULT": "O administrador de sistema padrão não pode ser desbloqueado por aqui",
+    "CANNOT_UNLOCK_SELF": "Você não pode desbloquear sua própria conta por aqui"
   },
   "ORG": {
     "TITLE": "Organizações",

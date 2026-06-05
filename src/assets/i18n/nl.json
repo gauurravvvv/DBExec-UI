@@ -309,7 +309,11 @@
     "VIEW_TITLE": "Systeembeheerder details",
     "DELETE_SINGLE": "Weet u zeker dat u deze systeembeheerder wilt verwijderen?",
     "DELETE_BULK": "Weet u zeker dat u <strong>{{count}}</strong> geselecteerde systeembeheerder(s) wilt verwijderen?",
-    "UPDATE_CONFIRM": "Weet u zeker dat u deze systeembeheerder wilt bijwerken?"
+    "UPDATE_CONFIRM": "Weet u zeker dat u deze systeembeheerder wilt bijwerken?",
+    "CANNOT_EDIT_DEFAULT": "De standaard-systeembeheerder kan niet worden bewerkt",
+    "CANNOT_EDIT_SELF": "Je kunt je eigen systeembeheerder-record hier niet bewerken",
+    "CANNOT_UNLOCK_DEFAULT": "De standaard-systeembeheerder kan hier niet worden ontgrendeld",
+    "CANNOT_UNLOCK_SELF": "Je kunt je eigen account hier niet ontgrendelen"
   },
   "ORG": {
     "TITLE": "Organisaties",

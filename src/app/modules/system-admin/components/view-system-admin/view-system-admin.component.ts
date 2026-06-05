@@ -28,7 +28,14 @@ interface AdminData {
   role: string;
   isFirstLogin: boolean;
   isDefault: number;
+  // Per-row action gates surfaced by getSystemAdmin /
+  // listSystemAdmin. False whenever the record is the default
+  // admin OR the actor themselves; the FE uses them to disable
+  // action buttons before the BE rejects.
   canDelete: boolean;
+  canEdit: boolean;
+  canUnlock: boolean;
+  canChangePassword: boolean;
   isLocked: boolean;
 }
 
@@ -125,6 +132,15 @@ export class ViewSystemAdminComponent implements OnInit, OnDestroy {
       // Use the hash to select a color
       this.avatarBackground = colors[hash % colors.length];
     }
+  }
+
+  /**
+   * Navigate to the edit page. Wired up by the Edit button which
+   * is itself gated on `adminData?.canEdit` so this never fires
+   * for the default-admin / self-edit cases.
+   */
+  goToEdit() {
+    this.router.navigate(['/app/admins', this.adminId, 'edit']);
   }
 
   confirmDelete(adminId: string) {

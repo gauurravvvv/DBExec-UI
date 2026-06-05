@@ -309,7 +309,11 @@
     "VIEW_TITLE": "Détails du administrateur système",
     "DELETE_SINGLE": "Êtes-vous sûr de vouloir supprimer ce administrateur système ?",
     "DELETE_BULK": "Êtes-vous sûr de vouloir supprimer <strong>{{count}}</strong> administrateur système(s) sélectionné(s) ?",
-    "UPDATE_CONFIRM": "Êtes-vous sûr de vouloir mettre à jour ce administrateur système ?"
+    "UPDATE_CONFIRM": "Êtes-vous sûr de vouloir mettre à jour ce administrateur système ?",
+    "CANNOT_EDIT_DEFAULT": "L'administrateur système par défaut ne peut pas être modifié",
+    "CANNOT_EDIT_SELF": "Vous ne pouvez pas modifier votre propre fiche d'administrateur système depuis cet écran",
+    "CANNOT_UNLOCK_DEFAULT": "L'administrateur système par défaut ne peut pas être déverrouillé depuis cet écran",
+    "CANNOT_UNLOCK_SELF": "Vous ne pouvez pas déverrouiller votre propre compte depuis cet écran"
   },
   "ORG": {
     "TITLE": "Organisations",

@@ -309,7 +309,11 @@
     "VIEW_TITLE": "Dettagli amministratore di sistema",
     "DELETE_SINGLE": "Sei sicuro di voler eliminare questo amministratore di sistema?",
     "DELETE_BULK": "Sei sicuro di voler eliminare <strong>{{count}}</strong> amministratore di sistema/i selezionato/i?",
-    "UPDATE_CONFIRM": "Sei sicuro di voler aggiornare questo amministratore di sistema?"
+    "UPDATE_CONFIRM": "Sei sicuro di voler aggiornare questo amministratore di sistema?",
+    "CANNOT_EDIT_DEFAULT": "L'amministratore di sistema predefinito non può essere modificato",
+    "CANNOT_EDIT_SELF": "Non puoi modificare il tuo record di amministratore di sistema da qui",
+    "CANNOT_UNLOCK_DEFAULT": "L'amministratore di sistema predefinito non può essere sbloccato da qui",
+    "CANNOT_UNLOCK_SELF": "Non puoi sbloccare il tuo account da qui"
   },
   "ORG": {
     "TITLE": "Organizzazioni",

@@ -309,7 +309,11 @@
     "VIEW_TITLE": "Detalles del administrador del sistema",
     "DELETE_SINGLE": "¿Está seguro de que desea eliminar este administrador del sistema?",
     "DELETE_BULK": "¿Está seguro de que desea eliminar <strong>{{count}}</strong> administrador del sistema(es) seleccionado(s)?",
-    "UPDATE_CONFIRM": "¿Está seguro de que desea actualizar este administrador del sistema?"
+    "UPDATE_CONFIRM": "¿Está seguro de que desea actualizar este administrador del sistema?",
+    "CANNOT_EDIT_DEFAULT": "El administrador de sistema predeterminado no se puede editar",
+    "CANNOT_EDIT_SELF": "No puedes editar tu propio registro de administrador de sistema desde aquí",
+    "CANNOT_UNLOCK_DEFAULT": "El administrador de sistema predeterminado no se puede desbloquear desde aquí",
+    "CANNOT_UNLOCK_SELF": "No puedes desbloquear tu propia cuenta desde aquí"
   },
   "ORG": {
     "TITLE": "Organizaciones",

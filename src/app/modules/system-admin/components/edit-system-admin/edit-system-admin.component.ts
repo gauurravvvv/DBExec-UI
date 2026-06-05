@@ -122,13 +122,23 @@ export class EditSystemAdminComponent
   async patchFormValues(): Promise<void> {
     await this.systemAdminService.loadOne(this.adminId);
     const data = this.systemAdminService.current();
-    if (data) {
-      this.adminData = data;
-      this.isLocked = !!this.adminData.isLocked;
-      this.adminForm.patchValue(this.adminData);
-      if (this.isLocked) {
-        this.adminForm.get('status')?.disable();
-      }
+    if (!data) return;
+
+    // Deep-link guard: if the BE marked this record uneditable
+    // (default admin OR the actor themselves), bounce back to the
+    // view page rather than render a form that would 400 on save.
+    // The list / view buttons already gate on canEdit; this catch
+    // covers direct URL access and stale link reloads.
+    if (data.canEdit === false) {
+      this.router.navigate(['/app/admins', this.adminId]);
+      return;
+    }
+
+    this.adminData = data;
+    this.isLocked = !!this.adminData.isLocked;
+    this.adminForm.patchValue(this.adminData);
+    if (this.isLocked) {
+      this.adminForm.get('status')?.disable();
     }
   }
 
