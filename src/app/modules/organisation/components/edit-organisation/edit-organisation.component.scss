@@ -1009,3 +1009,55 @@
 .readonly-info-title.readonly-info-title--spaced {
   margin-top: 1.25rem;
 }
+
+// Read-only "Platform schema" row on Edit Organisation. Schema is
+// fixed at create time and cannot be re-typed, so we render it as
+// a labelled chip with a small "set at creation" note alongside the
+// rest of the DB fields.
+.schema-locked-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+
+  .schema-locked-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--fs-control);
+    color: var(--text-color);
+    opacity: 0.75;
+    font-weight: var(--fw-medium);
+
+    i {
+      color: var(--primary-color);
+    }
+  }
+
+  .schema-locked-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    align-self: flex-start;
+    padding: 0.45rem 0.85rem;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    background: var(--hover-background);
+    color: var(--text-color);
+    font-size: var(--fs-control);
+    font-weight: var(--fw-medium);
+
+    i {
+      color: var(--text-color);
+      opacity: 0.6;
+      font-size: var(--fs-label);
+    }
+  }
+
+  .schema-locked-note {
+    margin: 0;
+    color: var(--text-color);
+    opacity: 0.6;
+    font-size: var(--fs-control);
+    line-height: 1.5;
+  }
+}

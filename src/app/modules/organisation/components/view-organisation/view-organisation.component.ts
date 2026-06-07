@@ -26,6 +26,7 @@ interface MasterDbConfig {
   hostname: string;
   port: number;
   dbName: string;
+  schema: string;
   username: string;
   dbType: string;
 }

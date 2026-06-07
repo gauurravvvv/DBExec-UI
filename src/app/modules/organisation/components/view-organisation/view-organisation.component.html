@@ -221,6 +221,15 @@
             </div>
             <div class="detail-item">
               <span class="label">
+                <i class="pi pi-sitemap"></i>
+                {{ 'ORG.DB_SCHEMA' | translate }}
+              </span>
+              <span class="value">{{
+                organisationData.masterDbConfig.schema
+              }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">
                 <i class="pi pi-user"></i>
                 {{ 'COMMON.USERNAME' | translate }}
               </span>

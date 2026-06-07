@@ -206,6 +206,9 @@
     "PORT_MAX": "Port cannot exceed 65535",
     "DB_NAME_PATTERN": "Database name can only contain letters, numbers, underscores and hyphens",
     "DATABASE_NAME_PATTERN": "Database name can only contain letters, numbers, underscores and hyphens",
+    "SCHEMA_REQUIRED": "Schema name is required",
+    "SCHEMA_MAX_LENGTH": "Schema name must not exceed 63 characters",
+    "SCHEMA_PATTERN": "Schema name must start with a lowercase letter or underscore and contain only lowercase letters, digits, or underscores",
     "NAME_REQUIRED": "Name is required",
     "NAME_PATTERN": "Name can only contain letters, spaces and hyphens",
     "ORGANISATION_REQUIRED": "Organisation is required",
@@ -464,7 +467,12 @@
     "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (auto-generated per-org key)",
     "SECURITY_EMAIL_MOVED_NOTE": "Security and email configuration are managed by the organisation admin under App Settings.",
     "SECURITY_AND_EMAIL": "Security & Email",
-    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "Security and email configuration are managed by the organisation admin under App Settings."
+    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "Security and email configuration are managed by the organisation admin under App Settings.",
+    "STEP_DB_CONFIG": "Database Configuration",
+    "DB_SCHEMA": "Platform Schema",
+    "DB_SCHEMA_PLACEHOLDER": "Postgres schema name",
+    "DB_SCHEMA_NOTE": "A new schema with this name will be created in your database to hold DBExec's platform tables. Use lowercase letters, digits, and underscores only.",
+    "DB_SCHEMA_LOCKED": "Schema is set at creation and cannot be changed."
   },
   "ROLE": {
     "TITLE": "Roles",

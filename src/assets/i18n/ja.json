@@ -206,6 +206,9 @@
     "PORT_MAX": "ポートは65535以下で入力してください",
     "DB_NAME_PATTERN": "データベース名には文字、数字、アンダースコア、ハイフンのみ使用できます",
     "DATABASE_NAME_PATTERN": "データベース名には文字、数字、アンダースコア、ハイフンのみ使用できます",
+    "SCHEMA_REQUIRED": "スキーマ名は必須です",
+    "SCHEMA_MAX_LENGTH": "スキーマ名は63文字以下で入力してください",
+    "SCHEMA_PATTERN": "スキーマ名は小文字またはアンダースコアで始まり、小文字、数字、アンダースコアのみ使用できます",
     "NAME_REQUIRED": "名前は必須です",
     "NAME_PATTERN": "名前には文字、スペース、ハイフンのみ使用できます",
     "ORGANISATION_REQUIRED": "組織は必須です",
@@ -464,7 +467,12 @@
     "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM（組織ごとの自動生成鍵）",
     "SECURITY_EMAIL_MOVED_NOTE": "セキュリティとメールの設定は、アプリ設定で組織管理者が管理します。",
     "SECURITY_AND_EMAIL": "セキュリティとメール",
-    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "セキュリティとメールの設定は、アプリ設定で組織管理者が管理します。"
+    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "セキュリティとメールの設定は、アプリ設定で組織管理者が管理します。",
+    "STEP_DB_CONFIG": "データベース設定",
+    "DB_SCHEMA": "プラットフォームスキーマ",
+    "DB_SCHEMA_PLACEHOLDER": "Postgres スキーマ名",
+    "DB_SCHEMA_NOTE": "DBExec のプラットフォームテーブルを保持するため、この名前で新しいスキーマがデータベースに作成されます。小文字、数字、アンダースコアのみを使用してください。",
+    "DB_SCHEMA_LOCKED": "スキーマは作成時に設定され、変更できません。"
   },
   "ROLE": {
     "TITLE": "役割",

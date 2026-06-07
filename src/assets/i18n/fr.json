@@ -206,6 +206,9 @@
     "PORT_MAX": "Le port ne peut pas dépasser 65535",
     "DB_NAME_PATTERN": "Le nom de la base de données ne peut contenir que des lettres, des chiffres, des underscores et des tirets",
     "DATABASE_NAME_PATTERN": "Le nom de la base de données ne peut contenir que des lettres, des chiffres, des underscores et des tirets",
+    "SCHEMA_REQUIRED": "Le nom du schéma est requis",
+    "SCHEMA_MAX_LENGTH": "Le nom du schéma ne peut pas dépasser 63 caractères",
+    "SCHEMA_PATTERN": "Le nom du schéma doit commencer par une lettre minuscule ou un underscore et ne peut contenir que des lettres minuscules, des chiffres ou des underscores",
     "NAME_REQUIRED": "Le nom est requis",
     "NAME_PATTERN": "Le nom ne peut contenir que des lettres, des espaces et des tirets",
     "ORGANISATION_REQUIRED": "L'organisation est requise",
@@ -464,7 +467,12 @@
     "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (clé par organisation générée automatiquement)",
     "SECURITY_EMAIL_MOVED_NOTE": "La configuration de la sécurité et de la messagerie est gérée par l'administrateur de l'organisation dans les paramètres de l'application.",
     "SECURITY_AND_EMAIL": "Sécurité et messagerie",
-    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "La configuration de la sécurité et de la messagerie est gérée par l'administrateur de l'organisation dans les paramètres de l'application."
+    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "La configuration de la sécurité et de la messagerie est gérée par l'administrateur de l'organisation dans les paramètres de l'application.",
+    "STEP_DB_CONFIG": "Configuration de la base de données",
+    "DB_SCHEMA": "Schéma de la plateforme",
+    "DB_SCHEMA_PLACEHOLDER": "Nom du schéma Postgres",
+    "DB_SCHEMA_NOTE": "Un nouveau schéma portant ce nom sera créé dans votre base de données pour héberger les tables de plateforme de DBExec. Utilisez uniquement des lettres minuscules, des chiffres et des underscores.",
+    "DB_SCHEMA_LOCKED": "Le schéma est défini à la création et ne peut pas être modifié."
   },
   "ROLE": {
     "TITLE": "Rôles",

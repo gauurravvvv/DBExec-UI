@@ -684,81 +684,6 @@
   }
 }
 
-// Encryption "managed for you" card. Sits in the spot where the
-// algorithm dropdown + pepper input used to be. Visual rhythm matches
-// the surrounding form-group-section blocks (same border, padding,
-// header treatment) so it doesn't feel like a special case.
-.encryption-auto-card {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-5);
-  padding: var(--space-6);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  background: var(--hover-background);
-
-  .encryption-auto-icon {
-    flex: 0 0 auto;
-    width: 40px;
-    height: 40px;
-    border-radius: 999px;
-    background: var(--primary-color-transparent);
-    color: var(--primary-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    i {
-      font-size: var(--fs-h3);
-    }
-  }
-
-  .encryption-auto-body {
-    flex: 1;
-
-    .encryption-auto-title {
-      font-weight: var(--fw-semibold);
-      color: var(--text-color);
-      margin-bottom: var(--space-2);
-      font-size: var(--fs-body);
-    }
-
-    .encryption-auto-description {
-      color: var(--text-color);
-      opacity: 0.75;
-      font-size: var(--fs-control);
-      line-height: 1.55;
-      margin-bottom: var(--space-4);
-    }
-
-    .encryption-auto-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-2);
-
-      li {
-        display: flex;
-        align-items: flex-start;
-        gap: var(--space-3);
-        color: var(--text-color);
-        opacity: 0.85;
-        font-size: var(--fs-control);
-        line-height: 1.45;
-
-        i {
-          color: var(--success-color, var(--primary-color));
-          font-size: var(--fs-label);
-          margin-top: 0.25rem;
-          flex: 0 0 auto;
-        }
-      }
-    }
-  }
-}
-
 // Two-column layout for steps
 .step-1-layout,
 .step-2-layout,
@@ -771,6 +696,13 @@
   @media (max-width: 992px) {
     grid-template-columns: 1fr;
   }
+}
+
+// Step 1 no longer has a right-column info card — render the
+// left column full-width so the form doesn't sit awkwardly in a
+// half-width column with empty space beside it.
+.step-1-layout {
+  grid-template-columns: 1fr;
 }
 
 .step-1-left,

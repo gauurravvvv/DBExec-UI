@@ -206,6 +206,9 @@
     "PORT_MAX": "端口不得超过 65535",
     "DB_NAME_PATTERN": "数据库名称只能包含字母、数字、下划线和连字符",
     "DATABASE_NAME_PATTERN": "数据库名称只能包含字母、数字、下划线和连字符",
+    "SCHEMA_REQUIRED": "模式名称为必填项",
+    "SCHEMA_MAX_LENGTH": "模式名称不得超过 63 个字符",
+    "SCHEMA_PATTERN": "模式名称必须以小写字母或下划线开头，且只能包含小写字母、数字或下划线",
     "NAME_REQUIRED": "名称为必填项",
     "NAME_PATTERN": "名称只能包含字母、空格和连字符",
     "ORGANISATION_REQUIRED": "组织为必填项",
@@ -464,7 +467,12 @@
     "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM（按组织自动生成的密钥）",
     "SECURITY_EMAIL_MOVED_NOTE": "安全和邮件配置由组织管理员在“应用设置”中管理。",
     "SECURITY_AND_EMAIL": "安全与邮件",
-    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "安全和邮件配置由组织管理员在“应用设置”中管理。"
+    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "安全和邮件配置由组织管理员在“应用设置”中管理。",
+    "STEP_DB_CONFIG": "数据库配置",
+    "DB_SCHEMA": "平台模式",
+    "DB_SCHEMA_PLACEHOLDER": "Postgres 模式名称",
+    "DB_SCHEMA_NOTE": "将在您的数据库中创建一个使用此名称的新模式，用于存放 DBExec 的平台表。仅使用小写字母、数字和下划线。",
+    "DB_SCHEMA_LOCKED": "模式在创建时设置，无法更改。"
   },
   "ROLE": {
     "TITLE": "角色",

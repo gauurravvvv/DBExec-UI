@@ -105,6 +105,14 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
         '',
         [Validators.required, Validators.pattern('^[a-zA-Z0-9_-]+$')],
       ],
+      dbSchema: [
+        '',
+        [
+          Validators.required,
+          Validators.maxLength(63),
+          Validators.pattern(/^[a-z_][a-z0-9_]{0,62}$/),
+        ],
+      ],
       dbUsername: ['', [Validators.required]],
       dbPassword: ['', [Validators.required]],
       adminEmail: ['', [Validators.required, Validators.email]],
@@ -119,7 +127,7 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
 
     // Reset connection test when DB fields change. Bumping the request id
     // invalidates any in-flight response so it can't apply stale state.
-    ['dbHost', 'dbPort', 'dbName', 'dbUsername', 'dbPassword'].forEach(
+    ['dbHost', 'dbPort', 'dbName', 'dbSchema', 'dbUsername', 'dbPassword'].forEach(
       field => {
         this.orgForm
           .get(field)
@@ -143,7 +151,14 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
   }
 
   isDbConnectionFieldsValid(): boolean {
-    const fields = ['dbHost', 'dbPort', 'dbName', 'dbUsername', 'dbPassword'];
+    const fields = [
+      'dbHost',
+      'dbPort',
+      'dbName',
+      'dbSchema',
+      'dbUsername',
+      'dbPassword',
+    ];
     return fields.every(f => this.orgForm.get(f)?.valid) || false;
   }
 
@@ -333,6 +348,17 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
       return this.translate.instant('VALIDATION.DESCRIPTION_MAX_LENGTH', {
         length: control.errors['maxlength'].requiredLength,
       });
+    return '';
+  }
+
+  getDbSchemaError(): string {
+    const control = this.orgForm.get('dbSchema');
+    if (control?.errors?.['required'])
+      return this.translate.instant('VALIDATION.SCHEMA_REQUIRED');
+    if (control?.errors?.['maxlength'])
+      return this.translate.instant('VALIDATION.SCHEMA_MAX_LENGTH');
+    if (control?.errors?.['pattern'])
+      return this.translate.instant('VALIDATION.SCHEMA_PATTERN');
     return '';
   }
 

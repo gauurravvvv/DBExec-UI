@@ -206,6 +206,9 @@
     "PORT_MAX": "포트는 65535를 초과할 수 없습니다",
     "DB_NAME_PATTERN": "데이터베이스 이름은 문자, 숫자, 밑줄, 하이픈만 포함할 수 있습니다",
     "DATABASE_NAME_PATTERN": "데이터베이스 이름은 문자, 숫자, 밑줄, 하이픈만 포함할 수 있습니다",
+    "SCHEMA_REQUIRED": "스키마 이름은 필수 항목입니다",
+    "SCHEMA_MAX_LENGTH": "스키마 이름은 63자를 초과할 수 없습니다",
+    "SCHEMA_PATTERN": "스키마 이름은 소문자 또는 밑줄로 시작해야 하며 소문자, 숫자, 밑줄만 포함할 수 있습니다",
     "NAME_REQUIRED": "이름은 필수 항목입니다",
     "NAME_PATTERN": "이름은 문자, 공백, 하이픈만 포함할 수 있습니다",
     "ORGANISATION_REQUIRED": "조직은 필수 항목입니다",
@@ -464,7 +467,12 @@
     "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (조직별 자동 생성 키)",
     "SECURITY_EMAIL_MOVED_NOTE": "보안 및 이메일 구성은 앱 설정에서 조직 관리자가 관리합니다.",
     "SECURITY_AND_EMAIL": "보안 및 이메일",
-    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "보안 및 이메일 구성은 앱 설정에서 조직 관리자가 관리합니다."
+    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "보안 및 이메일 구성은 앱 설정에서 조직 관리자가 관리합니다.",
+    "STEP_DB_CONFIG": "데이터베이스 구성",
+    "DB_SCHEMA": "플랫폼 스키마",
+    "DB_SCHEMA_PLACEHOLDER": "Postgres 스키마 이름",
+    "DB_SCHEMA_NOTE": "DBExec 플랫폼 테이블을 저장하기 위해 이 이름의 새 스키마가 데이터베이스에 생성됩니다. 소문자, 숫자, 밑줄만 사용하세요.",
+    "DB_SCHEMA_LOCKED": "스키마는 생성 시 설정되며 변경할 수 없습니다."
   },
   "ROLE": {
     "TITLE": "역할",

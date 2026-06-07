@@ -206,6 +206,9 @@
     "PORT_MAX": "La porta non può superare 65535",
     "DB_NAME_PATTERN": "Il nome del database può contenere solo lettere, numeri, trattini bassi e trattini",
     "DATABASE_NAME_PATTERN": "Il nome del database può contenere solo lettere, numeri, trattini bassi e trattini",
+    "SCHEMA_REQUIRED": "Il nome dello schema è obbligatorio",
+    "SCHEMA_MAX_LENGTH": "Il nome dello schema non può superare 63 caratteri",
+    "SCHEMA_PATTERN": "Il nome dello schema deve iniziare con una lettera minuscola o un trattino basso e può contenere solo lettere minuscole, cifre o trattini bassi",
     "NAME_REQUIRED": "Il nome è obbligatorio",
     "NAME_PATTERN": "Il nome può contenere solo lettere, spazi e trattini",
     "ORGANISATION_REQUIRED": "L'organizzazione è obbligatoria",
@@ -464,7 +467,12 @@
     "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (chiave per organizzazione generata automaticamente)",
     "SECURITY_EMAIL_MOVED_NOTE": "La configurazione di sicurezza ed e-mail è gestita dall'amministratore dell'organizzazione nelle impostazioni dell'app.",
     "SECURITY_AND_EMAIL": "Sicurezza ed e-mail",
-    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "La configurazione di sicurezza ed e-mail è gestita dall'amministratore dell'organizzazione nelle impostazioni dell'app."
+    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "La configurazione di sicurezza ed e-mail è gestita dall'amministratore dell'organizzazione nelle impostazioni dell'app.",
+    "STEP_DB_CONFIG": "Configurazione del database",
+    "DB_SCHEMA": "Schema della piattaforma",
+    "DB_SCHEMA_PLACEHOLDER": "Nome dello schema Postgres",
+    "DB_SCHEMA_NOTE": "Nel tuo database verrà creato un nuovo schema con questo nome per ospitare le tabelle di piattaforma di DBExec. Usa solo lettere minuscole, cifre e trattini bassi.",
+    "DB_SCHEMA_LOCKED": "Lo schema viene impostato alla creazione e non può essere modificato."
   },
   "ROLE": {
     "TITLE": "Ruoli",

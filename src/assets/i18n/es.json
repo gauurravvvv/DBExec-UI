@@ -206,6 +206,9 @@
     "PORT_MAX": "El puerto no puede exceder 65535",
     "DB_NAME_PATTERN": "El nombre de la base de datos solo puede contener letras, números, guiones bajos y guiones",
     "DATABASE_NAME_PATTERN": "El nombre de la base de datos solo puede contener letras, números, guiones bajos y guiones",
+    "SCHEMA_REQUIRED": "El nombre del esquema es obligatorio",
+    "SCHEMA_MAX_LENGTH": "El nombre del esquema no puede exceder 63 caracteres",
+    "SCHEMA_PATTERN": "El nombre del esquema debe comenzar con una letra minúscula o guion bajo y solo puede contener letras minúsculas, dígitos o guiones bajos",
     "NAME_REQUIRED": "El nombre es obligatorio",
     "NAME_PATTERN": "El nombre solo puede contener letras, espacios y guiones",
     "ORGANISATION_REQUIRED": "La organización es obligatoria",
@@ -464,7 +467,12 @@
     "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (clave por organización generada automáticamente)",
     "SECURITY_EMAIL_MOVED_NOTE": "La configuración de seguridad y correo electrónico la gestiona el administrador de la organización en Configuración de la aplicación.",
     "SECURITY_AND_EMAIL": "Seguridad y correo electrónico",
-    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "La configuración de seguridad y correo electrónico la gestiona el administrador de la organización en Configuración de la aplicación."
+    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "La configuración de seguridad y correo electrónico la gestiona el administrador de la organización en Configuración de la aplicación.",
+    "STEP_DB_CONFIG": "Configuración de la base de datos",
+    "DB_SCHEMA": "Esquema de la plataforma",
+    "DB_SCHEMA_PLACEHOLDER": "Nombre del esquema de Postgres",
+    "DB_SCHEMA_NOTE": "Se creará un nuevo esquema con este nombre en su base de datos para almacenar las tablas de plataforma de DBExec. Use solo letras minúsculas, dígitos y guiones bajos.",
+    "DB_SCHEMA_LOCKED": "El esquema se establece al crear y no se puede cambiar."
   },
   "ROLE": {
     "TITLE": "Roles",

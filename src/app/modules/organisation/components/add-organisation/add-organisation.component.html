@@ -68,7 +68,7 @@
           <i class="pi pi-check" *ngIf="currentStep > 0"></i>
           <span *ngIf="currentStep <= 0">1</span>
         </div>
-        <span class="step-label">{{ 'ORG.STEP_ORG_CONFIG' | translate }}</span>
+        <span class="step-label">{{ 'ORG.STEP_ORG_DETAILS' | translate }}</span>
       </div>
       <div class="step-line"></div>
       <div
@@ -78,7 +78,7 @@
       >
         <div class="step-dot">2</div>
         <span class="step-label">{{
-          'ORG.STEP_MASTER_DATASOURCE' | translate
+          'ORG.STEP_DB_CONFIG' | translate
         }}</span>
       </div>
     </div>
@@ -126,29 +126,6 @@
           </div>
         </div>
 
-        <!-- Right Column: Encryption info card (read-only, informational) -->
-        <div class="step-1-right">
-          <div class="readonly-info-container">
-            <div class="readonly-info-title">
-              <i class="pi pi-shield"></i>
-              {{ 'ORG.ENCRYPTION_CONFIG' | translate }}
-            </div>
-            <div class="readonly-info-card">
-              <p class="update-info-text">
-                <i class="pi pi-circle-fill"></i>
-                {{ 'ORG.ENCRYPTION_BULLET_1' | translate }}
-              </p>
-              <p class="update-info-text">
-                <i class="pi pi-circle-fill"></i>
-                {{ 'ORG.ENCRYPTION_BULLET_2' | translate }}
-              </p>
-              <p class="update-info-text">
-                <i class="pi pi-circle-fill"></i>
-                {{ 'ORG.ENCRYPTION_BULLET_3' | translate }}
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- Step 2: Master Database -->
@@ -212,6 +189,26 @@
               [errorMessage]="getDbFieldError('dbName')"
             >
             </app-custom-input>
+
+            <app-custom-input
+              formControlName="dbSchema"
+              [label]="'ORG.DB_SCHEMA' | translate"
+              [placeholder]="'ORG.DB_SCHEMA_PLACEHOLDER' | translate"
+              icon="pi-sitemap"
+              [required]="true"
+              [showError]="
+                !!(
+                  orgForm.get('dbSchema')?.invalid &&
+                  orgForm.get('dbSchema')?.touched
+                )
+              "
+              [errorMessage]="getDbSchemaError()"
+            >
+            </app-custom-input>
+            <p class="admin-setup-note">
+              <i class="pi pi-info-circle"></i>
+              {{ 'ORG.DB_SCHEMA_NOTE' | translate }}
+            </p>
 
             <div class="db-fields-row">
               <app-custom-input

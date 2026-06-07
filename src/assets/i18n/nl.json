@@ -206,6 +206,9 @@
     "PORT_MAX": "Poort mag niet hoger zijn dan 65535",
     "DB_NAME_PATTERN": "Databasenaam mag alleen letters, cijfers, underscores en koppeltekens bevatten",
     "DATABASE_NAME_PATTERN": "Databasenaam mag alleen letters, cijfers, underscores en koppeltekens bevatten",
+    "SCHEMA_REQUIRED": "Schemanaam is verplicht",
+    "SCHEMA_MAX_LENGTH": "Schemanaam mag niet langer zijn dan 63 tekens",
+    "SCHEMA_PATTERN": "Schemanaam moet beginnen met een kleine letter of underscore en mag alleen kleine letters, cijfers of underscores bevatten",
     "NAME_REQUIRED": "Naam is verplicht",
     "NAME_PATTERN": "Naam mag alleen letters, spaties en koppeltekens bevatten",
     "ORGANISATION_REQUIRED": "Organisatie is verplicht",
@@ -464,7 +467,12 @@
     "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (per organisatie automatisch gegenereerde sleutel)",
     "SECURITY_EMAIL_MOVED_NOTE": "Beveiligings- en e-mailconfiguratie worden beheerd door de organisatiebeheerder onder App-instellingen.",
     "SECURITY_AND_EMAIL": "Beveiliging & e-mail",
-    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "Beveiligings- en e-mailconfiguratie worden beheerd door de organisatiebeheerder onder App-instellingen."
+    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "Beveiligings- en e-mailconfiguratie worden beheerd door de organisatiebeheerder onder App-instellingen.",
+    "STEP_DB_CONFIG": "Databaseconfiguratie",
+    "DB_SCHEMA": "Platform-schema",
+    "DB_SCHEMA_PLACEHOLDER": "Postgres-schemanaam",
+    "DB_SCHEMA_NOTE": "Er wordt een nieuw schema met deze naam in uw database aangemaakt om de platform-tabellen van DBExec te bevatten. Gebruik alleen kleine letters, cijfers en underscores.",
+    "DB_SCHEMA_LOCKED": "Het schema wordt bij aanmaken ingesteld en kan niet worden gewijzigd."
   },
   "ROLE": {
     "TITLE": "Rollen",

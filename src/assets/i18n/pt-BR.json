@@ -206,6 +206,9 @@
     "PORT_MAX": "A porta não pode exceder 65535",
     "DB_NAME_PATTERN": "O nome do banco de dados pode conter apenas letras, números, sublinhados e hifens",
     "DATABASE_NAME_PATTERN": "O nome do banco de dados pode conter apenas letras, números, sublinhados e hifens",
+    "SCHEMA_REQUIRED": "O nome do esquema é obrigatório",
+    "SCHEMA_MAX_LENGTH": "O nome do esquema não pode exceder 63 caracteres",
+    "SCHEMA_PATTERN": "O nome do esquema deve começar com uma letra minúscula ou sublinhado e pode conter apenas letras minúsculas, dígitos ou sublinhados",
     "NAME_REQUIRED": "O nome é obrigatório",
     "NAME_PATTERN": "O nome pode conter apenas letras, espaços e hifens",
     "ORGANISATION_REQUIRED": "A organização é obrigatória",
@@ -464,7 +467,12 @@
     "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (chave por organização gerada automaticamente)",
     "SECURITY_EMAIL_MOVED_NOTE": "A configuração de segurança e e-mail é gerenciada pelo administrador da organização nas configurações do aplicativo.",
     "SECURITY_AND_EMAIL": "Segurança e e-mail",
-    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "A configuração de segurança e e-mail é gerenciada pelo administrador da organização nas configurações do aplicativo."
+    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "A configuração de segurança e e-mail é gerenciada pelo administrador da organização nas configurações do aplicativo.",
+    "STEP_DB_CONFIG": "Configuração do banco de dados",
+    "DB_SCHEMA": "Esquema da plataforma",
+    "DB_SCHEMA_PLACEHOLDER": "Nome do esquema do Postgres",
+    "DB_SCHEMA_NOTE": "Um novo esquema com este nome será criado no seu banco de dados para armazenar as tabelas da plataforma DBExec. Use apenas letras minúsculas, dígitos e sublinhados.",
+    "DB_SCHEMA_LOCKED": "O esquema é definido na criação e não pode ser alterado."
   },
   "ROLE": {
     "TITLE": "Funções",

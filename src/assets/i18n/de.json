@@ -206,6 +206,9 @@
     "PORT_MAX": "Port darf 65535 nicht überschreiten",
     "DB_NAME_PATTERN": "Datenbankname darf nur Buchstaben, Zahlen, Unterstriche und Bindestriche enthalten",
     "DATABASE_NAME_PATTERN": "Datenbankname darf nur Buchstaben, Zahlen, Unterstriche und Bindestriche enthalten",
+    "SCHEMA_REQUIRED": "Schemaname ist erforderlich",
+    "SCHEMA_MAX_LENGTH": "Schemaname darf 63 Zeichen nicht überschreiten",
+    "SCHEMA_PATTERN": "Schemaname muss mit einem Kleinbuchstaben oder Unterstrich beginnen und darf nur Kleinbuchstaben, Ziffern oder Unterstriche enthalten",
     "NAME_REQUIRED": "Name ist erforderlich",
     "NAME_PATTERN": "Name darf nur Buchstaben, Leerzeichen und Bindestriche enthalten",
     "ORGANISATION_REQUIRED": "Organisation ist erforderlich",
@@ -464,7 +467,12 @@
     "REVIEW_ENCRYPTION_VALUE": "AES-256-GCM (automatisch generierter Org-Schlüssel)",
     "SECURITY_EMAIL_MOVED_NOTE": "Sicherheits- und E-Mail-Konfiguration werden vom Organisationsadministrator unter „App-Einstellungen“ verwaltet.",
     "SECURITY_AND_EMAIL": "Sicherheit & E-Mail",
-    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "Sicherheits- und E-Mail-Konfiguration werden vom Organisationsadministrator unter „App-Einstellungen“ verwaltet."
+    "SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN": "Sicherheits- und E-Mail-Konfiguration werden vom Organisationsadministrator unter „App-Einstellungen“ verwaltet.",
+    "STEP_DB_CONFIG": "Datenbankkonfiguration",
+    "DB_SCHEMA": "Plattform-Schema",
+    "DB_SCHEMA_PLACEHOLDER": "Postgres-Schemaname",
+    "DB_SCHEMA_NOTE": "In Ihrer Datenbank wird ein neues Schema mit diesem Namen erstellt, um die Plattform-Tabellen von DBExec aufzunehmen. Verwenden Sie nur Kleinbuchstaben, Ziffern und Unterstriche.",
+    "DB_SCHEMA_LOCKED": "Das Schema wird bei der Erstellung festgelegt und kann nicht geändert werden."
   },
   "ROLE": {
     "TITLE": "Rollen",

@@ -79,7 +79,7 @@
       >
         <div class="step-dot">2</div>
         <span class="step-label">{{
-          'ORG.STEP_MASTER_DATASOURCE' | translate
+          'ORG.STEP_DB_CONFIG' | translate
         }}</span>
       </div>
     </div>
@@ -218,6 +218,24 @@
               [errorMessage]="getDbFieldError('dbName')"
             >
             </app-custom-input>
+
+            <!-- Platform schema is set at create time and locked
+                 afterwards — surface it as a read-only chip so the
+                 admin can see what's wired up without being able to
+                 retype it. The BE rejects schema changes on edit. -->
+            <div class="schema-locked-row" *ngIf="orgData?.masterDbConfig?.schema">
+              <div class="schema-locked-label">
+                <i class="pi pi-sitemap"></i>
+                <span>{{ 'ORG.DB_SCHEMA' | translate }}</span>
+              </div>
+              <div class="schema-locked-chip">
+                <i class="pi pi-lock"></i>
+                <span>{{ orgData.masterDbConfig.schema }}</span>
+              </div>
+              <p class="schema-locked-note">
+                {{ 'ORG.DB_SCHEMA_LOCKED' | translate }}
+              </p>
+            </div>
 
             <div class="db-fields-row">
               <app-custom-input
