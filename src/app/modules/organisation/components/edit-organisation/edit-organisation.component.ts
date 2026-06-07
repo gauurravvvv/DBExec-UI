@@ -176,36 +176,39 @@ export class EditOrganisationComponent
     // skipLoader:true → flips it false. The template's skeleton-form
     // mirrors that signal so the user sees a shape-correct placeholder
     // immediately, no global blocker.
+    //
+    // loadOne only writes to current() when res.status === true, so by
+    // the time we reach here we either have a hydrated org or null —
+    // either way, the service already shielded us from the error path
+    // and the global HTTP interceptor handled any toast. We apply the
+    // data directly; routing through handleSuccessService would
+    // misfire (no `code` on a synthetic wrapper) and trip an error
+    // toast on a perfectly good 200 response.
     await this.organisationService.loadOne(this.organisationId);
     const data = this.organisationService.current();
-    if (data) {
-      const response = { status: true, data } as any;
-      this.handleLoadedOrg(response);
-    }
+    if (data) this.applyLoadedOrg(data);
   }
 
-  private handleLoadedOrg(response: any) {
-    if (this.globalService.handleSuccessService(response, false)) {
-      this.orgData = response.data;
-      this.hasMasterDb = !!this.orgData.masterDbConfig;
+  private applyLoadedOrg(data: any) {
+    this.orgData = data;
+    this.hasMasterDb = !!data.masterDbConfig;
 
-      this.orgForm.patchValue({
-        id: this.orgData.id,
-        name: this.orgData.name,
-        description: this.orgData.description,
-        status: this.orgData.status,
-        dbHost: this.orgData.masterDbConfig?.hostname || '',
-        dbPort: this.orgData.masterDbConfig?.port || '',
-        dbName: this.orgData.masterDbConfig?.dbName || '',
-        dbUsername: this.orgData.masterDbConfig?.username || '',
-        dbPassword: '',
-      });
+    this.orgForm.patchValue({
+      id: data.id,
+      name: data.name,
+      description: data.description,
+      status: data.status,
+      dbHost: data.masterDbConfig?.hostname || '',
+      dbPort: data.masterDbConfig?.port || '',
+      dbName: data.masterDbConfig?.dbName || '',
+      dbUsername: data.masterDbConfig?.username || '',
+      dbPassword: '',
+    });
 
-      this.isFormDirty = false;
+    this.isFormDirty = false;
 
-      // Organisation name cannot be changed after creation
-      this.orgForm.get('name')?.disable();
-    }
+    // Organisation name cannot be changed after creation.
+    this.orgForm.get('name')?.disable();
   }
 
   // Step validation
