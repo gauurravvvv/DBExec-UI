@@ -171,44 +171,45 @@
               <span>{{ 'ORG.CONNECTION_DETAILS' | translate }}</span>
             </div>
 
-            <div class="db-fields-row">
-              <app-custom-input
-                formControlName="dbHost"
-                [label]="'ORG.HOST' | translate"
-                [placeholder]="'ORG.HOST_PLACEHOLDER' | translate"
-                icon="pi-desktop"
-                [showError]="
-                  !!(
-                    orgForm.get('dbHost')?.invalid &&
-                    orgForm.get('dbHost')?.touched
-                  )
-                "
-                [errorMessage]="getDbFieldError('dbHost')"
-              >
-              </app-custom-input>
+            <app-custom-input
+              formControlName="dbHost"
+              [label]="'ORG.HOST' | translate"
+              [placeholder]="'ORG.HOST_PLACEHOLDER' | translate"
+              icon="pi-desktop"
+              [required]="true"
+              [showError]="
+                !!(
+                  orgForm.get('dbHost')?.invalid &&
+                  orgForm.get('dbHost')?.touched
+                )
+              "
+              [errorMessage]="getDbFieldError('dbHost')"
+            >
+            </app-custom-input>
 
-              <app-custom-input
-                formControlName="dbPort"
-                [label]="'ORG.PORT' | translate"
-                [placeholder]="'ORG.PORT_PLACEHOLDER' | translate"
-                icon="pi-hashtag"
-                type="number"
-                [showError]="
-                  !!(
-                    orgForm.get('dbPort')?.invalid &&
-                    orgForm.get('dbPort')?.touched
-                  )
-                "
-                [errorMessage]="getDbFieldError('dbPort')"
-              >
-              </app-custom-input>
-            </div>
+            <app-custom-input
+              formControlName="dbPort"
+              [label]="'ORG.PORT' | translate"
+              [placeholder]="'ORG.PORT_PLACEHOLDER' | translate"
+              icon="pi-hashtag"
+              type="number"
+              [required]="true"
+              [showError]="
+                !!(
+                  orgForm.get('dbPort')?.invalid &&
+                  orgForm.get('dbPort')?.touched
+                )
+              "
+              [errorMessage]="getDbFieldError('dbPort')"
+            >
+            </app-custom-input>
 
             <app-custom-input
               formControlName="dbName"
               [label]="'ORG.DATASOURCE' | translate"
               [placeholder]="'ORG.DATASOURCE_PLACEHOLDER' | translate"
               icon="pi-database"
+              [required]="true"
               [showError]="
                 !!(
                   orgForm.get('dbName')?.invalid &&
@@ -219,49 +220,53 @@
             >
             </app-custom-input>
 
-            <!-- Platform schema is set at create time and locked
-                 afterwards — surface it as a read-only chip so the
-                 admin can see what's wired up without being able to
-                 retype it. The BE rejects schema changes on edit. -->
-            <div class="schema-locked-row" *ngIf="orgData?.masterDbConfig?.schema">
-              <div class="schema-locked-label">
-                <i class="pi pi-sitemap"></i>
-                <span>{{ 'ORG.DB_SCHEMA' | translate }}</span>
-              </div>
-              <div class="schema-locked-chip">
-                <i class="pi pi-lock"></i>
-                <span>{{ orgData.masterDbConfig.schema }}</span>
-              </div>
-              <p class="schema-locked-note">
-                {{ 'ORG.DB_SCHEMA_LOCKED' | translate }}
-              </p>
-            </div>
+            <app-custom-input
+              formControlName="dbSchema"
+              [label]="'ORG.DB_SCHEMA' | translate"
+              [placeholder]="'ORG.DB_SCHEMA_PLACEHOLDER' | translate"
+              icon="pi-sitemap"
+              [required]="true"
+              [showError]="
+                !!(
+                  orgForm.get('dbSchema')?.invalid &&
+                  orgForm.get('dbSchema')?.touched
+                )
+              "
+              [errorMessage]="getDbSchemaError()"
+            >
+            </app-custom-input>
 
-            <div class="db-fields-row">
-              <app-custom-input
-                formControlName="dbUsername"
-                [label]="'COMMON.USERNAME' | translate"
-                [placeholder]="'ORG.DB_USERNAME_PLACEHOLDER' | translate"
-                icon="pi-user"
-                [showError]="
-                  !!(
-                    orgForm.get('dbUsername')?.invalid &&
-                    orgForm.get('dbUsername')?.touched
-                  )
-                "
-                [errorMessage]="getDbFieldError('dbUsername')"
-              >
-              </app-custom-input>
+            <app-custom-input
+              formControlName="dbUsername"
+              [label]="'COMMON.USERNAME' | translate"
+              [placeholder]="'ORG.DB_USERNAME_PLACEHOLDER' | translate"
+              icon="pi-user"
+              [required]="true"
+              [showError]="
+                !!(
+                  orgForm.get('dbUsername')?.invalid &&
+                  orgForm.get('dbUsername')?.touched
+                )
+              "
+              [errorMessage]="getDbFieldError('dbUsername')"
+            >
+            </app-custom-input>
 
-              <app-custom-input
-                formControlName="dbPassword"
-                [label]="'ORG.PASSWORD' | translate"
-                [placeholder]="'ORG.LEAVE_BLANK_KEEP_CURRENT' | translate"
-                icon="pi-lock"
-                [showPasswordToggle]="true"
-              >
-              </app-custom-input>
-            </div>
+            <app-custom-input
+              formControlName="dbPassword"
+              [label]="'ORG.PASSWORD' | translate"
+              [placeholder]="'ORG.LEAVE_BLANK_KEEP_CURRENT' | translate"
+              icon="pi-lock"
+              [showPasswordToggle]="true"
+              [showError]="
+                !!(
+                  orgForm.get('dbPassword')?.invalid &&
+                  orgForm.get('dbPassword')?.touched
+                ) || !!passwordRequiredError
+              "
+              [errorMessage]="passwordRequiredError || getDbFieldError('dbPassword')"
+            >
+            </app-custom-input>
 
             <!-- Test Connection -->
             <div class="connection-test-section">
@@ -307,43 +312,21 @@
           </div>
         </div>
 
-        <!-- Right Column: Warning + Info -->
+        <!-- Right Column: Warning Card -->
         <div class="step-2-right">
-          <div class="readonly-info-container">
-            <div class="readonly-info-title warning-title">
-              <i class="pi pi-exclamation-triangle"></i>
-              {{ 'ORG.MASTER_DS_CONFIG' | translate }}
+          <div class="warning-container">
+            <div class="warning-title">
+              {{ 'ORG.EDIT_DB_WARNING_TITLE' | translate }}
             </div>
-            <div class="readonly-info-card warning-card">
-              <p class="update-info-text warning-text">
-                <i class="pi pi-circle-fill"></i>
-                {{ 'ORG.MASTER_DS_WARNING_1' | translate }}
+            <div class="warning-card">
+              <p class="warning-body">
+                {{ 'ORG.EDIT_DB_WARNING_BODY_1' | translate }}
               </p>
-              <p class="update-info-text warning-text">
-                <i class="pi pi-circle-fill"></i>
-                {{ 'ORG.MASTER_DS_WARNING_2' | translate }}
+              <p class="warning-body">
+                {{ 'ORG.EDIT_DB_WARNING_BODY_2' | translate }}
               </p>
-              <p class="update-info-text warning-text">
-                <i class="pi pi-circle-fill"></i>
-                {{ 'ORG.MASTER_DS_WARNING_3' | translate }}
-              </p>
-            </div>
-            <div class="readonly-info-title readonly-info-title--spaced">
-              <i class="pi pi-info-circle"></i>
-              {{ 'ORG.UPDATE_INFORMATION' | translate }}
-            </div>
-            <div class="readonly-info-card">
-              <p class="update-info-text">
-                <i class="pi pi-circle-fill"></i>
-                {{ 'ORG.UPDATE_INFO_1' | translate }}
-              </p>
-              <p class="update-info-text">
-                <i class="pi pi-circle-fill"></i>
-                {{ 'ORG.UPDATE_INFO_2' | translate }}
-              </p>
-              <p class="update-info-text">
-                <i class="pi pi-circle-fill"></i>
-                {{ 'ORG.UPDATE_INFO_3' | translate }}
+              <p class="warning-body">
+                {{ 'ORG.EDIT_DB_WARNING_BODY_3' | translate }}
               </p>
             </div>
           </div>

@@ -64,6 +64,11 @@ export class EditOrganisationComponent
   connectionTestLoading = false;
   connectionTestResult: 'success' | 'failed' | null = null;
   connectionTestError: string | null = null;
+  // Inline error shown next to the dbPassword field when the user has
+  // changed shape fields (host/port/dbName/dbSchema/dbUsername) but
+  // hasn't supplied a password. The BE also rejects this, but a
+  // client-side gate keeps the UX cleaner.
+  passwordRequiredError: string | null = null;
   // Sequence counter so in-flight responses that arrive after field edits
   // (or another newer test) are ignored — prevents a stale "Connected" state.
   private testRequestId = 0;
@@ -124,6 +129,14 @@ export class EditOrganisationComponent
         '',
         [Validators.required, Validators.pattern('^[a-zA-Z0-9_-]+$')],
       ],
+      dbSchema: [
+        '',
+        [
+          Validators.required,
+          Validators.maxLength(63),
+          Validators.pattern(/^[a-z_][a-z0-9_]{0,62}$/),
+        ],
+      ],
       dbUsername: ['', [Validators.required]],
       dbPassword: [''],
       // Security + email policy moved to per-org OrgPolicy (App Settings).
@@ -144,6 +157,7 @@ export class EditOrganisationComponent
           dbHost: this.orgData?.masterDbConfig?.hostname || '',
           dbPort: this.orgData?.masterDbConfig?.port || '',
           dbName: this.orgData?.masterDbConfig?.dbName || '',
+          dbSchema: this.orgData?.masterDbConfig?.schema || '',
           dbUsername: this.orgData?.masterDbConfig?.username || '',
           dbPassword: '',
         };
@@ -155,7 +169,7 @@ export class EditOrganisationComponent
 
     // Reset connection test when DB fields change. Bumping the request id
     // invalidates any in-flight response so it can't apply stale state.
-    ['dbHost', 'dbPort', 'dbName', 'dbUsername', 'dbPassword'].forEach(
+    ['dbHost', 'dbPort', 'dbName', 'dbSchema', 'dbUsername', 'dbPassword'].forEach(
       field => {
         this.orgForm
           .get(field)
@@ -164,6 +178,7 @@ export class EditOrganisationComponent
             this.connectionTested = false;
             this.connectionTestResult = null;
             this.connectionTestError = null;
+            this.passwordRequiredError = null;
             this.testRequestId++;
             this.cdr.markForCheck();
           });
@@ -201,6 +216,7 @@ export class EditOrganisationComponent
       dbHost: data.masterDbConfig?.hostname || '',
       dbPort: data.masterDbConfig?.port || '',
       dbName: data.masterDbConfig?.dbName || '',
+      dbSchema: data.masterDbConfig?.schema || '',
       dbUsername: data.masterDbConfig?.username || '',
       dbPassword: '',
     });
@@ -220,7 +236,7 @@ export class EditOrganisationComponent
   }
 
   isDbConnectionFieldsValid(): boolean {
-    const fields = ['dbHost', 'dbPort', 'dbName', 'dbUsername'];
+    const fields = ['dbHost', 'dbPort', 'dbName', 'dbSchema', 'dbUsername'];
     return (
       fields.every(
         f => this.orgForm.get(f)?.valid && this.orgForm.get(f)?.value,
@@ -235,11 +251,37 @@ export class EditOrganisationComponent
       dbHost: this.orgData.masterDbConfig.hostname || '',
       dbPort: this.orgData.masterDbConfig.port || '',
       dbName: this.orgData.masterDbConfig.dbName || '',
+      dbSchema: this.orgData.masterDbConfig.schema || '',
       dbUsername: this.orgData.masterDbConfig.username || '',
       dbPassword: '',
     };
-    return ['dbHost', 'dbPort', 'dbName', 'dbUsername', 'dbPassword'].some(
-      key => current[key] !== original[key],
+    return [
+      'dbHost',
+      'dbPort',
+      'dbName',
+      'dbSchema',
+      'dbUsername',
+      'dbPassword',
+    ].some(key => current[key] !== original[key]);
+  }
+
+  /**
+   * Returns true when any "shape" field (host/port/dbName/dbSchema/dbUsername)
+   * differs from what we loaded. Shape changes force the BE to re-validate
+   * the connection AND require the target schema be absent-or-empty, so the
+   * client also gates on schemaState === 'occupied' before declaring success.
+   * Password-only changes skip the schemaState gate.
+   */
+  isShapeChanged(): boolean {
+    if (!this.orgData?.masterDbConfig) return false;
+    const current = this.orgForm.value;
+    const cfg = this.orgData.masterDbConfig;
+    return (
+      String(current.dbHost ?? '') !== String(cfg.hostname ?? '') ||
+      String(current.dbPort ?? '') !== String(cfg.port ?? '') ||
+      String(current.dbName ?? '') !== String(cfg.dbName ?? '') ||
+      String(current.dbSchema ?? '') !== String(cfg.schema ?? '') ||
+      String(current.dbUsername ?? '') !== String(cfg.username ?? '')
     );
   }
 
@@ -306,11 +348,7 @@ export class EditOrganisationComponent
         host: formValue.dbHost,
         port: formValue.dbPort,
         database: formValue.dbName,
-        // Schema isn't editable on Edit Org — pass the existing one
-        // so the BE can still run its connection check. Empty-check
-        // will pass because we already own/use this schema; this is
-        // purely a reachability test.
-        schema: this.orgData?.masterDbConfig?.schema || '',
+        schema: formValue.dbSchema,
         username: formValue.dbUsername,
         password: formValue.dbPassword,
       })
@@ -324,13 +362,31 @@ export class EditOrganisationComponent
           this.cdr.markForCheck();
           return;
         }
-        if (response?.data?.isConnected) {
-          this.connectionTested = true;
-          this.connectionTestResult = 'success';
-        } else {
+
+        const data = response?.data;
+        if (!data?.isConnected) {
           this.connectionTested = false;
           this.connectionTestResult = 'failed';
+          this.cdr.markForCheck();
+          return;
         }
+
+        // Shape change → BE expects an absent-or-empty schema. We mirror
+        // Add Org and reject 'occupied' here so the user gets the same
+        // inline feedback before they hit Save. Password-only changes
+        // skip this gate — we already own/use the schema.
+        if (this.isShapeChanged() && data.schemaState === 'occupied') {
+          this.connectionTested = false;
+          this.connectionTestResult = 'failed';
+          this.connectionTestError = this.translate.instant(
+            'ORG.SCHEMA_NOT_EMPTY',
+          );
+          this.cdr.markForCheck();
+          return;
+        }
+
+        this.connectionTested = true;
+        this.connectionTestResult = 'success';
         this.cdr.markForCheck();
       })
       .catch(() => {
@@ -363,6 +419,19 @@ export class EditOrganisationComponent
   }
 
   onSubmit() {
+    // Shape changes (host/port/dbName/dbSchema/dbUsername) require a
+    // password — the BE will return ORG.DB_PASSWORD_REQUIRED_FOR_SHAPE_CHANGE
+    // otherwise. Surface it inline so the user fixes it before submitting.
+    this.passwordRequiredError = null;
+    if (this.isShapeChanged() && !this.orgForm.get('dbPassword')?.value) {
+      this.passwordRequiredError = this.translate.instant(
+        'ORG.DB_PASSWORD_REQUIRED',
+      );
+      this.orgForm.get('dbPassword')?.markAsTouched();
+      this.cdr.markForCheck();
+      return;
+    }
+
     if (this.orgForm.valid) {
       this.showSaveConfirm = true;
     } else {
@@ -413,6 +482,7 @@ export class EditOrganisationComponent
       dbHost: this.orgData.masterDbConfig?.hostname || '',
       dbPort: this.orgData.masterDbConfig?.port || '',
       dbName: this.orgData.masterDbConfig?.dbName || '',
+      dbSchema: this.orgData.masterDbConfig?.schema || '',
       dbUsername: this.orgData.masterDbConfig?.username || '',
       dbPassword: '',
     });
@@ -423,6 +493,7 @@ export class EditOrganisationComponent
     this.connectionTestResult = null;
     this.connectionTestError = null;
     this.connectionTestLoading = false;
+    this.passwordRequiredError = null;
     this.testRequestId++;
   }
 
@@ -459,6 +530,17 @@ export class EditOrganisationComponent
       return this.translate.instant('VALIDATION.DESCRIPTION_MAX_LENGTH', {
         length: control.errors['maxlength'].requiredLength,
       });
+    return '';
+  }
+
+  getDbSchemaError(): string {
+    const control = this.orgForm.get('dbSchema');
+    if (control?.errors?.['required'])
+      return this.translate.instant('VALIDATION.SCHEMA_REQUIRED');
+    if (control?.errors?.['maxlength'])
+      return this.translate.instant('VALIDATION.SCHEMA_MAX_LENGTH');
+    if (control?.errors?.['pattern'])
+      return this.translate.instant('VALIDATION.SCHEMA_PATTERN');
     return '';
   }
 

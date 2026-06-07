@@ -341,27 +341,17 @@ textarea,
   font-size: var(--fs-body) !important;
 }
 
-// PrimeNG popup / toast icons — theme defaults are 1.5–2rem font glyphs.
-// Pin them to the icon-scale tokens so the alert/info/error icon visually
-// anchors the popup without dwarfing its body copy.
+// PrimeNG popup icons — theme defaults are 1.5–2rem font glyphs.
+// Pin them to the icon-scale tokens so the alert/info/error icon
+// visually anchors the popup without dwarfing its body copy.
+// Toast icons are sized in _theme-variables.scss to match the new
+// modern toast layout (20px circle, severity colour).
 .p-confirm-popup .p-confirm-popup-icon {
   font-size: var(--icon-lg) !important; // 24px — compact popup
 }
 .p-confirm-dialog .p-confirm-dialog-icon,
 .p-dialog.p-confirm-dialog .p-confirm-dialog-icon {
   font-size: var(--icon-xl) !important; // 36px — modal-scale dialog
-}
-.p-toast .p-toast-message .p-toast-message-content .p-toast-message-icon {
-  font-size: var(--icon-xl) !important; // 36px — top-right toast
-}
-// Toast message body text + summary
-.p-toast .p-toast-message .p-toast-summary {
-  font-size: var(--fs-body) !important;
-  font-weight: var(--fw-semibold);
-}
-.p-toast .p-toast-message .p-toast-detail {
-  font-size: var(--fs-control) !important;
-  font-weight: var(--fw-regular);
 }
 
 ::-webkit-scrollbar {

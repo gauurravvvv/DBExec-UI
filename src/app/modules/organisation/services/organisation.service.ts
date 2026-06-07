@@ -157,6 +157,7 @@ export class OrganisationService {
         dbHost,
         dbPort,
         dbName,
+        dbSchema,
         dbUsername,
         dbPassword,
       } = orgForm.getRawValue();
@@ -169,10 +170,14 @@ export class OrganisationService {
         justification,
       };
 
-      // Only include DB fields if they have values
+      // Only include DB fields if they have values. The BE's two-path
+      // validator decides whether a shape-change requires re-validation
+      // + schemaState gate vs a password-only auth check — the FE just
+      // forwards whatever the user actually entered.
       if (dbHost) payload.dbHost = dbHost;
       if (dbPort) payload.dbPort = dbPort;
       if (dbName) payload.dbName = dbName;
+      if (dbSchema) payload.dbSchema = dbSchema;
       if (dbUsername) payload.dbUsername = dbUsername;
       if (dbPassword) payload.dbPassword = dbPassword;
 
@@ -277,6 +282,7 @@ export class OrganisationService {
       dbHost,
       dbPort,
       dbName,
+      dbSchema,
       dbUsername,
       dbPassword,
     } = orgForm.getRawValue();
@@ -293,6 +299,7 @@ export class OrganisationService {
     if (dbHost) payload.dbHost = dbHost;
     if (dbPort) payload.dbPort = dbPort;
     if (dbName) payload.dbName = dbName;
+    if (dbSchema) payload.dbSchema = dbSchema;
     if (dbUsername) payload.dbUsername = dbUsername;
     if (dbPassword) payload.dbPassword = dbPassword;
 

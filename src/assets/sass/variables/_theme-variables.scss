@@ -331,110 +331,190 @@
 
 // ================================================================
 // Toast styling
+// ----------------------------------------------------------------
+// White surface, 4px left severity accent, 1px border, soft shadow,
+// and a low-alpha severity tint layered on top so the surface still
+// reads as white but carries a hint of the severity colour. Body
+// text uses the muted token; summary uses the primary text colour.
+// PrimeNG's `.p-toast-message-content`/`.p-toast-message-icon`/
+// `.p-toast-summary`/`.p-toast-detail` selectors are the only ones
+// we touch — everything else inherits the design tokens.
 // ================================================================
 :root {
   .p-toast {
     &.p-toast-top-right {
-      top: 20px;
-      right: 20px;
+      top: 24px;
+      right: 24px;
     }
 
+    width: 400px;
+    max-width: calc(100vw - 48px);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
     .p-toast-message {
-      margin: var(--space-0);
-      background-color: var(--toast-background) !important;
-      border: var(--toast-border);
+      margin: 0;
+      background-color: var(--toast-background);
+      border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
-      opacity: 1 !important;
+      opacity: 1;
+      overflow: hidden;
 
       &::before {
         content: none;
       }
 
       .p-toast-message-content {
-        background-color: var(--toast-background) !important;
-        padding: var(--space-6);
-        border-width: 0 0 0 6px;
-        color: var(--toast-text-color);
+        // The tint is layered as a background-image (linear-gradient)
+        // over the toast surface so we don't need a fragile alpha
+        // composite — PrimeNG can re-state background-color, but it
+        // can't blow away the gradient.
+        background-color: var(--toast-background);
+        padding: 14px 18px;
+        border-width: 0 0 0 4px;
+        border-style: solid;
+        color: var(--text-color);
         display: flex;
-        align-items: center;
-        opacity: 1 !important;
+        align-items: flex-start;
+        gap: 14px;
+        opacity: 1;
 
         .p-toast-message-icon {
-          font-size: var(--fs-h1);
-          margin-right: 0.75rem;
+          font-size: 20px;
+          line-height: 1;
+          flex-shrink: 0;
           display: flex;
           align-items: center;
           justify-content: center;
-          height: 100%;
+          margin: 0;
+          width: 20px;
+          height: 20px;
+          margin-top: 1px;
         }
 
         .p-toast-message-text {
           flex: 1;
-          padding: 0.25rem 0;
+          padding: 0;
+          margin: 0;
+          min-width: 0;
 
           .p-toast-summary {
             font-weight: var(--fw-semibold);
-            font-size: var(--fs-h3);
-            margin-bottom: 0.25rem;
+            font-size: var(--fs-control);
+            color: var(--text-color);
+            line-height: 1.35;
+            margin: 0;
           }
 
           .p-toast-detail {
-            font-size: var(--fs-body);
-            opacity: 0.9;
+            font-size: var(--fs-label);
+            font-weight: var(--fw-regular);
+            color: var(--text-muted);
+            line-height: 1.45;
+            margin: 2px 0 0;
           }
         }
       }
 
+      // Severity colours + icon glyphs. We override the default
+      // PrimeNG toast icons to the circled variants (success →
+      // pi-check-circle, error → pi-times-circle) by re-pointing
+      // the icon's :before content at the right PrimeIcons unicode.
+      // warn (pi-exclamation-triangle) and info (pi-info-circle)
+      // already match the defaults — no override needed.
       &.p-toast-message-success {
-        background-color: var(--toast-background) !important;
-        border-left: 6px solid var(--toast-success-background);
+        border-left-color: var(--success-color);
 
         .p-toast-message-content {
-          background-color: var(--toast-background) !important;
+          background-image: linear-gradient(
+            var(--success-bg),
+            var(--success-bg)
+          );
+          border-left-color: var(--success-color);
+
+          .p-toast-message-icon {
+            color: var(--success-color);
+
+            &::before {
+              content: '\e90a'; // pi-check-circle
+            }
+          }
         }
       }
 
       &.p-toast-message-error {
-        background-color: var(--toast-background) !important;
-        border-left: 6px solid var(--toast-error-background);
+        border-left-color: var(--error-color);
 
         .p-toast-message-content {
-          background-color: var(--toast-background) !important;
+          background-image: linear-gradient(
+            var(--error-bg),
+            var(--error-bg)
+          );
+          border-left-color: var(--error-color);
+
+          .p-toast-message-icon {
+            color: var(--error-color);
+
+            &::before {
+              content: '\e90c'; // pi-times-circle
+            }
+          }
         }
       }
 
       &.p-toast-message-warn {
-        background-color: var(--toast-background) !important;
-        border-left: 6px solid var(--toast-warning-background);
+        border-left-color: var(--warning-color);
 
         .p-toast-message-content {
-          background-color: var(--toast-background) !important;
+          background-image: linear-gradient(
+            var(--warning-bg),
+            var(--warning-bg)
+          );
+          border-left-color: var(--warning-color);
+
+          .p-toast-message-icon {
+            color: var(--warning-color);
+          }
         }
       }
 
       &.p-toast-message-info {
-        background-color: var(--toast-background) !important;
-        border-left: 6px solid var(--toast-info-background);
+        border-left-color: var(--info-color);
 
         .p-toast-message-content {
-          background-color: var(--toast-background) !important;
+          background-image: linear-gradient(
+            var(--info-bg),
+            var(--info-bg)
+          );
+          border-left-color: var(--info-color);
+
+          .p-toast-message-icon {
+            color: var(--info-color);
+          }
         }
       }
 
       .p-toast-icon-close {
-        width: 2rem;
-        height: 2rem;
+        width: 24px;
+        height: 24px;
         border-radius: 50%;
         background: transparent;
-        color: var(--toast-text-color);
-        opacity: 0.7;
-        transition: all var(--motion-base) ease;
+        border: none;
+        color: var(--text-muted);
+        opacity: 0.75;
+        transition:
+          opacity var(--motion-base) ease,
+          background-color var(--motion-base) ease;
+        margin-left: 8px;
+        flex-shrink: 0;
 
         &:hover {
           opacity: 1;
-          background: var(--toast-icon-close-hover);
+          background: var(--hover-background);
         }
 
         &:focus {

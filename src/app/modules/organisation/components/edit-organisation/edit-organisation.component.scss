@@ -1010,54 +1010,61 @@
   margin-top: 1.25rem;
 }
 
-// Read-only "Platform schema" row on Edit Organisation. Schema is
-// fixed at create time and cannot be re-typed, so we render it as
-// a labelled chip with a small "set at creation" note alongside the
-// rest of the DB fields.
-.schema-locked-row {
+// Warning container shown in the right column of Step 2 on Edit Org.
+// Mirrors the shape of Add Org's .acknowledgments-container —
+// white surface card with a soft shadow, a primary accent bar on
+// the title, and a hover lift. Reusable across other admin pages
+// that need a "heads up before you save" panel.
+.warning-container {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-5);
 
-  .schema-locked-label {
+  .warning-title {
+    font-size: var(--fs-body);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    font-size: var(--fs-control);
-    color: var(--text-color);
-    opacity: 0.75;
-    font-weight: var(--fw-medium);
+    gap: var(--space-4);
+    margin-bottom: var(--space-2);
 
-    i {
-      color: var(--primary-color);
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 16px;
+      background: var(--primary-color);
+      border-radius: 2px;
     }
   }
 
-  .schema-locked-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-3);
-    align-self: flex-start;
-    padding: 0.45rem 0.85rem;
+  .warning-card {
+    padding: var(--space-6) var(--space-7);
     border: 1px solid var(--border-color);
-    border-radius: 999px;
-    background: var(--hover-background);
-    color: var(--text-color);
-    font-size: var(--fs-control);
-    font-weight: var(--fw-medium);
+    border-radius: var(--radius-md);
+    background: var(--card-background);
+    box-shadow: var(--shadow-sm);
+    transition:
+      box-shadow var(--motion-base) var(--ease-out),
+      border-color var(--motion-base) var(--ease-out);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
 
-    i {
-      color: var(--text-color);
-      opacity: 0.6;
-      font-size: var(--fs-label);
+    &:hover {
+      border-color: var(--primary-light);
+      box-shadow: var(--shadow-md);
     }
-  }
 
-  .schema-locked-note {
-    margin: 0;
-    color: var(--text-color);
-    opacity: 0.6;
-    font-size: var(--fs-control);
-    line-height: 1.5;
+    .warning-body {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: var(--fs-control);
+      line-height: var(--lh-normal, 1.5);
+    }
   }
 }
