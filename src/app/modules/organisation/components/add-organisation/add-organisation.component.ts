@@ -115,7 +115,16 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
       ],
       dbUsername: ['', [Validators.required]],
       dbPassword: ['', [Validators.required]],
-      adminEmail: ['', [Validators.required, Validators.email]],
+      // Validators.email alone allows 'foo@bar' (no TLD). REGEX.email
+      // adds the TLD requirement so 'asdas@sdhu' is rejected.
+      adminEmail: [
+        '',
+        [
+          Validators.required,
+          Validators.email,
+          Validators.pattern(REGEX.email),
+        ],
+      ],
       adminLocale: ['en', Validators.required],
       // Security + email policy now live on the per-org OrgPolicy
       // entity and are managed by the Org Admin under App Settings.
@@ -377,6 +386,8 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
             return this.translate.instant('VALIDATION.PORT_MUST_BE_NUMBER');
           case 'dbName':
             return this.translate.instant('VALIDATION.DB_NAME_PATTERN');
+          case 'adminEmail':
+            return this.translate.instant('VALIDATION.EMAIL_INVALID');
           default:
             return this.translate.instant('VALIDATION.INVALID_FORMAT');
         }

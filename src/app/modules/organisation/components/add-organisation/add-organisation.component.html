@@ -84,10 +84,10 @@
     </div>
 
     <form [formGroup]="orgForm" class="admin-form mt-4">
-      <!-- Step 1: Organisation Details (left) + Organisation Admin (right) -->
+      <!-- Step 1: Organisation Details (single vertical stack, 50% width) -->
       <div *ngIf="currentStep === 0" class="step-1-layout">
-        <!-- Left Column: Org Basic Info -->
         <div class="step-1-left">
+          <!-- Basic Information -->
           <div class="form-group-section">
             <div class="group-header">
               <i class="pi pi-building"></i>
@@ -123,10 +123,8 @@
             >
             </app-custom-input>
           </div>
-        </div>
 
-        <!-- Right Column: Organisation Admin -->
-        <div class="step-1-right">
+          <!-- Organisation Admin -->
           <div class="admin-setup-group">
             <div class="group-header">
               <i class="pi pi-user-plus"></i>
