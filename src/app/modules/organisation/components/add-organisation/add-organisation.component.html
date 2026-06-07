@@ -181,40 +181,38 @@
               <span>{{ 'ORG.CONNECTION_DETAILS' | translate }}</span>
             </div>
 
-            <div class="db-fields-row">
-              <app-custom-input
-                formControlName="dbHost"
-                [label]="'ORG.HOST' | translate"
-                [placeholder]="'ORG.HOST_PLACEHOLDER' | translate"
-                icon="pi-desktop"
-                [required]="true"
-                [showError]="
-                  !!(
-                    orgForm.get('dbHost')?.invalid &&
-                    orgForm.get('dbHost')?.touched
-                  )
-                "
-                [errorMessage]="getDbFieldError('dbHost')"
-              >
-              </app-custom-input>
+            <app-custom-input
+              formControlName="dbHost"
+              [label]="'ORG.HOST' | translate"
+              [placeholder]="'ORG.HOST_PLACEHOLDER' | translate"
+              icon="pi-desktop"
+              [required]="true"
+              [showError]="
+                !!(
+                  orgForm.get('dbHost')?.invalid &&
+                  orgForm.get('dbHost')?.touched
+                )
+              "
+              [errorMessage]="getDbFieldError('dbHost')"
+            >
+            </app-custom-input>
 
-              <app-custom-input
-                formControlName="dbPort"
-                [label]="'ORG.PORT' | translate"
-                [placeholder]="'ORG.PORT_PLACEHOLDER' | translate"
-                icon="pi-hashtag"
-                type="number"
-                [required]="true"
-                [showError]="
-                  !!(
-                    orgForm.get('dbPort')?.invalid &&
-                    orgForm.get('dbPort')?.touched
-                  )
-                "
-                [errorMessage]="getDbFieldError('dbPort')"
-              >
-              </app-custom-input>
-            </div>
+            <app-custom-input
+              formControlName="dbPort"
+              [label]="'ORG.PORT' | translate"
+              [placeholder]="'ORG.PORT_PLACEHOLDER' | translate"
+              icon="pi-hashtag"
+              type="number"
+              [required]="true"
+              [showError]="
+                !!(
+                  orgForm.get('dbPort')?.invalid &&
+                  orgForm.get('dbPort')?.touched
+                )
+              "
+              [errorMessage]="getDbFieldError('dbPort')"
+            >
+            </app-custom-input>
 
             <app-custom-input
               formControlName="dbName"
@@ -252,40 +250,38 @@
               {{ 'ORG.DB_SCHEMA_NOTE' | translate }}
             </p>
 
-            <div class="db-fields-row">
-              <app-custom-input
-                formControlName="dbUsername"
-                [label]="'COMMON.USERNAME' | translate"
-                [placeholder]="'ORG.DB_USERNAME_PLACEHOLDER' | translate"
-                icon="pi-user"
-                [required]="true"
-                [showError]="
-                  !!(
-                    orgForm.get('dbUsername')?.invalid &&
-                    orgForm.get('dbUsername')?.touched
-                  )
-                "
-                [errorMessage]="getDbFieldError('dbUsername')"
-              >
-              </app-custom-input>
+            <app-custom-input
+              formControlName="dbUsername"
+              [label]="'COMMON.USERNAME' | translate"
+              [placeholder]="'ORG.DB_USERNAME_PLACEHOLDER' | translate"
+              icon="pi-user"
+              [required]="true"
+              [showError]="
+                !!(
+                  orgForm.get('dbUsername')?.invalid &&
+                  orgForm.get('dbUsername')?.touched
+                )
+              "
+              [errorMessage]="getDbFieldError('dbUsername')"
+            >
+            </app-custom-input>
 
-              <app-custom-input
-                formControlName="dbPassword"
-                [label]="'ORG.PASSWORD' | translate"
-                [placeholder]="'ORG.ENTER_PASSWORD' | translate"
-                icon="pi-lock"
-                [required]="true"
-                [showPasswordToggle]="true"
-                [showError]="
-                  !!(
-                    orgForm.get('dbPassword')?.invalid &&
-                    orgForm.get('dbPassword')?.touched
-                  )
-                "
-                [errorMessage]="getDbFieldError('dbPassword')"
-              >
-              </app-custom-input>
-            </div>
+            <app-custom-input
+              formControlName="dbPassword"
+              [label]="'ORG.PASSWORD' | translate"
+              [placeholder]="'ORG.ENTER_PASSWORD' | translate"
+              icon="pi-lock"
+              [required]="true"
+              [showPasswordToggle]="true"
+              [showError]="
+                !!(
+                  orgForm.get('dbPassword')?.invalid &&
+                  orgForm.get('dbPassword')?.touched
+                )
+              "
+              [errorMessage]="getDbFieldError('dbPassword')"
+            >
+            </app-custom-input>
 
             <!-- Test Connection (text link) -->
             <div class="connection-test-section">
