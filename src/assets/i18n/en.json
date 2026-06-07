@@ -472,7 +472,8 @@
     "DB_SCHEMA": "Platform Schema",
     "DB_SCHEMA_PLACEHOLDER": "e.g. dbexec_master",
     "DB_SCHEMA_NOTE": "DBExec will create this schema in your database for its platform tables. If the schema already exists, it must be empty.",
-    "DB_SCHEMA_LOCKED": "Schema is set at creation and cannot be changed."
+    "DB_SCHEMA_LOCKED": "Schema is set at creation and cannot be changed.",
+    "SCHEMA_NOT_EMPTY": "The schema you specified already contains objects. Choose an empty schema or a new name."
   },
   "ROLE": {
     "TITLE": "Roles",

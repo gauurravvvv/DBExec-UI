@@ -248,25 +248,43 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
         host: formValue.dbHost,
         port: formValue.dbPort,
         database: formValue.dbName,
+        schema: formValue.dbSchema,
         username: formValue.dbUsername,
         password: formValue.dbPassword,
       })
       .then((response: any) => {
         if (reqId !== this.testRequestId) return;
         this.connectionTestLoading.set(false);
+
         if (response?.code !== 200) {
           this.connectionTested.set(false);
           this.connectionTestResult.set('failed');
           this.connectionTestError.set(response?.message || null);
           return;
         }
-        if (response?.data?.isConnected) {
-          this.connectionTested.set(true);
-          this.connectionTestResult.set('success');
-        } else {
+
+        const data = response?.data;
+        if (!data?.isConnected) {
           this.connectionTested.set(false);
           this.connectionTestResult.set('failed');
+          return;
         }
+
+        // Connection succeeded — now gate on schema state. The BE
+        // returns 'absent' / 'empty' / 'occupied'. Only 'absent' and
+        // 'empty' are acceptable; 'occupied' means the user picked a
+        // schema that already holds data we won't touch.
+        if (data.schemaState === 'occupied') {
+          this.connectionTested.set(false);
+          this.connectionTestResult.set('failed');
+          this.connectionTestError.set(
+            this.translate.instant('ORG.SCHEMA_NOT_EMPTY'),
+          );
+          return;
+        }
+
+        this.connectionTested.set(true);
+        this.connectionTestResult.set('success');
       })
       .catch(() => {
         if (reqId !== this.testRequestId) return;

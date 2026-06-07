@@ -472,7 +472,8 @@
     "DB_SCHEMA": "Esquema de la plataforma",
     "DB_SCHEMA_PLACEHOLDER": "p. ej. dbexec_master",
     "DB_SCHEMA_NOTE": "DBExec creará este esquema en tu base de datos para sus tablas de plataforma. Si el esquema ya existe, debe estar vacío.",
-    "DB_SCHEMA_LOCKED": "El esquema se establece al crear y no se puede cambiar."
+    "DB_SCHEMA_LOCKED": "El esquema se establece al crear y no se puede cambiar.",
+    "SCHEMA_NOT_EMPTY": "El esquema indicado ya contiene objetos. Elige un esquema vacío o un nombre nuevo."
   },
   "ROLE": {
     "TITLE": "Roles",

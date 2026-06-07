@@ -472,7 +472,8 @@
     "DB_SCHEMA": "プラットフォームスキーマ",
     "DB_SCHEMA_PLACEHOLDER": "例: dbexec_master",
     "DB_SCHEMA_NOTE": "DBExec はプラットフォーム用テーブルのためにこのスキーマをデータベースに作成します。スキーマが既に存在する場合は空である必要があります。",
-    "DB_SCHEMA_LOCKED": "スキーマは作成時に設定され、変更できません。"
+    "DB_SCHEMA_LOCKED": "スキーマは作成時に設定され、変更できません。",
+    "SCHEMA_NOT_EMPTY": "指定したスキーマには既にオブジェクトが含まれています。空のスキーマか別の名前を選択してください。"
   },
   "ROLE": {
     "TITLE": "役割",

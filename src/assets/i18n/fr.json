@@ -472,7 +472,8 @@
     "DB_SCHEMA": "Schéma de la plateforme",
     "DB_SCHEMA_PLACEHOLDER": "p. ex. dbexec_master",
     "DB_SCHEMA_NOTE": "DBExec créera ce schéma dans votre base de données pour ses tables de plateforme. Si le schéma existe déjà, il doit être vide.",
-    "DB_SCHEMA_LOCKED": "Le schéma est défini à la création et ne peut pas être modifié."
+    "DB_SCHEMA_LOCKED": "Le schéma est défini à la création et ne peut pas être modifié.",
+    "SCHEMA_NOT_EMPTY": "Le schéma indiqué contient déjà des objets. Choisissez un schéma vide ou un nouveau nom."
   },
   "ROLE": {
     "TITLE": "Rôles",

@@ -303,6 +303,11 @@ export class EditOrganisationComponent
         host: formValue.dbHost,
         port: formValue.dbPort,
         database: formValue.dbName,
+        // Schema isn't editable on Edit Org — pass the existing one
+        // so the BE can still run its connection check. Empty-check
+        // will pass because we already own/use this schema; this is
+        // purely a reachability test.
+        schema: this.orgData?.masterDbConfig?.schema || '',
         username: formValue.dbUsername,
         password: formValue.dbPassword,
       })

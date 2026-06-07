@@ -472,7 +472,8 @@
     "DB_SCHEMA": "Plattform-Schema",
     "DB_SCHEMA_PLACEHOLDER": "z. B. dbexec_master",
     "DB_SCHEMA_NOTE": "DBExec erstellt dieses Schema in Ihrer Datenbank für seine Plattformtabellen. Falls das Schema bereits existiert, muss es leer sein.",
-    "DB_SCHEMA_LOCKED": "Das Schema wird bei der Erstellung festgelegt und kann nicht geändert werden."
+    "DB_SCHEMA_LOCKED": "Das Schema wird bei der Erstellung festgelegt und kann nicht geändert werden.",
+    "SCHEMA_NOT_EMPTY": "Das angegebene Schema enthält bereits Objekte. Wählen Sie ein leeres Schema oder einen neuen Namen."
   },
   "ROLE": {
     "TITLE": "Rollen",
