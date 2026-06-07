@@ -145,9 +145,11 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
   isStep1Valid(): boolean {
     const nameValid = this.orgForm.get('name')?.valid || false;
     const descValid = this.orgForm.get('description')?.valid || false;
-    // Encryption is server-managed and no admin acknowledgement is
-    // gathered any more — step 1 just gates on name + description.
-    return nameValid && descValid;
+    const emailValid = this.orgForm.get('adminEmail')?.valid || false;
+    const localeValid = this.orgForm.get('adminLocale')?.valid || false;
+    // Step 1 now collects org basics AND the bootstrap admin's
+    // identity (email + locale). All four must be valid to advance.
+    return nameValid && descValid && emailValid && localeValid;
   }
 
   isDbConnectionFieldsValid(): boolean {

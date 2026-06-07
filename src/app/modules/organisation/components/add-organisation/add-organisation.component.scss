@@ -684,7 +684,8 @@
   }
 }
 
-// Two-column layout for steps
+// Two-column layout for steps. Step 1 = org details / org admin,
+// Step 2 = DB connection / acknowledgments. Both columns sized 50/50.
 .step-1-layout,
 .step-2-layout,
 .step-3-layout {
@@ -696,13 +697,6 @@
   @media (max-width: 992px) {
     grid-template-columns: 1fr;
   }
-}
-
-// Step 1 no longer has a right-column info card — render the
-// left column full-width so the form doesn't sit awkwardly in a
-// half-width column with empty space beside it.
-.step-1-layout {
-  grid-template-columns: 1fr;
 }
 
 .step-1-left,

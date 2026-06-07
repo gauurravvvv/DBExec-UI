@@ -84,11 +84,10 @@
     </div>
 
     <form [formGroup]="orgForm" class="admin-form mt-4">
-      <!-- Step 1: Organisation Config (Basic Info + Encryption Info) -->
+      <!-- Step 1: Organisation Details (left) + Organisation Admin (right) -->
       <div *ngIf="currentStep === 0" class="step-1-layout">
-        <!-- Left Column: Form Fields -->
+        <!-- Left Column: Org Basic Info -->
         <div class="step-1-left">
-          <!-- Basic Information Group -->
           <div class="form-group-section">
             <div class="group-header">
               <i class="pi pi-building"></i>
@@ -126,6 +125,49 @@
           </div>
         </div>
 
+        <!-- Right Column: Organisation Admin -->
+        <div class="step-1-right">
+          <div class="admin-setup-group">
+            <div class="group-header">
+              <i class="pi pi-user-plus"></i>
+              <span>{{ 'ORG.ORG_ADMIN' | translate }}</span>
+            </div>
+
+            <app-custom-input
+              formControlName="adminEmail"
+              [label]="'ORG.ADMIN_EMAIL' | translate"
+              [placeholder]="'ORG.ADMIN_EMAIL_PLACEHOLDER' | translate"
+              icon="pi-envelope"
+              type="email"
+              [required]="true"
+              [showError]="
+                !!(
+                  orgForm.get('adminEmail')?.invalid &&
+                  orgForm.get('adminEmail')?.touched
+                )
+              "
+              [errorMessage]="getDbFieldError('adminEmail')"
+            >
+            </app-custom-input>
+
+            <app-custom-dropdown
+              formControlName="adminLocale"
+              [label]="'ORG.ADMIN_LOCALE' | translate"
+              [options]="locales"
+              optionLabel="label"
+              optionValue="code"
+              [placeholder]="'ORG.ADMIN_LOCALE_PLACEHOLDER' | translate"
+              [filter]="false"
+              appendTo="body"
+              icon="pi-globe"
+            ></app-custom-dropdown>
+
+            <p class="admin-setup-note">
+              <i class="pi pi-info-circle"></i>
+              {{ 'ORG.ADMIN_SETUP_NOTE' | translate }}
+            </p>
+          </div>
+        </div>
       </div>
 
       <!-- Step 2: Master Database -->
@@ -288,47 +330,6 @@
             </div>
           </div>
 
-          <!-- Admin Setup Group -->
-          <div class="admin-setup-group">
-            <div class="group-header">
-              <i class="pi pi-user-plus"></i>
-              <span>{{ 'ORG.ORG_ADMIN' | translate }}</span>
-            </div>
-
-            <app-custom-input
-              formControlName="adminEmail"
-              [label]="'ORG.ADMIN_EMAIL' | translate"
-              [placeholder]="'ORG.ADMIN_EMAIL_PLACEHOLDER' | translate"
-              icon="pi-envelope"
-              type="email"
-              [required]="true"
-              [showError]="
-                !!(
-                  orgForm.get('adminEmail')?.invalid &&
-                  orgForm.get('adminEmail')?.touched
-                )
-              "
-              [errorMessage]="getDbFieldError('adminEmail')"
-            >
-            </app-custom-input>
-
-            <app-custom-dropdown
-              formControlName="adminLocale"
-              [label]="'ORG.ADMIN_LOCALE' | translate"
-              [options]="locales"
-              optionLabel="label"
-              optionValue="code"
-              [placeholder]="'ORG.ADMIN_LOCALE_PLACEHOLDER' | translate"
-              [filter]="false"
-              appendTo="body"
-              icon="pi-globe"
-            ></app-custom-dropdown>
-
-            <p class="admin-setup-note">
-              <i class="pi pi-info-circle"></i>
-              {{ 'ORG.ADMIN_SETUP_NOTE' | translate }}
-            </p>
-          </div>
         </div>
 
         <!-- Right Column: Acknowledgments -->
