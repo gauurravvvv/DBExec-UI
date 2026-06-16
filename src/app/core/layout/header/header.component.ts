@@ -22,6 +22,7 @@ import {
 } from 'src/app/core/services/locale.service';
 import { LoginService } from 'src/app/core/services/login.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
+import { PermissionService } from 'src/app/core/services/permission.service';
 import { StorageService } from 'src/app/core/services/storage.service';
 import { ThemeService } from 'src/app/core/services/theme.service';
 import { AddAnalysesActions } from 'src/app/modules/analyses/store';
@@ -81,6 +82,7 @@ export class HeaderComponent implements OnInit {
     private localeService: LocaleService,
     private themeService: ThemeService,
     public notificationService: NotificationService,
+    private permissionService: PermissionService,
   ) {
     this.destroyRef.onDestroy(() => {
       if (this.typewriterTimer) clearTimeout(this.typewriterTimer);
@@ -221,6 +223,10 @@ export class HeaderComponent implements OnInit {
     // colours bleed onto the unauthenticated auth screens until the
     // tab is hard-reloaded.
     this.themeService.clear();
+    // Drop the PermissionService cache so the next user's bootstrap
+    // hydrates a clean tree (storage is already cleared above; this
+    // resets the in-memory cached parse).
+    this.permissionService.reset();
     this.router.navigate(['/login']);
   }
 

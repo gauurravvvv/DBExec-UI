@@ -238,6 +238,15 @@ export class LoginService implements OnDestroy {
       JSON.stringify(d.announcements ?? []),
     );
 
+    // Permission tree — nested PermissionNode[] from
+    // buildSessionBootstrap. PermissionService + sidebar read from
+    // here; cleared on logout. Stored as JSON string for parity with
+    // ANNOUNCEMENTS (cached reads, single parse).
+    StorageService.set(
+      StorageType.PERMISSION_TREE,
+      JSON.stringify(d.permissions ?? []),
+    );
+
     // Theme + branding + (re)locale, all through the single
     // chokepoint. `null` theme/branding (system-admin path)
     // clears any previously injected style.
