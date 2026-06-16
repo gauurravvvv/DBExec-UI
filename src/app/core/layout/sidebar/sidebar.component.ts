@@ -10,7 +10,9 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { StorageType } from 'src/app/core/constants/storage-type.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { StorageService } from 'src/app/core/services/storage.service';
 import { SIDEBAR_ITEMS_ROUTES } from './sidebar.constant';
 
 interface MenuItem {
@@ -21,6 +23,25 @@ interface MenuItem {
   isExpanded?: boolean;
   subPermissions?: MenuItem[];
   route?: string;
+}
+
+/**
+ * BE PermissionNode shape from buildSessionBootstrap.
+ * Modules have no `level`; only leaf permissions do. We only render
+ * a node as a clickable nav item when level >= 1 (or when the node
+ * has children that themselves passed the filter).
+ */
+interface PermissionNode {
+  id?: string;
+  value: string;
+  name?: string;
+  icon?: string | null;
+  sequence?: number;
+  scope?: string;
+  level?: number;
+  children?: PermissionNode[];
+  /** Legacy nested shape — older snapshots, still tolerated. */
+  subPermissions?: PermissionNode[];
 }
 
 @Component({
@@ -73,8 +94,13 @@ export class SidebarComponent implements OnInit {
     public router: Router,
     private translate: TranslateService,
   ) {
-    const permissions = this.globalService.getTokenDetails('permission');
-    this.menuItems = this.processMenuItems(permissions);
+    // Source the menu from the nested PERMISSION_TREE written by
+    // Phase 2 of login (buildSessionBootstrap). Falls back to the
+    // JWT-embedded flat list if the tree storage key is empty —
+    // that only happens transiently during the relay; the tree is
+    // populated before the user lands on a real page.
+    const tree = this.readPermissionTree();
+    this.menuItems = this.processMenuItems(tree);
     // Restore the user's previously-expanded branches from localStorage
     // so a page refresh doesn't reset their open tree.
     this.restoreExpandedState();
@@ -156,24 +182,62 @@ export class SidebarComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  processMenuItems(items: MenuItem[], level: number = 0): MenuItem[] {
-    if (!items) return [];
-
-    return items
-      .filter(item => item.status)
-      .map(item => ({
-        ...item,
-        isExpanded: false,
-        subPermissions: item.subPermissions
-          ? this.processMenuItems(item.subPermissions, level + 1)
-          : undefined,
-        route: this.appendRouteToMenu(item),
-      }));
+  /**
+   * Read the nested permission tree from storage. Empty array on
+   * missing / malformed JSON. The PermissionService caches its own
+   * parse for runtime checks; we re-parse here independently because
+   * the sidebar only builds its menu once at construction time and
+   * doesn't need to share a cache.
+   */
+  private readPermissionTree(): PermissionNode[] {
+    const raw = StorageService.get(StorageType.PERMISSION_TREE);
+    if (!raw) return [];
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? (parsed as PermissionNode[]) : [];
+    } catch {
+      return [];
+    }
   }
 
-  appendRouteToMenu(item: MenuItem): string {
+  /**
+   * Walk the BE PermissionNode tree and shape it into the MenuItem
+   * tree the template renders. A node is included when:
+   *   - it carries `level >= 1` (a granted leaf), OR
+   *   - it has at least one descendant that does
+   *
+   * Modules with no granted children are dropped entirely so the
+   * sidebar never shows an empty section header.
+   */
+  processMenuItems(items: PermissionNode[], depth: number = 0): MenuItem[] {
+    if (!Array.isArray(items)) return [];
+
+    const result: MenuItem[] = [];
+    for (const node of items) {
+      const children = node.children ?? node.subPermissions ?? [];
+      const processedChildren = this.processMenuItems(children, depth + 1);
+      const hasGrant = typeof node.level === 'number' && node.level >= 1;
+
+      // Drop nodes that are neither granted leaves nor parents of one.
+      if (!hasGrant && processedChildren.length === 0) continue;
+
+      result.push({
+        label: node.name ?? node.value,
+        value: node.value,
+        status: true,
+        icon: node.icon ?? '',
+        isExpanded: false,
+        subPermissions:
+          processedChildren.length > 0 ? processedChildren : undefined,
+        route: this.appendRouteToMenu(node),
+      });
+    }
+    return result;
+  }
+
+  appendRouteToMenu(node: PermissionNode | MenuItem): string {
     const route = SIDEBAR_ITEMS_ROUTES.find(
-      ir => ir.value === item.value,
+      ir => ir.value === node.value,
     )?.route;
     return route || '';
   }
