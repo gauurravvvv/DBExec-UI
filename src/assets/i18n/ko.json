@@ -501,7 +501,13 @@
     "DELETE_BULK": "선택한 <strong>{{count}}</strong>개의 역할을 삭제하시겠습니까?",
     "DELETE_LOSE_PERMISSIONS": "이 역할에 할당된 사용자의 권한이 해제됩니다",
     "DELETE_CONFIG_REMOVED": "역할 설정이 영구적으로 삭제됩니다",
-    "UPDATE_CONFIRM": "이 역할을 업데이트하시겠습니까?"
+    "UPDATE_CONFIRM": "이 역할을 업데이트하시겠습니까?",
+    "PERMISSIONS_TITLE": "권한",
+    "GRANT_AT_LEAST_ONE": "역할을 저장하려면 최소한 하나의 권한을 부여하세요.",
+    "STATUS_ACTIVE": "활성",
+    "STATUS_INACTIVE": "비활성",
+    "NAME_IMMUTABLE": "생성 후에는 역할 이름을 변경할 수 없습니다.",
+    "LEVEL_TOOLTIP_PREFIX": ""
   },
   "GROUP": {
     "TITLE": "그룹",
@@ -2669,5 +2675,11 @@
       "SAVE": "변경 사항 저장",
       "SAVED": "이메일 구성이 업데이트되었습니다"
     }
+  },
+  "PERMISSIONS": {
+    "TITLE": "권한"
+  },
+  "ACCESS_LEVEL": {
+    "TITLE": "액세스 레벨"
   }
 }

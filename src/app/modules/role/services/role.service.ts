@@ -1,7 +1,18 @@
 import { Injectable, signal } from '@angular/core';
 import { EmptyError, Subject, lastValueFrom, takeUntil } from 'rxjs';
-import { ROLE } from 'src/app/core/constants/api.constant';
+import {
+  ACCESS_LEVELS,
+  PERMISSIONS,
+  ROLE,
+} from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
+import {
+  AccessLevelEntry,
+  AddRolePayload,
+  PermissionModule,
+  SelectedPermissionEntry,
+  UpdateRolePayload,
+} from '../role.types';
 
 /**
  * RoleService — list/view/CUD for roles + permission metadata.
@@ -121,26 +132,94 @@ export class RoleService {
     this._cancelReads$.next();
   }
 
-  async add(data: any): Promise<any> {
+  // ── New relational RBAC reads ─────────────────────────────────────
+  // The new permission-grid UX needs two metadata feeds:
+  //   - listPermissions(): the module/submodule tree. When the caller
+  //     passes a roleId, every leaf carries the role's effective level
+  //     so the grid can pre-select radios on Edit Role.
+  //   - listAccessLevels(): the four canonical rows (None/Read/Write/
+  //     Full). The grid renders one radio column per row using the
+  //     entry's `value` (0..3) as the radio value.
+
+  /**
+   * GET /api/v1/permissions[?scope=&roleId=]
+   * Returns the modules[] tree. Callers should ignore `orphans` for
+   * now — the role grid only renders modules with leaves.
+   */
+  async listPermissions(opts?: {
+    scope?: 'ORG' | 'SYSTEM' | 'ALL';
+    roleId?: string;
+  }): Promise<PermissionModule[]> {
+    const params: any = {};
+    if (opts?.scope) params.scope = opts.scope;
+    if (opts?.roleId) params.roleId = opts.roleId;
+    const res: any = await lastValueFrom(
+      this.http
+        .apiGet(PERMISSIONS.LIST, { params, skipLoader: true })
+        .pipe(takeUntil(this._cancelReads$)),
+    );
+    if (res?.status) return (res.data?.modules ?? []) as PermissionModule[];
+    return [];
+  }
+
+  /**
+   * GET /api/v1/access-levels
+   * Returns the canonical four rows. Sorted by `sequence` server-side
+   * but we don't rely on it — the grid sorts again before rendering.
+   */
+  async listAccessLevels(): Promise<AccessLevelEntry[]> {
+    const res: any = await lastValueFrom(
+      this.http
+        .apiGet(ACCESS_LEVELS.LIST, { skipLoader: true })
+        .pipe(takeUntil(this._cancelReads$)),
+    );
+    if (res?.status) return (res.data?.levels ?? []) as AccessLevelEntry[];
+    return [];
+  }
+
+  /**
+   * Strip `selectedPermissions` entries with level < 1 (the BE strips
+   * too but keeping the wire small helps when a role has hundreds of
+   * leaves and only a handful granted).
+   */
+  private pruneSelected(
+    entries: SelectedPermissionEntry[],
+  ): SelectedPermissionEntry[] {
+    return (entries || []).filter(e => e && e.level >= 1);
+  }
+
+  async add(data: AddRolePayload | any): Promise<any> {
     this._saving.set(true);
     try {
+      const payload = {
+        ...data,
+        selectedPermissions: this.pruneSelected(
+          data?.selectedPermissions ?? [],
+        ),
+      };
       return await lastValueFrom(
-        this.http.apiPost(ROLE.ADD, data, { skipLoader: true }),
+        this.http.apiPost(ROLE.ADD, payload, { skipLoader: true }),
       );
     } finally {
       this._saving.set(false);
     }
   }
 
-  async edit(data: any, justification?: string): Promise<any> {
+  async edit(
+    data: UpdateRolePayload | any,
+    justification?: string,
+  ): Promise<any> {
     this._saving.set(true);
     try {
-      return await lastValueFrom(
-        this.http.apiPut(
-          ROLE.UPDATE + data.id,
-          { ...data, justification },
-          { skipLoader: true },
+      const payload = {
+        ...data,
+        selectedPermissions: this.pruneSelected(
+          data?.selectedPermissions ?? [],
         ),
+        justification,
+      };
+      return await lastValueFrom(
+        this.http.apiPut(ROLE.UPDATE + data.id, payload, { skipLoader: true }),
       );
     } finally {
       this._saving.set(false);
@@ -180,6 +259,22 @@ export class RoleService {
     this._current.set(null);
   }
 
+  /**
+   * Convenience for view/edit screens that need the role record itself
+   * (not via the cached signal). Mirrors loadOne but returns the data
+   * directly so callers can await it in a Promise.all with the
+   * permission feeds.
+   */
+  async get(roleId: string): Promise<any> {
+    const res: any = await lastValueFrom(
+      this.http
+        .apiGet(ROLE.GET + roleId, { skipLoader: true })
+        .pipe(takeUntil(this._cancelReads$)),
+    );
+    if (res?.status) return res.data;
+    return null;
+  }
+
   // ── Legacy aliases kept for external callers (groups module) ──────────────
   // All pass skipLoader so they don't kick the global blocker — the
   // callers (group filter dropdown, group add/edit role picker, etc.)
@@ -193,12 +288,6 @@ export class RoleService {
     }
     return lastValueFrom(
       this.http.apiGet(ROLE.LIST, { params: queryParams, skipLoader: true }),
-    );
-  }
-
-  listPermissions() {
-    return lastValueFrom(
-      this.http.apiGet(ROLE.LIST_PERMISSIONS, { skipLoader: true }),
     );
   }
 

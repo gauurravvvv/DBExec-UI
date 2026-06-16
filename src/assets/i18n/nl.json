@@ -501,7 +501,13 @@
     "DELETE_BULK": "Weet u zeker dat u <strong>{{count}}</strong> geselecteerde rol(len) wilt verwijderen?",
     "DELETE_LOSE_PERMISSIONS": "Gebruikers met deze rol verliezen hun machtigingen",
     "DELETE_CONFIG_REMOVED": "Rolconfiguratie wordt permanent verwijderd",
-    "UPDATE_CONFIRM": "Weet u zeker dat u deze rol wilt bijwerken?"
+    "UPDATE_CONFIRM": "Weet u zeker dat u deze rol wilt bijwerken?",
+    "PERMISSIONS_TITLE": "Machtigingen",
+    "GRANT_AT_LEAST_ONE": "Verleen ten minste één machtiging om de rol op te slaan.",
+    "STATUS_ACTIVE": "Actief",
+    "STATUS_INACTIVE": "Inactief",
+    "NAME_IMMUTABLE": "De rolnaam kan na het aanmaken niet meer worden gewijzigd.",
+    "LEVEL_TOOLTIP_PREFIX": ""
   },
   "GROUP": {
     "TITLE": "Groepen",
@@ -2669,5 +2675,11 @@
       "SAVE": "Wijzigingen opslaan",
       "SAVED": "E-mailconfiguratie bijgewerkt"
     }
+  },
+  "PERMISSIONS": {
+    "TITLE": "Machtigingen"
+  },
+  "ACCESS_LEVEL": {
+    "TITLE": "Toegangsniveau"
   }
 }

@@ -5,20 +5,39 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { ROLE } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
+import { ACCESS } from 'src/app/core/services/permission.service';
 import { GlobalService } from 'src/app/core/services/global.service';
+import {
+  AccessLevelEntry,
+  PermissionModule,
+  SelectedPermissionEntry,
+} from '../../role.types';
 import { RoleService } from '../../services/role.service';
 
+/**
+ * Add Role — permission-grid UX.
+ *
+ * Layout: one column for the permission label + one radio column per
+ * canonical access level (None / Read / Write / Full). Rows alternate
+ * between module headers (full-width, bold, no radios) and leaf rows
+ * (label + one radio per level).
+ *
+ * State: `levelByPermissionId` maps each leaf id to its currently
+ * selected access level (0..3). Defaults to READ on Add Role per
+ * spec — bulk-creating a role with no leaves granted is rare; READ
+ * is the safest non-zero default.
+ *
+ * Save is disabled until the form is valid AND at least one leaf has
+ * level >= 1. The wire payload is built from `levelByPermissionId`
+ * and pruned client-side (BE prunes too, but small wire wins on
+ * roles with hundreds of leaves and a handful granted).
+ */
 @Component({
   selector: 'app-add-role',
   templateUrl: './add-role.component.html',
@@ -27,14 +46,16 @@ import { RoleService } from '../../services/role.service';
 })
 export class AddRoleComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   roleForm!: FormGroup;
-  permissions: any[] = [];
-  permissionControls: { [key: string]: FormControl } = {};
+  modules: PermissionModule[] = [];
+  accessLevels: AccessLevelEntry[] = [];
+
+  /** permissionId → selected access level (0..3). */
+  levelByPermissionId: Record<string, number> = {};
+
+  /** True until the metadata feeds (permissions + access levels) resolve. */
+  loadingMeta = true;
 
   saving = this.roleService.saving;
-  // Drives the permissions skeleton while LIST_PERMISSIONS is loading;
-  // form fields (name, description) render immediately so the user can
-  // start typing before the permission tree arrives.
-  loadingPermissions = this.roleService.loadingPermissions;
 
   constructor(
     private fb: FormBuilder,
@@ -56,11 +77,13 @@ export class AddRoleComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   }
 
   ngOnInit() {
-    this.loadPermissions();
+    this.loadMeta();
   }
 
   ngOnDestroy() {
-    // Abort loadPermissions if the user backs out before it resolves.
+    // Abort the parallel metadata fetches if the user backs out before
+    // they resolve. Without this the XHRs keep running, land in a
+    // destroyed component, and clobber the next page's signals.
     this.roleService.cancelReads();
   }
 
@@ -71,87 +94,118 @@ export class AddRoleComponent implements OnInit, OnDestroy, HasUnsavedChanges {
     });
   }
 
-  async loadPermissions() {
-    await this.roleService.loadPermissions();
-    const perms = this.roleService.permissions();
-    if (perms.length > 0) {
-      this.permissions = [...perms];
-      this.initializePermissionControls(this.permissions);
+  /**
+   * Parallel-fetch the access-level table + the ORG-scoped permission
+   * tree. Both must land before the grid can render — there's no
+   * useful intermediate state, so we keep a single `loadingMeta` flag
+   * driving the content-loader.
+   */
+  async loadMeta() {
+    this.loadingMeta = true;
+    this.cdr.markForCheck();
+    try {
+      const [levels, modules] = await Promise.all([
+        this.roleService.listAccessLevels(),
+        this.roleService.listPermissions({ scope: 'ORG' }),
+      ]);
+      // Sort defensively — BE sorts by sequence but the grid columns
+      // have to be in a deterministic order even if the metadata
+      // arrives out-of-order from a stale cache.
+      this.accessLevels = [...(levels || [])].sort(
+        (a, b) => a.sequence - b.sequence,
+      );
+      this.modules = (modules || [])
+        .slice()
+        .sort((a, b) => a.sequence - b.sequence)
+        .map(m => ({
+          ...m,
+          submodules: (m.submodules || [])
+            .slice()
+            .sort((a, b) => a.sequence - b.sequence),
+        }));
+
+      // Default each leaf to READ. We use the canonical ACCESS.READ
+      // constant rather than 1 so a future renumber of the
+      // access-level table only touches one place.
+      const initial: Record<string, number> = {};
+      for (const mod of this.modules) {
+        for (const leaf of mod.submodules || []) {
+          initial[leaf.id] = ACCESS.READ;
+        }
+      }
+      this.levelByPermissionId = initial;
+    } finally {
+      this.loadingMeta = false;
       this.cdr.markForCheck();
     }
   }
 
+  /** True when at least one leaf has level >= 1 (i.e. is granted). */
+  get hasAnyGrant(): boolean {
+    return Object.values(this.levelByPermissionId).some(v => v >= 1);
+  }
+
+  /** Save button enable state. */
+  get canSave(): boolean {
+    return this.roleForm.valid && this.hasAnyGrant && !this.saving();
+  }
+
+  /** Whether this leaf has the given level currently selected. */
+  isLevelSelected(permissionId: string, level: number): boolean {
+    return (this.levelByPermissionId[permissionId] ?? 0) === level;
+  }
+
+  /** Radio change handler — also marks the form dirty so Cancel enables. */
+  onLevelChange(permissionId: string, level: number) {
+    this.levelByPermissionId = {
+      ...this.levelByPermissionId,
+      [permissionId]: level,
+    };
+    this.roleForm.markAsDirty();
+  }
+
   onSubmit() {
-    if (this.roleForm.valid) {
-      const selectedPermissions = this.buildSelectedPermissions(
-        this.permissions,
-      );
-
-      if (selectedPermissions.length === 0) {
-        return;
-      }
-
-      const formValues = this.roleForm.value;
-      // Lock both the form AND the permission toggle controls (which
-      // live outside the FormGroup in `permissionControls`) so nothing
-      // is editable while the POST is in flight.
-      this.roleForm.disable({ emitEvent: false });
-      Object.values(this.permissionControls).forEach(c =>
-        c.disable({ emitEvent: false }),
-      );
-      this.roleService
-        .add({
-          name: formValues.name,
-          description: formValues.description || undefined,
-          selectedPermissions,
-        })
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.roleForm.markAsPristine();
-            this.router.navigate([ROLE.LIST]);
-          }
-        })
-        .finally(() => {
-          this.roleForm.enable({ emitEvent: false });
-          Object.values(this.permissionControls).forEach(c =>
-            c.enable({ emitEvent: false }),
-          );
-          // 'home' permission is locked via the template
-          // ([disabled]="permission.value === 'home'"), not on the
-          // FormControl, so no re-disable needed here.
-        });
-    } else {
+    if (!this.canSave) {
+      // Pop validation errors so the user can see why save is blocked.
       Object.keys(this.roleForm.controls).forEach(key => {
         const control = this.roleForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
-        }
+        if (control?.invalid) control.markAsTouched();
       });
+      return;
     }
-  }
-
-  private buildSelectedPermissions(permissions: any[]): any[] {
-    const result: any[] = [];
-    for (const perm of permissions) {
-      if (perm.subPermissions) {
-        const selectedSubs = perm.subPermissions.filter(
-          (sub: any) => this.permissionControls[sub.value]?.value,
-        );
-        if (
-          selectedSubs.length > 0 ||
-          this.permissionControls[perm.value]?.value
-        ) {
-          result.push({ ...perm, subPermissions: selectedSubs });
+    const selectedPermissions: SelectedPermissionEntry[] = [];
+    for (const [permissionId, level] of Object.entries(
+      this.levelByPermissionId,
+    )) {
+      if (level >= 1) selectedPermissions.push({ permissionId, level });
+    }
+    const formValues = this.roleForm.value;
+    this.roleForm.disable({ emitEvent: false });
+    this.roleService
+      .add({
+        name: formValues.name,
+        description: formValues.description || undefined,
+        selectedPermissions,
+      })
+      .then(response => {
+        if (this.globalService.handleSuccessService(response)) {
+          this.roleForm.markAsPristine();
+          this.router.navigate([ROLE.LIST]);
         }
-      } else if (this.permissionControls[perm.value]?.value) {
-        result.push(perm);
-      }
-    }
-    return result;
+      })
+      .finally(() => {
+        this.roleForm.enable({ emitEvent: false });
+        this.cdr.markForCheck();
+      });
   }
 
-  trackByIndex(index: number): number {
-    return index;
+  /** Reset the form and reload meta — same shape the legacy component used. */
+  onCancel() {
+    this.roleForm.reset();
+    this.modules = [];
+    this.accessLevels = [];
+    this.levelByPermissionId = {};
+    this.loadMeta();
   }
 
   getNameError(): string {
@@ -165,86 +219,15 @@ export class AddRoleComponent implements OnInit, OnDestroy, HasUnsavedChanges {
     return '';
   }
 
-  onCancel() {
-    this.roleForm.reset();
-    this.permissions = [];
-    this.permissionControls = {};
-    this.loadPermissions();
+  trackByModuleId(_: number, item: PermissionModule): string {
+    return item.id;
   }
 
-  getPermissionControl(permissionValue: string): FormControl {
-    if (!this.permissionControls[permissionValue]) {
-      this.permissionControls[permissionValue] = new FormControl(false);
-    }
-    return this.permissionControls[permissionValue];
+  trackByLeafId(_: number, item: { id: string }): string {
+    return item.id;
   }
 
-  onPermissionChange(permission: any, event: any) {
-    const checked = event.checked;
-
-    if (permission.subPermissions) {
-      this.updateChildPermissions(permission.subPermissions, checked);
-    }
-
-    if (checked && permission.parentId !== '0') {
-      this.updateParentPermission(permission);
-    }
-  }
-
-  private updateChildPermissions(permissions: any[], checked: boolean) {
-    permissions.forEach(perm => {
-      if (this.permissionControls[perm.value]) {
-        this.permissionControls[perm.value].setValue(checked, {
-          emitEvent: false,
-        });
-      }
-      if (perm.subPermissions) {
-        this.updateChildPermissions(perm.subPermissions, checked);
-      }
-    });
-  }
-
-  private updateParentPermission(permission: any) {
-    const parent = this.findPermissionById(
-      this.permissions,
-      permission.parentId,
-    );
-    if (parent && this.permissionControls[parent.value]) {
-      this.permissionControls[parent.value].setValue(true, {
-        emitEvent: false,
-      });
-      if (parent.parentId !== '0') {
-        this.updateParentPermission(parent);
-      }
-    }
-  }
-
-  private findPermissionById(permissions: any[], id: string): any {
-    for (const perm of permissions) {
-      if (perm.id.toString() === id) {
-        return perm;
-      }
-      if (perm.subPermissions) {
-        const found = this.findPermissionById(perm.subPermissions, id);
-        if (found) return found;
-      }
-    }
-    return null;
-  }
-
-  private initializePermissionControls(permissions: any[]) {
-    this.permissionControls = {};
-    this.addPermissionControls(permissions);
-  }
-
-  private addPermissionControls(permissions: any[]) {
-    permissions.forEach(perm => {
-      this.permissionControls[perm.value] = new FormControl(
-        perm.value === 'home' ? true : false,
-      );
-      if (perm.subPermissions) {
-        this.addPermissionControls(perm.subPermissions);
-      }
-    });
+  trackByLevelValue(_: number, item: AccessLevelEntry): number {
+    return item.value;
   }
 }

@@ -147,6 +147,8 @@
   gap: var(--space-7);
 }
 
+// Permission grid (same shape as Add Role — see add-role.component.scss
+// for the design notes).
 .permissions-section {
   width: 100%;
   margin-top: 2rem;
@@ -156,7 +158,7 @@
   .section-title {
     font-size: var(--fs-h2);
     font-weight: var(--fw-medium);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     color: var(--text-color);
     display: block;
 
@@ -166,56 +168,137 @@
     }
   }
 
-  .permissions-grid {
-    .permission-columns {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: var(--space-9);
-      width: 100%;
+  .grid-help {
+    color: var(--text-color);
+    opacity: 0.7;
+    font-size: var(--fs-body);
+    margin: 0 0 1rem 0;
+  }
 
-      .column {
-        min-width: 0;
+  .permission-grid {
+    --level-count: 4;
+    display: grid;
+    grid-template-columns: minmax(220px, 2fr) repeat(
+        var(--level-count),
+        minmax(80px, 1fr)
+      );
+    width: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
 
-        .column-header {
-          font-weight: var(--fw-semibold);
-          color: var(--text-color);
-          padding-bottom: 0.75rem;
-          margin-bottom: 1rem;
-          border-bottom: 2px solid var(--primary-color);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
+  .grid-cell {
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-size: var(--fs-body);
+    background: var(--card-background);
+  }
 
-        .permission-items {
-          display: flex;
-          flex-direction: column;
-          gap: var(--space-7);
+  .grid-cell--level {
+    justify-content: center;
+  }
 
-          .permission-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: var(--space-6);
-            padding: 0.25rem 0;
+  .grid-header-cell {
+    font-weight: var(--fw-semibold);
+    background: var(--hover-background);
+    color: var(--text-color);
+    border-bottom: 2px solid var(--primary-color);
+    text-transform: uppercase;
+    font-size: var(--fs-label);
+    letter-spacing: 0.5px;
+  }
 
-            .item-label {
-              color: var(--text-color);
-              font-size: var(--fs-body);
-              flex: 1;
-              min-width: 0;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-            }
-          }
-        }
-      }
+  .grid-module-cell {
+    grid-column: 1 / -1;
+    font-weight: var(--fw-semibold);
+    background: var(--surface-ground, var(--hover-background));
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+    border-top: 1px solid var(--border-color);
+
+    i {
+      margin-right: 0.5rem;
+      color: var(--primary-color);
     }
   }
 }
 
-// Confirmation popup
+.level-radio {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  width: 20px;
+  height: 20px;
+
+  input[type='radio'] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .level-radio-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    background: var(--card-background);
+    transition: all var(--motion-base, 150ms) ease;
+    position: relative;
+    display: inline-block;
+  }
+
+  &:hover .level-radio-dot {
+    border-color: var(--primary-color);
+  }
+
+  input[type='radio']:checked + .level-radio-dot {
+    border-color: var(--primary-color);
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--primary-color);
+    }
+  }
+
+  input[type='radio']:focus-visible + .level-radio-dot {
+    box-shadow: 0 0 0 2px var(--primary-color-transparent);
+  }
+
+  input[type='radio']:disabled + .level-radio-dot {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Confirmation popup — preserved from the legacy component so the
+// update-justification dialog looks identical to before.
 .confirmation-popup {
   position: fixed;
   top: 0;
@@ -411,7 +494,7 @@
   }
 }
 
-// PrimeNG overrides
+// PrimeNG overrides — header chrome only.
 :host ::ng-deep {
   .p-button {
     &.p-button-text {
@@ -438,28 +521,16 @@
         opacity: 0.6;
         cursor: not-allowed;
       }
+    }
 
-      &.p-button-danger {
-        border-color: var(--error-color) !important;
-        color: var(--error-color) !important;
+    &:disabled {
+      opacity: 0.6 !important;
+      cursor: not-allowed !important;
 
-        &:hover:not(:disabled) {
-          background: rgba(var(--error-rgb), 0.04) !important;
-        }
+      .pi {
+        opacity: 0.6;
       }
     }
-  }
-}
-
-@media screen and (max-width: 1400px) {
-  .permissions-section .permissions-grid .permission-columns {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media screen and (max-width: 1200px) {
-  .permissions-section .permissions-grid .permission-columns {
-    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -468,14 +539,34 @@
     width: 100%;
     padding-right: 0;
   }
-
-  .permissions-section .permissions-grid .permission-columns {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
-@media screen and (max-width: 576px) {
-  .permissions-section .permissions-grid .permission-columns {
-    grid-template-columns: 1fr;
+@media (max-width: 576px) {
+  .add-admin-wrapper {
+    padding: var(--space-5);
+
+    .add-admin-container {
+      padding: var(--space-6);
+
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-6);
+
+        .action-buttons {
+          width: 100%;
+          justify-content: flex-end;
+        }
+      }
+    }
+  }
+
+  .permissions-section {
+    .grid-cell--label {
+      padding: 0.5rem;
+    }
+    .grid-cell--level {
+      padding: 0.5rem;
+    }
   }
 }

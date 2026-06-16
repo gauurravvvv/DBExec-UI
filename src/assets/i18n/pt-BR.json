@@ -501,7 +501,13 @@
     "DELETE_BULK": "Tem certeza de que deseja excluir <strong>{{count}}</strong> função(ões) selecionada(s)?",
     "DELETE_LOSE_PERMISSIONS": "Os usuários atribuídos a esta função perderão suas permissões",
     "DELETE_CONFIG_REMOVED": "A configuração da função será removida permanentemente",
-    "UPDATE_CONFIRM": "Tem certeza de que deseja atualizar esta função?"
+    "UPDATE_CONFIRM": "Tem certeza de que deseja atualizar esta função?",
+    "PERMISSIONS_TITLE": "Permissões",
+    "GRANT_AT_LEAST_ONE": "Conceda pelo menos uma permissão para salvar a função.",
+    "STATUS_ACTIVE": "Ativo",
+    "STATUS_INACTIVE": "Inativo",
+    "NAME_IMMUTABLE": "O nome da função não pode ser alterado após a criação.",
+    "LEVEL_TOOLTIP_PREFIX": ""
   },
   "GROUP": {
     "TITLE": "Grupos",
@@ -2669,5 +2675,11 @@
       "SAVE": "Salvar alterações",
       "SAVED": "Configuração de e-mail atualizada"
     }
+  },
+  "PERMISSIONS": {
+    "TITLE": "Permissões"
+  },
+  "ACCESS_LEVEL": {
+    "TITLE": "Nível de acesso"
   }
 }

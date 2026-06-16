@@ -501,7 +501,13 @@
     "DELETE_BULK": "Sei sicuro di voler eliminare <strong>{{count}}</strong> ruolo/i selezionato/i?",
     "DELETE_LOSE_PERMISSIONS": "Gli utenti assegnati a questo ruolo perderanno i propri permessi",
     "DELETE_CONFIG_REMOVED": "La configurazione del ruolo verrà rimossa definitivamente",
-    "UPDATE_CONFIRM": "Sei sicuro di voler aggiornare questo ruolo?"
+    "UPDATE_CONFIRM": "Sei sicuro di voler aggiornare questo ruolo?",
+    "PERMISSIONS_TITLE": "Autorizzazioni",
+    "GRANT_AT_LEAST_ONE": "Concedi almeno un'autorizzazione per salvare il ruolo.",
+    "STATUS_ACTIVE": "Attivo",
+    "STATUS_INACTIVE": "Inattivo",
+    "NAME_IMMUTABLE": "Il nome del ruolo non può essere modificato dopo la creazione.",
+    "LEVEL_TOOLTIP_PREFIX": ""
   },
   "GROUP": {
     "TITLE": "Gruppi",
@@ -2669,5 +2675,11 @@
       "SAVE": "Salva modifiche",
       "SAVED": "Configurazione e-mail aggiornata"
     }
+  },
+  "PERMISSIONS": {
+    "TITLE": "Autorizzazioni"
+  },
+  "ACCESS_LEVEL": {
+    "TITLE": "Livello di accesso"
   }
 }

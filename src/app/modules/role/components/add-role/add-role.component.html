@@ -3,7 +3,7 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text" routerLink="/app/role">
+        <button pButton class="p-button-text" routerLink="/app/roles">
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>{{ 'ROLE.ADD_TITLE' | translate }}</h2>
@@ -23,7 +23,7 @@
           type="submit"
           [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
-          [disabled]="roleForm.invalid || saving()"
+          [disabled]="!canSave"
         >
           <i
             class="pi mr-2"
@@ -61,64 +61,81 @@
         </app-custom-input>
       </div>
 
-      <!-- Permissions skeleton while LIST_PERMISSIONS is in flight.
-           Same outer container/title so the page doesn't reflow when
-           the real toggles render. -->
-      <div
-        class="permissions-section"
-        *ngIf="loadingPermissions() && permissions.length === 0"
-      >
+      <!-- Loader while the parallel metadata fetches resolve. The form
+           fields above stay interactive so the user can start typing
+           before the grid lands. -->
+      <div class="permissions-section" *ngIf="loadingMeta">
         <label class="section-title">{{
-          'ROLE.SCREEN_PERMISSIONS' | translate
+          'PERMISSIONS.TITLE' | translate
         }}</label>
         <app-content-loader minHeight="240px"></app-content-loader>
       </div>
 
-      <!-- Permissions Section -->
-      <div class="permissions-section" *ngIf="permissions.length > 0">
+      <!-- Permission grid -->
+      <div
+        class="permissions-section"
+        *ngIf="!loadingMeta && modules.length > 0"
+      >
         <label class="section-title"
-          >{{ 'ROLE.SCREEN_PERMISSIONS' | translate
+          >{{ 'PERMISSIONS.TITLE' | translate
           }}<span class="required"> *</span></label
         >
 
-        <div class="permissions-grid">
-          <div class="permission-columns">
-            <div
-              class="column"
-              *ngFor="let permission of permissions; trackBy: trackByIndex"
-            >
-              <div class="column-header">{{ permission.label }}</div>
-              <div class="permission-items">
-                <div class="permission-item" *ngIf="!permission.subPermissions">
-                  <span class="item-label">{{ permission.label }}</span>
-                  <app-custom-toggle
-                    [formControl]="getPermissionControl(permission.value)"
-                    (onChange)="onPermissionChange(permission, $event)"
-                    [showStatusLabel]="false"
-                    [disabled]="permission.value === 'home'"
-                  ></app-custom-toggle>
-                </div>
+        <p class="grid-help" *ngIf="!hasAnyGrant">
+          {{ 'ROLE.GRANT_AT_LEAST_ONE' | translate }}
+        </p>
 
-                <ng-container *ngIf="permission.subPermissions">
-                  <div
-                    class="permission-item"
-                    *ngFor="
-                      let subPerm of permission.subPermissions;
-                      trackBy: trackByIndex
-                    "
-                  >
-                    <span class="item-label">{{ subPerm.label }}</span>
-
-                    <app-custom-toggle
-                      [formControl]="getPermissionControl(subPerm.value)"
-                      (onChange)="onPermissionChange(subPerm, $event)"
-                      [showStatusLabel]="false"
-                    ></app-custom-toggle>
-                  </div>
-                </ng-container>
-              </div>
-            </div>
+        <div
+          class="permission-grid"
+          role="grid"
+          [style.--level-count]="accessLevels.length"
+        >
+          <!-- Column headers: first cell is empty (permission name
+               column), then one cell per access level. -->
+          <div class="grid-cell grid-header-cell grid-cell--label" role="columnheader"></div>
+          <div
+            class="grid-cell grid-header-cell grid-cell--level"
+            role="columnheader"
+            *ngFor="let level of accessLevels; trackBy: trackByLevelValue"
+          >
+            {{ level.label }}
           </div>
+
+          <ng-container
+            *ngFor="let module of modules; trackBy: trackByModuleId"
+          >
+            <!-- Module header row — full-width, bold, no radios. -->
+            <div class="grid-cell grid-module-cell" role="rowheader">
+              <i *ngIf="module.icon" class="pi" [ngClass]="module.icon"></i>
+              {{ module.name }}
+            </div>
+
+            <!-- Leaf rows: name + one radio per level. -->
+            <ng-container
+              *ngFor="let leaf of module.submodules; trackBy: trackByLeafId"
+            >
+              <div class="grid-cell grid-cell--label" role="rowheader">
+                {{ leaf.name }}
+              </div>
+              <div
+                class="grid-cell grid-cell--level"
+                role="gridcell"
+                *ngFor="let level of accessLevels; trackBy: trackByLevelValue"
+              >
+                <label class="level-radio">
+                  <input
+                    type="radio"
+                    [name]="'level-' + leaf.id"
+                    [value]="level.value"
+                    [checked]="isLevelSelected(leaf.id, level.value)"
+                    (change)="onLevelChange(leaf.id, level.value)"
+                  />
+                  <span class="level-radio-dot" aria-hidden="true"></span>
+                  <span class="visually-hidden">{{ level.label }}</span>
+                </label>
+              </div>
+            </ng-container>
+          </ng-container>
         </div>
       </div>
     </form>

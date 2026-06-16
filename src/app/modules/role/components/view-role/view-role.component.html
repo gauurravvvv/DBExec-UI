@@ -1,7 +1,7 @@
 <div class="view-role-wrapper">
   <div class="view-role-container">
-    <!-- Header Section — visible immediately so the back button works
-         while the GET is still in flight. -->
+    <!-- Header — visible immediately so the back button works while
+         the GETs are still in flight. -->
     <div class="page-header">
       <div class="left-section">
         <button pButton class="p-button-text back-button" (click)="goBack()">
@@ -16,17 +16,12 @@
       </div>
     </div>
 
-    <!-- Centered branded loader while the GET is in flight. Page
-         chrome above (back button, title) stays clickable so the
-         user can bail out if they change their mind. -->
-    <app-content-loader *ngIf="loading() && !roleData"></app-content-loader>
+    <!-- Centered loader while the GETs are in flight. -->
+    <app-content-loader *ngIf="loadingMeta && !roleData"></app-content-loader>
 
-    <!-- Profile Section -->
     <div class="profile-container" *ngIf="roleData">
       <div class="details-grid">
-        <!-- First Row: Role icon + Role Info -->
         <div class="first-row">
-          <!-- Role Icon Section -->
           <div class="avatar-section">
             <div class="role-icon-circle">
               <i class="pi pi-shield"></i>
@@ -37,7 +32,6 @@
             }}</span>
           </div>
 
-          <!-- Role Information -->
           <div class="detail-group">
             <h4>{{ 'ROLE.ROLE_INFORMATION' | translate }}</h4>
             <div class="detail-item" *ngIf="roleData.description">
@@ -59,8 +53,8 @@
                 >
                   {{
                     roleData.status === 1
-                      ? ('COMMON.ACTIVE' | translate)
-                      : ('COMMON.INACTIVE' | translate)
+                      ? ('ROLE.STATUS_ACTIVE' | translate)
+                      : ('ROLE.STATUS_INACTIVE' | translate)
                   }}
                 </span>
               </span>
@@ -69,40 +63,50 @@
         </div>
       </div>
 
-      <!-- Permissions Section -->
-      <div class="permissions-section" *ngIf="permissions.length > 0">
+      <!-- Read-only permission grid: same module/leaf shape as Add/
+           Edit, but each leaf shows a chip with the current level
+           instead of a radio column. -->
+      <div class="permissions-section" *ngIf="modules.length > 0">
         <h4 class="section-title">
-          {{ 'ROLE.SCREEN_PERMISSIONS' | translate }}
+          {{ 'PERMISSIONS.TITLE' | translate }}
         </h4>
-        <div class="permission-columns">
-          <div
-            class="column"
-            *ngFor="let permission of permissions; trackBy: trackByIndex"
-          >
-            <div class="column-header">{{ permission.label }}</div>
-            <div class="permission-items">
-              <div class="permission-item" *ngIf="!permission.subPermissions">
-                <span class="item-label">{{ permission.label }}</span>
-                <i class="pi pi-check-circle perm-enabled"></i>
-              </div>
-              <ng-container *ngIf="permission.subPermissions">
-                <div
-                  class="permission-item"
-                  *ngFor="
-                    let subPerm of permission.subPermissions;
-                    trackBy: trackByIndex
-                  "
-                >
-                  <span class="item-label">{{ subPerm.label }}</span>
-                  <i class="pi pi-check-circle perm-enabled"></i>
-                </div>
-              </ng-container>
-            </div>
+
+        <div class="permission-grid" role="grid">
+          <div class="grid-cell grid-header-cell grid-cell--label" role="columnheader">
+            {{ 'COMMON.NAME' | translate }}
           </div>
+          <div class="grid-cell grid-header-cell grid-cell--level" role="columnheader">
+            {{ 'ACCESS_LEVEL.TITLE' | translate }}
+          </div>
+
+          <ng-container
+            *ngFor="let module of modules; trackBy: trackByModuleId"
+          >
+            <div class="grid-cell grid-module-cell" role="rowheader">
+              <i *ngIf="module.icon" class="pi" [ngClass]="module.icon"></i>
+              {{ module.name }}
+            </div>
+
+            <ng-container
+              *ngFor="let leaf of module.submodules; trackBy: trackByLeafId"
+            >
+              <div class="grid-cell grid-cell--label" role="rowheader">
+                {{ leaf.name }}
+              </div>
+              <div class="grid-cell grid-cell--level" role="gridcell">
+                <span
+                  class="level-chip"
+                  [attr.data-level]="levelCode(leaf.level)"
+                >
+                  {{ levelLabel(leaf.level) }}
+                </span>
+              </div>
+            </ng-container>
+          </ng-container>
         </div>
       </div>
 
-      <div *ngIf="permissions.length === 0" class="no-permissions">
+      <div *ngIf="!loadingMeta && modules.length === 0" class="no-permissions">
         {{ 'ROLE.NO_PERMISSIONS' | translate }}
       </div>
     </div>

@@ -501,7 +501,13 @@
     "DELETE_BULK": "¿Está seguro de que desea eliminar <strong>{{count}}</strong> rol(es) seleccionado(s)?",
     "DELETE_LOSE_PERMISSIONS": "Los usuarios asignados a este rol perderán sus permisos",
     "DELETE_CONFIG_REMOVED": "La configuración del rol se eliminará permanentemente",
-    "UPDATE_CONFIRM": "¿Está seguro de que desea actualizar este rol?"
+    "UPDATE_CONFIRM": "¿Está seguro de que desea actualizar este rol?",
+    "PERMISSIONS_TITLE": "Permisos",
+    "GRANT_AT_LEAST_ONE": "Conceda al menos un permiso para guardar el rol.",
+    "STATUS_ACTIVE": "Activo",
+    "STATUS_INACTIVE": "Inactivo",
+    "NAME_IMMUTABLE": "El nombre del rol no se puede cambiar después de su creación.",
+    "LEVEL_TOOLTIP_PREFIX": ""
   },
   "GROUP": {
     "TITLE": "Grupos",
@@ -2669,5 +2675,11 @@
       "SAVE": "Guardar cambios",
       "SAVED": "Configuración de correo actualizada"
     }
+  },
+  "PERMISSIONS": {
+    "TITLE": "Permisos"
+  },
+  "ACCESS_LEVEL": {
+    "TITLE": "Nivel de acceso"
   }
 }

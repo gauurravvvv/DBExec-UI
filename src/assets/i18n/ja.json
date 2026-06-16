@@ -501,7 +501,13 @@
     "DELETE_BULK": "<strong>{{count}}</strong>件の選択された役割を削除してもよろしいですか？",
     "DELETE_LOSE_PERMISSIONS": "この役割に割り当てられたユーザーは権限を失います",
     "DELETE_CONFIG_REMOVED": "役割の設定は完全に削除されます",
-    "UPDATE_CONFIRM": "この役割を更新してもよろしいですか？"
+    "UPDATE_CONFIRM": "この役割を更新してもよろしいですか？",
+    "PERMISSIONS_TITLE": "権限",
+    "GRANT_AT_LEAST_ONE": "ロールを保存するには、少なくとも1つの権限を付与してください。",
+    "STATUS_ACTIVE": "有効",
+    "STATUS_INACTIVE": "無効",
+    "NAME_IMMUTABLE": "作成後にロール名を変更することはできません。",
+    "LEVEL_TOOLTIP_PREFIX": ""
   },
   "GROUP": {
     "TITLE": "グループ",
@@ -2669,5 +2675,11 @@
       "SAVE": "変更を保存",
       "SAVED": "メール設定を更新しました"
     }
+  },
+  "PERMISSIONS": {
+    "TITLE": "権限"
+  },
+  "ACCESS_LEVEL": {
+    "TITLE": "アクセスレベル"
   }
 }

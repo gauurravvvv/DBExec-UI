@@ -3,7 +3,7 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text" routerLink="/app/role">
+        <button pButton class="p-button-text" routerLink="/app/roles">
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>{{ 'ROLE.EDIT_TITLE' | translate }}</h2>
@@ -26,9 +26,7 @@
           type="submit"
           [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
-          [disabled]="
-            roleForm.invalid || !isFormDirty || saving() || !roleData
-          "
+          [disabled]="!canSave"
         >
           <i
             class="pi mr-2"
@@ -38,25 +36,25 @@
       </div>
     </div>
 
-    <!-- Centered branded loader while the GET is in flight. Header
-         chrome (back button) stays clickable. -->
-    <app-content-loader *ngIf="loading() && !roleData"></app-content-loader>
+    <!-- Centered loader while role + permissions + access levels load -->
+    <app-content-loader *ngIf="loadingMeta && !roleData"></app-content-loader>
 
     <!-- Form Section -->
     <form *ngIf="roleData" [formGroup]="roleForm" class="admin-form">
       <div class="basic-info-section">
-        <!-- Role Name -->
+        <!-- Role Name (always locked — BE doesn't support rename) -->
         <app-custom-input
           formControlName="name"
           [label]="'COMMON.NAME' | translate"
           [placeholder]="'ROLE.ENTER_NAME' | translate"
           icon="pi-id-card"
           [required]="true"
-          [inputDisabled]="isDefault"
+          [inputDisabled]="true"
           [showError]="
             !!(roleForm.get('name')?.invalid && roleForm.get('name')?.touched)
           "
           [errorMessage]="getNameError()"
+          [hint]="'ROLE.NAME_IMMUTABLE' | translate"
         >
         </app-custom-input>
 
@@ -77,70 +75,84 @@
             [label]="'COMMON.STATUS' | translate"
             [trueValue]="1"
             [falseValue]="0"
-            [trueLabel]="'COMMON.ACTIVE' | translate"
-            [falseLabel]="'COMMON.INACTIVE' | translate"
+            [trueLabel]="'ROLE.STATUS_ACTIVE' | translate"
+            [falseLabel]="'ROLE.STATUS_INACTIVE' | translate"
           >
           </app-custom-toggle>
         </div>
       </div>
 
-      <!-- Permissions loader while LIST_PERMISSIONS is in flight. The
-           parallel form fields above stay interactive. -->
-      <div
-        class="permissions-section"
-        *ngIf="loadingPermissions() && permissions.length === 0"
-      >
+      <!-- Loader while the metadata feeds are in flight (after the
+           role record has landed but before the grid can render). -->
+      <div class="permissions-section" *ngIf="loadingMeta">
         <label class="section-title">{{
-          'ROLE.SCREEN_PERMISSIONS' | translate
+          'PERMISSIONS.TITLE' | translate
         }}</label>
         <app-content-loader minHeight="240px"></app-content-loader>
       </div>
 
-      <!-- Permissions Section -->
-      <div class="permissions-section" *ngIf="permissions.length > 0">
+      <!-- Permission grid -->
+      <div
+        class="permissions-section"
+        *ngIf="!loadingMeta && modules.length > 0"
+      >
         <label class="section-title"
-          >{{ 'ROLE.SCREEN_PERMISSIONS' | translate
+          >{{ 'PERMISSIONS.TITLE' | translate
           }}<span class="required"> *</span></label
         >
 
-        <div class="permissions-grid">
-          <div class="permission-columns">
-            <div
-              class="column"
-              *ngFor="let permission of permissions; trackBy: trackByIndex"
-            >
-              <div class="column-header">{{ permission.label }}</div>
-              <div class="permission-items">
-                <div class="permission-item" *ngIf="!permission.subPermissions">
-                  <span class="item-label">{{ permission.label }}</span>
-                  <app-custom-toggle
-                    [formControl]="getPermissionControl(permission.value)"
-                    (onChange)="onPermissionChange(permission, $event)"
-                    [showStatusLabel]="false"
-                    [disabled]="permission.value === 'home' || isDefault"
-                  ></app-custom-toggle>
-                </div>
+        <p class="grid-help" *ngIf="!hasAnyGrant">
+          {{ 'ROLE.GRANT_AT_LEAST_ONE' | translate }}
+        </p>
 
-                <ng-container *ngIf="permission.subPermissions">
-                  <div
-                    class="permission-item"
-                    *ngFor="
-                      let subPerm of permission.subPermissions;
-                      trackBy: trackByIndex
-                    "
-                  >
-                    <span class="item-label">{{ subPerm.label }}</span>
-                    <app-custom-toggle
-                      [formControl]="getPermissionControl(subPerm.value)"
-                      (onChange)="onPermissionChange(subPerm, $event)"
-                      [showStatusLabel]="false"
-                      [disabled]="isDefault"
-                    ></app-custom-toggle>
-                  </div>
-                </ng-container>
-              </div>
-            </div>
+        <div
+          class="permission-grid"
+          role="grid"
+          [style.--level-count]="accessLevels.length"
+        >
+          <div class="grid-cell grid-header-cell grid-cell--label" role="columnheader"></div>
+          <div
+            class="grid-cell grid-header-cell grid-cell--level"
+            role="columnheader"
+            *ngFor="let level of accessLevels; trackBy: trackByLevelValue"
+          >
+            {{ level.label }}
           </div>
+
+          <ng-container
+            *ngFor="let module of modules; trackBy: trackByModuleId"
+          >
+            <div class="grid-cell grid-module-cell" role="rowheader">
+              <i *ngIf="module.icon" class="pi" [ngClass]="module.icon"></i>
+              {{ module.name }}
+            </div>
+
+            <ng-container
+              *ngFor="let leaf of module.submodules; trackBy: trackByLeafId"
+            >
+              <div class="grid-cell grid-cell--label" role="rowheader">
+                {{ leaf.name }}
+              </div>
+              <div
+                class="grid-cell grid-cell--level"
+                role="gridcell"
+                *ngFor="let level of accessLevels; trackBy: trackByLevelValue"
+              >
+                <label class="level-radio">
+                  <input
+                    type="radio"
+                    [name]="'level-' + leaf.id"
+                    [value]="level.value"
+                    [checked]="isLevelSelected(leaf.id, level.value)"
+                    [disabled]="isDefault"
+                    (change)="onLevelChange(leaf.id, level.value)"
+                  />
+                  <span class="level-radio-dot" aria-hidden="true"></span>
+                  <span class="visually-hidden">{{ level.label }}</span>
+                </label>
+              </div>
+            </ng-container>
+          </ng-container>
         </div>
       </div>
     </form>

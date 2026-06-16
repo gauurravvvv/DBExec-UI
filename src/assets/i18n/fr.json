@@ -501,7 +501,13 @@
     "DELETE_BULK": "Êtes-vous sûr de vouloir supprimer <strong>{{count}}</strong> rôle(s) sélectionné(s) ?",
     "DELETE_LOSE_PERMISSIONS": "Les utilisateurs assignés à ce rôle perdront leurs permissions",
     "DELETE_CONFIG_REMOVED": "La configuration du rôle sera définitivement supprimée",
-    "UPDATE_CONFIRM": "Êtes-vous sûr de vouloir mettre à jour ce rôle ?"
+    "UPDATE_CONFIRM": "Êtes-vous sûr de vouloir mettre à jour ce rôle ?",
+    "PERMISSIONS_TITLE": "Autorisations",
+    "GRANT_AT_LEAST_ONE": "Accordez au moins une autorisation pour enregistrer le rôle.",
+    "STATUS_ACTIVE": "Actif",
+    "STATUS_INACTIVE": "Inactif",
+    "NAME_IMMUTABLE": "Le nom du rôle ne peut pas être modifié après sa création.",
+    "LEVEL_TOOLTIP_PREFIX": ""
   },
   "GROUP": {
     "TITLE": "Groupes",
@@ -2669,5 +2675,11 @@
       "SAVE": "Enregistrer les modifications",
       "SAVED": "Configuration de la messagerie mise à jour"
     }
+  },
+  "PERMISSIONS": {
+    "TITLE": "Autorisations"
+  },
+  "ACCESS_LEVEL": {
+    "TITLE": "Niveau d'accès"
   }
 }

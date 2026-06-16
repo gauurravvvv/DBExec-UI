@@ -215,6 +215,19 @@ export const ROLE = {
   LIST_PERMISSIONS: '/roles/permissions',
 };
 
+// Relational RBAC — replaces the legacy permission-tree shape served
+// via /roles/permissions. New leaves can carry an effective level when
+// the caller passes a roleId.
+export const PERMISSIONS = {
+  LIST: '/permissions',
+};
+
+// Canonical four-row access-level table. The `value` column (0..3) is
+// the radio value; `label` is the column header in the role grid.
+export const ACCESS_LEVELS = {
+  LIST: '/access-levels',
+};
+
 export const ACCESS = {
   GET: '/access/', // GET /access/:connectionId
   GRANT: '/access/grant',

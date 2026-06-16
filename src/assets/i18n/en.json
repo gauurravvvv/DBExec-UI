@@ -505,7 +505,19 @@
     "DELETE_BULK": "Are you sure you want to delete <strong>{{count}}</strong> selected role(s)?",
     "DELETE_LOSE_PERMISSIONS": "Users assigned to this role will lose their permissions",
     "DELETE_CONFIG_REMOVED": "Role configuration will be permanently removed",
-    "UPDATE_CONFIRM": "Are you sure you want to update this role?"
+    "UPDATE_CONFIRM": "Are you sure you want to update this role?",
+    "PERMISSIONS_TITLE": "Permissions",
+    "GRANT_AT_LEAST_ONE": "Grant at least one permission to save the role.",
+    "STATUS_ACTIVE": "Active",
+    "STATUS_INACTIVE": "Inactive",
+    "NAME_IMMUTABLE": "Role name cannot be changed after creation.",
+    "LEVEL_TOOLTIP_PREFIX": ""
+  },
+  "PERMISSIONS": {
+    "TITLE": "Permissions"
+  },
+  "ACCESS_LEVEL": {
+    "TITLE": "Access Level"
   },
   "GROUP": {
     "TITLE": "Groups",

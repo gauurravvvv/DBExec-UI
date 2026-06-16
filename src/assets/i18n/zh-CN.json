@@ -501,7 +501,13 @@
     "DELETE_BULK": "确定要删除已选中的 <strong>{{count}}</strong> 个角色吗？",
     "DELETE_LOSE_PERMISSIONS": "分配到此角色的用户将失去权限",
     "DELETE_CONFIG_REMOVED": "角色配置将被永久移除",
-    "UPDATE_CONFIRM": "确定要更新此角色吗？"
+    "UPDATE_CONFIRM": "确定要更新此角色吗？",
+    "PERMISSIONS_TITLE": "权限",
+    "GRANT_AT_LEAST_ONE": "请至少授予一项权限以保存角色。",
+    "STATUS_ACTIVE": "活跃",
+    "STATUS_INACTIVE": "非活跃",
+    "NAME_IMMUTABLE": "角色名称创建后无法更改。",
+    "LEVEL_TOOLTIP_PREFIX": ""
   },
   "GROUP": {
     "TITLE": "用户组",
@@ -2669,5 +2675,11 @@
       "SAVE": "保存更改",
       "SAVED": "邮件配置已更新"
     }
+  },
+  "PERMISSIONS": {
+    "TITLE": "权限"
+  },
+  "ACCESS_LEVEL": {
+    "TITLE": "访问级别"
   }
 }

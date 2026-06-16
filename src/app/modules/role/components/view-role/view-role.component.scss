@@ -208,6 +208,9 @@
         }
       }
 
+      // Read-only permission grid: two columns (name + current level).
+      // Module rows span both columns as a section divider above their
+      // leaves, same shape as the Add/Edit grid.
       .permissions-section {
         margin-top: 30px;
 
@@ -221,51 +224,78 @@
           display: block;
         }
 
-        .permission-columns {
+        .permission-grid {
           display: grid;
-          grid-template-columns: repeat(5, 1fr);
-          gap: var(--space-7);
+          grid-template-columns: minmax(220px, 2fr) minmax(120px, 1fr);
+          width: 100%;
+          border: 1px solid var(--border-color);
+          border-radius: var(--radius-md);
+          overflow: hidden;
+        }
 
-          .column {
-            background: var(--card-background);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            overflow: hidden;
+        .grid-cell {
+          padding: 0.75rem 1rem;
+          display: flex;
+          align-items: center;
+          border-bottom: 1px solid var(--border-color);
+          color: var(--text-color);
+          font-size: var(--fs-body);
+          background: var(--card-background);
+        }
 
-            .column-header {
-              background: var(--hover-background);
-              padding: 10px 15px;
-              font-weight: var(--fw-semibold);
-              font-size: var(--fs-body);
-              color: var(--text-color);
-              border-bottom: 1px solid var(--border-color);
-            }
+        .grid-cell--level {
+          justify-content: center;
+        }
 
-            .permission-items {
-              padding: var(--space-5);
+        .grid-header-cell {
+          font-weight: var(--fw-semibold);
+          background: var(--hover-background);
+          border-bottom: 2px solid var(--primary-color);
+          text-transform: uppercase;
+          font-size: var(--fs-label);
+          letter-spacing: 0.5px;
+        }
 
-              .permission-item {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 8px 5px;
-                border-bottom: 1px dashed var(--border-color);
+        .grid-module-cell {
+          grid-column: 1 / -1;
+          font-weight: var(--fw-semibold);
+          background: var(--surface-ground, var(--hover-background));
+          border-bottom: 1px solid var(--border-color);
+          border-top: 1px solid var(--border-color);
 
-                &:last-child {
-                  border-bottom: none;
-                }
+          i {
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+          }
+        }
 
-                .item-label {
-                  font-size: var(--fs-control);
-                  color: var(--text-color);
-                }
+        .level-chip {
+          display: inline-block;
+          padding: 0.2rem 0.65rem;
+          border-radius: var(--radius-lg, 999px);
+          font-size: var(--fs-label);
+          font-weight: var(--fw-semibold);
+          background: var(--hover-background);
+          color: var(--secondary-color);
 
-                .perm-enabled {
-                  color: var(--success-color);
-                  font-size: var(--fs-h3);
-                }
-              }
-            }
+          // Colour per access-level code. Codes are lower-cased by the
+          // component (full / write / read / none) so we can match
+          // them on the `data-level` attribute.
+          &[data-level='none'] {
+            background: rgba(var(--secondary-rgb, 100, 116, 139), 0.12);
+            color: var(--secondary-color);
+          }
+          &[data-level='read'] {
+            background: rgba(var(--info-rgb, 14, 165, 233), 0.15);
+            color: var(--info-color, var(--primary-color));
+          }
+          &[data-level='write'] {
+            background: rgba(var(--warning-rgb, 234, 179, 8), 0.18);
+            color: var(--warning-color, var(--primary-color));
+          }
+          &[data-level='full'] {
+            background: rgba(var(--success-rgb, 34, 197, 94), 0.18);
+            color: var(--success-color);
           }
         }
       }
@@ -316,8 +346,12 @@
       }
 
       .permissions-section {
-        .permission-columns {
-          grid-template-columns: repeat(2, 1fr);
+        .permission-grid {
+          grid-template-columns: minmax(150px, 2fr) minmax(90px, 1fr);
+        }
+
+        .grid-cell {
+          padding: 0.5rem 0.75rem;
         }
       }
     }
