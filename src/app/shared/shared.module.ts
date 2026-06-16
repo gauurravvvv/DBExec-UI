@@ -31,6 +31,7 @@ import {
 import { SkeletonTableRowsComponent } from './components/skeleton/skeleton-table.component';
 import { ContentLoaderComponent } from './components/content-loader/content-loader.component';
 import { BrandingWatermarkComponent } from './components/branding-watermark/branding-watermark.component';
+import { HasPermissionDirective } from './directives/has-permission.directive';
 import { RelativeTimePipe } from './pipes/relative-time.pipe';
 import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
 
@@ -64,6 +65,7 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     SkeletonTableRowsComponent,
     ContentLoaderComponent,
     BrandingWatermarkComponent,
+    HasPermissionDirective,
   ],
   imports: [
     CommonModule,
@@ -101,6 +103,7 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     SkeletonTableRowsComponent,
     ContentLoaderComponent,
     BrandingWatermarkComponent,
+    HasPermissionDirective,
     TranslateModule,
   ],
 })
