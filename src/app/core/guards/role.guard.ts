@@ -5,6 +5,7 @@ import {
   AUTH_ROUTES,
   HOME_ROUTES,
 } from 'src/app/core/layout/sidebar/sidebar.constant';
+import { PermissionService } from '../services/permission.service';
 import { GlobalService } from '../services/global.service';
 
 function getHomeByRole(role: string): string {
@@ -32,6 +33,7 @@ function getHomeByRole(role: string): string {
  */
 export const roleGuard: CanActivateFn = (route, state) => {
   const globalService = inject(GlobalService);
+  const permissionService = inject(PermissionService);
   const router = inject(Router);
 
   const userRole = globalService.getTokenDetails('role');
@@ -50,8 +52,11 @@ export const roleGuard: CanActivateFn = (route, state) => {
     return false;
   }
 
-  // Check module-level permission if specified
-  if (requiredPermission && !globalService.hasPermission(requiredPermission)) {
+  // Module-level permission check via the relational tree
+  // (PermissionService reads from StorageType.PERMISSION_TREE).
+  // READ is the default — route data can override later if any
+  // route ever wants WRITE/FULL gating (currently none do).
+  if (requiredPermission && !permissionService.canRead(requiredPermission)) {
     router.navigate([getHomeByRole(userRole)]);
     return false;
   }
