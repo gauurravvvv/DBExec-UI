@@ -5,15 +5,19 @@ import {
   HOME_ROUTES,
 } from 'src/app/core/layout/sidebar/sidebar.constant';
 import { PERMISSIONS } from '../constants/permissions.constant';
-import { GlobalService } from '../services/global.service';
+import { LoginService } from '../services/login.service';
 import { PermissionService } from '../services/permission.service';
 
 /**
  * Decide a user's "home" route from their permissions, not from a
- * role string. The platform System Admin is the only user that can
- * read `systemAdmin` (it's a SYSTEM-scope permission), so checking
- * that one value is enough to distinguish "platform operator" from
- * "org user". Org admins + org users share the same home.
+ * role string.
+ *
+ * A user can belong to many groups and therefore carry many roles;
+ * picking a single "primary role" is a lie. The platform System
+ * Admin is the only user that can read `systemAdmin` (it's a
+ * SYSTEM-scope permission), so checking that one value is the
+ * authoritative "platform operator?" signal regardless of how many
+ * roles the user has. Org admins + org users share the same home.
  */
 function getHomeFromPermissions(
   permissionService: PermissionService,
@@ -29,18 +33,16 @@ function getHomeFromPermissions(
  * boundary — the server re-checks every API call via
  * VerifyPermissionMiddleware.
  *
- * There's no role-string bypass anywhere. The platform System Admin
- * holds only home / systemAdmin / orgManagement / auditLogs /
- * loginActivity / announcementManagement / appSettings — anything
- * else returns false and redirects.
+ * No role-string check anywhere. Permissions are the only signal,
+ * which correctly handles users in multiple groups with overlapping
+ * grants.
  */
 export const roleGuard: CanActivateFn = (route, _state) => {
-  const globalService = inject(GlobalService);
+  const loginService = inject(LoginService);
   const permissionService = inject(PermissionService);
   const router = inject(Router);
 
-  const userRole = globalService.getTokenDetails('role');
-  if (!userRole) {
+  if (!loginService.isLoggedIn()) {
     router.navigate([AUTH_ROUTES.LOGIN]);
     return false;
   }

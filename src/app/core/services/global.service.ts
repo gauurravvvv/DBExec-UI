@@ -15,7 +15,6 @@ import { StorageService } from './storage.service';
 export class GlobalService {
   accessToken!: string | null;
   decodeToken!: any;
-  userRole!: string;
   reportUrl!: string;
   public isSidenavOpened: BehaviorSubject<boolean> =
     new BehaviorSubject<boolean>(false);

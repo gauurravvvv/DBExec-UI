@@ -13,7 +13,6 @@ import { PermissionService } from 'src/app/core/services/permission.service';
 export class OrgHomeComponent implements OnInit {
   userName = '';
   organisationName = '';
-  userRole = '';
   isAdmin = false;
 
   constructor(
@@ -26,11 +25,10 @@ export class OrgHomeComponent implements OnInit {
     this.userName = this.globalService.getTokenDetails('name') || '';
     this.organisationName =
       this.globalService.getTokenDetails('organisation') || '';
-    this.userRole = this.globalService.getTokenDetails('role') || '';
     // "Admin" surfaces extra cards on the org home dashboard. Detect
     // admin power by the ability to manage other users (FULL grant
     // on userManagement) rather than by a role string — keeps the
-    // gate honest across custom roles.
+    // gate honest across custom roles and users in multiple groups.
     this.isAdmin = this.permissionService.canDelete(
       PERMISSIONS.USER_MANAGEMENT,
     );

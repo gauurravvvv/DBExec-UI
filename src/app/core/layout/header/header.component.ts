@@ -49,7 +49,13 @@ export class HeaderComponent implements OnInit {
   organisationName: string = '';
   userInitials: string = '';
   userName: string = '';
-  userRole: string = '';
+  /** Role NAME for the profile-menu chip (display only). The
+   *  search-trigger / notification-bell visibility gates use
+   *  permission checks, not this string. */
+  /** True when the caller is the platform System Admin. Derived
+   *  from the systemAdmin permission, not from the role string —
+   *  honours users in multiple groups. */
+  isSystemAdmin: boolean = false;
   showProfileMenu: boolean = false;
   isAnimating = false;
   isFullscreen = false;
@@ -97,12 +103,14 @@ export class HeaderComponent implements OnInit {
     const userFullName = this.globalService.getTokenDetails('name');
     this.userName = userFullName;
     this.userInitials = this.globalService.chipNameProvider(userFullName);
-    this.userRole = this.globalService.getTokenDetails('role');
+    this.isSystemAdmin = this.permissionService.canRead(
+      PERMISSIONS.SYSTEM_ADMIN,
+    );
 
     this.localeService.initFromToken();
     this.currentLocale = this.localeService.currentLocale;
 
-    if (!this.permissionService.canRead(PERMISSIONS.SYSTEM_ADMIN)) {
+    if (!this.isSystemAdmin) {
       // Notifications are per-org; the platform System Admin has no
       // org context so the BE would 401 on every poll. Detect SA by
       // the presence of the systemAdmin permission (only their role

@@ -17,15 +17,11 @@
   <div class="header-right">
     <div class="header-actions">
       <!-- Search Trigger -->
-      <div
-        class="search-trigger"
-        (click)="openSearchModal()"
-        *ngIf="userRole !== 'SYSTEM-ADMIN'"
-      >
+      <div class="search-trigger" (click)="openSearchModal()" *ngIf="!isSystemAdmin">
         <i class="pi pi-search"></i>
         <span class="placeholder">{{
           'HEADER.SEARCH_PLACEHOLDER' | translate
-        }}</span>
+          }}</span>
         <kbd class="shortcut">⌘K</kbd>
       </div>
 
@@ -34,26 +30,13 @@
         <!-- PrimeIcons in this version ships pi-expand but not
              pi-compress. Use the window-minimize glyph for the
              "exit fullscreen" state. -->
-        <i
-          class="pi"
-          [ngClass]="isFullscreen ? 'pi-window-minimize' : 'pi-expand'"
-        ></i>
+        <i class="pi" [ngClass]="isFullscreen ? 'pi-window-minimize' : 'pi-expand'"></i>
       </button>
 
       <!-- Language Selector -->
-      <app-custom-dropdown
-        class="locale-dropdown"
-        [(ngModel)]="currentLocale"
-        [options]="locales"
-        optionLabel="label"
-        optionValue="code"
-        [filter]="false"
-        [autoDisplayFirst]="false"
-        [disabled]="changingLocale"
-        appendTo="body"
-        panelStyleClass="locale-dropdown-panel"
-        (onChangeEvent)="onLocaleChange($event)"
-      >
+      <app-custom-dropdown class="locale-dropdown" [(ngModel)]="currentLocale" [options]="locales" optionLabel="label"
+        optionValue="code" [filter]="false" [autoDisplayFirst]="false" [disabled]="changingLocale" appendTo="body"
+        panelStyleClass="locale-dropdown-panel" (onChangeEvent)="onLocaleChange($event)">
         <!-- Trigger: compact flag + ISO code (e.g. 🇺🇸 EN) -->
         <ng-template #selectedItemTemplate let-locale>
           <div class="locale-trigger">
@@ -63,17 +46,10 @@
         </ng-template>
         <!-- Panel rows: flag + full native name + active checkmark -->
         <ng-template #itemTemplate let-locale>
-          <div
-            class="locale-option"
-            [class.is-active]="locale.code === currentLocale"
-          >
+          <div class="locale-option" [class.is-active]="locale.code === currentLocale">
             <i [class]="locale.flagClass" aria-hidden="true"></i>
             <span class="locale-option-label">{{ locale.label }}</span>
-            <i
-              *ngIf="locale.code === currentLocale"
-              class="pi pi-check locale-option-check"
-              aria-hidden="true"
-            ></i>
+            <i *ngIf="locale.code === currentLocale" class="pi pi-check locale-option-check" aria-hidden="true"></i>
           </div>
         </ng-template>
       </app-custom-dropdown>
@@ -82,12 +58,8 @@
            Click opens the dropdown AND triggers a read-all in the
            service (UX requirement: any unread are cleared on bell
            click). Hidden for SYSTEM-ADMIN (no per-org binding). -->
-      <button
-        *ngIf="showNotificationBell"
-        class="icon-btn notification-btn"
-        (click)="toggleNotificationMenu($event)"
-        [attr.aria-label]="'HEADER.NOTIFICATIONS' | translate"
-      >
+      <button *ngIf="showNotificationBell" class="icon-btn notification-btn" (click)="toggleNotificationMenu($event)"
+        [attr.aria-label]="'HEADER.NOTIFICATIONS' | translate">
         <i class="pi pi-bell"></i>
         <span class="badge" *ngIf="notificationService.unreadCount() > 0">
           {{ notificationService.badgeLabel() }}
@@ -109,7 +81,6 @@
             <div class="menu-avatar">{{ userInitials }}</div>
             <div>
               <div class="menu-name">{{ userName }}</div>
-              <div class="menu-role-tag">{{ userRole }}</div>
             </div>
           </div>
           <div class="menu-divider"></div>
@@ -134,14 +105,10 @@
 </header>
 
 <!-- Announcement Banner (multi-queue) -->
-<div
-  class="announcement-banner"
-  *ngIf="currentAnnouncement"
-  [ngStyle]="{
+<div class="announcement-banner" *ngIf="currentAnnouncement" [ngStyle]="{
     background: currentAnnouncement.bgColor,
     color: currentAnnouncement.textColor,
-  }"
->
+  }">
   <div class="banner-shimmer"></div>
   <div class="banner-glow-left"></div>
   <div class="banner-glow-right"></div>
@@ -160,20 +127,12 @@
       </span>
     </div>
     <div class="banner-controls" *ngIf="announcements.length > 1">
-      <button
-        class="banner-nav-btn"
-        (click)="prevAnnouncement()"
-        [pTooltip]="'HEADER.PREVIOUS' | translate"
-        tooltipPosition="bottom"
-      >
+      <button class="banner-nav-btn" (click)="prevAnnouncement()" [pTooltip]="'HEADER.PREVIOUS' | translate"
+        tooltipPosition="bottom">
         <i class="pi pi-chevron-left"></i>
       </button>
-      <button
-        class="banner-nav-btn"
-        (click)="nextAnnouncement()"
-        [pTooltip]="'HEADER.NEXT' | translate"
-        tooltipPosition="bottom"
-      >
+      <button class="banner-nav-btn" (click)="nextAnnouncement()" [pTooltip]="'HEADER.NEXT' | translate"
+        tooltipPosition="bottom">
         <i class="pi pi-chevron-right"></i>
       </button>
     </div>
@@ -181,23 +140,14 @@
 </div>
 
 <!-- Announcement Popup -->
-<div
-  class="announcement-popup-backdrop"
-  *ngIf="showAnnouncementOverlay && currentAnnouncement"
-  (click)="showAnnouncementOverlay = false"
->
+<div class="announcement-popup-backdrop" *ngIf="showAnnouncementOverlay && currentAnnouncement"
+  (click)="showAnnouncementOverlay = false">
   <div class="announcement-popup" (click)="$event.stopPropagation()">
-    <div
-      class="popup-accent"
-      [ngStyle]="{ background: currentAnnouncement.bgColor }"
-    ></div>
+    <div class="popup-accent" [ngStyle]="{ background: currentAnnouncement.bgColor }"></div>
     <div class="popup-inner">
       <div class="popup-header-row">
-        <span
-          class="popup-tag"
-          [ngStyle]="{ color: currentAnnouncement.bgColor }"
-          >{{ 'HEADER.ANNOUNCEMENT' | translate }}</span
-        >
+        <span class="popup-tag" [ngStyle]="{ color: currentAnnouncement.bgColor }">{{ 'HEADER.ANNOUNCEMENT' | translate
+          }}</span>
       </div>
       <h3 class="popup-title">{{ currentAnnouncement.name }}</h3>
       <p class="popup-description">{{ currentAnnouncement.description }}</p>
@@ -215,20 +165,10 @@
 </div>
 
 <!-- Notification Menu — only ever opens for non-SYSTEM-ADMIN. -->
-<div
-  *ngIf="showNotificationBell"
-  class="notification-menu"
-  [class.show]="showNotificationMenu"
-  #notificationMenu
->
+<div *ngIf="showNotificationBell" class="notification-menu" [class.show]="showNotificationMenu" #notificationMenu>
   <div class="notification-header">
     <h3>{{ 'HEADER.NOTIFICATIONS' | translate }}</h3>
-    <button
-      pButton
-      class="p-button-text"
-      *ngIf="hasNotifications"
-      (click)="markAllAsRead()"
-    >
+    <button pButton class="p-button-text" *ngIf="hasNotifications" (click)="markAllAsRead()">
       {{ 'HEADER.MARK_ALL_READ' | translate }}
     </button>
   </div>
@@ -238,39 +178,30 @@
          readAt timestamp returned by the BE; the bell-open
          already flipped them all to read so this is mostly a
          tail for the "new arrival while panel was open" case. -->
-    <div
-      class="notification-item"
-      *ngFor="let n of notificationService.items(); trackBy: trackById"
-      [class.unread]="!n.readAt"
-    >
+    <div class="notification-item" *ngFor="let n of notificationService.items(); trackBy: trackById"
+      [class.unread]="!n.readAt">
       <div class="notification-icon">
-        <i
-          class="pi"
-          [ngClass]="
+        <i class="pi" [ngClass]="
             n.type === 'group_removed' ? 'pi-user-minus' : 'pi-user-plus'
-          "
-        ></i>
+          "></i>
       </div>
       <div class="notification-content">
         <p class="message-title">
           {{
-            (n.type === 'group_removed'
-              ? 'NOTIFICATION.GROUP_REMOVED_TITLE'
-              : 'NOTIFICATION.GROUP_ADDED_TITLE') | translate
+          (n.type === 'group_removed'
+          ? 'NOTIFICATION.GROUP_REMOVED_TITLE'
+          : 'NOTIFICATION.GROUP_ADDED_TITLE') | translate
           }}
         </p>
         <p class="message">
           {{
-            (n.type === 'group_removed'
-              ? 'NOTIFICATION.GROUP_REMOVED_BODY'
-              : 'NOTIFICATION.GROUP_ADDED_BODY')
-              | translate: { groupName: n.meta?.groupName || '' }
+          (n.type === 'group_removed'
+          ? 'NOTIFICATION.GROUP_REMOVED_BODY'
+          : 'NOTIFICATION.GROUP_ADDED_BODY')
+          | translate: { groupName: n.meta?.groupName || '' }
           }}
         </p>
-        <span
-          class="time"
-          [title]="n.createdOn | date: 'medium'"
-        >{{ n.createdOn | relativeTime }}</span>
+        <span class="time" [title]="n.createdOn | date: 'medium'">{{ n.createdOn | relativeTime }}</span>
       </div>
     </div>
   </div>

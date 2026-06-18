@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { PERMISSIONS } from 'src/app/core/constants/permissions.constant';
-import { GlobalService } from 'src/app/core/services/global.service';
+import { LoginService } from 'src/app/core/services/login.service';
 import { PermissionService } from 'src/app/core/services/permission.service';
 
 /**
@@ -10,10 +10,10 @@ import { PermissionService } from 'src/app/core/services/permission.service';
  *   - canRead(systemAdmin) → /app/home/system-admin (platform operator)
  *   - otherwise            → /app/home/org           (org user)
  *
- * The role string in the JWT is the role NAME (e.g. "System Admin",
- * "Administrator") which is a display label, not a behavioural gate.
- * Permissions are the only authoritative signal for "what should
- * this user see?".
+ * No role-string check anywhere — a user can belong to multiple
+ * groups carrying multiple roles, so picking a single "primary role"
+ * is unsafe. Permissions aggregate across every group via the
+ * resolveUserPermissions UNION on the BE.
  */
 @Component({
   selector: 'app-empty-root',
@@ -24,13 +24,12 @@ import { PermissionService } from 'src/app/core/services/permission.service';
 export class EmptyRootComponent implements OnInit {
   constructor(
     private router: Router,
-    private globalService: GlobalService,
+    private loginService: LoginService,
     private permissionService: PermissionService,
   ) {}
 
   ngOnInit(): void {
-    const role = this.globalService.getTokenDetails('role');
-    if (!role) {
+    if (!this.loginService.isLoggedIn()) {
       this.router.navigate(['/login']);
       return;
     }
