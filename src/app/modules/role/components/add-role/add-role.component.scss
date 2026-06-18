@@ -138,23 +138,31 @@
   gap: var(--space-7);
 }
 
-// Permission grid — the new relational-RBAC UX.
+// Permission grid — relational-RBAC UX.
 //
 // One column for the permission label + one column per canonical
 // access level. Rows alternate between module headers (full-width,
-// bold, no radios) and leaf rows (label + one radio per level).
+// quiet section dividers, no radios) and leaf rows (label + one
+// radio per level).
+//
+// Visual tone: lighter than the form fields above so the grid reads
+// as a tabular subsection, not another headline block. The Permissions
+// title sits at --fs-h3 + medium weight (same as PrimeNG card subtitles)
+// rather than --fs-h2 — keeps the page hierarchy: page title > form
+// section titles.
 .permissions-section {
   width: 100%;
-  margin-top: 2rem;
-  padding-top: 2rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
   border-top: 1px solid var(--border-color);
 
   .section-title {
-    font-size: var(--fs-h2);
+    font-size: var(--fs-h3);
     font-weight: var(--fw-medium);
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     color: var(--text-color);
     display: block;
+    letter-spacing: -0.005em;
 
     .required {
       color: var(--error-color);
@@ -164,9 +172,9 @@
 
   .grid-help {
     color: var(--text-color);
-    opacity: 0.7;
-    font-size: var(--fs-body);
-    margin: 0 0 1rem 0;
+    opacity: 0.65;
+    font-size: var(--fs-label);
+    margin: 0 0 0.75rem 0;
   }
 
   // CSS Grid: first column is the permission label, the remaining
@@ -184,10 +192,11 @@
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     overflow: hidden;
+    background: var(--card-background);
   }
 
   .grid-cell {
-    padding: 0.75rem 1rem;
+    padding: 0.55rem 0.9rem;
     display: flex;
     align-items: center;
     border-bottom: 1px solid var(--border-color);
@@ -200,28 +209,46 @@
     justify-content: center;
   }
 
+  // Column headers: subtle, no uppercase, no thick border. Reads as
+  // a table caption strip, not a billboard.
   .grid-header-cell {
-    font-weight: var(--fw-semibold);
+    font-weight: var(--fw-medium);
     background: var(--hover-background);
     color: var(--text-color);
-    border-bottom: 2px solid var(--primary-color);
-    text-transform: uppercase;
+    opacity: 0.75;
     font-size: var(--fs-label);
-    letter-spacing: 0.5px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
   }
 
+  // Module section dividers: quieter than before. Smaller font,
+  // medium weight, no double border, lighter background tint.
+  // The icon is the visual anchor; the text shouldn't shout.
   .grid-module-cell {
     grid-column: 1 / -1;
-    font-weight: var(--fw-semibold);
-    background: var(--surface-ground, var(--hover-background));
+    font-weight: var(--fw-medium);
+    font-size: var(--fs-label);
+    background: var(--hover-background);
     color: var(--text-color);
+    opacity: 0.85;
     border-bottom: 1px solid var(--border-color);
-    border-top: 1px solid var(--border-color);
+    padding-top: 0.45rem;
+    padding-bottom: 0.45rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 
     i {
       margin-right: 0.5rem;
       color: var(--primary-color);
+      opacity: 0.9;
+      font-size: var(--fs-body);
     }
+  }
+
+  // Leaf rows: zebra striping for scanability without bolding text.
+  .grid-cell--label {
+    color: var(--text-color);
+    opacity: 0.9;
   }
 }
 

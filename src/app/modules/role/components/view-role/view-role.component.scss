@@ -210,18 +210,19 @@
 
       // Read-only permission grid: two columns (name + current level).
       // Module rows span both columns as a section divider above their
-      // leaves, same shape as the Add/Edit grid.
+      // leaves, same shape + tone as the Add/Edit grid.
       .permissions-section {
-        margin-top: 30px;
+        margin-top: 24px;
 
         .section-title {
-          font-size: var(--fs-h2);
-          font-weight: var(--fw-semibold);
+          font-size: var(--fs-h3);
+          font-weight: var(--fw-medium);
           color: var(--text-color);
-          margin-bottom: 20px;
-          padding-bottom: 10px;
-          border-bottom: 2px solid var(--border-color);
+          margin-bottom: 12px;
+          padding-bottom: 8px;
+          border-bottom: 1px solid var(--border-color);
           display: block;
+          letter-spacing: -0.005em;
         }
 
         .permission-grid {
@@ -231,10 +232,11 @@
           border: 1px solid var(--border-color);
           border-radius: var(--radius-md);
           overflow: hidden;
+          background: var(--card-background);
         }
 
         .grid-cell {
-          padding: 0.75rem 1rem;
+          padding: 0.55rem 0.9rem;
           display: flex;
           align-items: center;
           border-bottom: 1px solid var(--border-color);
@@ -248,24 +250,31 @@
         }
 
         .grid-header-cell {
-          font-weight: var(--fw-semibold);
+          font-weight: var(--fw-medium);
           background: var(--hover-background);
-          border-bottom: 2px solid var(--primary-color);
-          text-transform: uppercase;
+          opacity: 0.75;
           font-size: var(--fs-label);
-          letter-spacing: 0.5px;
+          padding-top: 0.5rem;
+          padding-bottom: 0.5rem;
         }
 
         .grid-module-cell {
           grid-column: 1 / -1;
-          font-weight: var(--fw-semibold);
-          background: var(--surface-ground, var(--hover-background));
+          font-weight: var(--fw-medium);
+          font-size: var(--fs-label);
+          background: var(--hover-background);
+          opacity: 0.85;
           border-bottom: 1px solid var(--border-color);
-          border-top: 1px solid var(--border-color);
+          padding-top: 0.45rem;
+          padding-bottom: 0.45rem;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
 
           i {
             margin-right: 0.5rem;
             color: var(--primary-color);
+            opacity: 0.9;
+            font-size: var(--fs-body);
           }
         }
 

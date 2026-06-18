@@ -147,20 +147,21 @@
   gap: var(--space-7);
 }
 
-// Permission grid (same shape as Add Role — see add-role.component.scss
-// for the design notes).
+// Permission grid (same shape + tone as Add Role — see
+// add-role.component.scss for the design notes).
 .permissions-section {
   width: 100%;
-  margin-top: 2rem;
-  padding-top: 2rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
   border-top: 1px solid var(--border-color);
 
   .section-title {
-    font-size: var(--fs-h2);
+    font-size: var(--fs-h3);
     font-weight: var(--fw-medium);
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     color: var(--text-color);
     display: block;
+    letter-spacing: -0.005em;
 
     .required {
       color: var(--error-color);
@@ -170,9 +171,9 @@
 
   .grid-help {
     color: var(--text-color);
-    opacity: 0.7;
-    font-size: var(--fs-body);
-    margin: 0 0 1rem 0;
+    opacity: 0.65;
+    font-size: var(--fs-label);
+    margin: 0 0 0.75rem 0;
   }
 
   .permission-grid {
@@ -186,10 +187,11 @@
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     overflow: hidden;
+    background: var(--card-background);
   }
 
   .grid-cell {
-    padding: 0.75rem 1rem;
+    padding: 0.55rem 0.9rem;
     display: flex;
     align-items: center;
     border-bottom: 1px solid var(--border-color);
@@ -203,27 +205,39 @@
   }
 
   .grid-header-cell {
-    font-weight: var(--fw-semibold);
+    font-weight: var(--fw-medium);
     background: var(--hover-background);
     color: var(--text-color);
-    border-bottom: 2px solid var(--primary-color);
-    text-transform: uppercase;
+    opacity: 0.75;
     font-size: var(--fs-label);
-    letter-spacing: 0.5px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
   }
 
   .grid-module-cell {
     grid-column: 1 / -1;
-    font-weight: var(--fw-semibold);
-    background: var(--surface-ground, var(--hover-background));
+    font-weight: var(--fw-medium);
+    font-size: var(--fs-label);
+    background: var(--hover-background);
     color: var(--text-color);
+    opacity: 0.85;
     border-bottom: 1px solid var(--border-color);
-    border-top: 1px solid var(--border-color);
+    padding-top: 0.45rem;
+    padding-bottom: 0.45rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 
     i {
       margin-right: 0.5rem;
       color: var(--primary-color);
+      opacity: 0.9;
+      font-size: var(--fs-body);
     }
+  }
+
+  .grid-cell--label {
+    color: var(--text-color);
+    opacity: 0.9;
   }
 }
 
