@@ -67,18 +67,13 @@ export class ViewProfileComponent implements OnInit, OnDestroy {
     return `${p.firstName || ''} ${p.lastName || ''}`.trim();
   }
 
+  /**
+   * Role label is the role NAME stamped at login (e.g. "System Admin",
+   * "Administrator", "Member"). Already a display string — no mapping
+   * needed. Falls back to empty when the profile is still loading.
+   */
   get roleLabel(): string {
-    const p = this.profile();
-    switch (p?.role) {
-      case 'SYSTEM-ADMIN':
-        return this.translate.instant('PROFILE.ROLE_SYSTEM_ADMIN');
-      case 'ORG-ADMIN':
-        return this.translate.instant('PROFILE.ROLE_ORG_ADMIN');
-      case 'ORG-USER':
-        return this.translate.instant('PROFILE.ROLE_ORG_USER');
-      default:
-        return p?.role || '';
-    }
+    return this.profile()?.role || '';
   }
 
   openChangePasswordDialog() {

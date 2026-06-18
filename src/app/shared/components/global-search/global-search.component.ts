@@ -13,7 +13,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { PERMISSIONS } from 'src/app/core/constants/permissions.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { PermissionService } from 'src/app/core/services/permission.service';
 import { SIDEBAR_ITEMS_ROUTES } from '../../../core/layout/sidebar/sidebar.constant';
 import { GlobalSearchService } from '../../services/global-search.service';
 
@@ -45,16 +47,15 @@ export class GlobalSearchComponent implements OnInit {
     ANALYSES: 'ci ci-analyses',
   };
 
-  private userRole: string = '';
   private readonly destroyRef = inject(DestroyRef);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly permissionService = inject(PermissionService);
 
   constructor(
     private globalSearchService: GlobalSearchService,
     private globalService: GlobalService,
     private router: Router,
   ) {
-    this.userRole = this.globalService.getTokenDetails('role');
     // Debounce search input
     this.searchSubject
       .pipe(
@@ -81,7 +82,9 @@ export class GlobalSearchComponent implements OnInit {
     // Check for Cmd+K (Mac) or Ctrl+K (Windows/Linux)
     if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
       event.preventDefault(); // Prevent default browser behavior
-      if (this.userRole !== 'SYSTEM-ADMIN') {
+      // Global search is per-org; the platform System Admin has no
+      // org context. Detect by the absence of the systemAdmin grant.
+      if (!this.permissionService.canRead(PERMISSIONS.SYSTEM_ADMIN)) {
         this.openSearchModal();
       }
     }

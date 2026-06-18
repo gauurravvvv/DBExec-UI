@@ -1,12 +1,12 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { ROLES } from 'src/app/core/constants/user.constant';
+import { PERMISSIONS } from 'src/app/core/constants/permissions.constant';
 import {
   AUTH_ROUTES,
   HOME_ROUTES,
 } from 'src/app/core/layout/sidebar/sidebar.constant';
 import { LoginService } from 'src/app/core/services/login.service';
-import { GlobalService } from '../services/global.service';
+import { PermissionService } from '../services/permission.service';
 
 // Routes a NOT-logged-in user is allowed to visit. Visiting any of
 // these while already logged in bounces back to the role's home.
@@ -21,21 +21,26 @@ const UNAUTHENTICATED_ONLY_ROUTES = [
 // authenticated route: must be logged in, never bounce away.
 const POST_LOGIN_ROUTES = ['/relay'];
 
-function getDefaultRouteByRole(globalService: GlobalService): string {
-  const role = globalService.getTokenDetails('role');
-  if (role === ROLES.SYSTEM_ADMIN) {
-    return HOME_ROUTES.SYSTEM_ADMIN;
-  }
-  if (role) {
-    return HOME_ROUTES.ORG_ADMIN;
-  }
-  return AUTH_ROUTES.LOGIN;
+/**
+ * Pick a logged-in user's default route from their permissions, not
+ * from a role string. Only the platform System Admin role can read
+ * `systemAdmin`, so it's the authoritative "is this a platform
+ * operator?" signal. Org admins + org users share the org home.
+ */
+function getDefaultRouteByPermissions(
+  authService: LoginService,
+  permissionService: PermissionService,
+): string {
+  if (!authService.isLoggedIn()) return AUTH_ROUTES.LOGIN;
+  return permissionService.canRead(PERMISSIONS.SYSTEM_ADMIN)
+    ? HOME_ROUTES.SYSTEM_ADMIN
+    : HOME_ROUTES.ORG_ADMIN;
 }
 
 export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(LoginService);
   const router = inject(Router);
-  const globalService = inject(GlobalService);
+  const permissionService = inject(PermissionService);
 
   // /relay: must be authenticated (phase 1 set the access token);
   // never redirect away even though we're "logged in".
@@ -51,7 +56,10 @@ export const authGuard: CanActivateFn = (route, state) => {
   );
   if (isUnauthOnly) {
     if (authService.isLoggedIn()) {
-      const homeRoute = getDefaultRouteByRole(globalService);
+      const homeRoute = getDefaultRouteByPermissions(
+        authService,
+        permissionService,
+      );
       router.navigate([homeRoute]);
       return false;
     }

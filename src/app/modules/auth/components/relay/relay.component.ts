@@ -17,11 +17,12 @@ import {
 import { Router } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
+import { PERMISSIONS } from 'src/app/core/constants/permissions.constant';
 import { StorageType } from 'src/app/core/constants/storage-type.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { HOME_ROUTES } from 'src/app/core/layout/sidebar/sidebar.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
+import { PermissionService } from 'src/app/core/services/permission.service';
 import { StorageService } from 'src/app/core/services/storage.service';
 
 /**
@@ -101,6 +102,7 @@ export class RelayComponent implements OnInit, OnDestroy {
   private readonly globalService = inject(GlobalService);
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly permissionService = inject(PermissionService);
 
   readonly state = signal<'loading' | 'slow' | 'ready' | 'error'>('loading');
 
@@ -410,11 +412,11 @@ export class RelayComponent implements OnInit, OnDestroy {
   }
 
   private navigateHome(): void {
-    const role = this.globalService.getTokenDetails('role');
-    const target =
-      role === ROLES.SYSTEM_ADMIN
-        ? HOME_ROUTES.SYSTEM_ADMIN
-        : HOME_ROUTES.ORG_ADMIN;
+    // Pick the home variant by permission, not by role string.
+    // Only the platform System Admin can read `systemAdmin`.
+    const target = this.permissionService.canRead(PERMISSIONS.SYSTEM_ADMIN)
+      ? HOME_ROUTES.SYSTEM_ADMIN
+      : HOME_ROUTES.ORG_ADMIN;
     this.router.navigateByUrl(target, { replaceUrl: true });
   }
 

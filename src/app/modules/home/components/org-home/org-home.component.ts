@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ROLES } from 'src/app/core/constants/user.constant';
+import { PERMISSIONS } from 'src/app/core/constants/permissions.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { PermissionService } from 'src/app/core/services/permission.service';
 
 @Component({
   selector: 'app-org-home',
@@ -17,6 +18,7 @@ export class OrgHomeComponent implements OnInit {
 
   constructor(
     private globalService: GlobalService,
+    private permissionService: PermissionService,
     private router: Router,
   ) {}
 
@@ -25,7 +27,13 @@ export class OrgHomeComponent implements OnInit {
     this.organisationName =
       this.globalService.getTokenDetails('organisation') || '';
     this.userRole = this.globalService.getTokenDetails('role') || '';
-    this.isAdmin = this.userRole === ROLES.ORG_ADMIN;
+    // "Admin" surfaces extra cards on the org home dashboard. Detect
+    // admin power by the ability to manage other users (FULL grant
+    // on userManagement) rather than by a role string — keeps the
+    // gate honest across custom roles.
+    this.isAdmin = this.permissionService.canDelete(
+      PERMISSIONS.USER_MANAGEMENT,
+    );
   }
 
   navigateTo(route: string) {

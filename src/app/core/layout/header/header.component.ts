@@ -13,8 +13,8 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { PERMISSIONS } from 'src/app/core/constants/permissions.constant';
 import { StorageType } from 'src/app/core/constants/storage-type.constant';
-import { ROLES } from 'src/app/core/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import {
   LocaleService,
@@ -102,10 +102,11 @@ export class HeaderComponent implements OnInit {
     this.localeService.initFromToken();
     this.currentLocale = this.localeService.currentLocale;
 
-    if (this.userRole !== ROLES.SYSTEM_ADMIN) {
-      // Notifications are per-org; SYSTEM-ADMIN has no org context
-      // so the BE would 401 on every poll. Skip the poller entirely.
-      // Service is idempotent so re-mount is safe.
+    if (!this.permissionService.canRead(PERMISSIONS.SYSTEM_ADMIN)) {
+      // Notifications are per-org; the platform System Admin has no
+      // org context so the BE would 401 on every poll. Detect SA by
+      // the presence of the systemAdmin permission (only their role
+      // carries it). Service is idempotent so re-mount is safe.
       this.notificationService.start();
 
       // Announcements are now delivered in the login response and
@@ -267,7 +268,7 @@ export class HeaderComponent implements OnInit {
    *  Admin has no org binding so the bell is hidden entirely for
    *  them. Mirrors the start() gate in ngOnInit. */
   get showNotificationBell(): boolean {
-    return this.userRole !== ROLES.SYSTEM_ADMIN;
+    return !this.permissionService.canRead(PERMISSIONS.SYSTEM_ADMIN);
   }
 
   /** Bell click: open (or close) the dropdown. On open we fetch
