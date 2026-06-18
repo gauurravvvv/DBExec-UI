@@ -72,36 +72,47 @@
         </h4>
 
         <div class="permission-grid" role="grid">
-          <div class="grid-cell grid-header-cell grid-cell--label" role="columnheader">
-            {{ 'COMMON.NAME' | translate }}
-          </div>
-          <div class="grid-cell grid-header-cell grid-cell--level" role="columnheader">
-            {{ 'ACCESS_LEVEL.TITLE' | translate }}
+          <div class="grid-row grid-row--header" role="row">
+            <div class="grid-cell grid-cell--label" role="columnheader">
+              {{ 'COMMON.NAME' | translate }}
+            </div>
+            <div class="grid-cell grid-cell--level" role="columnheader">
+              {{ 'ACCESS_LEVEL.TITLE' | translate }}
+            </div>
           </div>
 
           <ng-container
             *ngFor="let module of modules; trackBy: trackByModuleId"
           >
-            <div class="grid-cell grid-module-cell" role="rowheader">
-              <i *ngIf="module.icon" class="pi" [ngClass]="module.icon"></i>
-              {{ module.name }}
-            </div>
+            <div class="grid-module">
+              <div class="grid-row grid-row--module" role="row">
+                <div class="grid-cell grid-cell--label grid-cell--module" role="rowheader">
+                  <i *ngIf="module.icon" class="pi" [ngClass]="module.icon"></i>
+                  {{ module.name }}
+                </div>
+                <div class="grid-cell grid-cell--level" aria-hidden="true"></div>
+              </div>
 
-            <ng-container
-              *ngFor="let leaf of module.submodules; trackBy: trackByLeafId"
-            >
-              <div class="grid-cell grid-cell--label" role="rowheader">
-                {{ leaf.name }}
-              </div>
-              <div class="grid-cell grid-cell--level" role="gridcell">
-                <span
-                  class="level-chip"
-                  [attr.data-level]="levelCode(leaf.level)"
+              <div class="grid-children">
+                <div
+                  class="grid-row grid-row--leaf"
+                  role="row"
+                  *ngFor="let leaf of module.submodules; trackBy: trackByLeafId"
                 >
-                  {{ levelLabel(leaf.level) }}
-                </span>
+                  <div class="grid-cell grid-cell--label grid-cell--leaf" role="rowheader">
+                    {{ leaf.name }}
+                  </div>
+                  <div class="grid-cell grid-cell--level" role="gridcell">
+                    <span
+                      class="level-chip"
+                      [attr.data-level]="levelCode(leaf.level)"
+                    >
+                      {{ levelLabel(leaf.level) }}
+                    </span>
+                  </div>
+                </div>
               </div>
-            </ng-container>
+            </div>
           </ng-container>
         </div>
       </div>

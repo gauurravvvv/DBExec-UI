@@ -138,28 +138,27 @@
   gap: var(--space-7);
 }
 
-// Permission grid — relational-RBAC UX.
+// Permission grid — compact tree UX.
 //
-// One column for the permission label + one column per canonical
-// access level. Rows alternate between module headers (full-width,
-// quiet section dividers, no radios) and leaf rows (label + one
-// radio per level).
+// Module name renders as a normal row (no full-width divider);
+// children render with a left-rail indent so the parent/child
+// relationship is visual, not structural. Header column strip
+// stays pinned via position: sticky so the level labels never
+// scroll out of view on long catalogs.
 //
-// Visual tone: lighter than the form fields above so the grid reads
-// as a tabular subsection, not another headline block. The Permissions
-// title sits at --fs-h3 + medium weight (same as PrimeNG card subtitles)
-// rather than --fs-h2 — keeps the page hierarchy: page title > form
-// section titles.
+// Density target: a 17-leaf catalog fits inside ~360px of grid
+// height without horizontal cramping. Modern settings-page feel —
+// Stripe/Vercel.
 .permissions-section {
   width: 100%;
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
   border-top: 1px solid var(--border-color);
 
   .section-title {
     font-size: var(--fs-h3);
     font-weight: var(--fw-medium);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     color: var(--text-color);
     display: block;
     letter-spacing: -0.005em;
@@ -172,96 +171,186 @@
 
   .grid-help {
     color: var(--text-color);
-    opacity: 0.65;
+    opacity: 0.6;
     font-size: var(--fs-label);
-    margin: 0 0 0.75rem 0;
+    margin: 0 0 0.5rem 0;
   }
 
-  // CSS Grid: first column is the permission label, the remaining
-  // columns are radio columns — one per access level. The module
-  // header row spans the full row via grid-column: 1 / -1 so it
-  // looks like a section divider above its leaves.
+  // Outer grid is a flex column of rows; each row internally uses
+  // CSS Grid for the label + level columns. Easier to indent children
+  // (just nest a wrapper div with a left border) than to fight CSS
+  // Grid's row gaps.
   .permission-grid {
     --level-count: 4;
-    display: grid;
-    grid-template-columns: minmax(220px, 2fr) repeat(
-        var(--level-count),
-        minmax(80px, 1fr)
-      );
     width: 100%;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     overflow: hidden;
     background: var(--card-background);
+    font-size: var(--fs-body);
+  }
+
+  .grid-row {
+    display: grid;
+    grid-template-columns: minmax(200px, 2fr) repeat(
+        var(--level-count),
+        minmax(70px, 1fr)
+      );
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    min-height: 32px;
+
+    &:last-child {
+      border-bottom: 0;
+    }
   }
 
   .grid-cell {
-    padding: 0.55rem 0.9rem;
+    padding: 0.3rem 0.75rem;
     display: flex;
     align-items: center;
-    border-bottom: 1px solid var(--border-color);
     color: var(--text-color);
     font-size: var(--fs-body);
-    background: var(--card-background);
+    line-height: 1.3;
   }
 
   .grid-cell--level {
     justify-content: center;
   }
 
-  // Column headers: subtle, no uppercase, no thick border. Reads as
-  // a table caption strip, not a billboard.
-  .grid-header-cell {
-    font-weight: var(--fw-medium);
-    background: var(--hover-background);
-    color: var(--text-color);
-    opacity: 0.75;
-    font-size: var(--fs-label);
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-  }
+  // Spans every level column on leaf rows so the embedded
+  // app-custom-radio can render its own internal grid that lines
+  // up with the column headers above.
+  .grid-cell--levels {
+    grid-column: 2 / -1;
+    padding: 0.15rem 0.75rem;
+    justify-content: stretch;
 
-  // Module section dividers: quieter than before. Smaller font,
-  // medium weight, no double border, lighter background tint.
-  // The icon is the visual anchor; the text shouldn't shout.
-  .grid-module-cell {
-    grid-column: 1 / -1;
-    font-weight: var(--fw-medium);
-    font-size: var(--fs-label);
-    background: var(--hover-background);
-    color: var(--text-color);
-    opacity: 0.85;
-    border-bottom: 1px solid var(--border-color);
-    padding-top: 0.45rem;
-    padding-bottom: 0.45rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+    .level-radio-group {
+      display: block;
+      width: 100%;
 
-    i {
-      margin-right: 0.5rem;
-      color: var(--primary-color);
-      opacity: 0.9;
-      font-size: var(--fs-body);
+      // The wrapper renders <label> + .radio-group. Drop the label
+      // (we don't have one) and the wrapper's vertical gap.
+      ::ng-deep .form-field {
+        gap: 0;
+      }
+      ::ng-deep .normal-label {
+        display: none;
+      }
+      ::ng-deep .error-message {
+        display: none;
+      }
+
+      // The radio-group inside the custom-radio is the actual grid.
+      // Force the same column template as the outer grid header so
+      // each radio dot lands under its column label.
+      ::ng-deep .radio-group {
+        display: grid !important;
+        grid-template-columns: repeat(var(--level-count), minmax(70px, 1fr));
+        gap: 0 !important;
+        padding: 0 !important;
+        width: 100%;
+      }
+
+      ::ng-deep .radio-option {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      // Hide the per-radio text label — column headers above already
+      // identify each level. Keeps the row a single-row visual.
+      ::ng-deep .p-radiobutton-label {
+        display: none !important;
+      }
     }
   }
 
-  // Leaf rows: zebra striping for scanability without bolding text.
-  .grid-cell--label {
-    color: var(--text-color);
-    opacity: 0.9;
+  // Sticky column header. Quiet — opacity, no uppercase, no underline.
+  .grid-row--header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--hover-background);
+    border-bottom: 1px solid var(--border-color);
+
+    .grid-cell {
+      padding-top: 0.4rem;
+      padding-bottom: 0.4rem;
+      font-size: var(--fs-label);
+      font-weight: var(--fw-medium);
+      opacity: 0.7;
+      color: var(--text-color);
+    }
+  }
+
+  // Module parent row: same height as a leaf, just slightly stronger
+  // text + an icon. No background fill; the visual divider is the
+  // icon + the indented children below.
+  .grid-row--module {
+    .grid-cell--module {
+      font-weight: var(--fw-medium);
+      color: var(--text-color);
+
+      i {
+        margin-right: 0.45rem;
+        color: var(--primary-color);
+        font-size: var(--fs-body);
+      }
+    }
+  }
+
+  // Children container: left rail (subtle vertical line) plus
+  // 1.25rem left indent on each leaf row to communicate hierarchy.
+  // The rail is the only visual cue that these belong to the parent
+  // above; no background tint, no extra divider.
+  .grid-children {
+    .grid-row--leaf {
+      .grid-cell--leaf {
+        padding-left: 2.25rem;
+        position: relative;
+        color: var(--text-color);
+        opacity: 0.9;
+
+        // Vertical rail on the left, terminating at the next-to-last
+        // child. Single subtle line — same colour as the row border
+        // so it blends with the table's grain.
+        &::before {
+          content: '';
+          position: absolute;
+          left: 1.15rem;
+          top: 0;
+          bottom: 0;
+          width: 1px;
+          background: var(--border-color);
+        }
+      }
+
+      &:hover {
+        background: var(--hover-background);
+      }
+    }
+  }
+
+  // Last leaf of each module: drop the rail half-way so it doesn't
+  // visually connect to the next module.
+  .grid-children .grid-row--leaf:last-child .grid-cell--leaf::before {
+    bottom: 50%;
   }
 }
 
-// Native radio replacement — circle outline + filled dot on
-// :checked, matching the existing primary-color theme.
+// Native radio replacement — smaller dot than before (16px vs 20px).
+// Modern settings UIs use compact controls; the larger dot read as
+// loud in the previous version.
 .level-radio {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   position: relative;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
 
   input[type='radio'] {
     position: absolute;
@@ -272,10 +361,10 @@
   }
 
   .level-radio-dot {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
-    border: 2px solid var(--border-color);
+    border: 1.5px solid var(--border-color);
     background: var(--card-background);
     transition: all var(--motion-base, 150ms) ease;
     position: relative;
@@ -295,8 +384,8 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background: var(--primary-color);
     }

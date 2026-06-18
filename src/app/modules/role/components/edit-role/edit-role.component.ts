@@ -178,6 +178,7 @@ export class EditRoleComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   }
 
   onLevelChange(permissionId: string, level: number) {
+    if (this.isDefault) return; // Default roles are read-only.
     this.levelByPermissionId = {
       ...this.levelByPermissionId,
       [permissionId]: level,

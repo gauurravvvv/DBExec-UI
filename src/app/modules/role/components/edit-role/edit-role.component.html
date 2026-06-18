@@ -110,48 +110,63 @@
           role="grid"
           [style.--level-count]="accessLevels.length"
         >
-          <div class="grid-cell grid-header-cell grid-cell--label" role="columnheader"></div>
-          <div
-            class="grid-cell grid-header-cell grid-cell--level"
-            role="columnheader"
-            *ngFor="let level of accessLevels; trackBy: trackByLevelValue"
-          >
-            {{ level.label }}
+          <div class="grid-row grid-row--header" role="row">
+            <div class="grid-cell grid-cell--label" role="columnheader"></div>
+            <div
+              class="grid-cell grid-cell--level"
+              role="columnheader"
+              *ngFor="let level of accessLevels; trackBy: trackByLevelValue"
+            >
+              {{ level.label }}
+            </div>
           </div>
 
           <ng-container
             *ngFor="let module of modules; trackBy: trackByModuleId"
           >
-            <div class="grid-cell grid-module-cell" role="rowheader">
-              <i *ngIf="module.icon" class="pi" [ngClass]="module.icon"></i>
-              {{ module.name }}
-            </div>
+            <div class="grid-module">
+              <div class="grid-row grid-row--module" role="row">
+                <div class="grid-cell grid-cell--label grid-cell--module" role="rowheader">
+                  <i *ngIf="module.icon" class="pi" [ngClass]="module.icon"></i>
+                  {{ module.name }}
+                </div>
+                <div
+                  class="grid-cell grid-cell--level"
+                  *ngFor="let level of accessLevels; trackBy: trackByLevelValue"
+                  aria-hidden="true"
+                ></div>
+              </div>
 
-            <ng-container
-              *ngFor="let leaf of module.submodules; trackBy: trackByLeafId"
-            >
-              <div class="grid-cell grid-cell--label" role="rowheader">
-                {{ leaf.name }}
+              <div class="grid-children">
+                <div
+                  class="grid-row grid-row--leaf"
+                  role="row"
+                  *ngFor="let leaf of module.submodules; trackBy: trackByLeafId"
+                >
+                  <div class="grid-cell grid-cell--label grid-cell--leaf" role="rowheader">
+                    {{ leaf.name }}
+                  </div>
+                  <div
+                    class="grid-cell grid-cell--levels"
+                    role="gridcell"
+                    [style.--level-count]="accessLevels.length"
+                  >
+                    <app-custom-radio
+                      class="level-radio-group"
+                      [class.is-readonly]="isDefault"
+                      [options]="accessLevels"
+                      [columns]="accessLevels.length"
+                      optionLabel="hidden"
+                      optionValue="value"
+                      gap="small"
+                      [ngModel]="levelByPermissionId[leaf.id]"
+                      [ngModelOptions]="{ standalone: true }"
+                      (ngModelChange)="onLevelChange(leaf.id, $event ?? 0)"
+                    ></app-custom-radio>
+                  </div>
+                </div>
               </div>
-              <div
-                class="grid-cell grid-cell--level"
-                role="gridcell"
-                *ngFor="let level of accessLevels; trackBy: trackByLevelValue"
-              >
-                <label class="level-radio">
-                  <input
-                    type="radio"
-                    [name]="'level-' + leaf.id"
-                    [value]="level.value"
-                    [checked]="isLevelSelected(leaf.id, level.value)"
-                    [disabled]="isDefault"
-                    (change)="onLevelChange(leaf.id, level.value)"
-                  />
-                  <span class="level-radio-dot" aria-hidden="true"></span>
-                  <span class="visually-hidden">{{ level.label }}</span>
-                </label>
-              </div>
-            </ng-container>
+            </div>
           </ng-container>
         </div>
       </div>

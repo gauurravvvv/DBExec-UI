@@ -151,14 +151,14 @@
 // add-role.component.scss for the design notes).
 .permissions-section {
   width: 100%;
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
   border-top: 1px solid var(--border-color);
 
   .section-title {
     font-size: var(--fs-h3);
     font-weight: var(--fw-medium);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     color: var(--text-color);
     display: block;
     letter-spacing: -0.005em;
@@ -171,131 +171,140 @@
 
   .grid-help {
     color: var(--text-color);
-    opacity: 0.65;
+    opacity: 0.6;
     font-size: var(--fs-label);
-    margin: 0 0 0.75rem 0;
+    margin: 0 0 0.5rem 0;
   }
 
   .permission-grid {
     --level-count: 4;
-    display: grid;
-    grid-template-columns: minmax(220px, 2fr) repeat(
-        var(--level-count),
-        minmax(80px, 1fr)
-      );
     width: 100%;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     overflow: hidden;
     background: var(--card-background);
+    font-size: var(--fs-body);
+  }
+
+  .grid-row {
+    display: grid;
+    grid-template-columns: minmax(200px, 2fr) repeat(
+        var(--level-count),
+        minmax(70px, 1fr)
+      );
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    min-height: 32px;
+
+    &:last-child {
+      border-bottom: 0;
+    }
   }
 
   .grid-cell {
-    padding: 0.55rem 0.9rem;
+    padding: 0.3rem 0.75rem;
     display: flex;
     align-items: center;
-    border-bottom: 1px solid var(--border-color);
     color: var(--text-color);
     font-size: var(--fs-body);
-    background: var(--card-background);
+    line-height: 1.3;
   }
 
   .grid-cell--level {
     justify-content: center;
   }
 
-  .grid-header-cell {
-    font-weight: var(--fw-medium);
-    background: var(--hover-background);
-    color: var(--text-color);
-    opacity: 0.75;
-    font-size: var(--fs-label);
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
+  .grid-cell--levels {
+    grid-column: 2 / -1;
+    padding: 0.15rem 0.75rem;
+    justify-content: stretch;
+
+    .level-radio-group {
+      display: block;
+      width: 100%;
+
+      ::ng-deep .form-field {
+        gap: 0;
+      }
+      ::ng-deep .normal-label,
+      ::ng-deep .error-message {
+        display: none;
+      }
+      ::ng-deep .radio-group {
+        display: grid !important;
+        grid-template-columns: repeat(var(--level-count), minmax(70px, 1fr));
+        gap: 0 !important;
+        padding: 0 !important;
+        width: 100%;
+      }
+      ::ng-deep .radio-option {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      ::ng-deep .p-radiobutton-label {
+        display: none !important;
+      }
+
+      &.is-readonly {
+        opacity: 0.55;
+        pointer-events: none;
+      }
+    }
   }
 
-  .grid-module-cell {
-    grid-column: 1 / -1;
-    font-weight: var(--fw-medium);
-    font-size: var(--fs-label);
+  .grid-row--header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
     background: var(--hover-background);
-    color: var(--text-color);
-    opacity: 0.85;
     border-bottom: 1px solid var(--border-color);
-    padding-top: 0.45rem;
-    padding-bottom: 0.45rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+
+    .grid-cell {
+      padding-top: 0.4rem;
+      padding-bottom: 0.4rem;
+      font-size: var(--fs-label);
+      font-weight: var(--fw-medium);
+      opacity: 0.7;
+    }
+  }
+
+  .grid-row--module .grid-cell--module {
+    font-weight: var(--fw-medium);
 
     i {
-      margin-right: 0.5rem;
+      margin-right: 0.45rem;
       color: var(--primary-color);
-      opacity: 0.9;
       font-size: var(--fs-body);
     }
   }
 
-  .grid-cell--label {
-    color: var(--text-color);
-    opacity: 0.9;
-  }
-}
+  .grid-children {
+    .grid-row--leaf {
+      .grid-cell--leaf {
+        padding-left: 2.25rem;
+        position: relative;
+        opacity: 0.9;
 
-.level-radio {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  position: relative;
-  width: 20px;
-  height: 20px;
+        &::before {
+          content: '';
+          position: absolute;
+          left: 1.15rem;
+          top: 0;
+          bottom: 0;
+          width: 1px;
+          background: var(--border-color);
+        }
+      }
 
-  input[type='radio'] {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-    pointer-events: none;
-  }
-
-  .level-radio-dot {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 2px solid var(--border-color);
-    background: var(--card-background);
-    transition: all var(--motion-base, 150ms) ease;
-    position: relative;
-    display: inline-block;
-  }
-
-  &:hover .level-radio-dot {
-    border-color: var(--primary-color);
-  }
-
-  input[type='radio']:checked + .level-radio-dot {
-    border-color: var(--primary-color);
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--primary-color);
+      &:hover {
+        background: var(--hover-background);
+      }
     }
   }
 
-  input[type='radio']:focus-visible + .level-radio-dot {
-    box-shadow: 0 0 0 2px var(--primary-color-transparent);
-  }
-
-  input[type='radio']:disabled + .level-radio-dot {
-    opacity: 0.5;
-    cursor: not-allowed;
+  .grid-children .grid-row--leaf:last-child .grid-cell--leaf::before {
+    bottom: 50%;
   }
 }
 
