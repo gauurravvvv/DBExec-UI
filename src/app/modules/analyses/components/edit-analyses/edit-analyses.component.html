@@ -118,6 +118,7 @@
       </button>
 
       <button
+        *hasPermission="'analyses'; level: 'write'"
         type="button"
         class="a-btn a-btn--primary"
         (click)="saveAnalysis()"

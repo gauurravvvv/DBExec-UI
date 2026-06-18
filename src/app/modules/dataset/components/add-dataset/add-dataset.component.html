@@ -65,6 +65,7 @@
     </div>
     <div class="toolbar-right">
       <button
+        *hasPermission="'datasetManager'; level: 'write'"
         pButton
         class="p-button-text btn-dataset"
         (click)="saveAsDataset()"

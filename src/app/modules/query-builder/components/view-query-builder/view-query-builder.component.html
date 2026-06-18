@@ -52,15 +52,30 @@
             </div>
           </div>
         </div>
-        <button class="btn-primary" type="button" (click)="onEdit()">
+        <button
+          *hasPermission="'queryBuilderScreen'; level: 'write'"
+          class="btn-primary"
+          type="button"
+          (click)="onEdit()"
+        >
           <i class="pi pi-pencil"></i>
           {{ 'COMMON.EDIT' | translate }}
         </button>
-        <button class="btn-configure" type="button" (click)="onConfigure()">
+        <button
+          *hasPermission="'queryBuilderScreen'; level: 'write'"
+          class="btn-configure"
+          type="button"
+          (click)="onConfigure()"
+        >
           <i class="pi pi-cog"></i>
           {{ 'QUERY_BUILDER_MODULE.CONFIGURE' | translate }}
         </button>
-        <button class="btn-danger" type="button" (click)="confirmDelete()">
+        <button
+          *hasPermission="'queryBuilderScreen'; level: 'delete'"
+          class="btn-danger"
+          type="button"
+          (click)="confirmDelete()"
+        >
           <i class="pi pi-trash"></i>
           {{ 'COMMON.DELETE' | translate }}
         </button>

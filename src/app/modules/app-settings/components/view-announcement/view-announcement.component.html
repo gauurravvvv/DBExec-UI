@@ -23,11 +23,16 @@
         </span>
       </div>
       <div class="header-actions">
-        <button class="btn-primary" (click)="onEdit()">
+        <button
+          *hasPermission="'announcementManagement'; level: 'write'"
+          class="btn-primary"
+          (click)="onEdit()"
+        >
           <i class="pi pi-pencil"></i>
           {{ 'COMMON.EDIT' | translate }}
         </button>
         <button
+          *hasPermission="'announcementManagement'; level: 'delete'"
           class="btn-danger"
           type="button"
           (click)="confirmDelete()"

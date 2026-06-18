@@ -8,6 +8,7 @@
 
       <div class="header-actions">
         <!-- Bulk Delete Button -->
+        <ng-container *hasPermission="'systemAdmin'; level: 'delete'">
         <button
           *ngIf="selectedCount > 0"
           pButton
@@ -17,6 +18,7 @@
           (click)="confirmBulkDelete()"
           class="p-button-raised p-button-danger modern-button"
         ></button>
+        </ng-container>
 
         <!-- Clear Filters Button -->
         <button
@@ -30,6 +32,7 @@
 
         <!-- Add Button -->
         <button
+          *hasPermission="'systemAdmin'; level: 'write'"
           pButton
           [label]="'COMMON.ADD' | translate"
           icon="pi pi-plus"
@@ -500,6 +503,7 @@
                        self). Self changes go through /profile;
                        default admin is immutable. -->
                   <button
+                    *hasPermission="'systemAdmin'; level: 'write'"
                     class="icon-btn edit-btn"
                     (click)="onEdit(admin.id)"
                     [disabled]="!admin.canEdit"
@@ -515,6 +519,7 @@
                     <i class="pi pi-pencil"></i>
                   </button>
                   <button
+                    *hasPermission="'systemAdmin'; level: 'delete'"
                     class="icon-btn delete-btn"
                     (click)="confirmDelete(admin.id)"
                     [disabled]="!admin.canDelete || isDeleting(admin.id)"

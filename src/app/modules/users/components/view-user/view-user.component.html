@@ -17,6 +17,7 @@
              reloads get the right state. Tooltip distinguishes the
              default-user lock from the self-action lock. -->
         <button
+          *hasPermission="'userManagement'; level: 'write'"
           class="btn-primary"
           type="button"
           [disabled]="!userData?.canEdit"
@@ -33,6 +34,7 @@
           <i class="pi pi-pencil"></i> {{ 'COMMON.EDIT' | translate }}
         </button>
         <button
+          *hasPermission="'userManagement'; level: 'delete'"
           class="btn-danger"
           type="button"
           [disabled]="!userData?.canDelete || isDeleting(userId)"
@@ -158,24 +160,26 @@
                         : ('COMMON.INACTIVE' | translate)
                   }}
                 </span>
-                <button
-                  *ngIf="userData?.isLocked"
-                  class="btn-unlock-inline"
-                  (click)="onUnlock()"
-                  [pTooltip]="'COMMON.UNLOCK_ACCOUNT' | translate"
-                  tooltipPosition="bottom"
-                  [disabled]="isUnlocking(userId)"
-                >
-                  <i
-                    class="pi"
-                    [ngClass]="
-                      isUnlocking(userId)
-                        ? 'pi-spin pi-spinner'
-                        : 'pi-lock-open'
-                    "
-                  ></i>
-                  {{ 'COMMON.UNLOCK' | translate }}
-                </button>
+                <ng-container *hasPermission="'userManagement'; level: 'write'">
+                  <button
+                    *ngIf="userData?.isLocked"
+                    class="btn-unlock-inline"
+                    (click)="onUnlock()"
+                    [pTooltip]="'COMMON.UNLOCK_ACCOUNT' | translate"
+                    tooltipPosition="bottom"
+                    [disabled]="isUnlocking(userId)"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="
+                        isUnlocking(userId)
+                          ? 'pi-spin pi-spinner'
+                          : 'pi-lock-open'
+                      "
+                    ></i>
+                    {{ 'COMMON.UNLOCK' | translate }}
+                  </button>
+                </ng-container>
               </span>
             </div>
             <div class="detail-item">

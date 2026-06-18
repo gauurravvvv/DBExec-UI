@@ -57,6 +57,7 @@
             [class.pi-trash]="!hasExistingConfiguration()"
           ></i>
         </button>
+        <ng-container *hasPermission="'queryBuilderScreen'; level: 'write'">
         <button
           pButton
           class="p-button-outlined"
@@ -67,6 +68,7 @@
         >
           <i class="pi pi-save mr-2"></i>
         </button>
+        </ng-container>
       </div>
     </div>
     <div class="screen-wrapper">

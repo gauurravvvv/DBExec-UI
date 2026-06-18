@@ -13,11 +13,20 @@
         <h2>{{ 'SECTION_MODULE.VIEW_TITLE' | translate }}</h2>
       </div>
       <div class="header-actions">
-        <button class="btn-primary" (click)="onEdit()">
+        <button
+          *hasPermission="'queryBuilderSection'; level: 'write'"
+          class="btn-primary"
+          (click)="onEdit()"
+        >
           <i class="pi pi-pencil"></i>
           {{ 'COMMON.EDIT' | translate }}
         </button>
-        <button class="btn-danger" type="button" (click)="confirmDelete()">
+        <button
+          *hasPermission="'queryBuilderSection'; level: 'delete'"
+          class="btn-danger"
+          type="button"
+          (click)="confirmDelete()"
+        >
           <i class="pi pi-trash"></i>
           {{ 'COMMON.DELETE' | translate }}
         </button>

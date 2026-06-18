@@ -28,6 +28,7 @@
           (click)="onCancel()"
         ></button>
         <button
+          *hasPermission="'queryBuilderSection'; level: 'write'"
           pButton
           class="p-button-primary btn-save"
           type="submit"

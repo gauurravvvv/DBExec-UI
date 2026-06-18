@@ -19,6 +19,7 @@
 
         <!-- Add Button -->
         <button
+          *hasPermission="'rlsRules'; level: 'write'"
           pButton
           [label]="'RLS.ADD_RULE' | translate"
           icon="pi pi-plus"
@@ -209,6 +210,7 @@
                     <i class="pi pi-eye"></i>
                   </button>
                   <button
+                    *hasPermission="'rlsRules'; level: 'write'"
                     class="icon-btn edit-btn"
                     (click)="onEdit(rule)"
                     [pTooltip]="'COMMON.EDIT' | translate"
@@ -217,6 +219,7 @@
                     <i class="pi pi-pencil"></i>
                   </button>
                   <button
+                    *hasPermission="'rlsRules'; level: 'write'"
                     class="icon-btn assign-btn"
                     (click)="onManageAssignments(rule)"
                     [pTooltip]="'RLS.MANAGE_ASSIGNMENTS' | translate"
@@ -225,6 +228,7 @@
                     <i class="pi pi-users"></i>
                   </button>
                   <button
+                    *hasPermission="'rlsRules'; level: 'delete'"
                     class="icon-btn delete-btn"
                     (click)="confirmDelete(rule.id)"
                     [pTooltip]="'COMMON.DELETE' | translate"

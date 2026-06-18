@@ -8,6 +8,7 @@
 
       <div class="header-actions">
         <!-- Bulk Delete Button -->
+        <ng-container *hasPermission="'datasetManager'; level: 'delete'">
         <button
           *ngIf="selectedCount > 0"
           pButton
@@ -17,6 +18,7 @@
           (click)="confirmBulkDelete()"
           class="p-button-raised p-button-danger modern-button"
         ></button>
+        </ng-container>
 
         <!-- Clear Filters Button -->
         <button
@@ -30,6 +32,7 @@
 
         <!-- Add Button -->
         <p-splitButton
+          *hasPermission="'datasetManager'; level: 'write'"
           [label]="'COMMON.ADD' | translate"
           icon="pi pi-plus"
           (onClick)="onAddNewAdmin()"
@@ -302,6 +305,7 @@
               <td>
                 <div class="row-actions">
                   <button
+                    *hasPermission="'datasetManager'; level: 'write'"
                     class="icon-btn edit-btn"
                     (click)="onEdit(dataset.id)"
                     [pTooltip]="'COMMON.EDIT' | translate"
@@ -310,6 +314,7 @@
                     <i class="pi pi-pencil"></i>
                   </button>
                   <button
+                    *hasPermission="'datasetManager'; level: 'delete'"
                     class="icon-btn delete-btn"
                     (click)="confirmDelete(dataset.id)"
                     [pTooltip]="'COMMON.DELETE' | translate"

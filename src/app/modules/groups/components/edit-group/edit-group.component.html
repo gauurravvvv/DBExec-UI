@@ -25,6 +25,7 @@
           (click)="onCancel()"
         ></button>
         <button
+          *hasPermission="'groupManagement'; level: 'write'"
           pButton
           class="p-button-primary btn-save"
           type="submit"

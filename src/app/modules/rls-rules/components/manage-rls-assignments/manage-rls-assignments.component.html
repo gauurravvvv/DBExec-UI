@@ -50,6 +50,7 @@
         ></app-custom-dropdown>
 
         <button
+          *hasPermission="'rlsRules'; level: 'write'"
           class="btn-add-assignment"
           (click)="addAssignment()"
           [disabled]="!newScope || !newScopeId || saving()"
@@ -101,6 +102,7 @@
             <span class="assignment-type">{{ a.scope }}</span>
           </div>
           <button
+            *hasPermission="'rlsRules'; level: 'delete'"
             class="btn-remove"
             (click)="removeAssignment(a)"
             [pTooltip]="'RLS.REMOVE_ASSIGNMENT' | translate"

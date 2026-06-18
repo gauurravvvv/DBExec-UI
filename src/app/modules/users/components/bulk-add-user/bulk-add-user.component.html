@@ -23,6 +23,7 @@
             (click)="onCancel()"
           ></button>
           <button
+            *hasPermission="'userManagement'; level: 'write'"
             pButton
             class="p-button-primary btn-save"
             type="button"
@@ -43,6 +44,7 @@
             (click)="onResetForAnother()"
           ></button>
           <button
+            *hasPermission="'userManagement'; level: 'write'"
             pButton
             class="p-button-primary btn-save"
             type="button"

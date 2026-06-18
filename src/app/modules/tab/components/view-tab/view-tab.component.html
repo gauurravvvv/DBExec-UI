@@ -13,11 +13,20 @@
         <h2>{{ 'TAB.VIEW_TITLE' | translate }}</h2>
       </div>
       <div class="header-actions">
-        <button class="btn-primary" (click)="onEdit()">
+        <button
+          *hasPermission="'queryBuilderTab'; level: 'write'"
+          class="btn-primary"
+          (click)="onEdit()"
+        >
           <i class="pi pi-pencil"></i>
           {{ 'COMMON.EDIT' | translate }}
         </button>
-        <button class="btn-danger" type="button" (click)="confirmDelete()">
+        <button
+          *hasPermission="'queryBuilderTab'; level: 'delete'"
+          class="btn-danger"
+          type="button"
+          (click)="confirmDelete()"
+        >
           <i class="pi pi-trash"></i>
           {{ 'COMMON.DELETE' | translate }}
         </button>

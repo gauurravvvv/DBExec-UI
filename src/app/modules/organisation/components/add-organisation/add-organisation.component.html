@@ -42,6 +42,7 @@
           class="p-button-primary btn-save"
           [disabled]="!isStep1Valid()"
         ></button>
+        <ng-container *hasPermission="'orgManagement'; level: 'write'">
         <button
           *ngIf="currentStep === 1"
           pButton
@@ -53,6 +54,7 @@
           (click)="onSubmit()"
           [disabled]="!isFormValid() || saving()"
         ></button>
+        </ng-container>
       </div>
     </div>
 

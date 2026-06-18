@@ -17,6 +17,7 @@
         ></button>
 
         <button
+          *hasPermission="'announcementManagement'; level: 'write'"
           pButton
           [label]="'COMMON.ADD' | translate"
           icon="pi pi-plus"
@@ -227,6 +228,7 @@
                     <i class="pi pi-eye"></i>
                   </button>
                   <button
+                    *hasPermission="'announcementManagement'; level: 'write'"
                     class="icon-btn edit-btn"
                     (click)="onEdit(a.id)"
                     [pTooltip]="'COMMON.EDIT' | translate"
@@ -235,6 +237,7 @@
                     <i class="pi pi-pencil"></i>
                   </button>
                   <button
+                    *hasPermission="'announcementManagement'; level: 'delete'"
                     class="icon-btn delete-btn"
                     (click)="confirmDelete(a.id)"
                     [pTooltip]="'COMMON.DELETE' | translate"

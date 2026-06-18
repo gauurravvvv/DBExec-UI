@@ -20,11 +20,17 @@
           ></i>
           {{ 'COMMON.REFRESH' | translate }}
         </button>
-        <button class="btn-primary" type="button" (click)="onEdit()">
+        <button
+          *hasPermission="'setupDB'; level: 'write'"
+          class="btn-primary"
+          type="button"
+          (click)="onEdit()"
+        >
           <i class="pi pi-pencil"></i>
           {{ 'COMMON.EDIT' | translate }}
         </button>
         <button
+          *hasPermission="'setupDB'; level: 'delete'"
           class="btn-danger"
           type="button"
           [disabled]="isDeleting(dbId)"

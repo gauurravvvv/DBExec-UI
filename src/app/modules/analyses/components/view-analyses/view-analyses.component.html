@@ -13,11 +13,16 @@
         <h2>{{ 'ANALYSES.ANALYSIS_DETAILS' | translate }}</h2>
       </div>
       <div class="header-actions" *ngIf="analysisDetails">
-        <button class="btn-primary" (click)="onEdit()">
+        <button
+          *hasPermission="'analyses'; level: 'write'"
+          class="btn-primary"
+          (click)="onEdit()"
+        >
           <i class="pi pi-pencil"></i>
           {{ 'COMMON.EDIT' | translate }}
         </button>
         <button
+          *hasPermission="'analyses'; level: 'delete'"
           class="btn-danger"
           type="button"
           [disabled]="isDeleting(analysisDetails.id)"
@@ -171,7 +176,11 @@
               {{ 'ANALYSES.ANALYSIS_FIELDS' | translate }}
               <span class="count-badge">{{ analysisFields.length || 0 }}</span>
             </h3>
-            <button class="btn-add-field" (click)="openAddCustomFieldDialog()">
+            <button
+              *hasPermission="'analyses'; level: 'write'"
+              class="btn-add-field"
+              (click)="openAddCustomFieldDialog()"
+            >
               <i class="pi pi-plus"></i>
               {{ 'ANALYSES.ADD_CUSTOM_FIELD' | translate }}
             </button>

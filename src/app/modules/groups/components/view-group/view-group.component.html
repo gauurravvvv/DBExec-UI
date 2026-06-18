@@ -12,7 +12,11 @@
         }}</span>
       </div>
       <div class="header-actions" *ngIf="groupData">
-        <button class="btn-primary" (click)="onEdit()">
+        <button
+          *hasPermission="'groupManagement'; level: 'write'"
+          class="btn-primary"
+          (click)="onEdit()"
+        >
           <i class="pi pi-pencil"></i>
           {{
             groupData?.isDefault === 1
@@ -20,21 +24,23 @@
               : ('COMMON.EDIT' | translate)
           }}
         </button>
-        <button
-          *ngIf="groupData?.isDefault !== 1"
-          class="btn-danger"
-          type="button"
-          [disabled]="isDeleting(groupData.id)"
-          (click)="confirmDelete()"
-        >
-          <i
-            class="pi"
-            [ngClass]="
-              isDeleting(groupData.id) ? 'pi-spin pi-spinner' : 'pi-trash'
-            "
-          ></i>
-          {{ 'COMMON.DELETE' | translate }}
-        </button>
+        <ng-container *hasPermission="'groupManagement'; level: 'delete'">
+          <button
+            *ngIf="groupData?.isDefault !== 1"
+            class="btn-danger"
+            type="button"
+            [disabled]="isDeleting(groupData.id)"
+            (click)="confirmDelete()"
+          >
+            <i
+              class="pi"
+              [ngClass]="
+                isDeleting(groupData.id) ? 'pi-spin pi-spinner' : 'pi-trash'
+              "
+            ></i>
+            {{ 'COMMON.DELETE' | translate }}
+          </button>
+        </ng-container>
       </div>
     </div>
 

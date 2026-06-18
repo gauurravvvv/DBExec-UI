@@ -13,11 +13,16 @@
         <h2>{{ 'CONNECTION.VIEW_TITLE' | translate }}</h2>
       </div>
       <div class="header-actions" *ngIf="connectionData">
-        <button class="btn-primary" (click)="onEdit()">
+        <button
+          *hasPermission="'dbConnections'; level: 'write'"
+          class="btn-primary"
+          (click)="onEdit()"
+        >
           <i class="pi pi-pencil"></i>
           {{ 'COMMON.EDIT' | translate }}
         </button>
         <button
+          *hasPermission="'dbConnections'; level: 'delete'"
           class="btn-danger"
           type="button"
           [disabled]="isDeleting(connectionData.id)"

@@ -18,6 +18,7 @@
           (click)="onCancel()"
         ></button>
         <button
+          *hasPermission="'setupDB'; level: 'write'"
           pButton
           class="p-button-primary btn-save"
           type="submit"

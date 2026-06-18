@@ -9,11 +9,16 @@
         <h2>{{ 'DATASET.DATASET_DETAILS' | translate }}</h2>
       </div>
       <div class="header-actions" *ngIf="datasetData">
-        <button class="btn-primary" (click)="onEdit()">
+        <button
+          *hasPermission="'datasetManager'; level: 'write'"
+          class="btn-primary"
+          (click)="onEdit()"
+        >
           <i class="pi pi-pencil"></i>
           {{ 'COMMON.EDIT' | translate }}
         </button>
         <button
+          *hasPermission="'datasetManager'; level: 'delete'"
           class="btn-danger"
           type="button"
           [disabled]="isDeleting(datasetData.id)"
@@ -209,7 +214,11 @@
                 datasetData.datasetFields?.length || 0
                 }}</span>
             </h3>
-            <button class="btn-add-field" (click)="openAddCustomFieldDialog()">
+            <button
+              *hasPermission="'datasetManager'; level: 'write'"
+              class="btn-add-field"
+              (click)="openAddCustomFieldDialog()"
+            >
               <i class="pi pi-plus"></i>
               {{ 'DATASET.ADD_CUSTOM_FIELD' | translate }}
             </button>
@@ -240,13 +249,25 @@
                       }}</span>
                   </span>
                   <div class="field-actions">
-                    <button pButton class="p-button-text p-button-sm btn-edit" (click)="openEditFieldDialog(entity, i)"
-                      [pTooltip]="'DATASET.EDIT_FIELD' | translate" tooltipPosition="top">
+                    <button
+                      *hasPermission="'datasetManager'; level: 'write'"
+                      pButton
+                      class="p-button-text p-button-sm btn-edit"
+                      (click)="openEditFieldDialog(entity, i)"
+                      [pTooltip]="'DATASET.EDIT_FIELD' | translate"
+                      tooltipPosition="top"
+                    >
                       <i class="pi pi-pencil"></i>
                     </button>
-                    <button pButton class="p-button-text p-button-sm p-button-danger btn-delete"
-                      (click)="confirmDeleteField(entity, i)" [pTooltip]="'DATASET.DELETE_FIELD' | translate"
-                      tooltipPosition="top" [disabled]="entity.type !== 2">
+                    <button
+                      *hasPermission="'datasetManager'; level: 'delete'"
+                      pButton
+                      class="p-button-text p-button-sm p-button-danger btn-delete"
+                      (click)="confirmDeleteField(entity, i)"
+                      [pTooltip]="'DATASET.DELETE_FIELD' | translate"
+                      tooltipPosition="top"
+                      [disabled]="entity.type !== 2"
+                    >
                       <i class="pi pi-trash"></i>
                     </button>
                   </div>

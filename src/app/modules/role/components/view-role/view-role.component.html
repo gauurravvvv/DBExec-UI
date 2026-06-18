@@ -10,7 +10,12 @@
         <h2>{{ 'ROLE.VIEW_TITLE' | translate }}</h2>
       </div>
       <div class="header-actions" *ngIf="roleData && roleData?.isDefault !== 1">
-        <button class="btn-primary" type="button" (click)="onEdit()">
+        <button
+          *hasPermission="'roleManagement'; level: 'write'"
+          class="btn-primary"
+          type="button"
+          (click)="onEdit()"
+        >
           <i class="pi pi-pencil"></i> {{ 'COMMON.EDIT' | translate }}
         </button>
       </div>

@@ -8,6 +8,7 @@
 
       <div class="header-actions">
         <!-- Bulk Delete Button -->
+        <ng-container *hasPermission="'dashboard'; level: 'delete'">
         <button
           *ngIf="selectedCount > 0"
           pButton
@@ -17,6 +18,7 @@
           (click)="confirmBulkDelete()"
           class="p-button-raised p-button-danger modern-button"
         ></button>
+        </ng-container>
 
         <!-- Clear Filters Button -->
         <button
@@ -316,6 +318,7 @@
               <td>
                 <div class="row-actions">
                   <button
+                    *hasPermission="'dashboard'; level: 'delete'"
                     class="icon-btn delete-btn"
                     (click)="confirmDelete(dashboard.id)"
                     [pTooltip]="'COMMON.DELETE' | translate"
