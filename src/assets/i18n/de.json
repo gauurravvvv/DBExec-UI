@@ -2685,63 +2685,63 @@
   "validation": {
     "organisation": {
       "name": {
-        "required": "Organisation name is required",
-        "tooShort": "Organisation name must be at least 2 characters",
-        "tooLong": "Organisation name must not exceed 64 characters",
-        "invalid": "Organisation name must start with a letter or digit and contain only letters, digits, spaces, dots, underscores, or hyphens"
+        "required": "Organisationsname ist erforderlich",
+        "tooShort": "Organisationsname muss mindestens 2 Zeichen lang sein",
+        "tooLong": "Organisationsname darf 64 Zeichen nicht überschreiten",
+        "invalid": "Organisationsname muss mit einem Buchstaben oder einer Ziffer beginnen und darf nur Buchstaben, Ziffern, Leerzeichen, Punkte, Unterstriche oder Bindestriche enthalten"
       },
       "description": {
-        "required": "Description is required",
-        "tooShort": "Description must be at least 2 characters",
-        "tooLong": "Description must not exceed 500 characters"
+        "required": "Beschreibung ist erforderlich",
+        "tooShort": "Beschreibung muss mindestens 2 Zeichen lang sein",
+        "tooLong": "Beschreibung darf 500 Zeichen nicht überschreiten"
       },
       "dbHost": {
-        "required": "Database host is required",
-        "tooLong": "Database host must not exceed 255 characters",
-        "invalid": "Database host must be a valid hostname or IPv4 address"
+        "required": "Datenbank-Host ist erforderlich",
+        "tooLong": "Datenbank-Host darf 255 Zeichen nicht überschreiten",
+        "invalid": "Datenbank-Host muss ein gültiger Hostname oder eine IPv4-Adresse sein"
       },
       "dbPort": {
-        "required": "Database port is required",
-        "notInteger": "Database port must be a whole number",
-        "outOfRange": "Database port must be between 1 and 65535"
+        "required": "Datenbank-Port ist erforderlich",
+        "notInteger": "Datenbank-Port muss eine ganze Zahl sein",
+        "outOfRange": "Datenbank-Port muss zwischen 1 und 65535 liegen"
       },
       "dbName": {
-        "required": "Database name is required",
-        "tooLong": "Database name must not exceed 63 characters",
-        "invalid": "Database name must start with a letter or underscore and contain only letters, digits, underscores, or hyphens"
+        "required": "Datenbankname ist erforderlich",
+        "tooLong": "Datenbankname darf 63 Zeichen nicht überschreiten",
+        "invalid": "Datenbankname muss mit einem Buchstaben oder Unterstrich beginnen und darf nur Buchstaben, Ziffern, Unterstriche oder Bindestriche enthalten"
       },
       "dbSchema": {
-        "required": "Schema name is required",
-        "tooLong": "Schema name must not exceed 63 characters",
-        "invalid": "Schema name must start with a lowercase letter or underscore and contain only lowercase letters, digits, or underscores"
+        "required": "Schemaname ist erforderlich",
+        "tooLong": "Schemaname darf 63 Zeichen nicht überschreiten",
+        "invalid": "Schemaname muss mit einem kleinen Buchstaben oder Unterstrich beginnen und darf nur kleine Buchstaben, Ziffern oder Unterstriche enthalten"
       },
       "dbUsername": {
-        "required": "Database username is required",
-        "tooLong": "Database username must not exceed 128 characters",
-        "invalid": "Database username must start with a letter or underscore and contain only letters, digits, underscores, or hyphens"
+        "required": "Datenbank-Benutzername ist erforderlich",
+        "tooLong": "Datenbank-Benutzername darf 128 Zeichen nicht überschreiten",
+        "invalid": "Datenbank-Benutzername muss mit einem Buchstaben oder Unterstrich beginnen und darf nur Buchstaben, Ziffern, Unterstriche oder Bindestriche enthalten"
       },
       "dbPassword": {
-        "required": "Database password is required",
-        "tooLong": "Database password must not exceed 256 characters"
+        "required": "Datenbank-Passwort ist erforderlich",
+        "tooLong": "Datenbank-Passwort darf 256 Zeichen nicht überschreiten"
       },
       "adminEmail": {
-        "required": "Administrator email is required",
-        "tooLong": "Administrator email must not exceed 320 characters",
-        "invalid": "Please enter a valid administrator email address"
+        "required": "E-Mail-Adresse des Administrators ist erforderlich",
+        "tooLong": "E-Mail-Adresse des Administrators darf 320 Zeichen nicht überschreiten",
+        "invalid": "Bitte geben Sie eine gültige E-Mail-Adresse des Administrators ein"
       },
       "adminLocale": {
-        "invalid": "Selected locale is not supported"
+        "invalid": "Ausgewählte Sprache wird nicht unterstützt"
       },
       "dbCredentials": {
-        "partial": "When updating the database password, host, port, database name, and username must all be provided so the new credentials can be verified"
+        "partial": "Beim Aktualisieren des Datenbank-Passworts müssen Host, Port, Datenbankname und Benutzername angegeben werden, damit die neuen Zugangsdaten überprüft werden können"
       }
     },
     "common": {
       "id": {
-        "invalid": "Invalid identifier"
+        "invalid": "Ungültige Kennung"
       },
       "status": {
-        "invalid": "Status must be 0 or 1"
+        "invalid": "Status muss 0 oder 1 sein"
       }
     }
   }

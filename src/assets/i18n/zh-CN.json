@@ -2685,63 +2685,63 @@
   "validation": {
     "organisation": {
       "name": {
-        "required": "Organisation name is required",
-        "tooShort": "Organisation name must be at least 2 characters",
-        "tooLong": "Organisation name must not exceed 64 characters",
-        "invalid": "Organisation name must start with a letter or digit and contain only letters, digits, spaces, dots, underscores, or hyphens"
+        "required": "组织名称为必填项",
+        "tooShort": "组织名称至少需要 2 个字符",
+        "tooLong": "组织名称不能超过 64 个字符",
+        "invalid": "组织名称必须以字母或数字开头，且只能包含字母、数字、空格、点、下划线或连字符"
       },
       "description": {
-        "required": "Description is required",
-        "tooShort": "Description must be at least 2 characters",
-        "tooLong": "Description must not exceed 500 characters"
+        "required": "描述为必填项",
+        "tooShort": "描述至少需要 2 个字符",
+        "tooLong": "描述不能超过 500 个字符"
       },
       "dbHost": {
-        "required": "Database host is required",
-        "tooLong": "Database host must not exceed 255 characters",
-        "invalid": "Database host must be a valid hostname or IPv4 address"
+        "required": "数据库主机为必填项",
+        "tooLong": "数据库主机不能超过 255 个字符",
+        "invalid": "数据库主机必须是有效的主机名或 IPv4 地址"
       },
       "dbPort": {
-        "required": "Database port is required",
-        "notInteger": "Database port must be a whole number",
-        "outOfRange": "Database port must be between 1 and 65535"
+        "required": "数据库端口为必填项",
+        "notInteger": "数据库端口必须为整数",
+        "outOfRange": "数据库端口必须介于 1 到 65535 之间"
       },
       "dbName": {
-        "required": "Database name is required",
-        "tooLong": "Database name must not exceed 63 characters",
-        "invalid": "Database name must start with a letter or underscore and contain only letters, digits, underscores, or hyphens"
+        "required": "数据库名称为必填项",
+        "tooLong": "数据库名称不能超过 63 个字符",
+        "invalid": "数据库名称必须以字母或下划线开头，且只能包含字母、数字、下划线或连字符"
       },
       "dbSchema": {
-        "required": "Schema name is required",
-        "tooLong": "Schema name must not exceed 63 characters",
-        "invalid": "Schema name must start with a lowercase letter or underscore and contain only lowercase letters, digits, or underscores"
+        "required": "架构名称为必填项",
+        "tooLong": "架构名称不能超过 63 个字符",
+        "invalid": "架构名称必须以小写字母或下划线开头，且只能包含小写字母、数字或下划线"
       },
       "dbUsername": {
-        "required": "Database username is required",
-        "tooLong": "Database username must not exceed 128 characters",
-        "invalid": "Database username must start with a letter or underscore and contain only letters, digits, underscores, or hyphens"
+        "required": "数据库用户名为必填项",
+        "tooLong": "数据库用户名不能超过 128 个字符",
+        "invalid": "数据库用户名必须以字母或下划线开头，且只能包含字母、数字、下划线或连字符"
       },
       "dbPassword": {
-        "required": "Database password is required",
-        "tooLong": "Database password must not exceed 256 characters"
+        "required": "数据库密码为必填项",
+        "tooLong": "数据库密码不能超过 256 个字符"
       },
       "adminEmail": {
-        "required": "Administrator email is required",
-        "tooLong": "Administrator email must not exceed 320 characters",
-        "invalid": "Please enter a valid administrator email address"
+        "required": "管理员电子邮件为必填项",
+        "tooLong": "管理员电子邮件不能超过 320 个字符",
+        "invalid": "请输入有效的管理员电子邮件地址"
       },
       "adminLocale": {
-        "invalid": "Selected locale is not supported"
+        "invalid": "所选语言不受支持"
       },
       "dbCredentials": {
-        "partial": "When updating the database password, host, port, database name, and username must all be provided so the new credentials can be verified"
+        "partial": "更新数据库密码时，必须同时提供主机、端口、数据库名称和用户名，以便验证新凭据"
       }
     },
     "common": {
       "id": {
-        "invalid": "Invalid identifier"
+        "invalid": "标识符无效"
       },
       "status": {
-        "invalid": "Status must be 0 or 1"
+        "invalid": "状态必须为 0 或 1"
       }
     }
   }

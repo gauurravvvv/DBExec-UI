@@ -2685,63 +2685,63 @@
   "validation": {
     "organisation": {
       "name": {
-        "required": "Organisation name is required",
-        "tooShort": "Organisation name must be at least 2 characters",
-        "tooLong": "Organisation name must not exceed 64 characters",
-        "invalid": "Organisation name must start with a letter or digit and contain only letters, digits, spaces, dots, underscores, or hyphens"
+        "required": "Organisatienaam is vereist",
+        "tooShort": "Organisatienaam moet minimaal 2 tekens bevatten",
+        "tooLong": "Organisatienaam mag niet meer dan 64 tekens bevatten",
+        "invalid": "Organisatienaam moet beginnen met een letter of cijfer en mag alleen letters, cijfers, spaties, punten, underscores of streepjes bevatten"
       },
       "description": {
-        "required": "Description is required",
-        "tooShort": "Description must be at least 2 characters",
-        "tooLong": "Description must not exceed 500 characters"
+        "required": "Beschrijving is vereist",
+        "tooShort": "Beschrijving moet minimaal 2 tekens bevatten",
+        "tooLong": "Beschrijving mag niet meer dan 500 tekens bevatten"
       },
       "dbHost": {
-        "required": "Database host is required",
-        "tooLong": "Database host must not exceed 255 characters",
-        "invalid": "Database host must be a valid hostname or IPv4 address"
+        "required": "Database-host is vereist",
+        "tooLong": "Database-host mag niet meer dan 255 tekens bevatten",
+        "invalid": "Database-host moet een geldige hostnaam of IPv4-adres zijn"
       },
       "dbPort": {
-        "required": "Database port is required",
-        "notInteger": "Database port must be a whole number",
-        "outOfRange": "Database port must be between 1 and 65535"
+        "required": "Database-poort is vereist",
+        "notInteger": "Database-poort moet een geheel getal zijn",
+        "outOfRange": "Database-poort moet tussen 1 en 65535 liggen"
       },
       "dbName": {
-        "required": "Database name is required",
-        "tooLong": "Database name must not exceed 63 characters",
-        "invalid": "Database name must start with a letter or underscore and contain only letters, digits, underscores, or hyphens"
+        "required": "Databasenaam is vereist",
+        "tooLong": "Databasenaam mag niet meer dan 63 tekens bevatten",
+        "invalid": "Databasenaam moet beginnen met een letter of underscore en mag alleen letters, cijfers, underscores of streepjes bevatten"
       },
       "dbSchema": {
-        "required": "Schema name is required",
-        "tooLong": "Schema name must not exceed 63 characters",
-        "invalid": "Schema name must start with a lowercase letter or underscore and contain only lowercase letters, digits, or underscores"
+        "required": "Schemanaam is vereist",
+        "tooLong": "Schemanaam mag niet meer dan 63 tekens bevatten",
+        "invalid": "Schemanaam moet beginnen met een kleine letter of underscore en mag alleen kleine letters, cijfers of underscores bevatten"
       },
       "dbUsername": {
-        "required": "Database username is required",
-        "tooLong": "Database username must not exceed 128 characters",
-        "invalid": "Database username must start with a letter or underscore and contain only letters, digits, underscores, or hyphens"
+        "required": "Database-gebruikersnaam is vereist",
+        "tooLong": "Database-gebruikersnaam mag niet meer dan 128 tekens bevatten",
+        "invalid": "Database-gebruikersnaam moet beginnen met een letter of underscore en mag alleen letters, cijfers, underscores of streepjes bevatten"
       },
       "dbPassword": {
-        "required": "Database password is required",
-        "tooLong": "Database password must not exceed 256 characters"
+        "required": "Database-wachtwoord is vereist",
+        "tooLong": "Database-wachtwoord mag niet meer dan 256 tekens bevatten"
       },
       "adminEmail": {
-        "required": "Administrator email is required",
-        "tooLong": "Administrator email must not exceed 320 characters",
-        "invalid": "Please enter a valid administrator email address"
+        "required": "E-mailadres van beheerder is vereist",
+        "tooLong": "E-mailadres van beheerder mag niet meer dan 320 tekens bevatten",
+        "invalid": "Voer een geldig e-mailadres van beheerder in"
       },
       "adminLocale": {
-        "invalid": "Selected locale is not supported"
+        "invalid": "Geselecteerde taal wordt niet ondersteund"
       },
       "dbCredentials": {
-        "partial": "When updating the database password, host, port, database name, and username must all be provided so the new credentials can be verified"
+        "partial": "Bij het bijwerken van het database-wachtwoord moeten host, poort, databasenaam en gebruikersnaam allemaal worden opgegeven, zodat de nieuwe inloggegevens kunnen worden geverifieerd"
       }
     },
     "common": {
       "id": {
-        "invalid": "Invalid identifier"
+        "invalid": "Ongeldige identificatie"
       },
       "status": {
-        "invalid": "Status must be 0 or 1"
+        "invalid": "Status moet 0 of 1 zijn"
       }
     }
   }

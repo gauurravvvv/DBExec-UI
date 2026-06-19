@@ -2685,63 +2685,63 @@
   "validation": {
     "organisation": {
       "name": {
-        "required": "Organisation name is required",
-        "tooShort": "Organisation name must be at least 2 characters",
-        "tooLong": "Organisation name must not exceed 64 characters",
-        "invalid": "Organisation name must start with a letter or digit and contain only letters, digits, spaces, dots, underscores, or hyphens"
+        "required": "組織名は必須です",
+        "tooShort": "組織名は2文字以上である必要があります",
+        "tooLong": "組織名は64文字を超えてはいけません",
+        "invalid": "組織名は英字または数字で始まり、英字、数字、スペース、ドット、アンダースコア、ハイフンのみを含めることができます"
       },
       "description": {
-        "required": "Description is required",
-        "tooShort": "Description must be at least 2 characters",
-        "tooLong": "Description must not exceed 500 characters"
+        "required": "説明は必須です",
+        "tooShort": "説明は2文字以上である必要があります",
+        "tooLong": "説明は500文字を超えてはいけません"
       },
       "dbHost": {
-        "required": "Database host is required",
-        "tooLong": "Database host must not exceed 255 characters",
-        "invalid": "Database host must be a valid hostname or IPv4 address"
+        "required": "データベースホストは必須です",
+        "tooLong": "データベースホストは255文字を超えてはいけません",
+        "invalid": "データベースホストは有効なホスト名またはIPv4アドレスである必要があります"
       },
       "dbPort": {
-        "required": "Database port is required",
-        "notInteger": "Database port must be a whole number",
-        "outOfRange": "Database port must be between 1 and 65535"
+        "required": "データベースポートは必須です",
+        "notInteger": "データベースポートは整数である必要があります",
+        "outOfRange": "データベースポートは1から65535の範囲である必要があります"
       },
       "dbName": {
-        "required": "Database name is required",
-        "tooLong": "Database name must not exceed 63 characters",
-        "invalid": "Database name must start with a letter or underscore and contain only letters, digits, underscores, or hyphens"
+        "required": "データベース名は必須です",
+        "tooLong": "データベース名は63文字を超えてはいけません",
+        "invalid": "データベース名は英字またはアンダースコアで始まり、英字、数字、アンダースコア、ハイフンのみを含めることができます"
       },
       "dbSchema": {
-        "required": "Schema name is required",
-        "tooLong": "Schema name must not exceed 63 characters",
-        "invalid": "Schema name must start with a lowercase letter or underscore and contain only lowercase letters, digits, or underscores"
+        "required": "スキーマ名は必須です",
+        "tooLong": "スキーマ名は63文字を超えてはいけません",
+        "invalid": "スキーマ名は小文字またはアンダースコアで始まり、小文字、数字、アンダースコアのみを含めることができます"
       },
       "dbUsername": {
-        "required": "Database username is required",
-        "tooLong": "Database username must not exceed 128 characters",
-        "invalid": "Database username must start with a letter or underscore and contain only letters, digits, underscores, or hyphens"
+        "required": "データベースユーザー名は必須です",
+        "tooLong": "データベースユーザー名は128文字を超えてはいけません",
+        "invalid": "データベースユーザー名は英字またはアンダースコアで始まり、英字、数字、アンダースコア、ハイフンのみを含めることができます"
       },
       "dbPassword": {
-        "required": "Database password is required",
-        "tooLong": "Database password must not exceed 256 characters"
+        "required": "データベースパスワードは必須です",
+        "tooLong": "データベースパスワードは256文字を超えてはいけません"
       },
       "adminEmail": {
-        "required": "Administrator email is required",
-        "tooLong": "Administrator email must not exceed 320 characters",
-        "invalid": "Please enter a valid administrator email address"
+        "required": "管理者のメールアドレスは必須です",
+        "tooLong": "管理者のメールアドレスは320文字を超えてはいけません",
+        "invalid": "有効な管理者のメールアドレスを入力してください"
       },
       "adminLocale": {
-        "invalid": "Selected locale is not supported"
+        "invalid": "選択した言語はサポートされていません"
       },
       "dbCredentials": {
-        "partial": "When updating the database password, host, port, database name, and username must all be provided so the new credentials can be verified"
+        "partial": "データベースパスワードを更新する際は、新しい認証情報を検証できるように、ホスト、ポート、データベース名、ユーザー名のすべてを指定する必要があります"
       }
     },
     "common": {
       "id": {
-        "invalid": "Invalid identifier"
+        "invalid": "無効な識別子"
       },
       "status": {
-        "invalid": "Status must be 0 or 1"
+        "invalid": "ステータスは0または1である必要があります"
       }
     }
   }

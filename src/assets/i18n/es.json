@@ -2685,63 +2685,63 @@
   "validation": {
     "organisation": {
       "name": {
-        "required": "Organisation name is required",
-        "tooShort": "Organisation name must be at least 2 characters",
-        "tooLong": "Organisation name must not exceed 64 characters",
-        "invalid": "Organisation name must start with a letter or digit and contain only letters, digits, spaces, dots, underscores, or hyphens"
+        "required": "El nombre de la organización es obligatorio",
+        "tooShort": "El nombre de la organización debe tener al menos 2 caracteres",
+        "tooLong": "El nombre de la organización no debe superar los 64 caracteres",
+        "invalid": "El nombre de la organización debe comenzar con una letra o un dígito y solo puede contener letras, dígitos, espacios, puntos, guiones bajos o guiones"
       },
       "description": {
-        "required": "Description is required",
-        "tooShort": "Description must be at least 2 characters",
-        "tooLong": "Description must not exceed 500 characters"
+        "required": "La descripción es obligatoria",
+        "tooShort": "La descripción debe tener al menos 2 caracteres",
+        "tooLong": "La descripción no debe superar los 500 caracteres"
       },
       "dbHost": {
-        "required": "Database host is required",
-        "tooLong": "Database host must not exceed 255 characters",
-        "invalid": "Database host must be a valid hostname or IPv4 address"
+        "required": "El host de la base de datos es obligatorio",
+        "tooLong": "El host de la base de datos no debe superar los 255 caracteres",
+        "invalid": "El host de la base de datos debe ser un nombre de host o dirección IPv4 válida"
       },
       "dbPort": {
-        "required": "Database port is required",
-        "notInteger": "Database port must be a whole number",
-        "outOfRange": "Database port must be between 1 and 65535"
+        "required": "El puerto de la base de datos es obligatorio",
+        "notInteger": "El puerto de la base de datos debe ser un número entero",
+        "outOfRange": "El puerto de la base de datos debe estar entre 1 y 65535"
       },
       "dbName": {
-        "required": "Database name is required",
-        "tooLong": "Database name must not exceed 63 characters",
-        "invalid": "Database name must start with a letter or underscore and contain only letters, digits, underscores, or hyphens"
+        "required": "El nombre de la base de datos es obligatorio",
+        "tooLong": "El nombre de la base de datos no debe superar los 63 caracteres",
+        "invalid": "El nombre de la base de datos debe comenzar con una letra o un guion bajo y solo puede contener letras, dígitos, guiones bajos o guiones"
       },
       "dbSchema": {
-        "required": "Schema name is required",
-        "tooLong": "Schema name must not exceed 63 characters",
-        "invalid": "Schema name must start with a lowercase letter or underscore and contain only lowercase letters, digits, or underscores"
+        "required": "El nombre del esquema es obligatorio",
+        "tooLong": "El nombre del esquema no debe superar los 63 caracteres",
+        "invalid": "El nombre del esquema debe comenzar con una letra minúscula o un guion bajo y solo puede contener letras minúsculas, dígitos o guiones bajos"
       },
       "dbUsername": {
-        "required": "Database username is required",
-        "tooLong": "Database username must not exceed 128 characters",
-        "invalid": "Database username must start with a letter or underscore and contain only letters, digits, underscores, or hyphens"
+        "required": "El nombre de usuario de la base de datos es obligatorio",
+        "tooLong": "El nombre de usuario de la base de datos no debe superar los 128 caracteres",
+        "invalid": "El nombre de usuario de la base de datos debe comenzar con una letra o un guion bajo y solo puede contener letras, dígitos, guiones bajos o guiones"
       },
       "dbPassword": {
-        "required": "Database password is required",
-        "tooLong": "Database password must not exceed 256 characters"
+        "required": "La contraseña de la base de datos es obligatoria",
+        "tooLong": "La contraseña de la base de datos no debe superar los 256 caracteres"
       },
       "adminEmail": {
-        "required": "Administrator email is required",
-        "tooLong": "Administrator email must not exceed 320 characters",
-        "invalid": "Please enter a valid administrator email address"
+        "required": "El correo electrónico del administrador es obligatorio",
+        "tooLong": "El correo electrónico del administrador no debe superar los 320 caracteres",
+        "invalid": "Ingrese un correo electrónico de administrador válido"
       },
       "adminLocale": {
-        "invalid": "Selected locale is not supported"
+        "invalid": "El idioma seleccionado no es compatible"
       },
       "dbCredentials": {
-        "partial": "When updating the database password, host, port, database name, and username must all be provided so the new credentials can be verified"
+        "partial": "Al actualizar la contraseña de la base de datos, el host, el puerto, el nombre de la base de datos y el nombre de usuario deben proporcionarse para que se puedan verificar las nuevas credenciales"
       }
     },
     "common": {
       "id": {
-        "invalid": "Invalid identifier"
+        "invalid": "Identificador no válido"
       },
       "status": {
-        "invalid": "Status must be 0 or 1"
+        "invalid": "El estado debe ser 0 o 1"
       }
     }
   }
