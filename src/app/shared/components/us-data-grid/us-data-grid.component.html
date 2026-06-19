@@ -1,0 +1,391 @@
+<div class="us-data-grid" [style.height]="resolvedConfig.height">
+  <!-- Toolbar — title, quick search, column chooser, add filter, clear -->
+  <div class="us-data-grid__toolbar" *ngIf="resolvedConfig.title || resolvedConfig.addLabel || resolvedConfig.enableColumnChooser || resolvedConfig.enableAddFilter">
+    <div class="us-data-grid__toolbar-left">
+      <div class="us-data-grid__title" *ngIf="resolvedConfig.title">{{ resolvedConfig.title }}</div>
+    </div>
+
+    <div class="us-data-grid__toolbar-right">
+      <div class="us-data-grid__quick-search">
+        <i class="pi pi-search"></i>
+        <input
+          type="text"
+          placeholder="Search across all columns"
+          [ngModel]="quickFilter"
+          (ngModelChange)="onQuickFilterChange($event)"
+        />
+      </div>
+
+      <button
+        *ngIf="resolvedConfig.enableColumnChooser"
+        pButton
+        type="button"
+        class="p-button-outlined p-button-sm"
+        icon="pi pi-list"
+        label="Columns"
+        pTooltip="Show / hide columns"
+        tooltipPosition="bottom"
+        (click)="columnsOp.toggle($event)"
+      ></button>
+
+      <button
+        *ngIf="resolvedConfig.enableAddFilter"
+        pButton
+        type="button"
+        class="p-button-outlined p-button-sm"
+        icon="pi pi-filter"
+        label="Add Filter"
+        pTooltip="Filter any column"
+        tooltipPosition="bottom"
+        (click)="addFilterOp.toggle($event)"
+      ></button>
+
+      <button
+        *ngIf="resolvedConfig.enableAutoFit"
+        pButton
+        type="button"
+        class="p-button-outlined p-button-sm"
+        icon="pi pi-arrows-h"
+        label="Auto-fit"
+        pTooltip="Auto-size every column to fit its content"
+        tooltipPosition="bottom"
+        (click)="autoFitColumns()"
+      ></button>
+
+      <button
+        *ngIf="resolvedConfig.enableDensityToggle"
+        pButton
+        type="button"
+        class="p-button-outlined p-button-sm"
+        [icon]="density === 'compact' ? 'pi pi-bars' : 'pi pi-th-large'"
+        [label]="density === 'compact' ? 'Comfortable' : 'Compact'"
+        pTooltip="Switch row density"
+        tooltipPosition="bottom"
+        (click)="toggleDensity()"
+      ></button>
+
+      <button
+        *ngIf="resolvedConfig.enableCsvExport"
+        pButton
+        type="button"
+        class="p-button-outlined p-button-sm"
+        icon="pi pi-download"
+        label="CSV"
+        pTooltip="Export visible rows as CSV"
+        tooltipPosition="bottom"
+        (click)="exportCsv()"
+      ></button>
+
+      <button
+        *ngIf="resolvedConfig.enableXlsxExport"
+        pButton
+        type="button"
+        class="p-button-outlined p-button-sm"
+        icon="pi pi-file-excel"
+        label="Excel"
+        pTooltip="Export visible rows as a .xlsx file"
+        tooltipPosition="bottom"
+        (click)="exportXlsx()"
+      ></button>
+
+      <button
+        *ngIf="resolvedConfig.enableRefresh"
+        pButton
+        type="button"
+        class="p-button-outlined p-button-sm"
+        [icon]="loading ? 'pi pi-spin pi-spinner' : 'pi pi-refresh'"
+        label="Refresh"
+        pTooltip="Reload data"
+        tooltipPosition="bottom"
+        [disabled]="loading"
+        (click)="onRefreshClick()"
+      ></button>
+
+      <button
+        *ngIf="canShowViews"
+        pButton
+        type="button"
+        class="p-button-outlined p-button-sm"
+        icon="pi pi-bookmark"
+        [label]="activeViewName || 'Views'"
+        pTooltip="Saved column + filter layouts"
+        tooltipPosition="bottom"
+        (click)="viewsOp.toggle($event)"
+      ></button>
+
+      <button
+        *ngIf="filterChips.length || quickFilter"
+        pButton
+        type="button"
+        class="p-button-text p-button-sm"
+        icon="pi pi-filter-slash"
+        label="Clear"
+        pTooltip="Clear all filters + search"
+        tooltipPosition="bottom"
+        (click)="clearAllFilters()"
+      ></button>
+
+      <button
+        *ngIf="resolvedConfig.addLabel"
+        pButton
+        type="button"
+        class="p-button p-button-sm us-data-grid__add"
+        [label]="resolvedConfig.addLabel"
+        icon="pi pi-plus"
+        (click)="onAddClick()"
+      ></button>
+    </div>
+  </div>
+
+  <!-- Quick-filter preset chips — one-click filter snapshots -->
+  <div class="us-data-grid__quick-presets"
+    *ngIf="resolvedConfig.quickFilters?.length">
+    <span class="us-data-grid__chips-label">Quick filters:</span>
+    <button
+      *ngFor="let q of resolvedConfig.quickFilters"
+      type="button"
+      class="us-quick-preset"
+      [class.us-quick-preset--active]="activeQuickFilterId === q.id"
+      (click)="applyQuickFilter(q)"
+    >
+      <i *ngIf="q.icon" [class]="q.icon"></i>
+      <span>{{ q.label }}</span>
+    </button>
+  </div>
+
+  <!-- Active filter chips -->
+  <div class="us-data-grid__chips" *ngIf="filterChips.length">
+    <span class="us-data-grid__chips-label">Filters:</span>
+    <p-chip
+      *ngFor="let chip of filterChips"
+      styleClass="us-filter-chip"
+      [label]="chip.headerLabel + ' · ' + chip.operator + ' · ' + chip.value"
+      [removable]="true"
+      (onRemove)="removeFilterChip(chip)"
+    ></p-chip>
+  </div>
+
+  <!-- Bulk action sticky bar — appears whenever rows are selected.
+       Hosts project their own action buttons into <us-data-grid>
+       via the `bulk-actions` slot (selector="[usGridBulkActions]"). -->
+  <div class="us-data-grid__bulkbar" *ngIf="selectedCount > 0">
+    <div class="us-data-grid__bulkbar-left">
+      <strong>{{ selectedCount }}</strong> selected
+      <button
+        pButton
+        type="button"
+        class="p-button-text p-button-sm"
+        label="Clear"
+        (click)="clearSelection()"
+      ></button>
+    </div>
+    <div class="us-data-grid__bulkbar-right">
+      <ng-content select="[usGridBulkActions]"></ng-content>
+    </div>
+  </div>
+
+  <!-- Row counter -->
+  <div class="us-data-grid__counter" *ngIf="resolvedConfig.showRowCounter && totalRowCount > 0">
+    Showing <strong>{{ visibleRowCount.toLocaleString() }}</strong>
+    of <strong>{{ totalRowCount.toLocaleString() }}</strong>
+    <ng-container *ngIf="activeViewName">
+      · view: <strong>{{ activeViewName }}</strong>
+    </ng-container>
+  </div>
+
+  <!-- AG Grid -->
+  <ag-grid-angular
+    class="us-data-grid__grid"
+    [theme]="theme"
+    [gridOptions]="gridOptions"
+    [rowData]="rows"
+    (gridReady)="onGridReady($event)"
+    (firstDataRendered)="onFirstDataRendered($event)"
+    (rowClicked)="onRowClicked($event)"
+    (selectionChanged)="onSelectionChanged($event)"
+    (sortChanged)="onSortChanged($event)"
+    (filterChanged)="onFilterChanged($event)"
+  ></ag-grid-angular>
+
+  <!-- Columns overlay -->
+  <p-overlayPanel #columnsOp [dismissable]="true" [showCloseIcon]="false" styleClass="us-data-grid__panel">
+    <div class="us-data-grid__panel-head">
+      <div class="us-data-grid__panel-title">Columns</div>
+      <button
+        pButton
+        type="button"
+        class="p-button-text p-button-sm"
+        label="Show all"
+        (click)="showAllColumns()"
+      ></button>
+    </div>
+    <div class="us-data-grid__panel-body">
+      <div class="us-data-grid__col-row"
+        *ngFor="let c of columnList; trackBy: trackByColId">
+        <label class="us-data-grid__col-name">
+          <p-checkbox
+            [binary]="true"
+            [ngModel]="c.visible"
+            (onChange)="toggleColumnVisibility(c.colId, $event.checked)"
+          ></p-checkbox>
+          <span>{{ c.headerLabel }}</span>
+        </label>
+        <span class="us-data-grid__col-pin">
+          <button
+            type="button"
+            class="us-data-grid__pin-btn"
+            [class.us-data-grid__pin-btn--active]="c.pinned === 'left'"
+            pTooltip="Freeze to left"
+            tooltipPosition="top"
+            (click)="pinColumn(c.colId, c.pinned === 'left' ? null : 'left')"
+          ><i class="pi pi-arrow-left"></i></button>
+          <button
+            type="button"
+            class="us-data-grid__pin-btn"
+            [class.us-data-grid__pin-btn--active]="c.pinned === 'right'"
+            pTooltip="Freeze to right"
+            tooltipPosition="top"
+            (click)="pinColumn(c.colId, c.pinned === 'right' ? null : 'right')"
+          ><i class="pi pi-arrow-right"></i></button>
+        </span>
+      </div>
+    </div>
+  </p-overlayPanel>
+
+  <!-- Add Filter overlay -->
+  <p-overlayPanel #addFilterOp [dismissable]="true" [showCloseIcon]="false" styleClass="us-data-grid__panel">
+    <div class="us-data-grid__panel-head">
+      <div class="us-data-grid__panel-title">Add Filter</div>
+    </div>
+    <div class="us-data-grid__panel-body us-data-grid__panel-body--form">
+      <us-select-field
+        id="usAddFilterColumn"
+        label="Column"
+        [(value)]="addFilterSelectedColumn"
+        [options]="addFilterColumns"
+        optionLabel="headerLabel"
+        [filter]="true"
+        placeholder="Select column"
+      ></us-select-field>
+
+      <us-select-field
+        id="usAddFilterOperator"
+        label="Operator"
+        [(value)]="addFilterOperator"
+        [options]="operatorsFor(addFilterSelectedColumn?.filter)"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Operator"
+      ></us-select-field>
+
+      <div class="us-data-grid__inline-field">
+        <label for="usAddFilterValue">Value</label>
+        <input
+          id="usAddFilterValue"
+          type="text"
+          class="us-data-grid__inline-input"
+          [ngModel]="addFilterValue"
+          (ngModelChange)="addFilterValue = $event"
+        />
+      </div>
+
+      <div class="us-data-grid__panel-actions">
+        <button
+          pButton
+          type="button"
+          class="p-button-text"
+          label="Cancel"
+          (click)="addFilterOp.hide()"
+        ></button>
+        <button
+          pButton
+          type="button"
+          class="p-button"
+          label="Apply"
+          [disabled]="!addFilterSelectedColumn || !addFilterValue"
+          (click)="applyAddFilter(addFilterOp)"
+        ></button>
+      </div>
+    </div>
+  </p-overlayPanel>
+
+  <!-- Saved Views overlay -->
+  <p-overlayPanel #viewsOp [dismissable]="true" [showCloseIcon]="false" styleClass="us-data-grid__panel">
+    <div class="us-data-grid__panel-head">
+      <div class="us-data-grid__panel-title">Saved Views</div>
+      <button
+        pButton
+        type="button"
+        class="p-button-text p-button-sm"
+        icon="pi pi-refresh"
+        label="Reset"
+        pTooltip="Clear all columns / filters / sort to the default layout"
+        tooltipPosition="left"
+        (click)="resetView()"
+      ></button>
+    </div>
+    <div class="us-data-grid__panel-body us-data-grid__panel-body--form">
+      <div class="us-data-grid__views" *ngIf="savedViews.length">
+        <div
+          class="us-data-grid__view-row"
+          *ngFor="let v of savedViews; trackBy: trackByViewName"
+          [class.us-data-grid__view-row--active]="v.name === activeViewName"
+        >
+          <button
+            pButton
+            type="button"
+            class="p-button-text p-button-sm us-data-grid__view-name"
+            [label]="v.name"
+            icon="pi pi-bookmark-fill"
+            (click)="applyView(v); viewsOp.hide()"
+          ></button>
+          <button
+            pButton
+            type="button"
+            class="p-button-rounded p-button-text p-button-sm"
+            icon="pi pi-times"
+            pTooltip="Delete view"
+            tooltipPosition="left"
+            (click)="deleteView(v)"
+          ></button>
+        </div>
+      </div>
+
+      <div class="us-data-grid__view-empty" *ngIf="!savedViews.length">
+        No saved views yet. Configure the grid the way you like, give
+        it a name below and Save.
+      </div>
+
+      <div class="us-data-grid__inline-field">
+        <label for="usSaveView">Save current as</label>
+        <input
+          id="usSaveView"
+          type="text"
+          class="us-data-grid__inline-input"
+          placeholder="e.g. Failed runs last 24h"
+          [ngModel]="newViewName"
+          (ngModelChange)="newViewName = $event"
+        />
+      </div>
+
+      <div class="us-data-grid__panel-actions">
+        <button
+          pButton
+          type="button"
+          class="p-button-text"
+          label="Close"
+          (click)="viewsOp.hide()"
+        ></button>
+        <button
+          pButton
+          type="button"
+          class="p-button"
+          icon="pi pi-bookmark"
+          label="Save view"
+          [disabled]="!newViewName.trim()"
+          (click)="saveCurrentView()"
+        ></button>
+      </div>
+    </div>
+  </p-overlayPanel>
+</div>
