@@ -7,12 +7,21 @@ import {
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
-import { REGEX } from 'src/app/core/constants/regex.constant';
 import { CONNECTION } from 'src/app/core/constants/routes.constant';
+import {
+  connectionDescriptionSchema,
+  connectionNameSchema,
+  datasourceIdSchema,
+} from 'src/app/shared/validators/connections';
+import {
+  dbPasswordSchema,
+  dbUsernameSchema,
+} from 'src/app/shared/validators/datasources';
+import { zodValidator } from 'src/app/shared/validators/zod-validator';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
@@ -68,20 +77,13 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
   }
 
   private initForm() {
+    // Field validators sourced from the SHARED Zod schema.
     this.connectionForm = this.fb.group({
-      name: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(64),
-          Validators.pattern(REGEX.orgName),
-        ],
-      ],
-      description: [''],
-      datasource: ['', Validators.required],
-      dbUsername: ['', Validators.required],
-      dbPassword: ['', Validators.required],
+      name: ['', [zodValidator(connectionNameSchema)]],
+      description: ['', [zodValidator(connectionDescriptionSchema)]],
+      datasource: ['', [zodValidator(datasourceIdSchema)]],
+      dbUsername: ['', [zodValidator(dbUsernameSchema)]],
+      dbPassword: ['', [zodValidator(dbPasswordSchema)]],
     });
 
     this.connectionForm.valueChanges
@@ -259,20 +261,13 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
       this.connectionForm.get('datasource')?.value !== '';
   }
 
+  fieldError(fieldName: string): string {
+    const control = this.connectionForm.get(fieldName);
+    const key = control?.errors?.['zod'] as string | undefined;
+    return key ? this.translate.instant(key) : '';
+  }
+
   getNameError(): string {
-    const control = this.connectionForm.get('name');
-    if (control?.errors?.['required'])
-      return this.translate.instant('VALIDATION.CONNECTION_NAME_REQUIRED');
-    if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.CONNECTION_NAME_MIN_LENGTH', {
-        length: control.errors['minlength'].requiredLength,
-      });
-    if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.CONNECTION_NAME_MAX_LENGTH', {
-        length: control.errors['maxlength'].requiredLength,
-      });
-    if (control?.errors?.['pattern'])
-      return this.translate.instant('VALIDATION.CONNECTION_NAME_PATTERN');
-    return '';
+    return this.fieldError('name');
   }
 }

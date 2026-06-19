@@ -2953,6 +2953,23 @@
       "justification": {
         "tooLong": "Justification must not exceed 500 characters"
       }
+    },
+    "connections": {
+      "name": {
+        "required": "Connection name is required",
+        "tooShort": "Connection name must be at least 2 characters",
+        "tooLong": "Connection name must not exceed 64 characters",
+        "invalid": "Connection name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens"
+      },
+      "datasource": {
+        "required": "Datasource is required"
+      },
+      "id": {
+        "required": "Connection id is required"
+      },
+      "justification": {
+        "tooLong": "Justification must not exceed 500 characters"
+      }
     }
   }
 }

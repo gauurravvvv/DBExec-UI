@@ -2907,6 +2907,23 @@
       "justification": {
         "tooLong": "理由不得超过 500 个字符"
       }
+    },
+    "connections": {
+      "name": {
+        "required": "连接名称为必填项",
+        "tooShort": "名称必须至少包含 2 个字符",
+        "tooLong": "名称不得超过 64 个字符",
+        "invalid": "名称必须以字母或数字开头，且只能包含字母、数字、空格、点、下划线和连字符"
+      },
+      "datasource": {
+        "required": "数据源为必填项"
+      },
+      "id": {
+        "required": "连接 ID 为必填项"
+      },
+      "justification": {
+        "tooLong": "理由不得超过 500 个字符"
+      }
     }
   }
 }

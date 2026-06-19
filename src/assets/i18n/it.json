@@ -2907,6 +2907,23 @@
       "justification": {
         "tooLong": "La motivazione non deve superare i 500 caratteri"
       }
+    },
+    "connections": {
+      "name": {
+        "required": "Il nome della connessione è obbligatorio",
+        "tooShort": "Il nome deve contenere almeno 2 caratteri",
+        "tooLong": "Il nome non deve superare i 64 caratteri",
+        "invalid": "Il nome deve iniziare con una lettera o un numero e può contenere solo lettere, numeri, spazi, punti, trattini bassi e trattini"
+      },
+      "datasource": {
+        "required": "La fonte dati è obbligatoria"
+      },
+      "id": {
+        "required": "L'id della connessione è obbligatorio"
+      },
+      "justification": {
+        "tooLong": "La motivazione non deve superare i 500 caratteri"
+      }
     }
   }
 }

@@ -2907,6 +2907,23 @@
       "justification": {
         "tooLong": "De motivering mag niet langer zijn dan 500 tekens"
       }
+    },
+    "connections": {
+      "name": {
+        "required": "Verbindingsnaam is verplicht",
+        "tooShort": "De naam moet minstens 2 tekens bevatten",
+        "tooLong": "De naam mag niet langer zijn dan 64 tekens",
+        "invalid": "De naam moet beginnen met een letter of cijfer en mag alleen letters, cijfers, spaties, punten, lage streepjes en koppeltekens bevatten"
+      },
+      "datasource": {
+        "required": "Gegevensbron is verplicht"
+      },
+      "id": {
+        "required": "Verbindings-id is verplicht"
+      },
+      "justification": {
+        "tooLong": "De motivering mag niet langer zijn dan 500 tekens"
+      }
     }
   }
 }

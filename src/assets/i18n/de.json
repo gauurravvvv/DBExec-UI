@@ -2907,6 +2907,23 @@
       "justification": {
         "tooLong": "Die Begründung darf 500 Zeichen nicht überschreiten"
       }
+    },
+    "connections": {
+      "name": {
+        "required": "Der Verbindungsname ist erforderlich",
+        "tooShort": "Der Name muss mindestens 2 Zeichen lang sein",
+        "tooLong": "Der Name darf 64 Zeichen nicht überschreiten",
+        "invalid": "Der Name muss mit einem Buchstaben oder einer Zahl beginnen und darf nur Buchstaben, Zahlen, Leerzeichen, Punkte, Unterstriche und Bindestriche enthalten"
+      },
+      "datasource": {
+        "required": "Die Datenquelle ist erforderlich"
+      },
+      "id": {
+        "required": "Die Verbindungs-ID ist erforderlich"
+      },
+      "justification": {
+        "tooLong": "Die Begründung darf 500 Zeichen nicht überschreiten"
+      }
     }
   }
 }

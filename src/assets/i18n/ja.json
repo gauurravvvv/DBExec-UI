@@ -2907,6 +2907,23 @@
       "justification": {
         "tooLong": "理由は 500 文字以内で入力してください"
       }
+    },
+    "connections": {
+      "name": {
+        "required": "接続名は必須です",
+        "tooShort": "名前は 2 文字以上で入力してください",
+        "tooLong": "名前は 64 文字以内で入力してください",
+        "invalid": "名前は英数字で始まり、英数字、スペース、ピリオド、アンダースコア、ハイフンのみ使用できます"
+      },
+      "datasource": {
+        "required": "データソースは必須です"
+      },
+      "id": {
+        "required": "接続 ID は必須です"
+      },
+      "justification": {
+        "tooLong": "理由は 500 文字以内で入力してください"
+      }
     }
   }
 }

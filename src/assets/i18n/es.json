@@ -2907,6 +2907,23 @@
       "justification": {
         "tooLong": "La justificación no debe superar los 500 caracteres"
       }
+    },
+    "connections": {
+      "name": {
+        "required": "El nombre de la conexión es obligatorio",
+        "tooShort": "El nombre debe tener al menos 2 caracteres",
+        "tooLong": "El nombre no debe superar los 64 caracteres",
+        "invalid": "El nombre debe comenzar con una letra o un número y solo puede contener letras, números, espacios, puntos, guiones bajos y guiones"
+      },
+      "datasource": {
+        "required": "La fuente de datos es obligatoria"
+      },
+      "id": {
+        "required": "El id de la conexión es obligatorio"
+      },
+      "justification": {
+        "tooLong": "La justificación no debe superar los 500 caracteres"
+      }
     }
   }
 }
