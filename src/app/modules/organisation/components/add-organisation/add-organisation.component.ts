@@ -7,7 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ORGANISATION } from 'src/app/core/constants/routes.constant';
@@ -16,6 +16,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { SUPPORTED_LOCALES } from 'src/app/core/services/locale.service';
 import {
   adminEmailSchema,
+  adminLocaleSchema,
   dbHostSchema,
   dbNameSchema,
   dbPasswordSchema,
@@ -95,7 +96,7 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
       dbUsername: ['', [zodValidator(dbUsernameSchema)]],
       dbPassword: ['', [zodValidator(dbPasswordSchema)]],
       adminEmail: ['', [zodValidator(adminEmailSchema)]],
-      adminLocale: ['en', Validators.required],
+      adminLocale: ['en', [zodValidator(adminLocaleSchema)]],
       // Security + email policy now live on the per-org OrgPolicy
       // entity and are managed by the Org Admin under App Settings.
       // They are deliberately NOT collected at org creation time.
