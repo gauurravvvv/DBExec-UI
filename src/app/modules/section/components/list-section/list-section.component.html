@@ -117,11 +117,13 @@
                   {{ 'COMMON.CREATED_ON' | translate }}
                 </div>
               </th>
+              <ng-container *hasPermission="'queryBuilderSection'; level: 'write'">
               <th style="width: 7rem; min-width: 7rem">
                 <div class="th-content actions-th">
                   {{ 'COMMON.ACTIONS' | translate }}
                 </div>
               </th>
+              </ng-container>
             </tr>
             <!-- Filter Row -->
             <tr>
@@ -177,9 +179,11 @@
                   (onChangeEvent)="onCreatedDateRangeChange($event)"
                 ></app-custom-daterange>
               </th>
+              <ng-container *hasPermission="'queryBuilderSection'; level: 'write'">
               <th>
                 <!-- No filter for Actions -->
               </th>
+              </ng-container>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-section>
@@ -235,6 +239,7 @@
                   section.createdOn | relativeTime
                 }}</span>
               </td>
+              <ng-container *hasPermission="'queryBuilderSection'; level: 'write'">
               <td>
                 <div class="row-actions">
                   <button
@@ -257,6 +262,7 @@
                   </button>
                 </div>
               </td>
+              </ng-container>
             </tr>
           </ng-template>
           <ng-template pTemplate="emptymessage">

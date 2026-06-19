@@ -197,11 +197,13 @@
                   </span>
                 </div>
               </th>
+              <ng-container *hasPermission="'dashboard'; level: 'delete'">
               <th style="width: 7rem; min-width: 7rem">
                 <div class="th-content actions-th">
                   {{ 'COMMON.ACTIONS' | translate }}
                 </div>
               </th>
+              </ng-container>
             </tr>
             <!-- Filter Row -->
             <tr>
@@ -254,9 +256,11 @@
                   (onChangeEvent)="onCreatedDateRangeChange($event)"
                 ></app-custom-daterange>
               </th>
+              <ng-container *hasPermission="'dashboard'; level: 'delete'">
               <th>
                 <!-- No filter for Actions -->
               </th>
+              </ng-container>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-dashboard>
@@ -315,6 +319,7 @@
                   {{ dashboard.createdOn | relativeTime }}
                 </span>
               </td>
+              <ng-container *hasPermission="'dashboard'; level: 'delete'">
               <td>
                 <div class="row-actions">
                   <button
@@ -336,6 +341,7 @@
                   </button>
                 </div>
               </td>
+              </ng-container>
             </tr>
           </ng-template>
           <!-- Skeleton rows while the lazy GET is in flight. -->
