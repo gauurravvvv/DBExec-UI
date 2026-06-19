@@ -2977,6 +2977,95 @@
           "invalid": "Tipo de prompt inválido"
         }
       }
+    },
+    "analyses": {
+      "name": {
+        "required": "O nome da análise é obrigatório",
+        "tooShort": "O nome deve ter pelo menos 2 caracteres",
+        "tooLong": "O nome não deve exceder 100 caracteres",
+        "invalid": "O nome deve começar com uma letra ou número e pode conter apenas letras, números, espaços, pontos, sublinhados e hifens"
+      },
+      "description": {
+        "tooLong": "A descrição não deve exceder 500 caracteres"
+      },
+      "justification": {
+        "tooLong": "A justificativa não deve exceder 500 caracteres"
+      },
+      "datasource": {
+        "required": "A fonte de dados é obrigatória"
+      },
+      "dataset": {
+        "required": "O conjunto de dados é obrigatório"
+      },
+      "id": {
+        "required": "O id da análise é obrigatório"
+      },
+      "filter": {
+        "atLeastOne": "Pelo menos um filtro é necessário",
+        "name": {
+          "required": "O nome do filtro é obrigatório",
+          "tooLong": "O nome do filtro não deve exceder 100 caracteres"
+        },
+        "column": {
+          "required": "A coluna é obrigatória",
+          "tooLong": "O nome da coluna não deve exceder 255 caracteres"
+        },
+        "type": {
+          "invalid": "Tipo de filtro inválido"
+        },
+        "control": {
+          "invalid": "Tipo de controle de filtro inválido"
+        },
+        "null": {
+          "invalid": "Opção de tratamento de nulos inválida"
+        },
+        "sequence": {
+          "invalid": "A sequência deve ser um inteiro não negativo"
+        },
+        "id": {
+          "required": "O id do filtro é obrigatório"
+        }
+      },
+      "rls": {
+        "id": {
+          "required": "O id da regra RLS é obrigatório"
+        },
+        "name": {
+          "required": "O nome da regra é obrigatório",
+          "tooLong": "O nome da regra não deve exceder 100 caracteres"
+        },
+        "column": {
+          "required": "A coluna é obrigatória",
+          "tooLong": "O nome da coluna não deve exceder 255 caracteres"
+        },
+        "dataset": {
+          "required": "O conjunto de dados é obrigatório"
+        },
+        "scope": {
+          "invalid": "O escopo deve ser usuário ou grupo"
+        },
+        "scopeId": {
+          "required": "O alvo do escopo é obrigatório"
+        },
+        "operator": {
+          "invalid": "Operador inválido"
+        },
+        "values": {
+          "atLeastOne": "Pelo menos um valor é necessário"
+        }
+      },
+      "dashboard": {
+        "analysisId": {
+          "required": "O id da análise de origem é obrigatório"
+        },
+        "id": {
+          "required": "O id do dashboard é obrigatório para republicar"
+        },
+        "name": {
+          "required": "O nome do dashboard é obrigatório",
+          "tooLong": "O nome do dashboard não deve exceder 255 caracteres"
+        }
+      }
     }
   }
 }

@@ -12,8 +12,13 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { REGEX } from 'src/app/core/constants/regex.constant';
 import { DashboardService } from 'src/app/modules/dashboard/services/dashboard.service';
+import {
+  analysisDescriptionSchema,
+  dashboardNameOptionalSchema,
+  dashboardNameSchema,
+} from 'src/app/shared/validators/analyses';
+import { zodValidator } from 'src/app/shared/validators/zod-validator';
 
 /**
  * Payload emitted by the dialog when the user submits.
@@ -98,20 +103,12 @@ export class PublishDashboardDialogComponent implements OnInit, OnChanges {
   }
 
   private initForm() {
+    // Field validators sourced from the SHARED Zod schema. `name` is
+    // required on 'new' and optional on 'existing' — swapped in
+    // setMode() so reactive form validity matches the visible UI.
     this.form = this.fb.group({
-      // Required only when mode === 'new'. We toggle the validator in
-      // setMode() rather than rely on @if-required, so reactive form
-      // validity matches the visible UI exactly.
-      name: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(100),
-          Validators.pattern(REGEX.orgName),
-        ],
-      ],
-      description: ['', [Validators.maxLength(500)]],
+      name: ['', [zodValidator(dashboardNameSchema)]],
+      description: ['', [zodValidator(analysisDescriptionSchema)]],
       dashboardId: [''],
     });
   }
@@ -134,20 +131,11 @@ export class PublishDashboardDialogComponent implements OnInit, OnChanges {
     const nameCtrl = this.form.get('name');
     const dashCtrl = this.form.get('dashboardId');
     if (this.mode === 'new') {
-      nameCtrl?.setValidators([
-        Validators.required,
-        Validators.minLength(2),
-        Validators.maxLength(100),
-        Validators.pattern(REGEX.orgName),
-      ]);
+      nameCtrl?.setValidators(zodValidator(dashboardNameSchema));
       dashCtrl?.clearValidators();
     } else {
-      // Republish: name optional rename only.
-      nameCtrl?.setValidators([
-        Validators.minLength(2),
-        Validators.maxLength(100),
-        Validators.pattern(REGEX.orgName),
-      ]);
+      // Republish: name optional rename only; dashboardId required.
+      nameCtrl?.setValidators(zodValidator(dashboardNameOptionalSchema));
       dashCtrl?.setValidators([Validators.required]);
     }
     nameCtrl?.updateValueAndValidity();
@@ -172,20 +160,8 @@ export class PublishDashboardDialogComponent implements OnInit, OnChanges {
 
   getNameError(): string {
     const ctrl = this.form.get('name');
-    if (!ctrl) return '';
-    if (ctrl.errors?.['required'])
-      return this.translate.instant('VALIDATION.ANALYSIS_NAME_REQUIRED');
-    if (ctrl.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.ANALYSIS_NAME_MIN_LENGTH', {
-        length: ctrl.errors['minlength'].requiredLength,
-      });
-    if (ctrl.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.ANALYSIS_NAME_MAX_LENGTH', {
-        length: ctrl.errors['maxlength'].requiredLength,
-      });
-    if (ctrl.errors?.['pattern'])
-      return this.translate.instant('VALIDATION.ANALYSIS_NAME_PATTERN');
-    return '';
+    const key = ctrl?.errors?.['zod'] as string | undefined;
+    return key ? this.translate.instant(key) : '';
   }
 
   /** True when the user can hit the primary action. */

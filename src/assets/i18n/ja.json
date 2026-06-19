@@ -2977,6 +2977,95 @@
           "invalid": "無効なプロンプトタイプです"
         }
       }
+    },
+    "analyses": {
+      "name": {
+        "required": "分析名は必須です",
+        "tooShort": "名前は 2 文字以上で入力してください",
+        "tooLong": "名前は 100 文字以内で入力してください",
+        "invalid": "名前は英数字で始まり、英数字、スペース、ピリオド、アンダースコア、ハイフンのみ使用できます"
+      },
+      "description": {
+        "tooLong": "説明は 500 文字以内で入力してください"
+      },
+      "justification": {
+        "tooLong": "理由は 500 文字以内で入力してください"
+      },
+      "datasource": {
+        "required": "データソースは必須です"
+      },
+      "dataset": {
+        "required": "データセットは必須です"
+      },
+      "id": {
+        "required": "分析 ID は必須です"
+      },
+      "filter": {
+        "atLeastOne": "フィルターを少なくとも 1 つ指定してください",
+        "name": {
+          "required": "フィルター名は必須です",
+          "tooLong": "フィルター名は 100 文字以内で入力してください"
+        },
+        "column": {
+          "required": "列は必須です",
+          "tooLong": "列名は 255 文字以内で入力してください"
+        },
+        "type": {
+          "invalid": "無効なフィルタータイプ"
+        },
+        "control": {
+          "invalid": "無効なフィルターコントロールタイプ"
+        },
+        "null": {
+          "invalid": "無効な NULL 処理オプション"
+        },
+        "sequence": {
+          "invalid": "シーケンスは 0 以上の整数で指定してください"
+        },
+        "id": {
+          "required": "フィルター ID は必須です"
+        }
+      },
+      "rls": {
+        "id": {
+          "required": "RLS ルール ID は必須です"
+        },
+        "name": {
+          "required": "ルール名は必須です",
+          "tooLong": "ルール名は 100 文字以内で入力してください"
+        },
+        "column": {
+          "required": "列は必須です",
+          "tooLong": "列名は 255 文字以内で入力してください"
+        },
+        "dataset": {
+          "required": "データセットは必須です"
+        },
+        "scope": {
+          "invalid": "スコープはユーザーまたはグループである必要があります"
+        },
+        "scopeId": {
+          "required": "スコープターゲットは必須です"
+        },
+        "operator": {
+          "invalid": "無効な演算子"
+        },
+        "values": {
+          "atLeastOne": "少なくとも 1 つの値を指定してください"
+        }
+      },
+      "dashboard": {
+        "analysisId": {
+          "required": "ソース分析 ID は必須です"
+        },
+        "id": {
+          "required": "再公開にはダッシュボード ID が必要です"
+        },
+        "name": {
+          "required": "ダッシュボード名は必須です",
+          "tooLong": "ダッシュボード名は 255 文字以内で入力してください"
+        }
+      }
     }
   }
 }

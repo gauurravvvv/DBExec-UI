@@ -2977,6 +2977,95 @@
           "invalid": "Tipo di prompt non valido"
         }
       }
+    },
+    "analyses": {
+      "name": {
+        "required": "Il nome dell'analisi è obbligatorio",
+        "tooShort": "Il nome deve contenere almeno 2 caratteri",
+        "tooLong": "Il nome non deve superare i 100 caratteri",
+        "invalid": "Il nome deve iniziare con una lettera o un numero e può contenere solo lettere, numeri, spazi, punti, trattini bassi e trattini"
+      },
+      "description": {
+        "tooLong": "La descrizione non deve superare i 500 caratteri"
+      },
+      "justification": {
+        "tooLong": "La motivazione non deve superare i 500 caratteri"
+      },
+      "datasource": {
+        "required": "La fonte dati è obbligatoria"
+      },
+      "dataset": {
+        "required": "Il dataset è obbligatorio"
+      },
+      "id": {
+        "required": "L'id dell'analisi è obbligatorio"
+      },
+      "filter": {
+        "atLeastOne": "È richiesto almeno un filtro",
+        "name": {
+          "required": "Il nome del filtro è obbligatorio",
+          "tooLong": "Il nome del filtro non deve superare i 100 caratteri"
+        },
+        "column": {
+          "required": "La colonna è obbligatoria",
+          "tooLong": "Il nome della colonna non deve superare i 255 caratteri"
+        },
+        "type": {
+          "invalid": "Tipo di filtro non valido"
+        },
+        "control": {
+          "invalid": "Tipo di controllo del filtro non valido"
+        },
+        "null": {
+          "invalid": "Opzione di gestione dei null non valida"
+        },
+        "sequence": {
+          "invalid": "La sequenza deve essere un intero non negativo"
+        },
+        "id": {
+          "required": "L'id del filtro è obbligatorio"
+        }
+      },
+      "rls": {
+        "id": {
+          "required": "L'id della regola RLS è obbligatorio"
+        },
+        "name": {
+          "required": "Il nome della regola è obbligatorio",
+          "tooLong": "Il nome della regola non deve superare i 100 caratteri"
+        },
+        "column": {
+          "required": "La colonna è obbligatoria",
+          "tooLong": "Il nome della colonna non deve superare i 255 caratteri"
+        },
+        "dataset": {
+          "required": "Il dataset è obbligatorio"
+        },
+        "scope": {
+          "invalid": "L'ambito deve essere utente o gruppo"
+        },
+        "scopeId": {
+          "required": "Il target dell'ambito è obbligatorio"
+        },
+        "operator": {
+          "invalid": "Operatore non valido"
+        },
+        "values": {
+          "atLeastOne": "È richiesto almeno un valore"
+        }
+      },
+      "dashboard": {
+        "analysisId": {
+          "required": "L'id dell'analisi di origine è obbligatorio"
+        },
+        "id": {
+          "required": "L'id della dashboard è obbligatorio per la ripubblicazione"
+        },
+        "name": {
+          "required": "Il nome della dashboard è obbligatorio",
+          "tooLong": "Il nome della dashboard non deve superare i 255 caratteri"
+        }
+      }
     }
   }
 }

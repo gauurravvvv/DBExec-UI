@@ -2977,6 +2977,95 @@
           "invalid": "Type d'invite invalide"
         }
       }
+    },
+    "analyses": {
+      "name": {
+        "required": "Le nom de l'analyse est obligatoire",
+        "tooShort": "Le nom doit comporter au moins 2 caractères",
+        "tooLong": "Le nom ne doit pas dépasser 100 caractères",
+        "invalid": "Le nom doit commencer par une lettre ou un chiffre et ne peut contenir que des lettres, chiffres, espaces, points, tirets bas et tirets"
+      },
+      "description": {
+        "tooLong": "La description ne doit pas dépasser 500 caractères"
+      },
+      "justification": {
+        "tooLong": "La justification ne doit pas dépasser 500 caractères"
+      },
+      "datasource": {
+        "required": "La source de données est obligatoire"
+      },
+      "dataset": {
+        "required": "Le jeu de données est obligatoire"
+      },
+      "id": {
+        "required": "L'identifiant de l'analyse est obligatoire"
+      },
+      "filter": {
+        "atLeastOne": "Au moins un filtre est requis",
+        "name": {
+          "required": "Le nom du filtre est obligatoire",
+          "tooLong": "Le nom du filtre ne doit pas dépasser 100 caractères"
+        },
+        "column": {
+          "required": "La colonne est obligatoire",
+          "tooLong": "Le nom de la colonne ne doit pas dépasser 255 caractères"
+        },
+        "type": {
+          "invalid": "Type de filtre invalide"
+        },
+        "control": {
+          "invalid": "Type de contrôle de filtre invalide"
+        },
+        "null": {
+          "invalid": "Option de gestion des valeurs nulles invalide"
+        },
+        "sequence": {
+          "invalid": "La séquence doit être un entier non négatif"
+        },
+        "id": {
+          "required": "L'identifiant du filtre est obligatoire"
+        }
+      },
+      "rls": {
+        "id": {
+          "required": "L'identifiant de la règle RLS est obligatoire"
+        },
+        "name": {
+          "required": "Le nom de la règle est obligatoire",
+          "tooLong": "Le nom de la règle ne doit pas dépasser 100 caractères"
+        },
+        "column": {
+          "required": "La colonne est obligatoire",
+          "tooLong": "Le nom de la colonne ne doit pas dépasser 255 caractères"
+        },
+        "dataset": {
+          "required": "Le jeu de données est obligatoire"
+        },
+        "scope": {
+          "invalid": "La portée doit être utilisateur ou groupe"
+        },
+        "scopeId": {
+          "required": "La cible de la portée est obligatoire"
+        },
+        "operator": {
+          "invalid": "Opérateur invalide"
+        },
+        "values": {
+          "atLeastOne": "Au moins une valeur est requise"
+        }
+      },
+      "dashboard": {
+        "analysisId": {
+          "required": "L'identifiant de l'analyse source est obligatoire"
+        },
+        "id": {
+          "required": "L'identifiant du tableau de bord est obligatoire pour la republication"
+        },
+        "name": {
+          "required": "Le nom du tableau de bord est obligatoire",
+          "tooLong": "Le nom du tableau de bord ne doit pas dépasser 255 caractères"
+        }
+      }
     }
   }
 }

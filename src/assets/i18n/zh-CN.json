@@ -2977,6 +2977,95 @@
           "invalid": "无效的提示类型"
         }
       }
+    },
+    "analyses": {
+      "name": {
+        "required": "分析名称为必填项",
+        "tooShort": "名称必须至少包含 2 个字符",
+        "tooLong": "名称不得超过 100 个字符",
+        "invalid": "名称必须以字母或数字开头，且只能包含字母、数字、空格、点、下划线和连字符"
+      },
+      "description": {
+        "tooLong": "描述不得超过 500 个字符"
+      },
+      "justification": {
+        "tooLong": "理由不得超过 500 个字符"
+      },
+      "datasource": {
+        "required": "数据源为必填项"
+      },
+      "dataset": {
+        "required": "数据集为必填项"
+      },
+      "id": {
+        "required": "分析 ID 为必填项"
+      },
+      "filter": {
+        "atLeastOne": "至少需要一个过滤器",
+        "name": {
+          "required": "过滤器名称为必填项",
+          "tooLong": "过滤器名称不得超过 100 个字符"
+        },
+        "column": {
+          "required": "列为必填项",
+          "tooLong": "列名不得超过 255 个字符"
+        },
+        "type": {
+          "invalid": "无效的过滤器类型"
+        },
+        "control": {
+          "invalid": "无效的过滤器控件类型"
+        },
+        "null": {
+          "invalid": "无效的空值处理选项"
+        },
+        "sequence": {
+          "invalid": "序号必须是非负整数"
+        },
+        "id": {
+          "required": "过滤器 ID 为必填项"
+        }
+      },
+      "rls": {
+        "id": {
+          "required": "RLS 规则 ID 为必填项"
+        },
+        "name": {
+          "required": "规则名称为必填项",
+          "tooLong": "规则名称不得超过 100 个字符"
+        },
+        "column": {
+          "required": "列为必填项",
+          "tooLong": "列名不得超过 255 个字符"
+        },
+        "dataset": {
+          "required": "数据集为必填项"
+        },
+        "scope": {
+          "invalid": "范围必须是用户或组"
+        },
+        "scopeId": {
+          "required": "范围目标为必填项"
+        },
+        "operator": {
+          "invalid": "无效的运算符"
+        },
+        "values": {
+          "atLeastOne": "至少需要一个值"
+        }
+      },
+      "dashboard": {
+        "analysisId": {
+          "required": "源分析 ID 为必填项"
+        },
+        "id": {
+          "required": "重新发布需要仪表板 ID"
+        },
+        "name": {
+          "required": "仪表板名称为必填项",
+          "tooLong": "仪表板名称不得超过 255 个字符"
+        }
+      }
     }
   }
 }

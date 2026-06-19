@@ -2977,6 +2977,95 @@
           "invalid": "잘못된 프롬프트 유형"
         }
       }
+    },
+    "analyses": {
+      "name": {
+        "required": "분석 이름이 필요합니다",
+        "tooShort": "이름은 2자 이상이어야 합니다",
+        "tooLong": "이름은 100자를 초과할 수 없습니다",
+        "invalid": "이름은 문자 또는 숫자로 시작해야 하며 문자, 숫자, 공백, 점, 밑줄, 하이픈만 사용할 수 있습니다"
+      },
+      "description": {
+        "tooLong": "설명은 500자를 초과할 수 없습니다"
+      },
+      "justification": {
+        "tooLong": "사유는 500자를 초과할 수 없습니다"
+      },
+      "datasource": {
+        "required": "데이터 소스가 필요합니다"
+      },
+      "dataset": {
+        "required": "데이터셋이 필요합니다"
+      },
+      "id": {
+        "required": "분석 ID가 필요합니다"
+      },
+      "filter": {
+        "atLeastOne": "필터가 하나 이상 필요합니다",
+        "name": {
+          "required": "필터 이름이 필요합니다",
+          "tooLong": "필터 이름은 100자를 초과할 수 없습니다"
+        },
+        "column": {
+          "required": "열이 필요합니다",
+          "tooLong": "열 이름은 255자를 초과할 수 없습니다"
+        },
+        "type": {
+          "invalid": "잘못된 필터 유형"
+        },
+        "control": {
+          "invalid": "잘못된 필터 컨트롤 유형"
+        },
+        "null": {
+          "invalid": "잘못된 null 처리 옵션"
+        },
+        "sequence": {
+          "invalid": "시퀀스는 음이 아닌 정수여야 합니다"
+        },
+        "id": {
+          "required": "필터 ID가 필요합니다"
+        }
+      },
+      "rls": {
+        "id": {
+          "required": "RLS 규칙 ID가 필요합니다"
+        },
+        "name": {
+          "required": "규칙 이름이 필요합니다",
+          "tooLong": "규칙 이름은 100자를 초과할 수 없습니다"
+        },
+        "column": {
+          "required": "열이 필요합니다",
+          "tooLong": "열 이름은 255자를 초과할 수 없습니다"
+        },
+        "dataset": {
+          "required": "데이터셋이 필요합니다"
+        },
+        "scope": {
+          "invalid": "범위는 사용자 또는 그룹이어야 합니다"
+        },
+        "scopeId": {
+          "required": "범위 대상이 필요합니다"
+        },
+        "operator": {
+          "invalid": "잘못된 연산자"
+        },
+        "values": {
+          "atLeastOne": "값이 하나 이상 필요합니다"
+        }
+      },
+      "dashboard": {
+        "analysisId": {
+          "required": "원본 분석 ID가 필요합니다"
+        },
+        "id": {
+          "required": "다시 게시하려면 대시보드 ID가 필요합니다"
+        },
+        "name": {
+          "required": "대시보드 이름이 필요합니다",
+          "tooLong": "대시보드 이름은 255자를 초과할 수 없습니다"
+        }
+      }
     }
   }
 }

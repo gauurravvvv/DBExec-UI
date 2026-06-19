@@ -2977,6 +2977,95 @@
           "invalid": "Ongeldig prompttype"
         }
       }
+    },
+    "analyses": {
+      "name": {
+        "required": "Analysenaam is verplicht",
+        "tooShort": "De naam moet minstens 2 tekens bevatten",
+        "tooLong": "De naam mag niet langer zijn dan 100 tekens",
+        "invalid": "De naam moet beginnen met een letter of cijfer en mag alleen letters, cijfers, spaties, punten, lage streepjes en koppeltekens bevatten"
+      },
+      "description": {
+        "tooLong": "De beschrijving mag niet langer zijn dan 500 tekens"
+      },
+      "justification": {
+        "tooLong": "De motivering mag niet langer zijn dan 500 tekens"
+      },
+      "datasource": {
+        "required": "Gegevensbron is verplicht"
+      },
+      "dataset": {
+        "required": "Dataset is verplicht"
+      },
+      "id": {
+        "required": "Analyse-id is verplicht"
+      },
+      "filter": {
+        "atLeastOne": "Er is minstens één filter vereist",
+        "name": {
+          "required": "Filternaam is verplicht",
+          "tooLong": "De filternaam mag niet langer zijn dan 100 tekens"
+        },
+        "column": {
+          "required": "Kolom is verplicht",
+          "tooLong": "De kolomnaam mag niet langer zijn dan 255 tekens"
+        },
+        "type": {
+          "invalid": "Ongeldig filtertype"
+        },
+        "control": {
+          "invalid": "Ongeldig type filterbesturingselement"
+        },
+        "null": {
+          "invalid": "Ongeldige optie voor null-behandeling"
+        },
+        "sequence": {
+          "invalid": "De volgorde moet een niet-negatief geheel getal zijn"
+        },
+        "id": {
+          "required": "Filter-id is verplicht"
+        }
+      },
+      "rls": {
+        "id": {
+          "required": "RLS-regel-id is verplicht"
+        },
+        "name": {
+          "required": "Regelnaam is verplicht",
+          "tooLong": "De regelnaam mag niet langer zijn dan 100 tekens"
+        },
+        "column": {
+          "required": "Kolom is verplicht",
+          "tooLong": "De kolomnaam mag niet langer zijn dan 255 tekens"
+        },
+        "dataset": {
+          "required": "Dataset is verplicht"
+        },
+        "scope": {
+          "invalid": "Bereik moet gebruiker of groep zijn"
+        },
+        "scopeId": {
+          "required": "Bereikdoel is verplicht"
+        },
+        "operator": {
+          "invalid": "Ongeldige operator"
+        },
+        "values": {
+          "atLeastOne": "Er is minstens één waarde vereist"
+        }
+      },
+      "dashboard": {
+        "analysisId": {
+          "required": "Bron-analyse-id is verplicht"
+        },
+        "id": {
+          "required": "Dashboard-id is vereist voor opnieuw publiceren"
+        },
+        "name": {
+          "required": "Dashboardnaam is verplicht",
+          "tooLong": "De dashboardnaam mag niet langer zijn dan 255 tekens"
+        }
+      }
     }
   }
 }

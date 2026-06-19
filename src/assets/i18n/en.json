@@ -3023,6 +3023,95 @@
           "invalid": "Invalid prompt type"
         }
       }
+    },
+    "analyses": {
+      "name": {
+        "required": "Analysis name is required",
+        "tooShort": "Analysis name must be at least 2 characters",
+        "tooLong": "Analysis name must not exceed 100 characters",
+        "invalid": "Analysis name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens"
+      },
+      "description": {
+        "tooLong": "Description must not exceed 500 characters"
+      },
+      "justification": {
+        "tooLong": "Justification must not exceed 500 characters"
+      },
+      "datasource": {
+        "required": "Datasource is required"
+      },
+      "dataset": {
+        "required": "Dataset is required"
+      },
+      "id": {
+        "required": "Analysis id is required"
+      },
+      "filter": {
+        "atLeastOne": "At least one filter is required",
+        "name": {
+          "required": "Filter name is required",
+          "tooLong": "Filter name must not exceed 100 characters"
+        },
+        "column": {
+          "required": "Column is required",
+          "tooLong": "Column name must not exceed 255 characters"
+        },
+        "type": {
+          "invalid": "Invalid filter type"
+        },
+        "control": {
+          "invalid": "Invalid filter control type"
+        },
+        "null": {
+          "invalid": "Invalid null-handling option"
+        },
+        "sequence": {
+          "invalid": "Sequence must be a non-negative integer"
+        },
+        "id": {
+          "required": "Filter id is required"
+        }
+      },
+      "rls": {
+        "id": {
+          "required": "RLS rule id is required"
+        },
+        "name": {
+          "required": "Rule name is required",
+          "tooLong": "Rule name must not exceed 100 characters"
+        },
+        "column": {
+          "required": "Column is required",
+          "tooLong": "Column name must not exceed 255 characters"
+        },
+        "dataset": {
+          "required": "Dataset is required"
+        },
+        "scope": {
+          "invalid": "Scope must be either user or group"
+        },
+        "scopeId": {
+          "required": "Scope target is required"
+        },
+        "operator": {
+          "invalid": "Invalid operator"
+        },
+        "values": {
+          "atLeastOne": "At least one value is required"
+        }
+      },
+      "dashboard": {
+        "analysisId": {
+          "required": "Source analysis id is required"
+        },
+        "id": {
+          "required": "Dashboard id is required for republish"
+        },
+        "name": {
+          "required": "Dashboard name is required",
+          "tooLong": "Dashboard name must not exceed 255 characters"
+        }
+      }
     }
   }
 }

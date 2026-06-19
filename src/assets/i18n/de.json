@@ -2977,6 +2977,95 @@
           "invalid": "Ungültiger Prompt-Typ"
         }
       }
+    },
+    "analyses": {
+      "name": {
+        "required": "Der Analysename ist erforderlich",
+        "tooShort": "Der Name muss mindestens 2 Zeichen lang sein",
+        "tooLong": "Der Name darf 100 Zeichen nicht überschreiten",
+        "invalid": "Der Name muss mit einem Buchstaben oder einer Zahl beginnen und darf nur Buchstaben, Zahlen, Leerzeichen, Punkte, Unterstriche und Bindestriche enthalten"
+      },
+      "description": {
+        "tooLong": "Die Beschreibung darf 500 Zeichen nicht überschreiten"
+      },
+      "justification": {
+        "tooLong": "Die Begründung darf 500 Zeichen nicht überschreiten"
+      },
+      "datasource": {
+        "required": "Die Datenquelle ist erforderlich"
+      },
+      "dataset": {
+        "required": "Der Datensatz ist erforderlich"
+      },
+      "id": {
+        "required": "Die Analyse-ID ist erforderlich"
+      },
+      "filter": {
+        "atLeastOne": "Mindestens ein Filter ist erforderlich",
+        "name": {
+          "required": "Der Filtername ist erforderlich",
+          "tooLong": "Der Filtername darf 100 Zeichen nicht überschreiten"
+        },
+        "column": {
+          "required": "Die Spalte ist erforderlich",
+          "tooLong": "Der Spaltenname darf 255 Zeichen nicht überschreiten"
+        },
+        "type": {
+          "invalid": "Ungültiger Filtertyp"
+        },
+        "control": {
+          "invalid": "Ungültiger Filtersteuerelementtyp"
+        },
+        "null": {
+          "invalid": "Ungültige Null-Handhabungsoption"
+        },
+        "sequence": {
+          "invalid": "Die Sequenz muss eine nicht-negative Ganzzahl sein"
+        },
+        "id": {
+          "required": "Die Filter-ID ist erforderlich"
+        }
+      },
+      "rls": {
+        "id": {
+          "required": "Die RLS-Regel-ID ist erforderlich"
+        },
+        "name": {
+          "required": "Der Regelname ist erforderlich",
+          "tooLong": "Der Regelname darf 100 Zeichen nicht überschreiten"
+        },
+        "column": {
+          "required": "Die Spalte ist erforderlich",
+          "tooLong": "Der Spaltenname darf 255 Zeichen nicht überschreiten"
+        },
+        "dataset": {
+          "required": "Der Datensatz ist erforderlich"
+        },
+        "scope": {
+          "invalid": "Der Geltungsbereich muss Benutzer oder Gruppe sein"
+        },
+        "scopeId": {
+          "required": "Das Geltungsbereichsziel ist erforderlich"
+        },
+        "operator": {
+          "invalid": "Ungültiger Operator"
+        },
+        "values": {
+          "atLeastOne": "Mindestens ein Wert ist erforderlich"
+        }
+      },
+      "dashboard": {
+        "analysisId": {
+          "required": "Die Quell-Analyse-ID ist erforderlich"
+        },
+        "id": {
+          "required": "Die Dashboard-ID ist für eine erneute Veröffentlichung erforderlich"
+        },
+        "name": {
+          "required": "Der Dashboard-Name ist erforderlich",
+          "tooLong": "Der Dashboard-Name darf 255 Zeichen nicht überschreiten"
+        }
+      }
     }
   }
 }

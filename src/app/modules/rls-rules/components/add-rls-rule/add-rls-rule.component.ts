@@ -18,8 +18,13 @@ import {
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
-import { REGEX } from 'src/app/core/constants/regex.constant';
 import { RLS_RULE } from 'src/app/core/constants/routes.constant';
+import {
+  analysisDatasetSchema,
+  analysisDescriptionSchema,
+  rlsRuleNameSchema,
+} from 'src/app/shared/validators/analyses';
+import { zodValidator } from 'src/app/shared/validators/zod-validator';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from 'src/app/modules/dataset/services/dataset.service';
@@ -99,18 +104,11 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
   }
 
   initForm() {
+    // Field validators sourced from the SHARED Zod schema.
     this.rlsForm = this.fb.group({
-      name: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(100),
-          Validators.pattern(REGEX.orgName),
-        ],
-      ],
-      description: [''],
-      datasetId: ['', Validators.required],
+      name: ['', [zodValidator(rlsRuleNameSchema)]],
+      description: ['', [zodValidator(analysisDescriptionSchema)]],
+      datasetId: ['', [zodValidator(analysisDatasetSchema)]],
       conditions: this.fb.array([this.createCondition()]),
       isEnabled: [true],
     });
