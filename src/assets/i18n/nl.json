@@ -2850,6 +2850,63 @@
         "required": "Identificatie is vereist",
         "invalid": "Ongeldige identificatie"
       }
+    },
+    "datasources": {
+      "name": {
+        "required": "Databasenaam is verplicht",
+        "tooShort": "De naam moet minstens 2 tekens bevatten",
+        "tooLong": "De naam mag niet langer zijn dan 64 tekens",
+        "invalid": "De naam moet beginnen met een letter of cijfer en mag alleen letters, cijfers, spaties, punten, lage streepjes en koppeltekens bevatten"
+      },
+      "description": {
+        "tooLong": "De beschrijving mag niet langer zijn dan 500 tekens"
+      },
+      "type": {
+        "invalid": "Ongeldig databasetype"
+      },
+      "host": {
+        "required": "Databasehost is verplicht",
+        "tooLong": "De host mag niet langer zijn dan 255 tekens",
+        "invalid": "De host mag alleen letters, cijfers, punten en koppeltekens bevatten"
+      },
+      "port": {
+        "required": "Databasepoort is verplicht",
+        "invalid": "De poort moet een geheel getal tussen 1 en 65535 zijn"
+      },
+      "database": {
+        "required": "Databasenaam is verplicht",
+        "tooLong": "De databasenaam mag niet langer zijn dan 128 tekens",
+        "invalid": "De databasenaam mag alleen letters, cijfers, lage streepjes en koppeltekens bevatten"
+      },
+      "username": {
+        "required": "Databasegebruikersnaam is verplicht",
+        "tooLong": "De gebruikersnaam mag niet langer zijn dan 128 tekens"
+      },
+      "password": {
+        "required": "Databasewachtwoord is verplicht",
+        "tooLong": "Het wachtwoord mag niet langer zijn dan 256 tekens"
+      },
+      "account": {
+        "required": "Snowflake-account is verplicht",
+        "tooLong": "Het Snowflake-account mag niet langer zijn dan 128 tekens"
+      },
+      "warehouse": {
+        "required": "Snowflake-warehouse is verplicht",
+        "tooLong": "Het Snowflake-warehouse mag niet langer zijn dan 128 tekens"
+      },
+      "role": {
+        "tooLong": "De Snowflake-rol mag niet langer zijn dan 128 tekens"
+      },
+      "schemaName": {
+        "tooLong": "Het standaardschema mag niet langer zijn dan 128 tekens"
+      },
+      "id": {
+        "required": "Het gegevensbron-id is verplicht",
+        "invalid": "Ongeldig gegevensbron-id"
+      },
+      "justification": {
+        "tooLong": "De motivering mag niet langer zijn dan 500 tekens"
+      }
     }
   }
 }

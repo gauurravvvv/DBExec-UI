@@ -2850,6 +2850,63 @@
         "required": "Kennung ist erforderlich",
         "invalid": "Ungültige Kennung"
       }
+    },
+    "datasources": {
+      "name": {
+        "required": "Der Datenbankname ist erforderlich",
+        "tooShort": "Der Name muss mindestens 2 Zeichen lang sein",
+        "tooLong": "Der Name darf 64 Zeichen nicht überschreiten",
+        "invalid": "Der Name muss mit einem Buchstaben oder einer Zahl beginnen und darf nur Buchstaben, Zahlen, Leerzeichen, Punkte, Unterstriche und Bindestriche enthalten"
+      },
+      "description": {
+        "tooLong": "Die Beschreibung darf 500 Zeichen nicht überschreiten"
+      },
+      "type": {
+        "invalid": "Ungültiger Datenbanktyp"
+      },
+      "host": {
+        "required": "Der Datenbank-Host ist erforderlich",
+        "tooLong": "Der Host darf 255 Zeichen nicht überschreiten",
+        "invalid": "Der Host darf nur Buchstaben, Zahlen, Punkte und Bindestriche enthalten"
+      },
+      "port": {
+        "required": "Der Datenbank-Port ist erforderlich",
+        "invalid": "Der Port muss eine ganze Zahl zwischen 1 und 65535 sein"
+      },
+      "database": {
+        "required": "Der Datenbankname ist erforderlich",
+        "tooLong": "Der Datenbankname darf 128 Zeichen nicht überschreiten",
+        "invalid": "Der Datenbankname darf nur Buchstaben, Zahlen, Unterstriche und Bindestriche enthalten"
+      },
+      "username": {
+        "required": "Der Datenbankbenutzername ist erforderlich",
+        "tooLong": "Der Benutzername darf 128 Zeichen nicht überschreiten"
+      },
+      "password": {
+        "required": "Das Datenbankkennwort ist erforderlich",
+        "tooLong": "Das Kennwort darf 256 Zeichen nicht überschreiten"
+      },
+      "account": {
+        "required": "Das Snowflake-Konto ist erforderlich",
+        "tooLong": "Das Snowflake-Konto darf 128 Zeichen nicht überschreiten"
+      },
+      "warehouse": {
+        "required": "Das Snowflake-Warehouse ist erforderlich",
+        "tooLong": "Das Snowflake-Warehouse darf 128 Zeichen nicht überschreiten"
+      },
+      "role": {
+        "tooLong": "Die Snowflake-Rolle darf 128 Zeichen nicht überschreiten"
+      },
+      "schemaName": {
+        "tooLong": "Das Standardschema darf 128 Zeichen nicht überschreiten"
+      },
+      "id": {
+        "required": "Die Datenquellen-ID ist erforderlich",
+        "invalid": "Ungültige Datenquellen-ID"
+      },
+      "justification": {
+        "tooLong": "Die Begründung darf 500 Zeichen nicht überschreiten"
+      }
     }
   }
 }

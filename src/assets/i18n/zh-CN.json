@@ -2850,6 +2850,63 @@
         "required": "标识符为必填项",
         "invalid": "标识符无效"
       }
+    },
+    "datasources": {
+      "name": {
+        "required": "数据库名称为必填项",
+        "tooShort": "名称必须至少包含 2 个字符",
+        "tooLong": "名称不得超过 64 个字符",
+        "invalid": "名称必须以字母或数字开头，且只能包含字母、数字、空格、点、下划线和连字符"
+      },
+      "description": {
+        "tooLong": "描述不得超过 500 个字符"
+      },
+      "type": {
+        "invalid": "无效的数据库类型"
+      },
+      "host": {
+        "required": "数据库主机为必填项",
+        "tooLong": "主机不得超过 255 个字符",
+        "invalid": "主机只能包含字母、数字、点和连字符"
+      },
+      "port": {
+        "required": "数据库端口为必填项",
+        "invalid": "端口必须是 1 到 65535 之间的整数"
+      },
+      "database": {
+        "required": "数据库名称为必填项",
+        "tooLong": "数据库名称不得超过 128 个字符",
+        "invalid": "数据库名称只能包含字母、数字、下划线和连字符"
+      },
+      "username": {
+        "required": "数据库用户名为必填项",
+        "tooLong": "用户名不得超过 128 个字符"
+      },
+      "password": {
+        "required": "数据库密码为必填项",
+        "tooLong": "密码不得超过 256 个字符"
+      },
+      "account": {
+        "required": "Snowflake 账户为必填项",
+        "tooLong": "Snowflake 账户不得超过 128 个字符"
+      },
+      "warehouse": {
+        "required": "Snowflake 仓库为必填项",
+        "tooLong": "Snowflake 仓库不得超过 128 个字符"
+      },
+      "role": {
+        "tooLong": "Snowflake 角色不得超过 128 个字符"
+      },
+      "schemaName": {
+        "tooLong": "默认架构不得超过 128 个字符"
+      },
+      "id": {
+        "required": "数据源 ID 为必填项",
+        "invalid": "无效的数据源 ID"
+      },
+      "justification": {
+        "tooLong": "理由不得超过 500 个字符"
+      }
     }
   }
 }

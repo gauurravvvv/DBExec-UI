@@ -2896,6 +2896,63 @@
         "required": "Identifier is required",
         "invalid": "Invalid identifier"
       }
+    },
+    "datasources": {
+      "name": {
+        "required": "Database name is required",
+        "tooShort": "Database name must be at least 2 characters",
+        "tooLong": "Database name must not exceed 64 characters",
+        "invalid": "Database name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens"
+      },
+      "description": {
+        "tooLong": "Description must not exceed 500 characters"
+      },
+      "type": {
+        "invalid": "Invalid database type"
+      },
+      "host": {
+        "required": "Database host is required",
+        "tooLong": "Database host must not exceed 255 characters",
+        "invalid": "Host must contain only letters, digits, dots and hyphens"
+      },
+      "port": {
+        "required": "Database port is required",
+        "invalid": "Port must be a whole number between 1 and 65535"
+      },
+      "database": {
+        "required": "Database name is required",
+        "tooLong": "Database name must not exceed 128 characters",
+        "invalid": "Database name can only contain letters, numbers, underscores and hyphens"
+      },
+      "username": {
+        "required": "Database username is required",
+        "tooLong": "Database username must not exceed 128 characters"
+      },
+      "password": {
+        "required": "Database password is required",
+        "tooLong": "Database password must not exceed 256 characters"
+      },
+      "account": {
+        "required": "Snowflake account is required",
+        "tooLong": "Snowflake account must not exceed 128 characters"
+      },
+      "warehouse": {
+        "required": "Snowflake warehouse is required",
+        "tooLong": "Snowflake warehouse must not exceed 128 characters"
+      },
+      "role": {
+        "tooLong": "Snowflake role must not exceed 128 characters"
+      },
+      "schemaName": {
+        "tooLong": "Default schema must not exceed 128 characters"
+      },
+      "id": {
+        "required": "Datasource id is required",
+        "invalid": "Invalid datasource id"
+      },
+      "justification": {
+        "tooLong": "Justification must not exceed 500 characters"
+      }
     }
   }
 }

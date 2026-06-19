@@ -2850,6 +2850,63 @@
         "required": "O identificador é obrigatório",
         "invalid": "Identificador inválido"
       }
+    },
+    "datasources": {
+      "name": {
+        "required": "O nome do banco de dados é obrigatório",
+        "tooShort": "O nome deve ter pelo menos 2 caracteres",
+        "tooLong": "O nome não deve exceder 64 caracteres",
+        "invalid": "O nome deve começar com uma letra ou número e pode conter apenas letras, números, espaços, pontos, sublinhados e hifens"
+      },
+      "description": {
+        "tooLong": "A descrição não deve exceder 500 caracteres"
+      },
+      "type": {
+        "invalid": "Tipo de banco de dados inválido"
+      },
+      "host": {
+        "required": "O host do banco de dados é obrigatório",
+        "tooLong": "O host não deve exceder 255 caracteres",
+        "invalid": "O host pode conter apenas letras, números, pontos e hifens"
+      },
+      "port": {
+        "required": "A porta do banco de dados é obrigatória",
+        "invalid": "A porta deve ser um número inteiro entre 1 e 65535"
+      },
+      "database": {
+        "required": "O nome do banco de dados é obrigatório",
+        "tooLong": "O nome do banco de dados não deve exceder 128 caracteres",
+        "invalid": "O nome do banco de dados pode conter apenas letras, números, sublinhados e hifens"
+      },
+      "username": {
+        "required": "O usuário do banco de dados é obrigatório",
+        "tooLong": "O usuário não deve exceder 128 caracteres"
+      },
+      "password": {
+        "required": "A senha do banco de dados é obrigatória",
+        "tooLong": "A senha não deve exceder 256 caracteres"
+      },
+      "account": {
+        "required": "A conta Snowflake é obrigatória",
+        "tooLong": "A conta Snowflake não deve exceder 128 caracteres"
+      },
+      "warehouse": {
+        "required": "O warehouse Snowflake é obrigatório",
+        "tooLong": "O warehouse Snowflake não deve exceder 128 caracteres"
+      },
+      "role": {
+        "tooLong": "A função Snowflake não deve exceder 128 caracteres"
+      },
+      "schemaName": {
+        "tooLong": "O esquema padrão não deve exceder 128 caracteres"
+      },
+      "id": {
+        "required": "O id da fonte de dados é obrigatório",
+        "invalid": "Id da fonte de dados inválido"
+      },
+      "justification": {
+        "tooLong": "A justificativa não deve exceder 500 caracteres"
+      }
     }
   }
 }

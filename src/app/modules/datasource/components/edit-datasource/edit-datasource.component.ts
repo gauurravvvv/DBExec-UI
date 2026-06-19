@@ -15,11 +15,19 @@ import {
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { REGEX } from 'src/app/core/constants/regex.constant';
 import { DATASOURCE } from 'src/app/core/constants/routes.constant';
+import {
+  dbDisplayNameSchema,
+  dbHostSchema,
+  dbNameSchema,
+  dbPortSchema,
+  dbUsernameSchema,
+  descriptionSchema,
+} from 'src/app/shared/validators/datasources';
+import { zodValidator } from 'src/app/shared/validators/zod-validator';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
@@ -168,32 +176,16 @@ export class EditDatasourceComponent
   }
 
   initForm(): void {
+    // Field validators sourced from the SHARED Zod schema. password
+    // is intentionally validator-less here — empty means "leave the
+    // stored password alone"; the BE update schema accepts that.
     this.datasourceForm = this.fb.group({
-      name: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(64),
-          Validators.pattern(REGEX.orgName),
-        ],
-      ],
-      description: ['', [Validators.maxLength(500)]],
-      host: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9.-]+$')]],
-      port: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern('^[0-9]+$'),
-          Validators.min(1),
-          Validators.max(65535),
-        ],
-      ],
-      database: [
-        '',
-        [Validators.required, Validators.pattern('^[a-zA-Z0-9_-]+$')],
-      ],
-      username: ['', Validators.required],
+      name: ['', [zodValidator(dbDisplayNameSchema)]],
+      description: ['', [zodValidator(descriptionSchema)]],
+      host: ['', [zodValidator(dbHostSchema)]],
+      port: ['', [zodValidator(dbPortSchema)]],
+      database: ['', [zodValidator(dbNameSchema)]],
+      username: ['', [zodValidator(dbUsernameSchema)]],
       password: [''],
       status: [true],
     });
@@ -398,37 +390,8 @@ export class EditDatasourceComponent
 
   getErrorMessage(fieldName: string): string {
     const control = this.datasourceForm.get(fieldName);
-    if (control?.errors) {
-      if (control.errors['required'])
-        return this.translate.instant('VALIDATION.FIELD_REQUIRED');
-      if (control.errors['minlength'])
-        return this.translate.instant('VALIDATION.MIN_LENGTH', {
-          length: control.errors['minlength'].requiredLength,
-        });
-      if (control.errors['maxlength'])
-        return this.translate.instant('VALIDATION.MAX_LENGTH', {
-          length: control.errors['maxlength'].requiredLength,
-        });
-      if (control.errors['pattern']) {
-        switch (fieldName) {
-          case 'name':
-            return this.translate.instant('VALIDATION.NAME_PATTERN');
-          case 'host':
-            return this.translate.instant('VALIDATION.INVALID_HOST_FORMAT');
-          case 'port':
-            return this.translate.instant('VALIDATION.PORT_MUST_BE_NUMBER');
-          case 'database':
-            return this.translate.instant('VALIDATION.DATABASE_NAME_PATTERN');
-          default:
-            return this.translate.instant('VALIDATION.INVALID_FORMAT');
-        }
-      }
-      if (control.errors['min'] && fieldName === 'port')
-        return this.translate.instant('VALIDATION.PORT_MIN');
-      if (control.errors['max'] && fieldName === 'port')
-        return this.translate.instant('VALIDATION.PORT_MAX');
-    }
-    return '';
+    const key = control?.errors?.['zod'] as string | undefined;
+    return key ? this.translate.instant(key) : '';
   }
 
   onPortKeyPress(event: KeyboardEvent): boolean {

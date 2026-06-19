@@ -2850,6 +2850,63 @@
         "required": "식별자가 필요합니다",
         "invalid": "잘못된 식별자"
       }
+    },
+    "datasources": {
+      "name": {
+        "required": "데이터베이스 이름이 필요합니다",
+        "tooShort": "이름은 2자 이상이어야 합니다",
+        "tooLong": "이름은 64자를 초과할 수 없습니다",
+        "invalid": "이름은 문자 또는 숫자로 시작해야 하며 문자, 숫자, 공백, 점, 밑줄, 하이픈만 사용할 수 있습니다"
+      },
+      "description": {
+        "tooLong": "설명은 500자를 초과할 수 없습니다"
+      },
+      "type": {
+        "invalid": "잘못된 데이터베이스 유형입니다"
+      },
+      "host": {
+        "required": "데이터베이스 호스트가 필요합니다",
+        "tooLong": "호스트는 255자를 초과할 수 없습니다",
+        "invalid": "호스트는 문자, 숫자, 점, 하이픈만 포함할 수 있습니다"
+      },
+      "port": {
+        "required": "데이터베이스 포트가 필요합니다",
+        "invalid": "포트는 1과 65535 사이의 정수여야 합니다"
+      },
+      "database": {
+        "required": "데이터베이스 이름이 필요합니다",
+        "tooLong": "데이터베이스 이름은 128자를 초과할 수 없습니다",
+        "invalid": "데이터베이스 이름은 문자, 숫자, 밑줄, 하이픈만 포함할 수 있습니다"
+      },
+      "username": {
+        "required": "데이터베이스 사용자 이름이 필요합니다",
+        "tooLong": "사용자 이름은 128자를 초과할 수 없습니다"
+      },
+      "password": {
+        "required": "데이터베이스 비밀번호가 필요합니다",
+        "tooLong": "비밀번호는 256자를 초과할 수 없습니다"
+      },
+      "account": {
+        "required": "Snowflake 계정이 필요합니다",
+        "tooLong": "Snowflake 계정은 128자를 초과할 수 없습니다"
+      },
+      "warehouse": {
+        "required": "Snowflake 웨어하우스가 필요합니다",
+        "tooLong": "Snowflake 웨어하우스는 128자를 초과할 수 없습니다"
+      },
+      "role": {
+        "tooLong": "Snowflake 역할은 128자를 초과할 수 없습니다"
+      },
+      "schemaName": {
+        "tooLong": "기본 스키마는 128자를 초과할 수 없습니다"
+      },
+      "id": {
+        "required": "데이터 소스 ID가 필요합니다",
+        "invalid": "잘못된 데이터 소스 ID입니다"
+      },
+      "justification": {
+        "tooLong": "사유는 500자를 초과할 수 없습니다"
+      }
     }
   }
 }

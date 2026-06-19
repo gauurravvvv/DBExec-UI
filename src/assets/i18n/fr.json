@@ -2850,6 +2850,63 @@
         "required": "L'identifiant est obligatoire",
         "invalid": "Identifiant invalide"
       }
+    },
+    "datasources": {
+      "name": {
+        "required": "Le nom de la base de données est obligatoire",
+        "tooShort": "Le nom de la base de données doit comporter au moins 2 caractères",
+        "tooLong": "Le nom de la base de données ne doit pas dépasser 64 caractères",
+        "invalid": "Le nom doit commencer par une lettre ou un chiffre et ne peut contenir que des lettres, chiffres, espaces, points, tirets bas et tirets"
+      },
+      "description": {
+        "tooLong": "La description ne doit pas dépasser 500 caractères"
+      },
+      "type": {
+        "invalid": "Type de base de données invalide"
+      },
+      "host": {
+        "required": "L'hôte de la base de données est obligatoire",
+        "tooLong": "L'hôte ne doit pas dépasser 255 caractères",
+        "invalid": "L'hôte ne peut contenir que des lettres, chiffres, points et tirets"
+      },
+      "port": {
+        "required": "Le port de la base de données est obligatoire",
+        "invalid": "Le port doit être un nombre entier entre 1 et 65535"
+      },
+      "database": {
+        "required": "Le nom de la base de données est obligatoire",
+        "tooLong": "Le nom de la base de données ne doit pas dépasser 128 caractères",
+        "invalid": "Le nom de la base de données ne peut contenir que des lettres, chiffres, tirets bas et tirets"
+      },
+      "username": {
+        "required": "Le nom d'utilisateur est obligatoire",
+        "tooLong": "Le nom d'utilisateur ne doit pas dépasser 128 caractères"
+      },
+      "password": {
+        "required": "Le mot de passe est obligatoire",
+        "tooLong": "Le mot de passe ne doit pas dépasser 256 caractères"
+      },
+      "account": {
+        "required": "Le compte Snowflake est obligatoire",
+        "tooLong": "Le compte Snowflake ne doit pas dépasser 128 caractères"
+      },
+      "warehouse": {
+        "required": "L'entrepôt Snowflake est obligatoire",
+        "tooLong": "L'entrepôt Snowflake ne doit pas dépasser 128 caractères"
+      },
+      "role": {
+        "tooLong": "Le rôle Snowflake ne doit pas dépasser 128 caractères"
+      },
+      "schemaName": {
+        "tooLong": "Le schéma par défaut ne doit pas dépasser 128 caractères"
+      },
+      "id": {
+        "required": "L'identifiant de la source de données est obligatoire",
+        "invalid": "Identifiant de source de données invalide"
+      },
+      "justification": {
+        "tooLong": "La justification ne doit pas dépasser 500 caractères"
+      }
     }
   }
 }
