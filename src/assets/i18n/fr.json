@@ -2935,6 +2935,48 @@
       "subject": {
         "invalid": "Référence utilisateur ou groupe invalide"
       }
+    },
+    "datasets": {
+      "name": {
+        "required": "Le nom du jeu de données est obligatoire",
+        "tooShort": "Le nom doit comporter au moins 2 caractères",
+        "tooLong": "Le nom ne doit pas dépasser 100 caractères",
+        "invalid": "Le nom doit commencer par une lettre ou un chiffre et ne peut contenir que des lettres, chiffres, espaces, points, tirets bas et tirets"
+      },
+      "description": {
+        "tooLong": "La description ne doit pas dépasser 500 caractères"
+      },
+      "justification": {
+        "required": "Veuillez fournir une justification pour ce changement",
+        "tooLong": "La justification ne doit pas dépasser 500 caractères"
+      },
+      "datasource": {
+        "required": "La source de données est obligatoire"
+      },
+      "sql": {
+        "required": "La requête SQL est obligatoire",
+        "tooLong": "La requête SQL ne doit pas dépasser 10000 caractères"
+      },
+      "queryBuilder": {
+        "required": "Le Query Builder est obligatoire"
+      },
+      "id": {
+        "required": "L'identifiant du jeu de données est obligatoire"
+      },
+      "field": {
+        "name": {
+          "required": "Le nom du champ est obligatoire",
+          "tooLong": "Le nom du champ ne doit pas dépasser 128 caractères"
+        }
+      },
+      "prompt": {
+        "id": {
+          "required": "L'identifiant de l'invite est obligatoire"
+        },
+        "type": {
+          "invalid": "Type d'invite invalide"
+        }
+      }
     }
   }
 }

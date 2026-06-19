@@ -2981,6 +2981,48 @@
       "subject": {
         "invalid": "Invalid user or group reference"
       }
+    },
+    "datasets": {
+      "name": {
+        "required": "Dataset name is required",
+        "tooShort": "Dataset name must be at least 2 characters",
+        "tooLong": "Dataset name must not exceed 100 characters",
+        "invalid": "Dataset name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens"
+      },
+      "description": {
+        "tooLong": "Description must not exceed 500 characters"
+      },
+      "justification": {
+        "required": "Please provide a justification for this change",
+        "tooLong": "Justification must not exceed 500 characters"
+      },
+      "datasource": {
+        "required": "Datasource is required"
+      },
+      "sql": {
+        "required": "SQL query is required",
+        "tooLong": "SQL query must not exceed 10000 characters"
+      },
+      "queryBuilder": {
+        "required": "Query Builder is required"
+      },
+      "id": {
+        "required": "Dataset id is required"
+      },
+      "field": {
+        "name": {
+          "required": "Field name is required",
+          "tooLong": "Field name must not exceed 128 characters"
+        }
+      },
+      "prompt": {
+        "id": {
+          "required": "Prompt id is required"
+        },
+        "type": {
+          "invalid": "Invalid prompt type"
+        }
+      }
     }
   }
 }

@@ -2935,6 +2935,48 @@
       "subject": {
         "invalid": "Ungültiger Benutzer- oder Gruppenverweis"
       }
+    },
+    "datasets": {
+      "name": {
+        "required": "Der Datensatzname ist erforderlich",
+        "tooShort": "Der Name muss mindestens 2 Zeichen lang sein",
+        "tooLong": "Der Name darf 100 Zeichen nicht überschreiten",
+        "invalid": "Der Name muss mit einem Buchstaben oder einer Zahl beginnen und darf nur Buchstaben, Zahlen, Leerzeichen, Punkte, Unterstriche und Bindestriche enthalten"
+      },
+      "description": {
+        "tooLong": "Die Beschreibung darf 500 Zeichen nicht überschreiten"
+      },
+      "justification": {
+        "required": "Bitte geben Sie eine Begründung für diese Änderung an",
+        "tooLong": "Die Begründung darf 500 Zeichen nicht überschreiten"
+      },
+      "datasource": {
+        "required": "Die Datenquelle ist erforderlich"
+      },
+      "sql": {
+        "required": "Die SQL-Abfrage ist erforderlich",
+        "tooLong": "Die SQL-Abfrage darf 10000 Zeichen nicht überschreiten"
+      },
+      "queryBuilder": {
+        "required": "Der Query Builder ist erforderlich"
+      },
+      "id": {
+        "required": "Die Datensatz-ID ist erforderlich"
+      },
+      "field": {
+        "name": {
+          "required": "Der Feldname ist erforderlich",
+          "tooLong": "Der Feldname darf 128 Zeichen nicht überschreiten"
+        }
+      },
+      "prompt": {
+        "id": {
+          "required": "Die Prompt-ID ist erforderlich"
+        },
+        "type": {
+          "invalid": "Ungültiger Prompt-Typ"
+        }
+      }
     }
   }
 }

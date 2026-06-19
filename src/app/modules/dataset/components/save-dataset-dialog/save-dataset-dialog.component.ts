@@ -8,9 +8,15 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { REGEX } from 'src/app/core/constants/regex.constant';
+import {
+  datasetDescriptionSchema,
+  datasetJustificationRequiredSchema,
+  datasetJustificationSchema,
+  datasetNameSchema,
+} from 'src/app/shared/validators/datasets';
+import { zodValidator } from 'src/app/shared/validators/zod-validator';
 
 export interface DatasetFormData {
   name: string;
@@ -65,14 +71,14 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
       });
 
       const justificationControl = this.datasetForm.get('justification');
-      if (this.showJustification) {
-        justificationControl?.setValidators([
-          Validators.required,
-          Validators.maxLength(500),
-        ]);
-      } else {
-        justificationControl?.clearValidators();
-      }
+      // Toggle between the optional and required-justification Zod
+      // schemas so the audit-log gate ("why are you changing this?")
+      // only fires on update flows.
+      justificationControl?.setValidators(
+        this.showJustification
+          ? zodValidator(datasetJustificationRequiredSchema)
+          : zodValidator(datasetJustificationSchema),
+      );
       justificationControl?.updateValueAndValidity();
     }
 
@@ -90,36 +96,22 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
   }
 
   initForm() {
+    // Field validators sourced from the SHARED Zod schema.
     this.datasetForm = this.fb.group({
-      name: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(100),
-          Validators.pattern(REGEX.orgName),
-        ],
-      ],
-      description: ['', [Validators.maxLength(500)]],
-      justification: ['', [Validators.maxLength(500)]],
+      name: ['', [zodValidator(datasetNameSchema)]],
+      description: ['', [zodValidator(datasetDescriptionSchema)]],
+      justification: ['', [zodValidator(datasetJustificationSchema)]],
     });
   }
 
+  fieldError(fieldName: string): string {
+    const control = this.datasetForm.get(fieldName);
+    const key = control?.errors?.['zod'] as string | undefined;
+    return key ? this.translate.instant(key) : '';
+  }
+
   getNameError(): string {
-    const control = this.datasetForm.get('name');
-    if (control?.errors?.['required'])
-      return this.translate.instant('VALIDATION.DATASET_NAME_REQUIRED');
-    if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.DATASET_NAME_MIN_LENGTH', {
-        length: control.errors['minlength'].requiredLength,
-      });
-    if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.DATASET_NAME_MAX_LENGTH', {
-        length: control.errors['maxlength'].requiredLength,
-      });
-    if (control?.errors?.['pattern'])
-      return this.translate.instant('VALIDATION.DATASET_NAME_PATTERN');
-    return '';
+    return this.fieldError('name');
   }
 
   onSubmit() {

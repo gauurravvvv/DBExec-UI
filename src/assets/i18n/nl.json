@@ -2935,6 +2935,48 @@
       "subject": {
         "invalid": "Ongeldige gebruikers- of groepsverwijzing"
       }
+    },
+    "datasets": {
+      "name": {
+        "required": "Datasetnaam is verplicht",
+        "tooShort": "De naam moet minstens 2 tekens bevatten",
+        "tooLong": "De naam mag niet langer zijn dan 100 tekens",
+        "invalid": "De naam moet beginnen met een letter of cijfer en mag alleen letters, cijfers, spaties, punten, lage streepjes en koppeltekens bevatten"
+      },
+      "description": {
+        "tooLong": "De beschrijving mag niet langer zijn dan 500 tekens"
+      },
+      "justification": {
+        "required": "Geef een motivering voor deze wijziging",
+        "tooLong": "De motivering mag niet langer zijn dan 500 tekens"
+      },
+      "datasource": {
+        "required": "Gegevensbron is verplicht"
+      },
+      "sql": {
+        "required": "SQL-query is verplicht",
+        "tooLong": "De SQL-query mag niet langer zijn dan 10000 tekens"
+      },
+      "queryBuilder": {
+        "required": "Query Builder is verplicht"
+      },
+      "id": {
+        "required": "Dataset-id is verplicht"
+      },
+      "field": {
+        "name": {
+          "required": "Veldnaam is verplicht",
+          "tooLong": "De veldnaam mag niet langer zijn dan 128 tekens"
+        }
+      },
+      "prompt": {
+        "id": {
+          "required": "Prompt-id is verplicht"
+        },
+        "type": {
+          "invalid": "Ongeldig prompttype"
+        }
+      }
     }
   }
 }

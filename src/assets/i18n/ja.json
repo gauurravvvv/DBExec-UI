@@ -2935,6 +2935,48 @@
       "subject": {
         "invalid": "無効なユーザーまたはグループの参照です"
       }
+    },
+    "datasets": {
+      "name": {
+        "required": "データセット名は必須です",
+        "tooShort": "名前は 2 文字以上で入力してください",
+        "tooLong": "名前は 100 文字以内で入力してください",
+        "invalid": "名前は英数字で始まり、英数字、スペース、ピリオド、アンダースコア、ハイフンのみ使用できます"
+      },
+      "description": {
+        "tooLong": "説明は 500 文字以内で入力してください"
+      },
+      "justification": {
+        "required": "この変更の理由を入力してください",
+        "tooLong": "理由は 500 文字以内で入力してください"
+      },
+      "datasource": {
+        "required": "データソースは必須です"
+      },
+      "sql": {
+        "required": "SQL クエリは必須です",
+        "tooLong": "SQL クエリは 10000 文字以内で入力してください"
+      },
+      "queryBuilder": {
+        "required": "クエリビルダーは必須です"
+      },
+      "id": {
+        "required": "データセット ID は必須です"
+      },
+      "field": {
+        "name": {
+          "required": "フィールド名は必須です",
+          "tooLong": "フィールド名は 128 文字以内で入力してください"
+        }
+      },
+      "prompt": {
+        "id": {
+          "required": "プロンプト ID は必須です"
+        },
+        "type": {
+          "invalid": "無効なプロンプトタイプです"
+        }
+      }
     }
   }
 }

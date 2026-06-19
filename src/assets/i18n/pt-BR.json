@@ -2935,6 +2935,48 @@
       "subject": {
         "invalid": "Referência de usuário ou grupo inválida"
       }
+    },
+    "datasets": {
+      "name": {
+        "required": "O nome do conjunto de dados é obrigatório",
+        "tooShort": "O nome deve ter pelo menos 2 caracteres",
+        "tooLong": "O nome não deve exceder 100 caracteres",
+        "invalid": "O nome deve começar com uma letra ou número e pode conter apenas letras, números, espaços, pontos, sublinhados e hifens"
+      },
+      "description": {
+        "tooLong": "A descrição não deve exceder 500 caracteres"
+      },
+      "justification": {
+        "required": "Forneça uma justificativa para esta alteração",
+        "tooLong": "A justificativa não deve exceder 500 caracteres"
+      },
+      "datasource": {
+        "required": "A fonte de dados é obrigatória"
+      },
+      "sql": {
+        "required": "A consulta SQL é obrigatória",
+        "tooLong": "A consulta SQL não deve exceder 10000 caracteres"
+      },
+      "queryBuilder": {
+        "required": "O Query Builder é obrigatório"
+      },
+      "id": {
+        "required": "O id do conjunto de dados é obrigatório"
+      },
+      "field": {
+        "name": {
+          "required": "O nome do campo é obrigatório",
+          "tooLong": "O nome do campo não deve exceder 128 caracteres"
+        }
+      },
+      "prompt": {
+        "id": {
+          "required": "O id do prompt é obrigatório"
+        },
+        "type": {
+          "invalid": "Tipo de prompt inválido"
+        }
+      }
     }
   }
 }

@@ -2935,6 +2935,48 @@
       "subject": {
         "invalid": "无效的用户或组引用"
       }
+    },
+    "datasets": {
+      "name": {
+        "required": "数据集名称为必填项",
+        "tooShort": "名称必须至少包含 2 个字符",
+        "tooLong": "名称不得超过 100 个字符",
+        "invalid": "名称必须以字母或数字开头，且只能包含字母、数字、空格、点、下划线和连字符"
+      },
+      "description": {
+        "tooLong": "描述不得超过 500 个字符"
+      },
+      "justification": {
+        "required": "请为此更改提供理由",
+        "tooLong": "理由不得超过 500 个字符"
+      },
+      "datasource": {
+        "required": "数据源为必填项"
+      },
+      "sql": {
+        "required": "SQL 查询为必填项",
+        "tooLong": "SQL 查询不得超过 10000 个字符"
+      },
+      "queryBuilder": {
+        "required": "查询构建器为必填项"
+      },
+      "id": {
+        "required": "数据集 ID 为必填项"
+      },
+      "field": {
+        "name": {
+          "required": "字段名称为必填项",
+          "tooLong": "字段名称不得超过 128 个字符"
+        }
+      },
+      "prompt": {
+        "id": {
+          "required": "提示 ID 为必填项"
+        },
+        "type": {
+          "invalid": "无效的提示类型"
+        }
+      }
     }
   }
 }

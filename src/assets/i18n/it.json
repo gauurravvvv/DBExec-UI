@@ -2935,6 +2935,48 @@
       "subject": {
         "invalid": "Riferimento utente o gruppo non valido"
       }
+    },
+    "datasets": {
+      "name": {
+        "required": "Il nome del dataset è obbligatorio",
+        "tooShort": "Il nome deve contenere almeno 2 caratteri",
+        "tooLong": "Il nome non deve superare i 100 caratteri",
+        "invalid": "Il nome deve iniziare con una lettera o un numero e può contenere solo lettere, numeri, spazi, punti, trattini bassi e trattini"
+      },
+      "description": {
+        "tooLong": "La descrizione non deve superare i 500 caratteri"
+      },
+      "justification": {
+        "required": "Fornisci una giustificazione per questa modifica",
+        "tooLong": "La motivazione non deve superare i 500 caratteri"
+      },
+      "datasource": {
+        "required": "La fonte dati è obbligatoria"
+      },
+      "sql": {
+        "required": "La query SQL è obbligatoria",
+        "tooLong": "La query SQL non deve superare i 10000 caratteri"
+      },
+      "queryBuilder": {
+        "required": "Il Query Builder è obbligatorio"
+      },
+      "id": {
+        "required": "L'id del dataset è obbligatorio"
+      },
+      "field": {
+        "name": {
+          "required": "Il nome del campo è obbligatorio",
+          "tooLong": "Il nome del campo non deve superare i 128 caratteri"
+        }
+      },
+      "prompt": {
+        "id": {
+          "required": "L'id del prompt è obbligatorio"
+        },
+        "type": {
+          "invalid": "Tipo di prompt non valido"
+        }
+      }
     }
   }
 }
