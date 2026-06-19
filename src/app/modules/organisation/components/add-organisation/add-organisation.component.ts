@@ -10,11 +10,22 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { REGEX } from 'src/app/core/constants/regex.constant';
 import { ORGANISATION } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SUPPORTED_LOCALES } from 'src/app/core/services/locale.service';
+import {
+  adminEmailSchema,
+  dbHostSchema,
+  dbNameSchema,
+  dbPasswordSchema,
+  dbPortSchema,
+  dbSchemaSchema,
+  dbUsernameSchema,
+  orgDescriptionSchema,
+  orgNameSchema,
+} from 'src/app/shared/validators/organisation';
+import { zodValidator } from 'src/app/shared/validators/zod-validator';
 import { OrganisationService } from '../../services/organisation.service';
 
 @Component({
@@ -65,66 +76,25 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
   }
 
   private initForm() {
+    // Every field validator below is sourced from the SHARED Zod
+    // schema in src/app/shared/validators/organisation.ts. The
+    // identical file exists in the BE repo, so what the FE rejects
+    // is exactly what the BE rejects — same regex, same min/max,
+    // same required flags, same translation keys.
     this.orgForm = this.fb.group({
-      name: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(64),
-          Validators.pattern(REGEX.orgName),
-        ],
-      ],
-      description: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(500),
-        ],
-      ],
+      name: ['', [zodValidator(orgNameSchema)]],
+      description: ['', [zodValidator(orgDescriptionSchema)]],
       // Encryption configuration is no longer collected from the
       // admin. The BE generates a per-org AES-256-GCM Data Encryption
       // Key (DEK) server-side and wraps it under the platform master
       // key on every org creation. See SECURITY.md for the design.
-      // Master database fields
-      dbHost: [
-        '',
-        [Validators.required, Validators.pattern('^[a-zA-Z0-9.-]+$')],
-      ],
-      dbPort: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern('^[0-9]+$'),
-          Validators.min(1),
-          Validators.max(65535),
-        ],
-      ],
-      dbName: [
-        '',
-        [Validators.required, Validators.pattern('^[a-zA-Z0-9_-]+$')],
-      ],
-      dbSchema: [
-        '',
-        [
-          Validators.required,
-          Validators.maxLength(63),
-          Validators.pattern(/^[a-z_][a-z0-9_]{0,62}$/),
-        ],
-      ],
-      dbUsername: ['', [Validators.required]],
-      dbPassword: ['', [Validators.required]],
-      // Validators.email alone allows 'foo@bar' (no TLD). REGEX.email
-      // adds the TLD requirement so 'asdas@sdhu' is rejected.
-      adminEmail: [
-        '',
-        [
-          Validators.required,
-          Validators.email,
-          Validators.pattern(REGEX.email),
-        ],
-      ],
+      dbHost: ['', [zodValidator(dbHostSchema)]],
+      dbPort: ['', [zodValidator(dbPortSchema)]],
+      dbName: ['', [zodValidator(dbNameSchema)]],
+      dbSchema: ['', [zodValidator(dbSchemaSchema)]],
+      dbUsername: ['', [zodValidator(dbUsernameSchema)]],
+      dbPassword: ['', [zodValidator(dbPasswordSchema)]],
+      adminEmail: ['', [zodValidator(adminEmailSchema)]],
       adminLocale: ['en', Validators.required],
       // Security + email policy now live on the per-org OrgPolicy
       // entity and are managed by the Org Admin under App Settings.
@@ -348,75 +318,31 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     );
   }
 
-  getNameError(): string {
-    const control = this.orgForm.get('name');
-    if (control?.errors?.['required'])
-      return this.translate.instant('VALIDATION.ORG_NAME_REQUIRED');
-    if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.ORG_NAME_MIN_LENGTH', {
-        length: control.errors['minlength'].requiredLength,
-      });
-    if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.ORG_NAME_MAX_LENGTH', {
-        length: control.errors['maxlength'].requiredLength,
-      });
-    if (control?.errors?.['pattern'])
-      return this.translate.instant('VALIDATION.ORG_NAME_PATTERN');
-    return '';
-  }
-
-  getDescriptionError(): string {
-    const control = this.orgForm.get('description');
-    if (control?.errors?.['required'])
-      return this.translate.instant('VALIDATION.DESCRIPTION_REQUIRED');
-    if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.DESCRIPTION_MIN_LENGTH', {
-        length: control.errors['minlength'].requiredLength,
-      });
-    if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.DESCRIPTION_MAX_LENGTH', {
-        length: control.errors['maxlength'].requiredLength,
-      });
-    return '';
-  }
-
-  getDbSchemaError(): string {
-    const control = this.orgForm.get('dbSchema');
-    if (control?.errors?.['required'])
-      return this.translate.instant('VALIDATION.SCHEMA_REQUIRED');
-    if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.SCHEMA_MAX_LENGTH');
-    if (control?.errors?.['pattern'])
-      return this.translate.instant('VALIDATION.SCHEMA_PATTERN');
-    return '';
-  }
-
-  getDbFieldError(fieldName: string): string {
+  /**
+   * Unified error getter. Reads the `zod` error key produced by
+   * `zodValidator` on every control wired through the shared schema
+   * and runs it through ngx-translate. The same translation key is
+   * what the BE returns on a 400 response, so a server-side failure
+   * surfaces with the exact same text the inline form error showed.
+   */
+  fieldError(fieldName: string): string {
     const control = this.orgForm.get(fieldName);
-    if (control?.errors) {
-      if (control.errors['required'])
-        return this.translate.instant('VALIDATION.FIELD_REQUIRED');
-      if (control.errors['pattern']) {
-        switch (fieldName) {
-          case 'dbHost':
-            return this.translate.instant('VALIDATION.INVALID_HOST_FORMAT');
-          case 'dbPort':
-            return this.translate.instant('VALIDATION.PORT_MUST_BE_NUMBER');
-          case 'dbName':
-            return this.translate.instant('VALIDATION.DB_NAME_PATTERN');
-          case 'adminEmail':
-            return this.translate.instant('VALIDATION.EMAIL_INVALID');
-          default:
-            return this.translate.instant('VALIDATION.INVALID_FORMAT');
-        }
-      }
-      if (control.errors['min'] && fieldName === 'dbPort')
-        return this.translate.instant('VALIDATION.PORT_MIN');
-      if (control.errors['max'] && fieldName === 'dbPort')
-        return this.translate.instant('VALIDATION.PORT_MAX');
-      if (control.errors['email'])
-        return this.translate.instant('VALIDATION.EMAIL_INVALID');
-    }
-    return '';
+    const key = control?.errors?.['zod'] as string | undefined;
+    return key ? this.translate.instant(key) : '';
+  }
+
+  // Backwards-compat aliases — kept short so existing templates work
+  // without a sweep. New code should call fieldError(name) directly.
+  getNameError(): string {
+    return this.fieldError('name');
+  }
+  getDescriptionError(): string {
+    return this.fieldError('description');
+  }
+  getDbSchemaError(): string {
+    return this.fieldError('dbSchema');
+  }
+  getDbFieldError(fieldName: string): string {
+    return this.fieldError(fieldName);
   }
 }
