@@ -2854,6 +2854,48 @@
       "users": {
         "idInvalid": "One or more user identifiers are invalid"
       }
+    },
+    "auth": {
+      "organisation": {
+        "required": "Organisation is required"
+      },
+      "username": {
+        "required": "Username is required",
+        "tooShort": "Username must be at least 6 characters",
+        "tooLong": "Username must not exceed 30 characters",
+        "invalid": "Username must start with a letter and contain only letters, digits, dots, underscores, or hyphens"
+      },
+      "email": {
+        "required": "Email is required",
+        "tooLong": "Email must not exceed 254 characters",
+        "invalid": "Please enter a valid email address"
+      },
+      "password": {
+        "required": "Password is required",
+        "tooShort": "Password must be at least 8 characters",
+        "tooLong": "Password must not exceed 128 characters",
+        "noSpaces": "Password must not contain spaces",
+        "lowercase": "Password must contain at least one lowercase letter",
+        "uppercase": "Password must contain at least one uppercase letter",
+        "digit": "Password must contain at least one number",
+        "special": "Password must contain at least one special character (e.g. @$!%*?&)"
+      },
+      "otp": {
+        "required": "OTP is required",
+        "invalid": "OTP must be 6 letters or digits"
+      },
+      "setupToken": {
+        "required": "Setup token is required",
+        "invalid": "Invalid setup token format"
+      },
+      "refreshToken": {
+        "required": "Refresh token is required",
+        "invalid": "Invalid refresh token"
+      },
+      "id": {
+        "required": "Identifier is required",
+        "invalid": "Invalid identifier"
+      }
     }
   }
 }

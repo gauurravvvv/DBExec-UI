@@ -15,7 +15,9 @@ import { AUTH } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
 import { StorageService } from 'src/app/core/services/storage.service';
+import { newPasswordSchema } from 'src/app/shared/validators/auth';
 import { passwordStrengthValidator } from 'src/app/shared/validators/password-strength.validator';
+import { zodValidator } from 'src/app/shared/validators/zod-validator';
 
 @Component({
   selector: 'app-set-password',
@@ -76,7 +78,17 @@ export class SetPasswordComponent implements OnInit {
   ) {
     this.setPasswordForm = this.fb.group(
       {
-        newPassword: ['', [Validators.required, passwordStrengthValidator()]],
+        // newPassword: BE-parity via zodValidator(newPasswordSchema)
+        // PLUS the per-rule strength validator for the live checklist
+        // (see reset-password.component.ts for the rationale).
+        newPassword: [
+          '',
+          [
+            Validators.required,
+            zodValidator(newPasswordSchema),
+            passwordStrengthValidator(),
+          ],
+        ],
         confirmPassword: ['', [Validators.required]],
       },
       {

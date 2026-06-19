@@ -2808,6 +2808,48 @@
       "users": {
         "idInvalid": "Uno o más identificadores de usuario no son válidos"
       }
+    },
+    "auth": {
+      "organisation": {
+        "required": "La organización es obligatoria"
+      },
+      "username": {
+        "required": "El nombre de usuario es obligatorio",
+        "tooShort": "El nombre de usuario debe tener al menos 6 caracteres",
+        "tooLong": "El nombre de usuario no debe superar los 30 caracteres",
+        "invalid": "El nombre de usuario debe comenzar con una letra y solo puede contener letras, dígitos, puntos, guiones bajos o guiones"
+      },
+      "email": {
+        "required": "El correo electrónico es obligatorio",
+        "tooLong": "El correo electrónico no debe superar los 254 caracteres",
+        "invalid": "Ingrese un correo electrónico válido"
+      },
+      "password": {
+        "required": "La contraseña es obligatoria",
+        "tooShort": "La contraseña debe tener al menos 8 caracteres",
+        "tooLong": "La contraseña no debe superar los 128 caracteres",
+        "noSpaces": "La contraseña no debe contener espacios",
+        "lowercase": "La contraseña debe contener al menos una letra minúscula",
+        "uppercase": "La contraseña debe contener al menos una letra mayúscula",
+        "digit": "La contraseña debe contener al menos un número",
+        "special": "La contraseña debe contener al menos un carácter especial (p. ej. @$!%*?&)"
+      },
+      "otp": {
+        "required": "El OTP es obligatorio",
+        "invalid": "El OTP debe tener 6 letras o dígitos"
+      },
+      "setupToken": {
+        "required": "El token de configuración es obligatorio",
+        "invalid": "Formato de token de configuración no válido"
+      },
+      "refreshToken": {
+        "required": "El token de actualización es obligatorio",
+        "invalid": "Token de actualización no válido"
+      },
+      "id": {
+        "required": "El identificador es obligatorio",
+        "invalid": "Identificador no válido"
+      }
     }
   }
 }

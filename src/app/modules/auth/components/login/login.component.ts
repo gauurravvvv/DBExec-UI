@@ -5,10 +5,16 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { FormGroup, UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
+import {
+  loginPasswordSchema,
+  organisationSchema,
+  usernameSchema,
+} from 'src/app/shared/validators/auth';
+import { zodValidator } from 'src/app/shared/validators/zod-validator';
 
 // Single generic message for any "wrong identifier or credential" outcome.
 // Specific server-side reasons (lockout, downtime, etc.) still pass through.
@@ -45,10 +51,16 @@ export class LoginComponent implements OnInit {
     // and reset flows — at sign-in, the server is the source of truth.
     // Client-side pattern checks here would block legacy accounts and leak
     // hints about the current password policy.
+    // Field validators sourced from the SHARED Zod schema at
+    // src/app/shared/validators/auth.ts (mirrored to BE). Login keeps
+    // looser rules than user-creation: required-only on username, no
+    // strength check on the password we're about to send to the
+    // server. Format / strength checks at sign-in would block legacy
+    // accounts and leak the current policy to attackers.
     this.loginForm = this.fb.group({
-      organisation: ['', [Validators.required]],
-      username: ['', [Validators.required]],
-      password: ['', [Validators.required]],
+      organisation: ['', [zodValidator(organisationSchema)]],
+      username: ['', [zodValidator(usernameSchema)]],
+      password: ['', [zodValidator(loginPasswordSchema)]],
     });
   }
 

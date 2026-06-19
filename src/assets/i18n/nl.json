@@ -2808,6 +2808,48 @@
       "users": {
         "idInvalid": "Een of meer gebruikersidentificatoren zijn ongeldig"
       }
+    },
+    "auth": {
+      "organisation": {
+        "required": "Organisatie is vereist"
+      },
+      "username": {
+        "required": "Gebruikersnaam is vereist",
+        "tooShort": "Gebruikersnaam moet minimaal 6 tekens bevatten",
+        "tooLong": "Gebruikersnaam mag niet meer dan 30 tekens bevatten",
+        "invalid": "Gebruikersnaam moet beginnen met een letter en mag alleen letters, cijfers, punten, underscores of streepjes bevatten"
+      },
+      "email": {
+        "required": "E-mailadres is vereist",
+        "tooLong": "E-mailadres mag niet meer dan 254 tekens bevatten",
+        "invalid": "Voer een geldig e-mailadres in"
+      },
+      "password": {
+        "required": "Wachtwoord is vereist",
+        "tooShort": "Wachtwoord moet minimaal 8 tekens bevatten",
+        "tooLong": "Wachtwoord mag niet meer dan 128 tekens bevatten",
+        "noSpaces": "Wachtwoord mag geen spaties bevatten",
+        "lowercase": "Wachtwoord moet ten minste één kleine letter bevatten",
+        "uppercase": "Wachtwoord moet ten minste één hoofdletter bevatten",
+        "digit": "Wachtwoord moet ten minste één cijfer bevatten",
+        "special": "Wachtwoord moet ten minste één speciaal teken bevatten (bijv. @$!%*?&)"
+      },
+      "otp": {
+        "required": "OTP is vereist",
+        "invalid": "OTP moet uit 6 letters of cijfers bestaan"
+      },
+      "setupToken": {
+        "required": "Configuratietoken is vereist",
+        "invalid": "Ongeldig configuratietoken-formaat"
+      },
+      "refreshToken": {
+        "required": "Verniewingstoken is vereist",
+        "invalid": "Ongeldig vernieuwingstoken"
+      },
+      "id": {
+        "required": "Identificatie is vereist",
+        "invalid": "Ongeldige identificatie"
+      }
     }
   }
 }

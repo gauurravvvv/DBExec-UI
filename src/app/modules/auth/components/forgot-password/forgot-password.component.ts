@@ -5,10 +5,16 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { FormGroup, UntypedFormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
+import {
+  emailSchema,
+  organisationSchema,
+  usernameSchema,
+} from 'src/app/shared/validators/auth';
+import { zodValidator } from 'src/app/shared/validators/zod-validator';
 
 @Component({
   selector: 'app-forgot-password',
@@ -32,10 +38,12 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     private loginService: LoginService,
     private globalService: GlobalService,
   ) {
+    // Field validators sourced from the SHARED Zod schema at
+    // src/app/shared/validators/auth.ts (mirrored to BE).
     this.forgotPasswordForm = this.fb.group({
-      organisation: ['', [Validators.required]],
-      username: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
+      organisation: ['', [zodValidator(organisationSchema)]],
+      username: ['', [zodValidator(usernameSchema)]],
+      email: ['', [zodValidator(emailSchema)]],
     });
   }
 

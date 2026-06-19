@@ -2808,6 +2808,48 @@
       "users": {
         "idInvalid": "Um ou mais identificadores de usuário são inválidos"
       }
+    },
+    "auth": {
+      "organisation": {
+        "required": "A organização é obrigatória"
+      },
+      "username": {
+        "required": "O nome de usuário é obrigatório",
+        "tooShort": "O nome de usuário deve ter pelo menos 6 caracteres",
+        "tooLong": "O nome de usuário não deve exceder 30 caracteres",
+        "invalid": "O nome de usuário deve começar com uma letra e pode conter apenas letras, dígitos, pontos, sublinhados ou hífens"
+      },
+      "email": {
+        "required": "O e-mail é obrigatório",
+        "tooLong": "O e-mail não deve exceder 254 caracteres",
+        "invalid": "Insira um endereço de e-mail válido"
+      },
+      "password": {
+        "required": "A senha é obrigatória",
+        "tooShort": "A senha deve ter pelo menos 8 caracteres",
+        "tooLong": "A senha não deve exceder 128 caracteres",
+        "noSpaces": "A senha não deve conter espaços",
+        "lowercase": "A senha deve conter pelo menos uma letra minúscula",
+        "uppercase": "A senha deve conter pelo menos uma letra maiúscula",
+        "digit": "A senha deve conter pelo menos um número",
+        "special": "A senha deve conter pelo menos um caractere especial (ex. @$!%*?&)"
+      },
+      "otp": {
+        "required": "O OTP é obrigatório",
+        "invalid": "O OTP deve ter 6 letras ou dígitos"
+      },
+      "setupToken": {
+        "required": "O token de configuração é obrigatório",
+        "invalid": "Formato do token de configuração inválido"
+      },
+      "refreshToken": {
+        "required": "O token de atualização é obrigatório",
+        "invalid": "Token de atualização inválido"
+      },
+      "id": {
+        "required": "O identificador é obrigatório",
+        "invalid": "Identificador inválido"
+      }
     }
   }
 }

@@ -21,7 +21,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AUTH } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
+import { newPasswordSchema } from 'src/app/shared/validators/auth';
 import { passwordStrengthValidator } from 'src/app/shared/validators/password-strength.validator';
+import { zodValidator } from 'src/app/shared/validators/zod-validator';
 
 @Component({
   selector: 'app-reset-password',
@@ -62,9 +64,26 @@ export class ResetPasswordComponent implements OnInit {
       );
     }
 
+    // newPassword has BOTH:
+    //   - `zodValidator(newPasswordSchema)` — surfaces the FIRST error
+    //     key (`errors['zod']`) matching exactly what the BE would
+    //     return on submit, so the user gets a consistent message
+    //     across FE inline and BE-rejection toasts.
+    //   - `passwordStrengthValidator()` — FE-only, surfaces ALL
+    //     failing rules at once as individual error keys so the live
+    //     "strength indicator" checklist (8 chars, lowercase, etc.)
+    //     can light up per rule.
+    // Both validators are advisory; the BE schema is the contract.
     this.resetPasswordForm = this.fb.group(
       {
-        newPassword: ['', [Validators.required, passwordStrengthValidator()]],
+        newPassword: [
+          '',
+          [
+            Validators.required,
+            zodValidator(newPasswordSchema),
+            passwordStrengthValidator(),
+          ],
+        ],
         confirmPassword: ['', [Validators.required]],
       },
       {

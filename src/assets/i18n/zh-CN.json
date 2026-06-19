@@ -2808,6 +2808,48 @@
       "users": {
         "idInvalid": "一个或多个用户标识符无效"
       }
+    },
+    "auth": {
+      "organisation": {
+        "required": "组织为必填项"
+      },
+      "username": {
+        "required": "用户名为必填项",
+        "tooShort": "用户名至少需要 6 个字符",
+        "tooLong": "用户名不能超过 30 个字符",
+        "invalid": "用户名必须以字母开头，且只能包含字母、数字、点、下划线或连字符"
+      },
+      "email": {
+        "required": "电子邮件为必填项",
+        "tooLong": "电子邮件不能超过 254 个字符",
+        "invalid": "请输入有效的电子邮件地址"
+      },
+      "password": {
+        "required": "密码为必填项",
+        "tooShort": "密码至少需要 8 个字符",
+        "tooLong": "密码不能超过 128 个字符",
+        "noSpaces": "密码不能包含空格",
+        "lowercase": "密码必须至少包含一个小写字母",
+        "uppercase": "密码必须至少包含一个大写字母",
+        "digit": "密码必须至少包含一个数字",
+        "special": "密码必须至少包含一个特殊字符 (例如 @$!%*?&)"
+      },
+      "otp": {
+        "required": "OTP 为必填项",
+        "invalid": "OTP 必须为 6 位字母或数字"
+      },
+      "setupToken": {
+        "required": "设置令牌为必填项",
+        "invalid": "设置令牌格式无效"
+      },
+      "refreshToken": {
+        "required": "刷新令牌为必填项",
+        "invalid": "无效的刷新令牌"
+      },
+      "id": {
+        "required": "标识符为必填项",
+        "invalid": "标识符无效"
+      }
     }
   }
 }

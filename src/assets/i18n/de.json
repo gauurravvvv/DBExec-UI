@@ -2808,6 +2808,48 @@
       "users": {
         "idInvalid": "Eine oder mehrere Benutzerkennungen sind ungültig"
       }
+    },
+    "auth": {
+      "organisation": {
+        "required": "Organisation ist erforderlich"
+      },
+      "username": {
+        "required": "Benutzername ist erforderlich",
+        "tooShort": "Benutzername muss mindestens 6 Zeichen lang sein",
+        "tooLong": "Benutzername darf 30 Zeichen nicht überschreiten",
+        "invalid": "Benutzername muss mit einem Buchstaben beginnen und darf nur Buchstaben, Ziffern, Punkte, Unterstriche oder Bindestriche enthalten"
+      },
+      "email": {
+        "required": "E-Mail-Adresse ist erforderlich",
+        "tooLong": "E-Mail-Adresse darf 254 Zeichen nicht überschreiten",
+        "invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein"
+      },
+      "password": {
+        "required": "Passwort ist erforderlich",
+        "tooShort": "Passwort muss mindestens 8 Zeichen lang sein",
+        "tooLong": "Passwort darf 128 Zeichen nicht überschreiten",
+        "noSpaces": "Passwort darf keine Leerzeichen enthalten",
+        "lowercase": "Passwort muss mindestens einen Kleinbuchstaben enthalten",
+        "uppercase": "Passwort muss mindestens einen Großbuchstaben enthalten",
+        "digit": "Passwort muss mindestens eine Ziffer enthalten",
+        "special": "Passwort muss mindestens ein Sonderzeichen enthalten (z. B. @$!%*?&)"
+      },
+      "otp": {
+        "required": "OTP ist erforderlich",
+        "invalid": "OTP muss aus 6 Buchstaben oder Ziffern bestehen"
+      },
+      "setupToken": {
+        "required": "Einrichtungstoken ist erforderlich",
+        "invalid": "Ungültiges Einrichtungstoken-Format"
+      },
+      "refreshToken": {
+        "required": "Aktualisierungstoken ist erforderlich",
+        "invalid": "Ungültiges Aktualisierungstoken"
+      },
+      "id": {
+        "required": "Kennung ist erforderlich",
+        "invalid": "Ungültige Kennung"
+      }
     }
   }
 }

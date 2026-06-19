@@ -2808,6 +2808,48 @@
       "users": {
         "idInvalid": "Un ou plusieurs identifiants d'utilisateur sont invalides"
       }
+    },
+    "auth": {
+      "organisation": {
+        "required": "L'organisation est obligatoire"
+      },
+      "username": {
+        "required": "Le nom d'utilisateur est obligatoire",
+        "tooShort": "Le nom d'utilisateur doit comporter au moins 6 caractères",
+        "tooLong": "Le nom d'utilisateur ne doit pas dépasser 30 caractères",
+        "invalid": "Le nom d'utilisateur doit commencer par une lettre et ne peut contenir que des lettres, chiffres, points, tirets bas ou tirets"
+      },
+      "email": {
+        "required": "L'e-mail est obligatoire",
+        "tooLong": "L'e-mail ne doit pas dépasser 254 caractères",
+        "invalid": "Veuillez saisir une adresse e-mail valide"
+      },
+      "password": {
+        "required": "Le mot de passe est obligatoire",
+        "tooShort": "Le mot de passe doit comporter au moins 8 caractères",
+        "tooLong": "Le mot de passe ne doit pas dépasser 128 caractères",
+        "noSpaces": "Le mot de passe ne doit pas contenir d'espaces",
+        "lowercase": "Le mot de passe doit contenir au moins une lettre minuscule",
+        "uppercase": "Le mot de passe doit contenir au moins une lettre majuscule",
+        "digit": "Le mot de passe doit contenir au moins un chiffre",
+        "special": "Le mot de passe doit contenir au moins un caractère spécial (ex. @$!%*?&)"
+      },
+      "otp": {
+        "required": "L'OTP est obligatoire",
+        "invalid": "L'OTP doit contenir 6 lettres ou chiffres"
+      },
+      "setupToken": {
+        "required": "Le jeton de configuration est obligatoire",
+        "invalid": "Format de jeton de configuration invalide"
+      },
+      "refreshToken": {
+        "required": "Le jeton de rafraîchissement est obligatoire",
+        "invalid": "Jeton de rafraîchissement invalide"
+      },
+      "id": {
+        "required": "L'identifiant est obligatoire",
+        "invalid": "Identifiant invalide"
+      }
     }
   }
 }
