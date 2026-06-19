@@ -2924,6 +2924,17 @@
       "justification": {
         "tooLong": "Die Begründung darf 500 Zeichen nicht überschreiten"
       }
+    },
+    "access": {
+      "datasource": {
+        "required": "Die Datenquelle ist erforderlich"
+      },
+      "connection": {
+        "required": "Die Verbindung ist erforderlich"
+      },
+      "subject": {
+        "invalid": "Ungültiger Benutzer- oder Gruppenverweis"
+      }
     }
   }
 }

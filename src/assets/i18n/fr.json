@@ -2924,6 +2924,17 @@
       "justification": {
         "tooLong": "La justification ne doit pas dépasser 500 caractères"
       }
+    },
+    "access": {
+      "datasource": {
+        "required": "La source de données est obligatoire"
+      },
+      "connection": {
+        "required": "La connexion est obligatoire"
+      },
+      "subject": {
+        "invalid": "Référence utilisateur ou groupe invalide"
+      }
     }
   }
 }

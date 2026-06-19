@@ -8,12 +8,17 @@ import {
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ConnectionService } from 'src/app/modules/connections/services/connection.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import {
+  accessConnectionSchema,
+  accessDatasourceSchema,
+} from 'src/app/shared/validators/access';
+import { zodValidator } from 'src/app/shared/validators/zod-validator';
 import { AccessService } from '../../services/access.service';
 
 @Component({
@@ -64,9 +69,11 @@ export class GrantAccessComponent implements OnInit, OnDestroy {
   }
 
   initForm() {
+    // Field validators sourced from the SHARED Zod schema at
+    // src/app/shared/validators/access.ts (mirrored to BE).
     this.accessForm = this.fb.group({
-      datasource: [null, Validators.required],
-      connection: [null, Validators.required],
+      datasource: [null, [zodValidator(accessDatasourceSchema)]],
+      connection: [null, [zodValidator(accessConnectionSchema)]],
       users: [[]],
       groups: [[]],
     });

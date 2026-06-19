@@ -2970,6 +2970,17 @@
       "justification": {
         "tooLong": "Justification must not exceed 500 characters"
       }
+    },
+    "access": {
+      "datasource": {
+        "required": "Datasource is required"
+      },
+      "connection": {
+        "required": "Connection is required"
+      },
+      "subject": {
+        "invalid": "Invalid user or group reference"
+      }
     }
   }
 }

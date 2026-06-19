@@ -2924,6 +2924,17 @@
       "justification": {
         "tooLong": "理由不得超过 500 个字符"
       }
+    },
+    "access": {
+      "datasource": {
+        "required": "数据源为必填项"
+      },
+      "connection": {
+        "required": "连接为必填项"
+      },
+      "subject": {
+        "invalid": "无效的用户或组引用"
+      }
     }
   }
 }

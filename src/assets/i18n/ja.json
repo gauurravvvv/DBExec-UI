@@ -2924,6 +2924,17 @@
       "justification": {
         "tooLong": "理由は 500 文字以内で入力してください"
       }
+    },
+    "access": {
+      "datasource": {
+        "required": "データソースは必須です"
+      },
+      "connection": {
+        "required": "接続は必須です"
+      },
+      "subject": {
+        "invalid": "無効なユーザーまたはグループの参照です"
+      }
     }
   }
 }

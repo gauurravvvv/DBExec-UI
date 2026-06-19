@@ -2924,6 +2924,17 @@
       "justification": {
         "tooLong": "De motivering mag niet langer zijn dan 500 tekens"
       }
+    },
+    "access": {
+      "datasource": {
+        "required": "Gegevensbron is verplicht"
+      },
+      "connection": {
+        "required": "Verbinding is verplicht"
+      },
+      "subject": {
+        "invalid": "Ongeldige gebruikers- of groepsverwijzing"
+      }
     }
   }
 }

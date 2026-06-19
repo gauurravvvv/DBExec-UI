@@ -2924,6 +2924,17 @@
       "justification": {
         "tooLong": "사유는 500자를 초과할 수 없습니다"
       }
+    },
+    "access": {
+      "datasource": {
+        "required": "데이터 소스가 필요합니다"
+      },
+      "connection": {
+        "required": "연결이 필요합니다"
+      },
+      "subject": {
+        "invalid": "잘못된 사용자 또는 그룹 참조"
+      }
     }
   }
 }
