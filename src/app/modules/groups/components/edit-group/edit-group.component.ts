@@ -12,11 +12,15 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
-import { REGEX } from 'src/app/core/constants/regex.constant';
 import { GROUP } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
+import {
+  groupDescriptionSchema,
+  groupNameSchema,
+} from 'src/app/shared/validators/groups';
+import { zodValidator } from 'src/app/shared/validators/zod-validator';
 import { GroupService } from '../../services/group.service';
 
 @Component({
@@ -99,18 +103,14 @@ export class EditGroupComponent
   }
 
   initForm(): void {
+    // Field validators sourced from the SHARED Zod schema. roleId
+    // stays Validators.required only — it's a disabled select with
+    // a pre-populated value from the role list, not a UUID input;
+    // the BE has its own UUID + existence check.
     this.groupForm = this.fb.group({
       id: [''],
-      name: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(64),
-          Validators.pattern(REGEX.orgName),
-        ],
-      ],
-      description: [''],
+      name: ['', [zodValidator(groupNameSchema)]],
+      description: ['', [zodValidator(groupDescriptionSchema)]],
       roleId: [{ value: '', disabled: true }, Validators.required],
       users: [[]],
       status: [1],
@@ -346,20 +346,13 @@ export class EditGroupComponent
       JSON.stringify(this.originalFormValue) !== JSON.stringify(currentValue);
   }
 
+  fieldError(fieldName: string): string {
+    const control = this.groupForm.get(fieldName);
+    const key = control?.errors?.['zod'] as string | undefined;
+    return key ? this.translate.instant(key) : '';
+  }
+
   getNameError(): string {
-    const control = this.groupForm.get('name');
-    if (control?.errors?.['required'])
-      return this.translate.instant('VALIDATION.GROUP_NAME_REQUIRED');
-    if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.GROUP_NAME_MIN_LENGTH', {
-        length: control.errors['minlength'].requiredLength,
-      });
-    if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.GROUP_NAME_MAX_LENGTH', {
-        length: control.errors['maxlength'].requiredLength,
-      });
-    if (control?.errors?.['pattern'])
-      return this.translate.instant('VALIDATION.GROUP_NAME_PATTERN');
-    return '';
+    return this.fieldError('name');
   }
 }

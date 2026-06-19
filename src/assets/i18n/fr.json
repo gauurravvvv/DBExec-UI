@@ -2743,6 +2743,71 @@
       "status": {
         "invalid": "Le statut doit être 0 ou 1"
       }
+    },
+    "users": {
+      "email": {
+        "required": "L'e-mail est obligatoire",
+        "tooLong": "L'e-mail ne doit pas dépasser 254 caractères",
+        "invalid": "Veuillez saisir une adresse e-mail valide"
+      },
+      "username": {
+        "required": "Le nom d'utilisateur est obligatoire",
+        "tooShort": "Le nom d'utilisateur doit comporter au moins 6 caractères",
+        "tooLong": "Le nom d'utilisateur ne doit pas dépasser 30 caractères",
+        "invalid": "Le nom d'utilisateur doit commencer par une lettre et ne peut contenir que des lettres, chiffres, points, tirets bas ou tirets"
+      },
+      "firstName": {
+        "required": "Le prénom est obligatoire",
+        "tooShort": "Le prénom doit comporter au moins 2 caractères",
+        "tooLong": "Le prénom ne doit pas dépasser 30 caractères",
+        "invalid": "Le prénom doit commencer par une lettre et ne peut contenir que des lettres, tirets, apostrophes ou espaces"
+      },
+      "lastName": {
+        "tooLong": "Le nom de famille ne doit pas dépasser 30 caractères",
+        "invalid": "Le nom de famille doit commencer par une lettre et ne peut contenir que des lettres, tirets, apostrophes ou espaces"
+      },
+      "locale": {
+        "invalid": "La langue sélectionnée n'est pas prise en charge"
+      },
+      "groupIds": {
+        "required": "Au moins un groupe doit être sélectionné",
+        "idInvalid": "Un ou plusieurs identifiants de groupe sont invalides"
+      }
+    },
+    "roles": {
+      "name": {
+        "required": "Le nom du rôle est obligatoire",
+        "tooShort": "Le nom du rôle doit comporter au moins 2 caractères",
+        "tooLong": "Le nom du rôle ne doit pas dépasser 64 caractères",
+        "invalid": "Le nom du rôle doit commencer par une lettre ou un chiffre et ne peut contenir que des lettres, chiffres, espaces, points, tirets bas ou tirets"
+      },
+      "description": {
+        "tooShort": "La description doit comporter au moins 2 caractères",
+        "tooLong": "La description ne doit pas dépasser 500 caractères"
+      },
+      "permissions": {
+        "required": "Au moins une autorisation doit être sélectionnée",
+        "entryInvalid": "Une entrée d'autorisation est invalide"
+      }
+    },
+    "groups": {
+      "name": {
+        "required": "Le nom du groupe est obligatoire",
+        "tooShort": "Le nom du groupe doit comporter au moins 2 caractères",
+        "tooLong": "Le nom du groupe ne doit pas dépasser 64 caractères",
+        "invalid": "Le nom du groupe doit commencer par une lettre ou un chiffre et ne peut contenir que des lettres, chiffres, espaces, points, tirets bas ou tirets"
+      },
+      "description": {
+        "tooShort": "La description doit comporter au moins 2 caractères",
+        "tooLong": "La description ne doit pas dépasser 500 caractères"
+      },
+      "roleId": {
+        "required": "Un rôle doit être sélectionné",
+        "invalid": "Le rôle sélectionné n'est pas valide"
+      },
+      "users": {
+        "idInvalid": "Un ou plusieurs identifiants d'utilisateur sont invalides"
+      }
     }
   }
 }

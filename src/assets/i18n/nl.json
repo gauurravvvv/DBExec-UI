@@ -2743,6 +2743,71 @@
       "status": {
         "invalid": "Status moet 0 of 1 zijn"
       }
+    },
+    "users": {
+      "email": {
+        "required": "E-mailadres is vereist",
+        "tooLong": "E-mailadres mag niet meer dan 254 tekens bevatten",
+        "invalid": "Voer een geldig e-mailadres in"
+      },
+      "username": {
+        "required": "Gebruikersnaam is vereist",
+        "tooShort": "Gebruikersnaam moet minimaal 6 tekens bevatten",
+        "tooLong": "Gebruikersnaam mag niet meer dan 30 tekens bevatten",
+        "invalid": "Gebruikersnaam moet beginnen met een letter en mag alleen letters, cijfers, punten, underscores of streepjes bevatten"
+      },
+      "firstName": {
+        "required": "Voornaam is vereist",
+        "tooShort": "Voornaam moet minimaal 2 tekens bevatten",
+        "tooLong": "Voornaam mag niet meer dan 30 tekens bevatten",
+        "invalid": "Voornaam moet beginnen met een letter en mag alleen letters, streepjes, apostrofs of spaties bevatten"
+      },
+      "lastName": {
+        "tooLong": "Achternaam mag niet meer dan 30 tekens bevatten",
+        "invalid": "Achternaam moet beginnen met een letter en mag alleen letters, streepjes, apostrofs of spaties bevatten"
+      },
+      "locale": {
+        "invalid": "Geselecteerde taal wordt niet ondersteund"
+      },
+      "groupIds": {
+        "required": "Er moet ten minste één groep worden geselecteerd",
+        "idInvalid": "Een of meer groepsidentificatoren zijn ongeldig"
+      }
+    },
+    "roles": {
+      "name": {
+        "required": "Rolnaam is vereist",
+        "tooShort": "Rolnaam moet minimaal 2 tekens bevatten",
+        "tooLong": "Rolnaam mag niet meer dan 64 tekens bevatten",
+        "invalid": "Rolnaam moet beginnen met een letter of cijfer en mag alleen letters, cijfers, spaties, punten, underscores of streepjes bevatten"
+      },
+      "description": {
+        "tooShort": "Beschrijving moet minimaal 2 tekens bevatten",
+        "tooLong": "Beschrijving mag niet meer dan 500 tekens bevatten"
+      },
+      "permissions": {
+        "required": "Er moet ten minste één rechten worden geselecteerd",
+        "entryInvalid": "Een rechteninvoer is ongeldig"
+      }
+    },
+    "groups": {
+      "name": {
+        "required": "Groepsnaam is vereist",
+        "tooShort": "Groepsnaam moet minimaal 2 tekens bevatten",
+        "tooLong": "Groepsnaam mag niet meer dan 64 tekens bevatten",
+        "invalid": "Groepsnaam moet beginnen met een letter of cijfer en mag alleen letters, cijfers, spaties, punten, underscores of streepjes bevatten"
+      },
+      "description": {
+        "tooShort": "Beschrijving moet minimaal 2 tekens bevatten",
+        "tooLong": "Beschrijving mag niet meer dan 500 tekens bevatten"
+      },
+      "roleId": {
+        "required": "Er moet een rol worden geselecteerd",
+        "invalid": "Geselecteerde rol is ongeldig"
+      },
+      "users": {
+        "idInvalid": "Een of meer gebruikersidentificatoren zijn ongeldig"
+      }
     }
   }
 }

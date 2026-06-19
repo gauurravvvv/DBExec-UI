@@ -2743,6 +2743,71 @@
       "status": {
         "invalid": "Lo stato deve essere 0 o 1"
       }
+    },
+    "users": {
+      "email": {
+        "required": "L'e-mail è obbligatoria",
+        "tooLong": "L'e-mail non deve superare i 254 caratteri",
+        "invalid": "Inserisci un'e-mail valida"
+      },
+      "username": {
+        "required": "Il nome utente è obbligatorio",
+        "tooShort": "Il nome utente deve contenere almeno 6 caratteri",
+        "tooLong": "Il nome utente non deve superare i 30 caratteri",
+        "invalid": "Il nome utente deve iniziare con una lettera e può contenere solo lettere, numeri, punti, trattini bassi o trattini"
+      },
+      "firstName": {
+        "required": "Il nome è obbligatorio",
+        "tooShort": "Il nome deve contenere almeno 2 caratteri",
+        "tooLong": "Il nome non deve superare i 30 caratteri",
+        "invalid": "Il nome deve iniziare con una lettera e può contenere solo lettere, trattini, apostrofi o spazi"
+      },
+      "lastName": {
+        "tooLong": "Il cognome non deve superare i 30 caratteri",
+        "invalid": "Il cognome deve iniziare con una lettera e può contenere solo lettere, trattini, apostrofi o spazi"
+      },
+      "locale": {
+        "invalid": "La lingua selezionata non è supportata"
+      },
+      "groupIds": {
+        "required": "Almeno un gruppo deve essere selezionato",
+        "idInvalid": "Uno o più identificatori di gruppo non sono validi"
+      }
+    },
+    "roles": {
+      "name": {
+        "required": "Il nome del ruolo è obbligatorio",
+        "tooShort": "Il nome del ruolo deve contenere almeno 2 caratteri",
+        "tooLong": "Il nome del ruolo non deve superare i 64 caratteri",
+        "invalid": "Il nome del ruolo deve iniziare con una lettera o un numero e può contenere solo lettere, numeri, spazi, punti, trattini bassi o trattini"
+      },
+      "description": {
+        "tooShort": "La descrizione deve contenere almeno 2 caratteri",
+        "tooLong": "La descrizione non deve superare i 500 caratteri"
+      },
+      "permissions": {
+        "required": "Almeno un permesso deve essere selezionato",
+        "entryInvalid": "Una voce di permesso non è valida"
+      }
+    },
+    "groups": {
+      "name": {
+        "required": "Il nome del gruppo è obbligatorio",
+        "tooShort": "Il nome del gruppo deve contenere almeno 2 caratteri",
+        "tooLong": "Il nome del gruppo non deve superare i 64 caratteri",
+        "invalid": "Il nome del gruppo deve iniziare con una lettera o un numero e può contenere solo lettere, numeri, spazi, punti, trattini bassi o trattini"
+      },
+      "description": {
+        "tooShort": "La descrizione deve contenere almeno 2 caratteri",
+        "tooLong": "La descrizione non deve superare i 500 caratteri"
+      },
+      "roleId": {
+        "required": "Un ruolo deve essere selezionato",
+        "invalid": "Il ruolo selezionato non è valido"
+      },
+      "users": {
+        "idInvalid": "Uno o più identificatori utente non sono validi"
+      }
     }
   }
 }

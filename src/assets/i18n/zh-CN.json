@@ -2743,6 +2743,71 @@
       "status": {
         "invalid": "状态必须为 0 或 1"
       }
+    },
+    "users": {
+      "email": {
+        "required": "电子邮件为必填项",
+        "tooLong": "电子邮件不能超过 254 个字符",
+        "invalid": "请输入有效的电子邮件地址"
+      },
+      "username": {
+        "required": "用户名为必填项",
+        "tooShort": "用户名至少需要 6 个字符",
+        "tooLong": "用户名不能超过 30 个字符",
+        "invalid": "用户名必须以字母开头，且只能包含字母、数字、点、下划线或连字符"
+      },
+      "firstName": {
+        "required": "名为必填项",
+        "tooShort": "名至少需要 2 个字符",
+        "tooLong": "名不能超过 30 个字符",
+        "invalid": "名必须以字母开头，且只能包含字母、连字符、撇号或空格"
+      },
+      "lastName": {
+        "tooLong": "姓不能超过 30 个字符",
+        "invalid": "姓必须以字母开头，且只能包含字母、连字符、撇号或空格"
+      },
+      "locale": {
+        "invalid": "所选语言不受支持"
+      },
+      "groupIds": {
+        "required": "必须至少选择一个组",
+        "idInvalid": "一个或多个组标识符无效"
+      }
+    },
+    "roles": {
+      "name": {
+        "required": "角色名称为必填项",
+        "tooShort": "角色名称至少需要 2 个字符",
+        "tooLong": "角色名称不能超过 64 个字符",
+        "invalid": "角色名称必须以字母或数字开头，且只能包含字母、数字、空格、点、下划线或连字符"
+      },
+      "description": {
+        "tooShort": "描述至少需要 2 个字符",
+        "tooLong": "描述不能超过 500 个字符"
+      },
+      "permissions": {
+        "required": "必须至少选择一个权限",
+        "entryInvalid": "权限条目无效"
+      }
+    },
+    "groups": {
+      "name": {
+        "required": "组名为必填项",
+        "tooShort": "组名至少需要 2 个字符",
+        "tooLong": "组名不能超过 64 个字符",
+        "invalid": "组名必须以字母或数字开头，且只能包含字母、数字、空格、点、下划线或连字符"
+      },
+      "description": {
+        "tooShort": "描述至少需要 2 个字符",
+        "tooLong": "描述不能超过 500 个字符"
+      },
+      "roleId": {
+        "required": "必须选择一个角色",
+        "invalid": "所选角色无效"
+      },
+      "users": {
+        "idInvalid": "一个或多个用户标识符无效"
+      }
     }
   }
 }

@@ -5,14 +5,18 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { REGEX } from 'src/app/core/constants/regex.constant';
 import { ROLE } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { ACCESS } from 'src/app/core/services/permission.service';
 import { GlobalService } from 'src/app/core/services/global.service';
+import {
+  roleDescriptionSchema,
+  roleNameSchema,
+} from 'src/app/shared/validators/roles';
+import { zodValidator } from 'src/app/shared/validators/zod-validator';
 import {
   AccessLevelEntry,
   PermissionModule,
@@ -88,9 +92,11 @@ export class AddRoleComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   }
 
   initForm() {
+    // Field validators sourced from the SHARED Zod schema at
+    // src/app/shared/validators/roles.ts (mirrored to BE).
     this.roleForm = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(REGEX.firstName)]],
-      description: [''],
+      name: ['', [zodValidator(roleNameSchema)]],
+      description: ['', [zodValidator(roleDescriptionSchema)]],
     });
   }
 
@@ -208,15 +214,17 @@ export class AddRoleComponent implements OnInit, OnDestroy, HasUnsavedChanges {
     this.loadMeta();
   }
 
+  /**
+   * Unified error getter — same translation key the BE returns on 400.
+   */
+  fieldError(fieldName: string): string {
+    const control = this.roleForm.get(fieldName);
+    const key = control?.errors?.['zod'] as string | undefined;
+    return key ? this.translate.instant(key) : '';
+  }
+
   getNameError(): string {
-    const nameControl = this.roleForm.get('name');
-    if (nameControl?.errors?.['required']) {
-      return this.translate.instant('VALIDATION.NAME_REQUIRED');
-    }
-    if (nameControl?.errors?.['pattern']) {
-      return this.translate.instant('VALIDATION.NAME_PATTERN');
-    }
-    return '';
+    return this.fieldError('name');
   }
 
   trackByModuleId(_: number, item: PermissionModule): string {

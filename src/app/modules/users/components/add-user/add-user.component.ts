@@ -4,22 +4,24 @@ import {
   Component,
   OnInit,
 } from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormGroup,
-  ValidationErrors,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
-import { REGEX } from 'src/app/core/constants/regex.constant';
 import { USER } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SUPPORTED_LOCALES } from 'src/app/core/services/locale.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
+import {
+  emailSchema,
+  firstNameSchema,
+  groupIdsSchema,
+  lastNameSchema,
+  localeSchema,
+  usernameSchema,
+} from 'src/app/shared/validators/users';
+import { zodValidator } from 'src/app/shared/validators/zod-validator';
 import { UserService } from '../../services/user.service';
 
 @Component({
@@ -63,38 +65,17 @@ export class AddUserComponent implements OnInit, HasUnsavedChanges {
   }
 
   initForm() {
+    // All field validators come from the SHARED Zod schema at
+    // src/app/shared/validators/users.ts (same file ships in the BE
+    // repo). Required / regex / length / locale-enum rules are
+    // identical on both sides.
     this.userForm = this.fb.group({
-      firstName: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(30),
-          Validators.pattern(REGEX.firstName),
-        ],
-      ],
-      // lastName is OPTIONAL — many cultures use a single mononym.
-      // Drop required + minLength; keep pattern + maxLength so an
-      // explicitly typed value still has to be well-formed.
-      lastName: [
-        '',
-        [Validators.maxLength(30), Validators.pattern(REGEX.lastName)],
-      ],
-      username: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(6),
-          Validators.maxLength(30),
-          Validators.pattern(REGEX.username),
-        ],
-      ],
-      email: ['', [Validators.required, Validators.email]],
-      // `Validators.required` treats `[]` as valid (only null/undefined/''
-      // fail it), so the form would silently accept zero-group users.
-      // Use a min-count check that fails when the selection is empty.
-      groupIds: [[], minArrayLength(1)],
-      locale: ['en', Validators.required],
+      firstName: ['', [zodValidator(firstNameSchema)]],
+      lastName: ['', [zodValidator(lastNameSchema)]],
+      username: ['', [zodValidator(usernameSchema)]],
+      email: ['', [zodValidator(emailSchema)]],
+      groupIds: [[], [zodValidator(groupIdsSchema)]],
+      locale: ['en', [zodValidator(localeSchema)]],
     });
   }
 
@@ -173,68 +154,26 @@ export class AddUserComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
+  /**
+   * Unified error getter. Reads the `zod` translation key produced by
+   * the shared schema and runs it through ngx-translate. Same key the
+   * BE returns on a 400.
+   */
+  fieldError(fieldName: string): string {
+    const control = this.userForm.get(fieldName);
+    const key = control?.errors?.['zod'] as string | undefined;
+    return key ? this.translate.instant(key) : '';
+  }
+
+  // Backwards-compat aliases for existing templates. New code should
+  // call fieldError(name) directly.
   getFirstNameError(): string {
-    const control = this.userForm.get('firstName');
-    if (control?.errors?.['required'])
-      return this.translate.instant('VALIDATION.FIRST_NAME_REQUIRED');
-    if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.FIRST_NAME_MIN', {
-        min: control.errors['minlength'].requiredLength,
-      });
-    if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.FIRST_NAME_MAX', {
-        max: control.errors['maxlength'].requiredLength,
-      });
-    if (control?.errors?.['pattern'])
-      return this.translate.instant('VALIDATION.FIRST_NAME_PATTERN');
-    return '';
+    return this.fieldError('firstName');
   }
-
   getLastNameError(): string {
-    const control = this.userForm.get('lastName');
-    if (control?.errors?.['required'])
-      return this.translate.instant('VALIDATION.LAST_NAME_REQUIRED');
-    if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.LAST_NAME_MIN', {
-        min: control.errors['minlength'].requiredLength,
-      });
-    if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.LAST_NAME_MAX', {
-        max: control.errors['maxlength'].requiredLength,
-      });
-    if (control?.errors?.['pattern'])
-      return this.translate.instant('VALIDATION.LAST_NAME_PATTERN');
-    return '';
+    return this.fieldError('lastName');
   }
-
   getUsernameError(): string {
-    const control = this.userForm.get('username');
-    if (control?.errors?.['required'])
-      return this.translate.instant('VALIDATION.USERNAME_REQUIRED');
-    if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.USERNAME_MIN', {
-        min: control.errors['minlength'].requiredLength,
-      });
-    if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.USERNAME_MAX', {
-        max: control.errors['maxlength'].requiredLength,
-      });
-    if (control?.errors?.['pattern'])
-      return this.translate.instant('VALIDATION.USERNAME_PATTERN');
-    return '';
+    return this.fieldError('username');
   }
-}
-
-/**
- * Validator that fails when an array-valued control has fewer than
- * `min` selections. Returns `{ minCount: { min, actual } }` on
- * failure so templates can surface a localised message keyed off the
- * `minCount` error name.
- */
-function minArrayLength(min: number) {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const value = control.value;
-    if (Array.isArray(value) && value.length >= min) return null;
-    return { minCount: { min, actual: Array.isArray(value) ? value.length : 0 } };
-  };
 }

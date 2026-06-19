@@ -2789,6 +2789,71 @@
       "status": {
         "invalid": "Status must be 0 or 1"
       }
+    },
+    "users": {
+      "email": {
+        "required": "Email is required",
+        "tooLong": "Email must not exceed 254 characters",
+        "invalid": "Please enter a valid email address"
+      },
+      "username": {
+        "required": "Username is required",
+        "tooShort": "Username must be at least 6 characters",
+        "tooLong": "Username must not exceed 30 characters",
+        "invalid": "Username must start with a letter and contain only letters, digits, dots, underscores, or hyphens"
+      },
+      "firstName": {
+        "required": "First name is required",
+        "tooShort": "First name must be at least 2 characters",
+        "tooLong": "First name must not exceed 30 characters",
+        "invalid": "First name must start with a letter and contain only letters, hyphens, apostrophes, or spaces"
+      },
+      "lastName": {
+        "tooLong": "Last name must not exceed 30 characters",
+        "invalid": "Last name must start with a letter and contain only letters, hyphens, apostrophes, or spaces"
+      },
+      "locale": {
+        "invalid": "Selected locale is not supported"
+      },
+      "groupIds": {
+        "required": "At least one group must be selected",
+        "idInvalid": "One or more group identifiers are invalid"
+      }
+    },
+    "roles": {
+      "name": {
+        "required": "Role name is required",
+        "tooShort": "Role name must be at least 2 characters",
+        "tooLong": "Role name must not exceed 64 characters",
+        "invalid": "Role name must start with a letter or digit and contain only letters, digits, spaces, dots, underscores, or hyphens"
+      },
+      "description": {
+        "tooShort": "Description must be at least 2 characters",
+        "tooLong": "Description must not exceed 500 characters"
+      },
+      "permissions": {
+        "required": "At least one permission must be selected",
+        "entryInvalid": "A permission entry is malformed"
+      }
+    },
+    "groups": {
+      "name": {
+        "required": "Group name is required",
+        "tooShort": "Group name must be at least 2 characters",
+        "tooLong": "Group name must not exceed 64 characters",
+        "invalid": "Group name must start with a letter or digit and contain only letters, digits, spaces, dots, underscores, or hyphens"
+      },
+      "description": {
+        "tooShort": "Description must be at least 2 characters",
+        "tooLong": "Description must not exceed 500 characters"
+      },
+      "roleId": {
+        "required": "A role must be selected",
+        "invalid": "Selected role is invalid"
+      },
+      "users": {
+        "idInvalid": "One or more user identifiers are invalid"
+      }
     }
   }
 }

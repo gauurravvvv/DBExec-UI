@@ -2743,6 +2743,71 @@
       "status": {
         "invalid": "Status muss 0 oder 1 sein"
       }
+    },
+    "users": {
+      "email": {
+        "required": "E-Mail-Adresse ist erforderlich",
+        "tooLong": "E-Mail-Adresse darf 254 Zeichen nicht überschreiten",
+        "invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein"
+      },
+      "username": {
+        "required": "Benutzername ist erforderlich",
+        "tooShort": "Benutzername muss mindestens 6 Zeichen lang sein",
+        "tooLong": "Benutzername darf 30 Zeichen nicht überschreiten",
+        "invalid": "Benutzername muss mit einem Buchstaben beginnen und darf nur Buchstaben, Ziffern, Punkte, Unterstriche oder Bindestriche enthalten"
+      },
+      "firstName": {
+        "required": "Vorname ist erforderlich",
+        "tooShort": "Vorname muss mindestens 2 Zeichen lang sein",
+        "tooLong": "Vorname darf 30 Zeichen nicht überschreiten",
+        "invalid": "Vorname muss mit einem Buchstaben beginnen und darf nur Buchstaben, Bindestriche, Apostrophe oder Leerzeichen enthalten"
+      },
+      "lastName": {
+        "tooLong": "Nachname darf 30 Zeichen nicht überschreiten",
+        "invalid": "Nachname muss mit einem Buchstaben beginnen und darf nur Buchstaben, Bindestriche, Apostrophe oder Leerzeichen enthalten"
+      },
+      "locale": {
+        "invalid": "Ausgewählte Sprache wird nicht unterstützt"
+      },
+      "groupIds": {
+        "required": "Mindestens eine Gruppe muss ausgewählt sein",
+        "idInvalid": "Eine oder mehrere Gruppenkennungen sind ungültig"
+      }
+    },
+    "roles": {
+      "name": {
+        "required": "Rollenname ist erforderlich",
+        "tooShort": "Rollenname muss mindestens 2 Zeichen lang sein",
+        "tooLong": "Rollenname darf 64 Zeichen nicht überschreiten",
+        "invalid": "Rollenname muss mit einem Buchstaben oder einer Ziffer beginnen und darf nur Buchstaben, Ziffern, Leerzeichen, Punkte, Unterstriche oder Bindestriche enthalten"
+      },
+      "description": {
+        "tooShort": "Beschreibung muss mindestens 2 Zeichen lang sein",
+        "tooLong": "Beschreibung darf 500 Zeichen nicht überschreiten"
+      },
+      "permissions": {
+        "required": "Mindestens eine Berechtigung muss ausgewählt sein",
+        "entryInvalid": "Ein Berechtigungseintrag ist ungültig"
+      }
+    },
+    "groups": {
+      "name": {
+        "required": "Gruppenname ist erforderlich",
+        "tooShort": "Gruppenname muss mindestens 2 Zeichen lang sein",
+        "tooLong": "Gruppenname darf 64 Zeichen nicht überschreiten",
+        "invalid": "Gruppenname muss mit einem Buchstaben oder einer Ziffer beginnen und darf nur Buchstaben, Ziffern, Leerzeichen, Punkte, Unterstriche oder Bindestriche enthalten"
+      },
+      "description": {
+        "tooShort": "Beschreibung muss mindestens 2 Zeichen lang sein",
+        "tooLong": "Beschreibung darf 500 Zeichen nicht überschreiten"
+      },
+      "roleId": {
+        "required": "Eine Rolle muss ausgewählt sein",
+        "invalid": "Ausgewählte Rolle ist ungültig"
+      },
+      "users": {
+        "idInvalid": "Eine oder mehrere Benutzerkennungen sind ungültig"
+      }
     }
   }
 }
