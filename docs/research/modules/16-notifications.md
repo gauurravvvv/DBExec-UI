@@ -1,0 +1,88 @@
+# 16 · Notifications
+
+In-app bell already in DBExec. Extend with categories + delivery
+channels + per-user preferences.
+
+## Categories
+
+```ts
+type NotificationCategory =
+  | 'group_added'
+  | 'group_removed'
+  | 'mention'                          // @username in a comment
+  | 'subscription_delivered'
+  | 'alert_fired'
+  | 'dataset_failed'
+  | 'permission_granted'
+  | 'dashboard_shared'
+  | 'comment_replied';
+```
+
+## Schema delta
+
+```sql
+ALTER TABLE notification
+  ADD COLUMN category varchar(32) NOT NULL,
+  ADD COLUMN url text,                       -- in-app target route
+  ADD COLUMN read_at timestamptz,
+  ADD COLUMN priority smallint NOT NULL DEFAULT 1;
+
+CREATE TABLE notification_preference (
+  user_id     uuid NOT NULL REFERENCES user(id) ON DELETE CASCADE,
+  category    varchar(32) NOT NULL,
+  in_app      boolean NOT NULL DEFAULT true,
+  email       boolean NOT NULL DEFAULT false,
+  slack       boolean NOT NULL DEFAULT false,
+  PRIMARY KEY (user_id, category)
+);
+```
+
+## Dispatch
+
+```ts
+async function notify(opts: {
+  userId: string;
+  category: NotificationCategory;
+  payload: Record<string, unknown>;
+  url?: string;
+}) {
+  const prefs = await NotificationPreference.findBy({ userId: opts.userId, category: opts.category });
+  const inApp = prefs?.inApp ?? true;
+  const email = prefs?.email ?? false;
+  const slack = prefs?.slack ?? false;
+
+  if (inApp) await Notification.insert({ ...opts });
+  if (email) await emailService.sendTemplated({ /* ... */ });
+  if (slack) await slackPostDM(/* ... */);
+}
+```
+
+## Real-time delivery (FE)
+
+- Long-poll today.
+- Upgrade to **SSE** (Server-Sent Events): `/notifications/stream`.
+- Or **WebSocket** if we already have one for live dashboards.
+
+```ts
+// FE: src/app/core/services/notification.service.ts
+const es = new EventSource('/api/v1/notifications/stream', { withCredentials: true });
+es.onmessage = (msg) => {
+  const n = JSON.parse(msg.data);
+  this.items.update(prev => [n, ...prev]);
+  this.unreadCount.update(c => c + 1);
+};
+```
+
+## UI
+
+- Bell badge with unread count.
+- Dropdown grouped by category.
+- "Mark all read" + per-row "Mark read".
+- Settings → Notifications: matrix of category × channel toggles.
+
+## Tests
+
+- **NOT-H-01** — group_added notification appears for member
+- **NOT-H-02** — mark-all-read resets badge
+- **NOT-N-01** — user can't read another user's notification
+- **NOT-E-01** — SSE reconnects after network blip
