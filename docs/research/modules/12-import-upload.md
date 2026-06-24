@@ -60,3 +60,43 @@ For onboarding, ship a `sample_chart_demo.csv` (1,000 rows) and a
 - **UP-JSON-H-01** — nested JSON flattened with `.` keys
 - **UP-PARSE-N-01** — malformed row → error with line number
 - **UP-AUDIT-H-01** — upload writes audit row with file hash
+
+## Appendix · Review additions
+
+- **Upload from URL** (S3 / GCS / Azure Blob / HTTPS) — accept a signed
+  URL instead of multipart; BE streams the bytes server-side.
+- **Resumable uploads** (tus.io protocol) — `POST /upload/init`,
+  `PATCH /upload/<id>` chunks, `HEAD /upload/<id>` for progress.
+- **Schema mapping UI**: re-uploading a CSV with shifted column order
+  → FE shows mapping `(new col → existing col)`.
+- **Mapping templates**: save the mapping as
+  `upload_mapping (id, dataset_id, source_format, mapping jsonb)` for
+  future re-uploads.
+- **Dry-run validation**: `POST /upload/dry-run` returns a report —
+  row count, type mismatches, duplicate PKs, blank-required-cell rows
+  — before persisting.
+- **Virus scan** (ClamAV) for enterprise. Hook in via TCP socket to
+  `clamav` daemon; abort upload on positive.
+- **Source file hash** stored in `dataset.upload_source_meta.sha256` so
+  re-uploading the same file is idempotent (skipped with notice).
+- **Org storage quota**: `org_storage_quota (organisation_id, max_bytes,
+  used_bytes)`; reject uploads that would exceed.
+- **Backfill mode**: append multiple historical files into one dataset.
+- **Webhook on upload complete**: emit `dataset.uploaded` event.
+- **Encrypted-at-rest staging**: upload lands in a `.tmp/` dir with
+  server-side AES-256 until processed.
+
+### New endpoints
+
+- `POST /upload/url` — submit URL, BE pulls server-side
+- `POST /upload/init` + `PATCH /upload/<id>` + `HEAD /upload/<id>` (tus)
+- `POST /upload/dry-run`
+- `GET /org/storage` — quota usage
+
+### Test IDs
+
+- UP-URL-H-01 — upload from S3 URL works
+- UP-TUS-H-01 — resumable upload after disconnect resumes from offset
+- UP-VIRUS-N-01 — infected file rejected before parse
+- UP-QUOTA-N-01 — over-quota → 413 with helpful message
+- UP-DUP-H-01 — same file hash re-uploaded → idempotent (no double-create)

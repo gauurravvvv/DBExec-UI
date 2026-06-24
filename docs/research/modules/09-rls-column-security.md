@@ -261,3 +261,32 @@ export default async function datasetPreview(req, res) {
   WHERE / GROUP BY? A masked column shouldn't be usable as a filter
   by the masked user. Recommend: also block the column from the
   filter picker for that user.
+
+## Appendix · Review additions
+
+- **Connection impersonation** — connect AS user's DB role rather
+  than WHERE-rewriting (Metabase pattern).
+- **Snowflake / Postgres native row policies** pass-through.
+- **Predicate dry-run validation** — flag 0-row-for-all-users misconfig.
+- **Effective permissions endpoint** — explain what user X can see.
+- **Default-deny** option per dataset.
+- **PII auto-detect** by scanning sample values.
+- **"Why am I seeing this row?"** admin debug overlay.
+- **Group rule precedence** explicit ordering.
+
+### Schema delta
+
+```sql
+CREATE TABLE connection_impersonation (datasource_id, scope, scope_id, db_role);
+ALTER TABLE column_security ADD COLUMN is_pii boolean, ADD COLUMN pii_class varchar(32);
+ALTER TABLE rls_rule
+  ADD COLUMN precedence int NOT NULL DEFAULT 0,
+  ADD COLUMN deny_by_default boolean NOT NULL DEFAULT false;
+```
+
+### Tests
+
+- RLS-IMP-H-01 — impersonation routes to DB role
+- RLS-PII-H-01 — SSN column auto-tagged
+- RLS-EXP-H-01 — effective endpoint explains predicates
+- RLS-LINT-H-01 — 0-row predicate flagged

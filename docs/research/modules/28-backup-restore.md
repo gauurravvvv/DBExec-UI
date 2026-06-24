@@ -50,3 +50,57 @@ Region picker on org creation.
 - **BAK-H-01** — full backup → restore round-trips with byte-identical data
 - **BAK-CONF-H-01** — restore with name conflict → user prompted to rename
 - **REG-N-01** — EU-pinned org user cannot create a US datasource
+
+## Appendix · Review additions
+
+- **PITR** (Point-in-time recovery) beyond logical backups.
+- **Cross-tenant restore** (M&A).
+- **Selective restore** — only dashboards, not users.
+- **Backup verification** — periodic restore-into-sandbox.
+- **Customer-managed encryption keys** (BYOK / KMS).
+- **Compliance retention** — legal holds.
+
+### Schema delta
+
+```sql
+CREATE TABLE backup_artifact (
+  id              uuid PRIMARY KEY,
+  organisation_id uuid NOT NULL,
+  kind            varchar(16) NOT NULL,  -- full|incremental|logical
+  location_uri    text NOT NULL,         -- s3://...
+  size_bytes      bigint,
+  checksum_sha256 varchar(64),
+  encrypted_by    varchar(64),           -- 'kms:arn:...' or 'aes-256-gcm:vault-key'
+  created_at      timestamptz NOT NULL DEFAULT now(),
+  verified_at     timestamptz,
+  verified_ok     boolean,
+  retention_until timestamptz,
+  legal_hold      boolean NOT NULL DEFAULT false
+);
+CREATE INDEX ON backup_artifact (organisation_id, created_at DESC);
+```
+
+### KMS encryption
+
+```ts
+import { KMSClient, EncryptCommand, DecryptCommand } from '@aws-sdk/client-kms';
+const kms = new KMSClient({ region: 'us-east-1' });
+const { CiphertextBlob } = await kms.send(new EncryptCommand({
+  KeyId: kmsKeyArn,
+  Plaintext: backupBytes,
+}));
+```
+
+### Verification job
+
+Weekly BullMQ job picks a random backup, restores into a throw-away
+schema, runs a row-count parity check, deletes the schema, updates
+`verified_at + verified_ok`.
+
+### Test IDs
+
+- BAK-PITR-H-01 — restore to T-30min works
+- BAK-VERIFY-H-01 — weekly restore-into-sandbox passes
+- BAK-KMS-H-01 — KMS-encrypted backup decrypts
+- BAK-HOLD-N-01 — legally-held backup cannot be deleted by org admin
+- BAK-SELECT-H-01 — restore only dashboards, leave users intact

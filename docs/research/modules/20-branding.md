@@ -37,3 +37,48 @@ emits them into `:root` on login. Charts pick up
 - **BR-H-01** — primary colour reflected on buttons
 - **BR-H-02** — favicon swap renders on tab
 - **BR-WL-H-01** — embed iframe hides "Powered by" footer
+
+## Appendix · Review additions
+
+- **Email branding** — per-tenant email template override (header
+  image, footer text).
+- **Custom domain** (`analytics.acme.com` CNAME) with auto-TLS via
+  Caddy / Traefik / Let's Encrypt.
+- **Brand-applied chart palette** with WCAG contrast check before
+  save.
+- **Logo dark/light** auto-swap based on theme.
+- **Login background** image / video / pattern.
+- **Custom CSS injection** with sanitisation.
+
+### Schema delta
+
+```sql
+CREATE TABLE custom_domain (
+  id              uuid PRIMARY KEY,
+  organisation_id uuid NOT NULL UNIQUE,
+  hostname        varchar(255) NOT NULL UNIQUE,
+  status          varchar(16) NOT NULL DEFAULT 'pending', -- pending|verified|failed
+  cert_arn        varchar(255),                          -- ACM ARN
+  verified_at     timestamptz,
+  cname_target    varchar(255) NOT NULL,
+  created_on      timestamptz NOT NULL DEFAULT now()
+);
+```
+
+### WCAG contrast check
+
+```ts
+import { contrast } from 'wcag-contrast';
+function validatePalette(fg: string, bg: string) {
+  const ratio = contrast.hex(fg, bg);
+  if (ratio < 4.5) throw new Error(`contrast ${ratio} < 4.5`);
+}
+```
+
+### Test IDs
+
+- BR-DOM-H-01 — CNAME verified, traffic routes through
+- BR-DOM-TLS-H-01 — TLS cert provisioned automatically
+- BR-PAL-WCAG-N-01 — palette failing contrast rejected
+- BR-LOGO-DARK-H-01 — dark theme swaps to logo_dark_url
+- BR-EMAIL-H-01 — sent email reflects org template overrides

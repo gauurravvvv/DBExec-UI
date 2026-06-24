@@ -246,3 +246,28 @@ function pickAggregate(req: SemanticQueryRequest, mvs: MaterialisedView[]) {
 - Should the result cache be partitioned per user, or shared org-wide
   with RLS in the key? **RLS in key** so cached rows respect each
   user's filters. Cache key includes `rlsHash`.
+
+## Appendix · Review additions
+
+- **Stale-while-revalidate** — serve stale, refresh in background.
+- **Cache tiers** — L1 in-process LRU + L2 Redis.
+- **Compression** — gzip JSON > 4 KB.
+- **Chunked storage** — split > Redis 512MB string limit.
+- **Cost-aware caching** — bigger queries cached longer.
+- **Per-org cache namespace** + LRU eviction at quota.
+- **Negative caching** — cache failures with short TTL.
+- **Cache key includes RLS predicates** — so each user gets their own row set.
+- **MV dependency cascade** — base dataset change cascades MV refresh.
+
+### Code
+
+- SWR implementation listed in REVIEW-DEEP.md `## 05`.
+- Chunked write listed there too.
+
+### Tests
+
+- CACHE-SWR-H-01 — stale return + background refresh
+- CACHE-CHUNK-H-01 — 50MB result round-trips
+- CACHE-QUOTA-H-01 — org-wide LRU eviction kicks in
+- CACHE-NEG-H-01 — failure cached short TTL
+- CACHE-MV-DEP-H-01 — base dataset change cascades MV

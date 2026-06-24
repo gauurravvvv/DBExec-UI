@@ -110,3 +110,63 @@ a.click();
 - **EXP-PDF-N-01** — visual that errored → placeholder in PDF, no crash
 - **EXP-RATE-N-01** — 11th export in 10 min → 429
 - **EXP-LARGE-H-01** — 1M row export streams without OOM
+
+## Appendix · Review additions
+
+### Concepts
+
+- **Watermarks** on exported PDFs (org logo, "Confidential" text,
+  recipient email, timestamp).
+- **Encrypted PDF** with password (re-encrypt with `pdf-lib`).
+- **Excel formatting**: bold headers, locked number formats, freeze
+  panes, conditional formatting per metric, per-row colouring
+  matching the visual.
+- **Chart in Excel**: embed both the chart image and the underlying
+  data sheet.
+- **PowerPoint export** (PPTX, one slide per visual) via `pptxgenjs`.
+- **Markdown export** of an analysis — analyst-friendly raw form.
+- **Inline HTML** export of a dashboard for email body delivery.
+- **Signed download URL** (S3-style) instead of direct stream when
+  large jobs run async.
+- **Background export with email link** for any job > 30s.
+- **Idempotency** via `Idempotency-Key` so retries don't double-export.
+
+### Schema delta
+
+```sql
+ALTER TABLE export_job
+  ADD COLUMN watermark_text varchar(255),
+  ADD COLUMN password_enc bytea,
+  ADD COLUMN signed_url text,
+  ADD COLUMN expires_at timestamptz,
+  ADD COLUMN idempotency_key varchar(255);
+```
+
+### New endpoints
+
+- `POST /export/dashboard/:id/pptx`
+- `POST /export/analysis/:id/markdown`
+- `POST /export/dashboard/:id/embed-html`
+
+### PDF watermark code
+
+```ts
+await page.evaluate((wm) => {
+  const div = document.createElement('div');
+  div.style.cssText = `
+    position:fixed;top:50%;left:50%;
+    transform:translate(-50%,-50%) rotate(-30deg);
+    opacity:.08;font-size:96px;pointer-events:none;z-index:9999;
+    font-family:sans-serif;color:#000`;
+  div.textContent = wm;
+  document.body.appendChild(div);
+}, watermarkText);
+```
+
+### Test IDs
+
+- EXP-WM-H-01 — watermark visible on every page
+- EXP-PWD-N-01 — encrypted PDF prompts for password
+- EXP-PPTX-H-01 — PPTX produced, one slide per visual
+- EXP-ASYNC-H-01 — large export emails a download link
+- EXP-IDEMP-H-01 — same idempotency key returns first job, no duplicate

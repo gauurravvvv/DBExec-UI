@@ -365,3 +365,32 @@ router.post('/scim/v2/Users', scimAuth, async (req, res) => {
 
 - Should we offer "Magic link" passwordless login? Useful but not
   enterprise must-have; ship V2.
+
+## Appendix · Review additions
+
+- **OAuth2 third-party apps** (Slack-style scoped tokens).
+- **`/.well-known/openid-configuration`** + **`/.well-known/jwks.json`**.
+- **Step-up auth** — fresh MFA challenge for sensitive actions.
+- **WebAuthn passkey** specifics (discoverable creds, attestation).
+- **API token IP allowlist** per token.
+- **Scope hierarchy** (`dashboards:read` implies thumbnails:read).
+- **Service-account key rotation** with two-active grace window.
+- **SCIM** add `/Schemas`, `/ResourceTypes`, `/ServiceProviderConfig`,
+  group member PATCH.
+- **SAML SLO** (Single Logout).
+- **Session anomaly detection** (impossible-travel, new IP).
+- **Adaptive brute-force backoff** (exponential vs hard N-fail).
+- **Refresh-token rotation with reuse-detection** — kills all sessions
+  if reused.
+
+### Code: rotation with reuse detection
+
+See REVIEW-DEEP.md `## 10` for the full snippet.
+
+### Tests
+
+- AUTH-RT-REUSE-N-01 — reused refresh token kills all sessions
+- AUTH-JWKS-H-01 — JWKS endpoint serves keys
+- AUTH-STEP-UP-H-01 — step-up required to delete org
+- AUTH-SCIM-PATCH-H-01 — SCIM PATCH adds group member
+- AUTH-OAUTH-H-01 — third-party app gets scoped token

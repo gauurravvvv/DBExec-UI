@@ -71,3 +71,55 @@ Admin → Cost dashboard:
 - **COST-H-01** — BigQuery query records bytes_scanned
 - **COST-BUD-H-01** — soft budget alert at 80%
 - **COST-BUD-N-01** — hard budget blocks 101% query
+
+## Appendix · Review additions
+
+- **Cost forecast** — ARIMA on cost time-series.
+- **Per-user budgets** in addition to per-dataset.
+- **Top expensive queries** dashboard (built-in).
+- **Cost attribution to dashboards** (sum of all underlying queries).
+- **Show estimated cost before running** (BigQuery dry-run API).
+- **Auto-pause warehouse** (Snowflake `ALTER WAREHOUSE ... SUSPEND`)
+  on hard threshold.
+
+### Schema delta
+
+```sql
+CREATE TABLE cost_forecast (
+  organisation_id uuid NOT NULL,
+  period          date NOT NULL,
+  projected_bytes bigint,
+  projected_credits numeric(12,6),
+  PRIMARY KEY (organisation_id, period)
+);
+
+ALTER TABLE budget
+  ADD COLUMN auto_pause boolean NOT NULL DEFAULT false,
+  ADD COLUMN notify_owners boolean NOT NULL DEFAULT true;
+```
+
+### BigQuery dry-run
+
+```ts
+import { BigQuery } from '@google-cloud/bigquery';
+const bq = new BigQuery({ projectId, credentials });
+const [job] = await bq.createQueryJob({
+  query: sql,
+  dryRun: true,
+});
+const bytes = Number(job.metadata.statistics.totalBytesProcessed);
+return { estimatedBytes: bytes, estimatedCostUsd: bytes / (1024 ** 4) * 5 }; // $5/TB
+```
+
+### Snowflake auto-pause
+
+```sql
+ALTER WAREHOUSE compute_wh SUSPEND;
+```
+
+### Test IDs
+
+- COST-FORE-H-01 — forecast within 20% of actual on stable workload
+- COST-AUTO-PAUSE-H-01 — warehouse paused at hard limit
+- COST-DRYRUN-H-01 — dry-run cost shown to user before run
+- COST-ATTR-H-01 — dashboard shows cumulative query cost

@@ -92,3 +92,55 @@ DBExec opens a new visual with the result.
 - **AI-N-01** — request for an undefined metric → graceful "I don't have that"
 - **AI-N-02** — request that would expose denied columns → refused
 - **AI-PRIV-H-01** — no row data ever sent to the LLM
+
+## Appendix · Review additions
+
+- **Conversation memory** across turns ("and for last year").
+- **Explain a visual** — AI generates 2-sentence summary.
+- **Anomaly callouts** — highlight outliers automatically.
+- **Suggested next-question chips**.
+- **Confidence indicator** (% certainty for the picked metric).
+- **Source citation** ("based on dataset `orders`, metric `revenue`").
+- **Local LLM** (Ollama / vLLM) for on-prem deployments.
+- **Schema sanitisation** — strip PII names before sending to LLM.
+- **Prompt injection defence** — system prompt is server-side only;
+  user input never appears in privileged tool descriptions.
+- **AI audit category** — every AI query logs to `audit_log` as
+  `category='ai_query'`.
+- **Per-org cost meter** — token usage stored, billable rollup.
+
+### Schema delta
+
+```sql
+CREATE TABLE ai_session (
+  id              uuid PRIMARY KEY,
+  organisation_id uuid NOT NULL,
+  user_id         uuid NOT NULL,
+  started_at      timestamptz NOT NULL DEFAULT now(),
+  ended_at        timestamptz,
+  total_tokens_in  int DEFAULT 0,
+  total_tokens_out int DEFAULT 0,
+  total_cost_usd   numeric(10,4) DEFAULT 0
+);
+
+CREATE TABLE ai_turn (
+  id          uuid PRIMARY KEY,
+  session_id  uuid NOT NULL REFERENCES ai_session(id) ON DELETE CASCADE,
+  role        varchar(16) NOT NULL,  -- user|assistant|tool
+  content     text,
+  tool_calls  jsonb,
+  tokens_in   int,
+  tokens_out  int,
+  latency_ms  int,
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+```
+
+### Test IDs
+
+- AI-CONV-H-01 — follow-up question reuses prior context
+- AI-EXPLAIN-H-01 — "summarise this visual" returns 2 sentences
+- AI-INJ-N-01 — prompt-injection attempt ignored
+- AI-COST-H-01 — tokens recorded per org
+- AI-SANIT-H-01 — PII columns redacted in schema sent to LLM
+- AI-CONF-H-01 — confidence indicator shown next to result

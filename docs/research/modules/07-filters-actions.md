@@ -207,3 +207,32 @@ export default async function dependentValues(req, res) {
 
 - Should drill jump to a different analysis (drill-through)? Yes,
   separate spec under "drill paths" (Power BI's drillthrough pattern).
+
+## Appendix · Review additions
+
+- **Filter hierarchies** auto-cascading.
+- **Fiscal calendar** for relative dates (`this fiscal Q`).
+- **Org filter library** — reusable filter defs.
+- **Filter from URL vs session vs default** layered resolution.
+- **Parameter-as-filter** (Tableau pattern).
+- **Sync slicers** across analyses on a dashboard.
+- **Excluded values** (negative chip from a chart click).
+- **Top-N filter** with `BY metric`.
+- **Comparison range** for prior-period overlays.
+- **Highlight vs filter exclude** (Tableau distinction).
+- **Affected row count preview** while typing.
+
+### Schema delta
+
+```sql
+CREATE TABLE org_fiscal_calendar (organisation_id PK, fy_start_month int, fy_start_day int);
+CREATE TABLE org_filter_library (id, organisation_id, name, definition jsonb);
+ALTER TABLE analysis_filter ADD COLUMN compare_range jsonb;
+```
+
+### Tests
+
+- FLT-FISCAL-H-01 — this fiscal quarter picks right window
+- FLT-COMP-H-01 — comparison range overlays prior
+- FLT-LIB-H-01 — org filter library reusable
+- FLT-HIGHLIGHT-H-01 — highlight preserves all rows

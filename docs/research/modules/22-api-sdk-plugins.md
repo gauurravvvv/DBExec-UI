@@ -101,3 +101,68 @@ JS for `defaultOptions(ctx)`.
 - **API-RL-H-01** — 101st call in 1min → 429
 - **SDK-H-01** — `client.datasets.preview(id)` returns expected shape
 - **EMBED-PM-H-01** — applyFilter from host postMessages into iframe
+
+## Appendix · Review additions
+
+- **GraphQL API** alongside REST (Looker has both).
+- **gRPC** for service-to-service.
+- **API changelog page** with deprecation timelines.
+- **OpenAPI spec at `/openapi.json`** + ReDoc at `/docs`.
+- **`Idempotency-Key` header** support on every mutation
+  (HTTP best practice).
+- **Rate-limit headers**:
+  `X-RateLimit-Limit`, `-Remaining`, `-Reset`.
+- **Pagination headers** (`Link: <...>; rel="next"`).
+- **Deprecation headers** (`Deprecation: true`, `Sunset: <date>`).
+- **CLI tool** (`dbexec` for CI usage).
+- **VS Code extension** stub for in-editor query authoring.
+- **OAuth2 third-party apps** (Slack-style "App X wants to read your data").
+
+### Schema delta
+
+```sql
+CREATE TABLE idempotency_record (
+  key             varchar(255) PRIMARY KEY,
+  organisation_id uuid NOT NULL,
+  request_hash    varchar(64) NOT NULL,
+  response_status int NOT NULL,
+  response_body   jsonb,
+  created_at      timestamptz NOT NULL DEFAULT now(),
+  expires_at      timestamptz NOT NULL DEFAULT now() + interval '24h'
+);
+CREATE INDEX ON idempotency_record (expires_at);
+```
+
+### Idempotency middleware
+
+```ts
+export async function idempotency(req, res, next) {
+  const key = req.headers['idempotency-key'];
+  if (!key || !req.method.match(/POST|PUT|PATCH/)) return next();
+  const reqHash = crypto.createHash('sha256')
+    .update(JSON.stringify(req.body)).digest('hex');
+  const existing = await IdempotencyRecord.findOne({ where: { key } });
+  if (existing) {
+    if (existing.requestHash !== reqHash)
+      return res.status(409).json({ error: 'idempotency key reused with different body' });
+    return res.status(existing.responseStatus).json(existing.responseBody);
+  }
+  const json = res.json.bind(res);
+  res.json = (body: any) => {
+    IdempotencyRecord.insert({
+      key, organisationId: res.locals.orgData.id, requestHash: reqHash,
+      responseStatus: res.statusCode, responseBody: body,
+    }).catch(() => {});
+    return json(body);
+  };
+  next();
+}
+```
+
+### Test IDs
+
+- API-IDEMP-H-01 — same key returns first response
+- API-IDEMP-N-01 — same key, different body → 409
+- API-HEADER-H-01 — rate-limit headers present
+- API-DEPR-H-01 — deprecated route returns sunset header
+- API-GQL-H-01 — GraphQL endpoint serves same data as REST

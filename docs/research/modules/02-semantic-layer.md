@@ -533,3 +533,41 @@ E2E IDs:
   evolution. Recommend a **compatible-subset** import path.
 - **Cross-dataset joins** — out of scope for V1; revisit Q3 (see
   module 04 query compiler).
+
+## Appendix · Review additions
+
+- **Derived dimensions** (not just metrics): a dim whose expression
+  references another dim.
+- **Filtered metrics** — `revenue_apac = SUM(revenue) FILTER (WHERE region='APAC')`.
+- **Hierarchies** (`Continent > Country > City`) as first-class.
+- **PoP virtual fields** (`revenue.prev_month`, `.yoy`, `.mtd`).
+- **Quick filters** at model level (chip-style on the FE).
+- **Drill paths declared on the model**, not the analysis.
+- **`sql_always_where`** — clause always injected (e.g. soft-delete filter).
+- **Required filters** — must be set before any query runs.
+- **Display SQL** — separate storage value from display label
+  (e.g. status_code=1 ↔ 'Active').
+- **Symmetric aggregates / fan-out detection** — join causing dup rows; warn + auto-dedupe.
+- **Model composition** (`include`).
+- **Allowed-aggregations per metric**, `allowed_dimensions`
+  (some metrics are meaningless with some dims).
+- **Cardinality on joins** — `1-1`, `1-many`, `many-many`.
+
+### New endpoints
+
+- `POST /semantic-model/:id/dry-run`
+- `POST /semantic-model/:id/lint`
+- `POST /semantic-model/:id/clone`
+- `GET /semantic-model/:id/usages`
+- `POST /semantic/explore` — suggested dims for a metric
+- `GET /semantic-model/:id/ddl-suggestion` — propose model from columns
+
+### Tests
+
+- SEM-DERIV-CYCLE-N-01 — transitive cycle detected
+- SEM-FANOUT-H-01 — joined model fan-out detected + warning
+- SEM-HIER-H-01 — region → country → city drill works
+- SEM-REQ-N-01 — query without required filter → 400
+- SEM-ALWAYS-H-01 — sql_always_where appended on every compile
+- SEM-CLONE-H-01 — clone deep-copies all children
+- SEM-LINT-H-01 — unused dimension flagged

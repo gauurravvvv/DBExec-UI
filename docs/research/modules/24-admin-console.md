@@ -74,3 +74,51 @@ CREATE TABLE org_usage_daily (
 - **ADM-N-01** — non-admin sees 403
 - **ADM-BACKUP-H-01** — backup file round-trips on restore
 - **ADM-PLAN-H-01** — exceeding seat limit blocks user creation
+
+## Appendix · Review additions
+
+- **Switch-org** UI for super admins (browse N orgs from one shell).
+- **Audit retention slider** per org.
+- **Impersonate user** for support (audited).
+- **Plan upgrade flow** with Stripe / Chargebee checkout.
+- **Trial extension** by support.
+- **Bulk user CSV import** (separate from SCIM).
+- **Bulk group CSV import**.
+- **Org clone** — duplicate org for staging.
+- **Org transfer** — change owning customer (M&A scenarios).
+- **Sandbox mode** — read-only org clone.
+- **Backup encryption at rest** with KMS (BYOK).
+- **Data export request** (GDPR Article 20).
+- **Right-to-erasure** (GDPR Article 17).
+
+### Schema delta
+
+```sql
+CREATE TABLE impersonation_event (
+  id              uuid PRIMARY KEY,
+  support_user_id uuid NOT NULL,
+  target_user_id  uuid NOT NULL,
+  reason          text,
+  started_at      timestamptz NOT NULL DEFAULT now(),
+  ended_at        timestamptz
+);
+
+CREATE TABLE gdpr_request (
+  id            uuid PRIMARY KEY,
+  organisation_id uuid NOT NULL,
+  user_id       uuid NOT NULL,
+  kind          varchar(16) NOT NULL,  -- export|delete
+  status        varchar(16) NOT NULL DEFAULT 'pending',
+  artifact_url  text,
+  completed_at  timestamptz,
+  created_at    timestamptz NOT NULL DEFAULT now()
+);
+```
+
+### Test IDs
+
+- ADM-IMP-H-01 — support can impersonate; audit logged
+- ADM-BULK-CSV-H-01 — bulk CSV imports 100 users
+- ADM-CLONE-H-01 — org cloned with selective tables
+- GDPR-EXP-H-01 — data export request fulfilled within SLA
+- GDPR-DEL-H-01 — right-to-erasure removes/anonymises user

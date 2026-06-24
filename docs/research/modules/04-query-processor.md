@@ -189,3 +189,30 @@ without running it. Critical for debug + AI agents.
   per-dialect code? Pro: covers 20+ dialects. Con: Python boundary,
   added latency. Recommend hand-written for top 4 dialects + SQLGlot
   fallback for niche.
+
+## Appendix · Review additions
+
+- **Query plan** as a separate artefact (not just SQL).
+- **Streaming results** via cursor for large queries.
+- **Cancel-by-query-id** semantics tied to `pg_cancel_backend` etc.
+- **Parameterised query AST cache**.
+- **Dialect-specific identifier folding** awareness (Snowflake UPPER,
+  Postgres lower).
+- **NULLS FIRST / NULLS LAST** per dialect.
+- **Date arithmetic** (`INTERVAL '1 day'` vs `DATEADD`).
+- **Limit pushdown** into subquery.
+- **CTE vs subquery preservation** per dialect (some optimisers
+  inline CTEs poorly).
+
+### New endpoints
+
+- `POST /query/cancel/:id`
+- `POST /query/explain-analyze`
+- `GET /query/stats` — slow query log per org
+
+### Tests
+
+- QP-CAN-H-01 — cancel mid-flight → 499
+- QP-NULL-H-01 — `NULLS LAST` rendered per dialect
+- QP-INT-H-01 — interval arithmetic correct on all dialects
+- QP-PUSH-H-01 — limit pushed into subquery, not wrapped

@@ -339,3 +339,32 @@ E2E IDs:
 - Should custom plugins ship as runtime npm packages (Webpack
   federation) or as JSON-only descriptors that map to a fixed
   ECharts option? Recommend descriptors first — safer sandbox.
+
+## Appendix · Review additions
+
+- **Visual templates** ("Funnel 4-stage signup" pre-mapped).
+- **Multi-axis** charts (dual y-axis independent scales).
+- **Reference markers / target lines**.
+- **Trend lines** (linear / log / exp regression).
+- **Forecast** (1-12 periods via ARIMA / Prophet).
+- **Annotations anchored to data points**.
+- **Compare mode** — current vs prior side-by-side.
+- **Saved views per analysis** — shareable presets.
+- **Visual interactions matrix** — which visual filters which.
+- **Bookmark state** — full UI snapshot (filters + drill + selection).
+
+### Schema delta
+
+```sql
+CREATE TABLE visual_template (id, name, family, body jsonb);
+CREATE TABLE analysis_bookmark (id, analysis_id, owner_id, name, state jsonb);
+CREATE TABLE visual_annotation (id, visual_id, x, y, text, created_at);
+```
+
+### Tests
+
+- ANL-FC-H-01 — forecast renders with confidence bands
+- ANL-TREND-H-01 — trendline overlay on scatter
+- ANL-BOOK-H-01 — bookmark restores filter+drill state
+- ANL-MULTI-H-01 — dual-axis with independent scales
+- ANL-COMPARE-H-01 — prior-period overlay

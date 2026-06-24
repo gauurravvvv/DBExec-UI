@@ -507,3 +507,35 @@ export default async function datasetUsage(req: Request, res: Response) {
   publish a `quota.upload_rows` field on the org.
 - Should we offer "auto-refresh from Google Sheets" or only manual
   refresh? Auto-refresh is a sub-feature of scheduling (module 15).
+
+## Appendix · Review additions
+
+- **Schema introspection cache** — per-dataset column list with TTL.
+- **Column-level descriptions** — data dictionary.
+- **Cached sample preview** without re-querying.
+- **Dataset templates** (Stripe / Salesforce / etc.).
+- **Refresh on write** — chained dependency refresh.
+- **Partial uploads** (append, not replace).
+- **Incremental upsert** by PK.
+- **Detect schema drift** after refresh.
+- **Snowflake / BigQuery external tables** as source.
+
+### Schema delta
+
+```sql
+ALTER TABLE dataset
+  ADD COLUMN column_descriptions jsonb,
+  ADD COLUMN sample_rows jsonb,
+  ADD COLUMN schema_introspection jsonb,
+  ADD COLUMN schema_introspected_at timestamptz,
+  ADD COLUMN refresh_strategy varchar(16) NOT NULL DEFAULT 'replace',
+  ADD COLUMN primary_key text[],
+  ADD COLUMN upstream_dataset_ids uuid[];
+```
+
+### Tests
+
+- DST-UPSERT-H-01 — upsert reuses existing row by PK
+- DST-DRIFT-H-01 — new upstream column → drift banner
+- DST-SAMPLE-H-01 — sample served from cache
+- DST-VERSION-DIFF-H-01 — diff between versions

@@ -288,3 +288,33 @@ export class BrowserPool {
 - "Snapshot vs live per visual" — should we allow heterogenous on
   one board (G16)? Yes, useful for "current revenue (live) +
   last-published target (snapshot)". V2.
+
+## Appendix · Review additions
+
+- **Tabs / pages** within a dashboard.
+- **Conditional visibility** of visuals.
+- **Free-form layout** option alongside grid.
+- **Dashboard variables** (different from parameters).
+- **Per-board theme override**.
+- **Snapshot diff** between two versions.
+- **Snapshot retention** policy.
+- **Presentation / TV mode** (auto-rotate pages).
+- **Parameter-sweep export** (one PDF per region).
+- **Print stylesheet**.
+- **Per-visual CSV bundle export** (zip).
+
+### Schema delta
+
+```sql
+CREATE TABLE dashboard_tab (id, dashboard_id, name, layout jsonb, ordering int);
+CREATE TABLE dashboard_snapshot (id, dashboard_id, version, payload jsonb, created_on);
+CREATE TABLE dashboard_variable (id, dashboard_id, name, default_value jsonb);
+ALTER TABLE dashboard ADD COLUMN theme_override jsonb;
+```
+
+### Tests
+
+- DSH-TAB-H-01 — multi-tab dashboard renders + remembers tab
+- DSH-VAR-H-01 — dashboard variable propagates to visuals
+- DSH-SWEEP-H-01 — per-region PDF sweep produces N files
+- DSH-TV-H-01 — TV mode rotates pages every 30s

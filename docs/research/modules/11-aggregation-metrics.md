@@ -59,3 +59,39 @@ and prior) and a join.
 - **METRIC-RATIO-H-01** — divide by zero → NULL not Infinity
 - **METRIC-CONV-H-01** — denominator excludes events outside window
 - **METRIC-POP-H-01** — period-over-period correctly aligns months
+
+## Appendix · Review additions
+
+After a deep-review pass these concepts were identified as missing and
+are listed here for the implementer:
+
+- **Non-additive metric flag**: `sem_metric.is_additive boolean`.
+  Distinct counts can't sum across windows; compiler must refuse.
+- **Semi-additive metrics** (Power BI terminology): `sem_metric.is_semi_additive`
+  + `sem_metric.semi_additive_func varchar` ('LAST'|'FIRST'|'AVG').
+  Use case: bank balance = LAST(balance) per month, not SUM.
+- **Window reset semantics**: `sem_metric.window_reset varchar`
+  ('day'|'week'|'month'|'year'|'fiscal_year'). MTD resets at month
+  boundary; YTD at year; fiscal at fiscal year start.
+- **Allowed aggregations whitelist**: `sem_metric.allowed_aggregations varchar[]`.
+- **Custom format strings** beyond currency/percent: `0.00 'kg'`,
+  `#,##0.0M`. Implement with `numbro` or `d3-format`.
+- **Approx-vs-exact distinct counts** flag — Snowflake / BigQuery have
+  `APPROX_COUNT_DISTINCT`; metric author picks accuracy vs speed.
+- **Window-function metrics**: `RANK() OVER (PARTITION BY ...)`,
+  `NTILE(10)`, `LAG()` for prior-period comparison.
+- **Percentile metrics**: dialect-specific
+  (`PERCENTILE_CONT` vs `APPROX_PERCENTILE`).
+- **Cross-metric math (virtual columns)**: FE composes
+  `metric_a - metric_b` without authoring a server-side derived
+  metric.
+- **Metric description tooltip** on hover in chart legend.
+
+### Test IDs to add
+
+- METRIC-SEMIADD-H-01 — LAST month-end balance correct
+- METRIC-RESET-H-01 — MTD resets at month boundary
+- METRIC-NONADD-N-01 — refuse to SUM distinct counts across regions
+- METRIC-FORMAT-H-01 — custom format applied in axis + tooltip
+- METRIC-PCT-H-01 — percentile works on PG / Snowflake / BQ / MSSQL
+- METRIC-WIN-RANK-H-01 — RANK() partition emits correct SQL

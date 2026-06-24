@@ -62,3 +62,52 @@ Server-side: compute cluster cells via Supercluster (npm) when row count
 - **GEO-DRILL-H-01** — click country → drill into states
 - **GEO-PIN-H-01** — 10k points clustered, opens to individual on zoom
 - **GEO-N-01** — country code missing from GeoJSON → row dropped with warning
+
+## Appendix · Review additions
+
+- **Tile provider config** (Mapbox / MapTiler / OSM / Google Maps)
+  with token management.
+- **Address geocoding** (street → lat/lng) via Mapbox / Photon.
+- **Reverse geocoding**.
+- **Time-series animation** (heatmap evolving over a date range).
+- **Route / line rendering** between two points.
+- **GeoJSON validation** via turf.js.
+- **H3 hex bins** (uber/h3-js) for high-density data.
+- **Projection picker** (Mercator / Albers / Robinson).
+
+### Schema delta
+
+```sql
+CREATE TABLE tile_provider (
+  id              uuid PRIMARY KEY,
+  organisation_id uuid NOT NULL,
+  kind            varchar(16) NOT NULL,  -- mapbox|maptiler|osm|google
+  token_enc       bytea,
+  default_style   varchar(64),
+  attribution     varchar(255)
+);
+```
+
+### h3-js bucketing
+
+```ts
+import { latLngToCell, cellToBoundary } from 'h3-js';
+const buckets = new Map<string, number>();
+for (const r of rows) {
+  const cell = latLngToCell(r.lat, r.lng, 7);  // resolution 7 ≈ ~5km hex
+  buckets.set(cell, (buckets.get(cell) ?? 0) + 1);
+}
+const features = [...buckets.entries()].map(([cell, count]) => ({
+  type: 'Feature',
+  properties: { count },
+  geometry: { type: 'Polygon', coordinates: [cellToBoundary(cell, true)] },
+}));
+```
+
+### Test IDs
+
+- GEO-TILE-H-01 — chosen tile provider's tiles load
+- GEO-GEOCODE-H-01 — address column resolved to lat/lng
+- GEO-ANIM-H-01 — time-series animation plays + scrubs
+- GEO-H3-H-01 — 100k points bucketed into ~200 hexes
+- GEO-PROJ-H-01 — projection switch re-renders without distortion

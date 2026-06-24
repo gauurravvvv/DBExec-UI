@@ -183,3 +183,90 @@ safe expression evaluation — no `new Function`.
 - **AL-N-01** — expression with side-effecting fn rejected
 - **AL-E-01** — alert when dataset returns 0 rows → does not fire
   unless `count == 0` is the condition
+
+## Appendix · Review additions
+
+### Concepts
+
+- **Snooze alerts** — temporarily silence without disable.
+- **Acknowledge alerts** — PagerDuty-style.
+- **Severity levels** — info / warning / critical → recipient routing.
+- **Quiet hours per recipient** (don't fire 22:00-07:00).
+- **Multi-channel fan-out**: same delivery → email + Slack + webhook.
+- **Recipient lists** — distribution list separate from each
+  subscription so updating recipients is one place.
+- **HMAC webhook signature** in `X-DBExec-Signature` header.
+- **Exponential-backoff retries** then dead-letter queue.
+- **Backfill missed schedules** when worker was down.
+- **Cron drift detection** — `next_run_at` slipped > 5 min → warn.
+- **One-time scheduled run** (Monday next week at 09:00).
+- **Trigger on data refresh** (not cron — fire when dataset refreshes).
+- **Consecutive-breach guard** (N samples breach before firing → avoid
+  flap).
+
+### Schema delta
+
+```sql
+ALTER TABLE alert
+  ADD COLUMN severity varchar(16) NOT NULL DEFAULT 'warning',
+  ADD COLUMN consecutive_breaches_required int NOT NULL DEFAULT 1,
+  ADD COLUMN acknowledged_until timestamptz,
+  ADD COLUMN snoozed_until timestamptz,
+  ADD COLUMN trigger_on_refresh boolean NOT NULL DEFAULT false;
+
+CREATE TABLE recipient_list (
+  id              uuid PRIMARY KEY,
+  organisation_id uuid NOT NULL,
+  name            varchar(100) NOT NULL,
+  members         jsonb NOT NULL,
+  UNIQUE (organisation_id, name)
+);
+
+CREATE TABLE delivery_attempt (
+  id              uuid PRIMARY KEY,
+  delivery_log_id uuid NOT NULL REFERENCES delivery_log(id) ON DELETE CASCADE,
+  attempt_no      int NOT NULL,
+  status          varchar(16) NOT NULL,
+  error           text,
+  occurred_at     timestamptz NOT NULL DEFAULT now()
+);
+```
+
+### Webhook signature
+
+```ts
+const sig = crypto.createHmac('sha256', secret)
+  .update(JSON.stringify(body)).digest('hex');
+await fetch(webhookUrl, {
+  method: 'POST',
+  headers: {
+    'X-DBExec-Signature': `t=${Date.now()},v1=${sig}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(body),
+});
+```
+
+### Exponential retry
+
+```ts
+const delays = [1, 5, 25, 125, 625]; // secs
+async function withRetry<T>(fn: () => Promise<T>, max = 5): Promise<T> {
+  let last;
+  for (let i = 0; i < max; i++) {
+    try { return await fn(); }
+    catch (e) { last = e; await sleep(delays[i] * 1000); }
+  }
+  throw last;
+}
+```
+
+### Test IDs
+
+- AL-CONSEC-H-01 — alert requires 3 breaches before firing
+- AL-SNOOZE-H-01 — snoozed alert skips its next run
+- AL-ACK-H-01 — acknowledged alert won't refire until ack expires
+- SUB-FAIL-RETRY-H-01 — failed delivery retries 3× then DLQs
+- SUB-BACKFILL-H-01 — worker restart catches up missed cron
+- AL-HMAC-H-01 — webhook signature verifiable
+- AL-REFRESH-H-01 — alert fires on dataset refresh, not cron

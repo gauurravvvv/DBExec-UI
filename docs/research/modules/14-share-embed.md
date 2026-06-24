@@ -119,3 +119,76 @@ token's `attrs`. Per-tenant data isolation without seat licences.
 - **SH-EMBED-RLS-H-01** — token attrs flow into RLS
 - **SH-EMBED-CSP-N-01** — different host than allowlist → blocked
 - **SH-EMBED-EXP-N-01** — expired JWT → 401
+
+## Appendix · Review additions
+
+### Concepts
+
+- **Group-shareable links**: target a dynamic group, not just emails.
+- **Granular embed permissions**: which visuals visible inside iframe.
+- **Embed event API**: `onFilterChange`, `onDrillUp`, `onError`,
+  `onRendered`.
+- **Embed parameter override** from host via `postMessage`:
+  `embed.applyFilter({...})`, `embed.resetFilters()`.
+- **Theme injection through embed token** — customer's per-tenant
+  theme baked into JWT `attrs.theme`.
+- **Embed view analytics**: track per-link view count, time-spent,
+  filter usage; surface in Share dialog.
+- **Anti-scraping**: throttle per-link view rate.
+- **Captcha gate** for public links above N views/hour.
+- **Cookie-free embed** mode for stricter privacy (token in query
+  string only, no Set-Cookie).
+- **Public link revocation list** with creator notification.
+
+### Schema delta
+
+```sql
+CREATE TABLE share_link_view_event (
+  id          bigserial PRIMARY KEY,
+  link_id     uuid NOT NULL REFERENCES share_link(id) ON DELETE CASCADE,
+  ip          inet,
+  user_agent  varchar(512),
+  country     varchar(64),
+  duration_ms int,
+  viewed_at   timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX ON share_link_view_event (link_id, viewed_at DESC);
+
+ALTER TABLE share_link
+  ADD COLUMN theme_override jsonb,
+  ADD COLUMN visible_visuals uuid[],
+  ADD COLUMN allowed_domains text[],
+  ADD COLUMN max_views_per_hour int;
+```
+
+### postMessage protocol
+
+```ts
+// iframe child emits
+window.parent.postMessage({
+  type: 'dbexec:event',
+  event: 'filter-change',
+  payload: state,
+}, '*');
+
+// host listens
+window.addEventListener('message', (e) => {
+  if (e.data?.type !== 'dbexec:event') return;
+  // route by e.data.event
+});
+
+// host pushes
+iframe.contentWindow.postMessage({
+  type: 'dbexec:command',
+  command: 'apply-filter',
+  payload: { region: 'APAC' },
+}, '*');
+```
+
+### Test IDs
+
+- SH-EVENT-H-01 — filter change inside iframe fires host callback
+- SH-EMBED-VIS-H-01 — visible_visuals hides others
+- SH-PUBLIC-CAPTCHA-N-01 — 50 views/hour triggers captcha
+- SH-REVOKE-H-01 — revoked link returns 410 with friendly page
+- SH-THEME-H-01 — token-injected theme applies inside iframe

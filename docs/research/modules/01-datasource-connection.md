@@ -517,3 +517,28 @@ E2E IDs match `e2e/docs/modules/04-datasources.md`. Add new ones:
 - Should the "managed datasource" (DuckDB or embedded Postgres) be
   per-org or per-org-per-user? Per-org keeps the row-count modest;
   per-user gives stronger isolation. Recommend **per-org with prefix**.
+
+## Appendix · Review additions
+
+Things missed in the original pass:
+
+- **Connection-string-only input** (`postgres://user:pw@host:port/db?sslmode=require`)
+  as an alternative to per-field form.
+- **SSH tunnel / bastion** for PrivateLink customers:
+  `tunnel_config jsonb (ssh_host, ssh_port, private_key_enc, jump_host)`.
+- **Read-replica routing** — `read_replica_hosts text[]` for round-robin.
+- **Datasource approval workflow** — "request datasource" → admin approves.
+- **Snowflake key-pair auth** (not just password) — store private key.
+- **TLS pinning** — `expected_cert_fingerprint sha256` optional field.
+- **PgBouncer awareness** — `SET LOCAL statement_timeout` inside a tx.
+- **Default DB for listing** (Snowflake) — `default_database_for_listing varchar`.
+- **`application_name`** propagated into the driver so customer's
+  `pg_stat_activity` shows "DBExec" + caller name.
+- **`statement_timeout`, `lock_timeout`, `idle_in_transaction_timeout`** separate columns.
+
+### Tests
+
+- DS-N-30 — connection string with unencoded `@` in password parses
+- DS-E-40 — idle pool shrinks below min, recovers on next checkout
+- DS-E-41 — read-replica hot-swap during a query
+- DS-N-31 — SSH tunnel handshake timeout → friendly error
