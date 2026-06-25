@@ -272,6 +272,64 @@ export const updateAnalysisSchema = z.object({
 });
 export type UpdateAnalysisInput = z.infer<typeof updateAnalysisSchema>;
 
+// ── Run-query (filter payload) schemas ─────────────────────────────
+
+/**
+ * Shape of a single filter applied at query time. Mirrors the BE
+ * `AppliedFilter` interface (filterEngine.service.ts) but expressed
+ * as a Zod schema so the run-query endpoint can reject malformed
+ * filters at the gate rather than letting the SQL compiler discover
+ * them at runtime.
+ *
+ * Column-name pattern matches `VALID_IDENTIFIER` inside the filter
+ * engine (^[a-zA-Z_][a-zA-Z0-9_]*$) — anything else is rejected here
+ * so the engine's `throw new Error(invalid column name)` path is
+ * never reached by a normal request.
+ */
+export const APPLIED_FILTER_COLUMN_PATTERN = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+
+export const appliedFilterSchema = z.object({
+  filterId: z.string().optional(),
+  columnName: z
+    .string({ message: 'validation.analyses.run.column.required' })
+    .regex(APPLIED_FILTER_COLUMN_PATTERN, {
+      message: 'validation.analyses.run.column.invalid',
+    }),
+  filterType: z
+    .string({ message: 'validation.analyses.run.filterType.required' })
+    .min(1, { message: 'validation.analyses.run.filterType.required' }),
+  operator: z.string().optional(),
+  values: z.array(z.any()).optional(),
+  rangeMin: z.number().optional(),
+  rangeMax: z.number().optional(),
+  includeMin: z.boolean().optional(),
+  includeMax: z.boolean().optional(),
+  dateRangeStart: z.string().optional(),
+  dateRangeEnd: z.string().optional(),
+  nullOption: z.string().optional(),
+});
+export type AppliedFilterInput = z.infer<typeof appliedFilterSchema>;
+
+/**
+ * POST /api/v1/analyses/:analysisId/run — body schema. Limit is
+ * either a positive int or -1 (the sentinel for "no row cap"); the
+ * controller checks `parsedLimit !== -1` to skip the LIMIT wrap.
+ */
+export const runAnalysisQuerySchema = z.object({
+  datasetId: idSchema('validation.analyses.run.datasetId.required'),
+  analysisId: idSchema('validation.analyses.run.analysisId.required'),
+  filters: z.array(appliedFilterSchema).optional(),
+  limit: z
+    .union([z.number().int(), z.string().regex(/^-?\d+$/)])
+    .optional()
+    .default(-1)
+    .transform(v => (typeof v === 'string' ? parseInt(v, 10) : v))
+    .refine(n => n === -1 || n > 0, {
+      message: 'validation.analyses.run.limit.invalid',
+    }),
+});
+export type RunAnalysisQueryInput = z.infer<typeof runAnalysisQuerySchema>;
+
 // ── RLS rule schemas ───────────────────────────────────────────────
 
 export const rlsRuleNameSchema = z.preprocess(
