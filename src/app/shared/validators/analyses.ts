@@ -294,63 +294,120 @@ export const rlsColumnNameSchema = z.preprocess(
     }),
 );
 
-export const addRlsRuleSchema = z.object({
-  name: rlsRuleNameSchema,
-  description: analysisDescriptionSchema,
-  datasetId: idSchema('validation.analyses.rls.dataset.required'),
-  scope: z.preprocess(
-    trimOrUndefined,
-    z.enum(RLS_SCOPE_VALUES, {
-      message: 'validation.analyses.rls.scope.invalid',
-    }),
-  ),
-  scopeId: idSchema('validation.analyses.rls.scopeId.required'),
-  columnName: rlsColumnNameSchema,
-  operator: z
-    .preprocess(
-      trimOrUndefined,
-      z.enum(RLS_OPERATOR_VALUES, {
-        message: 'validation.analyses.rls.operator.invalid',
-      }),
-    )
-    .optional()
-    .default('IN'),
-  values: z
-    .array(z.any())
-    .min(1, { message: 'validation.analyses.rls.values.atLeastOne' }),
-  isEnabled: z.boolean().optional().default(true),
-});
-export type AddRlsRuleInput = z.infer<typeof addRlsRuleSchema>;
+/**
+ * Cross-field rule for RLS payloads — keeps operator and values in sync
+ * so the BE resolver never has to guess at intent. Used by both
+ * `addRlsRuleSchema` and `updateRlsRuleSchema` via `.superRefine`.
+ *
+ * Why this lives here, not in the resolver: the resolver compiles
+ * `BETWEEN` with non-numeric or wrong-arity values into a silent
+ * fallback (which historically routed through the `EQUALS`/IN code
+ * path). Refusing the payload at the gate is the only way to stop
+ * that class of misconfiguration; the resolver still has a defensive
+ * guard but should never need it for newly-created rules.
+ */
+const refineRlsOperatorValues = (
+  data: { operator?: string; values?: unknown[] },
+  ctx: z.RefinementCtx,
+): void => {
+  // `values` is optional on the update schema; nothing to validate if
+  // the caller didn't touch it.
+  if (data.values === undefined) return;
+  const op = data.operator ?? 'IN';
 
-export const updateRlsRuleSchema = z.object({
-  id: idSchema('validation.analyses.rls.id.required'),
-  name: rlsRuleNameSchema.optional(),
-  description: analysisDescriptionSchema,
-  scope: z
-    .preprocess(
+  if (op === 'BETWEEN') {
+    if (data.values.length !== 2) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['values'],
+        message: 'validation.analyses.rls.values.betweenExactlyTwo',
+      });
+      return;
+    }
+    for (let i = 0; i < 2; i++) {
+      const v = data.values[i];
+      const n = typeof v === 'number' ? v : Number(v);
+      if (!Number.isFinite(n)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['values', i],
+          message: 'validation.analyses.rls.values.betweenNumeric',
+        });
+      }
+    }
+  } else if (op === 'EQUALS' && data.values.length !== 1) {
+    // EQUALS is a single-value operator. Multi-value EQUALS would
+    // either silently collapse to the first value or expand to an
+    // IN — both are surprising. Force IN for multi-value intent.
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['values'],
+      message: 'validation.analyses.rls.values.equalsExactlyOne',
+    });
+  }
+};
+
+export const addRlsRuleSchema = z
+  .object({
+    name: rlsRuleNameSchema,
+    description: analysisDescriptionSchema,
+    datasetId: idSchema('validation.analyses.rls.dataset.required'),
+    scope: z.preprocess(
       trimOrUndefined,
       z.enum(RLS_SCOPE_VALUES, {
         message: 'validation.analyses.rls.scope.invalid',
       }),
-    )
-    .optional(),
-  scopeId: idSchema('validation.analyses.rls.scopeId.required').optional(),
-  columnName: rlsColumnNameSchema.optional(),
-  operator: z
-    .preprocess(
-      trimOrUndefined,
-      z.enum(RLS_OPERATOR_VALUES, {
-        message: 'validation.analyses.rls.operator.invalid',
-      }),
-    )
-    .optional(),
-  values: z
-    .array(z.any())
-    .min(1, { message: 'validation.analyses.rls.values.atLeastOne' })
-    .optional(),
-  isEnabled: z.boolean().optional(),
-  justification: analysisJustificationSchema,
-});
+    ),
+    scopeId: idSchema('validation.analyses.rls.scopeId.required'),
+    columnName: rlsColumnNameSchema,
+    operator: z
+      .preprocess(
+        trimOrUndefined,
+        z.enum(RLS_OPERATOR_VALUES, {
+          message: 'validation.analyses.rls.operator.invalid',
+        }),
+      )
+      .optional()
+      .default('IN'),
+    values: z
+      .array(z.any())
+      .min(1, { message: 'validation.analyses.rls.values.atLeastOne' }),
+    isEnabled: z.boolean().optional().default(true),
+  })
+  .superRefine(refineRlsOperatorValues);
+export type AddRlsRuleInput = z.infer<typeof addRlsRuleSchema>;
+
+export const updateRlsRuleSchema = z
+  .object({
+    id: idSchema('validation.analyses.rls.id.required'),
+    name: rlsRuleNameSchema.optional(),
+    description: analysisDescriptionSchema,
+    scope: z
+      .preprocess(
+        trimOrUndefined,
+        z.enum(RLS_SCOPE_VALUES, {
+          message: 'validation.analyses.rls.scope.invalid',
+        }),
+      )
+      .optional(),
+    scopeId: idSchema('validation.analyses.rls.scopeId.required').optional(),
+    columnName: rlsColumnNameSchema.optional(),
+    operator: z
+      .preprocess(
+        trimOrUndefined,
+        z.enum(RLS_OPERATOR_VALUES, {
+          message: 'validation.analyses.rls.operator.invalid',
+        }),
+      )
+      .optional(),
+    values: z
+      .array(z.any())
+      .min(1, { message: 'validation.analyses.rls.values.atLeastOne' })
+      .optional(),
+    isEnabled: z.boolean().optional(),
+    justification: analysisJustificationSchema,
+  })
+  .superRefine(refineRlsOperatorValues);
 
 // ── Dashboard publish field schemas (used directly by FE form) ─────
 
