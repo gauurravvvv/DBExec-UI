@@ -21,6 +21,16 @@ of the union.
 See [11-aggregation-metrics §4](modules/11-aggregation-metrics.md#4-target-architecture)
 for the additive/semi-additive/non-additive resolution algorithm.
 
+## Action (visual action / dashboard action)
+
+A configured "what happens when the user clicks this cell" on a
+visual. Four kinds: `tab_nav` (jump to another tab in the same
+dashboard), `drill_through` (jump to a different analysis with
+context), `url` (open an external URL with templated params),
+`raw_rows` (open the raw-rows slide-over filtered to the clicked
+cell). Defined in
+[`../implementation/CROSS-TAB-DRILL-THROUGH.md`](../implementation/CROSS-TAB-DRILL-THROUGH.md).
+
 ## ACME (Automated Certificate Management Environment)
 
 The RFC 8555 protocol for automated TLS certificate issuance. DBExec
@@ -46,6 +56,15 @@ row after. Verified by re-walking. Defined in
 Customer-supplied KMS key used for envelope encryption of their
 data at rest. DBExec generates the per-object DEK; the customer's
 KMS wraps the DEK. Defined in [28-backup-restore §4](modules/28-backup-restore.md).
+
+## BullMQ jobId
+
+The identifier we attach to a queued job so the queue is
+idempotent under retry. For subscriptions:
+`sub:<subscriptionId>:<scheduledTimestamp>` for a specific run,
+`sub:<subscriptionId>` for the repeatable schedule itself. Same
+jobId = no-op on re-add. Defined in
+[15-scheduling-alerts §4](modules/15-scheduling-alerts.md).
 
 ## Canonical SQL
 
@@ -246,6 +265,18 @@ CSS media query that turns off non-essential animations. Required
 for WCAG 2.1 SC 2.3.3. Used across every animated component in the
 FE. Defined in [23-i18n-a11y §4](modules/23-i18n-a11y.md).
 
+## Prompt injection
+
+An attacker controls some text that ends up in the LLM's context
+and tries to override the system prompt ("ignore previous
+instructions, do X"). DBExec's defences: (1) tools that would
+do the attacker's bidding don't exist (e.g. no `run_sql` tool),
+(2) all LLM output is parsed against a Zod schema before
+materialising — unparseable output is dropped, (3) user-supplied
+text in dimension values is length-capped and delimited in the
+prompt. See [25-ai-insights §4](modules/25-ai-insights.md) and
+[`../implementation/AI-DASHBOARD-GENERATION.md`](../implementation/AI-DASHBOARD-GENERATION.md).
+
 ## Quota
 
 Per-org cap on a measurable resource: rows queried per day,
@@ -284,6 +315,13 @@ A metric that's additive across some dimensions but not others.
 E.g., `inventory_on_hand` adds across warehouses but not across
 days. The metric kind in module 11 declares which dimensions are
 additive.
+
+## SSE (Server-Sent Events)
+
+One-way HTTP streaming protocol where the server sends `text/event-stream`
+chunks to a long-lived connection. Used for AI dashboard generation
+progress events and for the real-time notifications feed. Simpler
+than WebSockets when only the server needs to push.
 
 ## SCIM (System for Cross-domain Identity Management)
 

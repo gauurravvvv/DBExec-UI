@@ -403,9 +403,310 @@ Accessibility:
 
 ---
 
-## 11. References
+## 11. Controller stub (BE)
+
+`src/controllers/visualAction/addVisualAction.ts`. Per-kind
+validation is in `Joi`/Zod middleware; the controller does the
+business checks (tab-belongs-to-dashboard, filter-belongs-to-tab)
+that need DB lookup.
+
+```typescript
+import { Request, Response } from 'express';
+import sendResponse from '../../utility/response';
+import { CODE } from '../../config';
+import { VISUAL_ACTION_MSG, GENERIC } from '../../constants/response.messages';
+import { auditLogger } from '../../services/auditLogger.service';
+import { AUDIT_MODULES, AUDIT_ACTIONS } from '../../constants/audit.constants';
+import Logger from '../../utility/logger';
+
+const addVisualAction = async (req: Request, res: Response) => {
+  const { visualId, dashboardId, name, trigger, kind, config, displayOrder } = req.body;
+  const { orgData, master_db_connection } = res.locals;
+  const connection = orgData.connection;
+
+  try {
+    const visual = await connection.getRepository('AnalysisVisual')
+      .findOne({ where: { id: visualId } });
+    if (!visual) {
+      await master_db_connection.close();
+      return sendResponse(res, false, CODE.NOT_FOUND, VISUAL_ACTION_MSG.VISUAL_NOT_FOUND);
+    }
+
+    // Per-kind business validation
+    if (kind === 'tab_nav') {
+      const tab = await connection.getRepository('DashboardTab')
+        .findOne({ where: { id: config.targetTabId, dashboardId } });
+      if (!tab) {
+        await master_db_connection.close();
+        return sendResponse(res, false, CODE.BAD_REQUEST, VISUAL_ACTION_MSG.TAB_NOT_IN_DASHBOARD);
+      }
+
+      // Resolve all targetFilterIds → ensure they belong to this dashboard or this tab
+      const filterIds = config.dimMap.map((m: any) => m.targetFilterId);
+      const filters = await connection.getRepository('DashboardFilter')
+        .createQueryBuilder('f')
+        .where('f.id IN (:...ids)', { ids: filterIds })
+        .andWhere('(f.dashboardId = :dashId OR f.dashboardTabId = :tabId)',
+                  { dashId: dashboardId, tabId: tab.id })
+        .getMany();
+      if (filters.length !== filterIds.length) {
+        await master_db_connection.close();
+        return sendResponse(res, false, CODE.BAD_REQUEST, VISUAL_ACTION_MSG.BAD_DIM_MAP);
+      }
+
+      // sourceColumn must exist on the visual's encoded fields
+      const encoded = new Set(visual.encodedFieldNames ?? []);
+      for (const m of config.dimMap) {
+        if (!encoded.has(m.sourceColumn)) {
+          await master_db_connection.close();
+          return sendResponse(res, false, CODE.BAD_REQUEST,
+            `${VISUAL_ACTION_MSG.UNKNOWN_SOURCE_COLUMN}: ${m.sourceColumn}`);
+        }
+      }
+    } else if (kind === 'drill_through') {
+      // similar resolution for analysis_parameter
+    }
+
+    const action = await connection.getRepository('VisualAction').save({
+      visualId, dashboardId, name, trigger, kind, config,
+      displayOrder: displayOrder ?? 0,
+      isEnabled: true,
+    });
+
+    await auditLogger.logAuditToOrg({
+      connection, req, res,
+      module: AUDIT_MODULES.VISUAL_ACTION,
+      action: AUDIT_ACTIONS.CREATE,
+      entityName: 'VisualAction',
+      entityId: action.id,
+      metadata: { kind, trigger, sourceVisualId: visualId },
+    });
+
+    await master_db_connection.close();
+    sendResponse(res, true, CODE.SUCCESS, VISUAL_ACTION_MSG.CREATED, action);
+  } catch (err: any) {
+    Logger.error(`Add visual action failed: ${err.message}`);
+    await master_db_connection.close().catch(() => undefined);
+    return sendResponse(res, false, CODE.SERVER_ERROR, GENERIC.SERVER_ERROR);
+  }
+};
+
+export default addVisualAction;
+```
+
+## 12. FE — the resolver service
+
+`src/app/modules/dashboards/services/visual-action-resolver.service.ts`.
+One singleton service, injected into the dashboard tab component.
+Pure logic — no HTTP — so it's trivially unit-testable.
+
+```typescript
+import { Injectable } from '@angular/core';
+import { ECEventParams } from '../models/echart-event.model';
+import { VisualAction } from '../models/visual-action.model';
+import { DashboardCtx } from '../models/dashboard-ctx.model';
+
+export interface ResolvedAction {
+  kind: 'navigate' | 'open-url' | 'open-raw-rows';
+  targetUrl?: string;
+  url?: string;
+  newTab?: boolean;
+  visualId?: string;
+  cellDims?: Record<string, unknown>;
+  rowFilters?: Array<{ column: string; op: 'eq'; value: unknown }>;
+  columns?: string[] | null;
+  limit?: number;
+}
+
+@Injectable({ providedIn: 'root' })
+export class VisualActionResolverService {
+  resolve(
+    visualId: string,
+    ev: ECEventParams,
+    ctx: DashboardCtx,
+  ): ResolvedAction | null {
+    const action = ctx.actions
+      .filter(a => a.visualId === visualId && a.isEnabled)
+      .filter(a => this.matchesTrigger(a.trigger, ev.event))
+      .sort((a, b) => a.displayOrder - b.displayOrder)[0];
+
+    if (!action) return null;
+
+    const cellDims = this.dimsFromEchartClick(ev, ctx.visualEncoding[visualId]);
+    if (!cellDims || Object.keys(cellDims).length === 0) return null;
+
+    switch (action.kind) {
+      case 'tab_nav': return this.buildTabNav(action, cellDims, ctx);
+      case 'drill_through': return this.buildDrillThrough(action, cellDims);
+      case 'url': return this.buildExternalUrl(action, cellDims);
+      case 'raw_rows': return this.buildRawRows(action, cellDims, visualId);
+    }
+  }
+
+  private matchesTrigger(trigger: string, event: string): boolean {
+    if (trigger === event) return true;
+    // Touch fall-back: configured 'dblclick' degrades to 'click' on touch
+    if (trigger === 'dblclick' && event === 'click' && this.isTouch()) return true;
+    return false;
+  }
+
+  private dimsFromEchartClick(
+    ev: ECEventParams,
+    encoding: Record<string, string>, // role → fieldName
+  ): Record<string, unknown> {
+    const out: Record<string, unknown> = {};
+    // ECharts gives us `params.data` for bar/line/scatter
+    if (ev.data && typeof ev.data === 'object') {
+      for (const [role, field] of Object.entries(encoding)) {
+        if (field in (ev.data as object)) {
+          out[field] = (ev.data as Record<string, unknown>)[field];
+        }
+      }
+    }
+    // Pie/treemap: params.name is the dimension value
+    if (Object.keys(out).length === 0 && ev.name && encoding.category) {
+      out[encoding.category] = ev.name;
+    }
+    return out;
+  }
+
+  private buildTabNav(
+    action: VisualAction,
+    cellDims: Record<string, unknown>,
+    ctx: DashboardCtx,
+  ): ResolvedAction {
+    const cfg = action.config as { targetTabId: string; dimMap: any[]; scrollToVisualId?: string };
+    const params = new URLSearchParams();
+    params.set('tab', cfg.targetTabId);
+    for (const m of cfg.dimMap) {
+      if (m.sourceColumn in cellDims) {
+        params.set(`f.${m.targetFilterId}`, this.encodeFilterValue(cellDims[m.sourceColumn]));
+      }
+    }
+    if (cfg.scrollToVisualId) params.set('scroll', cfg.scrollToVisualId);
+    return {
+      kind: 'navigate',
+      targetUrl: `/dashboard/${ctx.dashboardId}?${params.toString()}`,
+    };
+  }
+
+  private buildDrillThrough(action: VisualAction, cellDims: Record<string, unknown>): ResolvedAction {
+    const cfg = action.config as { targetAnalysisId: string; targetTabId?: string; paramMap: any[] };
+    const params = new URLSearchParams();
+    if (cfg.targetTabId) params.set('tab', cfg.targetTabId);
+    for (const m of cfg.paramMap) {
+      if (m.sourceColumn in cellDims) {
+        params.set(`p.${m.targetParameterId}`, this.encodeFilterValue(cellDims[m.sourceColumn]));
+      }
+    }
+    return {
+      kind: 'navigate',
+      targetUrl: `/analysis/${cfg.targetAnalysisId}?${params.toString()}`,
+    };
+  }
+
+  private buildExternalUrl(action: VisualAction, cellDims: Record<string, unknown>): ResolvedAction {
+    const cfg = action.config as { urlTemplate: string; newTab: boolean };
+    const url = cfg.urlTemplate.replace(/\{\{(\w+)\}\}/g, (_, key) => {
+      const v = cellDims[key];
+      return v == null ? '' : encodeURIComponent(String(v));
+    });
+    return { kind: 'open-url', url, newTab: cfg.newTab };
+  }
+
+  private buildRawRows(
+    action: VisualAction,
+    cellDims: Record<string, unknown>,
+    visualId: string,
+  ): ResolvedAction {
+    const cfg = action.config as { limit: number; columns?: string[] };
+    return {
+      kind: 'open-raw-rows',
+      visualId,
+      cellDims,
+      rowFilters: Object.entries(cellDims).map(([col, val]) => ({ column: col, op: 'eq', value: val })),
+      limit: cfg.limit ?? 100,
+      columns: cfg.columns ?? null,
+    };
+  }
+
+  private encodeFilterValue(v: unknown): string {
+    if (Array.isArray(v)) return encodeURIComponent(JSON.stringify(v));
+    return encodeURIComponent(String(v));
+  }
+
+  private isTouch(): boolean {
+    return 'ontouchstart' in window;
+  }
+}
+```
+
+Unit tests for this service cover every kind × cell-shape
+combination. Because there's no HTTP, the test file is a few
+dozen lines per kind.
+
+## 13. Observability
+
+Action firing emits a structured `evt: 'visual_action.fired'`
+log line. We sample at 100% for first-week soak, then drop to
+10% sampling once volume scales.
+
+```json
+{
+  "evt": "visual_action.fired",
+  "action_id": "va_abc",
+  "kind": "tab_nav",
+  "trigger": "click",
+  "source_visual": "vis_src",
+  "target_tab": "tab_target",
+  "mapped_dims": 2,
+  "correlation_id": "01HXY..."
+}
+```
+
+Metrics:
+
+| Metric | Type | Labels | Purpose |
+|---|---|---|---|
+| `dbexec_visual_action_fired_total` | counter | `kind`, `trigger` | usage by feature |
+| `dbexec_visual_action_no_resolve_total` | counter | `reason` | `cell_empty`, `target_deleted`, `dim_mismatch` |
+| `dbexec_visual_action_resolve_ms` | histogram | `kind` | resolver latency (should stay sub-1ms) |
+
+The "no resolve" counter is the leading indicator: a spike on
+`reason='target_deleted'` means a customer just deleted a tab
+that many actions point at, and we should auto-disable or warn
+proactively.
+
+## 14. Security & threat model
+
+| Threat | Mitigation |
+|---|---|
+| Action navigates to a tab the user can't see (RLS) | Resolver checks tab visibility against the user's resolved RLS context before navigating; non-blocking toast on deny |
+| URL action template contains attacker-injected fragment | Template substitution `urlencode`s every value; no raw HTML rendering; `urlTemplate` must match `^https?://` and pass per-org allowlist if `embed_app.disallow_external_links = true` |
+| Cell dim value is null/undefined → ends up as the literal string "undefined" | Substitution skips null/undefined; if every value skips, the action no-ops |
+| Author maps two source columns to the same target filter | Reject at validation (`BAD_REQUEST_DUPLICATE_TARGET_FILTER`) |
+| Drill-through into an analysis the user can't access | The downstream analysis page enforces RLS; resolver doesn't bypass anything — worst case is a "permission denied" landing |
+| Embed mode: malicious parent page intercepts the action | Tab nav stays inside the iframe (`router.navigateByUrl`); URL actions emit a `postMessage` to the parent so the parent decides; both controlled by `embed_app` config |
+| Stored XSS via action `name` displayed in author UI | The action name is rendered as text (`{{ action.name }}` in Angular templates auto-escapes); no `[innerHTML]` ever |
+| URL template length DoS | Validation caps `urlTemplate` length at 1024 chars |
+
+## 15. Performance budget
+
+| Operation | Target | Hard ceiling |
+|---|---|---|
+| Resolver compute (click → ResolvedAction) | p99 < 1 ms | 5 ms |
+| Tab nav (click → first paint of target tab) | p95 < 250 ms (cached) / 1.5 s (cold) | 5 s |
+| Cross-tab filter apply (URL state → query re-run) | p50 < 800 ms | reuses module 04 budget |
+
+The resolver runs synchronously on the click handler, so latency
+shows up as input lag. The 1 ms p99 target is what gives the
+click an immediate, native feel.
+
+## 16. References
 
 - [07-filters-actions.md §4](../research/modules/07-filters-actions.md)
 - [08-dashboard.md §4](../research/modules/08-dashboard.md)
+- [09-rls-column-security.md §4](../research/modules/09-rls-column-security.md)
+- [14-share-embed.md §4](../research/modules/14-share-embed.md)
 - [MULTI-TAB-DASHBOARD.md](MULTI-TAB-DASHBOARD.md)
 - Tableau "Dashboard actions" docs (terminology reference).

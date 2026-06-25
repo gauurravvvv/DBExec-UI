@@ -157,6 +157,56 @@ build":
 | 27 Cost | telemetry + budgets + BigQuery dry-run |
 | 28 Backup | logical backup + verify-restore + KMS |
 
+## How the modules connect (layers)
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│  L7 — Customer surfaces                                        │
+│  14 Share/Embed · 22 API/SDK · 21 Mobile/PWA                   │
+├────────────────────────────────────────────────────────────────┤
+│  L6 — Discovery & collaboration                                │
+│  17 Search/Catalogue · 18 Versioning · 24 Admin · 19 Audit     │
+├────────────────────────────────────────────────────────────────┤
+│  L5 — Consumption                                              │
+│  08 Dashboard · 13 Export · 15 Scheduling · 16 Notifications   │
+│  25 AI Insights · 26 Geo/Specialty charts                      │
+├────────────────────────────────────────────────────────────────┤
+│  L4 — Authoring                                                │
+│  06 Analysis/Visual Builder · 07 Filters/Actions               │
+│  11 Aggregation/Metrics · 12 Upload                            │
+├────────────────────────────────────────────────────────────────┤
+│  L3 — Data model                                               │
+│  02 Semantic Layer · 03 Dataset                                │
+├────────────────────────────────────────────────────────────────┤
+│  L2 — Execution                                                │
+│  04 Query Processor · 05 Cache · 27 Cost Observability         │
+├────────────────────────────────────────────────────────────────┤
+│  L1 — Connection                                               │
+│  01 Datasource · 09 RLS · 10 Auth/SSO                          │
+├────────────────────────────────────────────────────────────────┤
+│  L0 — Platform                                                 │
+│  20 Branding · 23 i18n/a11y · 28 Backup/Restore                │
+└────────────────────────────────────────────────────────────────┘
+```
+
+A change at layer L cascades upward. A new dialect in layer L2
+unlocks new datasources in L1, more dataset shapes in L3, and
+new visual options in L4. A breaking change at L3 (semantic
+model rename) ripples through every layer above.
+
+## Implementation docs → modules they pin down
+
+The research modules say *what to build*. The implementation
+docs say *exactly how* — controller code, migrations, FE
+components, runbooks, threat models.
+
+| Implementation doc | Pins down modules |
+|---|---|
+| [Multi-tab dashboard](../implementation/MULTI-TAB-DASHBOARD.md) | 08 (the multi-tab entity model + tab strip + URL state) |
+| [Per-tab scheduled exports](../implementation/PER-TAB-SCHEDULED-EXPORTS.md) | 13, 15, 08 (subscription scope, renderer, email template) |
+| [Cross-tab drill-through](../implementation/CROSS-TAB-DRILL-THROUGH.md) | 07, 08, 09, 14 (visual_action entity, resolver service, embed-safety) |
+| [AI dashboard generation](../implementation/AI-DASHBOARD-GENERATION.md) | 25, 02, 06, 08, 09, 27 (DashboardPlan format, validator, materialiser, SSE wizard) |
+
 ## Conventions
 
 - **Severity**: `P0` (blocks adoption), `P1` (table stakes), `P2` (nice-to-have).

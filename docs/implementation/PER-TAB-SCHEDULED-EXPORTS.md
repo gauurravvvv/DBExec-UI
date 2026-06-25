@@ -405,7 +405,354 @@ full test case IDs `PTSE-001` … `PTSE-040`. Headline tests:
 
 ---
 
-## 11. References
+## 11. Controller stub (BE)
+
+`src/controllers/scheduling/addSubscription.ts`. Follows the
+DBExec convention: validation already happened in middleware,
+the controller is straight-line business logic + audit + close
+the master DB connection.
+
+```typescript
+import { Request, Response } from 'express';
+import sendResponse from '../../utility/response';
+import { CODE } from '../../config';
+import { SCHED_MSG, GENERIC } from '../../constants/response.messages';
+import { auditLogger } from '../../services/auditLogger.service';
+import { snapshotEntity, AUDIT_FIELDS } from '../../utility/auditMetadata';
+import { AUDIT_MODULES, AUDIT_ACTIONS } from '../../constants/audit.constants';
+import { schedulerQueue } from '../../services/scheduler.queue';
+import Logger from '../../utility/logger';
+
+const addSubscription = async (req: Request, res: Response) => {
+  Logger.info('Add subscription request');
+  const {
+    dashboardId, name, cron, format, channelId,
+    deliveryScope, targetTabs, coverSheet, tabPerPage,
+  } = req.body;
+  const { loggedInId, orgData, master_db_connection } = res.locals;
+  const connection = orgData.connection;
+
+  try {
+    // 1. Validate tab IDs belong to dashboard
+    if (deliveryScope === 'tabs') {
+      const tabs = await connection
+        .getRepository('DashboardTab')
+        .createQueryBuilder('t')
+        .where('t.id IN (:...ids) AND t.dashboardId = :dashId', {
+          ids: targetTabs.map((t: any) => t.dashboardTabId),
+          dashId: dashboardId,
+        })
+        .getMany();
+
+      if (tabs.length !== targetTabs.length) {
+        await master_db_connection.close();
+        return sendResponse(res, false, CODE.BAD_REQUEST, SCHED_MSG.TAB_MISMATCH);
+      }
+    }
+
+    // 2. Insert in one tx
+    const sub = await connection.transaction(async (tx: any) => {
+      const subscription = await tx.getRepository('Subscription').save({
+        dashboardId, name, cron, format, channelId,
+        deliveryScope, coverSheet, tabPerPage,
+        ownerUserId: loggedInId,
+        status: 'active',
+        consecutiveFailures: 0,
+      });
+      if (deliveryScope === 'tabs') {
+        const tabRepo = tx.getRepository('SubscriptionTargetTab');
+        const tabLookup = await tx.getRepository('DashboardTab')
+          .find({ where: { dashboardId } });
+        const labelById = new Map(tabLookup.map((t: any) => [t.id, t.label]));
+        for (const t of targetTabs) {
+          await tabRepo.save({
+            subscriptionId: subscription.id,
+            dashboardTabId: t.dashboardTabId,
+            displayOrder: t.displayOrder,
+            tabLabel: labelById.get(t.dashboardTabId),
+          });
+        }
+      }
+      return subscription;
+    });
+
+    // 3. Schedule the cron in BullMQ
+    await schedulerQueue.upsertRepeatable({
+      jobId: `sub:${sub.id}`,
+      name: 'runSubscription',
+      data: { subscriptionId: sub.id },
+      repeat: { cron, tz: orgData.timezone ?? 'UTC' },
+    });
+
+    // 4. Audit
+    await auditLogger.logAuditToOrg({
+      connection, req, res,
+      module: AUDIT_MODULES.SUBSCRIPTION,
+      action: AUDIT_ACTIONS.CREATE,
+      entityName: 'Subscription',
+      entityId: sub.id,
+      metadata: {
+        entity: snapshotEntity(sub, AUDIT_FIELDS.SUBSCRIPTION),
+        deliveryScope,
+        tabCount: targetTabs?.length ?? 0,
+      },
+    });
+
+    await master_db_connection.close();
+    sendResponse(res, true, CODE.SUCCESS, SCHED_MSG.SUBSCRIPTION_CREATED, sub);
+  } catch (error: any) {
+    Logger.error(`Add subscription failed: ${error.message}`);
+    await master_db_connection.close().catch(() => undefined);
+    return sendResponse(res, false, CODE.SERVER_ERROR, GENERIC.SERVER_ERROR);
+  }
+};
+
+export default addSubscription;
+```
+
+## 12. FE component (Angular)
+
+`src/app/modules/scheduling/components/scope-picker/scope-picker.component.ts`.
+Talks to `scheduling-create.component` through a `ControlValueAccessor`
+so the existing form's validation/dirty-state flows pass through.
+
+```typescript
+import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { DashboardTab } from '../../../dashboards/models/dashboard-tab.model';
+
+export interface ScopeValue {
+  deliveryScope: 'whole_dashboard' | 'tabs';
+  targetTabs: Array<{ dashboardTabId: string; displayOrder: number }>;
+  coverSheet: boolean;
+  tabPerPage: boolean;
+}
+
+@Component({
+  selector: 'app-scope-picker',
+  templateUrl: './scope-picker.component.html',
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => ScopePickerComponent),
+    multi: true,
+  }],
+})
+export class ScopePickerComponent implements ControlValueAccessor, OnInit {
+  @Input() dashboardTabs: DashboardTab[] = [];
+  @Input() format: 'pdf' | 'xlsx' | 'csv' | 'png' = 'pdf';
+
+  value: ScopeValue = {
+    deliveryScope: 'whole_dashboard',
+    targetTabs: [],
+    coverSheet: true,
+    tabPerPage: true,
+  };
+
+  selected = new Set<string>();
+  orderedTabs: DashboardTab[] = [];
+
+  private onChange: (v: ScopeValue) => void = () => undefined;
+  private onTouched: () => void = () => undefined;
+
+  ngOnInit(): void {
+    this.orderedTabs = [...this.dashboardTabs];
+  }
+
+  writeValue(v: ScopeValue): void {
+    if (v) {
+      this.value = v;
+      this.selected = new Set(v.targetTabs.map(t => t.dashboardTabId));
+    }
+  }
+
+  registerOnChange(fn: (v: ScopeValue) => void): void { this.onChange = fn; }
+  registerOnTouched(fn: () => void): void { this.onTouched = fn; }
+
+  toggleScope(scope: 'whole_dashboard' | 'tabs'): void {
+    this.value.deliveryScope = scope;
+    this.emit();
+  }
+
+  toggleTab(tabId: string): void {
+    if (this.selected.has(tabId)) this.selected.delete(tabId);
+    else this.selected.add(tabId);
+    this.refreshTargetTabs();
+  }
+
+  onReorder(ev: CdkDragDrop<DashboardTab[]>): void {
+    moveItemInArray(this.orderedTabs, ev.previousIndex, ev.currentIndex);
+    this.refreshTargetTabs();
+  }
+
+  private refreshTargetTabs(): void {
+    this.value.targetTabs = this.orderedTabs
+      .filter(t => this.selected.has(t.id))
+      .map((t, i) => ({ dashboardTabId: t.id, displayOrder: i }));
+    this.emit();
+  }
+
+  private emit(): void {
+    this.onChange(this.value);
+    this.onTouched();
+  }
+
+  // Validators consumed by the parent form
+  isValid(): boolean {
+    if (this.value.deliveryScope === 'whole_dashboard') return true;
+    if (this.value.targetTabs.length === 0) return false;
+    if (this.format === 'png' && this.value.targetTabs.length !== 1) return false;
+    return true;
+  }
+}
+```
+
+Template excerpt (`scope-picker.component.html`) — the drag-drop
+list reuses Angular CDK so the existing chart-list reorder code
+in DBExec doesn't get a new dependency:
+
+```html
+<div class="scope-options">
+  <p-radioButton name="scope" value="whole_dashboard"
+                 [(ngModel)]="value.deliveryScope"
+                 (onClick)="toggleScope('whole_dashboard')"
+                 label="Entire dashboard"></p-radioButton>
+  <p-radioButton name="scope" value="tabs"
+                 [(ngModel)]="value.deliveryScope"
+                 (onClick)="toggleScope('tabs')"
+                 label="Selected tabs"></p-radioButton>
+</div>
+
+<div *ngIf="value.deliveryScope === 'tabs'" class="tab-picker">
+  <p class="hint">Pick tabs and drag to reorder. The PDF will follow this order.</p>
+  <div cdkDropList (cdkDropListDropped)="onReorder($event)">
+    <div *ngFor="let tab of orderedTabs" cdkDrag class="tab-row">
+      <p-checkbox [binary]="true"
+                  [ngModel]="selected.has(tab.id)"
+                  (ngModelChange)="toggleTab(tab.id)"></p-checkbox>
+      <span class="tab-label">{{ tab.label }}</span>
+      <i class="pi pi-bars drag-handle" cdkDragHandle></i>
+    </div>
+  </div>
+
+  <div *ngIf="format === 'png' && value.targetTabs.length > 1" class="form-error">
+    PNG can only render a single tab. Pick exactly one or switch format.
+  </div>
+</div>
+
+<div *ngIf="format === 'pdf'" class="pdf-options">
+  <p-checkbox [binary]="true" [(ngModel)]="value.coverSheet"
+              label="Include cover sheet"></p-checkbox>
+  <p-checkbox [binary]="true" [(ngModel)]="value.tabPerPage"
+              label="Start each tab on a new page"></p-checkbox>
+</div>
+```
+
+## 13. Observability
+
+Each subscription run emits a structured log line + metrics + an
+OpenTelemetry span. The span hangs off the BullMQ worker's root
+span so a single `correlation_id` traces the whole flow.
+
+**Structured log line** — one per run, written when the worker
+finishes (success or fail):
+
+```json
+{
+  "evt": "subscription.run",
+  "subscription_id": "sub_abc",
+  "org_id": "org_acme",
+  "dashboard_id": "dash_xyz",
+  "delivery_scope": "tabs",
+  "tab_count": 2,
+  "format": "pdf",
+  "render_ms": 8421,
+  "send_ms": 213,
+  "total_ms": 8634,
+  "rows_queried": 47312,
+  "status": "ok",
+  "correlation_id": "01HXY..."
+}
+```
+
+**Prometheus metrics:**
+
+| Metric | Type | Labels | Purpose |
+|---|---|---|---|
+| `dbexec_subscription_run_total` | counter | `org`, `format`, `scope`, `status` | runs by outcome |
+| `dbexec_subscription_run_seconds` | histogram | `format`, `scope` | end-to-end latency |
+| `dbexec_subscription_render_seconds` | histogram | `format`, `scope` | render-only latency |
+| `dbexec_subscription_pdf_pages` | histogram | `org` | PDF page distribution |
+| `dbexec_subscription_consecutive_failures` | gauge | `org` | for auto-pause alerting |
+
+**Trace span attributes** on the worker root span:
+
+- `dbexec.subscription_id`, `dbexec.dashboard_id`, `dbexec.org_id`
+- `dbexec.tab_count`, `dbexec.delivery_scope`
+- Child spans for `render`, `channel.dispatch`, `delivery_log.write`
+
+## 14. Security & threat model
+
+| Threat | Mitigation |
+|---|---|
+| Subscription owner deactivated → continues to email confidential data | Worker re-resolves user before render; if status ≠ active, auto-pause + audit |
+| Subscription targets a tab the *recipient* shouldn't see | Render runs in the *owner*'s RLS context. The system delivers what the owner sees. Documented; warning UI at subscription create when recipient ≠ owner |
+| Email channel forwarded externally | Mandatory PDF watermark with owner email + run timestamp (module 13); per-org "allow external recipients" toggle gates non-org email addresses |
+| Replay of pause-resume causes double-send | BullMQ `jobId = sub:<id>` (one repeatable per subscription) + `delivery_log` idempotency key `(sub, scheduledAt)` |
+| Tab rename swaps in attacker-controlled label | Snapshot `tab_label` at insert; updates require the standard CUD audit trail |
+| Slack/webhook channel URL changed to attacker | Channel updates write an audit row + send "channel changed — confirm" email to subscription owner before the *next* send fires |
+| SSRF in URL channel webhook | Reuses the platform-wide SSRF guard (RFC1918, link-local, cloud-metadata IPs rejected before fetch) |
+| PDF render uses customer fonts → font download from attacker site | Puppeteer runs with `--no-sandbox` disabled + a content-blocked allowlist of fonts; CSS `font-src` set to org's CDN only |
+
+## 15. Operational runbook
+
+**Symptom: subscription not firing.**
+1. Check BullMQ admin: is `sub:<id>` registered as repeatable?
+   If not, re-save the subscription (re-runs the `upsertRepeatable`).
+2. Check worker health: `dbexec_subscription_run_total` counter
+   stalled? Worker may be wedged on a previous job — restart.
+3. Check `subscription.status` — auto-paused after 3 consecutive
+   failures? Inspect `delivery_log` for the last few rows.
+
+**Symptom: subscription firing but email empty.**
+1. Inspect `delivery_log.metadata.tabs[*].rendered_pages`. If
+   all ranges are empty (`[]`), the renderer thinks the tab has
+   no visuals.
+2. Open the dashboard as the subscription owner — does RLS empty
+   every visual? If yes, that's the documented "empty-state"
+   outcome.
+3. If visuals show data in-app but renderer shows blank: the
+   render route may not be carrying the owner's session. Check
+   the worker's auth-as-user step.
+
+**Symptom: too many emails after an outage.**
+1. Worker backlog after recovery can fire all the missed
+   schedules at once. BullMQ has `removeOnFail` + a guard in the
+   worker: if `scheduledAt < now - 6h`, skip the run and write
+   `delivery_log.status = 'skipped'` with reason `'stale'`.
+
+**Symptom: PDF render times out at 10 min.**
+1. The dashboard probably has a slow visual. Open the dashboard
+   directly and time each visual via the existing dev-tools
+   network panel.
+2. Move the slow visual to its own tab the subscription doesn't
+   target, or convert to a cached materialised view (module 05).
+
+## 16. Performance budget
+
+| Operation | Target | Hard ceiling |
+|---|---|---|
+| Render full dashboard (5 tabs, 20 visuals) | p50 < 8 s, p95 < 20 s | 60 s |
+| Render single tab (4 visuals) | p50 < 3 s, p95 < 8 s | 30 s |
+| Channel dispatch (email) | p50 < 1 s | 10 s |
+| Channel dispatch (Slack) | p50 < 1.5 s | 10 s |
+| End-to-end (cron fire → recipient inbox) | p50 < 30 s, p95 < 90 s | 5 min |
+
+If any target slips, the renderer logs a `slow_render` event
+with the offending tab/visual and surfaces it on the admin
+"slow subscriptions" dashboard.
+
+## 17. References
 
 - [13-export-download.md §4](../research/modules/13-export-download.md)
 - [15-scheduling-alerts.md §4](../research/modules/15-scheduling-alerts.md)
