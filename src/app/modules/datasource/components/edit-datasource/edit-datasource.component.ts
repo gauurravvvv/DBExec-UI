@@ -30,7 +30,6 @@ import {
 import { zodValidator } from 'src/app/shared/validators/zod-validator';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import {
   DATABASE_TYPES,
   DatabaseTypeOption,
@@ -134,7 +133,6 @@ export class EditDatasourceComponent
   constructor(
     private fb: FormBuilder,
     private datasourceService: DatasourceService,
-    private organisationService: OrganisationService,
     private globalService: GlobalService,
     private router: Router,
     private route: ActivatedRoute,
@@ -274,15 +272,11 @@ export class EditDatasourceComponent
     this.connectionTestError = null;
     const reqId = ++this.testRequestId;
 
-    this.organisationService
-      .validateDatasource({
-        type: this.dbType,
-        host: formValue.host,
-        port: formValue.port,
-        database: formValue.database,
-        username: formValue.username,
-        password: formValue.password,
-      })
+    // DatasourceService.testConnection() handles the engine
+    // discriminator internally (snowflake vs typeorm), so we just
+    // pass the form value verbatim — same shape as save.
+    this.datasourceService
+      .testConnection({ type: this.dbType, ...formValue })
       .then((response: any) => {
         if (reqId !== this.testRequestId) return;
         this.connectionTestLoading = false;
@@ -326,23 +320,35 @@ export class EditDatasourceComponent
     if (this.saveJustification.trim()) {
       const formValue = this.datasourceForm.getRawValue();
 
-      // Note: `type` and `organisation` are deliberately NOT sent. Both
-      // are immutable for an existing datasource — changing engine
-      // would invalidate every downstream dataset's SQL, and moving a
-      // datasource across orgs would orphan every dataset/analysis/
-      // dashboard pointing at it. The BE should also reject these on
-      // update; this is defense in depth from the client side.
-      const payload = {
+      // `type` is sent so DatasourceService.buildEnginePayload() can
+      // discriminate between the typeorm shape (host/port) and the
+      // snowflake shape (account/warehouse/role/schemaName). The BE
+      // update path still treats `type` as immutable — it's used
+      // purely as a routing hint, the existing config-row type wins.
+      //
+      // `organisation` is deliberately NOT sent — moving a datasource
+      // across orgs would orphan every dataset/analysis/dashboard
+      // pointing at it.
+      const isSf = this.dbType === 'snowflake';
+      const payload: any = {
         id: this.datasourceId,
         name: formValue.name,
         description: formValue.description,
-        host: formValue.host,
-        port: formValue.port,
+        type: this.dbType,
         database: formValue.database,
         username: formValue.username,
         password: formValue.password,
         status: formValue.status ? 1 : 0,
       };
+      if (isSf) {
+        payload.account = formValue.account;
+        payload.warehouse = formValue.warehouse;
+        payload.role = formValue.role;
+        payload.schemaName = formValue.schemaName;
+      } else {
+        payload.host = formValue.host;
+        payload.port = formValue.port;
+      }
 
       // Payload was already extracted via getRawValue(), so we can
       // safely disable the whole form before firing the PUT.

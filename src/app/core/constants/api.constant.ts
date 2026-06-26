@@ -93,13 +93,12 @@ export const DATASOURCE = {
   // POST /datasources/:datasourceId/query
   RUN_QUERY_PREFIX: '/datasources/',
   RUN_QUERY_SUFFIX: '/query',
-  // GET /datasources/:datasourceId/activity
+  // GET /datasources/:id/usage — counts of dependent datasets/analyses/dashboards
+  USAGE_PREFIX: '/datasources/',
+  USAGE_SUFFIX: '/usage',
+  // GET /datasources/:id/activity — last 20 audit-log events for this datasource
   ACTIVITY_PREFIX: '/datasources/',
   ACTIVITY_SUFFIX: '/activity',
-  // POST /datasources/:datasourceId/activity/cancel-query
-  ACTIVITY_CANCEL_SUFFIX: '/activity/cancel-query',
-  // POST /datasources/:datasourceId/activity/terminate
-  ACTIVITY_TERMINATE_SUFFIX: '/activity/terminate',
 };
 
 export const GROUP = {
@@ -226,20 +225,6 @@ export const PERMISSIONS = {
 // the radio value; `label` is the column header in the role grid.
 export const ACCESS_LEVELS = {
   LIST: '/access-levels',
-};
-
-export const ACCESS = {
-  GET: '/access/', // GET /access/:connectionId
-  GRANT: '/access/grant',
-};
-
-export const CONNECTIONS = {
-  LIST: '/connections',
-  ADD: '/connections',
-  GET: '/connections/',
-  UPDATE: '/connections/',
-  DELETE: '/connections/',
-  BULK_DELETE: '/connections/bulk-delete',
 };
 
 export const ANALYSES = {

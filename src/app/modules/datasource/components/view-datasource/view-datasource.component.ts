@@ -1,22 +1,45 @@
+/**
+ * view-datasource — "what's built on this datasource within DBExec"
+ *
+ * Hero (engine icon + name + health pill + actions) → Connection
+ * details → Usage panel (counts + ngx-echarts donut) → Activity
+ * timeline. The previous schema-explorer version was a database
+ * inspector; this version answers a higher-level question: how is
+ * this datasource being used inside DBExec?
+ */
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  computed,
   OnDestroy,
   OnInit,
+  signal,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { EChartsOption } from 'echarts';
 import { DATASOURCE } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from '../../services/datasource.service';
 
-interface StorageTable {
-  name: string;
-  schema: string;
-  size: number;
-  percentage: number;
-  color: string;
+type HealthState = 'unknown' | 'ok' | 'failed' | 'testing';
+
+interface UsageCounts {
+  datasets: number;
+  analyses: number;
+  dashboards: number;
+}
+
+interface ActivityEvent {
+  id: string;
+  action: string;
+  actorId: string | null;
+  actorName: string;
+  actorUsername: string;
+  at: string;
+  metadata: any;
+  justification: string | null;
 }
 
 @Component({
@@ -26,42 +49,73 @@ interface StorageTable {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewDatasourceComponent implements OnInit, OnDestroy {
-  ngOnDestroy() {
-    // Abort in-flight reads if the user navigates away.
-    this.datasourceService.cancelReads();
-  }
-
   dbId!: string;
-  dbData: any;
+  dbData: any = null;
+
+  // ── Health pill ──────────────────────────────────────────────────
+  readonly health = signal<HealthState>('unknown');
+  readonly lastTestedAt = signal<string | null>(null);
+  readonly testInFlight = signal(false);
+
+  // ── Usage panel ──────────────────────────────────────────────────
+  readonly usage = signal<UsageCounts | null>(null);
+  readonly usageLoading = signal(false);
+  readonly hasAnyUsage = computed(() => {
+    const u = this.usage();
+    if (!u) return false;
+    return u.datasets > 0 || u.analyses > 0 || u.dashboards > 0;
+  });
+  readonly usageChartOption = computed<EChartsOption | null>(() => {
+    const u = this.usage();
+    if (!u || !this.hasAnyUsage()) return null;
+    return {
+      tooltip: { trigger: 'item' },
+      legend: { bottom: 0, left: 'center', icon: 'circle' },
+      series: [
+        {
+          name: 'Usage',
+          type: 'pie',
+          radius: ['55%', '80%'],
+          avoidLabelOverlap: false,
+          itemStyle: {
+            borderRadius: 8,
+            borderColor: 'var(--card-background)',
+            borderWidth: 2,
+          },
+          label: { show: false, position: 'center' },
+          emphasis: { label: { show: true, fontSize: 18, fontWeight: 'bold' } },
+          data: [
+            {
+              value: u.datasets,
+              name: this.translate.instant('DATASOURCE.USAGE_DATASETS'),
+              itemStyle: { color: '#3b82f6' },
+            },
+            {
+              value: u.analyses,
+              name: this.translate.instant('DATASOURCE.USAGE_ANALYSES'),
+              itemStyle: { color: '#8b5cf6' },
+            },
+            {
+              value: u.dashboards,
+              name: this.translate.instant('DATASOURCE.USAGE_DASHBOARDS'),
+              itemStyle: { color: '#10b981' },
+            },
+          ],
+        },
+      ],
+    };
+  });
+
+  // ── Activity panel ───────────────────────────────────────────────
+  readonly activity = signal<ActivityEvent[]>([]);
+  readonly activityLoading = signal(false);
+
+  // ── Delete modal ─────────────────────────────────────────────────
   showDeleteConfirm = false;
   deleteJustification = '';
-  // Drives the skeleton card on initial GET + per-id delete spinner.
+
   loading = this.datasourceService.loading;
   isDeleting = (id: string): boolean => this.datasourceService.isDeleting(id);
-  showTableDetails = false;
-  selectedTable: any = null;
-  selectedSchema: any = null;
-  tableSizeChartData: any;
-  schemaSizeChartData: any = {
-    labels: [],
-    datasets: [
-      {
-        data: [],
-        backgroundColor: [],
-      },
-    ],
-  }; // Initialize with empty data
-  schemaChartOptions: any;
-  chartOptions: any;
-  topStorageTables: StorageTable[] = [];
-
-  statsChartOptions: any;
-  recentQueries: any[] = []; // Array to hold recent queries
-
-  // Added missing properties
-  expandedSchemas: string[] = [];
-  filteredSchemas: any[] = [];
-  currentQuery: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -70,318 +124,156 @@ export class ViewDatasourceComponent implements OnInit, OnDestroy {
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
     private translate: TranslateService,
-  ) {
-    // Initialize chart options with default values
-    this.initChartOptions();
-  }
+  ) {}
 
   ngOnInit(): void {
     this.dbId = this.route.snapshot.params['id'];
     if (this.dbId) {
       this.loadDatasourceData();
+      this.loadUsage();
+      this.loadActivity();
     }
   }
 
-  // Changed from private to public
+  ngOnDestroy(): void {
+    this.datasourceService.cancelReads();
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // Data loading
+  // ─────────────────────────────────────────────────────────────────
+
   async loadDatasourceData(): Promise<void> {
-    this.datasourceService.resetCurrent();
     await this.datasourceService.loadOne(this.dbId);
-    const data = this.datasourceService.current();
-    if (data) {
-      this.dbData = data;
-      this.prepareChartData();
-      this.updateChartOptions();
-      this.filteredSchemas = this.dbData.statistics.schemaStats;
-      this.prepareTopStorageTables();
+    this.dbData = this.datasourceService.current();
+    if (this.dbData) {
+      const status = this.dbData.lastTestStatus as 'ok' | 'failed' | null;
+      this.health.set(status ?? 'unknown');
+      this.lastTestedAt.set(this.dbData.lastTestedAt ?? null);
+    }
+    this.cdr.markForCheck();
+  }
+
+  async loadUsage(): Promise<void> {
+    this.usageLoading.set(true);
+    try {
+      const res = await this.datasourceService.getUsage(this.dbId);
+      if (res?.status && res.data) {
+        this.usage.set({
+          datasets: res.data.datasets ?? 0,
+          analyses: res.data.analyses ?? 0,
+          dashboards: res.data.dashboards ?? 0,
+        });
+      }
+    } finally {
+      this.usageLoading.set(false);
       this.cdr.markForCheck();
     }
   }
 
-  onSchemaSearch(event: any): void {
-    const searchTerm = event.target.value.toLowerCase();
-    if (!searchTerm) {
-      this.filteredSchemas = this.dbData.statistics.schemaStats;
-    } else {
-      this.filteredSchemas = this.dbData.statistics.schemaStats.filter(
-        (schema: any) => schema.name.toLowerCase().includes(searchTerm),
-      );
+  async loadActivity(): Promise<void> {
+    this.activityLoading.set(true);
+    try {
+      const res = await this.datasourceService.getActivity(this.dbId);
+      if (res?.status && res.data?.events) {
+        this.activity.set(res.data.events as ActivityEvent[]);
+      }
+    } finally {
+      this.activityLoading.set(false);
+      this.cdr.markForCheck();
     }
   }
 
-  toggleSchemaExpand(schema: any): void {
-    const index = this.expandedSchemas.indexOf(schema.name);
-    if (index > -1) {
-      this.expandedSchemas.splice(index, 1);
-    } else {
-      this.expandedSchemas.push(schema.name);
+  // ─────────────────────────────────────────────────────────────────
+  // Test connection (the health-pill driver)
+  // ─────────────────────────────────────────────────────────────────
+
+  async onTestConnection(): Promise<void> {
+    if (this.testInFlight()) return;
+    this.testInFlight.set(true);
+    this.health.set('testing');
+    try {
+      const res = await this.datasourceService.testConnectionForExisting(this.dbId);
+      if (res?.status && res.data) {
+        const next = res.data.isConnected ? 'ok' : 'failed';
+        this.health.set(next);
+        this.lastTestedAt.set(res.data.lastTestedAt ?? new Date().toISOString());
+      } else {
+        this.health.set('failed');
+        this.lastTestedAt.set(new Date().toISOString());
+      }
+    } catch {
+      this.health.set('failed');
+      this.lastTestedAt.set(new Date().toISOString());
+    } finally {
+      this.testInFlight.set(false);
+      this.cdr.markForCheck();
     }
   }
 
-  getSchemaPercentage(schema: any): number {
-    const total = this.dbData.statistics.databaseSizeMB;
-    return (schema.totalSizeMB / total) * 100;
+  // ─────────────────────────────────────────────────────────────────
+  // Engine-aware UI helpers
+  // ─────────────────────────────────────────────────────────────────
+
+  /** True for Snowflake; toggles the "account/warehouse/role" row. */
+  get isSnowflake(): boolean {
+    return this.dbData?.config?.dbType === 'snowflake';
   }
 
-  formatDatasourceSize(): string {
-    const sizeMB = this.dbData?.statistics?.databaseSizeMB || 0;
-
-    if (sizeMB >= 1024) {
-      // Convert to GB if size is 1024 MB or more
-      const sizeGB = sizeMB / 1024;
-      return `${sizeGB.toFixed(2)} GB`;
-    } else if (sizeMB < 1) {
-      // Convert to KB if size is less than 1 MB
-      const sizeKB = sizeMB * 1024;
-      return `${sizeKB.toFixed(2)} KB`;
-    } else {
-      // Display in MB
-      return `${sizeMB.toFixed(2)} MB`;
-    }
-  }
-
-  formatTableSize(sizeMB: number): string {
-    if (sizeMB >= 1024) {
-      const sizeGB = sizeMB / 1024;
-      return `${sizeGB.toFixed(2)} GB`;
-    } else if (sizeMB < 1) {
-      const sizeKB = sizeMB * 1024;
-      return `${sizeKB.toFixed(2)} KB`;
-    } else {
-      return `${sizeMB.toFixed(2)} MB`;
-    }
-  }
-
-  onTableClick(event: Event, schema: any, table: any): void {
-    // Stop event propagation to prevent accordion collapse
-    event.stopPropagation();
-
-    // Set selected table and schema
-    this.selectedTable = table;
-    this.selectedSchema = schema;
-
-    // Show the dialog
-    this.showTableDetails = true;
-  }
-
-  closeTableDetails(): void {
-    this.showTableDetails = false;
-    this.selectedTable = null;
-    this.selectedSchema = null;
-  }
-
-  getSchemaColor(schema: any): string {
-    const colors = this.generateColors(
-      this.dbData.statistics.schemaStats.length,
-    );
-    const index = this.dbData.statistics.schemaStats.findIndex(
-      (s: any) => s.name === schema.name,
-    );
-    return colors[index % colors.length];
-  }
-
-  getTablesForSchema(schemaName: string): any[] {
-    const schema = this.dbData.statistics.schemas.find(
-      (s: any) => s.name === schemaName,
-    );
-    return schema ? schema.tables : [];
-  }
-
-  // Add method to prepare top storage tables
-  private prepareTopStorageTables(): void {
-    // Extract all tables with schema information
-    const allTables = this.dbData.statistics.schemas.flatMap((schema: any) =>
-      schema.tables.map((table: any) => ({
-        name: table.name,
-        schema: schema.name,
-        size: table.sizeMB.total,
-      })),
-    );
-
-    // Sort by size descending
-    const sortedTables = [...allTables].sort((a, b) => b.size - a.size);
-
-    // Take top 10
-    const topTables = sortedTables.slice(0, 10);
-
-    // Calculate percentages
-    const totalSize = this.dbData.statistics.databaseSizeMB;
-    const colors = this.generateColors(topTables.length);
-
-    this.topStorageTables = topTables.map((table, i) => ({
-      ...table,
-      percentage: (table.size / totalSize) * 100,
-      color: colors[i],
-    }));
-  }
-
-  private prepareChartData(): void {
-    // Prepare table size chart data
-    const tableData = this.dbData.statistics.schemas.flatMap((schema: any) =>
-      schema.tables.map((table: any) => ({
-        name: `${schema.name}.${table.name}`,
-        size: table.sizeMB.total,
-      })),
-    );
-
-    this.tableSizeChartData = {
-      labels: tableData.map((t: any) => t.name),
-      datasets: [
-        {
-          data: tableData.map((t: any) => t.size),
-          backgroundColor: this.generateColors(tableData.length),
-        },
-      ],
+  /** PrimeIcon for the engine — small visual cue in the hero. */
+  engineIcon(): string {
+    const t = this.dbData?.config?.dbType;
+    if (!t) return 'pi-database';
+    const map: Record<string, string> = {
+      postgres: 'pi-server',
+      mysql: 'pi-server',
+      mariadb: 'pi-server',
+      mssql: 'pi-server',
+      oracle: 'pi-server',
+      snowflake: 'pi-cloud',
     };
+    return map[t] ?? 'pi-database';
+  }
 
-    // Prepare schema size chart data
-    const schemaData = this.dbData.statistics.schemaStats;
-    const colors = this.generateColors(schemaData.length);
+  // ─────────────────────────────────────────────────────────────────
+  // Activity rendering helpers
+  // ─────────────────────────────────────────────────────────────────
 
-    this.schemaSizeChartData = {
-      labels: schemaData.map((s: any) => s.name),
-      datasets: [
-        {
-          data: schemaData.map((s: any) => s.totalSizeMB),
-          backgroundColor: colors,
-        },
-      ],
+  /** Map BE audit action codes → user-facing translation keys. */
+  activityLabelKey(action: string): string {
+    const map: Record<string, string> = {
+      CREATE: 'DATASOURCE.ACTIVITY_CREATED',
+      UPDATE: 'DATASOURCE.ACTIVITY_UPDATED',
+      DELETE: 'DATASOURCE.ACTIVITY_DELETED',
     };
+    return map[action] ?? 'DATASOURCE.ACTIVITY_OTHER';
   }
 
-  // Renamed existing options to schemaChartOptions
-  private initChartOptions(): void {
-    this.schemaChartOptions = {
-      plugins: {
-        legend: {
-          display: false,
-        },
-        tooltip: {
-          backgroundColor: 'var(--card-background)',
-          titleColor: 'var(--text-color)',
-          bodyColor: 'var(--text-color)',
-          borderColor: 'var(--border-color)',
-          borderWidth: 1,
-        },
-      },
-      responsive: true,
-      maintainAspectRatio: false,
+  /** PrimeIcon glyph per audit action. */
+  activityIcon(action: string): string {
+    const map: Record<string, string> = {
+      CREATE: 'pi-plus-circle',
+      UPDATE: 'pi-pencil',
+      DELETE: 'pi-trash',
     };
-
-    this.statsChartOptions = {
-      plugins: {
-        legend: {
-          position: 'bottom',
-          align: 'center',
-          labels: {
-            color: getComputedStyle(document.documentElement).getPropertyValue(
-              '--text-color',
-            ),
-            font: { size: 12 },
-            usePointStyle: true,
-            padding: 15,
-          },
-        },
-        title: {
-          display: true,
-          text: this.translate.instant('DATASOURCE.TOP_10_SCHEMAS_BY_SIZE'),
-          color: getComputedStyle(document.documentElement).getPropertyValue(
-            '--text-color',
-          ),
-          font: { size: 14, weight: 'bold' },
-          padding: { bottom: 10 },
-        },
-        tooltip: {
-          backgroundColor: getComputedStyle(
-            document.documentElement,
-          ).getPropertyValue('--card-background'),
-          titleColor: getComputedStyle(
-            document.documentElement,
-          ).getPropertyValue('--text-color'),
-          bodyColor: getComputedStyle(
-            document.documentElement,
-          ).getPropertyValue('--text-color'),
-          borderColor: getComputedStyle(
-            document.documentElement,
-          ).getPropertyValue('--border-color'),
-          borderWidth: 1,
-        },
-      },
-      responsive: true,
-      maintainAspectRatio: false,
-      indexAxis: 'y', // Make it a horizontal bar chart
-      scales: {
-        x: {
-          stacked: true,
-          ticks: {
-            color: getComputedStyle(document.documentElement).getPropertyValue(
-              '--text-color',
-            ),
-            font: { size: 11 },
-            beginAtZero: true,
-          },
-          grid: {
-            color: getComputedStyle(document.documentElement).getPropertyValue(
-              '--border-color',
-            ),
-            drawBorder: false,
-          },
-        },
-        y: {
-          stacked: true,
-          ticks: {
-            color: getComputedStyle(document.documentElement).getPropertyValue(
-              '--text-color',
-            ),
-            font: { size: 11 },
-          },
-          grid: {
-            display: false,
-          },
-        },
-      },
-      barThickness: 20,
-      maxBarThickness: 25,
-    };
+    return map[action] ?? 'pi-circle';
   }
 
-  private updateChartOptions(): void {
-    // Update schema count after data is loaded
-    const schemaCount = this.schemaSizeChartData.labels.length;
-    document.documentElement.style.setProperty(
-      '--schema-count',
-      schemaCount.toString(),
-    );
-  }
+  // ─────────────────────────────────────────────────────────────────
+  // Navigation
+  // ─────────────────────────────────────────────────────────────────
 
-  private generateColors(count: number): string[] {
-    const colors = [
-      '#FF6384',
-      '#36A2EB',
-      '#FFCE56',
-      '#4BC0C0',
-      '#9966FF',
-      '#FF9F40',
-      '#FF6384',
-      '#C9CBCF',
-      '#4BC0C0',
-      '#FF9F40',
-    ];
-    return Array(count)
-      .fill(0)
-      .map((_, i) => colors[i % colors.length]);
-  }
-
-  trackByName(index: number, item: any): any {
-    return item.name;
+  onEdit(): void {
+    this.router.navigate([DATASOURCE.LIST, this.dbId, 'edit']);
   }
 
   goBack(): void {
     this.router.navigate([DATASOURCE.LIST]);
   }
 
-  onEdit(): void {
-    this.router.navigate([DATASOURCE.edit(this.dbData.id)]);
-  }
+  // ─────────────────────────────────────────────────────────────────
+  // Delete (unchanged from previous version)
+  // ─────────────────────────────────────────────────────────────────
 
   confirmDelete(): void {
     this.showDeleteConfirm = true;
@@ -393,15 +285,23 @@ export class ViewDatasourceComponent implements OnInit, OnDestroy {
   }
 
   async proceedDelete(): Promise<void> {
-    if (this.dbData && this.deleteJustification.trim()) {
-      const response = await this.datasourceService.delete(
+    if (!this.deleteJustification.trim() || this.isDeleting(this.dbId)) return;
+    try {
+      const res = await this.datasourceService.delete(
         this.dbId,
         this.deleteJustification.trim(),
       );
-      if (this.globalService.handleSuccessService(response)) {
+      if (this.globalService.handleSuccessService(res)) {
+        this.showDeleteConfirm = false;
         this.deleteJustification = '';
         this.router.navigate([DATASOURCE.LIST]);
       }
+    } catch {
+      // service displays toast on failure
     }
+  }
+
+  trackByEventId(_index: number, event: ActivityEvent): string {
+    return event.id;
   }
 }

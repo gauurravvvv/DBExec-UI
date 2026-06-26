@@ -28,9 +28,10 @@
 
 // The announcement banner (when present) sits flush above .router-pane.
 // .router-pane carries the page padding so the banner stays full-bleed.
+// --space-6 (16px) is the project's default page-level padding step.
 .router-pane {
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  padding: var(--space-8);
+  padding: var(--space-6);
 }

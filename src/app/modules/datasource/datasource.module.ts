@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MenuModule } from 'primeng/menu';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
+import { SharedChartsModule } from 'src/app/shared/modules/shared-charts.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AddDatasourceComponent } from './components/add-datasource/add-datasource.component';
 import { EditDatasourceComponent } from './components/edit-datasource/edit-datasource.component';
@@ -24,6 +25,7 @@ import { DatasourceRoutingModule } from './datasource-routing.module';
     AppPrimeNGModule,
     DatasourceRoutingModule,
     SharedModule,
+    SharedChartsModule,
     MenuModule,
   ],
 })

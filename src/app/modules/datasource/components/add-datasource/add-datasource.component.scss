@@ -412,53 +412,76 @@
   }
 }
 
+// Connection test — same shape as Add Organisation. Real button
+// so the action is visible even when the form is incomplete, with
+// state badges (success / failed / pending hint) as siblings rather
+// than swapping the button's own label.
 .connection-test-section {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  margin-top: var(--space-5);
 
-  .test-connection-link {
+  .test-connection-btn {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-4);
-    color: var(--primary-color);
-    cursor: pointer;
-    font-size: var(--fs-body);
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--card-background);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: var(--fs-control);
     font-weight: var(--fw-medium);
-    text-decoration: none;
-    transition: opacity var(--motion-base) ease;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-    max-width: 100%;
+    cursor: pointer;
+    transition:
+      background var(--motion-fast) ease,
+      border-color var(--motion-fast) ease,
+      color var(--motion-fast) ease,
+      opacity var(--motion-fast) ease;
 
-    &:hover:not(.disabled) {
-      opacity: 0.8;
+    i { font-size: var(--fs-control); }
+
+    &:hover:not(:disabled) {
+      background: var(--hover-background);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
     }
 
-    &.disabled {
-      opacity: 0.5;
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--primary-color-transparent);
+    }
+
+    &:disabled {
       cursor: not-allowed;
-      pointer-events: none;
-    }
-
-    i {
-      font-size: var(--fs-body);
-      flex-shrink: 0;
-
-      &.pi-check-circle {
-        color: var(--success-color);
-      }
-
-      &.pi-times-circle {
-        color: var(--error-color);
-      }
+      opacity: 0.6;
     }
   }
 
-  .connection-hint {
-    color: var(--text-color);
-    opacity: 0.6;
-    font-size: var(--fs-label);
+  .connection-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--fs-control);
+    font-weight: var(--fw-medium);
+
+    i { font-size: var(--fs-control); }
+
+    &.success {
+      color: var(--success-color);
+    }
+
+    &.failed {
+      color: var(--error-color);
+    }
+
+    &.pending {
+      color: var(--secondary-color);
+      font-weight: var(--fw-regular);
+    }
   }
 }
 
