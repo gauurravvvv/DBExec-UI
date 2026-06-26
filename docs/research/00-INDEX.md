@@ -198,14 +198,69 @@ model rename) ripples through every layer above.
 
 The research modules say *what to build*. The implementation
 docs say *exactly how* — controller code, migrations, FE
-components, runbooks, threat models.
+components, runbooks, threat models. Two flavours of
+companion:
 
-| Implementation doc | Pins down modules |
+- **Per-module companion** — one per research module, pins
+  every section of that module down to ship.
+- **Feature-slice companion** — spans multiple modules to ship
+  one named feature.
+
+### Feature-slice companions
+
+| Doc | Spans modules |
 |---|---|
-| [Multi-tab dashboard](../implementation/MULTI-TAB-DASHBOARD.md) | 08 (the multi-tab entity model + tab strip + URL state) |
-| [Per-tab scheduled exports](../implementation/PER-TAB-SCHEDULED-EXPORTS.md) | 13, 15, 08 (subscription scope, renderer, email template) |
-| [Cross-tab drill-through](../implementation/CROSS-TAB-DRILL-THROUGH.md) | 07, 08, 09, 14 (visual_action entity, resolver service, embed-safety) |
-| [AI dashboard generation](../implementation/AI-DASHBOARD-GENERATION.md) | 25, 02, 06, 08, 09, 27 (DashboardPlan format, validator, materialiser, SSE wizard) |
+| [Multi-tab dashboard](../implementation/MULTI-TAB-DASHBOARD.md) | 08 |
+| [Per-tab scheduled exports](../implementation/PER-TAB-SCHEDULED-EXPORTS.md) | 13, 15, 08 |
+| [Cross-tab drill-through](../implementation/CROSS-TAB-DRILL-THROUGH.md) | 07, 08, 09, 14 |
+| [AI dashboard generation](../implementation/AI-DASHBOARD-GENERATION.md) | 25, 02, 06, 08, 09, 27 |
+
+### Per-module companions (one per research module)
+
+| # | Research module | Implementation companion |
+|---|---|---|
+| 01 | Datasource & Connection | [DATASOURCE-CONNECTION](../implementation/DATASOURCE-CONNECTION.md) |
+| 02 | Semantic Layer | [SEMANTIC-LAYER](../implementation/SEMANTIC-LAYER.md) |
+| 03 | Dataset | [DATASET](../implementation/DATASET.md) |
+| 04 | Query Processor | [QUERY-PROCESSOR](../implementation/QUERY-PROCESSOR.md) |
+| 05 | Cache & Materialisation | [CACHE-MATERIALISATION](../implementation/CACHE-MATERIALISATION.md) |
+| 06 | Analysis & Visual Builder | [ANALYSIS-VISUAL-BUILDER](../implementation/ANALYSIS-VISUAL-BUILDER.md) |
+| 07 | Filters / Actions | covered via [CROSS-TAB-DRILL-THROUGH](../implementation/CROSS-TAB-DRILL-THROUGH.md) |
+| 08 | Dashboard | [MULTI-TAB-DASHBOARD](../implementation/MULTI-TAB-DASHBOARD.md) |
+| 09 | RLS & Column Security | [RLS-COLUMN-SECURITY](../implementation/RLS-COLUMN-SECURITY.md) |
+| 10 | Auth / SSO / MFA / SCIM | [AUTH-SSO-MFA-SCIM](../implementation/AUTH-SSO-MFA-SCIM.md) |
+| 11 | Aggregation & Metrics | [AGGREGATION-METRICS](../implementation/AGGREGATION-METRICS.md) |
+| 12 | Import & Upload | [IMPORT-UPLOAD](../implementation/IMPORT-UPLOAD.md) |
+| 13 | Export & Download | [PER-TAB-SCHEDULED-EXPORTS](../implementation/PER-TAB-SCHEDULED-EXPORTS.md) |
+| 14 | Sharing & Embedding | [SHARE-EMBED](../implementation/SHARE-EMBED.md) |
+| 15 | Scheduling & Alerts | [PER-TAB-SCHEDULED-EXPORTS](../implementation/PER-TAB-SCHEDULED-EXPORTS.md) |
+| 16 | Notifications | [NOTIFICATIONS](../implementation/NOTIFICATIONS.md) |
+| 17 | Search / Catalogue | [SEARCH-CATALOGUE](../implementation/SEARCH-CATALOGUE.md) |
+| 18 | Versioning & Lineage | [VERSIONING-LINEAGE](../implementation/VERSIONING-LINEAGE.md) |
+| 19 | Audit & Observability | [AUDIT-OBSERVABILITY](../implementation/AUDIT-OBSERVABILITY.md) |
+| 20 | Branding & White-label | [BRANDING](../implementation/BRANDING.md) |
+| 21 | Mobile / PWA | [MOBILE-PWA](../implementation/MOBILE-PWA.md) |
+| 22 | API / SDK / Plugins | [API-SDK-PLUGINS](../implementation/API-SDK-PLUGINS.md) |
+| 23 | i18n / a11y | [I18N-A11Y](../implementation/I18N-A11Y.md) |
+| 24 | Admin Console | [ADMIN-CONSOLE](../implementation/ADMIN-CONSOLE.md) |
+| 25 | AI Insights | [AI-DASHBOARD-GENERATION](../implementation/AI-DASHBOARD-GENERATION.md) |
+| 26 | Geo / Maps / Specialty | [GEO-MAPS](../implementation/GEO-MAPS.md) |
+| 27 | Cost Observability | [COST-OBSERVABILITY](../implementation/COST-OBSERVABILITY.md) |
+| 28 | Backup & Restore | [BACKUP-RESTORE](../implementation/BACKUP-RESTORE.md) |
+
+### Integration-ready coverage
+
+All 28 modules now have an implementation companion. Each companion
+follows the same 14-section structure: problem statement, data
+model, API surface, controller stub (with audit + master-DB-close),
+FE component skeleton, observability metrics + traces, security &
+threat model, operational runbook, performance budget, migration
+& rollout, open questions, references.
+
+For a feature that spans modules (e.g. "AI generates a multi-tab
+dashboard with cross-tab drill-through and per-tab scheduled
+exports"), follow the *feature-slice* companions in the previous
+table — they bridge across modules.
 
 ## Conventions
 
