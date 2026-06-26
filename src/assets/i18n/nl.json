@@ -475,7 +475,8 @@
     "DB_SCHEMA_PLACEHOLDER": "bijv. dbexec_master",
     "DB_SCHEMA_NOTE": "DBExec maakt dit schema aan in je database voor zijn platformtabellen. Bestaat het schema al, dan moet het leeg zijn.",
     "DB_SCHEMA_LOCKED": "Het schema wordt bij aanmaken ingesteld en kan niet worden gewijzigd.",
-    "SCHEMA_NOT_EMPTY": "Het opgegeven schema bevat al objecten. Kies een leeg schema of een nieuwe naam."
+    "SCHEMA_NOT_EMPTY": "Het opgegeven schema bevat al objecten. Kies een leeg schema of een nieuwe naam.",
+    "NOT_TESTED_HINT": "Test de verbinding voordat u opslaat"
   },
   "ROLE": {
     "TITLE": "Rollen",

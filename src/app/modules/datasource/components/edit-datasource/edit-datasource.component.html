@@ -208,44 +208,65 @@
         >
         </app-custom-input>
 
-        <!-- Connection Test -->
+        <!-- Connection Test — same shape as Add Organisation:
+             real button (visible even disabled) + state spans
+             for success / failed / pending hint. Whole section only
+             renders once the user has dirtied a connection field;
+             otherwise editing a name shouldn't ask for a retest. -->
         <div class="form-field" *ngIf="isConnectionFieldsDirty()">
           <div class="connection-test-section">
-            <a
-              class="test-connection-link"
-              (click)="testConnection()"
-              [class.disabled]="
+            <button
+              type="button"
+              class="test-connection-btn"
+              [disabled]="
                 !isConnectionFieldsValid() ||
                 connectionTestLoading ||
                 connectionTested
               "
+              (click)="testConnection()"
             >
               <i
-                class="pi"
-                [ngClass]="{
-                  'pi-spin pi-spinner': connectionTestLoading,
-                  'pi-check-circle': connectionTestResult === 'success',
-                  'pi-times-circle': connectionTestResult === 'failed',
-                  'pi-bolt': !connectionTestLoading && !connectionTestResult,
-                }"
+                [class]="
+                  connectionTestLoading
+                    ? 'pi pi-spin pi-spinner'
+                    : 'pi pi-bolt'
+                "
               ></i>
               {{
                 connectionTestLoading
                   ? ('DATASOURCE.TESTING' | translate)
-                  : connectionTestResult === 'success'
-                    ? ('DATASOURCE.CONNECTION_SUCCESSFUL' | translate)
-                    : connectionTestResult === 'failed'
-                      ? connectionTestError ||
-                        ('DATASOURCE.CONNECTION_FAILED_RETRY' | translate)
-                      : ('DATASOURCE.TEST_CONNECTION' | translate)
+                  : ('DATASOURCE.TEST_CONNECTION' | translate)
               }}
-            </a>
-            <small
-              class="connection-hint"
-              *ngIf="!connectionTested && !connectionTestLoading"
+            </button>
+            <span
+              class="connection-status success"
+              *ngIf="connectionTestResult === 'success'"
             >
+              <i class="pi pi-check-circle"></i>
+              {{ 'DATASOURCE.CONNECTION_SUCCESSFUL' | translate }}
+            </span>
+            <span
+              class="connection-status failed"
+              *ngIf="connectionTestResult === 'failed'"
+            >
+              <i class="pi pi-times-circle"></i>
+              {{
+                connectionTestError ||
+                  ('DATASOURCE.CONNECTION_FAILED_RETRY' | translate)
+              }}
+            </span>
+            <span
+              class="connection-status pending"
+              *ngIf="
+                isConnectionFieldsValid() &&
+                !connectionTestLoading &&
+                !connectionTested &&
+                !connectionTestResult
+              "
+            >
+              <i class="pi pi-info-circle"></i>
               {{ 'DATASOURCE.CONNECTION_TEST_REQUIRED' | translate }}
-            </small>
+            </span>
           </div>
         </div>
 

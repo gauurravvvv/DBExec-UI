@@ -14,7 +14,12 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 145px);
+    // Was max-height: calc(100vh - 145px) — that magic number
+    // assumed the old header (56px) + footer (28px) chrome that
+    // got folded into the sidebar. The parent .router-pane is
+    // already flex-sized to the viewport, so flex: 1 + min-height:
+    // 0 (above) is enough. No fixed cap needed.
+    min-height: 0;
 
     .page-header {
       display: flex;
@@ -123,7 +128,12 @@
       flex: 1;
       overflow-y: auto;
       padding-right: 12px;
-      height: calc(100vh - 150px);
+      // Was height: calc(100vh - 150px) — same stale magic number
+      // as the container's max-height. With flex: 1 plus min-height:
+      // 0 the form pane sizes itself to whatever the parent grants,
+      // and the inner content scrolls when it doesn't fit. Works
+      // regardless of viewport height or what chrome wraps the page.
+      min-height: 0;
 
       &::-webkit-scrollbar {
         width: 8px;
@@ -880,33 +890,54 @@
 .connection-test-section {
   display: flex;
   align-items: center;
-  gap: var(--space-6);
-  margin-top: 0.25rem;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  margin-top: var(--space-5);
 
-  .test-connection-link {
+  // Real button styling so the test action is visible even when the
+  // form is in its initial empty state. Matches the secondary
+  // button styling on the datasource view-page so the two forms
+  // feel like the same app.
+  .test-connection-btn {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-3);
-    color: var(--primary-color);
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--card-background);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-family: inherit;
     font-size: var(--fs-control);
     font-weight: var(--fw-medium);
     cursor: pointer;
-    transition: opacity var(--motion-base) ease;
-
-    &:hover:not(.disabled) {
-      opacity: 0.8;
-      text-decoration: underline;
-    }
-
-    &.disabled {
-      color: var(--secondary-color);
-      cursor: not-allowed;
-      opacity: 0.5;
-      pointer-events: none;
-    }
+    transition:
+      background var(--motion-fast) ease,
+      border-color var(--motion-fast) ease,
+      color var(--motion-fast) ease,
+      opacity var(--motion-fast) ease;
 
     i {
       font-size: var(--fs-control);
+    }
+
+    // Active / hoverable state — gets the brand outline on hover.
+    &:hover:not(:disabled) {
+      background: var(--hover-background);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--primary-color-transparent);
+    }
+
+    // Disabled-but-visible — keep border + chrome readable so the
+    // user sees the button exists, just isn't actionable yet.
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
     }
   }
 
@@ -928,6 +959,13 @@
 
     &.failed {
       color: var(--error-color);
+    }
+
+    // "Fill the fields and test before saving" hint — softer than
+    // error red, more visible than disabled grey.
+    &.pending {
+      color: var(--secondary-color);
+      font-weight: var(--fw-regular);
     }
 
     i {

@@ -475,7 +475,8 @@
     "DB_SCHEMA_PLACEHOLDER": "ex. dbexec_master",
     "DB_SCHEMA_NOTE": "O DBExec criará este esquema no seu banco de dados para suas tabelas de plataforma. Se o esquema já existir, ele deve estar vazio.",
     "DB_SCHEMA_LOCKED": "O esquema é definido na criação e não pode ser alterado.",
-    "SCHEMA_NOT_EMPTY": "O esquema informado já contém objetos. Escolha um esquema vazio ou outro nome."
+    "SCHEMA_NOT_EMPTY": "O esquema informado já contém objetos. Escolha um esquema vazio ou outro nome.",
+    "NOT_TESTED_HINT": "Teste a conexão antes de salvar"
   },
   "ROLE": {
     "TITLE": "Funções",

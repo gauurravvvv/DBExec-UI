@@ -1,35 +1,44 @@
 // ─────────────────────────────────────────────────────────────────
 // view-datasource — "what's built on this datasource"
-// Hero → Connection → Usage → Activity. Vertical stack, single
-// column. The previous 2200-line schema-explorer SCSS is replaced.
+// Single parent card matching the rest of the home-shell pages
+// (add-org, list-datasource, etc). The four logical sections (hero
+// / connection / usage / activity) are dividers inside the card,
+// not nested cards-in-cards.
 // ─────────────────────────────────────────────────────────────────
 
 .view-datasource-wrapper {
   height: 100%;
-  overflow-y: auto;
-  background: var(--home-background-color);
+  display: flex;
+  flex-direction: column;
+  background: var(--card-background);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  min-height: 0;
 }
 
+// Single scroll surface inside the card — header sticks visually
+// to the top of the wrapper, content scrolls below.
 .view-datasource-container {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: var(--space-6);
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-6) var(--space-8);
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
 }
 
 // ── Hero ────────────────────────────────────────────────────────
+// First section of the parent card. No nested border/shadow — just
+// a row of identity + actions with a divider beneath.
 .hero-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-5);
-  padding: var(--space-6);
-  background: var(--card-background);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  padding: 0 0 var(--space-6);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .hero-left {
@@ -163,17 +172,28 @@
     border: 1px solid var(--border-color);
     background: var(--card-background);
     color: var(--text-color);
+    font-family: inherit;
     font-size: var(--fs-control);
     font-weight: var(--fw-medium);
     cursor: pointer;
     transition:
       background var(--motion-fast) ease,
       border-color var(--motion-fast) ease,
-      color var(--motion-fast) ease;
+      color var(--motion-fast) ease,
+      opacity var(--motion-fast) ease;
 
+    // Secondary hover — match the add-organisation Test Connection
+    // button so the same action reads the same across the app:
+    // brand border + brand text on hover, not just a background tint.
     &:hover:not(:disabled) {
       background: var(--hover-background);
       border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--primary-color-transparent);
     }
 
     &:disabled {
@@ -185,6 +205,7 @@
       font-size: var(--fs-control);
     }
 
+    // Primary still wins over secondary hover — keep solid-fill style.
     &.btn-primary {
       background: var(--primary-color);
       color: var(--primary-text);
@@ -193,6 +214,7 @@
       &:hover:not(:disabled) {
         background: var(--primary-hover);
         border-color: var(--primary-hover);
+        color: var(--primary-text);
       }
     }
 
@@ -202,23 +224,28 @@
 
       &:hover:not(:disabled) {
         background: var(--error-bg);
+        color: var(--error-color);
       }
     }
   }
 }
 
-// ── Info cards (Connection / Usage / Activity share this shell) ──
+// ── Info sections — flat dividends of the parent card, NOT nested
+// cards. Separated by a subtle divider; last section has no divider.
 .info-card {
-  background: var(--card-background);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--border-color);
+
+  &:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
 }
 
 .card-header {
-  padding: var(--space-5) var(--space-6);
-  border-bottom: 1px solid var(--border-color);
+  padding: 0 0 var(--space-5);
 
   h3 {
     margin: 0;
@@ -237,7 +264,7 @@
 }
 
 .card-content {
-  padding: var(--space-6);
+  padding: 0;
 }
 
 .config-grid {

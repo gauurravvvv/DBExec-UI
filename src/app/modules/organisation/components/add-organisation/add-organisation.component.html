@@ -279,11 +279,14 @@
             >
             </app-custom-input>
 
-            <!-- Test Connection (text link) -->
+            <!-- Test Connection — real button so users see it
+                 regardless of whether all fields are filled.
+                 Disabled-but-visible when not testable. -->
             <div class="connection-test-section">
-              <span
-                class="test-connection-link"
-                [class.disabled]="
+              <button
+                type="button"
+                class="test-connection-btn"
+                [disabled]="
                   !isDbConnectionFieldsValid() ||
                   connectionTestLoading() ||
                   connectionTested()
@@ -302,7 +305,7 @@
                     ? ('ORG.TESTING_CONNECTION' | translate)
                     : ('ORG.TEST_CONNECTION' | translate)
                 }}
-              </span>
+              </button>
               <span
                 class="connection-status success"
                 *ngIf="connectionTestResult() === 'success'"
@@ -318,6 +321,20 @@
                 {{
                   connectionTestError() || ('ORG.CONNECTION_FAILED' | translate)
                 }}
+              </span>
+              <!-- Hint when fields are valid but the user hasn't
+                   tested yet — nudges them to verify before save. -->
+              <span
+                class="connection-status pending"
+                *ngIf="
+                  isDbConnectionFieldsValid() &&
+                  !connectionTestLoading() &&
+                  !connectionTested() &&
+                  !connectionTestResult()
+                "
+              >
+                <i class="pi pi-info-circle"></i>
+                {{ 'ORG.NOT_TESTED_HINT' | translate }}
               </span>
             </div>
           </div>

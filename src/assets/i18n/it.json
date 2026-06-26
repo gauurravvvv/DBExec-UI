@@ -475,7 +475,8 @@
     "DB_SCHEMA_PLACEHOLDER": "es. dbexec_master",
     "DB_SCHEMA_NOTE": "DBExec creerà questo schema nel tuo database per le sue tabelle di piattaforma. Se lo schema esiste già, deve essere vuoto.",
     "DB_SCHEMA_LOCKED": "Lo schema viene impostato alla creazione e non può essere modificato.",
-    "SCHEMA_NOT_EMPTY": "Lo schema indicato contiene già oggetti. Scegli uno schema vuoto o un nuovo nome."
+    "SCHEMA_NOT_EMPTY": "Lo schema indicato contiene già oggetti. Scegli uno schema vuoto o un nuovo nome.",
+    "NOT_TESTED_HINT": "Testa la connessione prima di salvare"
   },
   "ROLE": {
     "TITLE": "Ruoli",

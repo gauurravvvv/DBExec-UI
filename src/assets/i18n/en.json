@@ -479,7 +479,8 @@
     "EDIT_DB_WARNING_TITLE": "Master Database Changes",
     "EDIT_DB_WARNING_BODY_1": "Changing these credentials affects every user of this organisation. Authentication, dashboards, and queries will be re-routed to the new connection on save.",
     "EDIT_DB_WARNING_BODY_2": "If you change the schema, the platform's tables will be created in the new schema. Tables in the previous schema remain in your database untouched but will no longer be used by DBExec.",
-    "EDIT_DB_WARNING_BODY_3": "Connection details (host, port, database, schema, or username) cannot be changed without also providing the current or new password."
+    "EDIT_DB_WARNING_BODY_3": "Connection details (host, port, database, schema, or username) cannot be changed without also providing the current or new password.",
+    "NOT_TESTED_HINT": "Test the connection before saving"
   },
   "ROLE": {
     "TITLE": "Roles",

@@ -475,7 +475,8 @@
     "DB_SCHEMA_PLACEHOLDER": "例如:dbexec_master",
     "DB_SCHEMA_NOTE": "DBExec 将在您的数据库中为其平台表创建该架构。如果该架构已存在,必须为空。",
     "DB_SCHEMA_LOCKED": "模式在创建时设置，无法更改。",
-    "SCHEMA_NOT_EMPTY": "指定的架构中已包含对象。请选择一个空架构或使用新名称。"
+    "SCHEMA_NOT_EMPTY": "指定的架构中已包含对象。请选择一个空架构或使用新名称。",
+    "NOT_TESTED_HINT": "保存前请测试连接"
   },
   "ROLE": {
     "TITLE": "角色",
