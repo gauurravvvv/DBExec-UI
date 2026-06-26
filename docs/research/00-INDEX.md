@@ -72,6 +72,10 @@ reference.
 
 ## Related docs
 
+- [`../BUILD-PLAN.md`](../BUILD-PLAN.md) — **the order to ship
+  the modules in**, eight phases with dependencies, exit
+  criteria, parallel tracks, and risk register. Start here if
+  you're picking what to work on next.
 - [`../DBEXEC-DEEP-RESEARCH.md`](../DBEXEC-DEEP-RESEARCH.md) —
   master overview with the cross-cutting gap matrix.
 - [`REVIEW-DEEP.md`](REVIEW-DEEP.md) — the second-pass critical
