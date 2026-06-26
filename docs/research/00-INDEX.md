@@ -76,6 +76,9 @@ reference.
   the modules in**, eight phases with dependencies, exit
   criteria, parallel tracks, and risk register. Start here if
   you're picking what to work on next.
+- [`../BRANCHING.md`](../BRANCHING.md) — git branching
+  convention: long-lived `develop` + nine `phase-*` containers
+  + `feature/m<NN>-…` short-lived branches.
 - [`../DBEXEC-DEEP-RESEARCH.md`](../DBEXEC-DEEP-RESEARCH.md) —
   master overview with the cross-cutting gap matrix.
 - [`REVIEW-DEEP.md`](REVIEW-DEEP.md) — the second-pass critical
