@@ -1,368 +1,285 @@
 <div class="view-datasource-wrapper">
   <div class="view-datasource-container">
-    <!-- Header Section -->
-    <div class="page-header">
-      <div class="left-section">
-        <button
-          pButton
-          class="p-button-text p-button-plain back-button"
-          (click)="goBack()"
-        >
-          <i class="pi pi-arrow-left back-icon"></i>
-        </button>
-        <h2>{{ 'DATASOURCE.VIEW_TITLE' | translate }}</h2>
-      </div>
-      <div class="header-actions" *ngIf="dbData">
-        <button class="btn-secondary" (click)="loadDatasourceData()">
-          <i
-            class="pi"
-            [ngClass]="loading() ? 'pi-spin pi-spinner' : 'pi-refresh'"
-          ></i>
-          {{ 'COMMON.REFRESH' | translate }}
-        </button>
-        <button
-          *hasPermission="'setupDB'; level: 'write'"
-          class="btn-primary"
-          type="button"
-          (click)="onEdit()"
-        >
-          <i class="pi pi-pencil"></i>
-          {{ 'COMMON.EDIT' | translate }}
-        </button>
-        <button
-          *hasPermission="'setupDB'; level: 'delete'"
-          class="btn-danger"
-          type="button"
-          [disabled]="isDeleting(dbId)"
-          (click)="confirmDelete()"
-        >
-          <i
-            class="pi"
-            [ngClass]="isDeleting(dbId) ? 'pi-spin pi-spinner' : 'pi-trash'"
-          ></i>
-          {{ 'COMMON.DELETE' | translate }}
-        </button>
-      </div>
-    </div>
-
-    <!-- Centered branded loader while the GET is in flight. -->
+    <!-- Centered branded loader while the initial GET is in flight. -->
     <app-content-loader *ngIf="loading() && !dbData"></app-content-loader>
 
-    <!-- Content Section -->
-    <div class="content-section" *ngIf="dbData">
-      <!-- Quick Stats Row -->
-      <div class="quick-stats">
-        <div class="stat-card animated">
-          <div class="stat-icon">
-            <i class="pi pi-database"></i>
+    <ng-container *ngIf="dbData">
+      <!-- ── Hero ──────────────────────────────────────────────── -->
+      <div class="hero-card">
+        <div class="hero-left">
+          <button
+            pButton
+            class="p-button-text p-button-plain back-button"
+            (click)="goBack()"
+            [pTooltip]="'COMMON.BACK' | translate"
+            tooltipPosition="bottom"
+          >
+            <i class="pi pi-arrow-left"></i>
+          </button>
+          <div class="engine-badge">
+            <i class="pi" [ngClass]="engineIcon()"></i>
           </div>
-          <div class="stat-info">
-            <span class="stat-value">{{
-              dbData?.statistics?.databaseSizeMB | fileSize
-            }}</span>
-            <span class="stat-label">{{
-              'DATASOURCE.DATASOURCE_SIZE' | translate
-            }}</span>
-          </div>
-        </div>
-        <div class="stat-card animated">
-          <div class="stat-icon">
-            <i class="pi pi-table"></i>
-          </div>
-          <div class="stat-info">
-            <span class="stat-value">{{ dbData.statistics.totalTables }}</span>
-            <span class="stat-label">{{
-              'DATASOURCE.TOTAL_TABLES' | translate
-            }}</span>
-          </div>
-        </div>
-        <div class="stat-card animated">
-          <div class="stat-icon">
-            <i class="pi pi-file"></i>
-          </div>
-          <div class="stat-info">
-            <span class="stat-value">{{ dbData.statistics.totalSchemas }}</span>
-            <span class="stat-label">{{
-              'DATASOURCE.SCHEMAS' | translate
-            }}</span>
-          </div>
-        </div>
-        <div class="stat-card animated">
-          <div class="stat-icon">
-            <i class="pi pi-search"></i>
-          </div>
-          <div class="stat-info">
-            <span class="stat-value">{{ dbData.statistics.totalIndexes }}</span>
-            <span class="stat-label">{{
-              'DATASOURCE.INDEXES' | translate
-            }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Main Content Grid -->
-      <div class="main-content">
-        <!-- Left Column -->
-        <div class="left-column">
-          <!-- Configuration Card -->
-          <div class="info-card">
-            <div class="card-header">
-              <h3>
-                <i class="pi pi-cog"></i
-                >{{ 'DATASOURCE.CONFIGURATION' | translate }}
-              </h3>
-            </div>
-            <div class="card-content">
-              <div class="config-grid">
-                <div class="config-item">
-                  <label>{{ 'DATASOURCE.DATASOURCE_TYPE' | translate }}</label>
-                  <p class="with-badge">
-                    <span class="config-badge">{{
-                      dbData?.config.dbType
-                    }}</span>
-                  </p>
-                </div>
-                <div class="config-item">
-                  <label>{{
-                    'DATASOURCE.CONNECTION_STATUS' | translate
-                  }}</label>
-                  <p>
-                    <span
-                      class="status-badge"
-                      [class.active]="dbData.status === 1"
-                    >
-                      {{
-                        dbData.status === 1
-                          ? ('COMMON.ACTIVE' | translate)
-                          : ('COMMON.INACTIVE' | translate)
-                      }}
-                    </span>
-                  </p>
-                </div>
-                <div class="config-item">
-                  <label>{{ 'DATASOURCE.HOST' | translate }}</label>
-                  <p>{{ dbData.config.hostname }}</p>
-                </div>
-                <div class="config-item">
-                  <label>{{ 'DATASOURCE.PORT' | translate }}</label>
-                  <p>{{ dbData.config.port }}</p>
-                </div>
-                <div class="config-item">
-                  <label>{{ 'DATASOURCE.DATABASE_NAME' | translate }}</label>
-                  <p>{{ dbData.config.dbName }}</p>
-                </div>
-                <div class="config-item">
-                  <label>{{ 'COMMON.ORGANISATION' | translate }}</label>
-                  <p>{{ dbData.organisationName }}</p>
-                </div>
-                <div class="config-item">
-                  <label>{{ 'COMMON.CREATED_ON' | translate }}</label>
-                  <p>{{ dbData.createdOn | date: 'medium' }}</p>
-                </div>
-                <div class="config-item">
-                  <label>{{ 'DATASOURCE.LAST_UPDATED' | translate }}</label>
-                  <p>{{ dbData.updatedOn | date: 'medium' }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Storage Analysis -->
-          <div class="info-card storage-card">
-            <div class="card-header">
-              <h3>
-                <i class="pi pi-chart-line"></i
-                >{{ 'DATASOURCE.STORAGE_ANALYSIS' | translate }}
-              </h3>
-            </div>
-            <div class="card-content">
-              <div class="charts-grid">
-                <div class="chart-container">
-                  <h4>
-                    {{
-                      'DATASOURCE.STORAGE_DISTRIBUTION_BY_SCHEMA' | translate
-                    }}
-                  </h4>
-                  <div class="chart-wrapper">
-                    <p-chart
-                      type="pie"
-                      [data]="schemaSizeChartData"
-                      [options]="schemaChartOptions"
-                      class="schema-chart"
-                    ></p-chart>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right Column -->
-        <div class="right-column">
-          <!-- Schema Analysis -->
-          <div class="info-card">
-            <div class="card-header">
-              <h3>
-                <i class="pi pi-file"></i
-                >{{ 'DATASOURCE.SCHEMA_ANALYSIS' | translate }}
-              </h3>
-              <div class="search-box">
-                <span class="p-input-icon-left">
-                  <i class="pi pi-search"></i>
-                  <input
-                    pInputText
-                    type="text"
-                    [placeholder]="'DATASOURCE.SEARCH_SCHEMA' | translate"
-                    (input)="onSchemaSearch($event)"
-                  />
+          <div class="hero-meta">
+            <h1 class="hero-name">{{ dbData.name }}</h1>
+            <div class="hero-sub">
+              <span class="engine-tag">{{ dbData.config?.dbType }}</span>
+              <span class="dot">·</span>
+              <ng-container [ngSwitch]="health()">
+                <span class="health-pill" *ngSwitchCase="'ok'">
+                  <i class="pi pi-check-circle"></i>
+                  {{ 'DATASOURCE.HEALTH_CONNECTED' | translate }}
                 </span>
-              </div>
-            </div>
-            <div class="card-content">
-              <div class="schema-list">
-                <div
-                  class="schema-item"
-                  *ngFor="let schema of filteredSchemas; trackBy: trackByName"
-                  (click)="toggleSchemaExpand(schema)"
-                  [class.expanded]="expandedSchemas.includes(schema.name)"
-                >
-                  <div class="schema-header">
-                    <i class="pi pi-file"></i>
-                    <span class="schema-name">{{ schema.name }}</span>
-                    <span class="schema-size">{{
-                      formatTableSize(schema.totalSizeMB)
-                    }}</span>
-                    <i
-                      class="expand-icon pi"
-                      [ngClass]="
-                        expandedSchemas.includes(schema.name)
-                          ? 'pi-chevron-up'
-                          : 'pi-chevron-down'
-                      "
-                    ></i>
-                  </div>
-                  <div class="schema-progress">
-                    <div
-                      class="progress-bar"
-                      [style.width.%]="getSchemaPercentage(schema)"
-                      [style.backgroundColor]="getSchemaColor(schema)"
-                    ></div>
-                  </div>
-                  <div class="schema-stats">
-                    <div class="stat">
-                      <span class="label">{{
-                        'DATASOURCE.TABLES' | translate
-                      }}</span>
-                      <span class="value">{{ schema.tableCount }}</span>
-                    </div>
-                    <div class="stat">
-                      <span class="label">{{
-                        'DATASOURCE.VIEWS' | translate
-                      }}</span>
-                      <span class="value">{{ schema.viewCount }}</span>
-                    </div>
-                    <div class="stat">
-                      <span class="label">{{
-                        'DATASOURCE.FUNCTIONS' | translate
-                      }}</span>
-                      <span class="value">{{ schema.functionCount }}</span>
-                    </div>
-                  </div>
-                  <!-- Expanded content -->
-                  <div
-                    class="schema-details"
-                    *ngIf="expandedSchemas.includes(schema.name)"
-                  >
-                    <div class="tables-list">
-                      <h5>{{ 'DATASOURCE.TABLES' | translate }}</h5>
-                      <div
-                        class="table-item"
-                        *ngFor="
-                          let table of getTablesForSchema(schema.name);
-                          trackBy: trackByName
-                        "
-                      >
-                        <div
-                          class="table-name"
-                          (click)="onTableClick($event, schema, table)"
-                          [title]="
-                            'DATASOURCE.CLICK_VIEW_TABLE_DETAILS' | translate
-                          "
-                        >
-                          <i class="pi pi-table"></i>
-                          <span>{{ table.name }}</span>
-                        </div>
-                        <div class="table-info">
-                          <span class="size">{{
-                            formatTableSize(table.sizeMB.total)
-                          }}</span>
-                          <span class="rows"
-                            >{{ table.totalColumns }}
-                            {{ 'DATASOURCE.COLUMNS' | translate }}</span
-                          >
-                          <span class="rows"
-                            >{{ table.rowCount }}
-                            {{ 'DATASOURCE.ROWS' | translate }}</span
-                          >
-                        </div>
-                      </div>
-                      <div class="no-tables" *ngIf="schema.name.length === 0">
-                        {{ 'DATASOURCE.NO_TABLES_FOUND' | translate }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                <span class="health-pill failed" *ngSwitchCase="'failed'">
+                  <i class="pi pi-times-circle"></i>
+                  {{ 'DATASOURCE.HEALTH_FAILED' | translate }}
+                </span>
+                <span class="health-pill testing" *ngSwitchCase="'testing'">
+                  <i class="pi pi-spin pi-spinner"></i>
+                  {{ 'DATASOURCE.HEALTH_TESTING' | translate }}
+                </span>
+                <span class="health-pill unknown" *ngSwitchDefault>
+                  <i class="pi pi-circle"></i>
+                  {{ 'DATASOURCE.HEALTH_NEVER_TESTED' | translate }}
+                </span>
+              </ng-container>
+              <ng-container *ngIf="lastTestedAt() as t">
+                <span class="dot">·</span>
+                <span class="tested-at" [title]="t | date: 'medium'">
+                  {{ 'DATASOURCE.TESTED' | translate }}
+                  {{ t | relativeTime }}
+                </span>
+              </ng-container>
             </div>
           </div>
+        </div>
+        <div class="hero-actions">
+          <button
+            class="btn-secondary"
+            type="button"
+            [disabled]="testInFlight()"
+            (click)="onTestConnection()"
+          >
+            <i class="pi" [ngClass]="testInFlight() ? 'pi-spin pi-spinner' : 'pi-bolt'"></i>
+            {{ 'DATASOURCE.TEST_CONNECTION' | translate }}
+          </button>
+          <button
+            *hasPermission="'setupDB'; level: 'write'"
+            class="btn-primary"
+            type="button"
+            (click)="onEdit()"
+          >
+            <i class="pi pi-pencil"></i>
+            {{ 'COMMON.EDIT' | translate }}
+          </button>
+          <button
+            *hasPermission="'setupDB'; level: 'delete'"
+            class="btn-danger"
+            type="button"
+            [disabled]="isDeleting(dbId)"
+            (click)="confirmDelete()"
+          >
+            <i class="pi" [ngClass]="isDeleting(dbId) ? 'pi-spin pi-spinner' : 'pi-trash'"></i>
+            {{ 'COMMON.DELETE' | translate }}
+          </button>
+        </div>
+      </div>
 
-          <!-- Tables Overview -->
-          <div class="info-card">
-            <div class="card-header">
-              <h3>
-                <i class="pi pi-table"></i
-                >{{ 'DATASOURCE.TOP_STORAGE_TABLES' | translate }}
-              </h3>
+      <!-- ── Connection details ────────────────────────────────── -->
+      <div class="info-card">
+        <div class="card-header">
+          <h3>
+            <i class="pi pi-cog"></i>
+            {{ 'DATASOURCE.CONFIGURATION' | translate }}
+          </h3>
+        </div>
+        <div class="card-content">
+          <div class="config-grid">
+            <div class="config-item" *ngIf="dbData.description">
+              <label>{{ 'COMMON.DESCRIPTION' | translate }}</label>
+              <p>{{ dbData.description }}</p>
             </div>
-            <div class="card-content">
-              <div class="top-tables">
-                <div
-                  class="table-item"
-                  *ngFor="let table of topStorageTables; trackBy: trackByName"
-                >
-                  <div class="table-info">
-                    <span class="table-name"
-                      >{{ table.schema }}.{{ table.name }}</span
-                    >
-                    <div class="table-stats">
-                      <span class="table-size">{{
-                        formatTableSize(table.size)
-                      }}</span>
-                      <span class="table-percentage"
-                        >({{ table.percentage.toFixed(1) }}%)</span
-                      >
-                    </div>
-                  </div>
-                  <div class="table-progress">
-                    <div
-                      class="progress-bar"
-                      [style.width.%]="table.percentage"
-                      [style.backgroundColor]="table.color"
-                    ></div>
-                  </div>
-                </div>
+            <div class="config-item">
+              <label>{{ 'DATASOURCE.CONNECTION_STATUS' | translate }}</label>
+              <p>
+                <span class="status-badge" [class.active]="dbData.status === 1">
+                  {{
+                    dbData.status === 1
+                      ? ('COMMON.ACTIVE' | translate)
+                      : ('COMMON.INACTIVE' | translate)
+                  }}
+                </span>
+              </p>
+            </div>
+
+            <!-- Snowflake-only chips -->
+            <ng-container *ngIf="isSnowflake">
+              <div class="config-item">
+                <label>{{ 'DATASOURCE.ACCOUNT' | translate }}</label>
+                <p>{{ dbData.config?.account }}</p>
               </div>
+              <div class="config-item">
+                <label>{{ 'DATASOURCE.WAREHOUSE' | translate }}</label>
+                <p>{{ dbData.config?.warehouse || '—' }}</p>
+              </div>
+              <div class="config-item">
+                <label>{{ 'DATASOURCE.ROLE' | translate }}</label>
+                <p>{{ dbData.config?.role || '—' }}</p>
+              </div>
+              <div class="config-item">
+                <label>{{ 'DATASOURCE.SCHEMA' | translate }}</label>
+                <p>{{ dbData.config?.schemaName || '—' }}</p>
+              </div>
+            </ng-container>
+
+            <!-- TypeORM engines: host + port -->
+            <ng-container *ngIf="!isSnowflake">
+              <div class="config-item">
+                <label>{{ 'DATASOURCE.HOST' | translate }}</label>
+                <p>{{ dbData.config?.hostname }}</p>
+              </div>
+              <div class="config-item">
+                <label>{{ 'DATASOURCE.PORT' | translate }}</label>
+                <p>{{ dbData.config?.port }}</p>
+              </div>
+            </ng-container>
+
+            <div class="config-item">
+              <label>{{ 'DATASOURCE.DATABASE_NAME' | translate }}</label>
+              <p>{{ dbData.config?.dbName }}</p>
+            </div>
+            <div class="config-item">
+              <label>{{ 'DATASOURCE.USERNAME' | translate }}</label>
+              <p>{{ dbData.config?.username }}</p>
+            </div>
+            <div class="config-item">
+              <label>{{ 'COMMON.CREATED_ON' | translate }}</label>
+              <p>{{ dbData.createdOn | date: 'medium' }}</p>
+            </div>
+            <div class="config-item" *ngIf="dbData.updatedOn">
+              <label>{{ 'DATASOURCE.LAST_UPDATED' | translate }}</label>
+              <p>{{ dbData.updatedOn | date: 'medium' }}</p>
             </div>
           </div>
         </div>
       </div>
-    </div>
+
+      <!-- ── Usage ─────────────────────────────────────────────── -->
+      <div class="info-card">
+        <div class="card-header">
+          <h3>
+            <i class="pi pi-sitemap"></i>
+            {{ 'DATASOURCE.USAGE' | translate }}
+          </h3>
+        </div>
+        <div class="card-content">
+          <ng-container *ngIf="!usageLoading() && usage(); else usageLoadingTpl">
+            <div class="usage-grid">
+              <div class="usage-card">
+                <div class="usage-value">{{ usage()?.datasets }}</div>
+                <div class="usage-label">
+                  {{ 'DATASOURCE.USAGE_DATASETS' | translate }}
+                </div>
+              </div>
+              <div class="usage-card">
+                <div class="usage-value">{{ usage()?.analyses }}</div>
+                <div class="usage-label">
+                  {{ 'DATASOURCE.USAGE_ANALYSES' | translate }}
+                </div>
+              </div>
+              <div class="usage-card">
+                <div class="usage-value">{{ usage()?.dashboards }}</div>
+                <div class="usage-label">
+                  {{ 'DATASOURCE.USAGE_DASHBOARDS' | translate }}
+                </div>
+              </div>
+            </div>
+
+            <div class="usage-chart" *ngIf="hasAnyUsage(); else usageEmpty">
+              <div
+                class="usage-chart-canvas"
+                echarts
+                [options]="usageChartOption()!"
+                [autoResize]="true"
+              ></div>
+            </div>
+
+            <ng-template #usageEmpty>
+              <div class="empty-state">
+                <i class="pi pi-inbox"></i>
+                <p>{{ 'DATASOURCE.USAGE_EMPTY' | translate }}</p>
+              </div>
+            </ng-template>
+          </ng-container>
+
+          <ng-template #usageLoadingTpl>
+            <div class="loading-row">
+              <i class="pi pi-spin pi-spinner"></i>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- ── Activity ──────────────────────────────────────────── -->
+      <div class="info-card">
+        <div class="card-header">
+          <h3>
+            <i class="pi pi-history"></i>
+            {{ 'DATASOURCE.ACTIVITY' | translate }}
+          </h3>
+        </div>
+        <div class="card-content">
+          <ng-container *ngIf="!activityLoading(); else activityLoadingTpl">
+            <ul class="activity-list" *ngIf="activity().length > 0; else activityEmpty">
+              <li
+                class="activity-row"
+                *ngFor="let event of activity(); trackBy: trackByEventId"
+              >
+                <div class="activity-icon">
+                  <i class="pi" [ngClass]="activityIcon(event.action)"></i>
+                </div>
+                <div class="activity-body">
+                  <div class="activity-title">
+                    {{ activityLabelKey(event.action) | translate }}
+                    <span class="activity-actor">· {{ event.actorName }}</span>
+                  </div>
+                  <div class="activity-meta">
+                    <span class="activity-time" [title]="event.at | date: 'medium'">
+                      {{ event.at | relativeTime }}
+                    </span>
+                    <span
+                      class="activity-justification"
+                      *ngIf="event.justification"
+                      [title]="event.justification"
+                    >
+                      · {{ event.justification }}
+                    </span>
+                  </div>
+                </div>
+              </li>
+            </ul>
+
+            <ng-template #activityEmpty>
+              <div class="empty-state">
+                <i class="pi pi-history"></i>
+                <p>{{ 'DATASOURCE.ACTIVITY_EMPTY' | translate }}</p>
+              </div>
+            </ng-template>
+          </ng-container>
+
+          <ng-template #activityLoadingTpl>
+            <div class="loading-row">
+              <i class="pi pi-spin pi-spinner"></i>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </ng-container>
   </div>
 </div>
 
-<!-- Delete Confirmation Dialog -->
+<!-- ── Delete confirmation modal ─────────────────────────────────── -->
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
   <div class="popup-content">
-    <!-- Header -->
     <div class="popup-header">
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
@@ -370,11 +287,10 @@
       <h3>{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
     </div>
 
-    <!-- Delete Section -->
     <div class="standard-delete-section">
       <div class="db-info-badge">
         <i class="pi pi-database"></i>
-        <span>{{ dbData?.config?.dbName }}</span>
+        <span>{{ dbData?.name }}</span>
       </div>
 
       <p class="delete-intro">
@@ -384,9 +300,7 @@
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>{{
-            'DATASOURCE.DELETE_INFO_ASSOCIATED_DATA' | translate
-          }}</span>
+          <span>{{ 'DATASOURCE.DELETE_INFO_ASSOCIATED_DATA' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
@@ -401,10 +315,10 @@
       </ul>
 
       <div class="justification-section">
-        <label
-          >{{ 'COMMON.JUSTIFICATION' | translate }}
-          <span class="required">*</span></label
-        >
+        <label>
+          {{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span>
+        </label>
         <textarea
           [(ngModel)]="deleteJustification"
           [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
@@ -415,7 +329,6 @@
       </div>
     </div>
 
-    <!-- Actions -->
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelDelete()">
         <i class="pi pi-times"></i>
@@ -426,131 +339,8 @@
         (click)="proceedDelete()"
         [disabled]="!deleteJustification.trim() || isDeleting(dbId)"
       >
-        <i
-          class="pi"
-          [ngClass]="isDeleting(dbId) ? 'pi-spin pi-spinner' : 'pi-trash'"
-        ></i>
+        <i class="pi" [ngClass]="isDeleting(dbId) ? 'pi-spin pi-spinner' : 'pi-trash'"></i>
         {{ 'COMMON.DELETE' | translate }}
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Table Details Dialog -->
-<div class="confirmation-popup" *ngIf="showTableDetails">
-  <div class="popup-content table-details-popup">
-    <div class="popup-header">
-      <h3>
-        <i class="pi pi-table"></i> {{ 'DATASOURCE.TABLE_DETAILS' | translate }}
-      </h3>
-      <button class="close-btn" (click)="closeTableDetails()">
-        <i class="pi pi-times"></i>
-      </button>
-    </div>
-
-    <div class="table-details-content" *ngIf="selectedTable">
-      <!-- Table Name and Schema -->
-      <div class="detail-section">
-        <div class="detail-item">
-          <label>{{ 'DATASOURCE.TABLE_NAME' | translate }}</label>
-          <p class="with-badge">
-            <span class="config-badge"
-              >{{ selectedSchema?.name }}.{{ selectedTable.name }}</span
-            >
-          </p>
-        </div>
-      </div>
-
-      <!-- Statistics Section -->
-      <div class="detail-section">
-        <h4>{{ 'DATASOURCE.STATISTICS' | translate }}</h4>
-        <div class="stats-grid">
-          <div class="stat-item">
-            <label
-              ><i class="pi pi-database"></i>
-              {{ 'DATASOURCE.TOTAL_SIZE' | translate }}</label
-            >
-            <p>{{ selectedTable.sizeMB.total | fileSize }}</p>
-          </div>
-          <div class="stat-item">
-            <label
-              ><i class="pi pi-list"></i>
-              {{ 'DATASOURCE.COLUMNS' | translate }}</label
-            >
-            <p>{{ selectedTable.totalColumns }}</p>
-          </div>
-          <div class="stat-item">
-            <label
-              ><i class="pi pi-align-justify"></i>
-              {{ 'DATASOURCE.ROWS' | translate }}</label
-            >
-            <p>{{ selectedTable.rowCount | number }}</p>
-          </div>
-          <div class="stat-item">
-            <label
-              ><i class="pi pi-search"></i>
-              {{ 'DATASOURCE.INDEXES' | translate }}</label
-            >
-            <p>{{ selectedTable.totalIndexes }}</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Size Breakdown -->
-      <div class="detail-section">
-        <h4>{{ 'DATASOURCE.SIZE_BREAKDOWN' | translate }}</h4>
-        <div class="size-breakdown">
-          <div class="size-item">
-            <span class="size-label">{{
-              'DATASOURCE.DATA_SIZE' | translate
-            }}</span>
-            <span class="size-value">{{
-              formatTableSize(selectedTable.sizeMB.data)
-            }}</span>
-          </div>
-          <div class="size-item">
-            <span class="size-label">{{
-              'DATASOURCE.INDEX_SIZE' | translate
-            }}</span>
-            <span class="size-value">{{
-              formatTableSize(selectedTable.sizeMB.index)
-            }}</span>
-          </div>
-          <div class="size-item">
-            <span class="size-label">{{
-              'DATASOURCE.UNUSED_SPACE' | translate
-            }}</span>
-            <span class="size-value">{{
-              formatTableSize(selectedTable.sizeMB.unused)
-            }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Columns Section -->
-      <div class="detail-section">
-        <h4>
-          {{ 'DATASOURCE.COLUMNS' | translate }} ({{
-            selectedTable.columns?.length || 0
-          }})
-        </h4>
-        <div class="columns-list">
-          <div
-            class="column-item"
-            *ngFor="let column of selectedTable.columns; trackBy: trackByName"
-          >
-            <span class="column-name">
-              <i class="pi pi-tag"></i> <span>{{ column.name }}</span>
-            </span>
-            <span class="column-type">{{ column.type }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="popup-actions">
-      <button class="btn-cancel" (click)="closeTableDetails()">
-        {{ 'COMMON.CLOSE' | translate }}
       </button>
     </div>
   </div>

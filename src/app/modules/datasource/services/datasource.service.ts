@@ -169,6 +169,55 @@ export class DatasourceService {
     );
   }
 
+  /**
+   * Test the saved credentials of an existing datasource. The BE
+   * looks up the row, decrypts the stored password, runs the engine-
+   * aware connection test, and persists `lastTestedAt` + `lastTestStatus`
+   * onto the row so the view page's health pill survives a refresh.
+   *
+   * Used by the "Test connection" button on the view-datasource page.
+   * Returns the raw BE response — callers read `data.isConnected`,
+   * `data.lastTestedAt`, `data.lastTestStatus`.
+   */
+  async testConnectionForExisting(id: string): Promise<any> {
+    return await lastValueFrom(
+      this.http.apiPost(
+        DATASOURCE.VALIDATE,
+        { id },
+        { skipLoader: true },
+      ),
+    );
+  }
+
+  /**
+   * Count of dependent datasets / analyses / dashboards built on this
+   * datasource. One cheap call backing the Usage panel + donut chart
+   * on the view page.
+   */
+  async getUsage(id: string): Promise<any> {
+    return await lastValueFrom(
+      this.http
+        .apiGet(DATASOURCE.USAGE_PREFIX + id + DATASOURCE.USAGE_SUFFIX, {
+          skipLoader: true,
+        })
+        .pipe(takeUntil(this._cancelReads$)),
+    );
+  }
+
+  /**
+   * Last 20 audit-log events for this datasource — powers the Activity
+   * timeline panel.
+   */
+  async getActivity(id: string): Promise<any> {
+    return await lastValueFrom(
+      this.http
+        .apiGet(DATASOURCE.ACTIVITY_PREFIX + id + DATASOURCE.ACTIVITY_SUFFIX, {
+          skipLoader: true,
+        })
+        .pipe(takeUntil(this._cancelReads$)),
+    );
+  }
+
   async delete(id: string, justification?: string): Promise<any> {
     // DELETE /datasources/:id — body carries justification.
     this.setDeleting(id, true);

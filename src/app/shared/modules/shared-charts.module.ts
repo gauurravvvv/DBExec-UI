@@ -33,6 +33,14 @@ export function loadEchartsGl(): Promise<unknown> {
       echarts: () => import('echarts'),
     }),
   ],
-  exports: [EchartVisualComponent, ConfigurableCardChartComponent],
+  exports: [
+    EchartVisualComponent,
+    ConfigurableCardChartComponent,
+    // Re-export so feature modules that import SharedChartsModule can
+    // use the `echarts` attribute-directive directly without doing
+    // their own NgxEchartsModule.forRoot() (which would re-register
+    // the echarts loader). View-datasource uses this for its donut.
+    NgxEchartsModule,
+  ],
 })
 export class SharedChartsModule {}
