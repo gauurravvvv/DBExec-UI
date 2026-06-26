@@ -88,34 +88,47 @@ export class DatasourceService {
     }
   }
 
+  /**
+   * Build the engine-shaped payload the BE expects.
+   *
+   * The BE Zod schema is a discriminated union on `type`:
+   *   - TypeORM engines (postgres / mysql / mariadb / mssql / oracle)
+   *     use host + port + database.
+   *   - Snowflake uses account + warehouse + role + schemaName + database
+   *     (no host/port; the SDK derives the URL from `account`).
+   *
+   * Selecting the right keys here keeps us in sync with the schema
+   * and avoids the BE silently dropping unknown fields.
+   */
+  private buildEnginePayload(payload: any): any {
+    const {
+      name,
+      description,
+      type,
+      database,
+      username,
+      password,
+    } = payload;
+    const body: any = { name, description, type, database, username, password };
+    if (type === 'snowflake') {
+      body.account = payload.account;
+      body.warehouse = payload.warehouse;
+      body.role = payload.role;
+      body.schemaName = payload.schemaName;
+    } else {
+      body.host = payload.host;
+      body.port = payload.port;
+    }
+    return body;
+  }
+
   async add(payload: any): Promise<any> {
     this._saving.set(true);
     try {
-      const {
-        name,
-        description,
-        type,
-        host,
-        port,
-        database,
-        username,
-        password,
-      } = payload;
       return await lastValueFrom(
-        this.http.apiPost(
-          DATASOURCE.ADD,
-          {
-            name,
-            description,
-            type,
-            host,
-            port,
-            database,
-            username,
-            password,
-          },
-          { skipLoader: true },
-        ),
+        this.http.apiPost(DATASOURCE.ADD, this.buildEnginePayload(payload), {
+          skipLoader: true,
+        }),
       );
     } finally {
       this._saving.set(false);
@@ -125,41 +138,35 @@ export class DatasourceService {
   async update(payload: any, justification?: string): Promise<any> {
     this._saving.set(true);
     try {
-      const {
-        id,
-        name,
-        description,
-        type,
-        host,
-        port,
-        database,
-        username,
-        password,
-        status,
-      } = payload;
+      const body = {
+        id: payload.id,
+        ...this.buildEnginePayload(payload),
+        status: payload.status,
+        justification,
+      };
       return await lastValueFrom(
         // PUT /datasources/:id
-        this.http.apiPut(
-          DATASOURCE.UPDATE + id,
-          {
-            id,
-            name,
-            description,
-            type,
-            host,
-            port,
-            database,
-            username,
-            password,
-            status,
-            justification,
-          },
-          { skipLoader: true },
-        ),
+        this.http.apiPut(DATASOURCE.UPDATE + payload.id, body, {
+          skipLoader: true,
+        }),
       );
     } finally {
       this._saving.set(false);
     }
+  }
+
+  /**
+   * Test a connection without persisting. Used by the add/edit
+   * forms. Same payload shape as `add` — discriminated on `type`.
+   * Returns the raw BE response so callers can react to
+   * `status: false` (connection failed) vs network error.
+   */
+  async testConnection(payload: any): Promise<any> {
+    return await lastValueFrom(
+      this.http.apiPost(DATASOURCE.VALIDATE, this.buildEnginePayload(payload), {
+        skipLoader: true,
+      }),
+    );
   }
 
   async delete(id: string, justification?: string): Promise<any> {

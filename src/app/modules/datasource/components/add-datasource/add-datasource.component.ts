@@ -13,7 +13,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { DATASOURCE } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import {
   dbDisplayNameSchema,
   dbHostSchema,
@@ -62,7 +61,6 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
   constructor(
     private fb: FormBuilder,
     private datasourceService: DatasourceService,
-    private organisationService: OrganisationService,
     private globalService: GlobalService,
     private router: Router,
     private cdr: ChangeDetectorRef,
@@ -309,29 +307,11 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
     this.connectionTestError = null;
     const reqId = ++this.testRequestId;
 
-    const isSf = isSnowflakeType(formValue.type);
-    this.organisationService
-      .validateDatasource(
-        isSf
-          ? {
-              type: formValue.type,
-              database: formValue.database,
-              username: formValue.username,
-              password: formValue.password,
-              account: formValue.account,
-              warehouse: formValue.warehouse,
-              role: formValue.role,
-              schemaName: formValue.schemaName,
-            }
-          : {
-              type: formValue.type,
-              host: formValue.host,
-              port: formValue.port,
-              database: formValue.database,
-              username: formValue.username,
-              password: formValue.password,
-            },
-      )
+    // DatasourceService.testConnection() handles the engine
+    // discriminator internally — same payload shape we'd pass to
+    // add()/update(), so the test path mirrors the save path.
+    this.datasourceService
+      .testConnection(formValue)
       .then((response: any) => {
         // Discard if user has edited a field or started a newer test
         if (reqId !== this.testRequestId) return;
