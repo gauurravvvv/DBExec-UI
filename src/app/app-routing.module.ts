@@ -85,16 +85,6 @@ const routes: Routes = [
           title: 'PAGE_TITLES.RLS_RULES',
         },
       },
-      {
-        path: 'access',
-        loadChildren: () =>
-          import('./modules/access/access.module').then(m => m.AccessModule),
-        canActivate: [roleGuard],
-        data: {
-          permission: PERMISSIONS.ACCESS_MANAGEMENT,
-          title: 'PAGE_TITLES.ACCESS',
-        },
-      },
       // Permission-gated
       {
         path: 'datasources',
@@ -106,18 +96,6 @@ const routes: Routes = [
         data: {
           permission: PERMISSIONS.SETUP_DB,
           title: 'PAGE_TITLES.DATASOURCES',
-        },
-      },
-      {
-        path: 'connections',
-        loadChildren: () =>
-          import('./modules/connections/connections.module').then(
-            m => m.ConnectionsModule,
-          ),
-        canActivate: [roleGuard],
-        data: {
-          permission: PERMISSIONS.DB_CONNECTIONS,
-          title: 'PAGE_TITLES.CONNECTIONS',
         },
       },
       {

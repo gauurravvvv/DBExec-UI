@@ -227,20 +227,6 @@ export const ACCESS_LEVELS = {
   LIST: '/access-levels',
 };
 
-export const ACCESS = {
-  GET: '/access/', // GET /access/:connectionId
-  GRANT: '/access/grant',
-};
-
-export const CONNECTIONS = {
-  LIST: '/connections',
-  ADD: '/connections',
-  GET: '/connections/',
-  UPDATE: '/connections/',
-  DELETE: '/connections/',
-  BULK_DELETE: '/connections/bulk-delete',
-};
-
 export const ANALYSES = {
   LIST: '/analyses',
   ADD: '/analyses',
