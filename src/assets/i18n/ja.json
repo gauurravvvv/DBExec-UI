@@ -284,7 +284,9 @@
     "NEXT": "次へ",
     "DARK_MODE": "Switch to Dark Mode",
     "LIGHT_MODE": "Switch to Light Mode",
-    "BLACK_MODE": "Switch to Black Mode"
+    "BLACK_MODE": "Switch to Black Mode",
+    "LANGUAGE": "言語",
+    "SEARCH": "検索"
   },
   "PROFILE": {
     "TITLE": "マイプロフィール",
@@ -2637,7 +2639,12 @@
     "GROUP_ADDED_TITLE": "グループに割り当てられました",
     "GROUP_ADDED_BODY": "{{groupName}} に割り当てられました。",
     "GROUP_REMOVED_TITLE": "グループから削除されました",
-    "GROUP_REMOVED_BODY": "{{groupName}} から削除されました。"
+    "GROUP_REMOVED_BODY": "{{groupName}} から削除されました。",
+    "GROUP_TODAY": "今日",
+    "GROUP_YESTERDAY": "昨日",
+    "GROUP_THIS_WEEK": "今週",
+    "GROUP_THIS_MONTH": "今月",
+    "GROUP_OLDER": "それ以前"
   },
   "MENU": {
     "SECURITY_POLICY": "セキュリティポリシー",

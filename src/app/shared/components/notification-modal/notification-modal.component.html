@@ -1,0 +1,41 @@
+<app-command-modal
+  [isOpen]="isOpen()"
+  [showInput]="false"
+  [title]="'HEADER.NOTIFICATIONS' | translate"
+  [headerActionLabel]="hasNotifications && hasUnread ? ('HEADER.MARK_ALL_READ' | translate) : null"
+  (headerAction)="onMarkAllRead()"
+  (closed)="close()"
+>
+  <ng-container *ngIf="hasNotifications; else emptyState">
+    <ng-container *ngFor="let group of groupedItems(); trackBy: trackByBucket">
+      <div class="group-header">{{ group.label | translate }}</div>
+      <ul class="notification-rows">
+        <li
+          *ngFor="let n of group.items; trackBy: trackById"
+          class="notification-row"
+          [class.unread]="!n.readAt"
+        >
+          <div class="notification-icon">
+            <i class="pi" [ngClass]="iconFor(n.type)" aria-hidden="true"></i>
+          </div>
+          <div class="notification-content">
+            <div class="row-title">{{ titleKeyFor(n) | translate }}</div>
+            <div class="row-message">
+              {{ bodyKeyFor(n) | translate: { groupName: n.meta?.groupName || '' } }}
+            </div>
+          </div>
+          <span class="row-time" [title]="n.createdOn | date: 'medium'">
+            {{ n.createdOn | relativeTime }}
+          </span>
+        </li>
+      </ul>
+    </ng-container>
+  </ng-container>
+
+  <ng-template #emptyState>
+    <div class="empty-state">
+      <i class="pi pi-bell-slash" aria-hidden="true"></i>
+      <p>{{ 'HEADER.ALL_CAUGHT_UP' | translate }}</p>
+    </div>
+  </ng-template>
+</app-command-modal>

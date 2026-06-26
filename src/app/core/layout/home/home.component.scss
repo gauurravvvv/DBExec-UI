@@ -1,31 +1,36 @@
+// Sidebar is now the only chrome — header and footer were folded into
+// it. Layout is a single horizontal flex: [sidebar][main]. Vertical
+// (column) layout is no longer needed because there's nothing above
+// or below the content row.
 .home-container {
   display: flex;
-  flex-direction: column;
-  height: 100vh; // Full viewport height
+  flex-direction: row;
+  height: 100vh;
   width: 100%;
   background-color: var(--home-background-color);
+  overflow: hidden;
 }
 
-.content-wrapper {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-  min-height: 0; // Important for Firefox
-}
 .main-content {
   flex: 1;
-  // min-width: 0 — lets the pane shrink to its flex slot horizontally
-  // min-height: 0 — same trick on the vertical axis; without this,
-  //   flex chains down to .p-datatable resolve to "auto" height, and
-  //   PrimeNG's scrollHeight="flex" mode has no fixed height to scroll
-  //   inside, so the body grows to fit all rows.
+  // min-width: 0 — lets the pane shrink horizontally inside its flex slot
+  // min-height: 0 — same on the vertical axis; without this, flex chains
+  //   down to .p-datatable resolve to "auto" height, and PrimeNG's
+  //   scrollHeight="flex" mode has no fixed height to scroll inside,
+  //   so the body grows to fit all rows.
   min-width: 0;
   min-height: 0;
-  // Clip overflow on BOTH axes here. The page itself does not scroll —
-  // listing pages give the table its own internal scroll on
-  // .p-datatable-wrapper. If main-content scrolled, the table would
-  // never need to.
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all var(--motion-slow) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// The announcement banner (when present) sits flush above .router-pane.
+// .router-pane carries the page padding so the banner stays full-bleed.
+.router-pane {
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
   padding: var(--space-8);
-  transition: all var(--motion-slow) cubic-bezier(0.4, 0, 0.2, 1);
 }

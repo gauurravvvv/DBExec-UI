@@ -4,15 +4,29 @@ import {
   Component,
   DestroyRef,
   HostBinding,
+  HostListener,
   inject,
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
+import { PERMISSIONS } from 'src/app/core/constants/permissions.constant';
 import { StorageType } from 'src/app/core/constants/storage-type.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import {
+  LocaleService,
+  SUPPORTED_LOCALES,
+} from 'src/app/core/services/locale.service';
+import { LoginService } from 'src/app/core/services/login.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
+import { PermissionService } from 'src/app/core/services/permission.service';
 import { StorageService } from 'src/app/core/services/storage.service';
+import { ThemeService } from 'src/app/core/services/theme.service';
+import { AddAnalysesActions } from 'src/app/modules/analyses/store';
+import { GlobalSearchService } from 'src/app/shared/services/global-search.service';
+import { NotificationModalService } from 'src/app/shared/services/notification-modal.service';
 import { SIDEBAR_ITEMS_ROUTES } from './sidebar.constant';
 
 interface MenuItem {
@@ -44,6 +58,17 @@ interface PermissionNode {
   subPermissions?: PermissionNode[];
 }
 
+/**
+ * The single layout chrome. Hosts:
+ *   - top region: brand wordmark + search icon + chevron toggle
+ *   - middle:     the permission-tree nav (scrollable)
+ *   - bottom:     notification bell + avatar + profile menu (locale, sign out)
+ *
+ * Replaces the old <app-header> + <app-footer>. Everything they
+ * carried — search trigger, notifications, locale picker, avatar
+ * menu, logout — moved here verbatim. Translation keys reused as-is
+ * (HEADER.*) so no copy work for the i18n vendor.
+ */
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
@@ -51,39 +76,33 @@ interface PermissionNode {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SidebarComponent implements OnInit {
-  /**
-   * The sidebar is open when EITHER the user has pinned it open (clicked
-   * the toggle) OR the mouse is currently peeking. The template still
-   * reads `isExpanded` everywhere; we recompute it whenever either input
-   * changes so all the existing bindings keep working unchanged.
-   */
+  // ── Nav-tree state ──────────────────────────────────────────────
+  // Hover-to-peek removed per UX call — sidebar now only opens on
+  // explicit click of the chevron handle. `isExpanded` is just the
+  // pinned-open state; the dead `isHoverPeeking`/`isPeekOverlay`
+  // flags were removed alongside their handlers.
   isExpanded = false;
-  /**
-   * User-controlled pin state (click toggle to flip). Bound to the host
-   * via .pinned-open class so the host width can change in lockstep —
-   * pinned means we PUSH content; peek floats OVER content.
-   */
   @HostBinding('class.pinned-open') isPinnedOpen = false;
-  /** Hover-driven temporary expansion. */
-  isHoverPeeking = false;
-  /** True while floating over content (peeking, not pinned). Drives the
-   *  overlay layout in CSS. */
-  isPeekOverlay = false;
   @HostBinding('class.is-mobile') isMobile = false;
   menuItems: MenuItem[] = [];
 
-  /** Small enter/leave delays so a mouse twitch across the rail doesn't
-   *  open and close the sidebar repeatedly. */
-  private static readonly PEEK_ENTER_DELAY = 120;
-  private static readonly PEEK_LEAVE_DELAY = 200;
-  private peekEnterTimer: ReturnType<typeof setTimeout> | null = null;
-  private peekLeaveTimer: ReturnType<typeof setTimeout> | null = null;
+  // ── Identity / header chrome (moved from HeaderComponent) ────────
+  organisationName = '';
+  userInitials = '';
+  userName = '';
+  /** JWT `email` claim — surfaced as the quiet identifier row at the
+   *  top of the avatar menu (Claude pattern). Falls back to the
+   *  `username` claim when email is missing from the token. */
+  userEmail = '';
+  isSystemAdmin = false;
+  showProfileMenu = false;
+  /** True while the Language flyout next to the profile menu is open. */
+  showLanguageFlyout = false;
+  locales = [...SUPPORTED_LOCALES];
+  currentLocale = 'en';
+  changingLocale = false;
 
-  /**
-   * localStorage key holding the set of expanded parent `value`s so the
-   * user's open branches survive page refreshes — the small-but-important
-   * detail Linear/Notion/Vercel sidebars all do.
-   */
+  /** localStorage key for the user's expanded-branch set. */
   private static readonly EXPANDED_STORAGE_KEY = 'sidebar.expanded';
 
   private destroyRef = inject(DestroyRef);
@@ -93,102 +112,69 @@ export class SidebarComponent implements OnInit {
     private globalService: GlobalService,
     public router: Router,
     private translate: TranslateService,
+    private store: Store,
+    private loginService: LoginService,
+    private localeService: LocaleService,
+    private themeService: ThemeService,
+    public notificationService: NotificationService,
+    private permissionService: PermissionService,
+    private globalSearchService: GlobalSearchService,
+    private notificationModalService: NotificationModalService,
   ) {
-    // Source the menu from the nested PERMISSION_TREE written by
-    // Phase 2 of login (buildSessionBootstrap). Falls back to the
-    // JWT-embedded flat list if the tree storage key is empty —
-    // that only happens transiently during the relay; the tree is
-    // populated before the user lands on a real page.
     const tree = this.readPermissionTree();
     this.menuItems = this.processMenuItems(tree);
-    // Restore the user's previously-expanded branches from localStorage
-    // so a page refresh doesn't reset their open tree.
     this.restoreExpandedState();
   }
 
   ngOnInit() {
     this.checkScreenSize();
 
-    // Re-run change detection when language changes (required for OnPush + translate pipe)
+    // Identity bootstrap (was in HeaderComponent.ngOnInit)
+    this.organisationName =
+      this.globalService.getTokenDetails('organisationName');
+    const userFullName = this.globalService.getTokenDetails('name');
+    this.userName = userFullName;
+    this.userInitials = this.globalService.chipNameProvider(userFullName);
+    // Prefer email — it's the unique identifier users recognise.
+    // Fall back to username when email isn't in the token (older JWTs).
+    this.userEmail =
+      this.globalService.getTokenDetails('email') ??
+      this.globalService.getTokenDetails('username') ??
+      '';
+    this.isSystemAdmin = this.permissionService.canRead(
+      PERMISSIONS.SYSTEM_ADMIN,
+    );
+
+    this.localeService.initFromToken();
+    this.currentLocale = this.localeService.currentLocale;
+
+    if (!this.isSystemAdmin) {
+      // Notifications are per-org; the platform System Admin has no
+      // org context so the BE would 401 on every poll. Service is
+      // idempotent so re-mount is safe.
+      this.notificationService.start();
+    }
+
+    // Re-run change detection when language changes (required for
+    // OnPush + translate pipe).
     this.translate.onLangChange
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.cdr.markForCheck());
+
     const resizeHandler = () => this.checkScreenSize();
     window.addEventListener('resize', resizeHandler);
     this.destroyRef.onDestroy(() => {
       window.removeEventListener('resize', resizeHandler);
-      this.clearPeekTimers();
     });
   }
 
-  /**
-   * Mouse enters the sidebar. If the user hasn't pinned it open, schedule
-   * a temporary expansion after PEEK_ENTER_DELAY so brief mouse-overs
-   * don't snap the rail open.
-   */
-  onSidebarMouseEnter(): void {
-    if (this.isPinnedOpen || this.isMobile) return;
-    this.cancelPeekLeave();
-    if (this.peekEnterTimer) return; // already scheduled
-    this.peekEnterTimer = setTimeout(() => {
-      this.peekEnterTimer = null;
-      this.isHoverPeeking = true;
-      this.isPeekOverlay = true;
-      this.expandMenuForCurrentRoute();
-      this.recomputeExpanded();
-    }, SidebarComponent.PEEK_ENTER_DELAY);
-  }
-
-  /**
-   * Mouse leaves the sidebar. Schedule the collapse after a slightly
-   * longer delay so users moving toward submenu items have time to
-   * cross the gap without the peek snapping closed.
-   */
-  onSidebarMouseLeave(): void {
-    if (this.isPinnedOpen || this.isMobile) return;
-    this.cancelPeekEnter();
-    if (!this.isHoverPeeking) return;
-    if (this.peekLeaveTimer) return;
-    this.peekLeaveTimer = setTimeout(() => {
-      this.peekLeaveTimer = null;
-      this.isHoverPeeking = false;
-      this.isPeekOverlay = false;
-      this.collapseAllMenus();
-      this.recomputeExpanded();
-    }, SidebarComponent.PEEK_LEAVE_DELAY);
-  }
-
-  private cancelPeekEnter(): void {
-    if (this.peekEnterTimer) {
-      clearTimeout(this.peekEnterTimer);
-      this.peekEnterTimer = null;
-    }
-  }
-
-  private cancelPeekLeave(): void {
-    if (this.peekLeaveTimer) {
-      clearTimeout(this.peekLeaveTimer);
-      this.peekLeaveTimer = null;
-    }
-  }
-
-  private clearPeekTimers(): void {
-    this.cancelPeekEnter();
-    this.cancelPeekLeave();
-  }
-
+  /** Single source of truth — open iff pinned by the chevron click. */
   private recomputeExpanded(): void {
-    this.isExpanded = this.isPinnedOpen || this.isHoverPeeking;
+    this.isExpanded = this.isPinnedOpen;
     this.cdr.markForCheck();
   }
 
-  /**
-   * Read the nested permission tree from storage. Empty array on
-   * missing / malformed JSON. The PermissionService caches its own
-   * parse for runtime checks; we re-parse here independently because
-   * the sidebar only builds its menu once at construction time and
-   * doesn't need to share a cache.
-   */
+  // ── Permission tree → menu shape ─────────────────────────────────
   private readPermissionTree(): PermissionNode[] {
     const raw = StorageService.get(StorageType.PERMISSION_TREE);
     if (!raw) return [];
@@ -200,16 +186,7 @@ export class SidebarComponent implements OnInit {
     }
   }
 
-  /**
-   * Walk the BE PermissionNode tree and shape it into the MenuItem
-   * tree the template renders. A node is included when:
-   *   - it carries `level >= 1` (a granted leaf), OR
-   *   - it has at least one descendant that does
-   *
-   * Modules with no granted children are dropped entirely so the
-   * sidebar never shows an empty section header.
-   */
-  processMenuItems(items: PermissionNode[], depth: number = 0): MenuItem[] {
+  processMenuItems(items: PermissionNode[], depth = 0): MenuItem[] {
     if (!Array.isArray(items)) return [];
 
     const result: MenuItem[] = [];
@@ -218,7 +195,6 @@ export class SidebarComponent implements OnInit {
       const processedChildren = this.processMenuItems(children, depth + 1);
       const hasGrant = typeof node.level === 'number' && node.level >= 1;
 
-      // Drop nodes that are neither granted leaves nor parents of one.
       if (!hasGrant && processedChildren.length === 0) continue;
 
       result.push({
@@ -242,22 +218,16 @@ export class SidebarComponent implements OnInit {
     return route || '';
   }
 
-  // Expand only the parent chain of the current route; collapse everything else
   private expandMenuForCurrentRoute() {
     this.collapseAllMenus();
-
     const currentUrl = this.router.url;
 
-    // Helper function to expand parent items
     const expandParents = (items: MenuItem[]): boolean => {
       for (const item of items) {
-        // Check if current route matches this item's route
         if (item.route && currentUrl.includes(item.route)) {
           item.isExpanded = true;
           return true;
         }
-
-        // Check children if they exist
         if (item.subPermissions && expandParents(item.subPermissions)) {
           item.isExpanded = true;
           return true;
@@ -269,15 +239,8 @@ export class SidebarComponent implements OnInit {
     expandParents(this.menuItems);
   }
 
-  /**
-   * Click the toggle handle: flip the pinned-open state. Pinned wins over
-   * hover-peek (clicking to pin always takes priority; clicking to unpin
-   * also cancels any in-progress peek timer).
-   */
+  // ── Toggle / expand actions ──────────────────────────────────────
   toggleSidebar() {
-    this.clearPeekTimers();
-    this.isHoverPeeking = false;
-    this.isPeekOverlay = false;
     this.isPinnedOpen = !this.isPinnedOpen;
     if (this.isPinnedOpen) {
       this.expandMenuForCurrentRoute();
@@ -307,21 +270,8 @@ export class SidebarComponent implements OnInit {
     });
   }
 
-  /**
-   * Click toggle. Linear/Notion/Vercel-style: click-only interaction, no
-   * hover-expand, no accordion auto-collapse — every branch the user
-   * opens stays open until they click it again. Multiple branches can
-   * be open simultaneously, which is the modern minimal-sidebar pattern.
-   *
-   * Closing a parent still cascades to its descendants so re-opening
-   * the parent shows it in a clean state.
-   */
   toggleSubmenuAndExpand(item: MenuItem) {
     if (!this.isExpanded) {
-      // Coming from collapsed → click on a parent icon pins the rail
-      // open (deliberate choice). Branch opens on the next tick once
-      // the width transition has started.
-      this.clearPeekTimers();
       this.isPinnedOpen = true;
       this.recomputeExpanded();
       setTimeout(() => {
@@ -338,12 +288,6 @@ export class SidebarComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  /**
-   * Persist the set of currently-expanded parent `value`s to
-   * localStorage so the open state survives a page refresh. Matches
-   * what every modern SaaS sidebar does — Linear, Notion, Vercel,
-   * Supabase, GitHub all remember which branches you opened.
-   */
   private persistExpandedState(): void {
     try {
       const open: string[] = [];
@@ -359,17 +303,10 @@ export class SidebarComponent implements OnInit {
         JSON.stringify(open),
       );
     } catch {
-      // localStorage can be unavailable (private mode, quota, etc.).
-      // Persistence is a nicety, not a correctness requirement.
+      // localStorage may be unavailable; persistence is a nicety.
     }
   }
 
-  /**
-   * Restore the expanded set saved by `persistExpandedState`. Walks
-   * the freshly-built menu tree and flips `isExpanded` on any parent
-   * whose `value` is in the stored set. Falls back to noop when the
-   * key isn't present (first-ever visit) or localStorage is blocked.
-   */
   private restoreExpandedState(): void {
     try {
       const raw = localStorage.getItem(SidebarComponent.EXPANDED_STORAGE_KEY);
@@ -383,7 +320,7 @@ export class SidebarComponent implements OnInit {
       };
       apply(this.menuItems);
     } catch {
-      // Stored payload was malformed or storage was blocked — ignore.
+      // ignore malformed payload
     }
   }
 
@@ -400,11 +337,6 @@ export class SidebarComponent implements OnInit {
     return this.router.url.includes(route);
   }
 
-  /**
-   * True when any descendant route under this item matches the current URL.
-   * Used to reflect "you are here" on the parent's collapsed-mode icon pill
-   * when the submenu itself isn't visible.
-   */
   hasActiveDescendant(item: MenuItem): boolean {
     if (!item.subPermissions?.length) return false;
     for (const child of item.subPermissions) {
@@ -423,18 +355,14 @@ export class SidebarComponent implements OnInit {
     const wasMobile = this.isMobile;
     this.isMobile = window.innerWidth <= 768;
 
-    // If transitioning to mobile/small screen
     if (!wasMobile && this.isMobile) {
-      // First collapse all menu items
       this.menuItems.forEach(item => {
         if (item.isExpanded) {
           item.isExpanded = false;
-          // Also collapse any sub-items
           if (item.subPermissions) {
             item.subPermissions.forEach(subItem => {
               if (subItem.isExpanded) {
                 subItem.isExpanded = false;
-                // Handle nested items if any
                 if (subItem.subPermissions) {
                   subItem.subPermissions.forEach(nestedItem => {
                     nestedItem.isExpanded = false;
@@ -445,13 +373,7 @@ export class SidebarComponent implements OnInit {
           }
         }
       });
-
-      // Then collapse the sidebar (force off in mobile — hover peek is
-      // disabled at this breakpoint).
       this.isPinnedOpen = false;
-      this.isHoverPeeking = false;
-      this.isPeekOverlay = false;
-      this.clearPeekTimers();
     }
 
     this.recomputeExpanded();
@@ -461,7 +383,132 @@ export class SidebarComponent implements OnInit {
     return index;
   }
 
+  trackById(_index: number, item: any): any {
+    return item.id;
+  }
+
   collapseAllAndToggle() {
     this.toggleSidebar();
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // Header chrome (moved from HeaderComponent)
+  // ─────────────────────────────────────────────────────────────────
+
+  /** Open the global search modal (rendered in the home shell). */
+  openSearchModal(): void {
+    this.globalSearchService.openSearch();
+  }
+
+  /**
+   * Notifications are a per-org concept; the platform System Admin
+   * has no org binding so the bell is hidden entirely for them.
+   */
+  get showNotificationBell(): boolean {
+    return !this.isSystemAdmin;
+  }
+
+  /**
+   * Bell click — open the notification command-modal. The modal
+   * subscribes to NotificationModalService.open$ and on open will
+   * itself call notificationService.openBell() (fetch feed +
+   * mark-as-read). The sidebar just fires the trigger.
+   */
+  openNotificationModal(): void {
+    // Close any other sidebar popovers so the modal owns the focus.
+    this.showProfileMenu = false;
+    this.showLanguageFlyout = false;
+    this.notificationModalService.open();
+  }
+
+  toggleProfileMenu(event: Event): void {
+    event.stopPropagation();
+    this.showProfileMenu = !this.showProfileMenu;
+    // Closing the profile menu also closes any open Language flyout.
+    if (!this.showProfileMenu) this.showLanguageFlyout = false;
+  }
+
+  /**
+   * Click the Language row in the profile menu. Click-toggles the
+   * flyout (in addition to the hover-driven open/close on the row
+   * itself). stopPropagation so the menu's outside-click handler
+   * doesn't immediately close everything.
+   */
+  toggleLanguageFlyout(event: Event): void {
+    event.stopPropagation();
+    this.showLanguageFlyout = !this.showLanguageFlyout;
+  }
+
+  viewProfile(): void {
+    this.showProfileMenu = false;
+    this.router.navigate(['/app/profile']);
+  }
+
+  /**
+   * Locale list inside the avatar menu. Calling LocaleService applies
+   * the locale; if the user landed via `?locale=` we strip the temp
+   * preview param so a future reload doesn't clobber the persisted
+   * choice (matches what the header dropdown did).
+   */
+  async onLocaleChange(localeCode: string): Promise<void> {
+    if (this.changingLocale || localeCode === this.currentLocale) return;
+    this.changingLocale = true;
+    await this.localeService.changeLocale(localeCode);
+    this.currentLocale = localeCode;
+
+    const currentTree = this.router.parseUrl(this.router.url);
+    if (currentTree.queryParams['locale'] !== undefined) {
+      const { locale: _drop, ...keep } = currentTree.queryParams;
+      const path =
+        currentTree.root.children['primary']?.segments
+          .map(s => '/' + s.path)
+          .join('') || '/';
+      this.router.navigate([path], { queryParams: keep, replaceUrl: true });
+    }
+
+    this.changingLocale = false;
+    this.cdr.markForCheck();
+  }
+
+  logout(): void {
+    this.loginService
+      .logout()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => this.clearSessionAndNavigate(),
+        error: () => this.clearSessionAndNavigate(),
+      });
+  }
+
+  private clearSessionAndNavigate(): void {
+    this.store.dispatch(AddAnalysesActions.clearAllDatasets());
+    StorageService.clear();
+    // Drop the injected org theme so the login page paints with
+    // default DBExec palette.
+    this.themeService.clear();
+    // Drop the PermissionService cache so the next user's bootstrap
+    // hydrates a clean tree.
+    this.permissionService.reset();
+    this.router.navigate(['/login']);
+  }
+
+  /**
+   * Click-outside handler — close the avatar menu (and its language
+   * flyout) when the user clicks anywhere that's not the avatar
+   * trigger or one of the menus themselves. The notification panel
+   * is now its own modal with its own dismiss logic, so it's not
+   * handled here.
+   */
+  @HostListener('document:click', ['$event'])
+  handleClickOutside(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (
+      !target.closest('.user-profile') &&
+      !target.closest('.profile-menu') &&
+      !target.closest('.language-flyout')
+    ) {
+      this.showProfileMenu = false;
+      this.showLanguageFlyout = false;
+    }
   }
 }

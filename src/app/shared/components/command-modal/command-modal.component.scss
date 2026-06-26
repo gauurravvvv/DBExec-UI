@@ -1,0 +1,188 @@
+// ===================================================================
+// Command Modal — generic palette shell. Used by both global search
+// and the notification modal. Wide rectangle near the top of the
+// viewport, dimmed backdrop. Matches the Claude command-palette
+// pattern.
+// ===================================================================
+
+.cmd-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: var(--z-modal);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 80px;
+  animation: cmd-fade-in 0.12s ease-out;
+}
+
+.cmd-modal {
+  width: 720px;
+  max-width: 92vw;
+  max-height: calc(100vh - 160px);
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: cmd-slide-in 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+// ── Header (input variant) ────────────────────────────────────────
+.cmd-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--card-background);
+}
+
+.cmd-search-icon {
+  font-size: var(--fs-h2);
+  color: var(--secondary-color);
+  flex-shrink: 0;
+}
+
+.cmd-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: var(--fs-h3);
+  color: var(--text-color);
+  font-family: inherit;
+
+  &::placeholder {
+    color: var(--secondary-color);
+    opacity: 0.85;
+  }
+}
+
+// ── Header (plain variant — title + action) ───────────────────────
+.cmd-header-plain {
+  justify-content: space-between;
+}
+
+.cmd-title {
+  margin: 0;
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-semibold);
+  color: var(--text-color);
+  line-height: 1.2;
+}
+
+.cmd-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.cmd-header-action {
+  background: transparent;
+  border: none;
+  color: var(--primary-color);
+  font-size: var(--fs-control);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  transition: background var(--motion-fast) ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(var(--primary-color-rgb), 0.1);
+  }
+
+  &:disabled {
+    color: var(--secondary-color);
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// ── Close button (shared by both header variants) ─────────────────
+.cmd-close {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--secondary-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition:
+    background var(--motion-fast) ease,
+    color var(--motion-fast) ease;
+
+  i {
+    font-size: var(--fs-body);
+  }
+
+  &:hover {
+    background: var(--hover-background);
+    color: var(--text-color);
+  }
+}
+
+// ── Body (scrolls; header stays pinned) ───────────────────────────
+.cmd-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+
+  // Custom scrollbar — thin, only on hover.
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+
+  &:hover {
+    scrollbar-color: var(--border-color) transparent;
+  }
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: var(--radius-xs);
+    transition: background var(--motion-base) ease;
+  }
+  &:hover::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+  }
+}
+
+// ── Mobile / narrow ───────────────────────────────────────────────
+@media (max-width: 768px) {
+  .cmd-backdrop {
+    padding-top: 24px;
+    padding-inline: 12px;
+  }
+
+  .cmd-modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100vh - 48px);
+  }
+}
+
+// ── Animations ────────────────────────────────────────────────────
+@keyframes cmd-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes cmd-slide-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}

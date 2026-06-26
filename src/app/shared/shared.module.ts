@@ -21,7 +21,9 @@ import { CustomRadioComponent } from './components/custom-radio/custom-radio.com
 import { CustomRangesliderComponent } from './components/custom-rangeslider/custom-rangeslider.component';
 import { CustomTextareaComponent } from './components/custom-textarea/custom-textarea.component';
 import { CustomToggleComponent } from './components/custom-toggle/custom-toggle.component';
+import { CommandModalComponent } from './components/command-modal/command-modal.component';
 import { GlobalSearchComponent } from './components/global-search/global-search.component';
+import { NotificationModalComponent } from './components/notification-modal/notification-modal.component';
 import { AppPrimeNGModule } from './modules/app-primeng.module';
 import { FileSizePipe } from './pipes/file-size.pipe';
 import {
@@ -50,7 +52,9 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     CustomRangesliderComponent,
     CustomTextareaComponent,
     CustomToggleComponent,
+    CommandModalComponent,
     GlobalSearchComponent,
+    NotificationModalComponent,
     AddCustomFieldDialogComponent,
     SaveAnalysesDialogComponent,
     DatasetPickerDialogComponent,
@@ -88,7 +92,9 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     CustomRangesliderComponent,
     CustomTextareaComponent,
     CustomToggleComponent,
+    CommandModalComponent,
     GlobalSearchComponent,
+    NotificationModalComponent,
     AddCustomFieldDialogComponent,
     SaveAnalysesDialogComponent,
     DatasetPickerDialogComponent,

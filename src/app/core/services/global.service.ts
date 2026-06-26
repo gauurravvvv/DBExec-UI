@@ -153,6 +153,8 @@ export class GlobalService {
           return decodeToken?.role;
         case 'username':
           return decodeToken?.username;
+        case 'email':
+          return decodeToken?.email;
         case 'organisationName':
           return decodeToken?.organisation;
         case 'organisationId':

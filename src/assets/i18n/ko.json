@@ -284,7 +284,9 @@
     "NEXT": "다음",
     "DARK_MODE": "Switch to Dark Mode",
     "LIGHT_MODE": "Switch to Light Mode",
-    "BLACK_MODE": "Switch to Black Mode"
+    "BLACK_MODE": "Switch to Black Mode",
+    "LANGUAGE": "언어",
+    "SEARCH": "검색"
   },
   "PROFILE": {
     "TITLE": "내 프로필",
@@ -2637,7 +2639,12 @@
     "GROUP_ADDED_TITLE": "그룹에 할당됨",
     "GROUP_ADDED_BODY": "{{groupName}} 그룹에 할당되었습니다.",
     "GROUP_REMOVED_TITLE": "그룹에서 제거됨",
-    "GROUP_REMOVED_BODY": "{{groupName}} 그룹에서 제거되었습니다."
+    "GROUP_REMOVED_BODY": "{{groupName}} 그룹에서 제거되었습니다.",
+    "GROUP_TODAY": "오늘",
+    "GROUP_YESTERDAY": "어제",
+    "GROUP_THIS_WEEK": "이번 주",
+    "GROUP_THIS_MONTH": "이번 달",
+    "GROUP_OLDER": "이전"
   },
   "MENU": {
     "SECURITY_POLICY": "보안 정책",

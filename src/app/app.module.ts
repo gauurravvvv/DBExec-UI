@@ -55,8 +55,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpErrorInterceptor } from './core/interceptors/http-error.interceptor';
 import { HttpRequestInterceptor } from './core/interceptors/http-request.interceptor';
-import { FooterComponent } from './core/layout/footer/footer.component';
-import { HeaderComponent } from './core/layout/header/header.component';
+import { AnnouncementBannerComponent } from './core/layout/announcement-banner/announcement-banner.component';
 import { HomeComponent } from './core/layout/home/home.component';
 import { SidebarComponent } from './core/layout/sidebar/sidebar.component';
 import { AuthModule } from './modules/auth/auth.module';
@@ -67,9 +66,8 @@ import { SharedModule } from './shared/shared.module';
   declarations: [
     AppComponent,
     HomeComponent,
-    HeaderComponent,
     SidebarComponent,
-    FooterComponent,
+    AnnouncementBannerComponent,
   ],
   imports: [
     AppRoutingModule,

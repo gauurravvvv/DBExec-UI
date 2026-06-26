@@ -1,98 +1,86 @@
-<!-- Search Modal Overlay -->
-<div
-  class="search-overlay"
-  *ngIf="showSearchModal"
-  (click)="closeSearchModal()"
+<app-command-modal
+  [isOpen]="showSearchModal"
+  [showInput]="true"
+  [inputPlaceholder]="'SEARCH.PLACEHOLDER' | translate"
+  [inputValue]="searchTerm"
+  (inputChange)="onSearchInput($event)"
+  (closed)="closeSearchModal()"
 >
-  <div class="search-modal" (click)="$event.stopPropagation()">
-    <!-- Search Input -->
-    <div class="search-header">
-      <i class="pi pi-search search-icon"></i>
-      <input
-        #searchInput
-        type="text"
-        [(ngModel)]="searchTerm"
-        (input)="onSearch()"
-        [placeholder]="'SEARCH.PLACEHOLDER' | translate"
-        class="search-input"
-        autocomplete="off"
-        spellcheck="false"
-      />
-      <kbd class="esc-hint" (click)="closeSearchModal()">ESC</kbd>
-    </div>
+  <!-- Filter chips (only shown when there are results to filter) -->
+  <div class="search-filters" *ngIf="uniqueEntityTypes.length > 0">
+    <button
+      type="button"
+      class="filter-chip"
+      [class.active]="activeFilter === 'ALL'"
+      (click)="setFilter('ALL')"
+    >
+      {{ 'SEARCH.ALL' | translate }}
+      <span class="chip-count">{{ searchResults.length }}</span>
+    </button>
+    <button
+      type="button"
+      class="filter-chip"
+      *ngFor="let type of uniqueEntityTypes; trackBy: trackByIndex"
+      [class.active]="activeFilter === type"
+      (click)="setFilter(type)"
+    >
+      {{ type }}
+      <span class="chip-count">{{ getCountForType(type) }}</span>
+    </button>
+  </div>
 
-    <!-- Filter Tabs -->
-    <div class="search-filters" *ngIf="uniqueEntityTypes.length > 0">
-      <button
-        class="filter-chip"
-        [class.active]="activeFilter === 'ALL'"
-        (click)="setFilter('ALL')"
-      >
-        {{ 'SEARCH.ALL' | translate }}
-        <span class="chip-count">{{ searchResults.length }}</span>
-      </button>
-      <button
-        class="filter-chip"
-        *ngFor="let type of uniqueEntityTypes; trackBy: trackByIndex"
-        [class.active]="activeFilter === type"
-        (click)="setFilter(type)"
-      >
-        {{ type }}
-        <span class="chip-count">{{ getCountForType(type) }}</span>
-      </button>
-    </div>
-
-    <!-- Results -->
-    <div class="search-results" *ngIf="searchResults.length > 0">
-      <div
-        class="result-item"
-        *ngFor="let result of filteredSearchResults; trackBy: trackById"
-        (click)="navigateToResult(result)"
-      >
-        <div class="result-icon">
-          <i [class]="result.icon"></i>
+  <!-- Results -->
+  <div class="search-results" *ngIf="searchResults.length > 0">
+    <div
+      class="result-item"
+      *ngFor="let result of filteredSearchResults; let i = index; trackBy: trackById"
+      [class.is-selected]="i === selectedIndex"
+      (click)="navigateToResult(result)"
+      (mouseenter)="selectedIndex = i"
+    >
+      <div class="result-icon">
+        <i [class]="result.icon"></i>
+      </div>
+      <div class="result-info">
+        <span class="result-name">{{ result.title }}</span>
+        <div class="result-detail">
+          <span class="result-tag">{{ result.entityType }}</span>
+          <ng-container *ngIf="result.breadcrumb">
+            <i class="pi pi-chevron-right breadcrumb-arrow"></i>
+            <span class="result-path">{{ result.breadcrumb }}</span>
+          </ng-container>
         </div>
-        <div class="result-info">
-          <span class="result-name">{{ result.title }}</span>
-          <div class="result-detail">
-            <span class="result-tag">{{ result.entityType }}</span>
-            <ng-container *ngIf="result.breadcrumb">
-              <i class="pi pi-chevron-right breadcrumb-arrow"></i>
-              <span class="result-path">{{ result.breadcrumb }}</span>
-            </ng-container>
-          </div>
-        </div>
-        <i class="pi pi-arrow-right result-go"></i>
       </div>
-    </div>
-
-    <!-- Empty State -->
-    <div class="empty-state" *ngIf="searchTerm && searchResults.length === 0">
-      <i class="pi pi-search empty-icon"></i>
-      <p class="empty-text">
-        {{ 'SEARCH.NO_RESULTS' | translate }}
-        <strong>"{{ searchTerm }}"</strong>
-      </p>
-      <p class="empty-sub">{{ 'SEARCH.TRY_DIFFERENT' | translate }}</p>
-    </div>
-
-    <!-- Idle State -->
-    <div class="idle-state" *ngIf="!searchTerm">
-      <i class="pi pi-search idle-icon"></i>
-      <p class="idle-text">{{ 'SEARCH.SEARCH_ACROSS' | translate }}</p>
-    </div>
-
-    <!-- Footer -->
-    <div class="search-footer">
-      <div class="shortcut">
-        <kbd>↑</kbd><kbd>↓</kbd><span>{{ 'SEARCH.NAVIGATE' | translate }}</span>
-      </div>
-      <div class="shortcut">
-        <kbd>↵</kbd><span>{{ 'SEARCH.OPEN' | translate }}</span>
-      </div>
-      <div class="shortcut">
-        <kbd>ESC</kbd><span>{{ 'SEARCH.CLOSE' | translate }}</span>
-      </div>
+      <i class="pi pi-arrow-right result-go"></i>
     </div>
   </div>
-</div>
+
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="searchTerm && searchResults.length === 0 && !loading()">
+    <i class="pi pi-search empty-icon"></i>
+    <p class="empty-text">
+      {{ 'SEARCH.NO_RESULTS' | translate }}
+      <strong>"{{ searchTerm }}"</strong>
+    </p>
+    <p class="empty-sub">{{ 'SEARCH.TRY_DIFFERENT' | translate }}</p>
+  </div>
+
+  <!-- Idle state -->
+  <div class="idle-state" *ngIf="!searchTerm">
+    <i class="pi pi-search idle-icon"></i>
+    <p class="idle-text">{{ 'SEARCH.SEARCH_ACROSS' | translate }}</p>
+  </div>
+
+  <!-- Footer keyboard hints -->
+  <div class="search-footer">
+    <div class="shortcut">
+      <kbd>↑</kbd><kbd>↓</kbd><span>{{ 'SEARCH.NAVIGATE' | translate }}</span>
+    </div>
+    <div class="shortcut">
+      <kbd>↵</kbd><span>{{ 'SEARCH.OPEN' | translate }}</span>
+    </div>
+    <div class="shortcut">
+      <kbd>ESC</kbd><span>{{ 'SEARCH.CLOSE' | translate }}</span>
+    </div>
+  </div>
+</app-command-modal>

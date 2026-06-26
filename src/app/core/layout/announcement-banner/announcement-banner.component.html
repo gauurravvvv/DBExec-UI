@@ -1,0 +1,59 @@
+<!-- Announcement Banner (multi-queue) -->
+<div class="announcement-banner" *ngIf="currentAnnouncement" [ngStyle]="{
+    background: currentAnnouncement.bgColor,
+    color: currentAnnouncement.textColor,
+  }">
+  <div class="banner-shimmer"></div>
+  <div class="banner-glow-left"></div>
+  <div class="banner-glow-right"></div>
+  <div class="banner-content">
+    <div class="banner-text-wrapper">
+      <span class="banner-label" (click)="openAnnouncementPopup()">
+        {{ 'HEADER.ANNOUNCEMENT' | translate }}
+        <span *ngIf="announcements.length > 1" class="banner-count">
+          ({{ currentAnnouncementIndex + 1 }}/{{ announcements.length }})
+        </span>
+      </span>
+      <span class="banner-divider">|</span>
+      <span class="banner-message" (click)="openAnnouncementPopup()">
+        {{ typedMessage }}<span class="typewriter-cursor" *ngIf="isTyping">|</span>
+      </span>
+    </div>
+    <div class="banner-controls" *ngIf="announcements.length > 1">
+      <button class="banner-nav-btn" (click)="prevAnnouncement()" [pTooltip]="'HEADER.PREVIOUS' | translate"
+        tooltipPosition="bottom">
+        <i class="pi pi-chevron-left"></i>
+      </button>
+      <button class="banner-nav-btn" (click)="nextAnnouncement()" [pTooltip]="'HEADER.NEXT' | translate"
+        tooltipPosition="bottom">
+        <i class="pi pi-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Announcement Popup -->
+<div class="announcement-popup-backdrop" *ngIf="showAnnouncementOverlay && currentAnnouncement"
+  (click)="showAnnouncementOverlay = false">
+  <div class="announcement-popup" (click)="$event.stopPropagation()">
+    <div class="popup-accent" [ngStyle]="{ background: currentAnnouncement.bgColor }"></div>
+    <div class="popup-inner">
+      <div class="popup-header-row">
+        <span class="popup-tag" [ngStyle]="{ color: currentAnnouncement.bgColor }">
+          {{ 'HEADER.ANNOUNCEMENT' | translate }}
+        </span>
+      </div>
+      <h3 class="popup-title">{{ currentAnnouncement.name }}</h3>
+      <p class="popup-description">{{ currentAnnouncement.description }}</p>
+      <div class="popup-footer-row">
+        <label class="do-not-show">
+          <p-checkbox [(ngModel)]="doNotShowAgain" [binary]="true"></p-checkbox>
+          <span>{{ 'HEADER.DO_NOT_SHOW_AGAIN' | translate }}</span>
+        </label>
+        <button class="popup-btn" (click)="closeAnnouncementPopup()">
+          {{ 'HEADER.DISMISS' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

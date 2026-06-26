@@ -1,0 +1,67 @@
+<div *ngIf="isOpen" class="cmd-backdrop" (click)="onBackdropClick($event)">
+  <div
+    #modalRoot
+    class="cmd-modal"
+    role="dialog"
+    aria-modal="true"
+    tabindex="-1"
+    (click)="onContentClick($event)"
+  >
+    <!-- Header — either a search input row or a plain title row with
+         an optional action button. The whole header is sticky on top
+         of the scroll body. -->
+    <div class="cmd-header" *ngIf="showInput; else titleHeader">
+      <i class="pi pi-search cmd-search-icon" aria-hidden="true"></i>
+      <input
+        #searchInput
+        type="text"
+        class="cmd-input"
+        [value]="inputValue"
+        [placeholder]="inputPlaceholder"
+        (input)="onInputInput($event)"
+        (keydown.enter)="onInputEnter(); $event.preventDefault()"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button
+        type="button"
+        class="cmd-close"
+        (click)="onCloseClick()"
+        aria-label="Close"
+      >
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <ng-template #titleHeader>
+      <div class="cmd-header cmd-header-plain">
+        <h2 class="cmd-title" *ngIf="title">{{ title }}</h2>
+        <div class="cmd-header-right">
+          <button
+            *ngIf="headerActionLabel"
+            type="button"
+            class="cmd-header-action"
+            [disabled]="headerActionDisabled"
+            (click)="onHeaderActionClick()"
+          >
+            {{ headerActionLabel }}
+          </button>
+          <button
+            type="button"
+            class="cmd-close"
+            (click)="onCloseClick()"
+            aria-label="Close"
+          >
+            <i class="pi pi-times" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </ng-template>
+
+    <!-- Body — the consumer projects its row list here. The scroll
+         lives inside .cmd-body so the header stays pinned. -->
+    <div class="cmd-body">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>

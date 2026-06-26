@@ -284,7 +284,9 @@
     "NEXT": "Próximo",
     "DARK_MODE": "Switch to Dark Mode",
     "LIGHT_MODE": "Switch to Light Mode",
-    "BLACK_MODE": "Switch to Black Mode"
+    "BLACK_MODE": "Switch to Black Mode",
+    "LANGUAGE": "Idioma",
+    "SEARCH": "Pesquisar"
   },
   "PROFILE": {
     "TITLE": "Meu perfil",
@@ -2637,7 +2639,12 @@
     "GROUP_ADDED_TITLE": "Atribuído a um grupo",
     "GROUP_ADDED_BODY": "Você foi atribuído a {{groupName}}.",
     "GROUP_REMOVED_TITLE": "Removido de um grupo",
-    "GROUP_REMOVED_BODY": "Você foi removido de {{groupName}}."
+    "GROUP_REMOVED_BODY": "Você foi removido de {{groupName}}.",
+    "GROUP_TODAY": "Hoje",
+    "GROUP_YESTERDAY": "Ontem",
+    "GROUP_THIS_WEEK": "Esta semana",
+    "GROUP_THIS_MONTH": "Este mês",
+    "GROUP_OLDER": "Mais antigos"
   },
   "MENU": {
     "SECURITY_POLICY": "Política de segurança",

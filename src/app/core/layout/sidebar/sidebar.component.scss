@@ -1,6 +1,7 @@
 // ===================================================================
-// Sidebar — Confident Modern (B option)
-// Single source of truth. No duplicate blocks below.
+// Sidebar — Single layout chrome
+// Top (brand + search + chevron) · Middle (nav, scrollable) · Bottom
+// (notification bell + avatar). Replaces the old header + footer.
 // ===================================================================
 
 // Host element holds the in-flow width. When the sidebar is peeking the
@@ -10,9 +11,9 @@
 :host {
   display: block;
   width: 64px;
-  height: 100%; // bound to .content-wrapper, not viewport
+  height: 100%;
   flex-shrink: 0;
-  position: relative; // anchors the absolute-positioned peek overlay
+  position: relative; // anchors the absolute peek overlay + floating panels
   transition: width var(--motion-base) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -31,9 +32,6 @@
   height: 100%;
   background: var(--card-background);
   border-right: 1px solid var(--border-color);
-  // Animate width AND box-shadow together so the panel grows and the
-  // overlay drop-shadow fade in lockstep — no shadow snap when peeking
-  // begins or ends.
   transition:
     width var(--motion-base) var(--ease-in-out),
     box-shadow var(--motion-base) var(--ease-in-out);
@@ -50,43 +48,16 @@
     position: fixed;
     z-index: var(--z-overlay);
   }
-
-  // Peek mode: the sidebar floats over the main content area. Bounded
-  // by .content-wrapper (height: 100%) so the overlay never spills over
-  // the top header band.
-  &.peek-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 240px;
-    height: 100%;
-    z-index: var(--z-overlay);
-    box-shadow: var(--shadow-lg);
-  }
 }
 
-// ── Header slot ─────────────────────────────────────────────────────
-// The toggle is absolutely positioned onto the sidebar's right divider
-// in both modes (circular "click here to collapse" handle), so the
-// header slot itself has zero height — nav content starts flush with
-// the top of the sidebar.
-.sidebar-header {
-  height: 0;
-  padding: 0;
-  overflow: visible; // let the absolutely-positioned toggle escape
-  flex-shrink: 0;
-}
-
-// Semi-circle handle pinned to the right divider — flat side flush
-// against the sidebar edge, curved side bulging into the content area.
-// Classic "tab" affordance. Same treatment in both expanded and
-// collapsed modes.
+// ── Chevron handle: semi-circle pinned to the right divider ────────
+// Same affordance as the pre-refactor sidebar — flat edge flush
+// against the sidebar's right border, curved edge bulging into the
+// content area. Floats absolutely, doesn't reserve layout space.
 .toggle-btn {
   width: 14px;
   height: 44px;
   border: 1px solid var(--border-color);
-  // Hide the left side of the border so the flat edge sits cleanly
-  // against the sidebar's right divider.
   border-left: none;
   background: var(--card-background);
   color: var(--secondary-color);
@@ -95,15 +66,11 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  // Round only the right edge — left side stays square against the
-  // sidebar divider, right side curves out.
   border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
   box-shadow: var(--shadow-sm);
   position: absolute;
-  top: 12px;
+  top: 18px;
   right: 0;
-  // Push the handle entirely outside the sidebar so its flat left edge
-  // aligns with the sidebar's right border.
   transform: translateX(100%);
   z-index: var(--z-elevated);
   transition:
@@ -120,13 +87,239 @@
   }
 }
 
-// ── Scrollable content area ──────────────────────────────────────────
+// ── TOP region: brand + search ─────────────────────────────────────
+.sidebar-top {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 14px 12px 12px;
+  border-bottom: 1px solid transparent;
+  min-height: 56px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  text-decoration: none;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  padding: 4px 6px;
+  margin: -4px -6px;
+  // Hover affordance intentionally removed — the brand wordmark is
+  // a static label, not a button-ish target.
+
+  .brand-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    filter: var(--icon-filter);
+  }
+
+  .brand-text {
+    font-size: var(--fs-h1);
+    font-weight: var(--fw-bold);
+    letter-spacing: -0.4px;
+    font-family: var(--font-brand);
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: opacity var(--motion-fast) ease;
+
+    .brand-highlight {
+      background: linear-gradient(135deg, #2196f3, #42a5f5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  }
+}
+
+// Cluster of action icons (bell + search) in the top row.
+.sidebar-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+// ── BOTTOM region: avatar only (bell moved to .sidebar-top) ────────
+.sidebar-bottom {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 10px 12px 14px;
+  border-top: 1px solid var(--border-color);
+  position: relative; // anchors the floating menus below
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  cursor: pointer;
+  padding: 4px 6px;
+  margin: -4px -6px;
+  flex: 1;
+  min-width: 0;
+  // Hover affordance intentionally removed — the chrome stays calm;
+  // affordance comes from the cursor + the popup the click reveals.
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: var(--primary-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--fs-label);
+    font-weight: var(--fw-semibold);
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px var(--primary-color-transparent);
+  }
+
+  .user-meta {
+    flex: 1;
+    min-width: 0;
+
+    .user-name {
+      font-size: var(--fs-control);
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+    }
+
+    .user-org {
+      font-size: var(--fs-micro);
+      color: var(--secondary-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+      margin-top: 1px;
+    }
+  }
+}
+
+// ── Icon buttons (search, chevron, bell) ───────────────────────────
+.icon-btn {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--secondary-color);
+  transition: color var(--motion-fast) ease;
+
+  i {
+    font-size: var(--fs-h3);
+    transition: color var(--motion-fast) ease;
+    pointer-events: none;
+  }
+
+  // Hover background removed per design call — keep the colour-tint
+  // on hover only, so the cluster stays visually quiet.
+  &:hover {
+    color: var(--text-color);
+
+    i {
+      color: var(--text-color);
+    }
+  }
+
+  &.notification-btn {
+    overflow: visible;
+
+    .badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background: var(--error-color);
+      color: var(--primary-text);
+      border-radius: var(--radius-pill);
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      font-size: 10px;
+      font-weight: var(--fw-bold);
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--card-background);
+      box-sizing: border-box;
+      pointer-events: none;
+      animation: badge-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+  }
+}
+
+// ── Collapsed mode: stack everything vertically, hide text ─────────
+.sidebar.collapsed {
+  .sidebar-top {
+    justify-content: center;     // centre the lone brand icon
+    padding: 14px 0 8px;
+    min-height: auto;
+  }
+
+  .brand {
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+
+    .brand-icon {
+      // Belt + braces: explicit horizontal centring of the icon glyph
+      // inside the full-width brand link.
+      margin: 0 auto;
+    }
+
+    .brand-text {
+      display: none;
+    }
+  }
+
+  .sidebar-bottom {
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 0 14px;
+    gap: 6px;
+  }
+
+  .user-profile {
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+
+    .user-meta {
+      display: none;
+    }
+  }
+}
+
+// ── Scrollable middle ──────────────────────────────────────────────
 .sidebar-content {
   flex: 1;
   overflow-y: auto;
   padding: 4px 0 12px;
+  min-height: 0; // critical for flex children that need to scroll
 
-  // Modern scrollbar — invisible until you actually scroll, then thin.
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
 
@@ -161,9 +354,7 @@
   margin: var(--space-0);
 }
 
-// ── Nav item — the row that holds an icon + label ──────────────────
-// Stable type metrics (font-weight + letter-spacing don't change on hover or
-// active) so rows never re-flow.
+// ── Nav row (icon + label) ─────────────────────────────────────────
 .nav-link,
 .submenu-link,
 .submenu-item > a,
@@ -171,15 +362,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.625rem 0.9rem; // bumped from 0.5/0.85 — more breathing room
-  margin: 0px 8px; // bumped vertical margin slightly too
+  padding: 0.625rem 0.9rem;
+  margin: 0px 8px;
   border-radius: var(--radius-sm);
-  font-size: var(
-    --fs-body
-  ); // 14px instead of 13 — sidebar text now matches body
-  font-weight: var(
-    --fw-semibold
-  ); // 600 — a touch bolder so labels carry presence
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
   color: var(--text-color);
   text-decoration: none;
   cursor: pointer;
@@ -200,10 +387,10 @@
     min-width: 0;
 
     i {
-      min-width: 24px; // bumped from 20 to keep parity with new icon size
+      min-width: 24px;
       display: flex;
       justify-content: center;
-      font-size: var(--fs-h3); // 15px icon glyph — slightly larger than text
+      font-size: var(--fs-h3);
       color: var(--secondary-color);
       transition: color var(--motion-fast) ease;
     }
@@ -213,8 +400,6 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      // Fade the label in/out as the sidebar transitions between modes.
-      // Always rendered (no *ngIf) so layout doesn't reflow.
       opacity: 1;
       transition: opacity var(--motion-fast) ease;
     }
@@ -240,13 +425,6 @@
 }
 
 // ── Active state ───────────────────────────────────────────────────
-// Expanded mode: 3px left-accent + brand-tinted background. Font weight
-// stays at 500 so the row width does not change on selection — a small
-// industry standard from Linear/Stripe/Vercel.
-//
-// Angular's routerLinkActive puts `.active` directly on the <a>/<div>
-// element, not on its <li> parent. So the active selectors target the
-// link element itself at every depth.
 .nav-link.active,
 .submenu-link.active,
 .submenu-item > a.active,
@@ -260,8 +438,6 @@
   }
 }
 
-// Collapsed mode: drop the left bar (it's only 64px wide), keep the
-// brand-tinted background pill so the icon still reads "you are here".
 .sidebar.collapsed {
   .nav-link.active,
   .submenu-link.active,
@@ -271,10 +447,6 @@
     margin: 1px 8px;
   }
 
-  // Parent reflection in collapsed mode — when the submenu isn't visible,
-  // the rail must still indicate which section is active. We use the
-  // brand-tinted pill on the parent (same family as the active state)
-  // because nothing else is on screen to compete with it.
   .nav-link.has-active-child,
   .submenu-link.has-active-child {
     background: var(--primary-color-transparent);
@@ -286,11 +458,6 @@
   }
 }
 
-// Expanded mode: parent of an active child gets a neutral hover-grey
-// background (Linear / Stripe convention) plus a brand-coloured icon —
-// strong enough to anchor the open branch, soft enough that the active
-// CHILD remains the dominant visual cue. The brand tint stays reserved
-// for the actual active row.
 .nav-link.has-active-child:not(.active),
 .submenu-link.has-active-child:not(.active) {
   background: var(--hover-background);
@@ -300,8 +467,7 @@
   }
 }
 
-// ── Section group headers (uppercase, secondary, small) ────────────
-// Only visible in expanded mode — collapsed rail keeps just icons.
+// ── Section group headers ──────────────────────────────────────────
 .section-label {
   font-size: var(--fs-micro);
   font-weight: var(--fw-semibold);
@@ -314,8 +480,6 @@
   text-overflow: ellipsis;
 }
 
-// Thin divider used in collapsed mode in place of text labels so groups
-// are still visually distinct.
 .sidebar.collapsed .section-label {
   display: block;
   font-size: 0;
@@ -328,11 +492,7 @@
   }
 }
 
-// ── Submenu (animated open/close) ──────────────────────────────────
-// Closed state: every item is clipped via max-height + opacity. When the
-// parent flips .expanded on, items reveal with a short slide. We do this
-// per-item instead of on the <ul> so closing a parent reliably hides
-// every descendant regardless of how deep the tree goes.
+// ── Submenu animation ──────────────────────────────────────────────
 .submenu,
 .nested-submenu {
   list-style: none;
@@ -354,14 +514,11 @@
 
 .submenu.expanded > .submenu-item,
 .nested-submenu.expanded > .nested-submenu-item {
-  // Plenty of headroom for deep menus; max-height only animates the visible
-  // bound, not the actual rendered height.
   max-height: 600px;
   opacity: 1;
   transform: translateY(0);
 }
 
-// Indent submenu items so the hierarchy reads at a glance.
 .submenu-item > .submenu-link,
 .submenu-item > a {
   padding-left: 2.4rem;
@@ -374,11 +531,6 @@
 
 // ── Collapsed mode: hide labels, hide arrows, hide submenus ────────
 .sidebar.collapsed {
-  // Hide labels and chevrons via `display: none` in the collapsed state —
-  // we tried opacity-only for animation smoothness, but the labels kept
-  // leaking past the 64px rail and overflowing into the content area.
-  // The expand animation still feels clean because the label nodes
-  // mount fresh when the panel opens.
   .nav-link .link-content .nav-text,
   .submenu-link .link-content .nav-text {
     display: none;
@@ -389,8 +541,6 @@
     display: none;
   }
 
-  // Guard against any leak: rows must never spill past their pill, and
-  // their content cluster must not stretch.
   .nav-link,
   .submenu-link,
   .submenu-item > a,
@@ -404,12 +554,6 @@
     display: none;
   }
 
-  // Top-level nav rows in collapsed mode. The earlier nested selector also
-  // matched .submenu-item > a, which carries an inherited padding-left of
-  // 2.4rem from the indent rule — that pushed the icon off-center inside
-  // its pill. Here we reset the padding back to symmetrical and stop the
-  // .link-content from stretching, so the icon sits in the middle of the
-  // 48px-wide pill instead of hugging its left edge.
   .nav-link,
   .submenu-link,
   .submenu-item > a,
@@ -421,23 +565,278 @@
     margin: 1px 8px;
 
     .link-content {
-      flex: 0 0 auto; // do not stretch — keep content compact
+      flex: 0 0 auto;
       justify-content: center;
       gap: var(--space-0);
-      width: 100%; // pill is 48px wide; let content fill it
-      // so justify-content centers the lone icon
+      width: 100%;
 
       i {
         min-width: 0;
-        margin: 0 auto; // belt + braces: explicit horizontal centring
+        margin: 0 auto;
       }
     }
   }
 
-  // Submenus stay closed in collapsed mode — click on parent icon expands
-  // the whole rail first (handled in TS), so we don't need fly-out panels.
   .submenu,
   .nested-submenu {
     display: none;
   }
+}
+
+// ── Floating panels (notification + profile) ───────────────────────
+// Rendered OUTSIDE <aside>. Anchored to the bottom-left corner of the
+// host via :host { position: relative }. Offset by 64px (rail width)
+// when collapsed, by 240px when expanded — controlled with the
+// .collapsed-anchor modifier.
+
+// Profile menu popover — visual base + positioning.
+// (Notifications are now a full command-modal, not an inline panel,
+// so the rules below only apply to .profile-menu.)
+.profile-menu {
+  position: absolute;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: calc(var(--z-overlay) + 1);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--motion-base) ease,
+    transform var(--motion-base) ease,
+    visibility 0s linear var(--motion-base);
+
+  &.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    transition-delay: 0s;
+  }
+
+  // Sits ABOVE the avatar. Bottom offset clears the avatar row
+  // (~58px incl padding) + 8px breathing gap.
+  bottom: calc(58px + 8px);
+  transform: translateY(8px) scale(0.98);
+  transform-origin: bottom center;
+
+  // Expanded sidebar: fit inside the rail column with 8px gutters.
+  left: 8px;
+  right: 8px;
+  max-width: 224px;
+
+  // Collapsed sidebar (64px rail): 260px panel can't fit inside, so
+  // anchor its LEFT edge 8px into the rail and let the rest overflow
+  // into the page area.
+  &.collapsed-anchor {
+    left: 8px;
+    right: auto;
+    max-width: none;
+    width: 260px;
+    transform-origin: bottom left;
+  }
+}
+
+// Profile panel internals — width is set by the positioning block
+// above (expanded vs collapsed-anchor variant).
+.profile-menu {
+  padding: var(--space-4);
+  animation: menu-drop 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+
+  // Quiet identifier row — muted username/email-style label at the
+  // very top of the menu. Single line, ellipsis on overflow.
+  .menu-identifier {
+    font-size: var(--fs-control);
+    color: var(--secondary-color);
+    padding: 6px 12px 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+  }
+
+  .menu-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 6px 0;
+  }
+
+  ul {
+    list-style: none;
+    padding: var(--space-0);
+    margin: var(--space-0);
+  }
+
+  .menu-item {
+    a {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+      padding: 9px 12px;
+      border-radius: var(--radius-md);
+      color: var(--text-color);
+      text-decoration: none;
+      font-size: var(--fs-body);
+      transition: background var(--motion-fast) ease;
+      cursor: pointer;
+
+      i {
+        font-size: var(--fs-body);
+        color: var(--secondary-color);
+        width: 16px;
+        text-align: center;
+      }
+
+      &:hover {
+        background: var(--hover-background);
+      }
+    }
+
+    // Language row: chevron pointer to the right hints at the flyout
+    // panel that opens on hover/click. Active state (.is-open) sticks
+    // the hover background on while the flyout is showing.
+    &.has-flyout {
+      a .flyout-caret {
+        margin-left: auto;
+        font-size: var(--fs-micro);
+        color: var(--secondary-color);
+      }
+
+      &.is-open a {
+        background: var(--hover-background);
+      }
+    }
+
+    &.logout a {
+      color: var(--error-color);
+      margin-top: 2px;
+
+      i { color: var(--error-color); }
+      &:hover { background: var(--error-bg); }
+    }
+  }
+}
+
+// ── Language flyout (sibling of .profile-menu) ─────────────────────
+// Anchored to the right edge of the profile menu so it looks like a
+// classic sub-menu spill. Vertically aligned to the bottom of the
+// avatar, same as the profile menu itself.
+.language-flyout {
+  position: absolute;
+  width: 260px;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-3) 0;
+  z-index: calc(var(--z-overlay) + 2);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-6px) scale(0.98);
+  transform-origin: left center;
+  transition:
+    opacity var(--motion-base) ease,
+    transform var(--motion-base) ease,
+    visibility 0s linear var(--motion-base);
+
+  // Expanded mode: profile menu is INSIDE the sidebar above the
+  // avatar. Flyout opens just to the right of the sidebar at
+  // roughly the Language row's vertical position. The bottom value
+  // matches the profile-menu's bottom (58+8) plus an extra 8 of
+  // padding so the flyout's top aligns with the Language row.
+  left: calc(240px + 8px);
+  bottom: calc(58px + 8px + 8px);
+
+  // Collapsed mode: profile menu starts at 8px and is 260px wide,
+  // so its right edge is at 268px from the rail's left. Anchor the
+  // flyout 6px past that. Keep the same vertical offset so the
+  // flyout reads as a side-extension of the (above-the-avatar)
+  // profile menu, not as something growing off the rail itself.
+  &.collapsed-anchor {
+    left: calc(8px + 260px + 6px);
+    bottom: calc(58px + 8px + 8px);
+  }
+
+  &.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0) scale(1);
+    transition-delay: 0s;
+  }
+
+  .locale-list {
+    list-style: none;
+    margin: var(--space-0);
+    padding: var(--space-0);
+    max-height: 360px;
+    overflow-y: auto;
+  }
+
+  .locale-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background var(--motion-fast) ease;
+
+    &:hover { background: var(--hover-background); }
+
+    &.is-disabled {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    .ci-flag {
+      width: 20px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    .locale-label {
+      flex: 1;
+      font-size: var(--fs-body);
+      color: var(--text-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    // Native country/region rendered as a softer adjunct so the
+    // language name stays the primary read.
+    .locale-region {
+      color: var(--secondary-color);
+      font-weight: var(--fw-regular);
+    }
+
+    .locale-check {
+      color: var(--primary-color);
+      font-size: 14px;
+    }
+
+    &.is-active .locale-label {
+      font-weight: var(--fw-semibold);
+    }
+  }
+}
+
+// ── Mobile: floating panels anchor to the screen edge ──────────────
+:host(.is-mobile) {
+  .profile-menu,
+  .language-flyout {
+    // Drawer width on mobile = 240px. The panel still sits to the
+    // right of the drawer when the drawer is open.
+    left: 16px;
+    right: 16px;
+    width: auto;
+  }
+}
+
+// ── Keyframes ──────────────────────────────────────────────────────
+@keyframes badge-pop {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+@keyframes menu-drop {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }

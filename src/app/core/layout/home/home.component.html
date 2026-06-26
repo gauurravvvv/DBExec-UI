@@ -1,11 +1,16 @@
 <div class="home-container">
-  <app-header></app-header>
-  <div class="content-wrapper">
-    <app-sidebar></app-sidebar>
-    <main class="main-content">
+  <app-sidebar></app-sidebar>
+  <main class="main-content">
+    <app-announcement-banner></app-announcement-banner>
+    <div class="router-pane">
       <router-outlet></router-outlet>
-    </main>
-  </div>
-  <app-footer></app-footer>
+    </div>
+  </main>
 </div>
+<!-- Modal hosts. Both live at the home-shell root so they overlay
+     every page. Search is triggered via GlobalSearchService
+     (sidebar button + ⌘K). Notifications are triggered via
+     NotificationModalService (sidebar bell button). -->
+<app-global-search></app-global-search>
+<app-notification-modal></app-notification-modal>
 <app-confirm-leave-dialog></app-confirm-leave-dialog>

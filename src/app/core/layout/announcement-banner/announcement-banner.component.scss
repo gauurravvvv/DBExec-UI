@@ -1,0 +1,265 @@
+// ── Announcement Banner ─────────────────────────────────────────────
+// Extracted from the header in the sidebar-shell refactor. Banner sits
+// at the top of <main> now, so visual width is the same (full page),
+// only the parent changed.
+.announcement-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 48px;
+  font-size: var(--fs-control);
+  position: relative;
+  z-index: 999;
+  overflow: hidden;
+  animation: bannerSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+
+  .banner-shimmer {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.08) 50%,
+      transparent
+    );
+    animation: shimmerSweep 4s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .banner-glow-left,
+  .banner-glow-right {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0.07;
+  }
+
+  .banner-glow-left {
+    left: -40px;
+    top: -50px;
+    background: radial-gradient(circle, white, transparent 70%);
+    animation: glowPulse 3s ease-in-out infinite;
+  }
+
+  .banner-glow-right {
+    right: 60px;
+    bottom: -50px;
+    background: radial-gradient(circle, white, transparent 70%);
+    animation: glowPulse 3s ease-in-out infinite 1.5s;
+  }
+
+  .banner-content {
+    position: relative;
+    z-index: var(--z-base);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    width: 100%;
+
+    .banner-text-wrapper {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+
+      .banner-label {
+        font-size: var(--fs-micro);
+        font-weight: var(--fw-semibold);
+        letter-spacing: 1.5px;
+        background: rgba(255, 255, 255, 0.18);
+        padding: 3px 8px;
+        border-radius: var(--radius-xs);
+        white-space: nowrap;
+        cursor: pointer;
+        transition: background var(--motion-base);
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
+
+        .banner-count {
+          margin-left: 4px;
+          font-weight: var(--fw-semibold);
+          opacity: 0.85;
+        }
+      }
+
+      .banner-divider {
+        opacity: 0.3;
+      }
+
+      .banner-message {
+        line-height: 1.4;
+        opacity: 0.95;
+        cursor: pointer;
+
+        .typewriter-cursor {
+          font-weight: var(--fw-regular);
+          animation: blink 0.7s step-end infinite;
+          margin-left: 1px;
+        }
+      }
+    }
+
+    .banner-controls {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+
+      .banner-nav-btn {
+        background: rgba(255, 255, 255, 0.15);
+        border: none;
+        color: inherit;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background var(--motion-base);
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
+
+        i {
+          font-size: var(--fs-micro);
+        }
+      }
+    }
+  }
+}
+
+// ── Announcement Popup ────────────────────────────────────────────
+.announcement-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-background);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: var(--z-modal);
+  animation: popupFadeIn 0.15s ease-out;
+}
+
+.announcement-popup {
+  background: var(--card-background);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  overflow: hidden;
+  animation: popupEnter 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  .popup-accent {
+    width: 4px;
+    flex-shrink: 0;
+  }
+
+  .popup-inner {
+    padding: 22px 24px;
+    flex: 1;
+
+    .popup-header-row {
+      margin-bottom: 14px;
+
+      .popup-tag {
+        font-size: var(--fs-micro);
+        font-weight: var(--fw-semibold);
+        letter-spacing: 0.5px;
+        color: var(--primary-color);
+        text-transform: uppercase;
+      }
+    }
+
+    .popup-title {
+      margin: 0 0 10px;
+      font-size: var(--fs-h2);
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
+      line-height: 1.4;
+    }
+
+    .popup-description {
+      margin: 0 0 20px;
+      font-size: var(--fs-body);
+      line-height: 1.7;
+      color: var(--secondary-color);
+      white-space: pre-line;
+    }
+
+    .popup-footer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+
+      .do-not-show {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        cursor: pointer;
+        margin: var(--space-0);
+
+        span {
+          font-size: var(--fs-control);
+          color: var(--secondary-color);
+          user-select: none;
+        }
+      }
+
+      .popup-btn {
+        background: transparent;
+        color: var(--secondary-color);
+        border: 1px solid var(--border-color);
+        padding: 7px 20px;
+        border-radius: var(--radius-md);
+        font-weight: var(--fw-medium);
+        font-size: var(--fs-control);
+        cursor: pointer;
+        transition: all var(--motion-fast) ease;
+
+        &:hover {
+          background: var(--hover-background);
+          color: var(--text-color);
+        }
+      }
+    }
+  }
+}
+
+// ── Keyframes ─────────────────────────────────────────────────────
+@keyframes bannerSlideIn {
+  from { opacity: 0; transform: translateY(-100%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmerSweep {
+  0%   { left: -100%; }
+  50%  { left: 150%; }
+  100% { left: 150%; }
+}
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.06; transform: scale(1); }
+  50%      { opacity: 0.12; transform: scale(1.2); }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+@keyframes popupFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes popupEnter {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}

@@ -1,0 +1,138 @@
+// ── Group header (Today / Yesterday / This week / …) ───────────────
+.group-header {
+  font-size: var(--fs-control);
+  color: var(--secondary-color);
+  padding: 14px 20px 6px;
+  position: sticky;
+  top: 0;
+  background: var(--card-background);
+  z-index: 1;
+  // First group sits flush with the modal header divider.
+  &:first-child {
+    padding-top: 14px;
+  }
+}
+
+// ── Notification rows ──────────────────────────────────────────────
+.notification-rows {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-5);
+  padding: 12px 20px;
+  cursor: default;
+  transition: background var(--motion-fast) ease;
+  position: relative;
+
+  &:hover {
+    background: var(--hover-background);
+  }
+
+  &.unread {
+    background: rgba(var(--primary-color-rgb), 0.04);
+
+    .row-title {
+      color: var(--text-color);
+    }
+    .notification-icon i {
+      color: var(--primary-color);
+    }
+    // Tiny unread dot in the top-right gutter — softer than a
+    // full left-border accent inside a full-width modal row.
+    &::after {
+      content: '';
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary-color);
+    }
+
+    &:hover {
+      background: rgba(var(--primary-color-rgb), 0.08);
+    }
+  }
+
+  .notification-icon {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-md);
+    background: var(--hover-background);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      color: var(--secondary-color);
+      font-size: var(--fs-body);
+    }
+  }
+
+  .notification-content {
+    flex: 1;
+    min-width: 0;
+    padding-right: 80px; // reserve space for the time chip on the right
+
+    .row-title {
+      font-size: var(--fs-body);
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .row-message {
+      font-size: var(--fs-control);
+      color: var(--secondary-color);
+      line-height: 1.4;
+      margin-top: 2px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
+
+  .row-time {
+    position: absolute;
+    top: 14px;
+    right: 36px; // clears the unread dot
+    font-size: var(--fs-micro);
+    color: var(--secondary-color);
+    white-space: nowrap;
+  }
+
+  // No unread dot → time can use the full right gutter.
+  &:not(.unread) .row-time {
+    right: 20px;
+  }
+}
+
+// ── Empty state ────────────────────────────────────────────────────
+.empty-state {
+  padding: 56px 20px;
+  text-align: center;
+  color: var(--secondary-color);
+
+  i {
+    font-size: var(--fs-h1);
+    display: block;
+    opacity: 0.5;
+    margin-bottom: 12px;
+  }
+
+  p {
+    margin: 0;
+    font-size: var(--fs-body);
+  }
+}

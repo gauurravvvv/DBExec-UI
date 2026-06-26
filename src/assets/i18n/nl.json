@@ -284,7 +284,9 @@
     "NEXT": "Volgende",
     "DARK_MODE": "Switch to Dark Mode",
     "LIGHT_MODE": "Switch to Light Mode",
-    "BLACK_MODE": "Switch to Black Mode"
+    "BLACK_MODE": "Switch to Black Mode",
+    "LANGUAGE": "Taal",
+    "SEARCH": "Zoeken"
   },
   "PROFILE": {
     "TITLE": "Mijn profiel",
@@ -2637,7 +2639,12 @@
     "GROUP_ADDED_TITLE": "Toegewezen aan een groep",
     "GROUP_ADDED_BODY": "Je bent toegewezen aan {{groupName}}.",
     "GROUP_REMOVED_TITLE": "Verwijderd uit een groep",
-    "GROUP_REMOVED_BODY": "Je bent verwijderd uit {{groupName}}."
+    "GROUP_REMOVED_BODY": "Je bent verwijderd uit {{groupName}}.",
+    "GROUP_TODAY": "Vandaag",
+    "GROUP_YESTERDAY": "Gisteren",
+    "GROUP_THIS_WEEK": "Deze week",
+    "GROUP_THIS_MONTH": "Deze maand",
+    "GROUP_OLDER": "Ouder"
   },
   "MENU": {
     "SECURITY_POLICY": "Beveiligingsbeleid",

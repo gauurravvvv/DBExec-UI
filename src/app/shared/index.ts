@@ -1,6 +1,5 @@
 // Barrel exports for shared module
-export * from '../core/layout/footer/footer.component';
-export * from '../core/layout/header/header.component';
+export * from '../core/layout/announcement-banner/announcement-banner.component';
 export * from '../core/layout/home/home.component';
 export * from '../core/layout/sidebar/sidebar.component';
 export * from './components/change-password-dialog/change-password-dialog.component';

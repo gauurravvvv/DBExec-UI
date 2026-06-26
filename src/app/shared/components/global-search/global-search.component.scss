@@ -1,347 +1,230 @@
 // ===================================================================
-// Global Search — Command Palette
+// Global Search — projected contents only. The modal chrome
+// (backdrop, frame, header, scroll body) lives in the
+// CommandModalComponent shell.
 // ===================================================================
 
-// ── Overlay ──────────────────────────────────────────────────────
-.search-overlay {
-  position: fixed;
-  inset: 0;
-  background: var(--overlay-background);
-  z-index: var(--z-modal);
+// ── Filter chips strip ─────────────────────────────────────────────
+.search-filters {
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-top: 20vh;
-  animation: fadeIn 0.1s ease-out;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
 }
 
-// ── Modal ────────────────────────────────────────────────────────
-.search-modal {
-  width: 580px;
-  max-width: 90vw;
-  background: var(--card-background);
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-xl);
-  overflow: hidden;
-  animation: slideIn 0.12s ease-out;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-color);
+  font-size: var(--fs-control);
+  cursor: pointer;
+  transition:
+    background var(--motion-fast) ease,
+    border-color var(--motion-fast) ease,
+    color var(--motion-fast) ease;
+
+  &:hover {
+    background: var(--hover-background);
+    border-color: var(--primary-color);
+  }
+
+  &.active {
+    background: var(--primary-color-transparent);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    font-weight: var(--fw-semibold);
+  }
+
+  .chip-count {
+    font-size: var(--fs-micro);
+    color: var(--secondary-color);
+    background: var(--card-background);
+    padding: 1px 6px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-color);
+  }
+
+  &.active .chip-count {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
 }
 
-// ── Search Header ────────────────────────────────────────────────
-.search-header {
+// ── Result list ────────────────────────────────────────────────────
+.search-results {
+  padding: 4px 0;
+}
+
+.result-item {
   display: flex;
   align-items: center;
   gap: var(--space-5);
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background var(--motion-fast) ease;
+  position: relative;
 
-  .search-icon {
-    font-size: var(--fs-body);
-    color: var(--secondary-color);
-    flex-shrink: 0;
-  }
-
-  .search-input {
-    flex: 1;
-    border: none;
-    background: transparent;
-    font-size: var(--fs-body);
-    color: var(--text-color);
-    outline: none;
-
-    &::placeholder {
-      color: var(--secondary-color);
-      opacity: 0.6;
-    }
-  }
-
-  .esc-hint {
-    font-size: var(--fs-micro);
-    font-family: inherit;
-    font-weight: var(--fw-medium);
+  &:hover,
+  &.is-selected {
     background: var(--hover-background);
-    color: var(--secondary-color);
-    border: 1px solid var(--border-color);
-    padding: 2px 6px;
-    border-radius: var(--radius-xs);
-    cursor: pointer;
-    flex-shrink: 0;
+  }
 
-    &:hover {
-      color: var(--text-color);
+  // Keyboard-selected row gets a slightly stronger background so it
+  // reads above plain hover.
+  &.is-selected {
+    background: rgba(var(--primary-color-rgb), 0.06);
+
+    .result-go {
+      opacity: 1;
+      color: var(--primary-color);
     }
   }
-}
 
-// ── Filter Chips ─────────────────────────────────────────────────
-.search-filters {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: 8px 16px;
-  border-bottom: 1px solid var(--border-color);
-  overflow-x: auto;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  .filter-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: 4px 10px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border-color);
-    background: transparent;
-    color: var(--secondary-color);
-    font-size: var(--fs-label);
-    font-weight: var(--fw-medium);
-    cursor: pointer;
-    transition: all var(--motion-fast) ease;
-    white-space: nowrap;
-    text-transform: capitalize;
-
-    .chip-count {
-      font-size: var(--fs-micro);
-      font-weight: var(--fw-semibold);
-      opacity: 0.5;
-    }
-
-    &:hover {
-      background: var(--hover-background);
-      color: var(--text-color);
-    }
-
-    &.active {
-      background: var(--primary-color);
-      color: var(--primary-text);
-      border-color: var(--primary-color);
-
-      .chip-count {
-        opacity: 0.8;
-      }
-    }
-  }
-}
-
-// ── Results ──────────────────────────────────────────────────────
-.search-results {
-  max-height: 320px;
-  overflow-y: auto;
-  padding: var(--space-3);
-
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: var(--radius-xs);
-  }
-
-  .result-item {
+  .result-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    background: var(--hover-background);
     display: flex;
     align-items: center;
-    gap: var(--space-5);
-    padding: 8px 10px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: background var(--motion-fast) ease;
+    justify-content: center;
+    flex-shrink: 0;
 
-    &:hover {
-      background: var(--hover-background);
+    i {
+      font-size: var(--fs-body);
+      color: var(--secondary-color);
+    }
+  }
 
-      .result-go {
-        opacity: 1;
-      }
+  .result-info {
+    flex: 1;
+    min-width: 0;
+
+    .result-name {
+      display: block;
+      font-size: var(--fs-body);
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
     }
 
-    .result-icon {
-      width: 32px;
-      height: 32px;
-      flex-shrink: 0;
+    .result-detail {
       display: flex;
       align-items: center;
-      justify-content: center;
-      border-radius: var(--radius-sm);
-      background: var(--hover-background);
-      border: 1px solid var(--border-color);
+      gap: 6px;
+      margin-top: 2px;
+      font-size: var(--fs-micro);
+      color: var(--secondary-color);
 
-      i {
-        font-size: var(--fs-control);
-        color: var(--primary-color);
-      }
-    }
-
-    .result-info {
-      flex: 1;
-      min-width: 0;
-
-      .result-name {
-        display: block;
-        font-size: var(--fs-control);
+      .result-tag {
+        padding: 1px 6px;
+        background: var(--card-background);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
         font-weight: var(--fw-medium);
-        color: var(--text-color);
-        line-height: 1.3;
+      }
+
+      .breadcrumb-arrow {
+        font-size: 9px;
+        opacity: 0.5;
+      }
+
+      .result-path {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-      }
-
-      .result-detail {
-        display: flex;
-        align-items: center;
-        gap: var(--space-3);
-        margin-top: 2px;
-
-        .result-tag {
-          font-size: var(--fs-micro);
-          font-weight: var(--fw-semibold);
-          text-transform: uppercase;
-          letter-spacing: 0.3px;
-          padding: 1px 5px;
-          border-radius: var(--radius-xs);
-          background: var(--hover-background);
-          color: var(--primary-color);
-          border: 1px solid var(--border-color);
-          line-height: 1.5;
-        }
-
-        .breadcrumb-arrow {
-          font-size: var(--fs-micro);
-          color: var(--secondary-color);
-          opacity: 0.4;
-        }
-
-        .result-path {
-          font-size: var(--fs-micro);
-          color: var(--secondary-color);
-          opacity: 0.7;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: 250px;
-        }
+        min-width: 0;
       }
     }
+  }
 
-    .result-go {
-      font-size: var(--fs-micro);
-      color: var(--secondary-color);
-      opacity: 0;
-      transition: opacity var(--motion-fast) ease;
-      flex-shrink: 0;
-    }
+  .result-go {
+    font-size: var(--fs-body);
+    color: var(--secondary-color);
+    opacity: 0;
+    transition:
+      opacity var(--motion-fast) ease,
+      color var(--motion-fast) ease;
+  }
+
+  &:hover .result-go {
+    opacity: 1;
   }
 }
 
-// ── Empty State ──────────────────────────────────────────────────
-.empty-state {
-  padding: 32px 20px;
+// ── Empty / idle states ────────────────────────────────────────────
+.empty-state,
+.idle-state {
+  padding: 56px 20px;
   text-align: center;
+  color: var(--secondary-color);
 
-  .empty-icon {
+  .empty-icon,
+  .idle-icon {
     font-size: var(--fs-h1);
-    color: var(--secondary-color);
-    opacity: 0.25;
-    margin-bottom: 8px;
+    display: block;
+    opacity: 0.5;
+    margin-bottom: 12px;
   }
 
-  .empty-text {
-    font-size: var(--fs-control);
-    color: var(--text-color);
-    margin: 0 0 4px;
-
-    strong {
-      font-weight: var(--fw-semibold);
-    }
+  .empty-text,
+  .idle-text {
+    margin: 0;
+    font-size: var(--fs-body);
   }
 
   .empty-sub {
-    font-size: var(--fs-label);
-    color: var(--secondary-color);
-    margin: var(--space-0);
-    opacity: 0.6;
+    margin: 6px 0 0;
+    font-size: var(--fs-control);
+    opacity: 0.7;
+  }
+
+  strong {
+    color: var(--text-color);
   }
 }
 
-// ── Idle State ───────────────────────────────────────────────────
-.idle-state {
-  padding: 28px 20px;
-  text-align: center;
-
-  .idle-icon {
-    font-size: var(--fs-h2);
-    color: var(--secondary-color);
-    opacity: 0.2;
-    margin-bottom: 6px;
-  }
-
-  .idle-text {
-    font-size: var(--fs-label);
-    color: var(--secondary-color);
-    opacity: 0.5;
-    margin: var(--space-0);
-  }
-}
-
-// ── Footer ───────────────────────────────────────────────────────
+// ── Footer (keyboard hints) ────────────────────────────────────────
 .search-footer {
   display: flex;
   align-items: center;
-  gap: var(--space-5);
-  padding: 6px 16px;
+  gap: var(--space-6);
+  padding: 10px 16px;
   border-top: 1px solid var(--border-color);
+  background: var(--hover-background);
+  font-size: var(--fs-micro);
+  color: var(--secondary-color);
 
   .shortcut {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: var(--space-2);
-    font-size: var(--fs-micro);
-    color: var(--secondary-color);
-    opacity: 0.5;
+    gap: 4px;
 
     kbd {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       min-width: 18px;
-      height: 17px;
+      height: 18px;
       padding: 0 4px;
-      background: var(--hover-background);
+      background: var(--card-background);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-xs);
-      font-size: var(--fs-micro);
-      font-family: inherit;
-      color: var(--secondary-color);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-color);
+      line-height: 1;
     }
-
-    span {
-      margin-left: 2px;
-    }
-  }
-}
-
-// ── Animations ───────────────────────────────────────────────────
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.99);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
   }
 }

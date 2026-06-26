@@ -3,11 +3,9 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
-  ElementRef,
   HostListener,
   inject,
   OnInit,
-  ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
@@ -26,14 +24,16 @@ import { GlobalSearchService } from '../../services/global-search.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GlobalSearchComponent implements OnInit {
-  @ViewChild('searchInput') searchInput!: ElementRef;
-
   showSearchModal = false;
   searchTerm = '';
   searchResults: any[] = [];
   uniqueEntityTypes: string[] = [];
-  activeFilter: string = 'ALL';
-  searchSubject = new Subject<string>();
+  activeFilter = 'ALL';
+  /** Currently-highlighted index in `filteredSearchResults`. Used by
+   *  ↑/↓ keyboard navigation. Reset to 0 on every new result set. */
+  selectedIndex = 0;
+
+  private readonly searchSubject = new Subject<string>();
 
   readonly loading = this.globalSearchService.loading;
   readonly results = this.globalSearchService.results;
@@ -56,16 +56,13 @@ export class GlobalSearchComponent implements OnInit {
     private globalService: GlobalService,
     private router: Router,
   ) {
-    // Debounce search input
     this.searchSubject
       .pipe(
         debounceTime(300),
         distinctUntilChanged(),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe(term => {
-        this.performSearch(term);
-      });
+      .subscribe(term => this.performSearch(term));
   }
 
   ngOnInit(): void {
@@ -77,49 +74,72 @@ export class GlobalSearchComponent implements OnInit {
       });
   }
 
+  /**
+   * Cmd-K / Ctrl-K shortcut keeps working from anywhere; the
+   * sidebar's button hits the same service. Escape is handled by
+   * the CommandModal base now, so we only intercept ↑/↓/Enter when
+   * the modal is open.
+   */
   @HostListener('window:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
-    // Check for Cmd+K (Mac) or Ctrl+K (Windows/Linux)
     if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
-      event.preventDefault(); // Prevent default browser behavior
-      // Global search is per-org; the platform System Admin has no
-      // org context. Detect by the absence of the systemAdmin grant.
+      event.preventDefault();
       if (!this.permissionService.canRead(PERMISSIONS.SYSTEM_ADMIN)) {
         this.openSearchModal();
       }
+      return;
     }
 
-    // Check for Escape key to close modal
-    if (event.key === 'Escape' && this.showSearchModal) {
-      this.closeSearchModal();
-    }
-  }
+    if (!this.showSearchModal) return;
+    const rows = this.filteredSearchResults;
+    if (rows.length === 0) return;
 
-  openSearchModal() {
-    this.showSearchModal = true;
-    setTimeout(() => {
-      if (this.searchInput) {
-        this.searchInput.nativeElement.focus();
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      this.selectedIndex = (this.selectedIndex + 1) % rows.length;
+      this.cdr.markForCheck();
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.selectedIndex =
+        (this.selectedIndex - 1 + rows.length) % rows.length;
+      this.cdr.markForCheck();
+    } else if (event.key === 'Enter') {
+      const target = rows[this.selectedIndex];
+      if (target) {
+        event.preventDefault();
+        this.navigateToResult(target);
       }
-    }, 100);
+    }
   }
 
-  closeSearchModal() {
+  openSearchModal(): void {
+    this.showSearchModal = true;
+    this.selectedIndex = 0;
+    this.cdr.markForCheck();
+  }
+
+  closeSearchModal(): void {
     this.showSearchModal = false;
     this.searchTerm = '';
     this.searchResults = [];
+    this.uniqueEntityTypes = [];
+    this.activeFilter = 'ALL';
+    this.selectedIndex = 0;
     this.globalSearchService.clearResults();
+    this.cdr.markForCheck();
   }
 
-  onSearch() {
-    this.searchSubject.next(this.searchTerm);
+  onSearchInput(value: string): void {
+    this.searchTerm = value;
+    this.searchSubject.next(value);
   }
 
-  performSearch(term: string) {
+  performSearch(term: string): void {
     if (!term.trim()) {
       this.searchResults = [];
       this.uniqueEntityTypes = [];
       this.activeFilter = 'ALL';
+      this.selectedIndex = 0;
       this.globalSearchService.clearResults();
       this.cdr.markForCheck();
       return;
@@ -129,18 +149,16 @@ export class GlobalSearchComponent implements OnInit {
       .globalSearch({ key: term })
       .then((response: any) => {
         if (response && response.status && response.data) {
-          this.searchResults = response.data.map((item: any) => {
-            return {
-              title: item.name,
-              type: item.entityType, // Use entityType for display
-              entity: item.entity, // Store original entity for logic
-              description: item.description,
-              link: this.getRouteUrl(item.entity),
-              icon: this.getIcon(item),
-              breadcrumb: this.getBreadcrumb(item),
-              ...item,
-            };
-          });
+          this.searchResults = response.data.map((item: any) => ({
+            title: item.name,
+            type: item.entityType,
+            entity: item.entity,
+            description: item.description,
+            link: this.getRouteUrl(item.entity),
+            icon: this.getIcon(item),
+            breadcrumb: this.getBreadcrumb(item),
+            ...item,
+          }));
           this.globalSearchService.setResults(this.searchResults);
           this.extractEntityTypes();
         } else {
@@ -148,6 +166,7 @@ export class GlobalSearchComponent implements OnInit {
           this.uniqueEntityTypes = [];
           this.globalSearchService.clearResults();
         }
+        this.selectedIndex = 0;
         this.cdr.markForCheck();
       })
       .catch(error => {
@@ -159,24 +178,22 @@ export class GlobalSearchComponent implements OnInit {
       });
   }
 
-  extractEntityTypes() {
+  extractEntityTypes(): void {
     const types = new Set(this.searchResults.map(item => item.entityType));
     this.uniqueEntityTypes = Array.from(types).sort();
-    // Reset filter to ALL when new search results arrive
     this.activeFilter = 'ALL';
   }
 
   get filteredSearchResults() {
-    if (this.activeFilter === 'ALL') {
-      return this.searchResults;
-    }
+    if (this.activeFilter === 'ALL') return this.searchResults;
     return this.searchResults.filter(
       item => item.entityType === this.activeFilter,
     );
   }
 
-  setFilter(filter: string) {
+  setFilter(filter: string): void {
     this.activeFilter = filter;
+    this.selectedIndex = 0;
   }
 
   getCountForType(type: string): number {
@@ -185,17 +202,13 @@ export class GlobalSearchComponent implements OnInit {
 
   getBreadcrumb(item: any): string {
     const parts: string[] = [];
-
-    // Base: All items have a datasource context via JOIN
     if (item.datasource?.name) parts.push(item.datasource.name);
 
-    // Context specific logic
     switch (item.entity) {
       case 'analyses':
         if (item.dataset?.name) parts.push(item.dataset.name);
         break;
-      case 'datasetManager': // Assuming this is dataset
-        // Already has datasource name
+      case 'datasetManager':
         break;
       case 'queryBuilderPrompt':
         if (item.tab?.name) parts.push(item.tab.name);
@@ -206,49 +219,28 @@ export class GlobalSearchComponent implements OnInit {
         break;
       case 'queryBuilderTab':
       case 'queryBuilderScreen':
-        // Direct child of database (or query builder)
         break;
     }
-
-    // Finally append the item name itself?
-    // User requested "Database -> Tab -> Section -> Prompt" ABOVE the prompt item?
-    // "show this data in a breadcrumb"
-    // Usually breadCrumbs show the path TO the item.
-    // If I search for a Prompt "P1", breadcrumb should be "DB1 -> Tab1 -> Sec1".
-
     return parts.join(' -> ');
   }
 
   getIcon(item: any): string {
-    // Try to match by entityType (e.g. "Analyses" -> "ANALYSES")
     if (item.entityType) {
       const typeKey = item.entityType.toUpperCase();
-      if (
+      const hit =
         this.GLOBAL_SEARCH_RESULT_ICON[
           typeKey as keyof typeof this.GLOBAL_SEARCH_RESULT_ICON
-        ]
-      ) {
-        return this.GLOBAL_SEARCH_RESULT_ICON[
-          typeKey as keyof typeof this.GLOBAL_SEARCH_RESULT_ICON
         ];
-      }
+      if (hit) return hit;
     }
-
-    // Try to match by entity (e.g. "analyses" -> "ANALYSES")
     if (item.entity) {
       const entityKey = item.entity.toUpperCase();
-      if (
+      const hit =
         this.GLOBAL_SEARCH_RESULT_ICON[
           entityKey as keyof typeof this.GLOBAL_SEARCH_RESULT_ICON
-        ]
-      ) {
-        return this.GLOBAL_SEARCH_RESULT_ICON[
-          entityKey as keyof typeof this.GLOBAL_SEARCH_RESULT_ICON
         ];
-      }
+      if (hit) return hit;
     }
-
-    // Default icon
     return 'pi pi-list';
   }
 
@@ -262,17 +254,16 @@ export class GlobalSearchComponent implements OnInit {
   }
 
   trackById(index: number, item: any): any {
-    return item.id;
+    return item.id ?? index;
   }
 
-  navigateToResult(result: any) {
+  navigateToResult(result: any): void {
     this.closeSearchModal();
     if (result.link) {
       const queryParams: any = {};
       if (result.organisationId) queryParams.orgId = result.organisationId;
       if (result.datasourceId) queryParams.datasourceId = result.datasourceId;
       if (result.name) queryParams.name = result.name;
-
       this.router.navigate([result.link], { queryParams });
     }
   }
