@@ -567,35 +567,10 @@
                 [pTooltip]="'COMMON.CLEAR' | translate"
                 tooltipPosition="bottom"
               ></button>
-              <!-- Chevron toggle + dismiss — same affordances as
-                   add-dataset. Custom .sheet-chevron-btn so the
-                   icons read as quiet glyphs, not action chips. -->
-              <button
-                type="button"
-                class="sheet-chevron-btn"
-                (click)="toggleResultSheet()"
-                [pTooltip]="
-                  (isResultSheetCollapsed
-                    ? 'DATASET.SHOW_RESULTS'
-                    : 'DATASET.HIDE_RESULTS'
-                  ) | translate
-                "
-                tooltipPosition="bottom"
-                [attr.aria-label]="
-                  (isResultSheetCollapsed
-                    ? 'DATASET.SHOW_RESULTS'
-                    : 'DATASET.HIDE_RESULTS'
-                  ) | translate
-                "
-              >
-                <i
-                  class="pi"
-                  [ngClass]="
-                    isResultSheetCollapsed ? 'pi-chevron-up' : 'pi-chevron-down'
-                  "
-                  aria-hidden="true"
-                ></i>
-              </button>
+              <!-- Dismiss — drops the result entirely. The
+                   collapse-chevron was removed because it duplicated
+                   the role of the drag handle / dismiss button and
+                   read as clutter in the toolbar. -->
               <button
                 type="button"
                 class="sheet-chevron-btn sheet-chevron-btn--dismiss"

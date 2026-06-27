@@ -644,37 +644,6 @@
                 [pTooltip]="'COMMON.CLEAR' | translate"
                 tooltipPosition="bottom"
               ></button>
-              <!-- Chevron toggle: collapse-to-strip when expanded,
-                   expand-from-strip when collapsed. Custom 20px
-                   button (not pButton) so it stays out of PrimeNG's
-                   button-sizing rules and reads as a quiet chevron
-                   icon instead of an action chip. -->
-              <button
-                type="button"
-                class="sheet-chevron-btn"
-                (click)="toggleResultSheet()"
-                [pTooltip]="
-                  (isResultSheetCollapsed
-                    ? 'DATASET.SHOW_RESULTS'
-                    : 'DATASET.HIDE_RESULTS'
-                  ) | translate
-                "
-                tooltipPosition="bottom"
-                [attr.aria-label]="
-                  (isResultSheetCollapsed
-                    ? 'DATASET.SHOW_RESULTS'
-                    : 'DATASET.HIDE_RESULTS'
-                  ) | translate
-                "
-              >
-                <i
-                  class="pi"
-                  [ngClass]="
-                    isResultSheetCollapsed ? 'pi-chevron-up' : 'pi-chevron-down'
-                  "
-                  aria-hidden="true"
-                ></i>
-              </button>
               <!-- Dismiss — drops the result entirely. Only the
                    user's next query brings the sheet back. -->
               <button
