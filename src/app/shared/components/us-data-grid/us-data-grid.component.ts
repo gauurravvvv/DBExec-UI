@@ -11,6 +11,7 @@ import {
   inject,
   AfterContentInit,
   OnChanges,
+  OnDestroy,
   SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
@@ -52,6 +53,8 @@ import {
 } from './us-data-grid.types';
 import { UsGridCellDirective } from './us-grid-cell.directive';
 import { UsCellTemplateRendererComponent } from './us-cell-template-renderer';
+import { UsServerListAdapter } from './us-server-list-adapter';
+import { UsPaginatorComponent } from '../us-paginator/us-paginator.component';
 
 /* Register the client-side row model module once per app bundle.
  * AG Grid v32 ships modules separately; without registration the
@@ -95,12 +98,13 @@ ModuleRegistry.registerModules([ClientSideRowModelModule]);
     TooltipModule,
     ChipModule,
     DropdownModule,
+    UsPaginatorComponent,
   ],
   templateUrl: './us-data-grid.component.html',
   styleUrls: ['./us-data-grid.component.scss'],
 })
 export class UsDataGridComponent<TData = unknown>
-  implements OnChanges, AfterContentInit
+  implements OnChanges, OnDestroy, AfterContentInit
 {
   private readonly cdr = inject(ChangeDetectorRef);
 
@@ -109,6 +113,22 @@ export class UsDataGridComponent<TData = unknown>
   @Input() columns: ColDef<TData>[] = [];
   @Input() rows: TData[] = [];
   @Input() config: UsDataGridConfig = {};
+
+  /**
+   * Server-side adapter — when present, the grid switches into
+   * "BE-paginated" mode: rowData is sourced from the adapter's
+   * signals, AG Grid's internal pagination is disabled, and a
+   * `<us-paginator>` is rendered below the grid wired to the
+   * adapter's page / limit / total state. Sort + floating-filter
+   * changes are forwarded to the adapter, which translates them
+   * into the BE list-call shape.
+   *
+   * When absent, the grid behaves exactly as today (client-side
+   * row model, AG Grid's own pagination, `[rows]` input directly
+   * bound to the grid). This keeps the dataset result sheet — the
+   * original `us-data-grid` consumer — working unchanged.
+   */
+  @Input() serverAdapter?: UsServerListAdapter<TData>;
 
   /** Free-text search across every column. Two-way bound from the
    *  toolbar's quick-search input. */
@@ -137,6 +157,13 @@ export class UsDataGridComponent<TData = unknown>
   /* ── internal state ─────────────────────────────────── */
 
   private gridApi?: GridApi<TData>;
+  private adapterSubscription?: import('rxjs').Subscription;
+
+  /** Reactive accessor used by the template — falls back to the
+   *  `[rows]` input when no server adapter is bound. */
+  get currentRows(): TData[] {
+    return this.serverAdapter ? this.serverAdapter.rows() : this.rows;
+  }
   resolvedConfig = { ...US_DATA_GRID_DEFAULTS } as Required<
     typeof US_DATA_GRID_DEFAULTS
   > & {
@@ -179,12 +206,55 @@ export class UsDataGridComponent<TData = unknown>
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['config']) this.resolveConfig();
-    if (changes['columns'] || changes['config']) this.buildGridOptions();
+    if (changes['columns'] || changes['config'] || changes['serverAdapter'])
+      this.buildGridOptions();
+    if (changes['serverAdapter']) this.onServerAdapterBound();
+  }
+
+  /**
+   * Re-bind the adapter's row signal to the grid every time the
+   * adapter input changes (which in practice is once, on first
+   * binding — host components hold a single adapter for the
+   * lifetime of the listing). The reload is fired lazily here so
+   * the consumer doesn't have to remember to kick the first
+   * request themselves.
+   */
+  private onServerAdapterBound(): void {
+    if (this.adapterSubscription) {
+      this.adapterSubscription.unsubscribe();
+      this.adapterSubscription = undefined;
+    }
+    if (!this.serverAdapter) return;
+    /* Subscribe to load events so OnPush change detection picks up
+     * new rows. We can't use Angular `effect()` here without an
+     * injection context, and we don't want to wrap the whole
+     * component in `inject(EnvironmentInjector)` boilerplate. */
+    this.adapterSubscription = this.serverAdapter.loaded$.subscribe(() => {
+      /* Push the new page into AG Grid directly via the API — this
+       * avoids a full grid re-init that [rowData] would trigger
+       * (which would lose the user's sort + filter UI state). */
+      if (this.gridApi) {
+        this.gridApi.setGridOption('rowData', this.serverAdapter!.rows());
+      }
+      this.cdr.markForCheck();
+    });
+    // First load happens here; subsequent loads are driven by
+    // page / sort / filter changes from inside the grid.
+    if (this.serverAdapter.rows().length === 0) {
+      this.serverAdapter.reload();
+    }
   }
 
   ngAfterContentInit(): void {
     this.cellTemplates.changes.subscribe(() => this.rebuildTemplateMap());
     this.rebuildTemplateMap();
+  }
+
+  ngOnDestroy(): void {
+    if (this.adapterSubscription) {
+      this.adapterSubscription.unsubscribe();
+      this.adapterSubscription = undefined;
+    }
   }
 
   private rebuildTemplateMap(): void {
@@ -276,11 +346,16 @@ export class UsDataGridComponent<TData = unknown>
       },
     );
 
+    // When a serverAdapter is bound, the host paginator takes over
+    // — AG Grid's internal pagination would double-paginate the
+    // already-paginated BE page.
+    const serverMode = !!this.serverAdapter;
+
     this.gridOptions = {
       columnDefs: decoratedColumns,
-      rowData: this.rows,
+      rowData: serverMode ? this.serverAdapter!.rows() : this.rows,
       animateRows: true,
-      pagination: cfg.enablePagination,
+      pagination: serverMode ? false : cfg.enablePagination,
       paginationPageSize: cfg.pageSize,
       paginationPageSizeSelector: cfg.pageSizeOptions,
       rowSelection: cfg.enableRowSelection ? cfg.rowSelectionMode : undefined,
@@ -388,13 +463,35 @@ export class UsDataGridComponent<TData = unknown>
   }
 
   onSortChanged(_event: SortChangedEvent): void {
-    /* No-op for now — clients listen via gridOptions if they need it. */
+    /* In server mode, translate AG Grid's column state into the
+     * adapter's sort model — only the columns the user has actually
+     * sorted (sort !== null) are forwarded. Sort priority (multi-
+     * column sort) is preserved via sortIndex. */
+    if (!this.serverAdapter || !this.gridApi) return;
+    const colState = this.gridApi.getColumnState();
+    const sorted = colState
+      .filter(s => s.sort === 'asc' || s.sort === 'desc')
+      .sort((a, b) => (a.sortIndex ?? 0) - (b.sortIndex ?? 0))
+      .map(s => ({
+        colId: s.colId,
+        sort: s.sort as 'asc' | 'desc',
+      }));
+    this.serverAdapter.setSort(sorted);
   }
 
   onFilterChanged(_event: FilterChangedEvent<TData>): void {
     this.refreshFilterChips();
     this.refreshRowCounter();
-    this.filterChange.emit(this.gridApi?.getFilterModel() ?? {});
+    const model = this.gridApi?.getFilterModel() ?? {};
+    this.filterChange.emit(model);
+    /* In server mode, the floating-filter row IS the data filter —
+     * forward to the adapter so the next page reflects the new
+     * filter set. setFilter resets the page to 1 inside the adapter
+     * (a filter change while on page 7 is almost never what the
+     * user wants). */
+    if (this.serverAdapter) {
+      this.serverAdapter.setFilter(model);
+    }
   }
 
   /* ── toolbar handlers ──────────────────────────────── */

@@ -198,7 +198,7 @@
     class="us-data-grid__grid"
     [theme]="theme"
     [gridOptions]="gridOptions"
-    [rowData]="rows"
+    [rowData]="currentRows"
     (gridReady)="onGridReady($event)"
     (firstDataRendered)="onFirstDataRendered($event)"
     (rowClicked)="onRowClicked($event)"
@@ -206,6 +206,19 @@
     (sortChanged)="onSortChanged($event)"
     (filterChanged)="onFilterChanged($event)"
   ></ag-grid-angular>
+
+  <!-- BE-driven paginator — visible only when a serverAdapter is
+       bound. The adapter owns page / limit / total; we mirror the
+       reads here and emit user-driven changes back. -->
+  <us-paginator
+    *ngIf="serverAdapter"
+    [page]="serverAdapter.page()"
+    [limit]="serverAdapter.limit()"
+    [total]="serverAdapter.total()"
+    [pageSizeOptions]="resolvedConfig.pageSizeOptions"
+    (pageChange)="serverAdapter.setPage($event)"
+    (limitChange)="serverAdapter.setLimit($event)"
+  ></us-paginator>
 
   <!-- Columns overlay -->
   <p-overlayPanel #columnsOp [dismissable]="true" [showCloseIcon]="false" styleClass="us-data-grid__panel">
