@@ -279,6 +279,19 @@ export class AddDatasetComponent
   // Save as Dataset Dialog
   showDatasetDialog = false;
 
+  /**
+   * BE safety-violation banner. Set when /datasets save returns
+   * `data.code === 'SAFETY_VIOLATION'`. Persistent (not a toast)
+   * because the user needs to see the offending token while
+   * editing the SQL. Cleared on any keystroke in the editor.
+   *
+   * Shape mirrors the BE response: `reason` is the human message
+   * and `offendingToken` is what the validator pointed at (a
+   * keyword like DELETE or a punctuation like `;`).
+   */
+  sqlSafetyError: { reason: string; offendingToken: string | null } | null =
+    null;
+
   // Results bottom sheet
   showResultsPopup = false;
   resultRows = 25;
@@ -954,6 +967,9 @@ export class AddDatasetComponent
           this.currentQuery = this.editor.getValue();
           this.sqlValidatorService.validateDebounced(this.editor.getModel());
           this.scheduleDialectLint();
+          // Any keystroke invalidates the last safety verdict — the
+          // banner clears so the next save attempt gets a fresh check.
+          this.clearSqlSafetyError();
           this.cdr.markForCheck();
         });
 
@@ -2053,12 +2069,29 @@ export class AddDatasetComponent
       this.datasetService
         .addDataset(payload)
         .then(response => {
+          // Safety-violation responses are 400s with a structured
+          // `data.code === 'SAFETY_VIOLATION'` payload. Catch them
+          // BEFORE the generic toast handler so we can pin the
+          // reason + offending token above the editor — toasts
+          // disappear and the user loses context.
+          if (
+            response &&
+            response.status === false &&
+            response.data?.code === 'SAFETY_VIOLATION'
+          ) {
+            this.sqlSafetyError = {
+              reason: response.message ?? 'SQL was rejected by the safety check.',
+              offendingToken: response.data?.offendingToken ?? null,
+            };
+            this.cdr.markForCheck();
+            return;
+          }
+
           if (this.globalService.handleSuccessService(response, true)) {
-            // Navigate to dataset list
+            // Saved cleanly — clear any prior banner.
+            this.sqlSafetyError = null;
             this._saved = true;
             this.router.navigate([DATASET.LIST]);
-            // Dataset saved successfully
-            // Now proceed with pending change if any
             if (this.pendingDatasourceChange) {
               this.proceedWithDatasourceChange(this.pendingDatasourceChange);
               this.pendingDatasourceChange = null;
@@ -2069,6 +2102,19 @@ export class AddDatasetComponent
         .catch(() => {
           this.cdr.markForCheck();
         });
+    }
+  }
+
+  /**
+   * Called by the editor's keystroke handler. The banner stays sticky
+   * across re-saves of the same offending SQL (so the user sees the
+   * full reason) but disappears the moment they edit, because their
+   * next save attempt re-runs the validator on whatever they typed.
+   */
+  clearSqlSafetyError(): void {
+    if (this.sqlSafetyError) {
+      this.sqlSafetyError = null;
+      this.cdr.markForCheck();
     }
   }
 

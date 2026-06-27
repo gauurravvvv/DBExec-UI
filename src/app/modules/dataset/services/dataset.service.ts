@@ -510,4 +510,33 @@ export class DatasetService {
       this._saving.set(false);
     }
   }
+
+  /**
+   * Downstream consumers — `{ analyses, dashboards, rlsRules, totalConsumers }`.
+   * Used by the Lineage tab and the delete-confirmation modal so the
+   * user knows what they'd break before they hit confirm.
+   */
+  async getLineage(datasetId: string): Promise<any> {
+    return await lastValueFrom(
+      this.http
+        .apiGet(DATASET.LINEAGE_PREFIX + datasetId + DATASET.LINEAGE_SUFFIX, {
+          skipLoader: true,
+        })
+        .pipe(takeUntil(this._cancelReads$)),
+    );
+  }
+
+  /**
+   * 30-day usage rollup — `{ summary: { runs, errors, p50, p95 }, daily: [...] }`.
+   * Drives the Usage tab's sparkline + latency strip.
+   */
+  async getUsage(datasetId: string): Promise<any> {
+    return await lastValueFrom(
+      this.http
+        .apiGet(DATASET.USAGE_PREFIX + datasetId + DATASET.USAGE_SUFFIX, {
+          skipLoader: true,
+        })
+        .pipe(takeUntil(this._cancelReads$)),
+    );
+  }
 }

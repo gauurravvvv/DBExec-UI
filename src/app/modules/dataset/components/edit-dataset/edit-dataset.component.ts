@@ -126,6 +126,15 @@ export class EditDatasetComponent
   // Save as Dataset Dialog
   showDatasetDialog = false;
 
+  /**
+   * Persistent banner for BE SAFETY_VIOLATION responses. Mirrors the
+   * add-dataset implementation — see that file for the rationale on
+   * "why a sticky banner instead of a toast" (the user needs the
+   * offending token visible while they edit the SQL).
+   */
+  sqlSafetyError: { reason: string; offendingToken: string | null } | null =
+    null;
+
   // Results Popup
   showResultsPopup = false;
   resultRows = 25;
@@ -576,6 +585,10 @@ export class EditDatasetComponent
         this.editor.onDidChangeModelContent(() => {
           this.currentQuery = this.editor.getValue();
           this.scheduleDialectLint();
+          // Editor changed — invalidate any stale safety verdict so
+          // the next save attempt re-runs the BE validator from
+          // scratch and the user isn't stuck on an outdated banner.
+          this.clearSqlSafetyError();
           this.cdr.markForCheck();
         });
 
@@ -1590,7 +1603,25 @@ export class EditDatasetComponent
       this.datasetService
         .updateDataset(saveData, (formData.justification || '').trim())
         .then(response => {
+          // Same SAFETY_VIOLATION handling as add-dataset — pin a
+          // persistent banner so the user can see the offending
+          // token while they edit the SQL, instead of a toast
+          // that fades.
+          if (
+            response &&
+            response.status === false &&
+            response.data?.code === 'SAFETY_VIOLATION'
+          ) {
+            this.sqlSafetyError = {
+              reason: response.message ?? 'SQL was rejected by the safety check.',
+              offendingToken: response.data?.offendingToken ?? null,
+            };
+            this.cdr.markForCheck();
+            return;
+          }
+
           if (this.globalService.handleSuccessService(response, true)) {
+            this.sqlSafetyError = null;
             this.originalQuery = this.editor?.getValue() || this.currentQuery;
             this.router.navigate([DATASET.LIST]);
           }
@@ -1599,6 +1630,17 @@ export class EditDatasetComponent
         .catch(() => {
           this.cdr.markForCheck();
         });
+    }
+  }
+
+  /**
+   * Mirror of add-dataset's clearer — runs on every editor keystroke
+   * so the banner doesn't outlive the SQL that produced it.
+   */
+  clearSqlSafetyError(): void {
+    if (this.sqlSafetyError) {
+      this.sqlSafetyError = null;
+      this.cdr.markForCheck();
     }
   }
 

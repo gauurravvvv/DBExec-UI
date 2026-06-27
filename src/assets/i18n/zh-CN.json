@@ -765,7 +765,19 @@
     "COPY_FAILED": "无法复制到剪贴板",
     "RESIZE_RESULTS": "调整结果面板大小",
     "SHOW_RESULTS": "显示结果",
-    "HIDE_RESULTS": "隐藏结果"
+    "HIDE_RESULTS": "隐藏结果",
+    "SAFETY_BANNER_TITLE": "SQL 被安全检查拒绝",
+    "LINEAGE": "血缘",
+    "LINEAGE_DASHBOARDS": "仪表板",
+    "LINEAGE_RLS_RULES": "RLS 规则",
+    "LINEAGE_EMPTY": "尚无内容依赖此数据集。",
+    "USAGE": "使用情况",
+    "USAGE_RUNS": "执行次数",
+    "USAGE_ERRORS": "错误",
+    "USAGE_P50": "p50",
+    "USAGE_P95": "p95",
+    "USAGE_EMPTY": "所选时间窗口内该数据集未被执行。",
+    "LAST_N_DAYS": "最近 {{days}} 天"
   },
   "ANALYSES": {
     "TITLE": "分析",

@@ -765,7 +765,19 @@
     "COPY_FAILED": "Kopieren in die Zwischenablage fehlgeschlagen",
     "RESIZE_RESULTS": "Ergebnispanel anpassen",
     "SHOW_RESULTS": "Ergebnisse anzeigen",
-    "HIDE_RESULTS": "Ergebnisse ausblenden"
+    "HIDE_RESULTS": "Ergebnisse ausblenden",
+    "SAFETY_BANNER_TITLE": "SQL durch Sicherheitsprüfung abgelehnt",
+    "LINEAGE": "Abstammung",
+    "LINEAGE_DASHBOARDS": "Dashboards",
+    "LINEAGE_RLS_RULES": "RLS-Regeln",
+    "LINEAGE_EMPTY": "Noch nichts hängt von diesem Datensatz ab.",
+    "USAGE": "Nutzung",
+    "USAGE_RUNS": "Ausführungen",
+    "USAGE_ERRORS": "Fehler",
+    "USAGE_P50": "p50",
+    "USAGE_P95": "p95",
+    "USAGE_EMPTY": "Dieser Datensatz wurde im ausgewählten Zeitraum nicht ausgeführt.",
+    "LAST_N_DAYS": "letzte {{days}} Tage"
   },
   "ANALYSES": {
     "TITLE": "Analysen",

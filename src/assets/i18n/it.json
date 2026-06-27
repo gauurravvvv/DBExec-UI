@@ -765,7 +765,19 @@
     "COPY_FAILED": "Impossibile copiare negli appunti",
     "RESIZE_RESULTS": "Ridimensiona il pannello dei risultati",
     "SHOW_RESULTS": "Mostra risultati",
-    "HIDE_RESULTS": "Nascondi risultati"
+    "HIDE_RESULTS": "Nascondi risultati",
+    "SAFETY_BANNER_TITLE": "SQL rifiutato dal controllo di sicurezza",
+    "LINEAGE": "Origine",
+    "LINEAGE_DASHBOARDS": "Dashboard",
+    "LINEAGE_RLS_RULES": "Regole RLS",
+    "LINEAGE_EMPTY": "Nessun elemento dipende ancora da questo dataset.",
+    "USAGE": "Utilizzo",
+    "USAGE_RUNS": "Esecuzioni",
+    "USAGE_ERRORS": "Errori",
+    "USAGE_P50": "p50",
+    "USAGE_P95": "p95",
+    "USAGE_EMPTY": "Questo dataset non è stato eseguito nella finestra selezionata.",
+    "LAST_N_DAYS": "ultimi {{days}} giorni"
   },
   "ANALYSES": {
     "TITLE": "Analisi",

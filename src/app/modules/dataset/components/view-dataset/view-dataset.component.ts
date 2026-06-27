@@ -34,6 +34,33 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
   fieldToDelete: any = null;
   isLoadingField = false;
 
+  /**
+   * Lineage payload — `{ analyses, dashboards, rlsRules, totalConsumers }`.
+   * Independent of `datasetData.analyses` (which is just a denormalised
+   * list) — this is the BE's authoritative view of dependents and is
+   * also what powers the "what breaks if I delete" guard in the
+   * delete-confirmation modal.
+   */
+  lineage: {
+    analyses: { id: string; name: string }[];
+    dashboards: { id: string; name: string }[];
+    rlsRules: { id: string; name: string }[];
+    totalConsumers: number;
+  } | null = null;
+  isLoadingLineage = false;
+
+  /**
+   * Usage payload — last 30 days. `summary` carries the headline KPIs;
+   * `daily` is the sparkline data. Shapes match the BE's
+   * /datasets/:id/usage response.
+   */
+  usage: {
+    windowDays: number;
+    summary: { runs: number; errors: number; p50: number; p95: number };
+    daily: { day: string; runs: number }[];
+  } | null = null;
+  isLoadingUsage = false;
+
   saving = this.datasetService.saving;
   // Drives the skeleton card on initial GET + per-id delete spinner.
   loading = this.datasetService.loading;
@@ -185,8 +212,55 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
     const response: any = await this.datasetService.loadOne(datasetId);
     if (this.globalService.handleSuccessService(response, false)) {
       this.datasetData = this.datasetService.current();
+      // Fan out the secondary fetches in parallel. They power the
+      // Lineage and Usage sections of the detail page; both are
+      // additive — a failure on either one just hides its section
+      // rather than blocking the rest of the page.
+      this.loadLineage(datasetId);
+      this.loadUsage(datasetId);
     }
     this.cdr.markForCheck();
+  }
+
+  private async loadLineage(datasetId: string): Promise<void> {
+    this.isLoadingLineage = true;
+    this.cdr.markForCheck();
+    try {
+      const res: any = await this.datasetService.getLineage(datasetId);
+      if (res?.status && res.data) {
+        this.lineage = res.data;
+      }
+    } catch (_err) {
+      // Silent — the section just doesn't render. The page still
+      // works for everything else.
+    } finally {
+      this.isLoadingLineage = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  private async loadUsage(datasetId: string): Promise<void> {
+    this.isLoadingUsage = true;
+    this.cdr.markForCheck();
+    try {
+      const res: any = await this.datasetService.getUsage(datasetId);
+      if (res?.status && res.data) {
+        this.usage = res.data;
+      }
+    } catch (_err) {
+      // Same posture as lineage — additive, not load-bearing.
+    } finally {
+      this.isLoadingUsage = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * Total downstream consumers — used by the delete confirmation
+   * modal to warn the user before they break things.
+   */
+  get hasDownstreamConsumers(): boolean {
+    return (this.lineage?.totalConsumers ?? 0) > 0;
   }
 
   goBack() {

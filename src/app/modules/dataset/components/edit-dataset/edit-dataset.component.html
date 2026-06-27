@@ -386,6 +386,37 @@
     <div class="editor-results-area">
       <!-- Monaco Editor Section -->
       <div class="editor-section">
+        <!-- SQL safety banner — pinned when BE rejects with
+             code='SAFETY_VIOLATION'. Same shape as add-dataset's
+             banner so users see consistent feedback on both screens. -->
+        <div
+          class="sql-safety-banner"
+          *ngIf="sqlSafetyError"
+          role="alert"
+        >
+          <i class="pi pi-shield"></i>
+          <div class="banner-body">
+            <div class="banner-title">
+              {{ 'DATASET.SAFETY_BANNER_TITLE' | translate }}
+            </div>
+            <div class="banner-reason">
+              {{ sqlSafetyError.reason }}
+              <code
+                *ngIf="sqlSafetyError.offendingToken"
+                class="offending-token"
+              >{{ sqlSafetyError.offendingToken }}</code>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="banner-dismiss"
+            (click)="clearSqlSafetyError()"
+            [attr.aria-label]="'COMMON.DISMISS' | translate"
+          >
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+
         <div
           class="editor-container"
           [hidden]="isLoadingEditor || monacoLoadFailed"

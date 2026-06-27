@@ -135,6 +135,12 @@ export const DATASET = {
   VALIDATE_FIELD_SUFFIX: '/fields/validate',
   // GET/PUT/DELETE /datasets/:datasetId/fields/:fieldId
   FIELD_SEGMENT: '/fields/',
+  // GET /datasets/:datasetId/lineage — downstream consumers
+  LINEAGE_PREFIX: '/datasets/',
+  LINEAGE_SUFFIX: '/lineage',
+  // GET /datasets/:datasetId/usage — 30-day stats for the usage tab
+  USAGE_PREFIX: '/datasets/',
+  USAGE_SUFFIX: '/usage',
 };
 
 export const TAB = {
