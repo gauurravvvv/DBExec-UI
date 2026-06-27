@@ -765,7 +765,19 @@
     "COPY_FAILED": "クリップボードへのコピーに失敗しました",
     "RESIZE_RESULTS": "結果パネルのサイズ変更",
     "SHOW_RESULTS": "結果を表示",
-    "HIDE_RESULTS": "結果を非表示"
+    "HIDE_RESULTS": "結果を非表示",
+    "SAFETY_BANNER_TITLE": "SQLは安全性チェックで拒否されました",
+    "LINEAGE": "系統",
+    "LINEAGE_DASHBOARDS": "ダッシュボード",
+    "LINEAGE_RLS_RULES": "RLSルール",
+    "LINEAGE_EMPTY": "このデータセットに依存しているものはまだありません。",
+    "USAGE": "使用状況",
+    "USAGE_RUNS": "実行回数",
+    "USAGE_ERRORS": "エラー",
+    "USAGE_P50": "p50",
+    "USAGE_P95": "p95",
+    "USAGE_EMPTY": "このデータセットは選択した期間に実行されていません。",
+    "LAST_N_DAYS": "直近{{days}}日"
   },
   "ANALYSES": {
     "TITLE": "分析",

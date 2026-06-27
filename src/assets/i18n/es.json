@@ -765,7 +765,19 @@
     "COPY_FAILED": "No se pudo copiar al portapapeles",
     "RESIZE_RESULTS": "Cambiar tamaño del panel de resultados",
     "SHOW_RESULTS": "Mostrar resultados",
-    "HIDE_RESULTS": "Ocultar resultados"
+    "HIDE_RESULTS": "Ocultar resultados",
+    "SAFETY_BANNER_TITLE": "SQL rechazado por la verificación de seguridad",
+    "LINEAGE": "Linaje",
+    "LINEAGE_DASHBOARDS": "Paneles",
+    "LINEAGE_RLS_RULES": "Reglas RLS",
+    "LINEAGE_EMPTY": "Nada depende aún de este conjunto de datos.",
+    "USAGE": "Uso",
+    "USAGE_RUNS": "Ejecuciones",
+    "USAGE_ERRORS": "Errores",
+    "USAGE_P50": "p50",
+    "USAGE_P95": "p95",
+    "USAGE_EMPTY": "Este conjunto de datos no se ha ejecutado en el período seleccionado.",
+    "LAST_N_DAYS": "últimos {{days}} días"
   },
   "ANALYSES": {
     "TITLE": "Análisis",

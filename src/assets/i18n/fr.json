@@ -765,7 +765,19 @@
     "COPY_FAILED": "Échec de la copie dans le presse-papiers",
     "RESIZE_RESULTS": "Redimensionner le panneau des résultats",
     "SHOW_RESULTS": "Afficher les résultats",
-    "HIDE_RESULTS": "Masquer les résultats"
+    "HIDE_RESULTS": "Masquer les résultats",
+    "SAFETY_BANNER_TITLE": "SQL refusé par la vérification de sécurité",
+    "LINEAGE": "Lignée",
+    "LINEAGE_DASHBOARDS": "Tableaux de bord",
+    "LINEAGE_RLS_RULES": "Règles RLS",
+    "LINEAGE_EMPTY": "Rien ne dépend encore de ce jeu de données.",
+    "USAGE": "Utilisation",
+    "USAGE_RUNS": "Exécutions",
+    "USAGE_ERRORS": "Erreurs",
+    "USAGE_P50": "p50",
+    "USAGE_P95": "p95",
+    "USAGE_EMPTY": "Ce jeu de données n'a pas été exécuté sur la période sélectionnée.",
+    "LAST_N_DAYS": "{{days}} derniers jours"
   },
   "ANALYSES": {
     "TITLE": "Analyses",

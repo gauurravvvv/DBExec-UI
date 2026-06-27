@@ -988,3 +988,174 @@
     }
   }
 }
+
+// ─── Lineage section ─────────────────────────────────────────────
+// "What depends on this dataset" — listed by entity kind so the
+// admin can see at a glance which dashboards / RLS rules will break
+// if they delete or radically change the SQL.
+.lineage-loading,
+.usage-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  color: var(--secondary-color);
+
+  i { font-size: var(--fs-h3); }
+}
+
+.lineage-empty,
+.usage-empty {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  background: var(--hover-background);
+  border-radius: var(--radius-md);
+  color: var(--secondary-color);
+  font-size: var(--fs-control);
+
+  i { color: var(--primary-color); }
+}
+
+.lineage-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.lineage-group {
+  h4 {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin: 0 0 var(--space-3);
+    font-size: var(--fs-control);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+
+    i { color: var(--primary-color); }
+
+    .count-badge {
+      // Override the page's h3-scope badge styling for this nested
+      // h4 — slightly smaller so it doesn't compete with the section
+      // header.
+      font-size: var(--fs-micro);
+      padding: 2px 8px;
+    }
+  }
+
+  .lineage-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--space-3);
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      font-size: var(--fs-control);
+      color: var(--text-color);
+      transition:
+        border-color var(--motion-fast) ease,
+        background var(--motion-fast) ease;
+
+      &:hover {
+        border-color: var(--primary-color);
+        background: var(--hover-background);
+      }
+
+      i {
+        color: var(--secondary-color);
+        font-size: var(--fs-control);
+        flex-shrink: 0;
+      }
+    }
+  }
+}
+
+// ─── Usage section ───────────────────────────────────────────────
+.usage-window {
+  font-size: var(--fs-label);
+  font-weight: var(--fw-regular);
+  color: var(--secondary-color);
+  margin-left: var(--space-3);
+}
+
+.usage-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.usage-kpi {
+  padding: var(--space-4) var(--space-5);
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+
+  .kpi-value {
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+    line-height: 1.1;
+
+    small {
+      font-size: var(--fs-control);
+      font-weight: var(--fw-regular);
+      color: var(--secondary-color);
+      margin-left: 2px;
+    }
+  }
+
+  .kpi-label {
+    margin-top: 4px;
+    font-size: var(--fs-micro);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--secondary-color);
+    font-weight: var(--fw-medium);
+  }
+
+  // Tint the errors KPI red whenever it isn't zero — gives the
+  // section a quick scan-readable shape.
+  &.has-errors .kpi-value {
+    color: var(--error-color);
+  }
+}
+
+// Lightweight 30-bar strip — no chart library needed for a window
+// this short. Bars normalise their height against the total runs
+// in the window so a sparse dataset still shows a readable shape.
+.usage-sparkline {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 56px;
+  padding: var(--space-3);
+  background: var(--hover-background);
+  border-radius: var(--radius-md);
+
+  .bar {
+    flex: 1;
+    min-width: 4px;
+    background: var(--primary-color);
+    border-radius: 2px;
+    opacity: 0.75;
+    transition: opacity var(--motion-fast) ease;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}

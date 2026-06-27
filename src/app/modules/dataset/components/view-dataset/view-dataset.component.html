@@ -307,6 +307,118 @@
             </div>
           </div>
         </div>
+
+        <!-- Lineage — what depends on this dataset.
+             Shows dashboards + RLS rules that aren't already covered
+             by the Analyses section above. Hides while the BE call
+             is in flight so a flash-of-no-data doesn't read as
+             "nothing depends on this." -->
+        <div class="info-section full-width" *ngIf="lineage || isLoadingLineage">
+          <h3>
+            <i class="pi pi-sitemap mr-2"></i>
+            {{ 'DATASET.LINEAGE' | translate }}
+            <span class="count-badge" *ngIf="lineage">{{
+              lineage.totalConsumers
+            }}</span>
+          </h3>
+
+          <div class="lineage-loading" *ngIf="isLoadingLineage && !lineage">
+            <i class="pi pi-spin pi-spinner"></i>
+          </div>
+
+          <ng-container *ngIf="lineage && !isLoadingLineage">
+            <div class="lineage-empty" *ngIf="lineage.totalConsumers === 0">
+              <i class="pi pi-info-circle"></i>
+              {{ 'DATASET.LINEAGE_EMPTY' | translate }}
+            </div>
+
+            <div class="lineage-groups" *ngIf="lineage.totalConsumers > 0">
+              <div class="lineage-group" *ngIf="lineage.dashboards.length > 0">
+                <h4>
+                  <i class="pi pi-gauge"></i>
+                  {{ 'DATASET.LINEAGE_DASHBOARDS' | translate }}
+                  <span class="count-badge">{{ lineage.dashboards.length }}</span>
+                </h4>
+                <ul class="lineage-list">
+                  <li *ngFor="let d of lineage.dashboards">
+                    <i class="pi pi-chart-pie"></i>
+                    {{ d.name }}
+                  </li>
+                </ul>
+              </div>
+
+              <div class="lineage-group" *ngIf="lineage.rlsRules.length > 0">
+                <h4>
+                  <i class="pi pi-filter"></i>
+                  {{ 'DATASET.LINEAGE_RLS_RULES' | translate }}
+                  <span class="count-badge">{{ lineage.rlsRules.length }}</span>
+                </h4>
+                <ul class="lineage-list">
+                  <li *ngFor="let r of lineage.rlsRules">
+                    <i class="pi pi-shield"></i>
+                    {{ r.name }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+
+        <!-- Usage — 30-day stats. Headline KPI strip + daily roll-up.
+             A flat sparkline-ish bar list keeps the section dependency-
+             free; no ngx-echarts needed for a 30-bar strip. -->
+        <div class="info-section full-width" *ngIf="usage || isLoadingUsage">
+          <h3>
+            <i class="pi pi-chart-line mr-2"></i>
+            {{ 'DATASET.USAGE' | translate }}
+            <span class="usage-window" *ngIf="usage">
+              ({{ 'DATASET.LAST_N_DAYS' | translate: { days: usage.windowDays } }})
+            </span>
+          </h3>
+
+          <div class="usage-loading" *ngIf="isLoadingUsage && !usage">
+            <i class="pi pi-spin pi-spinner"></i>
+          </div>
+
+          <ng-container *ngIf="usage && !isLoadingUsage">
+            <div class="usage-kpis">
+              <div class="usage-kpi">
+                <div class="kpi-value">{{ usage.summary.runs }}</div>
+                <div class="kpi-label">{{ 'DATASET.USAGE_RUNS' | translate }}</div>
+              </div>
+              <div class="usage-kpi" [class.has-errors]="usage.summary.errors > 0">
+                <div class="kpi-value">{{ usage.summary.errors }}</div>
+                <div class="kpi-label">{{ 'DATASET.USAGE_ERRORS' | translate }}</div>
+              </div>
+              <div class="usage-kpi">
+                <div class="kpi-value">{{ usage.summary.p50 }}<small>ms</small></div>
+                <div class="kpi-label">{{ 'DATASET.USAGE_P50' | translate }}</div>
+              </div>
+              <div class="usage-kpi">
+                <div class="kpi-value">{{ usage.summary.p95 }}<small>ms</small></div>
+                <div class="kpi-label">{{ 'DATASET.USAGE_P95' | translate }}</div>
+              </div>
+            </div>
+
+            <div class="usage-empty" *ngIf="usage.summary.runs === 0">
+              <i class="pi pi-info-circle"></i>
+              {{ 'DATASET.USAGE_EMPTY' | translate }}
+            </div>
+
+            <!-- Inline bar strip — no chart lib needed for 30 bars.
+                 Heights are CSS-normalised against the day with the
+                 most runs in the window, so a quiet dataset still
+                 shows a readable shape. -->
+            <div class="usage-sparkline" *ngIf="usage.daily.length > 0">
+              <div
+                class="bar"
+                *ngFor="let row of usage.daily"
+                [style.height.%]="(row.runs / (usage.summary.runs || 1)) * 100 || 4"
+                [title]="row.day + ': ' + row.runs + ' runs'"
+              ></div>
+            </div>
+          </ng-container>
+        </div>
       </div>
     </div>
   </div>

@@ -874,6 +874,101 @@
   position: relative;
 }
 
+// SQL safety banner — pinned above the editor whenever the BE
+// rejects a save with code='SAFETY_VIOLATION'. We deliberately use
+// the error palette + an alert role so screen readers announce it
+// as it appears. The offending-token is rendered in a monospace
+// code chip so a keyword like DELETE or a punctuation like ; reads
+// the same way it would in the editor.
+.sql-safety-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  margin: var(--space-3) var(--space-3) 0;
+  background: var(--error-bg);
+  border: 1px solid var(--error-color);
+  border-left-width: 4px;
+  border-radius: var(--radius-md);
+  color: var(--error-color);
+  font-size: var(--fs-control);
+  animation: sqlSafetySlideIn var(--motion-base) ease-out;
+
+  i.pi-shield {
+    font-size: var(--fs-h3);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .banner-body {
+    flex: 1;
+    min-width: 0;
+    color: var(--text-color);
+  }
+
+  .banner-title {
+    font-weight: var(--fw-semibold);
+    color: var(--error-color);
+    margin-bottom: 2px;
+  }
+
+  .banner-reason {
+    color: var(--text-color);
+    line-height: 1.45;
+    word-break: break-word;
+  }
+
+  .offending-token {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    background: var(--card-background);
+    border: 1px solid var(--error-color);
+    border-radius: var(--radius-xs);
+    color: var(--error-color);
+    font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: var(--fs-label);
+    font-weight: var(--fw-medium);
+  }
+
+  .banner-dismiss {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-xs);
+    color: var(--error-color);
+    cursor: pointer;
+    transition:
+      background var(--motion-fast) ease,
+      border-color var(--motion-fast) ease;
+
+    &:hover {
+      background: var(--card-background);
+      border-color: var(--error-color);
+    }
+
+    i {
+      font-size: var(--fs-control);
+    }
+  }
+}
+
+@keyframes sqlSafetySlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 // Individual tab editor containers (legacy)
 .tab-editor-container {
   width: 100%;

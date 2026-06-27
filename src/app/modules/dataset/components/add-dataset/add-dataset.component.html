@@ -454,6 +454,38 @@
           </div>
         </div>
 
+        <!-- SQL safety banner — pinned above the editor when the BE
+             rejected the save with code='SAFETY_VIOLATION'. Clears on
+             next keystroke. Not a toast — the user needs to see the
+             reason + offending token while editing the SQL. -->
+        <div
+          class="sql-safety-banner"
+          *ngIf="sqlSafetyError"
+          role="alert"
+        >
+          <i class="pi pi-shield"></i>
+          <div class="banner-body">
+            <div class="banner-title">
+              {{ 'DATASET.SAFETY_BANNER_TITLE' | translate }}
+            </div>
+            <div class="banner-reason">
+              {{ sqlSafetyError.reason }}
+              <code
+                *ngIf="sqlSafetyError.offendingToken"
+                class="offending-token"
+              >{{ sqlSafetyError.offendingToken }}</code>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="banner-dismiss"
+            (click)="clearSqlSafetyError()"
+            [attr.aria-label]="'COMMON.DISMISS' | translate"
+          >
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+
         <div
           class="editor-container"
           [hidden]="isLoadingEditor || monacoLoadFailed"

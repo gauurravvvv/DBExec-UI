@@ -765,7 +765,19 @@
     "COPY_FAILED": "Kan niet naar klembord kopiëren",
     "RESIZE_RESULTS": "Resultatenpaneel aanpassen",
     "SHOW_RESULTS": "Resultaten weergeven",
-    "HIDE_RESULTS": "Resultaten verbergen"
+    "HIDE_RESULTS": "Resultaten verbergen",
+    "SAFETY_BANNER_TITLE": "SQL geweigerd door beveiligingscontrole",
+    "LINEAGE": "Afkomst",
+    "LINEAGE_DASHBOARDS": "Dashboards",
+    "LINEAGE_RLS_RULES": "RLS-regels",
+    "LINEAGE_EMPTY": "Er hangt nog niets af van deze dataset.",
+    "USAGE": "Gebruik",
+    "USAGE_RUNS": "Uitvoeringen",
+    "USAGE_ERRORS": "Fouten",
+    "USAGE_P50": "p50",
+    "USAGE_P95": "p95",
+    "USAGE_EMPTY": "Deze dataset is in de gekozen periode niet uitgevoerd.",
+    "LAST_N_DAYS": "laatste {{days}} dagen"
   },
   "ANALYSES": {
     "TITLE": "Analyses",

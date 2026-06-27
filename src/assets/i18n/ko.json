@@ -765,7 +765,19 @@
     "COPY_FAILED": "클립보드에 복사할 수 없습니다",
     "RESIZE_RESULTS": "결과 패널 크기 조정",
     "SHOW_RESULTS": "결과 표시",
-    "HIDE_RESULTS": "결과 숨기기"
+    "HIDE_RESULTS": "결과 숨기기",
+    "SAFETY_BANNER_TITLE": "SQL이 보안 검사에서 거부되었습니다",
+    "LINEAGE": "계보",
+    "LINEAGE_DASHBOARDS": "대시보드",
+    "LINEAGE_RLS_RULES": "RLS 규칙",
+    "LINEAGE_EMPTY": "이 데이터셋에 의존하는 항목이 아직 없습니다.",
+    "USAGE": "사용 현황",
+    "USAGE_RUNS": "실행 횟수",
+    "USAGE_ERRORS": "오류",
+    "USAGE_P50": "p50",
+    "USAGE_P95": "p95",
+    "USAGE_EMPTY": "선택한 기간에 이 데이터셋이 실행되지 않았습니다.",
+    "LAST_N_DAYS": "최근 {{days}}일"
   },
   "ANALYSES": {
     "TITLE": "분석",

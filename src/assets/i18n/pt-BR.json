@@ -765,7 +765,19 @@
     "COPY_FAILED": "Não foi possível copiar para a área de transferência",
     "RESIZE_RESULTS": "Redimensionar painel de resultados",
     "SHOW_RESULTS": "Mostrar resultados",
-    "HIDE_RESULTS": "Ocultar resultados"
+    "HIDE_RESULTS": "Ocultar resultados",
+    "SAFETY_BANNER_TITLE": "SQL rejeitado pela verificação de segurança",
+    "LINEAGE": "Linhagem",
+    "LINEAGE_DASHBOARDS": "Painéis",
+    "LINEAGE_RLS_RULES": "Regras de RLS",
+    "LINEAGE_EMPTY": "Nada depende deste dataset ainda.",
+    "USAGE": "Uso",
+    "USAGE_RUNS": "Execuções",
+    "USAGE_ERRORS": "Erros",
+    "USAGE_P50": "p50",
+    "USAGE_P95": "p95",
+    "USAGE_EMPTY": "Este dataset não foi executado na janela selecionada.",
+    "LAST_N_DAYS": "últimos {{days}} dias"
   },
   "ANALYSES": {
     "TITLE": "Análises",

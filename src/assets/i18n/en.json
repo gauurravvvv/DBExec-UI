@@ -817,7 +817,19 @@
     "VALIDATION_FAILED": "Validation failed",
     "VALIDATION_FAILED_RETRY": "Validation failed. Please try again.",
     "VIA_QUERY_BUILDER": "Via Query Builder",
-    "VIEW_RESULTS": "View Results"
+    "VIEW_RESULTS": "View Results",
+    "SAFETY_BANNER_TITLE": "SQL rejected by safety check",
+    "LINEAGE": "Lineage",
+    "LINEAGE_DASHBOARDS": "Dashboards",
+    "LINEAGE_RLS_RULES": "RLS rules",
+    "LINEAGE_EMPTY": "Nothing depends on this dataset yet.",
+    "USAGE": "Usage",
+    "USAGE_RUNS": "Runs",
+    "USAGE_ERRORS": "Errors",
+    "USAGE_P50": "p50",
+    "USAGE_P95": "p95",
+    "USAGE_EMPTY": "This dataset has not been run in the selected window.",
+    "LAST_N_DAYS": "last {{days}} days"
   },
   "ANALYSES": {
     "TITLE": "Analyses",
