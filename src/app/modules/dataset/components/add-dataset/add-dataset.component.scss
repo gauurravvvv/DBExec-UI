@@ -1593,6 +1593,128 @@
         font-size: var(--fs-control);
       }
     }
+
+    // ── Typed error chrome ────────────────────────────────────────
+    // Tint the icon background per error kind so the user reads
+    // "what kind of failure" at a glance, before the message.
+    // permission/timeout/syntax all keep the error palette (these
+    // are still failures) — only the icon hue shifts. Connection
+    // gets amber because it's often the network's fault, not the SQL.
+    &[data-kind='timeout'] .error-icon-wrapper i,
+    &[data-kind='timeout'] .error-message-box {
+      border-left-color: var(--warning-color, #d97706);
+    }
+    &[data-kind='timeout'] .error-icon-wrapper {
+      background: rgba(217, 119, 6, 0.12);
+    }
+    &[data-kind='timeout'] .error-icon-wrapper i {
+      color: var(--warning-color, #d97706);
+    }
+
+    &[data-kind='connection'] .error-icon-wrapper {
+      background: rgba(217, 119, 6, 0.12);
+    }
+    &[data-kind='connection'] .error-icon-wrapper i {
+      color: var(--warning-color, #d97706);
+    }
+    &[data-kind='connection'] .error-message-box {
+      border-left-color: var(--warning-color, #d97706);
+    }
+
+    // safety_violation keeps the error palette but a shield icon —
+    // it's intentional protective behaviour, not a driver failure.
+    &[data-kind='safety_violation'] .error-icon-wrapper {
+      background: var(--error-bg);
+    }
+
+    // Offending-token chip — surfaces the keyword the safety
+    // validator pointed at (e.g. DELETE, ;, INTO) next to the engine
+    // message in a monospace pill so the user can spot it.
+    .offending-token-chip {
+      display: inline-block;
+      margin-left: var(--space-3);
+      padding: 2px 8px;
+      background: var(--card-background);
+      border: 1px solid var(--error-color);
+      border-radius: var(--radius-xs);
+      color: var(--error-color);
+      font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+      font-size: var(--fs-label);
+      font-weight: var(--fw-medium);
+      vertical-align: middle;
+    }
+
+    // Per-kind recovery hint. Smaller than the title; reads like a
+    // help bubble, not an action.
+    .error-hint {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      max-width: 600px;
+      margin-bottom: var(--space-4);
+      padding: var(--space-3) var(--space-4);
+      background: var(--hover-background);
+      border-radius: var(--radius-md);
+      color: var(--secondary-color);
+      font-size: var(--fs-label);
+      text-align: left;
+      line-height: 1.5;
+
+      i {
+        flex-shrink: 0;
+        margin-top: 2px;
+        color: var(--primary-color);
+      }
+    }
+  }
+
+  // Banners — truncation + warnings strips that sit above the table.
+  // Both use the same layout so they stack cleanly when both apply.
+  .results-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    margin: var(--space-3) var(--space-3) 0;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    font-size: var(--fs-label);
+    line-height: 1.45;
+
+    i {
+      flex-shrink: 0;
+      margin-top: 1px;
+      font-size: var(--fs-control);
+    }
+
+    .warnings-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      li + li {
+        margin-top: 2px;
+      }
+    }
+
+    &--truncated {
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      color: var(--text-color);
+
+      i {
+        color: var(--primary-color);
+      }
+    }
+
+    &--warning {
+      background: rgba(217, 119, 6, 0.08);
+      border: 1px solid rgba(217, 119, 6, 0.25);
+      color: var(--text-color);
+
+      i {
+        color: var(--warning-color, #d97706);
+      }
+    }
   }
 
   // Success Card

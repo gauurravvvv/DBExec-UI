@@ -296,6 +296,17 @@ export class AddDatasetComponent
   showResultsPopup = false;
   resultRows = 25;
   resultPage = 1;
+
+  /**
+   * Zero-based row index of the first row on the current page. Bound
+   * to PrimeNG `[first]` on the results table so the paginator's
+   * active-page chip stays in sync with the BE-returned page after
+   * each lazy load. Without this, `[value]` changing rows out from
+   * under the table caused PrimeNG to reset `first` to 0 and the
+   * paginator visually snapped back to page 1 even though the rows
+   * displayed were page N.
+   */
+  resultFirst = 0;
   isExportingResults = false;
   resultFilterValues: { [key: string]: string } = {};
   private resultFilterSubject = new Subject<void>();
@@ -491,8 +502,10 @@ export class AddDatasetComponent
       .subscribe(() => {
         if (!this.lastExecutedQuery) return;
 
-        // Reset to first page on filter change
+        // Reset to first page on filter change. resultFirst pairs
+        // with resultPage so the paginator highlight resets too.
         this.resultPage = 1;
+        this.resultFirst = 0;
 
         // Build filter object from non-empty filter values
         const filter: { [key: string]: string } = {};
@@ -1343,6 +1356,7 @@ export class AddDatasetComponent
     if (this.isExecutingQuery) return;
     const query = this.editor?.getValue() || this.currentQuery;
     this.resultPage = 1;
+    this.resultFirst = 0;
     this.resultFilterValues = {};
     // Deliberately leave `queryResult` in place until the new
     // result lands. Nulling it would unmount the sheet (the
@@ -1359,6 +1373,7 @@ export class AddDatasetComponent
   executeSelectedQuery(selectedText: string): void {
     if (this.isExecutingQuery) return;
     this.resultPage = 1;
+    this.resultFirst = 0;
     this.resultFilterValues = {};
     // See executeCompleteQuery — same anti-flicker reasoning.
     this.executeQueryForDatasource(selectedText);
@@ -1507,6 +1522,7 @@ export class AddDatasetComponent
   clearResultFilters(): void {
     this.resultFilterValues = {};
     this.resultPage = 1;
+    this.resultFirst = 0;
     if (this.lastExecutedQuery) {
       this.executeQueryForDatasource(
         this.lastExecutedQuery,
@@ -1575,13 +1591,23 @@ export class AddDatasetComponent
 
   onResultsLazyLoad(event: any): void {
     this.lastResultsLazyEvent = event;
+    const first = event.first || 0;
     const page =
-      Math.floor((event.first || 0) / (event.rows || this.resultRows)) + 1;
+      Math.floor(first / (event.rows || this.resultRows)) + 1;
     const limit = event.rows || this.resultRows;
 
     if (!this.lastExecutedQuery) return;
 
     this.resultPage = page;
+    // Mirror the offset PrimeNG asked for back onto our bound
+    // `[first]` so a subsequent `[value]` change (the lazy fetch
+    // returning rows) doesn't reset the paginator highlight to 0.
+    // markForCheck is required because this component is OnPush —
+    // the lazy event fires outside Angular's normal CD path and
+    // without a mark the new resultFirst value isn't flushed to
+    // PrimeNG's [first] binding until the next external trigger.
+    this.resultFirst = first;
+    this.cdr.markForCheck();
     if (this.resultRows !== limit) {
       this.resultRows = limit;
       // User changed page size — persist so the new choice
@@ -1815,22 +1841,28 @@ export class AddDatasetComponent
     this.cdr.markForCheck();
   }
 
-  private surfaceResultSheet(): void {
+  /**
+   * Show the result sheet. By default this is a pure show-and-uncollapse
+   * with NO pagination reset — pagination/filter-driven re-runs reuse
+   * the existing page state. Pass `resetPagination: true` from new-query
+   * call sites (executeCompleteQuery / executeSelectedQuery) where the
+   * user has issued a fresh query and previous page state would be
+   * meaningless. The lazy-load response path must call with default
+   * (false) so clicking Next doesn't snap back to page 1.
+   */
+  private surfaceResultSheet(opts: { resetPagination?: boolean } = {}): void {
     this.showResultsPopup = true;
     if (this.isResultSheetCollapsed) {
       this.isResultSheetCollapsed = false;
       this.persistSheetCollapsed(false);
     }
-    // Snap the table's internal "first row index" back to 0 so a
-    // 200-row → 7-row result transition doesn't leave the grid
-    // showing page 4 of nothing. PrimeNG's <p-table>.first is the
-    // index of the first row of the current page; setting it to 0
-    // is the minimal reset (filter inputs + sort survive — see
-    // .reset() if a fuller wipe is ever wanted).
-    if (this.resultsTable) {
-      this.resultsTable.first = 0;
+    if (opts.resetPagination) {
+      if (this.resultsTable) {
+        this.resultsTable.first = 0;
+      }
+      this.resultPage = 1;
+      this.resultFirst = 0;
     }
-    this.resultPage = 1;
   }
 
   /**
@@ -1943,6 +1975,11 @@ export class AddDatasetComponent
       .subscribe({
         next: (response: IAPIResponse<QueryExecuteData>) => {
           if (!response.status) {
+            // The BE now ships `data.errorKind` and (for safety
+            // violations) `data.offendingToken`. Surface both on
+            // the queryResult so the pane can pick a typed icon +
+            // recovery hint without parsing the engine message.
+            const errData: any = response.data ?? {};
             this.queryResult = {
               columns: [],
               rows: [],
@@ -1951,6 +1988,8 @@ export class AddDatasetComponent
               error:
                 response.message ||
                 this.translate.instant('DATASET.QUERY_EXECUTION_FAILED'),
+              errorKind: errData.errorKind || 'unknown',
+              offendingToken: errData.offendingToken ?? null,
             };
             // Surface the error in the sheet so the user sees what
             // failed instead of staring at a Run button that
@@ -1989,8 +2028,28 @@ export class AddDatasetComponent
             rows: Array.isArray(data.data) ? data.data : [],
             rowCount: data.rowCount ?? 0,
             executionTime,
+            executionMs: data.executionMs,
+            truncated: data.truncated ?? false,
+            warnings: Array.isArray(data.warnings) ? data.warnings : [],
             query: data.query,
           };
+
+          // PrimeNG resets internal `first` to 0 when `[value]`
+          // changes — even in lazy mode. Our `[first]="resultFirst"`
+          // binding only re-pushes on a JS-level change to that
+          // value, so when the user clicks Next (resultFirst goes
+          // 0 → 25 → next time 25 → 50 → ...) the binding eventually
+          // misses a beat. Defer the direct write to the next
+          // macrotask so it runs AFTER PrimeNG's CD cycle has
+          // re-processed `[value]` and reset its internal first.
+          // This is the rock-solid path used by PrimeNG community
+          // for this exact lazy-paginator-reset issue.
+          setTimeout(() => {
+            if (this.resultsTable && this.resultsTable.first !== this.resultFirst) {
+              this.resultsTable.first = this.resultFirst;
+              this.cdr.markForCheck();
+            }
+          }, 0);
 
           // Auto-fit column widths to the content of this result,
           // then flex the last column to absorb leftover container

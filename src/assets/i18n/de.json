@@ -777,7 +777,21 @@
     "USAGE_P50": "p50",
     "USAGE_P95": "p95",
     "USAGE_EMPTY": "Dieser Datensatz wurde im ausgewählten Zeitraum nicht ausgeführt.",
-    "LAST_N_DAYS": "letzte {{days}} Tage"
+    "LAST_N_DAYS": "letzte {{days}} Tage",
+    "ERROR_KIND_PERMISSION_DENIED": "Zugriff verweigert",
+    "ERROR_KIND_SYNTAX": "SQL-Syntaxfehler",
+    "ERROR_KIND_TIMEOUT": "Zeitüberschreitung der Abfrage",
+    "ERROR_KIND_CONNECTION": "Datenquelle nicht erreichbar",
+    "ERROR_KIND_OBJECT_NOT_FOUND": "Objekt nicht gefunden",
+    "ERROR_KIND_SAFETY_VIOLATION": "SQL durch Sicherheitsprüfung abgelehnt",
+    "ERROR_HINT_PERMISSION_DENIED": "Der Datenquellen-Benutzer hat keinen Zugriff auf ein oder mehrere Objekte. Bitten Sie den DB-Admin um SELECT-Rechte.",
+    "ERROR_HINT_SYNTAX": "Die Engine konnte das SQL nicht parsen. Die Positionsangabe zeigt auf den ersten unerwarteten Token.",
+    "ERROR_HINT_TIMEOUT": "Die Abfrage hat das Statement-Timeout überschritten. Fügen Sie ein WHERE hinzu oder vereinfachen Sie die JOINs.",
+    "ERROR_HINT_CONNECTION": "Die Datenquelle ist nicht erreichbar. Prüfen Sie die Verbindung in den Einstellungen.",
+    "ERROR_HINT_OBJECT_NOT_FOUND": "Eine Tabelle, Sicht oder Spalte aus der Abfrage existiert auf dieser Datenquelle nicht.",
+    "ERROR_HINT_SAFETY_VIOLATION": "Es sind nur einzelne SELECT- oder WITH … SELECT-Abfragen erlaubt.",
+    "OFFENDING_TOKEN_TOOLTIP": "Vom Validator abgelehntes Schlüsselwort",
+    "TRUNCATED_BANNER": "Ergebnis gekürzt — nur die erste Seite wird angezeigt. Verwenden Sie Paginierung oder ein WHERE."
   },
   "ANALYSES": {
     "TITLE": "Analysen",

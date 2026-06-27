@@ -777,7 +777,21 @@
     "USAGE_P50": "p50",
     "USAGE_P95": "p95",
     "USAGE_EMPTY": "このデータセットは選択した期間に実行されていません。",
-    "LAST_N_DAYS": "直近{{days}}日"
+    "LAST_N_DAYS": "直近{{days}}日",
+    "ERROR_KIND_PERMISSION_DENIED": "アクセス権限がありません",
+    "ERROR_KIND_SYNTAX": "SQL構文エラー",
+    "ERROR_KIND_TIMEOUT": "クエリがタイムアウトしました",
+    "ERROR_KIND_CONNECTION": "データソースに接続できません",
+    "ERROR_KIND_OBJECT_NOT_FOUND": "オブジェクトが見つかりません",
+    "ERROR_KIND_SAFETY_VIOLATION": "SQLは安全性チェックで拒否されました",
+    "ERROR_HINT_PERMISSION_DENIED": "データソースのユーザーがオブジェクトにアクセスできません。管理者にSELECT権限を依頼してください。",
+    "ERROR_HINT_SYNTAX": "エンジンがSQLを解析できませんでした。位置は最初の予期しないトークンを示します。",
+    "ERROR_HINT_TIMEOUT": "ステートメントタイムアウトを超えました。WHERE句を追加するかJOINを簡素化してください。",
+    "ERROR_HINT_CONNECTION": "データソースに到達できません。設定で接続を確認してください。",
+    "ERROR_HINT_OBJECT_NOT_FOUND": "クエリで参照されたテーブル、ビュー、または列はこのデータソースに存在しません。",
+    "ERROR_HINT_SAFETY_VIOLATION": "単一文のSELECTまたはWITH … SELECTクエリのみ許可されています。",
+    "OFFENDING_TOKEN_TOOLTIP": "バリデーターが拒否したキーワード",
+    "TRUNCATED_BANNER": "結果が切り捨てられました — 最初のページのみ表示。ページネーションまたはWHEREを使用してください。"
   },
   "ANALYSES": {
     "TITLE": "分析",
