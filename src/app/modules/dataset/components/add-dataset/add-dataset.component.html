@@ -128,6 +128,28 @@
       >
         <i class="pi pi-trash" aria-hidden="true"></i>
       </button>
+      <!-- Explain button — runs EXPLAIN against the user's SQL
+           without executing it. Shows the plan in a dialog (raw
+           JSON pretty-printed). Hidden while a query is in flight
+           since the Run/Cancel toggle owns the row at that moment. -->
+      <button
+        *ngIf="!isExecutingQuery"
+        pButton
+        class="btn-explain"
+        (click)="runExplain()"
+        [disabled]="
+          isLoadingEditor ||
+          !selectedDatasourceObj ||
+          !editor ||
+          isQueryEmpty ||
+          scopedSchemaUnavailable
+        "
+        [title]="'DATASET.EXPLAIN_QUERY' | translate"
+        [attr.aria-label]="'DATASET.EXPLAIN_QUERY' | translate"
+      >
+        <i class="pi pi-search" aria-hidden="true"></i>
+        <span class="btn-run-label">{{ 'DATASET.EXPLAIN' | translate }}</span>
+      </button>
       <!-- Run button — hidden while the query is in flight; replaced
            by the Cancel button below. Splitting into two buttons (vs
            one toggle) keeps each button's `[disabled]` rules
@@ -964,6 +986,57 @@
   (close)="onDatasetDialogClose($event)"
 >
 </app-save-dataset-dialog>
+
+<!-- EXPLAIN Plan Dialog — shows the engine's parse + plan for the
+     current editor SQL. PG/MySQL/Snowflake return JSON which we
+     pretty-print; Oracle returns text we render verbatim. The
+     dialog is dismissable via the X, Escape, or the outer scrim. -->
+<p-dialog
+  *ngIf="showExplainDialog"
+  [visible]="showExplainDialog"
+  (visibleChange)="$event ? null : closeExplainDialog()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closeOnEscape]="true"
+  styleClass="explain-plan-dialog"
+  [style]="{ width: 'min(960px, 92vw)' }"
+>
+  <ng-template pTemplate="header">
+    <div class="explain-plan-dialog__title">
+      <i class="pi pi-search"></i>
+      <span>{{ 'DATASET.EXPLAIN_PLAN_TITLE' | translate }}</span>
+      <span
+        *ngIf="explainState.engine"
+        class="explain-plan-dialog__engine"
+      >{{ explainState.engine }}</span>
+      <span
+        *ngIf="explainState.durationMs != null"
+        class="explain-plan-dialog__duration"
+      >{{ explainState.durationMs }}ms</span>
+    </div>
+  </ng-template>
+
+  <div class="explain-plan-dialog__body">
+    <div class="explain-plan-dialog__loading" *ngIf="explainState.loading">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>{{ 'DATASET.EXPLAIN_RUNNING' | translate }}</span>
+    </div>
+
+    <div
+      *ngIf="!explainState.loading && explainState.error"
+      class="explain-plan-dialog__error"
+    >
+      <i class="pi pi-exclamation-triangle"></i>
+      <code>{{ explainState.error }}</code>
+    </div>
+
+    <pre
+      *ngIf="!explainState.loading && !explainState.error && explainPlanText"
+      class="explain-plan-dialog__plan"
+    >{{ explainPlanText }}</pre>
+  </div>
+</p-dialog>
 
 <!-- Hidden File Input for SQL Import -->
 <input type="file" #fileInput hidden (change)="onFileSelected($event)" />

@@ -116,6 +116,102 @@ export class AddDatasetComponent
    * /queries/cancel endpoint to fire engine-specific cancellation.
    */
   activeQueryRequestId: string | null = null;
+
+  /**
+   * Explain panel state. Populated by `runExplain()` and shown in a
+   * dialog. `plan` is whatever shape the engine returned (PG/MySQL
+   * give JSON; Oracle gives text). We pretty-print via JSON.stringify
+   * on display.
+   */
+  showExplainDialog = false;
+  explainState: {
+    loading: boolean;
+    error: string | null;
+    plan: unknown | null;
+    engine: string;
+    durationMs: number | null;
+  } = { loading: false, error: null, plan: null, engine: '', durationMs: null };
+
+  /**
+   * Computed JSON string for the Explain dialog. Pretty-prints any
+   * structured plan; falls back to the engine's raw string when the
+   * driver didn't pre-parse (Snowflake / Oracle).
+   */
+  get explainPlanText(): string {
+    const p = this.explainState.plan;
+    if (p == null) return '';
+    if (typeof p === 'string') return p;
+    try {
+      return JSON.stringify(p, null, 2);
+    } catch {
+      return String(p);
+    }
+  }
+
+  /**
+   * Fire the BE explain endpoint with whatever SQL is in the editor.
+   * Opens the dialog optimistically so the user sees a loading state
+   * while the BE rounds-trips the EXPLAIN.
+   */
+  runExplain(): void {
+    const editor = this.editor;
+    const sql = (editor?.getValue() || this.currentQuery || '').trim();
+    if (!sql) return;
+    if (!this.selectedDatasourceObj?.id) return;
+
+    this.showExplainDialog = true;
+    this.explainState = {
+      loading: true,
+      error: null,
+      plan: null,
+      engine: '',
+      durationMs: null,
+    };
+    this.cdr.markForCheck();
+
+    this.queryService
+      .explainQuery({
+        datasourceId: this.selectedDatasourceObj.id,
+        query: sql,
+      })
+      .subscribe({
+        next: (res: any) => {
+          if (res?.status && res.data) {
+            this.explainState = {
+              loading: false,
+              error: null,
+              plan: res.data.plan,
+              engine: res.data.engine ?? '',
+              durationMs: res.data.durationMs ?? null,
+            };
+          } else {
+            this.explainState = {
+              loading: false,
+              error: res?.message ?? 'Explain failed',
+              plan: null,
+              engine: '',
+              durationMs: null,
+            };
+          }
+          this.cdr.markForCheck();
+        },
+        error: (err: any) => {
+          this.explainState = {
+            loading: false,
+            error: err?.error?.message ?? err?.message ?? 'Explain failed',
+            plan: null,
+            engine: '',
+            durationMs: null,
+          };
+          this.cdr.markForCheck();
+        },
+      });
+  }
+
+  closeExplainDialog(): void {
+    this.showExplainDialog = false;
+    this.cdr.markForCheck();
+  }
   monacoLoadFailed = false;
   queryResult: QueryResult | null = null;
 

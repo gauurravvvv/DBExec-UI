@@ -96,6 +96,70 @@ export class EditDatasetComponent
   isExecutingQuery = false;
   /** Mirror of add-dataset.activeQueryRequestId — see there. */
   activeQueryRequestId: string | null = null;
+
+  /** Explain dialog state — mirror of add-dataset. */
+  showExplainDialog = false;
+  explainState: {
+    loading: boolean;
+    error: string | null;
+    plan: unknown | null;
+    engine: string;
+    durationMs: number | null;
+  } = { loading: false, error: null, plan: null, engine: '', durationMs: null };
+
+  get explainPlanText(): string {
+    const p = this.explainState.plan;
+    if (p == null) return '';
+    if (typeof p === 'string') return p;
+    try {
+      return JSON.stringify(p, null, 2);
+    } catch {
+      return String(p);
+    }
+  }
+
+  runExplain(): void {
+    const sql = (this.editor?.getValue() || this.currentQuery || '').trim();
+    if (!sql || !this.selectedDatasourceObj?.id) return;
+    this.showExplainDialog = true;
+    this.explainState = { loading: true, error: null, plan: null, engine: '', durationMs: null };
+    this.cdr.markForCheck();
+    this.queryService
+      .explainQuery({ datasourceId: this.selectedDatasourceObj.id, query: sql })
+      .subscribe({
+        next: (res: any) => {
+          if (res?.status && res.data) {
+            this.explainState = {
+              loading: false, error: null,
+              plan: res.data.plan,
+              engine: res.data.engine ?? '',
+              durationMs: res.data.durationMs ?? null,
+            };
+          } else {
+            this.explainState = {
+              loading: false,
+              error: res?.message ?? 'Explain failed',
+              plan: null, engine: '', durationMs: null,
+            };
+          }
+          this.cdr.markForCheck();
+        },
+        error: (err: any) => {
+          this.explainState = {
+            loading: false,
+            error: err?.error?.message ?? err?.message ?? 'Explain failed',
+            plan: null, engine: '', durationMs: null,
+          };
+          this.cdr.markForCheck();
+        },
+      });
+  }
+
+  closeExplainDialog(): void {
+    this.showExplainDialog = false;
+    this.cdr.markForCheck();
+  }
+
   monacoLoadFailed = false;
   queryResult: QueryResult | null = null;
   datasources: DatasourceSchema[] = [];

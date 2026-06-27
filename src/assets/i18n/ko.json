@@ -792,7 +792,11 @@
     "ERROR_HINT_SAFETY_VIOLATION": "단일 문장의 SELECT 또는 WITH … SELECT 쿼리만 허용됩니다.",
     "OFFENDING_TOKEN_TOOLTIP": "검증기가 거부한 키워드",
     "TRUNCATED_BANNER": "결과가 잘렸습니다 — 첫 페이지만 표시됩니다. 페이지네이션이나 WHERE를 사용하세요.",
-    "CANCEL_QUERY": "실행 중인 쿼리 취소"
+    "CANCEL_QUERY": "실행 중인 쿼리 취소",
+    "EXPLAIN": "실행 계획",
+    "EXPLAIN_QUERY": "쿼리 실행 계획 표시",
+    "EXPLAIN_PLAN_TITLE": "쿼리 실행 계획",
+    "EXPLAIN_RUNNING": "엔진에 실행 계획 요청 중…"
   },
   "ANALYSES": {
     "TITLE": "분석",

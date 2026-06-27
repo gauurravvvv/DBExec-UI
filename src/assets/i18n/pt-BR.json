@@ -792,7 +792,11 @@
     "ERROR_HINT_SAFETY_VIOLATION": "Apenas consultas SELECT ou WITH … SELECT de uma única instrução são permitidas.",
     "OFFENDING_TOKEN_TOOLTIP": "Palavra-chave rejeitada pelo validador",
     "TRUNCATED_BANNER": "Resultado truncado — apenas a primeira página é exibida. Use paginação ou um WHERE.",
-    "CANCEL_QUERY": "Cancelar consulta em execução"
+    "CANCEL_QUERY": "Cancelar consulta em execução",
+    "EXPLAIN": "Explicar",
+    "EXPLAIN_QUERY": "Mostrar plano da consulta",
+    "EXPLAIN_PLAN_TITLE": "Plano da consulta",
+    "EXPLAIN_RUNNING": "Solicitando o plano ao motor…"
   },
   "ANALYSES": {
     "TITLE": "Análises",

@@ -792,7 +792,11 @@
     "ERROR_HINT_SAFETY_VIOLATION": "Es sind nur einzelne SELECT- oder WITH … SELECT-Abfragen erlaubt.",
     "OFFENDING_TOKEN_TOOLTIP": "Vom Validator abgelehntes Schlüsselwort",
     "TRUNCATED_BANNER": "Ergebnis gekürzt — nur die erste Seite wird angezeigt. Verwenden Sie Paginierung oder ein WHERE.",
-    "CANCEL_QUERY": "Laufende Abfrage abbrechen"
+    "CANCEL_QUERY": "Laufende Abfrage abbrechen",
+    "EXPLAIN": "Erklären",
+    "EXPLAIN_QUERY": "Abfrageplan anzeigen",
+    "EXPLAIN_PLAN_TITLE": "Abfrageplan",
+    "EXPLAIN_RUNNING": "Plan wird vom Modul angefordert…"
   },
   "ANALYSES": {
     "TITLE": "Analysen",

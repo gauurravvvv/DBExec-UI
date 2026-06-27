@@ -74,6 +74,18 @@ export class QueryService {
   }
 
   /**
+   * POST /api/v1/queries/explain — parse + plan the user SQL
+   * without executing it. Engine-aware: PG / MySQL / Snowflake
+   * return JSON; Oracle returns text. Caller gets back
+   * { engine, plan, raw, durationMs }.
+   */
+  explainQuery(payload: { datasourceId: string; query: string }): Observable<any> {
+    return this.httpClientService.queryPost(QUERY.EXPLAIN, payload, {
+      skipLoader: true,
+    });
+  }
+
+  /**
    * POST /api/v1/queries/structure — fetch the datasource's schema tree
    * (schemas → tables → columns). Driven by `loadingStructure` so the
    * editor's per-section spinner can show progress.
