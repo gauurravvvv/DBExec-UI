@@ -791,7 +791,12 @@
     "ERROR_HINT_OBJECT_NOT_FOUND": "Een tabel, view of kolom in de query bestaat niet op deze gegevensbron.",
     "ERROR_HINT_SAFETY_VIOLATION": "Alleen enkelvoudige SELECT- of WITH … SELECT-queries zijn toegestaan.",
     "OFFENDING_TOKEN_TOOLTIP": "Trefwoord geweigerd door de validator",
-    "TRUNCATED_BANNER": "Resultaat afgekapt — alleen de eerste pagina wordt getoond. Gebruik paginering of een WHERE."
+    "TRUNCATED_BANNER": "Resultaat afgekapt — alleen de eerste pagina wordt getoond. Gebruik paginering of een WHERE.",
+    "CANCEL_QUERY": "Lopende query annuleren",
+    "EXPLAIN": "Plan",
+    "EXPLAIN_QUERY": "Querytoolplan tonen",
+    "EXPLAIN_PLAN_TITLE": "Queryplan",
+    "EXPLAIN_RUNNING": "Plan ophalen…"
   },
   "ANALYSES": {
     "TITLE": "Analyses",

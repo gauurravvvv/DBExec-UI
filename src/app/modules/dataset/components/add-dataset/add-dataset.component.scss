@@ -2663,3 +2663,123 @@ td.empty-message-cell {
     background: var(--hover-background);
   }
 }
+
+// Explain button — sits beside Run / Cancel. Slightly muted vs the
+// primary Run button since EXPLAIN is exploratory, not an action
+// the user issues most of the time. Matches the toolbar's other
+// secondary buttons (Import / Export / Clear).
+.btn-explain {
+  background: var(--card-background) !important;
+  color: var(--text-color) !important;
+  border: 1px solid var(--border-color) !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: var(--fs-control);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  transition:
+    background var(--motion-fast) ease,
+    border-color var(--motion-fast) ease,
+    color var(--motion-fast) ease;
+
+  &:hover:not(:disabled) {
+    background: var(--hover-background) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--primary-color) !important;
+  }
+
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  i { font-size: var(--fs-control); }
+}
+
+// Explain dialog body — JSON plan rendered in a monospace block so
+// nesting indentation reads cleanly. Header carries the engine name
+// + EXPLAIN duration.
+:host ::ng-deep .explain-plan-dialog {
+  .p-dialog-header { padding: 14px 18px; }
+  .p-dialog-content { padding: 0 18px 18px; }
+}
+
+.explain-plan-dialog__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: var(--fw-semibold);
+
+  i { color: var(--primary-color); }
+
+  &__engine,
+  .explain-plan-dialog__engine {
+    margin-left: 6px;
+    padding: 2px 8px;
+    background: var(--hover-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xs);
+    font-size: var(--fs-label);
+    font-weight: var(--fw-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .explain-plan-dialog__duration {
+    margin-left: auto;
+    color: var(--secondary-color);
+    font-size: var(--fs-label);
+    font-weight: var(--fw-regular);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.explain-plan-dialog__body {
+  min-height: 200px;
+  max-height: min(70vh, 600px);
+  overflow: auto;
+}
+
+.explain-plan-dialog__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 64px 0;
+  color: var(--secondary-color);
+
+  i { font-size: var(--fs-h3); }
+}
+
+.explain-plan-dialog__error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--error-bg);
+  border: 1px solid var(--error-color);
+  border-left-width: 4px;
+  border-radius: var(--radius-md);
+  color: var(--error-color);
+
+  code {
+    flex: 1;
+    color: var(--text-color);
+    font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: var(--fs-label);
+    word-break: break-word;
+    white-space: pre-wrap;
+  }
+}
+
+.explain-plan-dialog__plan {
+  margin: 0;
+  padding: 14px 16px;
+  background: var(--hover-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: var(--fs-label);
+  line-height: 1.55;
+  color: var(--text-color);
+  white-space: pre;
+  overflow: auto;
+}

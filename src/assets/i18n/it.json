@@ -791,7 +791,12 @@
     "ERROR_HINT_OBJECT_NOT_FOUND": "Una tabella, vista o colonna referenziata non esiste su questa fonte dati.",
     "ERROR_HINT_SAFETY_VIOLATION": "Sono consentite solo query SELECT o WITH … SELECT a istruzione singola.",
     "OFFENDING_TOKEN_TOOLTIP": "Parola chiave rifiutata dal validatore",
-    "TRUNCATED_BANNER": "Risultato troncato — è mostrata solo la prima pagina. Usa la paginazione o un WHERE."
+    "TRUNCATED_BANNER": "Risultato troncato — è mostrata solo la prima pagina. Usa la paginazione o un WHERE.",
+    "CANCEL_QUERY": "Annulla l'esecuzione",
+    "EXPLAIN": "Spiega",
+    "EXPLAIN_QUERY": "Mostra il piano della query",
+    "EXPLAIN_PLAN_TITLE": "Piano della query",
+    "EXPLAIN_RUNNING": "Richiesta del piano al motore…"
   },
   "ANALYSES": {
     "TITLE": "Analisi",

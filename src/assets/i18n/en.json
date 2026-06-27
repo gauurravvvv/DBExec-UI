@@ -843,7 +843,12 @@
     "ERROR_HINT_OBJECT_NOT_FOUND": "A table, view, or column referenced by the query does not exist on this datasource.",
     "ERROR_HINT_SAFETY_VIOLATION": "Only single-statement SELECT or WITH ... SELECT queries are allowed. Remove the highlighted keyword and try again.",
     "OFFENDING_TOKEN_TOOLTIP": "Keyword the safety validator rejected",
-    "TRUNCATED_BANNER": "Result truncated — only the first page is shown. Use pagination or add a WHERE clause to see more."
+    "TRUNCATED_BANNER": "Result truncated — only the first page is shown. Use pagination or add a WHERE clause to see more.",
+    "CANCEL_QUERY": "Cancel running query",
+    "EXPLAIN": "Explain",
+    "EXPLAIN_QUERY": "Show query plan",
+    "EXPLAIN_PLAN_TITLE": "Query plan",
+    "EXPLAIN_RUNNING": "Asking the engine for the plan…"
   },
   "ANALYSES": {
     "TITLE": "Analyses",

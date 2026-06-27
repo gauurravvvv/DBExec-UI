@@ -791,7 +791,12 @@
     "ERROR_HINT_OBJECT_NOT_FOUND": "查询引用的表、视图或列在此数据源上不存在。",
     "ERROR_HINT_SAFETY_VIOLATION": "仅允许单语句 SELECT 或 WITH … SELECT 查询。",
     "OFFENDING_TOKEN_TOOLTIP": "验证器拒绝的关键字",
-    "TRUNCATED_BANNER": "结果已截断 — 仅显示第一页。请使用分页或 WHERE 子句查看更多。"
+    "TRUNCATED_BANNER": "结果已截断 — 仅显示第一页。请使用分页或 WHERE 子句查看更多。",
+    "CANCEL_QUERY": "取消正在运行的查询",
+    "EXPLAIN": "执行计划",
+    "EXPLAIN_QUERY": "显示查询计划",
+    "EXPLAIN_PLAN_TITLE": "查询计划",
+    "EXPLAIN_RUNNING": "正在向引擎请求计划…"
   },
   "ANALYSES": {
     "TITLE": "分析",

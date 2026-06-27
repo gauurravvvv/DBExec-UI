@@ -791,7 +791,12 @@
     "ERROR_HINT_OBJECT_NOT_FOUND": "Une table, vue ou colonne référencée par la requête n'existe pas sur cette source.",
     "ERROR_HINT_SAFETY_VIOLATION": "Seules les requêtes SELECT (ou WITH … SELECT) à instruction unique sont autorisées.",
     "OFFENDING_TOKEN_TOOLTIP": "Mot-clé refusé par le validateur",
-    "TRUNCATED_BANNER": "Résultat tronqué — seule la première page est affichée. Utilisez la pagination ou un WHERE pour voir plus."
+    "TRUNCATED_BANNER": "Résultat tronqué — seule la première page est affichée. Utilisez la pagination ou un WHERE pour voir plus.",
+    "CANCEL_QUERY": "Annuler la requête en cours",
+    "EXPLAIN": "Expliquer",
+    "EXPLAIN_QUERY": "Afficher le plan de la requête",
+    "EXPLAIN_PLAN_TITLE": "Plan de la requête",
+    "EXPLAIN_RUNNING": "Demande du plan au moteur…"
   },
   "ANALYSES": {
     "TITLE": "Analyses",

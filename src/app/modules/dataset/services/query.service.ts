@@ -30,13 +30,23 @@ export class QueryService {
 
   constructor(private httpClientService: HttpClientService) {}
 
-  /** POST /api/v1/queries/execute — run an ad-hoc SQL query. */
+  /**
+   * POST /api/v1/queries/execute — run an ad-hoc SQL query.
+   *
+   * `requestId` is FE-minted (caller-supplied) so the Cancel button
+   * has the id available immediately, before the BE responds. The
+   * BE accepts it on the request body, registers it in the in-process
+   * cancel registry, and returns the same id on the response. If the
+   * caller doesn't supply one we accept that (BE falls back to its
+   * own UUID) — keeps the contract backward compatible.
+   */
   executeQuery(queryData: {
     datasourceId: string;
     query: string;
     page?: number;
     limit?: number;
     filter?: string;
+    requestId?: string;
   }): Observable<any> {
     this._running.set(true);
     return this.httpClientService
@@ -47,6 +57,32 @@ export class QueryService {
           error: () => this._running.set(false),
         }),
       );
+  }
+
+  /**
+   * POST /api/v1/queries/cancel — interrupt a mid-flight executeQuery.
+   *
+   * Fire-and-forget from the caller's perspective — the in-flight
+   * executeQuery's own response handler picks up the engine's
+   * "query cancelled" error and surfaces it via the existing
+   * typed-error code path. This call just kicks the engine.
+   */
+  cancelQuery(payload: { requestId: string; datasourceId: string }): Observable<any> {
+    return this.httpClientService.queryPost(QUERY.CANCEL, payload, {
+      skipLoader: true,
+    });
+  }
+
+  /**
+   * POST /api/v1/queries/explain — parse + plan the user SQL
+   * without executing it. Engine-aware: PG / MySQL / Snowflake
+   * return JSON; Oracle returns text. Caller gets back
+   * { engine, plan, raw, durationMs }.
+   */
+  explainQuery(payload: { datasourceId: string; query: string }): Observable<any> {
+    return this.httpClientService.queryPost(QUERY.EXPLAIN, payload, {
+      skipLoader: true,
+    });
   }
 
   /**

@@ -94,6 +94,72 @@ export class EditDatasetComponent
   isLoadingEditor = true;
   isLoadingSchema = false;
   isExecutingQuery = false;
+  /** Mirror of add-dataset.activeQueryRequestId — see there. */
+  activeQueryRequestId: string | null = null;
+
+  /** Explain dialog state — mirror of add-dataset. */
+  showExplainDialog = false;
+  explainState: {
+    loading: boolean;
+    error: string | null;
+    plan: unknown | null;
+    engine: string;
+    durationMs: number | null;
+  } = { loading: false, error: null, plan: null, engine: '', durationMs: null };
+
+  get explainPlanText(): string {
+    const p = this.explainState.plan;
+    if (p == null) return '';
+    if (typeof p === 'string') return p;
+    try {
+      return JSON.stringify(p, null, 2);
+    } catch {
+      return String(p);
+    }
+  }
+
+  runExplain(): void {
+    const sql = (this.editor?.getValue() || this.currentQuery || '').trim();
+    if (!sql || !this.selectedDatasourceObj?.id) return;
+    this.showExplainDialog = true;
+    this.explainState = { loading: true, error: null, plan: null, engine: '', durationMs: null };
+    this.cdr.markForCheck();
+    this.queryService
+      .explainQuery({ datasourceId: this.selectedDatasourceObj.id, query: sql })
+      .subscribe({
+        next: (res: any) => {
+          if (res?.status && res.data) {
+            this.explainState = {
+              loading: false, error: null,
+              plan: res.data.plan,
+              engine: res.data.engine ?? '',
+              durationMs: res.data.durationMs ?? null,
+            };
+          } else {
+            this.explainState = {
+              loading: false,
+              error: res?.message ?? 'Explain failed',
+              plan: null, engine: '', durationMs: null,
+            };
+          }
+          this.cdr.markForCheck();
+        },
+        error: (err: any) => {
+          this.explainState = {
+            loading: false,
+            error: err?.error?.message ?? err?.message ?? 'Explain failed',
+            plan: null, engine: '', durationMs: null,
+          };
+          this.cdr.markForCheck();
+        },
+      });
+  }
+
+  closeExplainDialog(): void {
+    this.showExplainDialog = false;
+    this.cdr.markForCheck();
+  }
+
   monacoLoadFailed = false;
   queryResult: QueryResult | null = null;
   datasources: DatasourceSchema[] = [];
@@ -167,6 +233,76 @@ export class EditDatasetComponent
   get hasAnyColumnType(): boolean {
     const types = this.queryResult?.columnTypes;
     return !!types && Object.keys(types).length > 0;
+  }
+
+  /**
+   * Cached column definitions for the AG Grid result. Same pattern
+   * + helper as add-dataset — see there for the full rationale on
+   * why this is a field rather than a getter.
+   */
+  resultColDefs: any[] = [];
+
+  private buildResultColDefs(): any[] {
+    if (!this.queryResult || this.queryResult.columns.length === 0) return [];
+    const columns = this.queryResult.columns;
+    const types = this.queryResult.columnTypes ?? {};
+
+    const rowIndexCol: any = {
+      colId: '__rowIndex',
+      headerName: '#',
+      valueGetter: (params: any) =>
+        params?.node?.rowIndex != null ? params.node.rowIndex + 1 : '',
+      width: 64,
+      minWidth: 56,
+      maxWidth: 96,
+      pinned: 'left',
+      sortable: false,
+      filter: false,
+      resizable: false,
+      suppressMenu: true,
+      cellClass: 'us-row-index-cell',
+    };
+
+    const dataCols = columns.map((name: string) => {
+      const t = (types[name] ?? 'text').toLowerCase();
+      const def: any = {
+        colId: name,
+        field: name,
+        headerName: name,
+        sortable: true,
+        resizable: true,
+        headerTooltip: types[name] ? `${name} · ${types[name]}` : name,
+      };
+
+      if (t === 'integer' || t === 'numeric') {
+        def.filter = 'agNumberColumnFilter';
+        def.cellDataType = 'number';
+        def.type = 'numericColumn';
+      } else if (t === 'date' || t === 'timestamp') {
+        def.filter = 'agDateColumnFilter';
+        def.cellDataType = 'dateString';
+      } else if (t === 'boolean') {
+        def.filter = 'agSetColumnFilter';
+        def.cellDataType = 'boolean';
+      } else if (t === 'json') {
+        def.filter = 'agTextColumnFilter';
+        def.valueFormatter = (params: any) => {
+          if (params.value == null) return '';
+          if (typeof params.value === 'string') return params.value;
+          try {
+            return JSON.stringify(params.value);
+          } catch {
+            return String(params.value);
+          }
+        };
+      } else {
+        def.filter = 'agTextColumnFilter';
+      }
+
+      return def;
+    });
+
+    return [rowIndexCol, ...dataCols];
   }
 
   // ── Bottom-sheet state (mirrors add-dataset) ──────────────────────
@@ -1234,6 +1370,29 @@ export class EditDatasetComponent
     this.executeQueryForDatasource(this.lastExecutedQuery, page, limit, filter);
   }
 
+  /**
+   * Cancel the in-flight query. Mirror of add-dataset — see there
+   * for the rationale on the optimistic UI revert.
+   */
+  cancelActiveQuery(): void {
+    const id = this.activeQueryRequestId;
+    if (!id || !this.selectedDatasourceObj?.id) return;
+
+    this.isExecutingQuery = false;
+    this.activeQueryRequestId = null;
+    this.cdr.markForCheck();
+
+    this.queryService
+      .cancelQuery({
+        requestId: id,
+        datasourceId: this.selectedDatasourceObj.id,
+      })
+      .subscribe({
+        next: () => { /* engine cancel done */ },
+        error: () => { /* swallow */ },
+      });
+  }
+
   private executeQueryForDatasource(
     query: string,
     page: number = 1,
@@ -1250,6 +1409,12 @@ export class EditDatasetComponent
 
     this.isExecutingQuery = true;
     this.lastExecutedQuery = query;
+    // Mint requestId BEFORE the POST so the Cancel button has the id
+    // immediately. Mirror of add-dataset.
+    this.activeQueryRequestId =
+      typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `q-${Date.now()}-${Math.floor(Math.random() * 1e9)}`;
 
     const startTime = Date.now();
 
@@ -1258,6 +1423,7 @@ export class EditDatasetComponent
       query: query,
       page: page,
       limit: limit,
+      requestId: this.activeQueryRequestId,
     };
 
     if (Object.keys(filter).length > 0) {
@@ -1286,7 +1452,7 @@ export class EditDatasetComponent
               offendingToken: errData.offendingToken ?? null,
             };
             this.surfaceResultSheet();
-            this.isExecutingQuery = false;
+            this.isExecutingQuery = false; this.activeQueryRequestId = null;
             this.cdr.markForCheck();
             return;
           }
@@ -1301,7 +1467,7 @@ export class EditDatasetComponent
               message: response.message,
             };
             this.surfaceResultSheet();
-            this.isExecutingQuery = false;
+            this.isExecutingQuery = false; this.activeQueryRequestId = null;
             this.cdr.markForCheck();
             return;
           }
@@ -1322,6 +1488,10 @@ export class EditDatasetComponent
             warnings: Array.isArray(data.warnings) ? data.warnings : [],
             query: data.query,
           };
+
+          // Rebuild AG Grid ColDefs for the new result. Same as
+          // add-dataset.
+          this.resultColDefs = this.buildResultColDefs();
 
           // PrimeNG resets internal `first` to 0 when `[value]` changes.
           // Deferred direct write so this runs AFTER PrimeNG's CD
@@ -1346,7 +1516,7 @@ export class EditDatasetComponent
             this.surfaceResultSheet();
           }
 
-          this.isExecutingQuery = false;
+          this.isExecutingQuery = false; this.activeQueryRequestId = null;
           this.cdr.markForCheck();
         },
         error: (error: any) => {
@@ -1377,7 +1547,7 @@ export class EditDatasetComponent
           };
           this.surfaceResultSheet();
 
-          this.isExecutingQuery = false;
+          this.isExecutingQuery = false; this.activeQueryRequestId = null;
           this.cdr.markForCheck();
         },
       });

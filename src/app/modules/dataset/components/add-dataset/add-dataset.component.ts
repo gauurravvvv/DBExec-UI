@@ -107,6 +107,111 @@ export class AddDatasetComponent
   isLoadingEditor = true;
   isLoadingSchema = false;
   isExecutingQuery = false;
+
+  /**
+   * UUID of the in-flight query, generated FE-side before the POST
+   * fires so the Cancel button can reference it immediately. Cleared
+   * when the query resolves (success or error). The BE registers the
+   * id in its in-process cancel registry and accepts it on the
+   * /queries/cancel endpoint to fire engine-specific cancellation.
+   */
+  activeQueryRequestId: string | null = null;
+
+  /**
+   * Explain panel state. Populated by `runExplain()` and shown in a
+   * dialog. `plan` is whatever shape the engine returned (PG/MySQL
+   * give JSON; Oracle gives text). We pretty-print via JSON.stringify
+   * on display.
+   */
+  showExplainDialog = false;
+  explainState: {
+    loading: boolean;
+    error: string | null;
+    plan: unknown | null;
+    engine: string;
+    durationMs: number | null;
+  } = { loading: false, error: null, plan: null, engine: '', durationMs: null };
+
+  /**
+   * Computed JSON string for the Explain dialog. Pretty-prints any
+   * structured plan; falls back to the engine's raw string when the
+   * driver didn't pre-parse (Snowflake / Oracle).
+   */
+  get explainPlanText(): string {
+    const p = this.explainState.plan;
+    if (p == null) return '';
+    if (typeof p === 'string') return p;
+    try {
+      return JSON.stringify(p, null, 2);
+    } catch {
+      return String(p);
+    }
+  }
+
+  /**
+   * Fire the BE explain endpoint with whatever SQL is in the editor.
+   * Opens the dialog optimistically so the user sees a loading state
+   * while the BE rounds-trips the EXPLAIN.
+   */
+  runExplain(): void {
+    const editor = this.editor;
+    const sql = (editor?.getValue() || this.currentQuery || '').trim();
+    if (!sql) return;
+    if (!this.selectedDatasourceObj?.id) return;
+
+    this.showExplainDialog = true;
+    this.explainState = {
+      loading: true,
+      error: null,
+      plan: null,
+      engine: '',
+      durationMs: null,
+    };
+    this.cdr.markForCheck();
+
+    this.queryService
+      .explainQuery({
+        datasourceId: this.selectedDatasourceObj.id,
+        query: sql,
+      })
+      .subscribe({
+        next: (res: any) => {
+          if (res?.status && res.data) {
+            this.explainState = {
+              loading: false,
+              error: null,
+              plan: res.data.plan,
+              engine: res.data.engine ?? '',
+              durationMs: res.data.durationMs ?? null,
+            };
+          } else {
+            this.explainState = {
+              loading: false,
+              error: res?.message ?? 'Explain failed',
+              plan: null,
+              engine: '',
+              durationMs: null,
+            };
+          }
+          this.cdr.markForCheck();
+        },
+        error: (err: any) => {
+          this.explainState = {
+            loading: false,
+            error: err?.error?.message ?? err?.message ?? 'Explain failed',
+            plan: null,
+            engine: '',
+            durationMs: null,
+          };
+          this.cdr.markForCheck();
+        },
+      });
+  }
+
+  closeExplainDialog(): void {
+    this.showExplainDialog = false;
+    this.cdr.markForCheck();
+  }
   monacoLoadFailed = false;
   queryResult: QueryResult | null = null;
 
@@ -121,6 +226,91 @@ export class AddDatasetComponent
   get hasAnyColumnType(): boolean {
     const types = this.queryResult?.columnTypes;
     return !!types && Object.keys(types).length > 0;
+  }
+
+  /**
+   * Cached column definitions for the AG Grid result. Rebuilt whenever
+   * the queryResult changes (see the response handler). Kept as a
+   * field rather than a getter so AG Grid's input doesn't churn on
+   * every CD pass — re-running colDef construction on each tick
+   * causes the grid to re-init and lose user state (column order,
+   * widths, filter inputs).
+   */
+  resultColDefs: any[] = [];
+
+  /**
+   * Map our BE `columnTypes` vocabulary onto AG Grid ColDef[]. Sets
+   * the per-column filter type (numeric / date / set / text), cell
+   * data type for sorting + formatting, and resizable/sortable
+   * flags. The first row in the result also gets a row-number column
+   * pinned left for visual consistency with the previous PrimeNG
+   * layout.
+   */
+  private buildResultColDefs(): any[] {
+    if (!this.queryResult || this.queryResult.columns.length === 0) return [];
+    const columns = this.queryResult.columns;
+    const types = this.queryResult.columnTypes ?? {};
+
+    const rowIndexCol: any = {
+      colId: '__rowIndex',
+      headerName: '#',
+      valueGetter: (params: any) =>
+        params?.node?.rowIndex != null ? params.node.rowIndex + 1 : '',
+      width: 64,
+      minWidth: 56,
+      maxWidth: 96,
+      pinned: 'left',
+      sortable: false,
+      filter: false,
+      resizable: false,
+      suppressMenu: true,
+      cellClass: 'us-row-index-cell',
+    };
+
+    const dataCols = columns.map((name: string) => {
+      const t = (types[name] ?? 'text').toLowerCase();
+      // AG Grid v32 ColDef.
+      const def: any = {
+        colId: name,
+        field: name,
+        headerName: name,
+        sortable: true,
+        resizable: true,
+        // Show the type as a tooltip on the header instead of a chip
+        // — matches the cleaner AG Grid header style.
+        headerTooltip: types[name] ? `${name} · ${types[name]}` : name,
+      };
+
+      if (t === 'integer' || t === 'numeric') {
+        def.filter = 'agNumberColumnFilter';
+        def.cellDataType = 'number';
+        def.type = 'numericColumn';
+      } else if (t === 'date' || t === 'timestamp') {
+        def.filter = 'agDateColumnFilter';
+        def.cellDataType = 'dateString';
+      } else if (t === 'boolean') {
+        def.filter = 'agSetColumnFilter';
+        def.cellDataType = 'boolean';
+      } else if (t === 'json') {
+        def.filter = 'agTextColumnFilter';
+        // Pretty-print object/array cells.
+        def.valueFormatter = (params: any) => {
+          if (params.value == null) return '';
+          if (typeof params.value === 'string') return params.value;
+          try {
+            return JSON.stringify(params.value);
+          } catch {
+            return String(params.value);
+          }
+        };
+      } else {
+        def.filter = 'agTextColumnFilter';
+      }
+
+      return def;
+    });
+
+    return [rowIndexCol, ...dataCols];
   }
 
   /**
@@ -1934,6 +2124,34 @@ export class AddDatasetComponent
     this.persistSheetHeight(this.resultSheetHeightPx);
   }
 
+  /**
+   * Fire the cancel endpoint for the in-flight query. The pending
+   * executeQuery POST will surface a "query cancelled" engine error
+   * via the existing typed-error code path; we don't need to
+   * unsubscribe the observable. Optimistically toggle
+   * `isExecutingQuery = false` so the Run button is reachable
+   * immediately — the BE engine cancel is fire-and-forget from the
+   * FE's perspective.
+   */
+  cancelActiveQuery(): void {
+    const id = this.activeQueryRequestId;
+    if (!id || !this.selectedDatasourceObj?.id) return;
+
+    this.isExecutingQuery = false;
+    this.activeQueryRequestId = null;
+    this.cdr.markForCheck();
+
+    this.queryService
+      .cancelQuery({
+        requestId: id,
+        datasourceId: this.selectedDatasourceObj.id,
+      })
+      .subscribe({
+        next: () => { /* engine-side cancel done */ },
+        error: () => { /* swallow — UI already reverted */ },
+      });
+  }
+
   private executeQueryForDatasource(
     query: string,
     page: number = 1,
@@ -1958,11 +2176,20 @@ export class AddDatasetComponent
 
     const startTime = Date.now();
 
+    // Mint the requestId BEFORE the POST fires so the Cancel button
+    // has the id immediately. Stored on the component so the cancel
+    // handler can reach it. Cleared on response (success or error).
+    this.activeQueryRequestId =
+      typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `q-${Date.now()}-${Math.floor(Math.random() * 1e9)}`;
+
     const payload: any = {
       datasourceId: this.selectedDatasourceObj.id,
       query: query,
       page: page,
       limit: limit,
+      requestId: this.activeQueryRequestId,
     };
 
     if (Object.keys(filter).length > 0) {
@@ -1995,7 +2222,7 @@ export class AddDatasetComponent
             // failed instead of staring at a Run button that
             // appeared to do nothing.
             this.surfaceResultSheet();
-            this.isExecutingQuery = false;
+            this.isExecutingQuery = false; this.activeQueryRequestId = null;
             this.cdr.markForCheck();
             return;
           }
@@ -2012,7 +2239,7 @@ export class AddDatasetComponent
             // Show the message banner (DDL, "0 rows affected", etc.)
             // in the sheet even though there are no rows to render.
             this.surfaceResultSheet();
-            this.isExecutingQuery = false;
+            this.isExecutingQuery = false; this.activeQueryRequestId = null;
             this.cdr.markForCheck();
             return;
           }
@@ -2033,6 +2260,12 @@ export class AddDatasetComponent
             warnings: Array.isArray(data.warnings) ? data.warnings : [],
             query: data.query,
           };
+
+          // Rebuild AG Grid ColDefs for the new result so the grid
+          // gets fresh per-column filter types + formatters. Done
+          // before the PrimeNG-paginator workaround below because
+          // the grid swap will eventually retire that.
+          this.resultColDefs = this.buildResultColDefs();
 
           // PrimeNG resets internal `first` to 0 when `[value]`
           // changes — even in lazy mode. Our `[first]="resultFirst"`
@@ -2069,7 +2302,7 @@ export class AddDatasetComponent
             this.surfaceResultSheet();
           }
 
-          this.isExecutingQuery = false;
+          this.isExecutingQuery = false; this.activeQueryRequestId = null;
           this.cdr.markForCheck();
         },
         error: (error: any) => {
@@ -2103,7 +2336,7 @@ export class AddDatasetComponent
           // — surface the failure in the sheet so it's visible.
           this.surfaceResultSheet();
 
-          this.isExecutingQuery = false;
+          this.isExecutingQuery = false; this.activeQueryRequestId = null;
           this.cdr.markForCheck();
         },
       });

@@ -4,6 +4,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { MenuModule } from 'primeng/menu';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
+import { UsDataGridComponent } from 'src/app/shared/components/us-data-grid/us-data-grid.component';
+import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AddDatasetComponent } from './components/add-dataset/add-dataset.component';
 import { EditDatasetFieldsDialogComponent } from './components/edit-dataset-fields-dialog/edit-dataset-fields-dialog.component';
@@ -33,6 +35,11 @@ import { addDatasetReducer, ADD_DATASET_FEATURE_KEY } from './store';
     DatasetRoutingModule,
     SharedModule,
     MenuModule,
+    // Standalone — AG Grid backed result grid for the editor's result
+    // sheet. Brings drag-reorder, column-resize, native floating
+    // filters, density toggle, CSV/XLSX export.
+    UsDataGridComponent,
+    UsGridCellDirective,
     // NgRx Feature Store
     StoreModule.forFeature(ADD_DATASET_FEATURE_KEY, addDatasetReducer),
   ],
