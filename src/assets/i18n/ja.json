@@ -791,7 +791,8 @@
     "ERROR_HINT_OBJECT_NOT_FOUND": "クエリで参照されたテーブル、ビュー、または列はこのデータソースに存在しません。",
     "ERROR_HINT_SAFETY_VIOLATION": "単一文のSELECTまたはWITH … SELECTクエリのみ許可されています。",
     "OFFENDING_TOKEN_TOOLTIP": "バリデーターが拒否したキーワード",
-    "TRUNCATED_BANNER": "結果が切り捨てられました — 最初のページのみ表示。ページネーションまたはWHEREを使用してください。"
+    "TRUNCATED_BANNER": "結果が切り捨てられました — 最初のページのみ表示。ページネーションまたはWHEREを使用してください。",
+    "CANCEL_QUERY": "実行中のクエリをキャンセル"
   },
   "ANALYSES": {
     "TITLE": "分析",

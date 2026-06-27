@@ -791,7 +791,8 @@
     "ERROR_HINT_OBJECT_NOT_FOUND": "Uma tabela, view ou coluna referenciada não existe nessa fonte.",
     "ERROR_HINT_SAFETY_VIOLATION": "Apenas consultas SELECT ou WITH … SELECT de uma única instrução são permitidas.",
     "OFFENDING_TOKEN_TOOLTIP": "Palavra-chave rejeitada pelo validador",
-    "TRUNCATED_BANNER": "Resultado truncado — apenas a primeira página é exibida. Use paginação ou um WHERE."
+    "TRUNCATED_BANNER": "Resultado truncado — apenas a primeira página é exibida. Use paginação ou um WHERE.",
+    "CANCEL_QUERY": "Cancelar consulta em execução"
   },
   "ANALYSES": {
     "TITLE": "Análises",

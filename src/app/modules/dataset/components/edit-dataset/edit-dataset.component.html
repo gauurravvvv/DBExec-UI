@@ -117,7 +117,10 @@
       >
         <i class="pi pi-trash" aria-hidden="true"></i>
       </button>
+      <!-- Run / Cancel toggle — same shape as add-dataset. See that
+           file for the rationale on splitting into two buttons. -->
       <button
+        *ngIf="!isExecutingQuery"
         pButton
         class="btn-run"
         (click)="executeQuery()"
@@ -125,18 +128,24 @@
           isLoadingEditor ||
           !selectedDatasourceObj ||
           !editor ||
-          isExecutingQuery ||
           isQueryEmpty
         "
         [title]="'DATASET.EXECUTE_QUERY' | translate"
         [attr.aria-label]="'DATASET.EXECUTE_QUERY' | translate"
       >
-        <i
-          class="pi"
-          [ngClass]="isExecutingQuery ? 'pi-spin pi-spinner' : 'pi-play'"
-          aria-hidden="true"
-        ></i>
+        <i class="pi pi-play" aria-hidden="true"></i>
         <span class="btn-run-label">{{ 'DATASET.RUN' | translate }}</span>
+      </button>
+      <button
+        *ngIf="isExecutingQuery"
+        pButton
+        class="btn-run btn-run--cancel"
+        (click)="cancelActiveQuery()"
+        [title]="'DATASET.CANCEL_QUERY' | translate"
+        [attr.aria-label]="'DATASET.CANCEL_QUERY' | translate"
+      >
+        <i class="pi pi-times" aria-hidden="true"></i>
+        <span class="btn-run-label">{{ 'COMMON.CANCEL' | translate }}</span>
       </button>
     </div>
   </div>

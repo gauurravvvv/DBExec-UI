@@ -107,6 +107,15 @@ export class AddDatasetComponent
   isLoadingEditor = true;
   isLoadingSchema = false;
   isExecutingQuery = false;
+
+  /**
+   * UUID of the in-flight query, generated FE-side before the POST
+   * fires so the Cancel button can reference it immediately. Cleared
+   * when the query resolves (success or error). The BE registers the
+   * id in its in-process cancel registry and accepts it on the
+   * /queries/cancel endpoint to fire engine-specific cancellation.
+   */
+  activeQueryRequestId: string | null = null;
   monacoLoadFailed = false;
   queryResult: QueryResult | null = null;
 
@@ -2019,6 +2028,34 @@ export class AddDatasetComponent
     this.persistSheetHeight(this.resultSheetHeightPx);
   }
 
+  /**
+   * Fire the cancel endpoint for the in-flight query. The pending
+   * executeQuery POST will surface a "query cancelled" engine error
+   * via the existing typed-error code path; we don't need to
+   * unsubscribe the observable. Optimistically toggle
+   * `isExecutingQuery = false` so the Run button is reachable
+   * immediately — the BE engine cancel is fire-and-forget from the
+   * FE's perspective.
+   */
+  cancelActiveQuery(): void {
+    const id = this.activeQueryRequestId;
+    if (!id || !this.selectedDatasourceObj?.id) return;
+
+    this.isExecutingQuery = false;
+    this.activeQueryRequestId = null;
+    this.cdr.markForCheck();
+
+    this.queryService
+      .cancelQuery({
+        requestId: id,
+        datasourceId: this.selectedDatasourceObj.id,
+      })
+      .subscribe({
+        next: () => { /* engine-side cancel done */ },
+        error: () => { /* swallow — UI already reverted */ },
+      });
+  }
+
   private executeQueryForDatasource(
     query: string,
     page: number = 1,
@@ -2043,11 +2080,20 @@ export class AddDatasetComponent
 
     const startTime = Date.now();
 
+    // Mint the requestId BEFORE the POST fires so the Cancel button
+    // has the id immediately. Stored on the component so the cancel
+    // handler can reach it. Cleared on response (success or error).
+    this.activeQueryRequestId =
+      typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `q-${Date.now()}-${Math.floor(Math.random() * 1e9)}`;
+
     const payload: any = {
       datasourceId: this.selectedDatasourceObj.id,
       query: query,
       page: page,
       limit: limit,
+      requestId: this.activeQueryRequestId,
     };
 
     if (Object.keys(filter).length > 0) {
@@ -2080,7 +2126,7 @@ export class AddDatasetComponent
             // failed instead of staring at a Run button that
             // appeared to do nothing.
             this.surfaceResultSheet();
-            this.isExecutingQuery = false;
+            this.isExecutingQuery = false; this.activeQueryRequestId = null;
             this.cdr.markForCheck();
             return;
           }
@@ -2097,7 +2143,7 @@ export class AddDatasetComponent
             // Show the message banner (DDL, "0 rows affected", etc.)
             // in the sheet even though there are no rows to render.
             this.surfaceResultSheet();
-            this.isExecutingQuery = false;
+            this.isExecutingQuery = false; this.activeQueryRequestId = null;
             this.cdr.markForCheck();
             return;
           }
@@ -2160,7 +2206,7 @@ export class AddDatasetComponent
             this.surfaceResultSheet();
           }
 
-          this.isExecutingQuery = false;
+          this.isExecutingQuery = false; this.activeQueryRequestId = null;
           this.cdr.markForCheck();
         },
         error: (error: any) => {
@@ -2194,7 +2240,7 @@ export class AddDatasetComponent
           // — surface the failure in the sheet so it's visible.
           this.surfaceResultSheet();
 
-          this.isExecutingQuery = false;
+          this.isExecutingQuery = false; this.activeQueryRequestId = null;
           this.cdr.markForCheck();
         },
       });

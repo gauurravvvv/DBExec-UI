@@ -94,6 +94,8 @@ export class EditDatasetComponent
   isLoadingEditor = true;
   isLoadingSchema = false;
   isExecutingQuery = false;
+  /** Mirror of add-dataset.activeQueryRequestId — see there. */
+  activeQueryRequestId: string | null = null;
   monacoLoadFailed = false;
   queryResult: QueryResult | null = null;
   datasources: DatasourceSchema[] = [];
@@ -1304,6 +1306,29 @@ export class EditDatasetComponent
     this.executeQueryForDatasource(this.lastExecutedQuery, page, limit, filter);
   }
 
+  /**
+   * Cancel the in-flight query. Mirror of add-dataset — see there
+   * for the rationale on the optimistic UI revert.
+   */
+  cancelActiveQuery(): void {
+    const id = this.activeQueryRequestId;
+    if (!id || !this.selectedDatasourceObj?.id) return;
+
+    this.isExecutingQuery = false;
+    this.activeQueryRequestId = null;
+    this.cdr.markForCheck();
+
+    this.queryService
+      .cancelQuery({
+        requestId: id,
+        datasourceId: this.selectedDatasourceObj.id,
+      })
+      .subscribe({
+        next: () => { /* engine cancel done */ },
+        error: () => { /* swallow */ },
+      });
+  }
+
   private executeQueryForDatasource(
     query: string,
     page: number = 1,
@@ -1320,6 +1345,12 @@ export class EditDatasetComponent
 
     this.isExecutingQuery = true;
     this.lastExecutedQuery = query;
+    // Mint requestId BEFORE the POST so the Cancel button has the id
+    // immediately. Mirror of add-dataset.
+    this.activeQueryRequestId =
+      typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `q-${Date.now()}-${Math.floor(Math.random() * 1e9)}`;
 
     const startTime = Date.now();
 
@@ -1328,6 +1359,7 @@ export class EditDatasetComponent
       query: query,
       page: page,
       limit: limit,
+      requestId: this.activeQueryRequestId,
     };
 
     if (Object.keys(filter).length > 0) {
@@ -1356,7 +1388,7 @@ export class EditDatasetComponent
               offendingToken: errData.offendingToken ?? null,
             };
             this.surfaceResultSheet();
-            this.isExecutingQuery = false;
+            this.isExecutingQuery = false; this.activeQueryRequestId = null;
             this.cdr.markForCheck();
             return;
           }
@@ -1371,7 +1403,7 @@ export class EditDatasetComponent
               message: response.message,
             };
             this.surfaceResultSheet();
-            this.isExecutingQuery = false;
+            this.isExecutingQuery = false; this.activeQueryRequestId = null;
             this.cdr.markForCheck();
             return;
           }
@@ -1420,7 +1452,7 @@ export class EditDatasetComponent
             this.surfaceResultSheet();
           }
 
-          this.isExecutingQuery = false;
+          this.isExecutingQuery = false; this.activeQueryRequestId = null;
           this.cdr.markForCheck();
         },
         error: (error: any) => {
@@ -1451,7 +1483,7 @@ export class EditDatasetComponent
           };
           this.surfaceResultSheet();
 
-          this.isExecutingQuery = false;
+          this.isExecutingQuery = false; this.activeQueryRequestId = null;
           this.cdr.markForCheck();
         },
       });

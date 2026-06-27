@@ -208,6 +208,7 @@ export const QUERY = {
   EXECUTE: '/queries/execute',
   STRUCTURE: '/queries/structure',
   EXPORT: '/queries/export',
+  CANCEL: '/queries/cancel',
 };
 
 export const ROLE = {
