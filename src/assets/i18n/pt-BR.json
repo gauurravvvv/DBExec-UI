@@ -777,7 +777,21 @@
     "USAGE_P50": "p50",
     "USAGE_P95": "p95",
     "USAGE_EMPTY": "Este dataset não foi executado na janela selecionada.",
-    "LAST_N_DAYS": "últimos {{days}} dias"
+    "LAST_N_DAYS": "últimos {{days}} dias",
+    "ERROR_KIND_PERMISSION_DENIED": "Permissão negada",
+    "ERROR_KIND_SYNTAX": "Erro de sintaxe SQL",
+    "ERROR_KIND_TIMEOUT": "Consulta excedeu o tempo",
+    "ERROR_KIND_CONNECTION": "Não foi possível acessar a fonte de dados",
+    "ERROR_KIND_OBJECT_NOT_FOUND": "Objeto não encontrado",
+    "ERROR_KIND_SAFETY_VIOLATION": "SQL rejeitado pela verificação de segurança",
+    "ERROR_HINT_PERMISSION_DENIED": "O usuário da fonte de dados não tem acesso a um ou mais objetos. Peça ao DBA para conceder SELECT.",
+    "ERROR_HINT_SYNTAX": "O motor não conseguiu analisar o SQL. A posição indica o primeiro token inesperado.",
+    "ERROR_HINT_TIMEOUT": "A consulta excedeu o timeout. Adicione um WHERE ou simplifique os JOINs.",
+    "ERROR_HINT_CONNECTION": "Fonte de dados inacessível. Verifique a conexão nas configurações.",
+    "ERROR_HINT_OBJECT_NOT_FOUND": "Uma tabela, view ou coluna referenciada não existe nessa fonte.",
+    "ERROR_HINT_SAFETY_VIOLATION": "Apenas consultas SELECT ou WITH … SELECT de uma única instrução são permitidas.",
+    "OFFENDING_TOKEN_TOOLTIP": "Palavra-chave rejeitada pelo validador",
+    "TRUNCATED_BANNER": "Resultado truncado — apenas a primeira página é exibida. Use paginação ou um WHERE."
   },
   "ANALYSES": {
     "TITLE": "Análises",

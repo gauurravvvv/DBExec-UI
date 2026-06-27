@@ -777,7 +777,21 @@
     "USAGE_P50": "p50",
     "USAGE_P95": "p95",
     "USAGE_EMPTY": "선택한 기간에 이 데이터셋이 실행되지 않았습니다.",
-    "LAST_N_DAYS": "최근 {{days}}일"
+    "LAST_N_DAYS": "최근 {{days}}일",
+    "ERROR_KIND_PERMISSION_DENIED": "권한이 없습니다",
+    "ERROR_KIND_SYNTAX": "SQL 구문 오류",
+    "ERROR_KIND_TIMEOUT": "쿼리 시간이 초과되었습니다",
+    "ERROR_KIND_CONNECTION": "데이터 소스에 접근할 수 없습니다",
+    "ERROR_KIND_OBJECT_NOT_FOUND": "객체를 찾을 수 없습니다",
+    "ERROR_KIND_SAFETY_VIOLATION": "SQL이 보안 검사에서 거부되었습니다",
+    "ERROR_HINT_PERMISSION_DENIED": "데이터 소스 사용자가 객체에 접근할 수 없습니다. 관리자에게 SELECT 권한을 요청하세요.",
+    "ERROR_HINT_SYNTAX": "엔진이 SQL을 파싱할 수 없습니다. 위치는 첫 번째 예상치 못한 토큰을 가리킵니다.",
+    "ERROR_HINT_TIMEOUT": "쿼리가 명령문 제한 시간을 초과했습니다. WHERE 절을 추가하거나 JOIN을 단순화하세요.",
+    "ERROR_HINT_CONNECTION": "데이터 소스에 접근할 수 없습니다. 설정에서 연결을 확인하세요.",
+    "ERROR_HINT_OBJECT_NOT_FOUND": "쿼리에서 참조한 테이블, 뷰 또는 열이 이 데이터 소스에 존재하지 않습니다.",
+    "ERROR_HINT_SAFETY_VIOLATION": "단일 문장의 SELECT 또는 WITH … SELECT 쿼리만 허용됩니다.",
+    "OFFENDING_TOKEN_TOOLTIP": "검증기가 거부한 키워드",
+    "TRUNCATED_BANNER": "결과가 잘렸습니다 — 첫 페이지만 표시됩니다. 페이지네이션이나 WHERE를 사용하세요."
   },
   "ANALYSES": {
     "TITLE": "분석",

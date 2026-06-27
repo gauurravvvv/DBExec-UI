@@ -139,6 +139,15 @@ export class EditDatasetComponent
   showResultsPopup = false;
   resultRows = 25;
   resultPage = 1;
+
+  /**
+   * Zero-based first-row index for the paginator. Bound to PrimeNG
+   * `[first]` so the active-page highlight stays in sync with the
+   * BE-returned page after each lazy load. See add-dataset for the
+   * same rationale — without this, `[value]` mutations from the
+   * lazy fetch reset the paginator visually to page 1.
+   */
+  resultFirst = 0;
   isExportingResults = false;
   resultFilterValues: { [key: string]: string } = {};
   private resultFilterSubject = new Subject<void>();
@@ -328,8 +337,10 @@ export class EditDatasetComponent
       .subscribe(() => {
         if (!this.lastExecutedQuery) return;
 
-        // Reset to first page on filter change
+        // Reset to first page on filter change. resultFirst pairs
+        // with resultPage so the paginator highlight resets too.
         this.resultPage = 1;
+        this.resultFirst = 0;
 
         // Build filter object from non-empty filter values
         const filter: { [key: string]: string } = {};
@@ -977,6 +988,7 @@ export class EditDatasetComponent
     if (this.isExecutingQuery) return;
     const query = this.editor?.getValue() || this.currentQuery;
     this.resultPage = 1;
+    this.resultFirst = 0;
     this.resultFilterValues = {};
     // Leave queryResult in place until the new result lands —
     // avoids the *ngIf flicker that would otherwise unmount the
@@ -991,6 +1003,7 @@ export class EditDatasetComponent
   executeSelectedQuery(selectedText: string): void {
     if (this.isExecutingQuery) return;
     this.resultPage = 1;
+    this.resultFirst = 0;
     this.resultFilterValues = {};
     // See executeCompleteQuery — same anti-flicker reasoning.
     this.executeQueryForDatasource(selectedText);
@@ -1125,6 +1138,7 @@ export class EditDatasetComponent
   clearResultFilters(): void {
     this.resultFilterValues = {};
     this.resultPage = 1;
+    this.resultFirst = 0;
     if (this.lastExecutedQuery) {
       this.executeQueryForDatasource(
         this.lastExecutedQuery,
@@ -1193,14 +1207,21 @@ export class EditDatasetComponent
 
   onResultsLazyLoad(event: any): void {
     this.lastResultsLazyEvent = event;
+    const first = event.first || 0;
     const page =
-      Math.floor((event.first || 0) / (event.rows || this.resultRows)) + 1;
+      Math.floor(first / (event.rows || this.resultRows)) + 1;
     const limit = event.rows || this.resultRows;
 
     if (!this.lastExecutedQuery) return;
 
     this.resultPage = page;
     this.resultRows = limit;
+    // Mirror the offset PrimeNG asked for back onto our bound
+    // `[first]` so a subsequent `[value]` change doesn't reset the
+    // paginator highlight to page 1. markForCheck because this
+    // component is OnPush.
+    this.resultFirst = first;
+    this.cdr.markForCheck();
 
     // Build filter object from non-empty filter values
     const filter: { [key: string]: string } = {};
@@ -1249,6 +1270,10 @@ export class EditDatasetComponent
       .subscribe({
         next: (response: IAPIResponse<QueryExecuteData>) => {
           if (!response.status) {
+            // Mirror the add-dataset path — pick up errorKind +
+            // offendingToken so the pane renders a typed error
+            // instead of one generic red box.
+            const errData: any = response.data ?? {};
             this.queryResult = {
               columns: [],
               rows: [],
@@ -1257,6 +1282,8 @@ export class EditDatasetComponent
               error:
                 response.message ||
                 this.translate.instant('DATASET.QUERY_EXECUTION_FAILED'),
+              errorKind: errData.errorKind || 'unknown',
+              offendingToken: errData.offendingToken ?? null,
             };
             this.surfaceResultSheet();
             this.isExecutingQuery = false;
@@ -1290,8 +1317,21 @@ export class EditDatasetComponent
             rows: Array.isArray(data.data) ? data.data : [],
             rowCount: data.rowCount ?? 0,
             executionTime,
+            executionMs: data.executionMs,
+            truncated: data.truncated ?? false,
+            warnings: Array.isArray(data.warnings) ? data.warnings : [],
             query: data.query,
           };
+
+          // PrimeNG resets internal `first` to 0 when `[value]` changes.
+          // Deferred direct write so this runs AFTER PrimeNG's CD
+          // cycle. See add-dataset for the full rationale.
+          setTimeout(() => {
+            if (this.resultsTable && this.resultsTable.first !== this.resultFirst) {
+              this.resultsTable.first = this.resultFirst;
+              this.cdr.markForCheck();
+            }
+          }, 0);
 
           // Auto-fit columns to content. Columns keep their natural
           // measured widths; the trailing strip stays blank if total
@@ -1424,16 +1464,25 @@ export class EditDatasetComponent
     }
   }
 
-  private surfaceResultSheet(): void {
+  /**
+   * Show the result sheet. Pagination reset is opt-in via the
+   * `resetPagination` flag so the lazy-load response path can call
+   * this without snapping the paginator back to page 1. See
+   * add-dataset for the full rationale.
+   */
+  private surfaceResultSheet(opts: { resetPagination?: boolean } = {}): void {
     this.showResultsPopup = true;
     if (this.isResultSheetCollapsed) {
       this.isResultSheetCollapsed = false;
       this.persistSheetCollapsed(false);
     }
-    if (this.resultsTable) {
-      this.resultsTable.first = 0;
+    if (opts.resetPagination) {
+      if (this.resultsTable) {
+        this.resultsTable.first = 0;
+      }
+      this.resultPage = 1;
+      this.resultFirst = 0;
     }
-    this.resultPage = 1;
   }
 
   onSheetDragStart(event: MouseEvent): void {

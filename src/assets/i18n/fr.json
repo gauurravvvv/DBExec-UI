@@ -777,7 +777,21 @@
     "USAGE_P50": "p50",
     "USAGE_P95": "p95",
     "USAGE_EMPTY": "Ce jeu de données n'a pas été exécuté sur la période sélectionnée.",
-    "LAST_N_DAYS": "{{days}} derniers jours"
+    "LAST_N_DAYS": "{{days}} derniers jours",
+    "ERROR_KIND_PERMISSION_DENIED": "Autorisation refusée",
+    "ERROR_KIND_SYNTAX": "Erreur de syntaxe SQL",
+    "ERROR_KIND_TIMEOUT": "Délai d'exécution dépassé",
+    "ERROR_KIND_CONNECTION": "Impossible d'atteindre la source de données",
+    "ERROR_KIND_OBJECT_NOT_FOUND": "Objet introuvable",
+    "ERROR_KIND_SAFETY_VIOLATION": "SQL refusé par la vérification de sécurité",
+    "ERROR_HINT_PERMISSION_DENIED": "L'utilisateur de la source de données n'a pas accès à un ou plusieurs objets de cette requête. Demandez à votre administrateur d'accorder SELECT.",
+    "ERROR_HINT_SYNTAX": "Le moteur n'a pas pu analyser le SQL. La position dans le message pointe vers le premier jeton inattendu.",
+    "ERROR_HINT_TIMEOUT": "La requête a dépassé le délai. Ajoutez une clause WHERE pour réduire le résultat ou simplifiez les jointures.",
+    "ERROR_HINT_CONNECTION": "La source de données est inaccessible. Vérifiez la connexion depuis ses paramètres.",
+    "ERROR_HINT_OBJECT_NOT_FOUND": "Une table, vue ou colonne référencée par la requête n'existe pas sur cette source.",
+    "ERROR_HINT_SAFETY_VIOLATION": "Seules les requêtes SELECT (ou WITH … SELECT) à instruction unique sont autorisées.",
+    "OFFENDING_TOKEN_TOOLTIP": "Mot-clé refusé par le validateur",
+    "TRUNCATED_BANNER": "Résultat tronqué — seule la première page est affichée. Utilisez la pagination ou un WHERE pour voir plus."
   },
   "ANALYSES": {
     "TITLE": "Analyses",

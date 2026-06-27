@@ -777,7 +777,21 @@
     "USAGE_P50": "p50",
     "USAGE_P95": "p95",
     "USAGE_EMPTY": "Este conjunto de datos no se ha ejecutado en el período seleccionado.",
-    "LAST_N_DAYS": "últimos {{days}} días"
+    "LAST_N_DAYS": "últimos {{days}} días",
+    "ERROR_KIND_PERMISSION_DENIED": "Permiso denegado",
+    "ERROR_KIND_SYNTAX": "Error de sintaxis SQL",
+    "ERROR_KIND_TIMEOUT": "La consulta agotó el tiempo",
+    "ERROR_KIND_CONNECTION": "No se pudo acceder a la fuente de datos",
+    "ERROR_KIND_OBJECT_NOT_FOUND": "Objeto no encontrado",
+    "ERROR_KIND_SAFETY_VIOLATION": "SQL rechazado por la verificación de seguridad",
+    "ERROR_HINT_PERMISSION_DENIED": "El usuario de la fuente de datos no tiene acceso a uno o más objetos. Pida al administrador conceder SELECT.",
+    "ERROR_HINT_SYNTAX": "El motor no pudo analizar el SQL. La posición señala el primer token inesperado.",
+    "ERROR_HINT_TIMEOUT": "La consulta superó el tiempo máximo. Añada un WHERE o simplifique los JOIN.",
+    "ERROR_HINT_CONNECTION": "No se pudo acceder a la fuente. Revise la conexión en su configuración.",
+    "ERROR_HINT_OBJECT_NOT_FOUND": "Una tabla, vista o columna referenciada no existe en esta fuente.",
+    "ERROR_HINT_SAFETY_VIOLATION": "Solo se permiten consultas SELECT o WITH … SELECT de una sola instrucción.",
+    "OFFENDING_TOKEN_TOOLTIP": "Palabra clave rechazada por el validador",
+    "TRUNCATED_BANNER": "Resultado truncado — solo se muestra la primera página. Use paginación o un WHERE."
   },
   "ANALYSES": {
     "TITLE": "Análisis",

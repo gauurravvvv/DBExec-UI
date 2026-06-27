@@ -829,7 +829,21 @@
     "USAGE_P50": "p50",
     "USAGE_P95": "p95",
     "USAGE_EMPTY": "This dataset has not been run in the selected window.",
-    "LAST_N_DAYS": "last {{days}} days"
+    "LAST_N_DAYS": "last {{days}} days",
+    "ERROR_KIND_PERMISSION_DENIED": "Permission denied",
+    "ERROR_KIND_SYNTAX": "SQL syntax error",
+    "ERROR_KIND_TIMEOUT": "Query timed out",
+    "ERROR_KIND_CONNECTION": "Could not reach the datasource",
+    "ERROR_KIND_OBJECT_NOT_FOUND": "Object not found",
+    "ERROR_KIND_SAFETY_VIOLATION": "SQL rejected by safety check",
+    "ERROR_HINT_PERMISSION_DENIED": "The datasource user does not have access to one or more objects in this query. Ask your DB admin to grant SELECT on the referenced tables.",
+    "ERROR_HINT_SYNTAX": "The engine could not parse the SQL. The position in the message points at the first unexpected token.",
+    "ERROR_HINT_TIMEOUT": "The query exceeded the statement timeout. Add a WHERE clause to narrow the result, or simplify the joins.",
+    "ERROR_HINT_CONNECTION": "The datasource could not be reached. Check the connection from the datasource settings.",
+    "ERROR_HINT_OBJECT_NOT_FOUND": "A table, view, or column referenced by the query does not exist on this datasource.",
+    "ERROR_HINT_SAFETY_VIOLATION": "Only single-statement SELECT or WITH ... SELECT queries are allowed. Remove the highlighted keyword and try again.",
+    "OFFENDING_TOKEN_TOOLTIP": "Keyword the safety validator rejected",
+    "TRUNCATED_BANNER": "Result truncated — only the first page is shown. Use pagination or add a WHERE clause to see more."
   },
   "ANALYSES": {
     "TITLE": "Analyses",

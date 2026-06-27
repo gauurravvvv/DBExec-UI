@@ -699,14 +699,86 @@
                table alive — just CSS-hidden — so expanding is
                instant and free. -->
           <div class="results-popup-body" [hidden]="isResultSheetCollapsed">
-            <!-- Error Message -->
-            <div class="results-error-card" *ngIf="queryResult.error">
+            <!-- Error Message — typed by errorKind so the icon +
+                 title + hint match what actually failed. The fallback
+                 'unknown' branch shows the engine's raw message; that's
+                 the right move for a driver error we don't recognise. -->
+            <div
+              *ngIf="queryResult.error"
+              class="results-error-card"
+              [attr.data-kind]="queryResult.errorKind || 'unknown'"
+            >
               <div class="error-icon-wrapper">
-                <i class="pi pi-times"></i>
+                <i
+                  class="pi"
+                  [ngClass]="{
+                    'pi-lock': queryResult.errorKind === 'permission_denied',
+                    'pi-code': queryResult.errorKind === 'syntax',
+                    'pi-clock': queryResult.errorKind === 'timeout',
+                    'pi-wifi': queryResult.errorKind === 'connection',
+                    'pi-search': queryResult.errorKind === 'object_not_found',
+                    'pi-shield': queryResult.errorKind === 'safety_violation',
+                    'pi-times': !queryResult.errorKind || queryResult.errorKind === 'unknown'
+                  }"
+                ></i>
               </div>
-              <h4>{{ 'DATASET.QUERY_EXECUTION_FAILED' | translate }}</h4>
+              <h4>
+                <ng-container [ngSwitch]="queryResult.errorKind">
+                  <span *ngSwitchCase="'permission_denied'">{{
+                    'DATASET.ERROR_KIND_PERMISSION_DENIED' | translate
+                  }}</span>
+                  <span *ngSwitchCase="'syntax'">{{
+                    'DATASET.ERROR_KIND_SYNTAX' | translate
+                  }}</span>
+                  <span *ngSwitchCase="'timeout'">{{
+                    'DATASET.ERROR_KIND_TIMEOUT' | translate
+                  }}</span>
+                  <span *ngSwitchCase="'connection'">{{
+                    'DATASET.ERROR_KIND_CONNECTION' | translate
+                  }}</span>
+                  <span *ngSwitchCase="'object_not_found'">{{
+                    'DATASET.ERROR_KIND_OBJECT_NOT_FOUND' | translate
+                  }}</span>
+                  <span *ngSwitchCase="'safety_violation'">{{
+                    'DATASET.ERROR_KIND_SAFETY_VIOLATION' | translate
+                  }}</span>
+                  <span *ngSwitchDefault>{{
+                    'DATASET.QUERY_EXECUTION_FAILED' | translate
+                  }}</span>
+                </ng-container>
+              </h4>
               <div class="error-message-box">
                 <code>{{ queryResult.error }}</code>
+                <span
+                  *ngIf="queryResult.offendingToken"
+                  class="offending-token-chip"
+                  [title]="'DATASET.OFFENDING_TOKEN_TOOLTIP' | translate"
+                >{{ queryResult.offendingToken }}</span>
+              </div>
+              <!-- Per-kind recovery hint. Plain copy, not a CTA — the
+                   user's real action is to edit their SQL above. -->
+              <div class="error-hint" *ngIf="queryResult.errorKind">
+                <i class="pi pi-info-circle"></i>
+                <ng-container [ngSwitch]="queryResult.errorKind">
+                  <span *ngSwitchCase="'permission_denied'">{{
+                    'DATASET.ERROR_HINT_PERMISSION_DENIED' | translate
+                  }}</span>
+                  <span *ngSwitchCase="'syntax'">{{
+                    'DATASET.ERROR_HINT_SYNTAX' | translate
+                  }}</span>
+                  <span *ngSwitchCase="'timeout'">{{
+                    'DATASET.ERROR_HINT_TIMEOUT' | translate
+                  }}</span>
+                  <span *ngSwitchCase="'connection'">{{
+                    'DATASET.ERROR_HINT_CONNECTION' | translate
+                  }}</span>
+                  <span *ngSwitchCase="'object_not_found'">{{
+                    'DATASET.ERROR_HINT_OBJECT_NOT_FOUND' | translate
+                  }}</span>
+                  <span *ngSwitchCase="'safety_violation'">{{
+                    'DATASET.ERROR_HINT_SAFETY_VIOLATION' | translate
+                  }}</span>
+                </ng-container>
               </div>
               <div class="error-meta" *ngIf="queryResult.executionTime">
                 <i class="pi pi-clock"></i>
@@ -747,6 +819,35 @@
               <p>{{ 'DATASET.QUERY_RETURNED_ZERO' | translate }}</p>
             </div>
 
+            <!-- Truncation banner — shown above the table when the BE
+                 clipped the result at the row cap. Tells the user there
+                 are more rows and how to see them. -->
+            <div
+              *ngIf="!queryResult.error && queryResult.truncated"
+              class="results-banner results-banner--truncated"
+              role="status"
+            >
+              <i class="pi pi-info-circle"></i>
+              <span>{{ 'DATASET.TRUNCATED_BANNER' | translate }}</span>
+            </div>
+
+            <!-- Warnings strip — BE non-fatal notes (type discovery
+                 skipped, limit clamped, etc). Distinct from errors. -->
+            <div
+              *ngIf="
+                !queryResult.error &&
+                queryResult.warnings &&
+                queryResult.warnings.length > 0
+              "
+              class="results-banner results-banner--warning"
+              role="status"
+            >
+              <i class="pi pi-exclamation-triangle"></i>
+              <ul class="warnings-list">
+                <li *ngFor="let w of queryResult.warnings">{{ w }}</li>
+              </ul>
+            </div>
+
             <!-- Results Table with PrimeNG -->
             <div
               class="results-table-container"
@@ -756,6 +857,7 @@
                 #resultsTable
                 [value]="queryResult.rows"
                 [rows]="resultRows"
+                [first]="resultFirst"
                 [paginator]="isPaginationEnabled"
                 [lazy]="isPaginationEnabled"
                 (onLazyLoad)="onResultsLazyLoad($event)"

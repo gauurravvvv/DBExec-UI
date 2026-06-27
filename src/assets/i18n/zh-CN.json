@@ -777,7 +777,21 @@
     "USAGE_P50": "p50",
     "USAGE_P95": "p95",
     "USAGE_EMPTY": "所选时间窗口内该数据集未被执行。",
-    "LAST_N_DAYS": "最近 {{days}} 天"
+    "LAST_N_DAYS": "最近 {{days}} 天",
+    "ERROR_KIND_PERMISSION_DENIED": "权限被拒绝",
+    "ERROR_KIND_SYNTAX": "SQL 语法错误",
+    "ERROR_KIND_TIMEOUT": "查询超时",
+    "ERROR_KIND_CONNECTION": "无法访问数据源",
+    "ERROR_KIND_OBJECT_NOT_FOUND": "对象未找到",
+    "ERROR_KIND_SAFETY_VIOLATION": "SQL 被安全检查拒绝",
+    "ERROR_HINT_PERMISSION_DENIED": "数据源用户没有访问对象的权限。请向数据库管理员申请 SELECT 权限。",
+    "ERROR_HINT_SYNTAX": "引擎无法解析 SQL。位置指向第一个意外的标记。",
+    "ERROR_HINT_TIMEOUT": "查询超过语句超时限制。请添加 WHERE 子句或简化 JOIN。",
+    "ERROR_HINT_CONNECTION": "数据源不可访问。请在设置中检查连接。",
+    "ERROR_HINT_OBJECT_NOT_FOUND": "查询引用的表、视图或列在此数据源上不存在。",
+    "ERROR_HINT_SAFETY_VIOLATION": "仅允许单语句 SELECT 或 WITH … SELECT 查询。",
+    "OFFENDING_TOKEN_TOOLTIP": "验证器拒绝的关键字",
+    "TRUNCATED_BANNER": "结果已截断 — 仅显示第一页。请使用分页或 WHERE 子句查看更多。"
   },
   "ANALYSES": {
     "TITLE": "分析",

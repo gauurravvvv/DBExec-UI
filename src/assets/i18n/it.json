@@ -777,7 +777,21 @@
     "USAGE_P50": "p50",
     "USAGE_P95": "p95",
     "USAGE_EMPTY": "Questo dataset non è stato eseguito nella finestra selezionata.",
-    "LAST_N_DAYS": "ultimi {{days}} giorni"
+    "LAST_N_DAYS": "ultimi {{days}} giorni",
+    "ERROR_KIND_PERMISSION_DENIED": "Autorizzazione negata",
+    "ERROR_KIND_SYNTAX": "Errore di sintassi SQL",
+    "ERROR_KIND_TIMEOUT": "Query scaduta",
+    "ERROR_KIND_CONNECTION": "Impossibile raggiungere la fonte dati",
+    "ERROR_KIND_OBJECT_NOT_FOUND": "Oggetto non trovato",
+    "ERROR_KIND_SAFETY_VIOLATION": "SQL rifiutato dal controllo di sicurezza",
+    "ERROR_HINT_PERMISSION_DENIED": "L'utente della fonte dati non ha accesso a uno o più oggetti. Chiedi al DB admin di concedere SELECT.",
+    "ERROR_HINT_SYNTAX": "Il motore non ha potuto analizzare l'SQL. La posizione indica il primo token inatteso.",
+    "ERROR_HINT_TIMEOUT": "La query ha superato il timeout. Aggiungi un WHERE o semplifica i JOIN.",
+    "ERROR_HINT_CONNECTION": "Fonte dati non raggiungibile. Controlla la connessione nelle impostazioni.",
+    "ERROR_HINT_OBJECT_NOT_FOUND": "Una tabella, vista o colonna referenziata non esiste su questa fonte dati.",
+    "ERROR_HINT_SAFETY_VIOLATION": "Sono consentite solo query SELECT o WITH … SELECT a istruzione singola.",
+    "OFFENDING_TOKEN_TOOLTIP": "Parola chiave rifiutata dal validatore",
+    "TRUNCATED_BANNER": "Risultato troncato — è mostrata solo la prima pagina. Usa la paginazione o un WHERE."
   },
   "ANALYSES": {
     "TITLE": "Analisi",

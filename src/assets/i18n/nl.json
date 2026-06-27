@@ -777,7 +777,21 @@
     "USAGE_P50": "p50",
     "USAGE_P95": "p95",
     "USAGE_EMPTY": "Deze dataset is in de gekozen periode niet uitgevoerd.",
-    "LAST_N_DAYS": "laatste {{days}} dagen"
+    "LAST_N_DAYS": "laatste {{days}} dagen",
+    "ERROR_KIND_PERMISSION_DENIED": "Toegang geweigerd",
+    "ERROR_KIND_SYNTAX": "SQL-syntaxfout",
+    "ERROR_KIND_TIMEOUT": "Query liep af",
+    "ERROR_KIND_CONNECTION": "Gegevensbron niet bereikbaar",
+    "ERROR_KIND_OBJECT_NOT_FOUND": "Object niet gevonden",
+    "ERROR_KIND_SAFETY_VIOLATION": "SQL geweigerd door beveiligingscontrole",
+    "ERROR_HINT_PERMISSION_DENIED": "De gegevensbron-gebruiker heeft geen toegang tot een of meer objecten. Vraag de DB-beheerder om SELECT-rechten.",
+    "ERROR_HINT_SYNTAX": "De engine kon de SQL niet parsen. De positie wijst naar het eerste onverwachte token.",
+    "ERROR_HINT_TIMEOUT": "De query overschreed de statement-timeout. Voeg een WHERE toe of vereenvoudig de JOINs.",
+    "ERROR_HINT_CONNECTION": "Gegevensbron niet bereikbaar. Controleer de verbinding in de instellingen.",
+    "ERROR_HINT_OBJECT_NOT_FOUND": "Een tabel, view of kolom in de query bestaat niet op deze gegevensbron.",
+    "ERROR_HINT_SAFETY_VIOLATION": "Alleen enkelvoudige SELECT- of WITH … SELECT-queries zijn toegestaan.",
+    "OFFENDING_TOKEN_TOOLTIP": "Trefwoord geweigerd door de validator",
+    "TRUNCATED_BANNER": "Resultaat afgekapt — alleen de eerste pagina wordt getoond. Gebruik paginering of een WHERE."
   },
   "ANALYSES": {
     "TITLE": "Analyses",
