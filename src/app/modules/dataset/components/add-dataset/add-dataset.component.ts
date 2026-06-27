@@ -1038,6 +1038,19 @@ export class AddDatasetComponent
   }
 
   ngOnDestroy(): void {
+    // If a query is in-flight when the user navigates away, fire
+    // the engine cancel so the warehouse worker doesn't keep
+    // grinding for the full statement_timeout. Fire-and-forget —
+    // no error handling because the component is unmounting and
+    // there's no UI to surface anything to.
+    if (this.activeQueryRequestId && this.selectedDatasourceObj?.id) {
+      const id = this.activeQueryRequestId;
+      this.activeQueryRequestId = null;
+      this.queryService
+        .cancelQuery({ requestId: id, datasourceId: this.selectedDatasourceObj.id })
+        .subscribe({ next: () => undefined, error: () => undefined });
+    }
+
     this.resultFilterSubject.complete();
 
     if (this.paneResizeObserver) {

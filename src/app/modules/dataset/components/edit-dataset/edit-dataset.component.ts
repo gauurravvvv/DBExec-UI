@@ -599,6 +599,16 @@ export class EditDatasetComponent
   }
 
   ngOnDestroy(): void {
+    // Mirror of add-dataset — cancel any in-flight query so the
+    // warehouse worker doesn't keep grinding after navigate-away.
+    if (this.activeQueryRequestId && this.selectedDatasourceObj?.id) {
+      const id = this.activeQueryRequestId;
+      this.activeQueryRequestId = null;
+      this.queryService
+        .cancelQuery({ requestId: id, datasourceId: this.selectedDatasourceObj.id })
+        .subscribe({ next: () => undefined, error: () => undefined });
+    }
+
     this.resultFilterSubject.complete();
 
     if (this.paneResizeObserver) {

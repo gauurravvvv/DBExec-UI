@@ -1,5 +1,5 @@
-import { Injectable, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Injectable, computed, signal } from '@angular/core';
+import { Observable, finalize } from 'rxjs';
 import { QUERY } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
@@ -20,13 +20,26 @@ import { HttpClientService } from 'src/app/core/services/http-client.service';
  */
 @Injectable({ providedIn: 'root' })
 export class QueryService {
-  private _running = signal(false);
-  private _exporting = signal(false);
-  private _loadingStructure = signal(false);
+  // Reference-counted in-flight counters. The previous boolean-flag
+  // design was a footgun: when two callers fired executeQuery
+  // concurrently (e.g. an editor tab + the column-distinct dropdown
+  // probe), the second response's `next` flipped `_running` to
+  // false while the first call was still pending — Run buttons in
+  // OTHER components would re-enable mid-query.
+  //
+  // Counters increment on subscribe, decrement on finalize (success
+  // / error / unsubscribe). The exposed signals are computed > 0 so
+  // every existing consumer reads them as a boolean without any
+  // change.
+  private _runningCount = signal(0);
+  private _exportingCount = signal(0);
+  private _loadingStructureCount = signal(0);
 
-  readonly running = this._running.asReadonly();
-  readonly exporting = this._exporting.asReadonly();
-  readonly loadingStructure = this._loadingStructure.asReadonly();
+  readonly running = computed(() => this._runningCount() > 0);
+  readonly exporting = computed(() => this._exportingCount() > 0);
+  readonly loadingStructure = computed(
+    () => this._loadingStructureCount() > 0,
+  );
 
   constructor(private httpClientService: HttpClientService) {}
 
@@ -39,6 +52,10 @@ export class QueryService {
    * cancel registry, and returns the same id on the response. If the
    * caller doesn't supply one we accept that (BE falls back to its
    * own UUID) — keeps the contract backward compatible.
+   *
+   * `finalize` (vs `tap`) handles the unsubscribe path too — when
+   * the caller's component is destroyed mid-query and the
+   * subscription is torn down, the counter still gets decremented.
    */
   executeQuery(queryData: {
     datasourceId: string;
@@ -48,15 +65,10 @@ export class QueryService {
     filter?: string;
     requestId?: string;
   }): Observable<any> {
-    this._running.set(true);
+    this._runningCount.update(n => n + 1);
     return this.httpClientService
       .queryPost(QUERY.EXECUTE, queryData, { skipLoader: true })
-      .pipe(
-        tap({
-          next: () => this._running.set(false),
-          error: () => this._running.set(false),
-        }),
-      );
+      .pipe(finalize(() => this._runningCount.update(n => Math.max(0, n - 1))));
   }
 
   /**
@@ -91,14 +103,13 @@ export class QueryService {
    * editor's per-section spinner can show progress.
    */
   getDatasourceStructure(datasourceId: string): Observable<any> {
-    this._loadingStructure.set(true);
+    this._loadingStructureCount.update(n => n + 1);
     return this.httpClientService
       .queryPost(QUERY.STRUCTURE, { datasourceId }, { skipLoader: true })
       .pipe(
-        tap({
-          next: () => this._loadingStructure.set(false),
-          error: () => this._loadingStructure.set(false),
-        }),
+        finalize(() =>
+          this._loadingStructureCount.update(n => Math.max(0, n - 1)),
+        ),
       );
   }
 
@@ -108,17 +119,14 @@ export class QueryService {
     query: string;
     filter?: string;
   }): Observable<Blob> {
-    this._exporting.set(true);
+    this._exportingCount.update(n => n + 1);
     return this.httpClientService
       .queryPost(QUERY.EXPORT, queryData, {
         responseType: 'blob',
         skipLoader: true,
       })
       .pipe(
-        tap({
-          next: () => this._exporting.set(false),
-          error: () => this._exporting.set(false),
-        }),
+        finalize(() => this._exportingCount.update(n => Math.max(0, n - 1))),
       );
   }
 }

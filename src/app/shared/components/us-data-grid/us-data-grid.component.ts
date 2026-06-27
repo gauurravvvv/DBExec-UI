@@ -291,11 +291,30 @@ export class UsDataGridComponent<TData = unknown>
        * are discoverable. v32 default is hover-only, which users
        * miss. */
       suppressMenuHide: true,
-      columnMenu: 'legacy',
       domLayout: 'normal',
-      getRowId: cfg.rowIdField
-        ? p => String((p.data as Record<string, unknown>)[cfg.rowIdField])
-        : undefined,
+      // AG Grid uses getRowId for change-detection between render
+      // passes. Two key properties: (1) every row's returned id
+      // must be unique — duplicates collapse onto a single rendered
+      // row, and (2) it must be a stable string for the lifetime
+      // of the row.
+      //
+      // The original implementation returned `String(undefined)`
+      // for every row whose data lacked the configured rowIdField
+      // (e.g. SQL results without an `id` column) — all rows
+      // collapsed to "undefined" and only the first one rendered.
+      //
+      // The safe fallback is to skip getRowId entirely when the
+      // row's id value is missing — AG Grid then uses positional
+      // identity, which loses change-detection efficiency but
+      // guarantees every row renders. We detect missing values
+      // up-front (peek the first row) and unset getRowId if the
+      // field isn't present.
+      getRowId:
+        cfg.rowIdField &&
+        this.rows.length > 0 &&
+        (this.rows[0] as any)?.[cfg.rowIdField as string] != null
+          ? p => String((p.data as Record<string, unknown>)[cfg.rowIdField as string])
+          : undefined,
       ...this.config.extraGridOptions,
     };
 
