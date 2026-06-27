@@ -169,6 +169,76 @@ export class EditDatasetComponent
     return !!types && Object.keys(types).length > 0;
   }
 
+  /**
+   * Cached column definitions for the AG Grid result. Same pattern
+   * + helper as add-dataset — see there for the full rationale on
+   * why this is a field rather than a getter.
+   */
+  resultColDefs: any[] = [];
+
+  private buildResultColDefs(): any[] {
+    if (!this.queryResult || this.queryResult.columns.length === 0) return [];
+    const columns = this.queryResult.columns;
+    const types = this.queryResult.columnTypes ?? {};
+
+    const rowIndexCol: any = {
+      colId: '__rowIndex',
+      headerName: '#',
+      valueGetter: (params: any) =>
+        params?.node?.rowIndex != null ? params.node.rowIndex + 1 : '',
+      width: 64,
+      minWidth: 56,
+      maxWidth: 96,
+      pinned: 'left',
+      sortable: false,
+      filter: false,
+      resizable: false,
+      suppressMenu: true,
+      cellClass: 'us-row-index-cell',
+    };
+
+    const dataCols = columns.map((name: string) => {
+      const t = (types[name] ?? 'text').toLowerCase();
+      const def: any = {
+        colId: name,
+        field: name,
+        headerName: name,
+        sortable: true,
+        resizable: true,
+        headerTooltip: types[name] ? `${name} · ${types[name]}` : name,
+      };
+
+      if (t === 'integer' || t === 'numeric') {
+        def.filter = 'agNumberColumnFilter';
+        def.cellDataType = 'number';
+        def.type = 'numericColumn';
+      } else if (t === 'date' || t === 'timestamp') {
+        def.filter = 'agDateColumnFilter';
+        def.cellDataType = 'dateString';
+      } else if (t === 'boolean') {
+        def.filter = 'agSetColumnFilter';
+        def.cellDataType = 'boolean';
+      } else if (t === 'json') {
+        def.filter = 'agTextColumnFilter';
+        def.valueFormatter = (params: any) => {
+          if (params.value == null) return '';
+          if (typeof params.value === 'string') return params.value;
+          try {
+            return JSON.stringify(params.value);
+          } catch {
+            return String(params.value);
+          }
+        };
+      } else {
+        def.filter = 'agTextColumnFilter';
+      }
+
+      return def;
+    });
+
+    return [rowIndexCol, ...dataCols];
+  }
+
   // ── Bottom-sheet state (mirrors add-dataset) ──────────────────────
   resultSheetHeightPx = 420;
   isResultSheetCollapsed = false;
@@ -1322,6 +1392,10 @@ export class EditDatasetComponent
             warnings: Array.isArray(data.warnings) ? data.warnings : [],
             query: data.query,
           };
+
+          // Rebuild AG Grid ColDefs for the new result. Same as
+          // add-dataset.
+          this.resultColDefs = this.buildResultColDefs();
 
           // PrimeNG resets internal `first` to 0 when `[value]` changes.
           // Deferred direct write so this runs AFTER PrimeNG's CD

@@ -124,6 +124,91 @@ export class AddDatasetComponent
   }
 
   /**
+   * Cached column definitions for the AG Grid result. Rebuilt whenever
+   * the queryResult changes (see the response handler). Kept as a
+   * field rather than a getter so AG Grid's input doesn't churn on
+   * every CD pass — re-running colDef construction on each tick
+   * causes the grid to re-init and lose user state (column order,
+   * widths, filter inputs).
+   */
+  resultColDefs: any[] = [];
+
+  /**
+   * Map our BE `columnTypes` vocabulary onto AG Grid ColDef[]. Sets
+   * the per-column filter type (numeric / date / set / text), cell
+   * data type for sorting + formatting, and resizable/sortable
+   * flags. The first row in the result also gets a row-number column
+   * pinned left for visual consistency with the previous PrimeNG
+   * layout.
+   */
+  private buildResultColDefs(): any[] {
+    if (!this.queryResult || this.queryResult.columns.length === 0) return [];
+    const columns = this.queryResult.columns;
+    const types = this.queryResult.columnTypes ?? {};
+
+    const rowIndexCol: any = {
+      colId: '__rowIndex',
+      headerName: '#',
+      valueGetter: (params: any) =>
+        params?.node?.rowIndex != null ? params.node.rowIndex + 1 : '',
+      width: 64,
+      minWidth: 56,
+      maxWidth: 96,
+      pinned: 'left',
+      sortable: false,
+      filter: false,
+      resizable: false,
+      suppressMenu: true,
+      cellClass: 'us-row-index-cell',
+    };
+
+    const dataCols = columns.map((name: string) => {
+      const t = (types[name] ?? 'text').toLowerCase();
+      // AG Grid v32 ColDef.
+      const def: any = {
+        colId: name,
+        field: name,
+        headerName: name,
+        sortable: true,
+        resizable: true,
+        // Show the type as a tooltip on the header instead of a chip
+        // — matches the cleaner AG Grid header style.
+        headerTooltip: types[name] ? `${name} · ${types[name]}` : name,
+      };
+
+      if (t === 'integer' || t === 'numeric') {
+        def.filter = 'agNumberColumnFilter';
+        def.cellDataType = 'number';
+        def.type = 'numericColumn';
+      } else if (t === 'date' || t === 'timestamp') {
+        def.filter = 'agDateColumnFilter';
+        def.cellDataType = 'dateString';
+      } else if (t === 'boolean') {
+        def.filter = 'agSetColumnFilter';
+        def.cellDataType = 'boolean';
+      } else if (t === 'json') {
+        def.filter = 'agTextColumnFilter';
+        // Pretty-print object/array cells.
+        def.valueFormatter = (params: any) => {
+          if (params.value == null) return '';
+          if (typeof params.value === 'string') return params.value;
+          try {
+            return JSON.stringify(params.value);
+          } catch {
+            return String(params.value);
+          }
+        };
+      } else {
+        def.filter = 'agTextColumnFilter';
+      }
+
+      return def;
+    });
+
+    return [rowIndexCol, ...dataCols];
+  }
+
+  /**
    * Tracks which JSON cells in the result grid the user has
    * expanded. JSON cells render as a single-line summary by
    * default so one fat document doesn't make every row in the
@@ -2033,6 +2118,12 @@ export class AddDatasetComponent
             warnings: Array.isArray(data.warnings) ? data.warnings : [],
             query: data.query,
           };
+
+          // Rebuild AG Grid ColDefs for the new result so the grid
+          // gets fresh per-column filter types + formatters. Done
+          // before the PrimeNG-paginator workaround below because
+          // the grid swap will eventually retire that.
+          this.resultColDefs = this.buildResultColDefs();
 
           // PrimeNG resets internal `first` to 0 when `[value]`
           // changes — even in lazy mode. Our `[first]="resultFirst"`

@@ -817,215 +817,49 @@
               </ul>
             </div>
 
-            <!-- Results Table with PrimeNG -->
+            <!-- Results Table — AG Grid backed reusable component.
+                 Replaces the previous PrimeNG p-table block. Brings:
+                   - drag-reorder of columns
+                   - column resize (handle on every column edge)
+                   - native floating-filter row (numeric / date / text
+                     pickers per column type)
+                   - column-visibility chooser, density toggle
+                   - CSV + XLSX export
+                   - sort, multi-column sort with shift-click
+                   - keyboard navigation, focus rings
+                 We pass our own ColDefs (built from columnTypes), the
+                 rows from queryResult, and a small `config` that
+                 hides toolbar bits the dataset preview doesn't need
+                 (no "+ Add" button, no row selection). -->
             <div
-              class="results-table-container"
+              class="results-table-container us-result-grid"
               *ngIf="!queryResult.error && queryResult.columns.length > 0"
-            >
-              <p-table
-                #resultsTable
-                [value]="queryResult.rows"
-                [rows]="resultRows"
-                [first]="resultFirst"
-                [paginator]="isPaginationEnabled"
-                [lazy]="isPaginationEnabled"
-                (onLazyLoad)="onResultsLazyLoad($event)"
-                [totalRecords]="queryResult.rowCount"
-                [rowHover]="true"
-                currentPageReportTemplate="{first} - {last} of {totalRecords}"
-                [showCurrentPageReport]="true"
-                [rowsPerPageOptions]="[10, 25, 50, 100]"
-                paginatorDropdownAppendTo="body"
-                styleClass="p-datatable-sm modern-table"
-                [scrollable]="true"
-                scrollHeight="flex"
-                [resizableColumns]="true"
-                columnResizeMode="expand"
-              >
-                <!--
-                  Per-column width hints from measureColumnWidths. Renders
-                  once when the result lands; PrimeNG honours the colgroup
-                  and lets the user drag-resize from there onward. The
-                  frozen # row-number column takes a fixed 60px so the
-                  stripe of row indices aligns vertically with the header.
-                -->
-                <ng-template pTemplate="colgroup">
-                  <colgroup>
-                    <col style="width: 60px" />
-                    <col
-                      *ngFor="
-                        let col of queryResult.columns;
-                        trackBy: trackByIndex
-                      "
-                      [style.width.px]="columnWidths[col] || 160"
-                    />
-                  </colgroup>
-                </ng-template>
-
-                <ng-template pTemplate="header">
-                  <tr>
-                    <th style="width: 60px" pFrozenColumn>#</th>
-                    <th
-                      *ngFor="
-                        let col of queryResult.columns;
-                        trackBy: trackByIndex
-                      "
-                      pResizableColumn
-                    >
-                      <div class="th-content">
-                        {{ col }}
-                        <!--
-                          Render the type chip only when the BE was able to
-                          discover types for at least one column. Some
-                          dialects don't (yet) ship driver field metadata
-                          through to columnTypes — hiding the whole chip is
-                          cleaner than a wall of em-dashes. Postgres still
-                          fills this in via pg_typeof.
-                        -->
-                        <span
-                          class="column-datatype"
-                          *ngIf="
-                            hasAnyColumnType && queryResult.columnTypes?.[col]
-                          "
-                        >
-                          {{ queryResult.columnTypes?.[col] }}
-                        </span>
-                      </div>
-                    </th>
-                  </tr>
-                  <!-- Filter Row -->
-                  <tr>
-                    <th pFrozenColumn></th>
-                    <th
-                      *ngFor="
-                        let col of queryResult.columns;
-                        trackBy: trackByIndex
-                      "
-                    >
-                      <input
-                        pInputText
-                        type="text"
-                        [(ngModel)]="resultFilterValues[col]"
-                        (input)="onResultFilterChange()"
-                        [placeholder]="'Search ' + col"
-                        class="w-full p-column-filter"
-                      />
-                    </th>
-                  </tr>
-                </ng-template>
-
-                <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
-                  <tr>
-                    <td pFrozenColumn class="row-number-cell">
-                      {{ rowIndex + 1 }}
-                    </td>
-                    <!--
-                      Each cell goes through the cellFormat pipe so:
-                        - BIGINT / NUMBER / DECIMAL stay as the original
-                          string (no precision-losing Number cast) and
-                          right-align with the .numeric-cell class.
-                        - MySQL BIT (Buffer-shaped JSON) renders as
-                          true/false or hex, not [object Object].
-                        - Dates produce a deterministic ISO string.
-                        - JSON values pretty-print inside a <pre> with a
-                          capped height so a fat document doesn't dominate
-                          the grid.
-                        - NULL gets the muted, italicised placeholder via
-                          the .null-value class + the translated copy.
-                    -->
-                    <!--
-                      One pipe invocation per cell via `*ngIf as`: the
-                      pipe runs once and the resulting object is reused
-                      for the class binding, the (suppressed-for-JSON)
-                      title, and the inner switch. The previous version
-                      ran the pipe four times per cell — fine perf-wise
-                      with a pure pipe, ugly to read.
-
-                      JSON cells render the compact `summary` by default
-                      (e.g. `{ id, name, +3 }`) so a fat document doesn't
-                      make every row in the grid 6em tall. Clicking the
-                      row expands it to the full pretty-printed form.
-                    -->
-                    <ng-container
-                      *ngFor="
-                        let col of queryResult.columns;
-                        trackBy: trackByIndex
-                      "
-                    >
-                      <ng-container
-                        *ngIf="
-                          row[col]
-                            | cellFormat: queryResult.columnTypes?.[col] as cell
-                        "
-                      >
-                        <td
-                          [class.numeric-cell]="cell.align === 'right'"
-                          [class.json-td]="cell.kind === 'json'"
-                          [ngSwitch]="cell.kind"
-                          (contextmenu)="
-                            onCellContextMenu($event, rowIndex, col)
-                          "
-                        >
-                          <span *ngSwitchCase="'null'" class="null-value">{{
-                            'DATASET.CELL_NULL' | translate
-                          }}</span>
-
-                          <ng-container *ngSwitchCase="'json'">
-                            <ng-container
-                              *ngIf="
-                                expandedJsonCells.has(
-                                  jsonCellKey(rowIndex, col)
-                                );
-                                else jsonSummary
-                              "
-                            >
-                              <button
-                                type="button"
-                                class="json-toggle expanded"
-                                (click)="toggleJsonCell(rowIndex, col)"
-                                [attr.aria-label]="
-                                  'COMMON.COLLAPSE' | translate
-                                "
-                              >
-                                <i class="pi pi-chevron-down"></i>
-                              </button>
-                              <pre class="json-cell">{{ cell.display }}</pre>
-                            </ng-container>
-                            <ng-template #jsonSummary>
-                              <button
-                                type="button"
-                                class="json-toggle"
-                                (click)="toggleJsonCell(rowIndex, col)"
-                                [attr.aria-label]="'COMMON.EXPAND' | translate"
-                              >
-                                <i class="pi pi-chevron-right"></i>
-                              </button>
-                              <span class="json-summary">{{
-                                cell.summary
-                              }}</span>
-                            </ng-template>
-                          </ng-container>
-
-                          <span *ngSwitchDefault [title]="cell.display">{{
-                            cell.display
-                          }}</span>
-                        </td>
-                      </ng-container>
-                    </ng-container>
-                  </tr>
-                </ng-template>
-
-                <ng-template pTemplate="emptymessage">
-                  <tr>
-                    <td
-                      [attr.colspan]="queryResult.columns.length + 1"
-                      class="empty-message-cell text-center"
-                    >
-                      {{ 'COMMON.NO_MATCHING_RECORDS' | translate }}
-                    </td>
-                  </tr>
-                </ng-template>
-              </p-table>
+            ><us-data-grid
+                [columns]="resultColDefs"
+                [rows]="queryResult.rows"
+                [config]="{
+                  showFloatingFilters: true,
+                  enableColumnResize: true,
+                  enableColumnReorder: true,
+                  freezeFirstColumn: false,
+                  enableColumnChooser: true,
+                  enableAddFilter: false,
+                  enableAutoFit: true,
+                  enableDensityToggle: true,
+                  enableCsvExport: true,
+                  enableXlsxExport: true,
+                  enableRefresh: false,
+                  enableSavedViews: false,
+                  showRowCounter: false,
+                  enableRowSelection: false,
+                  enablePagination: true,
+                  pageSize: resultRows,
+                  pageSizeOptions: [10, 25, 50, 100],
+                  height: '100%',
+                  rowIdField: '__rowIndex',
+                  emptyMessage: ('DATASET.NO_RESULTS_FOUND' | translate)
+                }"
+              ></us-data-grid>
             </div>
           </div>
         </div>
