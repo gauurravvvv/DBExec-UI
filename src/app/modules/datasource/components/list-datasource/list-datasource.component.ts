@@ -6,21 +6,30 @@ import {
   inject,
   OnDestroy,
   OnInit,
-  ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Table } from 'primeng/table';
-import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import type { ColDef } from 'ag-grid-community';
 import { DATASOURCE } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
+import {
+  UsServerListAdapter,
+  UsListLoadParams,
+} from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
+import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
 import { DatasourceService } from '../../services/datasource.service';
 
-type DatasourceSortField = 'name' | 'type' | 'status' | 'createdOn';
-
+/**
+ * Datasource listing — renders through `<us-data-grid>` with a
+ * `UsServerListAdapter` driving the BE `/datasources` list call. The
+ * page header / content card / delete-confirm popup retain the
+ * existing styling and behaviour; only the `<p-table>` was swapped
+ * out for the AG Grid wrapper.
+ *
+ * Datasources ARE the listed entity, so there is no datasource
+ * dropdown — the adapter binds unconditionally in `ngOnInit`.
+ */
 @Component({
   selector: 'app-list-datasource',
   templateUrl: './list-datasource.component.html',
@@ -28,19 +37,19 @@ type DatasourceSortField = 'name' | 'type' | 'status' | 'createdOn';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListDatasourceComponent implements OnInit, OnDestroy {
-  ngOnDestroy() {
-    // Abort in-flight reads if the user navigates away.
-    this.datasourceService.cancelReads();
-  }
-
   private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
-  @ViewChild('dt') dt!: Table;
+  /* ── page state — UNCHANGED from the p-table version ──── */
 
-  // Bound directly to service signals — no local copies
-  datasources = this.datasourceService.datasources;
-  total = this.datasourceService.total;
-  loading = this.datasourceService.loading;
+  selectedDatasources: any[] = [];
+  selectedDatasource: any = null;
+  showDeleteConfirm = false;
+  bulkDelete = false;
+  deleteJustification = '';
+  loggedInUserId: any = this.globalService.getTokenDetails('userId');
+  today = new Date();
+  statusOptions: any[] = [];
 
   // Per-row spinner helpers — each row reads its own state.
   isDeleting = (id: string): boolean => this.datasourceService.isDeleting(id);
@@ -50,27 +59,40 @@ export class ListDatasourceComponent implements OnInit, OnDestroy {
     );
   }
 
-  listParams: any = {
-    limit: 10,
-    page: 1,
+  /* ── grid wiring ───────────────────────────────────────── */
+
+  /** AG Grid column definitions — widths preserved from the old
+   *  `<p-table>` so the visual layout is unchanged. cellRenderer
+   *  templates live in the HTML as `<ng-template usGridCell>`. */
+  cols: ColDef[] = [];
+
+  gridConfig: UsDataGridConfig = {
+    enableRowSelection: true,
+    rowSelectionMode: 'multiple',
+    freezeFirstColumn: true,
+    enableColumnChooser: true,
+    enableAddFilter: false, // BE-driven floating filters
+    enableAutoFit: true,
+    enableDensityToggle: true,
+    enableCsvExport: true,
+    enableXlsxExport: true,
+    enableRefresh: true,
+    enableSavedViews: true,
+    gridKey: 'datasources-list',
+    pageSizeOptions: [10, 25, 50, 100],
+    pageSize: 10,
+    height: 'calc(100vh - 280px)',
+    rowIdField: 'id',
   };
 
-  private searchSubject = new Subject<void>();
-  lastTableLazyLoadEvent: any;
-
-  loggedInUserId: any = this.globalService.getTokenDetails('userId');
-  selectedDatasource: any = null;
-  selectedDatasources: any[] = [];
-  sortHelper = new ListSortHelper<DatasourceSortField>();
-  showDeleteConfirm = false;
-  bulkDelete = false;
-  deleteJustification = '';
+  /** Server-side adapter — bound in `ngOnInit`. Unlike the tab
+   *  listing, there is no datasource dropdown gating this. */
+  adapter: UsServerListAdapter<any> | null = null;
 
   constructor(
     private datasourceService: DatasourceService,
     private router: Router,
     private globalService: GlobalService,
-    private cdr: ChangeDetectorRef,
     private translate: TranslateService,
   ) {}
 
@@ -80,124 +102,158 @@ export class ListDatasourceComponent implements OnInit, OnDestroy {
       { label: this.translate.instant('COMMON.INACTIVE'), value: 0 },
     ];
 
-    // Setup debounce for filter changes
-    this.searchSubject
-      .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        if (this.lastTableLazyLoadEvent) {
-          this.loadDatasources(this.lastTableLazyLoadEvent);
-        }
-      });
+    this.cols = this.buildColumns();
+    this.bindAdapter();
   }
 
-  today = new Date();
-
-  statusOptions: any[] = [];
-
-  filterValues: any = {
-    name: '',
-    description: '',
-    status: null,
-    createdDateRange: null,
-  };
-
-  get isFilterActive(): boolean {
-    return (
-      !!this.filterValues.name ||
-      !!this.filterValues.description ||
-      this.filterValues.status !== null ||
-      !!this.filterValues.createdDateRange
-    );
-  }
-
-  clearFilters() {
-    this.filterValues = {
-      name: '',
-      description: '',
-      status: null,
-      createdDateRange: null,
-    };
-    this.onFilterChange();
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.datasourceService.cancelReads();
+    this.adapter?.destroy();
   }
 
   get selectedCount(): number {
     return this.selectedDatasources?.length || 0;
   }
 
-  isRowSelectable = (event: any) => true;
+  get isFilterActive(): boolean {
+    return !!this.adapter && Object.keys(this.adapter.filterModel()).length > 0;
+  }
 
-  onFilterChange() {
+  /* ── column definitions ──────────────────────────────── */
+
+  private buildColumns(): ColDef[] {
+    return [
+      {
+        colId: 'name',
+        field: 'name',
+        headerName: this.translate.instant('COMMON.NAME'),
+        width: 224,
+        minWidth: 224,
+        filter: 'agTextColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+        pinned: 'left',
+      },
+      {
+        colId: 'description',
+        field: 'description',
+        headerName: this.translate.instant('COMMON.DESCRIPTION'),
+        minWidth: 320,
+        flex: 1,
+        filter: 'agTextColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+        sortable: false,
+      },
+      {
+        colId: 'type',
+        field: 'type',
+        headerName: this.translate.instant('COMMON.TYPE'),
+        width: 144,
+        minWidth: 144,
+        filter: 'agTextColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+      },
+      {
+        colId: 'status',
+        field: 'status',
+        headerName: this.translate.instant('COMMON.STATUS'),
+        width: 144,
+        minWidth: 144,
+        filter: 'agNumberColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+      },
+      {
+        colId: 'createdOn',
+        field: 'createdOn',
+        headerName: this.translate.instant('COMMON.CREATED_ON'),
+        width: 192,
+        minWidth: 192,
+        filter: 'agDateColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+      },
+      {
+        colId: 'actions',
+        headerName: this.translate.instant('COMMON.ACTIONS'),
+        width: 112,
+        minWidth: 112,
+        sortable: false,
+        filter: false,
+        resizable: false,
+        pinned: 'right',
+      },
+    ];
+  }
+
+  /* ── adapter wiring ─────────────────────────────────── */
+
+  /**
+   * Construct the server-side adapter. Datasources are the listed
+   * entity so the adapter binds eagerly — no datasourceId close-over
+   * required.
+   */
+  private bindAdapter() {
+    this.adapter?.destroy();
+    this.adapter = new UsServerListAdapter<any>({
+      load: (params: UsListLoadParams) =>
+        this.datasourceService.listDatasource({
+          page: params.page,
+          limit: params.limit,
+          ...(params.sort ? { sort: params.sort } : {}),
+          ...(params.filter ? { filter: params.filter } : {}),
+        }),
+      // BE returns `{ data: { datasources: [], count } }`.
+      unwrap: (res: any) => ({
+        rows: res?.data?.datasources ?? [],
+        total: res?.data?.count ?? 0,
+      }),
+      // Floating-filter cell value → BE filter slice.
+      filterBuilders: {
+        name: cell => ({ name: (cell as any)?.filter ?? cell }),
+        description: cell => ({
+          description: (cell as any)?.filter ?? cell,
+        }),
+        type: cell => ({ type: (cell as any)?.filter ?? cell }),
+        status: cell => {
+          const v = (cell as any)?.filter ?? cell;
+          return v === '' || v === null || v === undefined ? {} : { status: v };
+        },
+        createdOn: cell => {
+          // AG Grid date filter shapes: {dateFrom, dateTo, type, filterType}.
+          const c = cell as any;
+          const out: Record<string, string> = {};
+          if (c?.dateFrom) out['createdDateFrom'] = new Date(c.dateFrom).toISOString();
+          if (c?.dateTo) {
+            const to = new Date(c.dateTo);
+            to.setHours(23, 59, 59, 999);
+            out['createdDateTo'] = to.toISOString();
+          }
+          return out;
+        },
+      },
+      initial: { page: 1, limit: 10 },
+    });
+    this.cdr.markForCheck();
+  }
+
+  /* ── handlers re-pointed at the adapter ──────────────── */
+
+  onSelectionChange(rows: any[]) {
+    this.selectedDatasources = rows;
+    this.cdr.markForCheck();
+  }
+
+  clearFilters() {
+    if (!this.adapter) return;
+    this.adapter.setFilter({});
+    this.adapter.setSort([]);
     this.selectedDatasources = [];
-    this.searchSubject.next();
   }
 
-  onCreatedDateRangeChange(range: Date[] | null) {
-    this.filterValues.createdDateRange = range;
-    if (!range || (range[0] && range[1])) {
-      this.onFilterChange();
-    }
+  refreshList() {
+    this.adapter?.reload();
   }
 
-  toggleSort(field: DatasourceSortField) {
-    this.sortHelper.toggle(field);
-    this.selectedDatasources = [];
-    if (this.lastTableLazyLoadEvent) {
-      this.lastTableLazyLoadEvent.first = 0;
-      this.loadDatasources(this.lastTableLazyLoadEvent);
-    }
-  }
-
-  loadDatasources(event: any) {
-    if (!event) return;
-    const prev = this.lastTableLazyLoadEvent;
-    if (prev && (prev.first !== event.first || prev.rows !== event.rows)) {
-      this.selectedDatasources = [];
-    }
-    this.lastTableLazyLoadEvent = event;
-    const page = event.first / event.rows + 1;
-    const limit = event.rows;
-
-    this.listParams.page = page;
-    this.listParams.limit = limit;
-
-    this.listDatasourceAPI();
-  }
-
-  listDatasourceAPI() {
-    const params: any = {
-      page: this.listParams.page,
-      limit: this.listParams.limit,
-    };
-
-    let filter: any = {};
-    if (this.filterValues.name) filter.name = this.filterValues.name;
-    if (this.filterValues.description)
-      filter.description = this.filterValues.description;
-    if (
-      this.filterValues.status !== null &&
-      this.filterValues.status !== undefined
-    ) {
-      filter.status = this.filterValues.status;
-    }
-    if (this.filterValues.createdDateRange?.[0]) {
-      filter.createdDateFrom =
-        this.filterValues.createdDateRange[0].toISOString();
-    }
-    if (this.filterValues.createdDateRange?.[1]) {
-      const dateTo = new Date(this.filterValues.createdDateRange[1]);
-      dateTo.setHours(23, 59, 59, 999);
-      filter.createdDateTo = dateTo.toISOString();
-    }
-
-    if (Object.keys(filter).length > 0) {
-      params.filter = JSON.stringify(filter);
-    }
-
-    const sortParam = this.sortHelper.serialize();
-    if (sortParam) params.sort = sortParam;
-
-    this.datasourceService.load(params);
-  }
+  /* ── nav + bulk-delete — UNCHANGED behaviour ─────────── */
 
   onAddNewDatasource() {
     this.router.navigate([DATASOURCE.ADD]);
@@ -275,11 +331,5 @@ export class ListDatasourceComponent implements OnInit, OnDestroy {
     this.bulkDelete = false;
     this.deleteJustification = '';
     this.cdr.markForCheck();
-  }
-
-  refreshList() {
-    if (this.lastTableLazyLoadEvent) {
-      this.loadDatasources(this.lastTableLazyLoadEvent);
-    }
   }
 }

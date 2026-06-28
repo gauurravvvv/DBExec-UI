@@ -5,6 +5,7 @@ import {
   DestroyRef,
   ElementRef,
   inject,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -12,9 +13,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem } from 'primeng/api';
-import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import type { ColDef } from 'ag-grid-community';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import {
   ANALYSES,
@@ -26,31 +27,33 @@ import { AnalysisFormData } from 'src/app/modules/analyses/components/save-analy
 import { AnalysesService } from 'src/app/modules/analyses/services/analyses.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { QueryBuilderService } from 'src/app/modules/query-builder/services/query-builder.service';
-import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
+import {
+  UsServerListAdapter,
+  UsListLoadParams,
+} from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
+import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
 import { DatasetService } from '../../services/dataset.service';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 
-type DatasetSortField = 'name' | 'status' | 'createdOn';
-
+/**
+ * Dataset listing — renders through `<us-data-grid>` with a
+ * `UsServerListAdapter` driving the BE `/datasets` list call. The
+ * page header / datasource dropdown / delete-confirm popup retain
+ * the existing styling and behaviour; only the `<p-table>` was
+ * swapped out for the AG Grid wrapper.
+ */
 @Component({
   selector: 'app-list-dataset',
   templateUrl: './list-dataset.component.html',
   styleUrls: ['./list-dataset.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListDatasetComponent implements OnInit {
-  @ViewChild('dt') dt!: Table;
+export class ListDatasetComponent implements OnInit, OnDestroy {
   @ViewChild('qbSearchInput') qbSearchInput!: ElementRef;
 
-  limit = 10;
-  totalRecords = 0;
-  lastTableLazyLoadEvent: any;
-
-  datasets: any[] = [];
-  filteredDatasets: any[] = [];
+  /* ── page state — preserved from the p-table version ─── */
 
   selectedDatasets: any[] = [];
-  sortHelper = new ListSortHelper<DatasetSortField>();
   showDeleteConfirm = false;
   bulkDelete = false;
   deleteJustification = '';
@@ -69,10 +72,9 @@ export class ListDatasetComponent implements OnInit {
   preloadedDatasourcesTotal: number | null = null;
   selectedDatasource: any = null;
   saving = this.datasetService.saving;
-  // Local loading flag — the list still calls the legacy
-  // listDatasets() (a non-signal method) so we track it here. Set
-  // around the fetch and used by the p-table for the skeleton.
-  loadingList = false;
+  today = new Date();
+  statusOptions: any[] = [];
+
   // Per-row spinner helpers.
   isDeleting = (id: string): boolean => this.datasetService.isDeleting(id);
   get isBulkDeleting(): boolean {
@@ -81,51 +83,49 @@ export class ListDatasetComponent implements OnInit {
     );
   }
 
-  today = new Date();
+  addDatasetItems: MenuItem[] = [];
 
-  statusOptions: any[] = [];
+  // Datasource picker popup state.
+  showDsPickerPopup = false;
 
-  // Filter values for column filtering
-  filterValues: any = {
-    name: '',
-    description: '',
-    status: null,
-    createdDateRange: null,
+  // Create Analysis dialog.
+  showCreateAnalysisDialog = false;
+  analysisDatasetId: string = '';
+
+  // Debouncing for QB search.
+  private qbFilter$ = new Subject<void>();
+
+  /* ── grid wiring ───────────────────────────────────────── */
+
+  /** AG Grid column definitions. cellRenderer templates live in
+   *  the HTML as `<ng-template usGridCell>`. */
+  cols: ColDef[] = [];
+
+  gridConfig: UsDataGridConfig = {
+    enableRowSelection: true,
+    rowSelectionMode: 'multiple',
+    freezeFirstColumn: true,
+    enableColumnChooser: true,
+    enableAddFilter: false, // we use the BE-driven floating filters
+    enableAutoFit: true,
+    enableDensityToggle: true,
+    enableCsvExport: true,
+    enableXlsxExport: true,
+    enableRefresh: true,
+    enableSavedViews: true,
+    gridKey: 'datasets-list',
+    pageSizeOptions: [10, 25, 50, 100],
+    pageSize: 10,
+    height: 'calc(100vh - 340px)',
+    rowIdField: 'id',
   };
 
-  // Debouncing for filter changes
-  private filter$ = new Subject<void>();
-
-  // Debouncing for QB search
-  private qbFilter$ = new Subject<void>();
+  /** Server-side adapter — bound on first datasource selection so
+   *  the grid doesn't fire a datasets query before a datasource exists. */
+  adapter: UsServerListAdapter<any> | null = null;
 
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
-
-  get selectedCount(): number {
-    return this.selectedDatasets?.length || 0;
-  }
-
-  isRowSelectable = (event: any) => true;
-
-  trackById(index: number, item: any): any {
-    return item.id;
-  }
-
-  get isFilterActive(): boolean {
-    return (
-      !!this.filterValues.name ||
-      !!this.filterValues.description ||
-      this.filterValues.status !== null ||
-      !!this.filterValues.createdDateRange
-    );
-  }
-
-  addDatasetItems: MenuItem[] = [];
-
-  // Create Analysis dialog
-  showCreateAnalysisDialog = false;
-  analysisDatasetId: string = '';
 
   constructor(
     private router: Router,
@@ -137,6 +137,10 @@ export class ListDatasetComponent implements OnInit {
     private route: ActivatedRoute,
     private translate: TranslateService,
   ) {}
+
+  trackById(index: number, item: any): any {
+    return item.id;
+  }
 
   ngOnInit() {
     this.statusOptions = [
@@ -152,12 +156,7 @@ export class ListDatasetComponent implements OnInit {
       },
     ];
 
-    // Setup debounced filter
-    this.filter$
-      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.loadDatasets();
-      });
+    this.cols = this.buildColumns();
 
     // Setup debounced QB search
     this.qbFilter$
@@ -177,24 +176,76 @@ export class ListDatasetComponent implements OnInit {
       });
   }
 
-  handleDeepLinking(params: any) {
-    const datasourceId = params['datasourceId'] ? params['datasourceId'] : null;
-    const name = params['name'];
-
-    if (name) {
-      this.filterValues.name = name;
-    }
-
-    if (datasourceId) {
-      this.loadDatasources(datasourceId);
-    } else {
-      this.loadDatasources();
-    }
+  ngOnDestroy() {
+    this.datasetService.cancelReads();
+    this.adapter?.destroy();
   }
 
-  /**
-   * Fetcher for the server-mode datasource dropdown.
-   */
+  get selectedCount(): number {
+    return this.selectedDatasets?.length || 0;
+  }
+
+  get isFilterActive(): boolean {
+    return !!this.adapter && Object.keys(this.adapter.filterModel()).length > 0;
+  }
+
+  /* ── column definitions ──────────────────────────────── */
+
+  private buildColumns(): ColDef[] {
+    return [
+      {
+        colId: 'name',
+        field: 'name',
+        headerName: this.translate.instant('COMMON.NAME'),
+        width: 224,
+        minWidth: 224,
+        filter: 'agTextColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+        pinned: 'left',
+      },
+      {
+        colId: 'description',
+        field: 'description',
+        headerName: this.translate.instant('COMMON.DESCRIPTION'),
+        minWidth: 320,
+        flex: 1,
+        filter: 'agTextColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+        sortable: false,
+      },
+      {
+        colId: 'status',
+        field: 'status',
+        headerName: this.translate.instant('COMMON.STATUS'),
+        width: 144,
+        minWidth: 144,
+        filter: 'agNumberColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+      },
+      {
+        colId: 'createdOn',
+        field: 'createdOn',
+        headerName: this.translate.instant('COMMON.CREATED_ON'),
+        width: 192,
+        minWidth: 192,
+        filter: 'agDateColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+      },
+      {
+        colId: 'actions',
+        headerName: this.translate.instant('COMMON.ACTIONS'),
+        width: 144,
+        minWidth: 144,
+        sortable: false,
+        filter: false,
+        resizable: false,
+        pinned: 'right',
+      },
+    ];
+  }
+
+  /* ── datasource dropdown — UNCHANGED ─────────────────── */
+
   loadDatasourcesPage = async ({
     search,
     page,
@@ -222,40 +273,105 @@ export class ListDatasetComponent implements OnInit {
 
   onDBChange(datasourceId: any) {
     this.selectedDatasource = datasourceId;
-    this.loadDatasets();
+    this.bindAdapter();
   }
 
-  onFilterChange() {
-    this.selectedDatasets = [];
-    // Trigger debounced API call
-    this.filter$.next();
+  /* ── adapter wiring ─────────────────────────────────── */
+
+  /**
+   * Construct (or rebuild) the server-side adapter once a
+   * datasource has been picked. The adapter needs `datasourceId`
+   * in every request, so we close over the current selection.
+   */
+  private bindAdapter(deepLinkName?: string) {
+    if (!this.selectedDatasource) {
+      this.adapter = null;
+      return;
+    }
+    // Tear down any prior adapter so its in-flight call doesn't
+    // race the new one's first load.
+    this.adapter?.destroy();
+    const dsId = this.selectedDatasource;
+    this.adapter = new UsServerListAdapter<any>({
+      load: (params: UsListLoadParams) =>
+        this.datasetService.listDatasets({
+          datasourceId: dsId,
+          page: params.page,
+          limit: params.limit,
+          ...(params.sort ? { sort: params.sort } : {}),
+          ...(params.filter ? { filter: params.filter } : {}),
+        }),
+      // BE returns `{ datasets: [], totalItems | count }`.
+      unwrap: (res: any) => ({
+        rows: res?.data?.datasets ?? [],
+        total: res?.data?.totalItems ?? res?.data?.count ?? 0,
+      }),
+      filterBuilders: {
+        name: cell => ({ name: (cell as any)?.filter ?? cell }),
+        description: cell => ({
+          description: (cell as any)?.filter ?? cell,
+        }),
+        status: cell => {
+          const v = (cell as any)?.filter ?? cell;
+          return v === '' || v === null || v === undefined ? {} : { status: v };
+        },
+        createdOn: cell => {
+          // AG Grid date filter shapes: {dateFrom, dateTo, type, filterType}.
+          const c = cell as any;
+          const out: Record<string, string> = {};
+          if (c?.dateFrom)
+            out['createdDateFrom'] = new Date(c.dateFrom).toISOString();
+          if (c?.dateTo) {
+            const to = new Date(c.dateTo);
+            to.setHours(23, 59, 59, 999);
+            out['createdDateTo'] = to.toISOString();
+          }
+          return out;
+        },
+      },
+      initial: {
+        page: 1,
+        limit: 10,
+        ...(deepLinkName ? { filter: { name: deepLinkName } } : {}),
+      },
+    });
+    this.cdr.markForCheck();
+  }
+
+  /* ── handlers re-pointed at the adapter ──────────────── */
+
+  onSelectionChange(rows: any[]) {
+    this.selectedDatasets = rows;
+    this.cdr.markForCheck();
   }
 
   clearFilters() {
-    this.filterValues = {
-      name: '',
-      description: '',
-      status: null,
-      createdDateRange: null,
-    };
-    // Immediately reload without filters
-    this.loadDatasets();
+    if (!this.adapter) return;
+    this.adapter.setFilter({});
+    this.adapter.setSort([]);
+    this.selectedDatasets = [];
   }
 
-  onCreatedDateRangeChange(range: Date[] | null) {
-    this.filterValues.createdDateRange = range;
-    if (!range || (range[0] && range[1])) {
-      this.onFilterChange();
+  refreshList() {
+    this.adapter?.reload();
+  }
+
+  /* ── deep linking — preserved ────────────────────────── */
+
+  handleDeepLinking(params: any) {
+    const datasourceId = params['datasourceId'] ? params['datasourceId'] : null;
+    const name = params['name'];
+
+    if (datasourceId) {
+      this.loadDatasources(datasourceId, name);
+    } else {
+      this.loadDatasources(undefined, name);
     }
   }
 
-  loadDatasources(preSelectedDbId?: string): Promise<void> {
+  loadDatasources(preSelectedDbId?: string, deepLinkName?: string): Promise<void> {
     return new Promise(resolve => {
-      const params = {
-        page: DEFAULT_PAGE,
-        limit: 10,
-      };
-
+      const params = { page: DEFAULT_PAGE, limit: 10 };
       this.datasourceService
         .listDatasource(params)
         .then(response => {
@@ -264,29 +380,22 @@ export class ListDatasetComponent implements OnInit {
             this.preloadedDatasources = items;
             this.preloadedDatasourcesTotal =
               response?.data?.count ?? items.length;
-            this.datasources = items;
+            this.datasources = [...items];
             if (this.datasources.length > 0) {
-              if (
+              this.selectedDatasource =
                 preSelectedDbId &&
                 this.datasources.find(d => d.id === preSelectedDbId)
-              ) {
-                this.selectedDatasource = preSelectedDbId;
-              } else {
-                this.selectedDatasource = this.datasources[0].id;
-              }
-              this.loadDatasets();
+                  ? preSelectedDbId
+                  : this.datasources[0].id;
+              this.bindAdapter(deepLinkName);
             } else {
               this.selectedDatasource = null;
-              this.datasets = [];
-              this.filteredDatasets = [];
-              this.totalRecords = 0;
+              this.adapter = null;
             }
           } else {
             this.datasources = [];
             this.selectedDatasource = null;
-            this.datasets = [];
-            this.filteredDatasets = [];
-            this.totalRecords = 0;
+            this.adapter = null;
           }
           this.cdr.markForCheck();
           resolve();
@@ -294,126 +403,24 @@ export class ListDatasetComponent implements OnInit {
         .catch(() => {
           this.datasources = [];
           this.selectedDatasource = null;
-          this.datasets = [];
-          this.filteredDatasets = [];
-          this.totalRecords = 0;
+          this.adapter = null;
           this.cdr.markForCheck();
           resolve();
         });
     });
   }
 
-  toggleSort(field: DatasetSortField) {
-    this.sortHelper.toggle(field);
-    this.selectedDatasets = [];
-    if (this.lastTableLazyLoadEvent) {
-      this.lastTableLazyLoadEvent.first = 0;
-    }
-    this.loadDatasets(this.lastTableLazyLoadEvent);
-  }
-
-  loadDatasets(event?: any) {
-    if (!this.selectedDatasource) return;
-
-    if (event) {
-      const prev = this.lastTableLazyLoadEvent;
-      if (prev && (prev.first !== event.first || prev.rows !== event.rows)) {
-        this.selectedDatasets = [];
-      }
-      this.lastTableLazyLoadEvent = event;
-    }
-
-    const page = event ? Math.floor(event.first / event.rows) + 1 : 1;
-    const limit = event ? event.rows : this.limit;
-
-    const params: any = {
-      datasourceId: this.selectedDatasource,
-      page: page,
-      limit: limit,
-    };
-
-    // Build filter object
-    const filter: any = {};
-    if (this.filterValues.name) {
-      filter.name = this.filterValues.name;
-    }
-    if (this.filterValues.description) {
-      filter.description = this.filterValues.description;
-    }
-    if (
-      this.filterValues.status !== null &&
-      this.filterValues.status !== undefined
-    ) {
-      filter.status = this.filterValues.status;
-    }
-    if (this.filterValues.createdDateRange?.[0]) {
-      filter.createdDateFrom =
-        this.filterValues.createdDateRange[0].toISOString();
-    }
-    if (this.filterValues.createdDateRange?.[1]) {
-      const dateTo = new Date(this.filterValues.createdDateRange[1]);
-      dateTo.setHours(23, 59, 59, 999);
-      filter.createdDateTo = dateTo.toISOString();
-    }
-
-    if (Object.keys(filter).length > 0) {
-      params.filter = JSON.stringify(filter);
-    }
-
-    const sortParam = this.sortHelper.serialize();
-    if (sortParam) params.sort = sortParam;
-
-    this.loadingList = true;
-    this.cdr.markForCheck();
-    this.datasetService
-      .listDatasets(params)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.datasets = response.data.datasets || [];
-          this.filteredDatasets = [...this.datasets];
-          this.totalRecords = response.data.totalItems || this.datasets.length;
-        } else {
-          this.datasets = [];
-          this.filteredDatasets = [];
-          this.totalRecords = 0;
-        }
-        this.loadingList = false;
-        this.cdr.markForCheck();
-      })
-      .catch(() => {
-        this.datasets = [];
-        this.filteredDatasets = [];
-        this.totalRecords = 0;
-        this.loadingList = false;
-        this.cdr.markForCheck();
-      });
-  }
+  /* ── add navigation ─────────────────────────────────── */
 
   /**
    * Open the datasource-picker popup. Previously routed straight to
    * /datasets/new; the popup is the new entry point so the add page
-   * doesn't have to show org + datasource dropdowns. The popup itself
-   * is `app-dataset-picker-dialog` mounted near the bottom of the
-   * template — close events route through `onDsPickerDialogClose`.
+   * doesn't have to show org + datasource dropdowns.
    */
   onAddNewAdmin() {
     this.showDsPickerPopup = true;
   }
 
-  // ── Datasource picker popup state ─────────────────────────────────
-  // The picker UI (org → datasource → schema cascade) lives in its
-  // own component — see DatasetPickerDialogComponent. This page just
-  // toggles visibility and handles the close event with the chosen
-  // selections.
-  showDsPickerPopup = false;
-
-  /**
-   * Close handler for the picker dialog. `null` means the user
-   * cancelled (Escape / backdrop / Cancel button); a payload means
-   * they confirmed Continue. On confirm, navigate to /datasets/new
-   * carrying the picked datasource through router state so the add
-   * page can skip refetching it.
-   */
   onDsPickerDialogClose(
     result:
       | import('../dataset-picker-dialog/dataset-picker-dialog.component').DatasetPickerResult
@@ -571,7 +578,7 @@ export class ListDatasetComponent implements OnInit {
         )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
-            this.loadDatasets();
+            this.refreshList();
           }
           this.cdr.markForCheck();
         })
@@ -582,6 +589,8 @@ export class ListDatasetComponent implements OnInit {
     this.showDuplicateDialog = false;
     this.datasetToDuplicate = null;
   }
+
+  /* ── delete flow — UNCHANGED ─────────────────────────── */
 
   confirmDelete(id: string) {
     this.datasetToDelete = id;
@@ -653,13 +662,5 @@ export class ListDatasetComponent implements OnInit {
     this.datasetToDelete = null;
     this.bulkDelete = false;
     this.deleteJustification = '';
-  }
-
-  refreshList() {
-    if (this.lastTableLazyLoadEvent) {
-      this.loadDatasets(this.lastTableLazyLoadEvent);
-    } else {
-      this.loadDatasets();
-    }
   }
 }

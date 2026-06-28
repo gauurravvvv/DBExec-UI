@@ -4,6 +4,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { MenuModule } from 'primeng/menu';
+import { UsDataGridComponent } from 'src/app/shared/components/us-data-grid/us-data-grid.component';
+import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedChartsModule } from 'src/app/shared/modules/shared-charts.module';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -46,6 +48,8 @@ import {
     SharedModule,
     SharedChartsModule,
     MenuModule,
+    UsDataGridComponent,
+    UsGridCellDirective,
     // NgRx feature stores. Two slices — dataset cache + filter slice.
     StoreModule.forFeature(ADD_ANALYSES_FEATURE_KEY, addAnalysesReducer),
     StoreModule.forFeature(ANALYSES_FILTER_FEATURE_KEY, analysesFilterReducer),

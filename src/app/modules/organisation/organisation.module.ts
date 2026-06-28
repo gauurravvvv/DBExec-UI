@@ -6,6 +6,8 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
+import { UsDataGridComponent } from 'src/app/shared/components/us-data-grid/us-data-grid.component';
+import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AddOrganisationComponent } from './components/add-organisation/add-organisation.component';
@@ -33,6 +35,8 @@ import { OrganisationRoutingModule } from './organisation-routing.module';
     OrganisationRoutingModule,
     AppPrimeNGModule,
     SharedModule,
+    UsDataGridComponent,
+    UsGridCellDirective,
   ],
 })
 export class OrganisationModule {}

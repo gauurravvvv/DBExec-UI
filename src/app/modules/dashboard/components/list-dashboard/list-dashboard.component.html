@@ -59,326 +59,112 @@
         </div>
       </div>
 
-      <!-- Table -->
-      <div class="table-wrapper">
-        <p-table
-          #dt
-          [value]="dashboards()"
-          [rows]="10"
-          [paginator]="true"
-          [lazy]="true"
-          (onLazyLoad)="loadDashboards($event)"
-          [totalRecords]="totalRecords()"
-          [loading]="loading()"
-          [showLoader]="false"
-          [rowHover]="true"
-          dataKey="id"
-          [(selection)]="selectedDashboards"
-          [rowSelectable]="isRowSelectable"
-          currentPageReportTemplate="{first} - {last} of {totalRecords}"
-          [showCurrentPageReport]="true"
-          [rowsPerPageOptions]="[10, 25, 50, 100]"
-          styleClass="p-datatable-sm modern-table"
-          [scrollable]="true"
-          scrollHeight="flex"
-          [tableStyle]="{ 'min-width': '81rem' }"
+      <!-- AG Grid via us-data-grid. The grid hosts row-selection,
+           sort, floating filters, column chooser, density toggle,
+           CSV/XLSX export and saved views (gridKey='dashboards-list').
+           Per-cell DOM is supplied via <ng-template usGridCell> so
+           the visual look — name link, dataset/datasource text,
+           status pill, date text, row-actions — matches the previous
+           PrimeNG layout exactly. -->
+      <div class="table-wrapper" *ngIf="selectedDatasource && adapter">
+        <us-data-grid
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="gridConfig"
+          (selectionChange)="onSelectionChange($event)"
+          (refresh)="refreshList()"
         >
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="width: 2.75rem; min-width: 2.75rem" pFrozenColumn>
-                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-              </th>
-              <th
-                style="width: 14rem; min-width: 14rem"
-                pFrozenColumn
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('name')"
-                (click)="toggleSort('name')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.NAME' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('name')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up': sortHelper.direction('name') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('name') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('name'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('name') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('name') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <!-- Analysis column removed post-snapshot: a published dashboard
-                   no longer holds a live link back to its source analysis
-                   (the source can be edited or deleted independently), so
-                   showing the current analysis name would be misleading. -->
-              <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">
-                  {{ 'DASHBOARD.DATASET' | translate }}
-                </div>
-              </th>
-              <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">
-                  {{ 'COMMON.DATASOURCE' | translate }}
-                </div>
-              </th>
-              <th
-                style="width: 9rem; min-width: 9rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('status')"
-                (click)="toggleSort('status')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.STATUS' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('status')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up': sortHelper.direction('status') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('status') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('status'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('status') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('status') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <th
-                style="width: 12rem; min-width: 12rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('createdOn')"
-                (click)="toggleSort('createdOn')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.CREATED_ON' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('createdOn')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up':
-                          sortHelper.direction('createdOn') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('createdOn') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('createdOn'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('createdOn') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('createdOn') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <ng-container *hasPermission="'dashboard'; level: 'delete'">
-              <th style="width: 7rem; min-width: 7rem">
-                <div class="th-content actions-th">
-                  {{ 'COMMON.ACTIONS' | translate }}
-                </div>
-              </th>
-              </ng-container>
-            </tr>
-            <!-- Filter Row -->
-            <tr>
-              <th pFrozenColumn></th>
-              <th pFrozenColumn>
-                <app-custom-input
-                  [(ngModel)]="filterValues.name"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_NAME' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.datasetName"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'DASHBOARD.SEARCH_DATASET' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.datasourceName"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'DASHBOARD.SEARCH_DATASOURCE' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-dropdown
-                  [(ngModel)]="filterValues.status"
-                  [options]="statusOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  [placeholder]="'COMMON.ALL' | translate"
-                  [showClear]="true"
-                  [filter]="false"
-                  [autoDisplayFirst]="false"
-                  appendTo="body"
-                  (onChangeEvent)="onFilterChange()"
-                  icon="pi-circle-fill"
-                ></app-custom-dropdown>
-              </th>
-              <th>
-                <app-custom-daterange
-                  [(ngModel)]="filterValues.createdDateRange"
-                  [placeholder]="'COMMON.SELECT_RANGE' | translate"
-                  [showButtonBar]="true"
-                  [maxDate]="today"
-                  (onChangeEvent)="onCreatedDateRangeChange($event)"
-                ></app-custom-daterange>
-              </th>
-              <ng-container *hasPermission="'dashboard'; level: 'delete'">
-              <th>
-                <!-- No filter for Actions -->
-              </th>
-              </ng-container>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-dashboard>
-            <tr class="modern-row">
-              <td pFrozenColumn>
-                <p-tableCheckbox [value]="dashboard"></p-tableCheckbox>
-              </td>
-              <td pFrozenColumn>
-                <a
-                  class="dataset-name-link"
-                  [routerLink]="['/app/dashboards', dashboard.id]"
-                >
-                  {{ dashboard.name }}
-                </a>
-              </td>
-              <!-- Dataset name comes from the snapshot copy stored on
-                   the dashboard row (dataset_name). Datasource is the
-                   live join — datasource isn't part of the snapshot
-                   scope, so a deleted datasource shows blank here. -->
-              <td>
-                <span class="description-text" [title]="dashboard.datasetName">
-                  {{ dashboard.datasetName }}
-                </span>
-              </td>
-              <td>
-                <span
-                  class="description-text"
-                  [title]="dashboard.datasource?.name"
-                >
-                  {{ dashboard.datasource?.name }}
-                </span>
-              </td>
-              <td>
-                <span
-                  class="status-pill"
-                  [ngClass]="{
-                    active: dashboard.status === 1,
-                    inactive: dashboard.status !== 1,
-                  }"
-                >
-                  <span class="dot"></span>
-                  <span class="label">
-                    {{
-                      dashboard.status === 1
-                        ? ('COMMON.ACTIVE' | translate)
-                        : ('COMMON.INACTIVE' | translate)
-                    }}
-                  </span>
-                </span>
-              </td>
-              <td>
-                <span
-                  class="date-text"
-                  [title]="dashboard.createdOn | date: 'dd MMM yyyy, HH:mm:ss'"
-                >
-                  {{ dashboard.createdOn | relativeTime }}
-                </span>
-              </td>
-              <ng-container *hasPermission="'dashboard'; level: 'delete'">
-              <td>
-                <div class="row-actions">
-                  <button
-                    *hasPermission="'dashboard'; level: 'delete'"
-                    class="icon-btn delete-btn"
-                    (click)="confirmDelete(dashboard.id)"
-                    [pTooltip]="'COMMON.DELETE' | translate"
-                    tooltipPosition="bottom"
-                    [disabled]="isDeleting(dashboard.id)"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="
-                        isDeleting(dashboard.id)
-                          ? 'pi-spin pi-spinner'
-                          : 'pi-trash'
-                      "
-                    ></i>
-                  </button>
-                </div>
-              </td>
-              </ng-container>
-            </tr>
-          </ng-template>
-          <!-- Skeleton rows while the lazy GET is in flight. -->
-          <ng-template pTemplate="loadingbody">
-            <tr
-              *ngFor="let _ of [].constructor(10); let i = index"
-              appSkeletonRow
-              [columns]="5"
-              [showCheckbox]="true"
-              [showActions]="true"
-            ></tr>
-          </ng-template>
-          <ng-template pTemplate="emptymessage">
-            <tr class="empty-row">
-              <td colspan="8" class="empty-message-cell">
-                <div class="empty-state-inline">
-                  <i class="pi pi-search empty-state-icon"></i>
-                  <span class="empty-state-text">
-                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash;
-                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
-                  </span>
-                </div>
-              </td>
-            </tr>
+          <ng-template usGridCell="name" let-dashboard>
+            <a
+              class="dataset-name-link"
+              [routerLink]="['/app/dashboards', dashboard.id]"
+            >
+              {{ dashboard.name }}
+            </a>
           </ng-template>
 
-          <ng-template pTemplate="paginatorright">
-            <button
-              type="button"
-              class="paginator-refresh-btn"
-              (click)="refreshList()"
-              [attr.aria-label]="'COMMON.REFRESH' | translate"
-            >
-              <i class="pi pi-refresh"></i>
-            </button>
+          <ng-template usGridCell="datasetName" let-dashboard>
+            <span class="description-text" [title]="dashboard.datasetName">
+              {{ dashboard.datasetName }}
+            </span>
           </ng-template>
-        </p-table>
+
+          <ng-template usGridCell="datasourceName" let-dashboard>
+            <span
+              class="description-text"
+              [title]="dashboard.datasource?.name"
+            >
+              {{ dashboard.datasource?.name }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="status" let-dashboard>
+            <span
+              class="status-pill"
+              [ngClass]="{
+                active: dashboard.status === 1,
+                inactive: dashboard.status !== 1,
+              }"
+            >
+              <span class="dot"></span>
+              <span class="label">
+                {{
+                  dashboard.status === 1
+                    ? ('COMMON.ACTIVE' | translate)
+                    : ('COMMON.INACTIVE' | translate)
+                }}
+              </span>
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="createdOn" let-dashboard>
+            <span
+              class="date-text"
+              [pTooltip]="(dashboard.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              tooltipPosition="top"
+            >
+              {{ dashboard.createdOn | relativeTime }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="actions" let-dashboard>
+            <div class="row-actions">
+              <button
+                class="icon-btn view-btn"
+                (click)="onView(dashboard.id)"
+                [pTooltip]="'COMMON.VIEW' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-eye"></i>
+              </button>
+              <button
+                *hasPermission="'dashboard'; level: 'delete'"
+                class="icon-btn delete-btn"
+                (click)="confirmDelete(dashboard.id)"
+                [pTooltip]="'COMMON.DELETE' | translate"
+                tooltipPosition="bottom"
+                [disabled]="isDeleting(dashboard.id)"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    isDeleting(dashboard.id)
+                      ? 'pi-spin pi-spinner'
+                      : 'pi-trash'
+                  "
+                ></i>
+              </button>
+            </div>
+          </ng-template>
+        </us-data-grid>
+      </div>
+
+      <!-- Empty datasource state — no datasource picked yet. -->
+      <div class="empty-state-inline" *ngIf="!selectedDatasource">
+        <i class="pi pi-database empty-state-icon"></i>
+        <span class="empty-state-text">
+          {{ 'COMMON.SELECT_DATASOURCE' | translate }}
+        </span>
       </div>
     </div>
   </div>

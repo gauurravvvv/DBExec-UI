@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MenuModule } from 'primeng/menu';
+import { UsDataGridComponent } from 'src/app/shared/components/us-data-grid/us-data-grid.component';
+import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedChartsModule } from 'src/app/shared/modules/shared-charts.module';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -27,6 +29,8 @@ import { DatasourceRoutingModule } from './datasource-routing.module';
     SharedModule,
     SharedChartsModule,
     MenuModule,
+    UsDataGridComponent,
+    UsGridCellDirective,
   ],
 })
 export class DatasourceModule {}

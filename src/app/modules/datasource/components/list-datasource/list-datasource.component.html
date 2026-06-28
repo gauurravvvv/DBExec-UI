@@ -48,345 +48,102 @@
         <div class="toolbar-left"></div>
       </div>
 
-      <!-- Table -->
-      <div class="table-wrapper">
-        <p-table
-          #dt
-          [value]="datasources()"
-          [rows]="10"
-          [paginator]="true"
-          [lazy]="true"
-          (onLazyLoad)="loadDatasources($event)"
-          [totalRecords]="total()"
-          [loading]="loading()"
-          [showLoader]="false"
-          [rowHover]="true"
-          dataKey="id"
-          [(selection)]="selectedDatasources"
-          [rowSelectable]="isRowSelectable"
-          currentPageReportTemplate="{first} - {last} of {totalRecords}"
-          [showCurrentPageReport]="true"
-          [rowsPerPageOptions]="[10, 25, 50, 100]"
-          styleClass="p-datatable-sm modern-table"
-          [scrollable]="true"
-          scrollHeight="flex"
-          [tableStyle]="{ 'min-width': '74rem' }"
+      <!-- AG Grid via us-data-grid. The grid hosts row-selection,
+           sort, floating filters, column chooser, density toggle,
+           CSV/XLSX export and saved views (gridKey='datasources-list').
+           Per-cell DOM is supplied via <ng-template usGridCell> so
+           the visual look — name link, description, engine-type pill,
+           status pill, date text, row-actions — matches the
+           previous PrimeNG layout exactly. -->
+      <div class="table-wrapper" *ngIf="adapter">
+        <us-data-grid
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="gridConfig"
+          (selectionChange)="onSelectionChange($event)"
+          (refresh)="refreshList()"
         >
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="width: 2.75rem; min-width: 2.75rem" pFrozenColumn>
-                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-              </th>
-              <th
-                style="width: 14rem; min-width: 14rem"
-                pFrozenColumn
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('name')"
-                (click)="toggleSort('name')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.NAME' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('name')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up': sortHelper.direction('name') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('name') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('name'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('name') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('name') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <th style="min-width: 20rem">
-                <div class="th-content">
-                  {{ 'COMMON.DESCRIPTION' | translate }}
-                </div>
-              </th>
-              <th
-                style="width: 9rem; min-width: 9rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('type')"
-                (click)="toggleSort('type')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.TYPE' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('type')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up': sortHelper.direction('type') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('type') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('type'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('type') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('type') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <th
-                style="width: 9rem; min-width: 9rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('status')"
-                (click)="toggleSort('status')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.STATUS' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('status')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up': sortHelper.direction('status') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('status') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('status'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('status') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('status') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <th
-                style="width: 12rem; min-width: 12rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('createdOn')"
-                (click)="toggleSort('createdOn')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.CREATED_ON' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('createdOn')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up':
-                          sortHelper.direction('createdOn') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('createdOn') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('createdOn'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('createdOn') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('createdOn') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <ng-container *hasPermission="'setupDB'; level: 'write'">
-              <th style="width: 7rem; min-width: 7rem">
-                <div class="th-content actions-th">
-                  {{ 'COMMON.ACTIONS' | translate }}
-                </div>
-              </th>
-              </ng-container>
-            </tr>
-            <!-- Filter Row -->
-            <tr>
-              <th pFrozenColumn></th>
-              <th pFrozenColumn>
-                <app-custom-input
-                  [(ngModel)]="filterValues.name"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_NAME' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.description"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_DESCRIPTION' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <!-- No filter for Type currently, or add if needed. Keeping it empty for now as requested filter list was Name, Desc, Status -->
-              </th>
-              <th>
-                <app-custom-dropdown
-                  [(ngModel)]="filterValues.status"
-                  [options]="statusOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  [placeholder]="'COMMON.ALL' | translate"
-                  [showClear]="true"
-                  [filter]="false"
-                  [autoDisplayFirst]="false"
-                  appendTo="body"
-                  (onChangeEvent)="onFilterChange()"
-                  icon="pi-circle-fill"
-                ></app-custom-dropdown>
-              </th>
-              <th>
-                <app-custom-daterange
-                  [(ngModel)]="filterValues.createdDateRange"
-                  [placeholder]="'COMMON.SELECT_RANGE' | translate"
-                  [showButtonBar]="true"
-                  [maxDate]="today"
-                  (onChangeEvent)="onCreatedDateRangeChange($event)"
-                ></app-custom-daterange>
-              </th>
-              <ng-container *hasPermission="'setupDB'; level: 'write'">
-              <th>
-                <!-- No filter for Actions -->
-              </th>
-              </ng-container>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-db>
-            <tr class="modern-row">
-              <td pFrozenColumn>
-                <p-tableCheckbox [value]="db"></p-tableCheckbox>
-              </td>
-              <td pFrozenColumn>
-                <a
-                  class="dataset-name-link"
-                  [routerLink]="['/app/datasources', db.id]"
-                >
-                  {{ db.name }}
-                </a>
-              </td>
-              <td>
-                <span
-                  class="description-text"
-                  [title]="db.description"
-                  [class.is-truncatable]="!!db.description"
-                >
-                  {{ db.description || '—' }}
-                </span>
-              </td>
-              <td>
-                <span class="pill">{{ db.config?.dbType || '—' }}</span>
-              </td>
-              <td>
-                <span
-                  class="status-pill"
-                  [ngClass]="{
-                    active: db.status === 1,
-                    inactive: db.status !== 1,
-                  }"
-                >
-                  <span class="dot"></span>
-                  <span class="label">
-                    {{
-                      db.status === 1
-                        ? ('COMMON.ACTIVE' | translate)
-                        : ('COMMON.INACTIVE' | translate)
-                    }}
-                  </span>
-                </span>
-              </td>
-              <td>
-                <span
-                  class="date-text"
-                  [title]="db.createdOn | date: 'dd MMM yyyy, HH:mm:ss'"
-                >
-                  {{ db.createdOn | relativeTime }}
-                </span>
-              </td>
-              <ng-container *hasPermission="'setupDB'; level: 'write'">
-              <td>
-                <div class="row-actions">
-                  <button
-                    *hasPermission="'setupDB'; level: 'write'"
-                    class="icon-btn edit-btn"
-                    (click)="onEdit(db)"
-                    [pTooltip]="'COMMON.EDIT' | translate"
-                    tooltipPosition="bottom"
-                  >
-                    <i class="pi pi-pencil"></i>
-                  </button>
-                  <button
-                    *hasPermission="'setupDB'; level: 'delete'"
-                    class="icon-btn delete-btn"
-                    (click)="confirmDelete(db)"
-                    [pTooltip]="'COMMON.DELETE' | translate"
-                    tooltipPosition="bottom"
-                    [disabled]="isDeleting(db.id)"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="
-                        isDeleting(db.id) ? 'pi-spin pi-spinner' : 'pi-trash'
-                      "
-                    ></i>
-                  </button>
-                </div>
-              </td>
-              </ng-container>
-            </tr>
-          </ng-template>
-          <!-- Skeleton rows while the lazy GET is in flight. -->
-          <ng-template pTemplate="loadingbody">
-            <tr
-              *ngFor="let _ of [].constructor(10); let i = index"
-              appSkeletonRow
-              [columns]="5"
-              [showCheckbox]="true"
-              [showActions]="true"
-            ></tr>
-          </ng-template>
-          <ng-template pTemplate="emptymessage">
-            <tr class="empty-row">
-              <td colspan="7" class="empty-message-cell">
-                <div class="empty-state-inline">
-                  <i class="pi pi-search empty-state-icon"></i>
-                  <span class="empty-state-text">
-                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash;
-                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
-                  </span>
-                </div>
-              </td>
-            </tr>
+          <ng-template usGridCell="name" let-db>
+            <a
+              class="dataset-name-link"
+              [routerLink]="['/app/datasources', db.id]"
+            >
+              {{ db.name }}
+            </a>
           </ng-template>
 
-          <ng-template pTemplate="paginatorright">
-            <button
-              type="button"
-              class="paginator-refresh-btn"
-              (click)="refreshList()"
-              [attr.aria-label]="'COMMON.REFRESH' | translate"
+          <ng-template usGridCell="description" let-db>
+            <span
+              class="description-text"
+              [title]="db.description"
+              [class.is-truncatable]="!!db.description"
             >
-              <i class="pi pi-refresh"></i>
-            </button>
+              {{ db.description || '—' }}
+            </span>
           </ng-template>
-        </p-table>
+
+          <ng-template usGridCell="type" let-db>
+            <span class="pill">{{ db.config?.dbType || db.type || '—' }}</span>
+          </ng-template>
+
+          <ng-template usGridCell="status" let-db>
+            <span
+              class="status-pill"
+              [ngClass]="{
+                active: db.status === 1,
+                inactive: db.status !== 1,
+              }"
+            >
+              <span class="dot"></span>
+              <span class="label">
+                {{
+                  db.status === 1
+                    ? ('COMMON.ACTIVE' | translate)
+                    : ('COMMON.INACTIVE' | translate)
+                }}
+              </span>
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="createdOn" let-db>
+            <span
+              class="date-text"
+              [pTooltip]="(db.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              tooltipPosition="top"
+            >
+              {{ db.createdOn | relativeTime }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="actions" let-db>
+            <div class="row-actions">
+              <button
+                *hasPermission="'setupDB'; level: 'write'"
+                class="icon-btn edit-btn"
+                (click)="onEdit(db)"
+                [pTooltip]="'COMMON.EDIT' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button
+                *hasPermission="'setupDB'; level: 'delete'"
+                class="icon-btn delete-btn"
+                (click)="confirmDelete(db)"
+                [pTooltip]="'COMMON.DELETE' | translate"
+                tooltipPosition="bottom"
+                [disabled]="isDeleting(db.id)"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    isDeleting(db.id) ? 'pi-spin pi-spinner' : 'pi-trash'
+                  "
+                ></i>
+              </button>
+            </div>
+          </ng-template>
+        </us-data-grid>
       </div>
     </div>
   </div>

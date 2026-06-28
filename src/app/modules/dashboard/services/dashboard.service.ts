@@ -54,6 +54,18 @@ export class DashboardService {
 
   constructor(private http: HttpClientService) {}
 
+  /**
+   * Raw list call — returns the unwrapped BE response so callers
+   * (e.g. `<us-data-grid>` via `UsServerListAdapter`) can pull rows +
+   * count straight off `res.data`. Skips the signal-driven `load()`
+   * flow so the grid owns its own loading state.
+   */
+  listDashboard(params: any) {
+    return lastValueFrom(
+      this.http.apiGet(DASHBOARD.LIST, { params, skipLoader: true }),
+    );
+  }
+
   async load(params: any): Promise<void> {
     this._loading.set(true);
     try {

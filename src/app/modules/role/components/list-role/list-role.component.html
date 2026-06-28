@@ -44,242 +44,110 @@
 
     <!-- Unified Toolbar & Content Card -->
     <div class="content-card">
-      <div class="card-toolbar">
-        <div class="toolbar-left"></div>
-      </div>
-
-      <!-- Table -->
-      <div class="table-wrapper">
-        <p-table
-          #dt
-          [value]="roles()"
-          [rows]="10"
-          [paginator]="true"
-          [lazy]="true"
-          (onLazyLoad)="loadRoles($event)"
-          [totalRecords]="total()"
-          [loading]="loading()"
-          [showLoader]="false"
-          [rowHover]="true"
-          dataKey="id"
-          [(selection)]="selectedRoles"
-          [rowSelectable]="isRowSelectable"
-          currentPageReportTemplate="{first} - {last} of {totalRecords}"
-          [showCurrentPageReport]="true"
-          [rowsPerPageOptions]="[10, 25, 50, 100]"
-          styleClass="p-datatable-sm modern-table"
-          [scrollable]="true"
-          scrollHeight="calc(100vh - 440px)"
-          [tableStyle]="{ 'min-width': '65rem' }"
+      <!-- AG Grid via us-data-grid. The grid hosts row-selection,
+           sort, floating filters, column chooser, density toggle,
+           CSV/XLSX export and saved views (gridKey='roles-list').
+           Per-cell DOM is supplied via <ng-template usGridCell> so
+           the visual look — name link + default badge, description,
+           status pill, date text, row-actions — matches the
+           previous PrimeNG layout exactly. -->
+      <div class="table-wrapper" *ngIf="adapter">
+        <us-data-grid
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="gridConfig"
+          (selectionChange)="onSelectionChange($event)"
+          (refresh)="refreshList()"
         >
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="width: 2.75rem; min-width: 2.75rem">
-                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-              </th>
-              <th style="width: 14rem; min-width: 14rem">
-                <div class="th-content">{{ 'COMMON.NAME' | translate }}</div>
-              </th>
-              <th style="min-width: 20rem">
-                <div class="th-content">
-                  {{ 'ROLE.DESCRIPTION' | translate }}
-                </div>
-              </th>
-              <th style="width: 9rem; min-width: 9rem">
-                <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
-              </th>
-              <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">
-                  {{ 'COMMON.CREATED_ON' | translate }}
-                </div>
-              </th>
-              <ng-container *hasPermission="'roleManagement'; level: 'write'">
-              <th style="width: 7rem; min-width: 7rem">
-                <div class="th-content actions-th">
-                  {{ 'COMMON.ACTIONS' | translate }}
-                </div>
-              </th>
-              </ng-container>
-            </tr>
-            <!-- Filter Row -->
-            <tr>
-              <th></th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.name"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'ROLE.SEARCH_NAME' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.description"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'ROLE.SEARCH_DESCRIPTION' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-dropdown
-                  [(ngModel)]="filterValues.status"
-                  [options]="statusOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  [placeholder]="'COMMON.ALL' | translate"
-                  [showClear]="true"
-                  [filter]="false"
-                  [autoDisplayFirst]="false"
-                  appendTo="body"
-                  (onChangeEvent)="onFilterChange()"
-                  icon="pi-circle-fill"
-                ></app-custom-dropdown>
-              </th>
-              <th>
-                <app-custom-daterange
-                  [(ngModel)]="filterValues.createdDateRange"
-                  [placeholder]="'COMMON.SELECT_RANGE' | translate"
-                  [showButtonBar]="true"
-                  [maxDate]="today"
-                  (onChangeEvent)="onCreatedDateRangeChange($event)"
-                ></app-custom-daterange>
-              </th>
-              <ng-container *hasPermission="'roleManagement'; level: 'write'">
-              <th>
-                <!-- No filter for Actions -->
-              </th>
-              </ng-container>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-role>
-            <tr class="modern-row">
-              <td>
-                <p-tableCheckbox
-                  [value]="role"
-                  [disabled]="!role.canDelete"
-                ></p-tableCheckbox>
-              </td>
-              <td>
-                <span class="role-name-cell">
-                  <a
-                    class="dataset-name-link"
-                    [routerLink]="['/app/roles', role.id]"
-                  >
-                    {{ role.name }}
-                  </a>
-                  <!-- Default-role badge — brand-tinted, signals
-                       the row is seeded and immutable. Same
-                       convention as users / system-admin lists. -->
-                  <span
-                    *ngIf="role.isDefault === 1"
-                    class="row-badge row-badge--default"
-                  >{{ 'COMMON.DEFAULT_BADGE' | translate }}</span>
-                </span>
-              </td>
-              <td>
-                <span class="description-text" [title]="role.description">{{
-                  role.description
-                }}</span>
-              </td>
-              <td>
-                <span
-                  class="status-pill"
-                  [ngClass]="{
-                    active: role.status === 1,
-                    inactive: role.status !== 1,
-                  }"
-                >
-                  <span class="dot"></span>
-                  {{
-                    role.status === 1
-                      ? ('COMMON.ACTIVE' | translate)
-                      : ('COMMON.INACTIVE' | translate)
-                  }}
-                </span>
-              </td>
-              <td>
-                <span class="date-text" [pTooltip]="(role.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''" tooltipPosition="top">{{
-                  role.createdOn | relativeTime
-                }}</span>
-              </td>
-              <ng-container *hasPermission="'roleManagement'; level: 'write'">
-              <td>
-                <div class="row-actions">
-                  <button
-                    *hasPermission="'roleManagement'; level: 'write'"
-                    class="icon-btn edit-btn"
-                    (click)="onEdit(role.id)"
-                    [pTooltip]="
-                      !role.canEdit
-                        ? ('ROLE.CANNOT_EDIT_DEFAULT' | translate)
-                        : ('COMMON.EDIT' | translate)
-                    "
-                    tooltipPosition="bottom"
-                    [disabled]="!role.canEdit"
-                  >
-                    <i class="pi pi-pencil"></i>
-                  </button>
-                  <button
-                    *hasPermission="'roleManagement'; level: 'delete'"
-                    class="icon-btn delete-btn"
-                    (click)="confirmDelete(role.id)"
-                    [pTooltip]="
-                      !role.canDelete
-                        ? ('ROLE.CANNOT_DELETE_DEFAULT' | translate)
-                        : ('COMMON.DELETE' | translate)
-                    "
-                    tooltipPosition="bottom"
-                    [disabled]="!role.canDelete || isDeleting(role.id)"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="
-                        isDeleting(role.id) ? 'pi-spin pi-spinner' : 'pi-trash'
-                      "
-                    ></i>
-                  </button>
-                </div>
-              </td>
-              </ng-container>
-            </tr>
-          </ng-template>
-          <!-- Skeleton rows while the lazy GET is in flight. Replaces
-               the legacy global blocker for this module; header +
-               filters + pagination stay visible. -->
-          <ng-template pTemplate="loadingbody">
-            <tr
-              *ngFor="let _ of [].constructor(10); let i = index"
-              appSkeletonRow
-              [columns]="4"
-              [showCheckbox]="true"
-              [showActions]="true"
-            ></tr>
-          </ng-template>
-          <ng-template pTemplate="emptymessage">
-            <tr class="empty-row">
-              <td colspan="6" class="empty-message-cell">
-                <div class="empty-state-inline">
-                  <i class="pi pi-search empty-state-icon"></i>
-                  <span class="empty-state-text">
-                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash;
-                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
-                  </span>
-                </div>
-              </td>
-            </tr>
+          <ng-template usGridCell="name" let-role>
+            <span class="role-name-cell">
+              <a
+                class="dataset-name-link"
+                [routerLink]="['/app/roles', role.id]"
+              >
+                {{ role.name }}
+              </a>
+              <!-- Default-role badge — brand-tinted, signals
+                   the row is seeded and immutable. Same
+                   convention as users / system-admin lists. -->
+              <span
+                *ngIf="role.isDefault === 1"
+                class="row-badge row-badge--default"
+              >{{ 'COMMON.DEFAULT_BADGE' | translate }}</span>
+            </span>
           </ng-template>
 
-          <ng-template pTemplate="paginatorright">
-            <button
-              type="button"
-              class="paginator-refresh-btn"
-              (click)="refreshList()"
-              [attr.aria-label]="'COMMON.REFRESH' | translate"
-            >
-              <i class="pi pi-refresh"></i>
-            </button>
+          <ng-template usGridCell="description" let-role>
+            <span class="description-text" [title]="role.description">
+              {{ role.description }}
+            </span>
           </ng-template>
-        </p-table>
+
+          <ng-template usGridCell="status" let-role>
+            <span
+              class="status-pill"
+              [ngClass]="{
+                active: role.status === 1,
+                inactive: role.status !== 1,
+              }"
+            >
+              <span class="dot"></span>
+              {{
+                role.status === 1
+                  ? ('COMMON.ACTIVE' | translate)
+                  : ('COMMON.INACTIVE' | translate)
+              }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="createdOn" let-role>
+            <span
+              class="date-text"
+              [pTooltip]="(role.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              tooltipPosition="top"
+            >
+              {{ role.createdOn | relativeTime }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="actions" let-role>
+            <div class="row-actions">
+              <button
+                *hasPermission="'roleManagement'; level: 'write'"
+                class="icon-btn edit-btn"
+                (click)="onEdit(role.id)"
+                [pTooltip]="
+                  !role.canEdit
+                    ? ('ROLE.CANNOT_EDIT_DEFAULT' | translate)
+                    : ('COMMON.EDIT' | translate)
+                "
+                tooltipPosition="bottom"
+                [disabled]="!role.canEdit"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button
+                *hasPermission="'roleManagement'; level: 'delete'"
+                class="icon-btn delete-btn"
+                (click)="confirmDelete(role.id)"
+                [pTooltip]="
+                  !role.canDelete
+                    ? ('ROLE.CANNOT_DELETE_DEFAULT' | translate)
+                    : ('COMMON.DELETE' | translate)
+                "
+                tooltipPosition="bottom"
+                [disabled]="!role.canDelete || isDeleting(role.id)"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    isDeleting(role.id) ? 'pi-spin pi-spinner' : 'pi-trash'
+                  "
+                ></i>
+              </button>
+            </div>
+          </ng-template>
+        </us-data-grid>
       </div>
     </div>
   </div>

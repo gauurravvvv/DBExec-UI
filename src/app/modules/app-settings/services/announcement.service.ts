@@ -99,6 +99,20 @@ export class AnnouncementService {
     this._cancelReads$.next();
   }
 
+  /**
+   * Adapter-friendly list method — returns the raw BE response so a
+   * `UsServerListAdapter` can unwrap `{ data: { announcements, count } }`
+   * directly. Unlike `load()`, this does NOT touch the internal
+   * signals — the grid owns its own row state.
+   */
+  listAnnouncements(params: any) {
+    return lastValueFrom(
+      this.http
+        .apiGet(ANNOUNCEMENT.LIST, { params, skipLoader: true })
+        .pipe(takeUntil(this._cancelReads$)),
+    );
+  }
+
   async add(payload: AnnouncementPayload): Promise<any> {
     this._saving.set(true);
     try {

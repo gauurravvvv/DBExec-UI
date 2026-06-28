@@ -7,6 +7,19 @@
       </div>
 
       <div class="header-actions">
+        <!-- Bulk Delete Button -->
+        <ng-container *hasPermission="'announcementManagement'; level: 'delete'">
+          <button
+            *ngIf="selectedCount > 0"
+            pButton
+            [label]="'COMMON.DELETE_COUNT' | translate: { count: selectedCount }"
+            icon="pi pi-trash"
+            (click)="confirmBulkDelete()"
+            class="p-button-raised p-button-danger modern-button"
+          ></button>
+        </ng-container>
+
+        <!-- Clear Filters Button -->
         <button
           pButton
           [label]="'COMMON.CLEAR' | translate"
@@ -16,6 +29,7 @@
           class="p-button-outlined p-button-danger modern-button"
         ></button>
 
+        <!-- Add Button -->
         <button
           *hasPermission="'announcementManagement'; level: 'write'"
           pButton
@@ -30,250 +44,139 @@
     <!-- Unified Toolbar & Content Card -->
     <div class="content-card">
       <div class="card-toolbar">
-        <div class="toolbar-left"></div>
+        <div class="toolbar-left">
+          <!-- Group filter — server-driven. Lives in the toolbar
+               (not the floating-filter row) because the BE expects
+               `targetGroupId` as a top-level param, not inside the
+               `filter` JSON. -->
+          <div class="dropdown-field">
+            <app-custom-dropdown
+              [(ngModel)]="selectedGroup"
+              [serverMode]="true"
+              [fetcher]="loadGroupsPage"
+              [pageSize]="10"
+              [preloadedItems]="preloadedGroups"
+              [preloadedTotal]="preloadedGroupsTotal"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              [floatingLabel]="true"
+              [label]="'ANNOUNCEMENT.GROUP' | translate"
+              [showClear]="true"
+              [autoDisplayFirst]="false"
+              filterBy="name"
+              (onChangeEvent)="onGroupChange($event)"
+              icon="pi-users"
+            >
+            </app-custom-dropdown>
+          </div>
+        </div>
       </div>
 
-      <div class="table-wrapper">
-        <p-table
-          #dt
-          [value]="announcements()"
-          [rows]="10"
-          [paginator]="true"
-          [lazy]="true"
-          (onLazyLoad)="loadAnnouncements($event)"
-          [totalRecords]="totalRecordsSignal()"
-          [rowHover]="true"
-          dataKey="id"
-          currentPageReportTemplate="{first} - {last} of {totalRecords}"
-          [showCurrentPageReport]="true"
-          [rowsPerPageOptions]="[10, 25, 50, 100]"
-          styleClass="p-datatable-sm modern-table"
-          [scrollable]="true"
-          scrollHeight="flex"
-          [tableStyle]="{ 'min-width': '93rem' }"
+      <!-- AG Grid via us-data-grid. The grid hosts row-selection,
+           sort, floating filters, column chooser, density toggle,
+           CSV/XLSX export and saved views (gridKey='announcements-list').
+           Per-cell DOM is supplied via <ng-template usGridCell> so
+           the visual look — title link, description, target group,
+           status pill, active-window range, created date, row-actions —
+           matches the previous PrimeNG layout exactly. -->
+      <div class="table-wrapper" *ngIf="adapter">
+        <us-data-grid
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="gridConfig"
+          (selectionChange)="onSelectionChange($event)"
+          (refresh)="refreshList()"
         >
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="width: 5rem; min-width: 5rem" pFrozenColumn>
-                <div class="th-content">
-                  {{ 'ANNOUNCEMENT.PREVIEW' | translate }}
-                </div>
-              </th>
-              <th style="width: 14rem; min-width: 14rem" pFrozenColumn>
-                <div class="th-content">
-                  {{ 'ANNOUNCEMENT.ANNOUNCEMENT_TITLE' | translate }}
-                </div>
-              </th>
-              <th style="min-width: 20rem">
-                <div class="th-content">
-                  {{ 'COMMON.DESCRIPTION' | translate }}
-                </div>
-              </th>
-              <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">
-                  {{ 'ANNOUNCEMENT.GROUP' | translate }}
-                </div>
-              </th>
-              <th style="width: 9rem; min-width: 9rem">
-                <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
-              </th>
-              <th style="width: 14rem; min-width: 14rem">
-                <div class="th-content">
-                  {{ 'ANNOUNCEMENT.ACTIVE_WINDOW' | translate }}
-                </div>
-              </th>
-              <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">
-                  {{ 'COMMON.CREATED_ON' | translate }}
-                </div>
-              </th>
-              <th style="width: 7rem; min-width: 7rem">
-                <div class="th-content actions-th">
-                  {{ 'COMMON.ACTIONS' | translate }}
-                </div>
-              </th>
-            </tr>
-            <!-- Filter Row -->
-            <tr>
-              <th pFrozenColumn></th>
-              <th pFrozenColumn>
-                <app-custom-input
-                  [(ngModel)]="filterValues.name"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'ANNOUNCEMENT.SEARCH_TITLE' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.description"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_DESCRIPTION' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-dropdown
-                  [(ngModel)]="filterValues.targetGroupId"
-                  [serverMode]="true"
-                  [fetcher]="loadGroupsPage"
-                  [pageSize]="10"
-                  [preloadedItems]="preloadedGroups"
-                  [preloadedTotal]="preloadedGroupsTotal"
-                  optionLabel="name"
-                  optionValue="id"
-                  [placeholder]="'COMMON.ALL' | translate"
-                  [showClear]="true"
-                  [filter]="true"
-                  filterBy="name"
-                  [autoDisplayFirst]="false"
-                  appendTo="body"
-                  (onChangeEvent)="onFilterChange()"
-                  icon="pi-users"
-                ></app-custom-dropdown>
-              </th>
-              <th>
-                <app-custom-dropdown
-                  [(ngModel)]="filterValues.status"
-                  [options]="statusOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  [placeholder]="'COMMON.ALL' | translate"
-                  [showClear]="true"
-                  [filter]="false"
-                  [autoDisplayFirst]="false"
-                  appendTo="body"
-                  (onChangeEvent)="onFilterChange()"
-                  icon="pi-circle-fill"
-                ></app-custom-dropdown>
-              </th>
-              <th></th>
-              <th>
-                <app-custom-daterange
-                  [(ngModel)]="filterValues.createdDateRange"
-                  [placeholder]="'COMMON.SELECT_RANGE' | translate"
-                  [showButtonBar]="true"
-                  [maxDate]="today"
-                  (onChangeEvent)="onCreatedDateRangeChange($event)"
-                ></app-custom-daterange>
-              </th>
-              <th></th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-a>
-            <tr class="modern-row">
-              <td pFrozenColumn>
-                <span
-                  class="color-swatch"
-                  [style.background]="a.bgColor"
-                  [pTooltip]="'BG ' + a.bgColor + ' / Text ' + a.textColor"
-                ></span>
-              </td>
-              <td pFrozenColumn>
-                <a
-                  class="dataset-name-link"
-                  [routerLink]="['/app/settings/announcements', a.id]"
-                >
-                  {{ a.name }}
-                </a>
-              </td>
-              <td>
-                <span class="description-text" [title]="a.description">{{
-                  a.description || '-'
-                }}</span>
-              </td>
-              <td>
-                <span class="description-text">{{
-                  a.targetGroup?.name || '—'
-                }}</span>
-              </td>
-              <td>
-                <span
-                  class="status-pill"
-                  [ngClass]="{
-                    active: isActive(a),
-                    inactive: !isActive(a),
-                  }"
-                >
-                  <span class="dot"></span>
-                  {{
-                    isActive(a)
-                      ? ('COMMON.ACTIVE' | translate)
-                      : ('COMMON.INACTIVE' | translate)
-                  }}
-                </span>
-              </td>
-              <td>
-                <span class="date-text" *ngIf="a.startTime || a.endTime">
-                  {{ (a.startTime | date: 'mediumDate') || '—' }} →
-                  {{ (a.endTime | date: 'mediumDate') || '∞' }}
-                </span>
-                <span class="date-text" *ngIf="!a.startTime && !a.endTime">
-                  {{ 'ANNOUNCEMENT.ALWAYS' | translate }}
-                </span>
-              </td>
-              <td>
-                <span class="date-text" [pTooltip]="(a.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''" tooltipPosition="top">{{
-                  a.createdOn | relativeTime
-                }}</span>
-              </td>
-              <td>
-                <div class="row-actions">
-                  <button
-                    class="icon-btn view-btn"
-                    (click)="onView(a.id)"
-                    [pTooltip]="'COMMON.VIEW' | translate"
-                    tooltipPosition="bottom"
-                  >
-                    <i class="pi pi-eye"></i>
-                  </button>
-                  <button
-                    *hasPermission="'announcementManagement'; level: 'write'"
-                    class="icon-btn edit-btn"
-                    (click)="onEdit(a.id)"
-                    [pTooltip]="'COMMON.EDIT' | translate"
-                    tooltipPosition="bottom"
-                  >
-                    <i class="pi pi-pencil"></i>
-                  </button>
-                  <button
-                    *hasPermission="'announcementManagement'; level: 'delete'"
-                    class="icon-btn delete-btn"
-                    (click)="confirmDelete(a.id)"
-                    [pTooltip]="'COMMON.DELETE' | translate"
-                    tooltipPosition="bottom"
-                  >
-                    <i class="pi pi-trash"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="emptymessage">
-            <tr class="empty-row">
-              <td colspan="8" class="empty-message-cell">
-                <div class="empty-state-inline">
-                  <i class="pi pi-search empty-state-icon"></i>
-                  <span class="empty-state-text">
-                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash;
-                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
-                  </span>
-                </div>
-              </td>
-            </tr>
+          <ng-template usGridCell="name" let-a>
+            <a
+              class="dataset-name-link"
+              [routerLink]="['/app/settings/announcements', a.id]"
+            >
+              {{ a.name }}
+            </a>
           </ng-template>
 
-          <ng-template pTemplate="paginatorright">
-            <button
-              type="button"
-              class="paginator-refresh-btn"
-              (click)="refreshList()"
-              [attr.aria-label]="'COMMON.REFRESH' | translate"
-            >
-              <i class="pi pi-refresh"></i>
-            </button>
+          <ng-template usGridCell="description" let-a>
+            <span class="description-text" [title]="a.description">
+              {{ a.description || '—' }}
+            </span>
           </ng-template>
-        </p-table>
+
+          <ng-template usGridCell="targetGroup" let-a>
+            <span class="description-text">{{
+              a.targetGroup?.name || '—'
+            }}</span>
+          </ng-template>
+
+          <ng-template usGridCell="status" let-a>
+            <span
+              class="status-pill"
+              [ngClass]="{
+                active: isActive(a),
+                inactive: !isActive(a),
+              }"
+            >
+              <span class="dot"></span>
+              {{
+                isActive(a)
+                  ? ('COMMON.ACTIVE' | translate)
+                  : ('COMMON.INACTIVE' | translate)
+              }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="activeWindow" let-a>
+            <span class="date-text" *ngIf="a.startTime || a.endTime">
+              {{ (a.startTime | date: 'mediumDate') || '—' }} →
+              {{ (a.endTime | date: 'mediumDate') || '∞' }}
+            </span>
+            <span class="date-text" *ngIf="!a.startTime && !a.endTime">
+              {{ 'ANNOUNCEMENT.ALWAYS' | translate }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="createdOn" let-a>
+            <span
+              class="date-text"
+              [pTooltip]="(a.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              tooltipPosition="top"
+            >
+              {{ a.createdOn | relativeTime }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="actions" let-a>
+            <div class="row-actions">
+              <button
+                class="icon-btn view-btn"
+                (click)="onView(a.id)"
+                [pTooltip]="'COMMON.VIEW' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-eye"></i>
+              </button>
+              <button
+                *hasPermission="'announcementManagement'; level: 'write'"
+                class="icon-btn edit-btn"
+                (click)="onEdit(a.id)"
+                [pTooltip]="'COMMON.EDIT' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button
+                *hasPermission="'announcementManagement'; level: 'delete'"
+                class="icon-btn delete-btn"
+                (click)="confirmDelete(a.id)"
+                [pTooltip]="'COMMON.DELETE' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </ng-template>
+        </us-data-grid>
       </div>
     </div>
   </div>
@@ -288,8 +191,15 @@
       <h3>{{ 'ANNOUNCEMENT.DELETE_TITLE' | translate }}</h3>
     </div>
     <div class="standard-delete-section">
-      <p class="delete-intro">
+      <p class="delete-intro" *ngIf="!bulkDelete">
         {{ 'ANNOUNCEMENT.DELETE_SINGLE' | translate }}
+      </p>
+      <p class="delete-intro" *ngIf="bulkDelete">
+        <span
+          [innerHTML]="
+            'ANNOUNCEMENT.DELETE_BULK' | translate: { count: selectedCount }
+          "
+        ></span>
       </p>
       <ul class="delete-info-list">
         <li>
