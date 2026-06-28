@@ -6,20 +6,36 @@ import {
   inject,
   OnDestroy,
   OnInit,
-  ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Table } from 'primeng/table';
-import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import type { ColDef } from 'ag-grid-community';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { RLS_RULE } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import {
+  UsServerListAdapter,
+  UsListLoadParams,
+} from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
+import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
 import { RlsRulesService } from '../../services/rls-rules.service';
 
+/**
+ * RLS-rule listing — renders through `<us-data-grid>` with a
+ * `UsServerListAdapter` driving the legacy `rlsRulesService.listRules`
+ * call. The page header / datasource dropdown / delete-confirm popup /
+ * assignments side panel retain the existing styling and behaviour;
+ * only the `<p-table>` was swapped out for the AG Grid wrapper.
+ *
+ * PRE-EXISTING SEMANTIC MISMATCH (preserved): the BE list endpoint is
+ * dataset-scoped, but this page exposes a datasource selector. Passing
+ * `selectedDatasource` as the datasetId has always returned zero
+ * matches because dataset ids and datasource ids don't overlap. This
+ * migration is a like-for-like renderer swap — the broken BE wiring
+ * stays broken until the page is redesigned.
+ */
 @Component({
   selector: 'app-list-rls-rule',
   templateUrl: './list-rls-rule.component.html',
@@ -27,63 +43,47 @@ import { RlsRulesService } from '../../services/rls-rules.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListRlsRuleComponent implements OnInit, OnDestroy {
-  refreshList() {
-    if (this.lastTableLazyLoadEvent) {
-      this.loadRules(this.lastTableLazyLoadEvent);
-    }
-  }
-
-  ngOnDestroy() {
-    // Abort in-flight reads if the user navigates away.
-    this.rlsRulesService.cancelReads();
-  }
-
-  @ViewChild('dt') dt!: Table;
-
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
-  limit = 10;
-  lastTableLazyLoadEvent: any;
+  /* ── page state — preserved from the p-table version ──── */
 
-  // Signal refs — template binds directly to these
-  rules = this.rlsRulesService.rules;
-  total = this.rlsRulesService.total;
-  loading = this.rlsRulesService.loading;
-  saving = this.rlsRulesService.saving;
+  showDeleteConfirm = false;
+  ruleToDelete: string | null = null;
+  deleteJustification = '';
 
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
   selectedDatasource: any = null;
 
-  showDeleteConfirm = false;
-  ruleToDelete: string | null = null;
-  deleteJustification = '';
-
-  statusOptions = [
-    { label: this.translate.instant('COMMON.ACTIVE'), value: 1 },
-    { label: this.translate.instant('COMMON.INACTIVE'), value: 0 },
-  ];
-
-  filterValues: any = {
-    name: '',
-    datasetName: '',
-    status: null,
-  };
-
   activeRuleForAssignment: any = null;
   showAssignmentsPanel = false;
 
-  private filter$ = new Subject<void>();
+  /* ── grid wiring ───────────────────────────────────────── */
 
-  get isFilterActive(): boolean {
-    return (
-      !!this.filterValues.name ||
-      !!this.filterValues.datasetName ||
-      this.filterValues.status !== null
-    );
-  }
+  cols: ColDef[] = [];
+
+  gridConfig: UsDataGridConfig = {
+    enableRowSelection: false,
+    freezeFirstColumn: true,
+    enableColumnChooser: true,
+    enableAddFilter: false,
+    enableAutoFit: true,
+    enableDensityToggle: true,
+    enableCsvExport: true,
+    enableXlsxExport: true,
+    enableRefresh: true,
+    enableSavedViews: true,
+    gridKey: 'rls-rules-list',
+    pageSizeOptions: [10, 25, 50, 100],
+    pageSize: 10,
+    height: 'calc(100vh - 340px)',
+    rowIdField: 'id',
+  };
+
+  /** Server-side adapter — bound on first datasource selection. */
+  adapter: UsServerListAdapter<any> | null = null;
 
   constructor(
     private rlsRulesService: RlsRulesService,
@@ -94,18 +94,76 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.filter$
-      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.loadRules();
-      });
-
+    this.cols = this.buildColumns();
     this.loadDatasources();
   }
 
-  /**
-   * Fetcher for the server-mode datasource dropdown.
-   */
+  ngOnDestroy() {
+    this.rlsRulesService.cancelReads();
+    this.adapter?.destroy();
+  }
+
+  get isFilterActive(): boolean {
+    return !!this.adapter && Object.keys(this.adapter.filterModel()).length > 0;
+  }
+
+  /* ── column definitions ──────────────────────────────── */
+
+  private buildColumns(): ColDef[] {
+    return [
+      {
+        colId: 'name',
+        field: 'name',
+        headerName: this.translate.instant('COMMON.NAME'),
+        width: 240,
+        minWidth: 224,
+        filter: 'agTextColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+        pinned: 'left',
+      },
+      {
+        colId: 'datasetName',
+        field: 'dataset.name',
+        headerName: this.translate.instant('RLS.DATASET'),
+        width: 200,
+        minWidth: 180,
+        filter: 'agTextColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+        sortable: false,
+      },
+      {
+        colId: 'conditions',
+        field: 'conditions',
+        headerName: this.translate.instant('RLS.CONDITIONS'),
+        minWidth: 360,
+        flex: 1,
+        sortable: false,
+        filter: false,
+      },
+      {
+        colId: 'status',
+        field: 'status',
+        headerName: this.translate.instant('COMMON.STATUS'),
+        width: 144,
+        minWidth: 128,
+        filter: 'agNumberColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+      },
+      {
+        colId: 'actions',
+        headerName: this.translate.instant('COMMON.ACTIONS'),
+        width: 176,
+        minWidth: 176,
+        sortable: false,
+        filter: false,
+        resizable: false,
+        pinned: 'right',
+      },
+    ];
+  }
+
+  /* ── datasource dropdown — UNCHANGED ─────────────────── */
+
   loadDatasourcesPage = async ({
     search,
     page,
@@ -131,12 +189,14 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
     }
   };
 
+  onDatasourceChange(datasourceId: any) {
+    this.selectedDatasource = datasourceId;
+    this.bindAdapter();
+  }
+
   loadDatasources(): Promise<void> {
     return new Promise(resolve => {
-      const params = {
-        page: DEFAULT_PAGE,
-        limit: 10,
-      };
+      const params = { page: DEFAULT_PAGE, limit: 10 };
       this.datasourceService
         .listDatasource(params)
         .then(response => {
@@ -145,16 +205,18 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
             this.preloadedDatasources = items;
             this.preloadedDatasourcesTotal =
               response?.data?.count ?? items.length;
-            this.datasources = items;
+            this.datasources = [...items];
             if (this.datasources.length > 0) {
               this.selectedDatasource = this.datasources[0].id;
-              this.loadRules();
+              this.bindAdapter();
             } else {
               this.selectedDatasource = null;
+              this.adapter = null;
             }
           } else {
             this.datasources = [];
             this.selectedDatasource = null;
+            this.adapter = null;
           }
           this.cdr.markForCheck();
           resolve();
@@ -162,74 +224,65 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
         .catch(() => {
           this.datasources = [];
           this.selectedDatasource = null;
+          this.adapter = null;
           this.cdr.markForCheck();
           resolve();
         });
     });
   }
 
-  onDatasourceChange(datasourceId: any) {
-    this.selectedDatasource = datasourceId;
-    if (this.selectedDatasource) {
-      this.loadRules();
+  /* ── adapter wiring ─────────────────────────────────── */
+
+  /**
+   * Build the server-side adapter once a datasource has been picked.
+   * The legacy BE call (`listRules(datasetId)`) ignores
+   * filter/sort/pagination — we pass only the id. The adapter still
+   * drives the paginator UI client-side over the returned rows.
+   *
+   * NOTE: `selectedDatasource` is passed as the datasetId on purpose;
+   * see the class-level comment about the pre-existing mismatch.
+   */
+  private bindAdapter() {
+    if (!this.selectedDatasource) {
+      this.adapter = null;
+      return;
     }
+    this.adapter?.destroy();
+    const selectedDatasource = this.selectedDatasource;
+    this.adapter = new UsServerListAdapter<any>({
+      load: (_params: UsListLoadParams) =>
+        this.rlsRulesService.listRules(selectedDatasource),
+      unwrap: (res: any) => {
+        // BE may return `{ data: { rules: [...], count } }` or the
+        // bare array `{ data: [...] }`; mirror the legacy
+        // `load()` method's fallback chain.
+        const arr = Array.isArray(res?.data)
+          ? res.data
+          : (res?.data?.rules ?? []);
+        return { rows: arr, total: res?.data?.count ?? arr.length };
+      },
+      initial: { page: 1, limit: 10 },
+    });
+    this.cdr.markForCheck();
   }
 
-  onFilterChange() {
-    this.filter$.next();
-  }
+  /* ── handlers re-pointed at the adapter ──────────────── */
 
   clearFilters() {
-    this.filterValues = {
-      name: '',
-      datasetName: '',
-      status: null,
-    };
-    this.loadRules();
+    if (!this.adapter) return;
+    this.adapter.setFilter({});
+    this.adapter.setSort([]);
   }
 
-  loadRules(event?: any) {
-    if (!this.selectedDatasource) return;
-
-    if (event) {
-      this.lastTableLazyLoadEvent = event;
-    }
-
-    const page = event ? Math.floor(event.first / event.rows) + 1 : 1;
-    const limit = event ? event.rows : this.limit;
-
-    const params: any = { page, limit };
-
-    const filter: any = {};
-    if (this.filterValues.datasetName)
-      filter.datasetName = this.filterValues.datasetName;
-    if (this.filterValues.name) filter.name = this.filterValues.name;
-    if (
-      this.filterValues.status !== null &&
-      this.filterValues.status !== undefined
-    ) {
-      filter.status = this.filterValues.status;
-    }
-    if (Object.keys(filter).length > 0) params.filter = JSON.stringify(filter);
-
-    // PRE-EXISTING SEMANTIC MISMATCH: the BE list endpoint is
-    // scoped by dataset, not datasource. The FE list page exposes a
-    // datasource selector. Passing selectedDatasource through has
-    // always resulted in zero matches because dataset ids and
-    // datasource ids don't overlap; we keep the behaviour for
-    // continuity but this page needs a redesign (dataset-scoped
-    // selector or a different listing endpoint). Filter/sort params
-    // are ignored by the new BE route — keeping the call site
-    // unchanged so the UI shape doesn't shift in the same PR.
-    this.rlsRulesService
-      .load(this.selectedDatasource)
-      .then(() => {
-        this.cdr.markForCheck();
-      })
-      .catch(() => {
-        this.cdr.markForCheck();
-      });
+  refreshList() {
+    this.adapter?.reload();
   }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  /* ── assignments side panel — preserved ──────────────── */
 
   onManageAssignments(rule: any) {
     this.activeRuleForAssignment = rule;
@@ -241,16 +294,14 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
     this.activeRuleForAssignment = null;
   }
 
+  /* ── nav + delete — preserved ────────────────────────── */
+
   onAddNewRule() {
     this.router.navigate([RLS_RULE.ADD]);
   }
 
   onEdit(rule: any) {
     this.router.navigate([RLS_RULE.edit(rule.id)]);
-  }
-
-  trackByIndex(index: number): number {
-    return index;
   }
 
   confirmDelete(id: string) {
@@ -265,28 +316,24 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
   }
 
   proceedDelete() {
-    if (this.ruleToDelete && this.deleteJustification.trim()) {
-      this.rlsRulesService
-        .delete(this.ruleToDelete, this.deleteJustification.trim())
-        .then((response: any) => {
-          if (this.globalService.handleSuccessService(response)) {
-            if (this.lastTableLazyLoadEvent) {
-              this.loadRules(this.lastTableLazyLoadEvent);
-            } else {
-              this.loadRules();
-            }
-            this.showDeleteConfirm = false;
-            this.ruleToDelete = null;
-            this.deleteJustification = '';
-            this.cdr.markForCheck();
-          }
-        })
-        .catch(() => {
-          this.showDeleteConfirm = false;
-          this.ruleToDelete = null;
-          this.deleteJustification = '';
-          this.cdr.markForCheck();
-        });
-    }
+    const reason = this.deleteJustification.trim();
+    if (!this.ruleToDelete || !reason) return;
+
+    this.rlsRulesService
+      .delete(this.ruleToDelete, reason)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response)) {
+          this.refreshList();
+        }
+      })
+      .catch(() => {
+        /* global interceptor shows error toast */
+      })
+      .finally(() => {
+        this.showDeleteConfirm = false;
+        this.ruleToDelete = null;
+        this.deleteJustification = '';
+        this.cdr.markForCheck();
+      });
   }
 }

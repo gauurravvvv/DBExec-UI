@@ -86,6 +86,17 @@ export class SystemAdminService {
     }
   }
 
+  /**
+   * Raw list call — used by the `<us-data-grid>` server adapter. Returns
+   * the BE envelope verbatim; the adapter does its own unwrap into
+   * `{ rows, total }`. No signal writes, no global blocker.
+   */
+  listSystemAdmins(params: any) {
+    return lastValueFrom(
+      this.http.apiGet(SYSTEM_ADMIN.LIST, { params, skipLoader: true }),
+    );
+  }
+
   async loadOne(id: string) {
     this._loading.set(true);
     try {

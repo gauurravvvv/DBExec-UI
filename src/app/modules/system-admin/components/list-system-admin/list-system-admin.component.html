@@ -44,536 +44,174 @@
 
     <!-- Content Card -->
     <div class="content-card">
-      <!-- Table -->
-      <div class="table-wrapper">
-        <p-table
-          #dt
-          [value]="admins()"
-          [rows]="10"
-          [paginator]="true"
-          [lazy]="true"
-          [filterDelay]="1000"
-          (onLazyLoad)="loadSuperAdmins($event)"
-          [totalRecords]="total()"
-          [rowHover]="true"
-          dataKey="id"
-          [(selection)]="selectedAdmins"
-          [rowSelectable]="isRowSelectable"
-          currentPageReportTemplate="{first} - {last} of {totalRecords}"
-          [showCurrentPageReport]="true"
-          [rowsPerPageOptions]="[10, 25, 50, 100]"
-          styleClass="p-datatable-sm modern-table"
-          [scrollable]="true"
-          scrollHeight="flex"
-          [tableStyle]="{ 'min-width': '93rem' }"
-          [loading]="loading()"
-          [showLoader]="false"
+      <!-- AG Grid via us-data-grid. The grid hosts row-selection, sort,
+           floating filters, column chooser, density toggle, CSV/XLSX
+           export and saved views (gridKey='system-admins-list'). Per-cell
+           DOM is supplied via <ng-template usGridCell> so the visual look
+           — username link + default/self badges, status pill, date text,
+           row-actions — matches the previous PrimeNG layout exactly. -->
+      <div class="table-wrapper" *ngIf="adapter">
+        <us-data-grid
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="gridConfig"
+          (selectionChange)="onSelectionChange($event)"
+          (refresh)="refreshList()"
         >
-          <!-- Skeleton rows while the lazy-load is in flight — page chrome
-               (header, filters, add button, pagination) stays interactive. -->
-          <ng-template pTemplate="loadingbody">
-            <tr
-              *ngFor="let _ of [].constructor(10); let i = index"
-              appSkeletonRow
-              [columns]="7"
-              [showCheckbox]="true"
-              [showActions]="true"
-            ></tr>
-          </ng-template>
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="width: 2.75rem; min-width: 2.75rem" pFrozenColumn>
-                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-              </th>
-              <th
-                style="width: 12rem; min-width: 12rem"
-                pFrozenColumn
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('username')"
-                (click)="toggleSort('username')"
+          <ng-template usGridCell="username" let-admin>
+            <span class="username-cell">
+              <a
+                class="dataset-name-link"
+                [routerLink]="['/app/admins', admin.id]"
               >
-                <div class="th-content">
-                  <span>{{ 'COMMON.USERNAME' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('username')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up':
-                          sortHelper.direction('username') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('username') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('username'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('username') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('username') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <th
-                style="width: 10rem; min-width: 10rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('firstName')"
-                (click)="toggleSort('firstName')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.FIRST_NAME' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('firstName')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up':
-                          sortHelper.direction('firstName') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('firstName') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('firstName'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('firstName') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('firstName') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <th
-                style="width: 10rem; min-width: 10rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('lastName')"
-                (click)="toggleSort('lastName')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.LAST_NAME' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('lastName')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up':
-                          sortHelper.direction('lastName') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('lastName') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('lastName'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('lastName') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('lastName') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <th
-                style="min-width: 18rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('email')"
-                (click)="toggleSort('email')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.EMAIL' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('email')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up': sortHelper.direction('email') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('email') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('email'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('email') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('email') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <th
-                style="width: 9rem; min-width: 9rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('status')"
-                (click)="toggleSort('status')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.STATUS' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('status')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up': sortHelper.direction('status') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('status') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('status'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('status') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('status') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <th
-                style="width: 12rem; min-width: 12rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('lastLogin')"
-                (click)="toggleSort('lastLogin')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.LAST_LOGIN' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('lastLogin')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up':
-                          sortHelper.direction('lastLogin') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('lastLogin') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('lastLogin'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('lastLogin') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('lastLogin') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <th
-                style="width: 12rem; min-width: 12rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('createdOn')"
-                (click)="toggleSort('createdOn')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.CREATED_ON' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('createdOn')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up':
-                          sortHelper.direction('createdOn') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('createdOn') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('createdOn'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('createdOn') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('createdOn') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <ng-container *hasPermission="'systemAdmin'; level: 'write'">
-              <th style="width: 7rem; min-width: 7rem">
-                <div class="th-content actions-th">
-                  {{ 'COMMON.ACTIONS' | translate }}
-                </div>
-              </th>
-              </ng-container>
-            </tr>
-            <!-- Filter Row -->
-            <tr>
-              <th pFrozenColumn></th>
-              <th pFrozenColumn>
-                <app-custom-input
-                  [(ngModel)]="filterValues.username"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_USERNAME' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.firstName"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_FIRST_NAME' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.lastName"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_LAST_NAME' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.email"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_EMAIL' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-dropdown
-                  [(ngModel)]="filterValues.status"
-                  [options]="statusOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  [placeholder]="'COMMON.ALL' | translate"
-                  [showClear]="true"
-                  [filter]="false"
-                  appendTo="body"
-                  (onChangeEvent)="onFilterChange()"
-                  icon="pi-circle-fill"
-                ></app-custom-dropdown>
-              </th>
-              <th>
-                <app-custom-daterange
-                  [(ngModel)]="filterValues.lastLoginDateRange"
-                  [placeholder]="'COMMON.SELECT_RANGE' | translate"
-                  [showButtonBar]="true"
-                  [maxDate]="today"
-                  (onChangeEvent)="onLastLoginDateRangeChange($event)"
-                ></app-custom-daterange>
-              </th>
-              <th>
-                <app-custom-daterange
-                  [(ngModel)]="filterValues.createdDateRange"
-                  [placeholder]="'COMMON.SELECT_RANGE' | translate"
-                  [showButtonBar]="true"
-                  [maxDate]="today"
-                  (onChangeEvent)="onCreatedDateRangeChange($event)"
-                ></app-custom-daterange>
-              </th>
-              <ng-container *hasPermission="'systemAdmin'; level: 'write'">
-              <th>
-                <!-- No filter for Actions -->
-              </th>
-              </ng-container>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-admin>
-            <tr class="modern-row">
-              <td pFrozenColumn>
-                <p-tableCheckbox
-                  [value]="admin"
-                  [disabled]="!admin.canDelete"
-                ></p-tableCheckbox>
-              </td>
-              <td pFrozenColumn>
-                <span class="username-cell">
-                  <a
-                    class="dataset-name-link"
-                    [routerLink]="['/app/admins', admin.id]"
-                  >
-                    {{ admin.username }}
-                  </a>
-                  <!-- Identity badges — mirror the GitHub / Linear /
-                       Stripe convention for owner / current-user
-                       rows. The disabled action buttons already
-                       communicate the constraint; these badges
-                       explain WHY without requiring a hover. -->
-                  <span
-                    *ngIf="admin.isDefault === 1"
-                    class="row-badge row-badge--default"
-                  >{{ 'SYSTEM_ADMIN.DEFAULT_BADGE' | translate }}</span>
-                  <span
-                    *ngIf="admin.id === loggedInUserId"
-                    class="row-badge row-badge--self"
-                  >{{ 'SYSTEM_ADMIN.YOU_BADGE' | translate }}</span>
-                </span>
-              </td>
-              <td>
-                <span class="description-text">{{ admin.firstName }}</span>
-              </td>
-              <td>
-                <span class="description-text">{{ admin.lastName }}</span>
-              </td>
-              <td>
-                <span class="description-text" [title]="admin.email">{{
-                  admin.email
-                }}</span>
-              </td>
-              <td>
-                <span
-                  class="status-pill"
-                  [ngClass]="{
-                    locked: admin.isLocked,
-                    active: !admin.isLocked && admin.status === 1,
-                    inactive: !admin.isLocked && admin.status !== 1,
-                  }"
-                >
-                  <span class="dot"></span>
-                  <span class="label">
-                    {{
-                      admin.isLocked
-                        ? ('COMMON.LOCKED' | translate)
-                        : admin.status === 1
-                          ? ('COMMON.ACTIVE' | translate)
-                          : ('COMMON.INACTIVE' | translate)
-                    }}
-                  </span>
-                </span>
-              </td>
-              <td>
-                <span
-                  class="date-text"
-                  [title]="
-                    admin.lastLogin
-                      ? (admin.lastLogin | date: 'dd MMM yyyy, HH:mm:ss')
-                      : ''
-                  "
-                >
-                  {{
-                    admin.lastLogin
-                      ? (admin.lastLogin | relativeTime)
-                      : ('COMMON.NEVER' | translate)
-                  }}
-                </span>
-              </td>
-              <td>
-                <span
-                  class="date-text"
-                  [title]="admin.createdOn | date: 'dd MMM yyyy, HH:mm:ss'"
-                >
-                  {{ admin.createdOn | relativeTime }}
-                </span>
-              </td>
-              <ng-container *hasPermission="'systemAdmin'; level: 'write'">
-              <td>
-                <div class="row-actions">
-                  <!-- Unlock — gated on canUnlock (BE: not default,
-                       not self). Default admin's lock is recovered
-                       via the break-glass procedure, not the API. -->
-                  <button
-                    *ngIf="admin.isLocked"
-                    class="icon-btn unlock-btn"
-                    (click)="onUnlock(admin.id)"
-                    [disabled]="!admin.canUnlock || isUnlocking(admin.id)"
-                    [pTooltip]="
-                      !admin.canUnlock
-                        ? (admin.isDefault === 1
-                            ? ('SYSTEM_ADMIN.CANNOT_UNLOCK_DEFAULT' | translate)
-                            : ('SYSTEM_ADMIN.CANNOT_UNLOCK_SELF' | translate))
-                        : ('COMMON.UNLOCK_ACCOUNT' | translate)
-                    "
-                    tooltipPosition="bottom"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="
-                        isUnlocking(admin.id) ? 'pi-spin pi-spinner' : 'pi-lock-open'
-                      "
-                    ></i>
-                  </button>
-                  <!-- Edit — gated on canEdit (BE: not default, not
-                       self). Self changes go through /profile;
-                       default admin is immutable. -->
-                  <button
-                    *hasPermission="'systemAdmin'; level: 'write'"
-                    class="icon-btn edit-btn"
-                    (click)="onEdit(admin.id)"
-                    [disabled]="!admin.canEdit"
-                    [pTooltip]="
-                      !admin.canEdit
-                        ? (admin.isDefault === 1
-                            ? ('SYSTEM_ADMIN.CANNOT_EDIT_DEFAULT' | translate)
-                            : ('SYSTEM_ADMIN.CANNOT_EDIT_SELF' | translate))
-                        : ('COMMON.EDIT' | translate)
-                    "
-                    tooltipPosition="bottom"
-                  >
-                    <i class="pi pi-pencil"></i>
-                  </button>
-                  <button
-                    *hasPermission="'systemAdmin'; level: 'delete'"
-                    class="icon-btn delete-btn"
-                    (click)="confirmDelete(admin.id)"
-                    [disabled]="!admin.canDelete || isDeleting(admin.id)"
-                    [pTooltip]="
-                      !admin.canDelete
-                        ? admin.isDefault === 1
-                          ? ('COMMON.DEFAULT_ADMIN_NO_DELETE' | translate)
-                          : ('COMMON.CANNOT_DELETE_SELF' | translate)
-                        : ('COMMON.DELETE' | translate)
-                    "
-                    tooltipPosition="bottom"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="
-                        isDeleting(admin.id) ? 'pi-spin pi-spinner' : 'pi-trash'
-                      "
-                    ></i>
-                  </button>
-                </div>
-              </td>
-              </ng-container>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="emptymessage">
-            <tr class="empty-row">
-              <td colspan="9" class="empty-message-cell">
-                <div class="empty-state-inline">
-                  <i class="pi pi-search empty-state-icon"></i>
-                  <span class="empty-state-text">
-                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash;
-                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
-                  </span>
-                </div>
-              </td>
-            </tr>
+                {{ admin.username }}
+              </a>
+              <!-- Identity badges — mirror the GitHub / Linear / Stripe
+                   convention for owner / current-user rows. The disabled
+                   action buttons already communicate the constraint;
+                   these badges explain WHY without requiring a hover. -->
+              <span
+                *ngIf="admin.isDefault === 1"
+                class="row-badge row-badge--default"
+              >{{ 'SYSTEM_ADMIN.DEFAULT_BADGE' | translate }}</span>
+              <span
+                *ngIf="admin.id === loggedInUserId"
+                class="row-badge row-badge--self"
+              >{{ 'SYSTEM_ADMIN.YOU_BADGE' | translate }}</span>
+            </span>
           </ng-template>
 
-          <ng-template pTemplate="paginatorright">
-            <button
-              type="button"
-              class="paginator-refresh-btn"
-              (click)="refreshList()"
-              [attr.aria-label]="'COMMON.REFRESH' | translate"
-            >
-              <i class="pi pi-refresh"></i>
-            </button>
+          <ng-template usGridCell="firstName" let-admin>
+            <span class="description-text">{{ admin.firstName }}</span>
           </ng-template>
-        </p-table>
+
+          <ng-template usGridCell="lastName" let-admin>
+            <span class="description-text">{{ admin.lastName }}</span>
+          </ng-template>
+
+          <ng-template usGridCell="email" let-admin>
+            <span class="description-text" [title]="admin.email">{{
+              admin.email
+            }}</span>
+          </ng-template>
+
+          <ng-template usGridCell="status" let-admin>
+            <span
+              class="status-pill"
+              [ngClass]="{
+                locked: admin.isLocked,
+                active: !admin.isLocked && admin.status === 1,
+                inactive: !admin.isLocked && admin.status !== 1,
+              }"
+            >
+              <span class="dot"></span>
+              <span class="label">
+                {{
+                  admin.isLocked
+                    ? ('COMMON.LOCKED' | translate)
+                    : admin.status === 1
+                      ? ('COMMON.ACTIVE' | translate)
+                      : ('COMMON.INACTIVE' | translate)
+                }}
+              </span>
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="lastLogin" let-admin>
+            <span
+              class="date-text"
+              [title]="
+                admin.lastLogin
+                  ? (admin.lastLogin | date: 'dd MMM yyyy, HH:mm:ss')
+                  : ''
+              "
+            >
+              {{
+                admin.lastLogin
+                  ? (admin.lastLogin | relativeTime)
+                  : ('COMMON.NEVER' | translate)
+              }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="createdOn" let-admin>
+            <span
+              class="date-text"
+              [title]="admin.createdOn | date: 'dd MMM yyyy, HH:mm:ss'"
+            >
+              {{ admin.createdOn | relativeTime }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="actions" let-admin>
+            <div class="row-actions">
+              <!-- Unlock — gated on canUnlock (BE: not default, not
+                   self). Default admin's lock is recovered via the
+                   break-glass procedure, not the API. -->
+              <button
+                *ngIf="admin.isLocked"
+                class="icon-btn unlock-btn"
+                (click)="onUnlock(admin.id)"
+                [disabled]="!admin.canUnlock || isUnlocking(admin.id)"
+                [pTooltip]="
+                  !admin.canUnlock
+                    ? (admin.isDefault === 1
+                        ? ('SYSTEM_ADMIN.CANNOT_UNLOCK_DEFAULT' | translate)
+                        : ('SYSTEM_ADMIN.CANNOT_UNLOCK_SELF' | translate))
+                    : ('COMMON.UNLOCK_ACCOUNT' | translate)
+                "
+                tooltipPosition="bottom"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    isUnlocking(admin.id) ? 'pi-spin pi-spinner' : 'pi-lock-open'
+                  "
+                ></i>
+              </button>
+              <!-- Edit — gated on canEdit (BE: not default, not self).
+                   Self changes go through /profile; default admin is
+                   immutable. -->
+              <button
+                *hasPermission="'systemAdmin'; level: 'write'"
+                class="icon-btn edit-btn"
+                (click)="onEdit(admin.id)"
+                [disabled]="!admin.canEdit"
+                [pTooltip]="
+                  !admin.canEdit
+                    ? (admin.isDefault === 1
+                        ? ('SYSTEM_ADMIN.CANNOT_EDIT_DEFAULT' | translate)
+                        : ('SYSTEM_ADMIN.CANNOT_EDIT_SELF' | translate))
+                    : ('COMMON.EDIT' | translate)
+                "
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button
+                *hasPermission="'systemAdmin'; level: 'delete'"
+                class="icon-btn delete-btn"
+                (click)="confirmDelete(admin.id)"
+                [disabled]="!admin.canDelete || isDeleting(admin.id)"
+                [pTooltip]="
+                  !admin.canDelete
+                    ? admin.isDefault === 1
+                      ? ('COMMON.DEFAULT_ADMIN_NO_DELETE' | translate)
+                      : ('COMMON.CANNOT_DELETE_SELF' | translate)
+                    : ('COMMON.DELETE' | translate)
+                "
+                tooltipPosition="bottom"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    isDeleting(admin.id) ? 'pi-spin pi-spinner' : 'pi-trash'
+                  "
+                ></i>
+              </button>
+            </div>
+          </ng-template>
+        </us-data-grid>
       </div>
     </div>
   </div>

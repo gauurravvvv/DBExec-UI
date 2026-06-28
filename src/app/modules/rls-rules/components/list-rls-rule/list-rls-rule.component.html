@@ -58,212 +58,132 @@
         </div>
       </div>
 
-      <!-- Table -->
-      <div class="table-wrapper">
-        <p-table
-          #dt
-          [value]="rules()"
-          [rows]="10"
-          [paginator]="true"
-          [lazy]="true"
-          (onLazyLoad)="loadRules($event)"
-          [totalRecords]="total()"
-          [rowHover]="true"
-          dataKey="id"
-          currentPageReportTemplate="{first} - {last} of {totalRecords}"
-          [showCurrentPageReport]="true"
-          [rowsPerPageOptions]="[10, 25, 50, 100]"
-          styleClass="p-datatable-sm modern-table"
-          [scrollable]="true"
-          scrollHeight="calc(100vh - 440px)"
+      <!-- AG Grid via us-data-grid. Hosts sort, floating filters,
+           column chooser, density toggle, CSV/XLSX export and saved
+           views (gridKey='rls-rules-list'). Per-cell DOM is supplied
+           via <ng-template usGridCell> so the visual look — name link,
+           dataset text, conditions summary, status pill, row-actions —
+           matches the previous PrimeNG layout exactly. -->
+      <div class="table-wrapper" *ngIf="selectedDatasource && adapter">
+        <us-data-grid
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="gridConfig"
+          (refresh)="refreshList()"
         >
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="width: 22%" pFrozenColumn>
-                <div class="th-content">{{ 'COMMON.NAME' | translate }}</div>
-              </th>
-              <th style="width: 18%">
-                <div class="th-content">{{ 'RLS.DATASET' | translate }}</div>
-              </th>
-              <th style="width: 32%">
-                <div class="th-content">{{ 'RLS.CONDITIONS' | translate }}</div>
-              </th>
-              <th style="width: 8rem; min-width: 8rem">
-                <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
-              </th>
-              <th style="width: 16%">
-                <div class="th-content">{{ 'COMMON.ACTIONS' | translate }}</div>
-              </th>
-            </tr>
-            <!-- Filter Row -->
-            <tr>
-              <th pFrozenColumn>
-                <app-custom-input
-                  [(ngModel)]="filterValues.name"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_NAME' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.datasetName"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'RLS.SEARCH_DATASET' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <!-- No filter for Conditions -->
-              </th>
-              <th>
-                <app-custom-dropdown
-                  [(ngModel)]="filterValues.status"
-                  [options]="statusOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  [placeholder]="'COMMON.ALL' | translate"
-                  [showClear]="true"
-                  [filter]="false"
-                  [autoDisplayFirst]="false"
-                  appendTo="body"
-                  (onChangeEvent)="onFilterChange()"
-                  icon="pi-circle-fill"
-                ></app-custom-dropdown>
-              </th>
-              <th>
-                <!-- No filter for Actions -->
-              </th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-rule>
-            <tr class="modern-row">
-              <td pFrozenColumn>
-                <a
-                  class="dataset-name-link"
-                  [routerLink]="['/app/rls-rules', rule.id]"
-                >
-                  {{ rule.name }}
-                </a>
-              </td>
-              <td>
-                <span class="description-text" [title]="rule.dataset?.name">
-                  {{ rule.dataset?.name || '-' }}
-                </span>
-              </td>
-              <td>
-                <div
-                  class="conditions-summary"
-                  *ngIf="rule.conditions?.length; else noConds"
-                >
-                  <span class="conditions-count-badge">
-                    {{
-                      'RLS.CONDITION_COUNT'
-                        | translate: { count: rule.conditions.length }
-                    }}
-                  </span>
-                  <ng-container
-                    *ngFor="
-                      let c of rule.conditions;
-                      let i = index;
-                      trackBy: trackByIndex
-                    "
-                  >
-                    <span class="condition-preview" *ngIf="i < 2">
-                      <span class="cond-col">{{ c.columnName }}</span>
-                      <span class="cond-op">{{ c.operator }}</span>
-                    </span>
-                  </ng-container>
-                  <span class="more-conds" *ngIf="rule.conditions.length > 2">
-                    {{
-                      'RLS.MORE_CONDITIONS'
-                        | translate: { count: rule.conditions.length - 2 }
-                    }}
-                  </span>
-                </div>
-                <ng-template #noConds><span>-</span></ng-template>
-              </td>
-              <td>
-                <span
-                  class="status-pill"
-                  [ngClass]="{
-                    active: rule.status === 1,
-                    inactive: rule.status !== 1,
-                  }"
-                >
-                  <span class="dot"></span>
-                  {{
-                    rule.status === 1
-                      ? ('COMMON.ACTIVE' | translate)
-                      : ('COMMON.INACTIVE' | translate)
-                  }}
-                </span>
-              </td>
-              <td>
-                <div class="row-actions">
-                  <button
-                    class="icon-btn edit-btn"
-                    [routerLink]="['/app/rls-rules', rule.id]"
-                    [pTooltip]="'COMMON.VIEW' | translate"
-                    tooltipPosition="bottom"
-                  >
-                    <i class="pi pi-eye"></i>
-                  </button>
-                  <button
-                    *hasPermission="'rlsRules'; level: 'write'"
-                    class="icon-btn edit-btn"
-                    (click)="onEdit(rule)"
-                    [pTooltip]="'COMMON.EDIT' | translate"
-                    tooltipPosition="bottom"
-                  >
-                    <i class="pi pi-pencil"></i>
-                  </button>
-                  <button
-                    *hasPermission="'rlsRules'; level: 'write'"
-                    class="icon-btn assign-btn"
-                    (click)="onManageAssignments(rule)"
-                    [pTooltip]="'RLS.MANAGE_ASSIGNMENTS' | translate"
-                    tooltipPosition="bottom"
-                  >
-                    <i class="pi pi-users"></i>
-                  </button>
-                  <button
-                    *hasPermission="'rlsRules'; level: 'delete'"
-                    class="icon-btn delete-btn"
-                    (click)="confirmDelete(rule.id)"
-                    [pTooltip]="'COMMON.DELETE' | translate"
-                    tooltipPosition="bottom"
-                  >
-                    <i class="pi pi-trash"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="emptymessage">
-            <tr>
-              <td colspan="5" class="empty-message-cell text-center">
-                <span *ngIf="!selectedDatasource">{{
-                  'RLS.SELECT_DATASOURCE_MSG' | translate
-                }}</span>
-                <span *ngIf="selectedDatasource">{{
-                  'RLS.NO_RULES_FOUND' | translate
-                }}</span>
-              </td>
-            </tr>
+          <ng-template usGridCell="name" let-rule>
+            <a
+              class="dataset-name-link"
+              [routerLink]="['/app/rls-rules', rule.id]"
+            >
+              {{ rule.name }}
+            </a>
           </ng-template>
 
-          <ng-template pTemplate="paginatorright">
-            <button
-              type="button"
-              class="paginator-refresh-btn"
-              (click)="refreshList()"
-              [attr.aria-label]="'COMMON.REFRESH' | translate"
-            >
-              <i class="pi pi-refresh"></i>
-            </button>
+          <ng-template usGridCell="datasetName" let-rule>
+            <span class="description-text" [title]="rule.dataset?.name">
+              {{ rule.dataset?.name || '-' }}
+            </span>
           </ng-template>
-        </p-table>
+
+          <ng-template usGridCell="conditions" let-rule>
+            <div
+              class="conditions-summary"
+              *ngIf="rule.conditions?.length; else noConds"
+            >
+              <span class="conditions-count-badge">
+                {{
+                  'RLS.CONDITION_COUNT'
+                    | translate: { count: rule.conditions.length }
+                }}
+              </span>
+              <ng-container
+                *ngFor="
+                  let c of rule.conditions;
+                  let i = index;
+                  trackBy: trackByIndex
+                "
+              >
+                <span class="condition-preview" *ngIf="i < 2">
+                  <span class="cond-col">{{ c.columnName }}</span>
+                  <span class="cond-op">{{ c.operator }}</span>
+                </span>
+              </ng-container>
+              <span class="more-conds" *ngIf="rule.conditions.length > 2">
+                {{
+                  'RLS.MORE_CONDITIONS'
+                    | translate: { count: rule.conditions.length - 2 }
+                }}
+              </span>
+            </div>
+            <ng-template #noConds><span>-</span></ng-template>
+          </ng-template>
+
+          <ng-template usGridCell="status" let-rule>
+            <span
+              class="status-pill"
+              [ngClass]="{
+                active: rule.status === 1,
+                inactive: rule.status !== 1,
+              }"
+            >
+              <span class="dot"></span>
+              {{
+                rule.status === 1
+                  ? ('COMMON.ACTIVE' | translate)
+                  : ('COMMON.INACTIVE' | translate)
+              }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="actions" let-rule>
+            <div class="row-actions">
+              <button
+                class="icon-btn edit-btn"
+                [routerLink]="['/app/rls-rules', rule.id]"
+                [pTooltip]="'COMMON.VIEW' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-eye"></i>
+              </button>
+              <button
+                *hasPermission="'rlsRules'; level: 'write'"
+                class="icon-btn edit-btn"
+                (click)="onEdit(rule)"
+                [pTooltip]="'COMMON.EDIT' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button
+                *hasPermission="'rlsRules'; level: 'write'"
+                class="icon-btn assign-btn"
+                (click)="onManageAssignments(rule)"
+                [pTooltip]="'RLS.MANAGE_ASSIGNMENTS' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-users"></i>
+              </button>
+              <button
+                *hasPermission="'rlsRules'; level: 'delete'"
+                class="icon-btn delete-btn"
+                (click)="confirmDelete(rule.id)"
+                [pTooltip]="'COMMON.DELETE' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </ng-template>
+        </us-data-grid>
+      </div>
+
+      <!-- Empty datasource state — no datasource picked yet. -->
+      <div class="empty-state-inline" *ngIf="!selectedDatasource">
+        <i class="pi pi-database empty-state-icon"></i>
+        <span class="empty-state-text">
+          {{ 'RLS.SELECT_DATASOURCE_MSG' | translate }}
+        </span>
       </div>
     </div>
   </div>

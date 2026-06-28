@@ -25,6 +25,31 @@ export class AuditService {
 
   constructor(private http: HttpClientService) {}
 
+  /**
+   * Raw list call — returns the unwrapped BE response so callers
+   * (e.g. `<us-data-grid>` via `UsServerListAdapter`) can pull rows +
+   * count straight off `res.data`. Skips the signal-driven `loadAuditLogs()`
+   * flow so the grid owns its own loading state.
+   */
+  listAuditLogs(params: any) {
+    return lastValueFrom(
+      this.http.apiGet(AUDIT.LIST, { params, skipLoader: true }),
+    );
+  }
+
+  /**
+   * Raw login-activity list call — mirror of `listAuditLogs` for the
+   * `<us-data-grid>` migration of login-activity. Returns the
+   * unwrapped BE response so the adapter can pull `activities` +
+   * `count` straight off `res.data`. Skips `loadLoginActivity()`'s
+   * signal-driven flow so the grid owns its own loading state.
+   */
+  listLoginActivity(params: any) {
+    return lastValueFrom(
+      this.http.apiGet(AUDIT.LOGIN_ACTIVITY, { params, skipLoader: true }),
+    );
+  }
+
   async loadAuditLogs(params: any) {
     this._logsLoading.set(true);
     try {

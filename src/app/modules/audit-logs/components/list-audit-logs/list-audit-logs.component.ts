@@ -1,23 +1,35 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   inject,
   OnDestroy,
   OnInit,
-  ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslateService } from '@ngx-translate/core';
-import { Table } from 'primeng/table';
-import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import type { ColDef } from 'ag-grid-community';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
+import {
+  UsServerListAdapter,
+  UsListLoadParams,
+} from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
+import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
 import { AuditService } from '../../services/audit.service';
 
-type AuditLogSortField = 'action' | 'createdOn';
-
+/**
+ * Audit-logs listing — renders through `<us-data-grid>` with a
+ * `UsServerListAdapter` driving the BE `/audit-logs` list call. The
+ * page header / content card / detail popup retain the existing
+ * styling and behaviour; only the `<p-table>` was swapped out for
+ * the AG Grid wrapper. There is no datasource dropdown on this
+ * page — it lists logs at the org level, so the adapter binds
+ * directly in ngOnInit.
+ *
+ * Read-only — no row selection, no bulk delete, no row actions
+ * beyond the "view detail" popup triggered by clicking the name.
+ */
 @Component({
   selector: 'app-list-audit-logs',
   templateUrl: './list-audit-logs.component.html',
@@ -25,64 +37,41 @@ type AuditLogSortField = 'action' | 'createdOn';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListAuditLogsComponent implements OnInit, OnDestroy {
-  refreshList() {
-    if (this.lastTableLazyLoadEvent) {
-      this.loadLogs(this.lastTableLazyLoadEvent);
-    }
-  }
-
-  ngOnDestroy() {
-    // Abort in-flight reads if the user navigates away.
-    this.auditService.cancelReads();
-  }
-
   private destroyRef = inject(DestroyRef);
-  private searchSubject = new Subject<void>();
+  private cdr = inject(ChangeDetectorRef);
 
   Math = Math;
+  today = new Date();
+  totalCount = 0;
 
-  @ViewChild('dt') dt!: Table;
-
-  // Expose service signals as component refs
-  logs = this.auditService.logs;
-  totalItems = this.auditService.logsTotal;
-  loading = this.auditService.logsLoading;
-
-  lastTableLazyLoadEvent: any;
-  sortHelper = new ListSortHelper<AuditLogSortField>();
+  /* ── detail popup state — UNCHANGED ──────────────────── */
 
   showDetailDialog = false;
   selectedLog: any = null;
 
-  today = new Date();
+  /* ── grid wiring ─────────────────────────────────────── */
 
-  filterValues: any = {
-    username: '',
-    module: null,
-    action: null,
-    entityName: '',
-    status: null,
-    ipAddress: '',
-    justification: '',
-    dateRange: null,
+  cols: ColDef[] = [];
+
+  gridConfig: UsDataGridConfig = {
+    enableRowSelection: false,
+    freezeFirstColumn: true,
+    enableColumnChooser: true,
+    enableAddFilter: false, // we use the BE-driven floating filters
+    enableAutoFit: true,
+    enableDensityToggle: true,
+    enableCsvExport: true,
+    enableXlsxExport: true,
+    enableRefresh: true,
+    enableSavedViews: true,
+    gridKey: 'audit-logs-list',
+    pageSizeOptions: [25, 50, 100],
+    pageSize: 25,
+    height: 'calc(100vh - 280px)',
+    rowIdField: 'id',
   };
 
-  moduleOptions = [
-    { label: 'User', value: 'user' },
-    { label: 'Datasource', value: 'datasource' },
-    { label: 'Group', value: 'group' },
-    { label: 'Connection', value: 'connection' },
-    { label: 'Dataset', value: 'dataset' },
-    { label: 'Access', value: 'access' },
-  ];
-
-  actionOptions = [
-    { label: 'Create', value: 'CREATE' },
-    { label: 'Update', value: 'UPDATE' },
-    { label: 'Delete', value: 'DELETE' },
-  ];
-
-  statusOptions: { label: string; value: boolean }[] = [];
+  adapter: UsServerListAdapter<any> | null = null;
 
   constructor(
     private auditService: AuditService,
@@ -91,56 +80,198 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.statusOptions = [
-      { label: this.translate.instant('AUDIT.SUCCESS'), value: true },
-      { label: this.translate.instant('AUDIT.FAILED'), value: false },
-    ];
-
-    this.searchSubject
-      .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        if (this.lastTableLazyLoadEvent) {
-          this.loadLogs(this.lastTableLazyLoadEvent);
-        }
-      });
+    this.cols = this.buildColumns();
+    this.bindAdapter();
   }
 
-  onFilterChange() {
-    this.searchSubject.next();
-  }
-
-  refreshLogs() {
-    if (this.lastTableLazyLoadEvent) {
-      this.loadLogs(this.lastTableLazyLoadEvent);
-    }
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.auditService.cancelReads();
+    this.adapter?.destroy();
   }
 
   get isFilterActive(): boolean {
-    return (
-      !!this.filterValues.username ||
-      !!this.filterValues.module ||
-      !!this.filterValues.action ||
-      !!this.filterValues.entityName ||
-      this.filterValues.status !== null ||
-      !!this.filterValues.ipAddress ||
-      !!this.filterValues.justification ||
-      !!this.filterValues.dateRange
-    );
+    return !!this.adapter && Object.keys(this.adapter.filterModel()).length > 0;
   }
 
-  clearFilters() {
-    this.filterValues = {
-      username: '',
-      module: null,
-      action: null,
-      entityName: '',
-      status: null,
-      ipAddress: '',
-      justification: '',
-      dateRange: null,
-    };
-    this.onFilterChange();
+  /* ── column definitions ──────────────────────────────── */
+
+  private buildColumns(): ColDef[] {
+    return [
+      {
+        colId: 'entityName',
+        field: 'entityName',
+        headerName: this.translate.instant('COMMON.NAME'),
+        width: 224,
+        minWidth: 224,
+        filter: 'agTextColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+        sortable: false,
+        pinned: 'left',
+      },
+      {
+        colId: 'username',
+        field: 'username',
+        headerName: this.translate.instant('AUDIT.PERFORMED_BY'),
+        width: 192,
+        minWidth: 192,
+        filter: 'agTextColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+        sortable: false,
+      },
+      {
+        colId: 'action',
+        field: 'action',
+        headerName: this.translate.instant('AUDIT.ACTION'),
+        width: 144,
+        minWidth: 144,
+        filter: 'agTextColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+      },
+      {
+        colId: 'version',
+        field: 'version',
+        headerName: this.translate.instant('AUDIT.VERSION'),
+        width: 96,
+        minWidth: 96,
+        sortable: false,
+        filter: false,
+      },
+      {
+        colId: 'status',
+        field: 'responseSuccess',
+        headerName: this.translate.instant('COMMON.STATUS'),
+        width: 144,
+        minWidth: 144,
+        filter: 'agTextColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+        sortable: false,
+      },
+      {
+        colId: 'createdOn',
+        field: 'createdOn',
+        headerName: this.translate.instant('AUDIT.TIMESTAMP'),
+        width: 224,
+        minWidth: 224,
+        filter: 'agDateColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+      },
+      {
+        colId: 'ipAddress',
+        field: 'ipAddress',
+        headerName: this.translate.instant('AUDIT.IP_ADDRESS'),
+        width: 160,
+        minWidth: 160,
+        filter: 'agTextColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+        sortable: false,
+      },
+      {
+        colId: 'justification',
+        field: 'justification',
+        headerName: this.translate.instant('AUDIT.JUSTIFICATION'),
+        minWidth: 256,
+        flex: 1,
+        filter: 'agTextColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+        sortable: false,
+      },
+    ];
   }
+
+  /* ── adapter wiring ─────────────────────────────────── */
+
+  private bindAdapter() {
+    this.adapter?.destroy();
+    this.adapter = new UsServerListAdapter<any>({
+      load: (params: UsListLoadParams) =>
+        this.auditService.listAuditLogs({
+          page: params.page,
+          limit: params.limit,
+          ...(params.sort ? { sort: params.sort } : {}),
+          ...(params.filter ? { filter: params.filter } : {}),
+        }),
+      // Custom unwrap — the BE returns `{ logs: [], count }`.
+      unwrap: (res: any) => {
+        const rows = res?.data?.logs ?? [];
+        const total = res?.data?.count ?? 0;
+        this.totalCount = total;
+        // Push count into Page-level Export gating outside CD cycle.
+        Promise.resolve().then(() => this.cdr.markForCheck());
+        return { rows, total };
+      },
+      // Floating-filter cell value → BE filter slice. The grid's
+      // floating filters emit AG-Grid-shaped cells; this map flattens
+      // them into the
+      // `{username, module, action, entityName, status, ipAddress,
+      //   justification, dateFrom, dateTo}` shape the BE expects.
+      filterBuilders: {
+        entityName: cell => {
+          const v = (cell as any)?.filter ?? cell;
+          return v === '' || v === null || v === undefined
+            ? {}
+            : { entityName: v };
+        },
+        username: cell => {
+          const v = (cell as any)?.filter ?? cell;
+          return v === '' || v === null || v === undefined
+            ? {}
+            : { username: v };
+        },
+        action: cell => {
+          const v = (cell as any)?.filter ?? cell;
+          return v === '' || v === null || v === undefined ? {} : { action: v };
+        },
+        status: cell => {
+          const v = (cell as any)?.filter ?? cell;
+          if (v === '' || v === null || v === undefined) return {};
+          // Accept "true"/"false" or boolean. BE expects boolean.
+          const bool = typeof v === 'boolean' ? v : String(v).toLowerCase() === 'true';
+          return { status: bool };
+        },
+        ipAddress: cell => {
+          const v = (cell as any)?.filter ?? cell;
+          return v === '' || v === null || v === undefined
+            ? {}
+            : { ipAddress: v };
+        },
+        justification: cell => {
+          const v = (cell as any)?.filter ?? cell;
+          return v === '' || v === null || v === undefined
+            ? {}
+            : { justification: v };
+        },
+        createdOn: cell => {
+          // AG Grid date filter shape: {dateFrom, dateTo, type, filterType}.
+          const c = cell as any;
+          const out: Record<string, string> = {};
+          if (c?.dateFrom) out['dateFrom'] = new Date(c.dateFrom).toISOString();
+          if (c?.dateTo) {
+            const to = new Date(c.dateTo);
+            to.setHours(23, 59, 59, 999);
+            out['dateTo'] = to.toISOString();
+          }
+          return out;
+        },
+      },
+      initial: { page: 1, limit: 25 },
+    });
+    this.cdr.markForCheck();
+  }
+
+  /* ── handlers re-pointed at the adapter ──────────────── */
+
+  clearFilters() {
+    if (!this.adapter) return;
+    this.adapter.setFilter({});
+    this.adapter.setSort([]);
+  }
+
+  refreshList() {
+    this.adapter?.reload();
+  }
+
+  /* ── detail popup helpers — UNCHANGED ──────────────────── */
 
   getActionClass(action: string): string {
     switch (action) {
@@ -293,41 +424,51 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
       .trim();
   }
 
-  onDateRangeChange(range: Date[] | null) {
-    this.filterValues.dateRange = range;
-    // Only trigger filter when both dates are selected (or cleared)
-    if (!range || (range[0] && range[1])) {
-      this.onFilterChange();
-    }
-  }
+  /* ── BE PDF export — preserved (full filtered set) ──── */
 
-  private getFilterParams(): any {
+  /**
+   * Build the BE-shape filter payload from the adapter's current
+   * filterModel. The grid stores AG-Grid-shaped cells (`{filter,
+   * type, ...}` or `{dateFrom, dateTo, ...}`); this flattens them
+   * back into the slice the BE export expects.
+   */
+  private getExportFilterParams(): any {
+    if (!this.adapter) return {};
+    const model = this.adapter.filterModel();
     const filter: any = {};
-    if (this.filterValues.username)
-      filter.username = this.filterValues.username;
-    if (this.filterValues.module) filter.module = this.filterValues.module;
-    if (this.filterValues.action) filter.action = this.filterValues.action;
-    if (this.filterValues.entityName)
-      filter.entityName = this.filterValues.entityName;
-    if (this.filterValues.status !== null)
-      filter.status = this.filterValues.status;
-    if (this.filterValues.ipAddress)
-      filter.ipAddress = this.filterValues.ipAddress;
-    if (this.filterValues.justification)
-      filter.justification = this.filterValues.justification;
-    if (this.filterValues.dateRange?.[0])
-      filter.dateFrom = this.filterValues.dateRange[0].toISOString();
-    if (this.filterValues.dateRange?.[1]) {
-      // Set end of day for the "to" date
-      const dateTo = new Date(this.filterValues.dateRange[1]);
-      dateTo.setHours(23, 59, 59, 999);
-      filter.dateTo = dateTo.toISOString();
+
+    const flatten = (cell: any) => (cell?.filter ?? cell);
+
+    if (model['entityName']) filter.entityName = flatten(model['entityName']);
+    if (model['username']) filter.username = flatten(model['username']);
+    if (model['action']) filter.action = flatten(model['action']);
+    if (model['ipAddress']) filter.ipAddress = flatten(model['ipAddress']);
+    if (model['justification'])
+      filter.justification = flatten(model['justification']);
+
+    if (model['status'] !== undefined && model['status'] !== null) {
+      const v = flatten(model['status']);
+      if (v !== '' && v !== null && v !== undefined) {
+        filter.status =
+          typeof v === 'boolean' ? v : String(v).toLowerCase() === 'true';
+      }
     }
+
+    const dateCell: any = model['createdOn'];
+    if (dateCell?.dateFrom) {
+      filter.dateFrom = new Date(dateCell.dateFrom).toISOString();
+    }
+    if (dateCell?.dateTo) {
+      const to = new Date(dateCell.dateTo);
+      to.setHours(23, 59, 59, 999);
+      filter.dateTo = to.toISOString();
+    }
+
     return filter;
   }
 
   exportLogs(format: 'pdf') {
-    const filter = this.getFilterParams();
+    const filter = this.getExportFilterParams();
     const params: any = { format };
     if (Object.keys(filter).length > 0) {
       params.filter = JSON.stringify(filter);
@@ -356,29 +497,5 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
           });
         },
       });
-  }
-
-  toggleSort(field: AuditLogSortField) {
-    this.sortHelper.toggle(field);
-    if (this.lastTableLazyLoadEvent) {
-      this.lastTableLazyLoadEvent.first = 0;
-      this.loadLogs(this.lastTableLazyLoadEvent);
-    }
-  }
-
-  loadLogs(event: any) {
-    this.lastTableLazyLoadEvent = event;
-    const page = event.first / event.rows + 1;
-    const limit = event.rows;
-    const params: any = { page, limit };
-    const filter = this.getFilterParams();
-    if (Object.keys(filter).length > 0) {
-      params.filter = JSON.stringify(filter);
-    }
-
-    const sortParam = this.sortHelper.serialize();
-    if (sortParam) params.sort = sortParam;
-
-    this.auditService.loadAuditLogs(params);
   }
 }

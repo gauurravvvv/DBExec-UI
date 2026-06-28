@@ -1,56 +1,102 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
-  ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslateService } from '@ngx-translate/core';
-import { Table } from 'primeng/table';
-import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import type { ColDef } from 'ag-grid-community';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { AuditService } from 'src/app/modules/audit-logs/services/audit.service';
+import {
+  UsServerListAdapter,
+  UsListLoadParams,
+} from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
+import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
 
+/**
+ * Login activity listing — renders through `<us-data-grid>` with a
+ * `UsServerListAdapter` driving the BE `/audit-logs/login-activity`
+ * list call. Read-only: no bulk actions, no row actions. The page
+ * header (with PDF export + clear-filter buttons) and content card
+ * retain the existing styling; only the `<p-table>` was swapped out
+ * for the AG Grid wrapper.
+ */
 @Component({
   selector: 'app-list-login-activity',
   templateUrl: './list-login-activity.component.html',
   styleUrls: ['./list-login-activity.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListLoginActivityComponent implements OnInit {
-  refreshList() {
-    if (this.lastTableLazyLoadEvent) {
-      this.loadActivities(this.lastTableLazyLoadEvent);
-    }
-  }
-
+export class ListLoginActivityComponent implements OnInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
-  private searchSubject = new Subject<void>();
+  private cdr = inject(ChangeDetectorRef);
 
-  Math = Math;
-
-  @ViewChild('dt') dt!: Table;
-
-  // Expose service signals as component refs
-  activities = this.auditService.activity;
-  totalItems = this.auditService.activityTotal;
-  loading = this.auditService.activityLoading;
-
-  lastTableLazyLoadEvent: any;
+  /* ── page state ────────────────────────────────────────── */
 
   today = new Date();
+  isExporting = false;
 
-  filterValues: any = {
-    username: '',
-    eventType: null,
-    ipAddress: '',
-    dateRange: null,
+  /* ── grid wiring ───────────────────────────────────────── */
+
+  /** AG Grid column definitions — widths preserved from the old
+   *  `<p-table>` so the visual layout is unchanged. cellRenderer
+   *  templates live in the HTML as `<ng-template usGridCell>`. */
+  cols: ColDef[] = [];
+
+  gridConfig: UsDataGridConfig = {
+    enableRowSelection: false,
+    freezeFirstColumn: true,
+    enableColumnChooser: true,
+    enableAddFilter: false, // we use the BE-driven floating filters
+    enableAutoFit: true,
+    enableDensityToggle: true,
+    enableCsvExport: true,
+    enableXlsxExport: true,
+    enableRefresh: true,
+    enableSavedViews: true,
+    gridKey: 'login-activity-list',
+    pageSizeOptions: [25, 50, 100],
+    pageSize: 25,
+    height: 'calc(100vh - 280px)',
+    rowIdField: 'id',
   };
 
-  eventTypeOptions: any[] = [];
+  /** Server-side adapter — bound synchronously in ngOnInit; no
+   *  datasource gate for login activity (org-wide). */
+  adapter: UsServerListAdapter<any> | null = null;
+
+  /** Floating-filter → BE filter slice translators. Held on the
+   *  component (not just inside the adapter) so the BE-driven PDF
+   *  export can rebuild the same filter blob from the live
+   *  filterModel snapshot. */
+  private readonly filterBuilders: Record<
+    string,
+    (cell: unknown) => Record<string, unknown>
+  > = {
+    username: cell => ({ username: (cell as any)?.filter ?? cell }),
+    eventType: cell => {
+      const v = (cell as any)?.filter ?? cell;
+      return v === '' || v === null || v === undefined ? {} : { eventType: v };
+    },
+    ipAddress: cell => ({ ipAddress: (cell as any)?.filter ?? cell }),
+    createdOn: cell => {
+      // AG Grid date filter shape: {dateFrom, dateTo, type, filterType}.
+      const c = cell as any;
+      const out: Record<string, string> = {};
+      if (c?.dateFrom) out['dateFrom'] = new Date(c.dateFrom).toISOString();
+      if (c?.dateTo) {
+        const to = new Date(c.dateTo);
+        to.setHours(23, 59, 59, 999);
+        out['dateTo'] = to.toISOString();
+      }
+      return out;
+    },
+  };
 
   constructor(
     private auditService: AuditService,
@@ -58,78 +104,129 @@ export class ListLoginActivityComponent implements OnInit {
     private translate: TranslateService,
   ) {}
 
-  ngOnInit(): void {
-    this.eventTypeOptions = [
-      {
-        label: this.translate.instant('LOGIN_ACTIVITY.LOGIN_SUCCESS'),
-        value: 'LOGIN_SUCCESS',
-      },
-      {
-        label: this.translate.instant('LOGIN_ACTIVITY.LOGIN_FAILED'),
-        value: 'LOGIN_FAILED',
-      },
-      {
-        label: this.translate.instant('LOGIN_ACTIVITY.LOGOUT'),
-        value: 'LOGOUT',
-      },
-      {
-        label: this.translate.instant('LOGIN_ACTIVITY.TOKEN_REFRESH'),
-        value: 'TOKEN_REFRESH',
-      },
-      {
-        label: this.translate.instant('LOGIN_ACTIVITY.PASSWORD_RESET'),
-        value: 'PASSWORD_RESET',
-      },
-      {
-        label: this.translate.instant('LOGIN_ACTIVITY.OTP_GENERATED'),
-        value: 'OTP_GENERATED',
-      },
-    ];
-
-    this.searchSubject
-      .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        if (this.lastTableLazyLoadEvent) {
-          this.loadActivities(this.lastTableLazyLoadEvent);
-        }
-      });
+  ngOnInit() {
+    this.cols = this.buildColumns();
+    this.bindAdapter();
   }
 
-  onFilterChange() {
-    this.searchSubject.next();
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.auditService.cancelReads();
+    this.adapter?.destroy();
   }
 
-  onDateRangeChange(range: Date[] | null) {
-    this.filterValues.dateRange = range;
-    if (!range || (range[0] && range[1])) {
-      this.onFilterChange();
-    }
+  get totalItems(): number {
+    return this.adapter ? this.adapter.total() : 0;
   }
 
   get isFilterActive(): boolean {
-    return (
-      !!this.filterValues.username ||
-      !!this.filterValues.eventType ||
-      !!this.filterValues.ipAddress ||
-      !!this.filterValues.dateRange
-    );
+    return !!this.adapter && Object.keys(this.adapter.filterModel()).length > 0;
   }
 
-  refreshActivities() {
-    if (this.lastTableLazyLoadEvent) {
-      this.loadActivities(this.lastTableLazyLoadEvent);
-    }
+  /* ── column definitions ──────────────────────────────── */
+
+  private buildColumns(): ColDef[] {
+    return [
+      {
+        colId: 'username',
+        field: 'username',
+        headerName: this.translate.instant('COMMON.USERNAME'),
+        width: 192,
+        minWidth: 192,
+        filter: 'agTextColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+        pinned: 'left',
+      },
+      {
+        colId: 'eventType',
+        field: 'eventType',
+        headerName: this.translate.instant('LOGIN_ACTIVITY.EVENT'),
+        width: 176,
+        minWidth: 176,
+        filter: 'agTextColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+      },
+      {
+        colId: 'failureReason',
+        field: 'failureReason',
+        headerName: this.translate.instant('LOGIN_ACTIVITY.FAILURE_REASON'),
+        minWidth: 224,
+        flex: 1,
+        sortable: false,
+        filter: false,
+      },
+      {
+        colId: 'createdOn',
+        field: 'createdOn',
+        headerName: this.translate.instant('LOGIN_ACTIVITY.TIMESTAMP'),
+        width: 224,
+        minWidth: 224,
+        filter: 'agDateColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+      },
+      {
+        colId: 'ipAddress',
+        field: 'ipAddress',
+        headerName: this.translate.instant('LOGIN_ACTIVITY.IP_ADDRESS'),
+        width: 160,
+        minWidth: 160,
+        filter: 'agTextColumnFilter',
+        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
+      },
+      {
+        colId: 'userAgent',
+        field: 'userAgent',
+        headerName: this.translate.instant('LOGIN_ACTIVITY.USER_AGENT'),
+        minWidth: 256,
+        flex: 1,
+        sortable: false,
+        filter: false,
+      },
+    ];
   }
+
+  /* ── adapter wiring ─────────────────────────────────── */
+
+  /**
+   * Construct the server-side adapter. Called once from ngOnInit —
+   * no datasource gating needed for login activity.
+   */
+  private bindAdapter() {
+    this.adapter?.destroy();
+    this.adapter = new UsServerListAdapter<any>({
+      load: (params: UsListLoadParams) =>
+        this.auditService.listLoginActivity({
+          page: params.page,
+          limit: params.limit,
+          ...(params.sort ? { sort: params.sort } : {}),
+          ...(params.filter ? { filter: params.filter } : {}),
+        }),
+      // Custom unwrap — the BE returns `{ activities: [], count }`.
+      unwrap: (res: any) => ({
+        rows: res?.data?.activities ?? [],
+        total: res?.data?.count ?? 0,
+      }),
+      // Floating-filter cell value → BE filter slice. Reuse the
+      // shared map so the export path can rebuild the same blob.
+      filterBuilders: this.filterBuilders,
+      initial: { page: 1, limit: 25 },
+    });
+    this.cdr.markForCheck();
+  }
+
+  /* ── handlers ────────────────────────────────────────── */
 
   clearFilters() {
-    this.filterValues = {
-      username: '',
-      eventType: null,
-      ipAddress: '',
-      dateRange: null,
-    };
-    this.onFilterChange();
+    if (!this.adapter) return;
+    this.adapter.setFilter({});
+    this.adapter.setSort([]);
   }
+
+  refreshList() {
+    this.adapter?.reload();
+  }
+
+  /* ── presentation helpers — preserved from p-table version ── */
 
   getEventClass(eventType: string): string {
     switch (eventType) {
@@ -148,35 +245,27 @@ export class ListLoginActivityComponent implements OnInit {
     }
   }
 
-  formatEventType(eventType: string): string {
-    return eventType?.replace(/_/g, ' ') || '-';
-  }
-
-  private getFilterParams(): any {
-    const filter: any = {};
-    if (this.filterValues.username)
-      filter.username = this.filterValues.username;
-    if (this.filterValues.eventType)
-      filter.eventType = this.filterValues.eventType;
-    if (this.filterValues.ipAddress)
-      filter.ipAddress = this.filterValues.ipAddress;
-    if (this.filterValues.dateRange?.[0])
-      filter.dateFrom = this.filterValues.dateRange[0].toISOString();
-    if (this.filterValues.dateRange?.[1]) {
-      const dateTo = new Date(this.filterValues.dateRange[1]);
-      dateTo.setHours(23, 59, 59, 999);
-      filter.dateTo = dateTo.toISOString();
-    }
-    return filter;
-  }
+  /* ── BE-driven PDF export — preserved ─────────────────── */
 
   exportActivity(format: 'pdf') {
-    const filter = this.getFilterParams();
+    // Reuse the live filter model so the export mirrors what the user
+    // is seeing. Run each cell through the shared filterBuilders map
+    // — same logic the adapter uses to assemble the list-call filter
+    // blob — so the BE sees an identical shape on both endpoints.
+    const filter: Record<string, unknown> = {};
+    const filterModel = this.adapter?.filterModel() ?? {};
+    for (const [colId, cell] of Object.entries(filterModel)) {
+      if (cell === null || cell === undefined || cell === '') continue;
+      const builder = this.filterBuilders[colId];
+      Object.assign(filter, builder ? builder(cell) : { [colId]: cell });
+    }
     const params: any = { format };
     if (Object.keys(filter).length > 0) {
       params.filter = JSON.stringify(filter);
     }
 
+    this.isExporting = true;
+    this.cdr.markForCheck();
     this.auditService
       .exportLoginActivity(params)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -191,6 +280,8 @@ export class ListLoginActivityComponent implements OnInit {
           link.download = fileName;
           link.click();
           window.URL.revokeObjectURL(url);
+          this.isExporting = false;
+          this.cdr.markForCheck();
         },
         error: () => {
           this.globalService.handleSuccessService({
@@ -198,19 +289,9 @@ export class ListLoginActivityComponent implements OnInit {
             code: 500,
             message: 'Failed to export login activity',
           });
+          this.isExporting = false;
+          this.cdr.markForCheck();
         },
       });
-  }
-
-  loadActivities(event: any) {
-    this.lastTableLazyLoadEvent = event;
-    const page = event.first / event.rows + 1;
-    const limit = event.rows;
-    const params: any = { page, limit };
-    const filter = this.getFilterParams();
-    if (Object.keys(filter).length > 0) {
-      params.filter = JSON.stringify(filter);
-    }
-    this.auditService.loadLoginActivity(params);
   }
 }

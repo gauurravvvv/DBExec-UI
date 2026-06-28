@@ -55,573 +55,221 @@
     <!-- Unified Toolbar & Content Card -->
     <div class="content-card">
       <div class="card-toolbar">
-        <div class="toolbar-left"></div>
+        <div class="toolbar-left">
+          <!-- Group filter — server-driven. Lives in the toolbar
+               (not the floating-filter row) because it's a coarse
+               cross-cutting filter, not a per-column refinement.
+               Mirrors the role-filter pattern in the groups
+               module, just inverted. -->
+          <div class="dropdown-field">
+            <app-custom-dropdown
+              [(ngModel)]="selectedGroup"
+              [serverMode]="true"
+              [fetcher]="loadGroupsPage"
+              [pageSize]="10"
+              [preloadedItems]="preloadedGroups"
+              [preloadedTotal]="preloadedGroupsTotal"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              [floatingLabel]="true"
+              [label]="'COMMON.GROUP' | translate"
+              [showClear]="true"
+              [autoDisplayFirst]="false"
+              filterBy="name"
+              (onChangeEvent)="onGroupChange($event)"
+              icon="pi-users"
+            >
+            </app-custom-dropdown>
+          </div>
+        </div>
       </div>
 
-      <!-- Table -->
-      <div class="table-wrapper">
-        <p-table
-          #dt
-          [value]="users()"
-          [rows]="10"
-          [paginator]="true"
-          [lazy]="true"
-          (onLazyLoad)="loadUsers($event)"
-          [totalRecords]="total()"
-          [loading]="loading()"
-          [showLoader]="false"
-          [rowHover]="true"
-          dataKey="id"
-          [(selection)]="selectedUsers"
-          [rowSelectable]="isRowSelectable"
-          currentPageReportTemplate="{first} - {last} of {totalRecords}"
-          [showCurrentPageReport]="true"
-          [rowsPerPageOptions]="[10, 25, 50, 100]"
-          styleClass="p-datatable-sm modern-table"
-          [scrollable]="true"
-          scrollHeight="flex"
-          [tableStyle]="{ 'min-width': '105rem' }"
+      <!-- AG Grid via us-data-grid. The grid hosts row-selection,
+           sort, floating filters, column chooser, density toggle,
+           CSV/XLSX export and saved views (gridKey='users-list').
+           Per-cell DOM is supplied via <ng-template usGridCell> so
+           the visual look — username link + default/self badges,
+           groups join, status pill (with locked variant), date
+           text with relative-time, row-actions (unlock/edit/delete)
+           — matches the previous PrimeNG layout exactly. -->
+      <div class="table-wrapper" *ngIf="adapter">
+        <us-data-grid
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="gridConfig"
+          (selectionChange)="onSelectionChange($event)"
+          (refresh)="refreshList()"
         >
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="width: 2.75rem; min-width: 2.75rem" pFrozenColumn>
-                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-              </th>
-              <th
-                style="width: 12rem; min-width: 12rem"
-                pFrozenColumn
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('username')"
-                (click)="toggleSort('username')"
+          <ng-template usGridCell="username" let-user>
+            <span class="username-cell">
+              <a
+                class="dataset-name-link"
+                [routerLink]="['/app/users', user.id]"
               >
-                <div class="th-content">
-                  <span>{{ 'COMMON.USERNAME' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('username')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up':
-                          sortHelper.direction('username') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('username') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('username'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('username') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('username') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <th
-                style="width: 10rem; min-width: 10rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('firstName')"
-                (click)="toggleSort('firstName')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.FIRST_NAME' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('firstName')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up':
-                          sortHelper.direction('firstName') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('firstName') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('firstName'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('firstName') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('firstName') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <th
-                style="width: 10rem; min-width: 10rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('lastName')"
-                (click)="toggleSort('lastName')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.LAST_NAME' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('lastName')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up':
-                          sortHelper.direction('lastName') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('lastName') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('lastName'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('lastName') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('lastName') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <th
-                style="min-width: 18rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('email')"
-                (click)="toggleSort('email')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.EMAIL' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('email')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up': sortHelper.direction('email') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('email') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('email'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('email') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('email') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">{{ 'USER.GROUPS' | translate }}</div>
-              </th>
-              <th
-                style="width: 9rem; min-width: 9rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('status')"
-                (click)="toggleSort('status')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.STATUS' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('status')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up': sortHelper.direction('status') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('status') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('status'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('status') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('status') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <th
-                style="width: 12rem; min-width: 12rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('lastLogin')"
-                (click)="toggleSort('lastLogin')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.LAST_LOGIN' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('lastLogin')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up':
-                          sortHelper.direction('lastLogin') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('lastLogin') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('lastLogin'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('lastLogin') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('lastLogin') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <th
-                style="width: 12rem; min-width: 12rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('createdOn')"
-                (click)="toggleSort('createdOn')"
-              >
-                <div class="th-content">
-                  <span>{{ 'COMMON.CREATED_ON' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('createdOn')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up':
-                          sortHelper.direction('createdOn') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('createdOn') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('createdOn'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('createdOn') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('createdOn') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <ng-container *hasPermission="'userManagement'; level: 'write'">
-              <th style="width: 7rem; min-width: 7rem">
-                <div class="th-content actions-th">
-                  {{ 'COMMON.ACTIONS' | translate }}
-                </div>
-              </th>
-              </ng-container>
-            </tr>
-            <!-- Filter Row -->
-            <tr>
-              <th pFrozenColumn></th>
-              <th pFrozenColumn>
-                <app-custom-input
-                  [(ngModel)]="filterValues.username"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_USERNAME' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.firstName"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_FIRST_NAME' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.lastName"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_LAST_NAME' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.email"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_EMAIL' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-dropdown
-                  [(ngModel)]="selectedGroup"
-                  [serverMode]="true"
-                  [fetcher]="loadGroupsPage"
-                  [pageSize]="10"
-                  [preloadedItems]="preloadedGroups"
-                  [preloadedTotal]="preloadedGroupsTotal"
-                  optionLabel="name"
-                  optionValue="id"
-                  [placeholder]="'COMMON.ALL' | translate"
-                  [showClear]="true"
-                  [filter]="true"
-                  filterBy="name"
-                  [autoDisplayFirst]="false"
-                  appendTo="body"
-                  (onChangeEvent)="onGroupChange($event)"
-                  icon="pi-users"
-                ></app-custom-dropdown>
-              </th>
-              <th>
-                <app-custom-dropdown
-                  [(ngModel)]="filterValues.status"
-                  [options]="statusOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  [placeholder]="'COMMON.ALL' | translate"
-                  [showClear]="true"
-                  [filter]="false"
-                  [autoDisplayFirst]="false"
-                  appendTo="body"
-                  (onChangeEvent)="onFilterChange()"
-                  icon="pi-circle-fill"
-                ></app-custom-dropdown>
-              </th>
-              <th>
-                <app-custom-daterange
-                  [(ngModel)]="filterValues.lastLoginDateRange"
-                  [placeholder]="'COMMON.SELECT_RANGE' | translate"
-                  [showButtonBar]="true"
-                  [maxDate]="today"
-                  (onChangeEvent)="onLastLoginDateRangeChange($event)"
-                ></app-custom-daterange>
-              </th>
-              <th>
-                <app-custom-daterange
-                  [(ngModel)]="filterValues.createdDateRange"
-                  [placeholder]="'COMMON.SELECT_RANGE' | translate"
-                  [showButtonBar]="true"
-                  [maxDate]="today"
-                  (onChangeEvent)="onCreatedDateRangeChange($event)"
-                ></app-custom-daterange>
-              </th>
-              <ng-container *hasPermission="'userManagement'; level: 'write'">
-              <th>
-                <!-- No filter for Actions -->
-              </th>
-              </ng-container>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-user>
-            <tr class="modern-row">
-              <td pFrozenColumn>
-                <p-tableCheckbox
-                  [value]="user"
-                  [disabled]="!user.canDelete"
-                ></p-tableCheckbox>
-              </td>
-              <td pFrozenColumn>
-                <span class="username-cell">
-                  <a
-                    class="dataset-name-link"
-                    [routerLink]="['/app/users', user.id]"
-                  >
-                    {{ user.username }}
-                  </a>
-                  <!-- Identity badges — mirror the system-admin
-                       list convention so the row's locked state
-                       is visible at a glance, not just on hover. -->
-                  <span
-                    *ngIf="user.isDefault === 1"
-                    class="row-badge row-badge--default"
-                  >{{ 'COMMON.DEFAULT_BADGE' | translate }}</span>
-                  <span
-                    *ngIf="user.id === loggedInUserId"
-                    class="row-badge row-badge--self"
-                  >{{ 'COMMON.YOU_BADGE' | translate }}</span>
-                </span>
-              </td>
-              <td>
-                <span class="description-text">{{ user.firstName }}</span>
-              </td>
-              <td>
-                <span class="description-text">{{ user.lastName }}</span>
-              </td>
-              <td>
-                <span class="description-text" [title]="user.email">{{
-                  user.email
-                }}</span>
-              </td>
-              <td>
-                <span
-                  class="description-text"
-                  [title]="user.groupNames?.join(', ')"
-                >
-                  {{
-                    user.groupNames?.join(', ') ||
-                      ('USER.NO_GROUPS' | translate)
-                  }}
-                </span>
-              </td>
-              <td>
-                <span
-                  class="status-pill"
-                  [ngClass]="{
-                    locked: user.isLocked,
-                    active: !user.isLocked && user.status === 1,
-                    inactive: !user.isLocked && user.status !== 1,
-                  }"
-                >
-                  <span class="dot"></span>
-                  <span class="label">
-                    {{
-                      user.isLocked
-                        ? ('COMMON.LOCKED' | translate)
-                        : user.status === 1
-                          ? ('COMMON.ACTIVE' | translate)
-                          : ('COMMON.INACTIVE' | translate)
-                    }}
-                  </span>
-                </span>
-              </td>
-              <td>
-                <span
-                  class="date-text"
-                  [title]="
-                    user.lastLogin
-                      ? (user.lastLogin | date: 'dd MMM yyyy, HH:mm:ss')
-                      : ''
-                  "
-                >
-                  {{
-                    user.lastLogin
-                      ? (user.lastLogin | relativeTime)
-                      : ('USER.NEVER_LOGGED_IN' | translate)
-                  }}
-                </span>
-              </td>
-              <td>
-                <span
-                  class="date-text"
-                  [title]="user.createdOn | date: 'dd MMM yyyy, HH:mm:ss'"
-                >
-                  {{ user.createdOn | relativeTime }}
-                </span>
-              </td>
-              <ng-container *hasPermission="'userManagement'; level: 'write'">
-              <td>
-                <div class="row-actions">
-                  <!-- Unlock — gated on canUnlock from BE. Default
-                       user lock state is managed via onboarding /
-                       break-glass; self-unlock is impossible (locked
-                       account is logged out) but kept symmetric. -->
-                  <button
-                    *ngIf="user.isLocked"
-                    class="icon-btn unlock-btn"
-                    (click)="onUnlock(user.id)"
-                    [disabled]="!user.canUnlock || isUnlocking(user.id)"
-                    [pTooltip]="
-                      !user.canUnlock
-                        ? (user.isDefault === 1
-                            ? ('USER.CANNOT_UNLOCK_DEFAULT' | translate)
-                            : ('USER.CANNOT_UNLOCK_SELF' | translate))
-                        : ('COMMON.UNLOCK_ACCOUNT' | translate)
-                    "
-                    tooltipPosition="bottom"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="
-                        isUnlocking(user.id)
-                          ? 'pi-spin pi-spinner'
-                          : 'pi-lock-open'
-                      "
-                    ></i>
-                  </button>
-                  <!-- Edit — gated on canEdit (not default, not
-                       self). Self changes go through /profile;
-                       default user is immutable. -->
-                  <button
-                    *hasPermission="'userManagement'; level: 'write'"
-                    class="icon-btn edit-btn"
-                    (click)="onEdit(user.id)"
-                    [disabled]="!user.canEdit"
-                    [pTooltip]="
-                      !user.canEdit
-                        ? (user.isDefault === 1
-                            ? ('USER.CANNOT_EDIT_DEFAULT' | translate)
-                            : ('USER.CANNOT_EDIT_SELF' | translate))
-                        : ('COMMON.EDIT' | translate)
-                    "
-                    tooltipPosition="bottom"
-                  >
-                    <i class="pi pi-pencil"></i>
-                  </button>
-                  <button
-                    *hasPermission="'userManagement'; level: 'delete'"
-                    class="icon-btn delete-btn"
-                    (click)="confirmDelete(user.id)"
-                    [pTooltip]="
-                      !user.canDelete
-                        ? (user.isDefault === 1
-                            ? ('USER.CANNOT_DELETE_DEFAULT' | translate)
-                            : ('USER.CANNOT_DELETE_SELF' | translate))
-                        : ('COMMON.DELETE' | translate)
-                    "
-                    tooltipPosition="bottom"
-                    [disabled]="!user.canDelete || isDeleting(user.id)"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="
-                        isDeleting(user.id) ? 'pi-spin pi-spinner' : 'pi-trash'
-                      "
-                    ></i>
-                  </button>
-                </div>
-              </td>
-              </ng-container>
-            </tr>
-          </ng-template>
-          <!-- Skeleton rows while the lazy GET is in flight. -->
-          <ng-template pTemplate="loadingbody">
-            <tr
-              *ngFor="let _ of [].constructor(10); let i = index"
-              appSkeletonRow
-              [columns]="8"
-              [showCheckbox]="true"
-              [showActions]="true"
-            ></tr>
-          </ng-template>
-          <ng-template pTemplate="emptymessage">
-            <tr class="empty-row">
-              <td colspan="10" class="empty-message-cell">
-                <div class="empty-state-inline">
-                  <i class="pi pi-search empty-state-icon"></i>
-                  <span class="empty-state-text">
-                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash;
-                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
-                  </span>
-                </div>
-              </td>
-            </tr>
+                {{ user.username }}
+              </a>
+              <!-- Identity badges — mirror the system-admin
+                   list convention so the row's default/self
+                   state is visible at a glance. -->
+              <span
+                *ngIf="user.isDefault === 1"
+                class="row-badge row-badge--default"
+              >{{ 'COMMON.DEFAULT_BADGE' | translate }}</span>
+              <span
+                *ngIf="user.id === loggedInUserId"
+                class="row-badge row-badge--self"
+              >{{ 'COMMON.YOU_BADGE' | translate }}</span>
+            </span>
           </ng-template>
 
-          <ng-template pTemplate="paginatorright">
-            <button
-              type="button"
-              class="paginator-refresh-btn"
-              (click)="refreshList()"
-              [attr.aria-label]="'COMMON.REFRESH' | translate"
-            >
-              <i class="pi pi-refresh"></i>
-            </button>
+          <ng-template usGridCell="firstName" let-user>
+            <span class="description-text">{{ user.firstName }}</span>
           </ng-template>
-        </p-table>
+
+          <ng-template usGridCell="lastName" let-user>
+            <span class="description-text">{{ user.lastName }}</span>
+          </ng-template>
+
+          <ng-template usGridCell="email" let-user>
+            <span class="description-text" [title]="user.email">{{
+              user.email
+            }}</span>
+          </ng-template>
+
+          <ng-template usGridCell="groups" let-user>
+            <span
+              class="description-text"
+              [title]="user.groupNames?.join(', ')"
+            >
+              {{
+                user.groupNames?.join(', ') ||
+                  ('USER.NO_GROUPS' | translate)
+              }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="status" let-user>
+            <span
+              class="status-pill"
+              [ngClass]="{
+                locked: user.isLocked,
+                active: !user.isLocked && user.status === 1,
+                inactive: !user.isLocked && user.status !== 1,
+              }"
+            >
+              <span class="dot"></span>
+              <span class="label">
+                {{
+                  user.isLocked
+                    ? ('COMMON.LOCKED' | translate)
+                    : user.status === 1
+                      ? ('COMMON.ACTIVE' | translate)
+                      : ('COMMON.INACTIVE' | translate)
+                }}
+              </span>
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="lastLogin" let-user>
+            <span
+              class="date-text"
+              [title]="
+                user.lastLogin
+                  ? (user.lastLogin | date: 'dd MMM yyyy, HH:mm:ss')
+                  : ''
+              "
+            >
+              {{
+                user.lastLogin
+                  ? (user.lastLogin | relativeTime)
+                  : ('USER.NEVER_LOGGED_IN' | translate)
+              }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="createdOn" let-user>
+            <span
+              class="date-text"
+              [pTooltip]="(user.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              tooltipPosition="top"
+            >
+              {{ user.createdOn | relativeTime }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="actions" let-user>
+            <div class="row-actions">
+              <!-- Unlock — gated on canUnlock from BE. Default
+                   user lock state is managed via onboarding /
+                   break-glass; self-unlock is impossible (locked
+                   account is logged out) but kept symmetric. -->
+              <button
+                *ngIf="user.isLocked"
+                class="icon-btn unlock-btn"
+                (click)="onUnlock(user.id)"
+                [disabled]="!user.canUnlock || isUnlocking(user.id)"
+                [pTooltip]="
+                  !user.canUnlock
+                    ? (user.isDefault === 1
+                        ? ('USER.CANNOT_UNLOCK_DEFAULT' | translate)
+                        : ('USER.CANNOT_UNLOCK_SELF' | translate))
+                    : ('COMMON.UNLOCK_ACCOUNT' | translate)
+                "
+                tooltipPosition="bottom"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    isUnlocking(user.id)
+                      ? 'pi-spin pi-spinner'
+                      : 'pi-lock-open'
+                  "
+                ></i>
+              </button>
+              <!-- Edit — gated on canEdit (not default, not
+                   self). Self changes go through /profile;
+                   default user is immutable. -->
+              <button
+                *hasPermission="'userManagement'; level: 'write'"
+                class="icon-btn edit-btn"
+                (click)="onEdit(user.id)"
+                [disabled]="!user.canEdit"
+                [pTooltip]="
+                  !user.canEdit
+                    ? (user.isDefault === 1
+                        ? ('USER.CANNOT_EDIT_DEFAULT' | translate)
+                        : ('USER.CANNOT_EDIT_SELF' | translate))
+                    : ('COMMON.EDIT' | translate)
+                "
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button
+                *hasPermission="'userManagement'; level: 'delete'"
+                class="icon-btn delete-btn"
+                (click)="confirmDelete(user.id)"
+                [pTooltip]="
+                  !user.canDelete
+                    ? (user.isDefault === 1
+                        ? ('USER.CANNOT_DELETE_DEFAULT' | translate)
+                        : ('USER.CANNOT_DELETE_SELF' | translate))
+                    : ('COMMON.DELETE' | translate)
+                "
+                tooltipPosition="bottom"
+                [disabled]="!user.canDelete || isDeleting(user.id)"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    isDeleting(user.id) ? 'pi-spin pi-spinner' : 'pi-trash'
+                  "
+                ></i>
+              </button>
+            </div>
+          </ng-template>
+        </us-data-grid>
       </div>
     </div>
   </div>

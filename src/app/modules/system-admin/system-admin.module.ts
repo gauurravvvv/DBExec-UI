@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { UsDataGridComponent } from 'src/app/shared/components/us-data-grid/us-data-grid.component';
+import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AddSystemAdminComponent } from './components/add-system-admin/add-system-admin.component';
@@ -23,6 +25,8 @@ import { SystemAdminRoutingModule } from './system-admin-routing.module';
     AppPrimeNGModule,
     SystemAdminRoutingModule,
     SharedModule,
+    UsDataGridComponent,
+    UsGridCellDirective,
   ],
 })
 export class SystemAdminModule {}

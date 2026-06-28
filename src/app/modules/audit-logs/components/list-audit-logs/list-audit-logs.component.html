@@ -7,23 +7,20 @@
       </div>
 
       <div class="header-actions">
+        <!-- Page-level PDF export — exports the FULL filtered set
+             from the BE, distinct from the grid's CSV/XLSX which
+             only export the current page. -->
         <button
           pButton
           icon="pi pi-file-pdf"
           [pTooltip]="'COMMON.EXPORT_PDF' | translate"
           tooltipPosition="top"
           (click)="exportLogs('pdf')"
-          [disabled]="totalItems() === 0"
+          [disabled]="totalCount === 0"
           class="p-button-outlined p-button-danger modern-button"
         ></button>
-        <button
-          pButton
-          icon="pi pi-refresh"
-          [pTooltip]="'COMMON.REFRESH' | translate"
-          tooltipPosition="top"
-          (click)="refreshLogs()"
-          class="p-button-outlined modern-button"
-        ></button>
+
+        <!-- Clear Filters Button -->
         <button
           pButton
           [label]="'COMMON.CLEAR' | translate"
@@ -35,302 +32,92 @@
       </div>
     </div>
 
-    <!-- Unified Toolbar & Content Card -->
+    <!-- Unified Content Card -->
     <div class="content-card">
-      <div class="card-toolbar">
-        <div class="toolbar-left">
-          <div class="dropdown-field">
-            <app-custom-dropdown
-              [(ngModel)]="filterValues.module"
-              [options]="moduleOptions"
-              optionLabel="label"
-              optionValue="value"
-              [label]="'AUDIT.LOG_TYPE' | translate"
-              [floatingLabel]="true"
-              [showClear]="true"
-              [autoDisplayFirst]="false"
-              [placeholder]="'AUDIT.ALL_MODULES' | translate"
-              (onChangeEvent)="onFilterChange()"
-              icon="pi-box"
-            ></app-custom-dropdown>
-          </div>
-        </div>
-      </div>
-
-      <!-- Table -->
-      <div class="table-wrapper">
-        <p-table
-          #dt
-          [value]="logs()"
-          [rows]="25"
-          [paginator]="true"
-          [lazy]="true"
-          (onLazyLoad)="loadLogs($event)"
-          [totalRecords]="totalItems()"
-          [rowHover]="true"
-          dataKey="id"
-          currentPageReportTemplate="{first} - {last} of {totalRecords}"
-          [showCurrentPageReport]="true"
-          [rowsPerPageOptions]="[25, 50, 100]"
-          styleClass="p-datatable-sm modern-table"
-          [scrollable]="true"
-          scrollHeight="flex"
-          [tableStyle]="{ 'min-width': '90rem' }"
+      <!-- AG Grid via us-data-grid. The grid hosts sort, floating
+           filters, column chooser, density toggle, CSV/XLSX export
+           and saved views (gridKey='audit-logs-list'). Per-cell DOM
+           is supplied via <ng-template usGridCell> so the visual
+           look — name link, description, action badge, version
+           badge, status pill, date text — matches the previous
+           PrimeNG layout exactly. -->
+      <div class="table-wrapper" *ngIf="adapter">
+        <us-data-grid
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="gridConfig"
+          (refresh)="refreshList()"
         >
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="width: 14rem; min-width: 14rem" pFrozenColumn>
-                <div class="th-content">{{ 'COMMON.NAME' | translate }}</div>
-              </th>
-              <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">
-                  {{ 'AUDIT.PERFORMED_BY' | translate }}
-                </div>
-              </th>
-              <th
-                style="width: 9rem; min-width: 9rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('action')"
-                (click)="toggleSort('action')"
-              >
-                <div class="th-content">
-                  <span>{{ 'AUDIT.ACTION' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('action')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up': sortHelper.direction('action') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('action') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('action'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('action') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('action') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <th style="width: 6rem; min-width: 6rem">
-                <div class="th-content">{{ 'AUDIT.VERSION' | translate }}</div>
-              </th>
-              <th style="width: 9rem; min-width: 9rem">
-                <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
-              </th>
-              <th
-                style="width: 14rem; min-width: 14rem"
-                class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('createdOn')"
-                (click)="toggleSort('createdOn')"
-              >
-                <div class="th-content">
-                  <span>{{ 'AUDIT.TIMESTAMP' | translate }}</span>
-                  <span
-                    class="sort-indicator"
-                    [class.is-sorted]="!!sortHelper.direction('createdOn')"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="{
-                        'pi-arrow-up':
-                          sortHelper.direction('createdOn') === 'asc',
-                        'pi-arrow-down':
-                          sortHelper.direction('createdOn') === 'desc',
-                        'pi-arrows-v': !sortHelper.direction('createdOn'),
-                      }"
-                    ></i>
-                    <span
-                      class="sort-badge"
-                      *ngIf="
-                        sortHelper.index('createdOn') > 0 && sortHelper.size > 1
-                      "
-                      >{{ sortHelper.index('createdOn') }}</span
-                    >
-                  </span>
-                </div>
-              </th>
-              <th style="width: 10rem; min-width: 10rem">
-                <div class="th-content">
-                  {{ 'AUDIT.IP_ADDRESS' | translate }}
-                </div>
-              </th>
-              <th style="min-width: 16rem">
-                <div class="th-content">
-                  {{ 'AUDIT.JUSTIFICATION' | translate }}
-                </div>
-              </th>
-            </tr>
-            <!-- Filter Row -->
-            <tr>
-              <th pFrozenColumn>
-                <app-custom-input
-                  [(ngModel)]="filterValues.entityName"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'AUDIT.SEARCH_NAME' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.username"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'AUDIT.SEARCH_USER' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-dropdown
-                  [(ngModel)]="filterValues.action"
-                  [options]="actionOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  [showClear]="true"
-                  [autoDisplayFirst]="false"
-                  [placeholder]="'COMMON.ALL' | translate"
-                  appendTo="body"
-                  (onChangeEvent)="onFilterChange()"
-                  icon="pi-cog"
-                ></app-custom-dropdown>
-              </th>
-              <th><!-- Version — no filter --></th>
-              <th>
-                <app-custom-dropdown
-                  [(ngModel)]="filterValues.status"
-                  [options]="statusOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  [showClear]="true"
-                  [autoDisplayFirst]="false"
-                  [placeholder]="'COMMON.ALL' | translate"
-                  appendTo="body"
-                  (onChangeEvent)="onFilterChange()"
-                  icon="pi-circle-fill"
-                ></app-custom-dropdown>
-              </th>
-              <th>
-                <app-custom-daterange
-                  [(ngModel)]="filterValues.dateRange"
-                  [placeholder]="'COMMON.SELECT_RANGE' | translate"
-                  [showButtonBar]="true"
-                  [maxDate]="today"
-                  (onChangeEvent)="onDateRangeChange($event)"
-                ></app-custom-daterange>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.ipAddress"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'AUDIT.SEARCH_IP' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.justification"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'AUDIT.SEARCH_NAME' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-log>
-            <tr class="modern-row">
-              <td pFrozenColumn>
-                <a
-                  class="dataset-name-link"
-                  (click)="showDetail(log)"
-                  [title]="log.entityName"
-                >
-                  {{ log.entityName || '-' }}
-                </a>
-              </td>
-              <td>
-                <span class="description-text" [title]="log.username">{{
-                  log.username || '-'
-                }}</span>
-              </td>
-              <td>
-                <span
-                  class="action-badge"
-                  [ngClass]="getActionClass(log.action)"
-                >
-                  {{ log.action }}
-                </span>
-              </td>
-              <td>
-                <span class="version-badge">v{{ log.version || 1 }}</span>
-              </td>
-              <td>
-                <span
-                  class="status-pill"
-                  [ngClass]="{
-                    active: log.responseSuccess,
-                    inactive: !log.responseSuccess,
-                  }"
-                >
-                  <span class="dot"></span>
-                  <span class="label">
-                    {{
-                      log.responseSuccess
-                        ? ('AUDIT.SUCCESS' | translate)
-                        : ('AUDIT.FAILED' | translate)
-                    }}
-                  </span>
-                </span>
-              </td>
-              <td>
-                <span
-                  class="date-text"
-                  [title]="log.createdOn | date: 'dd MMM yyyy, HH:mm:ss'"
-                >
-                  {{ log.createdOn | relativeTime }}
-                </span>
-              </td>
-              <td>
-                <span class="description-text">{{ log.ipAddress || '-' }}</span>
-              </td>
-              <td>
-                <span
-                  class="description-text justification-text"
-                  [title]="log.justification || ''"
-                  >{{ log.justification || '-' }}</span
-                >
-              </td>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="emptymessage">
-            <tr class="empty-row">
-              <td colspan="8" class="empty-message-cell">
-                <div class="empty-state-inline">
-                  <i class="pi pi-search empty-state-icon"></i>
-                  <span class="empty-state-text">
-                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash;
-                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
-                  </span>
-                </div>
-              </td>
-            </tr>
+          <ng-template usGridCell="entityName" let-log>
+            <a
+              class="dataset-name-link"
+              (click)="showDetail(log)"
+              [title]="log.entityName"
+            >
+              {{ log.entityName || '-' }}
+            </a>
           </ng-template>
 
-          <ng-template pTemplate="paginatorright">
-            <button
-              type="button"
-              class="paginator-refresh-btn"
-              (click)="refreshList()"
-              [attr.aria-label]="'COMMON.REFRESH' | translate"
-            >
-              <i class="pi pi-refresh"></i>
-            </button>
+          <ng-template usGridCell="username" let-log>
+            <span class="description-text" [title]="log.username">
+              {{ log.username || '-' }}
+            </span>
           </ng-template>
-        </p-table>
+
+          <ng-template usGridCell="action" let-log>
+            <span
+              class="action-badge"
+              [ngClass]="getActionClass(log.action)"
+            >
+              {{ log.action }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="version" let-log>
+            <span class="version-badge">v{{ log.version || 1 }}</span>
+          </ng-template>
+
+          <ng-template usGridCell="status" let-log>
+            <span
+              class="status-pill"
+              [ngClass]="{
+                active: log.responseSuccess,
+                inactive: !log.responseSuccess,
+              }"
+            >
+              <span class="dot"></span>
+              <span class="label">
+                {{
+                  log.responseSuccess
+                    ? ('AUDIT.SUCCESS' | translate)
+                    : ('AUDIT.FAILED' | translate)
+                }}
+              </span>
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="createdOn" let-log>
+            <span
+              class="date-text"
+              [pTooltip]="(log.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              tooltipPosition="top"
+            >
+              {{ log.createdOn | relativeTime }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="ipAddress" let-log>
+            <span class="description-text">{{ log.ipAddress || '-' }}</span>
+          </ng-template>
+
+          <ng-template usGridCell="justification" let-log>
+            <span
+              class="description-text justification-text"
+              [title]="log.justification || ''"
+              >{{ log.justification || '-' }}</span
+            >
+          </ng-template>
+        </us-data-grid>
       </div>
     </div>
   </div>

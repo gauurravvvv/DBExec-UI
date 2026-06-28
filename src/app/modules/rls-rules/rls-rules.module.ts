@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { UsDataGridComponent } from 'src/app/shared/components/us-data-grid/us-data-grid.component';
+import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { AddRlsRuleComponent } from './components/add-rls-rule/add-rls-rule.component';
 import { EditRlsRuleComponent } from './components/edit-rls-rule/edit-rls-rule.component';
 import { ListRlsRuleComponent } from './components/list-rls-rule/list-rls-rule.component';
@@ -25,6 +27,8 @@ import { RlsRulesRoutingModule } from './rls-rules-routing.module';
     AppPrimeNGModule,
     RlsRulesRoutingModule,
     SharedModule,
+    UsDataGridComponent,
+    UsGridCellDirective,
   ],
 })
 export class RlsRulesModule {}
