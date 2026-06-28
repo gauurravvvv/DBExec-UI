@@ -239,14 +239,16 @@ export class ListSystemAdminComponent implements OnInit, OnDestroy {
             : { status: v };
         },
         lastLogin: cell => {
+          // BE expects lastLoginDateFrom / lastLoginDateTo (mirrors
+          // the createdDate* naming on the same controller).
           const c = cell as any;
           const out: Record<string, string> = {};
           if (c?.dateFrom)
-            out['lastLoginFrom'] = new Date(c.dateFrom).toISOString();
+            out['lastLoginDateFrom'] = new Date(c.dateFrom).toISOString();
           if (c?.dateTo) {
             const to = new Date(c.dateTo);
             to.setHours(23, 59, 59, 999);
-            out['lastLoginTo'] = to.toISOString();
+            out['lastLoginDateTo'] = to.toISOString();
           }
           return out;
         },

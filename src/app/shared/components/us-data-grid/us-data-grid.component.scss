@@ -240,16 +240,201 @@
   color: var(--text-color);
 }
 
-.us-data-grid .ag-floating-filter {
-  background: var(--secondary-background);
+/* ── Cell alignment fix for templated cells ────────────
+ *
+ * AG Grid cells render the cellRenderer's DOM inside an
+ * `.ag-cell-value` wrapper that itself stretches to the cell
+ * height — but a `<div class="row-actions">` (or any block
+ * we project via `<ng-template usGridCell>`) floats to the
+ * top by default, so the icon-buttons sit misaligned vs the
+ * row's other cell text. Force the cell wrapper to
+ * vertically center its content, and right-align the actions
+ * cell specifically.
+ *
+ * Limited to `.ag-cell-wrapper` + `.ag-cell-value` so plain
+ * text cells keep their default left-aligned single-line
+ * layout (AG Grid handles that via its own line-height
+ * rules, not flex). */
+.us-data-grid .ag-cell .ag-cell-wrapper,
+.us-data-grid .ag-cell .ag-cell-value {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
 }
 
-.us-data-grid .ag-floating-filter-input input {
-  font-family: var(--font-ui);
-  font-size: var(--fs-label);
-  height: 28px;
+.us-data-grid .ag-cell .row-actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  opacity: 1;
+}
+
+/* Action icon-button reset — AG Grid renders these outside
+ * the host component's view-encapsulated scope, so the per-
+ * page .icon-btn rules don't reach them. Replicate the shape
+ * here so every migrated listing's edit / delete / unlock /
+ * duplicate buttons look identical. */
+.us-data-grid .ag-cell .icon-btn {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: var(--radius-sm, 6px);
+  color: var(--secondary-color, var(--text-muted));
+  cursor: pointer;
+  padding: 0;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+
+  i {
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--hover-background);
+    color: var(--primary-color);
+    border-color: var(--border-color);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &.edit-btn:hover:not(:disabled) {
+    background: var(--primary-color-transparent);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+
+  &.delete-btn:hover:not(:disabled) {
+    background: var(--error-bg, rgba(220, 38, 38, 0.08));
+    color: var(--error-color, #dc2626);
+    border-color: var(--error-color, #dc2626);
+  }
+
+  &.unlock-btn:hover:not(:disabled),
+  &.view-btn:hover:not(:disabled),
+  &.more-btn:hover:not(:disabled),
+  &.duplicate-btn:hover:not(:disabled) {
+    background: var(--hover-background);
+    color: var(--primary-color);
+    border-color: var(--border-color);
+  }
+}
+
+/* ── PrimeNG-styled floating filters ───────────────────
+ *
+ * AG Grid's floating filter row ships with a Material-ish
+ * underline input. Replace it with PrimeNG's .p-inputtext
+ * look so the listings feel consistent with the rest of the
+ * app (custom-input, custom-dropdown, etc.).
+ *
+ * The selectors target both the wrapper (.ag-floating-filter)
+ * and the inputs it carries (date pickers + text inputs). */
+.us-data-grid .ag-floating-filter {
+  background: var(--secondary-background);
+  padding: 4px 6px;
+
+  /* Strip AG Grid's underline-flavoured wrapper styling. */
+  .ag-floating-filter-button {
+    /* Hide the per-column filter-popup button — we expose the
+     * AG Grid header menu instead, and the popup duplicates UX
+     * that doesn't match the existing PrimeNG dropdown filter
+     * surface. */
+    display: none !important;
+  }
+
+  .ag-floating-filter-body {
+    width: 100%;
+  }
+}
+
+.us-data-grid .ag-floating-filter-input {
+  width: 100%;
+  height: 100%;
+}
+
+/* Reskin the actual <input> + <textarea> AG Grid renders to
+ * match PrimeNG's .p-inputtext. The exact heights / radii /
+ * border colours mirror what the rest of the app uses
+ * (32px height, --border-color border, focus ring on
+ * --primary-color). */
+.us-data-grid .ag-floating-filter-input input,
+.us-data-grid .ag-floating-filter-input .ag-input-field-input,
+.us-data-grid .ag-floating-filter input,
+.us-data-grid .ag-floating-filter .ag-input-wrapper input,
+.us-data-grid .ag-text-field-input,
+.us-data-grid .ag-number-field-input,
+.us-data-grid .ag-date-field-input {
+  width: 100%;
+  height: 32px;
+  padding: 0 8px;
+  font-family: var(--font-ui) !important;
+  font-size: var(--fs-body) !important;
+  color: var(--text-color);
+  background: var(--input-background, var(--card-background));
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-md, 6px);
+  box-shadow: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  outline: none;
+
+  &::placeholder {
+    color: var(--text-muted);
+    opacity: 0.75;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: var(--primary-color);
+  }
+
+  &:focus,
+  &:focus-visible {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.15);
+  }
+}
+
+/* AG Grid's date input wrapper has an extra inner span — make
+ * sure the input itself stretches inside its <ag-input-wrapper>. */
+.us-data-grid .ag-input-wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+/* Header-menu icon — AG Grid puts its hamburger menu on every
+ * filterable column. Keep visible (consumers configured
+ * suppressMenuHide already) and tone the colour. */
+.us-data-grid .ag-header-icon {
+  color: var(--text-muted);
+  opacity: 0.75;
+
+  &:hover {
+    color: var(--primary-color);
+    opacity: 1;
+  }
+}
+
+/* Sort arrows — pick up the brand colour when active. */
+.us-data-grid .ag-sort-indicator-icon.ag-sort-order {
+  color: var(--text-muted);
+}
+
+.us-data-grid .ag-header-cell-sorted-asc .ag-sort-ascending-icon,
+.us-data-grid .ag-header-cell-sorted-desc .ag-sort-descending-icon {
+  color: var(--primary-color);
 }
 
 /* ── Saved Views overlay ─────────────────────────────── */

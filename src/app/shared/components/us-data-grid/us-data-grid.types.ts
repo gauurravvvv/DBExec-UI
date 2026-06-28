@@ -116,7 +116,12 @@ export const US_DATA_GRID_DEFAULTS: Required<
 > = {
   showFloatingFilters: true,
   enableColumnResize: true,
-  enableColumnReorder: true,
+  /* Column reorder disabled by default — user decision: dragging
+   * column headers around clashes with the existing PrimeNG-style
+   * listings where column order is part of the page design, not a
+   * per-user knob. Re-enable per consumer via UsDataGridConfig if
+   * the listing truly wants it. */
+  enableColumnReorder: false,
   freezeFirstColumn: true,
   enableColumnChooser: true,
   enableAddFilter: true,
