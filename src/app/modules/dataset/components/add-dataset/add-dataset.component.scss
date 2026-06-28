@@ -2695,50 +2695,52 @@ td.empty-message-cell {
   i { font-size: var(--fs-control); }
 }
 
-// Explain dialog body — JSON plan rendered in a monospace block so
-// nesting indentation reads cleanly. Header carries the engine name
-// + EXPLAIN duration.
-:host ::ng-deep .explain-plan-dialog {
-  .p-dialog-header { padding: 14px 18px; }
-  .p-dialog-content { padding: 0 18px 18px; }
+// EXPLAIN Plan popup — uses the shared .confirmation-popup chrome
+// (overlay scrim + .popup-content card + .popup-header / .popup-body
+// / .popup-actions blocks). The plan body needs more horizontal room
+// than the default confirm popup (which sizes at 500px), so we
+// override .popup-content's width when it's also .explain-plan-popup.
+// Layout-specific bits live under .explain-plan-popup__*.
+.popup-content.explain-plan-popup {
+  width: min(960px, 92vw);
+
+  // The popup-icon + h3 sit on the left; engine + duration chips
+  // float to the right side of the header.
+  .popup-header {
+    .explain-plan-popup__meta {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .explain-plan-popup__engine {
+      padding: 2px 8px;
+      background: var(--hover-background);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xs);
+      font-size: var(--fs-label);
+      font-weight: var(--fw-medium);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-color);
+    }
+
+    .explain-plan-popup__duration {
+      color: var(--secondary-color);
+      font-size: var(--fs-label);
+      font-variant-numeric: tabular-nums;
+    }
+  }
 }
 
-.explain-plan-dialog__title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: var(--fw-semibold);
-
-  i { color: var(--primary-color); }
-
-  &__engine,
-  .explain-plan-dialog__engine {
-    margin-left: 6px;
-    padding: 2px 8px;
-    background: var(--hover-background);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-xs);
-    font-size: var(--fs-label);
-    font-weight: var(--fw-medium);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-  .explain-plan-dialog__duration {
-    margin-left: auto;
-    color: var(--secondary-color);
-    font-size: var(--fs-label);
-    font-weight: var(--fw-regular);
-    font-variant-numeric: tabular-nums;
-  }
-}
-
-.explain-plan-dialog__body {
+.explain-plan-popup__body {
   min-height: 200px;
-  max-height: min(70vh, 600px);
+  max-height: min(60vh, 540px);
   overflow: auto;
 }
 
-.explain-plan-dialog__loading {
+.explain-plan-popup__loading {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2749,7 +2751,7 @@ td.empty-message-cell {
   i { font-size: var(--fs-h3); }
 }
 
-.explain-plan-dialog__error {
+.explain-plan-popup__error {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -2770,7 +2772,7 @@ td.empty-message-cell {
   }
 }
 
-.explain-plan-dialog__plan {
+.explain-plan-popup__plan {
   margin: 0;
   padding: 14px 16px;
   background: var(--hover-background);

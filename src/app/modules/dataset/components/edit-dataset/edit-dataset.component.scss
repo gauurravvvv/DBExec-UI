@@ -3134,44 +3134,88 @@ td.empty-message-cell {
   i { font-size: var(--fs-control); }
 }
 
-:host ::ng-deep .explain-plan-dialog {
-  .p-dialog-header { padding: 14px 18px; }
-  .p-dialog-content { padding: 0 18px 18px; }
-}
-.explain-plan-dialog__title {
-  display: flex; align-items: center; gap: 10px; font-weight: var(--fw-semibold);
-  i { color: var(--primary-color); }
-  .explain-plan-dialog__engine {
-    margin-left: 6px; padding: 2px 8px;
-    background: var(--hover-background); border: 1px solid var(--border-color);
-    border-radius: var(--radius-xs); font-size: var(--fs-label);
-    font-weight: var(--fw-medium); text-transform: uppercase; letter-spacing: 0.04em;
+// EXPLAIN Plan popup — see add-dataset for the canonical version
+// of this block; both pages share the same dialog markup so the
+// styling has to mirror.
+.popup-content.explain-plan-popup {
+  width: min(960px, 92vw);
+
+  .popup-header {
+    .explain-plan-popup__meta {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .explain-plan-popup__engine {
+      padding: 2px 8px;
+      background: var(--hover-background);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xs);
+      font-size: var(--fs-label);
+      font-weight: var(--fw-medium);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-color);
+    }
+
+    .explain-plan-popup__duration {
+      color: var(--secondary-color);
+      font-size: var(--fs-label);
+      font-variant-numeric: tabular-nums;
+    }
   }
-  .explain-plan-dialog__duration {
-    margin-left: auto; color: var(--secondary-color);
-    font-size: var(--fs-label); font-variant-numeric: tabular-nums;
-  }
 }
-.explain-plan-dialog__body { min-height: 200px; max-height: min(70vh, 600px); overflow: auto; }
-.explain-plan-dialog__loading {
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  padding: 64px 0; color: var(--secondary-color);
+
+.explain-plan-popup__body {
+  min-height: 200px;
+  max-height: min(60vh, 540px);
+  overflow: auto;
+}
+
+.explain-plan-popup__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 64px 0;
+  color: var(--secondary-color);
+
   i { font-size: var(--fs-h3); }
 }
-.explain-plan-dialog__error {
-  display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px;
-  background: var(--error-bg); border: 1px solid var(--error-color);
-  border-left-width: 4px; border-radius: var(--radius-md); color: var(--error-color);
+
+.explain-plan-popup__error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--error-bg);
+  border: 1px solid var(--error-color);
+  border-left-width: 4px;
+  border-radius: var(--radius-md);
+  color: var(--error-color);
+
   code {
-    flex: 1; color: var(--text-color);
+    flex: 1;
+    color: var(--text-color);
     font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
-    font-size: var(--fs-label); word-break: break-word; white-space: pre-wrap;
+    font-size: var(--fs-label);
+    word-break: break-word;
+    white-space: pre-wrap;
   }
 }
-.explain-plan-dialog__plan {
-  margin: 0; padding: 14px 16px; background: var(--hover-background);
-  border: 1px solid var(--border-color); border-radius: var(--radius-md);
+
+.explain-plan-popup__plan {
+  margin: 0;
+  padding: 14px 16px;
+  background: var(--hover-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
   font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: var(--fs-label); line-height: 1.55; color: var(--text-color);
-  white-space: pre; overflow: auto;
+  font-size: var(--fs-label);
+  line-height: 1.55;
+  color: var(--text-color);
+  white-space: pre;
+  overflow: auto;
 }
