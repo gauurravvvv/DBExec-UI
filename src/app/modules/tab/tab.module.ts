@@ -8,6 +8,8 @@ import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
 import { SharedModule } from 'src/app/shared';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
+import { UsDataGridComponent } from 'src/app/shared/components/us-data-grid/us-data-grid.component';
+import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { AddTabComponent } from './components/add-tab/add-tab.component';
 import { EditTabComponent } from './components/edit-tab/edit-tab.component';
 import { ListTabComponent } from './components/list-tab/list-tab.component';
@@ -33,6 +35,8 @@ import { TabRoutingModule } from './tab-routing.module';
     AppPrimeNGModule,
     SharedModule,
     TabRoutingModule,
+    UsDataGridComponent,
+    UsGridCellDirective,
   ],
 })
 export class TabModule {}

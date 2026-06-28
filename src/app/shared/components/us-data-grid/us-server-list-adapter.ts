@@ -1,4 +1,4 @@
-import { Observable, Subject, Subscription } from 'rxjs';
+import { Observable, Subject, Subscription, from, isObservable } from 'rxjs';
 import { signal } from '@angular/core';
 
 /**
@@ -42,8 +42,10 @@ export interface UsListResponse<TRow> {
 
 export interface UsServerListAdapterConfig<TRow> {
   /** Required: fires the BE call. Return whatever your service
-   *  returns — `unwrap` peels it into `{rows, total}`. */
-  load: (params: UsListLoadParams) => Observable<unknown>;
+   *  returns — Observable or Promise — and `unwrap` peels it into
+   *  `{rows, total}`. Most listings in the app use async/await over
+   *  `lastValueFrom`, so Promise support is essential. */
+  load: (params: UsListLoadParams) => Observable<unknown> | Promise<unknown>;
 
   /** Optional: peel the service response into `{rows, total}`.
    *  Default unwrap handles the canonical
@@ -197,7 +199,15 @@ export class UsServerListAdapter<TRow = unknown> {
     this.loading.set(true);
     const params = this.buildParams();
     const unwrap = this.cfg.unwrap ?? defaultUnwrap<TRow>;
-    this.inflight = this.cfg.load(params).subscribe({
+    // Normalise Promise → Observable so both paths flow through the
+    // same subscribe-with-cancellation pipe. `from(promise)`
+    // produces a cold Observable that emits once + completes, which
+    // is exactly what we want.
+    const result = this.cfg.load(params);
+    const obs$: Observable<unknown> = isObservable(result)
+      ? result
+      : from(result as Promise<unknown>);
+    this.inflight = obs$.subscribe({
       next: res => {
         const out = unwrap(res);
         this.rows.set(out.rows);

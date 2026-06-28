@@ -68,214 +68,101 @@
         </div>
       </div>
 
-      <!-- Table -->
-      <div class="table-wrapper">
-        <p-table
-          #dt
-          [value]="tabs()"
-          [rows]="10"
-          [paginator]="true"
-          [lazy]="true"
-          (onLazyLoad)="loadTabs($event)"
-          [totalRecords]="total()"
-          [rowHover]="true"
-          dataKey="id"
-          [(selection)]="selectedTabs"
-          [rowSelectable]="isRowSelectable"
-          currentPageReportTemplate="{first} - {last} of {totalRecords}"
-          [showCurrentPageReport]="true"
-          [rowsPerPageOptions]="[10, 25, 50, 100]"
-          styleClass="p-datatable-sm modern-table"
-          [scrollable]="true"
-          scrollHeight="calc(100vh - 440px)"
-          [tableStyle]="{ 'min-width': '73rem' }"
+      <!-- AG Grid via us-data-grid. The grid hosts row-selection,
+           sort, floating filters, column chooser, density toggle,
+           CSV/XLSX export and saved views (gridKey='tabs-list').
+           Per-cell DOM is supplied via <ng-template usGridCell> so
+           the visual look — name link, description, sections pill,
+           status pill, date text, row-actions — matches the
+           previous PrimeNG layout exactly. -->
+      <div class="table-wrapper" *ngIf="selectedDatasource && adapter">
+        <us-data-grid
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="gridConfig"
+          (selectionChange)="onSelectionChange($event)"
+          (refresh)="refreshList()"
         >
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="width: 2.75rem; min-width: 2.75rem" pFrozenColumn>
-                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-              </th>
-              <th style="width: 14rem; min-width: 14rem" pFrozenColumn>
-                <div class="th-content">{{ 'COMMON.NAME' | translate }}</div>
-              </th>
-              <th style="min-width: 20rem">
-                <div class="th-content">
-                  {{ 'COMMON.DESCRIPTION' | translate }}
-                </div>
-              </th>
-              <th style="width: 8rem; min-width: 8rem">
-                <div class="th-content">
-                  {{ 'COMMON.SECTIONS' | translate }}
-                </div>
-              </th>
-              <th style="width: 9rem; min-width: 9rem">
-                <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
-              </th>
-              <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">
-                  {{ 'COMMON.CREATED_ON' | translate }}
-                </div>
-              </th>
-              <ng-container *hasPermission="'queryBuilderTab'; level: 'write'">
-              <th style="width: 7rem; min-width: 7rem">
-                <div class="th-content actions-th">
-                  {{ 'COMMON.ACTIONS' | translate }}
-                </div>
-              </th>
-              </ng-container>
-            </tr>
-            <!-- Filter Row -->
-            <tr>
-              <th pFrozenColumn></th>
-              <th pFrozenColumn>
-                <app-custom-input
-                  [(ngModel)]="filterValues.name"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_NAME' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.description"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_DESCRIPTION' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <!-- No filter for Sections -->
-              </th>
-              <th>
-                <app-custom-dropdown
-                  [(ngModel)]="filterValues.status"
-                  [options]="statusOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  [placeholder]="'COMMON.ALL' | translate"
-                  [showClear]="true"
-                  [filter]="false"
-                  [autoDisplayFirst]="false"
-                  appendTo="body"
-                  (onChangeEvent)="onFilterChange()"
-                  icon="pi-circle-fill"
-                ></app-custom-dropdown>
-              </th>
-              <th>
-                <app-custom-daterange
-                  [(ngModel)]="filterValues.createdDateRange"
-                  [placeholder]="'COMMON.SELECT_RANGE' | translate"
-                  [showButtonBar]="true"
-                  [maxDate]="today"
-                  (onChangeEvent)="onCreatedDateRangeChange($event)"
-                ></app-custom-daterange>
-              </th>
-              <ng-container *hasPermission="'queryBuilderTab'; level: 'write'">
-              <th>
-                <!-- No filter for Actions -->
-              </th>
-              </ng-container>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-tab>
-            <tr class="modern-row">
-              <td pFrozenColumn>
-                <p-tableCheckbox [value]="tab"></p-tableCheckbox>
-              </td>
-              <td pFrozenColumn>
-                <a
-                  class="dataset-name-link"
-                  [routerLink]="['/app/tabs', tab.id]"
-                >
-                  {{ tab.name }}
-                </a>
-              </td>
-              <td>
-                <span class="description-text" [title]="tab.description">
-                  {{ tab.description }}
-                </span>
-              </td>
-              <td>
-                <span class="pill">
-                  <i class="pi pi-list"></i>
-                  {{
-                    'TAB.SECTIONS_COUNT'
-                      | translate: { count: tab.sections.length }
-                  }}
-                </span>
-              </td>
-              <td>
-                <span
-                  class="status-pill"
-                  [ngClass]="{
-                    active: tab.status === 1,
-                    inactive: tab.status !== 1,
-                  }"
-                >
-                  <span class="dot"></span>
-                  {{
-                    tab.status === 1
-                      ? ('COMMON.ACTIVE' | translate)
-                      : ('COMMON.INACTIVE' | translate)
-                  }}
-                </span>
-              </td>
-              <td>
-                <span class="date-text" [pTooltip]="(tab.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''" tooltipPosition="top">{{
-                  tab.createdOn | relativeTime
-                }}</span>
-              </td>
-              <ng-container *hasPermission="'queryBuilderTab'; level: 'write'">
-              <td>
-                <div class="row-actions">
-                  <button
-                    *hasPermission="'queryBuilderTab'; level: 'write'"
-                    class="icon-btn edit-btn"
-                    (click)="onEdit(tab.id)"
-                    [pTooltip]="'COMMON.EDIT' | translate"
-                    tooltipPosition="bottom"
-                  >
-                    <i class="pi pi-pencil"></i>
-                  </button>
-                  <button
-                    *hasPermission="'queryBuilderTab'; level: 'delete'"
-                    class="icon-btn delete-btn"
-                    (click)="confirmDelete(tab.id)"
-                    [pTooltip]="'COMMON.DELETE' | translate"
-                    tooltipPosition="bottom"
-                  >
-                    <i class="pi pi-trash"></i>
-                  </button>
-                </div>
-              </td>
-              </ng-container>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="emptymessage">
-            <tr class="empty-row">
-              <td colspan="7" class="empty-message-cell">
-                <div class="empty-state-inline">
-                  <i class="pi pi-search empty-state-icon"></i>
-                  <span class="empty-state-text">
-                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash;
-                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
-                  </span>
-                </div>
-              </td>
-            </tr>
+          <ng-template usGridCell="name" let-tab>
+            <a
+              class="dataset-name-link"
+              [routerLink]="['/app/tabs', tab.id]"
+            >
+              {{ tab.name }}
+            </a>
           </ng-template>
 
-          <ng-template pTemplate="paginatorright">
-            <button
-              type="button"
-              class="paginator-refresh-btn"
-              (click)="refreshList()"
-              [attr.aria-label]="'COMMON.REFRESH' | translate"
-            >
-              <i class="pi pi-refresh"></i>
-            </button>
+          <ng-template usGridCell="description" let-tab>
+            <span class="description-text" [title]="tab.description">
+              {{ tab.description }}
+            </span>
           </ng-template>
-        </p-table>
+
+          <ng-template usGridCell="sections" let-tab>
+            <span class="pill">
+              <i class="pi pi-list"></i>
+              {{ 'TAB.SECTIONS_COUNT' | translate: { count: tab.sections?.length || 0 } }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="status" let-tab>
+            <span
+              class="status-pill"
+              [ngClass]="{
+                active: tab.status === 1,
+                inactive: tab.status !== 1,
+              }"
+            >
+              <span class="dot"></span>
+              {{
+                tab.status === 1
+                  ? ('COMMON.ACTIVE' | translate)
+                  : ('COMMON.INACTIVE' | translate)
+              }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="createdOn" let-tab>
+            <span
+              class="date-text"
+              [pTooltip]="(tab.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              tooltipPosition="top"
+            >
+              {{ tab.createdOn | relativeTime }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="actions" let-tab>
+            <div class="row-actions">
+              <button
+                *hasPermission="'queryBuilderTab'; level: 'write'"
+                class="icon-btn edit-btn"
+                (click)="onEdit(tab.id)"
+                [pTooltip]="'COMMON.EDIT' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button
+                *hasPermission="'queryBuilderTab'; level: 'delete'"
+                class="icon-btn delete-btn"
+                (click)="confirmDelete(tab.id)"
+                [pTooltip]="'COMMON.DELETE' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </ng-template>
+        </us-data-grid>
+      </div>
+
+      <!-- Empty datasource state — no datasource picked yet. -->
+      <div class="empty-state-inline" *ngIf="!selectedDatasource">
+        <i class="pi pi-database empty-state-icon"></i>
+        <span class="empty-state-text">
+          {{ 'COMMON.SELECT_DATASOURCE' | translate }}
+        </span>
       </div>
     </div>
   </div>
