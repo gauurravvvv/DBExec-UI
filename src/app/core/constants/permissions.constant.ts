@@ -15,7 +15,9 @@ export const PERMISSIONS = {
 
   // Data Management
   SETUP_DB: 'setupDB',
-  MANAGE_DATABASE_ACCESS: 'manageDatabaseAccess',
+  DB_USERS: 'dbUsers',
+  DB_ROLES: 'dbRoles',
+  DB_PRIVILEGES: 'dbPrivileges',
 
   // DBExec Studio
   QB_TAB: 'queryBuilderTab',

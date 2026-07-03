@@ -12,11 +12,15 @@
     max-width: 100%;
   }
 
+  // List shell — mirrors list-user verbatim: wrapper > content-container
+  // > page-header-section (h2 above the card, NO subtitle) > content-card
+  // (flat/transparent — table sits on the page) > table-wrapper.
   .dataset-page-wrapper {
     display: flex;
     flex-direction: column;
     height: 100%;
     width: 100%;
+    padding: var(--space-0);
     min-width: 0;
     min-height: 0;
 
@@ -24,12 +28,13 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: 1.25rem 0 0;
+      padding: 1.5rem 2rem;
       max-width: 100%;
+      margin: 0 auto;
       width: 100%;
       min-width: 0;
       min-height: 0;
-      gap: var(--space-6);
+      gap: var(--space-8);
     }
   }
 
@@ -42,16 +47,13 @@
 
     .header-content {
       h2 {
-        font-size: clamp(1.1rem, 1rem + 0.3vw, 1.25rem);
+        // Title carries the header on its own (NO subtitle) — matches
+        // list-user's clamp.
+        font-size: clamp(1.25rem, 1.05rem + 0.4vw, 1.375rem);
         font-weight: var(--fw-semibold);
         color: var(--text-color);
-        letter-spacing: -0.02em;
+        letter-spacing: -0.025em;
         margin: 0;
-      }
-      p.subtitle {
-        margin: 0.25rem 0 0;
-        color: var(--secondary-color);
-        font-size: var(--fs-control);
       }
     }
 
@@ -63,13 +65,14 @@
     }
   }
 
-  // Real parent card — the listing surface. Background + border + radius so
-  // the toolbar and table read as one panel (matches the app's card style).
+  // Flat surface — no outline/shadow/border, table sits directly on the
+  // page background (list-user parity). The datasource picker + capability
+  // badge live in the card-toolbar row above the table.
   .content-card {
-    background: var(--card-background);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -78,13 +81,14 @@
     overflow: hidden;
 
     .card-toolbar {
-      padding: var(--space-6) var(--space-7);
-      border-bottom: 1px solid var(--border-color);
+      padding: 0 0 var(--space-5);
+      border-bottom: none;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: var(--space-6);
+      background: transparent;
 
       .toolbar-left,
       .toolbar-right {
@@ -191,36 +195,120 @@
         display: none;
       }
 
-      .p-datatable-thead > tr > th {
-        background: var(--hover-background);
-        color: var(--text-color);
+      // Header row — transparent, muted, no uppercase (list-user parity),
+      // sortable-th interactions.
+      .p-datatable-thead > tr:first-child > th {
+        background: transparent;
+        color: var(--text-muted);
+        opacity: 1;
         font-size: var(--fs-label);
         font-weight: var(--fw-semibold);
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        padding: 0.7rem 1rem;
-        border-bottom: 1px solid var(--border-color);
-
-        .th-content {
-          display: flex;
-          align-items: center;
-          gap: var(--space-4);
-        }
-
-        &:first-child { padding-left: 1.5rem; }
-        &:last-child { padding-right: 1.5rem; }
-      }
-
-      // Filter row (second header row) — card background + tighter padding,
-      // matching list-tab / list-dataset.
-      .p-datatable-thead > tr:last-child > th {
-        background: var(--card-background);
-        padding: 0.5rem 0.75rem;
         text-transform: none;
         letter-spacing: 0;
+        padding: var(--space-5) var(--space-6);
+        height: 40px;
+        border-bottom: 1px solid var(--border-color);
+        white-space: nowrap;
 
-        &:first-child { padding-left: 1.5rem; }
-        &:last-child { padding-right: 1.5rem; }
+        .th-content {
+          display: inline-flex;
+          align-items: center;
+          gap: var(--space-2);
+          line-height: 1;
+
+          &.actions-th {
+            justify-content: flex-end;
+            width: 100%;
+          }
+        }
+
+        &:first-child { padding-left: var(--space-6); }
+        &:last-child { padding-right: var(--space-8); }
+
+        &.sortable-th {
+          cursor: pointer;
+          user-select: none;
+          transition: color var(--motion-fast) ease;
+
+          &:hover {
+            color: var(--text-color);
+            .sort-indicator { opacity: 1; }
+          }
+
+          &.is-sorted {
+            color: var(--primary-color);
+            .sort-indicator {
+              opacity: 1;
+              .pi { color: var(--primary-color); }
+            }
+          }
+
+          .sort-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            margin-left: var(--space-2);
+            opacity: 0;
+            transition: opacity var(--motion-fast) ease;
+
+            &.is-sorted { opacity: 1; }
+
+            .pi {
+              font-size: 11px;
+              color: var(--text-muted);
+              transition: color var(--motion-fast) ease;
+            }
+
+            .sort-badge {
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              min-width: 14px;
+              height: 14px;
+              padding: 0 4px;
+              border-radius: var(--radius-pill);
+              background: var(--primary-color);
+              color: var(--primary-text);
+              font-size: 9px;
+              font-weight: var(--fw-bold);
+              line-height: 1;
+            }
+          }
+        }
+      }
+
+      // Filter row — transparent, tighter, and (FIX #3) every shared
+      // control renders at the SAME field height so the schema/role
+      // dropdown lines up with the date/calendar field. We normalise the
+      // control heights here rather than per-component.
+      .p-datatable-thead > tr:last-child > th {
+        padding: var(--space-4) var(--space-5);
+        height: 52px;
+        background: transparent;
+        border-bottom: 1px solid var(--border-color);
+
+        &:first-child { padding-left: var(--space-6); }
+        &:last-child { padding-right: var(--space-8); }
+
+        app-custom-dropdown,
+        app-custom-daterange,
+        app-custom-calendar,
+        app-custom-input {
+          display: block;
+          width: 100%;
+
+          .form-field {
+            gap: var(--space-0);
+          }
+
+          .p-dropdown,
+          .p-calendar,
+          .p-calendar .p-inputtext,
+          .p-inputtext {
+            width: 100% !important;
+            min-width: 0;
+          }
+        }
       }
 
       .p-datatable-tbody > tr {
@@ -229,32 +317,120 @@
         border-bottom: 1px solid var(--border-color);
 
         td {
-          padding: 0.7rem 1rem;
+          padding: 0.875rem 1rem;
+          height: 56px;
           vertical-align: middle;
           color: var(--text-color);
           font-size: var(--fs-body);
+          line-height: 1.45;
 
-          &:first-child { padding-left: 1.5rem; }
-          &:last-child { padding-right: 1.5rem; }
+          &:first-child { padding-left: 2rem; }
+          &:last-child { padding-right: 2rem; }
         }
 
         &:hover {
           background-color: var(--hover-background) !important;
+
+          td:first-child {
+            box-shadow: inset 3px 0 0 0 var(--primary-color);
+          }
+          .row-actions { opacity: 1; }
         }
       }
 
       .p-paginator {
-        background: var(--card-background);
-        border-top: 1px solid var(--border-color);
+        background: transparent;
+        border-top: none;
         justify-content: flex-end;
-        padding: 0.75rem 1.25rem;
+        padding: var(--space-4) var(--space-8);
+        gap: var(--space-2);
 
-        .p-paginator-page.p-highlight {
-          background: var(--primary-color);
-          color: var(--primary-text);
+        .p-paginator-current {
+          color: var(--text-muted);
+          font-size: var(--fs-control);
+          font-weight: var(--fw-medium);
+          margin-right: var(--space-5);
+          font-variant-numeric: tabular-nums;
+        }
+
+        .p-paginator-page,
+        .p-paginator-next,
+        .p-paginator-prev,
+        .p-paginator-first,
+        .p-paginator-last {
+          border-radius: var(--radius-sm);
+          color: var(--text-muted);
+          min-width: 28px;
+          height: 28px;
+          margin: 0;
+          font-weight: var(--fw-medium);
+          font-size: var(--fs-control);
+
+          &:hover {
+            background: var(--hover-background);
+            color: var(--text-color);
+          }
+
+          &.p-highlight {
+            background: var(--primary-color-transparent);
+            color: var(--primary-color);
+          }
+        }
+
+        .p-dropdown {
+          height: 28px;
+          min-height: 28px;
+          border-radius: var(--radius-sm);
         }
       }
     }
+  }
+
+  // Capability badge shown in the list toolbar (full / read-only).
+  .cap-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-control);
+    font-weight: var(--fw-medium);
+
+    &.full {
+      background: var(--success-bg, rgba(34, 197, 94, 0.12));
+      color: var(--success-color, #16a34a);
+    }
+    &.readonly {
+      background: var(--hover-background);
+      color: var(--secondary-color);
+    }
+  }
+
+  // Inline hint / empty prompts inside a list (no datasource, unsupported).
+  .list-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-5);
+    padding: 4rem 2rem;
+    color: var(--secondary-color);
+    text-align: center;
+
+    i { font-size: 2rem; opacity: 0.5; }
+    span { font-size: var(--fs-h3); }
+
+    &.unsupported i { color: var(--warning-color); }
+  }
+
+  .cap-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    padding: 3rem;
+    color: var(--secondary-color);
+    font-size: var(--fs-body);
   }
 
   .db-name-link {
@@ -531,6 +707,7 @@
             .form-row {
               display: flex;
               gap: var(--space-6);
+              align-items: flex-start;
 
               > * {
                 flex: 1;
@@ -543,6 +720,57 @@
             }
           }
         }
+      }
+    }
+  }
+
+  // FIX #3 — dropdown / number / calendar share ONE control height so a
+  // date field never renders taller than the dropdown beside it. Applied
+  // to the shared components' inner PrimeNG controls; no bespoke override.
+  :host ::ng-deep {
+    app-custom-dropdown .p-dropdown,
+    app-custom-calendar .p-calendar .p-inputtext,
+    app-custom-number .p-inputnumber .p-inputtext,
+    app-custom-input .p-inputtext {
+      height: 42px;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+    }
+
+    app-custom-dropdown .p-dropdown .p-dropdown-label {
+      display: flex;
+      align-items: center;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+
+  // Create-mode selector inside the role form (from-scratch / template /
+  // clone). Full-width segmented control.
+  .mode-tabs {
+    display: inline-flex;
+    gap: var(--space-2);
+    padding: 3px;
+    background: var(--hover-background);
+    border-radius: var(--radius-md);
+    width: fit-content;
+
+    button {
+      padding: 0.45rem 1rem;
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-sm);
+      font-size: var(--fs-control);
+      font-weight: var(--fw-medium);
+      color: var(--secondary-color);
+      cursor: pointer;
+      transition: all var(--motion-fast);
+
+      &.active {
+        background: var(--card-background);
+        color: var(--primary-color);
+        box-shadow: var(--shadow-sm);
       }
     }
   }
@@ -905,6 +1133,34 @@
         color: var(--text-color);
       }
 
+      // Segmented attach/detach (or from-scratch/template/clone) selector.
+      .mode-tabs {
+        display: inline-flex;
+        gap: var(--space-2);
+        padding: 3px;
+        margin-bottom: var(--space-6);
+        background: var(--hover-background);
+        border-radius: var(--radius-md);
+
+        button {
+          padding: 0.4rem 0.9rem;
+          border: none;
+          background: transparent;
+          border-radius: var(--radius-sm);
+          font-size: var(--fs-control);
+          font-weight: var(--fw-medium);
+          color: var(--secondary-color);
+          cursor: pointer;
+          transition: all var(--motion-fast);
+
+          &.active {
+            background: var(--card-background);
+            color: var(--primary-color);
+            box-shadow: var(--shadow-sm);
+          }
+        }
+      }
+
       .flags-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -998,5 +1254,369 @@
   @keyframes scaleIn {
     from { opacity: 0; transform: scale(0.95); }
     to { opacity: 1; transform: scale(1); }
+  }
+}
+
+// ── Privileges & Access composer (fix #4/#9) ──────────────────────────────
+// The merged Privileges + Effective + Saved-Sets surface. NO p-tabView.
+// The pending-changes tray + Apply live at the TOP (header action area);
+// the Access-Rules composer scrolls inside a bounded flex container; the
+// role filter + effective table and saved-sets sit alongside/below.
+@mixin db-access-composer {
+  .composer-page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    gap: var(--space-6);
+  }
+
+  // Top pending-changes / Apply tray — sits above the composer like the
+  // Users/Roles header action area.
+  .apply-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+    padding: var(--space-5) var(--space-6);
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    flex-shrink: 0;
+
+    .apply-summary {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+      flex: 1;
+
+      .apply-title {
+        font-size: var(--fs-body);
+        font-weight: var(--fw-semibold);
+        color: var(--text-color);
+      }
+
+      .apply-lines {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        max-height: 88px;
+        overflow-y: auto;
+
+        li {
+          display: flex;
+          align-items: center;
+          gap: var(--space-3);
+          font-size: var(--fs-control);
+          color: var(--secondary-color);
+          i { color: var(--primary-color); font-size: 11px; }
+        }
+      }
+
+      .apply-empty {
+        font-size: var(--fs-control);
+        color: var(--secondary-color);
+      }
+    }
+
+    .apply-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      flex-shrink: 0;
+    }
+  }
+
+  // Two-column body: rules composer (scrolls) + side rail (filter/defaults/
+  // saved sets). Collapses to a single column on narrow widths.
+  .composer-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr);
+    gap: var(--space-6);
+    flex: 1;
+    min-height: 0;
+
+    @media (max-width: 1100px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .rules-panel,
+  .rail-card {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .rules-panel {
+    overflow: hidden;
+
+    .panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--space-5);
+      padding: var(--space-6);
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+
+      h3 {
+        margin: 0;
+        font-size: var(--fs-h3);
+        font-weight: var(--fw-semibold);
+        color: var(--text-color);
+      }
+      .panel-hint {
+        margin: 2px 0 0;
+        font-size: var(--fs-control);
+        color: var(--secondary-color);
+      }
+    }
+
+    // The bounded, scrollable rule list — NO tabview. Rules stack and the
+    // container scrolls internally so the Apply bar + rail stay visible.
+    .rules-scroll {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: var(--space-6);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+
+      &::-webkit-scrollbar { width: 8px; }
+      &::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: var(--radius-xs);
+      }
+    }
+  }
+
+  .rule-card {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+    background: var(--hover-background);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+
+    .rule-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .rule-index {
+        font-size: var(--fs-control);
+        font-weight: var(--fw-semibold);
+        color: var(--text-color);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+    }
+
+    .rule-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-5);
+
+      @media (max-width: 640px) { grid-template-columns: 1fr; }
+    }
+
+    .rule-field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+
+      .field-label {
+        font-size: var(--fs-control);
+        font-weight: var(--fw-semibold);
+        color: var(--text-color);
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        flex-wrap: wrap;
+      }
+      .field-hint {
+        font-size: var(--fs-label);
+        color: var(--secondary-color);
+      }
+    }
+
+    .rule-objects { display: flex; flex-direction: column; gap: var(--space-5); }
+
+    .priv-checks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+
+      .priv-check {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: 4px 10px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-pill);
+        font-size: var(--fs-control);
+        color: var(--text-color);
+        cursor: pointer;
+
+        &.checked {
+          border-color: var(--primary-color);
+          background: var(--primary-color-transparent);
+          color: var(--primary-color);
+        }
+      }
+    }
+
+    .mini-link {
+      background: none;
+      border: none;
+      color: var(--primary-color);
+      cursor: pointer;
+      font-size: var(--fs-label);
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 0;
+    }
+  }
+
+  .add-rule-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    padding: 0.65rem 1rem;
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--primary-color);
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-control);
+    cursor: pointer;
+    transition: all var(--motion-base);
+
+    &:hover { border-color: var(--primary-color); background: var(--primary-color-transparent); }
+  }
+
+  // Side rail — role filter (effective) + saved sets + defaults. Scrolls.
+  .composer-rail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    min-height: 0;
+    overflow-y: auto;
+
+    .rail-card {
+      padding: var(--space-6);
+      gap: var(--space-5);
+
+      h4 {
+        margin: 0;
+        font-size: var(--fs-body);
+        font-weight: var(--fw-semibold);
+        color: var(--text-color);
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        i { color: var(--primary-color); }
+      }
+      .rail-hint {
+        margin: 0;
+        font-size: var(--fs-control);
+        color: var(--secondary-color);
+      }
+    }
+  }
+
+  .effective-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    max-height: 260px;
+    overflow-y: auto;
+
+    .effective-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--border-color);
+      font-size: var(--fs-control);
+
+      &:last-child { border-bottom: none; }
+
+      .eff-obj { color: var(--text-color); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .eff-via { color: var(--secondary-color); font-size: var(--fs-label); }
+    }
+  }
+
+  .saved-sets {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+
+    .saved-set {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-5);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--hover-background);
+
+      .set-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+        .set-name { font-weight: var(--fw-semibold); color: var(--text-color); font-size: var(--fs-control); }
+        .set-desc { color: var(--secondary-color); font-size: var(--fs-label); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      }
+    }
+  }
+
+  .defaults-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    max-height: 200px;
+    overflow-y: auto;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      font-size: var(--fs-control);
+      color: var(--text-color);
+      padding: var(--space-3) 0;
+      border-bottom: 1px dashed var(--border-color);
+      &:last-child { border-bottom: none; }
+      .def-scope { font-weight: var(--fw-medium); }
+      .def-privs { color: var(--secondary-color); }
+      .def-grantee { margin-left: auto; color: var(--primary-color); }
+    }
+  }
+
+  .rail-empty {
+    font-size: var(--fs-control);
+    color: var(--secondary-color);
+    padding: var(--space-4) 0;
   }
 }

@@ -1,0 +1,121 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text back-button" (click)="goBack()">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>{{ 'DB_ACCESS.EDIT_USER' | translate }}</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          [label]="'COMMON.CANCEL' | translate"
+          class="p-button-outlined btn-cancel"
+          (click)="onCancel()"
+        ></button>
+        <button
+          *hasPermission="'dbUsers'; level: 'write'"
+          pButton
+          class="p-button-primary btn-save"
+          type="button"
+          [label]="'COMMON.SAVE' | translate"
+          (click)="onSubmit()"
+          [disabled]="userForm.invalid || saving() || loadingRole"
+        >
+          <i class="pi mr-2" [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"></i>
+        </button>
+      </div>
+    </div>
+
+    <form [formGroup]="userForm" class="admin-form" *ngIf="!loadingRole">
+      <div class="left-section">
+        <div class="form-grid">
+          <app-custom-input
+            formControlName="name"
+            [label]="'DB_ACCESS.ROLE_NAME' | translate"
+            icon="pi-user"
+            [readonly]="true"
+          ></app-custom-input>
+
+          <app-custom-input
+            formControlName="password"
+            [label]="'DB_ACCESS.PASSWORD' | translate"
+            type="password"
+            icon="pi-lock"
+            [showPasswordToggle]="true"
+            [placeholder]="'DB_ACCESS.PASSWORD_UNCHANGED' | translate"
+          ></app-custom-input>
+
+          <div class="form-row">
+            <app-custom-number
+              formControlName="connectionLimit"
+              [label]="'DB_ACCESS.CONN_LIMIT' | translate"
+              [min]="-1"
+              [placeholder]="'DB_ACCESS.UNLIMITED' | translate"
+            ></app-custom-number>
+            <app-custom-calendar
+              formControlName="validUntil"
+              [label]="'DB_ACCESS.VALID_UNTIL' | translate"
+              [showTime]="false"
+              [showButtonBar]="true"
+              appendTo="body"
+            ></app-custom-calendar>
+          </div>
+
+          <h3 class="form-section-title">{{ 'DB_ACCESS.ATTRIBUTES' | translate }}</h3>
+          <div class="attr-toggles">
+            <div class="attr-toggle">
+              <span class="attr-meta">
+                <span class="attr-name">INHERIT</span>
+                <span class="attr-desc">{{ 'DB_ACCESS.ATTR_INHERIT' | translate }}</span>
+              </span>
+              <app-custom-toggle formControlName="inherit" [showStatusLabel]="false"></app-custom-toggle>
+            </div>
+            <div class="attr-toggle">
+              <span class="attr-meta">
+                <span class="attr-name">CREATEDB</span>
+                <span class="attr-desc">{{ 'DB_ACCESS.ATTR_CREATEDB' | translate }}</span>
+              </span>
+              <app-custom-toggle formControlName="createdb" [showStatusLabel]="false"></app-custom-toggle>
+            </div>
+            <div class="attr-toggle">
+              <span class="attr-meta">
+                <span class="attr-name">CREATEROLE</span>
+                <span class="attr-desc">{{ 'DB_ACCESS.ATTR_CREATEROLE' | translate }}</span>
+              </span>
+              <app-custom-toggle formControlName="createrole" [showStatusLabel]="false"></app-custom-toggle>
+            </div>
+            <div class="attr-toggle">
+              <span class="attr-meta">
+                <span class="attr-name">REPLICATION</span>
+                <span class="attr-desc">{{ 'DB_ACCESS.ATTR_REPLICATION' | translate }}</span>
+              </span>
+              <app-custom-toggle formControlName="replication" [showStatusLabel]="false"></app-custom-toggle>
+            </div>
+            <div class="attr-toggle danger">
+              <span class="attr-meta">
+                <span class="attr-name">SUPERUSER</span>
+                <span class="attr-desc">{{ 'DB_ACCESS.ATTR_SUPERUSER' | translate }}</span>
+              </span>
+              <app-custom-toggle formControlName="superuser" [showStatusLabel]="false"></app-custom-toggle>
+            </div>
+            <div class="attr-toggle danger">
+              <span class="attr-meta">
+                <span class="attr-name">BYPASSRLS</span>
+                <span class="attr-desc">{{ 'DB_ACCESS.ATTR_BYPASSRLS' | translate }}</span>
+              </span>
+              <app-custom-toggle formControlName="bypassrls" [showStatusLabel]="false"></app-custom-toggle>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="cap-loading" *ngIf="loadingRole">
+      <i class="pi pi-spin pi-spinner"></i>
+      {{ 'COMMON.LOADING' | translate }}
+    </div>
+  </div>
+</div>

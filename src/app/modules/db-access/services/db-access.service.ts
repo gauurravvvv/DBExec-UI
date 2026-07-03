@@ -245,6 +245,30 @@ export class DbAccessService {
     );
   }
 
+  /** GET /:datasourceId/objects/sequences?schema= → { data: [{ name }] } */
+  loadSequences(datasourceId: string, schema: string): Promise<any> {
+    return lastValueFrom(
+      this.http
+        .apiGet(this.base(datasourceId) + DB_ACCESS.OBJECTS_SEQUENCES_SUFFIX, {
+          params: { schema },
+          skipLoader: true,
+        })
+        .pipe(takeUntil(this._cancelReads$)),
+    );
+  }
+
+  /** GET /:datasourceId/objects/functions?schema= → { data: [{ name }] } */
+  loadFunctions(datasourceId: string, schema: string): Promise<any> {
+    return lastValueFrom(
+      this.http
+        .apiGet(this.base(datasourceId) + DB_ACCESS.OBJECTS_FUNCTIONS_SUFFIX, {
+          params: { schema },
+          skipLoader: true,
+        })
+        .pipe(takeUntil(this._cancelReads$)),
+    );
+  }
+
   /** GET /:datasourceId/grants/columns?schema=&table= */
   loadColumnGrants(datasourceId: string, schema: string, table: string): Promise<any> {
     return lastValueFrom(

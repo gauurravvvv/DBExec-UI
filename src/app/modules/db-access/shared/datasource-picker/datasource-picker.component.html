@@ -1,0 +1,20 @@
+<div class="ds-picker">
+  <app-custom-dropdown
+    [(ngModel)]="selectedDatasource"
+    [serverMode]="true"
+    [fetcher]="loadDatasourcesPage"
+    [pageSize]="10"
+    [preloadedItems]="preloadedDatasources"
+    [preloadedTotal]="preloadedDatasourcesTotal"
+    optionLabel="name"
+    optionValue="id"
+    [filter]="true"
+    [floatingLabel]="true"
+    [label]="'COMMON.DATASOURCE' | translate"
+    filterBy="name"
+    [showClear]="true"
+    appendTo="body"
+    (onChangeEvent)="onDatasourceChange($event)"
+    icon="pi-database"
+  ></app-custom-dropdown>
+</div>

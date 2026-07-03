@@ -361,6 +361,10 @@ export const DB_ACCESS = {
   MEMBERSHIPS_REMOVE_SUFFIX: '/memberships/remove',
   // GET /db-access/:datasourceId/schemas
   SCHEMAS_SUFFIX: '/schemas',
+  // GET /db-access/:datasourceId/objects/sequences?schema=
+  OBJECTS_SEQUENCES_SUFFIX: '/objects/sequences',
+  // GET /db-access/:datasourceId/objects/functions?schema=
+  OBJECTS_FUNCTIONS_SUFFIX: '/objects/functions',
   // GET /db-access/:datasourceId/grants/tables?schema=
   GRANTS_TABLES_SUFFIX: '/grants/tables',
   // GET /db-access/:datasourceId/grants/columns?schema=&table=

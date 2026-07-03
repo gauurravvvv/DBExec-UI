@@ -99,15 +99,39 @@ const routes: Routes = [
         },
       },
       {
-        path: 'db-access',
+        path: 'db-users',
         loadChildren: () =>
-          import('./modules/db-access/db-access.module').then(
-            m => m.DbAccessModule,
+          import('./modules/db-access/users/db-users.module').then(
+            m => m.DbUsersModule,
           ),
         canActivate: [roleGuard],
         data: {
-          permission: PERMISSIONS.MANAGE_DATABASE_ACCESS,
-          title: 'PAGE_TITLES.DB_ACCESS',
+          permission: PERMISSIONS.DB_USERS,
+          title: 'PAGE_TITLES.DB_USERS',
+        },
+      },
+      {
+        path: 'db-roles',
+        loadChildren: () =>
+          import('./modules/db-access/roles/db-roles.module').then(
+            m => m.DbRolesModule,
+          ),
+        canActivate: [roleGuard],
+        data: {
+          permission: PERMISSIONS.DB_ROLES,
+          title: 'PAGE_TITLES.DB_ROLES',
+        },
+      },
+      {
+        path: 'db-privileges',
+        loadChildren: () =>
+          import('./modules/db-access/privileges/db-privileges.module').then(
+            m => m.DbPrivilegesModule,
+          ),
+        canActivate: [roleGuard],
+        data: {
+          permission: PERMISSIONS.DB_PRIVILEGES,
+          title: 'PAGE_TITLES.DB_PRIVILEGES',
         },
       },
       {
