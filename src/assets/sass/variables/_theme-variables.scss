@@ -383,17 +383,31 @@
         gap: 14px;
         opacity: 1;
 
+        // PrimeNG 17 renders the severity icon as an inline <svg>
+        // (CheckIcon / TimesCircleIcon / …) carrying the
+        // .p-toast-message-icon class — NOT a PrimeIcons font <span>.
+        // Size + colour the SVG directly; a `font-size` / `::before`
+        // approach (the old font-glyph way) leaves the raw SVG paths
+        // showing as stray horizontal lines.
         .p-toast-message-icon {
-          font-size: 20px;
-          line-height: 1;
           flex-shrink: 0;
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0;
+          margin-top: 1px;
           width: 20px;
           height: 20px;
-          margin-top: 1px;
+          font-size: 20px; // covers the font-glyph fallback too
+
+          svg,
+          .p-icon {
+            width: 20px;
+            height: 20px;
+            // SVG icons paint via `fill`; inherit the severity colour
+            // set on .p-toast-message-icon per severity below.
+            fill: currentColor;
+          }
         }
 
         .p-toast-message-text {
@@ -420,12 +434,15 @@
         }
       }
 
-      // Severity colours + icon glyphs. We override the default
-      // PrimeNG toast icons to the circled variants (success →
-      // pi-check-circle, error → pi-times-circle) by re-pointing
-      // the icon's :before content at the right PrimeIcons unicode.
-      // warn (pi-exclamation-triangle) and info (pi-info-circle)
-      // already match the defaults — no override needed.
+      // Severity colours only. The glyph itself comes from the
+      // `pi pi-check-circle` / `pi pi-times-circle` / etc. class
+      // passed via MessageService `icon:` — PrimeNG 17 renders that
+      // as a PrimeIcons font <span>, which paints its own correct
+      // glyph. Do NOT re-point `::before { content }` here: the old
+      // hardcoded unicode (\e90a / \e90c) is a stale PrimeIcons
+      // codepoint that in v7 maps to the wrong glyph (rendered as
+      // stray horizontal lines), and it fights the pi-* class's own
+      // ::before. Colour is all we need to override.
       &.p-toast-message-success {
         border-left-color: var(--success-color);
 
@@ -438,10 +455,6 @@
 
           .p-toast-message-icon {
             color: var(--success-color);
-
-            &::before {
-              content: '\e90a'; // pi-check-circle
-            }
           }
         }
       }
@@ -458,10 +471,6 @@
 
           .p-toast-message-icon {
             color: var(--error-color);
-
-            &::before {
-              content: '\e90c'; // pi-times-circle
-            }
           }
         }
       }
