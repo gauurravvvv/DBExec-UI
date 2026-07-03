@@ -2,33 +2,61 @@
 
 @include db.db-access-page;
 
-.breadcrumb-row {
+.card-toolbar .dropdown-field {
+  min-width: 320px;
+  max-width: 420px;
+}
+
+.workspace-empty {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--space-4);
+  justify-content: center;
+  gap: var(--space-5);
+  padding: var(--space-9);
+  color: var(--secondary-color);
+  text-align: center;
 
-  .back-btn {
-    width: 32px;
-    height: 32px;
+  i {
+    font-size: 2rem;
+    opacity: 0.5;
+  }
+  span {
+    font-size: var(--fs-body);
+  }
+}
+
+.capability-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+
+  > i {
+    font-size: 1.35rem;
+    margin-top: 2px;
+  }
+
+  .banner-text {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--border-color);
-    background: var(--card-background);
-    border-radius: var(--radius-sm);
-    color: var(--secondary-color);
-    cursor: pointer;
-    transition: all var(--motion-base);
+    flex-direction: column;
+    gap: 2px;
 
-    &:hover {
-      border-color: var(--primary-color);
-      color: var(--primary-color);
+    strong {
+      font-size: var(--fs-body);
+    }
+    span {
+      font-size: var(--fs-control);
+      opacity: 0.9;
     }
   }
 
-  .ds-name {
+  &.unsupported {
+    background: var(--hover-background);
+    border-color: var(--border-color);
     color: var(--secondary-color);
-    font-weight: var(--fw-regular);
   }
 }
 

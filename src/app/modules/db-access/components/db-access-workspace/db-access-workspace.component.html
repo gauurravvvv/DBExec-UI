@@ -1,23 +1,17 @@
 <div class="dataset-page-wrapper">
   <div class="dataset-content-container">
+    <!-- Header -->
     <div class="page-header-section">
       <div class="header-content">
-        <div class="breadcrumb-row">
-          <button class="back-btn" (click)="back()">
-            <i class="pi pi-arrow-left"></i>
-          </button>
-          <h2>
-            {{ 'DB_ACCESS.TITLE' | translate }}
-            <span class="ds-name" *ngIf="datasourceName">— {{ datasourceName }}</span>
-          </h2>
-        </div>
+        <h2>{{ 'DB_ACCESS.TITLE' | translate }}</h2>
+        <p class="subtitle">{{ 'DB_ACCESS.SUBTITLE' | translate }}</p>
       </div>
       <div class="header-actions">
-        <span class="cap-badge full" *ngIf="!loadingCapability && canManage">
+        <span class="cap-badge full" *ngIf="capability && canManage && !loadingCapability">
           <i class="pi pi-check-circle"></i>
           {{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}
         </span>
-        <span class="cap-badge readonly" *ngIf="!loadingCapability && !canManage">
+        <span class="cap-badge readonly" *ngIf="capability && !canManage && !loadingCapability">
           <i class="pi pi-lock"></i>
           {{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}
         </span>
@@ -25,13 +19,57 @@
     </div>
 
     <div class="content-card">
-      <div class="cap-loading" *ngIf="loadingCapability">
+      <!-- Toolbar: datasource dropdown on top (like list-dataset / list-tab) -->
+      <div class="card-toolbar">
+        <div class="toolbar-left">
+          <div class="dropdown-field">
+            <app-custom-dropdown
+              [(ngModel)]="selectedDatasource"
+              [serverMode]="true"
+              [fetcher]="loadDatasourcesPage"
+              [pageSize]="10"
+              [preloadedItems]="preloadedDatasources"
+              [preloadedTotal]="preloadedDatasourcesTotal"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              [floatingLabel]="true"
+              [label]="'COMMON.DATASOURCE' | translate"
+              filterBy="name"
+              (onChangeEvent)="onDatasourceChange($event)"
+              icon="pi-database"
+            ></app-custom-dropdown>
+          </div>
+        </div>
+      </div>
+
+      <!-- No datasource chosen yet -->
+      <div class="workspace-empty" *ngIf="!datasourceId">
+        <i class="pi pi-database"></i>
+        <span>{{ 'DB_ACCESS.SELECT_DATASOURCE' | translate }}</span>
+      </div>
+
+      <!-- Probing capability -->
+      <div class="cap-loading" *ngIf="datasourceId && loadingCapability">
         <i class="pi pi-spin pi-spinner"></i>
         {{ 'DB_ACCESS.CHECKING_CAPABILITY' | translate }}
       </div>
 
+      <!-- Non-postgres -->
+      <div
+        class="capability-banner unsupported"
+        *ngIf="datasourceId && unsupported && !loadingCapability"
+      >
+        <i class="pi pi-info-circle"></i>
+        <div class="banner-text">
+          <strong>{{ 'DB_ACCESS.UNSUPPORTED_TITLE' | translate }}</strong>
+          <span>{{ 'DB_ACCESS.UNSUPPORTED_BODY' | translate }}</span>
+        </div>
+      </div>
+
+      <!-- Tabbed listings -->
       <p-tabView
-        *ngIf="!loadingCapability"
+        *ngIf="datasourceId && capability && !unsupported && !loadingCapability"
         [(activeIndex)]="activeIndex"
         styleClass="db-access-tabs"
       >

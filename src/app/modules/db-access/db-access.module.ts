@@ -6,7 +6,6 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { AddDbRoleComponent } from './components/add-db-role/add-db-role.component';
 import { AddDbUserComponent } from './components/add-db-user/add-db-user.component';
 import { ChangeSummaryDialogComponent } from './components/change-summary-dialog/change-summary-dialog.component';
-import { DbAccessHomeComponent } from './components/db-access-home/db-access-home.component';
 import { DbAccessWorkspaceComponent } from './components/db-access-workspace/db-access-workspace.component';
 import { DbAuditComponent } from './components/db-audit/db-audit.component';
 import { DbEffectivePrivilegesComponent } from './components/db-effective-privileges/db-effective-privileges.component';
@@ -23,7 +22,6 @@ import { DbAccessRoutingModule } from './db-access-routing.module';
 @NgModule({
   declarations: [
     ChangeSummaryDialogComponent,
-    DbAccessHomeComponent,
     DbAccessWorkspaceComponent,
     DbUsersComponent,
     DbRolesComponent,
