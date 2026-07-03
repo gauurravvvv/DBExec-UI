@@ -6,19 +6,20 @@ import {
   OnInit,
   inject,
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { DB_ACCESS } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DbAccessService } from '../../services/db-access.service';
 import { ChangeIntent, describeChange } from '../../services/describe-change';
 
 /**
- * DbUsersComponent — login roles (canLogin === true). List with status
- * pill (active / no-login / expired), expiry, connection limit, attribute
- * flag chips, and member-of. Create/edit via the confirmation-popup
- * attribute form (with optional attach-to-app-user/group), deactivate,
- * and a delete-wizard that surfaces owned-object counts + reassign-vs-drop
- * choice before the SQL-preview → confirm gate.
+ * DbUsersComponent — LISTING for login roles (canLogin === true). A p-table
+ * with status pill / expiry / connection limit / attribute chips / member-of
+ * and row actions (view / edit / deactivate / delete). Add + edit + view are
+ * now full SCREENS (routes) — this component only lists and confirms
+ * destructive ops (deactivate + a delete wizard) via the plain-language
+ * confirm gate. NO SQL is ever surfaced.
  */
 @Component({
   selector: 'app-db-users',
@@ -30,19 +31,12 @@ export class DbUsersComponent implements OnInit {
   @Input() datasourceId = '';
   @Input() canManage = false;
 
-  private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
 
   loading = this.dbAccess.loading;
   saving = this.dbAccess.saving;
 
   users: any[] = [];
-
-  // ── Create / edit dialog ──────────────────────────────────────────────
-  showForm = false;
-  editing = false;
-  editingName = '';
-  userForm!: FormGroup;
 
   // ── Change-summary confirm gate (plain-language, never SQL) ───────────
   showPreview = false;
@@ -65,29 +59,11 @@ export class DbUsersComponent implements OnInit {
     private dbAccess: DbAccessService,
     private globalService: GlobalService,
     private translate: TranslateService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
-    this.buildForm();
     this.load();
-  }
-
-  private buildForm(): void {
-    this.userForm = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(/^[A-Za-z_][A-Za-z0-9_$]*$/)]],
-      password: [''],
-      connectionLimit: [null],
-      validUntil: [null],
-      superuser: [false],
-      createdb: [false],
-      createrole: [false],
-      replication: [false],
-      bypassrls: [false],
-      inherit: [true],
-      // optional attach to app user/group
-      attachType: [null], // 'user' | 'group' | null
-      attachId: [''],
-    });
   }
 
   load(): void {
@@ -122,113 +98,23 @@ export class DbUsersComponent implements OnInit {
     const a = user.attributes ?? user;
     if (!(user.canLogin || a.login)) return 'no-login';
     const validUntil = a.validUntil ?? user.validUntil;
-    if (validUntil && new Date(validUntil).getTime() < Date.now()) return 'expired';
+    if (validUntil && new Date(validUntil).getTime() < Date.now())
+      return 'expired';
     return 'active';
   }
 
-  // ── Create / edit ──────────────────────────────────────────────────────
+  // ── Navigation to full screens ──────────────────────────────────────────
 
-  openCreate(): void {
-    this.editing = false;
-    this.editingName = '';
-    this.userForm.reset({ inherit: true });
-    this.userForm.get('name')?.enable();
-    this.showForm = true;
+  onAdd(): void {
+    this.router.navigate([DB_ACCESS.userNew(this.datasourceId)]);
   }
 
-  openEdit(user: any): void {
-    this.editing = true;
-    this.editingName = user.name;
-    const a = user.attributes ?? user;
-    this.userForm.reset({
-      name: user.name,
-      password: '',
-      connectionLimit: a.connectionLimit ?? null,
-      validUntil: a.validUntil ? new Date(a.validUntil) : null,
-      superuser: !!a.superuser,
-      createdb: !!a.createdb,
-      createrole: !!a.createrole,
-      replication: !!a.replication,
-      bypassrls: !!a.bypassrls,
-      inherit: a.inherit !== false,
-      attachType: null,
-      attachId: '',
-    });
-    // Name is immutable in-place; renaming is a separate operation.
-    this.userForm.get('name')?.disable();
-    this.showForm = true;
+  onView(user: any): void {
+    this.router.navigate([DB_ACCESS.userView(this.datasourceId, user.name)]);
   }
 
-  cancelForm(): void {
-    this.showForm = false;
-  }
-
-  private buildAttributes(): any {
-    const v = this.userForm.getRawValue();
-    const attributes: any = {
-      login: true,
-      superuser: v.superuser,
-      createdb: v.createdb,
-      createrole: v.createrole,
-      replication: v.replication,
-      bypassrls: v.bypassrls,
-      inherit: v.inherit,
-    };
-    if (v.connectionLimit !== null && v.connectionLimit !== undefined)
-      attributes.connectionLimit = v.connectionLimit;
-    if (v.validUntil)
-      attributes.validUntil = new Date(v.validUntil).toISOString();
-    if (v.password) attributes.password = v.password;
-    return attributes;
-  }
-
-  private buildAttachMapping(): any {
-    const v = this.userForm.getRawValue();
-    if (!v.attachType || !v.attachId) return undefined;
-    return v.attachType === 'group'
-      ? { appGroupId: v.attachId, mappingType: 'group' }
-      : { appUserId: v.attachId, mappingType: 'user' };
-  }
-
-  submitForm(): void {
-    if (this.userForm.invalid) return;
-    const v = this.userForm.getRawValue();
-    const attributes = this.buildAttributes();
-    const needsSuperuserConfirm = attributes.superuser || attributes.bypassrls;
-
-    this.previewTitle = this.editing
-      ? this.translate.instant('DB_ACCESS.PREVIEW_ALTER_USER')
-      : this.translate.instant('DB_ACCESS.PREVIEW_CREATE_USER');
-    this.previewDestructive = needsSuperuserConfirm;
-    this.confirmPhrase = null;
-
-    if (this.editing) {
-      const intent: ChangeIntent = { kind: 'alterRole', name: this.editingName, attributes };
-      this.runPreviewAndArm(
-        [intent],
-        () => this.dbAccess.updateRole(this.datasourceId, this.editingName, {
-          attributes,
-          previewOnly: true,
-        }),
-        () => this.dbAccess.updateRole(this.datasourceId, this.editingName, {
-          attributes,
-          confirm: needsSuperuserConfirm ? true : undefined,
-        }),
-      );
-    } else {
-      const body: any = { name: v.name, attributes };
-      const attach = this.buildAttachMapping();
-      if (attach) body.attachMapping = attach;
-      const intent: ChangeIntent = { kind: 'createRole', name: v.name, attributes, attachMapping: attach };
-      this.runPreviewAndArm(
-        [intent],
-        () => this.dbAccess.createRole(this.datasourceId, { ...body, previewOnly: true }),
-        () => this.dbAccess.createRole(this.datasourceId, {
-          ...body,
-          confirm: needsSuperuserConfirm ? true : undefined,
-        }),
-      );
-    }
+  onEdit(user: any): void {
+    this.router.navigate([DB_ACCESS.userEdit(this.datasourceId, user.name)]);
   }
 
   // ── Deactivate ───────────────────────────────────────────────────────────
@@ -241,7 +127,11 @@ export class DbUsersComponent implements OnInit {
     const intent: ChangeIntent = { kind: 'deactivate', name: user.name };
     this.runPreviewAndArm(
       [intent],
-      () => this.dbAccess.updateRole(this.datasourceId, user.name, { ...body, previewOnly: true }),
+      () =>
+        this.dbAccess.updateRole(this.datasourceId, user.name, {
+          ...body,
+          previewOnly: true,
+        }),
       () => this.dbAccess.updateRole(this.datasourceId, user.name, body),
     );
   }
@@ -277,12 +167,12 @@ export class DbUsersComponent implements OnInit {
     if (!this.deleteTarget) return;
     const name = this.deleteTarget.name;
     const base: any = { confirm: true };
-    if (this.deleteMode === 'reassign' && this.reassignTo) base.reassignTo = this.reassignTo;
+    if (this.deleteMode === 'reassign' && this.reassignTo)
+      base.reassignTo = this.reassignTo;
     if (this.deleteMode === 'drop') base.dropOwned = true;
 
     this.previewTitle = this.translate.instant('DB_ACCESS.PREVIEW_DELETE_USER');
     this.previewDestructive = true;
-    // Dropping a login role is high-impact — require typing its name.
     this.confirmPhrase = name;
     this.showDelete = false;
     const intent: ChangeIntent = {
@@ -293,7 +183,11 @@ export class DbUsersComponent implements OnInit {
     };
     this.runPreviewAndArm(
       [intent],
-      () => this.dbAccess.deleteRole(this.datasourceId, name, { ...base, previewOnly: true }),
+      () =>
+        this.dbAccess.deleteRole(this.datasourceId, name, {
+          ...base,
+          previewOnly: true,
+        }),
       () => this.dbAccess.deleteRole(this.datasourceId, name, base),
     );
   }
@@ -303,17 +197,12 @@ export class DbUsersComponent implements OnInit {
   }
 
   // ── Shared confirm flow ─────────────────────────────────────────────────
-  //
-  // Builds the plain-language summary FE-side from the structured intent
-  // (describeChange). The backend previewOnly call still runs to validate /
-  // dry-run, but its returned SQL is NEVER surfaced — only success is used.
 
   private runPreviewAndArm(
     intents: ChangeIntent[],
     preview: () => Promise<any>,
     execute: () => Promise<any>,
   ): void {
-    this.showForm = false;
     this.showPreview = true;
     this.previewLoading = true;
     this.summaries = intents.map(i => describeChange(i, this.translate));
@@ -322,7 +211,6 @@ export class DbUsersComponent implements OnInit {
 
     preview()
       .then(res => {
-        // Only surface validation success/failure — never the masked SQL.
         if (!res?.status) {
           this.globalService.handleSuccessService(res);
           this.showPreview = false;

@@ -273,6 +273,10 @@
       transition: all var(--motion-base);
 
       &:hover { background: var(--hover-background); }
+      &.view-btn:hover {
+        background: var(--hover-background);
+        color: var(--primary-color);
+      }
       &.edit-btn:hover {
         background: var(--primary-color-transparent);
         color: var(--primary-hover);
@@ -293,6 +297,435 @@
     color: var(--secondary-color);
 
     .empty-state-icon { font-size: 1.5rem; opacity: 0.6; }
+  }
+}
+
+// Full add / edit SCREEN shell — mirrors add-datasource's
+// .add-admin-wrapper > .add-admin-container > .page-header + .admin-form >
+// .form-grid so the create/edit pages read like the rest of the app. One
+// field per row (grid-template-columns: 1fr), no parent card around the form.
+@mixin db-access-form {
+  .add-admin-wrapper {
+    height: 100%;
+    overflow: hidden;
+
+    .add-admin-container {
+      background: var(--card-background);
+      border-radius: var(--radius-md);
+      padding: var(--space-7);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-shrink: 0;
+
+        .left-section {
+          display: flex;
+          align-items: center;
+          gap: var(--space-6);
+
+          .back-button {
+            padding: var(--space-0) !important;
+            width: 36px;
+            height: 36px;
+            border-radius: 50% !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent !important;
+            color: var(--text-color) !important;
+            min-width: 0;
+            border: none !important;
+            transition: all var(--motion-base) ease;
+
+            &:hover {
+              background: var(--hover-background) !important;
+            }
+
+            i {
+              font-size: var(--fs-h2);
+            }
+          }
+
+          h2 {
+            color: var(--text-color);
+            margin: var(--space-0);
+            font-size: var(--fs-h1);
+            font-weight: var(--fw-semibold);
+          }
+        }
+
+        .action-buttons {
+          display: flex;
+          gap: var(--space-5);
+
+          .btn-cancel {
+            background: var(--card-background) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-color) !important;
+            padding: 0.65rem 1.25rem;
+            border-radius: var(--radius-sm) !important;
+            font-weight: var(--fw-semibold);
+            box-shadow: var(--shadow-sm);
+
+            &:hover:not(:disabled) {
+              background: var(--hover-background) !important;
+              transform: translateY(-1px);
+              box-shadow: var(--shadow-md);
+            }
+
+            &:disabled {
+              opacity: 0.6;
+              cursor: not-allowed;
+            }
+          }
+
+          .btn-save {
+            background: linear-gradient(
+              135deg,
+              var(--primary-color),
+              var(--primary-hover)
+            ) !important;
+            color: white !important;
+            border: none !important;
+            padding: 0.65rem 1.25rem;
+            border-radius: var(--radius-sm) !important;
+            font-weight: var(--fw-semibold);
+            box-shadow: 0 4px 10px var(--primary-color-transparent);
+            transition: all var(--motion-base) ease;
+
+            &:hover:not(:disabled) {
+              opacity: 1;
+              transform: translateY(-1px);
+              box-shadow: var(--shadow-md);
+            }
+
+            &:disabled {
+              opacity: 0.6;
+              cursor: not-allowed;
+              background: var(--secondary-color) !important;
+              box-shadow: none;
+            }
+
+            i {
+              font-size: var(--fs-body);
+            }
+          }
+        }
+      }
+
+      .admin-form {
+        display: flex;
+        gap: var(--space-9);
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 4px;
+
+        &::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        &::-webkit-scrollbar-track {
+          background: transparent;
+          border-radius: var(--radius-xs);
+        }
+        &::-webkit-scrollbar-thumb {
+          background: var(--border-color);
+          border-radius: var(--radius-xs);
+          &:hover {
+            background: var(--secondary-color);
+          }
+        }
+        scrollbar-width: thin;
+        scrollbar-color: var(--border-color) transparent;
+
+        .left-section {
+          flex: 1;
+          max-width: calc(50% - 1rem);
+          display: flex;
+          flex-direction: column;
+
+          .form-grid {
+            width: 100%;
+            max-width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--space-7);
+            margin-bottom: 1rem;
+          }
+        }
+      }
+    }
+  }
+
+  // Section heading + hint inside the vertical form (e.g. "Attributes",
+  // "Attach to app user / group"). Full-width row in the 1fr grid.
+  .form-section-title {
+    font-size: var(--fs-body);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+    margin: 0.5rem 0 0;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .form-hint {
+    color: var(--secondary-color);
+    font-size: var(--fs-control);
+    margin: -0.25rem 0 0;
+    line-height: 1.5;
+  }
+
+  // Attribute toggles — one per row, label left / switch right, with an
+  // optional danger accent for guarded flags (SUPERUSER, BYPASSRLS).
+  .attr-toggles {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    background: var(--hover-background);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+
+    .attr-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-5);
+
+      .attr-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        .attr-name {
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
+          color: var(--text-color);
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+        }
+        .attr-desc {
+          font-size: var(--fs-label);
+          color: var(--secondary-color);
+        }
+      }
+
+      &.danger .attr-meta .attr-name {
+        color: var(--error-color);
+      }
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .add-admin-wrapper .add-admin-container .admin-form {
+      flex-direction: column;
+      .left-section {
+        flex: 0 0 100%;
+        max-width: 100%;
+      }
+    }
+  }
+}
+
+// Read-only VIEW screen — hero header + detail sections. Mirrors
+// view-datasource's single-card hero + info-card layout, adapted to role
+// data.
+@mixin db-access-view {
+  .view-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--card-background);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .view-container {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: var(--space-6) var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .hero-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    padding: 0 0 var(--space-6);
+    border-bottom: 1px solid var(--border-color);
+
+    .hero-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .back-button {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      i {
+        font-size: var(--fs-h3);
+        color: var(--secondary-color);
+      }
+      &:hover i {
+        color: var(--text-color);
+      }
+    }
+
+    .role-badge {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: var(--primary-color-transparent);
+      color: var(--primary-color);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      i {
+        font-size: var(--fs-h2);
+      }
+    }
+
+    .hero-meta {
+      flex: 1;
+      min-width: 0;
+
+      .hero-name {
+        margin: 0;
+        font-size: var(--fs-h1);
+        font-weight: var(--fw-semibold);
+        color: var(--text-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.2;
+      }
+
+      .hero-sub {
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+        font-size: var(--fs-control);
+        color: var(--secondary-color);
+        .dot {
+          opacity: 0.5;
+        }
+      }
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      flex-shrink: 0;
+
+      button {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-4);
+        padding: 0.55rem 1.05rem;
+        border-radius: var(--radius-sm);
+        font-weight: var(--fw-semibold);
+        font-size: var(--fs-control);
+        cursor: pointer;
+        border: 1px solid var(--border-color);
+        background: var(--card-background);
+        color: var(--text-color);
+        transition: all var(--motion-base);
+
+        &:hover:not(:disabled) {
+          background: var(--hover-background);
+        }
+        &.btn-primary {
+          background: linear-gradient(
+            135deg,
+            var(--primary-color),
+            var(--primary-hover)
+          );
+          color: var(--primary-text);
+          border: none;
+        }
+      }
+    }
+  }
+
+  .info-card {
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: var(--space-5);
+      h3 {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        margin: 0;
+        font-size: var(--fs-h3);
+        font-weight: var(--fw-semibold);
+        color: var(--text-color);
+        i {
+          color: var(--primary-color);
+        }
+      }
+    }
+
+    .config-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: var(--space-6);
+
+      .config-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        label {
+          font-size: var(--fs-label);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          color: var(--secondary-color);
+          font-weight: var(--fw-semibold);
+        }
+        p {
+          margin: 0;
+          color: var(--text-color);
+          font-size: var(--fs-body);
+        }
+      }
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+
+    .empty-inline {
+      color: var(--secondary-color);
+      font-size: var(--fs-body);
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-5) 0;
+    }
   }
 }
 

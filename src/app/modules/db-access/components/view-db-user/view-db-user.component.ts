@@ -1,0 +1,149 @@
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  inject,
+} from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { DB_ACCESS } from 'src/app/core/constants/routes.constant';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { DbAccessService } from '../../services/db-access.service';
+
+/**
+ * ViewDbUserComponent — read-only detail for a login role: hero header +
+ * detail sections (attributes, member-of, effective privileges summary
+ * from the /effective endpoint, and mapped app users / groups). Mirrors
+ * view-datasource's hero-card + info-card layout, adapted to role data.
+ */
+@Component({
+  selector: 'app-view-db-user',
+  templateUrl: './view-db-user.component.html',
+  styleUrls: ['./view-db-user.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class ViewDbUserComponent implements OnInit {
+  private cdr = inject(ChangeDetectorRef);
+
+  datasourceId = '';
+  roleName = '';
+  loading = true;
+  user: any = null;
+  effective: any[] = [];
+  effectiveLoading = false;
+  mappings: any[] = [];
+
+  constructor(
+    private dbAccess: DbAccessService,
+    private globalService: GlobalService,
+    private translate: TranslateService,
+    private route: ActivatedRoute,
+    private router: Router,
+  ) {}
+
+  ngOnInit(): void {
+    this.datasourceId = this.route.snapshot.paramMap.get('datasourceId') ?? '';
+    this.roleName = this.route.snapshot.paramMap.get('roleName') ?? '';
+    this.load();
+  }
+
+  private load(): void {
+    this.dbAccess
+      .loadRoles(this.datasourceId)
+      .then(() => {
+        const all = this.dbAccess.roles() ?? [];
+        this.user = all.find(r => r.name === this.roleName) ?? null;
+        if (!this.user) {
+          this.router.navigate([DB_ACCESS.workspace(this.datasourceId)]);
+          return;
+        }
+        this.loadEffective();
+        this.loadMappings();
+      })
+      .catch(() =>
+        this.router.navigate([DB_ACCESS.workspace(this.datasourceId)]),
+      )
+      .finally(() => {
+        this.loading = false;
+        this.cdr.markForCheck();
+      });
+  }
+
+  private loadEffective(): void {
+    this.effectiveLoading = true;
+    this.dbAccess
+      .loadEffective(this.datasourceId, this.roleName)
+      .then(res => {
+        this.effective = res?.status ? (res.data ?? []) : [];
+      })
+      .catch(() => (this.effective = []))
+      .finally(() => {
+        this.effectiveLoading = false;
+        this.cdr.markForCheck();
+      });
+  }
+
+  private loadMappings(): void {
+    this.dbAccess
+      .loadMappings(this.datasourceId)
+      .then(() => {
+        const all = this.dbAccess.mappings() ?? [];
+        this.mappings = all.filter(m => m.dbRoleName === this.roleName);
+        this.cdr.markForCheck();
+      })
+      .catch(() => this.cdr.markForCheck());
+  }
+
+  get attrs(): any {
+    return this.user?.attributes ?? this.user ?? {};
+  }
+
+  flags(): string[] {
+    const a = this.attrs;
+    const flags: string[] = [];
+    if (a.superuser) flags.push('SUPERUSER');
+    if (a.createdb) flags.push('CREATEDB');
+    if (a.createrole) flags.push('CREATEROLE');
+    if (a.replication) flags.push('REPLICATION');
+    if (a.bypassrls) flags.push('BYPASSRLS');
+    if (a.inherit !== false) flags.push('INHERIT');
+    return flags;
+  }
+
+  status(): 'active' | 'no-login' | 'expired' {
+    const a = this.attrs;
+    if (!(this.user?.canLogin || a.login)) return 'no-login';
+    const validUntil = a.validUntil ?? this.user?.validUntil;
+    if (validUntil && new Date(validUntil).getTime() < Date.now())
+      return 'expired';
+    return 'active';
+  }
+
+  get connLimit(): string {
+    const cl = this.attrs.connectionLimit ?? this.user?.connectionLimit;
+    if (cl === -1 || cl == null)
+      return this.translate.instant('DB_ACCESS.UNLIMITED');
+    return String(cl);
+  }
+
+  get validUntil(): string | null {
+    return this.attrs.validUntil ?? this.user?.validUntil ?? null;
+  }
+
+  mappingLabel(m: any): string {
+    return (
+      m.appUserName || m.appGroupName || m.appUserId || m.appGroupId || '—'
+    );
+  }
+
+  goBack(): void {
+    this.router.navigate([DB_ACCESS.workspace(this.datasourceId)]);
+  }
+
+  onEdit(): void {
+    this.router.navigate([
+      DB_ACCESS.userEdit(this.datasourceId, this.roleName),
+    ]);
+  }
+}

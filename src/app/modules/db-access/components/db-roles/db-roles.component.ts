@@ -6,18 +6,20 @@ import {
   OnInit,
   inject,
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { DB_ACCESS } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DbAccessService } from '../../services/db-access.service';
 import { ChangeIntent, describeChange } from '../../services/describe-change';
 
 /**
- * DbRolesComponent — group roles (canLogin === false). List with member
- * count + memberOf. Create from scratch / from template / by cloning an
- * existing role, edit, delete-wizard. A membership section attaches or
- * detaches role↔role (single or bulk). Every mutation flows through the
- * shared SQL-preview → confirm gate.
+ * DbRolesComponent — LISTING for group roles (canLogin === false). A
+ * p-table with member count + member-of and row actions (view / edit /
+ * attach / delete). Create + edit + view are now full SCREENS (routes).
+ * A membership dialog attaches / detaches role↔role and the delete wizard
+ * handles owned-object reassign / drop — both destructive confirm popups
+ * that flow through the plain-language confirm gate (never SQL).
  */
 @Component({
   selector: 'app-db-roles',
@@ -29,21 +31,12 @@ export class DbRolesComponent implements OnInit {
   @Input() datasourceId = '';
   @Input() canManage = false;
 
-  private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
 
   loading = this.dbAccess.loading;
   saving = this.dbAccess.saving;
 
   roles: any[] = [];
-  templates: any[] = [];
-
-  // ── Create / edit dialog ──────────────────────────────────────────────
-  showForm = false;
-  editing = false;
-  editingName = '';
-  roleForm!: FormGroup;
-  createMode: 'scratch' | 'template' | 'clone' = 'scratch';
 
   // ── Membership dialog ─────────────────────────────────────────────────
   showMembership = false;
@@ -73,22 +66,11 @@ export class DbRolesComponent implements OnInit {
     private dbAccess: DbAccessService,
     private globalService: GlobalService,
     private translate: TranslateService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
-    this.roleForm = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(/^[A-Za-z_][A-Za-z0-9_$]*$/)]],
-      inherit: [true],
-      createdb: [false],
-      createrole: [false],
-      templateId: [null],
-      cloneFrom: [null],
-    });
     this.load();
-    this.dbAccess.loadTemplates().then(() => {
-      this.templates = this.dbAccess.templates() ?? [];
-      this.cdr.markForCheck();
-    }).catch(() => {});
   }
 
   load(): void {
@@ -110,73 +92,18 @@ export class DbRolesComponent implements OnInit {
     return role.memberCount ?? role.members?.length ?? 0;
   }
 
-  // ── Create / edit ──────────────────────────────────────────────────────
+  // ── Navigation to full screens ──────────────────────────────────────────
 
-  openCreate(): void {
-    this.editing = false;
-    this.editingName = '';
-    this.createMode = 'scratch';
-    this.roleForm.reset({ inherit: true });
-    this.roleForm.get('name')?.enable();
-    this.showForm = true;
+  onAdd(): void {
+    this.router.navigate([DB_ACCESS.roleNew(this.datasourceId)]);
   }
 
-  openEdit(role: any): void {
-    this.editing = true;
-    this.editingName = role.name;
-    const a = role.attributes ?? role;
-    this.roleForm.reset({
-      name: role.name,
-      inherit: a.inherit !== false,
-      createdb: !!a.createdb,
-      createrole: !!a.createrole,
-      templateId: null,
-      cloneFrom: null,
-    });
-    this.roleForm.get('name')?.disable();
-    this.showForm = true;
+  onView(role: any): void {
+    this.router.navigate([DB_ACCESS.roleView(this.datasourceId, role.name)]);
   }
 
-  cancelForm(): void {
-    this.showForm = false;
-  }
-
-  submitForm(): void {
-    if (this.roleForm.invalid) return;
-    const v = this.roleForm.getRawValue();
-    const attributes: any = {
-      login: false,
-      inherit: v.inherit,
-      createdb: v.createdb,
-      createrole: v.createrole,
-    };
-
-    this.confirmPhrase = null;
-
-    if (this.editing) {
-      this.previewTitle = this.translate.instant('DB_ACCESS.PREVIEW_ALTER_ROLE');
-      this.previewDestructive = false;
-      const intent: ChangeIntent = { kind: 'alterRole', name: this.editingName, attributes };
-      this.runPreviewAndArm(
-        [intent],
-        () => this.dbAccess.updateRole(this.datasourceId, this.editingName, { attributes, previewOnly: true }),
-        () => this.dbAccess.updateRole(this.datasourceId, this.editingName, { attributes }),
-      );
-      return;
-    }
-
-    const body: any = { name: v.name, attributes };
-    if (this.createMode === 'template' && v.templateId) body.templateId = v.templateId;
-    if (this.createMode === 'clone' && v.cloneFrom) body.cloneFrom = v.cloneFrom;
-
-    this.previewTitle = this.translate.instant('DB_ACCESS.PREVIEW_CREATE_ROLE');
-    this.previewDestructive = false;
-    const intent: ChangeIntent = { kind: 'createRole', name: v.name, attributes };
-    this.runPreviewAndArm(
-      [intent],
-      () => this.dbAccess.createRole(this.datasourceId, { ...body, previewOnly: true }),
-      () => this.dbAccess.createRole(this.datasourceId, body),
-    );
+  onEdit(role: any): void {
+    this.router.navigate([DB_ACCESS.roleEdit(this.datasourceId, role.name)]);
   }
 
   // ── Membership ───────────────────────────────────────────────────────────
@@ -191,30 +118,61 @@ export class DbRolesComponent implements OnInit {
 
   submitMembership(): void {
     if (!this.membershipRoles.length || !this.membershipTarget) return;
-    const roleArg = this.membershipRoles.length === 1 ? this.membershipRoles[0] : this.membershipRoles;
+    const roleArg =
+      this.membershipRoles.length === 1
+        ? this.membershipRoles[0]
+        : this.membershipRoles;
 
     this.confirmPhrase = null;
 
     if (this.membershipMode === 'attach') {
-      const body: any = { role: roleArg, toRole: this.membershipTarget, adminOption: this.membershipAdminOption };
-      this.previewTitle = this.translate.instant('DB_ACCESS.PREVIEW_GRANT_MEMBERSHIP');
+      const body: any = {
+        role: roleArg,
+        toRole: this.membershipTarget,
+        adminOption: this.membershipAdminOption,
+      };
+      this.previewTitle = this.translate.instant(
+        'DB_ACCESS.PREVIEW_GRANT_MEMBERSHIP',
+      );
       this.previewDestructive = false;
       this.showMembership = false;
-      const intent: ChangeIntent = { kind: 'grantMembership', role: roleArg, toRole: this.membershipTarget };
+      const intent: ChangeIntent = {
+        kind: 'grantMembership',
+        role: roleArg,
+        toRole: this.membershipTarget,
+      };
       this.runPreviewAndArm(
         [intent],
-        () => this.dbAccess.attachRole(this.datasourceId, { ...body, previewOnly: true }),
+        () =>
+          this.dbAccess.attachRole(this.datasourceId, {
+            ...body,
+            previewOnly: true,
+          }),
         () => this.dbAccess.attachRole(this.datasourceId, body),
       );
     } else {
-      const body: any = { role: roleArg, toRole: this.membershipTarget, confirm: true };
-      this.previewTitle = this.translate.instant('DB_ACCESS.PREVIEW_REVOKE_MEMBERSHIP');
+      const body: any = {
+        role: roleArg,
+        toRole: this.membershipTarget,
+        confirm: true,
+      };
+      this.previewTitle = this.translate.instant(
+        'DB_ACCESS.PREVIEW_REVOKE_MEMBERSHIP',
+      );
       this.previewDestructive = true;
       this.showMembership = false;
-      const intent: ChangeIntent = { kind: 'revokeMembership', role: roleArg, toRole: this.membershipTarget };
+      const intent: ChangeIntent = {
+        kind: 'revokeMembership',
+        role: roleArg,
+        toRole: this.membershipTarget,
+      };
       this.runPreviewAndArm(
         [intent],
-        () => this.dbAccess.detachRole(this.datasourceId, { ...body, previewOnly: true }),
+        () =>
+          this.dbAccess.detachRole(this.datasourceId, {
+            ...body,
+            previewOnly: true,
+          }),
         () => this.dbAccess.detachRole(this.datasourceId, body),
       );
     }
@@ -259,7 +217,8 @@ export class DbRolesComponent implements OnInit {
     if (!this.deleteTarget) return;
     const name = this.deleteTarget.name;
     const base: any = { confirm: true };
-    if (this.deleteMode === 'reassign' && this.reassignTo) base.reassignTo = this.reassignTo;
+    if (this.deleteMode === 'reassign' && this.reassignTo)
+      base.reassignTo = this.reassignTo;
     if (this.deleteMode === 'drop') base.dropOwned = true;
 
     this.previewTitle = this.translate.instant('DB_ACCESS.PREVIEW_DELETE_ROLE');
@@ -274,7 +233,11 @@ export class DbRolesComponent implements OnInit {
     };
     this.runPreviewAndArm(
       [intent],
-      () => this.dbAccess.deleteRole(this.datasourceId, name, { ...base, previewOnly: true }),
+      () =>
+        this.dbAccess.deleteRole(this.datasourceId, name, {
+          ...base,
+          previewOnly: true,
+        }),
       () => this.dbAccess.deleteRole(this.datasourceId, name, base),
     );
   }
@@ -286,7 +249,6 @@ export class DbRolesComponent implements OnInit {
     preview: () => Promise<any>,
     execute: () => Promise<any>,
   ): void {
-    this.showForm = false;
     this.showPreview = true;
     this.previewLoading = true;
     this.summaries = intents.map(i => describeChange(i, this.translate));

@@ -13,11 +13,12 @@
           class="p-button-outlined modern-button"
         ></button>
         <button
-          *ngIf="canManage"
+          *hasPermission="'manageDatabaseAccess'; level: 'write'"
           pButton
           [label]="'DB_ACCESS.CREATE_USER' | translate"
           icon="pi pi-plus"
-          (click)="openCreate()"
+          (click)="onAdd()"
+          [disabled]="!canManage"
           class="p-button-raised p-button-primary modern-button"
         ></button>
       </div>
@@ -53,14 +54,16 @@
             <th style="min-width: 12rem">
               <div class="th-content">{{ 'DB_ACCESS.MEMBER_OF' | translate }}</div>
             </th>
-            <th style="width: 8rem" *ngIf="canManage">
+            <th style="width: 10rem">
               <div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div>
             </th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-user>
           <tr>
-            <td><span class="db-name-link">{{ user.name }}</span></td>
+            <td>
+              <a class="db-name-link" (click)="onView(user)">{{ user.name }}</a>
+            </td>
             <td>
               <span class="status-pill" [ngClass]="statusOf(user)">
                 <span class="dot"></span>
@@ -84,26 +87,38 @@
               <span *ngFor="let m of (user.memberOf ?? [])" class="count-pill">{{ m }}</span>
               <span class="muted" *ngIf="!(user.memberOf ?? []).length">—</span>
             </td>
-            <td *ngIf="canManage">
+            <td>
               <div class="row-actions">
                 <button
+                  class="icon-btn view-btn"
+                  (click)="onView(user)"
+                  [pTooltip]="'COMMON.VIEW' | translate"
+                  tooltipPosition="bottom"
+                >
+                  <i class="pi pi-eye"></i>
+                </button>
+                <button
+                  *hasPermission="'manageDatabaseAccess'; level: 'write'"
                   class="icon-btn edit-btn"
-                  (click)="openEdit(user)"
+                  (click)="onEdit(user)"
                   [pTooltip]="'COMMON.EDIT' | translate"
                   tooltipPosition="bottom"
                 >
                   <i class="pi pi-pencil"></i>
                 </button>
+                <ng-container *hasPermission="'manageDatabaseAccess'; level: 'write'">
+                  <button
+                    class="icon-btn"
+                    *ngIf="statusOf(user) !== 'no-login'"
+                    (click)="deactivate(user)"
+                    [pTooltip]="'DB_ACCESS.DEACTIVATE' | translate"
+                    tooltipPosition="bottom"
+                  >
+                    <i class="pi pi-ban"></i>
+                  </button>
+                </ng-container>
                 <button
-                  class="icon-btn"
-                  *ngIf="statusOf(user) !== 'no-login'"
-                  (click)="deactivate(user)"
-                  [pTooltip]="'DB_ACCESS.DEACTIVATE' | translate"
-                  tooltipPosition="bottom"
-                >
-                  <i class="pi pi-ban"></i>
-                </button>
-                <button
+                  *hasPermission="'manageDatabaseAccess'; level: 'delete'"
                   class="icon-btn delete-btn"
                   (click)="openDelete(user)"
                   [pTooltip]="'COMMON.DELETE' | translate"
@@ -117,7 +132,7 @@
         </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td [attr.colspan]="canManage ? 7 : 6">
+            <td colspan="7">
               <div class="empty-state-inline">
                 <i class="pi pi-users empty-state-icon"></i>
                 <span>{{ 'DB_ACCESS.NO_USERS' | translate }}</span>
@@ -130,113 +145,7 @@
   </div>
 </div>
 
-<!-- Create / edit dialog -->
-<div class="confirmation-popup" *ngIf="showForm">
-  <div class="popup-content wide">
-    <div class="popup-header">
-      <div class="popup-icon"><i class="pi pi-user"></i></div>
-      <h3>{{ (editing ? 'DB_ACCESS.EDIT_USER' : 'DB_ACCESS.CREATE_USER') | translate }}</h3>
-    </div>
-    <div class="popup-body">
-      <form [formGroup]="userForm">
-        <div class="form-field">
-          <app-custom-input
-            formControlName="name"
-            [label]="'DB_ACCESS.ROLE_NAME' | translate"
-            [placeholder]="'DB_ACCESS.ROLE_NAME_PLACEHOLDER' | translate"
-            icon="pi-user"
-            [required]="true"
-            [showError]="!!(userForm.get('name')?.invalid && userForm.get('name')?.touched)"
-            [errorMessage]="'DB_ACCESS.ROLE_NAME_INVALID' | translate"
-          ></app-custom-input>
-        </div>
-
-        <div class="form-row">
-          <div class="form-field">
-            <app-custom-input
-              formControlName="password"
-              [label]="'DB_ACCESS.PASSWORD' | translate"
-              type="password"
-              [showPasswordToggle]="true"
-              icon="pi-lock"
-              [placeholder]="(editing ? 'DB_ACCESS.PASSWORD_UNCHANGED' : 'DB_ACCESS.PASSWORD_PLACEHOLDER') | translate"
-            ></app-custom-input>
-          </div>
-          <div class="form-field">
-            <app-custom-number
-              formControlName="connectionLimit"
-              [label]="'DB_ACCESS.CONN_LIMIT' | translate"
-              [min]="-1"
-              [placeholder]="'DB_ACCESS.UNLIMITED' | translate"
-            ></app-custom-number>
-          </div>
-        </div>
-
-        <div class="form-field">
-          <app-custom-calendar
-            formControlName="validUntil"
-            [label]="'DB_ACCESS.VALID_UNTIL' | translate"
-            [showTime]="false"
-          ></app-custom-calendar>
-        </div>
-
-        <label class="field-label">{{ 'DB_ACCESS.ATTRIBUTES' | translate }}</label>
-        <div class="flags-grid">
-          <label class="flag-toggle"><span>INHERIT</span>
-            <p-inputSwitch formControlName="inherit"></p-inputSwitch></label>
-          <label class="flag-toggle"><span>CREATEDB</span>
-            <p-inputSwitch formControlName="createdb"></p-inputSwitch></label>
-          <label class="flag-toggle"><span>CREATEROLE</span>
-            <p-inputSwitch formControlName="createrole"></p-inputSwitch></label>
-          <label class="flag-toggle"><span>REPLICATION</span>
-            <p-inputSwitch formControlName="replication"></p-inputSwitch></label>
-          <label class="flag-toggle danger"><span>SUPERUSER</span>
-            <p-inputSwitch formControlName="superuser"></p-inputSwitch></label>
-          <label class="flag-toggle danger"><span>BYPASSRLS</span>
-            <p-inputSwitch formControlName="bypassrls"></p-inputSwitch></label>
-        </div>
-
-        <!-- Attach to app user/group (create only) -->
-        <div class="attach-block" *ngIf="!editing">
-          <label class="field-label">{{ 'DB_ACCESS.ATTACH_MAPPING' | translate }}</label>
-          <div class="form-row">
-            <div class="form-field">
-              <app-custom-dropdown
-                formControlName="attachType"
-                [options]="[
-                  { label: ('DB_ACCESS.APP_USER' | translate), value: 'user' },
-                  { label: ('DB_ACCESS.APP_GROUP' | translate), value: 'group' }
-                ]"
-                optionLabel="label"
-                optionValue="value"
-                [showClear]="true"
-                [label]="'DB_ACCESS.MAPPING_TYPE' | translate"
-              ></app-custom-dropdown>
-            </div>
-            <div class="form-field">
-              <app-custom-input
-                formControlName="attachId"
-                [label]="'DB_ACCESS.APP_ENTITY_ID' | translate"
-                [placeholder]="'DB_ACCESS.APP_ENTITY_ID_PLACEHOLDER' | translate"
-                icon="pi-link"
-              ></app-custom-input>
-            </div>
-          </div>
-        </div>
-      </form>
-    </div>
-    <div class="popup-actions">
-      <button class="btn-cancel" (click)="cancelForm()">
-        <i class="pi pi-times"></i>{{ 'COMMON.CANCEL' | translate }}
-      </button>
-      <button class="btn-confirm" [disabled]="userForm.invalid" (click)="submitForm()">
-        <i class="pi pi-eye"></i>{{ 'DB_ACCESS.REVIEW_SQL' | translate }}
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Delete wizard -->
+<!-- Delete wizard — destructive confirm popup (plain-language, no SQL) -->
 <div class="confirmation-popup" *ngIf="showDelete">
   <div class="popup-content wide">
     <div class="popup-header">

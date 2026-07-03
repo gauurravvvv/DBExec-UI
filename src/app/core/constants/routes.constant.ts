@@ -62,6 +62,26 @@ export const USER = {
 };
 
 export const DATASOURCE = feature('/app/datasources');
+
+// Database Access Management. The module is datasource-scoped: the home
+// picker lands at LIST, then everything nests under /:datasourceId. The
+// helpers below build the workspace + REST-shaped user / role screens.
+export const DB_ACCESS = {
+  LIST: '/app/db-access',
+  workspace: (dsId: string | number) => `/app/db-access/${dsId}`,
+  // Users (login roles)
+  userNew: (dsId: string | number) => `/app/db-access/${dsId}/users/new`,
+  userView: (dsId: string | number, roleName: string) =>
+    `/app/db-access/${dsId}/users/${roleName}`,
+  userEdit: (dsId: string | number, roleName: string) =>
+    `/app/db-access/${dsId}/users/${roleName}/edit`,
+  // Roles (group roles)
+  roleNew: (dsId: string | number) => `/app/db-access/${dsId}/roles/new`,
+  roleView: (dsId: string | number, roleName: string) =>
+    `/app/db-access/${dsId}/roles/${roleName}`,
+  roleEdit: (dsId: string | number, roleName: string) =>
+    `/app/db-access/${dsId}/roles/${roleName}/edit`,
+};
 export const DATASET = feature('/app/datasets');
 export const TAB = feature('/app/tabs');
 export const SECTION = feature('/app/sections');

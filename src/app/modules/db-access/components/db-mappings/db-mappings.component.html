@@ -13,11 +13,12 @@
           class="p-button-outlined modern-button"
         ></button>
         <button
-          *ngIf="canManage"
+          *hasPermission="'manageDatabaseAccess'; level: 'write'"
           pButton
           [label]="'DB_ACCESS.ATTACH_MAPPING' | translate"
           icon="pi pi-plus"
           (click)="openAttach()"
+          [disabled]="!canManage"
           class="p-button-raised p-button-primary modern-button"
         ></button>
       </div>
@@ -39,7 +40,7 @@
             <th><div class="th-content">{{ 'DB_ACCESS.APP_ENTITY' | translate }}</div></th>
             <th><div class="th-content">{{ 'DB_ACCESS.DB_ROLE' | translate }}</div></th>
             <th><div class="th-content">{{ 'DB_ACCESS.NOTES' | translate }}</div></th>
-            <th style="width: 6rem" *ngIf="canManage"><div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div></th>
+            <th style="width: 6rem"><div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div></th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-m>
@@ -53,9 +54,10 @@
             <td>{{ m.appUserName || m.appGroupName || m.appUserId || m.appGroupId }}</td>
             <td><span class="flag-chip">{{ m.dbRoleName }}</span></td>
             <td><span class="muted">{{ m.notes || '—' }}</span></td>
-            <td *ngIf="canManage">
+            <td>
               <div class="row-actions">
-                <button class="icon-btn delete-btn" (click)="openDetach(m)"
+                <button *hasPermission="'manageDatabaseAccess'; level: 'delete'"
+                  class="icon-btn delete-btn" (click)="openDetach(m)"
                   [pTooltip]="'DB_ACCESS.DETACH' | translate" tooltipPosition="bottom">
                   <i class="pi pi-unlink"></i>
                 </button>
@@ -65,7 +67,7 @@
         </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td [attr.colspan]="canManage ? 5 : 4">
+            <td colspan="5">
               <div class="empty-state-inline">
                 <i class="pi pi-link empty-state-icon"></i>
                 <span>{{ 'DB_ACCESS.NO_MAPPINGS' | translate }}</span>
@@ -88,31 +90,35 @@
     <div class="popup-body">
       <div class="form-field">
         <app-custom-dropdown
-          [(ngModel)]="attachType"
-          [options]="[
-            { label: ('DB_ACCESS.APP_USER' | translate), value: 'user' },
-            { label: ('DB_ACCESS.APP_GROUP' | translate), value: 'group' }
-          ]"
-          optionLabel="label"
-          optionValue="value"
-          [label]="'DB_ACCESS.MAPPING_TYPE' | translate"
-        ></app-custom-dropdown>
-      </div>
-      <div class="form-field">
-        <app-custom-input
-          [(ngModel)]="attachEntityId"
-          [label]="'DB_ACCESS.APP_ENTITY_ID' | translate"
-          [placeholder]="'DB_ACCESS.APP_ENTITY_ID_PLACEHOLDER' | translate"
-          icon="pi-id-card"
-        ></app-custom-input>
-      </div>
-      <div class="form-field">
-        <app-custom-dropdown
           [(ngModel)]="attachRole"
           [options]="roleNames"
           [filter]="true"
           [label]="'DB_ACCESS.DB_ROLE' | translate"
         ></app-custom-dropdown>
+      </div>
+      <div class="form-field">
+        <app-custom-multiselect
+          [(ngModel)]="attachUserIds"
+          [options]="appUserOptions"
+          optionLabel="label"
+          optionValue="value"
+          [filter]="true"
+          filterBy="label"
+          [label]="'DB_ACCESS.APP_USERS' | translate"
+          [placeholder]="'DB_ACCESS.SELECT_APP_USERS' | translate"
+        ></app-custom-multiselect>
+      </div>
+      <div class="form-field">
+        <app-custom-multiselect
+          [(ngModel)]="attachGroupIds"
+          [options]="appGroupOptions"
+          optionLabel="label"
+          optionValue="value"
+          [filter]="true"
+          filterBy="label"
+          [label]="'DB_ACCESS.APP_GROUPS' | translate"
+          [placeholder]="'DB_ACCESS.SELECT_APP_GROUPS' | translate"
+        ></app-custom-multiselect>
       </div>
       <div class="form-field">
         <app-custom-input
@@ -126,7 +132,7 @@
       <button class="btn-cancel" (click)="cancelAttach()">
         <i class="pi pi-times"></i>{{ 'COMMON.CANCEL' | translate }}
       </button>
-      <button class="btn-confirm" [disabled]="!attachEntityId || !attachRole || saving()" (click)="submitAttach()">
+      <button class="btn-confirm" [disabled]="!attachValid || saving()" (click)="submitAttach()">
         <i class="pi" [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-check'"></i>{{ 'DB_ACCESS.ATTACH' | translate }}
       </button>
     </div>

@@ -7,12 +7,18 @@ import {
   inject,
 } from '@angular/core';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { GroupService } from 'src/app/modules/groups/services/group.service';
+import { UserService } from 'src/app/modules/users/services/user.service';
 import { DbAccessService } from '../../services/db-access.service';
 
 /**
  * DbMappingsComponent — the DBExec-side bridge: app-user / app-group ↔
- * DB-role-name mappings for this datasource (FR-6.1, v1 storage only).
- * List + attach / detach dialogs. Detach requires an explicit confirm.
+ * DB-role-name mappings for this datasource. List + attach / detach.
+ * The attach dialog picks app users + groups from TWO multiselects
+ * (populated from UserService / GroupService) — no free-text id. Each
+ * selected user becomes { appUserId, mappingType:'user' } and each group
+ * { appGroupId, mappingType:'group' } on the mappings endpoint. Detach
+ * requires an explicit confirm.
  */
 @Component({
   selector: 'app-db-mappings',
@@ -32,10 +38,14 @@ export class DbMappingsComponent implements OnInit {
   mappings: any[] = [];
   roleNames: string[] = [];
 
+  // App user / group pickers.
+  appUserOptions: { label: string; value: string }[] = [];
+  appGroupOptions: { label: string; value: string }[] = [];
+
   // attach dialog
   showAttach = false;
-  attachType: 'user' | 'group' = 'user';
-  attachEntityId = '';
+  attachUserIds: string[] = [];
+  attachGroupIds: string[] = [];
   attachRole = '';
   attachNotes = '';
 
@@ -45,27 +55,69 @@ export class DbMappingsComponent implements OnInit {
 
   constructor(
     private dbAccess: DbAccessService,
+    private userService: UserService,
+    private groupService: GroupService,
     private globalService: GlobalService,
   ) {}
 
   ngOnInit(): void {
     this.load();
-    this.dbAccess.loadRoles(this.datasourceId).then(() => {
-      this.roleNames = (this.dbAccess.roles() ?? []).map(r => r.name);
-      this.cdr.markForCheck();
-    }).catch(() => {});
+    this.dbAccess
+      .loadRoles(this.datasourceId)
+      .then(() => {
+        this.roleNames = (this.dbAccess.roles() ?? []).map(r => r.name);
+        this.cdr.markForCheck();
+      })
+      .catch(() => {});
+    this.loadAppEntities();
   }
 
   load(): void {
-    this.dbAccess.loadMappings(this.datasourceId).then(() => {
-      this.mappings = this.dbAccess.mappings() ?? [];
-      this.cdr.markForCheck();
-    }).catch(() => this.cdr.markForCheck());
+    this.dbAccess
+      .loadMappings(this.datasourceId)
+      .then(() => {
+        this.mappings = this.dbAccess.mappings() ?? [];
+        this.cdr.markForCheck();
+      })
+      .catch(() => this.cdr.markForCheck());
+  }
+
+  private loadAppEntities(): void {
+    this.userService
+      .listUser({ page: 1, limit: 1000 })
+      .then((res: any) => {
+        if (this.globalService.handleSuccessService(res, false)) {
+          this.appUserOptions = (res?.data?.users ?? []).map((u: any) => ({
+            value: u.id,
+            label: this.userLabel(u),
+          }));
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => this.cdr.markForCheck());
+
+    this.groupService
+      .listGroups({ page: 1, limit: 1000 })
+      .then((res: any) => {
+        if (this.globalService.handleSuccessService(res, false)) {
+          this.appGroupOptions = (res?.data?.groups ?? []).map((g: any) => ({
+            value: g.id,
+            label: g.name,
+          }));
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => this.cdr.markForCheck());
+  }
+
+  private userLabel(u: any): string {
+    const full = [u.firstName, u.lastName].filter(Boolean).join(' ').trim();
+    return full || u.username || u.email || u.id;
   }
 
   openAttach(): void {
-    this.attachType = 'user';
-    this.attachEntityId = '';
+    this.attachUserIds = [];
+    this.attachGroupIds = [];
     this.attachRole = '';
     this.attachNotes = '';
     this.showAttach = true;
@@ -75,26 +127,46 @@ export class DbMappingsComponent implements OnInit {
     this.showAttach = false;
   }
 
-  submitAttach(): void {
-    if (!this.attachEntityId || !this.attachRole) return;
-    const body: any = {
-      dbRoleName: this.attachRole,
-      mappingType: this.attachType,
-      notes: this.attachNotes || undefined,
-    };
-    if (this.attachType === 'group') body.appGroupId = this.attachEntityId;
-    else body.appUserId = this.attachEntityId;
+  get attachValid(): boolean {
+    return (
+      !!this.attachRole &&
+      (this.attachUserIds.length > 0 || this.attachGroupIds.length > 0)
+    );
+  }
 
-    this.dbAccess
-      .attachMapping(this.datasourceId, body)
-      .then(res => {
-        if (this.globalService.handleSuccessService(res)) {
-          this.showAttach = false;
-          this.load();
-        }
-      })
-      .catch(() => {})
-      .finally(() => this.cdr.markForCheck());
+  async submitAttach(): Promise<void> {
+    if (!this.attachValid) return;
+    const notes = this.attachNotes || undefined;
+    const payloads: any[] = [];
+    this.attachUserIds.forEach(id =>
+      payloads.push({
+        appUserId: id,
+        mappingType: 'user',
+        dbRoleName: this.attachRole,
+        notes,
+      }),
+    );
+    this.attachGroupIds.forEach(id =>
+      payloads.push({
+        appGroupId: id,
+        mappingType: 'group',
+        dbRoleName: this.attachRole,
+        notes,
+      }),
+    );
+
+    let ok = true;
+    for (const body of payloads) {
+      try {
+        const res = await this.dbAccess.attachMapping(this.datasourceId, body);
+        if (!this.globalService.handleSuccessService(res)) ok = false;
+      } catch {
+        ok = false;
+      }
+    }
+    if (ok) this.showAttach = false;
+    this.load();
+    this.cdr.markForCheck();
   }
 
   openDetach(mapping: any): void {
@@ -110,7 +182,10 @@ export class DbMappingsComponent implements OnInit {
   proceedDetach(): void {
     if (!this.detachTarget) return;
     this.dbAccess
-      .detachMapping(this.datasourceId, { id: this.detachTarget.id, confirm: true })
+      .detachMapping(this.datasourceId, {
+        id: this.detachTarget.id,
+        confirm: true,
+      })
       .then(res => {
         if (this.globalService.handleSuccessService(res)) {
           this.showDetach = false;

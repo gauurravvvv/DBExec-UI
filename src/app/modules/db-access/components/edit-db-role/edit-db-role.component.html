@@ -1,0 +1,96 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text back-button"
+          [routerLink]="['/app/db-access', datasourceId]"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>{{ 'DB_ACCESS.EDIT_ROLE' | translate }}</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          [label]="'COMMON.CANCEL' | translate"
+          class="p-button-outlined btn-cancel"
+          (click)="onCancel()"
+        ></button>
+        <button
+          *hasPermission="'manageDatabaseAccess'; level: 'write'"
+          pButton
+          class="p-button-primary btn-save"
+          type="button"
+          [label]="'DB_ACCESS.REVIEW_SQL' | translate"
+          (click)="onSubmit()"
+          [disabled]="roleForm.invalid || saving() || loadingRole"
+        >
+          <i
+            class="pi mr-2"
+            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-eye'"
+          ></i>
+        </button>
+      </div>
+    </div>
+
+    <form [formGroup]="roleForm" class="admin-form" *ngIf="!loadingRole">
+      <div class="left-section">
+        <div class="form-grid">
+          <app-custom-input
+            formControlName="name"
+            [label]="'DB_ACCESS.ROLE_NAME' | translate"
+            icon="pi-id-card"
+            [readonly]="true"
+          ></app-custom-input>
+
+          <h3 class="form-section-title">
+            {{ 'DB_ACCESS.ATTRIBUTES' | translate }}
+          </h3>
+          <div class="attr-toggles">
+            <label class="attr-toggle">
+              <span class="attr-meta">
+                <span class="attr-name">INHERIT</span>
+                <span class="attr-desc">{{ 'DB_ACCESS.ATTR_INHERIT' | translate }}</span>
+              </span>
+              <p-inputSwitch formControlName="inherit"></p-inputSwitch>
+            </label>
+            <label class="attr-toggle">
+              <span class="attr-meta">
+                <span class="attr-name">CREATEDB</span>
+                <span class="attr-desc">{{ 'DB_ACCESS.ATTR_CREATEDB' | translate }}</span>
+              </span>
+              <p-inputSwitch formControlName="createdb"></p-inputSwitch>
+            </label>
+            <label class="attr-toggle">
+              <span class="attr-meta">
+                <span class="attr-name">CREATEROLE</span>
+                <span class="attr-desc">{{ 'DB_ACCESS.ATTR_CREATEROLE' | translate }}</span>
+              </span>
+              <p-inputSwitch formControlName="createrole"></p-inputSwitch>
+            </label>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="cap-loading" *ngIf="loadingRole">
+      <i class="pi pi-spin pi-spinner"></i>
+      {{ 'COMMON.LOADING' | translate }}
+    </div>
+  </div>
+</div>
+
+<app-change-summary-dialog
+  [visible]="showPreview"
+  [title]="previewTitle"
+  [summaries]="summaries"
+  [destructive]="previewDestructive"
+  [confirmPhrase]="confirmPhrase"
+  [loading]="previewLoading"
+  [executing]="saving()"
+  (confirmed)="confirmPreview()"
+  (cancelled)="cancelPreview()"
+></app-change-summary-dialog>

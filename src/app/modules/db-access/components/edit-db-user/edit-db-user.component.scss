@@ -1,0 +1,12 @@
+@use '../../styles/db-access-shared' as db;
+
+@include db.db-access-form;
+@include db.db-access-dialog;
+
+.cap-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  color: var(--secondary-color);
+  padding: var(--space-7);
+}
