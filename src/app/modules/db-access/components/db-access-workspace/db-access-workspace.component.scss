@@ -1,0 +1,93 @@
+@use '../../styles/db-access-shared' as db;
+
+@include db.db-access-page;
+
+.breadcrumb-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+
+  .back-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    background: var(--card-background);
+    border-radius: var(--radius-sm);
+    color: var(--secondary-color);
+    cursor: pointer;
+    transition: all var(--motion-base);
+
+    &:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+  }
+
+  .ds-name {
+    color: var(--secondary-color);
+    font-weight: var(--fw-regular);
+  }
+}
+
+.cap-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-control);
+  font-weight: var(--fw-semibold);
+
+  &.full {
+    background: var(--success-bg, rgba(34, 197, 94, 0.12));
+    color: var(--success-color, #16a34a);
+  }
+  &.readonly {
+    background: var(--warning-bg, rgba(245, 158, 11, 0.12));
+    color: var(--warning-color, #d97706);
+  }
+}
+
+.cap-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-8);
+  color: var(--secondary-color);
+}
+
+::ng-deep .db-access-tabs {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .p-tabview-nav {
+    background: transparent;
+    border-bottom: 1px solid var(--border-color);
+
+    li .p-tabview-nav-link {
+      background: transparent;
+      border: none;
+      color: var(--secondary-color);
+      font-weight: var(--fw-medium);
+      padding: 0.75rem 1.1rem;
+
+      &:not(.p-disabled):focus { box-shadow: none; }
+    }
+
+    li.p-highlight .p-tabview-nav-link {
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--primary-color);
+    }
+  }
+
+  .p-tabview-panels {
+    background: transparent;
+    padding: 1.25rem 0 0;
+    flex: 1;
+    min-height: 0;
+  }
+}

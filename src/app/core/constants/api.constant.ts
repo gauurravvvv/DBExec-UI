@@ -342,6 +342,53 @@ export const ORG_POLICY = {
   UPDATE_EMAIL: '/api/v1/org-policy/email',
 };
 
+/**
+ * Database Access Management — UI over PostgreSQL native roles / users /
+ * grants for a chosen datasource. Every path is scoped by :datasourceId
+ * (except the org-wide /templates group). Prefixes ending in `/` are
+ * concatenated with the datasource id; suffixes complete the sub-resource.
+ * All under `/api/v1/db-access`.
+ */
+export const DB_ACCESS = {
+  // GET /db-access/:datasourceId/capability
+  BASE: '/db-access/',
+  CAPABILITY_SUFFIX: '/capability',
+  // GET /db-access/:datasourceId/roles  (users [canLogin] + roles split FE-side)
+  ROLES_SUFFIX: '/roles',
+  // GET /db-access/:datasourceId/memberships
+  MEMBERSHIPS_SUFFIX: '/memberships',
+  // POST /db-access/:datasourceId/memberships/remove
+  MEMBERSHIPS_REMOVE_SUFFIX: '/memberships/remove',
+  // GET /db-access/:datasourceId/schemas
+  SCHEMAS_SUFFIX: '/schemas',
+  // GET /db-access/:datasourceId/grants/tables?schema=
+  GRANTS_TABLES_SUFFIX: '/grants/tables',
+  // GET /db-access/:datasourceId/grants/columns?schema=&table=
+  GRANTS_COLUMNS_SUFFIX: '/grants/columns',
+  // GET /db-access/:datasourceId/grants/export
+  GRANTS_EXPORT_SUFFIX: '/grants/export',
+  // GET /db-access/:datasourceId/default-privileges
+  DEFAULT_PRIVILEGES_SUFFIX: '/default-privileges',
+  // GET /db-access/:datasourceId/effective/:roleName
+  EFFECTIVE_SEGMENT: '/effective/',
+  // GET /db-access/:datasourceId/roles/:roleName/owned
+  ROLE_SEGMENT: '/roles/',
+  OWNED_SUFFIX: '/owned',
+  RENAME_SUFFIX: '/rename',
+  DELETE_SUFFIX: '/delete',
+  // POST /db-access/:datasourceId/change-set
+  CHANGE_SET_SUFFIX: '/change-set',
+  // GET /db-access/:datasourceId/mappings
+  MAPPINGS_SUFFIX: '/mappings',
+  MAPPINGS_REMOVE_SUFFIX: '/mappings/remove',
+  // GET /db-access/:datasourceId/audit
+  AUDIT_SUFFIX: '/audit',
+  // Org-wide templates
+  TEMPLATES: '/db-access/templates',
+  TEMPLATE_DELETE_PREFIX: '/db-access/templates/', // POST /db-access/templates/:id/delete
+  TEMPLATE_DELETE_SUFFIX: '/delete',
+};
+
 export const NOTIFICATION = {
   // GET — last 30 days for the logged-in user
   LIST: '/notifications',

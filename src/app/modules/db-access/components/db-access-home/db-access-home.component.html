@@ -1,0 +1,87 @@
+<div class="dataset-page-wrapper">
+  <div class="dataset-content-container">
+    <div class="page-header-section">
+      <div class="header-content">
+        <h2>{{ 'DB_ACCESS.TITLE' | translate }}</h2>
+        <p class="subtitle">{{ 'DB_ACCESS.SUBTITLE' | translate }}</p>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <div class="landing-panel">
+        <div class="picker-block">
+          <label class="picker-label">
+            <i class="pi pi-database"></i>
+            {{ 'DB_ACCESS.SELECT_DATASOURCE' | translate }}
+          </label>
+          <app-custom-dropdown
+            [(ngModel)]="selectedDatasource"
+            [serverMode]="true"
+            [fetcher]="loadDatasourcesPage"
+            [pageSize]="10"
+            [preloadedItems]="preloadedDatasources"
+            [preloadedTotal]="preloadedDatasourcesTotal"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            [floatingLabel]="true"
+            [label]="'COMMON.DATASOURCE' | translate"
+            filterBy="name"
+            (onChangeEvent)="onDatasourceChange($event)"
+            icon="pi-database"
+          ></app-custom-dropdown>
+        </div>
+
+        <!-- Probing -->
+        <div class="probe-state" *ngIf="probing">
+          <i class="pi pi-spin pi-spinner"></i>
+          {{ 'DB_ACCESS.CHECKING_CAPABILITY' | translate }}
+        </div>
+
+        <!-- Non-postgres -->
+        <div class="capability-banner unsupported" *ngIf="unsupported && !probing">
+          <i class="pi pi-info-circle"></i>
+          <div class="banner-text">
+            <strong>{{ 'DB_ACCESS.UNSUPPORTED_TITLE' | translate }}</strong>
+            <span>{{ 'DB_ACCESS.UNSUPPORTED_BODY' | translate }}</span>
+          </div>
+        </div>
+
+        <!-- Full management -->
+        <div
+          class="capability-banner full"
+          *ngIf="capability && canManage && !probing"
+        >
+          <i class="pi pi-check-circle"></i>
+          <div class="banner-text">
+            <strong>{{ 'DB_ACCESS.CAP_FULL_TITLE' | translate }}</strong>
+            <span>{{ 'DB_ACCESS.CAP_FULL_BODY' | translate }}</span>
+          </div>
+        </div>
+
+        <!-- Read-only / under-privileged -->
+        <div
+          class="capability-banner readonly"
+          *ngIf="capability && !canManage && !probing"
+        >
+          <i class="pi pi-exclamation-triangle"></i>
+          <div class="banner-text">
+            <strong>{{ 'DB_ACCESS.CAP_READONLY_TITLE' | translate }}</strong>
+            <span>{{ 'DB_ACCESS.CAP_READONLY_BODY' | translate }}</span>
+          </div>
+        </div>
+
+        <div class="landing-actions" *ngIf="capability && !unsupported && !probing">
+          <button
+            pButton
+            [label]="'DB_ACCESS.OPEN_WORKSPACE' | translate"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            (click)="openWorkspace()"
+            class="p-button-raised p-button-primary modern-button"
+          ></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

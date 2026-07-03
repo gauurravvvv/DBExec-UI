@@ -1,0 +1,24 @@
+@use '../../styles/db-access-shared' as db;
+
+@include db.db-access-page;
+@include db.db-access-table;
+@include db.db-access-dialog;
+
+.tab-body { height: 100%; display: flex; flex-direction: column; }
+
+.card-toolbar .toolbar-title {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  color: var(--text-color);
+}
+
+.muted { color: var(--secondary-color); }
+.count-pill > i { margin-right: 3px; }
+
+.delete-intro {
+  color: var(--secondary-color);
+  text-align: center;
+  margin: 0.5rem 0;
+  font-size: var(--fs-body);
+  line-height: 1.5;
+}

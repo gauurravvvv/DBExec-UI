@@ -1,0 +1,58 @@
+@use '../../styles/db-access-shared' as db;
+
+@include db.db-access-page;
+@include db.db-access-table;
+@include db.db-access-dialog;
+
+.tab-body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-toolbar .toolbar-title {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  color: var(--text-color);
+}
+
+.muted { color: var(--secondary-color); }
+.date-text { color: var(--text-muted, var(--secondary-color)); font-variant-numeric: tabular-nums; }
+
+.delete-intro {
+  color: var(--secondary-color);
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: var(--fs-body);
+  line-height: 1.5;
+}
+
+.owned-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  color: var(--secondary-color);
+  padding: var(--space-5) 0;
+}
+
+.delete-mode {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: 0.75rem;
+
+  .mode-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-size: var(--fs-body);
+    color: var(--text-color);
+    cursor: pointer;
+  }
+
+  .reassign-picker { margin: 0 0 var(--space-4) 1.5rem; }
+}
+
+.flags-grid .flag-toggle.danger span { color: var(--error-color); }
+
+.attach-block { margin-top: 1rem; }

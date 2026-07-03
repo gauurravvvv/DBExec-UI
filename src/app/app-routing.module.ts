@@ -99,6 +99,18 @@ const routes: Routes = [
         },
       },
       {
+        path: 'db-access',
+        loadChildren: () =>
+          import('./modules/db-access/db-access.module').then(
+            m => m.DbAccessModule,
+          ),
+        canActivate: [roleGuard],
+        data: {
+          permission: PERMISSIONS.MANAGE_DATABASE_ACCESS,
+          title: 'PAGE_TITLES.DB_ACCESS',
+        },
+      },
+      {
         path: 'roles',
         loadChildren: () =>
           import('./modules/role/role.module').then(m => m.RoleModule),

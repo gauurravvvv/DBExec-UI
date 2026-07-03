@@ -1,0 +1,64 @@
+<div class="tab-body">
+  <div class="content-card">
+    <div class="card-toolbar">
+      <div class="toolbar-left">
+        <div class="dropdown-field">
+          <app-custom-dropdown
+            [(ngModel)]="selectedRole"
+            [options]="roleNames"
+            [filter]="true"
+            [floatingLabel]="true"
+            [label]="'DB_ACCESS.PICK_ROLE' | translate"
+            (onChangeEvent)="onRoleChange($event)"
+            icon="pi-id-card"
+          ></app-custom-dropdown>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <p-table
+        [value]="rows"
+        [rows]="15"
+        [paginator]="rows.length > 15"
+        [rowHover]="true"
+        styleClass="p-datatable-sm modern-table"
+        [loading]="loadingRows"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th><div class="th-content">{{ 'DB_ACCESS.OBJECT' | translate }}</div></th>
+            <th style="width: 8rem"><div class="th-content">{{ 'DB_ACCESS.OBJECT_TYPE' | translate }}</div></th>
+            <th><div class="th-content">{{ 'DB_ACCESS.PRIVILEGE' | translate }}</div></th>
+            <th><div class="th-content">{{ 'DB_ACCESS.VIA' | translate }}</div></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td>
+              <span class="obj-name">{{ row.schema ? row.schema + '.' : '' }}{{ row.object || row.table || row.name }}</span>
+            </td>
+            <td><span class="count-pill">{{ row.objectType || row.type || 'table' }}</span></td>
+            <td><span class="flag-chip">{{ row.privilege || row.priv }}</span></td>
+            <td>
+              <span class="via-chip" *ngIf="row.via && row.via !== selectedRole; else direct">
+                <i class="pi pi-sitemap"></i> {{ row.via }}
+              </span>
+              <ng-template #direct><span class="muted">{{ 'DB_ACCESS.DIRECT' | translate }}</span></ng-template>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="4">
+              <div class="empty-state-inline">
+                <i class="pi pi-eye empty-state-icon"></i>
+                <span>{{ (selectedRole ? 'DB_ACCESS.NO_EFFECTIVE' : 'DB_ACCESS.PICK_ROLE_PROMPT') | translate }}</span>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>

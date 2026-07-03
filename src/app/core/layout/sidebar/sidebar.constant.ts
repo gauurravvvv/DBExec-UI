@@ -16,6 +16,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
   { value: 'groupManagement', route: '/app/groups' },
   { value: 'roleManagement', route: '/app/roles' },
   { value: 'setupDB', route: '/app/datasources' },
+  { value: 'manageDatabaseAccess', route: '/app/db-access' },
   { value: 'datasetManager', route: '/app/datasets' },
   { value: 'analyses', route: '/app/analyses' },
   { value: 'queryBuilderTab', route: '/app/tabs' },

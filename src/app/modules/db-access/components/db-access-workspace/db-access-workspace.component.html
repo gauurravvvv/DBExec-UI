@@ -1,0 +1,86 @@
+<div class="dataset-page-wrapper">
+  <div class="dataset-content-container">
+    <div class="page-header-section">
+      <div class="header-content">
+        <div class="breadcrumb-row">
+          <button class="back-btn" (click)="back()">
+            <i class="pi pi-arrow-left"></i>
+          </button>
+          <h2>
+            {{ 'DB_ACCESS.TITLE' | translate }}
+            <span class="ds-name" *ngIf="datasourceName">— {{ datasourceName }}</span>
+          </h2>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span class="cap-badge full" *ngIf="!loadingCapability && canManage">
+          <i class="pi pi-check-circle"></i>
+          {{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}
+        </span>
+        <span class="cap-badge readonly" *ngIf="!loadingCapability && !canManage">
+          <i class="pi pi-lock"></i>
+          {{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}
+        </span>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <div class="cap-loading" *ngIf="loadingCapability">
+        <i class="pi pi-spin pi-spinner"></i>
+        {{ 'DB_ACCESS.CHECKING_CAPABILITY' | translate }}
+      </div>
+
+      <p-tabView
+        *ngIf="!loadingCapability"
+        [(activeIndex)]="activeIndex"
+        styleClass="db-access-tabs"
+      >
+        <p-tabPanel [header]="'DB_ACCESS.TAB_USERS' | translate">
+          <app-db-users
+            *ngIf="activeIndex === 0"
+            [datasourceId]="datasourceId"
+            [canManage]="canManage"
+          ></app-db-users>
+        </p-tabPanel>
+
+        <p-tabPanel [header]="'DB_ACCESS.TAB_ROLES' | translate">
+          <app-db-roles
+            *ngIf="activeIndex === 1"
+            [datasourceId]="datasourceId"
+            [canManage]="canManage"
+          ></app-db-roles>
+        </p-tabPanel>
+
+        <p-tabPanel [header]="'DB_ACCESS.TAB_PRIVILEGES' | translate">
+          <app-db-grant-matrix
+            *ngIf="activeIndex === 2"
+            [datasourceId]="datasourceId"
+            [canManage]="canManage"
+          ></app-db-grant-matrix>
+        </p-tabPanel>
+
+        <p-tabPanel [header]="'DB_ACCESS.TAB_EFFECTIVE' | translate">
+          <app-db-effective-privileges
+            *ngIf="activeIndex === 3"
+            [datasourceId]="datasourceId"
+          ></app-db-effective-privileges>
+        </p-tabPanel>
+
+        <p-tabPanel [header]="'DB_ACCESS.TAB_MAPPINGS' | translate">
+          <app-db-mappings
+            *ngIf="activeIndex === 4"
+            [datasourceId]="datasourceId"
+            [canManage]="canManage"
+          ></app-db-mappings>
+        </p-tabPanel>
+
+        <p-tabPanel [header]="'DB_ACCESS.TAB_AUDIT' | translate">
+          <app-db-audit
+            *ngIf="activeIndex === 5"
+            [datasourceId]="datasourceId"
+          ></app-db-audit>
+        </p-tabPanel>
+      </p-tabView>
+    </div>
+  </div>
+</div>
