@@ -1,18 +1,19 @@
 <div class="tab-body">
-  <div class="content-card">
-    <div class="card-toolbar">
-      <div class="toolbar-left">
-        <div class="dropdown-field">
-          <app-custom-dropdown
-            [(ngModel)]="selectedRole"
-            [options]="roleNames"
-            [filter]="true"
-            [floatingLabel]="true"
-            [label]="'DB_ACCESS.PICK_ROLE' | translate"
-            (onChangeEvent)="onRoleChange($event)"
-            icon="pi-id-card"
-          ></app-custom-dropdown>
-        </div>
+    <div class="panel-toolbar">
+      <div class="dropdown-field">
+        <app-custom-dropdown
+          [(ngModel)]="selectedRole"
+          [options]="roleOptions"
+          optionLabel="label"
+          optionValue="value"
+          [filter]="true"
+          filterBy="label"
+          appendTo="body"
+          [floatingLabel]="true"
+          [label]="'DB_ACCESS.PICK_ROLE' | translate"
+          (onChangeEvent)="onRoleChange($event)"
+          icon="pi-id-card"
+        ></app-custom-dropdown>
       </div>
     </div>
 
@@ -21,9 +22,12 @@
         [value]="rows"
         [rows]="15"
         [paginator]="rows.length > 15"
+        [rowsPerPageOptions]="[15, 25, 50, 100]"
         [rowHover]="true"
         styleClass="p-datatable-sm modern-table"
         [loading]="loadingRows"
+        [scrollable]="true"
+        scrollHeight="flex"
       >
         <ng-template pTemplate="header">
           <tr>
@@ -60,5 +64,4 @@
         </ng-template>
       </p-table>
     </div>
-  </div>
 </div>

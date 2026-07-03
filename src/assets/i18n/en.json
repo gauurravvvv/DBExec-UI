@@ -3160,6 +3160,7 @@
     "SELECT_APP_USERS": "Select app users to attach",
     "SELECT_APP_GROUPS": "Select app groups to attach",
     "ATTACH_HINT": "Attach this database role to one or more app users and groups. Each selection is linked to the role for this datasource.",
+    "DISCARD_UNSAVED": "You have unsaved changes in the privilege composer. Discard them and switch tabs?",
     "ATTR_INHERIT": "Inherit privileges of roles it is a member of",
     "ATTR_CREATEDB": "Can create new databases",
     "ATTR_CREATEROLE": "Can create, alter, and drop other roles",

@@ -87,35 +87,57 @@
   color: var(--secondary-color);
 }
 
+// Tabs live inside the parent card, so they must fill it and let the panel
+// body scroll (fixes the "no proper scroll" report). The nav row is inset to
+// align with the card padding and reads as a segmented header.
 ::ng-deep .db-access-tabs {
   height: 100%;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+
+  .p-tabview-nav-container {
+    flex-shrink: 0;
+  }
 
   .p-tabview-nav {
-    background: transparent;
+    background: var(--hover-background);
+    border: none;
     border-bottom: 1px solid var(--border-color);
+    padding: 0 var(--space-6);
+    gap: var(--space-2);
 
     li .p-tabview-nav-link {
       background: transparent;
       border: none;
+      border-bottom: 2px solid transparent;
       color: var(--secondary-color);
       font-weight: var(--fw-medium);
-      padding: 0.75rem 1.1rem;
+      font-size: var(--fs-control);
+      padding: 0.85rem 1.1rem;
+      margin: 0;
+      transition: all var(--motion-base);
 
-      &:not(.p-disabled):focus { box-shadow: none; }
+      &:not(.p-disabled):focus {
+        box-shadow: none;
+      }
+      &:hover {
+        color: var(--text-color);
+      }
     }
 
     li.p-highlight .p-tabview-nav-link {
       color: var(--primary-color);
       border-bottom: 2px solid var(--primary-color);
+      background: var(--card-background);
     }
   }
 
   .p-tabview-panels {
-    background: transparent;
-    padding: 1.25rem 0 0;
+    background: var(--card-background);
+    padding: var(--space-6) var(--space-7);
     flex: 1;
     min-height: 0;
+    overflow-y: auto;
   }
 }

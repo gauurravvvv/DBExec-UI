@@ -42,6 +42,8 @@
               ]"
               optionLabel="label"
               optionValue="value"
+              [filter]="false"
+              appendTo="body"
               [disabled]="!canManage"
             ></app-custom-dropdown>
           </div>
@@ -54,6 +56,8 @@
               [options]="levelOptions"
               optionLabel="label"
               optionValue="value"
+              [filter]="false"
+              appendTo="body"
               (onChangeEvent)="onLevelChange(rule)"
               [disabled]="!canManage"
             ></app-custom-dropdown>
@@ -64,8 +68,12 @@
             <label class="field-label">{{ 'DB_ACCESS.SCHEMA' | translate }}</label>
             <app-custom-dropdown
               [(ngModel)]="rule.schema"
-              [options]="schemas"
+              [options]="schemaOptions"
+              optionLabel="label"
+              optionValue="value"
               [filter]="true"
+              filterBy="label"
+              appendTo="body"
               (onChangeEvent)="onSchemaChange(rule)"
               [disabled]="!canManage"
               [placeholder]="'DB_ACCESS.SELECT_SCHEMA' | translate"
@@ -77,8 +85,12 @@
             <label class="field-label">{{ 'DB_ACCESS.GRANTEE' | translate }}</label>
             <app-custom-dropdown
               [(ngModel)]="rule.grantee"
-              [options]="roleNames"
+              [options]="roleOptions"
+              optionLabel="label"
+              optionValue="value"
               [filter]="true"
+              filterBy="label"
+              appendTo="body"
               [disabled]="!canManage"
               [placeholder]="'DB_ACCESS.SELECT_ROLE' | translate"
             ></app-custom-dropdown>
@@ -87,10 +99,14 @@
 
         <!-- tables (table + column levels) -->
         <div class="rule-tables" *ngIf="(rule.level === 'table' || rule.level === 'column') && rule.schema">
-          <label class="flag-toggle inline" *ngIf="rule.level === 'table'">
-            <span>{{ 'DB_ACCESS.ALL_TABLES' | translate }}</span>
-            <p-inputSwitch [(ngModel)]="rule.allTables" [disabled]="!canManage"></p-inputSwitch>
-          </label>
+          <app-custom-toggle
+            *ngIf="rule.level === 'table'"
+            [(ngModel)]="rule.allTables"
+            [label]="'DB_ACCESS.ALL_TABLES' | translate"
+            [trueLabel]="'COMMON.YES' | translate"
+            [falseLabel]="'COMMON.NO' | translate"
+            [disabled]="!canManage"
+          ></app-custom-toggle>
 
           <div class="rule-field" *ngIf="!(rule.level === 'table' && rule.allTables)">
             <label class="field-label">
@@ -99,7 +115,11 @@
             <app-custom-multiselect
               [(ngModel)]="rule.tables"
               [options]="tablesFor(rule)"
+              optionLabel="label"
+              optionValue="value"
               [filter]="true"
+              filterBy="label"
+              appendTo="body"
               [placeholder]="'DB_ACCESS.SELECT_TABLES' | translate"
             ></app-custom-multiselect>
           </div>
@@ -115,7 +135,11 @@
             <app-custom-multiselect
               [(ngModel)]="rule.columnsByTable[rule.tables[0]]"
               [options]="columnsFor(rule, rule.tables[0])"
+              optionLabel="label"
+              optionValue="value"
               [filter]="true"
+              filterBy="label"
+              appendTo="body"
               [placeholder]="'DB_ACCESS.SELECT_COLUMNS' | translate"
             ></app-custom-multiselect>
           </div>
@@ -141,10 +165,14 @@
           </div>
         </div>
 
-        <label class="flag-toggle inline" *ngIf="rule.action === 'grant'">
-          <span>{{ 'DB_ACCESS.WITH_GRANT_OPTION' | translate }}</span>
-          <p-inputSwitch [(ngModel)]="rule.withGrantOption" [disabled]="!canManage"></p-inputSwitch>
-        </label>
+        <app-custom-toggle
+          *ngIf="rule.action === 'grant'"
+          [(ngModel)]="rule.withGrantOption"
+          [label]="'DB_ACCESS.WITH_GRANT_OPTION' | translate"
+          [trueLabel]="'COMMON.YES' | translate"
+          [falseLabel]="'COMMON.NO' | translate"
+          [disabled]="!canManage"
+        ></app-custom-toggle>
       </div>
 
       <button
@@ -185,8 +213,12 @@
         <p class="panel-hint">{{ 'DB_ACCESS.PUBLIC_HINT' | translate }}</p>
         <app-custom-dropdown
           [(ngModel)]="publicSchema"
-          [options]="schemas"
+          [options]="schemaOptions"
+          optionLabel="label"
+          optionValue="value"
           [filter]="true"
+          filterBy="label"
+          appendTo="body"
           [label]="'DB_ACCESS.SCHEMA' | translate"
           [disabled]="!canManage"
         ></app-custom-dropdown>

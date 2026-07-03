@@ -88,6 +88,11 @@ export class DbRolesComponent implements OnInit {
     return (this.dbAccess.roles() ?? []).map(r => r.name);
   }
 
+  /** {label,value} option list for the shared dropdowns/multiselects. */
+  get allRoleOptions(): { label: string; value: string }[] {
+    return this.allRoleNames.map(n => ({ label: n, value: n }));
+  }
+
   memberCount(role: any): number {
     return role.memberCount ?? role.members?.length ?? 0;
   }

@@ -25,7 +25,7 @@ export class DbEffectivePrivilegesComponent implements OnInit {
 
   private cdr = inject(ChangeDetectorRef);
 
-  roleNames: string[] = [];
+  roleOptions: { label: string; value: string }[] = [];
   selectedRole = '';
   rows: any[] = [];
   loadingRows = false;
@@ -34,7 +34,10 @@ export class DbEffectivePrivilegesComponent implements OnInit {
 
   ngOnInit(): void {
     this.dbAccess.loadRoles(this.datasourceId).then(() => {
-      this.roleNames = (this.dbAccess.roles() ?? []).map(r => r.name);
+      this.roleOptions = (this.dbAccess.roles() ?? []).map(r => ({
+        label: r.name,
+        value: r.name,
+      }));
       this.cdr.markForCheck();
     }).catch(() => {});
   }

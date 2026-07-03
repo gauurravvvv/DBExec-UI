@@ -63,10 +63,13 @@
     }
   }
 
+  // Real parent card — the listing surface. Background + border + radius so
+  // the toolbar and table read as one panel (matches the app's card style).
   .content-card {
-    background: transparent;
-    border: none;
-    box-shadow: none;
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -75,7 +78,8 @@
     overflow: hidden;
 
     .card-toolbar {
-      padding: 0 0 var(--space-5);
+      padding: var(--space-6) var(--space-7);
+      border-bottom: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -120,6 +124,55 @@
 }
 
 @mixin db-access-table {
+  // In-panel toolbar for tabs that keep their own action(s) (Mappings /
+  // Effective / Audit) now that the workspace owns the primary toolbar.
+  .panel-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-5);
+    margin-bottom: var(--space-6);
+    flex-shrink: 0;
+
+    .panel-title {
+      font-size: var(--fs-body);
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
+    }
+
+    .panel-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+    }
+
+    .dropdown-field {
+      min-width: 300px;
+      max-width: 400px;
+    }
+  }
+
+  // Paginator refresh affordance (bottom-right of the table).
+  .paginator-refresh-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border-color);
+    background: var(--card-background);
+    border-radius: var(--radius-sm);
+    color: var(--secondary-color);
+    cursor: pointer;
+    transition: all var(--motion-base);
+
+    &:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+  }
+
   .table-wrapper {
     flex: 1;
     overflow: hidden;
@@ -517,6 +570,12 @@
 
       &.danger .attr-meta .attr-name {
         color: var(--error-color);
+      }
+
+      // app-custom-toggle renders a .form-field wrapper — strip its default
+      // block margins so it aligns tight to the right of the meta column.
+      app-custom-toggle .form-field {
+        margin: 0;
       }
     }
   }

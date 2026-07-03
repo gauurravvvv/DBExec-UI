@@ -18,8 +18,8 @@
       </div>
     </div>
 
+    <!-- Parent card: toolbar (dropdown + Refresh + Create in one row) + tabs -->
     <div class="content-card">
-      <!-- Toolbar: datasource dropdown on top (like list-dataset / list-tab) -->
       <div class="card-toolbar">
         <div class="toolbar-left">
           <div class="dropdown-field">
@@ -36,10 +36,42 @@
               [floatingLabel]="true"
               [label]="'COMMON.DATASOURCE' | translate"
               filterBy="name"
+              appendTo="body"
               (onChangeEvent)="onDatasourceChange($event)"
               icon="pi-database"
             ></app-custom-dropdown>
           </div>
+        </div>
+
+        <div
+          class="toolbar-right"
+          *ngIf="datasourceId && capability && !unsupported && !loadingCapability"
+        >
+          <button
+            pButton
+            [label]="'COMMON.REFRESH' | translate"
+            icon="pi pi-refresh"
+            (click)="onRefresh()"
+            class="p-button-outlined modern-button"
+          ></button>
+          <button
+            *ngIf="activeIndex === 1"
+            pButton
+            [label]="'DB_ACCESS.MANAGE_MEMBERSHIP' | translate"
+            icon="pi pi-sitemap"
+            (click)="onManageMembership()"
+            [disabled]="!canManage"
+            class="p-button-outlined modern-button"
+          ></button>
+          <button
+            *ngIf="showCreate"
+            pButton
+            [label]="createLabel"
+            icon="pi pi-plus"
+            (click)="onAdd()"
+            [disabled]="!canManage"
+            class="p-button-raised p-button-primary modern-button"
+          ></button>
         </div>
       </div>
 
@@ -70,11 +102,13 @@
       <!-- Tabbed listings -->
       <p-tabView
         *ngIf="datasourceId && capability && !unsupported && !loadingCapability"
-        [(activeIndex)]="activeIndex"
+        [activeIndex]="activeIndex"
+        (onChange)="onTabChange($event)"
         styleClass="db-access-tabs"
       >
         <p-tabPanel [header]="'DB_ACCESS.TAB_USERS' | translate">
           <app-db-users
+            #usersRef
             *ngIf="activeIndex === 0"
             [datasourceId]="datasourceId"
             [canManage]="canManage"
@@ -83,6 +117,7 @@
 
         <p-tabPanel [header]="'DB_ACCESS.TAB_ROLES' | translate">
           <app-db-roles
+            #rolesRef
             *ngIf="activeIndex === 1"
             [datasourceId]="datasourceId"
             [canManage]="canManage"
@@ -91,6 +126,7 @@
 
         <p-tabPanel [header]="'DB_ACCESS.TAB_PRIVILEGES' | translate">
           <app-db-grant-matrix
+            #matrixRef
             *ngIf="activeIndex === 2"
             [datasourceId]="datasourceId"
             [canManage]="canManage"

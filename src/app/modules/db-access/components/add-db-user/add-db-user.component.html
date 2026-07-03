@@ -85,48 +85,48 @@
             {{ 'DB_ACCESS.ATTRIBUTES' | translate }}
           </h3>
           <div class="attr-toggles">
-            <label class="attr-toggle">
+            <div class="attr-toggle">
               <span class="attr-meta">
                 <span class="attr-name">INHERIT</span>
                 <span class="attr-desc">{{ 'DB_ACCESS.ATTR_INHERIT' | translate }}</span>
               </span>
-              <p-inputSwitch formControlName="inherit"></p-inputSwitch>
-            </label>
-            <label class="attr-toggle">
+              <app-custom-toggle formControlName="inherit" [showStatusLabel]="false"></app-custom-toggle>
+            </div>
+            <div class="attr-toggle">
               <span class="attr-meta">
                 <span class="attr-name">CREATEDB</span>
                 <span class="attr-desc">{{ 'DB_ACCESS.ATTR_CREATEDB' | translate }}</span>
               </span>
-              <p-inputSwitch formControlName="createdb"></p-inputSwitch>
-            </label>
-            <label class="attr-toggle">
+              <app-custom-toggle formControlName="createdb" [showStatusLabel]="false"></app-custom-toggle>
+            </div>
+            <div class="attr-toggle">
               <span class="attr-meta">
                 <span class="attr-name">CREATEROLE</span>
                 <span class="attr-desc">{{ 'DB_ACCESS.ATTR_CREATEROLE' | translate }}</span>
               </span>
-              <p-inputSwitch formControlName="createrole"></p-inputSwitch>
-            </label>
-            <label class="attr-toggle">
+              <app-custom-toggle formControlName="createrole" [showStatusLabel]="false"></app-custom-toggle>
+            </div>
+            <div class="attr-toggle">
               <span class="attr-meta">
                 <span class="attr-name">REPLICATION</span>
                 <span class="attr-desc">{{ 'DB_ACCESS.ATTR_REPLICATION' | translate }}</span>
               </span>
-              <p-inputSwitch formControlName="replication"></p-inputSwitch>
-            </label>
-            <label class="attr-toggle danger">
+              <app-custom-toggle formControlName="replication" [showStatusLabel]="false"></app-custom-toggle>
+            </div>
+            <div class="attr-toggle danger">
               <span class="attr-meta">
                 <span class="attr-name">SUPERUSER</span>
                 <span class="attr-desc">{{ 'DB_ACCESS.ATTR_SUPERUSER' | translate }}</span>
               </span>
-              <p-inputSwitch formControlName="superuser"></p-inputSwitch>
-            </label>
-            <label class="attr-toggle danger">
+              <app-custom-toggle formControlName="superuser" [showStatusLabel]="false"></app-custom-toggle>
+            </div>
+            <div class="attr-toggle danger">
               <span class="attr-meta">
                 <span class="attr-name">BYPASSRLS</span>
                 <span class="attr-desc">{{ 'DB_ACCESS.ATTR_BYPASSRLS' | translate }}</span>
               </span>
-              <p-inputSwitch formControlName="bypassrls"></p-inputSwitch>
-            </label>
+              <app-custom-toggle formControlName="bypassrls" [showStatusLabel]="false"></app-custom-toggle>
+            </div>
           </div>
 
           <!-- Attach to app user / group -->
@@ -142,6 +142,7 @@
             optionValue="value"
             [filter]="true"
             filterBy="label"
+            appendTo="body"
             [label]="'DB_ACCESS.APP_USERS' | translate"
             [placeholder]="'DB_ACCESS.SELECT_APP_USERS' | translate"
             icon="pi-user"
@@ -154,6 +155,7 @@
             optionValue="value"
             [filter]="true"
             filterBy="label"
+            appendTo="body"
             [label]="'DB_ACCESS.APP_GROUPS' | translate"
             [placeholder]="'DB_ACCESS.SELECT_APP_GROUPS' | translate"
             icon="pi-users"

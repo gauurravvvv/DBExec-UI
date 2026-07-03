@@ -1,10 +1,7 @@
 <div class="tab-body">
-  <div class="content-card">
-    <div class="card-toolbar">
-      <div class="toolbar-left">
-        <span class="toolbar-title">{{ 'DB_ACCESS.MAPPINGS_TITLE' | translate }}</span>
-      </div>
-      <div class="toolbar-right">
+    <div class="panel-toolbar">
+      <span class="panel-title">{{ 'DB_ACCESS.MAPPINGS_TITLE' | translate }}</span>
+      <div class="panel-actions">
         <button
           pButton
           [label]="'COMMON.REFRESH' | translate"
@@ -29,10 +26,13 @@
         [value]="mappings"
         [rows]="10"
         [paginator]="mappings.length > 10"
+        [rowsPerPageOptions]="[10, 25, 50, 100]"
         [rowHover]="true"
         dataKey="id"
         styleClass="p-datatable-sm modern-table"
         [loading]="loading()"
+        [scrollable]="true"
+        scrollHeight="flex"
       >
         <ng-template pTemplate="header">
           <tr>
@@ -77,7 +77,6 @@
         </ng-template>
       </p-table>
     </div>
-  </div>
 </div>
 
 <!-- Attach dialog -->
@@ -91,8 +90,12 @@
       <div class="form-field">
         <app-custom-dropdown
           [(ngModel)]="attachRole"
-          [options]="roleNames"
+          [options]="roleOptions"
+          optionLabel="label"
+          optionValue="value"
           [filter]="true"
+          filterBy="label"
+          appendTo="body"
           [label]="'DB_ACCESS.DB_ROLE' | translate"
         ></app-custom-dropdown>
       </div>
@@ -104,6 +107,7 @@
           optionValue="value"
           [filter]="true"
           filterBy="label"
+          appendTo="body"
           [label]="'DB_ACCESS.APP_USERS' | translate"
           [placeholder]="'DB_ACCESS.SELECT_APP_USERS' | translate"
         ></app-custom-multiselect>
@@ -116,6 +120,7 @@
           optionValue="value"
           [filter]="true"
           filterBy="label"
+          appendTo="body"
           [label]="'DB_ACCESS.APP_GROUPS' | translate"
           [placeholder]="'DB_ACCESS.SELECT_APP_GROUPS' | translate"
         ></app-custom-multiselect>

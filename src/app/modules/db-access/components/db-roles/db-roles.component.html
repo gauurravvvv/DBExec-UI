@@ -1,47 +1,18 @@
 <div class="tab-body">
-  <div class="content-card">
-    <div class="card-toolbar">
-      <div class="toolbar-left">
-        <span class="toolbar-title">{{ 'DB_ACCESS.ROLES_TITLE' | translate }}</span>
-      </div>
-      <div class="toolbar-right">
-        <button
-          pButton
-          [label]="'COMMON.REFRESH' | translate"
-          icon="pi pi-refresh"
-          (click)="load()"
-          class="p-button-outlined modern-button"
-        ></button>
-        <button
-          *hasPermission="'manageDatabaseAccess'; level: 'write'"
-          pButton
-          [label]="'DB_ACCESS.MANAGE_MEMBERSHIP' | translate"
-          icon="pi pi-sitemap"
-          (click)="openMembership('attach')"
-          [disabled]="!canManage"
-          class="p-button-outlined modern-button"
-        ></button>
-        <button
-          *hasPermission="'manageDatabaseAccess'; level: 'write'"
-          pButton
-          [label]="'DB_ACCESS.CREATE_ROLE' | translate"
-          icon="pi pi-plus"
-          (click)="onAdd()"
-          [disabled]="!canManage"
-          class="p-button-raised p-button-primary modern-button"
-        ></button>
-      </div>
-    </div>
-
     <div class="table-wrapper">
       <p-table
         [value]="roles"
         [rows]="10"
         [paginator]="roles.length > 10"
+        [rowsPerPageOptions]="[10, 25, 50, 100]"
+        currentPageReportTemplate="{first} - {last} of {totalRecords}"
+        [showCurrentPageReport]="true"
         [rowHover]="true"
         dataKey="name"
         styleClass="p-datatable-sm modern-table"
         [loading]="loading()"
+        [scrollable]="true"
+        scrollHeight="flex"
       >
         <ng-template pTemplate="header">
           <tr>
@@ -94,9 +65,19 @@
             </td>
           </tr>
         </ng-template>
+
+        <ng-template pTemplate="paginatorright">
+          <button
+            type="button"
+            class="paginator-refresh-btn"
+            (click)="load()"
+            [attr.aria-label]="'COMMON.REFRESH' | translate"
+          >
+            <i class="pi pi-refresh"></i>
+          </button>
+        </ng-template>
       </p-table>
     </div>
-  </div>
 </div>
 
 <!-- Membership dialog -->
@@ -117,11 +98,15 @@
       </div>
 
       <div class="form-field">
-        <label class="field-label">{{ 'DB_ACCESS.MEMBER_ROLES' | translate }}</label>
         <app-custom-multiselect
           [(ngModel)]="membershipRoles"
-          [options]="allRoleNames"
+          [options]="allRoleOptions"
+          optionLabel="label"
+          optionValue="value"
           [filter]="true"
+          filterBy="label"
+          appendTo="body"
+          [label]="'DB_ACCESS.MEMBER_ROLES' | translate"
           [placeholder]="'DB_ACCESS.SELECT_MEMBER_ROLES' | translate"
         ></app-custom-multiselect>
       </div>
@@ -129,16 +114,23 @@
       <div class="form-field">
         <app-custom-dropdown
           [(ngModel)]="membershipTarget"
-          [options]="allRoleNames"
+          [options]="allRoleOptions"
+          optionLabel="label"
+          optionValue="value"
           [filter]="true"
+          filterBy="label"
+          appendTo="body"
           [label]="'DB_ACCESS.GRANT_TO_ROLE' | translate"
         ></app-custom-dropdown>
       </div>
 
-      <label class="flag-toggle" *ngIf="membershipMode === 'attach'">
-        <span>{{ 'DB_ACCESS.ADMIN_OPTION' | translate }}</span>
-        <p-inputSwitch [(ngModel)]="membershipAdminOption"></p-inputSwitch>
-      </label>
+      <app-custom-toggle
+        *ngIf="membershipMode === 'attach'"
+        [(ngModel)]="membershipAdminOption"
+        [label]="'DB_ACCESS.ADMIN_OPTION' | translate"
+        [trueLabel]="'COMMON.YES' | translate"
+        [falseLabel]="'COMMON.NO' | translate"
+      ></app-custom-toggle>
     </div>
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelMembership()">
@@ -177,8 +169,9 @@
           <span>{{ 'DB_ACCESS.REASSIGN_TO' | translate }}</span>
         </label>
         <div class="reassign-picker" *ngIf="deleteMode === 'reassign'">
-          <app-custom-dropdown [(ngModel)]="reassignTo" [options]="allRoleNames" [filter]="true"
-            [label]="'DB_ACCESS.TARGET_ROLE' | translate"></app-custom-dropdown>
+          <app-custom-dropdown [(ngModel)]="reassignTo" [options]="allRoleOptions"
+            optionLabel="label" optionValue="value" [filter]="true" filterBy="label"
+            appendTo="body" [label]="'DB_ACCESS.TARGET_ROLE' | translate"></app-custom-dropdown>
         </div>
         <label class="mode-option">
           <input type="radio" name="delModeR" value="drop" [(ngModel)]="deleteMode" />

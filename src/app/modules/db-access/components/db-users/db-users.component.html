@@ -1,38 +1,18 @@
 <div class="tab-body">
-  <div class="content-card">
-    <div class="card-toolbar">
-      <div class="toolbar-left">
-        <span class="toolbar-title">{{ 'DB_ACCESS.USERS_TITLE' | translate }}</span>
-      </div>
-      <div class="toolbar-right">
-        <button
-          pButton
-          [label]="'COMMON.REFRESH' | translate"
-          icon="pi pi-refresh"
-          (click)="load()"
-          class="p-button-outlined modern-button"
-        ></button>
-        <button
-          *hasPermission="'manageDatabaseAccess'; level: 'write'"
-          pButton
-          [label]="'DB_ACCESS.CREATE_USER' | translate"
-          icon="pi pi-plus"
-          (click)="onAdd()"
-          [disabled]="!canManage"
-          class="p-button-raised p-button-primary modern-button"
-        ></button>
-      </div>
-    </div>
-
     <div class="table-wrapper">
       <p-table
         [value]="users"
         [rows]="10"
         [paginator]="users.length > 10"
+        [rowsPerPageOptions]="[10, 25, 50, 100]"
+        currentPageReportTemplate="{first} - {last} of {totalRecords}"
+        [showCurrentPageReport]="true"
         [rowHover]="true"
         dataKey="name"
         styleClass="p-datatable-sm modern-table"
         [loading]="loading()"
+        [scrollable]="true"
+        scrollHeight="flex"
       >
         <ng-template pTemplate="header">
           <tr>
@@ -140,9 +120,19 @@
             </td>
           </tr>
         </ng-template>
+
+        <ng-template pTemplate="paginatorright">
+          <button
+            type="button"
+            class="paginator-refresh-btn"
+            (click)="load()"
+            [attr.aria-label]="'COMMON.REFRESH' | translate"
+          >
+            <i class="pi pi-refresh"></i>
+          </button>
+        </ng-template>
       </p-table>
     </div>
-  </div>
 </div>
 
 <!-- Delete wizard — destructive confirm popup (plain-language, no SQL) -->
@@ -175,8 +165,12 @@
         <div class="reassign-picker" *ngIf="deleteMode === 'reassign'">
           <app-custom-dropdown
             [(ngModel)]="reassignTo"
-            [options]="groupRoleNames"
+            [options]="groupRoleOptions"
+            optionLabel="label"
+            optionValue="value"
             [filter]="true"
+            filterBy="label"
+            appendTo="body"
             [label]="'DB_ACCESS.TARGET_ROLE' | translate"
           ></app-custom-dropdown>
         </div>

@@ -34,7 +34,8 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
   roleForm!: FormGroup;
   createMode: 'scratch' | 'template' | 'clone' = 'scratch';
   templates: any[] = [];
-  allRoleNames: string[] = [];
+  // {label,value} options so the clone dropdown resolves labels.
+  allRoleOptions: { label: string; value: string }[] = [];
   saving = this.dbAccess.saving;
 
   showPreview = false;
@@ -69,7 +70,10 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
     this.dbAccess
       .loadRoles(this.datasourceId)
       .then(() => {
-        this.allRoleNames = (this.dbAccess.roles() ?? []).map(r => r.name);
+        this.allRoleOptions = (this.dbAccess.roles() ?? []).map(r => ({
+          label: r.name,
+          value: r.name,
+        }));
         this.cdr.markForCheck();
       })
       .catch(() => {});

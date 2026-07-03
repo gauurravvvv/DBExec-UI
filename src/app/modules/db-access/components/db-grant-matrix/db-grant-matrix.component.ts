@@ -33,8 +33,8 @@ interface AccessRule {
   grantee: string;
   action: 'grant' | 'revoke';
   withGrantOption: boolean;
-  // per-rule cascade of loaded tables/columns
-  loadedTables?: string[];
+  // per-rule cascade of loaded tables ({label,value} options)
+  loadedTables?: { label: string; value: string }[];
 }
 
 /**
@@ -64,17 +64,20 @@ export class DbGrantMatrixComponent implements OnInit {
   loading = this.dbAccess.loading;
   saving = this.dbAccess.saving;
 
-  schemas: string[] = [];
-  roleNames: string[] = [];
+  // Option arrays ({label,value}) so the shared dropdowns/multiselects can
+  // resolve a display label — PrimeNG renders blank for bare string[] when
+  // optionLabel/optionValue default to 'label'/''.
+  schemaOptions: { label: string; value: string }[] = [];
+  roleOptions: { label: string; value: string }[] = [];
   levelOptions: { label: string; value: AccessRule['level'] }[] = [];
   defaultPrivileges: any[] = [];
 
   rules: AccessRule[] = [];
   private ruleSeq = 0;
 
-  // per-rule table/column caches keyed by "ruleId"
-  tableCache: Record<number, string[]> = {};
-  columnCache: Record<string, string[]> = {}; // key `${schema}.${table}`
+  // per-rule table/column caches keyed by "ruleId" — {label,value} options.
+  tableCache: Record<number, { label: string; value: string }[]> = {};
+  columnCache: Record<string, { label: string; value: string }[]> = {}; // key `${schema}.${table}`
 
   // ── PUBLIC hardening row ──────────────────────────────────────────────
   publicSchema = '';
@@ -106,17 +109,30 @@ export class DbGrantMatrixComponent implements OnInit {
     this.addRule();
   }
 
+  private toOptions(values: string[]): { label: string; value: string }[] {
+    // Dedup + drop empties, then wrap as {label,value} for the shared inputs.
+    return Array.from(new Set(values.filter(Boolean))).map(v => ({
+      label: v,
+      value: v,
+    }));
+  }
+
   private loadSchemas(): void {
     this.dbAccess.loadSchemas(this.datasourceId).then(() => {
       const raw = this.dbAccess.schemas() ?? [];
-      this.schemas = raw.map((s: any) => (typeof s === 'string' ? s : s.name ?? s.schema));
+      const names = raw.map((s: any) =>
+        typeof s === 'string' ? s : (s.name ?? s.schema),
+      );
+      this.schemaOptions = this.toOptions(names);
       this.cdr.markForCheck();
     }).catch(() => {});
   }
 
   private loadRoles(): void {
     this.dbAccess.loadRoles(this.datasourceId).then(() => {
-      this.roleNames = (this.dbAccess.roles() ?? []).map(r => r.name);
+      this.roleOptions = this.toOptions(
+        (this.dbAccess.roles() ?? []).map(r => r.name),
+      );
       this.cdr.markForCheck();
     }).catch(() => {});
   }
@@ -179,15 +195,20 @@ export class DbGrantMatrixComponent implements OnInit {
     }
     this.dbAccess.loadTableGrants(this.datasourceId, rule.schema).then(res => {
       if (res?.status) {
-        const tables = (res.data ?? []).map((t: any) => (typeof t === 'string' ? t : t.table ?? t.name));
-        this.tableCache[rule.id] = tables;
-        rule.loadedTables = tables;
+        // Table-grant rows are one-per-privilege, so many rows repeat the
+        // same table — dedup to distinct table names before building options.
+        const tables = (res.data ?? []).map((t: any) =>
+          typeof t === 'string' ? t : (t.table ?? t.name),
+        );
+        const opts = this.toOptions(tables);
+        this.tableCache[rule.id] = opts;
+        rule.loadedTables = opts;
       }
       this.cdr.markForCheck();
     }).catch(() => {});
   }
 
-  tablesFor(rule: AccessRule): string[] {
+  tablesFor(rule: AccessRule): { label: string; value: string }[] {
     return rule.loadedTables ?? this.tableCache[rule.id] ?? [];
   }
 
@@ -196,13 +217,16 @@ export class DbGrantMatrixComponent implements OnInit {
     if (this.columnCache[key]) return;
     this.dbAccess.loadColumnGrants(this.datasourceId, rule.schema, table).then(res => {
       if (res?.status) {
-        this.columnCache[key] = (res.data ?? []).map((c: any) => (typeof c === 'string' ? c : c.column ?? c.name));
+        const cols = (res.data ?? []).map((c: any) =>
+          typeof c === 'string' ? c : (c.column ?? c.name),
+        );
+        this.columnCache[key] = this.toOptions(cols);
       }
       this.cdr.markForCheck();
     }).catch(() => {});
   }
 
-  columnsFor(rule: AccessRule, table: string): string[] {
+  columnsFor(rule: AccessRule, table: string): { label: string; value: string }[] {
     return this.columnCache[`${rule.schema}.${table}`] ?? [];
   }
 
@@ -221,6 +245,22 @@ export class DbGrantMatrixComponent implements OnInit {
 
   get anyValidRule(): boolean {
     return this.rules.some(r => this.ruleValid(r));
+  }
+
+  /**
+   * True when the composer has any partially-filled rule (or the PUBLIC
+   * schema is chosen) — used by the workspace to warn before a tab switch
+   * discards in-progress privilege authoring.
+   */
+  hasUnsavedChanges(): boolean {
+    if (this.publicSchema) return true;
+    return this.rules.some(
+      r =>
+        !!r.schema ||
+        !!r.grantee ||
+        r.privileges.length > 0 ||
+        r.tables.length > 0,
+    );
   }
 
   // Live plain-language summary of composed rules (shown in the tray).

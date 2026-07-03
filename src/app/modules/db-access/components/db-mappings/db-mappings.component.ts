@@ -36,7 +36,8 @@ export class DbMappingsComponent implements OnInit {
   saving = this.dbAccess.saving;
 
   mappings: any[] = [];
-  roleNames: string[] = [];
+  // {label,value} options so the shared dropdown resolves the DB-role label.
+  roleOptions: { label: string; value: string }[] = [];
 
   // App user / group pickers.
   appUserOptions: { label: string; value: string }[] = [];
@@ -65,7 +66,10 @@ export class DbMappingsComponent implements OnInit {
     this.dbAccess
       .loadRoles(this.datasourceId)
       .then(() => {
-        this.roleNames = (this.dbAccess.roles() ?? []).map(r => r.name);
+        this.roleOptions = (this.dbAccess.roles() ?? []).map(r => ({
+          label: r.name,
+          value: r.name,
+        }));
         this.cdr.markForCheck();
       })
       .catch(() => {});

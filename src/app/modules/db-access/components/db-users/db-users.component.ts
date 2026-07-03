@@ -83,6 +83,11 @@ export class DbUsersComponent implements OnInit {
       .map(r => r.name);
   }
 
+  /** {label,value} options so the reassign dropdown renders labels. */
+  get groupRoleOptions(): { label: string; value: string }[] {
+    return this.groupRoleNames.map(n => ({ label: n, value: n }));
+  }
+
   flagsOf(user: any): string[] {
     const a = user.attributes ?? user;
     const flags: string[] = [];
