@@ -25,13 +25,13 @@
           pButton
           class="p-button-primary btn-save"
           type="button"
-          [label]="'DB_ACCESS.REVIEW_SQL' | translate"
+          [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
           [disabled]="userForm.invalid || saving() || loadingRole"
         >
           <i
             class="pi mr-2"
-            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-eye'"
+            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
           ></i>
         </button>
       </div>
@@ -57,19 +57,21 @@
             [placeholder]="'DB_ACCESS.PASSWORD_UNCHANGED' | translate"
           ></app-custom-input>
 
-          <app-custom-number
-            formControlName="connectionLimit"
-            [label]="'DB_ACCESS.CONN_LIMIT' | translate"
-            [min]="-1"
-            [placeholder]="'DB_ACCESS.UNLIMITED' | translate"
-          ></app-custom-number>
-
-          <app-custom-calendar
-            formControlName="validUntil"
-            [label]="'DB_ACCESS.VALID_UNTIL' | translate"
-            [showTime]="false"
-            [showButtonBar]="true"
-          ></app-custom-calendar>
+          <div class="form-row">
+            <app-custom-number
+              formControlName="connectionLimit"
+              [label]="'DB_ACCESS.CONN_LIMIT' | translate"
+              [min]="-1"
+              [placeholder]="'DB_ACCESS.UNLIMITED' | translate"
+            ></app-custom-number>
+            <app-custom-calendar
+              formControlName="validUntil"
+              [label]="'DB_ACCESS.VALID_UNTIL' | translate"
+              [showTime]="false"
+              [showButtonBar]="true"
+              appendTo="body"
+            ></app-custom-calendar>
+          </div>
 
           <h3 class="form-section-title">
             {{ 'DB_ACCESS.ATTRIBUTES' | translate }}
@@ -128,15 +130,3 @@
     </div>
   </div>
 </div>
-
-<app-change-summary-dialog
-  [visible]="showPreview"
-  [title]="previewTitle"
-  [summaries]="summaries"
-  [destructive]="previewDestructive"
-  [confirmPhrase]="confirmPhrase"
-  [loading]="previewLoading"
-  [executing]="saving()"
-  (confirmed)="confirmPreview()"
-  (cancelled)="cancelPreview()"
-></app-change-summary-dialog>

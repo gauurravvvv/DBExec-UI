@@ -15,7 +15,6 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
 import { DbAccessService } from '../../services/db-access.service';
-import { ChangeIntent, describeChange } from '../../services/describe-change';
 
 /**
  * AddDbUserComponent — full-page create screen for a login role (a DB
@@ -26,8 +25,7 @@ import { ChangeIntent, describeChange } from '../../services/describe-change';
  * Attach-to-app happens via TWO multiselects (app users + app groups)
  * populated from UserService / GroupService — no free-text id. Each
  * selected user/group becomes an attachMapping call after the role is
- * created. Every mutation still flows through the plain-language
- * change-summary confirm gate (never SQL).
+ * created. The primary button saves directly (NO SQL is ever shown).
  */
 @Component({
   selector: 'app-add-db-user',
@@ -46,15 +44,6 @@ export class AddDbUserComponent implements OnInit, OnDestroy, HasUnsavedChanges 
   // App user / group pickers (id + label options).
   appUserOptions: { label: string; value: string }[] = [];
   appGroupOptions: { label: string; value: string }[] = [];
-
-  // ── Change-summary confirm gate (plain-language, never SQL) ───────────
-  showPreview = false;
-  previewLoading = false;
-  summaries: string[] = [];
-  previewDestructive = false;
-  previewTitle = '';
-  confirmPhrase: string | null = null;
-  private pendingExecute: (() => Promise<any>) | null = null;
 
   constructor(
     private dbAccess: DbAccessService,
@@ -182,6 +171,12 @@ export class AddDbUserComponent implements OnInit, OnDestroy, HasUnsavedChanges 
     return mappings;
   }
 
+  /**
+   * Create the user directly (no SQL-preview dialog — per UX the primary
+   * button is a plain Create). SUPERUSER / BYPASSRLS still pass confirm:true
+   * to the BE silently. Selected app users / groups are attached after the
+   * role exists.
+   */
   onSubmit(): void {
     if (this.userForm.invalid) return;
     const v = this.userForm.getRawValue();
@@ -190,39 +185,20 @@ export class AddDbUserComponent implements OnInit, OnDestroy, HasUnsavedChanges 
     const needsSuperuserConfirm = attributes.superuser || attributes.bypassrls;
 
     const body: any = { name: v.name, attributes };
-    // Pass the first mapping inline for describeChange + createRole; the
-    // rest (and the create-time attach) are wired via the mappings endpoint
-    // after the role exists.
     if (attachMappings.length) body.attachMapping = attachMappings[0];
+    if (needsSuperuserConfirm) body.confirm = true;
 
-    this.previewTitle = this.translate.instant('DB_ACCESS.PREVIEW_CREATE_USER');
-    this.previewDestructive = needsSuperuserConfirm;
-    this.confirmPhrase = null;
-
-    const intent: ChangeIntent = {
-      kind: 'createRole',
-      name: v.name,
-      attributes,
-      attachMapping: attachMappings[0],
-    };
-
-    this.runPreviewAndArm(
-      [intent],
-      () =>
-        this.dbAccess.createRole(this.datasourceId, {
-          ...body,
-          previewOnly: true,
-        }),
-      async () => {
-        const res = await this.dbAccess.createRole(this.datasourceId, {
-          ...body,
-          confirm: needsSuperuserConfirm ? true : undefined,
-        });
-        // After the role exists, attach every selected app user / group.
-        if (res?.status) await this.attachAll(v.name, attachMappings);
-        return res;
-      },
-    );
+    this.dbAccess
+      .createRole(this.datasourceId, body)
+      .then(async res => {
+        if (this.globalService.handleSuccessService(res)) {
+          if (res?.status) await this.attachAll(v.name, attachMappings);
+          this.userForm.markAsPristine();
+          this.router.navigate([DB_ACCESS.workspace(this.datasourceId)]);
+        }
+      })
+      .catch(() => {})
+      .finally(() => this.cdr.markForCheck());
   }
 
   private async attachAll(roleName: string, mappings: any[]): Promise<void> {
@@ -242,53 +218,5 @@ export class AddDbUserComponent implements OnInit, OnDestroy, HasUnsavedChanges 
   onCancel(): void {
     this.userForm.markAsPristine();
     this.router.navigate([DB_ACCESS.workspace(this.datasourceId)]);
-  }
-
-  // ── Shared confirm flow (plain-language summary; never SQL) ────────────
-
-  private runPreviewAndArm(
-    intents: ChangeIntent[],
-    preview: () => Promise<any>,
-    execute: () => Promise<any>,
-  ): void {
-    this.showPreview = true;
-    this.previewLoading = true;
-    this.summaries = intents.map(i => describeChange(i, this.translate));
-    this.pendingExecute = execute;
-    this.cdr.markForCheck();
-
-    preview()
-      .then(res => {
-        if (!res?.status) {
-          this.globalService.handleSuccessService(res);
-          this.showPreview = false;
-        }
-      })
-      .catch(() => {
-        this.showPreview = false;
-      })
-      .finally(() => {
-        this.previewLoading = false;
-        this.cdr.markForCheck();
-      });
-  }
-
-  confirmPreview(): void {
-    if (!this.pendingExecute) return;
-    this.pendingExecute()
-      .then(res => {
-        if (this.globalService.handleSuccessService(res)) {
-          this.showPreview = false;
-          this.userForm.markAsPristine();
-          this.router.navigate([DB_ACCESS.workspace(this.datasourceId)]);
-        }
-      })
-      .catch(() => {})
-      .finally(() => this.cdr.markForCheck());
-  }
-
-  cancelPreview(): void {
-    this.showPreview = false;
-    this.pendingExecute = null;
   }
 }

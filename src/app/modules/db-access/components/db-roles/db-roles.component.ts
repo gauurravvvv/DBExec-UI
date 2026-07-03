@@ -2,12 +2,16 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  DestroyRef,
   Input,
   OnInit,
   inject,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { DB_ACCESS } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DbAccessService } from '../../services/db-access.service';
@@ -32,11 +36,17 @@ export class DbRolesComponent implements OnInit {
   @Input() canManage = false;
 
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
 
   loading = this.dbAccess.loading;
   saving = this.dbAccess.saving;
 
-  roles: any[] = [];
+  private allRoles: any[] = []; // full set from BE
+  roles: any[] = []; // filtered view bound to the table
+
+  // ── Filter (debounced, client-side) ───────────────────────────────────
+  filterName = '';
+  private filter$ = new Subject<void>();
 
   // ── Membership dialog ─────────────────────────────────────────────────
   showMembership = false;
@@ -70,6 +80,9 @@ export class DbRolesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.filter$
+      .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.applyFilters());
     this.load();
   }
 
@@ -78,10 +91,34 @@ export class DbRolesComponent implements OnInit {
       .loadRoles(this.datasourceId)
       .then(() => {
         const all = this.dbAccess.roles() ?? [];
-        this.roles = all.filter(r => !(r.canLogin || r.attributes?.login));
+        this.allRoles = all.filter(r => !(r.canLogin || r.attributes?.login));
+        this.applyFilters();
         this.cdr.markForCheck();
       })
       .catch(() => this.cdr.markForCheck());
+  }
+
+  get isFilterActive(): boolean {
+    return !!this.filterName;
+  }
+
+  onFilterChange(): void {
+    this.filter$.next();
+  }
+
+  clearFilters(): void {
+    this.filterName = '';
+    this.applyFilters();
+  }
+
+  private applyFilters(): void {
+    const name = this.filterName.trim().toLowerCase();
+    this.roles = name
+      ? this.allRoles.filter(r =>
+          String(r.name).toLowerCase().includes(name),
+        )
+      : [...this.allRoles];
+    this.cdr.markForCheck();
   }
 
   get allRoleNames(): string[] {

@@ -48,12 +48,15 @@
           *ngIf="datasourceId && capability && !unsupported && !loadingCapability"
         >
           <button
-            pButton
-            [label]="'COMMON.REFRESH' | translate"
-            icon="pi pi-refresh"
+            type="button"
+            class="icon-action-btn"
             (click)="onRefresh()"
-            class="p-button-outlined modern-button"
-          ></button>
+            [pTooltip]="'COMMON.REFRESH' | translate"
+            tooltipPosition="bottom"
+            [attr.aria-label]="'COMMON.REFRESH' | translate"
+          >
+            <i class="pi pi-refresh"></i>
+          </button>
           <button
             *ngIf="activeIndex === 1"
             pButton
@@ -139,22 +142,28 @@
             [datasourceId]="datasourceId"
           ></app-db-effective-privileges>
         </p-tabPanel>
-
-        <p-tabPanel [header]="'DB_ACCESS.TAB_MAPPINGS' | translate">
-          <app-db-mappings
-            *ngIf="activeIndex === 4"
-            [datasourceId]="datasourceId"
-            [canManage]="canManage"
-          ></app-db-mappings>
-        </p-tabPanel>
-
-        <p-tabPanel [header]="'DB_ACCESS.TAB_AUDIT' | translate">
-          <app-db-audit
-            *ngIf="activeIndex === 5"
-            [datasourceId]="datasourceId"
-          ></app-db-audit>
-        </p-tabPanel>
       </p-tabView>
+    </div>
+  </div>
+</div>
+
+<!-- Discard unsaved privilege changes — confirmation popup -->
+<div class="confirmation-popup" *ngIf="showDiscardPopup">
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-icon destructive"><i class="pi pi-exclamation-triangle"></i></div>
+      <h3>{{ 'DB_ACCESS.DISCARD_TITLE' | translate }}</h3>
+    </div>
+    <div class="popup-body">
+      <p class="discard-text">{{ 'DB_ACCESS.DISCARD_UNSAVED' | translate }}</p>
+    </div>
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDiscard()">
+        <i class="pi pi-times"></i>{{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button class="btn-confirm btn-danger" (click)="confirmDiscard()">
+        <i class="pi pi-trash"></i>{{ 'DB_ACCESS.DISCARD_CONFIRM' | translate }}
+      </button>
     </div>
   </div>
 </div>

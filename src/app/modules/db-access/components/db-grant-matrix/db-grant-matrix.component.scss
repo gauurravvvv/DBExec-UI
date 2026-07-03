@@ -2,9 +2,12 @@
 
 @include db.db-access-page;
 
+// The panel is a bounded flex container (min-height:0, no overflow); this
+// body owns the scroll for the composer so long rule lists scroll cleanly.
 .tab-body {
   height: 100%;
   overflow-y: auto;
+  padding-right: 4px;
 }
 
 .matrix-layout {

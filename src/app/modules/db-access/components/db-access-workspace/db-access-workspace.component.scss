@@ -1,10 +1,44 @@
 @use '../../styles/db-access-shared' as db;
 
 @include db.db-access-page;
+@include db.db-access-dialog;
 
 .card-toolbar .dropdown-field {
   min-width: 320px;
   max-width: 420px;
+}
+
+// Icon-only action button (Refresh) sitting in the toolbar.
+.icon-action-btn {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  background: var(--card-background);
+  border-radius: var(--radius-sm);
+  color: var(--secondary-color);
+  cursor: pointer;
+  transition: all var(--motion-base);
+
+  &:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: var(--hover-background);
+  }
+
+  i {
+    font-size: var(--fs-body);
+  }
+}
+
+.discard-text {
+  color: var(--secondary-color);
+  text-align: center;
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  margin: 0;
 }
 
 .workspace-empty {
@@ -133,11 +167,40 @@
     }
   }
 
+  // Bounded flex container — no scroll here. Each tab body owns its scroll
+  // (listing tables via scrollHeight="flex"; the privilege composer scrolls
+  // its own .tab-body). This is what makes the Privileges tab scroll right.
   .p-tabview-panels {
     background: var(--card-background);
     padding: var(--space-6) var(--space-7);
-    flex: 1;
+    flex: 1 1 auto;
     min-height: 0;
-    overflow-y: auto;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    .p-tabview-panel {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+}
+
+// Listing tab bodies fill the panel so their table's scrollHeight="flex"
+// has a bounded parent to scroll within.
+::ng-deep app-db-users,
+::ng-deep app-db-roles,
+::ng-deep app-db-effective-privileges,
+::ng-deep app-db-grant-matrix {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+
+  .tab-body {
+    flex: 1 1 auto;
+    min-height: 0;
   }
 }

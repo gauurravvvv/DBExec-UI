@@ -109,6 +109,26 @@ export class DbGrantMatrixComponent implements OnInit {
     this.addRule();
   }
 
+  /**
+   * Reload catalog data (schemas / roles / defaults) WITHOUT adding a new
+   * rule or clearing the composer. Bound to the toolbar refresh — fixes the
+   * bug where refresh appended an empty rule (it used to call ngOnInit).
+   */
+  refresh(): void {
+    this.loadSchemas();
+    this.loadRoles();
+    this.loadDefaults();
+  }
+
+  /** Clear the composer back to a single empty rule (used on discard). */
+  resetComposer(): void {
+    this.rules = [];
+    this.ruleSeq = 0;
+    this.publicSchema = '';
+    this.addRule();
+    this.cdr.markForCheck();
+  }
+
   private toOptions(values: string[]): { label: string; value: string }[] {
     // Dedup + drop empties, then wrap as {label,value} for the shared inputs.
     return Array.from(new Set(values.filter(Boolean))).map(v => ({

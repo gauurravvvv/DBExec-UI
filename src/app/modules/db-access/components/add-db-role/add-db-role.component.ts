@@ -12,13 +12,12 @@ import { DB_ACCESS } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DbAccessService } from '../../services/db-access.service';
-import { ChangeIntent, describeChange } from '../../services/describe-change';
 
 /**
  * AddDbRoleComponent — full-page create screen for a group role
  * (canLogin === false). Supports from-scratch / from-template / clone
- * modes, attribute toggles (INHERIT / CREATEDB / CREATEROLE), and flows
- * through the plain-language confirm gate (never SQL).
+ * modes, attribute toggles (INHERIT / CREATEDB / CREATEROLE). The primary
+ * button saves directly (NO SQL is ever shown).
  */
 @Component({
   selector: 'app-add-db-role',
@@ -37,14 +36,6 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
   // {label,value} options so the clone dropdown resolves labels.
   allRoleOptions: { label: string; value: string }[] = [];
   saving = this.dbAccess.saving;
-
-  showPreview = false;
-  previewLoading = false;
-  summaries: string[] = [];
-  previewDestructive = false;
-  previewTitle = '';
-  confirmPhrase: string | null = null;
-  private pendingExecute: (() => Promise<any>) | null = null;
 
   constructor(
     private dbAccess: DbAccessService,
@@ -107,6 +98,7 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
     this.createMode = mode;
   }
 
+  /** Create the role directly (no SQL-preview dialog). */
   onSubmit(): void {
     if (this.roleForm.invalid) return;
     const v = this.roleForm.getRawValue();
@@ -121,64 +113,10 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
       body.templateId = v.templateId;
     if (this.createMode === 'clone' && v.cloneFrom) body.cloneFrom = v.cloneFrom;
 
-    this.previewTitle = this.translate.instant('DB_ACCESS.PREVIEW_CREATE_ROLE');
-    this.previewDestructive = false;
-    this.confirmPhrase = null;
-
-    const intent: ChangeIntent = {
-      kind: 'createRole',
-      name: v.name,
-      attributes,
-    };
-    this.runPreviewAndArm(
-      [intent],
-      () =>
-        this.dbAccess.createRole(this.datasourceId, {
-          ...body,
-          previewOnly: true,
-        }),
-      () => this.dbAccess.createRole(this.datasourceId, body),
-    );
-  }
-
-  onCancel(): void {
-    this.roleForm.markAsPristine();
-    this.router.navigate([DB_ACCESS.workspace(this.datasourceId)]);
-  }
-
-  private runPreviewAndArm(
-    intents: ChangeIntent[],
-    preview: () => Promise<any>,
-    execute: () => Promise<any>,
-  ): void {
-    this.showPreview = true;
-    this.previewLoading = true;
-    this.summaries = intents.map(i => describeChange(i, this.translate));
-    this.pendingExecute = execute;
-    this.cdr.markForCheck();
-
-    preview()
-      .then(res => {
-        if (!res?.status) {
-          this.globalService.handleSuccessService(res);
-          this.showPreview = false;
-        }
-      })
-      .catch(() => {
-        this.showPreview = false;
-      })
-      .finally(() => {
-        this.previewLoading = false;
-        this.cdr.markForCheck();
-      });
-  }
-
-  confirmPreview(): void {
-    if (!this.pendingExecute) return;
-    this.pendingExecute()
+    this.dbAccess
+      .createRole(this.datasourceId, body)
       .then(res => {
         if (this.globalService.handleSuccessService(res)) {
-          this.showPreview = false;
           this.roleForm.markAsPristine();
           this.router.navigate([DB_ACCESS.workspace(this.datasourceId)]);
         }
@@ -187,8 +125,8 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
       .finally(() => this.cdr.markForCheck());
   }
 
-  cancelPreview(): void {
-    this.showPreview = false;
-    this.pendingExecute = null;
+  onCancel(): void {
+    this.roleForm.markAsPristine();
+    this.router.navigate([DB_ACCESS.workspace(this.datasourceId)]);
   }
 }

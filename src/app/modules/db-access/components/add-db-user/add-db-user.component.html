@@ -25,13 +25,13 @@
           pButton
           class="p-button-primary btn-save"
           type="button"
-          [label]="'DB_ACCESS.REVIEW_SQL' | translate"
+          [label]="'COMMON.CREATE' | translate"
           (click)="onSubmit()"
           [disabled]="userForm.invalid || saving()"
         >
           <i
             class="pi mr-2"
-            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-eye'"
+            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
           ></i>
         </button>
       </div>
@@ -64,21 +64,22 @@
             [placeholder]="'DB_ACCESS.PASSWORD_PLACEHOLDER' | translate"
           ></app-custom-input>
 
-          <!-- Connection limit -->
-          <app-custom-number
-            formControlName="connectionLimit"
-            [label]="'DB_ACCESS.CONN_LIMIT' | translate"
-            [min]="-1"
-            [placeholder]="'DB_ACCESS.UNLIMITED' | translate"
-          ></app-custom-number>
-
-          <!-- Expiry -->
-          <app-custom-calendar
-            formControlName="validUntil"
-            [label]="'DB_ACCESS.VALID_UNTIL' | translate"
-            [showTime]="false"
-            [showButtonBar]="true"
-          ></app-custom-calendar>
+          <!-- Connection limit + Expiry in one row -->
+          <div class="form-row">
+            <app-custom-number
+              formControlName="connectionLimit"
+              [label]="'DB_ACCESS.CONN_LIMIT' | translate"
+              [min]="-1"
+              [placeholder]="'DB_ACCESS.UNLIMITED' | translate"
+            ></app-custom-number>
+            <app-custom-calendar
+              formControlName="validUntil"
+              [label]="'DB_ACCESS.VALID_UNTIL' | translate"
+              [showTime]="false"
+              [showButtonBar]="true"
+              appendTo="body"
+            ></app-custom-calendar>
+          </div>
 
           <!-- Attributes -->
           <h3 class="form-section-title">
@@ -129,52 +130,41 @@
             </div>
           </div>
 
-          <!-- Attach to app user / group -->
+          <!-- Attach to app group / user -->
           <h3 class="form-section-title">
             {{ 'DB_ACCESS.ATTACH_MAPPING' | translate }}
           </h3>
           <p class="form-hint">{{ 'DB_ACCESS.ATTACH_HINT' | translate }}</p>
 
-          <app-custom-multiselect
-            formControlName="appUserIds"
-            [options]="appUserOptions"
-            optionLabel="label"
-            optionValue="value"
-            [filter]="true"
-            filterBy="label"
-            appendTo="body"
-            [label]="'DB_ACCESS.APP_USERS' | translate"
-            [placeholder]="'DB_ACCESS.SELECT_APP_USERS' | translate"
-            icon="pi-user"
-          ></app-custom-multiselect>
+          <div class="form-row">
+            <app-custom-multiselect
+              formControlName="appGroupIds"
+              [options]="appGroupOptions"
+              optionLabel="label"
+              optionValue="value"
+              [filter]="true"
+              filterBy="label"
+              appendTo="body"
+              [label]="'DB_ACCESS.APP_GROUPS' | translate"
+              [placeholder]="'DB_ACCESS.SELECT_APP_GROUPS' | translate"
+              icon="pi-users"
+            ></app-custom-multiselect>
 
-          <app-custom-multiselect
-            formControlName="appGroupIds"
-            [options]="appGroupOptions"
-            optionLabel="label"
-            optionValue="value"
-            [filter]="true"
-            filterBy="label"
-            appendTo="body"
-            [label]="'DB_ACCESS.APP_GROUPS' | translate"
-            [placeholder]="'DB_ACCESS.SELECT_APP_GROUPS' | translate"
-            icon="pi-users"
-          ></app-custom-multiselect>
+            <app-custom-multiselect
+              formControlName="appUserIds"
+              [options]="appUserOptions"
+              optionLabel="label"
+              optionValue="value"
+              [filter]="true"
+              filterBy="label"
+              appendTo="body"
+              [label]="'DB_ACCESS.APP_USERS' | translate"
+              [placeholder]="'DB_ACCESS.SELECT_APP_USERS' | translate"
+              icon="pi-user"
+            ></app-custom-multiselect>
+          </div>
         </div>
       </div>
     </form>
   </div>
 </div>
-
-<!-- Plain-language change-summary confirm gate -->
-<app-change-summary-dialog
-  [visible]="showPreview"
-  [title]="previewTitle"
-  [summaries]="summaries"
-  [destructive]="previewDestructive"
-  [confirmPhrase]="confirmPhrase"
-  [loading]="previewLoading"
-  [executing]="saving()"
-  (confirmed)="confirmPreview()"
-  (cancelled)="cancelPreview()"
-></app-change-summary-dialog>

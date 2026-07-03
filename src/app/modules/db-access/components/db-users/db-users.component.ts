@@ -2,12 +2,16 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  DestroyRef,
   Input,
   OnInit,
   inject,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { DB_ACCESS } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DbAccessService } from '../../services/db-access.service';
@@ -15,11 +19,12 @@ import { ChangeIntent, describeChange } from '../../services/describe-change';
 
 /**
  * DbUsersComponent — LISTING for login roles (canLogin === true). A p-table
- * with status pill / expiry / connection limit / attribute chips / member-of
- * and row actions (view / edit / deactivate / delete). Add + edit + view are
- * now full SCREENS (routes) — this component only lists and confirms
- * destructive ops (deactivate + a delete wizard) via the plain-language
- * confirm gate. NO SQL is ever surfaced.
+ * with status pill / expiry / connection limit / attribute chips / member-of,
+ * a filter row (name + status, debounced), client-side pagination, and row
+ * actions (view / edit / deactivate / delete). The BE returns all roles in
+ * one call, so filtering + paging happen in-memory — the table only renders
+ * the current page, so large role sets don't hang the UI. Add + edit + view
+ * are full SCREENS. Destructive ops (deactivate / delete) use confirm popups.
  */
 @Component({
   selector: 'app-db-users',
@@ -32,11 +37,21 @@ export class DbUsersComponent implements OnInit {
   @Input() canManage = false;
 
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
 
   loading = this.dbAccess.loading;
   saving = this.dbAccess.saving;
 
-  users: any[] = [];
+  private allUsers: any[] = []; // full set from BE
+  users: any[] = []; // filtered view bound to the table
+
+  // ── Filters (debounced, client-side) ──────────────────────────────────
+  statusFilterOptions: { label: string; value: string }[] = [];
+  filterValues: { name: string; status: string | null } = {
+    name: '',
+    status: null,
+  };
+  private filter$ = new Subject<void>();
 
   // ── Change-summary confirm gate (plain-language, never SQL) ───────────
   showPreview = false;
@@ -63,6 +78,14 @@ export class DbUsersComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.statusFilterOptions = [
+      { label: this.translate.instant('DB_ACCESS.STATUS_ACTIVE'), value: 'active' },
+      { label: this.translate.instant('DB_ACCESS.STATUS_NO-LOGIN'), value: 'no-login' },
+      { label: this.translate.instant('DB_ACCESS.STATUS_EXPIRED'), value: 'expired' },
+    ];
+    this.filter$
+      .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.applyFilters());
     this.load();
   }
 
@@ -71,10 +94,35 @@ export class DbUsersComponent implements OnInit {
       .loadRoles(this.datasourceId)
       .then(() => {
         const all = this.dbAccess.roles() ?? [];
-        this.users = all.filter(r => r.canLogin || r.attributes?.login);
+        this.allUsers = all.filter(r => r.canLogin || r.attributes?.login);
+        this.applyFilters();
         this.cdr.markForCheck();
       })
       .catch(() => this.cdr.markForCheck());
+  }
+
+  get isFilterActive(): boolean {
+    return !!this.filterValues.name || this.filterValues.status !== null;
+  }
+
+  onFilterChange(): void {
+    this.filter$.next();
+  }
+
+  clearFilters(): void {
+    this.filterValues = { name: '', status: null };
+    this.applyFilters();
+  }
+
+  private applyFilters(): void {
+    const name = (this.filterValues.name || '').trim().toLowerCase();
+    const status = this.filterValues.status;
+    this.users = this.allUsers.filter(u => {
+      if (name && !String(u.name).toLowerCase().includes(name)) return false;
+      if (status && this.statusOf(u) !== status) return false;
+      return true;
+    });
+    this.cdr.markForCheck();
   }
 
   get groupRoleNames(): string[] {

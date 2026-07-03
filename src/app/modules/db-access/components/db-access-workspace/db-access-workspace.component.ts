@@ -52,6 +52,10 @@ export class DbAccessWorkspaceComponent implements OnInit, OnDestroy {
   unsupported = false; // non-postgres → 400 on capability
   activeIndex = 0;
 
+  // Discard-changes popup (leaving the Privileges tab mid-composition).
+  showDiscardPopup = false;
+  private pendingTabIndex: number | null = null;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -170,25 +174,38 @@ export class DbAccessWorkspaceComponent implements OnInit, OnDestroy {
 
   /**
    * p-tabView (onChange) handler. Blocks a switch away from the Privileges
-   * tab when a rule is half-composed, unless the user confirms discarding.
+   * tab when a rule is half-composed, surfacing a discard confirmation
+   * POPUP (not a native window.confirm).
    */
   onTabChange(event: { index: number }): void {
     const leavingMatrix =
       this.activeIndex === 2 && event.index !== 2 && this.matrixRef;
     if (leavingMatrix && this.matrixRef!.hasUnsavedChanges()) {
-      const ok = window.confirm(
-        this.translate.instant('DB_ACCESS.DISCARD_UNSAVED'),
-      );
-      if (!ok) {
-        // Revert the tab header selection back to Privileges.
-        setTimeout(() => {
-          this.activeIndex = 2;
-          this.cdr.markForCheck();
-        });
-        return;
-      }
+      this.pendingTabIndex = event.index;
+      this.showDiscardPopup = true;
+      // Snap the header back to Privileges until the user decides.
+      setTimeout(() => {
+        this.activeIndex = 2;
+        this.cdr.markForCheck();
+      });
+      return;
     }
     this.activeIndex = event.index;
+  }
+
+  confirmDiscard(): void {
+    this.showDiscardPopup = false;
+    if (this.pendingTabIndex !== null) {
+      this.matrixRef?.resetComposer();
+      this.activeIndex = this.pendingTabIndex;
+      this.pendingTabIndex = null;
+      this.cdr.markForCheck();
+    }
+  }
+
+  cancelDiscard(): void {
+    this.showDiscardPopup = false;
+    this.pendingTabIndex = null;
   }
 
   // ── Context-aware toolbar (Refresh + Create act on the active tab) ───────
@@ -224,10 +241,11 @@ export class DbAccessWorkspaceComponent implements OnInit, OnDestroy {
         this.rolesRef?.load();
         break;
       case 2:
-        this.matrixRef?.ngOnInit();
+        // Reload catalog data only — must NOT add a new rule (bug fix).
+        this.matrixRef?.refresh();
         break;
       default:
-        // Effective / Mappings / Audit re-mount on their own; nudge CD.
+        // Effective re-mounts on its own; nudge CD.
         this.cdr.markForCheck();
     }
   }

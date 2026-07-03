@@ -12,14 +12,12 @@ import { DB_ACCESS } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DbAccessService } from '../../services/db-access.service';
-import { ChangeIntent, describeChange } from '../../services/describe-change';
 
 /**
  * EditDbUserComponent — full-page edit screen for a login role. Loads the
  * role by name (from the roles list), pins the name read-only (rename is a
  * separate op), and lets the admin alter attributes / password / limit /
- * expiry. Attach-to-app lives only on the create screen and Mappings tab.
- * Alter flows through the plain-language confirm gate (never SQL).
+ * expiry. The primary button saves directly (NO SQL is ever shown).
  */
 @Component({
   selector: 'app-edit-db-user',
@@ -36,14 +34,6 @@ export class EditDbUserComponent implements OnInit, HasUnsavedChanges {
   loadingRole = true;
   userForm!: FormGroup;
   saving = this.dbAccess.saving;
-
-  showPreview = false;
-  previewLoading = false;
-  summaries: string[] = [];
-  previewDestructive = false;
-  previewTitle = '';
-  confirmPhrase: string | null = null;
-  private pendingExecute: (() => Promise<any>) | null = null;
 
   constructor(
     private dbAccess: DbAccessService,
@@ -134,73 +124,19 @@ export class EditDbUserComponent implements OnInit, HasUnsavedChanges {
     return attributes;
   }
 
+  /** Save attribute changes directly (no SQL-preview dialog). */
   onSubmit(): void {
     if (this.userForm.invalid) return;
     const attributes = this.buildAttributes();
     const needsSuperuserConfirm = attributes.superuser || attributes.bypassrls;
 
-    this.previewTitle = this.translate.instant('DB_ACCESS.PREVIEW_ALTER_USER');
-    this.previewDestructive = needsSuperuserConfirm;
-    this.confirmPhrase = null;
-
-    const intent: ChangeIntent = {
-      kind: 'alterRole',
-      name: this.roleName,
-      attributes,
-    };
-    this.runPreviewAndArm(
-      [intent],
-      () =>
-        this.dbAccess.updateRole(this.datasourceId, this.roleName, {
-          attributes,
-          previewOnly: true,
-        }),
-      () =>
-        this.dbAccess.updateRole(this.datasourceId, this.roleName, {
-          attributes,
-          confirm: needsSuperuserConfirm ? true : undefined,
-        }),
-    );
-  }
-
-  onCancel(): void {
-    this.userForm.markAsPristine();
-    this.router.navigate([DB_ACCESS.workspace(this.datasourceId)]);
-  }
-
-  private runPreviewAndArm(
-    intents: ChangeIntent[],
-    preview: () => Promise<any>,
-    execute: () => Promise<any>,
-  ): void {
-    this.showPreview = true;
-    this.previewLoading = true;
-    this.summaries = intents.map(i => describeChange(i, this.translate));
-    this.pendingExecute = execute;
-    this.cdr.markForCheck();
-
-    preview()
-      .then(res => {
-        if (!res?.status) {
-          this.globalService.handleSuccessService(res);
-          this.showPreview = false;
-        }
+    this.dbAccess
+      .updateRole(this.datasourceId, this.roleName, {
+        attributes,
+        confirm: needsSuperuserConfirm ? true : undefined,
       })
-      .catch(() => {
-        this.showPreview = false;
-      })
-      .finally(() => {
-        this.previewLoading = false;
-        this.cdr.markForCheck();
-      });
-  }
-
-  confirmPreview(): void {
-    if (!this.pendingExecute) return;
-    this.pendingExecute()
       .then(res => {
         if (this.globalService.handleSuccessService(res)) {
-          this.showPreview = false;
           this.userForm.markAsPristine();
           this.router.navigate([DB_ACCESS.workspace(this.datasourceId)]);
         }
@@ -209,8 +145,8 @@ export class EditDbUserComponent implements OnInit, HasUnsavedChanges {
       .finally(() => this.cdr.markForCheck());
   }
 
-  cancelPreview(): void {
-    this.showPreview = false;
-    this.pendingExecute = null;
+  onCancel(): void {
+    this.userForm.markAsPristine();
+    this.router.navigate([DB_ACCESS.workspace(this.datasourceId)]);
   }
 }

@@ -7,13 +7,6 @@
           <h3>{{ 'DB_ACCESS.ACCESS_RULES' | translate }}</h3>
           <p class="panel-hint">{{ 'DB_ACCESS.ACCESS_RULES_HINT' | translate }}</p>
         </div>
-        <button
-          pButton
-          [label]="'COMMON.REFRESH' | translate"
-          icon="pi pi-refresh"
-          (click)="ngOnInit()"
-          class="p-button-outlined modern-button"
-        ></button>
       </div>
 
       <div class="rule-card" *ngFor="let rule of rules; let i = index">
@@ -199,9 +192,9 @@
         <button
           *ngIf="canManage"
           pButton
-          [label]="'DB_ACCESS.REVIEW_CHANGES' | translate"
-          icon="pi pi-check"
-          [disabled]="!anyValidRule"
+          [label]="'DB_ACCESS.APPLY_CHANGES' | translate"
+          [icon]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
+          [disabled]="!anyValidRule || saving()"
           (click)="reviewChanges()"
           class="p-button-raised p-button-primary modern-button full-width"
         ></button>

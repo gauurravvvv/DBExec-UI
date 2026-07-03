@@ -12,12 +12,11 @@ import { DB_ACCESS } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DbAccessService } from '../../services/db-access.service';
-import { ChangeIntent, describeChange } from '../../services/describe-change';
 
 /**
  * EditDbRoleComponent — full-page edit for a group role. Loads by name,
  * pins the name read-only, edits the INHERIT / CREATEDB / CREATEROLE
- * attributes, and flows through the plain-language confirm gate.
+ * attributes. The primary button saves directly (NO SQL is ever shown).
  */
 @Component({
   selector: 'app-edit-db-role',
@@ -34,14 +33,6 @@ export class EditDbRoleComponent implements OnInit, HasUnsavedChanges {
   loadingRole = true;
   roleForm!: FormGroup;
   saving = this.dbAccess.saving;
-
-  showPreview = false;
-  previewLoading = false;
-  summaries: string[] = [];
-  previewDestructive = false;
-  previewTitle = '';
-  confirmPhrase: string | null = null;
-  private pendingExecute: (() => Promise<any>) | null = null;
 
   constructor(
     private dbAccess: DbAccessService,
@@ -97,6 +88,7 @@ export class EditDbRoleComponent implements OnInit, HasUnsavedChanges {
     return this.isFormDirty;
   }
 
+  /** Save attribute changes directly (no SQL-preview dialog). */
   onSubmit(): void {
     if (this.roleForm.invalid) return;
     const v = this.roleForm.getRawValue();
@@ -107,67 +99,10 @@ export class EditDbRoleComponent implements OnInit, HasUnsavedChanges {
       createrole: v.createrole,
     };
 
-    this.previewTitle = this.translate.instant('DB_ACCESS.PREVIEW_ALTER_ROLE');
-    this.previewDestructive = false;
-    this.confirmPhrase = null;
-
-    const intent: ChangeIntent = {
-      kind: 'alterRole',
-      name: this.roleName,
-      attributes,
-    };
-    this.runPreviewAndArm(
-      [intent],
-      () =>
-        this.dbAccess.updateRole(this.datasourceId, this.roleName, {
-          attributes,
-          previewOnly: true,
-        }),
-      () =>
-        this.dbAccess.updateRole(this.datasourceId, this.roleName, {
-          attributes,
-        }),
-    );
-  }
-
-  onCancel(): void {
-    this.roleForm.markAsPristine();
-    this.router.navigate([DB_ACCESS.workspace(this.datasourceId)]);
-  }
-
-  private runPreviewAndArm(
-    intents: ChangeIntent[],
-    preview: () => Promise<any>,
-    execute: () => Promise<any>,
-  ): void {
-    this.showPreview = true;
-    this.previewLoading = true;
-    this.summaries = intents.map(i => describeChange(i, this.translate));
-    this.pendingExecute = execute;
-    this.cdr.markForCheck();
-
-    preview()
-      .then(res => {
-        if (!res?.status) {
-          this.globalService.handleSuccessService(res);
-          this.showPreview = false;
-        }
-      })
-      .catch(() => {
-        this.showPreview = false;
-      })
-      .finally(() => {
-        this.previewLoading = false;
-        this.cdr.markForCheck();
-      });
-  }
-
-  confirmPreview(): void {
-    if (!this.pendingExecute) return;
-    this.pendingExecute()
+    this.dbAccess
+      .updateRole(this.datasourceId, this.roleName, { attributes })
       .then(res => {
         if (this.globalService.handleSuccessService(res)) {
-          this.showPreview = false;
           this.roleForm.markAsPristine();
           this.router.navigate([DB_ACCESS.workspace(this.datasourceId)]);
         }
@@ -176,8 +111,8 @@ export class EditDbRoleComponent implements OnInit, HasUnsavedChanges {
       .finally(() => this.cdr.markForCheck());
   }
 
-  cancelPreview(): void {
-    this.showPreview = false;
-    this.pendingExecute = null;
+  onCancel(): void {
+    this.roleForm.markAsPristine();
+    this.router.navigate([DB_ACCESS.workspace(this.datasourceId)]);
   }
 }

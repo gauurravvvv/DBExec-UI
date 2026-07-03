@@ -24,13 +24,13 @@
           pButton
           class="p-button-primary btn-save"
           type="button"
-          [label]="'DB_ACCESS.REVIEW_SQL' | translate"
+          [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
           [disabled]="roleForm.invalid || saving() || loadingRole"
         >
           <i
             class="pi mr-2"
-            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-eye'"
+            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
           ></i>
         </button>
       </div>
@@ -82,15 +82,3 @@
     </div>
   </div>
 </div>
-
-<app-change-summary-dialog
-  [visible]="showPreview"
-  [title]="previewTitle"
-  [summaries]="summaries"
-  [destructive]="previewDestructive"
-  [confirmPhrase]="confirmPhrase"
-  [loading]="previewLoading"
-  [executing]="saving()"
-  (confirmed)="confirmPreview()"
-  (cancelled)="cancelPreview()"
-></app-change-summary-dialog>

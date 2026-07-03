@@ -13,6 +13,7 @@
         [loading]="loading()"
         [scrollable]="true"
         scrollHeight="flex"
+        [tableStyle]="{ 'min-width': '64rem' }"
       >
         <ng-template pTemplate="header">
           <tr>
@@ -37,6 +38,37 @@
             <th style="width: 10rem">
               <div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div>
             </th>
+          </tr>
+          <!-- Filter row -->
+          <tr>
+            <th>
+              <app-custom-input
+                [(ngModel)]="filterValues.name"
+                (ngModelChange)="onFilterChange()"
+                [placeholder]="'COMMON.SEARCH_NAME' | translate"
+                icon="pi-search"
+              ></app-custom-input>
+            </th>
+            <th>
+              <app-custom-dropdown
+                [(ngModel)]="filterValues.status"
+                [options]="statusFilterOptions"
+                optionLabel="label"
+                optionValue="value"
+                [placeholder]="'COMMON.ALL' | translate"
+                [showClear]="true"
+                [filter]="false"
+                [autoDisplayFirst]="false"
+                appendTo="body"
+                (onChangeEvent)="onFilterChange()"
+                icon="pi-circle-fill"
+              ></app-custom-dropdown>
+            </th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-user>
