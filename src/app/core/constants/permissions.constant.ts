@@ -20,6 +20,8 @@ export const PERMISSIONS = {
   DB_PRIVILEGES: 'dbPrivileges',
 
   // DBExec Studio
+  CONNECTION_MANAGER: 'connectionManager',
+  QUERY_RUNNER: 'queryRunner',
   QB_TAB: 'queryBuilderTab',
   QB_SECTION: 'queryBuilderSection',
   QB_PROMPT: 'queryBuilderPrompt',

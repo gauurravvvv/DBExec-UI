@@ -135,6 +135,18 @@ const routes: Routes = [
         },
       },
       {
+        path: 'query-runner',
+        loadChildren: () =>
+          import('./modules/query-runner/query-runner.module').then(
+            m => m.QueryRunnerModule,
+          ),
+        canActivate: [roleGuard],
+        data: {
+          permission: PERMISSIONS.QUERY_RUNNER,
+          title: 'PAGE_TITLES.QUERY_RUNNER',
+        },
+      },
+      {
         path: 'roles',
         loadChildren: () =>
           import('./modules/role/role.module').then(m => m.RoleModule),
@@ -266,6 +278,21 @@ const routes: Routes = [
         data: { title: 'PAGE_TITLES.NOT_FOUND' },
       },
     ],
+  },
+  // Standalone Query Runner executor — deliberately OUTSIDE the `app`
+  // shell (no sidebar/topbar) so a browser tab opened from the launcher
+  // is a focused, full-screen workspace. Still auth + permission gated.
+  {
+    path: 'query-runner/exec',
+    loadChildren: () =>
+      import('./modules/query-runner/executor/query-executor.module').then(
+        m => m.QueryExecutorModule,
+      ),
+    canActivate: [authGuard, roleGuard],
+    data: {
+      permission: PERMISSIONS.QUERY_RUNNER,
+      title: 'PAGE_TITLES.QUERY_RUNNER',
+    },
   },
   // Anything unknown lands on a real 404 page rather than silently
   // bouncing to /login. Inside the authenticated shell so the user

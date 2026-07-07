@@ -21,6 +21,8 @@ export const SIDEBAR_ITEMS_ROUTES = [
   { value: 'dbPrivileges', route: '/app/db-privileges' },
   { value: 'datasetManager', route: '/app/datasets' },
   { value: 'analyses', route: '/app/analyses' },
+  { value: 'connectionManager', route: '/app/query-runner/connections' },
+  { value: 'queryRunner', route: '/app/query-runner' },
   { value: 'queryBuilderTab', route: '/app/tabs' },
   { value: 'queryBuilderSection', route: '/app/sections' },
   { value: 'queryBuilderPrompt', route: '/app/prompts' },

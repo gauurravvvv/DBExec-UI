@@ -1,0 +1,5 @@
+@use '../../../db-access/styles/db-access-shared' as db;
+
+@include db.db-access-page;
+@include db.db-access-table;
+@include db.db-access-dialog;

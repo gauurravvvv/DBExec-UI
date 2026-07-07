@@ -101,6 +101,20 @@ export const DATASOURCE = {
   ACTIVITY_SUFFIX: '/activity',
 };
 
+export const QUERY_RUNNER = {
+  // Connection CRUD (owner-scoped)
+  CONNECTIONS: '/query-runner/connections',
+  CONNECTION: '/query-runner/connections/', // + :id  (GET/PUT/DELETE)
+  // POST /query-runner/connections/:id/test  → verify creds
+  TEST_SUFFIX: '/test',
+  // GET  /query-runner/connections/:id/catalog  → schema catalog for IntelliSense
+  CATALOG_SUFFIX: '/catalog',
+  // POST /query-runner/connections/:id/execute  → run SQL
+  EXECUTE_SUFFIX: '/execute',
+  // POST /query-runner/connections/:id/cancel   → cancel a running run
+  CANCEL_SUFFIX: '/cancel',
+};
+
 export const GROUP = {
   LIST: '/groups',
   ADD: '/groups',

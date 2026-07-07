@@ -1,0 +1,95 @@
+<div class="dataset-page-wrapper">
+  <div class="dataset-content-container">
+    <div class="page-header-section">
+      <div class="header-content">
+        <h2>{{ 'QUERY_RUNNER.TITLE' | translate }}</h2>
+      </div>
+      <div class="header-actions">
+        <button
+          pButton
+          [label]="'QUERY_RUNNER.MANAGE_CONNECTIONS' | translate"
+          icon="pi pi-cog"
+          [routerLink]="['/app/query-runner/connections']"
+          class="p-button-outlined modern-button"
+        ></button>
+      </div>
+    </div>
+
+    <div class="content-card launcher-card">
+      <div class="launcher-intro">
+        <div class="launcher-badge"><i class="pi pi-play"></i></div>
+        <div>
+          <h3>{{ 'QUERY_RUNNER.LAUNCH_TITLE' | translate }}</h3>
+          <p>{{ 'QUERY_RUNNER.LAUNCH_SUBTITLE' | translate }}</p>
+        </div>
+      </div>
+
+      <!-- Empty state: no connections yet -->
+      <div class="launcher-empty" *ngIf="!connectionsLoading && hasNoConnections">
+        <i class="pi pi-link"></i>
+        <p>{{ 'QUERY_RUNNER.NO_CONNECTIONS_HINT' | translate }}</p>
+        <button
+          *hasPermission="'connectionManager'; level: 'write'"
+          pButton
+          [label]="'QUERY_RUNNER.NEW_CONNECTION' | translate"
+          icon="pi pi-plus"
+          (click)="createConnection()"
+          class="p-button-primary modern-button"
+        ></button>
+      </div>
+
+      <div class="launcher-form" *ngIf="!hasNoConnections">
+        <div class="launcher-step">
+          <label>{{ 'QUERY_RUNNER.STEP_DATASOURCE' | translate }}</label>
+          <app-custom-dropdown
+            [ngModel]="selectedDatasourceId"
+            (onChangeEvent)="onDatasourceChange($event)"
+            [serverMode]="true"
+            [fetcher]="loadDatasourcesPage"
+            [pageSize]="10"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            filterBy="name"
+            [showClear]="true"
+            appendTo="body"
+            icon="pi-database"
+            [placeholder]="'QUERY_RUNNER.SELECT_DATASOURCE' | translate"
+          ></app-custom-dropdown>
+        </div>
+
+        <div class="launcher-step">
+          <label>{{ 'QUERY_RUNNER.STEP_CONNECTION' | translate }}</label>
+          <app-custom-dropdown
+            [(ngModel)]="selectedConnectionId"
+            [options]="connectionOptions"
+            optionLabel="label"
+            optionValue="value"
+            [filter]="true"
+            filterBy="label"
+            [showClear]="true"
+            appendTo="body"
+            icon="pi-link"
+            [disabled]="!selectedDatasourceId"
+            [placeholder]="(selectedDatasourceId ? 'QUERY_RUNNER.SELECT_CONNECTION' : 'QUERY_RUNNER.SELECT_DATASOURCE_FIRST') | translate"
+          ></app-custom-dropdown>
+          <small class="step-hint" *ngIf="selectedDatasourceId && connectionOptions.length === 0">
+            {{ 'QUERY_RUNNER.NO_CONNECTIONS_FOR_DS' | translate }}
+          </small>
+        </div>
+
+        <div class="launcher-actions">
+          <button
+            pButton
+            [label]="(verifying ? 'QUERY_RUNNER.VERIFYING' : 'QUERY_RUNNER.OPEN_EXECUTOR') | translate"
+            [disabled]="!canOpen"
+            (click)="open()"
+            class="p-button-raised p-button-primary modern-button open-btn"
+          >
+            <i class="pi mr-2" [ngClass]="verifying ? 'pi-spin pi-spinner' : 'pi-external-link'"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

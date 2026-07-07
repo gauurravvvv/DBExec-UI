@@ -1,0 +1,292 @@
+/* Standalone Query Runner workspace — full-viewport, DBeaver-style.
+   Deliberately self-contained (no app shell), tuned for long sessions
+   on dense data: calm neutrals, one teal functional accent, tabular
+   numerics in the grid. */
+:host {
+  --qx-bg: var(--surface-ground, #f7f8fa);
+  --qx-elev: var(--surface-card, #ffffff);
+  --qx-border: var(--surface-border, #d9dde5);
+  --qx-text: var(--text-color, #1c2430);
+  --qx-muted: var(--text-color-secondary, #6b7482);
+  --qx-accent: var(--primary-color, #2f6f6a);
+  --qx-accent-text: var(--primary-color-text, #ffffff);
+  --qx-error: #c0392b;
+  --qx-ok: #2e7d46;
+
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.qx-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--qx-bg);
+  color: var(--qx-text);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* ── top bar ─────────────────────────────────────────────────────── */
+.qx-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: var(--qx-elev);
+  border-bottom: 1px solid var(--qx-border);
+  flex-shrink: 0;
+}
+.qx-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+
+  > i {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 7px;
+    background: var(--qx-accent);
+    color: var(--qx-accent-text);
+    flex-shrink: 0;
+  }
+}
+.qx-title {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  min-width: 0;
+  .qx-ds {
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .qx-conn {
+    font-size: 0.72rem;
+    color: var(--qx-muted);
+  }
+}
+.qx-engine {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--qx-muted);
+  border: 1px solid var(--qx-border);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+.qx-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+
+  .qx-sep {
+    width: 1px;
+    height: 22px;
+    background: var(--qx-border);
+    margin: 0 0.3rem;
+  }
+  .qx-autocommit {
+    display: inline-flex;
+  }
+}
+
+/* ── body ───────────────────────────────────────────────────────── */
+.qx-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* object browser */
+.qx-browser {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--qx-elev);
+  border-right: 1px solid var(--qx-border);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.qx-browser-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--qx-muted);
+  border-bottom: 1px solid var(--qx-border);
+}
+.qx-icon {
+  border: none;
+  background: transparent;
+  color: var(--qx-muted);
+  cursor: pointer;
+  &:hover:not(:disabled) { color: var(--qx-accent); }
+}
+.qx-tree {
+  flex: 1;
+  overflow: auto;
+  padding: 0.25rem 0;
+  font-size: 0.8rem;
+}
+.qx-empty {
+  padding: 1rem 0.75rem;
+  color: var(--qx-muted);
+  font-size: 0.78rem;
+}
+.qx-node {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 3px 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  &:hover { background: var(--qx-bg); }
+  &.indent { padding-left: 1.4rem; }
+  > .pi:first-child { font-size: 0.6rem; color: var(--qx-muted); }
+}
+.qx-cols { padding-left: 0.4rem; }
+.qx-col {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 2px 0.75rem 2px 2.4rem;
+  cursor: pointer;
+  font-size: 0.76rem;
+  &:hover { background: var(--qx-bg); }
+  .pi { font-size: 0.55rem; color: var(--qx-muted); }
+  .pi-key { color: #b8860b; }
+  .qx-col-name { color: var(--qx-text); }
+  .qx-col-type { margin-left: auto; color: var(--qx-muted); font-size: 0.68rem; }
+}
+
+/* editor + results */
+.qx-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.qx-editor {
+  height: 42%;
+  min-height: 120px;
+  border-bottom: 2px solid var(--qx-border);
+  background: var(--qx-elev);
+  overflow: hidden;
+}
+.qx-editor-host {
+  height: 100%;
+  :global(.cm-editor) { height: 100%; }
+}
+.qx-results {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--qx-elev);
+}
+.qx-result-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0.35rem 0.5rem 0;
+  border-bottom: 1px solid var(--qx-border);
+  overflow-x: auto;
+  button {
+    border: 1px solid transparent;
+    border-bottom: none;
+    background: transparent;
+    color: var(--qx-muted);
+    padding: 0.35rem 0.7rem;
+    font-size: 0.76rem;
+    cursor: pointer;
+    border-radius: 6px 6px 0 0;
+    white-space: nowrap;
+    &.active {
+      background: var(--qx-bg);
+      color: var(--qx-text);
+      border-color: var(--qx-border);
+    }
+  }
+}
+.qx-result-body {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+.qx-grid {
+  width: 100%;
+  height: 100%;
+}
+.qx-result-empty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  color: var(--qx-muted);
+  i { font-size: 1.6rem; }
+}
+.qx-msg {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  color: var(--qx-ok);
+  font-size: 0.85rem;
+}
+.qx-error {
+  padding: 1rem;
+  .qx-error-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--qx-error);
+    font-size: 0.85rem;
+    strong { font-family: ui-monospace, monospace; }
+  }
+  .qx-error-hint {
+    margin-top: 0.4rem;
+    color: var(--qx-muted);
+    font-size: 0.8rem;
+  }
+}
+
+/* ── status bar ─────────────────────────────────────────────────── */
+.qx-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.3rem 1rem;
+  background: var(--qx-elev);
+  border-top: 1px solid var(--qx-border);
+  font-size: 0.74rem;
+  color: var(--qx-muted);
+  flex-shrink: 0;
+}
+.qx-status-left {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.qx-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  &.read { background: var(--qx-muted); }
+  &.write { background: #a86b00; }
+}

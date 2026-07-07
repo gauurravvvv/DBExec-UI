@@ -1,0 +1,162 @@
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  inject,
+} from '@angular/core';
+import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { QUERY_RUNNER } from 'src/app/core/constants/routes.constant';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import {
+  QueryConnection,
+  QueryRunnerService,
+} from '../services/query-runner.service';
+
+/**
+ * LauncherComponent — the Query Runner entry point. Pick a datasource,
+ * then one of your connections on it, then Open. Open verifies the
+ * connection's credentials and, on success, opens the standalone
+ * executor in a new browser tab titled with the datasource name.
+ */
+@Component({
+  selector: 'app-launcher',
+  templateUrl: './launcher.component.html',
+  styleUrls: ['./launcher.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class LauncherComponent implements OnInit {
+  private cdr = inject(ChangeDetectorRef);
+
+  selectedDatasourceId: string | null = null;
+  selectedConnectionId: string | null = null;
+
+  connectionOptions: { label: string; value: string }[] = [];
+  private connectionsById = new Map<string, QueryConnection>();
+  connectionsLoading = false;
+  verifying = false;
+
+  hasNoConnections = false;
+
+  constructor(
+    private service: QueryRunnerService,
+    private datasourceService: DatasourceService,
+    private globalService: GlobalService,
+    private translate: TranslateService,
+    private router: Router,
+  ) {}
+
+  ngOnInit(): void {
+    // Preload the user's connections once so we can both drive the
+    // connection dropdown and detect the empty state.
+    this.loadConnections();
+  }
+
+  /** Server-mode fetcher for the datasource dropdown. */
+  loadDatasourcesPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.datasourceService.listDatasource(params);
+      if (res?.status) {
+        return {
+          items: res?.data?.datasources ?? [],
+          total: res?.data?.count ?? 0,
+        };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
+  private allConnections: QueryConnection[] = [];
+
+  private loadConnections(): void {
+    this.connectionsLoading = true;
+    this.cdr.markForCheck();
+    this.service
+      .listConnections()
+      .then(res => {
+        this.allConnections = res?.status ? (res.data?.connections ?? []) : [];
+        this.hasNoConnections = this.allConnections.length === 0;
+        this.refreshConnectionOptions();
+      })
+      .catch(() => {
+        this.allConnections = [];
+        this.hasNoConnections = true;
+      })
+      .finally(() => {
+        this.connectionsLoading = false;
+        this.cdr.markForCheck();
+      });
+  }
+
+  /** When the datasource changes, filter connections to it + reset. */
+  onDatasourceChange(dsId: string | null): void {
+    this.selectedDatasourceId = dsId;
+    this.selectedConnectionId = null;
+    this.refreshConnectionOptions();
+    this.cdr.markForCheck();
+  }
+
+  private refreshConnectionOptions(): void {
+    this.connectionsById.clear();
+    const list = this.selectedDatasourceId
+      ? this.allConnections.filter(
+          c => c.datasourceId === this.selectedDatasourceId,
+        )
+      : [];
+    for (const c of list) this.connectionsById.set(c.id, c);
+    this.connectionOptions = list.map(c => ({
+      label: `${c.name} — ${c.username}`,
+      value: c.id,
+    }));
+  }
+
+  get canOpen(): boolean {
+    return (
+      !!this.selectedDatasourceId &&
+      !!this.selectedConnectionId &&
+      !this.verifying
+    );
+  }
+
+  createConnection(): void {
+    this.router.navigate([QUERY_RUNNER.connectionNew()]);
+  }
+
+  /** Verify the chosen connection, then open the executor tab. */
+  open(): void {
+    if (!this.canOpen || !this.selectedConnectionId) return;
+    this.verifying = true;
+    this.cdr.markForCheck();
+    const connId = this.selectedConnectionId;
+    this.service
+      .testConnection(connId)
+      .then(res => {
+        if (res?.status && res.data?.isConnected) {
+          const url = `${QUERY_RUNNER.EXEC}?conn=${encodeURIComponent(connId)}`;
+          window.open(url, '_blank');
+        } else {
+          // Surface the connection error; do NOT open a tab.
+          this.globalService.handleSuccessService(res);
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        this.verifying = false;
+        this.cdr.markForCheck();
+      });
+  }
+}

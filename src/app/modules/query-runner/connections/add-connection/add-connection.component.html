@@ -1,0 +1,97 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text back-button" (click)="goBack()">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>
+          {{ (isEdit ? 'QUERY_RUNNER.EDIT_CONNECTION' : 'QUERY_RUNNER.NEW_CONNECTION') | translate }}
+        </h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          [label]="'COMMON.CANCEL' | translate"
+          class="p-button-outlined btn-cancel"
+          (click)="onCancel()"
+        ></button>
+        <button
+          *hasPermission="'connectionManager'; level: 'write'"
+          pButton
+          class="p-button-primary btn-save"
+          type="button"
+          [label]="(isEdit ? 'COMMON.SAVE' : 'COMMON.CREATE') | translate"
+          (click)="onSubmit()"
+          [disabled]="form.invalid || saving"
+        >
+          <i class="pi mr-2" [ngClass]="saving ? 'pi-spin pi-spinner' : 'pi-save'"></i>
+        </button>
+      </div>
+    </div>
+
+    <form [formGroup]="form" class="admin-form">
+      <div class="left-section">
+        <div class="form-grid">
+          <p class="form-hint">
+            <i class="pi pi-info-circle"></i>
+            {{ 'QUERY_RUNNER.CONNECTION_HINT' | translate }}
+          </p>
+
+          <app-custom-input
+            formControlName="name"
+            [label]="'QUERY_RUNNER.CONNECTION_NAME' | translate"
+            [placeholder]="'QUERY_RUNNER.CONNECTION_NAME_PLACEHOLDER' | translate"
+            icon="pi-link"
+            [required]="true"
+            [showError]="!!(form.get('name')?.invalid && form.get('name')?.touched)"
+            [errorMessage]="getErrorMessage('name')"
+          ></app-custom-input>
+
+          <app-custom-dropdown
+            formControlName="datasourceId"
+            [label]="'COMMON.DATASOURCE' | translate"
+            [serverMode]="true"
+            [fetcher]="loadDatasourcesPage"
+            [pageSize]="10"
+            [resolveSelected]="resolveDatasource"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            filterBy="name"
+            appendTo="body"
+            icon="pi-database"
+            [required]="true"
+            [showError]="!!(form.get('datasourceId')?.invalid && form.get('datasourceId')?.touched)"
+            [errorMessage]="getErrorMessage('datasourceId')"
+          ></app-custom-dropdown>
+
+          <h3 class="form-section-title">{{ 'QUERY_RUNNER.CREDENTIALS' | translate }}</h3>
+
+          <app-custom-input
+            formControlName="username"
+            [label]="'QUERY_RUNNER.LOGIN' | translate"
+            [placeholder]="'QUERY_RUNNER.LOGIN_PLACEHOLDER' | translate"
+            icon="pi-user"
+            [required]="true"
+            [showError]="!!(form.get('username')?.invalid && form.get('username')?.touched)"
+            [errorMessage]="getErrorMessage('username')"
+          ></app-custom-input>
+
+          <app-custom-input
+            formControlName="password"
+            [label]="'QUERY_RUNNER.PASSWORD' | translate"
+            type="password"
+            icon="pi-lock"
+            [showPasswordToggle]="true"
+            [required]="!isEdit"
+            [placeholder]="(isEdit ? 'QUERY_RUNNER.PASSWORD_UNCHANGED' : 'QUERY_RUNNER.PASSWORD_PLACEHOLDER') | translate"
+            [showError]="!!(form.get('password')?.invalid && form.get('password')?.touched)"
+            [errorMessage]="getErrorMessage('password')"
+          ></app-custom-input>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

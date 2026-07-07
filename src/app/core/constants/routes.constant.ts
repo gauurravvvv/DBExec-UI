@@ -90,6 +90,17 @@ export const DB_ACCESS = {
   PRIVILEGES_LIST: '/app/db-privileges',
   privilegeView: (id: string | number) => `/app/db-privileges/${id}`,
 };
+
+export const QUERY_RUNNER = {
+  // Launcher (datasource → connection → open)
+  LAUNCHER: '/app/query-runner',
+  // Connection profiles (owner-scoped CRUD)
+  CONNECTIONS_LIST: '/app/query-runner/connections',
+  connectionNew: () => '/app/query-runner/connections/new',
+  connectionEdit: (id: string) => `/app/query-runner/connections/${id}/edit`,
+  // Standalone executor tab (outside the app shell)
+  EXEC: '/query-runner/exec',
+};
 export const DATASET = feature('/app/datasets');
 export const TAB = feature('/app/tabs');
 export const SECTION = feature('/app/sections');
