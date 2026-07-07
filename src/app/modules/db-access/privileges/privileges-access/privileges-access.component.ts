@@ -6,6 +6,7 @@ import {
   OnInit,
   inject,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DbAccessContextService } from '../../services/db-access-context.service';
@@ -108,10 +109,18 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     private ctx: DbAccessContextService,
     private globalService: GlobalService,
     private translate: TranslateService,
+    private router: Router,
   ) {}
 
   get canManage(): boolean {
     return this.ctx.canManage;
+  }
+
+  /** Open the live Active Sessions viewer, carrying the selected datasource. */
+  goToSessions(): void {
+    this.router.navigate(['/app/db-privileges/sessions'], {
+      queryParams: this.datasourceId ? { ds: this.datasourceId } : {},
+    });
   }
 
   ngOnInit(): void {

@@ -382,6 +382,13 @@ export const DB_ACCESS = {
   DELETE_SUFFIX: '/delete',
   // POST /db-access/:datasourceId/change-set
   CHANGE_SET_SUFFIX: '/change-set',
+  // GET /db-access/:datasourceId/sessions → { sessions, selfPid }
+  SESSIONS_SUFFIX: '/sessions',
+  // POST /db-access/:datasourceId/sessions/:pid/cancel
+  // POST /db-access/:datasourceId/sessions/:pid/terminate
+  SESSIONS_SEGMENT: '/sessions/',
+  CANCEL_SUFFIX: '/cancel',
+  TERMINATE_SUFFIX: '/terminate',
 };
 
 export const NOTIFICATION = {

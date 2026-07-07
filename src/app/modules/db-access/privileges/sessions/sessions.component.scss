@@ -1,0 +1,61 @@
+@use '../../styles/db-access-shared' as db;
+
+@include db.db-access-page;
+@include db.db-access-table;
+@include db.db-access-dialog;
+
+// Confirm popup intro text (reused from the delete wizard styling).
+.delete-intro {
+  color: var(--secondary-color);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  margin: 0;
+}
+
+// Sessions-specific cell styling — the shared table mixin covers pills,
+// row-actions, date-text and count-pill; these are the extras.
+.pid-text {
+  font-family: var(--font-mono, monospace);
+  font-weight: var(--fw-medium);
+  color: var(--text-color);
+}
+
+.self-tag {
+  display: inline-block;
+  margin-left: var(--space-3);
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--primary-color-transparent);
+  color: var(--primary-color);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+}
+
+// The management connection's own row — subtle highlight so it reads as
+// distinct from the rows the user can act on.
+.self-row {
+  background: var(--primary-color-transparent) !important;
+}
+
+.query-text {
+  display: block;
+  max-width: 32rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--fs-control);
+  color: var(--secondary-color);
+}
+
+// "Hide background workers" filter toggle in the header filter row.
+.hide-bg-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  font-size: var(--fs-control);
+  color: var(--secondary-color);
+  white-space: nowrap;
+}

@@ -336,6 +336,54 @@ export class DbAccessService {
     );
   }
 
+  // ── Active sessions (live pg_stat_activity viewer) ────────────────────────
+
+  /**
+   * GET /:datasourceId/sessions — live pg_stat_activity snapshot.
+   * Returns the raw response; data is `{ sessions: [...], selfPid }`.
+   * Sessions are volatile (NOT cached BE-side) — call on every refresh.
+   */
+  loadSessions(datasourceId: string): Promise<any> {
+    this._loading.set(true);
+    return lastValueFrom(
+      this.http
+        .apiGet(this.base(datasourceId) + DB_ACCESS.SESSIONS_SUFFIX, {
+          skipLoader: true,
+        })
+        .pipe(takeUntil(this._cancelReads$)),
+    ).finally(() => this._loading.set(false));
+  }
+
+  /**
+   * POST /:datasourceId/sessions/:pid/cancel — pg_cancel_backend (gentle;
+   * cancels the running query, connection survives). Requires confirm.
+   */
+  cancelSession(datasourceId: string, pid: number): Promise<any> {
+    this._saving.set(true);
+    return lastValueFrom(
+      this.http.apiPost(
+        this.base(datasourceId) + DB_ACCESS.SESSIONS_SEGMENT + pid + DB_ACCESS.CANCEL_SUFFIX,
+        { confirm: true },
+        { skipLoader: true },
+      ),
+    ).finally(() => this._saving.set(false));
+  }
+
+  /**
+   * POST /:datasourceId/sessions/:pid/terminate — pg_terminate_backend
+   * (destructive; drops the whole connection). Requires confirm + FULL.
+   */
+  terminateSession(datasourceId: string, pid: number): Promise<any> {
+    this._saving.set(true);
+    return lastValueFrom(
+      this.http.apiPost(
+        this.base(datasourceId) + DB_ACCESS.SESSIONS_SEGMENT + pid + DB_ACCESS.TERMINATE_SUFFIX,
+        { confirm: true },
+        { skipLoader: true },
+      ),
+    ).finally(() => this._saving.set(false));
+  }
+
   cancelReads(): void {
     this._cancelReads$.next();
   }

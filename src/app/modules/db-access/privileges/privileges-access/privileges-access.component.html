@@ -6,6 +6,13 @@
         <h2>{{ 'DB_ACCESS.PRIVILEGES_TITLE' | translate }}</h2>
       </div>
       <div class="header-actions">
+        <button
+          pButton
+          [label]="'DB_ACCESS.ACTIVE_SESSIONS' | translate"
+          icon="pi pi-bolt"
+          (click)="goToSessions()"
+          class="p-button-outlined modern-button"
+        ></button>
         <span class="cap-badge full" *ngIf="datasourceId && capability() && canManage && !unsupported()">
           <i class="pi pi-check-circle"></i>
           {{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}
