@@ -126,14 +126,13 @@
               <th></th>
               <th></th>
               <th>
-                <label class="hide-bg-toggle" [pTooltip]="'DB_ACCESS.HIDE_BACKGROUND_HINT' | translate" tooltipPosition="bottom">
-                  <p-checkbox
-                    [binary]="true"
+                <span class="hide-bg-toggle" [pTooltip]="'DB_ACCESS.HIDE_BACKGROUND_HINT' | translate" tooltipPosition="bottom">
+                  <app-custom-binary-checkbox
                     [(ngModel)]="filterValues.hideBackground"
+                    [label]="'DB_ACCESS.HIDE_BACKGROUND' | translate"
                     (onChange)="onFilterChange()"
-                  ></p-checkbox>
-                  <span>{{ 'DB_ACCESS.HIDE_BACKGROUND' | translate }}</span>
-                </label>
+                  ></app-custom-binary-checkbox>
+                </span>
               </th>
             </tr>
           </ng-template>

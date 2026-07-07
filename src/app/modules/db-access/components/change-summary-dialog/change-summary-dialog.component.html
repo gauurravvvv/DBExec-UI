@@ -35,10 +35,11 @@
 
         <!-- Destructive acknowledgement -->
         <div class="ack-section" *ngIf="destructive && !readOnly && !confirmPhrase">
-          <label class="ack-check">
-            <input type="checkbox" [(ngModel)]="ackChecked" />
-            <span>{{ 'DB_ACCESS.ACK_DESTRUCTIVE' | translate }}</span>
-          </label>
+          <app-custom-binary-checkbox
+            class="ack-check"
+            [(ngModel)]="ackChecked"
+            [label]="'DB_ACCESS.ACK_DESTRUCTIVE' | translate"
+          ></app-custom-binary-checkbox>
         </div>
 
         <!-- Type-to-confirm -->

@@ -415,19 +415,18 @@
         <li><i class="pi pi-box"></i><span>{{ 'DB_ACCESS.OWNED_COUNT' | translate: { count: ownedCount } }}</span></li>
       </ul>
       <div class="delete-mode" *ngIf="!ownedLoading && ownedCount > 0">
-        <label class="mode-option">
-          <input type="radio" name="delModeR" value="reassign" [(ngModel)]="deleteMode" />
-          <span>{{ 'DB_ACCESS.REASSIGN_TO' | translate }}</span>
-        </label>
+        <app-custom-radio
+          [(ngModel)]="deleteMode"
+          [options]="deleteModeOptions"
+          optionLabel="label"
+          optionValue="value"
+          layout="vertical"
+        ></app-custom-radio>
         <div class="reassign-picker" *ngIf="deleteMode === 'reassign'">
           <app-custom-dropdown [(ngModel)]="reassignTo" [options]="allRoleOptions"
             optionLabel="label" optionValue="value" [filter]="true" filterBy="label"
             appendTo="body" [label]="'DB_ACCESS.TARGET_ROLE' | translate"></app-custom-dropdown>
         </div>
-        <label class="mode-option">
-          <input type="radio" name="delModeR" value="drop" [(ngModel)]="deleteMode" />
-          <span>{{ 'DB_ACCESS.DROP_OWNED' | translate }}</span>
-        </label>
       </div>
     </div>
     <div class="popup-actions">

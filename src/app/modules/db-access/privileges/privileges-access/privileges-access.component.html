@@ -218,19 +218,18 @@
                 <div class="rule-field">
                   <label class="field-label">{{ 'DB_ACCESS.PRIVILEGES' | translate }}</label>
                   <div class="priv-checks">
-                    <label
+                    <span
                       *ngFor="let p of privsFor(rule.level)"
                       class="priv-check"
                       [class.checked]="rule.privileges.includes(p)"
                     >
-                      <p-checkbox
-                        [binary]="true"
+                      <app-custom-binary-checkbox
                         [ngModel]="rule.privileges.includes(p)"
-                        (onChange)="togglePriv(rule, p)"
+                        [label]="p"
                         [disabled]="!canManage"
-                      ></p-checkbox>
-                      <span>{{ p }}</span>
-                    </label>
+                        (onChange)="togglePriv(rule, p)"
+                      ></app-custom-binary-checkbox>
+                    </span>
                   </div>
                 </div>
 

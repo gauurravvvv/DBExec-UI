@@ -99,6 +99,7 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   ownedSummary: any = null;
   deleteMode: 'reassign' | 'drop' = 'reassign';
   reassignTo = '';
+  deleteModeOptions: { label: string; value: 'reassign' | 'drop' }[] = [];
 
   constructor(
     private dbAccess: DbAccessService,
@@ -117,6 +118,10 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
       { label: this.translate.instant('DB_ACCESS.STATUS_ACTIVE'), value: 'active' },
       { label: this.translate.instant('DB_ACCESS.STATUS_NO-LOGIN'), value: 'no-login' },
       { label: this.translate.instant('DB_ACCESS.STATUS_EXPIRED'), value: 'expired' },
+    ];
+    this.deleteModeOptions = [
+      { label: this.translate.instant('DB_ACCESS.REASSIGN_TO'), value: 'reassign' },
+      { label: this.translate.instant('DB_ACCESS.DROP_OWNED'), value: 'drop' },
     ];
     this.filter$
       .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
