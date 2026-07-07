@@ -1051,6 +1051,19 @@
         &:hover:not(:disabled) {
           background: var(--hover-background);
         }
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+        &.btn-outlined {
+          background: transparent;
+          color: var(--primary-color);
+          border: 1px solid var(--primary-color);
+          &:hover:not(:disabled) {
+            background: var(--primary-color);
+            color: var(--primary-text);
+          }
+        }
         &.btn-primary {
           background: linear-gradient(
             135deg,

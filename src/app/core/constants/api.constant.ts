@@ -378,6 +378,8 @@ export const DB_ACCESS = {
   // GET /db-access/:datasourceId/roles/:roleName/owned
   ROLE_SEGMENT: '/roles/',
   OWNED_SUFFIX: '/owned',
+  // GET /db-access/:datasourceId/roles/:roleName/export → full access profile
+  ACCESS_EXPORT_SUFFIX: '/export',
   RENAME_SUFFIX: '/rename',
   DELETE_SUFFIX: '/delete',
   // POST /db-access/:datasourceId/change-set

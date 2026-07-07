@@ -30,6 +30,26 @@
         </div>
         <div class="hero-actions">
           <button
+            class="btn-outlined"
+            type="button"
+            [disabled]="exporting"
+            (click)="exportAccess('json')"
+            [pTooltip]="'DB_ACCESS.EXPORT_ACCESS_HINT' | translate"
+            tooltipPosition="bottom"
+          >
+            <i class="pi" [ngClass]="exporting ? 'pi-spin pi-spinner' : 'pi-download'"></i>
+            {{ 'DB_ACCESS.EXPORT_JSON' | translate }}
+          </button>
+          <button
+            class="btn-outlined"
+            type="button"
+            [disabled]="exporting"
+            (click)="exportAccess('csv')"
+          >
+            <i class="pi pi-file-excel"></i>
+            {{ 'DB_ACCESS.EXPORT_CSV' | translate }}
+          </button>
+          <button
             *hasPermission="'dbRoles'; level: 'write'"
             class="btn-primary"
             type="button"

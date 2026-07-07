@@ -156,6 +156,24 @@ export class DbAccessService {
     );
   }
 
+  /**
+   * GET /:datasourceId/roles/:roleName/export — full access profile
+   * (attributes, granted roles, effective privileges + provenance,
+   * owned objects) for one role/user. Caller triggers a JSON/CSV
+   * browser download.
+   */
+  exportRoleAccess(datasourceId: string, roleName: string): Promise<any> {
+    return lastValueFrom(
+      this.http.apiGet(
+        this.base(datasourceId) +
+          DB_ACCESS.ROLE_SEGMENT +
+          encodeURIComponent(roleName) +
+          DB_ACCESS.ACCESS_EXPORT_SUFFIX,
+        { skipLoader: true },
+      ),
+    );
+  }
+
   // ── Memberships ──────────────────────────────────────────────────────────
 
   async loadMemberships(datasourceId: string): Promise<any> {

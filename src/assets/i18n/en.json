@@ -3108,6 +3108,9 @@
   "DB_ACCESS": {
     "TITLE": "Database Access Management",
     "SUBTITLE": "Manage PostgreSQL users, roles, and privileges on a datasource",
+    "EXPORT_JSON": "Export JSON",
+    "EXPORT_CSV": "Export CSV",
+    "EXPORT_ACCESS_HINT": "Download this account's full access profile (attributes, granted roles, effective privileges, owned objects) for audit.",
     "SELECT_DATASOURCE": "Choose a datasource to manage",
     "CHECKING_CAPABILITY": "Checking management capability…",
     "OPEN_WORKSPACE": "Open Workspace",

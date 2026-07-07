@@ -11,6 +11,10 @@ import { DB_ACCESS } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DbAccessContextService } from '../../services/db-access-context.service';
 import { DbAccessService } from '../../services/db-access.service';
+import {
+  downloadAccessCsv,
+  downloadAccessJson,
+} from '../../services/access-export.util';
 
 /**
  * ViewDbRoleComponent — read-only detail for a group role: hero header +
@@ -32,6 +36,7 @@ export class ViewDbRoleComponent implements OnInit {
   role: any = null;
   effective: any[] = [];
   effectiveLoading = false;
+  exporting = false;
 
   constructor(
     private dbAccess: DbAccessService,
@@ -110,5 +115,32 @@ export class ViewDbRoleComponent implements OnInit {
     this.router.navigate([DB_ACCESS.roleEdit(this.roleName)], {
       queryParams: { ds: this.datasourceId },
     });
+  }
+
+  /**
+   * Fetch this role's full access profile and download it as JSON or
+   * CSV. Live read from the datasource — nothing persisted.
+   */
+  exportAccess(format: 'json' | 'csv'): void {
+    if (this.exporting) return;
+    this.exporting = true;
+    this.cdr.markForCheck();
+    this.dbAccess
+      .exportRoleAccess(this.datasourceId, this.roleName)
+      .then(res => {
+        if (res?.status && res.data) {
+          if (format === 'csv') downloadAccessCsv(res.data);
+          else downloadAccessJson(res.data);
+        } else {
+          this.globalService.handleSuccessService(res);
+        }
+      })
+      .catch(() => {
+        /* interceptor toasts the error */
+      })
+      .finally(() => {
+        this.exporting = false;
+        this.cdr.markForCheck();
+      });
   }
 }
