@@ -107,8 +107,13 @@ export const QUERY_RUNNER = {
   CONNECTION: '/query-runner/connections/', // + :id  (GET/PUT/DELETE)
   // POST /query-runner/connections/:id/test  → verify creds
   TEST_SUFFIX: '/test',
-  // GET  /query-runner/connections/:id/catalog  → schema catalog for IntelliSense
+  // GET  /query-runner/connections/:id/catalog       → schemas only (fast)
+  // GET  /query-runner/connections/:id/catalog?full=true → full catalog
   CATALOG_SUFFIX: '/catalog',
+  // GET  /query-runner/connections/:id/tables?schema=   → lazy: tables in a schema
+  TABLES_SUFFIX: '/tables',
+  // GET  /query-runner/connections/:id/columns?schema=&table= → lazy: columns
+  COLUMNS_SUFFIX: '/columns',
   // POST /query-runner/connections/:id/execute  → run SQL
   EXECUTE_SUFFIX: '/execute',
   // POST /query-runner/connections/:id/cancel   → cancel a running run

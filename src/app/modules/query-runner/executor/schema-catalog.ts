@@ -1,30 +1,9 @@
 /**
  * SchemaCatalog — the client-side index that powers the editor's
- * IntelliSense. Built from the /catalog DTO once per connection. Adapted
- * from INTEGRATION_PLAN §5.1.
+ * IntelliSense. Built incrementally as the object browser / completion
+ * fetch tables per schema and columns per table (lazy loading), so it
+ * never needs the whole database up front.
  */
-export interface SchemaCatalogDTO {
-  schemas: string[];
-  tables: { schema: string; name: string; type: string }[];
-  columns: {
-    schema: string;
-    table: string;
-    column: string;
-    dataType: string;
-    isNullable: boolean;
-    isPrimaryKey: boolean;
-  }[];
-  foreignKeys: {
-    schema: string;
-    table: string;
-    column: string;
-    refSchema: string;
-    refTable: string;
-    refColumn: string;
-  }[];
-  fetchedAt: number;
-}
-
 export interface ColInfo {
   name: string;
   dataType: string;
@@ -40,33 +19,37 @@ export interface TblInfo {
 export class SchemaCatalog {
   private byTable = new Map<string, ColInfo[]>(); // `${schema}.${table}` + bare `table`
   private tablesBySchema = new Map<string, TblInfo[]>();
-  readonly schemas: string[];
+  schemas: string[] = [];
   readonly defaultSchema = 'public';
 
-  constructor(dto: SchemaCatalogDTO) {
-    this.schemas = dto.schemas ?? [];
-    for (const t of dto.tables ?? []) {
-      const arr = this.tablesBySchema.get(t.schema) ?? [];
-      arr.push({ schema: t.schema, name: t.name, type: t.type });
-      this.tablesBySchema.set(t.schema, arr);
-    }
-    for (const c of dto.columns ?? []) {
-      const info: ColInfo = {
-        name: c.column,
-        dataType: c.dataType,
-        isPrimaryKey: c.isPrimaryKey,
-        nullable: c.isNullable,
-      };
-      this.push(`${c.schema}.${c.table}`, info);
-      this.push(c.table, info); // bare name (last-wins across schemas; fine)
-    }
+  constructor(schemas: string[] = []) {
+    this.schemas = schemas;
   }
 
-  private push(key: string, c: ColInfo): void {
-    const k = key.toLowerCase();
-    const arr = this.byTable.get(k) ?? [];
-    arr.push(c);
-    this.byTable.set(k, arr);
+  setSchemas(schemas: string[]): void {
+    this.schemas = schemas;
+  }
+
+  /** Merge the tables of one schema (from a lazy fetch). */
+  setTables(schema: string, tables: { name: string; type: string }[]): void {
+    this.tablesBySchema.set(
+      schema,
+      tables.map(t => ({ schema, name: t.name, type: t.type })),
+    );
+  }
+
+  /** Merge the columns of one table (from a lazy fetch). */
+  setColumns(schema: string, table: string, cols: ColInfo[]): void {
+    this.byTable.set(`${schema}.${table}`.toLowerCase(), cols);
+    // Bare-name fallback (last-wins across schemas; fine for completion).
+    this.byTable.set(table.toLowerCase(), cols);
+  }
+
+  hasColumns(schema: string | undefined, table: string): boolean {
+    return (
+      this.byTable.has(`${schema ?? this.defaultSchema}.${table}`.toLowerCase()) ||
+      this.byTable.has(table.toLowerCase())
+    );
   }
 
   columns(schema: string | undefined, table: string): ColInfo[] {

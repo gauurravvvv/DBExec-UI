@@ -11,21 +11,34 @@
     </div>
 
     <div class="qx-toolbar">
-      <button pButton class="p-button-sm p-button-primary" (click)="run()"
+      <button pButton class="p-button-sm p-button-primary" (click)="run('smart')"
         [disabled]="running || !editorReady"
         [pTooltip]="'QUERY_RUNNER.RUN_HINT' | translate" tooltipPosition="bottom">
         <i class="pi" [ngClass]="running ? 'pi-spin pi-spinner' : 'pi-play'"></i>
         <span>{{ (running ? 'QUERY_RUNNER.RUNNING' : 'QUERY_RUNNER.RUN') | translate }}</span>
+      </button>
+      <button pButton class="p-button-sm p-button-outlined" (click)="run('all')"
+        [disabled]="running || !editorReady"
+        [pTooltip]="'QUERY_RUNNER.RUN_ALL' | translate" tooltipPosition="bottom">
+        <i class="pi pi-forward"></i>
       </button>
       <button pButton class="p-button-sm p-button-outlined p-button-danger" (click)="cancel()"
         [disabled]="!running"
         [pTooltip]="'QUERY_RUNNER.STOP' | translate" tooltipPosition="bottom">
         <i class="pi pi-stop-circle"></i>
       </button>
-      <button pButton class="p-button-sm p-button-outlined" (click)="format()"
+
+      <span class="qx-sep"></span>
+
+      <button pButton class="p-button-sm p-button-text" (click)="format()"
         [disabled]="!editorReady"
         [pTooltip]="'QUERY_RUNNER.FORMAT' | translate" tooltipPosition="bottom">
         <i class="pi pi-align-left"></i>
+      </button>
+      <button pButton class="p-button-sm p-button-text" (click)="toggleWrap()"
+        [class.qx-active]="wordWrap" [disabled]="!editorReady"
+        [pTooltip]="'QUERY_RUNNER.WRAP' | translate" tooltipPosition="bottom">
+        <i class="pi pi-bars"></i>
       </button>
 
       <span class="qx-sep"></span>
@@ -40,17 +53,17 @@
   </header>
 
   <div class="qx-body">
-    <!-- Object browser -->
+    <!-- Object browser (lazy) -->
     <aside class="qx-browser">
       <div class="qx-browser-head">
         <span>{{ 'QUERY_RUNNER.OBJECTS' | translate }}</span>
-        <button class="qx-icon" (click)="refreshCatalog()" [disabled]="catalogLoading"
+        <button class="qx-icon" (click)="refreshSchemas()" [disabled]="schemasLoading"
           [pTooltip]="'COMMON.REFRESH' | translate" tooltipPosition="bottom">
-          <i class="pi" [ngClass]="catalogLoading ? 'pi-spin pi-spinner' : 'pi-refresh'"></i>
+          <i class="pi" [ngClass]="schemasLoading ? 'pi-spin pi-spinner' : 'pi-refresh'"></i>
         </button>
       </div>
       <div class="qx-tree">
-        <div class="qx-empty" *ngIf="!catalogLoading && browser.length === 0">
+        <div class="qx-empty" *ngIf="!schemasLoading && browser.length === 0">
           {{ 'QUERY_RUNNER.NO_OBJECTS' | translate }}
         </div>
         <div class="qx-schema" *ngFor="let s of browser">
@@ -58,19 +71,27 @@
             <i class="pi" [ngClass]="s.open ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
             <i class="pi pi-folder"></i>
             <span>{{ s.schema }}</span>
+            <i class="pi pi-spin pi-spinner qx-node-spin" *ngIf="s.loading"></i>
           </div>
           <div class="qx-tables" *ngIf="s.open">
+            <div class="qx-mini-hint" *ngIf="s.loaded && s.tables.length === 0">
+              {{ 'QUERY_RUNNER.NO_TABLES' | translate }}
+            </div>
             <div class="qx-table-group" *ngFor="let t of s.tables">
-              <div class="qx-node indent" (click)="toggleTable(t)" (dblclick)="insertSelect(s.schema, t.name)">
+              <div class="qx-node indent" (click)="toggleTable(s, t)" (dblclick)="insertSelect(s.schema, t.name)">
                 <i class="pi" [ngClass]="t.open ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
                 <i class="pi" [ngClass]="t.type === 'view' ? 'pi-eye' : 'pi-table'"></i>
                 <span>{{ t.name }}</span>
+                <i class="pi pi-spin pi-spinner qx-node-spin" *ngIf="t.loading"></i>
               </div>
               <div class="qx-cols" *ngIf="t.open">
                 <div class="qx-col" *ngFor="let c of t.columns" (click)="insertText(c.name)">
                   <i class="pi" [ngClass]="c.isPrimaryKey ? 'pi-key' : 'pi-circle'"></i>
                   <span class="qx-col-name">{{ c.name }}</span>
                   <span class="qx-col-type">{{ c.dataType }}</span>
+                </div>
+                <div class="qx-mini-hint" *ngIf="t.loaded && t.columns.length === 0">
+                  {{ 'QUERY_RUNNER.NO_COLUMNS' | translate }}
                 </div>
               </div>
             </div>
@@ -86,16 +107,34 @@
       </section>
 
       <section class="qx-results">
-        <!-- Result tabs when multiple statements -->
-        <nav class="qx-result-tabs" *ngIf="results.length > 1">
-          <button *ngFor="let r of results; let i = index"
-            [class.active]="activeResult === i" (click)="setActive(i)">
-            {{ tabLabel(r, i) }}
-          </button>
-        </nav>
+        <!-- Result toolbar -->
+        <div class="qx-result-toolbar" *ngIf="results.length">
+          <nav class="qx-result-tabs" *ngIf="results.length > 1">
+            <button *ngFor="let r of results; let i = index"
+              [class.active]="activeResult === i" (click)="setActive(i)">
+              {{ tabLabel(r, i) }}
+            </button>
+          </nav>
+          <div class="qx-result-actions" *ngIf="activeRows as ar">
+            <input class="qx-quickfilter" type="text"
+              [(ngModel)]="quickFilter" (ngModelChange)="onQuickFilter()"
+              [placeholder]="'QUERY_RUNNER.FILTER_RESULTS' | translate" />
+            <button class="qx-icon" (click)="toggleFilters()" [class.qx-active]="showFilters"
+              [pTooltip]="'QUERY_RUNNER.COLUMN_FILTERS' | translate" tooltipPosition="bottom">
+              <i class="pi pi-filter"></i>
+            </button>
+            <button class="qx-icon" (click)="exportCsv()"
+              [pTooltip]="'QUERY_RUNNER.EXPORT_CSV' | translate" tooltipPosition="bottom">
+              <i class="pi pi-file"></i>
+            </button>
+            <button class="qx-icon" (click)="exportJson()"
+              [pTooltip]="'QUERY_RUNNER.EXPORT_JSON' | translate" tooltipPosition="bottom">
+              <i class="pi pi-file-export"></i>
+            </button>
+          </div>
+        </div>
 
         <div class="qx-result-body">
-          <!-- Empty -->
           <div class="qx-result-empty" *ngIf="results.length === 0">
             <i class="pi pi-database"></i>
             <span>{{ 'QUERY_RUNNER.RUN_TO_SEE' | translate }}</span>
@@ -103,13 +142,20 @@
 
           <ng-container *ngIf="results[activeResult] as r">
             <!-- Rows → AG Grid -->
-            <ag-grid-angular *ngIf="r.kind === 'rows'"
-              class="qx-grid"
-              [theme]="gridTheme"
-              [rowData]="r.rows"
-              [columnDefs]="colDefs(r)"
-              [gridOptions]="gridOptions">
-            </ag-grid-angular>
+            <div class="qx-grid-wrap" *ngIf="r.kind === 'rows'">
+              <div class="qx-trunc-banner" *ngIf="r.truncated">
+                <i class="pi pi-exclamation-triangle"></i>
+                {{ 'QUERY_RUNNER.TRUNCATED' | translate: { n: r.rows.length } }}
+              </div>
+              <ag-grid-angular
+                class="qx-grid"
+                [theme]="gridTheme"
+                [rowData]="r.rows"
+                [columnDefs]="colDefs(r)"
+                [gridOptions]="gridOptions"
+                (gridReady)="onGridReady($event)">
+              </ag-grid-angular>
+            </div>
 
             <!-- Message -->
             <div class="qx-msg" *ngIf="r.kind === 'message'">
@@ -125,6 +171,9 @@
                 <span>{{ r.message }}</span>
               </div>
               <div class="qx-error-hint" *ngIf="r.hint">{{ 'QUERY_RUNNER.HINT' | translate }}: {{ r.hint }}</div>
+              <button class="qx-goto" *ngIf="r.offset != null" (click)="goToError()">
+                <i class="pi pi-arrow-right"></i> {{ 'QUERY_RUNNER.GO_TO_ERROR' | translate }}
+              </button>
             </div>
           </ng-container>
         </div>
@@ -135,6 +184,8 @@
   <!-- Status bar -->
   <footer class="qx-status">
     <span class="qx-status-left">
+      <span class="qx-cursor">{{ cursorInfo }}</span>
+      <span class="qx-sep-dot">·</span>
       <span class="qx-dot" [ngClass]="autoCommit ? 'write' : 'read'"></span>
       {{ (autoCommit ? 'QUERY_RUNNER.WRITE_MODE' : 'QUERY_RUNNER.READONLY_MODE') | translate }}
     </span>

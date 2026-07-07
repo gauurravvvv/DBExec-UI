@@ -108,7 +108,16 @@ function schemaCompletion(name: string): Completion {
   };
 }
 
-export function dbexecCompletionSource(cat: SchemaCatalog) {
+/**
+ * @param cat            the (incrementally-hydrated) catalog
+ * @param requestColumns lazy loader: called with (schema?, table) when a
+ *                       table's columns aren't cached yet. It should fetch
+ *                       + merge them into `cat`, then re-trigger completion.
+ */
+export function dbexecCompletionSource(
+  cat: SchemaCatalog,
+  requestColumns?: (schema: string | undefined, table: string) => void,
+) {
   return (ctx: CompletionContext): CompletionResult | null => {
     const textBefore = ctx.state.sliceDoc(0, ctx.pos);
 
@@ -134,6 +143,11 @@ export function dbexecCompletionSource(cat: SchemaCatalog) {
             options: cols.map(c => colCompletion(c)),
             validFor: /^[\w$]*$/,
           };
+        }
+        // Columns not cached yet — kick off a lazy fetch; completion
+        // re-fires once they land.
+        if (!cat.hasColumns(target.schema, target.table) && requestColumns) {
+          requestColumns(target.schema, target.table);
         }
       }
       if (cat.isSchema(ident)) {
@@ -173,6 +187,9 @@ export function dbexecCompletionSource(cat: SchemaCatalog) {
       const opts: Completion[] = [];
       for (const r of refs) {
         const cols = cat.columns(r.schema, r.table);
+        if (!cols.length && !cat.hasColumns(r.schema, r.table) && requestColumns) {
+          requestColumns(r.schema, r.table);
+        }
         const prefix = r.alias ?? (refs.length > 1 ? r.table : undefined);
         for (const c of cols) opts.push(colCompletion(c, prefix));
       }

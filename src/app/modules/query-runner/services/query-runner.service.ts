@@ -87,10 +87,40 @@ export class QueryRunnerService {
 
   // ── executor ────────────────────────────────────────────────────
 
-  /** Schema catalog for IntelliSense (schemas/tables/columns/FKs). */
-  getCatalog(id: string): Promise<any> {
+  /** Schema names only — fast first paint of the object browser. */
+  getSchemas(id: string): Promise<any> {
     return lastValueFrom(
       this.http.apiGet(this.base(id) + QUERY_RUNNER.CATALOG_SUFFIX, {
+        skipLoader: true,
+      }),
+    );
+  }
+
+  /** Full catalog (schemas + tables + columns + FKs) — primes IntelliSense. */
+  getFullCatalog(id: string): Promise<any> {
+    return lastValueFrom(
+      this.http.apiGet(this.base(id) + QUERY_RUNNER.CATALOG_SUFFIX, {
+        params: { full: 'true' },
+        skipLoader: true,
+      }),
+    );
+  }
+
+  /** Lazy: tables in one schema (fetched when a schema node expands). */
+  getTables(id: string, schema: string): Promise<any> {
+    return lastValueFrom(
+      this.http.apiGet(this.base(id) + QUERY_RUNNER.TABLES_SUFFIX, {
+        params: { schema },
+        skipLoader: true,
+      }),
+    );
+  }
+
+  /** Lazy: columns of one table (fetched when a table node expands). */
+  getColumns(id: string, schema: string, table: string): Promise<any> {
+    return lastValueFrom(
+      this.http.apiGet(this.base(id) + QUERY_RUNNER.COLUMNS_SUFFIX, {
+        params: { schema, table },
         skipLoader: true,
       }),
     );

@@ -15,16 +15,56 @@ import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { TranslateModule } from '@ngx-translate/core';
 
-import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap } from '@codemirror/autocomplete';
-import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
+import {
+  autocompletion,
+  closeBrackets,
+  closeBracketsKeymap,
+  completionKeymap,
+  startCompletion,
+} from '@codemirror/autocomplete';
+import {
+  defaultKeymap,
+  history,
+  historyKeymap,
+  indentWithTab,
+  toggleComment,
+} from '@codemirror/commands';
 import { PostgreSQL, sql, keywordCompletionSource } from '@codemirror/lang-sql';
-import { bracketMatching, defaultHighlightStyle, indentOnInput, syntaxHighlighting } from '@codemirror/language';
-import { searchKeymap, highlightSelectionMatches } from '@codemirror/search';
+import {
+  bracketMatching,
+  defaultHighlightStyle,
+  foldGutter,
+  foldKeymap,
+  indentOnInput,
+  syntaxHighlighting,
+} from '@codemirror/language';
+import { lintGutter, setDiagnostics, Diagnostic } from '@codemirror/lint';
+import { search, searchKeymap, highlightSelectionMatches } from '@codemirror/search';
 import { Compartment, EditorState } from '@codemirror/state';
-import { EditorView, drawSelection, highlightActiveLine, keymap, lineNumbers } from '@codemirror/view';
+import {
+  Decoration,
+  DecorationSet,
+  EditorView,
+  drawSelection,
+  highlightActiveLine,
+  highlightActiveLineGutter,
+  keymap,
+  lineNumbers,
+  placeholder,
+  rectangularSelection,
+} from '@codemirror/view';
+import { StateEffect, StateField } from '@codemirror/state';
 
 import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef, GridOptions, ModuleRegistry, ClientSideRowModelModule, themeQuartz } from 'ag-grid-community';
+import {
+  ColDef,
+  GridApi,
+  GridOptions,
+  GridReadyEvent,
+  ModuleRegistry,
+  ClientSideRowModelModule,
+  themeQuartz,
+} from 'ag-grid-community';
 import { format as formatSql } from 'sql-formatter';
 
 import { ButtonModule } from 'primeng/button';
@@ -36,6 +76,7 @@ import { QueryRunnerService } from '../services/query-runner.service';
 import { SchemaCatalog } from './schema-catalog';
 import { dbexecCompletionSource } from './completion';
 import { TypedCellComponent } from './typed-cell.component';
+import { splitStatements, statementAtCursor } from './split-statements';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
@@ -53,15 +94,52 @@ type QueryResult =
   | { kind: 'message'; command: string; text: string; elapsedMs: number; statementIndex: number }
   | { kind: 'error'; message: string; code?: string; hint?: string; offset?: number; statementIndex: number };
 
+interface TreeTable {
+  name: string;
+  type: string;
+  open: boolean;
+  loading: boolean;
+  loaded: boolean;
+  columns: { name: string; dataType: string; isPrimaryKey: boolean }[];
+}
+interface TreeSchema {
+  schema: string;
+  open: boolean;
+  loading: boolean;
+  loaded: boolean;
+  tables: TreeTable[];
+}
+
+/** CM effect + field: transient highlight of the range that just ran. */
+const setRunFlash = StateEffect.define<{ from: number; to: number } | null>();
+const runFlashField = StateField.define<DecorationSet>({
+  create: () => Decoration.none,
+  update(value, tr) {
+    value = value.map(tr.changes);
+    for (const e of tr.effects) {
+      if (e.is(setRunFlash)) {
+        value = e.value
+          ? Decoration.set([
+              Decoration.mark({ class: 'qx-run-flash' }).range(
+                e.value.from,
+                e.value.to,
+              ),
+            ])
+          : Decoration.none;
+      }
+    }
+    return value;
+  },
+  provide: f => EditorView.decorations.from(f),
+});
+
 /**
- * QueryExecutorComponent — the standalone Query Runner workspace. Loads
- * OUTSIDE the app shell (no sidebar), so a browser tab is a focused,
- * full-screen SQL tool. Left object browser, CodeMirror editor with
- * catalog-driven IntelliSense, AG Grid typed results, run/format/cancel
- * toolbar, auto-commit + Commit/Rollback, status bar.
- *
- * Standalone component (imports its own deps) so it can be lazily loaded
- * by query-executor.module without the app shell modules.
+ * QueryExecutorComponent — the standalone Query Runner workspace. Full
+ * SQL editor: lazy schema tree, CodeMirror with IntelliSense + find/
+ * replace + comment toggle + folding + wrapping + multi-cursor + smart
+ * run (selection / statement-at-cursor) + go-to-error + autosave, and an
+ * AG Grid result panel with export / copy / quick-filter / column
+ * filters. Loads outside the app shell.
  */
 @Component({
   selector: 'app-query-executor',
@@ -93,8 +171,10 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   // Editor
   private view!: EditorView;
   private langCompartment = new Compartment();
-  private catalog: SchemaCatalog | null = null;
+  private wrapCompartment = new Compartment();
+  private catalog = new SchemaCatalog();
   editorReady = false;
+  wordWrap = false;
 
   // Execution
   running = false;
@@ -104,19 +184,27 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   private executionId: string | null = null;
   elapsedMs: number | null = null;
   statusText = '';
+  cursorInfo = 'Ln 1, Col 1';
 
-  // Object browser
-  catalogLoading = false;
-  browser: {
-    schema: string;
-    open: boolean;
-    tables: { name: string; type: string; open: boolean; columns: { name: string; dataType: string; isPrimaryKey: boolean }[] }[];
-  }[] = [];
+  // Object browser (lazy)
+  schemasLoading = false;
+  browser: TreeSchema[] = [];
+  private storageKey = '';
 
   // AG Grid
   gridTheme = themeQuartz;
+  private gridApi: GridApi | null = null;
+  quickFilter = '';
+  showFilters = false;
   gridOptions: GridOptions = {
-    defaultColDef: { flex: 0, width: 170, resizable: true, sortable: true, filter: true, minWidth: 90 },
+    defaultColDef: {
+      flex: 0,
+      width: 170,
+      resizable: true,
+      sortable: true,
+      filter: true,
+      minWidth: 90,
+    },
     enableCellTextSelection: true,
     ensureDomOrder: true,
     rowSelection: 'multiple' as any,
@@ -136,8 +224,9 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       this.statusText = 'No connection specified';
       return;
     }
+    this.storageKey = `qx-draft:${this.connectionId}`;
     this.loadConnectionMeta();
-    this.loadCatalog();
+    this.loadSchemas();
   }
 
   ngAfterViewInit(): void {
@@ -148,7 +237,7 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     this.view?.destroy();
   }
 
-  // ── metadata + catalog ────────────────────────────────────────────
+  // ── metadata + lazy catalog ────────────────────────────────────────
 
   private loadConnectionMeta(): void {
     this.service
@@ -158,63 +247,156 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
           this.connectionName = res.data.name;
           this.datasourceName = res.data.datasourceName ?? '';
           this.engine = res.data.engine ?? '';
-          const t = this.datasourceName
-            ? `${this.datasourceName} — Query Runner`
-            : 'Query Runner';
-          this.title.setTitle(t);
+          this.title.setTitle(
+            this.datasourceName
+              ? `${this.datasourceName} — Query Runner`
+              : 'Query Runner',
+          );
         }
         this.cdr.markForCheck();
       })
       .catch(() => {});
   }
 
-  private loadCatalog(): void {
-    this.catalogLoading = true;
+  /** First paint: schema names only. */
+  private loadSchemas(): void {
+    this.schemasLoading = true;
     this.cdr.markForCheck();
     this.service
-      .getCatalog(this.connectionId)
+      .getSchemas(this.connectionId)
       .then(res => {
-        if (res?.status && res.data) {
-          this.catalog = new SchemaCatalog(res.data);
-          this.buildBrowser(res.data);
-          this.reconfigureCatalog();
-        }
+        const schemas: string[] = res?.status ? (res.data?.schemas ?? []) : [];
+        this.catalog.setSchemas(schemas);
+        this.browser = schemas.map(s => ({
+          schema: s,
+          open: false,
+          loading: false,
+          loaded: false,
+          tables: [],
+        }));
+        this.reconfigureCatalog();
       })
       .catch(() => {})
       .finally(() => {
-        this.catalogLoading = false;
+        this.schemasLoading = false;
         this.cdr.markForCheck();
       });
   }
 
-  private buildBrowser(dto: any): void {
-    const bySchema = new Map<string, any[]>();
-    for (const t of dto.tables ?? []) {
-      const arr = bySchema.get(t.schema) ?? [];
-      const cols = (dto.columns ?? [])
-        .filter((c: any) => c.schema === t.schema && c.table === t.name)
-        .map((c: any) => ({ name: c.column, dataType: c.dataType, isPrimaryKey: c.isPrimaryKey }));
-      arr.push({ name: t.name, type: t.type, open: false, columns: cols });
-      bySchema.set(t.schema, arr);
-    }
-    this.browser = (dto.schemas ?? []).map((s: string) => ({
-      schema: s,
-      open: s === 'public',
-      tables: bySchema.get(s) ?? [],
-    }));
-  }
-
-  toggleSchema(s: any): void {
+  /** Expand a schema → lazy-load its tables (once). */
+  toggleSchema(s: TreeSchema): void {
     s.open = !s.open;
-  }
-  toggleTable(t: any): void {
-    t.open = !t.open;
+    if (s.open && !s.loaded && !s.loading) {
+      s.loading = true;
+      this.cdr.markForCheck();
+      this.service
+        .getTables(this.connectionId, s.schema)
+        .then(res => {
+          const tables = res?.status ? (res.data?.tables ?? []) : [];
+          s.tables = tables.map((t: any) => ({
+            name: t.name,
+            type: t.type,
+            open: false,
+            loading: false,
+            loaded: false,
+            columns: [],
+          }));
+          s.loaded = true;
+          this.catalog.setTables(s.schema, tables);
+          this.reconfigureCatalog();
+        })
+        .catch(() => {})
+        .finally(() => {
+          s.loading = false;
+          this.cdr.markForCheck();
+        });
+    }
   }
 
-  /** Double-click a table → insert a SELECT into the editor. */
+  /** Expand a table → lazy-load its columns (once). */
+  toggleTable(s: TreeSchema, t: TreeTable): void {
+    t.open = !t.open;
+    if (t.open && !t.loaded && !t.loading) {
+      this.fetchColumns(s.schema, t);
+    }
+  }
+
+  private fetchColumns(schema: string, t: TreeTable): void {
+    t.loading = true;
+    this.cdr.markForCheck();
+    this.service
+      .getColumns(this.connectionId, schema, t.name)
+      .then(res => {
+        const cols = res?.status ? (res.data?.columns ?? []) : [];
+        t.columns = cols.map((c: any) => ({
+          name: c.column,
+          dataType: c.dataType,
+          isPrimaryKey: c.isPrimaryKey,
+        }));
+        t.loaded = true;
+        this.catalog.setColumns(
+          schema,
+          t.name,
+          cols.map((c: any) => ({
+            name: c.column,
+            dataType: c.dataType,
+            isPrimaryKey: c.isPrimaryKey,
+            nullable: c.isNullable,
+          })),
+        );
+      })
+      .catch(() => {})
+      .finally(() => {
+        t.loading = false;
+        this.cdr.markForCheck();
+      });
+  }
+
+  /**
+   * Lazy column loader used by IntelliSense: fetch a table's columns if
+   * we don't have them, then re-trigger completion so they appear.
+   */
+  private requestColumnsForCompletion = (
+    schema: string | undefined,
+    table: string,
+  ): void => {
+    if (this.catalog.hasColumns(schema, table)) return;
+    // Resolve the real schema: prefer the given one, else find the table
+    // in any loaded schema.
+    let sch = schema;
+    if (!sch) {
+      for (const s of this.browser) {
+        if (s.tables.some(t => t.name.toLowerCase() === table.toLowerCase())) {
+          sch = s.schema;
+          break;
+        }
+      }
+    }
+    if (!sch) sch = this.catalog.defaultSchema;
+    this.service
+      .getColumns(this.connectionId, sch, table)
+      .then(res => {
+        if (res?.status) {
+          const cols = res.data?.columns ?? [];
+          this.catalog.setColumns(
+            sch!,
+            table,
+            cols.map((c: any) => ({
+              name: c.column,
+              dataType: c.dataType,
+              isPrimaryKey: c.isPrimaryKey,
+              nullable: c.isNullable,
+            })),
+          );
+          // Re-fire completion so the freshly-loaded columns show.
+          if (this.view) startCompletion(this.view);
+        }
+      })
+      .catch(() => {});
+  };
+
   insertSelect(schema: string, table: string): void {
-    const stmt = `SELECT *\nFROM ${schema}.${table}\nLIMIT 100;`;
-    this.replaceAll(stmt);
+    this.replaceAll(`SELECT *\nFROM ${schema}.${table}\nLIMIT 100;`);
   }
 
   insertText(text: string): void {
@@ -232,7 +414,7 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       autocompletion({
         activateOnTyping: true,
         override: [
-          ...(this.catalog ? [dbexecCompletionSource(this.catalog)] : []),
+          dbexecCompletionSource(this.catalog, this.requestColumnsForCompletion),
           keywordCompletionSource(PostgreSQL, false),
         ],
       }),
@@ -240,29 +422,37 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private initEditor(): void {
-    // Build the editor outside Angular's zone (CM manages its own DOM).
+    const saved = this.loadDraft();
     this.zone.runOutsideAngular(() => {
       this.view = new EditorView({
         parent: this.editorHost.nativeElement,
         state: EditorState.create({
-          doc: '-- Write SQL. Ctrl/Cmd+Enter runs the statement.\n',
+          doc: saved ?? '',
           extensions: [
             lineNumbers(),
             highlightActiveLine(),
+            highlightActiveLineGutter(),
             drawSelection(),
+            rectangularSelection(),
             history(),
+            foldGutter(),
             bracketMatching(),
             closeBrackets(),
             indentOnInput(),
             highlightSelectionMatches(),
+            search({ top: true }),
+            lintGutter(),
+            runFlashField,
+            placeholder('-- Write SQL. Ctrl/Cmd+Enter runs the statement at the cursor.'),
             syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+            this.wrapCompartment.of([]),
             this.langCompartment.of(this.buildLanguage()),
             keymap.of([
               {
                 key: 'Mod-Enter',
                 preventDefault: true,
                 run: () => {
-                  this.zone.run(() => this.run());
+                  this.zone.run(() => this.run('smart'));
                   return true;
                 },
               },
@@ -270,26 +460,40 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
                 key: 'Mod-Shift-Enter',
                 preventDefault: true,
                 run: () => {
-                  this.zone.run(() => this.run());
+                  this.zone.run(() => this.run('all'));
                   return true;
                 },
+              },
+              {
+                key: 'Mod-/',
+                preventDefault: true,
+                run: toggleComment,
               },
               indentWithTab,
               ...closeBracketsKeymap,
               ...defaultKeymap,
               ...historyKeymap,
+              ...foldKeymap,
               ...completionKeymap,
               ...searchKeymap,
             ]),
+            EditorView.updateListener.of(u => {
+              if (u.docChanged) this.scheduleAutosave();
+              if (u.selectionSet || u.docChanged) this.updateCursorInfo();
+            }),
             EditorView.theme({
               '&': { height: '100%' },
-              '.cm-scroller': { fontFamily: 'ui-monospace, SFMono-Regular, monospace', fontSize: '13px' },
+              '.cm-scroller': {
+                fontFamily: 'ui-monospace, SFMono-Regular, monospace',
+                fontSize: '13px',
+              },
             }),
           ],
         }),
       });
     });
     this.editorReady = true;
+    this.updateCursorInfo();
     this.cdr.markForCheck();
   }
 
@@ -300,13 +504,34 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     });
   }
 
-  private getSql(): string {
+  toggleWrap(): void {
+    this.wordWrap = !this.wordWrap;
+    this.view?.dispatch({
+      effects: this.wrapCompartment.reconfigure(
+        this.wordWrap ? EditorView.lineWrapping : [],
+      ),
+    });
+  }
+
+  private updateCursorInfo(): void {
+    if (!this.view) return;
+    const pos = this.view.state.selection.main.head;
+    const line = this.view.state.doc.lineAt(pos);
+    this.zone.run(() => {
+      this.cursorInfo = `Ln ${line.number}, Col ${pos - line.from + 1}`;
+      this.cdr.markForCheck();
+    });
+  }
+
+  private getAll(): string {
     return this.view ? this.view.state.doc.toString() : '';
   }
-  private getSelection(): string | null {
+  private getSelection(): { text: string; from: number; to: number } | null {
     if (!this.view) return null;
     const { from, to } = this.view.state.selection.main;
-    return from === to ? null : this.view.state.sliceDoc(from, to);
+    return from === to
+      ? null
+      : { text: this.view.state.sliceDoc(from, to), from, to };
   }
   private replaceAll(text: string): void {
     if (!this.view) return;
@@ -315,16 +540,66 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     });
   }
 
+  // ── autosave (localStorage, per connection) ─────────────────────────
+
+  private autosaveHandle: any = null;
+  private scheduleAutosave(): void {
+    if (this.autosaveHandle) clearTimeout(this.autosaveHandle);
+    this.autosaveHandle = setTimeout(() => {
+      try {
+        localStorage.setItem(this.storageKey, this.getAll());
+      } catch {
+        /* quota / disabled — best-effort */
+      }
+    }, 600);
+  }
+  private loadDraft(): string | null {
+    try {
+      return localStorage.getItem(this.storageKey);
+    } catch {
+      return null;
+    }
+  }
+
   // ── run / cancel / format ──────────────────────────────────────────
 
   private genId(): string {
     return 'ex_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
   }
 
-  run(): void {
-    if (this.running) return;
-    const sqlText = this.getSelection() ?? this.getSql();
+  /**
+   * mode 'smart' = selection, else the statement at the cursor.
+   * mode 'all'   = the whole editor.
+   */
+  run(mode: 'smart' | 'all' = 'smart'): void {
+    if (this.running || !this.view) return;
+
+    let sqlText: string;
+    let range: { from: number; to: number } | null = null;
+    if (mode === 'all') {
+      sqlText = this.getAll();
+    } else {
+      const sel = this.getSelection();
+      if (sel) {
+        sqlText = sel.text;
+        range = { from: sel.from, to: sel.to };
+      } else {
+        const pos = this.view.state.selection.main.head;
+        const stmt = statementAtCursor(this.getAll(), pos);
+        if (!stmt) return;
+        sqlText = stmt.sql;
+        range = { from: stmt.from, to: stmt.to };
+      }
+    }
     if (!sqlText.trim()) return;
+
+    // Flash the range that will run (~500ms).
+    if (range) {
+      this.view.dispatch({ effects: setRunFlash.of(range) });
+      setTimeout(() => this.view?.dispatch({ effects: setRunFlash.of(null) }), 500);
+    }
+    // Clear any prior error diagnostics.
+    this.view.dispatch(setDiagnostics(this.view.state, []));
 
     this.running = true;
     this.results = [];
@@ -341,6 +616,7 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
         if (res?.status && res.data?.results) {
           this.results = res.data.results as QueryResult[];
           this.statusText = this.summarize();
+          this.maybeMarkError(range?.from ?? 0);
         } else {
           this.results = [
             { kind: 'error', message: res?.message ?? 'Execution failed', statementIndex: 0 },
@@ -361,6 +637,35 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       });
   }
 
+  /** If a result is an error with an offset, drop a lint marker + jump. */
+  private maybeMarkError(base: number): void {
+    if (!this.view) return;
+    const err = this.results.find(r => r.kind === 'error') as
+      | { kind: 'error'; message: string; offset?: number }
+      | undefined;
+    if (!err || err.offset == null) return;
+    const pos = Math.min(Math.max(0, base + err.offset), this.view.state.doc.length);
+    const diag: Diagnostic = {
+      from: pos,
+      to: Math.min(pos + 1, this.view.state.doc.length),
+      severity: 'error',
+      message: err.message,
+    };
+    this.view.dispatch(setDiagnostics(this.view.state, [diag]));
+  }
+
+  /** Jump the cursor to the failing offset. */
+  goToError(): void {
+    if (!this.view) return;
+    const err = this.results[this.activeResult] as
+      | { kind: 'error'; offset?: number }
+      | undefined;
+    if (!err || err.offset == null) return;
+    const pos = Math.min(Math.max(0, err.offset), this.view.state.doc.length);
+    this.view.dispatch({ selection: { anchor: pos }, scrollIntoView: true });
+    this.view.focus();
+  }
+
   cancel(): void {
     if (!this.running || !this.executionId) return;
     this.service.cancel(this.connectionId, this.executionId).catch(() => {});
@@ -376,14 +681,21 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       };
       const sel = this.getSelection();
       if (sel) {
-        const { from, to } = this.view.state.selection.main;
-        this.view.dispatch({ changes: { from, to, insert: formatSql(sel, opts) } });
+        this.view.dispatch({
+          changes: { from: sel.from, to: sel.to, insert: formatSql(sel.text, opts) },
+        });
       } else {
-        this.replaceAll(formatSql(this.getSql(), opts));
+        this.replaceAll(formatSql(this.getAll(), opts));
       }
     } catch {
-      /* sql-formatter throws on unparseable input; leave the text as-is */
+      /* unparseable → leave as-is */
     }
+  }
+
+  openFind(): void {
+    // The search panel toggles via the searchKeymap (Mod-F); this button
+    // focuses the editor first so the shortcut lands.
+    this.view?.focus();
   }
 
   private summarize(): string {
@@ -403,11 +715,15 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     this.cdr.markForCheck();
   }
 
-  // ── result grid helpers ─────────────────────────────────────────────
+  // ── result grid ─────────────────────────────────────────────────────
 
   get activeRows(): QueryRow | null {
     const r = this.results[this.activeResult];
     return r && r.kind === 'rows' ? r : null;
+  }
+
+  onGridReady(e: GridReadyEvent): void {
+    this.gridApi = e.api;
   }
 
   colDefs(r: QueryRow): ColDef[] {
@@ -418,7 +734,49 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       cellRenderer: TypedCellComponent,
       cellRendererParams: { semanticType: c.semanticType },
       type: c.semanticType === 'number' ? 'rightAligned' : undefined,
+      filter: true,
+      floatingFilter: this.showFilters,
     }));
+  }
+
+  onQuickFilter(): void {
+    this.gridApi?.setGridOption('quickFilterText', this.quickFilter);
+  }
+
+  toggleFilters(): void {
+    this.showFilters = !this.showFilters;
+    // Re-apply colDefs so floatingFilter flips.
+    const r = this.activeRows;
+    if (r && this.gridApi) this.gridApi.setGridOption('columnDefs', this.colDefs(r));
+    this.cdr.markForCheck();
+  }
+
+  exportCsv(): void {
+    this.gridApi?.exportDataAsCsv({ fileName: this.exportName('csv') });
+  }
+
+  exportJson(): void {
+    const r = this.activeRows;
+    if (!r) return;
+    const objects = r.rows.map(row => {
+      const o: Record<string, unknown> = {};
+      r.columns.forEach(c => (o[c.name] = row[c.field]));
+      return o;
+    });
+    const blob = new Blob([JSON.stringify(objects, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = this.exportName('json');
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  private exportName(ext: string): string {
+    const base = (this.datasourceName || 'query').replace(/[^A-Za-z0-9_-]+/g, '_');
+    return `${base}_result.${ext}`;
   }
 
   tabLabel(r: QueryResult, i: number): string {
@@ -428,7 +786,7 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     return `#${i + 1}`;
   }
 
-  refreshCatalog(): void {
-    this.loadCatalog();
+  refreshSchemas(): void {
+    this.loadSchemas();
   }
 }

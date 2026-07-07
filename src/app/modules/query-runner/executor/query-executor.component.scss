@@ -96,6 +96,16 @@
   .qx-autocommit {
     display: inline-flex;
   }
+  .qx-active {
+    color: var(--qx-accent) !important;
+    background: var(--qx-bg) !important;
+  }
+}
+
+/* range flash after a run */
+:host ::ng-deep .qx-run-flash {
+  background: color-mix(in srgb, var(--qx-accent) 18%, transparent);
+  border-radius: 3px;
 }
 
 /* ── body ───────────────────────────────────────────────────────── */
@@ -157,6 +167,13 @@
   &:hover { background: var(--qx-bg); }
   &.indent { padding-left: 1.4rem; }
   > .pi:first-child { font-size: 0.6rem; color: var(--qx-muted); }
+  .qx-node-spin { margin-left: auto; font-size: 0.7rem; color: var(--qx-accent); }
+}
+.qx-mini-hint {
+  padding: 3px 0.75rem 3px 2.4rem;
+  color: var(--qx-muted);
+  font-size: 0.72rem;
+  font-style: italic;
 }
 .qx-cols { padding-left: 0.4rem; }
 .qx-col {
@@ -199,21 +216,27 @@
   min-height: 0;
   background: var(--qx-elev);
 }
+.qx-result-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.3rem 0.5rem;
+  border-bottom: 1px solid var(--qx-border);
+  min-height: 38px;
+}
 .qx-result-tabs {
   display: flex;
   gap: 2px;
-  padding: 0.35rem 0.5rem 0;
-  border-bottom: 1px solid var(--qx-border);
   overflow-x: auto;
   button {
     border: 1px solid transparent;
-    border-bottom: none;
     background: transparent;
     color: var(--qx-muted);
-    padding: 0.35rem 0.7rem;
+    padding: 0.3rem 0.7rem;
     font-size: 0.76rem;
     cursor: pointer;
-    border-radius: 6px 6px 0 0;
+    border-radius: 6px;
     white-space: nowrap;
     &.active {
       background: var(--qx-bg);
@@ -222,15 +245,76 @@
     }
   }
 }
+.qx-result-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: auto;
+
+  .qx-quickfilter {
+    height: 28px;
+    border: 1px solid var(--qx-border);
+    border-radius: 6px;
+    padding: 0 0.5rem;
+    font-size: 0.78rem;
+    background: var(--qx-bg);
+    color: var(--qx-text);
+    width: 180px;
+    &:focus { outline: none; border-color: var(--qx-accent); }
+  }
+  .qx-icon {
+    border: 1px solid var(--qx-border);
+    background: transparent;
+    color: var(--qx-muted);
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    &:hover { color: var(--qx-accent); }
+    &.qx-active { color: var(--qx-accent); border-color: var(--qx-accent); }
+  }
+}
 .qx-result-body {
   flex: 1;
   min-height: 0;
   position: relative;
 }
+.qx-grid-wrap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.qx-trunc-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  background: #fff6e5;
+  color: #a86b00;
+  font-size: 0.76rem;
+  border-bottom: 1px solid #f0dcae;
+}
 .qx-grid {
   width: 100%;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
 }
+.qx-goto {
+  margin-top: 0.5rem;
+  border: 1px solid var(--qx-border);
+  background: transparent;
+  color: var(--qx-accent);
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  &:hover { background: var(--qx-bg); }
+}
+.qx-cursor { font-variant-numeric: tabular-nums; }
+.qx-sep-dot { opacity: 0.5; }
 .qx-result-empty {
   height: 100%;
   display: flex;
