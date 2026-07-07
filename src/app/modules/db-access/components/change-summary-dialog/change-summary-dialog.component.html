@@ -1,0 +1,78 @@
+<div class="confirmation-popup" *ngIf="visible">
+  <div class="popup-content summary-content">
+    <!-- Header -->
+    <div class="popup-header" [class.destructive]="destructive">
+      <div class="popup-icon" [class.destructive]="destructive">
+        <i class="pi" [ngClass]="destructive ? 'pi-exclamation-triangle' : 'pi-check-circle'"></i>
+      </div>
+      <h3>{{ title || ('DB_ACCESS.CONFIRM_CHANGES' | translate) }}</h3>
+      <p class="popup-subtitle">{{ 'DB_ACCESS.CONFIRM_HINT' | translate }}</p>
+    </div>
+
+    <!-- Body: plain-language change summary -->
+    <div class="popup-body summary-body">
+      <div class="summary-loading" *ngIf="loading">
+        <i class="pi pi-spin pi-spinner"></i>
+        {{ 'DB_ACCESS.VALIDATING' | translate }}
+      </div>
+
+      <ng-container *ngIf="!loading">
+        <div class="summary-count">
+          {{ 'DB_ACCESS.CHANGE_COUNT' | translate: { count: summaries.length } }}
+        </div>
+
+        <ul class="summary-list" *ngIf="summaries.length">
+          <li *ngFor="let s of summaries">
+            <i class="pi" [ngClass]="destructive ? 'pi-minus-circle' : 'pi-angle-right'"></i>
+            <span>{{ s }}</span>
+          </li>
+        </ul>
+
+        <div class="summary-empty" *ngIf="!summaries.length">
+          <i class="pi pi-info-circle"></i>
+          {{ 'DB_ACCESS.NO_CHANGES' | translate }}
+        </div>
+
+        <!-- Destructive acknowledgement -->
+        <div class="ack-section" *ngIf="destructive && !readOnly && !confirmPhrase">
+          <label class="ack-check">
+            <input type="checkbox" [(ngModel)]="ackChecked" />
+            <span>{{ 'DB_ACCESS.ACK_DESTRUCTIVE' | translate }}</span>
+          </label>
+        </div>
+
+        <!-- Type-to-confirm -->
+        <div class="ack-section" *ngIf="confirmPhrase && !readOnly">
+          <label class="ack-label">
+            {{ 'DB_ACCESS.TYPE_TO_CONFIRM' | translate: { phrase: confirmPhrase } }}
+          </label>
+          <input
+            type="text"
+            class="ack-input"
+            [(ngModel)]="typedPhrase"
+            [placeholder]="confirmPhrase"
+            autocomplete="off"
+          />
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Actions -->
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="onCancel()">
+        <i class="pi pi-times"></i>
+        {{ (readOnly ? 'COMMON.CLOSE' : 'COMMON.CANCEL') | translate }}
+      </button>
+      <button
+        *ngIf="!readOnly"
+        class="btn-confirm"
+        [class.btn-danger]="destructive"
+        [disabled]="!canConfirm"
+        (click)="onConfirm()"
+      >
+        <i class="pi" [ngClass]="executing ? 'pi-spin pi-spinner' : 'pi-check'"></i>
+        {{ confirmLabel || ('DB_ACCESS.APPLY_CHANGES' | translate) }}
+      </button>
+    </div>
+  </div>
+</div>

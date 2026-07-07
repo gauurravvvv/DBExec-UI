@@ -99,6 +99,56 @@ const routes: Routes = [
         },
       },
       {
+        path: 'db-users',
+        loadChildren: () =>
+          import('./modules/db-access/users/db-users.module').then(
+            m => m.DbUsersModule,
+          ),
+        canActivate: [roleGuard],
+        data: {
+          permission: PERMISSIONS.DB_USERS,
+          title: 'PAGE_TITLES.DB_USERS',
+        },
+      },
+      {
+        path: 'db-roles',
+        loadChildren: () =>
+          import('./modules/db-access/roles/db-roles.module').then(
+            m => m.DbRolesModule,
+          ),
+        canActivate: [roleGuard],
+        data: {
+          permission: PERMISSIONS.DB_ROLES,
+          title: 'PAGE_TITLES.DB_ROLES',
+        },
+      },
+      {
+        path: 'db-privileges',
+        loadChildren: () =>
+          import('./modules/db-access/privileges/db-privileges.module').then(
+            m => m.DbPrivilegesModule,
+          ),
+        canActivate: [roleGuard],
+        data: {
+          permission: PERMISSIONS.DB_PRIVILEGES,
+          title: 'PAGE_TITLES.DB_PRIVILEGES',
+        },
+      },
+      {
+        // Launcher gates on queryRunner; the Connections screens gate on
+        // connectionManager — so the parent carries NO single permission.
+        // Each child route in QueryRunnerModule guards itself via roleGuard
+        // + its own data.permission. (Still auth-gated by the /app shell.)
+        path: 'query-runner',
+        loadChildren: () =>
+          import('./modules/query-runner/query-runner.module').then(
+            m => m.QueryRunnerModule,
+          ),
+        data: {
+          title: 'PAGE_TITLES.QUERY_RUNNER',
+        },
+      },
+      {
         path: 'roles',
         loadChildren: () =>
           import('./modules/role/role.module').then(m => m.RoleModule),
@@ -230,6 +280,21 @@ const routes: Routes = [
         data: { title: 'PAGE_TITLES.NOT_FOUND' },
       },
     ],
+  },
+  // Standalone Query Runner executor — deliberately OUTSIDE the `app`
+  // shell (no sidebar/topbar) so a browser tab opened from the launcher
+  // is a focused, full-screen workspace. Still auth + permission gated.
+  {
+    path: 'query-runner/exec',
+    loadChildren: () =>
+      import('./modules/query-runner/executor/query-executor.module').then(
+        m => m.QueryExecutorModule,
+      ),
+    canActivate: [authGuard, roleGuard],
+    data: {
+      permission: PERMISSIONS.QUERY_RUNNER,
+      title: 'PAGE_TITLES.QUERY_RUNNER',
+    },
   },
   // Anything unknown lands on a real 404 page rather than silently
   // bouncing to /login. Inside the authenticated shell so the user

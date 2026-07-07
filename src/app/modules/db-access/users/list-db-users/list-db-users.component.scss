@@ -1,0 +1,42 @@
+@use '../../styles/db-access-shared' as db;
+
+@include db.db-access-page;
+@include db.db-access-table;
+@include db.db-access-dialog;
+
+// Delete-wizard specifics reused from the dialog mixin.
+.delete-intro {
+  color: var(--secondary-color);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  margin: 0 0 0.75rem;
+}
+
+.delete-mode {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin-top: var(--space-5);
+
+  .mode-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-size: var(--fs-body);
+    color: var(--text-color);
+    cursor: pointer;
+  }
+
+  .reassign-picker {
+    padding-left: 1.5rem;
+  }
+}
+
+.owned-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  color: var(--secondary-color);
+  font-size: var(--fs-control);
+  padding: var(--space-4) 0;
+}

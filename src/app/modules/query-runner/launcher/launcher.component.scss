@@ -1,0 +1,91 @@
+@use '../../db-access/styles/db-access-shared' as db;
+
+@include db.db-access-page;
+
+.launcher-card {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-7, 2rem);
+}
+
+.launcher-intro {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  margin-bottom: var(--space-6, 1.5rem);
+
+  .launcher-badge {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md, 10px);
+    display: grid;
+    place-items: center;
+    background: var(--primary-color);
+    color: var(--primary-text);
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  h3 {
+    margin: 0 0 2px;
+    font-size: var(--fs-h3);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+  }
+  p {
+    margin: 0;
+    color: var(--secondary-color);
+    font-size: var(--fs-body);
+  }
+}
+
+.launcher-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6, 1.5rem);
+}
+
+.launcher-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 8px);
+
+  label {
+    font-size: var(--fs-label);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+  }
+  .step-hint {
+    color: var(--warn, #a86b00);
+    font-size: var(--fs-control);
+  }
+}
+
+.launcher-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-4);
+
+  .open-btn {
+    min-width: 180px;
+  }
+}
+
+.launcher-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-7, 2rem) 0;
+  text-align: center;
+
+  i {
+    font-size: 2rem;
+    color: var(--secondary-color);
+  }
+  p {
+    margin: 0;
+    color: var(--secondary-color);
+    font-size: var(--fs-body);
+  }
+}

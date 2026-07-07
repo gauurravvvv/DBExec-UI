@@ -1,0 +1,366 @@
+<div class="dataset-page-wrapper">
+  <div class="dataset-content-container">
+    <!-- Header Section — h2 above the card, NO subtitle (list-user parity) -->
+    <div class="page-header-section">
+      <div class="header-content">
+        <h2>{{ 'DB_ACCESS.USERS_LIST_TITLE' | translate }}</h2>
+      </div>
+
+      <div class="header-actions">
+        <button
+          pButton
+          [label]="'COMMON.CLEAR' | translate"
+          icon="pi pi-filter-slash"
+          (click)="clearFilters()"
+          [disabled]="!isFilterActive"
+          class="p-button-outlined p-button-danger modern-button"
+        ></button>
+
+        <button
+          *hasPermission="'dbUsers'; level: 'write'"
+          pButton
+          [label]="'DB_ACCESS.CREATE_USER' | translate"
+          icon="pi pi-plus"
+          (click)="onAdd()"
+          [disabled]="!datasourceId || !canManage"
+          class="p-button-raised p-button-primary modern-button"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Content card (flat) — toolbar holds the datasource picker + badge -->
+    <div class="content-card">
+      <div class="card-toolbar">
+        <div class="toolbar-left">
+          <app-datasource-picker
+            (changed)="onDatasourceChange($event)"
+          ></app-datasource-picker>
+        </div>
+        <div class="toolbar-right" *ngIf="datasourceId && !unsupported()">
+          <span class="cap-badge full" *ngIf="capability() && canManage">
+            <i class="pi pi-check-circle"></i>
+            {{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}
+          </span>
+          <span class="cap-badge readonly" *ngIf="capability() && !canManage">
+            <i class="pi pi-lock"></i>
+            {{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}
+          </span>
+        </div>
+      </div>
+
+      <!-- No datasource chosen -->
+      <div class="list-hint" *ngIf="!datasourceId && !capabilityLoading()">
+        <i class="pi pi-database"></i>
+        <span>{{ 'DB_ACCESS.SELECT_DATASOURCE_HINT' | translate }}</span>
+      </div>
+
+      <div class="cap-loading" *ngIf="datasourceId && capabilityLoading()">
+        <i class="pi pi-spin pi-spinner"></i>
+        {{ 'DB_ACCESS.CHECKING_CAPABILITY' | translate }}
+      </div>
+
+      <div class="list-hint unsupported" *ngIf="datasourceId && unsupported()">
+        <i class="pi pi-info-circle"></i>
+        <span>{{ 'DB_ACCESS.UNSUPPORTED_BODY' | translate }}</span>
+      </div>
+
+      <!-- Table -->
+      <div
+        class="table-wrapper"
+        *ngIf="datasourceId && !unsupported() && !capabilityLoading()"
+      >
+        <p-table
+          [value]="users"
+          [rows]="10"
+          [paginator]="true"
+          [rowsPerPageOptions]="[10, 25, 50, 100]"
+          currentPageReportTemplate="{first} - {last} of {totalRecords}"
+          [showCurrentPageReport]="true"
+          [rowHover]="true"
+          dataKey="name"
+          styleClass="p-datatable-sm modern-table"
+          [loading]="loading()"
+          [scrollable]="true"
+          scrollHeight="flex"
+          [tableStyle]="{ 'min-width': '64rem' }"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th
+                style="min-width: 14rem"
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('name')"
+                (click)="toggleSort('name')"
+              >
+                <div class="th-content">
+                  <span>{{ 'COMMON.NAME' | translate }}</span>
+                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('name')">
+                    <i class="pi" [ngClass]="{
+                      'pi-arrow-up': sortHelper.direction('name') === 'asc',
+                      'pi-arrow-down': sortHelper.direction('name') === 'desc',
+                      'pi-arrows-v': !sortHelper.direction('name')
+                    }"></i>
+                  </span>
+                </div>
+              </th>
+              <th
+                style="width: 9rem"
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('status')"
+                (click)="toggleSort('status')"
+              >
+                <div class="th-content">
+                  <span>{{ 'COMMON.STATUS' | translate }}</span>
+                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('status')">
+                    <i class="pi" [ngClass]="{
+                      'pi-arrow-up': sortHelper.direction('status') === 'asc',
+                      'pi-arrow-down': sortHelper.direction('status') === 'desc',
+                      'pi-arrows-v': !sortHelper.direction('status')
+                    }"></i>
+                  </span>
+                </div>
+              </th>
+              <th
+                style="width: 11rem"
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('validUntil')"
+                (click)="toggleSort('validUntil')"
+              >
+                <div class="th-content">
+                  <span>{{ 'DB_ACCESS.EXPIRY' | translate }}</span>
+                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('validUntil')">
+                    <i class="pi" [ngClass]="{
+                      'pi-arrow-up': sortHelper.direction('validUntil') === 'asc',
+                      'pi-arrow-down': sortHelper.direction('validUntil') === 'desc',
+                      'pi-arrows-v': !sortHelper.direction('validUntil')
+                    }"></i>
+                  </span>
+                </div>
+              </th>
+              <th
+                style="width: 8rem"
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('connectionLimit')"
+                (click)="toggleSort('connectionLimit')"
+              >
+                <div class="th-content">
+                  <span>{{ 'DB_ACCESS.CONN_LIMIT' | translate }}</span>
+                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('connectionLimit')">
+                    <i class="pi" [ngClass]="{
+                      'pi-arrow-up': sortHelper.direction('connectionLimit') === 'asc',
+                      'pi-arrow-down': sortHelper.direction('connectionLimit') === 'desc',
+                      'pi-arrows-v': !sortHelper.direction('connectionLimit')
+                    }"></i>
+                  </span>
+                </div>
+              </th>
+              <th style="min-width: 12rem"><div class="th-content">{{ 'DB_ACCESS.FLAGS' | translate }}</div></th>
+              <th style="min-width: 12rem"><div class="th-content">{{ 'DB_ACCESS.MEMBER_OF' | translate }}</div></th>
+              <th style="width: 10rem"><div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div></th>
+            </tr>
+            <!-- Filter Row -->
+            <tr>
+              <th>
+                <app-custom-input
+                  [(ngModel)]="filterValues.name"
+                  (ngModelChange)="onFilterChange()"
+                  [placeholder]="'COMMON.SEARCH_NAME' | translate"
+                  icon="pi-search"
+                ></app-custom-input>
+              </th>
+              <th>
+                <app-custom-dropdown
+                  [(ngModel)]="filterValues.status"
+                  [options]="statusOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  [placeholder]="'COMMON.ALL' | translate"
+                  [showClear]="true"
+                  [filter]="false"
+                  [autoDisplayFirst]="false"
+                  appendTo="body"
+                  (onChangeEvent)="onFilterChange()"
+                  icon="pi-circle-fill"
+                ></app-custom-dropdown>
+              </th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-user>
+            <tr class="modern-row">
+              <td>
+                <a class="dataset-name-link" (click)="onView(user)">{{ user.name }}</a>
+              </td>
+              <td>
+                <span class="status-pill" [ngClass]="statusOf(user)">
+                  <span class="dot"></span>
+                  {{ 'DB_ACCESS.STATUS_' + (statusOf(user) | uppercase) | translate }}
+                </span>
+              </td>
+              <td>
+                <span
+                  class="date-text"
+                  *ngIf="(user.attributes?.validUntil || user.validUntil) as vu; else noExpiry"
+                >
+                  {{ vu | date: 'dd MMM yyyy' }}
+                </span>
+                <ng-template #noExpiry><span class="description-text">—</span></ng-template>
+              </td>
+              <td>
+                <span class="description-text">{{ connLimitOf(user) }}</span>
+              </td>
+              <td>
+                <span *ngFor="let f of flagsOf(user)" class="flag-chip">{{ f }}</span>
+                <span class="description-text" *ngIf="!flagsOf(user).length">—</span>
+              </td>
+              <td>
+                <span *ngFor="let m of (user.memberOf ?? [])" class="count-pill">{{ m }}</span>
+                <span class="description-text" *ngIf="!(user.memberOf ?? []).length">—</span>
+              </td>
+              <td>
+                <div class="row-actions">
+                  <button
+                    class="icon-btn view-btn"
+                    (click)="onView(user)"
+                    [pTooltip]="'COMMON.VIEW' | translate"
+                    tooltipPosition="bottom"
+                  >
+                    <i class="pi pi-eye"></i>
+                  </button>
+                  <button
+                    *hasPermission="'dbUsers'; level: 'write'"
+                    class="icon-btn edit-btn"
+                    (click)="onEdit(user)"
+                    [disabled]="!canManage"
+                    [pTooltip]="'COMMON.EDIT' | translate"
+                    tooltipPosition="bottom"
+                  >
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <ng-container *hasPermission="'dbUsers'; level: 'write'">
+                    <button
+                      class="icon-btn"
+                      *ngIf="statusOf(user) !== 'no-login'"
+                      (click)="deactivate(user)"
+                      [disabled]="!canManage"
+                      [pTooltip]="'DB_ACCESS.DEACTIVATE' | translate"
+                      tooltipPosition="bottom"
+                    >
+                      <i class="pi pi-ban"></i>
+                    </button>
+                  </ng-container>
+                  <button
+                    *hasPermission="'dbUsers'; level: 'delete'"
+                    class="icon-btn delete-btn"
+                    (click)="openDelete(user)"
+                    [disabled]="!canManage"
+                    [pTooltip]="'COMMON.DELETE' | translate"
+                    tooltipPosition="bottom"
+                  >
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr class="empty-row">
+              <td colspan="7" class="empty-message-cell">
+                <div class="empty-state-inline">
+                  <i class="pi pi-users empty-state-icon"></i>
+                  <span class="empty-state-text">{{ 'DB_ACCESS.NO_USERS' | translate }}</span>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="paginatorright">
+            <button
+              type="button"
+              class="paginator-refresh-btn"
+              (click)="load()"
+              [attr.aria-label]="'COMMON.REFRESH' | translate"
+            >
+              <i class="pi pi-refresh"></i>
+            </button>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete wizard — destructive confirm popup (plain-language, no SQL) -->
+<div class="confirmation-popup" *ngIf="showDelete">
+  <div class="popup-content wide">
+    <div class="popup-header">
+      <div class="popup-icon destructive"><i class="pi pi-trash"></i></div>
+      <h3>{{ 'DB_ACCESS.DELETE_USER' | translate }}</h3>
+    </div>
+    <div class="popup-body">
+      <p class="delete-intro" [innerHTML]="'DB_ACCESS.DELETE_ROLE_INTRO' | translate: { name: deleteTarget?.name }"></p>
+      <div class="owned-summary" *ngIf="ownedLoading">
+        <i class="pi pi-spin pi-spinner"></i>
+        {{ 'DB_ACCESS.CHECKING_OWNED' | translate }}
+      </div>
+      <ul class="info-list" *ngIf="!ownedLoading">
+        <li>
+          <i class="pi pi-box"></i>
+          <span>{{ 'DB_ACCESS.OWNED_COUNT' | translate: { count: ownedCount } }}</span>
+        </li>
+      </ul>
+      <div class="delete-mode" *ngIf="!ownedLoading && ownedCount > 0">
+        <label class="mode-option">
+          <input type="radio" name="delMode" value="reassign" [(ngModel)]="deleteMode" />
+          <span>{{ 'DB_ACCESS.REASSIGN_TO' | translate }}</span>
+        </label>
+        <div class="reassign-picker" *ngIf="deleteMode === 'reassign'">
+          <app-custom-dropdown
+            [(ngModel)]="reassignTo"
+            [options]="groupRoleOptions"
+            optionLabel="label"
+            optionValue="value"
+            [filter]="true"
+            filterBy="label"
+            appendTo="body"
+            [label]="'DB_ACCESS.TARGET_ROLE' | translate"
+          ></app-custom-dropdown>
+        </div>
+        <label class="mode-option">
+          <input type="radio" name="delMode" value="drop" [(ngModel)]="deleteMode" />
+          <span>{{ 'DB_ACCESS.DROP_OWNED' | translate }}</span>
+        </label>
+      </div>
+    </div>
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">
+        <i class="pi pi-times"></i>{{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm btn-danger"
+        [disabled]="ownedLoading || (ownedCount > 0 && deleteMode === 'reassign' && !reassignTo)"
+        (click)="proceedDelete()"
+      >
+        <i class="pi pi-eye"></i>{{ 'DB_ACCESS.REVIEW_SQL' | translate }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Plain-language change-summary confirm gate -->
+<app-change-summary-dialog
+  [visible]="showPreview"
+  [title]="previewTitle"
+  [summaries]="summaries"
+  [destructive]="previewDestructive"
+  [confirmPhrase]="confirmPhrase"
+  [loading]="previewLoading"
+  [executing]="saving()"
+  [readOnly]="!canManage"
+  (confirmed)="confirmPreview()"
+  (cancelled)="cancelPreview()"
+></app-change-summary-dialog>

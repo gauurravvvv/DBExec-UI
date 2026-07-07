@@ -101,6 +101,36 @@ export const DATASOURCE = {
   ACTIVITY_SUFFIX: '/activity',
 };
 
+export const QUERY_RUNNER = {
+  // Connection CRUD (owner-scoped)
+  CONNECTIONS: '/query-runner/connections',
+  CONNECTION: '/query-runner/connections/', // + :id  (GET/PUT/DELETE)
+  // POST /query-runner/connections/:id/test  → verify creds
+  TEST_SUFFIX: '/test',
+  // POST /query-runner/connections/:id/default  → set default for its datasource
+  DEFAULT_SUFFIX: '/default',
+  // POST /query-runner/connections/:id/enabled  → enable / disable
+  ENABLED_SUFFIX: '/enabled',
+  // GET  /query-runner/connections/:id/catalog       → schemas only (fast)
+  // GET  /query-runner/connections/:id/catalog?full=true → full catalog
+  CATALOG_SUFFIX: '/catalog',
+  // GET  /query-runner/connections/:id/tables?schema=   → lazy: tables in a schema
+  TABLES_SUFFIX: '/tables',
+  // GET  /query-runner/connections/:id/columns?schema=&table= → lazy: columns
+  COLUMNS_SUFFIX: '/columns',
+  // Object explorer (read-only inspection)
+  OBJECTS_SUFFIX: '/objects', // ?schema=  → grouped object list
+  OBJECT_TABLE_SUFFIX: '/object/table', // ?schema=&name=
+  OBJECT_VIEW_SUFFIX: '/object/view', // ?schema=&name=&materialized=
+  OBJECT_FUNCTION_SUFFIX: '/object/function', // ?schema=&name=
+  OBJECT_SEQUENCE_SUFFIX: '/object/sequence', // ?schema=&name=
+  OBJECT_MATVIEW_REFRESH_SUFFIX: '/object/matview/refresh', // ?schema=&name=
+  // POST /query-runner/connections/:id/execute  → run SQL
+  EXECUTE_SUFFIX: '/execute',
+  // POST /query-runner/connections/:id/cancel   → cancel a running run
+  CANCEL_SUFFIX: '/cancel',
+};
+
 export const GROUP = {
   LIST: '/groups',
   ADD: '/groups',
@@ -340,6 +370,57 @@ export const ORG_POLICY = {
   GET: '/api/v1/org-policy',
   UPDATE_SECURITY: '/api/v1/org-policy/security',
   UPDATE_EMAIL: '/api/v1/org-policy/email',
+};
+
+/**
+ * Database Access Management — UI over PostgreSQL native roles / users /
+ * grants for a chosen datasource. Every path is scoped by :datasourceId
+ * (except the org-wide /templates group). Prefixes ending in `/` are
+ * concatenated with the datasource id; suffixes complete the sub-resource.
+ * All under `/api/v1/db-access`.
+ */
+export const DB_ACCESS = {
+  // GET /db-access/:datasourceId/capability
+  BASE: '/db-access/',
+  CAPABILITY_SUFFIX: '/capability',
+  // GET /db-access/:datasourceId/roles  (users [canLogin] + roles split FE-side)
+  ROLES_SUFFIX: '/roles',
+  // GET /db-access/:datasourceId/memberships
+  MEMBERSHIPS_SUFFIX: '/memberships',
+  // POST /db-access/:datasourceId/memberships/remove
+  MEMBERSHIPS_REMOVE_SUFFIX: '/memberships/remove',
+  // GET /db-access/:datasourceId/schemas
+  SCHEMAS_SUFFIX: '/schemas',
+  // GET /db-access/:datasourceId/objects/sequences?schema=
+  OBJECTS_SEQUENCES_SUFFIX: '/objects/sequences',
+  // GET /db-access/:datasourceId/objects/functions?schema=
+  OBJECTS_FUNCTIONS_SUFFIX: '/objects/functions',
+  // GET /db-access/:datasourceId/grants/tables?schema=
+  GRANTS_TABLES_SUFFIX: '/grants/tables',
+  // GET /db-access/:datasourceId/grants/columns?schema=&table=
+  GRANTS_COLUMNS_SUFFIX: '/grants/columns',
+  // GET /db-access/:datasourceId/grants/export
+  GRANTS_EXPORT_SUFFIX: '/grants/export',
+  // GET /db-access/:datasourceId/default-privileges
+  DEFAULT_PRIVILEGES_SUFFIX: '/default-privileges',
+  // GET /db-access/:datasourceId/effective/:roleName
+  EFFECTIVE_SEGMENT: '/effective/',
+  // GET /db-access/:datasourceId/roles/:roleName/owned
+  ROLE_SEGMENT: '/roles/',
+  OWNED_SUFFIX: '/owned',
+  // GET /db-access/:datasourceId/roles/:roleName/export → full access profile
+  ACCESS_EXPORT_SUFFIX: '/export',
+  RENAME_SUFFIX: '/rename',
+  DELETE_SUFFIX: '/delete',
+  // POST /db-access/:datasourceId/change-set
+  CHANGE_SET_SUFFIX: '/change-set',
+  // GET /db-access/:datasourceId/sessions → { sessions, selfPid }
+  SESSIONS_SUFFIX: '/sessions',
+  // POST /db-access/:datasourceId/sessions/:pid/cancel
+  // POST /db-access/:datasourceId/sessions/:pid/terminate
+  SESSIONS_SEGMENT: '/sessions/',
+  CANCEL_SUFFIX: '/cancel',
+  TERMINATE_SUFFIX: '/terminate',
 };
 
 export const NOTIFICATION = {

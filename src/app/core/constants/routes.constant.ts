@@ -62,6 +62,45 @@ export const USER = {
 };
 
 export const DATASOURCE = feature('/app/datasources');
+
+// Database Access Management — split into THREE sidebar sections
+// (Database Users / Database Roles / Privileges & Access), each its own
+// list → add/edit/view module like `datasource`. The selected datasource
+// is carried across sections via the `?ds=<id>` query param (owned by the
+// shared datasource-picker + DbAccessContextService), NOT in the path.
+// Callers pass the datasource id as a queryParams object where needed.
+export const DB_ACCESS = {
+  // Database Users (login roles)
+  USERS_LIST: '/app/db-users',
+  usersList: (dsId?: string | number) => [
+    '/app/db-users',
+    ...(dsId ? [] : []),
+  ],
+  userNew: () => '/app/db-users/new',
+  userView: (roleName: string) => `/app/db-users/${roleName}`,
+  userEdit: (roleName: string) => `/app/db-users/${roleName}/edit`,
+
+  // Database Roles (group roles)
+  ROLES_LIST: '/app/db-roles',
+  roleNew: () => '/app/db-roles/new',
+  roleView: (roleName: string) => `/app/db-roles/${roleName}`,
+  roleEdit: (roleName: string) => `/app/db-roles/${roleName}/edit`,
+
+  // Privileges & Access (composer + effective + saved sets)
+  PRIVILEGES_LIST: '/app/db-privileges',
+  privilegeView: (id: string | number) => `/app/db-privileges/${id}`,
+};
+
+export const QUERY_RUNNER = {
+  // Launcher (datasource → connection → open)
+  LAUNCHER: '/app/query-runner',
+  // Connection profiles (owner-scoped CRUD)
+  CONNECTIONS_LIST: '/app/query-runner/connections',
+  connectionNew: () => '/app/query-runner/connections/new',
+  connectionEdit: (id: string) => `/app/query-runner/connections/${id}/edit`,
+  // Standalone executor tab (outside the app shell)
+  EXEC: '/query-runner/exec',
+};
 export const DATASET = feature('/app/datasets');
 export const TAB = feature('/app/tabs');
 export const SECTION = feature('/app/sections');

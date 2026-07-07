@@ -1,0 +1,179 @@
+<div class="od-overlay" *ngIf="visible" (click)="close()">
+  <div class="od-modal" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="od-head">
+      <div class="od-title">
+        <i class="pi" [ngClass]="{
+          'pi-table': kind === 'table',
+          'pi-eye': kind === 'view',
+          'pi-clone': kind === 'matview',
+          'pi-cog': kind === 'function',
+          'pi-sort-numeric-up': kind === 'sequence'
+        }"></i>
+        <span class="od-name">{{ schema }}.{{ name }}</span>
+        <span class="od-kind">{{ ('QUERY_RUNNER.KIND_' + (kind || '') | uppercase) | translate }}</span>
+      </div>
+      <div class="od-head-actions">
+        <button class="od-refresh" *ngIf="kind === 'matview'"
+          (click)="refreshMatview()" [disabled]="refreshing">
+          <i class="pi" [ngClass]="refreshing ? 'pi-spin pi-spinner' : 'pi-refresh'"></i>
+          {{ 'QUERY_RUNNER.REFRESH_MATVIEW' | translate }}
+        </button>
+        <button class="od-close" (click)="close()"><i class="pi pi-times"></i></button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="od-tabs" *ngIf="detail && !loading">
+      <button *ngFor="let t of tabs" [class.active]="activeTab === t" (click)="setTab(t)">
+        {{ ('QUERY_RUNNER.TAB_' + (t | uppercase)) | translate }}
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="od-body">
+      <div class="od-loading" *ngIf="loading">
+        <i class="pi pi-spin pi-spinner"></i> {{ 'COMMON.LOADING' | translate }}
+      </div>
+      <div class="od-error" *ngIf="error">
+        <i class="pi pi-times-circle"></i> {{ error }}
+      </div>
+
+      <ng-container *ngIf="detail && !loading">
+        <!-- COLUMNS -->
+        <table class="od-table" *ngIf="activeTab === 'columns'">
+          <thead>
+            <tr>
+              <th>{{ 'QUERY_RUNNER.COL_NAME' | translate }}</th>
+              <th>{{ 'QUERY_RUNNER.COL_TYPE' | translate }}</th>
+              <th>{{ 'QUERY_RUNNER.COL_NULLABLE' | translate }}</th>
+              <th>{{ 'QUERY_RUNNER.COL_DEFAULT' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of detail.columns">
+              <td>
+                <i class="pi pi-key od-pk" *ngIf="c.isPrimaryKey"></i>
+                {{ c.column }}
+              </td>
+              <td class="od-mono">{{ c.dataType }}</td>
+              <td>{{ c.nullable ? 'YES' : 'NO' }}</td>
+              <td class="od-mono od-muted">{{ c.default || '—' }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- INDEXES -->
+        <table class="od-table" *ngIf="activeTab === 'indexes'">
+          <thead>
+            <tr>
+              <th>{{ 'QUERY_RUNNER.IDX_NAME' | translate }}</th>
+              <th>{{ 'QUERY_RUNNER.IDX_METHOD' | translate }}</th>
+              <th>{{ 'QUERY_RUNNER.IDX_UNIQUE' | translate }}</th>
+              <th>{{ 'QUERY_RUNNER.IDX_SIZE' | translate }}</th>
+              <th>{{ 'QUERY_RUNNER.IDX_DEF' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ix of detail.indexes">
+              <td>{{ ix.name }}<span class="od-badge" *ngIf="ix.isPrimary">PK</span></td>
+              <td>{{ ix.method }}</td>
+              <td>{{ ix.isUnique ? 'YES' : 'NO' }}</td>
+              <td>{{ humanSize(ix.sizeBytes) }}</td>
+              <td class="od-mono od-muted od-def">{{ ix.definition }}</td>
+            </tr>
+            <tr *ngIf="!detail.indexes?.length"><td colspan="5" class="od-none">—</td></tr>
+          </tbody>
+        </table>
+
+        <!-- CONSTRAINTS -->
+        <table class="od-table" *ngIf="activeTab === 'constraints'">
+          <thead>
+            <tr>
+              <th>{{ 'QUERY_RUNNER.CON_NAME' | translate }}</th>
+              <th>{{ 'QUERY_RUNNER.CON_TYPE' | translate }}</th>
+              <th>{{ 'QUERY_RUNNER.CON_DEF' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let cn of detail.constraints">
+              <td>{{ cn.name }}</td>
+              <td><span class="od-chip">{{ cn.type }}</span></td>
+              <td class="od-mono od-muted od-def">{{ cn.definition }}</td>
+            </tr>
+            <tr *ngIf="!detail.constraints?.length"><td colspan="3" class="od-none">—</td></tr>
+          </tbody>
+        </table>
+
+        <!-- TRIGGERS -->
+        <table class="od-table" *ngIf="activeTab === 'triggers'">
+          <thead>
+            <tr>
+              <th>{{ 'QUERY_RUNNER.TRG_NAME' | translate }}</th>
+              <th>{{ 'QUERY_RUNNER.TRG_DEF' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let tg of detail.triggers">
+              <td>{{ tg.name }}</td>
+              <td class="od-mono od-muted od-def">{{ tg.definition }}</td>
+            </tr>
+            <tr *ngIf="!detail.triggers?.length"><td colspan="2" class="od-none">—</td></tr>
+          </tbody>
+        </table>
+
+        <!-- DDL -->
+        <div class="od-code-wrap" *ngIf="activeTab === 'ddl'">
+          <button class="od-copy" (click)="copy(detail.ddl)">
+            <i class="pi pi-copy"></i> {{ 'QUERY_RUNNER.COPY' | translate }}
+          </button>
+          <pre class="od-code">{{ detail.ddl }}</pre>
+        </div>
+
+        <!-- DEFINITION (view / matview) -->
+        <div class="od-code-wrap" *ngIf="activeTab === 'definition'">
+          <button class="od-copy" (click)="copy(detail.definition)">
+            <i class="pi pi-copy"></i> {{ 'QUERY_RUNNER.COPY' | translate }}
+          </button>
+          <pre class="od-code">{{ detail.definition }}</pre>
+        </div>
+
+        <!-- SOURCE (function) -->
+        <div class="od-code-wrap" *ngIf="activeTab === 'source'">
+          <div class="od-sig">{{ name }}({{ detail.args }}) → {{ detail.returns }}
+            <span class="od-chip" *ngIf="detail.language">{{ detail.language }}</span>
+          </div>
+          <button class="od-copy" (click)="copy(detail.source)">
+            <i class="pi pi-copy"></i> {{ 'QUERY_RUNNER.COPY' | translate }}
+          </button>
+          <pre class="od-code">{{ detail.source }}</pre>
+        </div>
+
+        <!-- INFO -->
+        <div class="od-info" *ngIf="activeTab === 'info'">
+          <!-- table / view / matview -->
+          <ng-container *ngIf="kind === 'table' || kind === 'view' || kind === 'matview'">
+            <div class="od-kv" *ngIf="detail.owner"><label>Owner</label><span>{{ detail.owner }}</span></div>
+            <div class="od-kv"><label>Size</label><span>{{ humanSize(detail.sizeBytes) }}</span></div>
+            <div class="od-kv" *ngIf="detail.rowEstimate != null"><label>Est. rows</label><span>{{ detail.rowEstimate | number }}</span></div>
+            <div class="od-kv" *ngIf="detail.comment"><label>Comment</label><span>{{ detail.comment }}</span></div>
+          </ng-container>
+          <!-- function -->
+          <ng-container *ngIf="kind === 'function'">
+            <div class="od-kv"><label>Returns</label><span class="od-mono">{{ detail.returns }}</span></div>
+            <div class="od-kv" *ngIf="detail.language"><label>Language</label><span>{{ detail.language }}</span></div>
+            <div class="od-kv" *ngIf="detail.comment"><label>Comment</label><span>{{ detail.comment }}</span></div>
+          </ng-container>
+          <!-- sequence -->
+          <ng-container *ngIf="kind === 'sequence'">
+            <div class="od-kv"><label>Last value</label><span class="od-mono">{{ detail.lastValue }}</span></div>
+            <div class="od-kv"><label>Increment</label><span class="od-mono">{{ detail.increment }}</span></div>
+            <div class="od-kv"><label>Min</label><span class="od-mono">{{ detail.minValue }}</span></div>
+            <div class="od-kv"><label>Max</label><span class="od-mono">{{ detail.maxValue }}</span></div>
+            <div class="od-kv"><label>Cycle</label><span>{{ detail.cycle ? 'YES' : 'NO' }}</span></div>
+          </ng-container>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

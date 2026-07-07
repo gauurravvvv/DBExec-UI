@@ -1,0 +1,146 @@
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  inject,
+} from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { DB_ACCESS } from 'src/app/core/constants/routes.constant';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { DbAccessContextService } from '../../services/db-access-context.service';
+import { DbAccessService } from '../../services/db-access.service';
+import {
+  downloadAccessCsv,
+  downloadAccessJson,
+} from '../../services/access-export.util';
+
+/**
+ * ViewDbRoleComponent — read-only detail for a group role: hero header +
+ * detail sections (attributes, member count / member-of, effective
+ * privileges). Datasource carried by ?ds=.
+ */
+@Component({
+  selector: 'app-view-db-role',
+  templateUrl: './view-db-role.component.html',
+  styleUrls: ['./view-db-role.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class ViewDbRoleComponent implements OnInit {
+  private cdr = inject(ChangeDetectorRef);
+
+  datasourceId = '';
+  roleName = '';
+  loading = true;
+  role: any = null;
+  effective: any[] = [];
+  effectiveLoading = false;
+  exporting = false;
+
+  constructor(
+    private dbAccess: DbAccessService,
+    private ctx: DbAccessContextService,
+    private globalService: GlobalService,
+    private translate: TranslateService,
+    private route: ActivatedRoute,
+    private router: Router,
+  ) {}
+
+  ngOnInit(): void {
+    this.datasourceId =
+      this.route.snapshot.queryParamMap.get('ds') || this.ctx.datasourceId() || '';
+    this.roleName = this.route.snapshot.paramMap.get('roleName') ?? '';
+    if (!this.datasourceId) {
+      this.router.navigate([DB_ACCESS.ROLES_LIST]);
+      return;
+    }
+    this.ctx.setDatasource(this.datasourceId);
+    this.load();
+  }
+
+  private load(): void {
+    this.dbAccess
+      .loadRoles(this.datasourceId)
+      .then(() => {
+        const all = this.dbAccess.roles() ?? [];
+        this.role = all.find(r => r.name === this.roleName) ?? null;
+        if (!this.role) {
+          this.goBack();
+          return;
+        }
+        this.loadEffective();
+      })
+      .catch(() => this.goBack())
+      .finally(() => {
+        this.loading = false;
+        this.cdr.markForCheck();
+      });
+  }
+
+  private loadEffective(): void {
+    this.effectiveLoading = true;
+    this.dbAccess
+      .loadEffective(this.datasourceId, this.roleName)
+      .then(res => (this.effective = res?.status ? (res.data ?? []) : []))
+      .catch(() => (this.effective = []))
+      .finally(() => {
+        this.effectiveLoading = false;
+        this.cdr.markForCheck();
+      });
+  }
+
+  get attrs(): any {
+    return this.role?.attributes ?? this.role ?? {};
+  }
+
+  flags(): string[] {
+    const a = this.attrs;
+    const flags: string[] = [];
+    if (a.createdb) flags.push('CREATEDB');
+    if (a.createrole) flags.push('CREATEROLE');
+    if (a.inherit !== false) flags.push('INHERIT');
+    return flags;
+  }
+
+  get memberCount(): number {
+    return this.role?.memberCount ?? this.role?.members?.length ?? 0;
+  }
+
+  goBack(): void {
+    this.router.navigate([DB_ACCESS.ROLES_LIST], { queryParams: { ds: this.datasourceId } });
+  }
+
+  onEdit(): void {
+    this.router.navigate([DB_ACCESS.roleEdit(this.roleName)], {
+      queryParams: { ds: this.datasourceId },
+    });
+  }
+
+  /**
+   * Fetch this role's full access profile and download it as JSON or
+   * CSV. Live read from the datasource — nothing persisted.
+   */
+  exportAccess(format: 'json' | 'csv'): void {
+    if (this.exporting) return;
+    this.exporting = true;
+    this.cdr.markForCheck();
+    this.dbAccess
+      .exportRoleAccess(this.datasourceId, this.roleName)
+      .then(res => {
+        if (res?.status && res.data) {
+          if (format === 'csv') downloadAccessCsv(res.data);
+          else downloadAccessJson(res.data);
+        } else {
+          this.globalService.handleSuccessService(res);
+        }
+      })
+      .catch(() => {
+        /* interceptor toasts the error */
+      })
+      .finally(() => {
+        this.exporting = false;
+        this.cdr.markForCheck();
+      });
+  }
+}

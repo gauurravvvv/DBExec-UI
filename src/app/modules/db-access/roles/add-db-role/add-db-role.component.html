@@ -1,0 +1,96 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text back-button" (click)="goBack()">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>{{ 'DB_ACCESS.CREATE_ROLE' | translate }}</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          [label]="'COMMON.CANCEL' | translate"
+          class="p-button-outlined btn-cancel"
+          (click)="onCancel()"
+        ></button>
+        <button
+          *hasPermission="'dbRoles'; level: 'write'"
+          pButton
+          class="p-button-primary btn-save"
+          type="button"
+          [label]="'COMMON.CREATE' | translate"
+          (click)="onSubmit()"
+          [disabled]="roleForm.invalid || saving()"
+        >
+          <i class="pi mr-2" [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"></i>
+        </button>
+      </div>
+    </div>
+
+    <form [formGroup]="roleForm" class="admin-form">
+      <div class="left-section">
+        <div class="form-grid">
+          <div class="mode-tabs">
+            <button type="button" [class.active]="createMode === 'scratch'" (click)="setMode('scratch')">
+              {{ 'DB_ACCESS.FROM_SCRATCH' | translate }}
+            </button>
+            <button type="button" [class.active]="createMode === 'clone'" (click)="setMode('clone')">
+              {{ 'DB_ACCESS.CLONE' | translate }}
+            </button>
+          </div>
+
+          <app-custom-input
+            formControlName="name"
+            [label]="'DB_ACCESS.ROLE_NAME' | translate"
+            [placeholder]="'DB_ACCESS.ROLE_NAME_PLACEHOLDER' | translate"
+            icon="pi-id-card"
+            [required]="true"
+            [showError]="!!(roleForm.get('name')?.invalid && roleForm.get('name')?.touched)"
+            [errorMessage]="getErrorMessage('name')"
+          ></app-custom-input>
+
+          <app-custom-dropdown
+            *ngIf="createMode === 'clone'"
+            formControlName="cloneFrom"
+            [options]="allRoleOptions"
+            optionLabel="label"
+            optionValue="value"
+            [label]="'DB_ACCESS.CLONE_FROM' | translate"
+            [filter]="true"
+            filterBy="label"
+            appendTo="body"
+          ></app-custom-dropdown>
+
+          <ng-container *ngIf="createMode === 'scratch'">
+            <h3 class="form-section-title">{{ 'DB_ACCESS.ATTRIBUTES' | translate }}</h3>
+            <div class="attr-toggles">
+              <div class="attr-toggle">
+                <span class="attr-meta">
+                  <span class="attr-name">INHERIT</span>
+                  <span class="attr-desc">{{ 'DB_ACCESS.ATTR_INHERIT' | translate }}</span>
+                </span>
+                <app-custom-toggle formControlName="inherit" [showStatusLabel]="false"></app-custom-toggle>
+              </div>
+              <div class="attr-toggle">
+                <span class="attr-meta">
+                  <span class="attr-name">CREATEDB</span>
+                  <span class="attr-desc">{{ 'DB_ACCESS.ATTR_CREATEDB' | translate }}</span>
+                </span>
+                <app-custom-toggle formControlName="createdb" [showStatusLabel]="false"></app-custom-toggle>
+              </div>
+              <div class="attr-toggle">
+                <span class="attr-meta">
+                  <span class="attr-name">CREATEROLE</span>
+                  <span class="attr-desc">{{ 'DB_ACCESS.ATTR_CREATEROLE' | translate }}</span>
+                </span>
+                <app-custom-toggle formControlName="createrole" [showStatusLabel]="false"></app-custom-toggle>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

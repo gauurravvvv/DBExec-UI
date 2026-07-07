@@ -1,0 +1,179 @@
+<div class="dataset-page-wrapper">
+  <div class="dataset-content-container">
+    <div class="page-header-section">
+      <div class="header-content">
+        <h2>{{ 'QUERY_RUNNER.CONNECTIONS_TITLE' | translate }}</h2>
+      </div>
+      <div class="header-actions">
+        <button
+          pButton
+          [label]="'COMMON.CLEAR' | translate"
+          icon="pi pi-filter-slash"
+          (click)="clearFilters()"
+          [disabled]="!isFilterActive"
+          class="p-button-outlined p-button-danger modern-button"
+        ></button>
+        <button
+          *hasPermission="'connectionManager'; level: 'write'"
+          pButton
+          [label]="'QUERY_RUNNER.NEW_CONNECTION' | translate"
+          icon="pi pi-plus"
+          (click)="onAdd()"
+          class="p-button-raised p-button-primary modern-button"
+        ></button>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <div class="table-wrapper">
+        <p-table
+          [value]="connections"
+          [rows]="10"
+          [paginator]="true"
+          [rowsPerPageOptions]="[10, 25, 50, 100]"
+          currentPageReportTemplate="{first} - {last} of {totalRecords}"
+          [showCurrentPageReport]="true"
+          [rowHover]="true"
+          dataKey="id"
+          styleClass="p-datatable-sm modern-table"
+          [loading]="loading"
+          [scrollable]="true"
+          scrollHeight="flex"
+          [tableStyle]="{ 'min-width': '68rem' }"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="min-width: 14rem"><div class="th-content">{{ 'COMMON.NAME' | translate }}</div></th>
+              <th style="min-width: 12rem"><div class="th-content">{{ 'COMMON.DATASOURCE' | translate }}</div></th>
+              <th style="width: 10rem"><div class="th-content">{{ 'QUERY_RUNNER.LOGIN' | translate }}</div></th>
+              <th style="width: 8rem"><div class="th-content">{{ 'QUERY_RUNNER.HEALTH' | translate }}</div></th>
+              <th style="width: 7rem"><div class="th-content">{{ 'QUERY_RUNNER.STATE' | translate }}</div></th>
+              <th style="width: 15rem"><div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div></th>
+            </tr>
+            <tr>
+              <th>
+                <app-custom-input
+                  [(ngModel)]="filterName"
+                  (ngModelChange)="onFilterChange()"
+                  [placeholder]="'COMMON.SEARCH_NAME' | translate"
+                  icon="pi-search"
+                ></app-custom-input>
+              </th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-c>
+            <tr class="modern-row" [class.qx-row-disabled]="c.enabled === false">
+              <td>
+                <span class="dataset-name-link">{{ c.name }}</span>
+                <span class="default-badge" *ngIf="c.isDefault"
+                  [pTooltip]="'QUERY_RUNNER.DEFAULT_BADGE' | translate" tooltipPosition="top">
+                  <i class="pi pi-star-fill"></i>
+                </span>
+              </td>
+              <td>
+                <span class="count-pill" *ngIf="c.engine">{{ c.engine }}</span>
+                {{ c.datasourceName || '—' }}
+              </td>
+              <td><span class="flag-chip">{{ c.username }}</span></td>
+              <td>
+                <span class="status-pill" [ngClass]="c.lastTestStatus === 'success' ? 'active' : (c.lastTestStatus === 'failure' ? 'expired' : 'no-login')">
+                  <span class="dot"></span>
+                  {{ (c.lastTestStatus === 'success' ? 'QUERY_RUNNER.HEALTH_OK' : (c.lastTestStatus === 'failure' ? 'QUERY_RUNNER.HEALTH_FAIL' : 'QUERY_RUNNER.HEALTH_UNKNOWN')) | translate }}
+                </span>
+              </td>
+              <td>
+                <span class="status-pill" [ngClass]="c.enabled === false ? 'expired' : 'active'">
+                  <span class="dot"></span>
+                  {{ (c.enabled === false ? 'QUERY_RUNNER.DISABLED' : 'QUERY_RUNNER.ENABLED') | translate }}
+                </span>
+              </td>
+              <td>
+                <div class="row-actions">
+                  <button *hasPermission="'connectionManager'; level: 'write'"
+                    class="icon-btn" (click)="onSetDefault(c)"
+                    [disabled]="busyId === c.id || c.isDefault || c.enabled === false"
+                    [pTooltip]="(c.isDefault ? 'QUERY_RUNNER.IS_DEFAULT' : 'QUERY_RUNNER.SET_DEFAULT') | translate" tooltipPosition="bottom">
+                    <i class="pi" [ngClass]="c.isDefault ? 'pi-star-fill' : 'pi-star'"></i>
+                  </button>
+                  <button class="icon-btn"
+                    (click)="onTest(c)" [disabled]="testingId === c.id"
+                    [pTooltip]="'QUERY_RUNNER.TEST' | translate" tooltipPosition="bottom">
+                    <i class="pi" [ngClass]="testingId === c.id ? 'pi-spin pi-spinner' : 'pi-bolt'"></i>
+                  </button>
+                  <button class="icon-btn view-btn"
+                    (click)="onOpen(c)" [disabled]="c.enabled === false"
+                    [pTooltip]="'QUERY_RUNNER.OPEN' | translate" tooltipPosition="bottom">
+                    <i class="pi pi-external-link"></i>
+                  </button>
+                  <button *hasPermission="'connectionManager'; level: 'write'"
+                    class="icon-btn" (click)="onToggleEnabled(c)" [disabled]="busyId === c.id"
+                    [pTooltip]="(c.enabled === false ? 'QUERY_RUNNER.ENABLE' : 'QUERY_RUNNER.DISABLE') | translate" tooltipPosition="bottom">
+                    <i class="pi" [ngClass]="c.enabled === false ? 'pi-check-circle' : 'pi-ban'"></i>
+                  </button>
+                  <button *hasPermission="'connectionManager'; level: 'write'"
+                    class="icon-btn edit-btn" (click)="onEdit(c)"
+                    [pTooltip]="'COMMON.EDIT' | translate" tooltipPosition="bottom">
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <button *hasPermission="'connectionManager'; level: 'delete'"
+                    class="icon-btn delete-btn" (click)="confirmDelete(c)"
+                    [pTooltip]="'COMMON.DELETE' | translate" tooltipPosition="bottom">
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr class="empty-row">
+              <td colspan="6" class="empty-message-cell">
+                <div class="empty-state-inline">
+                  <i class="pi pi-link empty-state-icon"></i>
+                  <span class="empty-state-text">{{ 'QUERY_RUNNER.NO_CONNECTIONS' | translate }}</span>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="paginatorright">
+            <button
+              type="button"
+              class="paginator-refresh-btn"
+              (click)="load()"
+              [attr.aria-label]="'COMMON.REFRESH' | translate"
+            >
+              <i class="pi pi-refresh"></i>
+            </button>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete confirm -->
+<div class="confirmation-popup" *ngIf="showDeleteConfirm">
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-icon danger"><i class="pi pi-exclamation-triangle"></i></div>
+      <h3>{{ 'QUERY_RUNNER.DELETE_CONNECTION' | translate }}</h3>
+    </div>
+    <div class="popup-body">
+      <p>{{ 'QUERY_RUNNER.DELETE_CONFIRM' | translate: { name: toDelete?.name } }}</p>
+    </div>
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">
+        <i class="pi pi-times"></i>{{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="deleting">
+        <i class="pi" [ngClass]="deleting ? 'pi-spin pi-spinner' : 'pi-trash'"></i>
+        {{ 'COMMON.DELETE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

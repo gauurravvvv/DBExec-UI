@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+
+.ds-picker {
+  min-width: 260px;
+  max-width: 360px;
+
+  app-custom-dropdown {
+    display: block;
+    width: 100%;
+  }
+}
