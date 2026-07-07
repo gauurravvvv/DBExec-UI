@@ -135,14 +135,16 @@ const routes: Routes = [
         },
       },
       {
+        // Launcher gates on queryRunner; the Connections screens gate on
+        // connectionManager — so the parent carries NO single permission.
+        // Each child route in QueryRunnerModule guards itself via roleGuard
+        // + its own data.permission. (Still auth-gated by the /app shell.)
         path: 'query-runner',
         loadChildren: () =>
           import('./modules/query-runner/query-runner.module').then(
             m => m.QueryRunnerModule,
           ),
-        canActivate: [roleGuard],
         data: {
-          permission: PERMISSIONS.QUERY_RUNNER,
           title: 'PAGE_TITLES.QUERY_RUNNER',
         },
       },

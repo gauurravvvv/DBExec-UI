@@ -765,12 +765,6 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
-  openFind(): void {
-    // The search panel toggles via the searchKeymap (Mod-F); this button
-    // focuses the editor first so the shortcut lands.
-    this.view?.focus();
-  }
-
   private summarize(): string {
     const r = this.results[this.activeResult];
     if (!r) return '';

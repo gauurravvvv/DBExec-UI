@@ -120,16 +120,6 @@ export class QueryRunnerService {
     );
   }
 
-  /** Full catalog (schemas + tables + columns + FKs) — primes IntelliSense. */
-  getFullCatalog(id: string): Promise<any> {
-    return lastValueFrom(
-      this.http.apiGet(this.base(id) + QUERY_RUNNER.CATALOG_SUFFIX, {
-        params: { full: 'true' },
-        skipLoader: true,
-      }),
-    );
-  }
-
   /** Lazy: tables in one schema (fetched when a schema node expands). */
   getTables(id: string, schema: string): Promise<any> {
     return lastValueFrom(

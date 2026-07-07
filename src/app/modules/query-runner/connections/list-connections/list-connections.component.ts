@@ -212,6 +212,13 @@ export class ListConnectionsComponent implements OnInit {
       .then(res => {
         if (this.globalService.handleSuccessService(res)) {
           this.all = this.all.filter(c => c.id !== id);
+          // If deleting the default promoted a sibling, reflect the new ★.
+          const promoted = res.data?.promotedDefaultId;
+          if (promoted) {
+            this.all.forEach(x => {
+              if (x.id === promoted) x.isDefault = true;
+            });
+          }
           this.applyFilter();
           this.cancelDelete();
         }

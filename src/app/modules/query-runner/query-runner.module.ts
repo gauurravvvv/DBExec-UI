@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { PERMISSIONS } from 'src/app/core/constants/permissions.constant';
+import { roleGuard } from 'src/app/core/guards/role.guard';
 import { unsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -17,18 +19,35 @@ import { LauncherComponent } from './launcher/launcher.component';
  * lives in its own lazy module (query-executor.module) mounted OUTSIDE
  * the app shell, so a browser tab opens as a focused full-screen tool.
  */
+// Each route guards on ITS OWN permission: the launcher needs
+// queryRunner, the connection screens need connectionManager. A user
+// granted only one of the two still reaches the screens they can use.
 const routes: Routes = [
-  { path: '', component: LauncherComponent },
-  { path: 'connections', component: ListConnectionsComponent },
+  {
+    path: '',
+    component: LauncherComponent,
+    canActivate: [roleGuard],
+    data: { permission: PERMISSIONS.QUERY_RUNNER },
+  },
+  {
+    path: 'connections',
+    component: ListConnectionsComponent,
+    canActivate: [roleGuard],
+    data: { permission: PERMISSIONS.CONNECTION_MANAGER },
+  },
   {
     path: 'connections/new',
     component: AddConnectionComponent,
+    canActivate: [roleGuard],
     canDeactivate: [unsavedChangesGuard],
+    data: { permission: PERMISSIONS.CONNECTION_MANAGER },
   },
   {
     path: 'connections/:id/edit',
     component: AddConnectionComponent,
+    canActivate: [roleGuard],
     canDeactivate: [unsavedChangesGuard],
+    data: { permission: PERMISSIONS.CONNECTION_MANAGER },
   },
 ];
 
