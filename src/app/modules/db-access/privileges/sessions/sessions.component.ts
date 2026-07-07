@@ -32,7 +32,7 @@ type SessionAction = 'cancel' | 'terminate';
 /**
  * SessionsComponent — a live pg_stat_activity viewer for a datasource,
  * reached from the Privileges & Access header ("Active Sessions"). Mirrors
- * list-db-users: h2 in .page-header-section (no subtitle), a flat
+ * the list-user shell: h2 in .page-header-section (no subtitle), a flat
  * .content-card with the shared datasource-picker in the toolbar, then a
  * p-datatable-sm modern-table with a filter row, status pills, and
  * row-actions.

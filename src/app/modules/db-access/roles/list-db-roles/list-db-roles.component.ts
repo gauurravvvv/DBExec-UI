@@ -19,14 +19,33 @@ import { DbAccessContextService } from '../../services/db-access-context.service
 import { DbAccessService } from '../../services/db-access.service';
 import { ChangeIntent, describeChange } from '../../services/describe-change';
 
-type RoleSortField = 'name' | 'memberCount';
+type RoleSortField =
+  | 'name'
+  | 'type'
+  | 'status'
+  | 'validUntil'
+  | 'connectionLimit'
+  | 'memberCount';
+
+/** Login-type filter for the merged list. */
+type RoleTypeFilter = 'all' | 'login' | 'group';
 
 /**
- * ListDbRolesComponent — the Database Roles section landing. Same list-user
- * shell as Users (h2 above a flat card, datasource-picker toolbar, modern
- * table, sortable headers, filter row, row-actions, paginator refresh) but
- * for group roles (canLogin === false). Row actions include a membership
- * attach + the owned-object delete wizard. NO p-tabView.
+ * ListDbRolesComponent — the single "Database Users & Roles" landing.
+ *
+ * A PostgreSQL "user" and "role" are the same pg_roles object; they differ
+ * only by canLogin (LOGIN vs NOLOGIN). This one screen manages both. A Type
+ * filter (All / Login users / Group roles) slices the list; login-only
+ * columns (status, expiry, conn-limit, flags) render for every row but read
+ * "—" for group roles. Row actions cover the login-user lifecycle
+ * (deactivate) AND the group-role lifecycle (membership attach/detach), plus
+ * the shared owned-object delete wizard. NO p-tabView.
+ *
+ * Same list-user shell as the rest of the app: h2 above a flat card, a
+ * datasource-picker toolbar, a modern table with sortable headers, filter
+ * row, status pills, row-actions and a paginator refresh. The datasource is
+ * chosen via the shared picker (writes ?ds= + context); roles are fetched
+ * once (BE returns all) and paged client-side.
  */
 @Component({
   selector: 'app-list-db-roles',
@@ -45,14 +64,19 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   unsupported = this.ctx.unsupported;
 
   datasourceId = '';
+  // All roles for the datasource (login + group), fetched once.
   private allRoles: any[] = [];
   roles: any[] = [];
 
   sortHelper = new ListSortHelper<RoleSortField>();
-  filterName = '';
+  // Type filter defaults to "all" — the merged screen shows everything on
+  // open, with the Type column distinguishing login users from group roles.
+  typeFilter: RoleTypeFilter = 'all';
+  statusOptions: { label: string; value: string }[] = [];
+  filterValues: { name: string; status: string | null } = { name: '', status: null };
   private filter$ = new Subject<void>();
 
-  // Membership dialog.
+  // Membership dialog (group-role lifecycle).
   showMembership = false;
   membershipMode: 'attach' | 'detach' = 'attach';
   membershipRoles: string[] = [];
@@ -89,6 +113,11 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.statusOptions = [
+      { label: this.translate.instant('DB_ACCESS.STATUS_ACTIVE'), value: 'active' },
+      { label: this.translate.instant('DB_ACCESS.STATUS_NO-LOGIN'), value: 'no-login' },
+      { label: this.translate.instant('DB_ACCESS.STATUS_EXPIRED'), value: 'expired' },
+    ];
     this.filter$
       .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.applyFilters());
@@ -102,7 +131,7 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     this.datasourceId = id || '';
     this.allRoles = [];
     this.roles = [];
-    this.filterName = '';
+    this.filterValues = { name: '', status: null };
     if (!this.datasourceId) {
       this.cdr.markForCheck();
       return;
@@ -115,16 +144,31 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     this.dbAccess
       .loadRoles(this.datasourceId)
       .then(() => {
-        const all = this.dbAccess.roles() ?? [];
-        this.allRoles = all.filter(r => !(r.canLogin || r.attributes?.login));
+        // Keep ALL roles — the Type filter does the login/group slicing.
+        this.allRoles = this.dbAccess.roles() ?? [];
         this.applyFilters();
         this.cdr.markForCheck();
       })
       .catch(() => this.cdr.markForCheck());
   }
 
+  // ── Type filter ─────────────────────────────────────────────────────────
+  setTypeFilter(type: RoleTypeFilter): void {
+    if (this.typeFilter === type) return;
+    this.typeFilter = type;
+    this.applyFilters();
+  }
+
+  isLogin(role: any): boolean {
+    return !!(role.canLogin || role.attributes?.login);
+  }
+
   get isFilterActive(): boolean {
-    return !!this.filterName;
+    return (
+      !!this.filterValues.name ||
+      this.filterValues.status !== null ||
+      this.typeFilter !== 'all'
+    );
   }
 
   onFilterChange(): void {
@@ -132,7 +176,8 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   }
 
   clearFilters(): void {
-    this.filterName = '';
+    this.filterValues = { name: '', status: null };
+    this.typeFilter = 'all';
     this.applyFilters();
   }
 
@@ -142,51 +187,129 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   }
 
   private applyFilters(): void {
-    const name = this.filterName.trim().toLowerCase();
-    let rows = name
-      ? this.allRoles.filter(r => String(r.name).toLowerCase().includes(name))
-      : [...this.allRoles];
+    const name = (this.filterValues.name || '').trim().toLowerCase();
+    const status = this.filterValues.status;
+    let rows = this.allRoles.filter(r => {
+      // Type slice.
+      if (this.typeFilter === 'login' && !this.isLogin(r)) return false;
+      if (this.typeFilter === 'group' && this.isLogin(r)) return false;
+      // Name + status.
+      if (name && !String(r.name).toLowerCase().includes(name)) return false;
+      if (status && this.statusOf(r) !== status) return false;
+      return true;
+    });
     rows = this.sortRows(rows);
     this.roles = rows;
     this.cdr.markForCheck();
   }
 
   private sortRows(rows: any[]): any[] {
-    const nameDir = this.sortHelper.direction('name');
-    const countDir = this.sortHelper.direction('memberCount');
-    const active = nameDir
-      ? { field: 'name' as RoleSortField, dir: nameDir }
-      : countDir
-        ? { field: 'memberCount' as RoleSortField, dir: countDir }
-        : null;
-    if (!active) return rows;
+    const fields: RoleSortField[] = [
+      'name',
+      'type',
+      'status',
+      'validUntil',
+      'connectionLimit',
+      'memberCount',
+    ];
+    const active = fields
+      .map(f => ({ field: f, dir: this.sortHelper.direction(f) }))
+      .find(x => !!x.dir);
+    if (!active || !active.dir) return rows;
     const factor = active.dir === 'desc' ? -1 : 1;
     return [...rows].sort((a, b) => {
-      const av = active.field === 'name' ? String(a.name).toLowerCase() : this.memberCount(a);
-      const bv = active.field === 'name' ? String(b.name).toLowerCase() : this.memberCount(b);
+      const av = this.sortValue(a, active.field);
+      const bv = this.sortValue(b, active.field);
       if (av < bv) return -1 * factor;
       if (av > bv) return 1 * factor;
       return 0;
     });
   }
 
-  get allRoleOptions(): { label: string; value: string }[] {
-    return (this.dbAccess.roles() ?? []).map(r => ({ label: r.name, value: r.name }));
+  private sortValue(role: any, field: RoleSortField): any {
+    const a = role.attributes ?? role;
+    switch (field) {
+      case 'name': return String(role.name).toLowerCase();
+      case 'type': return this.isLogin(role) ? 0 : 1;
+      case 'status': return this.statusOf(role);
+      case 'validUntil': return new Date(a.validUntil ?? role.validUntil ?? 0).getTime();
+      case 'connectionLimit': return a.connectionLimit ?? role.connectionLimit ?? -1;
+      case 'memberCount': return this.memberCount(role);
+      default: return '';
+    }
+  }
+
+  // ── Row rendering helpers (login-aware) ─────────────────────────────────
+  flagsOf(role: any): string[] {
+    const a = role.attributes ?? role;
+    const flags: string[] = [];
+    if (a.superuser) flags.push('SUPERUSER');
+    if (a.createdb) flags.push('CREATEDB');
+    if (a.createrole) flags.push('CREATEROLE');
+    if (a.replication) flags.push('REPLICATION');
+    if (a.bypassrls) flags.push('BYPASSRLS');
+    return flags;
+  }
+
+  statusOf(role: any): 'active' | 'no-login' | 'expired' {
+    const a = role.attributes ?? role;
+    if (!this.isLogin(role)) return 'no-login';
+    const validUntil = a.validUntil ?? role.validUntil;
+    if (validUntil && new Date(validUntil).getTime() < Date.now()) return 'expired';
+    return 'active';
+  }
+
+  connLimitOf(role: any): string {
+    const a = role.attributes ?? role;
+    const cl = a.connectionLimit ?? role.connectionLimit;
+    if (cl === -1 || cl == null) return this.translate.instant('DB_ACCESS.UNLIMITED');
+    return String(cl);
   }
 
   memberCount(role: any): number {
     return role.memberCount ?? role.members?.length ?? 0;
   }
 
+  /** All roles for grantee pickers (any target may receive membership). */
+  get allRoleOptions(): { label: string; value: string }[] {
+    return (this.dbAccess.roles() ?? []).map(r => ({ label: r.name, value: r.name }));
+  }
+
+  /** Group roles only — the valid reassign target when dropping a role. */
+  get groupRoleOptions(): { label: string; value: string }[] {
+    return (this.dbAccess.roles() ?? [])
+      .filter(r => !this.isLogin(r))
+      .map(r => ({ label: r.name, value: r.name }));
+  }
+
   // ── Navigation (carry ?ds=) ──────────────────────────────────────────
   onAdd(): void {
-    this.router.navigate([DB_ACCESS.roleNew()], { queryParams: { ds: this.datasourceId } });
+    // Preselect the create form's "Can log in" toggle from the active Type
+    // filter: group → OFF, otherwise ON (login is the common default).
+    const login = this.typeFilter === 'group' ? '0' : '1';
+    this.router.navigate([DB_ACCESS.roleNew()], {
+      queryParams: { ds: this.datasourceId, login },
+    });
   }
   onView(role: any): void {
     this.router.navigate([DB_ACCESS.roleView(role.name)], { queryParams: { ds: this.datasourceId } });
   }
   onEdit(role: any): void {
     this.router.navigate([DB_ACCESS.roleEdit(role.name)], { queryParams: { ds: this.datasourceId } });
+  }
+
+  // ── Deactivate (login users only) ───────────────────────────────────────
+  deactivate(role: any): void {
+    this.previewTitle = this.translate.instant('DB_ACCESS.PREVIEW_DEACTIVATE');
+    this.previewDestructive = false;
+    this.confirmPhrase = null;
+    const body = { attributes: { login: false } };
+    const intent: ChangeIntent = { kind: 'deactivate', name: role.name };
+    this.runPreviewAndArm(
+      [intent],
+      () => this.dbAccess.updateRole(this.datasourceId, role.name, { ...body, previewOnly: true }),
+      () => this.dbAccess.updateRole(this.datasourceId, role.name, body),
+    );
   }
 
   // ── Membership ────────────────────────────────────────────────────────
@@ -274,7 +397,12 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     if (this.deleteMode === 'reassign' && this.reassignTo) base.reassignTo = this.reassignTo;
     if (this.deleteMode === 'drop') base.dropOwned = true;
 
-    this.previewTitle = this.translate.instant('DB_ACCESS.PREVIEW_DELETE_ROLE');
+    // Title reflects what the target actually is.
+    this.previewTitle = this.translate.instant(
+      this.isLogin(this.deleteTarget)
+        ? 'DB_ACCESS.PREVIEW_DELETE_USER'
+        : 'DB_ACCESS.PREVIEW_DELETE_ROLE',
+    );
     this.previewDestructive = true;
     this.confirmPhrase = name;
     this.showDelete = false;

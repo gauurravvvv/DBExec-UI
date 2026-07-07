@@ -7,8 +7,11 @@ import { EditDbRoleComponent } from './edit-db-role/edit-db-role.component';
 import { ListDbRolesComponent } from './list-db-roles/list-db-roles.component';
 import { ViewDbRoleComponent } from './view-db-role/view-db-role.component';
 
-// Database Roles section — its own list → add/edit/view module. Static
-// `new` before `:roleName`. The selected datasource travels via ?ds=.
+// Database Users & Roles section — its own list → add/edit/view module.
+// A PG "user" and "role" are the same object (they differ only by
+// canLogin), so this one module manages both; the list's Type filter
+// slices login users from group roles. Static `new` before `:roleName`.
+// The selected datasource travels via ?ds=.
 const routes: Routes = [
   { path: '', component: ListDbRolesComponent },
   { path: 'new', component: AddDbRoleComponent, canDeactivate: [unsavedChangesGuard] },

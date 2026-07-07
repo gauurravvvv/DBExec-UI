@@ -39,6 +39,47 @@
             [readonly]="true"
           ></app-custom-input>
 
+          <!-- Can log in — promote a group role to a login user, or demote -->
+          <div class="attr-toggle can-login">
+            <span class="attr-meta">
+              <span class="attr-name">{{ 'DB_ACCESS.CAN_LOGIN' | translate }}</span>
+              <span class="attr-desc">{{ 'DB_ACCESS.CAN_LOGIN_DESC' | translate }}</span>
+            </span>
+            <app-custom-toggle
+              formControlName="canLogin"
+              [trueLabel]="'DB_ACCESS.TYPE_LOGIN' | translate"
+              [falseLabel]="'DB_ACCESS.TYPE_GROUP' | translate"
+            ></app-custom-toggle>
+          </div>
+
+          <!-- Login-only credentials -->
+          <ng-container *ngIf="canLogin">
+            <app-custom-input
+              formControlName="password"
+              [label]="'DB_ACCESS.PASSWORD' | translate"
+              type="password"
+              icon="pi-lock"
+              [showPasswordToggle]="true"
+              [placeholder]="'DB_ACCESS.PASSWORD_UNCHANGED_PLACEHOLDER' | translate"
+            ></app-custom-input>
+
+            <div class="form-row">
+              <app-custom-number
+                formControlName="connectionLimit"
+                [label]="'DB_ACCESS.CONN_LIMIT' | translate"
+                [min]="-1"
+                [placeholder]="'DB_ACCESS.UNLIMITED' | translate"
+              ></app-custom-number>
+              <app-custom-calendar
+                formControlName="validUntil"
+                [label]="'DB_ACCESS.VALID_UNTIL' | translate"
+                [showTime]="false"
+                [showButtonBar]="true"
+                appendTo="body"
+              ></app-custom-calendar>
+            </div>
+          </ng-container>
+
           <h3 class="form-section-title">{{ 'DB_ACCESS.ATTRIBUTES' | translate }}</h3>
           <div class="attr-toggles">
             <div class="attr-toggle">
@@ -62,6 +103,30 @@
               </span>
               <app-custom-toggle formControlName="createrole" [showStatusLabel]="false"></app-custom-toggle>
             </div>
+            <!-- Login-only attributes -->
+            <ng-container *ngIf="canLogin">
+              <div class="attr-toggle">
+                <span class="attr-meta">
+                  <span class="attr-name">REPLICATION</span>
+                  <span class="attr-desc">{{ 'DB_ACCESS.ATTR_REPLICATION' | translate }}</span>
+                </span>
+                <app-custom-toggle formControlName="replication" [showStatusLabel]="false"></app-custom-toggle>
+              </div>
+              <div class="attr-toggle danger">
+                <span class="attr-meta">
+                  <span class="attr-name">SUPERUSER</span>
+                  <span class="attr-desc">{{ 'DB_ACCESS.ATTR_SUPERUSER' | translate }}</span>
+                </span>
+                <app-custom-toggle formControlName="superuser" [showStatusLabel]="false"></app-custom-toggle>
+              </div>
+              <div class="attr-toggle danger">
+                <span class="attr-meta">
+                  <span class="attr-name">BYPASSRLS</span>
+                  <span class="attr-desc">{{ 'DB_ACCESS.ATTR_BYPASSRLS' | translate }}</span>
+                </span>
+                <app-custom-toggle formControlName="bypassrls" [showStatusLabel]="false"></app-custom-toggle>
+              </div>
+            </ng-container>
           </div>
         </div>
       </div>

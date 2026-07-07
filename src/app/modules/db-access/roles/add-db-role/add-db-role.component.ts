@@ -15,9 +15,15 @@ import { DbAccessContextService } from '../../services/db-access-context.service
 import { DbAccessService } from '../../services/db-access.service';
 
 /**
- * AddDbRoleComponent — full-page create for a group role (canLogin ===
- * false). From-scratch / from-template / clone modes with attribute
- * toggles. Datasource carried by ?ds=. Saves directly (no SQL shown).
+ * AddDbRoleComponent — full-page create for a PostgreSQL role.
+ *
+ * A "user" and a "role" are the same pg_roles object; they differ only by
+ * canLogin. This one form creates both: a "Can log in" toggle switches
+ * between a login user (reveals password / connection-limit / expiry /
+ * login-only attributes) and a group role (attributes only). The toggle
+ * defaults from the ?login= query param the list passes based on its active
+ * Type filter. From-scratch / clone modes remain. Datasource carried by ?ds=.
+ * Saves directly (no SQL shown).
  */
 @Component({
   selector: 'app-add-db-role',
@@ -52,11 +58,23 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
       return;
     }
     this.ctx.setDatasource(this.datasourceId);
+    // Default the login toggle from ?login= (list passes '0' for the Group
+    // filter, '1'/absent otherwise). Login is the common default.
+    const canLogin = this.route.snapshot.queryParamMap.get('login') !== '0';
     this.roleForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern(/^[A-Za-z_][A-Za-z0-9_$]*$/)]],
+      canLogin: [canLogin],
+      // login-only
+      password: [''],
+      connectionLimit: [null],
+      validUntil: [null],
+      // attributes shared / login-only
       inherit: [true],
       createdb: [false],
       createrole: [false],
+      replication: [false],
+      superuser: [false],
+      bypassrls: [false],
       cloneFrom: [null],
     });
     this.dbAccess
@@ -66,6 +84,10 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
         this.cdr.markForCheck();
       })
       .catch(() => {});
+  }
+
+  get canLogin(): boolean {
+    return !!this.roleForm?.get('canLogin')?.value;
   }
 
   get isFormDirty(): boolean {
@@ -87,17 +109,35 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
     this.createMode = mode;
   }
 
-  onSubmit(): void {
-    if (this.roleForm.invalid) return;
+  private buildAttributes(login: boolean): any {
     const v = this.roleForm.getRawValue();
     const attributes: any = {
-      login: false,
+      login,
       inherit: v.inherit,
       createdb: v.createdb,
       createrole: v.createrole,
     };
+    if (login) {
+      attributes.superuser = v.superuser;
+      attributes.replication = v.replication;
+      attributes.bypassrls = v.bypassrls;
+      if (v.connectionLimit !== null && v.connectionLimit !== undefined)
+        attributes.connectionLimit = v.connectionLimit;
+      if (v.validUntil) attributes.validUntil = new Date(v.validUntil).toISOString();
+      if (v.password) attributes.password = v.password;
+    }
+    return attributes;
+  }
+
+  onSubmit(): void {
+    if (this.roleForm.invalid) return;
+    const v = this.roleForm.getRawValue();
+    const attributes = this.buildAttributes(!!v.canLogin);
+    const needsSuperuserConfirm = !!(attributes.superuser || attributes.bypassrls);
+
     const body: any = { name: v.name, attributes };
     if (this.createMode === 'clone' && v.cloneFrom) body.cloneFrom = v.cloneFrom;
+    if (needsSuperuserConfirm) body.confirm = true;
 
     this.dbAccess
       .createRole(this.datasourceId, body)

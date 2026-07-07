@@ -38,6 +38,34 @@
       <div class="card-toolbar">
         <div class="toolbar-left">
           <app-datasource-picker (changed)="onDatasourceChange($event)"></app-datasource-picker>
+
+          <!-- Type filter — one screen for both login users and group roles -->
+          <div class="type-filter" *ngIf="datasourceId && !unsupported() && !capabilityLoading()">
+            <button
+              type="button"
+              class="type-chip"
+              [class.active]="typeFilter === 'all'"
+              (click)="setTypeFilter('all')"
+            >
+              <i class="pi pi-list"></i>{{ 'DB_ACCESS.TYPE_ALL' | translate }}
+            </button>
+            <button
+              type="button"
+              class="type-chip"
+              [class.active]="typeFilter === 'login'"
+              (click)="setTypeFilter('login')"
+            >
+              <i class="pi pi-user"></i>{{ 'DB_ACCESS.TYPE_LOGIN' | translate }}
+            </button>
+            <button
+              type="button"
+              class="type-chip"
+              [class.active]="typeFilter === 'group'"
+              (click)="setTypeFilter('group')"
+            >
+              <i class="pi pi-users"></i>{{ 'DB_ACCESS.TYPE_GROUP' | translate }}
+            </button>
+          </div>
         </div>
         <div class="toolbar-right" *ngIf="datasourceId && !unsupported()">
           <span class="cap-badge full" *ngIf="capability() && canManage">
@@ -78,7 +106,7 @@
           [loading]="loading()"
           [scrollable]="true"
           scrollHeight="flex"
-          [tableStyle]="{ 'min-width': '48rem' }"
+          [tableStyle]="{ 'min-width': '72rem' }"
         >
           <ng-template pTemplate="header">
             <tr>
@@ -100,34 +128,105 @@
                 </div>
               </th>
               <th
-                style="width: 10rem"
+                style="width: 8rem"
                 class="sortable-th"
-                [class.is-sorted]="!!sortHelper.direction('memberCount')"
-                (click)="toggleSort('memberCount')"
+                [class.is-sorted]="!!sortHelper.direction('type')"
+                (click)="toggleSort('type')"
               >
                 <div class="th-content">
-                  <span>{{ 'DB_ACCESS.MEMBER_COUNT' | translate }}</span>
-                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('memberCount')">
+                  <span>{{ 'DB_ACCESS.TYPE' | translate }}</span>
+                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('type')">
                     <i class="pi" [ngClass]="{
-                      'pi-arrow-up': sortHelper.direction('memberCount') === 'asc',
-                      'pi-arrow-down': sortHelper.direction('memberCount') === 'desc',
-                      'pi-arrows-v': !sortHelper.direction('memberCount')
+                      'pi-arrow-up': sortHelper.direction('type') === 'asc',
+                      'pi-arrow-down': sortHelper.direction('type') === 'desc',
+                      'pi-arrows-v': !sortHelper.direction('type')
                     }"></i>
                   </span>
                 </div>
               </th>
-              <th style="min-width: 14rem"><div class="th-content">{{ 'DB_ACCESS.MEMBER_OF' | translate }}</div></th>
-              <th style="width: 11rem"><div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div></th>
+              <th
+                style="width: 9rem"
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('status')"
+                (click)="toggleSort('status')"
+              >
+                <div class="th-content">
+                  <span>{{ 'COMMON.STATUS' | translate }}</span>
+                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('status')">
+                    <i class="pi" [ngClass]="{
+                      'pi-arrow-up': sortHelper.direction('status') === 'asc',
+                      'pi-arrow-down': sortHelper.direction('status') === 'desc',
+                      'pi-arrows-v': !sortHelper.direction('status')
+                    }"></i>
+                  </span>
+                </div>
+              </th>
+              <th
+                style="width: 11rem"
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('validUntil')"
+                (click)="toggleSort('validUntil')"
+              >
+                <div class="th-content">
+                  <span>{{ 'DB_ACCESS.EXPIRY' | translate }}</span>
+                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('validUntil')">
+                    <i class="pi" [ngClass]="{
+                      'pi-arrow-up': sortHelper.direction('validUntil') === 'asc',
+                      'pi-arrow-down': sortHelper.direction('validUntil') === 'desc',
+                      'pi-arrows-v': !sortHelper.direction('validUntil')
+                    }"></i>
+                  </span>
+                </div>
+              </th>
+              <th
+                style="width: 8rem"
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('connectionLimit')"
+                (click)="toggleSort('connectionLimit')"
+              >
+                <div class="th-content">
+                  <span>{{ 'DB_ACCESS.CONN_LIMIT' | translate }}</span>
+                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('connectionLimit')">
+                    <i class="pi" [ngClass]="{
+                      'pi-arrow-up': sortHelper.direction('connectionLimit') === 'asc',
+                      'pi-arrow-down': sortHelper.direction('connectionLimit') === 'desc',
+                      'pi-arrows-v': !sortHelper.direction('connectionLimit')
+                    }"></i>
+                  </span>
+                </div>
+              </th>
+              <th style="min-width: 12rem"><div class="th-content">{{ 'DB_ACCESS.FLAGS' | translate }}</div></th>
+              <th style="min-width: 12rem"><div class="th-content">{{ 'DB_ACCESS.MEMBER_OF' | translate }}</div></th>
+              <th style="width: 12rem"><div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div></th>
             </tr>
+            <!-- Filter Row -->
             <tr>
               <th>
                 <app-custom-input
-                  [(ngModel)]="filterName"
+                  [(ngModel)]="filterValues.name"
                   (ngModelChange)="onFilterChange()"
                   [placeholder]="'COMMON.SEARCH_NAME' | translate"
                   icon="pi-search"
                 ></app-custom-input>
               </th>
+              <th></th>
+              <th>
+                <app-custom-dropdown
+                  [(ngModel)]="filterValues.status"
+                  [options]="statusOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  [placeholder]="'COMMON.ALL' | translate"
+                  [showClear]="true"
+                  [filter]="false"
+                  [autoDisplayFirst]="false"
+                  appendTo="body"
+                  (onChangeEvent)="onFilterChange()"
+                  icon="pi-circle-fill"
+                ></app-custom-dropdown>
+              </th>
+              <th></th>
+              <th></th>
               <th></th>
               <th></th>
               <th></th>
@@ -136,7 +235,34 @@
           <ng-template pTemplate="body" let-role>
             <tr class="modern-row">
               <td><a class="dataset-name-link" (click)="onView(role)">{{ role.name }}</a></td>
-              <td><span class="count-pill"><i class="pi pi-users"></i> {{ memberCount(role) }}</span></td>
+              <td>
+                <span class="type-badge" [class.login]="isLogin(role)" [class.group]="!isLogin(role)">
+                  <i class="pi" [ngClass]="isLogin(role) ? 'pi-user' : 'pi-users'"></i>
+                  {{ (isLogin(role) ? 'DB_ACCESS.TYPE_LOGIN' : 'DB_ACCESS.TYPE_GROUP') | translate }}
+                </span>
+              </td>
+              <td>
+                <span class="status-pill" [ngClass]="statusOf(role)">
+                  <span class="dot"></span>
+                  {{ 'DB_ACCESS.STATUS_' + (statusOf(role) | uppercase) | translate }}
+                </span>
+              </td>
+              <td>
+                <span
+                  class="date-text"
+                  *ngIf="isLogin(role) && (role.attributes?.validUntil || role.validUntil) as vu; else noExpiry"
+                >
+                  {{ vu | date: 'dd MMM yyyy' }}
+                </span>
+                <ng-template #noExpiry><span class="description-text">—</span></ng-template>
+              </td>
+              <td>
+                <span class="description-text">{{ isLogin(role) ? connLimitOf(role) : '—' }}</span>
+              </td>
+              <td>
+                <span *ngFor="let f of flagsOf(role)" class="flag-chip">{{ f }}</span>
+                <span class="description-text" *ngIf="!flagsOf(role).length">—</span>
+              </td>
               <td>
                 <span *ngFor="let m of (role.memberOf ?? [])" class="count-pill">{{ m }}</span>
                 <span class="description-text" *ngIf="!(role.memberOf ?? []).length">—</span>
@@ -157,6 +283,18 @@
                     [pTooltip]="'COMMON.EDIT' | translate" tooltipPosition="bottom">
                     <i class="pi pi-pencil"></i>
                   </button>
+                  <ng-container *hasPermission="'dbRoles'; level: 'write'">
+                    <button
+                      class="icon-btn"
+                      *ngIf="statusOf(role) !== 'no-login'"
+                      (click)="deactivate(role)"
+                      [disabled]="!canManage"
+                      [pTooltip]="'DB_ACCESS.DEACTIVATE' | translate"
+                      tooltipPosition="bottom"
+                    >
+                      <i class="pi pi-ban"></i>
+                    </button>
+                  </ng-container>
                   <button *hasPermission="'dbRoles'; level: 'delete'"
                     class="icon-btn delete-btn" (click)="openDelete(role)" [disabled]="!canManage"
                     [pTooltip]="'COMMON.DELETE' | translate" tooltipPosition="bottom">
@@ -168,7 +306,7 @@
           </ng-template>
           <ng-template pTemplate="emptymessage">
             <tr class="empty-row">
-              <td colspan="4" class="empty-message-cell">
+              <td colspan="8" class="empty-message-cell">
                 <div class="empty-state-inline">
                   <i class="pi pi-id-card empty-state-icon"></i>
                   <span class="empty-state-text">{{ 'DB_ACCESS.NO_ROLES' | translate }}</span>

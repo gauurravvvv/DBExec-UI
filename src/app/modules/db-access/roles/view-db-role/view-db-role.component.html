@@ -18,13 +18,21 @@
           >
             <i class="pi pi-arrow-left"></i>
           </button>
-          <div class="role-badge"><i class="pi pi-users"></i></div>
+          <div class="role-badge"><i class="pi" [ngClass]="isLogin ? 'pi-user' : 'pi-users'"></i></div>
           <div class="hero-meta">
             <h1 class="hero-name">{{ role.name }}</h1>
             <div class="hero-sub">
-              <span class="count-pill"><i class="pi pi-users"></i> {{ memberCount }}</span>
+              <span class="type-badge" [class.login]="isLogin" [class.group]="!isLogin">
+                <i class="pi" [ngClass]="isLogin ? 'pi-user' : 'pi-users'"></i>
+                {{ (isLogin ? 'DB_ACCESS.TYPE_LOGIN' : 'DB_ACCESS.TYPE_GROUP') | translate }}
+              </span>
               <span class="dot">·</span>
-              <span>{{ 'DB_ACCESS.ROLES_TITLE' | translate }}</span>
+              <span class="status-pill" *ngIf="isLogin" [ngClass]="status()">
+                <span class="dot"></span>
+                {{ 'DB_ACCESS.STATUS_' + (status() | uppercase) | translate }}
+              </span>
+              <span class="dot" *ngIf="isLogin">·</span>
+              <span class="count-pill"><i class="pi pi-users"></i> {{ memberCount }}</span>
             </div>
           </div>
         </div>
@@ -58,6 +66,33 @@
             <i class="pi pi-pencil"></i>
             {{ 'COMMON.EDIT' | translate }}
           </button>
+        </div>
+      </div>
+
+      <!-- Login details — only for login users -->
+      <div class="info-card" *ngIf="isLogin">
+        <div class="card-header">
+          <h3><i class="pi pi-user"></i>{{ 'DB_ACCESS.LOGIN_DETAILS' | translate }}</h3>
+        </div>
+        <div class="config-grid">
+          <div class="config-item">
+            <label>{{ 'COMMON.STATUS' | translate }}</label>
+            <p>
+              <span class="status-pill" [ngClass]="status()">
+                <span class="dot"></span>
+                {{ 'DB_ACCESS.STATUS_' + (status() | uppercase) | translate }}
+              </span>
+            </p>
+          </div>
+          <div class="config-item">
+            <label>{{ 'DB_ACCESS.EXPIRY' | translate }}</label>
+            <p *ngIf="validUntil; else noExp">{{ validUntil | date: 'dd MMM yyyy' }}</p>
+            <ng-template #noExp><p>—</p></ng-template>
+          </div>
+          <div class="config-item">
+            <label>{{ 'DB_ACCESS.CONN_LIMIT' | translate }}</label>
+            <p>{{ connLimit }}</p>
+          </div>
         </div>
       </div>
 

@@ -14,8 +14,9 @@ export const PERMISSIONS = {
   USER_GROUP: 'groupManagement',
 
   // Data Management
+  // A PG "user" and "role" are the same object; login users and group
+  // roles are managed on one screen gated by DB_ROLES.
   SETUP_DB: 'setupDB',
-  DB_USERS: 'dbUsers',
   DB_ROLES: 'dbRoles',
   DB_PRIVILEGES: 'dbPrivileges',
 

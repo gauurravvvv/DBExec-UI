@@ -70,17 +70,9 @@ export const DATASOURCE = feature('/app/datasources');
 // shared datasource-picker + DbAccessContextService), NOT in the path.
 // Callers pass the datasource id as a queryParams object where needed.
 export const DB_ACCESS = {
-  // Database Users (login roles)
-  USERS_LIST: '/app/db-users',
-  usersList: (dsId?: string | number) => [
-    '/app/db-users',
-    ...(dsId ? [] : []),
-  ],
-  userNew: () => '/app/db-users/new',
-  userView: (roleName: string) => `/app/db-users/${roleName}`,
-  userEdit: (roleName: string) => `/app/db-users/${roleName}/edit`,
-
-  // Database Roles (group roles)
+  // Database Users & Roles — a PG "user" and "role" are the same object
+  // (they differ only by canLogin), so login users and group roles are
+  // managed on ONE screen at /app/db-roles.
   ROLES_LIST: '/app/db-roles',
   roleNew: () => '/app/db-roles/new',
   roleView: (roleName: string) => `/app/db-roles/${roleName}`,

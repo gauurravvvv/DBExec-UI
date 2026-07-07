@@ -94,9 +94,37 @@ export class ViewDbRoleComponent implements OnInit {
     return this.role?.attributes ?? this.role ?? {};
   }
 
+  /** A login user (canLogin) vs a group role. Drives which cards show. */
+  get isLogin(): boolean {
+    return !!(this.role?.canLogin || this.attrs.login);
+  }
+
+  status(): 'active' | 'no-login' | 'expired' {
+    if (!this.isLogin) return 'no-login';
+    const validUntil = this.attrs.validUntil;
+    if (validUntil && new Date(validUntil).getTime() < Date.now()) return 'expired';
+    return 'active';
+  }
+
+  get validUntil(): string | null {
+    return this.attrs.validUntil ?? null;
+  }
+
+  get connLimit(): string {
+    const cl = this.attrs.connectionLimit;
+    if (cl === -1 || cl == null) return this.translate.instant('DB_ACCESS.UNLIMITED');
+    return String(cl);
+  }
+
   flags(): string[] {
     const a = this.attrs;
     const flags: string[] = [];
+    // Login-only capability flags first.
+    if (this.isLogin) {
+      if (a.superuser) flags.push('SUPERUSER');
+      if (a.replication) flags.push('REPLICATION');
+      if (a.bypassrls) flags.push('BYPASSRLS');
+    }
     if (a.createdb) flags.push('CREATEDB');
     if (a.createrole) flags.push('CREATEROLE');
     if (a.inherit !== false) flags.push('INHERIT');
