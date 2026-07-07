@@ -65,14 +65,16 @@
     }
   }
 
-  // Flat surface — no outline/shadow/border, table sits directly on the
-  // page background (list-user parity). The datasource picker + capability
-  // badge live in the card-toolbar row above the table.
+  // Visible parent card — a standard surface panel (background + border +
+  // radius + subtle shadow + inner padding) wrapping the toolbar and table.
+  // Scoped to db-access / query-runner via these mixins (Angular component
+  // encapsulation keeps it local); the global .content-card stays flat.
   .content-card {
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+    padding: var(--space-6);
     display: flex;
     flex-direction: column;
     flex: 1;
