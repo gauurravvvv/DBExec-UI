@@ -26,7 +26,6 @@ export interface ChangeIntent {
   name?: string;
   newName?: string;
   attributes?: any;
-  attachMapping?: { appUserId?: string; appGroupId?: string; mappingType?: string };
   reassignTo?: string;
   dropOwned?: boolean;
   // membership
@@ -64,9 +63,6 @@ export function describeChange(intent: ChangeIntent, t: TranslateService): strin
         parts.push(t.instant('DB_ACCESS.SUMMARY.EXPIRING', {
           date: new Date(intent.attributes.validUntil).toLocaleDateString(),
         }));
-      }
-      if (intent.attachMapping) {
-        parts.push(t.instant('DB_ACCESS.SUMMARY.ATTACHED'));
       }
       const suffix = parts.length ? ' ' + parts.join('; ') : '';
       return (

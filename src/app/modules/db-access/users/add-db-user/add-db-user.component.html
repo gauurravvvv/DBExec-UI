@@ -114,37 +114,6 @@
               <app-custom-toggle formControlName="bypassrls" [showStatusLabel]="false"></app-custom-toggle>
             </div>
           </div>
-
-          <h3 class="form-section-title">{{ 'DB_ACCESS.ATTACH_MAPPING' | translate }}</h3>
-          <p class="form-hint">{{ 'DB_ACCESS.ATTACH_HINT' | translate }}</p>
-
-          <div class="form-row">
-            <app-custom-multiselect
-              formControlName="appGroupIds"
-              [options]="appGroupOptions"
-              optionLabel="label"
-              optionValue="value"
-              [filter]="true"
-              filterBy="label"
-              appendTo="body"
-              [label]="'DB_ACCESS.APP_GROUPS' | translate"
-              [placeholder]="'DB_ACCESS.SELECT_APP_GROUPS' | translate"
-              icon="pi-users"
-            ></app-custom-multiselect>
-
-            <app-custom-multiselect
-              formControlName="appUserIds"
-              [options]="appUserOptions"
-              optionLabel="label"
-              optionValue="value"
-              [filter]="true"
-              filterBy="label"
-              appendTo="body"
-              [label]="'DB_ACCESS.APP_USERS' | translate"
-              [placeholder]="'DB_ACCESS.SELECT_APP_USERS' | translate"
-              icon="pi-user"
-            ></app-custom-multiselect>
-          </div>
         </div>
       </div>
     </form>

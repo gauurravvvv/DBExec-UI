@@ -5,15 +5,16 @@ import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 /**
  * DbAccessService — UI over the customer datasource's PostgreSQL-native
- * security model (roles / users / grants / memberships / templates /
- * mappings / audit). Mirrors DatasourceService's signal + skipLoader
- * conventions: `loading` for reads, `saving` for writes; every call
- * passes `{ skipLoader: true }` so the module drives its own spinners.
+ * security model (roles / users / grants / memberships). Mirrors
+ * DatasourceService's signal + skipLoader conventions: `loading` for
+ * reads, `saving` for writes; every call passes `{ skipLoader: true }`
+ * so the module drives its own spinners.
  *
- * Source of truth is the DB — nothing here is mirrored. Every mutating
- * endpoint accepts `previewOnly: true`, which returns `{ masked: string[] }`
- * (a SQL preview) instead of executing. Destructive ops require
- * `confirm: true`.
+ * FULLY STATELESS: the target datasource's PostgreSQL catalog is the
+ * ONLY source of truth — nothing is mirrored or persisted to our DB.
+ * Every mutating endpoint accepts `previewOnly: true`, which returns
+ * `{ masked: string[] }` (a SQL preview) instead of executing.
+ * Destructive ops require `confirm: true`.
  */
 @Injectable({ providedIn: 'root' })
 export class DbAccessService {
@@ -21,9 +22,6 @@ export class DbAccessService {
   private _roles = signal<any[]>([]);
   private _memberships = signal<any>(null);
   private _schemas = signal<any[]>([]);
-  private _mappings = signal<any[]>([]);
-  private _templates = signal<any[]>([]);
-  private _audit = signal<any[]>([]);
   private _loading = signal(false);
   private _saving = signal(false);
 
@@ -35,9 +33,6 @@ export class DbAccessService {
   readonly roles = this._roles.asReadonly();
   readonly memberships = this._memberships.asReadonly();
   readonly schemas = this._schemas.asReadonly();
-  readonly mappings = this._mappings.asReadonly();
-  readonly templates = this._templates.asReadonly();
-  readonly audit = this._audit.asReadonly();
   readonly loading = this._loading.asReadonly();
   readonly saving = this._saving.asReadonly();
 
@@ -326,109 +321,7 @@ export class DbAccessService {
     );
   }
 
-  // ── Mappings (app user/group ↔ DB role) ──────────────────────────────────
-
-  async loadMappings(datasourceId: string): Promise<any> {
-    this._loading.set(true);
-    try {
-      const res: any = await lastValueFrom(
-        this.http
-          .apiGet(this.base(datasourceId) + DB_ACCESS.MAPPINGS_SUFFIX, {
-            skipLoader: true,
-          })
-          .pipe(takeUntil(this._cancelReads$)),
-      );
-      if (res?.status) this._mappings.set(res.data ?? []);
-      return res;
-    } catch (err) {
-      if (err instanceof EmptyError) return null;
-      this._mappings.set([]);
-      throw err;
-    } finally {
-      this._loading.set(false);
-    }
-  }
-
-  attachMapping(datasourceId: string, body: any): Promise<any> {
-    this._saving.set(true);
-    return lastValueFrom(
-      this.http.apiPost(
-        this.base(datasourceId) + DB_ACCESS.MAPPINGS_SUFFIX,
-        body,
-        { skipLoader: true },
-      ),
-    ).finally(() => this._saving.set(false));
-  }
-
-  detachMapping(datasourceId: string, body: any): Promise<any> {
-    this._saving.set(true);
-    return lastValueFrom(
-      this.http.apiPost(
-        this.base(datasourceId) + DB_ACCESS.MAPPINGS_REMOVE_SUFFIX,
-        body,
-        { skipLoader: true },
-      ),
-    ).finally(() => this._saving.set(false));
-  }
-
-  // ── Templates (org-wide, not datasource-scoped) ──────────────────────────
-
-  async loadTemplates(): Promise<any> {
-    try {
-      const res: any = await lastValueFrom(
-        this.http
-          .apiGet(DB_ACCESS.TEMPLATES, { skipLoader: true })
-          .pipe(takeUntil(this._cancelReads$)),
-      );
-      if (res?.status) this._templates.set(res.data ?? []);
-      return res;
-    } catch (err) {
-      if (err instanceof EmptyError) return null;
-      this._templates.set([]);
-      throw err;
-    }
-  }
-
-  saveTemplate(body: any): Promise<any> {
-    this._saving.set(true);
-    return lastValueFrom(
-      this.http.apiPost(DB_ACCESS.TEMPLATES, body, { skipLoader: true }),
-    ).finally(() => this._saving.set(false));
-  }
-
-  deleteTemplate(id: string): Promise<any> {
-    this._saving.set(true);
-    return lastValueFrom(
-      this.http.apiPost(
-        DB_ACCESS.TEMPLATE_DELETE_PREFIX + id + DB_ACCESS.TEMPLATE_DELETE_SUFFIX,
-        { confirm: true },
-        { skipLoader: true },
-      ),
-    ).finally(() => this._saving.set(false));
-  }
-
-  // ── Audit + export ────────────────────────────────────────────────────────
-
-  async loadAudit(datasourceId: string): Promise<any> {
-    this._loading.set(true);
-    try {
-      const res: any = await lastValueFrom(
-        this.http
-          .apiGet(this.base(datasourceId) + DB_ACCESS.AUDIT_SUFFIX, {
-            skipLoader: true,
-          })
-          .pipe(takeUntil(this._cancelReads$)),
-      );
-      if (res?.status) this._audit.set(res.data ?? []);
-      return res;
-    } catch (err) {
-      if (err instanceof EmptyError) return null;
-      this._audit.set([]);
-      throw err;
-    } finally {
-      this._loading.set(false);
-    }
-  }
+  // ── Export ────────────────────────────────────────────────────────────────
 
   /**
    * GET /:datasourceId/grants/export — returns the full grant snapshot as
@@ -452,7 +345,5 @@ export class DbAccessService {
     this._roles.set([]);
     this._memberships.set(null);
     this._schemas.set([]);
-    this._mappings.set([]);
-    this._audit.set([]);
   }
 }

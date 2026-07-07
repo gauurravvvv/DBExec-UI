@@ -14,9 +14,9 @@ import { DbAccessService } from '../../services/db-access.service';
 
 /**
  * ViewDbUserComponent — read-only detail for a login role: hero header +
- * detail sections (attributes, member-of, mapped app users/groups, and an
- * effective-privileges summary). Mirrors view-datasource's hero + info-card
- * layout. Datasource carried by ?ds=.
+ * detail sections (attributes, member-of, and an effective-privileges
+ * summary). Mirrors view-datasource's hero + info-card layout. Datasource
+ * carried by ?ds=.
  */
 @Component({
   selector: 'app-view-db-user',
@@ -33,7 +33,6 @@ export class ViewDbUserComponent implements OnInit {
   user: any = null;
   effective: any[] = [];
   effectiveLoading = false;
-  mappings: any[] = [];
 
   constructor(
     private dbAccess: DbAccessService,
@@ -67,7 +66,6 @@ export class ViewDbUserComponent implements OnInit {
           return;
         }
         this.loadEffective();
-        this.loadMappings();
       })
       .catch(() => this.goBack())
       .finally(() => {
@@ -86,17 +84,6 @@ export class ViewDbUserComponent implements OnInit {
         this.effectiveLoading = false;
         this.cdr.markForCheck();
       });
-  }
-
-  private loadMappings(): void {
-    this.dbAccess
-      .loadMappings(this.datasourceId)
-      .then(() => {
-        const all = this.dbAccess.mappings() ?? [];
-        this.mappings = all.filter(m => m.dbRoleName === this.roleName);
-        this.cdr.markForCheck();
-      })
-      .catch(() => this.cdr.markForCheck());
   }
 
   get attrs(): any {
@@ -131,10 +118,6 @@ export class ViewDbUserComponent implements OnInit {
 
   get validUntil(): string | null {
     return this.attrs.validUntil ?? this.user?.validUntil ?? null;
-  }
-
-  mappingLabel(m: any): string {
-    return m.appUserName || m.appGroupName || m.appUserId || m.appGroupId || '—';
   }
 
   goBack(): void {

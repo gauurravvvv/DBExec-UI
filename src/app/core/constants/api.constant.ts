@@ -382,15 +382,6 @@ export const DB_ACCESS = {
   DELETE_SUFFIX: '/delete',
   // POST /db-access/:datasourceId/change-set
   CHANGE_SET_SUFFIX: '/change-set',
-  // GET /db-access/:datasourceId/mappings
-  MAPPINGS_SUFFIX: '/mappings',
-  MAPPINGS_REMOVE_SUFFIX: '/mappings/remove',
-  // GET /db-access/:datasourceId/audit
-  AUDIT_SUFFIX: '/audit',
-  // Org-wide templates
-  TEMPLATES: '/db-access/templates',
-  TEMPLATE_DELETE_PREFIX: '/db-access/templates/', // POST /db-access/templates/:id/delete
-  TEMPLATE_DELETE_SUFFIX: '/delete',
 };
 
 export const NOTIFICATION = {

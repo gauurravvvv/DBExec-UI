@@ -14,8 +14,8 @@ import { DbAccessService } from '../../services/db-access.service';
 
 /**
  * ViewDbRoleComponent — read-only detail for a group role: hero header +
- * detail sections (attributes, member count / member-of, mapped app
- * users/groups, effective privileges). Datasource carried by ?ds=.
+ * detail sections (attributes, member count / member-of, effective
+ * privileges). Datasource carried by ?ds=.
  */
 @Component({
   selector: 'app-view-db-role',
@@ -32,7 +32,6 @@ export class ViewDbRoleComponent implements OnInit {
   role: any = null;
   effective: any[] = [];
   effectiveLoading = false;
-  mappings: any[] = [];
 
   constructor(
     private dbAccess: DbAccessService,
@@ -66,7 +65,6 @@ export class ViewDbRoleComponent implements OnInit {
           return;
         }
         this.loadEffective();
-        this.loadMappings();
       })
       .catch(() => this.goBack())
       .finally(() => {
@@ -87,17 +85,6 @@ export class ViewDbRoleComponent implements OnInit {
       });
   }
 
-  private loadMappings(): void {
-    this.dbAccess
-      .loadMappings(this.datasourceId)
-      .then(() => {
-        const all = this.dbAccess.mappings() ?? [];
-        this.mappings = all.filter(m => m.dbRoleName === this.roleName);
-        this.cdr.markForCheck();
-      })
-      .catch(() => this.cdr.markForCheck());
-  }
-
   get attrs(): any {
     return this.role?.attributes ?? this.role ?? {};
   }
@@ -113,10 +100,6 @@ export class ViewDbRoleComponent implements OnInit {
 
   get memberCount(): number {
     return this.role?.memberCount ?? this.role?.members?.length ?? 0;
-  }
-
-  mappingLabel(m: any): string {
-    return m.appUserName || m.appGroupName || m.appUserId || m.appGroupId || '—';
   }
 
   goBack(): void {

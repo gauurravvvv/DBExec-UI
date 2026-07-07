@@ -56,14 +56,6 @@
           <div class="apply-actions" *ngIf="canManage">
             <button
               pButton
-              [label]="'DB_ACCESS.SAVE_AS_SET' | translate"
-              icon="pi pi-bookmark"
-              [disabled]="!anyValidRule || saving()"
-              (click)="openSaveSet()"
-              class="p-button-outlined modern-button"
-            ></button>
-            <button
-              pButton
               [label]="'DB_ACCESS.APPLY_CHANGES' | translate"
               [icon]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
               [disabled]="!anyValidRule || saving()"
@@ -290,33 +282,6 @@
               </div>
             </div>
 
-            <!-- Saved privilege sets -->
-            <div class="rail-card">
-              <h4><i class="pi pi-bookmark"></i>{{ 'DB_ACCESS.SAVED_SETS' | translate }}</h4>
-              <p class="rail-hint">{{ 'DB_ACCESS.SAVED_SETS_HINT' | translate }}</p>
-              <div class="saved-sets" *ngIf="savedSets.length; else noSets">
-                <div class="saved-set" *ngFor="let set of savedSets">
-                  <div class="set-meta">
-                    <span class="set-name">{{ set.name }}</span>
-                    <span class="set-desc" *ngIf="set.description" [title]="set.description">{{ set.description }}</span>
-                  </div>
-                  <button
-                    *hasPermission="'dbPrivileges'; level: 'delete'"
-                    class="icon-btn delete-btn"
-                    (click)="confirmDeleteSet(set)"
-                    [disabled]="set.isBuiltIn"
-                    [pTooltip]="'DB_ACCESS.DELETE_SET' | translate"
-                    tooltipPosition="left"
-                  >
-                    <i class="pi pi-trash"></i>
-                  </button>
-                </div>
-              </div>
-              <ng-template #noSets>
-                <p class="rail-empty">{{ 'DB_ACCESS.NO_SAVED_SETS' | translate }}</p>
-              </ng-template>
-            </div>
-
             <!-- Default privileges -->
             <div class="rail-card">
               <h4><i class="pi pi-sliders-h"></i>{{ 'DB_ACCESS.DEFAULT_PRIVILEGES' | translate }}</h4>
@@ -334,66 +299,6 @@
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- Save-As privilege set dialog -->
-<div class="confirmation-popup" *ngIf="showSaveSet">
-  <div class="popup-content">
-    <div class="popup-header">
-      <div class="popup-icon"><i class="pi pi-bookmark"></i></div>
-      <h3>{{ 'DB_ACCESS.SAVE_SET_TITLE' | translate }}</h3>
-    </div>
-    <div class="popup-body">
-      <div class="form-field">
-        <app-custom-input
-          [(ngModel)]="setName"
-          [label]="'DB_ACCESS.SET_NAME' | translate"
-          [placeholder]="'DB_ACCESS.SET_NAME_PLACEHOLDER' | translate"
-          icon="pi-bookmark"
-          [required]="true"
-        ></app-custom-input>
-      </div>
-      <div class="form-field">
-        <app-custom-textarea
-          [(ngModel)]="setDescription"
-          [label]="'DB_ACCESS.SET_DESCRIPTION' | translate"
-          [placeholder]="'DB_ACCESS.SET_DESCRIPTION_PLACEHOLDER' | translate"
-          [rows]="3"
-        ></app-custom-textarea>
-      </div>
-    </div>
-    <div class="popup-actions">
-      <button class="btn-cancel" (click)="cancelSaveSet()">
-        <i class="pi pi-times"></i>{{ 'COMMON.CANCEL' | translate }}
-      </button>
-      <button class="btn-confirm" [disabled]="!setName.trim() || saving()" (click)="saveSet()">
-        <i class="pi" [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-check'"></i>
-        {{ 'DB_ACCESS.SAVE_SET' | translate }}
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Delete saved-set confirm -->
-<div class="confirmation-popup" *ngIf="showDeleteSet">
-  <div class="popup-content">
-    <div class="popup-header">
-      <div class="popup-icon destructive"><i class="pi pi-trash"></i></div>
-      <h3>{{ 'DB_ACCESS.DELETE_SET' | translate }}</h3>
-    </div>
-    <div class="popup-body">
-      <p class="delete-intro" [innerHTML]="'DB_ACCESS.DELETE_SET_INTRO' | translate: { name: deleteSetTarget?.name }"></p>
-    </div>
-    <div class="popup-actions">
-      <button class="btn-cancel" (click)="cancelDeleteSet()">
-        <i class="pi pi-times"></i>{{ 'COMMON.CANCEL' | translate }}
-      </button>
-      <button class="btn-confirm btn-danger" [disabled]="saving()" (click)="proceedDeleteSet()">
-        <i class="pi" [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-trash'"></i>
-        {{ 'COMMON.DELETE' | translate }}
-      </button>
     </div>
   </div>
 </div>

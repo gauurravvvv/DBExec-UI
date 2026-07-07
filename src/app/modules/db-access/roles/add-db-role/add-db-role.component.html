@@ -36,9 +36,6 @@
             <button type="button" [class.active]="createMode === 'scratch'" (click)="setMode('scratch')">
               {{ 'DB_ACCESS.FROM_SCRATCH' | translate }}
             </button>
-            <button type="button" [class.active]="createMode === 'template'" (click)="setMode('template')">
-              {{ 'DB_ACCESS.FROM_TEMPLATE' | translate }}
-            </button>
             <button type="button" [class.active]="createMode === 'clone'" (click)="setMode('clone')">
               {{ 'DB_ACCESS.CLONE' | translate }}
             </button>
@@ -53,18 +50,6 @@
             [showError]="!!(roleForm.get('name')?.invalid && roleForm.get('name')?.touched)"
             [errorMessage]="getErrorMessage('name')"
           ></app-custom-input>
-
-          <app-custom-dropdown
-            *ngIf="createMode === 'template'"
-            formControlName="templateId"
-            [options]="templates"
-            optionLabel="name"
-            optionValue="id"
-            [label]="'DB_ACCESS.TEMPLATE' | translate"
-            [filter]="true"
-            filterBy="name"
-            appendTo="body"
-          ></app-custom-dropdown>
 
           <app-custom-dropdown
             *ngIf="createMode === 'clone'"

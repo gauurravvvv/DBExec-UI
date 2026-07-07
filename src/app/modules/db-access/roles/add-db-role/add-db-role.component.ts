@@ -31,8 +31,7 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
 
   datasourceId = '';
   roleForm!: FormGroup;
-  createMode: 'scratch' | 'template' | 'clone' = 'scratch';
-  templates: any[] = [];
+  createMode: 'scratch' | 'clone' = 'scratch';
   allRoleOptions: { label: string; value: string }[] = [];
   saving = this.dbAccess.saving;
 
@@ -58,20 +57,12 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
       inherit: [true],
       createdb: [false],
       createrole: [false],
-      templateId: [null],
       cloneFrom: [null],
     });
     this.dbAccess
       .loadRoles(this.datasourceId)
       .then(() => {
         this.allRoleOptions = (this.dbAccess.roles() ?? []).map(r => ({ label: r.name, value: r.name }));
-        this.cdr.markForCheck();
-      })
-      .catch(() => {});
-    this.dbAccess
-      .loadTemplates()
-      .then(() => {
-        this.templates = this.dbAccess.templates() ?? [];
         this.cdr.markForCheck();
       })
       .catch(() => {});
@@ -92,7 +83,7 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
     return '';
   }
 
-  setMode(mode: 'scratch' | 'template' | 'clone'): void {
+  setMode(mode: 'scratch' | 'clone'): void {
     this.createMode = mode;
   }
 
@@ -106,7 +97,6 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
       createrole: v.createrole,
     };
     const body: any = { name: v.name, attributes };
-    if (this.createMode === 'template' && v.templateId) body.templateId = v.templateId;
     if (this.createMode === 'clone' && v.cloneFrom) body.cloneFrom = v.cloneFrom;
 
     this.dbAccess

@@ -41,12 +41,17 @@ interface AccessRule {
 }
 
 /**
- * PrivilegesAccessComponent — the merged Privileges + Effective + Saved-Sets
- * surface (fix #4). NO p-tabView. Layout (fix #9): a pending-changes + Apply
- * bar at the TOP, then a two-column body — the Access-Rules composer (which
- * scrolls inside a bounded flex container) on the left, and a rail on the
- * right holding a role FILTER (its effective privileges), a Save-As-set form
- * + saved-sets list, and the default-privileges panel.
+ * PrivilegesAccessComponent — the merged Privileges + Effective surface.
+ * NO p-tabView. Layout: a pending-changes + Apply bar at the TOP, then a
+ * two-column body — the Access-Rules composer (which scrolls inside a
+ * bounded flex container) on the left, and a rail on the right holding a
+ * role FILTER (its live effective privileges) and the default-privileges
+ * panel.
+ *
+ * FULLY STATELESS: the composer reads the role's LIVE effective privileges
+ * and applies grant/restrict change-sets directly against the target
+ * datasource. Nothing is saved to our DB — there are no saved privilege
+ * sets.
  *
  * Efficiency (fix #6/#8): all schema/table/column/sequence/function reads go
  * through DbAccessContextService, which memoises by data tuple and dedupes
@@ -90,15 +95,6 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
   filterRole = '';
   effectiveRows: any[] = [];
   effectiveLoading = false;
-
-  // ── Save-As privilege set (db_role_template) + saved-sets list ──────────
-  savedSets: any[] = [];
-  showSaveSet = false;
-  setName = '';
-  setDescription = '';
-
-  showDeleteSet = false;
-  deleteSetTarget: any = null;
 
   // ── Change-summary confirm gate ─────────────────────────────────────────
   showConfirm = false;
@@ -145,7 +141,6 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     this.ruleHints = {};
     this.filterRole = '';
     this.effectiveRows = [];
-    this.savedSets = [];
     if (!this.datasourceId) {
       this.cdr.markForCheck();
       return;
@@ -153,7 +148,6 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     this.loadSchemas();
     this.loadRoles();
     this.loadDefaults();
-    this.loadSavedSets();
     this.addRule();
     this.cdr.markForCheck();
   }
@@ -180,16 +174,6 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
       .loadDefaultPrivileges(this.datasourceId)
       .then(res => {
         if (res?.status) this.defaultPrivileges = res.data ?? [];
-        this.cdr.markForCheck();
-      })
-      .catch(() => {});
-  }
-
-  private loadSavedSets(): void {
-    this.dbAccess
-      .loadTemplates()
-      .then(() => {
-        this.savedSets = this.dbAccess.templates() ?? [];
         this.cdr.markForCheck();
       })
       .catch(() => {});
@@ -524,74 +508,5 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
   effectiveObject(row: any): string {
     const schema = row.schema ? row.schema + '.' : '';
     return schema + (row.object || row.table || row.name || '');
-  }
-
-  // ── Save-As privilege set (db_role_template) (fix #4) ───────────────────
-
-  openSaveSet(): void {
-    if (!this.anyValidRule) return;
-    this.setName = '';
-    this.setDescription = '';
-    this.showSaveSet = true;
-  }
-
-  cancelSaveSet(): void {
-    this.showSaveSet = false;
-  }
-
-  saveSet(): void {
-    if (!this.setName.trim()) return;
-    const valid = this.rules.filter(r => this.ruleValid(r));
-    // definition: the structured privilege set (objType + privileges + scope).
-    const definition = valid.map(r => ({
-      objType: r.level,
-      privileges: r.privileges,
-      scope: {
-        schema: r.schema,
-        allInSchema: r.allTables && r.level !== 'column',
-        objects: r.tables,
-      },
-      action: r.action,
-    }));
-    this.dbAccess
-      .saveTemplate({
-        name: this.setName.trim(),
-        description: this.setDescription.trim() || undefined,
-        definition,
-        datasourceId: this.datasourceId,
-      })
-      .then(res => {
-        if (this.globalService.handleSuccessService(res)) {
-          this.showSaveSet = false;
-          this.loadSavedSets();
-        }
-      })
-      .catch(() => {})
-      .finally(() => this.cdr.markForCheck());
-  }
-
-  confirmDeleteSet(set: any): void {
-    this.deleteSetTarget = set;
-    this.showDeleteSet = true;
-  }
-
-  cancelDeleteSet(): void {
-    this.showDeleteSet = false;
-    this.deleteSetTarget = null;
-  }
-
-  proceedDeleteSet(): void {
-    if (!this.deleteSetTarget) return;
-    this.dbAccess
-      .deleteTemplate(this.deleteSetTarget.id)
-      .then(res => {
-        if (this.globalService.handleSuccessService(res)) {
-          this.showDeleteSet = false;
-          this.deleteSetTarget = null;
-          this.loadSavedSets();
-        }
-      })
-      .catch(() => {})
-      .finally(() => this.cdr.markForCheck());
   }
 }
