@@ -12,15 +12,19 @@
     max-width: 100%;
   }
 
-  // List shell — mirrors list-user verbatim: wrapper > content-container
-  // > page-header-section (h2 above the card, NO subtitle) > content-card
-  // (flat/transparent — table sits on the page) > table-wrapper.
+  // List shell — the whole content-container is ONE visible parent card:
+  // the header (h2 + buttons), the toolbar (datasource picker + Type
+  // filter) and the table all live inside a single surface panel. The
+  // outer wrapper stays the flex/scroll host; the inner container carries
+  // the card surface (background + border + radius + shadow + padding).
+  // Scoped to db-access / query-runner via these mixins (Angular component
+  // encapsulation keeps it local) — the global shell is unaffected.
   .dataset-page-wrapper {
     display: flex;
     flex-direction: column;
     height: 100%;
     width: 100%;
-    padding: var(--space-0);
+    padding: var(--space-6);
     min-width: 0;
     min-height: 0;
 
@@ -28,13 +32,19 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: 1.5rem 2rem;
+      padding: var(--space-6) var(--space-7);
       max-width: 100%;
       margin: 0 auto;
       width: 100%;
       min-width: 0;
       min-height: 0;
-      gap: var(--space-8);
+      gap: var(--space-6);
+
+      // The card surface.
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
     }
   }
 
@@ -65,16 +75,15 @@
     }
   }
 
-  // Visible parent card — a standard surface panel (background + border +
-  // radius + subtle shadow + inner padding) wrapping the toolbar and table.
-  // Scoped to db-access / query-runner via these mixins (Angular component
-  // encapsulation keeps it local); the global .content-card stays flat.
+  // Flat inner section — the visible card surface lives on the parent
+  // .dataset-content-container (which wraps the header too), so this inner
+  // block that holds the toolbar + table stays transparent to avoid a
+  // card-in-a-card.
   .content-card {
-    background: var(--card-background);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
-    padding: var(--space-6);
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
     display: flex;
     flex-direction: column;
     flex: 1;
