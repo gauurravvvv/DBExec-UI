@@ -107,6 +107,10 @@ export const QUERY_RUNNER = {
   CONNECTION: '/query-runner/connections/', // + :id  (GET/PUT/DELETE)
   // POST /query-runner/connections/:id/test  → verify creds
   TEST_SUFFIX: '/test',
+  // POST /query-runner/connections/:id/default  → set default for its datasource
+  DEFAULT_SUFFIX: '/default',
+  // POST /query-runner/connections/:id/enabled  → enable / disable
+  ENABLED_SUFFIX: '/enabled',
   // GET  /query-runner/connections/:id/catalog       → schemas only (fast)
   // GET  /query-runner/connections/:id/catalog?full=true → full catalog
   CATALOG_SUFFIX: '/catalog',

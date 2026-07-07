@@ -129,8 +129,65 @@ export class ListConnectionsComponent implements OnInit {
 
   /** Open this connection in the standalone executor browser tab. */
   onOpen(c: QueryConnection): void {
+    if (c.enabled === false) return; // guarded in template too
     const url = `${QUERY_RUNNER.EXEC}?conn=${encodeURIComponent(c.id)}`;
     window.open(url, '_blank');
+  }
+
+  busyId: string | null = null;
+
+  /** Star this connection as the default for its datasource. */
+  onSetDefault(c: QueryConnection): void {
+    if (this.busyId || c.isDefault || c.enabled === false) return;
+    this.busyId = c.id;
+    this.cdr.markForCheck();
+    this.service
+      .setDefault(c.id)
+      .then(res => {
+        if (this.globalService.handleSuccessService(res)) {
+          // One default per datasource: clear siblings on the same ds.
+          this.all.forEach(x => {
+            if (x.datasourceId === c.datasourceId) x.isDefault = x.id === c.id;
+          });
+          this.applyFilter();
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        this.busyId = null;
+        this.cdr.markForCheck();
+      });
+  }
+
+  /** Enable / disable a connection. */
+  onToggleEnabled(c: QueryConnection): void {
+    if (this.busyId) return;
+    const next = !(c.enabled !== false);
+    this.busyId = c.id;
+    this.cdr.markForCheck();
+    this.service
+      .setEnabled(c.id, next)
+      .then(res => {
+        if (this.globalService.handleSuccessService(res)) {
+          c.enabled = res.data?.enabled ?? next;
+          c.isDefault = res.data?.isDefault ?? c.isDefault;
+          // A sibling may have inherited the default on disable.
+          const promoted = res.data?.promotedDefaultId;
+          if (promoted) {
+            this.all.forEach(x => {
+              if (x.datasourceId === c.datasourceId) {
+                x.isDefault = x.id === promoted;
+              }
+            });
+          }
+          this.applyFilter();
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        this.busyId = null;
+        this.cdr.markForCheck();
+      });
   }
 
   confirmDelete(c: QueryConnection): void {

@@ -21,6 +21,8 @@ export interface QueryConnection {
   host?: string | null;
   database?: string | null;
   username: string;
+  enabled?: boolean;
+  isDefault?: boolean;
   lastTestedAt?: string | null;
   lastTestStatus?: string | null;
   createdOn?: string | null;
@@ -80,6 +82,28 @@ export class QueryRunnerService {
       this.http.apiPost(
         this.base(id) + QUERY_RUNNER.TEST_SUFFIX,
         {},
+        { skipLoader: true },
+      ),
+    );
+  }
+
+  /** Mark this connection as the default for its datasource. */
+  setDefault(id: string): Promise<any> {
+    return lastValueFrom(
+      this.http.apiPost(
+        this.base(id) + QUERY_RUNNER.DEFAULT_SUFFIX,
+        {},
+        { skipLoader: true },
+      ),
+    );
+  }
+
+  /** Enable / disable a connection. */
+  setEnabled(id: string, enabled: boolean): Promise<any> {
+    return lastValueFrom(
+      this.http.apiPost(
+        this.base(id) + QUERY_RUNNER.ENABLED_SUFFIX,
+        { enabled },
         { skipLoader: true },
       ),
     );

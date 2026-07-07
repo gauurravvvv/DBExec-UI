@@ -73,8 +73,11 @@
             [disabled]="!selectedDatasourceId"
             [placeholder]="(selectedDatasourceId ? 'QUERY_RUNNER.SELECT_CONNECTION' : 'QUERY_RUNNER.SELECT_DATASOURCE_FIRST') | translate"
           ></app-custom-dropdown>
-          <small class="step-hint" *ngIf="selectedDatasourceId && connectionOptions.length === 0">
+          <small class="step-hint" *ngIf="selectedDatasourceId && connectionOptions.length === 0 && !allDisabledForDs">
             {{ 'QUERY_RUNNER.NO_CONNECTIONS_FOR_DS' | translate }}
+          </small>
+          <small class="step-hint" *ngIf="allDisabledForDs">
+            {{ 'QUERY_RUNNER.ALL_DISABLED_FOR_DS' | translate }}
           </small>
         </div>
 

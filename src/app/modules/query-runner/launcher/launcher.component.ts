@@ -102,7 +102,10 @@ export class LauncherComponent implements OnInit {
       });
   }
 
-  /** When the datasource changes, filter connections to it + reset. */
+  /** True when the chosen datasource has connections, but all disabled. */
+  allDisabledForDs = false;
+
+  /** When the datasource changes, filter connections to it + preselect default. */
   onDatasourceChange(dsId: string | null): void {
     this.selectedDatasourceId = dsId;
     this.selectedConnectionId = null;
@@ -112,16 +115,28 @@ export class LauncherComponent implements OnInit {
 
   private refreshConnectionOptions(): void {
     this.connectionsById.clear();
-    const list = this.selectedDatasourceId
-      ? this.allConnections.filter(
-          c => c.datasourceId === this.selectedDatasourceId,
-        )
-      : [];
-    for (const c of list) this.connectionsById.set(c.id, c);
-    this.connectionOptions = list.map(c => ({
-      label: `${c.name} — ${c.username}`,
+    this.allDisabledForDs = false;
+    if (!this.selectedDatasourceId) {
+      this.connectionOptions = [];
+      return;
+    }
+    const forDs = this.allConnections.filter(
+      c => c.datasourceId === this.selectedDatasourceId,
+    );
+    // Only ENABLED connections are selectable in the launcher.
+    const usable = forDs.filter(c => c.enabled !== false);
+    this.allDisabledForDs = forDs.length > 0 && usable.length === 0;
+
+    for (const c of usable) this.connectionsById.set(c.id, c);
+    this.connectionOptions = usable.map(c => ({
+      label: c.isDefault ? `★ ${c.name} — ${c.username}` : `${c.name} — ${c.username}`,
       value: c.id,
     }));
+
+    // Preselect: the default for this datasource, else the first enabled
+    // one, so the user can hit Open immediately.
+    const def = usable.find(c => c.isDefault) ?? usable[0];
+    this.selectedConnectionId = def ? def.id : null;
   }
 
   get canOpen(): boolean {

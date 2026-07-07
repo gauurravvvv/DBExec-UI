@@ -3,3 +3,22 @@
 @include db.db-access-page;
 @include db.db-access-table;
 @include db.db-access-dialog;
+
+.default-badge {
+  margin-left: 0.4rem;
+  color: #e0a800;
+  font-size: 0.72rem;
+}
+
+// Disabled connections read as muted but stay legible.
+.qx-row-disabled {
+  opacity: 0.55;
+  .dataset-name-link {
+    text-decoration: line-through;
+  }
+}
+
+// Starred (default) action button keeps the gold even when disabled.
+.row-actions .icon-btn .pi-star-fill {
+  color: #e0a800;
+}
