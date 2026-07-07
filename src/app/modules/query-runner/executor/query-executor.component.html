@@ -72,28 +72,105 @@
             <i class="pi pi-folder"></i>
             <span>{{ s.schema }}</span>
             <i class="pi pi-spin pi-spinner qx-node-spin" *ngIf="s.loading"></i>
+            <button class="qx-node-refresh" *ngIf="s.open && s.loaded"
+              (click)="$event.stopPropagation(); refreshSchema(s)"
+              [pTooltip]="'QUERY_RUNNER.REFRESH_SCHEMA' | translate" tooltipPosition="right">
+              <i class="pi pi-refresh"></i>
+            </button>
           </div>
-          <div class="qx-tables" *ngIf="s.open">
-            <div class="qx-mini-hint" *ngIf="s.loaded && s.tables.length === 0">
-              {{ 'QUERY_RUNNER.NO_TABLES' | translate }}
+
+          <div class="qx-groups" *ngIf="s.open && s.loaded">
+            <!-- TABLES -->
+            <div class="qx-group">
+              <div class="qx-node group" (click)="toggleGroup(s, 'tables')">
+                <i class="pi" [ngClass]="s.g.tables ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
+                <i class="pi pi-table"></i><span>{{ 'QUERY_RUNNER.GRP_TABLES' | translate }}</span>
+                <span class="qx-count">{{ s.tables.length }}</span>
+              </div>
+              <div *ngIf="s.g.tables">
+                <div class="qx-table-group" *ngFor="let t of s.tables">
+                  <div class="qx-node indent2">
+                    <i class="pi qx-twist" [ngClass]="t.open ? 'pi-chevron-down' : 'pi-chevron-right'" (click)="toggleTable(s, t)"></i>
+                    <i class="pi pi-table" (click)="openObject('table', s.schema, t.name)"></i>
+                    <span (click)="openObject('table', s.schema, t.name)" (dblclick)="insertSelect(s.schema, t.name)">{{ t.name }}</span>
+                    <i class="pi pi-spin pi-spinner qx-node-spin" *ngIf="t.loading"></i>
+                  </div>
+                  <div class="qx-cols" *ngIf="t.open">
+                    <div class="qx-col" *ngFor="let c of t.columns" (click)="insertText(c.name)">
+                      <i class="pi" [ngClass]="c.isPrimaryKey ? 'pi-key' : 'pi-circle'"></i>
+                      <span class="qx-col-name">{{ c.name }}</span>
+                      <span class="qx-col-type">{{ c.dataType }}</span>
+                    </div>
+                    <div class="qx-mini-hint" *ngIf="t.loaded && t.columns.length === 0">
+                      {{ 'QUERY_RUNNER.NO_COLUMNS' | translate }}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="qx-table-group" *ngFor="let t of s.tables">
-              <div class="qx-node indent" (click)="toggleTable(s, t)" (dblclick)="insertSelect(s.schema, t.name)">
-                <i class="pi" [ngClass]="t.open ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
-                <i class="pi" [ngClass]="t.type === 'view' ? 'pi-eye' : 'pi-table'"></i>
-                <span>{{ t.name }}</span>
-                <i class="pi pi-spin pi-spinner qx-node-spin" *ngIf="t.loading"></i>
+
+            <!-- VIEWS -->
+            <div class="qx-group" *ngIf="s.views.length">
+              <div class="qx-node group" (click)="toggleGroup(s, 'views')">
+                <i class="pi" [ngClass]="s.g.views ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
+                <i class="pi pi-eye"></i><span>{{ 'QUERY_RUNNER.GRP_VIEWS' | translate }}</span>
+                <span class="qx-count">{{ s.views.length }}</span>
               </div>
-              <div class="qx-cols" *ngIf="t.open">
-                <div class="qx-col" *ngFor="let c of t.columns" (click)="insertText(c.name)">
-                  <i class="pi" [ngClass]="c.isPrimaryKey ? 'pi-key' : 'pi-circle'"></i>
-                  <span class="qx-col-name">{{ c.name }}</span>
-                  <span class="qx-col-type">{{ c.dataType }}</span>
-                </div>
-                <div class="qx-mini-hint" *ngIf="t.loaded && t.columns.length === 0">
-                  {{ 'QUERY_RUNNER.NO_COLUMNS' | translate }}
+              <div *ngIf="s.g.views">
+                <div class="qx-node indent2 leaf" *ngFor="let v of s.views"
+                  (click)="openObject('view', s.schema, v.name)" (dblclick)="insertSelect(s.schema, v.name)">
+                  <i class="pi pi-eye"></i><span>{{ v.name }}</span>
                 </div>
               </div>
+            </div>
+
+            <!-- MATERIALIZED VIEWS -->
+            <div class="qx-group" *ngIf="s.matviews.length">
+              <div class="qx-node group" (click)="toggleGroup(s, 'matviews')">
+                <i class="pi" [ngClass]="s.g.matviews ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
+                <i class="pi pi-clone"></i><span>{{ 'QUERY_RUNNER.GRP_MATVIEWS' | translate }}</span>
+                <span class="qx-count">{{ s.matviews.length }}</span>
+              </div>
+              <div *ngIf="s.g.matviews">
+                <div class="qx-node indent2 leaf" *ngFor="let v of s.matviews"
+                  (click)="openObject('matview', s.schema, v.name)" (dblclick)="insertSelect(s.schema, v.name)">
+                  <i class="pi pi-clone"></i><span>{{ v.name }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- FUNCTIONS -->
+            <div class="qx-group" *ngIf="s.functions.length">
+              <div class="qx-node group" (click)="toggleGroup(s, 'functions')">
+                <i class="pi" [ngClass]="s.g.functions ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
+                <i class="pi pi-cog"></i><span>{{ 'QUERY_RUNNER.GRP_FUNCTIONS' | translate }}</span>
+                <span class="qx-count">{{ s.functions.length }}</span>
+              </div>
+              <div *ngIf="s.g.functions">
+                <div class="qx-node indent2 leaf" *ngFor="let f of s.functions"
+                  (click)="openObject('function', s.schema, f.name)">
+                  <i class="pi pi-cog"></i><span>{{ f.name }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- SEQUENCES -->
+            <div class="qx-group" *ngIf="s.sequences.length">
+              <div class="qx-node group" (click)="toggleGroup(s, 'sequences')">
+                <i class="pi" [ngClass]="s.g.sequences ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
+                <i class="pi pi-sort-numeric-up"></i><span>{{ 'QUERY_RUNNER.GRP_SEQUENCES' | translate }}</span>
+                <span class="qx-count">{{ s.sequences.length }}</span>
+              </div>
+              <div *ngIf="s.g.sequences">
+                <div class="qx-node indent2 leaf" *ngFor="let q of s.sequences"
+                  (click)="openObject('sequence', s.schema, q.name)">
+                  <i class="pi pi-sort-numeric-up"></i><span>{{ q.name }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="qx-mini-hint" *ngIf="!s.tables.length && !s.views.length && !s.matviews.length && !s.functions.length && !s.sequences.length">
+              {{ 'QUERY_RUNNER.NO_OBJECTS_IN_SCHEMA' | translate }}
             </div>
           </div>
         </div>
@@ -192,3 +269,13 @@
     <span class="qx-status-right">{{ statusText }}</span>
   </footer>
 </div>
+
+<!-- Read-only object detail modal -->
+<app-object-detail
+  [visible]="detailVisible"
+  [connectionId]="connectionId"
+  [kind]="detailKind"
+  [schema]="detailSchema"
+  [name]="detailName"
+  (closed)="closeDetail()"
+></app-object-detail>

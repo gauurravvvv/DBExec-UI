@@ -77,6 +77,7 @@ import { SchemaCatalog } from './schema-catalog';
 import { dbexecCompletionSource } from './completion';
 import { TypedCellComponent } from './typed-cell.component';
 import { splitStatements, statementAtCursor } from './split-statements';
+import { ObjectDetailComponent, ObjectKind } from './object-detail.component';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
@@ -102,12 +103,24 @@ interface TreeTable {
   loaded: boolean;
   columns: { name: string; dataType: string; isPrimaryKey: boolean }[];
 }
+/** A non-table object node (view / matview / function / sequence). */
+interface TreeObject {
+  name: string;
+  args?: string;
+  returns?: string;
+}
 interface TreeSchema {
   schema: string;
   open: boolean;
   loading: boolean;
   loaded: boolean;
   tables: TreeTable[];
+  views: TreeObject[];
+  matviews: TreeObject[];
+  functions: TreeObject[];
+  sequences: TreeObject[];
+  // group folder open state
+  g: { tables: boolean; views: boolean; matviews: boolean; functions: boolean; sequences: boolean };
 }
 
 /** CM effect + field: transient highlight of the range that just ran. */
@@ -152,6 +165,7 @@ const runFlashField = StateField.define<DecorationSet>({
     ButtonModule,
     TooltipModule,
     ToggleButtonModule,
+    ObjectDetailComponent,
   ],
   templateUrl: './query-executor.component.html',
   styleUrls: ['./query-executor.component.scss'],
@@ -190,6 +204,12 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   schemasLoading = false;
   browser: TreeSchema[] = [];
   private storageKey = '';
+
+  // Object-detail modal
+  detailVisible = false;
+  detailKind: ObjectKind | null = null;
+  detailSchema = '';
+  detailName = '';
 
   // AG Grid
   gridTheme = themeQuartz;
@@ -273,6 +293,11 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
           loading: false,
           loaded: false,
           tables: [],
+          views: [],
+          matviews: [],
+          functions: [],
+          sequences: [],
+          g: { tables: true, views: false, matviews: false, functions: false, sequences: false },
         }));
         this.reconfigureCatalog();
       })
@@ -283,34 +308,68 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       });
   }
 
-  /** Expand a schema → lazy-load its tables (once). */
+  /** Expand a schema → lazy-load ALL its objects, grouped (once). */
   toggleSchema(s: TreeSchema): void {
     s.open = !s.open;
     if (s.open && !s.loaded && !s.loading) {
-      s.loading = true;
-      this.cdr.markForCheck();
-      this.service
-        .getTables(this.connectionId, s.schema)
-        .then(res => {
-          const tables = res?.status ? (res.data?.tables ?? []) : [];
-          s.tables = tables.map((t: any) => ({
-            name: t.name,
-            type: t.type,
-            open: false,
-            loading: false,
-            loaded: false,
-            columns: [],
-          }));
-          s.loaded = true;
-          this.catalog.setTables(s.schema, tables);
-          this.reconfigureCatalog();
-        })
-        .catch(() => {})
-        .finally(() => {
-          s.loading = false;
-          this.cdr.markForCheck();
-        });
+      this.loadSchemaObjects(s);
     }
+  }
+
+  private loadSchemaObjects(s: TreeSchema): void {
+    s.loading = true;
+    this.cdr.markForCheck();
+    this.service
+      .getObjects(this.connectionId, s.schema)
+      .then(res => {
+        const d = res?.status ? res.data : null;
+        const tables = d?.tables ?? [];
+        s.tables = tables.map((t: any) => ({
+          name: t.name,
+          type: t.type,
+          open: false,
+          loading: false,
+          loaded: false,
+          columns: [],
+        }));
+        s.views = (d?.views ?? []).map((v: any) => ({ name: v.name }));
+        s.matviews = (d?.matviews ?? []).map((v: any) => ({ name: v.name }));
+        s.functions = (d?.functions ?? []).map((f: any) => ({
+          name: f.name,
+          args: f.args,
+          returns: f.returns,
+        }));
+        s.sequences = (d?.sequences ?? []).map((q: any) => ({ name: q.name }));
+        s.loaded = true;
+        // Feed IntelliSense: tables + views are queryable relations.
+        this.catalog.setTables(s.schema, [
+          ...tables,
+          ...s.views.map(v => ({ name: v.name, type: 'view' })),
+          ...s.matviews.map(v => ({ name: v.name, type: 'matview' })),
+        ]);
+        this.reconfigureCatalog();
+      })
+      .catch(() => {})
+      .finally(() => {
+        s.loading = false;
+        this.cdr.markForCheck();
+      });
+  }
+
+  /** Group folder toggle (Tables / Views / …). */
+  toggleGroup(s: TreeSchema, group: keyof TreeSchema['g']): void {
+    s.g[group] = !s.g[group];
+  }
+
+  /** Refresh one schema's objects (clears cache + re-fetches). */
+  refreshSchema(s: TreeSchema): void {
+    s.loaded = false;
+    s.tables = [];
+    s.views = [];
+    s.matviews = [];
+    s.functions = [];
+    s.sequences = [];
+    this.loadSchemaObjects(s);
   }
 
   /** Expand a table → lazy-load its columns (once). */
@@ -404,6 +463,20 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     const { from, to } = this.view.state.selection.main;
     this.view.dispatch({ changes: { from, to, insert: text } });
     this.view.focus();
+  }
+
+  /** Open the read-only detail modal for any object node. */
+  openObject(kind: ObjectKind, schema: string, name: string): void {
+    this.detailKind = kind;
+    this.detailSchema = schema;
+    this.detailName = name;
+    this.detailVisible = true;
+    this.cdr.markForCheck();
+  }
+
+  closeDetail(): void {
+    this.detailVisible = false;
+    this.cdr.markForCheck();
   }
 
   // ── editor ────────────────────────────────────────────────────────

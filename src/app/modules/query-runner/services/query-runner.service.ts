@@ -150,6 +150,69 @@ export class QueryRunnerService {
     );
   }
 
+  // ── object explorer ─────────────────────────────────────────────
+
+  /** Grouped objects in a schema (tables/views/matviews/functions/sequences). */
+  getObjects(id: string, schema: string): Promise<any> {
+    return lastValueFrom(
+      this.http.apiGet(this.base(id) + QUERY_RUNNER.OBJECTS_SUFFIX, {
+        params: { schema },
+        skipLoader: true,
+      }),
+    );
+  }
+
+  getTableDetail(id: string, schema: string, name: string): Promise<any> {
+    return lastValueFrom(
+      this.http.apiGet(this.base(id) + QUERY_RUNNER.OBJECT_TABLE_SUFFIX, {
+        params: { schema, name },
+        skipLoader: true,
+      }),
+    );
+  }
+
+  getViewDetail(
+    id: string,
+    schema: string,
+    name: string,
+    materialized = false,
+  ): Promise<any> {
+    return lastValueFrom(
+      this.http.apiGet(this.base(id) + QUERY_RUNNER.OBJECT_VIEW_SUFFIX, {
+        params: { schema, name, materialized: String(materialized) },
+        skipLoader: true,
+      }),
+    );
+  }
+
+  getFunctionDetail(id: string, schema: string, name: string): Promise<any> {
+    return lastValueFrom(
+      this.http.apiGet(this.base(id) + QUERY_RUNNER.OBJECT_FUNCTION_SUFFIX, {
+        params: { schema, name },
+        skipLoader: true,
+      }),
+    );
+  }
+
+  getSequenceDetail(id: string, schema: string, name: string): Promise<any> {
+    return lastValueFrom(
+      this.http.apiGet(this.base(id) + QUERY_RUNNER.OBJECT_SEQUENCE_SUFFIX, {
+        params: { schema, name },
+        skipLoader: true,
+      }),
+    );
+  }
+
+  refreshMatview(id: string, schema: string, name: string): Promise<any> {
+    return lastValueFrom(
+      this.http.apiPost(
+        this.base(id) + QUERY_RUNNER.OBJECT_MATVIEW_REFRESH_SUFFIX,
+        {},
+        { params: { schema, name }, skipLoader: true },
+      ),
+    );
+  }
+
   /** Run a SQL script; write=true commits, else read-only. */
   execute(
     id: string,

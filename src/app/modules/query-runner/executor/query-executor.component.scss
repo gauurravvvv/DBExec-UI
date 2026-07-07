@@ -175,6 +175,34 @@
   font-size: 0.72rem;
   font-style: italic;
 }
+.qx-node-refresh {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: var(--qx-muted);
+  cursor: pointer;
+  font-size: 0.7rem;
+  &:hover { color: var(--qx-accent); }
+}
+.qx-node.group {
+  color: var(--qx-muted);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding-left: 1.4rem;
+}
+.qx-count {
+  margin-left: auto;
+  font-size: 0.68rem;
+  color: var(--qx-muted);
+  background: var(--qx-bg);
+  border-radius: 999px;
+  padding: 0 6px;
+}
+.qx-node.indent2 { padding-left: 2.2rem; }
+.qx-node.leaf { cursor: pointer; }
+.qx-twist { cursor: pointer; }
+.qx-node .qx-node-spin { margin-left: auto; }
 .qx-cols { padding-left: 0.4rem; }
 .qx-col {
   display: flex;

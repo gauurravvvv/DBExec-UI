@@ -118,6 +118,13 @@ export const QUERY_RUNNER = {
   TABLES_SUFFIX: '/tables',
   // GET  /query-runner/connections/:id/columns?schema=&table= → lazy: columns
   COLUMNS_SUFFIX: '/columns',
+  // Object explorer (read-only inspection)
+  OBJECTS_SUFFIX: '/objects', // ?schema=  → grouped object list
+  OBJECT_TABLE_SUFFIX: '/object/table', // ?schema=&name=
+  OBJECT_VIEW_SUFFIX: '/object/view', // ?schema=&name=&materialized=
+  OBJECT_FUNCTION_SUFFIX: '/object/function', // ?schema=&name=
+  OBJECT_SEQUENCE_SUFFIX: '/object/sequence', // ?schema=&name=
+  OBJECT_MATVIEW_REFRESH_SUFFIX: '/object/matview/refresh', // ?schema=&name=
   // POST /query-runner/connections/:id/execute  → run SQL
   EXECUTE_SUFFIX: '/execute',
   // POST /query-runner/connections/:id/cancel   → cancel a running run
