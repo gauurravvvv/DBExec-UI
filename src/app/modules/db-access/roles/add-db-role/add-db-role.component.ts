@@ -2,9 +2,11 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  DestroyRef,
   OnInit,
   inject,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -34,6 +36,7 @@ import { DbAccessService } from '../../services/db-access.service';
 export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
 
   datasourceId = '';
   roleForm!: FormGroup;
@@ -60,7 +63,27 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
     // form body stays hidden until a datasource is picked.
     this.datasourceId = '';
     this.roleForm = this.buildForm();
+    // Password is required ONLY for a login user. Keep its validator in sync
+    // with the Can-log-in toggle (and apply it for the initial default).
+    this.syncPasswordValidator(this.defaultCanLogin);
+    this.roleForm
+      .get('canLogin')!
+      .valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((login: boolean) => this.syncPasswordValidator(login));
     this.initialised = true;
+  }
+
+  /** Password required when Can-log-in is ON; cleared (+ reset) when OFF. */
+  private syncPasswordValidator(login: boolean): void {
+    const pw = this.roleForm.get('password');
+    if (!pw) return;
+    if (login) {
+      pw.setValidators([Validators.required]);
+    } else {
+      pw.clearValidators();
+      pw.setValue('', { emitEvent: false });
+    }
+    pw.updateValueAndValidity({ emitEvent: false });
   }
 
   /** True once ngOnInit has run — lets onDatasourceChange skip the reset for

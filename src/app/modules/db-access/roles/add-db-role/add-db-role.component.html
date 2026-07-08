@@ -48,16 +48,9 @@
           </p>
 
           <ng-container *ngIf="datasourceId">
-            <div class="mode-tabs">
-              <button type="button" [class.active]="createMode === 'scratch'" (click)="setMode('scratch')">
-                {{ 'DB_ACCESS.FROM_SCRATCH' | translate }}
-              </button>
-              <button type="button" [class.active]="createMode === 'clone'" (click)="setMode('clone')">
-                {{ 'DB_ACCESS.CLONE' | translate }}
-              </button>
-            </div>
-
-          <app-custom-input
+            <!-- Field order: Role Name → Can log in → (mode) → login-only
+                 Password / Connection Limit / Valid Until → Attributes. -->
+            <app-custom-input
             formControlName="name"
             [label]="'DB_ACCESS.ROLE_NAME' | translate"
             [placeholder]="'DB_ACCESS.ROLE_NAME_PLACEHOLDER' | translate"
@@ -78,6 +71,15 @@
               [trueLabel]="'DB_ACCESS.TYPE_LOGIN' | translate"
               [falseLabel]="'DB_ACCESS.TYPE_GROUP' | translate"
             ></app-custom-toggle>
+          </div>
+
+          <div class="mode-tabs">
+            <button type="button" [class.active]="createMode === 'scratch'" (click)="setMode('scratch')">
+              {{ 'DB_ACCESS.FROM_SCRATCH' | translate }}
+            </button>
+            <button type="button" [class.active]="createMode === 'clone'" (click)="setMode('clone')">
+              {{ 'DB_ACCESS.CLONE' | translate }}
+            </button>
           </div>
 
           <app-custom-dropdown
@@ -101,6 +103,9 @@
                 type="password"
                 icon="pi-lock"
                 [showPasswordToggle]="true"
+                [required]="true"
+                [showError]="!!(roleForm.get('password')?.invalid && roleForm.get('password')?.touched)"
+                [errorMessage]="getErrorMessage('password')"
                 [placeholder]="'DB_ACCESS.PASSWORD_PLACEHOLDER' | translate"
               ></app-custom-input>
 
