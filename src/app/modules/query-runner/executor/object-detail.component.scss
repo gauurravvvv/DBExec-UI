@@ -49,7 +49,7 @@
     text-overflow: ellipsis;
   }
   .od-kind {
-    font-size: 0.62rem;
+    font-size: var(--fs-label);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--od-muted);
@@ -69,7 +69,7 @@
   color: var(--od-accent);
   border-radius: 6px;
   padding: 0.3rem 0.6rem;
-  font-size: 0.78rem;
+  font-size: var(--fs-control);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -97,7 +97,7 @@
     background: transparent;
     color: var(--od-muted);
     padding: 0.4rem 0.8rem;
-    font-size: 0.78rem;
+    font-size: var(--fs-control);
     cursor: pointer;
     border-radius: 6px 6px 0 0;
     white-space: nowrap;
@@ -128,7 +128,7 @@
 .od-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.82rem;
+  font-size: var(--fs-body);
   th {
     text-align: left;
     color: var(--od-muted);
@@ -144,7 +144,7 @@
     border-bottom: 1px solid var(--surface-ground, #eef0f4);
     vertical-align: top;
   }
-  .od-pk { color: #b8860b; margin-right: 0.3rem; font-size: 0.7rem; }
+  .od-pk { color: #b8860b; margin-right: 0.3rem; font-size: var(--fs-label); }
 }
 .od-mono { font-family: ui-monospace, monospace; }
 .od-muted { color: var(--od-muted); }
@@ -153,7 +153,7 @@
 .od-chip,
 .od-badge {
   display: inline-block;
-  font-size: 0.66rem;
+  font-size: var(--fs-label);
   border-radius: 4px;
   padding: 1px 6px;
   background: var(--surface-ground, #eef0f4);
@@ -171,7 +171,7 @@
   color: var(--od-muted);
   border-radius: 6px;
   padding: 0.2rem 0.5rem;
-  font-size: 0.72rem;
+  font-size: var(--fs-control);
   cursor: pointer;
   display: inline-flex;
   gap: 0.3rem;
@@ -184,14 +184,14 @@
   border: 1px solid var(--od-border);
   border-radius: 8px;
   font-family: ui-monospace, monospace;
-  font-size: 0.8rem;
+  font-size: var(--fs-control);
   white-space: pre-wrap;
   word-break: break-word;
   overflow-x: auto;
 }
 .od-sig {
   font-family: ui-monospace, monospace;
-  font-size: 0.8rem;
+  font-size: var(--fs-control);
   color: var(--od-muted);
   margin-bottom: 0.5rem;
   display: flex;
@@ -207,7 +207,7 @@
 .od-kv {
   display: flex;
   gap: 0.75rem;
-  font-size: 0.85rem;
+  font-size: var(--fs-body);
   label {
     width: 110px;
     color: var(--od-muted);
@@ -229,7 +229,7 @@
   align-items: center;
   gap: 0.25rem;
   color: var(--od-accent);
-  i { font-size: 0.7rem; }
+  i { font-size: var(--fs-label); }
 }
 
 /* Function signature tab: mono signature line + attribute chip row. */

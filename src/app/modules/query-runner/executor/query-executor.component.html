@@ -270,17 +270,31 @@
         </div>
 
         <div class="qx-result-body">
-          <div class="qx-result-empty" *ngIf="results.length === 0">
+          <!-- Running — calm placeholder (no animation) while the query runs -->
+          <div class="qx-result-loading" *ngIf="running">
+            <i class="pi pi-spin pi-spinner"></i>
+            <span>{{ 'QUERY_RUNNER.RUNNING' | translate }}</span>
+          </div>
+
+          <!-- Empty — only when idle with no results yet -->
+          <div class="qx-result-empty" *ngIf="!running && results.length === 0">
             <i class="pi pi-database"></i>
             <span>{{ 'QUERY_RUNNER.RUN_TO_SEE' | translate }}</span>
           </div>
 
-          <ng-container *ngIf="results[activeResult] as r">
+          <ng-container *ngIf="!running && results[activeResult] as r">
             <!-- Rows → AG Grid -->
             <div class="qx-grid-wrap" *ngIf="r.kind === 'rows'">
-              <div class="qx-trunc-banner" *ngIf="r.truncated">
-                <i class="pi pi-exclamation-triangle"></i>
-                {{ 'QUERY_RUNNER.TRUNCATED' | translate: { n: r.rows.length } }}
+              <!-- Quiet result-context header (rows · ms), shown even for a
+                   single result where there is no tab bar. -->
+              <div class="qx-result-context" *ngIf="resultContext as ctx">
+                <span class="qx-ctx-count">{{ ctx.count }}</span>
+                <span class="qx-ctx-sep">·</span>
+                <span class="qx-ctx-time">{{ ctx.elapsed }}</span>
+                <span class="qx-ctx-trunc" *ngIf="ctx.truncated">
+                  <i class="pi pi-exclamation-triangle"></i>
+                  {{ 'QUERY_RUNNER.TRUNCATED' | translate: { n: r.rows.length } }}
+                </span>
               </div>
               <ag-grid-angular
                 class="qx-grid"

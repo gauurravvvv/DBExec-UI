@@ -1069,6 +1069,21 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     return r && r.kind === 'rows' ? r : null;
   }
 
+  /**
+   * Quiet context line shown above the active rows grid ("240 rows · 88 ms",
+   * plus a truncation note). Purely derived from the active result — no new
+   * state. Empty string when the active result isn't a row set.
+   */
+  get resultContext(): { count: string; elapsed: string; truncated: boolean } | null {
+    const r = this.activeRows;
+    if (!r) return null;
+    return {
+      count: `${r.rowCount.toLocaleString()} row${r.rowCount === 1 ? '' : 's'}`,
+      elapsed: `${Math.round(r.elapsedMs).toLocaleString()} ms`,
+      truncated: r.truncated,
+    };
+  }
+
   onGridReady(e: GridReadyEvent): void {
     this.gridApi = e.api;
   }
