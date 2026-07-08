@@ -67,10 +67,18 @@
                 <h3>{{ 'DB_ACCESS.ACCESS_RULES' | translate }}</h3>
                 <p class="panel-hint">{{ 'DB_ACCESS.ACCESS_RULES_HINT' | translate }}</p>
               </div>
+              <button *ngIf="canManage" class="add-rule-btn" (click)="addRule()">
+                <i class="pi pi-plus"></i> {{ 'DB_ACCESS.ADD_RULE' | translate }}
+              </button>
             </div>
 
             <div class="rules-scroll">
-              <div class="rule-card" *ngFor="let rule of rules; let i = index; trackBy: trackByRule">
+              <div
+                class="rule-card"
+                *ngFor="let rule of rules; let i = index; trackBy: trackByRule"
+                [attr.data-rule-id]="rule.id"
+                [class.rule-just-added]="highlightId === rule.id"
+              >
                 <div class="rule-card-head">
                   <span class="rule-index">{{ 'DB_ACCESS.RULE_N' | translate: { n: i + 1 } }}</span>
                   <button
@@ -125,7 +133,6 @@
                       optionValue="value"
                       [filter]="true"
                       filterBy="label"
-                      [showClear]="true"
                       appendTo="body"
                       (onChangeEvent)="onSchemaChange(rule)"
                       [disabled]="!canManage"
@@ -229,10 +236,6 @@
                   (onChange)="onActionChange()"
                 ></app-custom-toggle>
               </div>
-
-              <button *ngIf="canManage" class="add-rule-btn" (click)="addRule()">
-                <i class="pi pi-plus"></i> {{ 'DB_ACCESS.ADD_RULE' | translate }}
-              </button>
             </div>
           </div>
 

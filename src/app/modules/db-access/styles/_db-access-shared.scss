@@ -1670,6 +1670,12 @@
     flex-direction: column;
     gap: var(--space-5);
 
+    // Just-added: a one-shot pulse so the user's eye lands on the new card
+    // after Add Rule scrolls it into view. Ring + tint fade back to resting.
+    &.rule-just-added {
+      animation: db-access-rule-pulse 1.6s ease-out 1;
+    }
+
     .rule-card-head {
       display: flex;
       align-items: center;
@@ -1784,22 +1790,28 @@
     }
   }
 
+  // Add-Rule — lives inline in the panel head (right of the "Access Rules"
+  // title). Compact solid pill so it reads as the section's primary action
+  // without the heavy full-width dashed block it used to be at the bottom.
   .add-rule-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-4);
-    padding: 0.65rem 1rem;
-    border: 1px dashed var(--border-color);
+    gap: var(--space-3);
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 0.5rem 0.85rem;
+    border: 1px solid var(--primary-color);
     border-radius: var(--radius-md);
-    background: transparent;
+    background: var(--primary-color-transparent);
     color: var(--primary-color);
     font-weight: var(--fw-semibold);
     font-size: var(--fs-control);
     cursor: pointer;
     transition: all var(--motion-base);
 
-    &:hover { border-color: var(--primary-color); background: var(--primary-color-transparent); }
+    i { font-size: 0.75rem; }
+    &:hover { background: var(--primary-color); color: #fff; }
   }
 
   // Side rail — role filter (effective) + saved sets + defaults. Scrolls.
@@ -1910,5 +1922,24 @@
     font-size: var(--fs-control);
     color: var(--secondary-color);
     padding: var(--space-4) 0;
+  }
+
+  // One-shot highlight for a freshly added rule card (see .rule-just-added).
+  // Fades a primary ring + tint in, then settles back to the resting card.
+  @keyframes db-access-rule-pulse {
+    0% {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--primary-color-transparent);
+      background: var(--primary-color-transparent);
+    }
+    60% {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--primary-color-transparent);
+    }
+    100% {
+      border-color: var(--border-color);
+      box-shadow: 0 0 0 0 transparent;
+      background: var(--hover-background);
+    }
   }
 }

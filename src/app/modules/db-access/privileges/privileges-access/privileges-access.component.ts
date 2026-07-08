@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   OnDestroy,
   OnInit,
   inject,
@@ -72,6 +73,11 @@ interface AccessRule {
 })
 export class PrivilegesAccessComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
+  private host: ElementRef<HTMLElement> = inject(ElementRef);
+
+  /** Rule id to flash after it's added (drives a transient highlight class). */
+  highlightId: number | null = null;
+  private highlightTimer: ReturnType<typeof setTimeout> | null = null;
 
   loading = this.dbAccess.loading;
   saving = this.dbAccess.saving;
@@ -135,6 +141,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.dbAccess.cancelReads();
+    if (this.highlightTimer) clearTimeout(this.highlightTimer);
   }
 
   /** Emitted by the datasource picker (init hydrate + change). */
@@ -193,10 +200,11 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
   trackByRule = (_: number, rule: AccessRule): number => rule.id;
 
   addRule(): void {
+    const id = ++this.ruleSeq;
     this.rules = [
       ...this.rules,
       {
-        id: ++this.ruleSeq,
+        id,
         schema: '',
         allTables: true,
         tables: [],
@@ -209,6 +217,26 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
       },
     ];
     this.cdr.markForCheck();
+    this.revealRule(id);
+  }
+
+  /** Scroll the just-added rule into view (within the bounded scroll area)
+   *  and flash a transient highlight so the user's eye lands on it. */
+  private revealRule(id: number): void {
+    this.highlightId = id;
+    if (this.highlightTimer) clearTimeout(this.highlightTimer);
+    // Wait for the *ngFor to render the new card, then scroll + focus it.
+    requestAnimationFrame(() => {
+      const card = this.host.nativeElement.querySelector<HTMLElement>(
+        `[data-rule-id="${id}"]`,
+      );
+      card?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      // Clear the highlight after the pulse so re-adding re-triggers it.
+      this.highlightTimer = setTimeout(() => {
+        this.highlightId = null;
+        this.cdr.markForCheck();
+      }, 1600);
+    });
   }
 
   removeRule(rule: AccessRule): void {

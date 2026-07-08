@@ -112,10 +112,22 @@ export class DbAccessContextService {
 
   // ── Introspection (memoised, deduped, cancel-on-switch) ────────────────
 
-  private toOptions(values: any[]): Option[] {
-    const names = values.map(v =>
-      typeof v === 'string' ? v : (v?.name ?? v?.schema ?? v?.table ?? v?.column),
-    );
+  /**
+   * Map an API payload to distinct { label, value } options.
+   *
+   * The tables/columns endpoints return GRANT rows (grantee/schema/table/
+   * privilege/…), so every row carries a `schema` field. Without a preferred
+   * key the generic `name ?? schema ?? table ?? column` chain collapses all
+   * of those rows to the single schema name. `preferKey` lets each caller
+   * pick the field that actually distinguishes its objects (e.g. 'table' for
+   * the table list, 'column' for columns) before the generic fallback.
+   */
+  private toOptions(values: any[], preferKey?: 'name' | 'schema' | 'table' | 'column'): Option[] {
+    const names = values.map(v => {
+      if (typeof v === 'string') return v;
+      const preferred = preferKey ? v?.[preferKey] : undefined;
+      return preferred ?? v?.name ?? v?.schema ?? v?.table ?? v?.column;
+    });
     return Array.from(new Set(names.filter(Boolean))).map((v: string) => ({
       label: v,
       value: v,
@@ -152,7 +164,7 @@ export class DbAccessContextService {
     const p = this.dbAccess
       .loadTableGrants(datasourceId, schema)
       .then((res: any) => {
-        const opts = this.toOptions(res?.status ? (res.data ?? []) : []);
+        const opts = this.toOptions(res?.status ? (res.data ?? []) : [], 'table');
         if (gen === this.generation) this.tableCache.set(key, opts);
         return opts;
       })
@@ -172,7 +184,7 @@ export class DbAccessContextService {
     const p = this.dbAccess
       .loadColumnGrants(datasourceId, schema, table)
       .then((res: any) => {
-        const opts = this.toOptions(res?.status ? (res.data ?? []) : []);
+        const opts = this.toOptions(res?.status ? (res.data ?? []) : [], 'column');
         if (gen === this.generation) this.columnCache.set(key, opts);
         return opts;
       })
