@@ -153,12 +153,12 @@
                 <div class="rule-objects" *ngIf="usesObjects(rule) && rule.schema">
                   <app-custom-toggle
                     *ngIf="rule.level !== 'column'"
-                    [(ngModel)]="rule.allTables"
+                    [ngModel]="rule.allTables"
+                    (ngModelChange)="rule.allTables = $event; onAllTablesChange(rule)"
                     [label]="'DB_ACCESS.ALL_TABLES' | translate"
                     [trueLabel]="'COMMON.YES' | translate"
                     [falseLabel]="'COMMON.NO' | translate"
                     [disabled]="!canManage"
-                    (onChange)="onActionChange()"
                   ></app-custom-toggle>
 
                   <div class="rule-field" *ngIf="rule.level === 'column' || !rule.allTables">

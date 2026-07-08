@@ -235,64 +235,114 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     }
   }
 
-  onLevelChange(rule: AccessRule): void {
-    // Prune privileges that don't apply to the new level (fix #12).
-    const allowed = this.privsFor(rule.level);
-    rule.privileges = rule.privileges.filter(p => allowed.includes(p));
+  // ── Control interdependencies ───────────────────────────────────────────
+  //
+  // The composer's object multiselect (tables / sequences / functions) is a
+  // dependent field: whether it's SHOWN and what OPTIONS it has both derive
+  // from level + schema + allTables. The single source of truth for "does
+  // this rule currently need its object list?" is `needsObjectList` below;
+  // every control that can affect that answer (level, schema, allTables,
+  // tables) funnels through `reconcileRule`, which normalises the dependent
+  // state and lazily loads the right objects. This guarantees the list is
+  // populated the instant the field becomes visible — no matter which
+  // control the user touched, or in what order — closing the class of bugs
+  // where flipping "All tables" off (or picking table-level after schema)
+  // left the field empty because nothing had loaded the objects.
 
-    // Column level targets a SINGLE table (fix #7): if multiple were picked,
-    // keep the first and surface a hint.
-    if (rule.level === 'column' && rule.tables.length > 1) {
-      rule.tables = [rule.tables[0]];
-      this.ruleHints[rule.id] = this.translate.instant('DB_ACCESS.COLUMN_LEVEL_SINGLE_TABLE');
+  /** True when the object multiselect is rendered for this rule (mirror of
+   *  the template's *ngIf: level uses objects, a schema is chosen, and either
+   *  we're at column level or "All tables" is off). */
+  private needsObjectList(rule: AccessRule): boolean {
+    if (!this.usesObjects(rule) || !rule.schema) return false;
+    return rule.level === 'column' || !rule.allTables;
+  }
+
+  /**
+   * Normalise a rule's dependent state after ANY interdependent control
+   * changes, then lazily fetch the objects the (now-consistent) rule needs.
+   * Always re-emits `rules` after the async load resolves so the freshly
+   * loaded options render even though the load was kicked off by an
+   * unrelated control. Idempotent — the context cache dedupes fetches.
+   */
+  private reconcileRule(rule: AccessRule): void {
+    // Column level always targets a single table and always shows the picker.
+    if (rule.level === 'column') {
+      rule.allTables = false;
+      if (rule.tables.length > 1) {
+        rule.tables = [rule.tables[rule.tables.length - 1]];
+        this.ruleHints[rule.id] = this.translate.instant('DB_ACCESS.COLUMN_LEVEL_SINGLE_TABLE');
+      } else {
+        delete this.ruleHints[rule.id];
+      }
     } else {
       delete this.ruleHints[rule.id];
     }
 
-    // Switching to a schema-only level drops table/column selections.
+    // Schema level has no object list — clear any leftover selections so a
+    // stale table/column can't leak into validity or the serialised change.
     if (rule.level === 'schema') {
       rule.tables = [];
       rule.columnsByTable = {};
       rule.allTables = true;
     }
 
-    // Load objects for sequence/function levels (fix #10).
-    if ((rule.level === 'sequence' || rule.level === 'function') && rule.schema) {
+    // When the object list is hidden (All tables ON at table/sequence/function
+    // level), drop the now-invisible selections for the same reason.
+    if (!this.needsObjectList(rule) && rule.level !== 'schema') {
+      rule.tables = [];
+      rule.columnsByTable = {};
+    }
+
+    // Prune column selections down to the still-selected tables.
+    const keep = new Set(rule.tables);
+    Object.keys(rule.columnsByTable).forEach(t => {
+      if (!keep.has(t)) delete rule.columnsByTable[t];
+    });
+
+    // Lazily load exactly the objects the visible field needs.
+    if (this.needsObjectList(rule)) {
       this.loadObjectsFor(rule);
+      // Column level: prefetch the columns of its single chosen table.
+      if (rule.level === 'column' && rule.tables[0]) {
+        this.loadColumnsFor(rule, rule.tables[0]);
+      }
     }
 
     this.rules = [...this.rules];
     this.cdr.markForCheck();
+  }
+
+  onLevelChange(rule: AccessRule): void {
+    // Prune privileges that don't apply to the new level (fix #12).
+    const allowed = this.privsFor(rule.level);
+    rule.privileges = rule.privileges.filter(p => allowed.includes(p));
+    this.reconcileRule(rule);
   }
 
   onSchemaChange(rule: AccessRule): void {
-    // Clearing the schema clears tables + columns + dependent state (fix #12).
+    // Switching schema invalidates every object selection under it.
     rule.tables = [];
     rule.columnsByTable = {};
-    delete this.ruleHints[rule.id];
-    if (!rule.schema) {
-      this.rules = [...this.rules];
-      this.cdr.markForCheck();
-      return;
-    }
-    // Memoised fetch — shared across rules on the same schema (fix #6/#8).
-    if (rule.level === 'sequence' || rule.level === 'function') {
-      this.loadObjectsFor(rule);
-    } else {
-      this.ctx.loadTables(this.datasourceId, rule.schema).then(() => {
-        this.rules = [...this.rules];
-        this.cdr.markForCheck();
-      });
-    }
-    this.rules = [...this.rules];
-    this.cdr.markForCheck();
+    this.reconcileRule(rule);
   }
 
+  /** "All tables in schema" toggled. Off → load + show the object list;
+   *  on → the list hides and its selections are cleared. Both handled by the
+   *  central reconcile so the list is never left empty when it appears. */
+  onAllTablesChange(rule: AccessRule): void {
+    this.reconcileRule(rule);
+  }
+
+  /** Fetch the objects a rule's multiselect needs (tables / sequences /
+   *  functions by level) and re-emit rules when they arrive. */
   private loadObjectsFor(rule: AccessRule): void {
+    if (!rule.schema) return;
     const loader =
       rule.level === 'sequence'
         ? this.ctx.loadSequences(this.datasourceId, rule.schema)
-        : this.ctx.loadFunctions(this.datasourceId, rule.schema);
+        : rule.level === 'function'
+          ? this.ctx.loadFunctions(this.datasourceId, rule.schema)
+          : this.ctx.loadTables(this.datasourceId, rule.schema);
     loader.then(() => {
       this.rules = [...this.rules];
       this.cdr.markForCheck();
@@ -319,23 +369,11 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Column-level table select is single (fix #7) — coerce to one value. */
+  /** Object selection changed. Column-level coercion to a single table,
+   *  column pruning, and the single-table column prefetch all live in the
+   *  central reconcile (fix #7 / #12). */
   onTablesChange(rule: AccessRule): void {
-    if (rule.level === 'column' && rule.tables.length > 1) {
-      rule.tables = [rule.tables[rule.tables.length - 1]];
-      this.ruleHints[rule.id] = this.translate.instant('DB_ACCESS.COLUMN_LEVEL_SINGLE_TABLE');
-    }
-    // Prune columns of tables no longer selected (fix #12).
-    const keep = new Set(rule.tables);
-    Object.keys(rule.columnsByTable).forEach(t => {
-      if (!keep.has(t)) delete rule.columnsByTable[t];
-    });
-    // Prefetch columns for a column-level single table.
-    if (rule.level === 'column' && rule.tables[0]) {
-      this.loadColumnsFor(rule, rule.tables[0]);
-    }
-    this.rules = [...this.rules];
-    this.cdr.markForCheck();
+    this.reconcileRule(rule);
   }
 
   togglePriv(rule: AccessRule, priv: string): void {
