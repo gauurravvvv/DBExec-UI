@@ -22,10 +22,9 @@ import { DbAccessService } from '../../services/db-access.service';
  * A "user" and a "role" are the same pg_roles object; they differ only by
  * canLogin. This one form creates both: a "Can log in" toggle switches
  * between a login user (reveals password / connection-limit / expiry /
- * login-only attributes) and a group role (attributes only). The toggle
- * defaults from the ?login= query param the list passes based on its active
- * Type filter. From-scratch / clone modes remain. Datasource carried by ?ds=.
- * Saves directly (no SQL shown).
+ * login-only attributes) and a group role (attributes only). From-scratch /
+ * clone modes remain. The datasource is chosen inside the form (nothing is
+ * carried in the URL). Saves directly (no SQL shown).
  */
 @Component({
   selector: 'app-add-db-role',
@@ -229,6 +228,7 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
   }
 
   goBack(): void {
-    this.router.navigate([DB_ACCESS.ROLES_LIST], { queryParams: { ds: this.datasourceId } });
+    // Datasource is carried by the shared context (not the URL).
+    this.router.navigate([DB_ACCESS.ROLES_LIST]);
   }
 }

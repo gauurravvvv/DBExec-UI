@@ -48,8 +48,9 @@ export class ViewDbRoleComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.datasourceId =
-      this.route.snapshot.queryParamMap.get('ds') || this.ctx.datasourceId() || '';
+    // Datasource comes from the shared context (never the URL). A cold
+    // deep-link with no context falls through to the redirect below.
+    this.datasourceId = this.ctx.datasourceId() || '';
     this.roleName = this.route.snapshot.paramMap.get('roleName') ?? '';
     if (!this.datasourceId) {
       this.router.navigate([DB_ACCESS.ROLES_LIST]);
@@ -136,13 +137,11 @@ export class ViewDbRoleComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate([DB_ACCESS.ROLES_LIST], { queryParams: { ds: this.datasourceId } });
+    this.router.navigate([DB_ACCESS.ROLES_LIST]);
   }
 
   onEdit(): void {
-    this.router.navigate([DB_ACCESS.roleEdit(this.roleName)], {
-      queryParams: { ds: this.datasourceId },
-    });
+    this.router.navigate([DB_ACCESS.roleEdit(this.roleName)]);
   }
 
   /**

@@ -359,10 +359,12 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     this.router.navigate([DB_ACCESS.roleNew()]);
   }
   onView(role: any): void {
-    this.router.navigate([DB_ACCESS.roleView(role.name)], { queryParams: { ds: this.datasourceId } });
+    // Datasource is carried by the shared context (not the URL).
+    this.router.navigate([DB_ACCESS.roleView(role.name)]);
   }
   onEdit(role: any): void {
-    this.router.navigate([DB_ACCESS.roleEdit(role.name)], { queryParams: { ds: this.datasourceId } });
+    // Datasource is carried by the shared context (not the URL).
+    this.router.navigate([DB_ACCESS.roleEdit(role.name)]);
   }
 
   // ── Deactivate (login users only) ───────────────────────────────────────

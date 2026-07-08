@@ -9,23 +9,24 @@ import {
   Output,
   inject,
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { DbAccessContextService } from '../../services/db-access-context.service';
 
 /**
- * DatasourcePickerComponent — the shared header dropdown used by all three
- * DB-access list screens (Users / Roles / Privileges). It is a server-mode
- * `app-custom-dropdown` (paged fetcher, appendTo="body") backed by the
- * shared `DbAccessContextService` + the `?ds=<id>` query param, so the
- * selection persists across the three sidebar sections and deep-links.
+ * DatasourcePickerComponent — the shared header dropdown used by the
+ * DB-access list screens (Roles / Privileges). It is a server-mode
+ * `app-custom-dropdown` (paged fetcher, appendTo="body") backed solely by
+ * the shared `DbAccessContextService`, so the selection persists across the
+ * sidebar sections for the session.
  *
- * On init it hydrates from `?ds=` (or the context's current value), probes
- * capability once, and emits `changed`. On change it writes the context,
- * updates `?ds=` (replaceUrl — clean history), probes capability, and emits.
- * Clearing the selection drops `?ds=` and resets context (which clears all
- * downstream caches for the old datasource).
+ * The datasource is NEVER mirrored into the URL — there is no `?ds=` query
+ * param on any db-access screen. On init it hydrates from the context's
+ * current value (cross-section nav within the app), probes capability once,
+ * and emits `changed`. On change it writes the context, probes capability,
+ * and emits. Clearing the selection resets the context (which clears all
+ * downstream caches for the old datasource). A refresh / external deep link
+ * starts with no datasource selected, by design.
  */
 @Component({
   selector: 'app-datasource-picker',
@@ -39,9 +40,9 @@ export class DatasourcePickerComponent implements OnInit, OnDestroy {
   /** Show the clear (✕) affordance. Lists want it; the Add-Role form doesn't. */
   @Input() allowClear = true;
   /**
-   * Pre-select from ?ds= / the shared context on init. Lists hydrate so the
-   * selection persists across sections + deep links. The Add-Role form sets
-   * this false so the user always picks the datasource manually.
+   * Pre-select from the shared context on init. Lists hydrate so the
+   * selection persists across sections during the session. The Add-Role form
+   * sets this false so the user always picks the datasource manually.
    */
   @Input() autoHydrate = true;
 
@@ -55,8 +56,6 @@ export class DatasourcePickerComponent implements OnInit, OnDestroy {
     private datasourceService: DatasourceService,
     private ctx: DbAccessContextService,
     private globalService: GlobalService,
-    private route: ActivatedRoute,
-    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -65,16 +64,16 @@ export class DatasourcePickerComponent implements OnInit, OnDestroy {
     // Add-Role opts out of hydration so the user always picks manually.
     if (!this.autoHydrate) return;
 
-    // Hydrate from ?ds= (deep link) or the shared context (cross-section nav).
-    const fromQuery = this.route.snapshot.queryParamMap.get('ds') ?? '';
-    const initial = fromQuery || this.ctx.datasourceId() || '';
+    // Hydrate from the shared context only (cross-section nav within the
+    // app). We deliberately do NOT read or write ?ds= — the datasource is
+    // never mirrored into the URL. Selection persists in memory for the
+    // session via DbAccessContextService.
+    const initial = this.ctx.datasourceId() || '';
     if (initial) {
       this.selectedDatasource = initial;
       // Push into context (no-op if unchanged) + probe once.
       this.ctx.setDatasource(initial);
       this.ctx.probeCapability(initial);
-      // Ensure ?ds= reflects the hydrated id when it came from context.
-      if (!fromQuery) this.syncQueryParam(initial);
       // Emit after the microtask so parent @ViewChild refs are ready.
       queueMicrotask(() => this.changed.emit(initial));
     }
@@ -127,20 +126,10 @@ export class DatasourcePickerComponent implements OnInit, OnDestroy {
     const next = id || '';
     this.selectedDatasource = next || null;
     this.ctx.setDatasource(next); // clears old caches + capability
-    // Only mirror the selection into ?ds= when hydration is on (the list
-    // screens). The Add-Role form keeps a clean route, so skip the URL sync.
-    if (this.autoHydrate) this.syncQueryParam(next);
+    // The selection is persisted in the shared context only — never written
+    // to the URL (no ?ds= mirroring on any db-access screen).
     if (next) this.ctx.probeCapability(next);
     this.changed.emit(next);
     this.cdr.markForCheck();
-  }
-
-  private syncQueryParam(id: string): void {
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { ds: id || null },
-      queryParamsHandling: 'merge',
-      replaceUrl: true,
-    });
   }
 }
