@@ -82,77 +82,149 @@
   border-radius: 999px;
   padding: 2px 8px;
 }
+// ── toolbar button system ───────────────────────────────────────────────
+// Every action is a REAL button on an even 34px row (was a mix of flat blue
+// text links). Explicit rules + !important because PrimeNG's own p-button /
+// p-button-text / p-button-outlined selectors are high-specificity and were
+// winning, leaving the icon buttons chromeless.
+$qx-btn-h: 34px;
+
 .qx-toolbar {
   display: flex;
   align-items: center;
   gap: var(--space-4);
   flex-shrink: 0;
 
-  // App-standard button styling — same spec as the shared .modern-button
-  // (used across list-user / db-access), so the executor toolbar buttons
-  // match every other button in the app instead of a bespoke compact size.
-  :host ::ng-deep .modern-button,
-  .modern-button {
-    border-radius: var(--radius-sm) !important;
-    font-weight: var(--fw-semibold);
-    padding: 0.65rem 1.25rem;
-
-    &.p-button-primary {
-      background: linear-gradient(
-        135deg,
-        var(--primary-color),
-        var(--primary-hover)
-      ) !important;
-      border: none !important;
-      color: white !important;
-      box-shadow: 0 4px 10px var(--primary-color-transparent);
-      transition: all var(--motion-base) ease;
-
-      &:hover {
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-md);
-      }
-    }
-
-    // Outlined buttons: app-standard border + text, minus PrimeNG's inset
-    // ring (kept clean single outline).
-    &.p-button-outlined,
-    &.p-button-outlined.p-button {
-      background: transparent;
-      box-shadow: none !important;
-    }
-  }
-
-  .qx-sep {
-    width: 1px;
-    height: 22px;
-    background: var(--qx-border);
-    margin: 0 0.3rem;
-  }
-  .qx-autocommit {
-    display: inline-flex;
-  }
-  .qx-active {
-    color: var(--qx-accent) !important;
-    background: var(--qx-bg) !important;
-  }
-
-  // Button groups — visually cluster related actions with a tighter gap.
   .qx-btn-group {
     display: inline-flex;
     align-items: center;
     gap: var(--space-3);
   }
-  // Compact icon-only buttons keep a square footprint next to the labelled
-  // Run/Format buttons (override the shared modern-button horizontal pad).
-  :host ::ng-deep .qx-icon-btn.modern-button {
-    padding: 0.5rem 0.6rem;
+
+  // Base: normalise every toolbar button to the app button shape.
+  :host ::ng-deep .modern-button.p-button,
+  .modern-button {
+    height: $qx-btn-h;
+    min-width: $qx-btn-h;
+    border-radius: var(--radius-sm) !important;
+    font-weight: var(--fw-semibold) !important;
+    font-size: var(--fs-control) !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    transition: all var(--motion-base) ease;
+    box-shadow: none;
+
+    .pi { font-size: 0.95rem; }
   }
-  :host ::ng-deep .qx-run-btn.modern-button,
-  :host ::ng-deep .qx-labeled-btn.modern-button {
+
+  // Primary Run — solid gradient, a touch more presence, hover lift.
+  :host ::ng-deep .qx-run-btn.p-button.p-button-primary,
+  .qx-run-btn.p-button-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
+    border: 1px solid transparent !important;
+    color: #fff !important;
+    padding: 0 1rem !important;
+    box-shadow: 0 2px 6px var(--primary-color-transparent);
+    &:enabled:hover,
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+  }
+
+  // Labelled secondary (Format) — outlined, real border + text (not a link).
+  :host ::ng-deep .qx-labeled-btn.p-button,
+  .qx-labeled-btn {
+    padding: 0 0.85rem !important;
+    background: var(--card-background) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-color) !important;
+    &:enabled:hover,
+    &:hover {
+      border-color: var(--primary-color) !important;
+      color: var(--primary-color) !important;
+      background: var(--primary-color-transparent) !important;
+    }
+  }
+
+  // Icon-only — real square button chrome (border + bg), even 34x34.
+  :host ::ng-deep .qx-icon-btn.p-button,
+  .qx-icon-btn {
+    width: $qx-btn-h;
+    height: $qx-btn-h;
+    padding: 0 !important;
+    background: var(--card-background) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-muted) !important;
+    box-shadow: none !important;
+
+    &:enabled:hover,
+    &:hover {
+      border-color: var(--primary-color) !important;
+      color: var(--primary-color) !important;
+      background: var(--primary-color-transparent) !important;
+    }
+
+    // Active toggle state (wrap / explain / minimap on).
+    &.qx-active {
+      border-color: var(--primary-color) !important;
+      color: var(--primary-color) !important;
+      background: var(--primary-color-transparent) !important;
+    }
+
+    // Danger (Stop) — red accent on hover, only meaningful when enabled.
+    &.p-button-danger:enabled:hover {
+      border-color: var(--error-color) !important;
+      color: var(--error-color) !important;
+      background: var(--error-bg) !important;
+    }
+
+    &:disabled { opacity: 0.45; }
+  }
+
+  .qx-sep {
+    width: 1px;
+    height: 20px;
+    background: var(--qx-border);
+    margin: 0 0.15rem;
+    flex-shrink: 0;
+  }
+
+  // Read-only / Write toggle — a fully self-owned button (no PrimeNG
+  // p-toggleButton, whose default styling rendered as an oversized pink→blue
+  // block that fought every override). Compact pill on the 34px row.
+  .qx-mode-toggle {
+    height: $qx-btn-h;
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
+    padding: 0 0.85rem;
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-control);
+    font-weight: var(--fw-semibold);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all var(--motion-base) ease;
+    // OFF = read-only: quiet, neutral (NOT pink).
+    background: var(--secondary-background);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+
+    .pi { font-size: 0.9rem; }
+
+    &:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+    // ON = write mode: warning-amber accent (destructive-capable).
+    &.write {
+      background: var(--warning-bg);
+      border-color: var(--warning-color);
+      color: var(--warning-color);
+      &:hover { background: var(--warning-bg); color: var(--warning-color); }
+    }
   }
 }
 
@@ -752,83 +824,8 @@
   &.write { background: var(--warning-color); }
 }
 
-/* ── CodeMirror autocomplete (IntelliSense) — app design system ──────
-   The default CodeMirror completion popup ships a bare light-grey box
-   that looks nothing like the rest of the app. Theme it with the app
-   tokens so it reads like the shared dropdown / overlay surfaces:
-   card surface, app border + radius + shadow, app text + mono font,
-   primary-tinted active row and matched text. Uses :global (same
-   convention as .cm-editor above) since CodeMirror renders the tooltip
-   in its own layer. */
-:global(.cm-tooltip.cm-tooltip-autocomplete) {
-  background: var(--card-background);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
-  font-family: var(--font-ui);
-}
-
-:global(.cm-tooltip-autocomplete > ul) {
-  font-family: var(--font-mono);
-  font-size: var(--fs-control);
-  max-height: 16rem;
-}
-
-:global(.cm-tooltip-autocomplete > ul > li) {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.28rem 0.6rem;
-  color: var(--text-color);
-  line-height: 1.5;
-}
-
-:global(.cm-tooltip-autocomplete > ul > li[aria-selected]) {
-  background: var(--primary-color-transparent);
-  color: var(--text-color);
-}
-
-:global(.cm-completionLabel) {
-  color: var(--text-color);
-}
-
-:global(.cm-completionMatchedText) {
-  color: var(--primary-color);
-  font-weight: var(--fw-semibold);
-  text-decoration: none;
-}
-
-:global(.cm-completionDetail) {
-  margin-left: auto;
-  padding-left: 1rem;
-  color: var(--text-muted);
-  font-style: normal;
-  font-size: var(--fs-label);
-}
-
-:global(.cm-completionIcon) {
-  color: var(--text-muted);
-  opacity: 0.9;
-  margin-right: 0.1rem;
-}
-/* Type-specific icon accents so column / table / pk read distinctly. */
-:global(.cm-completionIcon-column),
-:global(.cm-completionIcon-property) { color: var(--primary-color); }
-:global(.cm-completionIcon-pk) { color: var(--warning-color); }
-:global(.cm-completionIcon-table),
-:global(.cm-completionIcon-class) { color: var(--text-color); }
-:global(.cm-completionIcon-schema),
-:global(.cm-completionIcon-namespace) { color: var(--text-muted); }
-
-/* Completion info tooltip (the detail panel beside the list). */
-:global(.cm-tooltip.cm-completionInfo) {
-  background: var(--card-background);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  color: var(--text-color);
-  font-family: var(--font-ui);
-  font-size: var(--fs-control);
-  padding: 0.5rem 0.75rem;
-}
+/* NOTE: All CodeMirror chrome (autocomplete popup, find/replace panel, base
+   editor, gutters, selection) is themed GLOBALLY in
+   src/assets/sass/_codemirror-theme.scss — CM appends those layers to
+   document.body, outside this component's Emulated-encapsulation subtree, so
+   scoped :global rules here did not reliably reach them. Do not re-add them. */

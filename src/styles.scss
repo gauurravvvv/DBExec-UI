@@ -3,6 +3,10 @@
 @import 'primeng/resources/primeng.css';
 @import 'primeicons/primeicons.css';
 @import './assets/sass/variables/theme-variables';
+// Global CodeMirror chrome theme (Query Runner editor). Must load after the
+// theme variables so the design tokens resolve. Un-scoped on purpose — CM
+// appends its autocomplete/search layers to document.body.
+@import './assets/sass/codemirror-theme';
 
 // ================================================================
 // Global typography — single source of truth.

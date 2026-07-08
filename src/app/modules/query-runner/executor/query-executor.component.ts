@@ -74,7 +74,6 @@ import { format as formatSql } from 'sql-formatter';
 
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
-import { ToggleButtonModule } from 'primeng/togglebutton';
 import { MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
@@ -187,7 +186,6 @@ const runFlashField = StateField.define<DecorationSet>({
     AgGridAngular,
     ButtonModule,
     TooltipModule,
-    ToggleButtonModule,
     MenuModule,
     ObjectDetailComponent,
   ],
@@ -652,11 +650,17 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
             }),
             EditorView.theme({
               '&': { height: '100%' },
-              // Match the app's mono stack + control font size so the editor
-              // reads like the rest of the application, not a bare CM6 canvas.
+              // Match the app's mono stack + a comfortable, readable editor
+              // size (14px / 1.6). Fuller chrome theming (gutters, selection,
+              // autocomplete, find panel) lives in the GLOBAL
+              // _codemirror-theme.scss — CM appends those layers to body.
               '.cm-scroller': {
                 fontFamily: 'var(--font-mono)',
-                fontSize: 'var(--fs-control)',
+                // Explicit px (not a rem token): the app root font-size is
+                // 14px, so rem tokens render ~12px in the editor — too small
+                // for code. 14px absolute keeps it comfortable everywhere.
+                fontSize: '14px',
+                lineHeight: '1.65',
               },
             }),
           ],

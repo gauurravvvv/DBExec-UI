@@ -1,0 +1,270 @@
+// ============================================================================
+// Global CodeMirror 6 chrome theme — Query Runner executor.
+//
+// These rules are intentionally GLOBAL (loaded from styles.scss), NOT inside
+// the executor component's scoped SCSS. CodeMirror renders its autocomplete
+// tooltip and search/find panel in its own layers attached to document.body,
+// OUTSIDE the component's DOM subtree — so Angular's Emulated encapsulation
+// (and even :global from the component) does not reliably reach them. Styling
+// them here, un-scoped, is the correct and reliable approach.
+//
+// Everything maps to the app design tokens so the editor reads as part of the
+// application, not a bare CM6 canvas.
+// ============================================================================
+
+// ── base editor surface ────────────────────────────────────────────────────
+.cm-editor {
+  height: 100%;
+  background: var(--card-background);
+  color: var(--text-color);
+
+  .cm-scroller {
+    font-family: var(--font-mono);
+    // Explicit 14px — the app root font-size is 14px so rem tokens render
+    // ~12px in the editor, too small for code. Absolute keeps it readable.
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  // Gutters — quiet, app-toned; match the surrounding chrome.
+  .cm-gutters {
+    background: var(--secondary-background);
+    color: var(--text-muted);
+    border-right: 1px solid var(--border-color);
+  }
+  .cm-lineNumbers .cm-gutterElement {
+    padding: 0 0.6rem 0 0.75rem;
+    color: var(--text-muted);
+  }
+  .cm-foldGutter .cm-gutterElement {
+    color: var(--text-muted);
+  }
+
+  // Active line + its gutter — faint primary wash so the caret line reads.
+  .cm-activeLine {
+    background: rgba(var(--primary-color-rgb), 0.05);
+  }
+  .cm-activeLineGutter {
+    background: rgba(var(--primary-color-rgb), 0.08);
+    color: var(--primary-color);
+  }
+
+  // Selection + match highlight — app primary tint (not the browser default).
+  .cm-selectionBackground,
+  &.cm-focused .cm-selectionBackground,
+  .cm-content ::selection {
+    background: var(--primary-color-transparent) !important;
+  }
+  .cm-selectionMatch {
+    background: rgba(var(--primary-color-rgb), 0.12);
+  }
+  .cm-cursor {
+    border-left-color: var(--primary-color);
+    border-left-width: 2px;
+  }
+
+  // Matching bracket emphasis.
+  .cm-matchingBracket {
+    background: rgba(var(--primary-color-rgb), 0.18);
+    color: var(--text-color) !important;
+    outline: 1px solid var(--primary-color);
+  }
+
+  &.cm-focused {
+    outline: none;
+  }
+}
+
+// ── autocomplete / IntelliSense popup ───────────────────────────────────────
+// Kill the bare grey box + serif font + yellow keys + harsh blue selection;
+// re-skin as the app's dropdown/overlay surface.
+.cm-tooltip.cm-tooltip-autocomplete {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  font-family: var(--font-ui);
+
+  & > ul {
+    font-family: var(--font-mono);
+    font-size: var(--fs-control);
+    max-height: 17rem;
+    min-width: 22rem;
+
+    & > li {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.32rem 0.7rem;
+      color: var(--text-color);
+      line-height: 1.5;
+      border-radius: var(--radius-xs);
+      margin: 1px 4px;
+
+      &[aria-selected] {
+        background: var(--primary-color-transparent);
+        color: var(--text-color);
+      }
+    }
+  }
+}
+
+.cm-completionLabel {
+  color: var(--text-color);
+}
+.cm-completionMatchedText {
+  color: var(--primary-color);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+}
+.cm-completionDetail {
+  margin-left: auto;
+  padding-left: 1rem;
+  color: var(--text-muted);
+  font-style: normal;
+  font-size: var(--fs-label);
+}
+
+// Completion type icons — replace the default (yellow key) glyph colours with
+// app-toned accents so keyword / table / column / pk read distinctly.
+.cm-completionIcon {
+  color: var(--text-muted);
+  opacity: 0.9;
+  margin-right: 0.15rem;
+  font-size: 0.9em;
+  // Neutralise the default coloured emoji-ish glyphs.
+  &::after { opacity: 0.85; }
+}
+.cm-completionIcon-keyword { color: var(--primary-color); }
+.cm-completionIcon-column,
+.cm-completionIcon-property { color: var(--primary-color); }
+.cm-completionIcon-pk { color: var(--warning-color); }
+.cm-completionIcon-table,
+.cm-completionIcon-class { color: var(--text-color); }
+.cm-completionIcon-schema,
+.cm-completionIcon-namespace { color: var(--text-muted); }
+
+// The detail panel that appears beside the completion list.
+.cm-tooltip.cm-completionInfo {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  color: var(--text-color);
+  font-family: var(--font-ui);
+  font-size: var(--fs-control);
+  padding: 0.5rem 0.75rem;
+  max-width: 24rem;
+}
+
+// Generic hover tooltips (lint messages, etc.).
+.cm-tooltip:not(.cm-tooltip-autocomplete):not(.cm-completionInfo):not(.cm-panel) {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  color: var(--text-color);
+  font-family: var(--font-ui);
+  font-size: var(--fs-control);
+  padding: 0.35rem 0.6rem;
+}
+
+// ── search / find-replace panel ─────────────────────────────────────────────
+// The raw browser widget → an app-toned toolbar row of real inputs + buttons.
+.cm-panels {
+  background: var(--card-background);
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color);
+  &.cm-panels-top { border-bottom: 1px solid var(--border-color); }
+  &.cm-panels-bottom { border-top: 1px solid var(--border-color); }
+}
+
+.cm-panel.cm-search {
+  padding: 0.55rem 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-ui);
+  font-size: var(--fs-control);
+
+  // Text inputs (Find / Replace) → app input.
+  .cm-textfield {
+    height: 32px;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--card-background);
+    color: var(--text-color);
+    font-family: var(--font-ui);
+    font-size: var(--fs-control);
+    padding: 0 0.6rem;
+    min-width: 15rem;
+    outline: none;
+    transition: border-color var(--motion-base) ease, box-shadow var(--motion-base) ease;
+
+    &:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--primary-color-transparent);
+    }
+    &::placeholder { color: var(--text-muted); }
+  }
+
+  // Buttons (next / previous / all / replace / replace all) → app button.
+  .cm-button {
+    height: 32px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--card-background);
+    background-image: none;
+    color: var(--text-color);
+    font-family: var(--font-ui);
+    font-size: var(--fs-control);
+    font-weight: var(--fw-medium);
+    padding: 0 0.75rem;
+    cursor: pointer;
+    transition: all var(--motion-base) ease;
+
+    &:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+      background: var(--primary-color-transparent);
+    }
+    &:active { transform: translateY(1px); }
+  }
+
+  // Checkbox labels (match case / regexp / by word) — aligned + app-toned.
+  label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--text-color);
+    font-size: var(--fs-control);
+    margin: 0 0.15rem;
+    cursor: pointer;
+
+    input[type='checkbox'] {
+      width: 15px;
+      height: 15px;
+      accent-color: var(--primary-color);
+      cursor: pointer;
+      margin: 0;
+    }
+  }
+
+  // The close (✕) affordance.
+  [name='close'],
+  button[aria-label='close'] {
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0 0.35rem;
+    &:hover { color: var(--error-color); }
+  }
+}

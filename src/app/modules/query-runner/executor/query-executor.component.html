@@ -61,12 +61,12 @@
       <span class="qx-sep"></span>
 
       <!-- Right: read/write toggle, palette, shortcuts, overflow -->
-      <label class="qx-autocommit" [pTooltip]="'QUERY_RUNNER.AUTOCOMMIT_HINT' | translate" tooltipPosition="bottom">
-        <p-toggleButton [(ngModel)]="autoCommit"
-          onLabel="{{ 'QUERY_RUNNER.WRITE_ON' | translate }}"
-          offLabel="{{ 'QUERY_RUNNER.READ_ONLY' | translate }}"
-          onIcon="pi pi-pencil" offIcon="pi pi-lock"></p-toggleButton>
-      </label>
+      <button type="button" class="qx-mode-toggle" [class.write]="autoCommit"
+        (click)="autoCommit = !autoCommit"
+        [pTooltip]="'QUERY_RUNNER.AUTOCOMMIT_HINT' | translate" tooltipPosition="bottom">
+        <i class="pi" [ngClass]="autoCommit ? 'pi-pencil' : 'pi-lock'"></i>
+        <span>{{ (autoCommit ? 'QUERY_RUNNER.WRITE_ON' : 'QUERY_RUNNER.READ_ONLY') | translate }}</span>
+      </button>
 
       <button pButton class="p-button-text modern-button qx-icon-btn" (click)="openPalette()"
         [disabled]="!editorReady"
