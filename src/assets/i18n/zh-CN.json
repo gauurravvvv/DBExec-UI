@@ -3110,6 +3110,8 @@
     "LOAD_FILE_TITLE": "Load SQL file",
     "LOAD_FILE_HINT": "The editor already has content. Replace it with the file, or append the file to the end?",
     "REPLACE": "Replace",
-    "APPEND": "Append"
+    "APPEND": "Append",
+    "LIMIT_LABEL": "Limit",
+    "LIMIT_HINT": "Max rows returned per run (caps the result without changing your SQL). Default 200."
   }
 }

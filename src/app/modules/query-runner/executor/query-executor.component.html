@@ -60,7 +60,14 @@
 
       <span class="qx-sep"></span>
 
-      <!-- Right: read/write toggle, palette, shortcuts, overflow -->
+      <!-- Right: row limit, read/write toggle, palette, shortcuts, overflow -->
+      <label class="qx-limit" [pTooltip]="'QUERY_RUNNER.LIMIT_HINT' | translate" tooltipPosition="bottom">
+        <span class="qx-limit-label">{{ 'QUERY_RUNNER.LIMIT_LABEL' | translate }}</span>
+        <input type="number" min="1" [max]="50000" step="50"
+          [ngModel]="rowLimit" (ngModelChange)="onRowLimitChange($event)"
+          class="qx-limit-input" />
+      </label>
+
       <button type="button" class="qx-mode-toggle" [class.write]="autoCommit"
         (click)="autoCommit = !autoCommit"
         [pTooltip]="'QUERY_RUNNER.AUTOCOMMIT_HINT' | translate" tooltipPosition="bottom">

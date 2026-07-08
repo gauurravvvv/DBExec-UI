@@ -192,6 +192,43 @@ $qx-btn-h: 34px;
     flex-shrink: 0;
   }
 
+  // Row-limit input — compact "Limit [200]" control on the 34px row. Caps
+  // returned rows without touching the SQL.
+  .qx-limit {
+    height: $qx-btn-h;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 0 0.6rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    background: var(--card-background);
+    white-space: nowrap;
+
+    .qx-limit-label {
+      font-size: var(--fs-label);
+      font-weight: var(--fw-semibold);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .qx-limit-input {
+      width: 4.5rem;
+      height: 24px;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--text-color);
+      font-size: var(--fs-control);
+      font-variant-numeric: tabular-nums;
+      // Keep the native spinners (up/down) — handy for nudging the value.
+    }
+    &:focus-within {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--primary-color-transparent);
+    }
+  }
+
   // Read-only / Write toggle — a fully self-owned button (no PrimeNG
   // p-toggleButton, whose default styling rendered as an oversized pink→blue
   // block that fought every override). Compact pill on the 34px row.

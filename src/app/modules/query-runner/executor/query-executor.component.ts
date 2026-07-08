@@ -233,6 +233,12 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   // Toolbar overflow menu (PrimeNG p-menu)
   overflowItems: MenuItem[] = [];
 
+  // Row-limit cap sent as maxRows on each run. Default 200. This does NOT
+  // rewrite the user's SQL — the BE computes the full result then returns
+  // only the first N rows and flags `truncated`. 1..50000 (BE also clamps).
+  rowLimit = 200;
+  private readonly MAX_ROW_LIMIT = 50000;
+
   // Execution
   running = false;
   autoCommit = false; // OFF ⇒ read-only preview; ON ⇒ writes commit
@@ -296,6 +302,13 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     // Restore minimap preference (default on).
     try {
       this.minimapOn = localStorage.getItem('qx-minimap') !== '0';
+    } catch {
+      /* storage disabled */
+    }
+    // Restore the row-limit (default 200).
+    try {
+      const saved = parseInt(localStorage.getItem('qx-row-limit') ?? '', 10);
+      if (!Number.isNaN(saved)) this.rowLimit = this.clampLimit(saved);
     } catch {
       /* storage disabled */
     }
@@ -729,6 +742,24 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     this.explainMode = !this.explainMode;
   }
 
+  // ── row limit ───────────────────────────────────────────────────────
+
+  private clampLimit(n: number): number {
+    if (!Number.isFinite(n) || n < 1) return 1;
+    return Math.min(Math.floor(n), this.MAX_ROW_LIMIT);
+  }
+
+  /** Bound + persist the row-limit when the toolbar input changes. */
+  onRowLimitChange(value: number | string): void {
+    const n = typeof value === 'string' ? parseInt(value, 10) : value;
+    this.rowLimit = this.clampLimit(Number.isNaN(n as number) ? 200 : (n as number));
+    try {
+      localStorage.setItem('qx-row-limit', String(this.rowLimit));
+    } catch {
+      /* storage disabled */
+    }
+  }
+
   // ── command palette ─────────────────────────────────────────────────
 
   /** The full action list the palette (and shortcuts help) surfaces. */
@@ -1064,6 +1095,7 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       .execute(this.connectionId, sqlText, this.autoCommit, this.executionId, {
         explain: this.explainMode,
         analyze: this.explainMode && this.autoCommit,
+        maxRows: this.rowLimit,
       })
       .then(res => {
         this.elapsedMs = Math.round(performance.now() - t0);

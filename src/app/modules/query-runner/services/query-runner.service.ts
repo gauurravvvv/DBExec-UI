@@ -229,7 +229,7 @@ export class QueryRunnerService {
     sql: string,
     write: boolean,
     executionId: string | null,
-    opts?: { explain?: boolean; analyze?: boolean },
+    opts?: { explain?: boolean; analyze?: boolean; maxRows?: number },
   ): Promise<any> {
     return lastValueFrom(
       this.http.apiPost(
@@ -240,6 +240,8 @@ export class QueryRunnerService {
           executionId,
           explain: opts?.explain ?? false,
           analyze: opts?.analyze ?? false,
+          // Row cap for display (BE clamps to 50k); omitted → BE default.
+          ...(opts?.maxRows ? { maxRows: opts.maxRows } : {}),
         },
         { skipLoader: true },
       ),
