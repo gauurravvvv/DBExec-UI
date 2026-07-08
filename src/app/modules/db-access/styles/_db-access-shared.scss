@@ -12,23 +12,17 @@
     max-width: 100%;
   }
 
-  // List shell — the whole content-container is ONE visible parent card:
-  // the header (h2 + buttons), the toolbar (datasource picker + Type
-  // filter) and the table all live inside a single surface panel. The
-  // outer wrapper stays the flex/scroll host; the inner container carries
-  // the card surface (background + border + radius + shadow + padding).
-  // Scoped to db-access / query-runner via these mixins (Angular component
-  // encapsulation keeps it local) — the global shell is unaffected.
+  // List shell — flat, pixel-identical to the canonical list-user page:
+  // wrapper has NO padding, the content-container carries a single
+  // 1.5rem 2rem page inset and is fully transparent (no card surface,
+  // border, radius or shadow). The header + toolbar + table sit directly
+  // on the page background exactly like Users / Groups / Datasources.
   .dataset-page-wrapper {
     display: flex;
     flex-direction: column;
     height: 100%;
     width: 100%;
-    // Outer page inset — matches the canonical list-user container padding
-    // (1.5rem 2rem) exactly, so the db-access pages line up with the rest
-    // of the app. The card surface lives on the inner container; the
-    // wrapper only supplies the gap between the app chrome and the card.
-    padding: 1.5rem 2rem;
+    padding: var(--space-0);
     min-width: 0;
     min-height: 0;
 
@@ -36,21 +30,12 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      // Card inner padding (its own comfortable breathing room). No extra
-      // outer padding here — the wrapper already provides the page inset,
-      // so there is no double padding.
-      padding: var(--space-6) var(--space-7);
+      padding: 1.5rem 2rem;
       max-width: 100%;
       width: 100%;
       min-width: 0;
       min-height: 0;
-      gap: var(--space-6);
-
-      // The card surface.
-      background: var(--card-background);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+      gap: var(--space-8);
     }
   }
 
