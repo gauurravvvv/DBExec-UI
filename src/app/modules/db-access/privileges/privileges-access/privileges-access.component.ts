@@ -462,6 +462,12 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     return this.rules.some(r => this.ruleValid(r));
   }
 
+  /** Apply is allowed only when there is at least one rule AND every rule is
+   *  complete — so no half-filled rule is silently skipped on apply. */
+  get allRulesValid(): boolean {
+    return this.rules.length > 0 && this.rules.every(r => this.ruleValid(r));
+  }
+
   get liveSummaries(): string[] {
     return this.rules
       .filter(r => this.ruleValid(r))

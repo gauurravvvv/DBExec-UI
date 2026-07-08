@@ -1676,6 +1676,13 @@
       animation: db-access-rule-pulse 1.6s ease-out 1;
     }
 
+    // Incomplete: a rule missing a mandatory field. Warning left-edge so the
+    // user can see at a glance which card is blocking Apply Changes.
+    &.rule-incomplete {
+      border-color: var(--warning-color, #d97706);
+      box-shadow: inset 3px 0 0 0 var(--warning-color, #d97706);
+    }
+
     .rule-card-head {
       display: flex;
       align-items: center;
@@ -1687,6 +1694,24 @@
         color: var(--text-color);
         text-transform: uppercase;
         letter-spacing: 0.03em;
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+
+        .rule-incomplete-chip {
+          display: inline-flex;
+          align-items: center;
+          gap: 3px;
+          text-transform: none;
+          letter-spacing: 0;
+          font-weight: var(--fw-medium);
+          font-size: var(--fs-label);
+          color: var(--warning-color, #b45309);
+          background: var(--warning-bg, rgba(217, 119, 6, 0.12));
+          padding: 1px 7px;
+          border-radius: var(--radius-pill);
+          i { font-size: 0.7rem; }
+        }
       }
 
       // Remove-rule (×) — same borderless icon-button treatment as the list

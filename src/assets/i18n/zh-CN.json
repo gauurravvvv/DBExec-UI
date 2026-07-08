@@ -3506,6 +3506,8 @@
       "GENERIC": "Apply change"
     },
     "SELECT_DATE": "Select a date",
-    "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role."
+    "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role.",
+    "RULE_INCOMPLETE": "未完成",
+    "APPLY_DISABLED_HINT": "应用前请完成或移除每一条规则。"
   }
 }

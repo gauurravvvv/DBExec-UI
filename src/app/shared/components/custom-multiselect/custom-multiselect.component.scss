@@ -271,12 +271,17 @@
       }
 
       .p-checkbox {
+        // Match the item checkboxes: undo the global round-wrapper clip so the
+        // header "select all" box is a clean rounded square too.
+        border-radius: var(--radius-xs) !important;
+        overflow: visible !important;
+
         .p-checkbox-box {
           width: 18px;
           height: 18px;
-          border-radius: var(--radius-xs);
+          border-radius: var(--radius-xs) !important;
           background: var(--card-background);
-          border: 1px solid var(--border-color);
+          border: 1.5px solid var(--border-color);
           transition: all var(--motion-base);
 
           &:not(.p-disabled):hover {
@@ -346,13 +351,19 @@
 
         .p-checkbox {
           margin-right: 0.5rem;
+          // The global theme rounds the .p-checkbox WRAPPER (border-radius:50%
+          // + overflow:hidden), which clips our square box into a faint circle
+          // when unchecked. Neutralise it so the box renders as a clean
+          // rounded square, matching the header checkbox + the rest of the app.
+          border-radius: var(--radius-xs) !important;
+          overflow: visible !important;
 
           .p-checkbox-box {
             width: 18px;
             height: 18px;
-            border-radius: var(--radius-xs);
+            border-radius: var(--radius-xs) !important;
             background: var(--card-background);
-            border: 1px solid var(--border-color);
+            border: 1.5px solid var(--border-color);
             transition: all var(--motion-base);
 
             &:not(.p-disabled):hover {

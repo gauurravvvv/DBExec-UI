@@ -18,7 +18,9 @@
           pButton
           [label]="'DB_ACCESS.APPLY_CHANGES' | translate"
           [icon]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
-          [disabled]="!anyValidRule || saving()"
+          [disabled]="!allRulesValid || saving()"
+          [pTooltip]="!allRulesValid ? ('DB_ACCESS.APPLY_DISABLED_HINT' | translate) : ''"
+          tooltipPosition="bottom"
           (click)="applyChanges()"
           class="p-button-raised p-button-primary modern-button"
         ></button>
@@ -78,9 +80,16 @@
                 *ngFor="let rule of rules; let i = index; trackBy: trackByRule"
                 [attr.data-rule-id]="rule.id"
                 [class.rule-just-added]="highlightId === rule.id"
+                [class.rule-incomplete]="!ruleValid(rule)"
               >
                 <div class="rule-card-head">
-                  <span class="rule-index">{{ 'DB_ACCESS.RULE_N' | translate: { n: i + 1 } }}</span>
+                  <span class="rule-index">
+                    {{ 'DB_ACCESS.RULE_N' | translate: { n: i + 1 } }}
+                    <span class="rule-incomplete-chip" *ngIf="!ruleValid(rule)">
+                      <i class="pi pi-exclamation-circle"></i>
+                      {{ 'DB_ACCESS.RULE_INCOMPLETE' | translate }}
+                    </span>
+                  </span>
                   <button
                     class="icon-btn delete-btn"
                     *ngIf="rules.length > 1 && canManage"
