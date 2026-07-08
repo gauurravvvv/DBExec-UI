@@ -289,44 +289,44 @@
         <div class="od-info" *ngIf="activeTab === 'info'">
           <!-- table / view / matview -->
           <ng-container *ngIf="kind === 'table' || kind === 'view' || kind === 'matview'">
-            <div class="od-kv" *ngIf="detail.owner"><label>Owner</label><span>{{ detail.owner }}</span></div>
-            <div class="od-kv"><label>Size</label><span>{{ humanSize(detail.sizeBytes) }}</span></div>
-            <div class="od-kv" *ngIf="detail.rowEstimate != null"><label>Est. rows</label><span>{{ detail.rowEstimate | number }}</span></div>
-            <div class="od-kv" *ngIf="detail.comment"><label>Comment</label><span>{{ detail.comment }}</span></div>
+            <div class="od-kv" *ngIf="detail.owner"><label>{{ 'QUERY_RUNNER.OD_OWNER' | translate }}</label><span>{{ detail.owner }}</span></div>
+            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_SIZE' | translate }}</label><span>{{ humanSize(detail.sizeBytes) }}</span></div>
+            <div class="od-kv" *ngIf="detail.rowEstimate != null"><label>{{ 'QUERY_RUNNER.OD_EST_ROWS' | translate }}</label><span>{{ detail.rowEstimate | number }}</span></div>
+            <div class="od-kv" *ngIf="detail.comment"><label>{{ 'QUERY_RUNNER.OD_COMMENT' | translate }}</label><span>{{ detail.comment }}</span></div>
           </ng-container>
           <!-- function -->
           <ng-container *ngIf="kind === 'function'">
-            <div class="od-kv"><label>Returns</label><span class="od-mono">{{ detail.returns }}</span></div>
-            <div class="od-kv" *ngIf="detail.language"><label>Language</label><span>{{ detail.language }}</span></div>
-            <div class="od-kv" *ngIf="detail.owner"><label>Owner</label><span>{{ detail.owner }}</span></div>
-            <div class="od-kv" *ngIf="detail.cost != null"><label>Cost</label><span class="od-mono">{{ detail.cost }}</span></div>
-            <div class="od-kv" *ngIf="detail.comment"><label>Comment</label><span>{{ detail.comment }}</span></div>
+            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_RETURNS' | translate }}</label><span class="od-mono">{{ detail.returns }}</span></div>
+            <div class="od-kv" *ngIf="detail.language"><label>{{ 'QUERY_RUNNER.OD_LANGUAGE' | translate }}</label><span>{{ detail.language }}</span></div>
+            <div class="od-kv" *ngIf="detail.owner"><label>{{ 'QUERY_RUNNER.OD_OWNER' | translate }}</label><span>{{ detail.owner }}</span></div>
+            <div class="od-kv" *ngIf="detail.cost != null"><label>{{ 'QUERY_RUNNER.OD_COST' | translate }}</label><span class="od-mono">{{ detail.cost }}</span></div>
+            <div class="od-kv" *ngIf="detail.comment"><label>{{ 'QUERY_RUNNER.OD_COMMENT' | translate }}</label><span>{{ detail.comment }}</span></div>
           </ng-container>
           <!-- sequence -->
           <ng-container *ngIf="kind === 'sequence'">
-            <div class="od-kv" *ngIf="detail.dataType"><label>Data type</label><span class="od-mono">{{ detail.dataType }}</span></div>
-            <div class="od-kv"><label>Last value</label><span class="od-mono">{{ detail.lastValue }}</span></div>
-            <div class="od-kv"><label>Start</label><span class="od-mono">{{ detail.startValue }}</span></div>
-            <div class="od-kv"><label>Increment</label><span class="od-mono">{{ detail.increment }}</span></div>
-            <div class="od-kv"><label>Min</label><span class="od-mono">{{ detail.minValue }}</span></div>
-            <div class="od-kv"><label>Max</label><span class="od-mono">{{ detail.maxValue }}</span></div>
-            <div class="od-kv" *ngIf="detail.cacheSize"><label>Cache</label><span class="od-mono">{{ detail.cacheSize }}</span></div>
-            <div class="od-kv"><label>Cycle</label><span>{{ detail.cycle ? 'YES' : 'NO' }}</span></div>
-            <div class="od-kv" *ngIf="detail.ownedBy"><label>Owned by</label><span class="od-mono">{{ detail.ownedBy }}</span></div>
+            <div class="od-kv" *ngIf="detail.dataType"><label>{{ 'QUERY_RUNNER.OD_DATA_TYPE' | translate }}</label><span class="od-mono">{{ detail.dataType }}</span></div>
+            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_LAST_VALUE' | translate }}</label><span class="od-mono">{{ detail.lastValue }}</span></div>
+            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_START' | translate }}</label><span class="od-mono">{{ detail.startValue }}</span></div>
+            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_INCREMENT' | translate }}</label><span class="od-mono">{{ detail.increment }}</span></div>
+            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_MIN' | translate }}</label><span class="od-mono">{{ detail.minValue }}</span></div>
+            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_MAX' | translate }}</label><span class="od-mono">{{ detail.maxValue }}</span></div>
+            <div class="od-kv" *ngIf="detail.cacheSize"><label>{{ 'QUERY_RUNNER.OD_CACHE' | translate }}</label><span class="od-mono">{{ detail.cacheSize }}</span></div>
+            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_CYCLE' | translate }}</label><span>{{ detail.cycle ? 'YES' : 'NO' }}</span></div>
+            <div class="od-kv" *ngIf="detail.ownedBy"><label>{{ 'QUERY_RUNNER.OD_OWNED_BY' | translate }}</label><span class="od-mono">{{ detail.ownedBy }}</span></div>
           </ng-container>
           <!-- trigger -->
           <ng-container *ngIf="kind === 'trigger'">
-            <div class="od-kv"><label>Table</label><span class="od-mono">{{ detail.schema }}.{{ detail.table }}</span></div>
-            <div class="od-kv"><label>Timing</label><span>{{ detail.timing }}</span></div>
-            <div class="od-kv"><label>Events</label>
+            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_TABLE' | translate }}</label><span class="od-mono">{{ detail.schema }}.{{ detail.table }}</span></div>
+            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_TIMING' | translate }}</label><span>{{ detail.timing }}</span></div>
+            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_EVENTS' | translate }}</label>
               <span>
                 <span class="od-chip" *ngFor="let ev of detail.events">{{ ev }}</span>
               </span>
             </div>
-            <div class="od-kv"><label>Level</label><span>{{ detail.level }}</span></div>
-            <div class="od-kv" *ngIf="detail.function"><label>Function</label><span class="od-mono">{{ detail.function }}</span></div>
-            <div class="od-kv"><label>Enabled</label><span>{{ detail.enabled }}</span></div>
-            <div class="od-kv" *ngIf="detail.comment"><label>Comment</label><span>{{ detail.comment }}</span></div>
+            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_LEVEL' | translate }}</label><span>{{ detail.level }}</span></div>
+            <div class="od-kv" *ngIf="detail.function"><label>{{ 'QUERY_RUNNER.OD_FUNCTION' | translate }}</label><span class="od-mono">{{ detail.function }}</span></div>
+            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_ENABLED' | translate }}</label><span>{{ detail.enabled }}</span></div>
+            <div class="od-kv" *ngIf="detail.comment"><label>{{ 'QUERY_RUNNER.OD_COMMENT' | translate }}</label><span>{{ detail.comment }}</span></div>
           </ng-container>
         </div>
 

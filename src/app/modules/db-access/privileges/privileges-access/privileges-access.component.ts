@@ -112,7 +112,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
   ruleHints: Record<number, string> = {};
 
   // ── Role filter → effective privileges (merged from old Effective tab) ──
-  filterRole = '';
+  filterRole: string | null = null;
   effectiveLoading = false;
   /** Raw flat rows from the API ({schema, table, privilege, via}). */
   private effectiveRaw: any[] = [];
@@ -178,7 +178,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     this.rules = [];
     this.ruleSeq = 0;
     this.ruleHints = {};
-    this.filterRole = '';
+    this.filterRole = null;
     this.resetEffective();
     if (!this.datasourceId) {
       this.cdr.markForCheck();
@@ -581,7 +581,10 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
   // ── Role filter → effective privileges (fix #4) ─────────────────────────
 
   onFilterRoleChange(role: any): void {
-    this.filterRole = role || '';
+    // Keep null when cleared (not '') so PrimeNG's p-dropdown treats it as
+    // "no value" and hides its clear (✕) icon — an empty string counts as a
+    // present value and would leave the ✕ showing after a clear.
+    this.filterRole = role ?? null;
     this.effectiveFilter = '';
     if (!this.filterRole) {
       this.resetEffective();

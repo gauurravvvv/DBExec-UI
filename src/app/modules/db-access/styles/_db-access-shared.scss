@@ -1889,8 +1889,11 @@
     margin-top: var(--space-4);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
+    // Horizontal scroll for wide rows (long object names + many chips) so
+    // content is never clipped; vertical scroll is the virtual-scroll axis.
+    overflow-x: auto;
 
-    &::-webkit-scrollbar { width: 8px; }
+    &::-webkit-scrollbar { width: 8px; height: 8px; }
     &::-webkit-scrollbar-thumb {
       background: var(--border-color);
       border-radius: var(--radius-xs);
@@ -1898,11 +1901,14 @@
 
     // Each grouped object: name + source on the top line, priv chips below.
     // Fixed height (58px) MUST match the viewport itemSize for correct
-    // virtual-scroll geometry. Privileges beyond what fits on one chip line
-    // collapse into a "+N" chip (computed in TS) so the row never overflows.
+    // virtual-scroll geometry. Rows grow as wide as their content and the
+    // viewport scrolls horizontally to reveal long names / many chips; the
+    // "+N" chip still collapses very long privilege sets so most rows fit.
     .eff-group {
       height: 58px;
       box-sizing: border-box;
+      min-width: 100%;
+      width: max-content;
       display: flex;
       flex-direction: column;
       gap: var(--space-3);
@@ -1914,15 +1920,12 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: var(--space-4);
+        gap: var(--space-5);
 
         .eff-obj {
           color: var(--text-color);
           font-weight: var(--fw-medium);
           font-size: var(--fs-control);
-          min-width: 0;
-          overflow: hidden;
-          text-overflow: ellipsis;
           white-space: nowrap;
         }
         .eff-sources {
@@ -1953,7 +1956,6 @@
         flex-wrap: nowrap;
         align-items: center;
         gap: var(--space-2);
-        overflow: hidden;
 
         // Self-contained chip styling — the shared .flag-chip lives in the
         // db-access-table mixin, which this screen doesn't include, so define
