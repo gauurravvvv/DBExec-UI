@@ -171,9 +171,18 @@
       }
     }
 
-    &.p-button-outlined {
+    // Outlined buttons: keep the app-standard blue border + text, but kill
+    // PrimeNG's default blue INSET box-shadow ring (which made the button
+    // read as a heavy double-bordered chip). Clean single 1px outline now.
+    &.p-button-outlined,
+    &.p-button-outlined.p-button {
       background: transparent;
-      border: 1px solid var(--border-color);
+      box-shadow: none !important;
+
+      &:focus,
+      &:enabled:focus {
+        box-shadow: 0 0 0 2px var(--primary-color-transparent) !important;
+      }
     }
   }
 }

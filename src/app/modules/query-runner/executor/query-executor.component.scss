@@ -114,9 +114,12 @@
       }
     }
 
-    &.p-button-outlined {
+    // Outlined buttons: app-standard border + text, minus PrimeNG's inset
+    // ring (kept clean single outline).
+    &.p-button-outlined,
+    &.p-button-outlined.p-button {
       background: transparent;
-      border: 1px solid var(--border-color);
+      box-shadow: none !important;
     }
   }
 
