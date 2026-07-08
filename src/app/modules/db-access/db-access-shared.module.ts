@@ -4,6 +4,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { UsDataGridComponent } from 'src/app/shared/components/us-data-grid/us-data-grid.component';
+import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { ChangeSummaryDialogComponent } from './components/change-summary-dialog/change-summary-dialog.component';
 import { DatasourcePickerComponent } from './shared/datasource-picker/datasource-picker.component';
 
@@ -28,6 +30,8 @@ import { DatasourcePickerComponent } from './shared/datasource-picker/datasource
     TranslateModule,
     AppPrimeNGModule,
     SharedModule,
+    UsDataGridComponent,
+    UsGridCellDirective,
   ],
   exports: [
     CommonModule,
@@ -38,6 +42,8 @@ import { DatasourcePickerComponent } from './shared/datasource-picker/datasource
     SharedModule,
     DatasourcePickerComponent,
     ChangeSummaryDialogComponent,
+    UsDataGridComponent,
+    UsGridCellDirective,
   ],
 })
 export class DbAccessSharedModule {}

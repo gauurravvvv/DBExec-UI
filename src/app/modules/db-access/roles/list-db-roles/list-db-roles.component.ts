@@ -12,9 +12,12 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import type { ColDef } from 'ag-grid-community';
 import { DB_ACCESS } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
+import { UsServerListAdapter } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
+import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
 import { DbAccessContextService } from '../../services/db-access-context.service';
 import { DbAccessService } from '../../services/db-access.service';
 import { ChangeIntent, describeChange } from '../../services/describe-change';
@@ -67,6 +70,29 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   // All roles for the datasource (login + group), fetched once.
   private allRoles: any[] = [];
   roles: any[] = [];
+
+  /* ── us-data-grid wiring (identical pattern to list-user) ───────────── */
+  cols: ColDef[] = [];
+  gridConfig: UsDataGridConfig = {
+    enableRowSelection: false,
+    freezeFirstColumn: true,
+    enableColumnChooser: true,
+    enableAddFilter: false,
+    enableAutoFit: true,
+    enableDensityToggle: true,
+    enableCsvExport: true,
+    enableXlsxExport: true,
+    enableRefresh: true,
+    enableSavedViews: true,
+    gridKey: 'db-roles-list',
+    pageSizeOptions: [10, 25, 50, 100],
+    pageSize: 10,
+    height: 'calc(100vh - 280px)',
+    rowIdField: 'name',
+  };
+  // Client-side adapter: /roles returns the full array; `load` returns the
+  // Type/name/status-filtered + sorted rows the component already computes.
+  adapter: UsServerListAdapter<any> | null = null;
 
   sortHelper = new ListSortHelper<RoleSortField>();
   // Type filter defaults to "all" — the merged screen shows everything on
@@ -123,6 +149,8 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
       { label: this.translate.instant('DB_ACCESS.REASSIGN_TO'), value: 'reassign' },
       { label: this.translate.instant('DB_ACCESS.DROP_OWNED'), value: 'drop' },
     ];
+    this.cols = this.buildColumns();
+    this.buildAdapter();
     this.filter$
       .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.applyFilters());
@@ -130,6 +158,36 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.dbAccess.cancelReads();
+    this.adapter?.destroy();
+  }
+
+  /** AG Grid columns — widths preserved from the previous p-table. Cell DOM
+   *  is supplied by `<ng-template usGridCell>` in the HTML. Sorting/filtering
+   *  is handled client-side by the grid over the one BE page we feed it. */
+  private buildColumns(): ColDef[] {
+    const t = (k: string) => this.translate.instant(k);
+    return [
+      { colId: 'name', field: 'name', headerName: t('COMMON.NAME'), minWidth: 224, flex: 1, filter: 'agTextColumnFilter', filterParams: { buttons: ['reset'], suppressAndOrCondition: true }, pinned: 'left' },
+      { colId: 'type', field: 'canLogin', headerName: t('DB_ACCESS.TYPE'), width: 130, minWidth: 130 },
+      { colId: 'status', field: 'status', headerName: t('COMMON.STATUS'), width: 130, minWidth: 130 },
+      { colId: 'validUntil', field: 'validUntil', headerName: t('DB_ACCESS.EXPIRY'), width: 150, minWidth: 150 },
+      { colId: 'connectionLimit', field: 'connectionLimit', headerName: t('DB_ACCESS.CONN_LIMIT'), width: 130, minWidth: 130 },
+      { colId: 'flags', field: 'flags', headerName: t('DB_ACCESS.FLAGS'), minWidth: 190, sortable: false, filter: false },
+      { colId: 'memberOf', field: 'memberOf', headerName: t('DB_ACCESS.MEMBER_OF'), minWidth: 190, sortable: false, filter: false },
+      { colId: 'actions', headerName: t('COMMON.ACTIONS'), width: 190, minWidth: 190, sortable: false, filter: false, resizable: false, pinned: 'right' },
+    ];
+  }
+
+  /** Client-side adapter — its `load` simply hands the grid the already
+   *  Type/name/status-filtered + sorted rows the component computes in
+   *  applyFilters(). No BE round-trip on page/sort (that's client-side). */
+  private buildAdapter(): void {
+    this.adapter?.destroy();
+    this.adapter = new UsServerListAdapter<any>({
+      load: () => Promise.resolve({ rows: this.roles, total: this.roles.length }),
+      unwrap: (res: any) => ({ rows: res.rows, total: res.total }),
+      initial: { page: 1, limit: 10 },
+    });
   }
 
   onDatasourceChange(id: string): void {
@@ -205,7 +263,14 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     });
     rows = this.sortRows(rows);
     this.roles = rows;
+    // Hand the fresh page to the grid.
+    this.adapter?.reload();
     this.cdr.markForCheck();
+  }
+
+  /** Grid Refresh button → re-fetch roles from the datasource. */
+  refreshList(): void {
+    this.load();
   }
 
   private sortRows(rows: any[]): any[] {
