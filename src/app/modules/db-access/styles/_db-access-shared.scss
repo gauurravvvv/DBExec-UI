@@ -1308,11 +1308,16 @@
 
 // Dialog form chrome — reused by the create/edit popups.
 @mixin db-access-dialog {
+  // Chrome matched to the canonical app confirmation-popup (list-user):
+  // blur(8px) backdrop, --shadow-xl + 1px ring card, 56px header icon at
+  // --icon-lg, slideUp entrance, borderless centered footer. Body sub-styles
+  // (mode-tabs / flags-grid / info-list / form fields) are db-access extras
+  // the richer dialogs (membership) need — kept below.
   .confirmation-popup {
     position: fixed;
     inset: 0;
     background: var(--overlay-background);
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(8px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1321,24 +1326,24 @@
 
     .popup-content {
       background: var(--card-background);
-      width: 90%;
-      max-width: 520px;
+      width: 100%;
+      max-width: 420px;
       border-radius: var(--radius-lg);
       box-shadow:
-        0 20px 25px -5px var(--shadow-color),
-        0 8px 10px -6px var(--shadow-color);
-      border: 1px solid var(--border-color);
+        var(--shadow-xl),
+        0 0 0 1px var(--border-color);
       overflow: hidden;
-      animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: slideUp 0.25s ease-out;
       display: flex;
       flex-direction: column;
       max-height: 90vh;
 
+      // Membership / other form dialogs need more room than a plain confirm.
       &.wide { max-width: 640px; }
     }
 
     .popup-header {
-      padding: 1.35rem 1.5rem 0.75rem;
+      padding: var(--space-8) var(--space-8) 0;
       text-align: center;
       display: flex;
       flex-direction: column;
@@ -1346,15 +1351,15 @@
       gap: var(--space-4);
 
       .popup-icon {
-        width: 46px;
-        height: 46px;
+        width: 56px;
+        height: 56px;
         background: var(--primary-color-transparent);
         color: var(--primary-color);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: var(--fs-h1);
+        font-size: var(--icon-lg);
 
         &.destructive {
           background: var(--error-bg);
@@ -1371,11 +1376,18 @@
     }
 
     .popup-body {
-      padding: 0.5rem 1.5rem 1rem;
+      padding: var(--space-6) var(--space-8) 0;
       overflow-y: auto;
+      // Plain confirmations read centered (matches canonical); form dialogs
+      // (membership) opt back to left with their own layout blocks below.
+      text-align: center;
+
+      // Form dialogs left-align their controls — a centered form looks broken.
+      &.form-body { text-align: left; }
 
       .form-field {
         margin-bottom: 1rem;
+        text-align: left;
       }
 
       .form-row {
@@ -1459,31 +1471,35 @@
       }
     }
 
+    // Borderless, centered footer — matches the canonical confirmation-popup
+    // (no grey bar / top divider). Padding closes the card started by the
+    // header/body so the whole thing reads as one --space-8 inset card.
     .popup-actions {
-      padding: 1rem 1.5rem 1.35rem;
-      background: var(--hover-background);
-      border-top: 1px solid var(--border-color);
+      padding: var(--space-8);
       display: flex;
       gap: var(--space-5);
-      justify-content: flex-end;
+      justify-content: center;
 
       button {
-        display: flex;
+        display: inline-flex;
         align-items: center;
-        gap: var(--space-4);
-        padding: 0.6rem 1.2rem;
-        border-radius: var(--radius-sm);
+        justify-content: center;
+        gap: var(--space-3);
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--radius-md);
+        border: none;
         font-weight: var(--fw-semibold);
         font-size: var(--fs-body);
         cursor: pointer;
-        transition: all var(--motion-base);
-        border: 1px solid transparent;
+        transition: all var(--motion-base) ease;
+
+        i { font-size: var(--fs-control); }
 
         &.btn-cancel {
-          background: var(--card-background);
-          border-color: var(--border-color);
+          background: var(--hover-background);
           color: var(--text-color);
-          &:hover { background: var(--hover-background); }
+          border: 1px solid var(--border-color);
+          &:hover { background: var(--border-color); }
         }
 
         &.btn-confirm {
@@ -1493,14 +1509,28 @@
             var(--primary-hover)
           );
           color: var(--primary-text);
+          box-shadow: 0 4px 14px var(--primary-color-transparent);
 
-          &.btn-danger { background: var(--error-color); }
+          // Destructive confirms (terminate / delete) go error-colored.
+          &.btn-danger {
+            background: linear-gradient(
+              135deg,
+              var(--error-color),
+              var(--error-color)
+            );
+            box-shadow: 0 4px 14px var(--error-bg);
+          }
 
           &:hover:not(:disabled) {
-            transform: translateY(-1px);
+            transform: translateY(-2px);
             box-shadow: var(--shadow-md);
           }
-          &:disabled { opacity: 0.5; cursor: not-allowed; }
+          &:active { transform: translateY(0); }
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+          }
         }
       }
     }
@@ -1881,18 +1911,31 @@
   .composer-rail {
     display: grid;
     grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
-    align-items: start;
+    // Rows stretch so the effective card can bound its inner viewport and
+    // scroll THERE — not the whole rail. The rail itself never scrolls.
+    align-items: stretch;
     gap: var(--space-6);
+    flex: 1;
     min-height: 0;
-    overflow-y: auto;
+    overflow: hidden;
 
     @media (max-width: 1100px) {
+      // Below the breakpoint the panel stacks and the page scrolls normally.
       grid-template-columns: 1fr;
+      overflow: visible;
     }
 
     .rail-card {
       padding: var(--space-6);
       gap: var(--space-5);
+      // Bound the card to its grid track so a flex child (the viewport) can
+      // take the leftover height and scroll internally.
+      min-height: 0;
+      overflow: hidden;
+
+      // The default-privileges card is short — let it scroll its own list if
+      // it ever overflows rather than stretching the row.
+      .defaults-list { overflow-y: auto; min-height: 0; }
 
       h4 {
         margin: 0;
@@ -1953,8 +1996,11 @@
   }
 
   .eff-viewport {
-    // Taller now the panel has the full page width (own tab).
-    height: 460px;
+    // Fill the leftover height of the (bounded) rail-card and scroll HERE —
+    // so the outer card never grows a scrollbar. A minimum keeps it usable
+    // when the card is short; it grows to fill tall viewports.
+    flex: 1;
+    min-height: 240px;
     margin-top: var(--space-4);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);

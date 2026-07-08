@@ -14,7 +14,7 @@
           class="p-button-outlined modern-button"
         ></button>
         <button
-          *ngIf="datasourceId && !unsupported() && !capabilityLoading() && canManage"
+          *ngIf="datasourceId && !unsupported() && !capabilityLoading() && canManage && activeTab === 'compose'"
           pButton
           [label]="'DB_ACCESS.APPLY_CHANGES' | translate"
           [icon]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
@@ -148,7 +148,8 @@
                       [options]="levelOptions"
                       optionLabel="label"
                       optionValue="value"
-                      [filter]="false"
+                      [filter]="true"
+                      filterBy="label"
                       appendTo="body"
                       (onChangeEvent)="onLevelChange(rule)"
                       [disabled]="!canManage"
