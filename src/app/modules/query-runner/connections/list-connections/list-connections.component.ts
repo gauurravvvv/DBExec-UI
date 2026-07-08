@@ -35,7 +35,6 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
 
   loading = false;
-  private all: QueryConnection[] = [];
   connections: QueryConnection[] = [];
   filterName = '';
 
@@ -58,8 +57,8 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
     height: 'calc(100vh - 280px)',
     rowIdField: 'id',
   };
-  // Client-side adapter: /connections returns the full array; `load`
-  // hands the grid the name-filtered rows the component already computes.
+  // Server-side adapter: the grid's page/sort/column-filters drive a BE
+  // query (LIMIT/OFFSET + WHERE + COUNT). See buildAdapter().
   adapter: UsServerListAdapter<any> | null = null;
 
   testingId: string | null = null;
@@ -79,7 +78,7 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.cols = this.buildColumns();
     this.buildAdapter();
-    this.load();
+    this.adapter?.reload();
   }
 
   ngOnDestroy(): void {
@@ -100,68 +99,71 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
     ];
   }
 
-  /** Client-side adapter — its `load` hands the grid the already
-   *  name-filtered rows the component computes in applyFilter(). */
+  /**
+   * Server-side adapter. Each `load` sends page/limit/sort/filter to
+   * `listConnections(...)` which pages + column-filters server-side and
+   * returns `{ count, connections }`. `sortFieldMap` whitelists AG Grid
+   * colIds → BE sort keys; `filterBuilders` turn per-column cell values into
+   * BE filter slices. The toolbar name box feeds the same `name` slice via
+   * patchFilter (below).
+   */
   private buildAdapter(): void {
     this.adapter?.destroy();
     this.adapter = new UsServerListAdapter<any>({
-      load: () => Promise.resolve({ rows: this.connections, total: this.connections.length }),
+      load: p =>
+        this.service
+          .listConnections(undefined, {
+            page: p.page,
+            limit: p.limit,
+            sort: p.sort,
+            filter: p.filter,
+          })
+          .then(res => {
+            const rows = res?.status ? (res.data?.connections ?? []) : [];
+            this.connections = rows; // keep for any template refs
+            return { rows, total: res?.data?.count ?? res?.data?.total ?? rows.length };
+          }),
       unwrap: (res: any) => ({ rows: res.rows, total: res.total }),
+      sortFieldMap: {
+        name: 'name',
+        login: 'username',
+        state: 'enabled',
+        health: 'lastTestStatus',
+      },
+      filterBuilders: {
+        // AG Grid text filter on the Name column → BE `name` ILIKE slice.
+        name: (v: any) => {
+          const val = typeof v === 'string' ? v : v?.filter;
+          return val ? { name: String(val) } : {};
+        },
+        login: (v: any) => {
+          const val = typeof v === 'string' ? v : v?.filter;
+          return val ? { username: String(val) } : {};
+        },
+      },
       initial: { page: 1, limit: 10 },
     });
   }
 
-  /** Grid Refresh button → re-fetch connections. */
+  /** Grid Refresh button → re-run the current page/filter query. */
   refreshList(): void {
-    this.load();
+    this.adapter?.reload();
   }
 
-  load(): void {
-    this.loading = true;
-    this.cdr.markForCheck();
-    this.service
-      .listConnections()
-      .then(res => {
-        this.all = res?.status ? (res.data?.connections ?? []) : [];
-        this.applyFilter();
-      })
-      .catch(() => {
-        this.all = [];
-        this.applyFilter();
-      })
-      .finally(() => {
-        this.loading = false;
-        this.cdr.markForCheck();
-      });
-  }
-
+  /** Toolbar name box → inject a server-side `name` filter slice. */
   onFilterChange(): void {
-    this.applyFilter();
-    this.cdr.markForCheck();
+    const q = this.filterName.trim();
+    this.adapter?.patchFilter({ name: q || undefined });
   }
 
   clearFilters(): void {
     this.filterName = '';
-    this.applyFilter();
+    this.adapter?.patchFilter({ name: undefined });
     this.cdr.markForCheck();
   }
 
   get isFilterActive(): boolean {
     return !!this.filterName.trim();
-  }
-
-  private applyFilter(): void {
-    const q = this.filterName.trim().toLowerCase();
-    this.connections = q
-      ? this.all.filter(
-          c =>
-            c.name.toLowerCase().includes(q) ||
-            (c.datasourceName ?? '').toLowerCase().includes(q) ||
-            c.username.toLowerCase().includes(q),
-        )
-      : [...this.all];
-    // Hand the fresh rows to the grid.
-    this.adapter?.reload();
   }
 
   onAdd(): void {
@@ -212,11 +214,8 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
       .setDefault(c.id)
       .then(res => {
         if (this.globalService.handleSuccessService(res)) {
-          // One default per datasource: clear siblings on the same ds.
-          this.all.forEach(x => {
-            if (x.datasourceId === c.datasourceId) x.isDefault = x.id === c.id;
-          });
-          this.applyFilter();
+          // Server-paged: re-pull the current page to reflect the new ★.
+          this.adapter?.reload();
         }
       })
       .catch(() => {})
@@ -236,18 +235,8 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
       .setEnabled(c.id, next)
       .then(res => {
         if (this.globalService.handleSuccessService(res)) {
-          c.enabled = res.data?.enabled ?? next;
-          c.isDefault = res.data?.isDefault ?? c.isDefault;
-          // A sibling may have inherited the default on disable.
-          const promoted = res.data?.promotedDefaultId;
-          if (promoted) {
-            this.all.forEach(x => {
-              if (x.datasourceId === c.datasourceId) {
-                x.isDefault = x.id === promoted;
-              }
-            });
-          }
-          this.applyFilter();
+          // Server-paged: re-pull so enabled + any promoted default show.
+          this.adapter?.reload();
         }
       })
       .catch(() => {})
@@ -278,15 +267,8 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
       .deleteConnection(id)
       .then(res => {
         if (this.globalService.handleSuccessService(res)) {
-          this.all = this.all.filter(c => c.id !== id);
-          // If deleting the default promoted a sibling, reflect the new ★.
-          const promoted = res.data?.promotedDefaultId;
-          if (promoted) {
-            this.all.forEach(x => {
-              if (x.id === promoted) x.isDefault = true;
-            });
-          }
-          this.applyFilter();
+          // Server-paged: re-pull so the removal + any promoted default show.
+          this.adapter?.reload();
           this.cancelDelete();
         }
       })

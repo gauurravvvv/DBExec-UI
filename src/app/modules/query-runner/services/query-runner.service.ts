@@ -43,10 +43,24 @@ export class QueryRunnerService {
     return QUERY_RUNNER.CONNECTION + encodeURIComponent(id);
   }
 
-  /** List my connections; optionally filtered to one datasource. */
-  listConnections(datasourceId?: string): Promise<any> {
+  /**
+   * List my connections; optionally filtered to one datasource. When
+   * `paging` is supplied the BE paginates + per-column filters server-side
+   * and returns `{ count, connections }`; without it (launcher picker) the
+   * full list is returned.
+   */
+  listConnections(
+    datasourceId?: string,
+    paging?: { page?: number; limit?: number; sort?: string; filter?: string },
+  ): Promise<any> {
     const params: Record<string, string> = {};
     if (datasourceId) params['datasourceId'] = datasourceId;
+    if (paging) {
+      if (paging.page != null) params['page'] = String(paging.page);
+      if (paging.limit != null) params['limit'] = String(paging.limit);
+      if (paging.sort) params['sort'] = paging.sort;
+      if (paging.filter) params['filter'] = paging.filter;
+    }
     return lastValueFrom(
       this.http.apiGet(QUERY_RUNNER.CONNECTIONS, { params, skipLoader: true }),
     );
