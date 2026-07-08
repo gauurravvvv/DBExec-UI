@@ -11,6 +11,10 @@
     "databaseManagement": "Gerenciamento de dados",
     "setupDB": "Fonte de dados",
     "dbConnections": "Conexões",
+    "dbRoles": "Funções de banco de dados",
+    "dbPrivileges": "Privilégios e acesso",
+    "connectionManager": "Conexões",
+    "queryRunner": "Executor de consultas",
     "accessManagement": "Gerenciador de acesso",
     "dbExecStudio": "DBExec Studio",
     "queryBuilderTab": "Aba",
@@ -3116,6 +3120,10 @@
   },
   "DB_ACCESS": {
     "SELECT_DATE": "Select a date",
-    "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role."
+    "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role.",
+    "EFFECTIVE_SUMMARY": "{{objects}} objetos · {{privileges}} privilégios",
+    "FILTER_OBJECTS": "Filtrar objetos…",
+    "VIA_ROLE": "Herdado via {{role}}",
+    "NO_MATCHING_OBJECTS": "Nenhum objeto corresponde ao filtro."
   }
 }

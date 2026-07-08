@@ -11,6 +11,10 @@
     "databaseManagement": "数据管理",
     "setupDB": "数据源",
     "dbConnections": "连接",
+    "dbRoles": "数据库角色",
+    "dbPrivileges": "权限与访问",
+    "connectionManager": "连接",
+    "queryRunner": "查询运行器",
     "accessManagement": "访问管理",
     "dbExecStudio": "DBExec Studio",
     "queryBuilderTab": "标签页",
@@ -3116,6 +3120,10 @@
   },
   "DB_ACCESS": {
     "SELECT_DATE": "Select a date",
-    "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role."
+    "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role.",
+    "EFFECTIVE_SUMMARY": "{{objects}} 个对象 · {{privileges}} 项权限",
+    "FILTER_OBJECTS": "筛选对象…",
+    "VIA_ROLE": "通过 {{role}} 继承",
+    "NO_MATCHING_OBJECTS": "没有对象与筛选条件匹配。"
   }
 }

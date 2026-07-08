@@ -25,6 +25,19 @@ type Level = 'table' | 'column' | 'schema' | 'sequence' | 'function';
 type Option = { label: string; value: string };
 
 /**
+ * One object's effective privileges, grouped from the flat API rows for the
+ * Effective-privileges panel. `sources` lists distinct provenance — 'Direct'
+ * for a direct grant, otherwise the role the privilege is inherited through.
+ */
+interface EffectiveGroup {
+  key: string; // "schema.table" — display label + filter target + trackBy id
+  privileges: string[]; // sorted, de-duplicated privilege names (full set)
+  shown: string[]; // the first N privileges rendered as chips (fits one line)
+  extra: number; // count collapsed into the "+N" chip (0 when all shown)
+  sources: string[]; // distinct provenance: 'Direct' | '<role>' …
+}
+
+/**
  * One composed access rule (a repeater row). Maps to one or more change-set
  * statements when serialised. NO SQL — pure structured intent. Objects
  * (tables / sequences / functions) come from the memoised context cache.
@@ -100,8 +113,18 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
 
   // ── Role filter → effective privileges (merged from old Effective tab) ──
   filterRole = '';
-  effectiveRows: any[] = [];
   effectiveLoading = false;
+  /** Raw flat rows from the API ({schema, table, privilege, via}). */
+  private effectiveRaw: any[] = [];
+  /** Rows grouped into one entry per object (schema.table) — the display model. */
+  effectiveGroups: EffectiveGroup[] = [];
+  /** effectiveGroups narrowed by the object filter box (what the list renders). */
+  filteredGroups: EffectiveGroup[] = [];
+  /** Substring filter over schema.table. */
+  effectiveFilter = '';
+  /** Totals for the summary line. */
+  effectiveObjectCount = 0;
+  effectivePrivCount = 0;
 
   // ── Change-summary confirm gate ─────────────────────────────────────────
   showConfirm = false;
@@ -156,7 +179,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     this.ruleSeq = 0;
     this.ruleHints = {};
     this.filterRole = '';
-    this.effectiveRows = [];
+    this.resetEffective();
     if (!this.datasourceId) {
       this.cdr.markForCheck();
       return;
@@ -559,8 +582,9 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
 
   onFilterRoleChange(role: any): void {
     this.filterRole = role || '';
+    this.effectiveFilter = '';
     if (!this.filterRole) {
-      this.effectiveRows = [];
+      this.resetEffective();
       this.cdr.markForCheck();
       return;
     }
@@ -569,19 +593,96 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
 
   private loadEffective(role: string): void {
     this.effectiveLoading = true;
+    this.resetEffective();
     this.cdr.markForCheck();
     this.dbAccess
       .loadEffective(this.datasourceId, role)
-      .then(res => (this.effectiveRows = res?.status ? (res.data ?? []) : []))
-      .catch(() => (this.effectiveRows = []))
+      .then(res => {
+        this.effectiveRaw = res?.status ? (res.data ?? []) : [];
+        this.groupEffective();
+      })
+      .catch(() => this.resetEffective())
       .finally(() => {
         this.effectiveLoading = false;
         this.cdr.markForCheck();
       });
   }
 
-  effectiveObject(row: any): string {
-    const schema = row.schema ? row.schema + '.' : '';
-    return schema + (row.object || row.table || row.name || '');
+  /** Clear all effective-privilege display state. */
+  private resetEffective(): void {
+    this.effectiveRaw = [];
+    this.effectiveGroups = [];
+    this.filteredGroups = [];
+    this.effectiveObjectCount = 0;
+    this.effectivePrivCount = 0;
   }
+
+  /**
+   * Collapse the flat {schema, table, privilege, via} rows into one entry per
+   * object (schema.table): privileges de-duplicated + sorted, provenance
+   * de-duplicated ('direct' → 'Direct'). Objects sorted by name. This is what
+   * makes the panel scannable — one line per table instead of one per grant.
+   */
+  private groupEffective(): void {
+    const byKey = new Map<string, { privs: Set<string>; sources: Set<string> }>();
+    let privCount = 0;
+    for (const r of this.effectiveRaw) {
+      const table = r.table || r.object || r.name || '';
+      const key = (r.schema ? r.schema + '.' : '') + table;
+      if (!key) continue;
+      let g = byKey.get(key);
+      if (!g) {
+        g = { privs: new Set<string>(), sources: new Set<string>() };
+        byKey.set(key, g);
+      }
+      const priv = r.privilege || r.priv;
+      if (priv && !g.privs.has(priv)) {
+        g.privs.add(priv);
+        privCount++;
+      }
+      const via = r.via || 'direct';
+      g.sources.add(via === 'direct' ? 'Direct' : via);
+    }
+
+    // Chips shown inline per row before collapsing the rest into "+N". Keeps
+    // every row a single fixed-height line (required by the virtual scroll).
+    const MAX_CHIPS = 6;
+
+    this.effectiveGroups = Array.from(byKey.entries())
+      .map(([key, g]) => {
+        const privileges = Array.from(g.privs).sort();
+        return {
+          key,
+          privileges,
+          shown: privileges.slice(0, MAX_CHIPS),
+          extra: Math.max(0, privileges.length - MAX_CHIPS),
+          // 'Direct' first, then role names alphabetically.
+          sources: Array.from(g.sources).sort((a, b) =>
+            a === 'Direct' ? -1 : b === 'Direct' ? 1 : a.localeCompare(b),
+          ),
+        };
+      })
+      .sort((a, b) => a.key.localeCompare(b.key));
+
+    this.effectiveObjectCount = this.effectiveGroups.length;
+    this.effectivePrivCount = privCount;
+    this.applyEffectiveFilter();
+  }
+
+  /** Narrow the grouped objects by the filter box (substring on schema.table). */
+  onEffectiveFilterChange(value: string): void {
+    this.effectiveFilter = value ?? '';
+    this.applyEffectiveFilter();
+    this.cdr.markForCheck();
+  }
+
+  private applyEffectiveFilter(): void {
+    const q = this.effectiveFilter.trim().toLowerCase();
+    this.filteredGroups = q
+      ? this.effectiveGroups.filter(g => g.key.toLowerCase().includes(q))
+      : this.effectiveGroups;
+  }
+
+  /** trackBy for the virtual-scroll list. */
+  trackByGroupKey = (_: number, g: EffectiveGroup): string => g.key;
 }

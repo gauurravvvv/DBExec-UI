@@ -1,3 +1,4 @@
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DbAccessSharedModule } from '../db-access-shared.module';
@@ -20,6 +21,6 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [PrivilegesAccessComponent, SessionsComponent],
-  imports: [DbAccessSharedModule, RouterModule.forChild(routes)],
+  imports: [DbAccessSharedModule, ScrollingModule, RouterModule.forChild(routes)],
 })
 export class DbPrivilegesModule {}

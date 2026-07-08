@@ -11,6 +11,10 @@
     "databaseManagement": "Gegevensbeheer",
     "setupDB": "Gegevensbron",
     "dbConnections": "Verbindingen",
+    "dbRoles": "Databaserollen",
+    "dbPrivileges": "Rechten en toegang",
+    "connectionManager": "Verbindingen",
+    "queryRunner": "Query-runner",
     "accessManagement": "Toegangsbeheer",
     "dbExecStudio": "DBExec Studio",
     "queryBuilderTab": "Tab",
@@ -3116,6 +3120,10 @@
   },
   "DB_ACCESS": {
     "SELECT_DATE": "Select a date",
-    "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role."
+    "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role.",
+    "EFFECTIVE_SUMMARY": "{{objects}} objecten · {{privileges}} rechten",
+    "FILTER_OBJECTS": "Objecten filteren…",
+    "VIA_ROLE": "Overgeërfd via {{role}}",
+    "NO_MATCHING_OBJECTS": "Geen objecten komen overeen met het filter."
   }
 }

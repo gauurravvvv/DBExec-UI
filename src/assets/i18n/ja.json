@@ -11,6 +11,10 @@
     "databaseManagement": "データ管理",
     "setupDB": "データソース",
     "dbConnections": "接続",
+    "dbRoles": "データベースロール",
+    "dbPrivileges": "権限とアクセス",
+    "connectionManager": "接続",
+    "queryRunner": "クエリランナー",
     "accessManagement": "アクセス管理",
     "dbExecStudio": "DBExec Studio",
     "queryBuilderTab": "タブ",
@@ -3116,6 +3120,10 @@
   },
   "DB_ACCESS": {
     "SELECT_DATE": "Select a date",
-    "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role."
+    "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role.",
+    "EFFECTIVE_SUMMARY": "{{objects}} オブジェクト · {{privileges}} 権限",
+    "FILTER_OBJECTS": "オブジェクトを絞り込み…",
+    "VIA_ROLE": "{{role}} から継承",
+    "NO_MATCHING_OBJECTS": "フィルターに一致するオブジェクトがありません。"
   }
 }

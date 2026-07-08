@@ -262,14 +262,62 @@
               <div class="rail-empty" *ngIf="effectiveLoading">
                 <i class="pi pi-spin pi-spinner"></i> {{ 'COMMON.LOADING' | translate }}
               </div>
-              <div class="effective-list" *ngIf="!effectiveLoading && effectiveRows.length">
-                <div class="effective-row" *ngFor="let row of effectiveRows">
-                  <span class="eff-obj" [title]="effectiveObject(row)">{{ effectiveObject(row) }}</span>
-                  <span class="flag-chip">{{ row.privilege || row.priv }}</span>
-                  <span class="eff-via">{{ row.via || ('DB_ACCESS.DIRECT' | translate) }}</span>
+
+              <!-- Grouped, filterable, virtualised effective privileges -->
+              <ng-container *ngIf="!effectiveLoading && effectiveGroups.length">
+                <!-- Summary + object filter -->
+                <div class="eff-summary">
+                  {{
+                    'DB_ACCESS.EFFECTIVE_SUMMARY'
+                      | translate: { objects: effectiveObjectCount, privileges: effectivePrivCount }
+                  }}
                 </div>
-              </div>
-              <div class="rail-empty" *ngIf="!effectiveLoading && filterRole && !effectiveRows.length">
+                <div class="eff-filter">
+                  <i class="pi pi-search"></i>
+                  <input
+                    type="text"
+                    [ngModel]="effectiveFilter"
+                    (ngModelChange)="onEffectiveFilterChange($event)"
+                    [placeholder]="'DB_ACCESS.FILTER_OBJECTS' | translate"
+                  />
+                </div>
+
+                <cdk-virtual-scroll-viewport
+                  *ngIf="filteredGroups.length"
+                  class="eff-viewport"
+                  itemSize="58"
+                  minBufferPx="232"
+                  maxBufferPx="464"
+                >
+                  <div
+                    class="eff-group"
+                    *cdkVirtualFor="let g of filteredGroups; trackBy: trackByGroupKey"
+                  >
+                    <div class="eff-group-head">
+                      <span class="eff-obj" [title]="g.key">{{ g.key }}</span>
+                      <span class="eff-sources">
+                        <span
+                          class="eff-source"
+                          *ngFor="let s of g.sources"
+                          [class.direct]="s === 'Direct'"
+                          [title]="s === 'Direct' ? '' : ('DB_ACCESS.VIA_ROLE' | translate: { role: s })"
+                        >{{ s === 'Direct' ? ('DB_ACCESS.DIRECT' | translate) : s }}</span>
+                      </span>
+                    </div>
+                    <div class="eff-privs" [title]="g.privileges.join(', ')">
+                      <span class="flag-chip" *ngFor="let p of g.shown">{{ p }}</span>
+                      <span class="flag-chip more" *ngIf="g.extra">+{{ g.extra }}</span>
+                    </div>
+                  </div>
+                </cdk-virtual-scroll-viewport>
+
+                <!-- Filter matched nothing -->
+                <div class="rail-empty" *ngIf="!filteredGroups.length">
+                  {{ 'DB_ACCESS.NO_MATCHING_OBJECTS' | translate }}
+                </div>
+              </ng-container>
+
+              <div class="rail-empty" *ngIf="!effectiveLoading && filterRole && !effectiveGroups.length">
                 {{ 'DB_ACCESS.NO_EFFECTIVE' | translate }}
               </div>
               <div class="rail-empty" *ngIf="!effectiveLoading && !filterRole">
