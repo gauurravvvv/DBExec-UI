@@ -3,6 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
+  Input,
   OnDestroy,
   OnInit,
   Output,
@@ -35,6 +36,15 @@ import { DbAccessContextService } from '../../services/db-access-context.service
 export class DatasourcePickerComponent implements OnInit, OnDestroy {
   @Output() changed = new EventEmitter<string>();
 
+  /** Show the clear (✕) affordance. Lists want it; the Add-Role form doesn't. */
+  @Input() allowClear = true;
+  /**
+   * Pre-select from ?ds= / the shared context on init. Lists hydrate so the
+   * selection persists across sections + deep links. The Add-Role form sets
+   * this false so the user always picks the datasource manually.
+   */
+  @Input() autoHydrate = true;
+
   private cdr = inject(ChangeDetectorRef);
 
   selectedDatasource: string | null = null;
@@ -51,6 +61,9 @@ export class DatasourcePickerComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadFirstPage();
+
+    // Add-Role opts out of hydration so the user always picks manually.
+    if (!this.autoHydrate) return;
 
     // Hydrate from ?ds= (deep link) or the shared context (cross-section nav).
     const fromQuery = this.route.snapshot.queryParamMap.get('ds') ?? '';
@@ -114,7 +127,9 @@ export class DatasourcePickerComponent implements OnInit, OnDestroy {
     const next = id || '';
     this.selectedDatasource = next || null;
     this.ctx.setDatasource(next); // clears old caches + capability
-    this.syncQueryParam(next);
+    // Only mirror the selection into ?ds= when hydration is on (the list
+    // screens). The Add-Role form keeps a clean route, so skip the URL sync.
+    if (this.autoHydrate) this.syncQueryParam(next);
     if (next) this.ctx.probeCapability(next);
     this.changed.emit(next);
     this.cdr.markForCheck();

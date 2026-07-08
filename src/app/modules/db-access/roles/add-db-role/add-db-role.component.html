@@ -33,11 +33,14 @@
       <div class="left-section">
         <div class="form-grid">
           <!-- Datasource — chosen here (Create Role is reachable without one
-               selected on the list). Changing it resets the rest of the form. -->
-          <div class="form-field-block">
-            <label class="form-section-title">{{ 'COMMON.DATASOURCE' | translate }}</label>
-            <app-datasource-picker (changed)="onDatasourceChange($event)"></app-datasource-picker>
-          </div>
+               selected on the list). No auto-select + no clear: the user
+               always picks manually. The picker's own floating label labels
+               the field. Changing it resets the rest of the form. -->
+          <app-datasource-picker
+            [autoHydrate]="false"
+            [allowClear]="false"
+            (changed)="onDatasourceChange($event)"
+          ></app-datasource-picker>
 
           <!-- Prompt shown until a datasource is chosen. -->
           <p class="form-hint" *ngIf="!datasourceId">

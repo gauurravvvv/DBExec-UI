@@ -55,18 +55,11 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
   private defaultCanLogin = true;
 
   ngOnInit(): void {
-    // Datasource is now chosen INSIDE the form (via <app-datasource-picker>).
-    // Pre-select from ?ds= / context if present; otherwise the form body
-    // stays hidden until the user picks one. No redirect.
-    this.datasourceId =
-      this.route.snapshot.queryParamMap.get('ds') || this.ctx.datasourceId() || '';
-    this.defaultCanLogin = this.route.snapshot.queryParamMap.get('login') !== '0';
+    // Datasource is chosen INSIDE the form (via <app-datasource-picker>), by
+    // the user — nothing pre-selected, no ?ds= / ?login= route params. The
+    // form body stays hidden until a datasource is picked.
+    this.datasourceId = '';
     this.roleForm = this.buildForm();
-    // If a datasource is already selected, load its roles for the clone list.
-    // (The picker also emits `changed` on init for a pre-selected ds, which
-    // calls onDatasourceChange — but that resets the form; on first init we
-    // only want to load options, so guard the reset there via `initialised`.)
-    if (this.datasourceId) this.loadCloneOptions(this.datasourceId);
     this.initialised = true;
   }
 
