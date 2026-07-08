@@ -193,6 +193,21 @@ export class QueryRunnerService {
     );
   }
 
+  /** Trigger detail — needs the owning table (triggers are per-table). */
+  getTriggerDetail(
+    id: string,
+    schema: string,
+    table: string,
+    name: string,
+  ): Promise<any> {
+    return lastValueFrom(
+      this.http.apiGet(this.base(id) + QUERY_RUNNER.OBJECT_TRIGGER_SUFFIX, {
+        params: { schema, table, name },
+        skipLoader: true,
+      }),
+    );
+  }
+
   refreshMatview(id: string, schema: string, name: string): Promise<any> {
     return lastValueFrom(
       this.http.apiPost(
@@ -203,17 +218,29 @@ export class QueryRunnerService {
     );
   }
 
-  /** Run a SQL script; write=true commits, else read-only. */
+  /**
+   * Run a SQL script; write=true commits, else read-only.
+   * opts.explain wraps plannable statements in EXPLAIN (FORMAT JSON);
+   * opts.analyze adds ANALYZE (real execution — only honoured server-side
+   * when write is also true).
+   */
   execute(
     id: string,
     sql: string,
     write: boolean,
-    executionId: string,
+    executionId: string | null,
+    opts?: { explain?: boolean; analyze?: boolean },
   ): Promise<any> {
     return lastValueFrom(
       this.http.apiPost(
         this.base(id) + QUERY_RUNNER.EXECUTE_SUFFIX,
-        { sql, write, executionId },
+        {
+          sql,
+          write,
+          executionId,
+          explain: opts?.explain ?? false,
+          analyze: opts?.analyze ?? false,
+        },
         { skipLoader: true },
       ),
     );

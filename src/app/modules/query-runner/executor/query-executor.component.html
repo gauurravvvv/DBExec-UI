@@ -11,44 +11,78 @@
     </div>
 
     <div class="qx-toolbar">
-      <button pButton class="p-button-raised p-button-primary modern-button" (click)="run('smart')"
-        [disabled]="running || !editorReady"
-        [pTooltip]="'QUERY_RUNNER.RUN_HINT' | translate" tooltipPosition="bottom">
-        <i class="pi" [ngClass]="running ? 'pi-spin pi-spinner' : 'pi-play'"></i>
-        <span>{{ (running ? 'QUERY_RUNNER.RUNNING' : 'QUERY_RUNNER.RUN') | translate }}</span>
-      </button>
-      <button pButton class="p-button-outlined modern-button" (click)="run('all')"
-        [disabled]="running || !editorReady"
-        [pTooltip]="'QUERY_RUNNER.RUN_ALL' | translate" tooltipPosition="bottom">
-        <i class="pi pi-forward"></i>
-      </button>
-      <button pButton class="p-button-outlined p-button-danger modern-button" (click)="cancel()"
-        [disabled]="!running"
-        [pTooltip]="'QUERY_RUNNER.STOP' | translate" tooltipPosition="bottom">
-        <i class="pi pi-stop-circle"></i>
-      </button>
+      <!-- Primary: Run / Run all / Stop -->
+      <div class="qx-btn-group">
+        <button pButton class="p-button-raised p-button-primary modern-button qx-run-btn" (click)="run('smart')"
+          [disabled]="running || !editorReady"
+          [pTooltip]="'QUERY_RUNNER.RUN_HINT' | translate" tooltipPosition="bottom">
+          <i class="pi" [ngClass]="running ? 'pi-spin pi-spinner' : 'pi-play'"></i>
+          <span>{{ (running ? 'QUERY_RUNNER.RUNNING' : 'QUERY_RUNNER.RUN') | translate }}</span>
+        </button>
+        <button pButton class="p-button-outlined modern-button qx-icon-btn" (click)="run('all')"
+          [disabled]="running || !editorReady"
+          [pTooltip]="'QUERY_RUNNER.RUN_ALL' | translate" tooltipPosition="bottom">
+          <i class="pi pi-forward"></i>
+        </button>
+        <button pButton class="p-button-outlined p-button-danger modern-button qx-icon-btn" (click)="cancel()"
+          [disabled]="!running"
+          [pTooltip]="'QUERY_RUNNER.STOP' | translate" tooltipPosition="bottom">
+          <i class="pi pi-stop-circle"></i>
+        </button>
+      </div>
 
       <span class="qx-sep"></span>
 
-      <button pButton class="p-button-text modern-button" (click)="format()"
-        [disabled]="!editorReady"
-        [pTooltip]="'QUERY_RUNNER.FORMAT' | translate" tooltipPosition="bottom">
-        <i class="pi pi-align-left"></i>
-      </button>
-      <button pButton class="p-button-text modern-button" (click)="toggleWrap()"
-        [class.qx-active]="wordWrap" [disabled]="!editorReady"
-        [pTooltip]="'QUERY_RUNNER.WRAP' | translate" tooltipPosition="bottom">
-        <i class="pi pi-bars"></i>
-      </button>
+      <!-- Edit: Format / Wrap / Explain / Minimap -->
+      <div class="qx-btn-group">
+        <button pButton class="p-button-outlined modern-button qx-labeled-btn" (click)="format()"
+          [disabled]="!editorReady"
+          [pTooltip]="'QUERY_RUNNER.FORMAT_HINT' | translate" tooltipPosition="bottom">
+          <i class="pi pi-align-left"></i>
+          <span>{{ 'QUERY_RUNNER.FORMAT' | translate }}</span>
+        </button>
+        <button pButton class="p-button-text modern-button qx-icon-btn" (click)="toggleWrap()"
+          [class.qx-active]="wordWrap" [disabled]="!editorReady"
+          [pTooltip]="'QUERY_RUNNER.WRAP' | translate" tooltipPosition="bottom">
+          <i class="pi pi-bars"></i>
+        </button>
+        <button pButton class="p-button-text modern-button qx-icon-btn" (click)="toggleExplain()"
+          [class.qx-active]="explainMode" [disabled]="!editorReady"
+          [pTooltip]="'QUERY_RUNNER.EXPLAIN_HINT' | translate" tooltipPosition="bottom">
+          <i class="pi pi-sitemap"></i>
+        </button>
+        <button pButton class="p-button-text modern-button qx-icon-btn" (click)="toggleMinimap()"
+          [class.qx-active]="minimapOn" [disabled]="!editorReady"
+          [pTooltip]="'QUERY_RUNNER.MINIMAP_HINT' | translate" tooltipPosition="bottom">
+          <i class="pi pi-map"></i>
+        </button>
+      </div>
 
       <span class="qx-sep"></span>
 
+      <!-- Right: read/write toggle, palette, shortcuts, overflow -->
       <label class="qx-autocommit" [pTooltip]="'QUERY_RUNNER.AUTOCOMMIT_HINT' | translate" tooltipPosition="bottom">
         <p-toggleButton [(ngModel)]="autoCommit"
           onLabel="{{ 'QUERY_RUNNER.WRITE_ON' | translate }}"
           offLabel="{{ 'QUERY_RUNNER.READ_ONLY' | translate }}"
           onIcon="pi pi-pencil" offIcon="pi pi-lock"></p-toggleButton>
       </label>
+
+      <button pButton class="p-button-text modern-button qx-icon-btn" (click)="openPalette()"
+        [disabled]="!editorReady"
+        [pTooltip]="'QUERY_RUNNER.PALETTE_HINT' | translate" tooltipPosition="bottom">
+        <i class="pi pi-bolt"></i>
+      </button>
+      <button pButton class="p-button-text modern-button qx-icon-btn" (click)="openShortcuts()"
+        [pTooltip]="'QUERY_RUNNER.SHORTCUTS_HINT' | translate" tooltipPosition="bottom">
+        <i class="pi pi-question-circle"></i>
+      </button>
+      <button pButton class="p-button-text modern-button qx-icon-btn" (click)="overflowMenu.toggle($event)"
+        [disabled]="!editorReady"
+        [pTooltip]="'QUERY_RUNNER.MORE' | translate" tooltipPosition="bottom">
+        <i class="pi pi-ellipsis-v"></i>
+      </button>
+      <p-menu #overflowMenu [model]="overflowItems" [popup]="true" appendTo="body"></p-menu>
     </div>
   </header>
 
@@ -89,11 +123,18 @@
               </div>
               <div *ngIf="s.g.tables">
                 <div class="qx-table-group" *ngFor="let t of s.tables">
-                  <div class="qx-node indent2">
+                  <div class="qx-node indent2 qx-has-actions">
                     <i class="pi qx-twist" [ngClass]="t.open ? 'pi-chevron-down' : 'pi-chevron-right'" (click)="toggleTable(s, t)"></i>
                     <i class="pi pi-table" (click)="openObject('table', s.schema, t.name)"></i>
                     <span (click)="openObject('table', s.schema, t.name)" (dblclick)="insertSelect(s.schema, t.name)">{{ t.name }}</span>
                     <i class="pi pi-spin pi-spinner qx-node-spin" *ngIf="t.loading"></i>
+                    <span class="qx-node-actions">
+                      <button class="qx-node-act" (click)="$event.stopPropagation(); previewData(s.schema, t.name)"
+                        [disabled]="running"
+                        [pTooltip]="'QUERY_RUNNER.PREVIEW_DATA' | translate" tooltipPosition="left">
+                        <i class="pi pi-eye"></i>
+                      </button>
+                    </span>
                   </div>
                   <div class="qx-cols" *ngIf="t.open">
                     <div class="qx-col" *ngFor="let c of t.columns" (click)="insertText(c.name)">
@@ -169,7 +210,24 @@
               </div>
             </div>
 
-            <div class="qx-mini-hint" *ngIf="!s.tables.length && !s.views.length && !s.matviews.length && !s.functions.length && !s.sequences.length">
+            <!-- TRIGGERS -->
+            <div class="qx-group" *ngIf="s.triggers.length">
+              <div class="qx-node group" (click)="toggleGroup(s, 'triggers')">
+                <i class="pi" [ngClass]="s.g.triggers ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
+                <i class="pi pi-bolt"></i><span>{{ 'QUERY_RUNNER.GRP_TRIGGERS' | translate }}</span>
+                <span class="qx-count">{{ s.triggers.length }}</span>
+              </div>
+              <div *ngIf="s.g.triggers">
+                <div class="qx-node indent2 leaf" *ngFor="let tg of s.triggers"
+                  (click)="openTrigger(s.schema, tg.table, tg.name)"
+                  [pTooltip]="tg.timing + ' ' + tg.events + ' · ' + tg.table" tooltipPosition="right">
+                  <i class="pi pi-bolt"></i><span>{{ tg.name }}</span>
+                  <span class="qx-trigger-table">{{ tg.table }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="qx-mini-hint" *ngIf="!s.tables.length && !s.views.length && !s.matviews.length && !s.functions.length && !s.sequences.length && !s.triggers.length">
               {{ 'QUERY_RUNNER.NO_OBJECTS_IN_SCHEMA' | translate }}
             </div>
           </div>
@@ -252,6 +310,39 @@
                 <i class="pi pi-arrow-right"></i> {{ 'QUERY_RUNNER.GO_TO_ERROR' | translate }}
               </button>
             </div>
+
+            <!-- EXPLAIN plan -->
+            <div class="qx-plan" *ngIf="r.kind === 'explain'">
+              <div class="qx-plan-toolbar">
+                <span class="qx-plan-title">
+                  <i class="pi pi-sitemap"></i>
+                  {{ (r.analyzed ? 'QUERY_RUNNER.PLAN_ANALYZED' : 'QUERY_RUNNER.PLAN_ESTIMATE') | translate }}
+                </span>
+                <button class="qx-icon" (click)="copyPlan()"
+                  [pTooltip]="'QUERY_RUNNER.COPY' | translate" tooltipPosition="bottom">
+                  <i class="pi pi-copy"></i>
+                </button>
+              </div>
+              <div class="qx-plan-tree">
+                <div class="qx-plan-node" *ngFor="let pr of planRows(activePlan)"
+                  [style.padding-left.px]="12 + pr.depth * 18">
+                  <span class="qx-plan-op">{{ pr.node['Node Type'] }}</span>
+                  <span class="qx-plan-rel" *ngIf="pr.node['Relation Name']">
+                    on {{ pr.node['Relation Name'] }}{{ pr.node['Alias'] && pr.node['Alias'] !== pr.node['Relation Name'] ? ' ' + pr.node['Alias'] : '' }}
+                  </span>
+                  <span class="qx-plan-cost">
+                    cost={{ pr.node['Startup Cost'] }}..{{ pr.node['Total Cost'] }} · rows={{ pr.node['Plan Rows'] }}
+                    <ng-container *ngIf="pr.node['Actual Total Time'] != null">
+                      · actual={{ pr.node['Actual Total Time'] }}ms · {{ pr.node['Actual Rows'] }} rows
+                    </ng-container>
+                  </span>
+                </div>
+              </div>
+              <details class="qx-plan-raw">
+                <summary>{{ 'QUERY_RUNNER.PLAN_RAW' | translate }}</summary>
+                <pre>{{ activePlanJson }}</pre>
+              </details>
+            </div>
           </ng-container>
         </div>
       </section>
@@ -270,6 +361,60 @@
   </footer>
 </div>
 
+<!-- Command palette (Ctrl/Cmd+Shift+P) -->
+<div class="qx-overlay" *ngIf="paletteOpen" (click)="closePalette()">
+  <div class="qx-palette" (click)="$event.stopPropagation()">
+    <div class="qx-palette-search">
+      <i class="pi pi-search"></i>
+      <input #paletteInput type="text" [(ngModel)]="paletteQuery" (ngModelChange)="onPaletteFilter()"
+        [placeholder]="'QUERY_RUNNER.PALETTE_PLACEHOLDER' | translate" autocomplete="off" />
+    </div>
+    <div class="qx-palette-list">
+      <button class="qx-palette-item" *ngFor="let it of paletteItems" (click)="runPaletteItem(it.id)">
+        <i class="pi" [ngClass]="it.icon"></i>
+        <span class="qx-palette-label">{{ it.label }}</span>
+        <span class="qx-palette-hint" *ngIf="it.hint">{{ it.hint }}</span>
+      </button>
+      <div class="qx-palette-empty" *ngIf="!paletteItems.length">
+        {{ 'QUERY_RUNNER.PALETTE_EMPTY' | translate }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Go to line (Ctrl/Cmd+G) -->
+<div class="qx-overlay" *ngIf="gotoOpen" (click)="closeGoto()">
+  <div class="qx-goto-box" (click)="$event.stopPropagation()">
+    <label>{{ 'QUERY_RUNNER.GOTO_LINE' | translate }}</label>
+    <input #gotoInput type="number" min="1" [(ngModel)]="gotoValue"
+      (keydown.enter)="applyGoto()" (keydown.escape)="closeGoto()" autocomplete="off" />
+    <div class="qx-goto-actions">
+      <button class="qx-btn-ghost" (click)="closeGoto()">{{ 'COMMON.CANCEL' | translate }}</button>
+      <button class="qx-btn-primary" (click)="applyGoto()">{{ 'QUERY_RUNNER.GO' | translate }}</button>
+    </div>
+  </div>
+</div>
+
+<!-- Keyboard shortcuts help (?) -->
+<div class="qx-overlay" *ngIf="shortcutsOpen" (click)="closeShortcuts()">
+  <div class="qx-shortcuts" (click)="$event.stopPropagation()">
+    <div class="qx-shortcuts-head">
+      <h3>{{ 'QUERY_RUNNER.SHORTCUTS_TITLE' | translate }}</h3>
+      <button class="qx-icon" (click)="closeShortcuts()"><i class="pi pi-times"></i></button>
+    </div>
+    <ul class="qx-shortcuts-list">
+      <li><kbd>Ctrl/⌘</kbd> + <kbd>Enter</kbd><span>{{ 'QUERY_RUNNER.RUN' | translate }}</span></li>
+      <li><kbd>Ctrl/⌘</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd><span>{{ 'QUERY_RUNNER.RUN_ALL' | translate }}</span></li>
+      <li><kbd>Ctrl/⌘</kbd> + <kbd>/</kbd><span>{{ 'QUERY_RUNNER.SC_COMMENT' | translate }}</span></li>
+      <li><kbd>Ctrl/⌘</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd><span>{{ 'QUERY_RUNNER.SC_PALETTE' | translate }}</span></li>
+      <li><kbd>Ctrl/⌘</kbd> + <kbd>G</kbd><span>{{ 'QUERY_RUNNER.SC_GOTO' | translate }}</span></li>
+      <li><kbd>Ctrl/⌘</kbd> + <kbd>F</kbd><span>{{ 'QUERY_RUNNER.SC_FIND' | translate }}</span></li>
+      <li><kbd>Alt</kbd> + <kbd>↑/↓</kbd><span>{{ 'QUERY_RUNNER.SC_MOVE_LINE' | translate }}</span></li>
+      <li><kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↓</kbd><span>{{ 'QUERY_RUNNER.SC_DUP_LINE' | translate }}</span></li>
+    </ul>
+  </div>
+</div>
+
 <!-- Read-only object detail modal -->
 <app-object-detail
   [visible]="detailVisible"
@@ -277,5 +422,6 @@
   [kind]="detailKind"
   [schema]="detailSchema"
   [name]="detailName"
+  [table]="detailTable"
   (closed)="closeDetail()"
 ></app-object-detail>

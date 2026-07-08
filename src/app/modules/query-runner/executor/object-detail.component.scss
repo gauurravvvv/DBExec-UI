@@ -213,4 +213,34 @@
     color: var(--od-muted);
     flex-shrink: 0;
   }
+  span { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
+}
+
+/* Soft inline badge for column identity/generated flags. */
+.od-badge-soft {
+  background: color-mix(in srgb, var(--od-accent) 14%, transparent);
+  color: var(--od-accent);
+  font-weight: 600;
+}
+
+/* FK target chip in the columns tab. */
+.od-fk {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--od-accent);
+  i { font-size: 0.7rem; }
+}
+
+/* Function signature tab: mono signature line + attribute chip row. */
+.od-signature {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  .od-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    .od-chip { text-transform: uppercase; letter-spacing: 0.03em; }
+  }
 }

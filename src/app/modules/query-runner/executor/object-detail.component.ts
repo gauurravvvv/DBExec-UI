@@ -12,7 +12,13 @@ import {
 import { TranslateModule } from '@ngx-translate/core';
 import { QueryRunnerService } from '../services/query-runner.service';
 
-export type ObjectKind = 'table' | 'view' | 'matview' | 'function' | 'sequence';
+export type ObjectKind =
+  | 'table'
+  | 'view'
+  | 'matview'
+  | 'function'
+  | 'sequence'
+  | 'trigger';
 
 /**
  * ObjectDetailComponent — a read-only, tabbed modal describing one DB
@@ -41,6 +47,7 @@ export class ObjectDetailComponent implements OnChanges {
   @Input() kind: ObjectKind | null = null;
   @Input() schema = '';
   @Input() name = '';
+  @Input() table = ''; // owning table (triggers only)
 
   @Output() closed = new EventEmitter<void>();
 
@@ -56,25 +63,32 @@ export class ObjectDetailComponent implements OnChanges {
 
   ngOnChanges(): void {
     if (!this.visible || !this.kind || !this.name) return;
-    const key = `${this.kind}:${this.schema}.${this.name}`;
+    const key = `${this.kind}:${this.schema}.${this.table}.${this.name}`;
     if (key === this.lastKey) return; // already loaded this target
     this.lastKey = key;
     this.load();
   }
 
-  /** Tabs available for the current kind. */
+  /** Tabs available for the current kind (only rendered if data present). */
   get tabs(): string[] {
     switch (this.kind) {
-      case 'table':
-        return ['columns', 'indexes', 'constraints', 'triggers', 'ddl', 'info'];
+      case 'table': {
+        const base = ['columns', 'indexes', 'constraints', 'triggers'];
+        // Partitions only when the table actually has children.
+        if (this.detail?.partitions?.length) base.push('partitions');
+        base.push('dependencies', 'permissions', 'stats', 'ddl', 'info');
+        return base;
+      }
       case 'matview':
-        return ['columns', 'definition', 'info'];
+        return ['columns', 'definition', 'indexes', 'info'];
       case 'view':
-        return ['columns', 'definition', 'info'];
+        return ['columns', 'definition', 'dependencies', 'info'];
       case 'function':
-        return ['source', 'info'];
+        return ['signature', 'source', 'info'];
       case 'sequence':
         return ['info'];
+      case 'trigger':
+        return ['definition', 'info'];
       default:
         return [];
     }
@@ -114,6 +128,14 @@ export class ObjectDetailComponent implements OnChanges {
         break;
       case 'sequence':
         req = this.service.getSequenceDetail(this.connectionId, this.schema, this.name);
+        break;
+      case 'trigger':
+        req = this.service.getTriggerDetail(
+          this.connectionId,
+          this.schema,
+          this.table,
+          this.name,
+        );
         break;
       default:
         req = Promise.resolve({ status: false });
