@@ -3511,6 +3511,10 @@
     "APPLY_DISABLED_HINT": "Vervollständigen oder entfernen Sie jede Regel vor dem Übernehmen.",
     "CHOOSE_DATASOURCE": "Datenquelle auswählen",
     "TAB_COMPOSE": "Regeln erstellen",
-    "TAB_EFFECTIVE_PRIVS": "Effektive Berechtigungen"
+    "TAB_EFFECTIVE_PRIVS": "Effektive Berechtigungen",
+    "ALL_SEQUENCES": "Alle Sequenzen im Schema",
+    "ALL_FUNCTIONS": "Alle Funktionen im Schema",
+    "SELECT_SEQUENCES": "Sequenzen auswählen",
+    "SELECT_FUNCTIONS": "Funktionen auswählen"
   }
 }

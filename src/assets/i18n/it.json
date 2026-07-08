@@ -3511,6 +3511,10 @@
     "APPLY_DISABLED_HINT": "Completa o rimuovi ogni regola prima di applicare.",
     "CHOOSE_DATASOURCE": "Scegli un'origine dati",
     "TAB_COMPOSE": "Componi regole",
-    "TAB_EFFECTIVE_PRIVS": "Privilegi effettivi"
+    "TAB_EFFECTIVE_PRIVS": "Privilegi effettivi",
+    "ALL_SEQUENCES": "Tutte le sequenze nello schema",
+    "ALL_FUNCTIONS": "Tutte le funzioni nello schema",
+    "SELECT_SEQUENCES": "Seleziona sequenze",
+    "SELECT_FUNCTIONS": "Seleziona funzioni"
   }
 }

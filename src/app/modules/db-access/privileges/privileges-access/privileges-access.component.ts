@@ -453,6 +453,35 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
       rule.level === 'sequence' || rule.level === 'function';
   }
 
+  /** i18n key for the "All <objects> in schema" toggle — level-aware so a
+   *  Sequence rule reads "All sequences in schema", not "All tables…". */
+  allObjectsLabelKey(rule: AccessRule): string {
+    switch (rule.level) {
+      case 'sequence': return 'DB_ACCESS.ALL_SEQUENCES';
+      case 'function': return 'DB_ACCESS.ALL_FUNCTIONS';
+      default: return 'DB_ACCESS.ALL_TABLES';
+    }
+  }
+
+  /** i18n key for the object-multiselect field label, by level. */
+  objectsLabelKey(rule: AccessRule): string {
+    switch (rule.level) {
+      case 'column': return 'DB_ACCESS.TABLE'; // column level targets one table
+      case 'sequence': return 'DB_ACCESS.SEQUENCES';
+      case 'function': return 'DB_ACCESS.FUNCTIONS';
+      default: return 'DB_ACCESS.TABLES';
+    }
+  }
+
+  /** i18n key for the object-multiselect placeholder, by level. */
+  objectsPlaceholderKey(rule: AccessRule): string {
+    switch (rule.level) {
+      case 'sequence': return 'DB_ACCESS.SELECT_SEQUENCES';
+      case 'function': return 'DB_ACCESS.SELECT_FUNCTIONS';
+      default: return 'DB_ACCESS.SELECT_TABLES';
+    }
+  }
+
   ruleValid(rule: AccessRule): boolean {
     if (!rule.schema || !rule.grantee || !rule.privileges.length) return false;
     if (rule.level === 'table' && !rule.allTables && !rule.tables.length) return false;

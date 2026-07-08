@@ -3374,7 +3374,11 @@
     "APPLY_DISABLED_HINT": "Complete or remove every rule before applying.",
     "CHOOSE_DATASOURCE": "Choose a datasource",
     "TAB_COMPOSE": "Compose rules",
-    "TAB_EFFECTIVE_PRIVS": "Effective privileges"
+    "TAB_EFFECTIVE_PRIVS": "Effective privileges",
+    "ALL_SEQUENCES": "All sequences in schema",
+    "ALL_FUNCTIONS": "All functions in schema",
+    "SELECT_SEQUENCES": "Select sequences",
+    "SELECT_FUNCTIONS": "Select functions"
   },
   "QUERY_RUNNER": {
     "TITLE": "Query Runner",

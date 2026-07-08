@@ -3511,6 +3511,10 @@
     "APPLY_DISABLED_HINT": "应用前请完成或移除每一条规则。",
     "CHOOSE_DATASOURCE": "选择数据源",
     "TAB_COMPOSE": "编写规则",
-    "TAB_EFFECTIVE_PRIVS": "有效权限"
+    "TAB_EFFECTIVE_PRIVS": "有效权限",
+    "ALL_SEQUENCES": "模式中的所有序列",
+    "ALL_FUNCTIONS": "模式中的所有函数",
+    "SELECT_SEQUENCES": "选择序列",
+    "SELECT_FUNCTIONS": "选择函数"
   }
 }

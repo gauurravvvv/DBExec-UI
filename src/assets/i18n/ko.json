@@ -3511,6 +3511,10 @@
     "APPLY_DISABLED_HINT": "적용하기 전에 모든 규칙을 완성하거나 제거하세요.",
     "CHOOSE_DATASOURCE": "데이터 소스 선택",
     "TAB_COMPOSE": "규칙 작성",
-    "TAB_EFFECTIVE_PRIVS": "유효 권한"
+    "TAB_EFFECTIVE_PRIVS": "유효 권한",
+    "ALL_SEQUENCES": "스키마의 모든 시퀀스",
+    "ALL_FUNCTIONS": "스키마의 모든 함수",
+    "SELECT_SEQUENCES": "시퀀스 선택",
+    "SELECT_FUNCTIONS": "함수 선택"
   }
 }

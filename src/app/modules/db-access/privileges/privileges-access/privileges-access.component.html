@@ -193,7 +193,7 @@
                     *ngIf="rule.level !== 'column'"
                     [ngModel]="rule.allTables"
                     (ngModelChange)="rule.allTables = $event; onAllTablesChange(rule)"
-                    [label]="'DB_ACCESS.ALL_TABLES' | translate"
+                    [label]="allObjectsLabelKey(rule) | translate"
                     [trueLabel]="'COMMON.YES' | translate"
                     [falseLabel]="'COMMON.NO' | translate"
                     [disabled]="!canManage"
@@ -201,7 +201,7 @@
 
                   <div class="rule-field" *ngIf="rule.level === 'column' || !rule.allTables">
                     <label class="field-label">
-                      {{ (isColumnSingle(rule) ? 'DB_ACCESS.TABLE' : 'DB_ACCESS.OBJECTS') | translate }}
+                      {{ objectsLabelKey(rule) | translate }}
                       <span class="field-hint" *ngIf="ruleHints[rule.id]">· {{ ruleHints[rule.id] }}</span>
                     </label>
                     <app-custom-multiselect
@@ -213,7 +213,7 @@
                       [filter]="true"
                       filterBy="label"
                       appendTo="body"
-                      [placeholder]="'DB_ACCESS.SELECT_OBJECTS' | translate"
+                      [placeholder]="objectsPlaceholderKey(rule) | translate"
                     ></app-custom-multiselect>
                   </div>
 

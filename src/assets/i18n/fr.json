@@ -3511,6 +3511,10 @@
     "APPLY_DISABLED_HINT": "Complétez ou supprimez chaque règle avant d'appliquer.",
     "CHOOSE_DATASOURCE": "Choisir une source de données",
     "TAB_COMPOSE": "Composer des règles",
-    "TAB_EFFECTIVE_PRIVS": "Privilèges effectifs"
+    "TAB_EFFECTIVE_PRIVS": "Privilèges effectifs",
+    "ALL_SEQUENCES": "Toutes les séquences du schéma",
+    "ALL_FUNCTIONS": "Toutes les fonctions du schéma",
+    "SELECT_SEQUENCES": "Sélectionner les séquences",
+    "SELECT_FUNCTIONS": "Sélectionner les fonctions"
   }
 }
