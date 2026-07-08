@@ -33,13 +33,18 @@
 
       <span class="qx-sep"></span>
 
-      <!-- Edit: Format / Wrap / Explain / Minimap -->
+      <!-- Edit: Format / Wrap / Explain / Minimap / Upload -->
       <div class="qx-btn-group">
         <button pButton class="p-button-outlined modern-button qx-labeled-btn" (click)="format()"
           [disabled]="!editorReady"
           [pTooltip]="'QUERY_RUNNER.FORMAT_HINT' | translate" tooltipPosition="bottom">
           <i class="pi pi-align-left"></i>
           <span>{{ 'QUERY_RUNNER.FORMAT' | translate }}</span>
+        </button>
+        <button pButton class="p-button-text modern-button qx-icon-btn" (click)="openFileDialog()"
+          [disabled]="!editorReady"
+          [pTooltip]="'QUERY_RUNNER.UPLOAD_HINT' | translate" tooltipPosition="bottom">
+          <i class="pi pi-upload"></i>
         </button>
         <button pButton class="p-button-text modern-button qx-icon-btn" (click)="toggleWrap()"
           [class.qx-active]="wordWrap" [disabled]="!editorReady"
@@ -237,9 +242,20 @@
 
     <!-- Editor + results -->
     <main class="qx-main">
-      <section class="qx-editor">
+      <section class="qx-editor"
+        (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
         <div #editorHost class="qx-editor-host"></div>
+        <!-- Drop overlay — shown while a file is dragged over the editor -->
+        <div class="qx-drop-overlay" *ngIf="dragOver">
+          <div class="qx-drop-card">
+            <i class="pi pi-upload"></i>
+            <span>{{ 'QUERY_RUNNER.DROP_SQL' | translate }}</span>
+          </div>
+        </div>
       </section>
+      <!-- Hidden native picker for the upload button / overflow / palette -->
+      <input #fileInput type="file" accept=".sql,.txt,.ddl,.pgsql,text/plain"
+        class="qx-file-input" (change)="onFileSelected($event)" hidden />
 
       <section class="qx-results">
         <!-- Result toolbar -->
@@ -426,6 +442,19 @@
       <li><kbd>Alt</kbd> + <kbd>↑/↓</kbd><span>{{ 'QUERY_RUNNER.SC_MOVE_LINE' | translate }}</span></li>
       <li><kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>↓</kbd><span>{{ 'QUERY_RUNNER.SC_DUP_LINE' | translate }}</span></li>
     </ul>
+  </div>
+</div>
+
+<!-- Load .sql — replace or append when the editor isn't empty -->
+<div class="qx-overlay" *ngIf="loadChoiceOpen" (click)="cancelLoadChoice()">
+  <div class="qx-goto-box qx-load-box" (click)="$event.stopPropagation()">
+    <label>{{ 'QUERY_RUNNER.LOAD_FILE_TITLE' | translate }}</label>
+    <p class="qx-load-hint">{{ 'QUERY_RUNNER.LOAD_FILE_HINT' | translate }}</p>
+    <div class="qx-goto-actions">
+      <button class="qx-btn-ghost" (click)="cancelLoadChoice()">{{ 'COMMON.CANCEL' | translate }}</button>
+      <button class="qx-btn-ghost" (click)="applyLoadedFile('append')">{{ 'QUERY_RUNNER.APPEND' | translate }}</button>
+      <button class="qx-btn-primary" (click)="applyLoadedFile('replace')">{{ 'QUERY_RUNNER.REPLACE' | translate }}</button>
+    </div>
   </div>
 </div>
 

@@ -326,6 +326,20 @@ $qx-btn-h: 34px;
   box-shadow: var(--shadow-md);
   padding: 1.25rem;
 }
+// Hidden native file picker.
+.qx-file-input { display: none; }
+
+// Load-choice dialog reuses the goto-box shell; add its body hint.
+.qx-load-box {
+  .qx-load-hint {
+    margin: 0 0 var(--space-5);
+    font-size: var(--fs-control);
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .qx-goto-actions { flex-wrap: wrap; }
+}
+
 .qx-goto-box {
   label {
     display: block;
@@ -546,10 +560,40 @@ $qx-btn-h: 34px;
   border-bottom: 2px solid var(--qx-border);
   background: var(--qx-elev);
   overflow: hidden;
+  position: relative; // anchor for the drop overlay
 }
 .qx-editor-host {
   height: 100%;
   :global(.cm-editor) { height: 100%; }
+}
+
+// Drag-drop a .sql file onto the editor — calm dashed drop zone.
+.qx-drop-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-color-transparent);
+  backdrop-filter: blur(1px);
+  pointer-events: none; // let the native drop event reach .qx-editor
+
+  .qx-drop-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-7) var(--space-9);
+    border: 2px dashed var(--primary-color);
+    border-radius: var(--radius-md);
+    background: var(--card-background);
+    color: var(--primary-color);
+    font-size: var(--fs-body);
+    font-weight: var(--fw-semibold);
+    box-shadow: var(--shadow-md);
+    i { font-size: 1.75rem; }
+  }
 }
 .qx-results {
   flex: 1;

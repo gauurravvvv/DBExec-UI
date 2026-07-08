@@ -198,6 +198,7 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   private zone = inject(NgZone);
 
   @ViewChild('editorHost', { static: false }) editorHost!: ElementRef<HTMLDivElement>;
+  @ViewChild('fileInput', { static: false }) fileInput!: ElementRef<HTMLInputElement>;
 
   connectionId = '';
   connectionName = '';
@@ -221,6 +222,14 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   gotoOpen = false;
   gotoValue = '';
   shortcutsOpen = false;
+
+  // SQL file upload (button / overflow / drag-drop)
+  dragOver = false; // drop-overlay visible while a file is dragged over
+  loadChoiceOpen = false; // replace/append prompt when the editor isn't empty
+  private pendingFileSql: string | null = null;
+  private pendingFileName = '';
+  // Max .sql we'll read into the editor (guards a giant accidental drop).
+  private readonly MAX_SQL_BYTES = 5 * 1024 * 1024;
 
   // Toolbar overflow menu (PrimeNG p-menu)
   overflowItems: MenuItem[] = [];
@@ -737,6 +746,7 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       { id: 'lower', label: 'Lower-case selection', hint: '', icon: 'pi-arrow-down', run: () => this.transformCase('lower') },
       { id: 'clear', label: 'Clear editor', hint: '', icon: 'pi-trash', run: () => this.clearEditor() },
       { id: 'copy', label: 'Copy all', hint: '', icon: 'pi-copy', run: () => this.copyAll() },
+      { id: 'upload', label: 'Upload .sql file', hint: '', icon: 'pi-upload', run: () => this.openFileDialog() },
       { id: 'download', label: 'Download .sql', hint: '', icon: 'pi-download', run: () => this.downloadSql() },
     ];
   }
@@ -847,16 +857,126 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     URL.revokeObjectURL(url);
   }
 
+  // ── SQL file upload (button / overflow / drag-drop) ─────────────────
+
+  /** Open the native file picker (hidden <input type="file">). */
+  openFileDialog(): void {
+    this.fileInput?.nativeElement.click();
+  }
+
+  /** Native picker change handler. */
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) this.readSqlFile(file);
+    // Reset so choosing the SAME file again still fires change.
+    input.value = '';
+  }
+
+  /**
+   * Read a .sql (or plain text) file's contents. Guards oversize + binary.
+   * If the editor is empty, loads immediately; otherwise opens the
+   * replace/append choice.
+   */
+  private readSqlFile(file: File): void {
+    const nameOk = /\.(sql|txt|ddl|pgsql)$/i.test(file.name);
+    if (!nameOk && file.type && !file.type.startsWith('text')) {
+      this.statusText = 'Only .sql / text files can be loaded';
+      this.cdr.markForCheck();
+      return;
+    }
+    if (file.size > this.MAX_SQL_BYTES) {
+      this.statusText = 'File too large (max 5 MB)';
+      this.cdr.markForCheck();
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = String(reader.result ?? '');
+      this.pendingFileSql = text;
+      this.pendingFileName = file.name;
+      if (this.getAll().trim().length === 0) {
+        // Empty editor → load straight in, no prompt.
+        this.applyLoadedFile('replace');
+      } else {
+        this.loadChoiceOpen = true;
+        this.cdr.markForCheck();
+      }
+    };
+    reader.onerror = () => {
+      this.statusText = 'Could not read file';
+      this.cdr.markForCheck();
+    };
+    reader.readAsText(file);
+  }
+
+  /** Resolve the replace/append choice (or the auto path for an empty editor). */
+  applyLoadedFile(mode: 'replace' | 'append'): void {
+    const text = this.pendingFileSql ?? '';
+    if (this.view) {
+      if (mode === 'replace') {
+        this.replaceAll(text);
+      } else {
+        const cur = this.getAll();
+        const joiner = cur.endsWith('\n') || cur.length === 0 ? '' : '\n\n';
+        this.replaceAll(cur + joiner + text);
+      }
+    }
+    this.statusText = `Loaded ${this.pendingFileName}`;
+    this.pendingFileSql = null;
+    this.pendingFileName = '';
+    this.loadChoiceOpen = false;
+    this.cdr.markForCheck();
+    this.view?.focus();
+  }
+
+  cancelLoadChoice(): void {
+    this.pendingFileSql = null;
+    this.pendingFileName = '';
+    this.loadChoiceOpen = false;
+    this.cdr.markForCheck();
+    this.view?.focus();
+  }
+
+  // Drag-drop a .sql onto the editor. Only react when files are dragged.
+  onDragOver(event: DragEvent): void {
+    if (!event.dataTransfer || !Array.from(event.dataTransfer.types).includes('Files')) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+    if (!this.dragOver) {
+      this.dragOver = true;
+      this.cdr.markForCheck();
+    }
+  }
+  onDragLeave(event: DragEvent): void {
+    // Ignore leave events bubbling from children — only clear when leaving
+    // the editor region entirely.
+    if (event.relatedTarget && (event.currentTarget as HTMLElement).contains(event.relatedTarget as Node)) {
+      return;
+    }
+    this.dragOver = false;
+    this.cdr.markForCheck();
+  }
+  onDrop(event: DragEvent): void {
+    if (!event.dataTransfer) return;
+    event.preventDefault();
+    this.dragOver = false;
+    this.cdr.markForCheck();
+    const file = event.dataTransfer.files?.[0];
+    if (file) this.readSqlFile(file);
+  }
+
   /** PrimeNG overflow menu (⋯) — the less-used actions. */
   private buildOverflowMenu(): void {
     this.overflowItems = [
+      { label: 'Upload .sql…', icon: 'pi pi-upload', command: () => this.openFileDialog() },
+      { label: 'Download .sql', icon: 'pi pi-download', command: () => this.downloadSql() },
+      { separator: true },
       { label: 'Go to line…', icon: 'pi pi-directions', command: () => this.openGoto() },
       { label: 'Upper-case selection', icon: 'pi pi-arrow-up', command: () => this.transformCase('upper') },
       { label: 'Lower-case selection', icon: 'pi pi-arrow-down', command: () => this.transformCase('lower') },
       { separator: true },
       { label: 'Copy all', icon: 'pi pi-copy', command: () => this.copyAll() },
-      { label: 'Download .sql', icon: 'pi pi-download', command: () => this.downloadSql() },
-      { separator: true },
       { label: 'Clear editor', icon: 'pi pi-trash', command: () => this.clearEditor() },
     ];
   }
