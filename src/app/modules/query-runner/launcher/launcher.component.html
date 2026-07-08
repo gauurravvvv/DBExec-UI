@@ -40,10 +40,10 @@
 
       <div class="launcher-form" *ngIf="!hasNoConnections">
         <div class="launcher-step">
-          <label>{{ 'QUERY_RUNNER.STEP_DATASOURCE' | translate }}</label>
           <app-custom-dropdown
             [ngModel]="selectedDatasourceId"
             (onChangeEvent)="onDatasourceChange($event)"
+            [label]="'QUERY_RUNNER.STEP_DATASOURCE' | translate"
             [serverMode]="true"
             [fetcher]="loadDatasourcesPage"
             [pageSize]="10"
@@ -59,9 +59,9 @@
         </div>
 
         <div class="launcher-step">
-          <label>{{ 'QUERY_RUNNER.STEP_CONNECTION' | translate }}</label>
           <app-custom-dropdown
             [(ngModel)]="selectedConnectionId"
+            [label]="'QUERY_RUNNER.STEP_CONNECTION' | translate"
             [options]="connectionOptions"
             optionLabel="label"
             optionValue="value"

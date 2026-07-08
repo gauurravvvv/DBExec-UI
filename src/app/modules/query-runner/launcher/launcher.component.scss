@@ -57,11 +57,8 @@
   flex-direction: column;
   gap: var(--space-3, 8px);
 
-  label {
-    font-size: var(--fs-label);
-    font-weight: var(--fw-semibold);
-    color: var(--text-color);
-  }
+  // Label is rendered by the shared app-custom-dropdown's [label] input
+  // (same as the canonical Language field) — no bespoke sub-header here.
   .step-hint {
     color: var(--warning-color);
     font-size: var(--fs-control);

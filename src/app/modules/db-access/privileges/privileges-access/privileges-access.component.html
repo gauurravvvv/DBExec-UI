@@ -100,9 +100,9 @@
 
                 <div class="rule-grid">
                   <div class="rule-field">
-                    <label class="field-label">{{ 'DB_ACCESS.ACTION' | translate }}</label>
                     <app-custom-dropdown
                       [(ngModel)]="rule.action"
+                      [label]="'DB_ACCESS.ACTION' | translate"
                       [options]="[
                         { label: ('DB_ACCESS.GRANT' | translate), value: 'grant' },
                         { label: ('DB_ACCESS.REVOKE' | translate), value: 'revoke' }
@@ -117,9 +117,9 @@
                   </div>
 
                   <div class="rule-field">
-                    <label class="field-label">{{ 'DB_ACCESS.LEVEL' | translate }}</label>
                     <app-custom-dropdown
                       [(ngModel)]="rule.level"
+                      [label]="'DB_ACCESS.LEVEL' | translate"
                       [options]="levelOptions"
                       optionLabel="label"
                       optionValue="value"
@@ -131,9 +131,9 @@
                   </div>
 
                   <div class="rule-field">
-                    <label class="field-label">{{ 'DB_ACCESS.SCHEMA' | translate }}</label>
                     <app-custom-dropdown
                       [(ngModel)]="rule.schema"
+                      [label]="'DB_ACCESS.SCHEMA' | translate"
                       [options]="schemaOptions"
                       optionLabel="label"
                       optionValue="value"
@@ -148,9 +148,9 @@
                   </div>
 
                   <div class="rule-field">
-                    <label class="field-label">{{ 'DB_ACCESS.GRANTEE' | translate }}</label>
                     <app-custom-dropdown
                       [(ngModel)]="rule.grantee"
+                      [label]="'DB_ACCESS.GRANTEE' | translate"
                       [options]="roleOptions"
                       optionLabel="label"
                       optionValue="value"
