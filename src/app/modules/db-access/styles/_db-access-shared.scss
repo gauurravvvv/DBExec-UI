@@ -47,7 +47,10 @@
   .page-header-section {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
+    // Centre the title and the action row on one baseline so Active Sessions
+    // / Apply changes / the capability badge line up vertically (was
+    // flex-end, which dropped the taller buttons below the title baseline).
+    align-items: center;
     flex-wrap: wrap;
     gap: var(--space-6);
 
@@ -184,6 +187,74 @@
         box-shadow: 0 0 0 2px var(--primary-color-transparent) !important;
       }
     }
+  }
+
+  // ── Shared list / header state chrome ─────────────────────────────────
+  // Used by every db-access screen (both the us-data-grid lists AND the
+  // Privileges composer): the capability badge in the header action row,
+  // the "pick a datasource" empty hint, and the capability spinner. Lives
+  // in db-access-page (which all screens @include) so it applies uniformly
+  // — previously these sat in db-access-table and were invisible on the
+  // composer screen, which only includes db-access-page + db-access-composer.
+
+  // Capability badge (full / read-only) — inline-flex + matched line-height
+  // so it centres on the SAME baseline as the neighbouring buttons in the
+  // flex header row (was sitting low next to Active Sessions / Apply).
+  .cap-badge {
+    display: inline-flex;
+    align-items: center;
+    align-self: center;
+    gap: var(--space-3);
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-control);
+    font-weight: var(--fw-medium);
+    line-height: 1.2;
+    white-space: nowrap;
+
+    i { font-size: var(--fs-control); }
+
+    &.full {
+      background: var(--success-bg, rgba(34, 197, 94, 0.12));
+      color: var(--success-color, #16a34a);
+    }
+    &.readonly {
+      background: var(--hover-background);
+      color: var(--secondary-color);
+    }
+  }
+
+  // Inline hint / empty prompt (no datasource, unsupported). Sits inside the
+  // card directly under the datasource picker, so it reads as a quiet body
+  // hint (--fs-body, muted, centred) rather than an oversized H3 banner.
+  .list-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    padding: var(--space-9) var(--space-6);
+    color: var(--secondary-color);
+    text-align: center;
+
+    i { font-size: 1.75rem; opacity: 0.45; }
+    span {
+      font-size: var(--fs-body);
+      max-width: 420px;
+      line-height: 1.5;
+    }
+
+    &.unsupported i { color: var(--warning-color); opacity: 1; }
+  }
+
+  .cap-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    padding: 3rem;
+    color: var(--secondary-color);
+    font-size: var(--fs-body);
   }
 }
 
@@ -449,53 +520,6 @@
         }
       }
     }
-  }
-
-  // Capability badge shown in the list toolbar (full / read-only).
-  .cap-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-3);
-    padding: 4px 10px;
-    border-radius: var(--radius-pill);
-    font-size: var(--fs-control);
-    font-weight: var(--fw-medium);
-
-    &.full {
-      background: var(--success-bg, rgba(34, 197, 94, 0.12));
-      color: var(--success-color, #16a34a);
-    }
-    &.readonly {
-      background: var(--hover-background);
-      color: var(--secondary-color);
-    }
-  }
-
-  // Inline hint / empty prompts inside a list (no datasource, unsupported).
-  .list-hint {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-5);
-    padding: 4rem 2rem;
-    color: var(--secondary-color);
-    text-align: center;
-
-    i { font-size: 2rem; opacity: 0.5; }
-    span { font-size: var(--fs-h3); }
-
-    &.unsupported i { color: var(--warning-color); }
-  }
-
-  .cap-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-4);
-    padding: 3rem;
-    color: var(--secondary-color);
-    font-size: var(--fs-body);
   }
 
   // Name link — mirrors list-user's .dataset-name-link so the primary
@@ -1593,6 +1617,39 @@
         color: var(--text-color);
         text-transform: uppercase;
         letter-spacing: 0.03em;
+      }
+
+      // Remove-rule (×) — same borderless icon-button treatment as the list
+      // row-actions delete button (28px hit area, muted resting colour, red
+      // on hover). Previously an unstyled native <button>.
+      .icon-btn {
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        background: transparent;
+        border-radius: var(--radius-sm);
+        color: var(--text-muted);
+        cursor: pointer;
+        transition:
+          background-color var(--motion-fast) ease,
+          color var(--motion-fast) ease;
+
+        i { font-size: var(--fs-body); }
+
+        &:hover {
+          background: var(--card-background);
+        }
+        &.delete-btn:hover {
+          color: var(--error-color);
+        }
+
+        &:focus-visible {
+          outline: 2px solid var(--primary-color);
+          outline-offset: 1px;
+        }
       }
     }
 
