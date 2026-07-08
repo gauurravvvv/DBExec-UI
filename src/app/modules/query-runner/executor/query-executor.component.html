@@ -11,18 +11,18 @@
     </div>
 
     <div class="qx-toolbar">
-      <button pButton class="p-button-sm p-button-primary" (click)="run('smart')"
+      <button pButton class="p-button-raised p-button-primary modern-button" (click)="run('smart')"
         [disabled]="running || !editorReady"
         [pTooltip]="'QUERY_RUNNER.RUN_HINT' | translate" tooltipPosition="bottom">
         <i class="pi" [ngClass]="running ? 'pi-spin pi-spinner' : 'pi-play'"></i>
         <span>{{ (running ? 'QUERY_RUNNER.RUNNING' : 'QUERY_RUNNER.RUN') | translate }}</span>
       </button>
-      <button pButton class="p-button-sm p-button-outlined" (click)="run('all')"
+      <button pButton class="p-button-outlined modern-button" (click)="run('all')"
         [disabled]="running || !editorReady"
         [pTooltip]="'QUERY_RUNNER.RUN_ALL' | translate" tooltipPosition="bottom">
         <i class="pi pi-forward"></i>
       </button>
-      <button pButton class="p-button-sm p-button-outlined p-button-danger" (click)="cancel()"
+      <button pButton class="p-button-outlined p-button-danger modern-button" (click)="cancel()"
         [disabled]="!running"
         [pTooltip]="'QUERY_RUNNER.STOP' | translate" tooltipPosition="bottom">
         <i class="pi pi-stop-circle"></i>
@@ -30,12 +30,12 @@
 
       <span class="qx-sep"></span>
 
-      <button pButton class="p-button-sm p-button-text" (click)="format()"
+      <button pButton class="p-button-text modern-button" (click)="format()"
         [disabled]="!editorReady"
         [pTooltip]="'QUERY_RUNNER.FORMAT' | translate" tooltipPosition="bottom">
         <i class="pi pi-align-left"></i>
       </button>
-      <button pButton class="p-button-sm p-button-text" (click)="toggleWrap()"
+      <button pButton class="p-button-text modern-button" (click)="toggleWrap()"
         [class.qx-active]="wordWrap" [disabled]="!editorReady"
         [pTooltip]="'QUERY_RUNNER.WRAP' | translate" tooltipPosition="bottom">
         <i class="pi pi-bars"></i>

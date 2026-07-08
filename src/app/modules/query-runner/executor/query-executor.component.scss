@@ -85,8 +85,40 @@
 .qx-toolbar {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: var(--space-4);
   flex-shrink: 0;
+
+  // App-standard button styling — same spec as the shared .modern-button
+  // (used across list-user / db-access), so the executor toolbar buttons
+  // match every other button in the app instead of a bespoke compact size.
+  :host ::ng-deep .modern-button,
+  .modern-button {
+    border-radius: var(--radius-sm) !important;
+    font-weight: var(--fw-semibold);
+    padding: 0.65rem 1.25rem;
+
+    &.p-button-primary {
+      background: linear-gradient(
+        135deg,
+        var(--primary-color),
+        var(--primary-hover)
+      ) !important;
+      border: none !important;
+      color: white !important;
+      box-shadow: 0 4px 10px var(--primary-color-transparent);
+      transition: all var(--motion-base) ease;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+      }
+    }
+
+    &.p-button-outlined {
+      background: transparent;
+      border: 1px solid var(--border-color);
+    }
+  }
 
   .qx-sep {
     width: 1px;
