@@ -198,7 +198,6 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   private zone = inject(NgZone);
 
   @ViewChild('editorHost', { static: false }) editorHost!: ElementRef<HTMLDivElement>;
-  @ViewChild('fileInput', { static: false }) fileInput!: ElementRef<HTMLInputElement>;
 
   connectionId = '';
   connectionName = '';
@@ -746,7 +745,6 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       { id: 'lower', label: 'Lower-case selection', hint: '', icon: 'pi-arrow-down', run: () => this.transformCase('lower') },
       { id: 'clear', label: 'Clear editor', hint: '', icon: 'pi-trash', run: () => this.clearEditor() },
       { id: 'copy', label: 'Copy all', hint: '', icon: 'pi-copy', run: () => this.copyAll() },
-      { id: 'upload', label: 'Upload .sql file', hint: '', icon: 'pi-upload', run: () => this.openFileDialog() },
       { id: 'download', label: 'Download .sql', hint: '', icon: 'pi-download', run: () => this.downloadSql() },
     ];
   }
@@ -857,41 +855,11 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     URL.revokeObjectURL(url);
   }
 
-  // ── SQL file upload (button / overflow / drag-drop) ─────────────────
+  // ── SQL file load (drag-drop onto the editor) ──────────────────────
 
   /**
-   * Open the native file picker. Resolves the input via the ViewChild, or
-   * falls back to a DOM lookup (the ViewChild can be undefined if the click
-   * arrives from a PrimeNG menu/overlay callback). Clearing value first lets
-   * the same file be re-picked.
-   */
-  openFileDialog(): void {
-    const el =
-      this.fileInput?.nativeElement ??
-      (this.editorHost?.nativeElement
-        ?.closest('.qx-shell')
-        ?.querySelector('input.qx-file-input') as HTMLInputElement | null);
-    if (!el) {
-      this.statusText = 'File picker unavailable';
-      this.cdr.markForCheck();
-      return;
-    }
-    el.value = '';
-    el.click();
-  }
-
-  /** Native picker change handler. */
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (file) this.readSqlFile(file);
-    // Reset so choosing the SAME file again still fires change.
-    input.value = '';
-  }
-
-  /**
-   * Read a .sql (or plain text) file's contents. Guards oversize + binary.
-   * If the editor is empty, loads immediately; otherwise opens the
+   * Read a dropped .sql (or plain text) file's contents. Guards oversize +
+   * binary. If the editor is empty, loads immediately; otherwise opens the
    * replace/append choice.
    */
   private readSqlFile(file: File): void {
@@ -985,7 +953,6 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   /** PrimeNG overflow menu (⋯) — the less-used actions. */
   private buildOverflowMenu(): void {
     this.overflowItems = [
-      { label: 'Upload .sql…', icon: 'pi pi-upload', command: () => this.openFileDialog() },
       { label: 'Download .sql', icon: 'pi pi-download', command: () => this.downloadSql() },
       { separator: true },
       { label: 'Go to line…', icon: 'pi pi-directions', command: () => this.openGoto() },

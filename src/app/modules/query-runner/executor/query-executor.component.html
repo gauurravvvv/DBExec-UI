@@ -33,18 +33,13 @@
 
       <span class="qx-sep"></span>
 
-      <!-- Edit: Format / Wrap / Explain / Minimap / Upload -->
+      <!-- Edit: Format / Wrap / Explain / Minimap -->
       <div class="qx-btn-group">
         <button pButton class="p-button-outlined modern-button qx-labeled-btn" (click)="format()"
           [disabled]="!editorReady"
           [pTooltip]="'QUERY_RUNNER.FORMAT_HINT' | translate" tooltipPosition="bottom">
           <i class="pi pi-align-left"></i>
           <span>{{ 'QUERY_RUNNER.FORMAT' | translate }}</span>
-        </button>
-        <button pButton class="p-button-text modern-button qx-icon-btn" (click)="openFileDialog()"
-          [disabled]="!editorReady"
-          [pTooltip]="'QUERY_RUNNER.UPLOAD_HINT' | translate" tooltipPosition="bottom">
-          <i class="pi pi-upload"></i>
         </button>
         <button pButton class="p-button-text modern-button qx-icon-btn" (click)="toggleWrap()"
           [class.qx-active]="wordWrap" [disabled]="!editorReady"
@@ -253,12 +248,6 @@
           </div>
         </div>
       </section>
-      <!-- Off-screen native picker for the upload button / overflow / palette.
-           Positioned off-screen (NOT display:none / hidden) so .click() from a
-           user gesture reliably opens it and (change) always fires. -->
-      <input #fileInput type="file" accept=".sql,.txt,.ddl,.pgsql,text/plain"
-        class="qx-file-input" (change)="onFileSelected($event)"
-        tabindex="-1" aria-hidden="true" />
 
       <section class="qx-results">
         <!-- Result toolbar -->

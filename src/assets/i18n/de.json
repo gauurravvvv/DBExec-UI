@@ -3106,7 +3106,6 @@
     "TAB_SIGNATURE": "Signature",
     "TAB_DEFINITION": "Definition",
     "KIND_TRIGGER": "Trigger",
-    "UPLOAD_HINT": "Upload a .sql file",
     "DROP_SQL": "Drop a .sql file to load it",
     "LOAD_FILE_TITLE": "Load SQL file",
     "LOAD_FILE_HINT": "The editor already has content. Replace it with the file, or append the file to the end?",
