@@ -3115,6 +3115,7 @@
     "LIMIT_HINT": "Max rows returned per run (caps the result without changing your SQL). Default 200."
   },
   "DB_ACCESS": {
-    "SELECT_DATE": "Select a date"
+    "SELECT_DATE": "Select a date",
+    "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role."
   }
 }

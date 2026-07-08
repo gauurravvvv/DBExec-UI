@@ -357,9 +357,11 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     // Preselect the create form's "Can log in" toggle from the active Type
     // filter: group → OFF, otherwise ON (login is the common default).
     const login = this.typeFilter === 'group' ? '0' : '1';
-    this.router.navigate([DB_ACCESS.roleNew()], {
-      queryParams: { ds: this.datasourceId, login },
-    });
+    // Pass ds only when one is selected; the form now lets the user pick the
+    // datasource when opened without one.
+    const queryParams: Record<string, string> = { login };
+    if (this.datasourceId) queryParams['ds'] = this.datasourceId;
+    this.router.navigate([DB_ACCESS.roleNew()], { queryParams });
   }
   onView(role: any): void {
     this.router.navigate([DB_ACCESS.roleView(role.name)], { queryParams: { ds: this.datasourceId } });

@@ -50,20 +50,34 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
     private router: Router,
   ) {}
 
+  // Default the "Can log in" toggle from ?login= (list passes '0' for the
+  // Group filter, '1'/absent otherwise). Login is the common default.
+  private defaultCanLogin = true;
+
   ngOnInit(): void {
+    // Datasource is now chosen INSIDE the form (via <app-datasource-picker>).
+    // Pre-select from ?ds= / context if present; otherwise the form body
+    // stays hidden until the user picks one. No redirect.
     this.datasourceId =
       this.route.snapshot.queryParamMap.get('ds') || this.ctx.datasourceId() || '';
-    if (!this.datasourceId) {
-      this.router.navigate([DB_ACCESS.ROLES_LIST]);
-      return;
-    }
-    this.ctx.setDatasource(this.datasourceId);
-    // Default the login toggle from ?login= (list passes '0' for the Group
-    // filter, '1'/absent otherwise). Login is the common default.
-    const canLogin = this.route.snapshot.queryParamMap.get('login') !== '0';
-    this.roleForm = this.fb.group({
+    this.defaultCanLogin = this.route.snapshot.queryParamMap.get('login') !== '0';
+    this.roleForm = this.buildForm();
+    // If a datasource is already selected, load its roles for the clone list.
+    // (The picker also emits `changed` on init for a pre-selected ds, which
+    // calls onDatasourceChange — but that resets the form; on first init we
+    // only want to load options, so guard the reset there via `initialised`.)
+    if (this.datasourceId) this.loadCloneOptions(this.datasourceId);
+    this.initialised = true;
+  }
+
+  /** True once ngOnInit has run — lets onDatasourceChange skip the reset for
+   *  the picker's initial hydration emit (which matches the pre-set ds). */
+  private initialised = false;
+
+  private buildForm(): FormGroup {
+    return this.fb.group({
       name: ['', [Validators.required, Validators.pattern(/^[A-Za-z_][A-Za-z0-9_$]*$/)]],
-      canLogin: [canLogin],
+      canLogin: [this.defaultCanLogin],
       // login-only
       password: [''],
       connectionLimit: [null],
@@ -77,10 +91,52 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
       bypassrls: [false],
       cloneFrom: [null],
     });
+  }
+
+  /**
+   * Datasource chosen / changed inside the form. On a genuine change (not the
+   * picker's initial hydration for a pre-set ds) reset ALL fields back to
+   * defaults except the datasource itself, keeping the create mode, and
+   * reload the clone-source options for the new datasource.
+   */
+  onDatasourceChange(id: string): void {
+    const next = id || '';
+    const changed = next !== this.datasourceId;
+    this.datasourceId = next;
+
+    if (changed && this.initialised) {
+      // Reset everything except the datasource; keep createMode + the default
+      // canLogin/inherit. Clears name/password/limit/expiry/attrs/cloneFrom.
+      this.roleForm.reset({
+        name: '',
+        canLogin: this.defaultCanLogin,
+        password: '',
+        connectionLimit: null,
+        validUntil: null,
+        inherit: true,
+        createdb: false,
+        createrole: false,
+        replication: false,
+        superuser: false,
+        bypassrls: false,
+        cloneFrom: null,
+      });
+      this.roleForm.markAsPristine();
+    }
+
+    this.allRoleOptions = [];
+    if (next) this.loadCloneOptions(next);
+    this.cdr.markForCheck();
+  }
+
+  private loadCloneOptions(datasourceId: string): void {
     this.dbAccess
-      .loadRoles(this.datasourceId)
+      .loadRoles(datasourceId)
       .then(() => {
-        this.allRoleOptions = (this.dbAccess.roles() ?? []).map(r => ({ label: r.name, value: r.name }));
+        this.allRoleOptions = (this.dbAccess.roles() ?? []).map(r => ({
+          label: r.name,
+          value: r.name,
+        }));
         this.cdr.markForCheck();
       })
       .catch(() => {});

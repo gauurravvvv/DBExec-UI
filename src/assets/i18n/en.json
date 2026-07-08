@@ -3362,7 +3362,8 @@
       "SCOPE_DATABASE": "the database",
       "GENERIC": "Apply change"
     },
-    "SELECT_DATE": "Select a date"
+    "SELECT_DATE": "Select a date",
+    "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role."
   },
   "QUERY_RUNNER": {
     "TITLE": "Query Runner",

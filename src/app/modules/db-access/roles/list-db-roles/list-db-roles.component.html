@@ -22,13 +22,15 @@
           [disabled]="!datasourceId || !canManage"
           class="p-button-outlined modern-button"
         ></button>
+        <!-- Always enabled: the datasource is chosen inside the Add-Role
+             form (capability is per-datasource, so it can't be judged here).
+             The form + BE enforce manage rights on the chosen datasource. -->
         <button
           *hasPermission="'dbRoles'; level: 'write'"
           pButton
           [label]="'DB_ACCESS.CREATE_ROLE' | translate"
           icon="pi pi-plus"
           (click)="onAdd()"
-          [disabled]="!datasourceId || !canManage"
           class="p-button-raised p-button-primary modern-button"
         ></button>
       </div>

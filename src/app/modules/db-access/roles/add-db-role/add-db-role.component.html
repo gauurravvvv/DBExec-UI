@@ -22,7 +22,7 @@
           type="button"
           [label]="'COMMON.CREATE' | translate"
           (click)="onSubmit()"
-          [disabled]="roleForm.invalid || saving()"
+          [disabled]="!datasourceId || roleForm.invalid || saving()"
         >
           <i class="pi mr-2" [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"></i>
         </button>
@@ -32,14 +32,27 @@
     <form [formGroup]="roleForm" class="admin-form">
       <div class="left-section">
         <div class="form-grid">
-          <div class="mode-tabs">
-            <button type="button" [class.active]="createMode === 'scratch'" (click)="setMode('scratch')">
-              {{ 'DB_ACCESS.FROM_SCRATCH' | translate }}
-            </button>
-            <button type="button" [class.active]="createMode === 'clone'" (click)="setMode('clone')">
-              {{ 'DB_ACCESS.CLONE' | translate }}
-            </button>
+          <!-- Datasource — chosen here (Create Role is reachable without one
+               selected on the list). Changing it resets the rest of the form. -->
+          <div class="form-field-block">
+            <label class="form-section-title">{{ 'COMMON.DATASOURCE' | translate }}</label>
+            <app-datasource-picker (changed)="onDatasourceChange($event)"></app-datasource-picker>
           </div>
+
+          <!-- Prompt shown until a datasource is chosen. -->
+          <p class="form-hint" *ngIf="!datasourceId">
+            {{ 'DB_ACCESS.PICK_DATASOURCE_TO_CREATE' | translate }}
+          </p>
+
+          <ng-container *ngIf="datasourceId">
+            <div class="mode-tabs">
+              <button type="button" [class.active]="createMode === 'scratch'" (click)="setMode('scratch')">
+                {{ 'DB_ACCESS.FROM_SCRATCH' | translate }}
+              </button>
+              <button type="button" [class.active]="createMode === 'clone'" (click)="setMode('clone')">
+                {{ 'DB_ACCESS.CLONE' | translate }}
+              </button>
+            </div>
 
           <app-custom-input
             formControlName="name"
@@ -155,6 +168,9 @@
               </ng-container>
             </div>
           </ng-container>
+          <!-- /createMode scratch -->
+        </ng-container>
+        <!-- /datasource chosen -->
         </div>
       </div>
     </form>
