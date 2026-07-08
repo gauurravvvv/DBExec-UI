@@ -2,13 +2,17 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  OnDestroy,
   OnInit,
   inject,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import type { ColDef } from 'ag-grid-community';
 import { QUERY_RUNNER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { UsServerListAdapter } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
+import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
 import {
   QueryConnection,
   QueryRunnerService,
@@ -27,13 +31,36 @@ import {
   styleUrls: ['./list-connections.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListConnectionsComponent implements OnInit {
+export class ListConnectionsComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
 
   loading = false;
   private all: QueryConnection[] = [];
   connections: QueryConnection[] = [];
   filterName = '';
+
+  /* ── us-data-grid wiring (identical pattern to list-db-roles) ───────── */
+  cols: ColDef[] = [];
+  gridConfig: UsDataGridConfig = {
+    enableRowSelection: false,
+    freezeFirstColumn: true,
+    enableColumnChooser: true,
+    enableAddFilter: false,
+    enableAutoFit: true,
+    enableDensityToggle: true,
+    enableCsvExport: true,
+    enableXlsxExport: true,
+    enableRefresh: true,
+    enableSavedViews: true,
+    gridKey: 'connections-list',
+    pageSizeOptions: [10, 25, 50, 100],
+    pageSize: 10,
+    height: 'calc(100vh - 280px)',
+    rowIdField: 'id',
+  };
+  // Client-side adapter: /connections returns the full array; `load`
+  // hands the grid the name-filtered rows the component already computes.
+  adapter: UsServerListAdapter<any> | null = null;
 
   testingId: string | null = null;
 
@@ -50,6 +77,42 @@ export class ListConnectionsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.cols = this.buildColumns();
+    this.buildAdapter();
+    this.load();
+  }
+
+  ngOnDestroy(): void {
+    this.adapter?.destroy();
+  }
+
+  /** AG Grid columns — widths preserved from the previous p-table. Cell
+   *  DOM is supplied by `<ng-template usGridCell>` in the HTML. */
+  private buildColumns(): ColDef[] {
+    const t = (k: string) => this.translate.instant(k);
+    return [
+      { colId: 'name', field: 'name', headerName: t('COMMON.NAME'), minWidth: 224, flex: 1, filter: 'agTextColumnFilter', filterParams: { buttons: ['reset'], suppressAndOrCondition: true }, pinned: 'left' },
+      { colId: 'datasource', field: 'datasourceName', headerName: t('COMMON.DATASOURCE'), minWidth: 192 },
+      { colId: 'login', field: 'username', headerName: t('QUERY_RUNNER.LOGIN'), width: 160, minWidth: 160 },
+      { colId: 'health', field: 'lastTestStatus', headerName: t('QUERY_RUNNER.HEALTH'), width: 128, minWidth: 128 },
+      { colId: 'state', field: 'enabled', headerName: t('QUERY_RUNNER.STATE'), width: 112, minWidth: 112 },
+      { colId: 'actions', headerName: t('COMMON.ACTIONS'), width: 240, minWidth: 240, sortable: false, filter: false, resizable: false, pinned: 'right' },
+    ];
+  }
+
+  /** Client-side adapter — its `load` hands the grid the already
+   *  name-filtered rows the component computes in applyFilter(). */
+  private buildAdapter(): void {
+    this.adapter?.destroy();
+    this.adapter = new UsServerListAdapter<any>({
+      load: () => Promise.resolve({ rows: this.connections, total: this.connections.length }),
+      unwrap: (res: any) => ({ rows: res.rows, total: res.total }),
+      initial: { page: 1, limit: 10 },
+    });
+  }
+
+  /** Grid Refresh button → re-fetch connections. */
+  refreshList(): void {
     this.load();
   }
 
@@ -97,6 +160,8 @@ export class ListConnectionsComponent implements OnInit {
             c.username.toLowerCase().includes(q),
         )
       : [...this.all];
+    // Hand the fresh rows to the grid.
+    this.adapter?.reload();
   }
 
   onAdd(): void {
@@ -118,6 +183,8 @@ export class ListConnectionsComponent implements OnInit {
         // Reflect the new health on the row without a full reload.
         c.lastTestStatus = res?.data?.isConnected ? 'success' : 'failure';
         c.lastTestedAt = res?.data?.lastTestedAt ?? new Date().toISOString();
+        // Push the mutated row into the grid so its Health pill updates.
+        this.adapter?.reload();
         this.globalService.handleSuccessService(res);
       })
       .catch(() => {})

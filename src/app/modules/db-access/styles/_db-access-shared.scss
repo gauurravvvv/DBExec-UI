@@ -12,17 +12,17 @@
     max-width: 100%;
   }
 
-  // List shell — flat, pixel-identical to the canonical list-user page:
-  // wrapper has NO padding, the content-container carries a single
-  // 1.5rem 2rem page inset and is fully transparent (no card surface,
-  // border, radius or shadow). The header + toolbar + table sit directly
-  // on the page background exactly like Users / Groups / Datasources.
+  // List shell — the content sits in a white parent CARD, identical to the
+  // Add Role / Add User / Add Group screens' .add-admin-wrapper card
+  // (background: --card-background, border-radius: --radius-md,
+  // box-shadow: --shadow-sm, padding: --space-8). The wrapper supplies a
+  // small page inset around the card so it doesn't touch the app chrome.
   .dataset-page-wrapper {
     display: flex;
     flex-direction: column;
     height: 100%;
     width: 100%;
-    padding: var(--space-0);
+    padding: 1.5rem 2rem;
     min-width: 0;
     min-height: 0;
 
@@ -30,12 +30,17 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: 1.5rem 2rem;
       max-width: 100%;
       width: 100%;
       min-width: 0;
       min-height: 0;
       gap: var(--space-8);
+
+      // The parent card — same surface treatment as the Add screens.
+      background: var(--card-background);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: var(--space-8);
     }
   }
 
@@ -708,7 +713,8 @@
     .add-admin-container {
       background: var(--card-background);
       border-radius: var(--radius-md);
-      padding: var(--space-7);
+      // Match add-user's container padding (--space-8) exactly.
+      padding: var(--space-8);
       height: 100%;
       display: flex;
       flex-direction: column;
@@ -853,7 +859,7 @@
             width: 50%;
             display: flex;
             flex-direction: column;
-            gap: var(--space-7);
+            gap: var(--space-8);
             margin-bottom: 1rem;
 
             @media (max-width: 768px) {

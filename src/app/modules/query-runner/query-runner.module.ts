@@ -8,6 +8,8 @@ import { roleGuard } from 'src/app/core/guards/role.guard';
 import { unsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { UsDataGridComponent } from 'src/app/shared/components/us-data-grid/us-data-grid.component';
+import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { AddConnectionComponent } from './connections/add-connection/add-connection.component';
 import { ListConnectionsComponent } from './connections/list-connections/list-connections.component';
 import { LauncherComponent } from './launcher/launcher.component';
@@ -64,6 +66,8 @@ const routes: Routes = [
     TranslateModule,
     AppPrimeNGModule,
     SharedModule,
+    UsDataGridComponent,
+    UsGridCellDirective,
     RouterModule.forChild(routes),
   ],
 })

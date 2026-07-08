@@ -7,7 +7,10 @@ import {
   inject,
 } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import type { ColDef } from 'ag-grid-community';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { UsServerListAdapter } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
+import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
 import { DbAccessContextService } from '../../services/db-access-context.service';
 import { DbAccessService } from '../../services/db-access.service';
 
@@ -64,6 +67,30 @@ export class SessionsComponent implements OnInit, OnDestroy {
   sessions: SessionRow[] = [];
   selfPid = 0;
 
+  /* ── us-data-grid wiring (identical pattern to list-db-roles) ───────── */
+  cols: ColDef[] = [];
+  gridConfig: UsDataGridConfig = {
+    enableRowSelection: false,
+    freezeFirstColumn: true,
+    enableColumnChooser: true,
+    enableAddFilter: false,
+    enableAutoFit: true,
+    enableDensityToggle: true,
+    enableCsvExport: true,
+    enableXlsxExport: true,
+    enableRefresh: true,
+    enableSavedViews: true,
+    gridKey: 'db-sessions-list',
+    pageSizeOptions: [10, 25, 50, 100],
+    pageSize: 10,
+    height: 'calc(100vh - 280px)',
+    rowIdField: 'pid',
+  };
+  // Client-side adapter: loadSessions returns the full array; `load` hands
+  // the grid the name/state/hideBackground-filtered rows applyFilters()
+  // already computes.
+  adapter: UsServerListAdapter<any> | null = null;
+
   // Filters (client-side).
   statusOptions: { label: string; value: string }[] = [];
   filterValues: { name: string; state: string | null; hideBackground: boolean } = {
@@ -97,10 +124,47 @@ export class SessionsComponent implements OnInit, OnDestroy {
         value: 'idle in transaction',
       },
     ];
+    this.cols = this.buildColumns();
+    this.buildAdapter();
   }
 
   ngOnDestroy(): void {
     this.dbAccess.cancelReads();
+    this.adapter?.destroy();
+  }
+
+  /** AG Grid columns — widths preserved from the previous p-table. Cell
+   *  DOM is supplied by `<ng-template usGridCell>` in the HTML. */
+  private buildColumns(): ColDef[] {
+    const t = (k: string) => this.translate.instant(k);
+    return [
+      { colId: 'pid', field: 'pid', headerName: t('DB_ACCESS.PID'), width: 112, minWidth: 112, filter: 'agNumberColumnFilter', filterParams: { buttons: ['reset'], suppressAndOrCondition: true }, pinned: 'left' },
+      { colId: 'user', field: 'user', headerName: t('DB_ACCESS.SESSION_USER'), minWidth: 160 },
+      { colId: 'database', field: 'database', headerName: t('DB_ACCESS.SESSION_DATABASE'), minWidth: 144 },
+      { colId: 'clientAddr', field: 'clientAddr', headerName: t('DB_ACCESS.CLIENT_ADDR'), minWidth: 144 },
+      { colId: 'applicationName', field: 'applicationName', headerName: t('DB_ACCESS.APPLICATION'), minWidth: 160 },
+      { colId: 'state', field: 'state', headerName: t('DB_ACCESS.SESSION_STATE'), width: 160, minWidth: 160 },
+      { colId: 'waitEventType', field: 'waitEventType', headerName: t('DB_ACCESS.WAIT'), width: 128, minWidth: 128 },
+      { colId: 'query', field: 'query', headerName: t('DB_ACCESS.QUERY'), minWidth: 288, flex: 1 },
+      { colId: 'queryStart', field: 'queryStart', headerName: t('DB_ACCESS.STARTED'), width: 144, minWidth: 144 },
+      { colId: 'actions', headerName: t('COMMON.ACTIONS'), width: 144, minWidth: 144, sortable: false, filter: false, resizable: false, pinned: 'right' },
+    ];
+  }
+
+  /** Client-side adapter — its `load` hands the grid the already
+   *  filtered rows the component computes in applyFilters(). */
+  private buildAdapter(): void {
+    this.adapter?.destroy();
+    this.adapter = new UsServerListAdapter<any>({
+      load: () => Promise.resolve({ rows: this.sessions, total: this.sessions.length }),
+      unwrap: (res: any) => ({ rows: res.rows, total: res.total }),
+      initial: { page: 1, limit: 10 },
+    });
+  }
+
+  /** Grid Refresh button → re-fetch the live session list. */
+  refreshList(): void {
+    this.refresh();
   }
 
   /** Emitted by the datasource picker (init hydrate + change). */
@@ -161,6 +225,8 @@ export class SessionsComponent implements OnInit, OnDestroy {
       }
       return true;
     });
+    // Hand the fresh rows to the grid.
+    this.adapter?.reload();
     this.cdr.markForCheck();
   }
 
