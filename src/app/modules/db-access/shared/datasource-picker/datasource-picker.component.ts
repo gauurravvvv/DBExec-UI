@@ -46,6 +46,16 @@ export class DatasourcePickerComponent implements OnInit, OnDestroy {
    */
   @Input() autoHydrate = true;
 
+  /**
+   * Render the "Datasource" text as a floating label (lists) vs. a static
+   * field label with a placeholder prompt (the Add-Role form, which wants an
+   * explicit "Choose a datasource" cue since nothing is pre-selected).
+   */
+  @Input() floatingLabel = true;
+  /** Placeholder shown when nothing is selected (only meaningful when the
+   *  label is not floating). Defaults to the shared "Choose a datasource". */
+  @Input() placeholder = 'DB_ACCESS.CHOOSE_DATASOURCE';
+
   private cdr = inject(ChangeDetectorRef);
 
   selectedDatasource: string | null = null;

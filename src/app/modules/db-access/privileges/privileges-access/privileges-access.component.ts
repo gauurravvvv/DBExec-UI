@@ -100,6 +100,10 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
 
   datasourceId = '';
 
+  /** Active tab: the rule composer (write) vs the effective-privileges
+   *  inspector (read-only). Split so each gets full width. */
+  activeTab: 'compose' | 'effective' = 'compose';
+
   schemaOptions: Option[] = [];
   roleOptions: Option[] = [];
   levelOptions: { label: string; value: Level }[] = [];

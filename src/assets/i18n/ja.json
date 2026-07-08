@@ -3508,6 +3508,9 @@
     "SELECT_DATE": "Select a date",
     "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role.",
     "RULE_INCOMPLETE": "未完了",
-    "APPLY_DISABLED_HINT": "適用する前に、すべてのルールを完成させるか削除してください。"
+    "APPLY_DISABLED_HINT": "適用する前に、すべてのルールを完成させるか削除してください。",
+    "CHOOSE_DATASOURCE": "データソースを選択",
+    "TAB_COMPOSE": "ルールを作成",
+    "TAB_EFFECTIVE_PRIVS": "実効権限"
   }
 }

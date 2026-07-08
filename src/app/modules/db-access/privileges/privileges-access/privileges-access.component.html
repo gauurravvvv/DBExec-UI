@@ -56,14 +56,36 @@
         <span>{{ 'DB_ACCESS.UNSUPPORTED_BODY' | translate }}</span>
       </div>
 
-      <!-- Composer — NO p-tabView anywhere. The Apply action lives in the
-           page header (like Save on Add User/Role); no pending-changes
-           sub-card. -->
+      <!-- Two segmented tabs: the rule composer (write) and the effective-
+           privileges inspector (read-only). Each gets the full page width.
+           Self-owned segmented control — NO p-tabView. The Apply action
+           lives in the page header (like Save on Add User/Role). -->
       <div class="composer-page" *ngIf="datasourceId && !unsupported() && !capabilityLoading()">
-        <!-- BODY: composer (scrolls) + rail -->
+        <div class="priv-tabs" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            [class.active]="activeTab === 'compose'"
+            [attr.aria-selected]="activeTab === 'compose'"
+            (click)="activeTab = 'compose'"
+          >
+            <i class="pi pi-pencil"></i> {{ 'DB_ACCESS.TAB_COMPOSE' | translate }}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            [class.active]="activeTab === 'effective'"
+            [attr.aria-selected]="activeTab === 'effective'"
+            (click)="activeTab = 'effective'"
+          >
+            <i class="pi pi-shield"></i> {{ 'DB_ACCESS.TAB_EFFECTIVE_PRIVS' | translate }}
+          </button>
+        </div>
+
+        <!-- BODY: full-width panel for the active tab -->
         <div class="composer-body">
           <!-- Access Rules composer (bounded scroll) -->
-          <div class="rules-panel">
+          <div class="rules-panel" *ngIf="activeTab === 'compose'">
             <div class="panel-head">
               <div>
                 <h3>{{ 'DB_ACCESS.ACCESS_RULES' | translate }}</h3>
@@ -248,8 +270,9 @@
             </div>
           </div>
 
-          <!-- Rail: role filter (effective) + saved sets + defaults -->
-          <div class="composer-rail">
+          <!-- Effective privileges tab: role filter (effective) + defaults.
+               Full width on its own tab. -->
+          <div class="composer-rail" *ngIf="activeTab === 'effective'">
             <!-- Effective privileges filter (merged from old Effective tab) -->
             <div class="rail-card">
               <h4><i class="pi pi-shield"></i>{{ 'DB_ACCESS.ROLE_FILTER' | translate }}</h4>

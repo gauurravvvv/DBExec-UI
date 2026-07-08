@@ -39,6 +39,8 @@
           <app-datasource-picker
             [autoHydrate]="false"
             [allowClear]="false"
+            [floatingLabel]="false"
+            [placeholder]="'DB_ACCESS.CHOOSE_DATASOURCE'"
             (changed)="onDatasourceChange($event)"
           ></app-datasource-picker>
 

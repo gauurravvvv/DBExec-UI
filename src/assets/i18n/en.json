@@ -3371,7 +3371,10 @@
     "SELECT_DATE": "Select a date",
     "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role.",
     "RULE_INCOMPLETE": "Incomplete",
-    "APPLY_DISABLED_HINT": "Complete or remove every rule before applying."
+    "APPLY_DISABLED_HINT": "Complete or remove every rule before applying.",
+    "CHOOSE_DATASOURCE": "Choose a datasource",
+    "TAB_COMPOSE": "Compose rules",
+    "TAB_EFFECTIVE_PRIVS": "Effective privileges"
   },
   "QUERY_RUNNER": {
     "TITLE": "Query Runner",

@@ -3508,6 +3508,9 @@
     "SELECT_DATE": "Select a date",
     "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role.",
     "RULE_INCOMPLETE": "Incompleta",
-    "APPLY_DISABLED_HINT": "Completa o rimuovi ogni regola prima di applicare."
+    "APPLY_DISABLED_HINT": "Completa o rimuovi ogni regola prima di applicare.",
+    "CHOOSE_DATASOURCE": "Scegli un'origine dati",
+    "TAB_COMPOSE": "Componi regole",
+    "TAB_EFFECTIVE_PRIVS": "Privilegi effettivi"
   }
 }
