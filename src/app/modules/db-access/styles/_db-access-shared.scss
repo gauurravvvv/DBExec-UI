@@ -911,6 +911,30 @@
                 min-width: 0;
               }
 
+              // Height parity: make BOTH fields match the app's standard
+              // padding-driven control height (custom-input/dropdown use
+              // 0.625rem 0.75rem). The shared custom-number ships a fixed 32px
+              // and the shared custom-calendar uses 0.75rem 1rem, so left
+              // alone Connection limit + Valid until don't line up. Normalise
+              // both to the input padding + drop the number's fixed height,
+              // scoped to this row only (shared components untouched elsewhere).
+              app-custom-number ::ng-deep .p-inputnumber .p-inputtext,
+              app-custom-calendar ::ng-deep .p-calendar .p-inputtext {
+                height: auto !important;
+                padding: 0.625rem 0.75rem !important;
+                font-size: var(--fs-body) !important;
+                line-height: 1.4 !important;
+              }
+              // Inline number steppers + the calendar trigger follow the same
+              // height so the whole control is even.
+              app-custom-number
+                ::ng-deep
+                .p-inputnumber.p-inputnumber-buttons-horizontal
+                .p-inputnumber-button,
+              app-custom-calendar ::ng-deep .p-calendar .p-datepicker-trigger {
+                height: auto !important;
+              }
+
               @media (max-width: 640px) {
                 flex-direction: column;
               }
@@ -1018,6 +1042,46 @@
       app-custom-toggle .form-field {
         margin: 0;
       }
+    }
+  }
+
+  // Standalone "Can log in" toggle — it lives directly in the form column
+  // (NOT inside the grey .attr-toggles container), so the nested .attr-toggle
+  // rules above don't reach it. Give it the same label-left / switch-right
+  // layout AND its own card surface so the label + description read correctly
+  // (fixes the run-together "Can log in<desc>" with no styling).
+  .attr-toggle.can-login {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding: var(--space-5) var(--space-6);
+    background: var(--hover-background);
+    border-radius: var(--radius-md);
+
+    .attr-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+
+      .attr-name {
+        font-size: var(--fs-control);
+        font-weight: var(--fw-semibold);
+        color: var(--text-color);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+      .attr-desc {
+        font-size: var(--fs-label);
+        color: var(--secondary-color);
+        line-height: 1.5;
+      }
+    }
+
+    app-custom-toggle {
+      flex-shrink: 0;
+      .form-field { margin: 0; }
     }
   }
 

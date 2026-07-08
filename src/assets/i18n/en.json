@@ -3361,7 +3361,8 @@
       "SCOPE_FUNCTIONS": "functions in schema '{{schema}}'",
       "SCOPE_DATABASE": "the database",
       "GENERIC": "Apply change"
-    }
+    },
+    "SELECT_DATE": "Select a date"
   },
   "QUERY_RUNNER": {
     "TITLE": "Query Runner",

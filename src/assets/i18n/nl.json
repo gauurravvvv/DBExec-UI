@@ -3113,5 +3113,8 @@
     "APPEND": "Append",
     "LIMIT_LABEL": "Limit",
     "LIMIT_HINT": "Max rows returned per run (caps the result without changing your SQL). Default 200."
+  },
+  "DB_ACCESS": {
+    "SELECT_DATE": "Select a date"
   }
 }
