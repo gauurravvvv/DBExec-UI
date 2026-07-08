@@ -24,7 +24,11 @@
     flex-direction: column;
     height: 100%;
     width: 100%;
-    padding: var(--space-6);
+    // Outer page inset — matches the canonical list-user container padding
+    // (1.5rem 2rem) exactly, so the db-access pages line up with the rest
+    // of the app. The card surface lives on the inner container; the
+    // wrapper only supplies the gap between the app chrome and the card.
+    padding: 1.5rem 2rem;
     min-width: 0;
     min-height: 0;
 
@@ -32,9 +36,11 @@
       flex: 1;
       display: flex;
       flex-direction: column;
+      // Card inner padding (its own comfortable breathing room). No extra
+      // outer padding here — the wrapper already provides the page inset,
+      // so there is no double padding.
       padding: var(--space-6) var(--space-7);
       max-width: 100%;
-      margin: 0 auto;
       width: 100%;
       min-width: 0;
       min-height: 0;
@@ -150,20 +156,24 @@
     }
   }
 
+  // Buttons match the canonical list-user .modern-button exactly (same
+  // padding, gradient, !important overrides) so db-access action buttons
+  // are pixel-identical to the rest of the app.
   .modern-button {
     border-radius: var(--radius-sm) !important;
     font-weight: var(--fw-semibold);
-    padding: 0.6rem 1.15rem;
+    padding: 0.65rem 1.25rem;
 
     &.p-button-primary {
       background: linear-gradient(
         135deg,
         var(--primary-color),
         var(--primary-hover)
-      );
-      color: var(--primary-text);
-      border: none;
+      ) !important;
+      border: none !important;
+      color: white !important;
       box-shadow: 0 4px 10px var(--primary-color-transparent);
+      transition: all var(--motion-base) ease;
 
       &:hover {
         transform: translateY(-1px);
