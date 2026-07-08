@@ -859,9 +859,25 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
 
   // ── SQL file upload (button / overflow / drag-drop) ─────────────────
 
-  /** Open the native file picker (hidden <input type="file">). */
+  /**
+   * Open the native file picker. Resolves the input via the ViewChild, or
+   * falls back to a DOM lookup (the ViewChild can be undefined if the click
+   * arrives from a PrimeNG menu/overlay callback). Clearing value first lets
+   * the same file be re-picked.
+   */
   openFileDialog(): void {
-    this.fileInput?.nativeElement.click();
+    const el =
+      this.fileInput?.nativeElement ??
+      (this.editorHost?.nativeElement
+        ?.closest('.qx-shell')
+        ?.querySelector('input.qx-file-input') as HTMLInputElement | null);
+    if (!el) {
+      this.statusText = 'File picker unavailable';
+      this.cdr.markForCheck();
+      return;
+    }
+    el.value = '';
+    el.click();
   }
 
   /** Native picker change handler. */

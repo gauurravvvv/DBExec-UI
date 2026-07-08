@@ -253,9 +253,12 @@
           </div>
         </div>
       </section>
-      <!-- Hidden native picker for the upload button / overflow / palette -->
+      <!-- Off-screen native picker for the upload button / overflow / palette.
+           Positioned off-screen (NOT display:none / hidden) so .click() from a
+           user gesture reliably opens it and (change) always fires. -->
       <input #fileInput type="file" accept=".sql,.txt,.ddl,.pgsql,text/plain"
-        class="qx-file-input" (change)="onFileSelected($event)" hidden />
+        class="qx-file-input" (change)="onFileSelected($event)"
+        tabindex="-1" aria-hidden="true" />
 
       <section class="qx-results">
         <!-- Result toolbar -->

@@ -326,8 +326,22 @@ $qx-btn-h: 34px;
   box-shadow: var(--shadow-md);
   padding: 1.25rem;
 }
-// Hidden native file picker.
-.qx-file-input { display: none; }
+// Native file picker — visually hidden but STILL RENDERED (off-screen, not
+// display:none/hidden) so .click() from a user gesture reliably opens it and
+// (change) fires. display:none inputs are ignored by some browsers.
+.qx-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
 
 // Load-choice dialog reuses the goto-box shell; add its body hint.
 .qx-load-box {
