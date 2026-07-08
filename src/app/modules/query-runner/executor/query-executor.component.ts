@@ -64,6 +64,7 @@ import {
   ModuleRegistry,
   ClientSideRowModelModule,
   themeQuartz,
+  colorSchemeLightWarm,
 } from 'ag-grid-community';
 import { format as formatSql } from 'sql-formatter';
 
@@ -212,7 +213,10 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   detailName = '';
 
   // AG Grid
-  gridTheme = themeQuartz;
+  // Same AG Grid theme the canonical us-data-grid uses, so the executor's
+  // result grid matches every other grid in the app (see
+  // us-data-grid.component.ts).
+  gridTheme = themeQuartz.withPart(colorSchemeLightWarm);
   private gridApi: GridApi | null = null;
   quickFilter = '';
   showFilters = false;
@@ -556,9 +560,11 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
             }),
             EditorView.theme({
               '&': { height: '100%' },
+              // Match the app's mono stack + control font size so the editor
+              // reads like the rest of the application, not a bare CM6 canvas.
               '.cm-scroller': {
-                fontFamily: 'ui-monospace, SFMono-Regular, monospace',
-                fontSize: '13px',
+                fontFamily: 'var(--font-mono)',
+                fontSize: 'var(--fs-control)',
               },
             }),
           ],

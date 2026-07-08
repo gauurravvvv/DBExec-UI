@@ -842,23 +842,26 @@
 
         .left-section {
           flex: 1;
-          // Single-column form (unlike add-datasource's two-column shell) —
-          // give it a comfortable reading width instead of clamping to half.
-          max-width: 760px;
-          width: 100%;
           display: flex;
           flex-direction: column;
 
+          // Left-aligned single-column form at 50% width — matches the
+          // canonical add-user / edit-user form exactly (add-user
+          // .form-grid { width: 50% }). Collapses to full width on narrow
+          // screens.
           .form-grid {
-            width: 100%;
-            max-width: 100%;
-            display: grid;
-            grid-template-columns: 1fr;
+            width: 50%;
+            display: flex;
+            flex-direction: column;
             gap: var(--space-7);
             margin-bottom: 1rem;
 
-            // Two-up row inside the vertical grid (e.g. connection limit +
-            // expiry, groups + users). Collapses to stacked on narrow widths.
+            @media (max-width: 768px) {
+              width: 100%;
+            }
+
+            // Two-up row inside the vertical column (e.g. connection limit +
+            // expiry). Collapses to stacked on narrow widths.
             .form-row {
               display: flex;
               gap: var(--space-6);
@@ -879,27 +882,12 @@
     }
   }
 
-  // FIX #3 — dropdown / number / calendar share ONE control height so a
-  // date field never renders taller than the dropdown beside it. Applied
-  // to the shared components' inner PrimeNG controls; no bespoke override.
-  :host ::ng-deep {
-    app-custom-dropdown .p-dropdown,
-    app-custom-calendar .p-calendar .p-inputtext,
-    app-custom-number .p-inputnumber .p-inputtext,
-    app-custom-input .p-inputtext {
-      height: 42px;
-      min-height: 42px;
-      display: flex;
-      align-items: center;
-    }
-
-    app-custom-dropdown .p-dropdown .p-dropdown-label {
-      display: flex;
-      align-items: center;
-      padding-top: 0;
-      padding-bottom: 0;
-    }
-  }
+  // Control heights are governed entirely by the shared app-custom-*
+  // components (padding-driven, ~40px) — the same height they render at in
+  // every other module. No bespoke height override here: forcing an
+  // explicit height (previously 42px) made db-access controls taller than
+  // the shared components everywhere else. The shared library already keeps
+  // input / dropdown / calendar / number visually aligned.
 
   // Create-mode selector inside the role form (from-scratch / template /
   // clone). Full-width segmented control.

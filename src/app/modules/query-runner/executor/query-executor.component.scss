@@ -1,17 +1,18 @@
-/* Standalone Query Runner workspace — full-viewport, DBeaver-style.
-   Deliberately self-contained (no app shell), tuned for long sessions
-   on dense data: calm neutrals, one teal functional accent, tabular
-   numerics in the grid. */
+/* Standalone Query Runner workspace — full-viewport, DBeaver-style
+   layout, but styled entirely with the app design tokens so it reads
+   as part of the application (no bespoke teal palette). The --qx-*
+   aliases now map 1:1 to app tokens; the workspace keeps its 3-pane
+   layout, not its own colours. */
 :host {
-  --qx-bg: var(--surface-ground, #f7f8fa);
-  --qx-elev: var(--surface-card, #ffffff);
-  --qx-border: var(--surface-border, #d9dde5);
-  --qx-text: var(--text-color, #1c2430);
-  --qx-muted: var(--text-color-secondary, #6b7482);
-  --qx-accent: var(--primary-color, #2f6f6a);
-  --qx-accent-text: var(--primary-color-text, #ffffff);
-  --qx-error: #c0392b;
-  --qx-ok: #2e7d46;
+  --qx-bg: var(--background-color);
+  --qx-elev: var(--card-background);
+  --qx-border: var(--border-color);
+  --qx-text: var(--text-color);
+  --qx-muted: var(--text-muted);
+  --qx-accent: var(--primary-color);
+  --qx-accent-text: var(--primary-color-text);
+  --qx-error: var(--error-color);
+  --qx-ok: var(--success-color);
 
   display: block;
   height: 100vh;
@@ -24,7 +25,7 @@
   height: 100vh;
   background: var(--qx-bg);
   color: var(--qx-text);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-ui);
 }
 
 /* ── top bar ─────────────────────────────────────────────────────── */
@@ -213,7 +214,7 @@
   font-size: 0.76rem;
   &:hover { background: var(--qx-bg); }
   .pi { font-size: 0.55rem; color: var(--qx-muted); }
-  .pi-key { color: #b8860b; }
+  .pi-key { color: var(--warning-color); }
   .qx-col-name { color: var(--qx-text); }
   .qx-col-type { margin-left: auto; color: var(--qx-muted); font-size: 0.68rem; }
 }
@@ -317,10 +318,10 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.35rem 0.75rem;
-  background: #fff6e5;
-  color: #a86b00;
+  background: var(--warning-bg);
+  color: var(--warning-color);
   font-size: 0.76rem;
-  border-bottom: 1px solid #f0dcae;
+  border-bottom: 1px solid var(--warning-color);
 }
 .qx-grid {
   width: 100%;
@@ -400,5 +401,86 @@
   height: 8px;
   border-radius: 50%;
   &.read { background: var(--qx-muted); }
-  &.write { background: #a86b00; }
+  &.write { background: var(--warning-color); }
+}
+
+/* ── CodeMirror autocomplete (IntelliSense) — app design system ──────
+   The default CodeMirror completion popup ships a bare light-grey box
+   that looks nothing like the rest of the app. Theme it with the app
+   tokens so it reads like the shared dropdown / overlay surfaces:
+   card surface, app border + radius + shadow, app text + mono font,
+   primary-tinted active row and matched text. Uses :global (same
+   convention as .cm-editor above) since CodeMirror renders the tooltip
+   in its own layer. */
+:global(.cm-tooltip.cm-tooltip-autocomplete) {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  font-family: var(--font-ui);
+}
+
+:global(.cm-tooltip-autocomplete > ul) {
+  font-family: var(--font-mono);
+  font-size: var(--fs-control);
+  max-height: 16rem;
+}
+
+:global(.cm-tooltip-autocomplete > ul > li) {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.28rem 0.6rem;
+  color: var(--text-color);
+  line-height: 1.5;
+}
+
+:global(.cm-tooltip-autocomplete > ul > li[aria-selected]) {
+  background: var(--primary-color-transparent);
+  color: var(--text-color);
+}
+
+:global(.cm-completionLabel) {
+  color: var(--text-color);
+}
+
+:global(.cm-completionMatchedText) {
+  color: var(--primary-color);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+}
+
+:global(.cm-completionDetail) {
+  margin-left: auto;
+  padding-left: 1rem;
+  color: var(--text-muted);
+  font-style: normal;
+  font-size: var(--fs-label);
+}
+
+:global(.cm-completionIcon) {
+  color: var(--text-muted);
+  opacity: 0.9;
+  margin-right: 0.1rem;
+}
+/* Type-specific icon accents so column / table / pk read distinctly. */
+:global(.cm-completionIcon-column),
+:global(.cm-completionIcon-property) { color: var(--primary-color); }
+:global(.cm-completionIcon-pk) { color: var(--warning-color); }
+:global(.cm-completionIcon-table),
+:global(.cm-completionIcon-class) { color: var(--text-color); }
+:global(.cm-completionIcon-schema),
+:global(.cm-completionIcon-namespace) { color: var(--text-muted); }
+
+/* Completion info tooltip (the detail panel beside the list). */
+:global(.cm-tooltip.cm-completionInfo) {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  color: var(--text-color);
+  font-family: var(--font-ui);
+  font-size: var(--fs-control);
+  padding: 0.5rem 0.75rem;
 }
