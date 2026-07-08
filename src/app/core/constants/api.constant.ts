@@ -124,6 +124,7 @@ export const QUERY_RUNNER = {
   OBJECT_VIEW_SUFFIX: '/object/view', // ?schema=&name=&materialized=
   OBJECT_FUNCTION_SUFFIX: '/object/function', // ?schema=&name=
   OBJECT_SEQUENCE_SUFFIX: '/object/sequence', // ?schema=&name=
+  OBJECT_TRIGGER_SUFFIX: '/object/trigger', // ?schema=&table=&name=
   OBJECT_MATVIEW_REFRESH_SUFFIX: '/object/matview/refresh', // ?schema=&name=
   // POST /query-runner/connections/:id/execute  → run SQL
   EXECUTE_SUFFIX: '/execute',

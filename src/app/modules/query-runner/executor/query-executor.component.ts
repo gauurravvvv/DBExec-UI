@@ -23,10 +23,13 @@ import {
   startCompletion,
 } from '@codemirror/autocomplete';
 import {
+  copyLineDown,
   defaultKeymap,
   history,
   historyKeymap,
   indentWithTab,
+  moveLineDown,
+  moveLineUp,
   toggleComment,
 } from '@codemirror/commands';
 import { PostgreSQL, sql, keywordCompletionSource } from '@codemirror/lang-sql';
@@ -54,6 +57,7 @@ import {
   rectangularSelection,
 } from '@codemirror/view';
 import { StateEffect, StateField } from '@codemirror/state';
+import { showMinimap } from '@replit/codemirror-minimap';
 
 import { AgGridAngular } from 'ag-grid-angular';
 import {
@@ -70,7 +74,8 @@ import { format as formatSql } from 'sql-formatter';
 
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
-import { ToggleButtonModule } from 'primeng/togglebutton';
+import { MenuModule } from 'primeng/menu';
+import { MenuItem } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 
 import { QueryRunnerService } from '../services/query-runner.service';
@@ -94,7 +99,8 @@ interface QueryRow {
 type QueryResult =
   | QueryRow
   | { kind: 'message'; command: string; text: string; elapsedMs: number; statementIndex: number }
-  | { kind: 'error'; message: string; code?: string; hint?: string; offset?: number; statementIndex: number };
+  | { kind: 'error'; message: string; code?: string; hint?: string; offset?: number; statementIndex: number }
+  | { kind: 'explain'; plan: any; analyzed: boolean; elapsedMs: number; statementIndex: number };
 
 interface TreeTable {
   name: string;
@@ -110,6 +116,13 @@ interface TreeObject {
   args?: string;
   returns?: string;
 }
+/** A trigger node — carries its owning table (triggers are per-table). */
+interface TreeTrigger {
+  name: string;
+  table: string;
+  timing?: string;
+  events?: string;
+}
 interface TreeSchema {
   schema: string;
   open: boolean;
@@ -120,8 +133,16 @@ interface TreeSchema {
   matviews: TreeObject[];
   functions: TreeObject[];
   sequences: TreeObject[];
+  triggers: TreeTrigger[];
   // group folder open state
-  g: { tables: boolean; views: boolean; matviews: boolean; functions: boolean; sequences: boolean };
+  g: {
+    tables: boolean;
+    views: boolean;
+    matviews: boolean;
+    functions: boolean;
+    sequences: boolean;
+    triggers: boolean;
+  };
 }
 
 /** CM effect + field: transient highlight of the range that just ran. */
@@ -165,7 +186,7 @@ const runFlashField = StateField.define<DecorationSet>({
     AgGridAngular,
     ButtonModule,
     TooltipModule,
-    ToggleButtonModule,
+    MenuModule,
     ObjectDetailComponent,
   ],
   templateUrl: './query-executor.component.html',
@@ -177,6 +198,7 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   private zone = inject(NgZone);
 
   @ViewChild('editorHost', { static: false }) editorHost!: ElementRef<HTMLDivElement>;
+  @ViewChild('fileInput', { static: false }) fileInput!: ElementRef<HTMLInputElement>;
 
   connectionId = '';
   connectionName = '';
@@ -187,13 +209,35 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   private view!: EditorView;
   private langCompartment = new Compartment();
   private wrapCompartment = new Compartment();
+  private minimapCompartment = new Compartment();
   private catalog = new SchemaCatalog();
   editorReady = false;
   wordWrap = false;
+  minimapOn = true;
+
+  // Editor overlays (command palette / go-to-line / shortcuts help)
+  paletteOpen = false;
+  paletteQuery = '';
+  paletteItems: { id: string; label: string; hint?: string; icon: string }[] = [];
+  gotoOpen = false;
+  gotoValue = '';
+  shortcutsOpen = false;
+
+  // SQL file upload (button / overflow / drag-drop)
+  dragOver = false; // drop-overlay visible while a file is dragged over
+  loadChoiceOpen = false; // replace/append prompt when the editor isn't empty
+  private pendingFileSql: string | null = null;
+  private pendingFileName = '';
+  // Max .sql we'll read into the editor (guards a giant accidental drop).
+  private readonly MAX_SQL_BYTES = 5 * 1024 * 1024;
+
+  // Toolbar overflow menu (PrimeNG p-menu)
+  overflowItems: MenuItem[] = [];
 
   // Execution
   running = false;
   autoCommit = false; // OFF ⇒ read-only preview; ON ⇒ writes commit
+  explainMode = false; // when ON, Run wraps statements in EXPLAIN
   results: QueryResult[] = [];
   activeResult = 0;
   private executionId: string | null = null;
@@ -211,6 +255,7 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   detailKind: ObjectKind | null = null;
   detailSchema = '';
   detailName = '';
+  detailTable = ''; // for triggers (owning table)
 
   // AG Grid
   // Same AG Grid theme the canonical us-data-grid uses, so the executor's
@@ -249,6 +294,13 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       return;
     }
     this.storageKey = `qx-draft:${this.connectionId}`;
+    // Restore minimap preference (default on).
+    try {
+      this.minimapOn = localStorage.getItem('qx-minimap') !== '0';
+    } catch {
+      /* storage disabled */
+    }
+    this.buildOverflowMenu();
     this.loadConnectionMeta();
     this.loadSchemas();
   }
@@ -301,7 +353,15 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
           matviews: [],
           functions: [],
           sequences: [],
-          g: { tables: true, views: false, matviews: false, functions: false, sequences: false },
+          triggers: [],
+          g: {
+            tables: true,
+            views: false,
+            matviews: false,
+            functions: false,
+            sequences: false,
+            triggers: false,
+          },
         }));
         this.reconfigureCatalog();
       })
@@ -344,6 +404,12 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
           returns: f.returns,
         }));
         s.sequences = (d?.sequences ?? []).map((q: any) => ({ name: q.name }));
+        s.triggers = (d?.triggers ?? []).map((t: any) => ({
+          name: t.name,
+          table: t.table,
+          timing: t.timing,
+          events: t.events,
+        }));
         s.loaded = true;
         // Feed IntelliSense: tables + views are queryable relations.
         this.catalog.setTables(s.schema, [
@@ -373,6 +439,7 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     s.matviews = [];
     s.functions = [];
     s.sequences = [];
+    s.triggers = [];
     this.loadSchemaObjects(s);
   }
 
@@ -474,6 +541,17 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     this.detailKind = kind;
     this.detailSchema = schema;
     this.detailName = name;
+    this.detailTable = '';
+    this.detailVisible = true;
+    this.cdr.markForCheck();
+  }
+
+  /** Open the detail modal for a trigger (needs its owning table). */
+  openTrigger(schema: string, table: string, name: string): void {
+    this.detailKind = 'trigger';
+    this.detailSchema = schema;
+    this.detailName = name;
+    this.detailTable = table;
     this.detailVisible = true;
     this.cdr.markForCheck();
   }
@@ -523,6 +601,7 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
             placeholder('-- Write SQL. Ctrl/Cmd+Enter runs the statement at the cursor.'),
             syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
             this.wrapCompartment.of([]),
+            this.minimapCompartment.of(this.minimapOn ? this.minimapExtension() : []),
             this.langCompartment.of(this.buildLanguage()),
             keymap.of([
               {
@@ -546,6 +625,26 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
                 preventDefault: true,
                 run: toggleComment,
               },
+              {
+                key: 'Mod-Shift-p',
+                preventDefault: true,
+                run: () => {
+                  this.zone.run(() => this.openPalette());
+                  return true;
+                },
+              },
+              {
+                key: 'Mod-g',
+                preventDefault: true,
+                run: () => {
+                  this.zone.run(() => this.openGoto());
+                  return true;
+                },
+              },
+              // Duplicate line ↓ and move line ↑/↓ — VSCode parity.
+              { key: 'Shift-Alt-ArrowDown', run: copyLineDown },
+              { key: 'Alt-ArrowUp', run: moveLineUp },
+              { key: 'Alt-ArrowDown', run: moveLineDown },
               indentWithTab,
               ...closeBracketsKeymap,
               ...defaultKeymap,
@@ -560,11 +659,17 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
             }),
             EditorView.theme({
               '&': { height: '100%' },
-              // Match the app's mono stack + control font size so the editor
-              // reads like the rest of the application, not a bare CM6 canvas.
+              // Match the app's mono stack + a comfortable, readable editor
+              // size (14px / 1.6). Fuller chrome theming (gutters, selection,
+              // autocomplete, find panel) lives in the GLOBAL
+              // _codemirror-theme.scss — CM appends those layers to body.
               '.cm-scroller': {
                 fontFamily: 'var(--font-mono)',
-                fontSize: 'var(--fs-control)',
+                // Explicit px (not a rem token): the app root font-size is
+                // 14px, so rem tokens render ~12px in the editor — too small
+                // for code. 14px absolute keeps it comfortable everywhere.
+                fontSize: '14px',
+                lineHeight: '1.65',
               },
             }),
           ],
@@ -590,6 +695,306 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
         this.wordWrap ? EditorView.lineWrapping : [],
       ),
     });
+  }
+
+  // ── minimap (VSCode-style) ──────────────────────────────────────────
+
+  /** Build the minimap facet extension, themed via the container's class. */
+  private minimapExtension() {
+    return showMinimap.compute([], () => ({
+      create: () => {
+        const dom = document.createElement('div');
+        dom.className = 'qx-minimap';
+        return { dom };
+      },
+      displayText: 'blocks',
+      showOverlay: 'always',
+    }));
+  }
+
+  toggleMinimap(): void {
+    this.minimapOn = !this.minimapOn;
+    this.view?.dispatch({
+      effects: this.minimapCompartment.reconfigure(
+        this.minimapOn ? this.minimapExtension() : [],
+      ),
+    });
+    try {
+      localStorage.setItem('qx-minimap', this.minimapOn ? '1' : '0');
+    } catch {
+      /* storage disabled */
+    }
+  }
+
+  toggleExplain(): void {
+    this.explainMode = !this.explainMode;
+  }
+
+  // ── command palette ─────────────────────────────────────────────────
+
+  /** The full action list the palette (and shortcuts help) surfaces. */
+  private paletteActions(): { id: string; label: string; hint?: string; icon: string; run: () => void }[] {
+    return [
+      { id: 'run', label: 'Run statement', hint: 'Ctrl/Cmd+Enter', icon: 'pi-play', run: () => this.run('smart') },
+      { id: 'run-all', label: 'Run all', hint: 'Ctrl/Cmd+Shift+Enter', icon: 'pi-forward', run: () => this.run('all') },
+      { id: 'format', label: 'Format SQL', hint: '', icon: 'pi-align-left', run: () => this.format() },
+      { id: 'wrap', label: 'Toggle word wrap', hint: '', icon: 'pi-bars', run: () => this.toggleWrap() },
+      { id: 'minimap', label: 'Toggle minimap', hint: '', icon: 'pi-map', run: () => this.toggleMinimap() },
+      { id: 'explain', label: 'Toggle EXPLAIN mode', hint: '', icon: 'pi-sitemap', run: () => this.toggleExplain() },
+      { id: 'goto', label: 'Go to line…', hint: 'Ctrl/Cmd+G', icon: 'pi-directions', run: () => this.openGoto() },
+      { id: 'upper', label: 'Upper-case selection', hint: '', icon: 'pi-arrow-up', run: () => this.transformCase('upper') },
+      { id: 'lower', label: 'Lower-case selection', hint: '', icon: 'pi-arrow-down', run: () => this.transformCase('lower') },
+      { id: 'clear', label: 'Clear editor', hint: '', icon: 'pi-trash', run: () => this.clearEditor() },
+      { id: 'copy', label: 'Copy all', hint: '', icon: 'pi-copy', run: () => this.copyAll() },
+      { id: 'upload', label: 'Upload .sql file', hint: '', icon: 'pi-upload', run: () => this.openFileDialog() },
+      { id: 'download', label: 'Download .sql', hint: '', icon: 'pi-download', run: () => this.downloadSql() },
+    ];
+  }
+
+  openPalette(): void {
+    this.paletteQuery = '';
+    this.paletteItems = this.paletteActions().map(a => ({
+      id: a.id,
+      label: a.label,
+      hint: a.hint,
+      icon: a.icon,
+    }));
+    this.paletteOpen = true;
+    this.cdr.markForCheck();
+  }
+
+  onPaletteFilter(): void {
+    const q = this.paletteQuery.trim().toLowerCase();
+    this.paletteItems = this.paletteActions()
+      .filter(a => !q || a.label.toLowerCase().includes(q))
+      .map(a => ({ id: a.id, label: a.label, hint: a.hint, icon: a.icon }));
+    this.cdr.markForCheck();
+  }
+
+  runPaletteItem(id: string): void {
+    const action = this.paletteActions().find(a => a.id === id);
+    this.paletteOpen = false;
+    this.cdr.markForCheck();
+    action?.run();
+    setTimeout(() => this.view?.focus(), 0);
+  }
+
+  closePalette(): void {
+    this.paletteOpen = false;
+    this.cdr.markForCheck();
+    this.view?.focus();
+  }
+
+  // ── go to line ──────────────────────────────────────────────────────
+
+  openGoto(): void {
+    this.gotoValue = '';
+    this.gotoOpen = true;
+    this.cdr.markForCheck();
+  }
+
+  applyGoto(): void {
+    const n = parseInt(this.gotoValue, 10);
+    this.gotoOpen = false;
+    this.cdr.markForCheck();
+    if (!this.view || Number.isNaN(n)) {
+      this.view?.focus();
+      return;
+    }
+    const total = this.view.state.doc.lines;
+    const lineNo = Math.min(Math.max(1, n), total);
+    const line = this.view.state.doc.line(lineNo);
+    this.view.dispatch({ selection: { anchor: line.from }, scrollIntoView: true });
+    this.view.focus();
+  }
+
+  closeGoto(): void {
+    this.gotoOpen = false;
+    this.cdr.markForCheck();
+    this.view?.focus();
+  }
+
+  // ── shortcuts help ──────────────────────────────────────────────────
+
+  openShortcuts(): void {
+    this.shortcutsOpen = true;
+    this.cdr.markForCheck();
+  }
+  closeShortcuts(): void {
+    this.shortcutsOpen = false;
+    this.cdr.markForCheck();
+  }
+
+  // ── editor text actions (palette + overflow) ────────────────────────
+
+  private transformCase(mode: 'upper' | 'lower'): void {
+    const sel = this.getSelection();
+    if (!this.view || !sel) return;
+    const out = mode === 'upper' ? sel.text.toUpperCase() : sel.text.toLowerCase();
+    this.view.dispatch({ changes: { from: sel.from, to: sel.to, insert: out } });
+  }
+
+  clearEditor(): void {
+    this.replaceAll('');
+    this.view?.focus();
+  }
+
+  copyAll(): void {
+    try {
+      navigator.clipboard?.writeText(this.getAll());
+    } catch {
+      /* clipboard blocked */
+    }
+  }
+
+  downloadSql(): void {
+    const blob = new Blob([this.getAll()], { type: 'text/sql' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = this.exportName('sql');
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── SQL file upload (button / overflow / drag-drop) ─────────────────
+
+  /**
+   * Open the native file picker. Resolves the input via the ViewChild, or
+   * falls back to a DOM lookup (the ViewChild can be undefined if the click
+   * arrives from a PrimeNG menu/overlay callback). Clearing value first lets
+   * the same file be re-picked.
+   */
+  openFileDialog(): void {
+    const el =
+      this.fileInput?.nativeElement ??
+      (this.editorHost?.nativeElement
+        ?.closest('.qx-shell')
+        ?.querySelector('input.qx-file-input') as HTMLInputElement | null);
+    if (!el) {
+      this.statusText = 'File picker unavailable';
+      this.cdr.markForCheck();
+      return;
+    }
+    el.value = '';
+    el.click();
+  }
+
+  /** Native picker change handler. */
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) this.readSqlFile(file);
+    // Reset so choosing the SAME file again still fires change.
+    input.value = '';
+  }
+
+  /**
+   * Read a .sql (or plain text) file's contents. Guards oversize + binary.
+   * If the editor is empty, loads immediately; otherwise opens the
+   * replace/append choice.
+   */
+  private readSqlFile(file: File): void {
+    const nameOk = /\.(sql|txt|ddl|pgsql)$/i.test(file.name);
+    if (!nameOk && file.type && !file.type.startsWith('text')) {
+      this.statusText = 'Only .sql / text files can be loaded';
+      this.cdr.markForCheck();
+      return;
+    }
+    if (file.size > this.MAX_SQL_BYTES) {
+      this.statusText = 'File too large (max 5 MB)';
+      this.cdr.markForCheck();
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = String(reader.result ?? '');
+      this.pendingFileSql = text;
+      this.pendingFileName = file.name;
+      if (this.getAll().trim().length === 0) {
+        // Empty editor → load straight in, no prompt.
+        this.applyLoadedFile('replace');
+      } else {
+        this.loadChoiceOpen = true;
+        this.cdr.markForCheck();
+      }
+    };
+    reader.onerror = () => {
+      this.statusText = 'Could not read file';
+      this.cdr.markForCheck();
+    };
+    reader.readAsText(file);
+  }
+
+  /** Resolve the replace/append choice (or the auto path for an empty editor). */
+  applyLoadedFile(mode: 'replace' | 'append'): void {
+    const text = this.pendingFileSql ?? '';
+    if (this.view) {
+      if (mode === 'replace') {
+        this.replaceAll(text);
+      } else {
+        const cur = this.getAll();
+        const joiner = cur.endsWith('\n') || cur.length === 0 ? '' : '\n\n';
+        this.replaceAll(cur + joiner + text);
+      }
+    }
+    this.statusText = `Loaded ${this.pendingFileName}`;
+    this.pendingFileSql = null;
+    this.pendingFileName = '';
+    this.loadChoiceOpen = false;
+    this.cdr.markForCheck();
+    this.view?.focus();
+  }
+
+  cancelLoadChoice(): void {
+    this.pendingFileSql = null;
+    this.pendingFileName = '';
+    this.loadChoiceOpen = false;
+    this.cdr.markForCheck();
+    this.view?.focus();
+  }
+
+  // Drag-drop a .sql onto the editor. Only react when files are dragged.
+  onDragOver(event: DragEvent): void {
+    if (!event.dataTransfer || !Array.from(event.dataTransfer.types).includes('Files')) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+    if (!this.dragOver) {
+      this.dragOver = true;
+      this.cdr.markForCheck();
+    }
+  }
+  onDragLeave(event: DragEvent): void {
+    // Ignore leave events bubbling from children — only clear when leaving
+    // the editor region entirely.
+    if (event.relatedTarget && (event.currentTarget as HTMLElement).contains(event.relatedTarget as Node)) {
+      return;
+    }
+    this.dragOver = false;
+    this.cdr.markForCheck();
+  }
+  onDrop(event: DragEvent): void {
+    if (!event.dataTransfer) return;
+    event.preventDefault();
+    this.dragOver = false;
+    this.cdr.markForCheck();
+    const file = event.dataTransfer.files?.[0];
+    if (file) this.readSqlFile(file);
+  }
+
+  /** PrimeNG overflow menu (⋯) — the less-used actions. */
+  private buildOverflowMenu(): void {
+    this.overflowItems = [
+      { label: 'Upload .sql…', icon: 'pi pi-upload', command: () => this.openFileDialog() },
+      { label: 'Download .sql', icon: 'pi pi-download', command: () => this.downloadSql() },
+      { separator: true },
+      { label: 'Go to line…', icon: 'pi pi-directions', command: () => this.openGoto() },
+      { label: 'Upper-case selection', icon: 'pi pi-arrow-up', command: () => this.transformCase('upper') },
+      { label: 'Lower-case selection', icon: 'pi pi-arrow-down', command: () => this.transformCase('lower') },
+      { separator: true },
+      { label: 'Copy all', icon: 'pi pi-copy', command: () => this.copyAll() },
+      { label: 'Clear editor', icon: 'pi pi-trash', command: () => this.clearEditor() },
+    ];
   }
 
   private updateCursorInfo(): void {
@@ -689,7 +1094,10 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
 
     const t0 = performance.now();
     this.service
-      .execute(this.connectionId, sqlText, this.autoCommit, this.executionId)
+      .execute(this.connectionId, sqlText, this.autoCommit, this.executionId, {
+        explain: this.explainMode,
+        analyze: this.explainMode && this.autoCommit,
+      })
       .then(res => {
         this.elapsedMs = Math.round(performance.now() - t0);
         if (res?.status && res.data?.results) {
@@ -779,6 +1187,8 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     }
     if (r.kind === 'message') return `${r.text} · ${Math.round(r.elapsedMs)} ms`;
     if (r.kind === 'error') return 'Error';
+    if (r.kind === 'explain')
+      return `Plan${r.analyzed ? ' (analyzed)' : ''} · ${Math.round(r.elapsedMs)} ms`;
     return '';
   }
 
@@ -793,6 +1203,21 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   get activeRows(): QueryRow | null {
     const r = this.results[this.activeResult];
     return r && r.kind === 'rows' ? r : null;
+  }
+
+  /**
+   * Quiet context line shown above the active rows grid ("240 rows · 88 ms",
+   * plus a truncation note). Purely derived from the active result — no new
+   * state. Empty string when the active result isn't a row set.
+   */
+  get resultContext(): { count: string; elapsed: string; truncated: boolean } | null {
+    const r = this.activeRows;
+    if (!r) return null;
+    return {
+      count: `${r.rowCount.toLocaleString()} row${r.rowCount === 1 ? '' : 's'}`,
+      elapsed: `${Math.round(r.elapsedMs).toLocaleString()} ms`,
+      truncated: r.truncated,
+    };
   }
 
   onGridReady(e: GridReadyEvent): void {
@@ -856,7 +1281,60 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     if (r.kind === 'rows') return `Result ${i + 1} (${r.rowCount})`;
     if (r.kind === 'message') return r.command || `Message ${i + 1}`;
     if (r.kind === 'error') return 'Error';
+    if (r.kind === 'explain') return 'Query plan';
     return `#${i + 1}`;
+  }
+
+  // ── EXPLAIN plan rendering helpers (result panel) ───────────────────
+
+  /** The root plan node of the active explain result, or null. */
+  get activePlan(): any | null {
+    const r = this.results[this.activeResult];
+    if (!r || r.kind !== 'explain') return null;
+    // EXPLAIN (FORMAT JSON) → [ { "Plan": {...}, ... } ]
+    const root = Array.isArray(r.plan) ? r.plan[0] : r.plan;
+    return root?.Plan ?? root ?? null;
+  }
+
+  /** Pretty-printed full plan JSON (for the raw view / copy). */
+  get activePlanJson(): string {
+    const r = this.results[this.activeResult];
+    if (!r || r.kind !== 'explain') return '';
+    try {
+      return JSON.stringify(r.plan, null, 2);
+    } catch {
+      return String(r.plan);
+    }
+  }
+
+  /** Flatten a plan tree into indented rows for a readable node list. */
+  planRows(node: any, depth = 0, acc: { depth: number; node: any }[] = []): { depth: number; node: any }[] {
+    if (!node) return acc;
+    acc.push({ depth, node });
+    for (const child of node.Plans ?? []) this.planRows(child, depth + 1, acc);
+    return acc;
+  }
+
+  copyPlan(): void {
+    try {
+      navigator.clipboard?.writeText(this.activePlanJson);
+    } catch {
+      /* clipboard blocked */
+    }
+  }
+
+  // ── table data preview (object tree → SELECT * LIMIT 100) ───────────
+
+  /**
+   * Quick data preview for a table/view: drop a SELECT into the editor and
+   * run it read-only so the rows land in the result grid. Reuses the
+   * normal execute path (no dedicated BE endpoint).
+   */
+  previewData(schema: string, name: string): void {
+    if (this.running) return;
+    this.replaceAll(`SELECT *\nFROM ${schema}.${name}\nLIMIT 100;`);
+    // Run everything (single statement just inserted).
+    this.run('all');
   }
 
   refreshSchemas(): void {
