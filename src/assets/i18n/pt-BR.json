@@ -3243,7 +3243,17 @@
     "OD_EVENTS": "Eventos",
     "OD_LEVEL": "Nível",
     "OD_FUNCTION": "Função",
-    "OD_ENABLED": "Habilitado"
+    "OD_ENABLED": "Habilitado",
+    "FIND_PLACEHOLDER": "Localizar",
+    "REPLACE_PLACEHOLDER": "Substituir",
+    "MATCH_CASE": "Diferenciar maiúsculas",
+    "USE_REGEX": "Usar expressão regular",
+    "WHOLE_WORD": "Palavra inteira",
+    "FIND_NEXT": "Próxima ocorrência",
+    "FIND_PREV": "Ocorrência anterior",
+    "CLOSE": "Fechar",
+    "REPLACE_ALL": "Substituir tudo",
+    "NO_MATCHES": "Nenhum resultado"
   },
   "DB_ACCESS": {
     "TITLE": "Gerenciamento de acesso ao banco de dados",

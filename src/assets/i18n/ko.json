@@ -3243,7 +3243,17 @@
     "OD_EVENTS": "이벤트",
     "OD_LEVEL": "수준",
     "OD_FUNCTION": "함수",
-    "OD_ENABLED": "활성화됨"
+    "OD_ENABLED": "활성화됨",
+    "FIND_PLACEHOLDER": "찾기",
+    "REPLACE_PLACEHOLDER": "바꾸기",
+    "MATCH_CASE": "대/소문자 구분",
+    "USE_REGEX": "정규식 사용",
+    "WHOLE_WORD": "단어 단위로 일치",
+    "FIND_NEXT": "다음 일치",
+    "FIND_PREV": "이전 일치",
+    "CLOSE": "닫기",
+    "REPLACE_ALL": "모두 바꾸기",
+    "NO_MATCHES": "결과 없음"
   },
   "DB_ACCESS": {
     "TITLE": "데이터베이스 접근 관리",

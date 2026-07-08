@@ -3243,7 +3243,17 @@
     "OD_EVENTS": "事件",
     "OD_LEVEL": "级别",
     "OD_FUNCTION": "函数",
-    "OD_ENABLED": "已启用"
+    "OD_ENABLED": "已启用",
+    "FIND_PLACEHOLDER": "查找",
+    "REPLACE_PLACEHOLDER": "替换",
+    "MATCH_CASE": "区分大小写",
+    "USE_REGEX": "使用正则表达式",
+    "WHOLE_WORD": "全字匹配",
+    "FIND_NEXT": "下一个匹配",
+    "FIND_PREV": "上一个匹配",
+    "CLOSE": "关闭",
+    "REPLACE_ALL": "全部替换",
+    "NO_MATCHES": "无结果"
   },
   "DB_ACCESS": {
     "TITLE": "数据库访问管理",

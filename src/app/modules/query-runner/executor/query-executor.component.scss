@@ -102,7 +102,10 @@ $qx-btn-h: 34px;
   }
 
   // Base: normalise every toolbar button to the app button shape.
-  :host ::ng-deep .modern-button.p-button,
+  // NOTE: these rules live INSIDE `.qx-toolbar`, so use `::ng-deep` (NOT
+  // `:host ::ng-deep`, which would wrongly nest the host attr *under*
+  // `.qx-toolbar` and never match).
+  ::ng-deep .modern-button.p-button,
   .modern-button {
     height: $qx-btn-h;
     min-width: $qx-btn-h;
@@ -119,66 +122,77 @@ $qx-btn-h: 34px;
     .pi { font-size: 0.95rem; }
   }
 
-  // Primary Run — solid gradient, a touch more presence, hover lift.
-  :host ::ng-deep .qx-run-btn.p-button.p-button-primary,
-  .qx-run-btn.p-button-primary {
+  // Primary Run — the ONE strong accent in the toolbar (matches dataset/new
+  // .btn-run exactly: 135° gradient, soft primary shadow, hover lift).
+  ::ng-deep .qx-run-btn.p-button.p-button-primary:not(#_) {
     background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
     border: 1px solid transparent !important;
     color: #fff !important;
     padding: 0 1rem !important;
-    box-shadow: 0 2px 6px var(--primary-color-transparent);
+    box-shadow: 0 4px 10px var(--primary-color-transparent);
     &:enabled:hover,
     &:hover {
       transform: translateY(-1px);
       box-shadow: var(--shadow-md);
     }
+    &:disabled { opacity: 0.55; box-shadow: none; transform: none; }
   }
 
-  // Labelled secondary (Format) — outlined, real border + text (not a link).
-  :host ::ng-deep .qx-labeled-btn.p-button,
-  .qx-labeled-btn {
-    padding: 0 0.85rem !important;
-    background: var(--card-background) !important;
-    border: 1px solid var(--border-color) !important;
-    color: var(--text-color) !important;
+  // Labelled secondary (Format) — flat/ghost text button (matches dataset/new
+  // ghost buttons): transparent, no border, colours to primary on hover. NOT a
+  // bordered pill. The `:not(#_)` guard adds one ID's worth of specificity so
+  // this beats PrimeNG's long `.p-button-outlined:not(…):not(…)…` border-color
+  // rule (which is (0,8,0)) without having to mirror its exact :not() chain.
+  ::ng-deep .qx-labeled-btn.p-button:not(#_) {
+    padding: 0 0.6rem !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    border-color: transparent !important;
+    color: var(--text-muted) !important;
+    box-shadow: none !important;
     &:enabled:hover,
     &:hover {
-      border-color: var(--primary-color) !important;
       color: var(--primary-color) !important;
-      background: var(--primary-color-transparent) !important;
+      background: var(--hover-background) !important;
+      border-color: transparent !important;
     }
+    &:disabled { opacity: 0.5; }
   }
 
-  // Icon-only — real square button chrome (border + bg), even 34x34.
-  :host ::ng-deep .qx-icon-btn.p-button,
-  .qx-icon-btn {
+  // Icon-only — flat/ghost (matches dataset/new .btn-export etc): transparent,
+  // NO border, muted icon; hover is a subtle neutral tint + primary icon. The
+  // whole boxed-pill look is gone; group dividers (.qx-sep) carry structure.
+  // `:not(#_)` specificity guard — see the Format rule above.
+  ::ng-deep .qx-icon-btn.p-button:not(#_) {
     width: $qx-btn-h;
     height: $qx-btn-h;
     padding: 0 !important;
-    background: var(--card-background) !important;
-    border: 1px solid var(--border-color) !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    border-color: transparent !important;
     color: var(--text-muted) !important;
     box-shadow: none !important;
 
     &:enabled:hover,
     &:hover {
-      border-color: var(--primary-color) !important;
       color: var(--primary-color) !important;
-      background: var(--primary-color-transparent) !important;
+      background: var(--hover-background) !important;
+      border-color: transparent !important;
     }
 
-    // Active toggle state (wrap / explain / minimap on).
+    // Active toggle state (wrap / explain / minimap on) — primary icon + faint
+    // primary tint, still borderless.
     &.qx-active {
-      border-color: var(--primary-color) !important;
       color: var(--primary-color) !important;
       background: var(--primary-color-transparent) !important;
+      border-color: transparent !important;
     }
 
-    // Danger (Stop) — red accent on hover, only meaningful when enabled.
+    // Danger (Stop) — red icon on hover, only meaningful when enabled.
     &.p-button-danger:enabled:hover {
-      border-color: var(--error-color) !important;
       color: var(--error-color) !important;
       background: var(--error-bg) !important;
+      border-color: transparent !important;
     }
 
     &:disabled { opacity: 0.45; }
@@ -599,6 +613,150 @@ $qx-btn-h: 34px;
 .qx-editor-host {
   height: 100%;
   :global(.cm-editor) { height: 100%; }
+
+  // ── Find/replace: a compact floating card top-right of the editor ──
+  // Our custom CM panel (search-panel.ts, class .qx-find) mounts inside
+  // .cm-panels.cm-panels-top. Float that panel container as a card instead of
+  // the stock full-width top strip. Deep selectors: CM renders outside Angular
+  // view encapsulation.
+  ::ng-deep .cm-panels.cm-panels-top {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    left: auto;
+    z-index: 6;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--card-background);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+
+  ::ng-deep .qx-find {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    width: min(30rem, 70vw);
+    font-family: var(--font-ui);
+
+    .qx-find-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    // Find / Replace text inputs.
+    .qx-find-input {
+      flex: 1;
+      min-width: 0;
+      height: 30px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--card-background);
+      color: var(--text-color);
+      font-family: var(--font-mono);
+      font-size: var(--fs-control);
+      padding: 0 var(--space-4);
+      outline: none;
+      transition: border-color var(--motion-base) ease, box-shadow var(--motion-base) ease;
+
+      &::placeholder { color: var(--text-muted); }
+      &:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px var(--primary-color-transparent);
+      }
+    }
+
+    // Case / regex / whole-word chips.
+    .qx-find-toggles {
+      display: inline-flex;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+    .qx-find-toggle {
+      height: 26px;
+      min-width: 26px;
+      padding: 0 var(--space-3);
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: var(--fs-label);
+      font-weight: var(--fw-semibold);
+      font-family: var(--font-mono);
+      cursor: pointer;
+      transition: all var(--motion-base) ease;
+
+      &:hover { background: var(--hover-background); color: var(--text-color); }
+      // Enabled flag — primary tint, matching the toolbar's .qx-active.
+      &.on {
+        background: var(--primary-color-transparent);
+        color: var(--primary-color);
+      }
+    }
+
+    // n/total match count (or "No results").
+    .qx-find-count {
+      flex-shrink: 0;
+      min-width: 3.5rem;
+      text-align: right;
+      font-size: var(--fs-label);
+      font-variant-numeric: tabular-nums;
+      color: var(--text-muted);
+      &.empty { color: var(--error-color); }
+    }
+
+    // Prev / next / close — flat/ghost icon buttons (toolbar language).
+    .qx-find-nav {
+      display: inline-flex;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+    .qx-find-iconbtn {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--motion-base) ease;
+
+      .pi { font-size: 0.8rem; }
+      &:hover { background: var(--hover-background); color: var(--primary-color); }
+      &.qx-find-close:hover { color: var(--error-color); background: var(--error-bg); }
+    }
+
+    // Replace / Replace-all — flat text buttons.
+    .qx-find-replace-actions {
+      display: inline-flex;
+      gap: var(--space-2);
+      flex-shrink: 0;
+    }
+    .qx-find-textbtn {
+      height: 30px;
+      padding: 0 var(--space-4);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--card-background);
+      color: var(--text-color);
+      font-size: var(--fs-control);
+      font-weight: var(--fw-medium);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all var(--motion-base) ease;
+
+      &:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        background: var(--primary-color-transparent);
+      }
+    }
+  }
 }
 
 // Drag-drop a .sql file onto the editor — calm dashed drop zone.

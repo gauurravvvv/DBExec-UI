@@ -3243,7 +3243,17 @@
     "OD_EVENTS": "Gebeurtenissen",
     "OD_LEVEL": "Niveau",
     "OD_FUNCTION": "Functie",
-    "OD_ENABLED": "Ingeschakeld"
+    "OD_ENABLED": "Ingeschakeld",
+    "FIND_PLACEHOLDER": "Zoeken",
+    "REPLACE_PLACEHOLDER": "Vervangen",
+    "MATCH_CASE": "Hoofdlettergevoelig",
+    "USE_REGEX": "Reguliere expressie gebruiken",
+    "WHOLE_WORD": "Heel woord",
+    "FIND_NEXT": "Volgende overeenkomst",
+    "FIND_PREV": "Vorige overeenkomst",
+    "CLOSE": "Sluiten",
+    "REPLACE_ALL": "Alles vervangen",
+    "NO_MATCHES": "Geen resultaten"
   },
   "DB_ACCESS": {
     "TITLE": "Databasetoegangsbeheer",

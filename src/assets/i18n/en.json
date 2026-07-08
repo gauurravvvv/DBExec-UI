@@ -3565,6 +3565,16 @@
     "OD_EVENTS": "Events",
     "OD_LEVEL": "Level",
     "OD_FUNCTION": "Function",
-    "OD_ENABLED": "Enabled"
+    "OD_ENABLED": "Enabled",
+    "FIND_PLACEHOLDER": "Find",
+    "REPLACE_PLACEHOLDER": "Replace",
+    "MATCH_CASE": "Match case",
+    "USE_REGEX": "Use regular expression",
+    "WHOLE_WORD": "Match whole word",
+    "FIND_NEXT": "Next match",
+    "FIND_PREV": "Previous match",
+    "CLOSE": "Close",
+    "REPLACE_ALL": "Replace all",
+    "NO_MATCHES": "No results"
   }
 }

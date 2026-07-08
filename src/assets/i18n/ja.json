@@ -3243,7 +3243,17 @@
     "OD_EVENTS": "イベント",
     "OD_LEVEL": "レベル",
     "OD_FUNCTION": "関数",
-    "OD_ENABLED": "有効"
+    "OD_ENABLED": "有効",
+    "FIND_PLACEHOLDER": "検索",
+    "REPLACE_PLACEHOLDER": "置換",
+    "MATCH_CASE": "大文字と小文字を区別",
+    "USE_REGEX": "正規表現を使用",
+    "WHOLE_WORD": "単語単位で一致",
+    "FIND_NEXT": "次の一致",
+    "FIND_PREV": "前の一致",
+    "CLOSE": "閉じる",
+    "REPLACE_ALL": "すべて置換",
+    "NO_MATCHES": "結果なし"
   },
   "DB_ACCESS": {
     "TITLE": "データベースアクセス管理",

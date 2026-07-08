@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import {
   autocompletion,
@@ -58,6 +58,8 @@ import {
 } from '@codemirror/view';
 import { StateEffect, StateField } from '@codemirror/state';
 import { showMinimap } from '@replit/codemirror-minimap';
+
+import { buildSearchPanel, SearchPanelLabels } from './search-panel';
 
 import { AgGridAngular } from 'ag-grid-angular';
 import {
@@ -196,6 +198,7 @@ const runFlashField = StateField.define<DecorationSet>({
 export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
+  private translate = inject(TranslateService);
 
   @ViewChild('editorHost', { static: false }) editorHost!: ElementRef<HTMLDivElement>;
 
@@ -588,6 +591,24 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     ];
   }
 
+  // Resolve the find/replace panel's static labels once (panel is plain DOM).
+  private searchLabels(): SearchPanelLabels {
+    const t = (k: string) => this.translate.instant(k);
+    return {
+      find: t('QUERY_RUNNER.FIND_PLACEHOLDER'),
+      replace: t('QUERY_RUNNER.REPLACE_PLACEHOLDER'),
+      matchCase: t('QUERY_RUNNER.MATCH_CASE'),
+      useRegex: t('QUERY_RUNNER.USE_REGEX'),
+      wholeWord: t('QUERY_RUNNER.WHOLE_WORD'),
+      next: t('QUERY_RUNNER.FIND_NEXT'),
+      prev: t('QUERY_RUNNER.FIND_PREV'),
+      close: t('QUERY_RUNNER.CLOSE'),
+      replaceOne: t('QUERY_RUNNER.REPLACE'),
+      replaceAll: t('QUERY_RUNNER.REPLACE_ALL'),
+      noMatches: t('QUERY_RUNNER.NO_MATCHES'),
+    };
+  }
+
   private initEditor(): void {
     const saved = this.loadDraft();
     this.zone.runOutsideAngular(() => {
@@ -607,7 +628,10 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
             closeBrackets(),
             indentOnInput(),
             highlightSelectionMatches(),
-            search({ top: true }),
+            // Compact floating find/replace card (custom panel) instead of the
+            // stock full-width strip. Labels resolved once at init — the panel
+            // is plain DOM (editor runs outside Angular).
+            search({ top: true, createPanel: buildSearchPanel(this.searchLabels()) }),
             lintGutter(),
             runFlashField,
             placeholder('-- Write SQL. Ctrl/Cmd+Enter runs the statement at the cursor.'),

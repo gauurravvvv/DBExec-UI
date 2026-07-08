@@ -1,61 +1,76 @@
 :host {
-  --od-bg: var(--surface-card, #fff);
-  --od-border: var(--surface-border, #d9dde5);
-  --od-text: var(--text-color, #1c2430);
-  --od-muted: var(--text-color-secondary, #6b7482);
-  --od-accent: var(--primary-color, #2f6f6a);
+  // Aliases resolve to app tokens; fallbacks retoned OFF the old bespoke teal
+  // palette so no teal accent / darker-than-app text can ever surface.
+  --od-bg: var(--card-background, #fff);
+  --od-border: var(--border-color, #e0e0e0);
+  --od-text: var(--text-color, #333333);
+  --od-muted: var(--text-muted, #6b7280);
+  --od-accent: var(--primary-color, #2196f3);
 }
 
 .od-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: var(--overlay-background, rgba(0, 0, 0, 0.45));
   display: grid;
   place-items: center;
-  z-index: 1200;
+  z-index: var(--z-overlay, 1200);
   padding: 2rem;
 }
 .od-modal {
   background: var(--od-bg);
   color: var(--od-text);
-  border-radius: 10px;
+  // Canonical app modal chrome — --shadow-xl + 1px ring, --radius-lg (was a
+  // bespoke 10px + heavy 0 20px 60px shadow).
+  border-radius: var(--radius-lg, 12px);
   width: min(920px, 96vw);
   max-height: 88vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  font-family: 'Inter', system-ui, sans-serif;
+  box-shadow:
+    var(--shadow-xl, 0 20px 25px -5px rgba(0, 0, 0, 0.1)),
+    0 0 0 1px var(--border-color, #e0e0e0);
+  font-family: var(--font-ui, 'Inter', system-ui, sans-serif);
 }
 
 .od-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.8rem 1rem;
+  padding: var(--space-5) var(--space-6);
   border-bottom: 1px solid var(--od-border);
+  background: var(--hover-background, #f5f5f5);
 }
 .od-title {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-4);
   min-width: 0;
-  > i { color: var(--od-accent); }
+  > i {
+    color: var(--od-accent);
+    font-size: var(--fs-h3);
+  }
   .od-name {
-    font-weight: 600;
-    font-family: ui-monospace, monospace;
+    font-weight: var(--fw-semibold, 600);
+    font-size: var(--fs-body);
+    font-family: var(--font-mono, ui-monospace, monospace);
+    color: var(--text-color);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  // Object kind ("TABLE"/"VIEW"/…) — soft primary chip, matching the app's
+  // badge language (was a plain grey outline pill).
   .od-kind {
-    font-size: var(--fs-label);
+    font-size: var(--fs-micro, 11px);
+    font-weight: var(--fw-semibold, 600);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--od-muted);
-    border: 1px solid var(--od-border);
-    border-radius: 999px;
-    padding: 1px 7px;
+    color: var(--od-accent);
+    background: var(--primary-color-transparent, rgba(33, 150, 243, 0.15));
+    border-radius: var(--radius-pill, 999px);
+    padding: 2px 8px;
   }
 }
 .od-head-actions {
@@ -65,16 +80,20 @@
 }
 .od-refresh {
   border: 1px solid var(--od-border);
-  background: transparent;
+  background: var(--card-background);
   color: var(--od-accent);
-  border-radius: 6px;
+  border-radius: var(--radius-sm, 6px);
   padding: 0.3rem 0.6rem;
   font-size: var(--fs-control);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  &:hover:not(:disabled) { background: var(--surface-ground, #f7f8fa); }
+  transition: all var(--motion-base, 200ms) ease;
+  &:hover:not(:disabled) {
+    border-color: var(--od-accent);
+    background: var(--primary-color-transparent, rgba(33, 150, 243, 0.15));
+  }
 }
 .od-close {
   border: none;
@@ -85,26 +104,36 @@
   &:hover { color: var(--od-text); }
 }
 
+// Segmented tab strip — matches the app's .priv-tabs pattern: a subtle track
+// with pill buttons; the active tab lifts onto the card surface with primary
+// text (was flat underline-less text links that barely read as tabs).
 .od-tabs {
   display: flex;
-  gap: 2px;
-  padding: 0.4rem 0.75rem 0;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-6);
   border-bottom: 1px solid var(--od-border);
   overflow-x: auto;
+
   button {
     border: 1px solid transparent;
-    border-bottom: none;
     background: transparent;
     color: var(--od-muted);
-    padding: 0.4rem 0.8rem;
+    padding: 0.4rem 0.85rem;
     font-size: var(--fs-control);
+    font-weight: var(--fw-medium, 500);
     cursor: pointer;
-    border-radius: 6px 6px 0 0;
+    border-radius: var(--radius-sm, 6px);
     white-space: nowrap;
+    transition: all var(--motion-base, 200ms) ease;
+
+    &:hover:not(.active) {
+      color: var(--text-color);
+      background: var(--hover-background, #f5f5f5);
+    }
     &.active {
-      color: var(--od-text);
-      border-color: var(--od-border);
-      background: var(--surface-ground, #f7f8fa);
+      color: var(--od-accent);
+      background: var(--primary-color-transparent, rgba(33, 150, 243, 0.15));
+      font-weight: var(--fw-semibold, 600);
     }
   }
 }
@@ -123,28 +152,45 @@
   color: var(--od-muted);
   padding: 1rem;
 }
-.od-error { color: #c0392b; }
+.od-error { color: var(--error-color, #f44336); }
 
+// Data table — mirrors the app's .modern-table: shaded sticky header, zebra
+// body rows, hover highlight, compact mono cells (was a bare HTML table with
+// hairline rows and no header fill).
 .od-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--fs-body);
+  font-size: var(--fs-control);
+
   th {
     text-align: left;
-    color: var(--od-muted);
-    font-weight: 600;
-    padding: 0.4rem 0.6rem;
+    color: var(--text-color);
+    font-weight: var(--fw-semibold, 600);
+    font-size: var(--fs-control);
+    padding: 0.45rem 0.7rem;
     border-bottom: 1px solid var(--od-border);
     position: sticky;
     top: 0;
-    background: var(--od-bg);
+    z-index: 1;
+    background: var(--hover-background, #f5f5f5);
+    white-space: nowrap;
+  }
+  tbody tr {
+    &:nth-child(even) > td { background: rgba(0, 0, 0, 0.018); }
+    &:hover > td { background: var(--hover-background, #f5f5f5); }
   }
   td {
-    padding: 0.4rem 0.6rem;
-    border-bottom: 1px solid var(--surface-ground, #eef0f4);
+    padding: 0.4rem 0.7rem;
+    border-bottom: 1px solid var(--od-border);
     vertical-align: top;
+    color: var(--text-color);
+    font-family: var(--font-mono, ui-monospace, monospace);
   }
-  .od-pk { color: #b8860b; margin-right: 0.3rem; font-size: var(--fs-label); }
+  .od-pk {
+    color: var(--warning-color, #ff9800);
+    margin-right: 0.3rem;
+    font-size: var(--fs-label);
+  }
 }
 .od-mono { font-family: ui-monospace, monospace; }
 .od-muted { color: var(--od-muted); }
@@ -154,9 +200,9 @@
 .od-badge {
   display: inline-block;
   font-size: var(--fs-label);
-  border-radius: 4px;
+  border-radius: var(--radius-xs, 4px);
   padding: 1px 6px;
-  background: var(--surface-ground, #eef0f4);
+  background: var(--hover-background, #f5f5f5);
   color: var(--od-text);
 }
 .od-badge { margin-left: 0.4rem; }
@@ -180,11 +226,12 @@
 .od-code {
   margin: 0;
   padding: 0.75rem;
-  background: var(--surface-ground, #f7f8fa);
+  background: var(--secondary-background, #f8fafc);
   border: 1px solid var(--od-border);
-  border-radius: 8px;
-  font-family: ui-monospace, monospace;
+  border-radius: var(--radius-md, 8px);
+  font-family: var(--font-mono, ui-monospace, monospace);
   font-size: var(--fs-control);
+  color: var(--text-color);
   white-space: pre-wrap;
   word-break: break-word;
   overflow-x: auto;
