@@ -108,8 +108,12 @@
      flex-scrollable sticky positioning); the global rule forces a
      card-background header with !important, so we chain `.modern-table` +
      !important here to keep the shaded header and beat it. */
-  &.modern-table .p-datatable-thead > tr > th,
-  .p-datatable-thead > tr > th {
+  /* Scope to the FIRST header row (labels) only — the second thead row is the
+     filter row, which gets its own tight padding below (.ct-filter-row > th).
+     Applying this row's 0.5rem vertical padding to the filter cells too created
+     a visible gap between the header and the filter inputs. */
+  &.modern-table .p-datatable-thead > tr:first-child > th,
+  .p-datatable-thead > tr:first-child > th {
     background: var(--hover-background) !important;
     color: var(--text-muted) !important;
     font-size: var(--fs-label) !important;
@@ -262,11 +266,14 @@
     }
   }
 
-  /* Per-column filter row — shared app-custom-input in each header cell. */
+  /* Per-column filter row — shared app-custom-input in each header cell.
+     Tight vertical padding (and !important to beat the global .modern-table th
+     padding) so the inputs sit snug directly under the header with no gap. */
+  &.modern-table .ct-filter-row > th,
   .ct-filter-row > th {
-    background: var(--card-background);
+    background: var(--card-background) !important;
     border-bottom: 1px solid var(--border-color);
-    padding: 0.3rem 0.5rem;
+    padding: var(--space-3) 0.5rem !important;
     app-custom-input { display: block; width: 100%; }
   }
 
