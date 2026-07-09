@@ -3,7 +3,8 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { UsDataGridComponent } from 'src/app/shared/components/us-data-grid/us-data-grid.component';
+import { CustomTableComponent } from 'src/app/shared/components/custom-table/custom-table.component';
+import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-table/custom-table-empty.directive';
 import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { AddRlsRuleComponent } from './components/add-rls-rule/add-rls-rule.component';
 import { EditRlsRuleComponent } from './components/edit-rls-rule/edit-rls-rule.component';
@@ -27,7 +28,11 @@ import { RlsRulesRoutingModule } from './rls-rules-routing.module';
     AppPrimeNGModule,
     RlsRulesRoutingModule,
     SharedModule,
-    UsDataGridComponent,
+    // Standalone — the shared unified list table + its projected-empty
+    // directive. `UsGridCellDirective` stays: the table reuses it verbatim
+    // for per-cell templates.
+    CustomTableComponent,
+    CustomTableEmptyDirective,
     UsGridCellDirective,
   ],
 })

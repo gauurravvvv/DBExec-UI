@@ -9,23 +9,27 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import type { ColDef } from 'ag-grid-community';
 import { SYSTEM_ADMIN } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import {
   UsServerListAdapter,
   UsListLoadParams,
 } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
-import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
+import type {
+  CustomTableColumn,
+  CustomTableConfig,
+} from 'src/app/shared/components/custom-table/custom-table.types';
 import { SystemAdminService } from '../../services/system-admin.service';
 
 /**
- * System Admin listing — renders through `<us-data-grid>` with a
- * `UsServerListAdapter` driving the BE `/system-admins` list call. The
- * page header / content card / delete-confirm popup retain the existing
- * styling and behaviour; only the `<p-table>` was swapped out for the
- * AG Grid wrapper. There is no datasource dropdown here — system admins
- * are master-DB scoped — so the adapter binds on `ngOnInit`.
+ * System Admin listing — renders through the shared `<app-custom-table>` (the
+ * app's unified list table) driven by a `UsServerListAdapter` on the BE
+ * `/system-admins` list call. Infinite scroll (no page controls), a single
+ * global search plus on-demand per-column filters (shared inputs), and
+ * per-row actions. No bulk selection.
+ *
+ * System admins are org-wide (master-DB scoped) so there's no datasource gate
+ * and no secondary filter dropdown — the adapter binds on `ngOnInit`.
  */
 @Component({
   selector: 'app-list-system-admin',
@@ -37,13 +41,11 @@ export class ListSystemAdminComponent implements OnInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
-  /* ── page state — UNCHANGED from the p-table version ──── */
+  /* ── page state ──────────────────────────────────────── */
 
   loggedInUserId: any;
-  selectedAdmins: any[] = [];
   showDeleteConfirm = false;
   adminIdToDelete: string | null = null;
-  bulkDelete = false;
   deleteJustification = '';
   today = new Date();
   statusOptions: { label: string; value: number }[] = [];
@@ -54,35 +56,25 @@ export class ListSystemAdminComponent implements OnInit, OnDestroy {
   isDeleting = (id: string): boolean => this.systemAdminService.isDeleting(id);
   isUnlocking = (id: string): boolean =>
     this.systemAdminService.isUnlocking(id);
-  get isBulkDeleting(): boolean {
-    return this.selectedAdmins.some(a =>
-      this.systemAdminService.isDeleting(a.id),
-    );
-  }
 
-  /* ── grid wiring ───────────────────────────────────────── */
+  /* ── custom-table wiring (unified simple table; server-driven) ──────── */
 
-  /** AG Grid column definitions — widths preserved from the old
-   *  `<p-table>` so the visual layout is unchanged. cellRenderer
-   *  templates live in the HTML as `<ng-template usGridCell>`. */
-  cols: ColDef[] = [];
+  /** Unified-table columns. Cell DOM is supplied by `<ng-template usGridCell>`
+   *  in the HTML; `filter` flags enable the on-demand per-column filter row. */
+  cols: CustomTableColumn[] = [];
 
-  gridConfig: UsDataGridConfig = {
-    enableRowSelection: true,
-    rowSelectionMode: 'multiple',
-    freezeFirstColumn: true,
-    enableColumnChooser: true,
-    enableAddFilter: false, // we use the BE-driven floating filters
-    enableAutoFit: true,
-    enableDensityToggle: true,
-    enableCsvExport: true,
-    enableXlsxExport: true,
-    enableRefresh: true,
-    enableSavedViews: true,
+  tableConfig: CustomTableConfig = {
+    mode: 'scroll', // infinite scroll — no page controls
+    pageSize: 50, // rows fetched per scroll page
+    globalSearch: true,
+    globalSearchKey: 'search', // BE system-admins list matches a `search` filter key
+    globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
+    showColumnFilters: true,
+    enableExport: true,
+    enableDensity: true,
+    density: 'comfortable',
     gridKey: 'system-admins-list',
-    pageSizeOptions: [10, 25, 50, 100],
-    pageSize: 10,
-    height: 'calc(100vh - 280px)',
+    height: 'flex',
     rowIdField: 'id',
   };
 
@@ -105,6 +97,13 @@ export class ListSystemAdminComponent implements OnInit, OnDestroy {
     ];
 
     this.cols = this.buildColumns();
+    // Field-specific search placeholder so the user knows what's matched.
+    this.tableConfig = {
+      ...this.tableConfig,
+      globalSearchPlaceholder: this.translate.instant(
+        'SYSTEM_ADMIN.SEARCH_PLACEHOLDER',
+      ),
+    };
     this.bindAdapter();
   }
 
@@ -114,92 +113,19 @@ export class ListSystemAdminComponent implements OnInit, OnDestroy {
     this.adapter?.destroy();
   }
 
-  get selectedCount(): number {
-    return this.selectedAdmins?.length || 0;
-  }
-
-  get isFilterActive(): boolean {
-    return !!this.adapter && Object.keys(this.adapter.filterModel()).length > 0;
-  }
-
   /* ── column definitions ──────────────────────────────── */
 
-  private buildColumns(): ColDef[] {
+  private buildColumns(): CustomTableColumn[] {
+    const t = (k: string) => this.translate.instant(k);
     return [
-      {
-        colId: 'username',
-        field: 'username',
-        headerName: this.translate.instant('COMMON.USERNAME'),
-        width: 192,
-        minWidth: 192,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        pinned: 'left',
-      },
-      {
-        colId: 'firstName',
-        field: 'firstName',
-        headerName: this.translate.instant('COMMON.FIRST_NAME'),
-        width: 160,
-        minWidth: 160,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'lastName',
-        field: 'lastName',
-        headerName: this.translate.instant('COMMON.LAST_NAME'),
-        width: 160,
-        minWidth: 160,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'email',
-        field: 'email',
-        headerName: this.translate.instant('COMMON.EMAIL'),
-        minWidth: 288,
-        flex: 1,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'status',
-        field: 'status',
-        headerName: this.translate.instant('COMMON.STATUS'),
-        width: 144,
-        minWidth: 144,
-        filter: 'agNumberColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'lastLogin',
-        field: 'lastLogin',
-        headerName: this.translate.instant('COMMON.LAST_LOGIN'),
-        width: 192,
-        minWidth: 192,
-        filter: 'agDateColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'createdOn',
-        field: 'createdOn',
-        headerName: this.translate.instant('COMMON.CREATED_ON'),
-        width: 192,
-        minWidth: 192,
-        filter: 'agDateColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'actions',
-        headerName: this.translate.instant('COMMON.ACTIONS'),
-        width: 112,
-        minWidth: 112,
-        sortable: false,
-        filter: false,
-        resizable: false,
-        pinned: 'right',
-      },
+      { colId: 'username', field: 'username', header: t('COMMON.USERNAME'), width: '192px', frozen: true, filter: 'text' },
+      { colId: 'firstName', field: 'firstName', header: t('COMMON.FIRST_NAME'), width: '160px', filter: 'text' },
+      { colId: 'lastName', field: 'lastName', header: t('COMMON.LAST_NAME'), width: '160px', filter: 'text' },
+      { colId: 'email', field: 'email', header: t('COMMON.EMAIL'), width: '288px', filter: 'text' },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px', filter: 'numeric' },
+      { colId: 'lastLogin', field: 'lastLogin', header: t('COMMON.LAST_LOGIN'), width: '192px' },
+      { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px' },
+      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
     ];
   }
 
@@ -207,7 +133,7 @@ export class ListSystemAdminComponent implements OnInit, OnDestroy {
 
   /**
    * Construct the server-side adapter. Called once from ngOnInit —
-   * unlike the tabs module there's no datasource to gate on.
+   * there's no datasource to gate on.
    */
   private bindAdapter() {
     this.adapter?.destroy();
@@ -224,80 +150,21 @@ export class ListSystemAdminComponent implements OnInit, OnDestroy {
         rows: res?.data?.systemAdmins ?? [],
         total: res?.data?.count ?? 0,
       }),
-      // Floating-filter cell value → BE filter slice. The grid's
-      // floating filters emit AG-Grid-shaped cells; this map flattens
-      // them into the shape the BE expects.
-      filterBuilders: {
-        username: cell => ({ username: (cell as any)?.filter ?? cell }),
-        firstName: cell => ({ firstName: (cell as any)?.filter ?? cell }),
-        lastName: cell => ({ lastName: (cell as any)?.filter ?? cell }),
-        email: cell => ({ email: (cell as any)?.filter ?? cell }),
-        status: cell => {
-          const v = (cell as any)?.filter ?? cell;
-          return v === '' || v === null || v === undefined
-            ? {}
-            : { status: v };
-        },
-        lastLogin: cell => {
-          // BE expects lastLoginDateFrom / lastLoginDateTo (mirrors
-          // the createdDate* naming on the same controller).
-          const c = cell as any;
-          const out: Record<string, string> = {};
-          if (c?.dateFrom)
-            out['lastLoginDateFrom'] = new Date(c.dateFrom).toISOString();
-          if (c?.dateTo) {
-            const to = new Date(c.dateTo);
-            to.setHours(23, 59, 59, 999);
-            out['lastLoginDateTo'] = to.toISOString();
-          }
-          return out;
-        },
-        createdOn: cell => {
-          const c = cell as any;
-          const out: Record<string, string> = {};
-          if (c?.dateFrom)
-            out['createdDateFrom'] = new Date(c.dateFrom).toISOString();
-          if (c?.dateTo) {
-            const to = new Date(c.dateTo);
-            to.setHours(23, 59, 59, 999);
-            out['createdDateTo'] = to.toISOString();
-          }
-          return out;
-        },
-      },
-      initial: { page: 1, limit: 10 },
+      // custom-table sends PLAIN filter values (global `search` + per-column
+      // username/firstName/lastName/email/status), so the adapter's identity
+      // mapping passes them straight through — no AG-Grid cell unwrapping.
+      initial: { page: 1, limit: 50 },
     });
     this.cdr.markForCheck();
   }
 
   /* ── handlers re-pointed at the adapter ──────────────── */
 
-  onSelectionChange(rows: any[]) {
-    // Defensive — drop default admins, the logged-in user, and any row
-    // the BE flagged non-deletable. The grid's isRowSelectable hook
-    // should already prevent it, but the bulk-delete CTA reads off
-    // this array so we double-guard.
-    this.selectedAdmins = (rows || []).filter(
-      a =>
-        a?.isDefault !== 1 &&
-        a?.id !== this.loggedInUserId &&
-        a?.canDelete !== false,
-    );
-    this.cdr.markForCheck();
-  }
-
-  clearFilters() {
-    if (!this.adapter) return;
-    this.adapter.setFilter({});
-    this.adapter.setSort([]);
-    this.selectedAdmins = [];
-  }
-
   refreshList() {
     this.adapter?.reload();
   }
 
-  /* ── nav + per-row actions — UNCHANGED ───────────────── */
+  /* ── nav + per-row actions ───────────────────────────── */
 
   onAddNewAdmin() {
     this.router.navigate([SYSTEM_ADMIN.ADD]);
@@ -318,21 +185,12 @@ export class ListSystemAdminComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.adminIdToDelete = id;
-    this.bulkDelete = false;
-    this.showDeleteConfirm = true;
-  }
-
-  confirmBulkDelete() {
-    if (this.selectedCount === 0) return;
-    this.adminIdToDelete = null;
-    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.adminIdToDelete = null;
-    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
@@ -340,37 +198,12 @@ export class ListSystemAdminComponent implements OnInit, OnDestroy {
     const reason = this.deleteJustification.trim();
     if (!reason) return;
 
-    if (this.bulkDelete) {
-      const ids = this.selectedAdmins.map(a => a.id);
-      if (ids.length === 0) {
-        this.cancelDelete();
-        return;
-      }
-      this.systemAdminService
-        .bulkDelete(ids, reason)
-        .then((res: any) => {
-          if (this.globalService.handleSuccessService(res)) {
-            this.selectedAdmins = [];
-            this.refreshList();
-          }
-        })
-        .catch(() => {
-          /* global interceptor shows error toast */
-        })
-        .finally(() => {
-          this.closeDeletePopup();
-          this.cdr.markForCheck();
-        });
-      return;
-    }
-
     if (this.adminIdToDelete) {
       const id = this.adminIdToDelete;
       this.systemAdminService
         .delete(id, reason)
         .then((res: any) => {
           if (this.globalService.handleSuccessService(res)) {
-            this.selectedAdmins = this.selectedAdmins.filter(a => a.id !== id);
             this.refreshList();
           }
         })
@@ -387,7 +220,6 @@ export class ListSystemAdminComponent implements OnInit, OnDestroy {
   private closeDeletePopup() {
     this.showDeleteConfirm = false;
     this.adminIdToDelete = null;
-    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 }

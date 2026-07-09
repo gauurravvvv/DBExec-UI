@@ -4,7 +4,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { MenuModule } from 'primeng/menu';
-import { UsDataGridComponent } from 'src/app/shared/components/us-data-grid/us-data-grid.component';
+import { CustomTableComponent } from 'src/app/shared/components/custom-table/custom-table.component';
+import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-table/custom-table-empty.directive';
 import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedChartsModule } from 'src/app/shared/modules/shared-charts.module';
@@ -48,7 +49,11 @@ import {
     SharedModule,
     SharedChartsModule,
     MenuModule,
-    UsDataGridComponent,
+    // Standalone — the shared unified list table + its projected-empty
+    // directive. `UsGridCellDirective` stays: the table reuses it verbatim
+    // for per-cell templates.
+    CustomTableComponent,
+    CustomTableEmptyDirective,
     UsGridCellDirective,
     // NgRx feature stores. Two slices — dataset cache + filter slice.
     StoreModule.forFeature(ADD_ANALYSES_FEATURE_KEY, addAnalysesReducer),

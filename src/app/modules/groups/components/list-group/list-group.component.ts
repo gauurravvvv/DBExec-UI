@@ -7,10 +7,8 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import type { ColDef } from 'ag-grid-community';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { GROUP } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -19,17 +17,23 @@ import {
   UsServerListAdapter,
   UsListLoadParams,
 } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
-import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
+import type {
+  CustomTableColumn,
+  CustomTableConfig,
+} from 'src/app/shared/components/custom-table/custom-table.types';
 import { GroupService } from '../../services/group.service';
 
 /**
- * Group listing — renders through `<us-data-grid>` with a
- * `UsServerListAdapter` driving the BE `/groups` list call. Unlike
- * the tab listing, groups has NO datasource dropdown so the adapter
- * is bound in `ngOnInit` directly. The Role filter (a server-mode
- * dropdown) lives in the card toolbar above the grid and feeds an
- * additional `roleId` param into the load fn — rebuilding the
- * adapter on role change keeps the closure in sync.
+ * Group listing — renders through the shared `<app-custom-table>` (the app's
+ * unified list table) driven by a `UsServerListAdapter` on the BE `/groups`
+ * list call. Infinite scroll (no page controls), a single global search plus
+ * on-demand per-column filters (shared inputs), and per-row actions. No bulk
+ * selection.
+ *
+ * Groups is org-wide (no datasource gate) but carries an extra Role filter
+ * (server-mode dropdown) projected into the table's toolbar-left slot, so it
+ * sits inline with the search + action icons. Selecting a role rebuilds the
+ * adapter so the closure captures the latest `roleId`.
  */
 @Component({
   selector: 'app-list-group',
@@ -43,16 +47,13 @@ export class ListGroupComponent implements OnInit, OnDestroy {
 
   /* ── page state ──────────────────────────────────────── */
 
-  selectedGroups: any[] = [];
   showDeleteConfirm = false;
   groupToDelete: string | null = null;
-  bulkDelete = false;
   deleteJustification = '';
-  Math = Math;
   today = new Date();
   statusOptions: { label: string; value: number }[] = [];
 
-  // Role filter — server-mode dropdown outside the grid.
+  // Role filter — server-mode dropdown outside the grid (card toolbar).
   roles: any[] = [];
   selectedRole: string | null = null;
   preloadedRoles: any[] | null = null;
@@ -61,35 +62,31 @@ export class ListGroupComponent implements OnInit, OnDestroy {
   // Per-row spinner helpers — the BE delete promise sets a per-id
   // flag on the service so each row can spin independently.
   isDeleting = (id: string): boolean => this.groupService.isDeleting(id);
-  get isBulkDeleting(): boolean {
-    return this.selectedGroups.some(g => this.groupService.isDeleting(g.id));
-  }
 
-  /* ── grid wiring ───────────────────────────────────────── */
+  /* ── custom-table wiring (unified simple table; server-driven) ──────── */
 
-  cols: ColDef[] = [];
+  /** Unified-table columns. Cell DOM is supplied by `<ng-template usGridCell>`
+   *  in the HTML; `filter` flags enable the on-demand per-column filter row. */
+  cols: CustomTableColumn[] = [];
 
-  gridConfig: UsDataGridConfig = {
-    enableRowSelection: true,
-    rowSelectionMode: 'multiple',
-    freezeFirstColumn: true,
-    enableColumnChooser: true,
-    enableAddFilter: false, // we use the BE-driven floating filters
-    enableAutoFit: true,
-    enableDensityToggle: true,
-    enableCsvExport: true,
-    enableXlsxExport: true,
-    enableRefresh: true,
-    enableSavedViews: true,
+  tableConfig: CustomTableConfig = {
+    mode: 'scroll', // infinite scroll — no page controls
+    pageSize: 50, // rows fetched per scroll page
+    globalSearch: true,
+    globalSearchKey: 'search', // BE groups list matches a `search` filter key
+    globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
+    showColumnFilters: true,
+    enableExport: true,
+    enableDensity: true,
+    density: 'comfortable',
     gridKey: 'groups-list',
-    pageSizeOptions: [10, 25, 50, 100],
-    pageSize: 10,
-    // No datasource dropdown = more vertical space than tabs.
-    height: 'calc(100vh - 280px)',
+    height: 'flex',
     rowIdField: 'id',
   };
 
-  /** Server-side adapter — bound in `ngOnInit` (no datasource gate). */
+  /** Server-side adapter — bound on ngOnInit (no datasource gate)
+   *  and rebuilt whenever the Role filter changes so the closure
+   *  picks up the new value. */
   adapter: UsServerListAdapter<any> | null = null;
 
   constructor(
@@ -107,6 +104,11 @@ export class ListGroupComponent implements OnInit, OnDestroy {
     ];
 
     this.cols = this.buildColumns();
+    // Field-specific search placeholder so the user knows what's matched.
+    this.tableConfig = {
+      ...this.tableConfig,
+      globalSearchPlaceholder: this.translate.instant('GROUP.SEARCH_PLACEHOLDER'),
+    };
     this.loadRoles();
     this.bindAdapter();
   }
@@ -119,83 +121,25 @@ export class ListGroupComponent implements OnInit, OnDestroy {
     this.adapter?.destroy();
   }
 
-  get selectedCount(): number {
-    return this.selectedGroups?.length || 0;
-  }
-
-  get isFilterActive(): boolean {
-    return (
-      (!!this.adapter && Object.keys(this.adapter.filterModel()).length > 0) ||
-      !!this.selectedRole
-    );
-  }
-
   /* ── column definitions ──────────────────────────────── */
 
-  private buildColumns(): ColDef[] {
+  private buildColumns(): CustomTableColumn[] {
+    const t = (k: string) => this.translate.instant(k);
     return [
-      {
-        colId: 'name',
-        field: 'name',
-        headerName: this.translate.instant('COMMON.NAME'),
-        width: 224,
-        minWidth: 224,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        pinned: 'left',
-      },
-      {
-        colId: 'description',
-        field: 'description',
-        headerName: this.translate.instant('COMMON.DESCRIPTION'),
-        minWidth: 320,
-        flex: 1,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        sortable: false,
-      },
-      {
-        colId: 'roleName',
-        field: 'roleName',
-        headerName: this.translate.instant('COMMON.ROLE'),
-        width: 192,
-        minWidth: 192,
-        sortable: false,
-        filter: false,
-      },
-      {
-        colId: 'status',
-        field: 'status',
-        headerName: this.translate.instant('COMMON.STATUS'),
-        width: 144,
-        minWidth: 144,
-        filter: 'agNumberColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'createdOn',
-        field: 'createdOn',
-        headerName: this.translate.instant('COMMON.CREATED_ON'),
-        width: 192,
-        minWidth: 192,
-        filter: 'agDateColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'actions',
-        headerName: this.translate.instant('COMMON.ACTIONS'),
-        width: 112,
-        minWidth: 112,
-        sortable: false,
-        filter: false,
-        resizable: false,
-        pinned: 'right',
-      },
+      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
+      { colId: 'description', field: 'description', header: t('COMMON.DESCRIPTION'), width: '320px', filter: 'text', sortable: false },
+      { colId: 'roleName', field: 'roleName', header: t('COMMON.ROLE'), width: '192px', sortable: false },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px', filter: 'numeric' },
+      { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px' },
+      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
     ];
   }
 
   /* ── role filter dropdown ────────────────────────────── */
 
+  /**
+   * Fetcher for the server-mode Role filter dropdown.
+   */
   loadRolesPage = async ({
     search,
     page,
@@ -236,7 +180,6 @@ export class ListGroupComponent implements OnInit, OnDestroy {
 
   onRoleChange(roleId: string | null) {
     this.selectedRole = roleId;
-    this.selectedGroups = [];
     // The adapter closes over selectedRole — rebuild so the next
     // load picks up the new value.
     this.bindAdapter();
@@ -263,63 +206,21 @@ export class ListGroupComponent implements OnInit, OnDestroy {
         rows: res?.data?.groups ?? [],
         total: res?.data?.count ?? 0,
       }),
-      // Floating-filter cell value → BE filter slice. Flattens the
-      // AG-Grid-shaped cells into the
-      // `{name, description, status, createdDateFrom, createdDateTo}`
-      // shape the BE expects.
-      filterBuilders: {
-        name: cell => ({ name: (cell as any)?.filter ?? cell }),
-        description: cell => ({
-          description: (cell as any)?.filter ?? cell,
-        }),
-        status: cell => {
-          const v = (cell as any)?.filter ?? cell;
-          return v === '' || v === null || v === undefined ? {} : { status: v };
-        },
-        createdOn: cell => {
-          // AG Grid date filter shapes: {dateFrom, dateTo, type, filterType}.
-          const c = cell as any;
-          const out: Record<string, string> = {};
-          if (c?.dateFrom) out['createdDateFrom'] = new Date(c.dateFrom).toISOString();
-          if (c?.dateTo) {
-            const to = new Date(c.dateTo);
-            to.setHours(23, 59, 59, 999);
-            out['createdDateTo'] = to.toISOString();
-          }
-          return out;
-        },
-      },
-      initial: { page: 1, limit: 10 },
+      // custom-table sends PLAIN filter values (global `search` + per-column
+      // name/description/status), so the adapter's identity mapping passes
+      // them straight through — no AG-Grid cell unwrapping needed.
+      initial: { page: 1, limit: 50 },
     });
     this.cdr.markForCheck();
   }
 
   /* ── handlers re-pointed at the adapter ──────────────── */
 
-  onSelectionChange(rows: any[]) {
-    // Default groups are not selectable for bulk-delete — filter them
-    // out defensively in case the grid surfaces them.
-    this.selectedGroups = (rows ?? []).filter(r => r?.isDefault !== 1);
-    this.cdr.markForCheck();
-  }
-
-  isRowSelectable = (event: any) => event?.data?.isDefault !== 1;
-
-  clearFilters() {
-    if (this.adapter) {
-      this.adapter.setFilter({});
-      this.adapter.setSort([]);
-    }
-    this.selectedRole = null;
-    this.selectedGroups = [];
-    this.bindAdapter();
-  }
-
   refreshList() {
     this.adapter?.reload();
   }
 
-  /* ── nav + delete ───────────────────────────────────── */
+  /* ── nav + per-row delete ────────────────────────────── */
 
   onAddNewCategory() {
     this.router.navigate([GROUP.ADD]);
@@ -331,21 +232,12 @@ export class ListGroupComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.groupToDelete = id;
-    this.bulkDelete = false;
-    this.showDeleteConfirm = true;
-  }
-
-  confirmBulkDelete() {
-    if (this.selectedCount === 0) return;
-    this.groupToDelete = null;
-    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.groupToDelete = null;
-    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
@@ -353,38 +245,11 @@ export class ListGroupComponent implements OnInit, OnDestroy {
     const reason = this.deleteJustification.trim();
     if (!reason) return;
 
-    if (this.bulkDelete) {
-      const ids = this.selectedGroups.map(g => g.id);
-      if (ids.length === 0) {
-        this.cancelDelete();
-        return;
-      }
-      this.groupService
-        .bulkDelete(ids, reason)
-        .then((res: any) => {
-          if (this.globalService.handleSuccessService(res)) {
-            this.selectedGroups = [];
-            this.refreshList();
-          }
-        })
-        .catch(() => {
-          /* global interceptor shows error toast */
-        })
-        .finally(() => {
-          this.closeDeletePopup();
-          this.cdr.markForCheck();
-        });
-      return;
-    }
-
     if (this.groupToDelete) {
       this.groupService
         .delete(this.groupToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
-            this.selectedGroups = this.selectedGroups.filter(
-              g => g.id !== this.groupToDelete,
-            );
             this.refreshList();
           }
         })
@@ -401,7 +266,6 @@ export class ListGroupComponent implements OnInit, OnDestroy {
   private closeDeletePopup() {
     this.showDeleteConfirm = false;
     this.groupToDelete = null;
-    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 }

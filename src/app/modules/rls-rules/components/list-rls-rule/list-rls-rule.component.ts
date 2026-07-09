@@ -2,15 +2,12 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  DestroyRef,
   inject,
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import type { ColDef } from 'ag-grid-community';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { RLS_RULE } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -19,22 +16,30 @@ import {
   UsServerListAdapter,
   UsListLoadParams,
 } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
-import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
+import type {
+  CustomTableColumn,
+  CustomTableConfig,
+} from 'src/app/shared/components/custom-table/custom-table.types';
 import { RlsRulesService } from '../../services/rls-rules.service';
 
 /**
- * RLS-rule listing — renders through `<us-data-grid>` with a
- * `UsServerListAdapter` driving the legacy `rlsRulesService.listRules`
- * call. The page header / datasource dropdown / delete-confirm popup /
- * assignments side panel retain the existing styling and behaviour;
- * only the `<p-table>` was swapped out for the AG Grid wrapper.
+ * RLS-rule listing — renders through the shared `<app-custom-table>` (the app's
+ * unified list table) driven by a `UsServerListAdapter` on the legacy
+ * `rlsRulesService.listRules` call. Infinite scroll (no page controls), a
+ * single global search plus on-demand per-column filters (shared inputs), and
+ * per-row actions. No bulk selection.
+ *
+ * RLS is datasource-scoped: the adapter is built only once a datasource is
+ * chosen (it needs the id in every request), so the datasource picker is
+ * projected into the table's toolbar-left slot. The page header, delete-confirm
+ * popup and assignments side panel retain their existing behaviour.
  *
  * PRE-EXISTING SEMANTIC MISMATCH (preserved): the BE list endpoint is
  * dataset-scoped, but this page exposes a datasource selector. Passing
- * `selectedDatasource` as the datasetId has always returned zero
- * matches because dataset ids and datasource ids don't overlap. This
- * migration is a like-for-like renderer swap — the broken BE wiring
- * stays broken until the page is redesigned.
+ * `selectedDatasource` as the datasetId has always returned zero matches
+ * because dataset ids and datasource ids don't overlap. This migration is a
+ * like-for-like renderer swap — the broken BE wiring stays broken until the
+ * page is redesigned.
  */
 @Component({
   selector: 'app-list-rls-rule',
@@ -43,7 +48,6 @@ import { RlsRulesService } from '../../services/rls-rules.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListRlsRuleComponent implements OnInit, OnDestroy {
-  private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
   /* ── page state — preserved from the p-table version ──── */
@@ -60,29 +64,29 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
   activeRuleForAssignment: any = null;
   showAssignmentsPanel = false;
 
-  /* ── grid wiring ───────────────────────────────────────── */
+  /* ── custom-table wiring (unified simple table; server-driven) ──────── */
 
-  cols: ColDef[] = [];
+  /** Unified-table columns. Cell DOM is supplied by `<ng-template usGridCell>`
+   *  in the HTML; `filter` flags enable the on-demand per-column filter row. */
+  cols: CustomTableColumn[] = [];
 
-  gridConfig: UsDataGridConfig = {
-    enableRowSelection: false,
-    freezeFirstColumn: true,
-    enableColumnChooser: true,
-    enableAddFilter: false,
-    enableAutoFit: true,
-    enableDensityToggle: true,
-    enableCsvExport: true,
-    enableXlsxExport: true,
-    enableRefresh: true,
-    enableSavedViews: true,
+  tableConfig: CustomTableConfig = {
+    mode: 'scroll', // infinite scroll — no page controls
+    pageSize: 50, // rows fetched per scroll page
+    globalSearch: true,
+    globalSearchKey: 'search', // BE rules list matches a `search` filter key
+    globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
+    showColumnFilters: true,
+    enableExport: true,
+    enableDensity: true,
+    density: 'comfortable',
     gridKey: 'rls-rules-list',
-    pageSizeOptions: [10, 25, 50, 100],
-    pageSize: 10,
-    height: 'calc(100vh - 340px)',
+    height: 'flex',
     rowIdField: 'id',
   };
 
-  /** Server-side adapter — bound on first datasource selection. */
+  /** Server-side adapter — bound on first datasource selection so
+   *  the table doesn't fire a rules query before a datasource exists. */
   adapter: UsServerListAdapter<any> | null = null;
 
   constructor(
@@ -95,6 +99,11 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.cols = this.buildColumns();
+    // Field-specific search placeholder so the user knows what's matched.
+    this.tableConfig = {
+      ...this.tableConfig,
+      globalSearchPlaceholder: this.translate.instant('RLS.SEARCH_PLACEHOLDER'),
+    };
     this.loadDatasources();
   }
 
@@ -103,62 +112,16 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
     this.adapter?.destroy();
   }
 
-  get isFilterActive(): boolean {
-    return !!this.adapter && Object.keys(this.adapter.filterModel()).length > 0;
-  }
-
   /* ── column definitions ──────────────────────────────── */
 
-  private buildColumns(): ColDef[] {
+  private buildColumns(): CustomTableColumn[] {
+    const t = (k: string) => this.translate.instant(k);
     return [
-      {
-        colId: 'name',
-        field: 'name',
-        headerName: this.translate.instant('COMMON.NAME'),
-        width: 240,
-        minWidth: 224,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        pinned: 'left',
-      },
-      {
-        colId: 'datasetName',
-        field: 'dataset.name',
-        headerName: this.translate.instant('RLS.DATASET'),
-        width: 200,
-        minWidth: 180,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        sortable: false,
-      },
-      {
-        colId: 'conditions',
-        field: 'conditions',
-        headerName: this.translate.instant('RLS.CONDITIONS'),
-        minWidth: 360,
-        flex: 1,
-        sortable: false,
-        filter: false,
-      },
-      {
-        colId: 'status',
-        field: 'status',
-        headerName: this.translate.instant('COMMON.STATUS'),
-        width: 144,
-        minWidth: 128,
-        filter: 'agNumberColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'actions',
-        headerName: this.translate.instant('COMMON.ACTIONS'),
-        width: 176,
-        minWidth: 176,
-        sortable: false,
-        filter: false,
-        resizable: false,
-        pinned: 'right',
-      },
+      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '240px', frozen: true, filter: 'text' },
+      { colId: 'datasetName', field: 'dataset.name', header: t('RLS.DATASET'), width: '200px', filter: 'text', sortable: false },
+      { colId: 'conditions', field: 'conditions', header: t('RLS.CONDITIONS'), width: '360px', sortable: false },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px', filter: 'numeric' },
+      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
     ];
   }
 
@@ -236,8 +199,8 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
   /**
    * Build the server-side adapter once a datasource has been picked.
    * The legacy BE call (`listRules(datasetId)`) ignores
-   * filter/sort/pagination — we pass only the id. The adapter still
-   * drives the paginator UI client-side over the returned rows.
+   * filter/sort/pagination — we pass only the id. The custom-table still
+   * drives search/scroll UI client-side over the returned rows.
    *
    * NOTE: `selectedDatasource` is passed as the datasetId on purpose;
    * see the class-level comment about the pre-existing mismatch.
@@ -247,6 +210,8 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
       this.adapter = null;
       return;
     }
+    // Tear down any prior adapter so its in-flight call doesn't
+    // race the new one's first load.
     this.adapter?.destroy();
     const selectedDatasource = this.selectedDatasource;
     this.adapter = new UsServerListAdapter<any>({
@@ -261,18 +226,12 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
           : (res?.data?.rules ?? []);
         return { rows: arr, total: res?.data?.count ?? arr.length };
       },
-      initial: { page: 1, limit: 10 },
+      initial: { page: 1, limit: 50 },
     });
     this.cdr.markForCheck();
   }
 
   /* ── handlers re-pointed at the adapter ──────────────── */
-
-  clearFilters() {
-    if (!this.adapter) return;
-    this.adapter.setFilter({});
-    this.adapter.setSort([]);
-  }
 
   refreshList() {
     this.adapter?.reload();

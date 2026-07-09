@@ -10,7 +10,6 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import type { ColDef } from 'ag-grid-community';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { ANALYSES } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -19,15 +18,23 @@ import {
   UsServerListAdapter,
   UsListLoadParams,
 } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
-import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
+import type {
+  CustomTableColumn,
+  CustomTableConfig,
+} from 'src/app/shared/components/custom-table/custom-table.types';
 import { AnalysesService } from '../../services/analyses.service';
 
 /**
- * Analyses listing — renders through `<us-data-grid>` with a
- * `UsServerListAdapter` driving the BE `/analyses` list call. The
- * page header / datasource dropdown / delete-confirm popup retain
- * their existing styling and behaviour; only the `<p-table>` was
- * swapped out for the AG Grid wrapper. Mirrors the tabs module pass.
+ * Analyses listing — renders through the shared `<app-custom-table>` (the app's
+ * unified list table) driven by a `UsServerListAdapter` on the BE `/analyses`
+ * list call. Infinite scroll (no page controls), a single global search plus
+ * on-demand per-column filters (shared inputs), and per-row actions. No bulk
+ * selection.
+ *
+ * Analyses is datasource-scoped: the adapter is built only once a datasource is
+ * chosen (it needs `datasourceId` in every request), so the datasource picker
+ * is projected into the table's toolbar-left slot. The page header and
+ * delete-confirm popup retain their existing behaviour.
  */
 @Component({
   selector: 'app-list-analyses',
@@ -39,12 +46,10 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
-  /* ── page state — UNCHANGED from the p-table version ──── */
+  /* ── page state — preserved from the p-table version ──── */
 
-  selectedAnalyses: any[] = [];
   showDeleteConfirm = false;
   analysisToDelete: string | null = null;
-  bulkDelete = false;
   deleteJustification = '';
   Math = Math;
   datasources: any[] = [];
@@ -57,40 +62,30 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
   /* ── per-row delete spinner helpers ─────────────────────── */
 
   isDeleting = (id: string): boolean => this.analysesService.isDeleting(id);
-  get isBulkDeleting(): boolean {
-    return this.selectedAnalyses.some((a: any) =>
-      this.analysesService.isDeleting(a.id),
-    );
-  }
 
-  /* ── grid wiring ───────────────────────────────────────── */
+  /* ── custom-table wiring (unified simple table; server-driven) ──────── */
 
-  /** AG Grid column definitions — widths preserved from the old
-   *  `<p-table>` so the visual layout is unchanged. cellRenderer
-   *  templates live in the HTML as `<ng-template usGridCell>`. */
-  cols: ColDef[] = [];
+  /** Unified-table columns. Cell DOM is supplied by `<ng-template usGridCell>`
+   *  in the HTML; `filter` flags enable the on-demand per-column filter row. */
+  cols: CustomTableColumn[] = [];
 
-  gridConfig: UsDataGridConfig = {
-    enableRowSelection: true,
-    rowSelectionMode: 'multiple',
-    freezeFirstColumn: true,
-    enableColumnChooser: true,
-    enableAddFilter: false, // we use the BE-driven floating filters
-    enableAutoFit: true,
-    enableDensityToggle: true,
-    enableCsvExport: true,
-    enableXlsxExport: true,
-    enableRefresh: true,
-    enableSavedViews: true,
+  tableConfig: CustomTableConfig = {
+    mode: 'scroll', // infinite scroll — no page controls
+    pageSize: 50, // rows fetched per scroll page
+    globalSearch: true,
+    globalSearchKey: 'search', // BE analyses list matches a `search` filter key
+    globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
+    showColumnFilters: true,
+    enableExport: true,
+    enableDensity: true,
+    density: 'comfortable',
     gridKey: 'analyses-list',
-    pageSizeOptions: [10, 25, 50, 100],
-    pageSize: 10,
-    height: 'calc(100vh - 340px)',
+    height: 'flex',
     rowIdField: 'id',
   };
 
   /** Server-side adapter — bound on first datasource selection so
-   *  the grid doesn't fire an analyses query before a datasource exists. */
+   *  the table doesn't fire an analyses query before a datasource exists. */
   adapter: UsServerListAdapter<any> | null = null;
 
   constructor(
@@ -109,6 +104,13 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
     ];
 
     this.cols = this.buildColumns();
+    // Field-specific search placeholder so the user knows what's matched.
+    this.tableConfig = {
+      ...this.tableConfig,
+      globalSearchPlaceholder: this.translate.instant(
+        'ANALYSES.SEARCH_PLACEHOLDER',
+      ),
+    };
 
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -127,85 +129,18 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
     this.adapter?.destroy();
   }
 
-  get selectedCount(): number {
-    return this.selectedAnalyses?.length || 0;
-  }
-
-  get isFilterActive(): boolean {
-    return !!this.adapter && Object.keys(this.adapter.filterModel()).length > 0;
-  }
-
   /* ── column definitions ──────────────────────────────── */
 
-  private buildColumns(): ColDef[] {
+  private buildColumns(): CustomTableColumn[] {
+    const t = (k: string) => this.translate.instant(k);
     return [
-      {
-        colId: 'name',
-        field: 'name',
-        headerName: this.translate.instant('COMMON.NAME'),
-        width: 224,
-        minWidth: 224,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        pinned: 'left',
-      },
-      {
-        colId: 'description',
-        field: 'description',
-        headerName: this.translate.instant('COMMON.DESCRIPTION'),
-        minWidth: 320,
-        flex: 1,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        sortable: false,
-      },
-      {
-        colId: 'datasetName',
-        field: 'dataset.name',
-        headerName: this.translate.instant('COMMON.DATASET'),
-        width: 192,
-        minWidth: 192,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        sortable: false,
-      },
-      {
-        colId: 'visuals',
-        field: 'visuals',
-        headerName: this.translate.instant('ANALYSES.VISUALS_COUNT'),
-        width: 128,
-        minWidth: 128,
-        sortable: false,
-        filter: false,
-      },
-      {
-        colId: 'status',
-        field: 'status',
-        headerName: this.translate.instant('COMMON.STATUS'),
-        width: 144,
-        minWidth: 144,
-        filter: 'agNumberColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'createdOn',
-        field: 'createdOn',
-        headerName: this.translate.instant('COMMON.CREATED_ON'),
-        width: 192,
-        minWidth: 192,
-        filter: 'agDateColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'actions',
-        headerName: this.translate.instant('COMMON.ACTIONS'),
-        width: 112,
-        minWidth: 112,
-        sortable: false,
-        filter: false,
-        resizable: false,
-        pinned: 'right',
-      },
+      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
+      { colId: 'description', field: 'description', header: t('COMMON.DESCRIPTION'), width: '320px', filter: 'text', sortable: false },
+      { colId: 'datasetName', field: 'dataset.name', header: t('COMMON.DATASET'), width: '192px', filter: 'text', sortable: false },
+      { colId: 'visuals', field: 'visuals', header: t('ANALYSES.VISUALS_COUNT'), width: '128px', sortable: false },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px', filter: 'numeric' },
+      { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px' },
+      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
     ];
   }
 
@@ -248,7 +183,7 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
    * has been picked. The adapter needs `datasourceId` in every
    * request, so we close over the current selection.
    */
-  private bindAdapter() {
+  private bindAdapter(deepLinkName?: string) {
     if (!this.selectedDatasource) {
       this.adapter = null;
       return;
@@ -272,54 +207,19 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
         rows: res?.data?.analyses ?? [],
         total: res?.data?.count ?? res?.data?.totalItems ?? 0,
       }),
-      // Floating-filter cell value → BE filter slice. The grid's
-      // floating filters emit AG-Grid-shaped cells; this map flattens
-      // them into the `{name, description, datasetName, status,
-      // createdDateFrom, createdDateTo}` shape the BE expects.
-      filterBuilders: {
-        name: cell => ({ name: (cell as any)?.filter ?? cell }),
-        description: cell => ({
-          description: (cell as any)?.filter ?? cell,
-        }),
-        datasetName: cell => ({
-          datasetName: (cell as any)?.filter ?? cell,
-        }),
-        status: cell => {
-          const v = (cell as any)?.filter ?? cell;
-          return v === '' || v === null || v === undefined ? {} : { status: v };
-        },
-        createdOn: cell => {
-          // AG Grid date filter shapes: {dateFrom, dateTo, type, filterType}.
-          const c = cell as any;
-          const out: Record<string, string> = {};
-          if (c?.dateFrom)
-            out['createdDateFrom'] = new Date(c.dateFrom).toISOString();
-          if (c?.dateTo) {
-            const to = new Date(c.dateTo);
-            to.setHours(23, 59, 59, 999);
-            out['createdDateTo'] = to.toISOString();
-          }
-          return out;
-        },
+      // custom-table sends PLAIN filter values (global `search` + per-column
+      // name/description/datasetName/status), so the adapter's identity mapping
+      // passes them straight through — no AG-Grid cell unwrapping needed.
+      initial: {
+        page: 1,
+        limit: 50,
+        ...(deepLinkName ? { filter: { name: deepLinkName } } : {}),
       },
-      initial: { page: 1, limit: 10 },
     });
     this.cdr.markForCheck();
   }
 
   /* ── handlers re-pointed at the adapter ──────────────── */
-
-  onSelectionChange(rows: any[]) {
-    this.selectedAnalyses = rows;
-    this.cdr.markForCheck();
-  }
-
-  clearFilters() {
-    if (!this.adapter) return;
-    this.adapter.setFilter({});
-    this.adapter.setSort([]);
-    this.selectedAnalyses = [];
-  }
 
   refreshList() {
     this.adapter?.reload();
@@ -332,17 +232,13 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
     const name = params['name'];
 
     if (datasourceId) {
-      this.loadDatasources(datasourceId).then(() => {
-        if (name && this.adapter) {
-          this.adapter.patchFilter({ name });
-        }
-      });
+      this.loadDatasources(datasourceId, name);
     } else {
-      this.loadDatasources();
+      this.loadDatasources(undefined, name);
     }
   }
 
-  loadDatasources(preSelectedDbId?: string): Promise<void> {
+  loadDatasources(preSelectedDbId?: string, deepLinkName?: string): Promise<void> {
     return new Promise(resolve => {
       const params = { page: DEFAULT_PAGE, limit: 10 };
       this.datasourceService
@@ -360,7 +256,7 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
                 this.datasources.find(d => d.id === preSelectedDbId)
                   ? preSelectedDbId
                   : this.datasources[0].id;
-              this.bindAdapter();
+              this.bindAdapter(deepLinkName);
             } else {
               this.selectedDatasource = null;
               this.adapter = null;
@@ -383,7 +279,7 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
     });
   }
 
-  /* ── nav + bulk-delete — UNCHANGED ───────────────────── */
+  /* ── nav + per-row delete — UNCHANGED ────────────────── */
 
   onView(id: string) {
     this.router.navigate([ANALYSES.view(id)]);
@@ -395,21 +291,12 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.analysisToDelete = id;
-    this.bulkDelete = false;
-    this.showDeleteConfirm = true;
-  }
-
-  confirmBulkDelete() {
-    if (this.selectedCount === 0) return;
-    this.analysisToDelete = null;
-    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.analysisToDelete = null;
-    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
@@ -417,38 +304,11 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
     const reason = this.deleteJustification.trim();
     if (!reason) return;
 
-    if (this.bulkDelete) {
-      const ids = this.selectedAnalyses.map(a => a.id);
-      if (ids.length === 0) {
-        this.cancelDelete();
-        return;
-      }
-      this.analysesService
-        .bulkDeleteAnalyses(ids, reason)
-        .then((res: any) => {
-          if (this.globalService.handleSuccessService(res)) {
-            this.selectedAnalyses = [];
-            this.refreshList();
-          }
-        })
-        .catch(() => {
-          /* global interceptor shows error toast */
-        })
-        .finally(() => {
-          this.closeDeletePopup();
-          this.cdr.markForCheck();
-        });
-      return;
-    }
-
     if (this.analysisToDelete) {
       this.analysesService
         .deleteAnalyses(this.analysisToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
-            this.selectedAnalyses = this.selectedAnalyses.filter(
-              a => a.id !== this.analysisToDelete,
-            );
             this.refreshList();
           }
         })
@@ -465,7 +325,6 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
   private closeDeletePopup() {
     this.showDeleteConfirm = false;
     this.analysisToDelete = null;
-    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 }
