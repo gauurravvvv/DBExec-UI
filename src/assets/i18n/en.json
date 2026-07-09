@@ -191,7 +191,8 @@
     "COLUMNS": "Columns",
     "EXPORT": "Export",
     "NO_RECORDS": "No records found",
-    "SHOWING_OF": "Showing {{shown}} of {{total}}"
+    "SHOWING_OF": "Showing {{shown}} of {{total}}",
+    "GROUP": "Group"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "First name is required",

@@ -191,7 +191,8 @@
     "COLUMNS": "Kolommen",
     "EXPORT": "Exporteren",
     "NO_RECORDS": "Geen records gevonden",
-    "SHOWING_OF": "{{shown}} van {{total}} weergegeven"
+    "SHOWING_OF": "{{shown}} van {{total}} weergegeven",
+    "GROUP": "Groep"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Voornaam is verplicht",

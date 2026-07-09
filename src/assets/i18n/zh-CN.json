@@ -191,7 +191,8 @@
     "COLUMNS": "列",
     "EXPORT": "导出",
     "NO_RECORDS": "未找到记录",
-    "SHOWING_OF": "显示 {{shown}} / {{total}}"
+    "SHOWING_OF": "显示 {{shown}} / {{total}}",
+    "GROUP": "组"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名字为必填项",

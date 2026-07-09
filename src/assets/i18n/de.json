@@ -191,7 +191,8 @@
     "COLUMNS": "Spalten",
     "EXPORT": "Exportieren",
     "NO_RECORDS": "Keine Datensätze gefunden",
-    "SHOWING_OF": "{{shown}} von {{total}} angezeigt"
+    "SHOWING_OF": "{{shown}} von {{total}} angezeigt",
+    "GROUP": "Gruppe"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Vorname ist erforderlich",

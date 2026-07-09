@@ -191,7 +191,8 @@
     "COLUMNS": "Colonnes",
     "EXPORT": "Exporter",
     "NO_RECORDS": "Aucun enregistrement trouvé",
-    "SHOWING_OF": "Affichage de {{shown}} sur {{total}}"
+    "SHOWING_OF": "Affichage de {{shown}} sur {{total}}",
+    "GROUP": "Groupe"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Le prénom est requis",

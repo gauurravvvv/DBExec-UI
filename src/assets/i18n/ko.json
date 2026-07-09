@@ -191,7 +191,8 @@
     "COLUMNS": "열",
     "EXPORT": "내보내기",
     "NO_RECORDS": "레코드가 없습니다",
-    "SHOWING_OF": "{{total}}개 중 {{shown}}개 표시"
+    "SHOWING_OF": "{{total}}개 중 {{shown}}개 표시",
+    "GROUP": "그룹"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "이름은 필수 항목입니다",

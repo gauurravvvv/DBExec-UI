@@ -191,7 +191,8 @@
     "COLUMNS": "列",
     "EXPORT": "エクスポート",
     "NO_RECORDS": "レコードが見つかりません",
-    "SHOWING_OF": "{{total}} 件中 {{shown}} 件を表示"
+    "SHOWING_OF": "{{total}} 件中 {{shown}} 件を表示",
+    "GROUP": "グループ"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名は必須です",
