@@ -3545,6 +3545,7 @@
     "ALL_SEQUENCES": "スキーマ内のすべてのシーケンス",
     "ALL_FUNCTIONS": "スキーマ内のすべての関数",
     "SELECT_SEQUENCES": "シーケンスを選択",
-    "SELECT_FUNCTIONS": "関数を選択"
+    "SELECT_FUNCTIONS": "関数を選択",
+    "SEARCH_ROLES_PLACEHOLDER": "名前でユーザーとロールを検索"
   }
 }

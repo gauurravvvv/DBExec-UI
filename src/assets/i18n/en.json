@@ -3386,7 +3386,8 @@
     "ALL_SEQUENCES": "All sequences in schema",
     "ALL_FUNCTIONS": "All functions in schema",
     "SELECT_SEQUENCES": "Select sequences",
-    "SELECT_FUNCTIONS": "Select functions"
+    "SELECT_FUNCTIONS": "Select functions",
+    "SEARCH_ROLES_PLACEHOLDER": "Search users & roles by name"
   },
   "QUERY_RUNNER": {
     "TITLE": "Query Runner",

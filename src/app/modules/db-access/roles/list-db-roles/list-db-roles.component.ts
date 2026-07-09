@@ -61,12 +61,14 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   /* ── custom-table wiring (unified simple table; server-driven) ──────── */
   cols: CustomTableColumn[] = [];
   tableConfig: CustomTableConfig = {
-    mode: 'scroll', // infinite virtual scroll — no page controls
+    mode: 'scroll', // plain infinite scroll — no page controls
     pageSize: 50, // rows fetched per scroll page
     globalSearch: true, // search box matches role name
     globalSearchKey: 'name', // roles BE matches the `name` filter key
-    showColumnFilters: true, // Filter toggle reveals per-column filters
+    // Field-specific placeholder set in ngOnInit (translate ready there) so
+    // the user knows exactly what the search matches.
     globalSearchPlaceholder: undefined,
+    showColumnFilters: true, // Filter toggle reveals per-column filters
     enableExport: true,
     enableDensity: true,
     density: 'comfortable',
@@ -128,6 +130,11 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
       { label: this.translate.instant('DB_ACCESS.DROP_OWNED'), value: 'drop' },
     ];
     this.cols = this.buildColumns();
+    // Field-specific search placeholder so the user knows what the box matches.
+    this.tableConfig = {
+      ...this.tableConfig,
+      globalSearchPlaceholder: this.translate.instant('DB_ACCESS.SEARCH_ROLES_PLACEHOLDER'),
+    };
     this.buildAdapter();
   }
 

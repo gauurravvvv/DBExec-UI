@@ -1,9 +1,12 @@
 <div class="custom-table" [class.density-compact]="density === 'compact'">
   <!-- ── Slim toolbar: title (left) + global search + only the enabled
        secondary actions (right). Nothing else by default. ── -->
-  <div class="ct-toolbar" *ngIf="cfg.globalSearch || cfg.title || hasSecondaryActions">
+  <div class="ct-toolbar">
     <div class="ct-toolbar-left">
       <span class="ct-title" *ngIf="cfg.title">{{ cfg.title }}</span>
+      <!-- Host-projected controls on the toolbar's left (e.g. a datasource
+           picker + segmented filter), so they share the table's single row. -->
+      <ng-content select="[tableToolbarStart]"></ng-content>
     </div>
 
     <div class="ct-toolbar-right">
@@ -83,15 +86,18 @@
     </div>
   </div>
 
-  <!-- ── Table ── -->
+  <!-- ── Table ──
+       Plain (non-virtualised) scroll: every accumulated row is rendered
+       normally, so rows can be any height and borders behave — no vanishing
+       / recycling glitches. Scroll-mode fetches the next page when the
+       scroll body nears the bottom (see ngAfterViewInit → onScroll). ── -->
   <p-table
+    #dt
     [value]="rows"
     [lazy]="true"
     [loading]="loading && !loadingMore"
     [scrollable]="true"
     [scrollHeight]="scrollHeight"
-    [virtualScroll]="isScroll"
-    [virtualScrollItemSize]="isScroll ? cfg.rowHeight : undefined"
     [rowTrackBy]="trackRow"
     (onLazyLoad)="onLazyLoad($event)"
     responsiveLayout="scroll"

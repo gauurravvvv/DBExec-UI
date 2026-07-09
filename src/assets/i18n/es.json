@@ -3545,6 +3545,7 @@
     "ALL_SEQUENCES": "Todas las secuencias del esquema",
     "ALL_FUNCTIONS": "Todas las funciones del esquema",
     "SELECT_SEQUENCES": "Seleccionar secuencias",
-    "SELECT_FUNCTIONS": "Seleccionar funciones"
+    "SELECT_FUNCTIONS": "Seleccionar funciones",
+    "SEARCH_ROLES_PLACEHOLDER": "Buscar usuarios y roles por nombre"
   }
 }

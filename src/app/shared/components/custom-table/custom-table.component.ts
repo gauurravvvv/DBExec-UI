@@ -1,11 +1,14 @@
 import {
   AfterContentInit,
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   ContentChildren,
+  ElementRef,
   EventEmitter,
   Input,
+  NgZone,
   OnChanges,
   OnDestroy,
   Output,
@@ -78,10 +81,16 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomTableComponent
-  implements AfterContentInit, OnChanges, OnDestroy
+  implements AfterContentInit, AfterViewInit, OnChanges, OnDestroy
 {
   private cdr = inject(ChangeDetectorRef);
   private translate = inject(TranslateService);
+  private host: ElementRef<HTMLElement> = inject(ElementRef);
+  private zone = inject(NgZone);
+
+  /** The p-table's scroll body, wired for plain infinite scroll. */
+  private scrollBody?: HTMLElement;
+  private scrollHandler?: (e: Event) => void;
 
   @Input() columns: CustomTableColumn[] = [];
   @Input() serverAdapter?: UsServerListAdapter<Record<string, unknown>>;
@@ -179,9 +188,37 @@ export class CustomTableComponent
     this.cellDirectives.changes.subscribe(index);
   }
 
+  /** Attach the infinite-scroll listener to the p-table's scroll body. Runs
+   *  outside Angular's zone (scroll fires constantly); loadMore() re-enters
+   *  the zone only when it actually fetches. */
+  ngAfterViewInit(): void {
+    if (!this.isScroll) return;
+    // PrimeNG creates the scroll container asynchronously; grab it next tick.
+    setTimeout(() => this.attachScroll(), 0);
+  }
+
+  private attachScroll(): void {
+    const el = this.host.nativeElement.querySelector(
+      '.ct-p-table .p-datatable-wrapper',
+    ) as HTMLElement | null;
+    if (!el) return;
+    this.scrollBody = el;
+    this.scrollHandler = () => {
+      const nearBottom =
+        el.scrollTop + el.clientHeight >=
+        el.scrollHeight - this.cfg.rowHeight * 3;
+      if (nearBottom) this.zone.run(() => this.loadMore());
+    };
+    this.zone.runOutsideAngular(() =>
+      el.addEventListener('scroll', this.scrollHandler!, { passive: true }),
+    );
+  }
+
   ngOnDestroy(): void {
     if (this.searchDebounce) clearTimeout(this.searchDebounce);
     this.loadedSub?.unsubscribe();
+    if (this.scrollBody && this.scrollHandler)
+      this.scrollBody.removeEventListener('scroll', this.scrollHandler);
   }
 
   /** True while a scroll-triggered "next page" fetch is in flight. */
@@ -302,38 +339,27 @@ export class CustomTableComponent
     this.serverAdapter.setPage(this.serverAdapter.page() + 1);
   }
 
-  /** Signature of the sort currently applied to the server, so scroll-driven
-   *  onLazyLoad events (which repeat the active sortField) don't re-trigger a
-   *  sort + reset accumulation. Null = no sort. */
+  /** Signature of the sort currently applied to the server, so a repeated
+   *  onLazyLoad for the same sort doesn't reset accumulation. Null = no sort. */
   private appliedSort: string | null = null;
 
   /**
-   * p-table (lazy) fires onLazyLoad both when sorting AND — with virtual
-   * scroll on — as the visible {first,last} window moves. We disambiguate:
-   * if the (sortField,sortOrder) differs from what's applied, it's a real
-   * sort (reset to page 1); otherwise it's a scroll → prefetch the next page
-   * when the window nears the loaded tail.
+   * p-table (lazy) fires onLazyLoad on sort. We're NOT virtualised (plain
+   * infinite scroll — see onScroll), so this only handles sort changes: when
+   * the (sortField,sortOrder) differs from what's applied, re-sort (resets to
+   * page 1). Same sort → ignore.
    */
   onLazyLoad(e: {
-    first?: number;
-    last?: number;
     sortField?: string | string[] | null;
     sortOrder?: number | null;
   }): void {
     if (!this.serverAdapter) return;
-    // Normalise p-table's sortField (string | string[] | null) to one field.
     const field = Array.isArray(e.sortField) ? e.sortField[0] : e.sortField;
     const order = e.sortOrder ?? undefined;
     const sig = field ? `${field}:${order ?? 1}` : null;
-    if (sig !== this.appliedSort) {
-      this.appliedSort = sig;
-      this.onSort({ field: field ?? undefined, order });
-      return;
-    }
-    if (this.cfg.mode !== 'scroll') return;
-    const last = e.last ?? 0;
-    // Prefetch when the window reaches the loaded tail.
-    if (last >= this.accumulated.length - 1) this.loadMore();
+    if (sig === this.appliedSort) return;
+    this.appliedSort = sig;
+    this.onSort({ field: field ?? undefined, order });
   }
 
   // ── toolbar secondary actions ─────────────────────────────────────────────

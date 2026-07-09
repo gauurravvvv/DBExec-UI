@@ -6,14 +6,6 @@
       </div>
       <div class="header-actions">
         <button
-          pButton
-          [label]="'COMMON.CLEAR' | translate"
-          icon="pi pi-filter-slash"
-          (click)="clearFilters()"
-          [disabled]="!isFilterActive"
-          class="p-button-outlined p-button-danger modern-button"
-        ></button>
-        <button
           *hasPermission="'dbRoles'; level: 'write'"
           pButton
           [label]="'DB_ACCESS.MANAGE_MEMBERSHIP' | translate"
@@ -37,50 +29,35 @@
     </div>
 
     <div class="content-card">
-      <div class="card-toolbar">
-        <div class="toolbar-left">
-          <app-datasource-picker (changed)="onDatasourceChange($event)"></app-datasource-picker>
+      <!-- Always-on control row: datasource picker (so it's reachable with
+           nothing selected) + Type chips + capability badge. Chips/badge only
+           mean something once a datasource is chosen, so they're gated. -->
+      <div class="roles-toolbar-start">
+        <app-datasource-picker (changed)="onDatasourceChange($event)"></app-datasource-picker>
 
-          <!-- Type filter — one screen for both login users and group roles -->
-          <div class="type-filter" *ngIf="datasourceId && !unsupported() && !capabilityLoading()">
-            <button
-              type="button"
-              class="type-chip"
-              [class.active]="typeFilter === 'all'"
-              (click)="setTypeFilter('all')"
-            >
+        <ng-container *ngIf="datasourceId && !unsupported() && !capabilityLoading()">
+          <div class="type-filter">
+            <button type="button" class="type-chip" [class.active]="typeFilter === 'all'" (click)="setTypeFilter('all')">
               <i class="pi pi-list"></i>{{ 'DB_ACCESS.TYPE_ALL' | translate }}
             </button>
-            <button
-              type="button"
-              class="type-chip"
-              [class.active]="typeFilter === 'login'"
-              (click)="setTypeFilter('login')"
-            >
+            <button type="button" class="type-chip" [class.active]="typeFilter === 'login'" (click)="setTypeFilter('login')">
               <i class="pi pi-user"></i>{{ 'DB_ACCESS.TYPE_LOGIN' | translate }}
             </button>
-            <button
-              type="button"
-              class="type-chip"
-              [class.active]="typeFilter === 'group'"
-              (click)="setTypeFilter('group')"
-            >
+            <button type="button" class="type-chip" [class.active]="typeFilter === 'group'" (click)="setTypeFilter('group')">
               <i class="pi pi-users"></i>{{ 'DB_ACCESS.TYPE_GROUP' | translate }}
             </button>
           </div>
-        </div>
-        <div class="toolbar-right" *ngIf="datasourceId && !unsupported()">
+
           <span class="cap-badge full" *ngIf="capability() && canManage">
-            <i class="pi pi-check-circle"></i>
-            {{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}
+            <i class="pi pi-check-circle"></i>{{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}
           </span>
           <span class="cap-badge readonly" *ngIf="capability() && !canManage">
-            <i class="pi pi-lock"></i>
-            {{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}
+            <i class="pi pi-lock"></i>{{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}
           </span>
-        </div>
+        </ng-container>
       </div>
 
+      <!-- Banners for the non-ready states (no datasource / checking / unsupported) -->
       <div class="list-hint" *ngIf="!datasourceId && !capabilityLoading()">
         <i class="pi pi-database"></i>
         <span>{{ 'DB_ACCESS.SELECT_DATASOURCE_HINT' | translate }}</span>

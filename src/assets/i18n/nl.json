@@ -3545,6 +3545,7 @@
     "ALL_SEQUENCES": "Alle sequenties in schema",
     "ALL_FUNCTIONS": "Alle functies in schema",
     "SELECT_SEQUENCES": "Sequenties selecteren",
-    "SELECT_FUNCTIONS": "Functies selecteren"
+    "SELECT_FUNCTIONS": "Functies selecteren",
+    "SEARCH_ROLES_PLACEHOLDER": "Zoek gebruikers en rollen op naam"
   }
 }

@@ -40,6 +40,14 @@
   padding: 0 0 var(--space-5);
   flex-wrap: wrap;
 
+  .ct-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+
   .ct-title {
     font-size: var(--fs-body);
     font-weight: var(--fw-semibold);

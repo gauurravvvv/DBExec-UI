@@ -3545,6 +3545,7 @@
     "ALL_SEQUENCES": "스키마의 모든 시퀀스",
     "ALL_FUNCTIONS": "스키마의 모든 함수",
     "SELECT_SEQUENCES": "시퀀스 선택",
-    "SELECT_FUNCTIONS": "함수 선택"
+    "SELECT_FUNCTIONS": "함수 선택",
+    "SEARCH_ROLES_PLACEHOLDER": "이름으로 사용자 및 역할 검색"
   }
 }

@@ -147,6 +147,22 @@
         }
       }
     }
+
+    // Always-on control row: datasource picker + Type segmented control +
+    // capability badge, sharing one aligned line above the table. The picker
+    // lives here (not inside the table) so it's reachable even with nothing
+    // selected — the table below only renders once a datasource is chosen.
+    .roles-toolbar-start {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-5);
+      padding: 0 0 var(--space-5);
+
+      // The shared datasource picker keeps its own width; let it sit at the
+      // start and push the chips/badge after it.
+      app-datasource-picker { flex: 0 0 auto; }
+    }
   }
 
   // Buttons match the canonical list-user .modern-button exactly (same

@@ -3545,6 +3545,7 @@
     "ALL_SEQUENCES": "模式中的所有序列",
     "ALL_FUNCTIONS": "模式中的所有函数",
     "SELECT_SEQUENCES": "选择序列",
-    "SELECT_FUNCTIONS": "选择函数"
+    "SELECT_FUNCTIONS": "选择函数",
+    "SEARCH_ROLES_PLACEHOLDER": "按名称搜索用户和角色"
   }
 }

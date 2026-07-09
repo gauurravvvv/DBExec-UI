@@ -3545,6 +3545,7 @@
     "ALL_SEQUENCES": "Tutte le sequenze nello schema",
     "ALL_FUNCTIONS": "Tutte le funzioni nello schema",
     "SELECT_SEQUENCES": "Seleziona sequenze",
-    "SELECT_FUNCTIONS": "Seleziona funzioni"
+    "SELECT_FUNCTIONS": "Seleziona funzioni",
+    "SEARCH_ROLES_PLACEHOLDER": "Cerca utenti e ruoli per nome"
   }
 }
