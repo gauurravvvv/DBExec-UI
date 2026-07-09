@@ -37,7 +37,12 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-5);
-  padding: 0 0 var(--space-5);
+  // Top padding gives projected controls with a FLOATING label (e.g. the
+  // datasource picker in the toolbarStart slot) room for the label, which
+  // sits above the input's top edge — otherwise an ancestor `overflow:hidden`
+  // (content-card / table-wrapper) clips it. Mirrors the app's .card-toolbar
+  // clip-fix (12px = --space-5).
+  padding: var(--space-5) 0;
   flex-wrap: wrap;
 
   .ct-toolbar-left {
