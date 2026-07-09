@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { UsDataGridComponent } from 'src/app/shared/components/us-data-grid/us-data-grid.component';
+import { CustomTableComponent } from 'src/app/shared/components/custom-table/custom-table.component';
+import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-table/custom-table-empty.directive';
 import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedChartsModule } from 'src/app/shared/modules/shared-charts.module';
@@ -19,7 +20,11 @@ import { DashboardRoutingModule } from './dashboard-routing.module';
     SharedModule,
     SharedChartsModule,
     AppPrimeNGModule,
-    UsDataGridComponent,
+    // Standalone — the shared unified list table + its projected-empty
+    // directive. `UsGridCellDirective` stays: the table reuses it verbatim
+    // for per-cell templates.
+    CustomTableComponent,
+    CustomTableEmptyDirective,
     UsGridCellDirective,
   ],
 })

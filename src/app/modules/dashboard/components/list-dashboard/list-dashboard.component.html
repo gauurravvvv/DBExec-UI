@@ -5,39 +5,24 @@
       <div class="header-content">
         <h2>{{ 'DASHBOARD.TITLE' | translate }}</h2>
       </div>
-
-      <div class="header-actions">
-        <!-- Bulk Delete Button -->
-        <ng-container *hasPermission="'dashboard'; level: 'delete'">
-        <button
-          *ngIf="selectedCount > 0"
-          pButton
-          [label]="('COMMON.DELETE' | translate) + ' (' + selectedCount + ')'"
-          [icon]="isBulkDeleting ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
-          [disabled]="isBulkDeleting"
-          (click)="confirmBulkDelete()"
-          class="p-button-raised p-button-danger modern-button"
-        ></button>
-        </ng-container>
-
-        <!-- Clear Filters Button -->
-        <button
-          pButton
-          [label]="'COMMON.CLEAR' | translate"
-          icon="pi pi-filter-slash"
-          (click)="clearFilters()"
-          [disabled]="!isFilterActive"
-          class="p-button-outlined p-button-danger modern-button"
-        ></button>
-      </div>
     </div>
 
-    <!-- Unified Toolbar & Content Card -->
+    <!-- Content Card -->
     <div class="content-card">
-      <div class="card-toolbar">
-        <div class="toolbar-left">
-          <!-- Datasource Dropdown — server-driven -->
-          <div class="dropdown-field">
+      <!-- Unified simple table. Infinite scroll, global search + on-demand
+           per-column filters (shared inputs), per-row actions. Dashboard is
+           datasource-scoped, so the datasource picker is projected into the
+           toolbar's LEFT slot; the table renders only once a datasource is
+           chosen (adapter set). Per-cell DOM via <ng-template usGridCell>. -->
+      <div class="table-wrapper" *ngIf="adapter">
+        <app-custom-table
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="tableConfig"
+          (refresh)="refreshList()"
+        >
+          <!-- Toolbar-left slot: server-driven datasource picker. -->
+          <div tableToolbarStart class="ds-toolbar-start">
             <app-custom-dropdown
               [(ngModel)]="selectedDatasource"
               [serverMode]="true"
@@ -56,24 +41,13 @@
             >
             </app-custom-dropdown>
           </div>
-        </div>
-      </div>
 
-      <!-- AG Grid via us-data-grid. The grid hosts row-selection,
-           sort, floating filters, column chooser, density toggle,
-           CSV/XLSX export and saved views (gridKey='dashboards-list').
-           Per-cell DOM is supplied via <ng-template usGridCell> so
-           the visual look — name link, dataset/datasource text,
-           status pill, date text, row-actions — matches the previous
-           PrimeNG layout exactly. -->
-      <div class="table-wrapper" *ngIf="selectedDatasource && adapter">
-        <us-data-grid
-          [columns]="cols"
-          [serverAdapter]="adapter"
-          [config]="gridConfig"
-          (selectionChange)="onSelectionChange($event)"
-          (refresh)="refreshList()"
-        >
+          <!-- Empty body — always projected so only one empty state shows. -->
+          <div tableEmpty class="ct-empty-body">
+            <i class="pi pi-inbox"></i>
+            <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
+          </div>
+
           <ng-template usGridCell="name" let-dashboard>
             <a
               class="dataset-name-link"
@@ -156,11 +130,29 @@
               </button>
             </div>
           </ng-template>
-        </us-data-grid>
+        </app-custom-table>
       </div>
 
-      <!-- Empty datasource state — no datasource picked yet. -->
-      <div class="empty-state-inline" *ngIf="!selectedDatasource">
+      <!-- Empty datasource state — no datasource picked yet (adapter null,
+           so the table + its toolbar picker aren't rendered). This inline
+           picker keeps the datasource selectable in that state. -->
+      <div class="empty-state-inline" *ngIf="!adapter">
+        <app-custom-dropdown
+          [(ngModel)]="selectedDatasource"
+          [serverMode]="true"
+          [fetcher]="loadDatasourcesPage"
+          [pageSize]="10"
+          [preloadedItems]="preloadedDatasources"
+          [preloadedTotal]="preloadedDatasourcesTotal"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          [floatingLabel]="true"
+          [label]="'COMMON.DATASOURCE' | translate"
+          filterBy="name"
+          (onChangeEvent)="onDBChange($event)"
+          icon="pi-database"
+        ></app-custom-dropdown>
         <i class="pi pi-database empty-state-icon"></i>
         <span class="empty-state-text">
           {{ 'COMMON.SELECT_DATASOURCE' | translate }}
@@ -180,16 +172,9 @@
     </div>
 
     <div class="standard-delete-section">
-      <p class="delete-intro" *ngIf="!bulkDelete">
+      <p class="delete-intro">
         {{ 'DASHBOARD.CONFIRM_DELETE_SINGLE' | translate }}
       </p>
-      <p
-        class="delete-intro"
-        *ngIf="bulkDelete"
-        [innerHTML]="
-          'DASHBOARD.CONFIRM_DELETE_BULK' | translate: { count: selectedCount }
-        "
-      ></p>
 
       <ul class="delete-info-list">
         <li>
@@ -232,17 +217,13 @@
         (click)="proceedDelete()"
         [disabled]="
           !deleteJustification.trim() ||
-          (bulkDelete
-            ? isBulkDeleting
-            : !!(dashboardToDelete && isDeleting(dashboardToDelete)))
+          !!(dashboardToDelete && isDeleting(dashboardToDelete))
         "
       >
         <i
           class="pi"
           [ngClass]="
-            (bulkDelete
-              ? isBulkDeleting
-              : !!(dashboardToDelete && isDeleting(dashboardToDelete)))
+            !!(dashboardToDelete && isDeleting(dashboardToDelete))
               ? 'pi-spin pi-spinner'
               : 'pi-trash'
           "

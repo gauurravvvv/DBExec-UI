@@ -10,7 +10,6 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import type { ColDef } from 'ag-grid-community';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { DASHBOARD as DB_ROUTES } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -19,15 +18,23 @@ import {
   UsServerListAdapter,
   UsListLoadParams,
 } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
-import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
+import type {
+  CustomTableColumn,
+  CustomTableConfig,
+} from 'src/app/shared/components/custom-table/custom-table.types';
 import { DashboardService } from '../../services/dashboard.service';
 
 /**
- * Dashboard listing — renders through `<us-data-grid>` with a
- * `UsServerListAdapter` driving the BE `/dashboards` list call. The
- * page header / datasource dropdown / delete-confirm popup retain the
- * existing styling and behaviour; only the `<p-table>` was swapped
- * out for the AG Grid wrapper.
+ * Dashboard listing — renders through the shared `<app-custom-table>` (the app's
+ * unified list table) driven by a `UsServerListAdapter` on the BE `/dashboards`
+ * list call. Infinite scroll (no page controls), a single global search plus
+ * on-demand per-column filters (shared inputs), and per-row actions. No bulk
+ * selection.
+ *
+ * Dashboard is datasource-scoped: the adapter is built only once a datasource is
+ * chosen (it needs `datasourceId` in every request), so the datasource picker
+ * is projected into the table's toolbar-left slot. The page header and
+ * delete-confirm popup retain their existing behaviour.
  */
 @Component({
   selector: 'app-list-dashboard',
@@ -41,10 +48,8 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
 
   /* ── page state — preserved from the p-table version ─── */
 
-  selectedDashboards: any[] = [];
   showDeleteConfirm = false;
   dashboardToDelete: string | null = null;
-  bulkDelete = false;
   deleteJustification = '';
   Math = Math;
   datasources: any[] = [];
@@ -54,44 +59,34 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
   today = new Date();
   statusOptions: any[] = [];
 
-  // Per-row spinner helpers from the service.
+  // Per-row spinner helper from the service.
   isDeleting = (id: string): boolean => this.dashboardService.isDeleting(id);
-  get isBulkDeleting(): boolean {
-    return this.selectedDashboards.some(d =>
-      this.dashboardService.isDeleting(d.id),
-    );
-  }
 
-  /* ── grid wiring ───────────────────────────────────────── */
+  /* ── custom-table wiring (unified simple table; server-driven) ──────── */
 
-  /** AG Grid column definitions. Cell renderers live in the HTML as
-   *  `<ng-template usGridCell>` so the visual layout is unchanged
-   *  from the previous `<p-table>` markup. */
-  cols: ColDef[] = [];
+  /** Unified-table columns. Cell DOM is supplied by `<ng-template usGridCell>`
+   *  in the HTML; `filter` flags enable the on-demand per-column filter row. */
+  cols: CustomTableColumn[] = [];
 
-  gridConfig: UsDataGridConfig = {
-    enableRowSelection: true,
-    rowSelectionMode: 'multiple',
-    freezeFirstColumn: true,
-    enableColumnChooser: true,
-    enableAddFilter: false, // BE-driven floating filters
-    enableAutoFit: true,
-    enableDensityToggle: true,
-    enableCsvExport: true,
-    enableXlsxExport: true,
-    enableRefresh: true,
-    enableSavedViews: true,
+  tableConfig: CustomTableConfig = {
+    mode: 'scroll', // infinite scroll — no page controls
+    pageSize: 50, // rows fetched per scroll page
+    globalSearch: true,
+    globalSearchKey: 'search', // BE dashboards list matches a `search` filter key
+    globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
+    showColumnFilters: true,
+    enableExport: true,
+    enableDensity: true,
+    density: 'comfortable',
     gridKey: 'dashboards-list',
-    pageSizeOptions: [10, 25, 50, 100],
-    pageSize: 10,
-    height: 'calc(100vh - 340px)',
+    height: 'flex',
     rowIdField: 'id',
   };
 
-  /** Server-side adapter — bound on first datasource selection so
-   *  the grid doesn't fire a dashboards query before a datasource
-   *  exists. Rebuilt on every datasource change so the closed-over
-   *  `datasourceId` stays in lockstep with the dropdown. */
+  /** Server-side adapter — bound on first datasource selection so the table
+   *  doesn't fire a dashboards query before a datasource exists. Rebuilt on
+   *  every datasource change so the closed-over `datasourceId` stays in
+   *  lockstep with the dropdown. */
   adapter: UsServerListAdapter<any> | null = null;
 
   constructor(
@@ -110,6 +105,13 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     ];
 
     this.cols = this.buildColumns();
+    // Field-specific search placeholder so the user knows what's matched.
+    this.tableConfig = {
+      ...this.tableConfig,
+      globalSearchPlaceholder: this.translate.instant(
+        'DASHBOARD.SEARCH_PLACEHOLDER',
+      ),
+    };
 
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -128,76 +130,17 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     this.adapter?.destroy();
   }
 
-  get selectedCount(): number {
-    return this.selectedDashboards?.length || 0;
-  }
-
-  get isFilterActive(): boolean {
-    return !!this.adapter && Object.keys(this.adapter.filterModel()).length > 0;
-  }
-
   /* ── column definitions ──────────────────────────────── */
 
-  private buildColumns(): ColDef[] {
+  private buildColumns(): CustomTableColumn[] {
+    const t = (k: string) => this.translate.instant(k);
     return [
-      {
-        colId: 'name',
-        field: 'name',
-        headerName: this.translate.instant('COMMON.NAME'),
-        width: 224,
-        minWidth: 224,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        pinned: 'left',
-      },
-      {
-        colId: 'datasetName',
-        field: 'datasetName',
-        headerName: this.translate.instant('DASHBOARD.DATASET'),
-        width: 192,
-        minWidth: 192,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        sortable: false,
-      },
-      {
-        colId: 'datasourceName',
-        field: 'datasource.name',
-        headerName: this.translate.instant('COMMON.DATASOURCE'),
-        width: 192,
-        minWidth: 192,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        sortable: false,
-      },
-      {
-        colId: 'status',
-        field: 'status',
-        headerName: this.translate.instant('COMMON.STATUS'),
-        width: 144,
-        minWidth: 144,
-        filter: 'agNumberColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'createdOn',
-        field: 'createdOn',
-        headerName: this.translate.instant('COMMON.CREATED_ON'),
-        width: 192,
-        minWidth: 192,
-        filter: 'agDateColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'actions',
-        headerName: this.translate.instant('COMMON.ACTIONS'),
-        width: 112,
-        minWidth: 112,
-        sortable: false,
-        filter: false,
-        resizable: false,
-        pinned: 'right',
-      },
+      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
+      { colId: 'datasetName', field: 'datasetName', header: t('DASHBOARD.DATASET'), width: '192px', filter: 'text', sortable: false },
+      { colId: 'datasourceName', field: 'datasource.name', header: t('COMMON.DATASOURCE'), width: '192px', filter: 'text', sortable: false },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px', filter: 'numeric' },
+      { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px' },
+      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
     ];
   }
 
@@ -240,7 +183,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
    * has been picked. The adapter needs `datasourceId` in every
    * request, so we close over the current selection.
    */
-  private bindAdapter() {
+  private bindAdapter(deepLinkName?: string) {
     if (!this.selectedDatasource) {
       this.adapter = null;
       return;
@@ -258,58 +201,24 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
           ...(params.sort ? { sort: params.sort } : {}),
           ...(params.filter ? { filter: params.filter } : {}),
         }),
-      // Custom unwrap — the BE returns `{ data: { dashboards: [], count } }`.
+      // BE returns `{ data: { dashboards: [], count } }`.
       unwrap: (res: any) => ({
         rows: res?.data?.dashboards ?? [],
         total: res?.data?.count ?? 0,
       }),
-      // Floating-filter cell value → BE filter slice. AG Grid emits
-      // cell-shaped values; this map flattens them into the
-      // `{name, datasetName, datasourceName, status, createdDateFrom,
-      // createdDateTo}` shape the BE expects.
-      filterBuilders: {
-        name: cell => ({ name: (cell as any)?.filter ?? cell }),
-        datasetName: cell => ({
-          datasetName: (cell as any)?.filter ?? cell,
-        }),
-        datasourceName: cell => ({
-          datasourceName: (cell as any)?.filter ?? cell,
-        }),
-        status: cell => {
-          const v = (cell as any)?.filter ?? cell;
-          return v === '' || v === null || v === undefined ? {} : { status: v };
-        },
-        createdOn: cell => {
-          // AG Grid date filter shape: {dateFrom, dateTo, type, filterType}.
-          const c = cell as any;
-          const out: Record<string, string> = {};
-          if (c?.dateFrom) out['createdDateFrom'] = new Date(c.dateFrom).toISOString();
-          if (c?.dateTo) {
-            const to = new Date(c.dateTo);
-            to.setHours(23, 59, 59, 999);
-            out['createdDateTo'] = to.toISOString();
-          }
-          return out;
-        },
+      // custom-table sends PLAIN filter values (global `search` + per-column
+      // name/datasetName/datasourceName/status), so the adapter's identity
+      // mapping passes them straight through — no AG-Grid cell unwrapping.
+      initial: {
+        page: 1,
+        limit: 50,
+        ...(deepLinkName ? { filter: { name: deepLinkName } } : {}),
       },
-      initial: { page: 1, limit: 10 },
     });
     this.cdr.markForCheck();
   }
 
   /* ── handlers re-pointed at the adapter ──────────────── */
-
-  onSelectionChange(rows: any[]) {
-    this.selectedDashboards = rows;
-    this.cdr.markForCheck();
-  }
-
-  clearFilters() {
-    if (!this.adapter) return;
-    this.adapter.setFilter({});
-    this.adapter.setSort([]);
-    this.selectedDashboards = [];
-  }
 
   refreshList() {
     this.adapter?.reload();
@@ -322,17 +231,13 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     const name = params['name'];
 
     if (datasourceId) {
-      this.loadDatasources(datasourceId).then(() => {
-        if (name && this.adapter) {
-          this.adapter.patchFilter({ name });
-        }
-      });
+      this.loadDatasources(datasourceId, name);
     } else {
-      this.loadDatasources();
+      this.loadDatasources(undefined, name);
     }
   }
 
-  loadDatasources(preSelectedDbId?: string): Promise<void> {
+  loadDatasources(preSelectedDbId?: string, deepLinkName?: string): Promise<void> {
     return new Promise(resolve => {
       const params = { page: DEFAULT_PAGE, limit: 10 };
       this.datasourceService
@@ -350,7 +255,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
                 this.datasources.find(d => d.id === preSelectedDbId)
                   ? preSelectedDbId
                   : this.datasources[0].id;
-              this.bindAdapter();
+              this.bindAdapter(deepLinkName);
             } else {
               this.selectedDatasource = null;
               this.adapter = null;
@@ -373,7 +278,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  /* ── nav + bulk-delete ──────────────────────────────── */
+  /* ── nav + delete ───────────────────────────────────── */
 
   onView(id: string) {
     this.router.navigate([DB_ROUTES.view(id)]);
@@ -381,21 +286,12 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.dashboardToDelete = id;
-    this.bulkDelete = false;
-    this.showDeleteConfirm = true;
-  }
-
-  confirmBulkDelete() {
-    if (this.selectedCount === 0) return;
-    this.dashboardToDelete = null;
-    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.dashboardToDelete = null;
-    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
@@ -403,38 +299,11 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     const reason = this.deleteJustification.trim();
     if (!reason) return;
 
-    if (this.bulkDelete) {
-      const ids = this.selectedDashboards.map(d => d.id);
-      if (ids.length === 0) {
-        this.cancelDelete();
-        return;
-      }
-      this.dashboardService
-        .bulkDelete(ids, reason)
-        .then((res: any) => {
-          if (this.globalService.handleSuccessService(res)) {
-            this.selectedDashboards = [];
-            this.refreshList();
-          }
-        })
-        .catch(() => {
-          /* global interceptor shows error toast */
-        })
-        .finally(() => {
-          this.closeDeletePopup();
-          this.cdr.markForCheck();
-        });
-      return;
-    }
-
     if (this.dashboardToDelete) {
       this.dashboardService
         .delete(this.dashboardToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
-            this.selectedDashboards = this.selectedDashboards.filter(
-              d => d.id !== this.dashboardToDelete,
-            );
             this.refreshList();
           }
         })
@@ -453,7 +322,6 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
   private closeDeletePopup() {
     this.showDeleteConfirm = false;
     this.dashboardToDelete = null;
-    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 }

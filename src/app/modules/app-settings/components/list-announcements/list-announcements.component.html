@@ -7,28 +7,6 @@
       </div>
 
       <div class="header-actions">
-        <!-- Bulk Delete Button -->
-        <ng-container *hasPermission="'announcementManagement'; level: 'delete'">
-          <button
-            *ngIf="selectedCount > 0"
-            pButton
-            [label]="'COMMON.DELETE_COUNT' | translate: { count: selectedCount }"
-            icon="pi pi-trash"
-            (click)="confirmBulkDelete()"
-            class="p-button-raised p-button-danger modern-button"
-          ></button>
-        </ng-container>
-
-        <!-- Clear Filters Button -->
-        <button
-          pButton
-          [label]="'COMMON.CLEAR' | translate"
-          icon="pi pi-filter-slash"
-          (click)="clearFilters()"
-          [disabled]="!isFilterActive"
-          class="p-button-outlined p-button-danger modern-button"
-        ></button>
-
         <!-- Add Button -->
         <button
           *hasPermission="'announcementManagement'; level: 'write'"
@@ -41,15 +19,25 @@
       </div>
     </div>
 
-    <!-- Unified Toolbar & Content Card -->
+    <!-- Content Card -->
     <div class="content-card">
-      <div class="card-toolbar">
-        <div class="toolbar-left">
-          <!-- Group filter — server-driven. Lives in the toolbar
-               (not the floating-filter row) because the BE expects
-               `targetGroupId` as a top-level param, not inside the
-               `filter` JSON. -->
-          <div class="dropdown-field">
+      <!-- Unified simple table. Infinite scroll, global search + on-demand
+           per-column filters (shared inputs), per-row actions. The Group
+           filter is projected into the toolbar's LEFT slot so it sits inline
+           with the search + action icons. Per-cell DOM via <ng-template
+           usGridCell>. -->
+      <div class="table-wrapper" *ngIf="adapter">
+        <app-custom-table
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="tableConfig"
+          (refresh)="refreshList()"
+        >
+          <!-- Toolbar-left slot: server-driven Group filter dropdown. Lives
+               here (not the per-column filter row) because the BE expects
+               `targetGroupId` as a top-level param, not inside the `filter`
+               JSON. -->
+          <div tableToolbarStart class="ann-toolbar-start">
             <app-custom-dropdown
               [(ngModel)]="selectedGroup"
               [serverMode]="true"
@@ -67,27 +55,15 @@
               filterBy="name"
               (onChangeEvent)="onGroupChange($event)"
               icon="pi-users"
-            >
-            </app-custom-dropdown>
+            ></app-custom-dropdown>
           </div>
-        </div>
-      </div>
 
-      <!-- AG Grid via us-data-grid. The grid hosts row-selection,
-           sort, floating filters, column chooser, density toggle,
-           CSV/XLSX export and saved views (gridKey='announcements-list').
-           Per-cell DOM is supplied via <ng-template usGridCell> so
-           the visual look — title link, description, target group,
-           status pill, active-window range, created date, row-actions —
-           matches the previous PrimeNG layout exactly. -->
-      <div class="table-wrapper" *ngIf="adapter">
-        <us-data-grid
-          [columns]="cols"
-          [serverAdapter]="adapter"
-          [config]="gridConfig"
-          (selectionChange)="onSelectionChange($event)"
-          (refresh)="refreshList()"
-        >
+          <!-- Empty body — always projected so only one empty state shows. -->
+          <div tableEmpty class="ct-empty-body">
+            <i class="pi pi-inbox"></i>
+            <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
+          </div>
+
           <ng-template usGridCell="name" let-a>
             <a
               class="dataset-name-link"
@@ -176,7 +152,7 @@
               </button>
             </div>
           </ng-template>
-        </us-data-grid>
+        </app-custom-table>
       </div>
     </div>
   </div>
@@ -191,15 +167,8 @@
       <h3>{{ 'ANNOUNCEMENT.DELETE_TITLE' | translate }}</h3>
     </div>
     <div class="standard-delete-section">
-      <p class="delete-intro" *ngIf="!bulkDelete">
+      <p class="delete-intro">
         {{ 'ANNOUNCEMENT.DELETE_SINGLE' | translate }}
-      </p>
-      <p class="delete-intro" *ngIf="bulkDelete">
-        <span
-          [innerHTML]="
-            'ANNOUNCEMENT.DELETE_BULK' | translate: { count: selectedCount }
-          "
-        ></span>
       </p>
       <ul class="delete-info-list">
         <li>

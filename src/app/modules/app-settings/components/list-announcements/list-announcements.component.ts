@@ -9,7 +9,6 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import type { ColDef } from 'ag-grid-community';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { ANNOUNCEMENT } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -18,17 +17,24 @@ import {
   UsServerListAdapter,
   UsListLoadParams,
 } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
-import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
+import type {
+  CustomTableColumn,
+  CustomTableConfig,
+} from 'src/app/shared/components/custom-table/custom-table.types';
 import { AnnouncementService } from '../../services/announcement.service';
 
 /**
- * Announcements listing — renders through `<us-data-grid>` with a
- * `UsServerListAdapter` driving the BE `/announcements` list call.
- * No datasource gate; the adapter binds in `ngOnInit`. The Group
- * filter (a server-mode dropdown) lives in the card toolbar above
- * the grid and feeds an additional `targetGroupId` param into the
- * load fn — rebuilding the adapter on group change keeps the closure
- * in sync, mirroring the role filter in the group listing.
+ * Announcements listing — renders through the shared `<app-custom-table>` (the
+ * app's unified list table) driven by a `UsServerListAdapter` on the BE
+ * `/announcements` list call. Infinite scroll (no page controls), a single
+ * global search plus on-demand per-column filters (shared inputs), and per-row
+ * actions. No bulk selection.
+ *
+ * No datasource gate; the adapter binds in `ngOnInit`. The Group filter (a
+ * server-mode dropdown) is projected into the table's toolbar-left slot so it
+ * sits inline with the search + action icons, and feeds an additional
+ * `targetGroupId` param into the load fn — rebuilding the adapter on group
+ * change keeps the closure in sync.
  */
 @Component({
   selector: 'app-list-announcements',
@@ -42,49 +48,43 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
 
   /* ── page state ──────────────────────────────────────── */
 
-  selectedAnnouncements: any[] = [];
   showDeleteConfirm = false;
   toDeleteId: string | null = null;
-  bulkDelete = false;
-  deleteJustification = '';
-  Math = Math;
   today = new Date();
   statusOptions: { label: string; value: number }[] = [];
 
-  // Group filter — server-mode dropdown outside the grid. Mirrors the
-  // role filter on groups/list; lives in the card toolbar because the
-  // BE expects `targetGroupId` as a top-level param, not inside the
-  // `filter` JSON.
+  // Group filter — server-mode dropdown outside the grid. Lives in the
+  // table's toolbar-left slot because the BE expects `targetGroupId` as a
+  // top-level param, not inside the `filter` JSON.
   groups: any[] = [];
   selectedGroup: string | null = null;
   preloadedGroups: any[] | null = null;
   preloadedGroupsTotal: number | null = null;
 
-  /* ── grid wiring ───────────────────────────────────────── */
+  /* ── custom-table wiring (unified simple table; server-driven) ──────── */
 
-  cols: ColDef[] = [];
+  /** Unified-table columns. Cell DOM is supplied by `<ng-template usGridCell>`
+   *  in the HTML; `filter` flags enable the on-demand per-column filter row. */
+  cols: CustomTableColumn[] = [];
 
-  gridConfig: UsDataGridConfig = {
-    enableRowSelection: true,
-    rowSelectionMode: 'multiple',
-    freezeFirstColumn: true,
-    enableColumnChooser: true,
-    enableAddFilter: false, // we use the BE-driven floating filters
-    enableAutoFit: true,
-    enableDensityToggle: true,
-    enableCsvExport: true,
-    enableXlsxExport: true,
-    enableRefresh: true,
-    enableSavedViews: true,
+  tableConfig: CustomTableConfig = {
+    mode: 'scroll', // infinite scroll — no page controls
+    pageSize: 50, // rows fetched per scroll page
+    globalSearch: true,
+    globalSearchKey: 'search', // BE announcements list matches a `search` filter key
+    globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
+    showColumnFilters: true,
+    enableExport: true,
+    enableDensity: true,
+    density: 'comfortable',
     gridKey: 'announcements-list',
-    pageSizeOptions: [10, 25, 50, 100],
-    pageSize: 10,
-    // No datasource dropdown = full available height.
-    height: 'calc(100vh - 280px)',
+    height: 'flex',
     rowIdField: 'id',
   };
 
-  /** Server-side adapter — bound in `ngOnInit` (no datasource gate). */
+  /** Server-side adapter — bound in `ngOnInit` (no datasource gate) and
+   *  rebuilt whenever the Group filter changes so the closure picks up the
+   *  new value. */
   adapter: UsServerListAdapter<any> | null = null;
 
   constructor(
@@ -102,6 +102,13 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
     ];
 
     this.cols = this.buildColumns();
+    // Field-specific search placeholder so the user knows what's matched.
+    this.tableConfig = {
+      ...this.tableConfig,
+      globalSearchPlaceholder: this.translate.instant(
+        'ANNOUNCEMENT.SEARCH_PLACEHOLDER',
+      ),
+    };
     this.loadGroups();
     this.bindAdapter();
   }
@@ -114,86 +121,18 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
     this.adapter?.destroy();
   }
 
-  get selectedCount(): number {
-    return this.selectedAnnouncements?.length || 0;
-  }
-
-  get isFilterActive(): boolean {
-    return (
-      (!!this.adapter && Object.keys(this.adapter.filterModel()).length > 0) ||
-      !!this.selectedGroup
-    );
-  }
-
   /* ── column definitions ──────────────────────────────── */
 
-  private buildColumns(): ColDef[] {
+  private buildColumns(): CustomTableColumn[] {
+    const t = (k: string) => this.translate.instant(k);
     return [
-      {
-        colId: 'name',
-        field: 'name',
-        headerName: this.translate.instant('ANNOUNCEMENT.ANNOUNCEMENT_TITLE'),
-        width: 224,
-        minWidth: 224,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        pinned: 'left',
-      },
-      {
-        colId: 'description',
-        field: 'description',
-        headerName: this.translate.instant('COMMON.DESCRIPTION'),
-        minWidth: 320,
-        flex: 1,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        sortable: false,
-      },
-      {
-        colId: 'targetGroup',
-        field: 'targetGroup.name',
-        headerName: this.translate.instant('ANNOUNCEMENT.GROUP'),
-        width: 192,
-        minWidth: 192,
-        sortable: false,
-        filter: false,
-      },
-      {
-        colId: 'status',
-        field: 'status',
-        headerName: this.translate.instant('COMMON.STATUS'),
-        width: 144,
-        minWidth: 144,
-        filter: 'agNumberColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'activeWindow',
-        headerName: this.translate.instant('ANNOUNCEMENT.ACTIVE_WINDOW'),
-        width: 224,
-        minWidth: 224,
-        sortable: false,
-        filter: false,
-      },
-      {
-        colId: 'createdOn',
-        field: 'createdOn',
-        headerName: this.translate.instant('COMMON.CREATED_ON'),
-        width: 192,
-        minWidth: 192,
-        filter: 'agDateColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'actions',
-        headerName: this.translate.instant('COMMON.ACTIONS'),
-        width: 128,
-        minWidth: 128,
-        sortable: false,
-        filter: false,
-        resizable: false,
-        pinned: 'right',
-      },
+      { colId: 'name', field: 'name', header: t('ANNOUNCEMENT.ANNOUNCEMENT_TITLE'), width: '224px', frozen: true, filter: 'text' },
+      { colId: 'description', field: 'description', header: t('COMMON.DESCRIPTION'), width: '320px', filter: 'text', sortable: false },
+      { colId: 'targetGroup', field: 'targetGroup.name', header: t('ANNOUNCEMENT.GROUP'), width: '192px', sortable: false },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px', filter: 'numeric' },
+      { colId: 'activeWindow', header: t('ANNOUNCEMENT.ACTIVE_WINDOW'), width: '224px', sortable: false },
+      { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px' },
+      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
     ];
   }
 
@@ -243,7 +182,6 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
 
   onGroupChange(groupId: string | null): void {
     this.selectedGroup = groupId;
-    this.selectedAnnouncements = [];
     // The adapter closes over selectedGroup — rebuild so the next
     // load picks up the new value.
     this.bindAdapter();
@@ -270,55 +208,15 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
         rows: res?.data?.announcements ?? [],
         total: res?.data?.count ?? 0,
       }),
-      // Floating-filter cell value → BE filter slice. Flattens the
-      // AG-Grid-shaped cells into the
-      // `{name, description, status, createdDateFrom, createdDateTo}`
-      // shape the BE expects. Announcements use `name`/`description`
-      // entity fields (despite UI calling them title/message in some
-      // labels).
-      filterBuilders: {
-        name: cell => ({ name: (cell as any)?.filter ?? cell }),
-        description: cell => ({
-          description: (cell as any)?.filter ?? cell,
-        }),
-        status: cell => {
-          const v = (cell as any)?.filter ?? cell;
-          return v === '' || v === null || v === undefined ? {} : { status: v };
-        },
-        createdOn: cell => {
-          // AG Grid date filter shapes: {dateFrom, dateTo, type, filterType}.
-          const c = cell as any;
-          const out: Record<string, string> = {};
-          if (c?.dateFrom) out['createdDateFrom'] = new Date(c.dateFrom).toISOString();
-          if (c?.dateTo) {
-            const to = new Date(c.dateTo);
-            to.setHours(23, 59, 59, 999);
-            out['createdDateTo'] = to.toISOString();
-          }
-          return out;
-        },
-      },
-      initial: { page: 1, limit: 10 },
+      // custom-table sends PLAIN filter values (global `search` + per-column
+      // name/description/status), so the adapter's identity mapping passes
+      // them straight through — no AG-Grid cell unwrapping needed.
+      initial: { page: 1, limit: 50 },
     });
     this.cdr.markForCheck();
   }
 
   /* ── handlers re-pointed at the adapter ──────────────── */
-
-  onSelectionChange(rows: any[]): void {
-    this.selectedAnnouncements = rows ?? [];
-    this.cdr.markForCheck();
-  }
-
-  clearFilters(): void {
-    if (this.adapter) {
-      this.adapter.setFilter({});
-      this.adapter.setSort([]);
-    }
-    this.selectedGroup = null;
-    this.selectedAnnouncements = [];
-    this.bindAdapter();
-  }
 
   refreshList(): void {
     this.adapter?.reload();
@@ -334,7 +232,7 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
     return true;
   }
 
-  /* ── nav + delete ───────────────────────────────────── */
+  /* ── nav + per-row delete ───────────────────────────── */
 
   onAdd(): void {
     this.router.navigate([ANNOUNCEMENT.ADD]);
@@ -350,55 +248,20 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string): void {
     this.toDeleteId = id;
-    this.bulkDelete = false;
-    this.showDeleteConfirm = true;
-  }
-
-  confirmBulkDelete(): void {
-    if (this.selectedCount === 0) return;
-    this.toDeleteId = null;
-    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete(): void {
     this.showDeleteConfirm = false;
     this.toDeleteId = null;
-    this.bulkDelete = false;
-    this.deleteJustification = '';
   }
 
   proceedDelete(): void {
-    if (this.bulkDelete) {
-      // No bulk-delete endpoint on /announcements — fire per-id
-      // deletes in parallel and refresh once they settle. This keeps
-      // the UI affordance (select N rows → delete) without needing a
-      // BE addition.
-      const ids = this.selectedAnnouncements.map(a => a.id);
-      if (ids.length === 0) {
-        this.cancelDelete();
-        return;
-      }
-      Promise.allSettled(ids.map(id => this.announcementService.delete(id)))
-        .then(() => {
-          this.selectedAnnouncements = [];
-          this.refreshList();
-        })
-        .finally(() => {
-          this.cancelDelete();
-          this.cdr.markForCheck();
-        });
-      return;
-    }
-
     if (this.toDeleteId) {
       this.announcementService
         .delete(this.toDeleteId)
         .then(res => {
           if (this.globalService.handleSuccessService(res)) {
-            this.selectedAnnouncements = this.selectedAnnouncements.filter(
-              a => a.id !== this.toDeleteId,
-            );
             this.refreshList();
           }
         })

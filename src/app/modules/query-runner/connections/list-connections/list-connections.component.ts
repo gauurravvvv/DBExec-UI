@@ -8,11 +8,13 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import type { ColDef } from 'ag-grid-community';
 import { QUERY_RUNNER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { UsServerListAdapter } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
-import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
+import type {
+  CustomTableColumn,
+  CustomTableConfig,
+} from 'src/app/shared/components/custom-table/custom-table.types';
 import {
   QueryConnection,
   QueryRunnerService,
@@ -36,28 +38,28 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
 
   loading = false;
   connections: QueryConnection[] = [];
-  filterName = '';
 
-  /* ── us-data-grid wiring (identical pattern to list-db-roles) ───────── */
-  cols: ColDef[] = [];
-  gridConfig: UsDataGridConfig = {
-    enableRowSelection: false,
-    freezeFirstColumn: true,
-    enableColumnChooser: true,
-    enableAddFilter: false,
-    enableAutoFit: true,
-    enableDensityToggle: true,
-    enableCsvExport: true,
-    enableXlsxExport: true,
-    enableRefresh: true,
-    enableSavedViews: true,
+  /* ── custom-table wiring (unified simple table; server-driven) ──────── */
+
+  /** Unified-table columns. Cell DOM is supplied by `<ng-template usGridCell>`
+   *  in the HTML; the single `name` column carries the on-demand text filter. */
+  cols: CustomTableColumn[] = [];
+
+  tableConfig: CustomTableConfig = {
+    mode: 'scroll', // infinite scroll — no page controls
+    pageSize: 50, // rows fetched per scroll page
+    globalSearch: true,
+    globalSearchKey: 'search', // BE connections list matches a `search` filter key
+    globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
+    showColumnFilters: true,
+    enableExport: true,
+    enableDensity: true,
+    density: 'comfortable',
     gridKey: 'connections-list',
-    pageSizeOptions: [10, 25, 50, 100],
-    pageSize: 10,
-    height: 'calc(100vh - 280px)',
+    height: 'flex',
     rowIdField: 'id',
   };
-  // Server-side adapter: the grid's page/sort/column-filters drive a BE
+  // Server-side adapter: the table's page/sort/global-search drive a BE
   // query (LIMIT/OFFSET + WHERE + COUNT). See buildAdapter().
   adapter: UsServerListAdapter<any> | null = null;
 
@@ -77,6 +79,13 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.cols = this.buildColumns();
+    // Field-specific search placeholder so the user knows what's matched.
+    this.tableConfig = {
+      ...this.tableConfig,
+      globalSearchPlaceholder: this.translate.instant(
+        'QUERY_RUNNER.CONNECTIONS_SEARCH_PLACEHOLDER',
+      ),
+    };
     this.buildAdapter();
     this.adapter?.reload();
   }
@@ -85,27 +94,27 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
     this.adapter?.destroy();
   }
 
-  /** AG Grid columns — widths preserved from the previous p-table. Cell
-   *  DOM is supplied by `<ng-template usGridCell>` in the HTML. */
-  private buildColumns(): ColDef[] {
+  /** Unified-table columns — widths carried over from the AG-Grid ColDefs.
+   *  Cell DOM is supplied by `<ng-template usGridCell>` in the HTML. */
+  private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
-      { colId: 'name', field: 'name', headerName: t('COMMON.NAME'), minWidth: 224, flex: 1, filter: 'agTextColumnFilter', filterParams: { buttons: ['reset'], suppressAndOrCondition: true }, pinned: 'left' },
-      { colId: 'datasource', field: 'datasourceName', headerName: t('COMMON.DATASOURCE'), minWidth: 192 },
-      { colId: 'login', field: 'username', headerName: t('QUERY_RUNNER.LOGIN'), width: 160, minWidth: 160 },
-      { colId: 'health', field: 'lastTestStatus', headerName: t('QUERY_RUNNER.HEALTH'), width: 128, minWidth: 128 },
-      { colId: 'state', field: 'enabled', headerName: t('QUERY_RUNNER.STATE'), width: 112, minWidth: 112 },
-      { colId: 'actions', headerName: t('COMMON.ACTIONS'), width: 240, minWidth: 240, sortable: false, filter: false, resizable: false, pinned: 'right' },
+      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
+      { colId: 'datasource', field: 'datasourceName', header: t('COMMON.DATASOURCE'), width: '192px' },
+      { colId: 'login', field: 'username', header: t('QUERY_RUNNER.LOGIN'), width: '160px' },
+      { colId: 'health', field: 'lastTestStatus', header: t('QUERY_RUNNER.HEALTH'), width: '128px', sortable: false },
+      { colId: 'state', field: 'enabled', header: t('QUERY_RUNNER.STATE'), width: '112px', sortable: false },
+      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
     ];
   }
 
   /**
    * Server-side adapter. Each `load` sends page/limit/sort/filter to
-   * `listConnections(...)` which pages + column-filters server-side and
-   * returns `{ count, connections }`. `sortFieldMap` whitelists AG Grid
-   * colIds → BE sort keys; `filterBuilders` turn per-column cell values into
-   * BE filter slices. The toolbar name box feeds the same `name` slice via
-   * patchFilter (below).
+   * `listConnections(...)` which pages + filters server-side and returns
+   * `{ count, connections }`. `sortFieldMap` whitelists the table colIds →
+   * BE sort keys. custom-table sends PLAIN filter values (the global `search`
+   * key + per-column `name`), so the adapter passes them straight through —
+   * no AG-Grid cell unwrapping needed.
    */
   private buildAdapter(): void {
     this.adapter?.destroy();
@@ -130,40 +139,13 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
         state: 'enabled',
         health: 'lastTestStatus',
       },
-      filterBuilders: {
-        // AG Grid text filter on the Name column → BE `name` ILIKE slice.
-        name: (v: any) => {
-          const val = typeof v === 'string' ? v : v?.filter;
-          return val ? { name: String(val) } : {};
-        },
-        login: (v: any) => {
-          const val = typeof v === 'string' ? v : v?.filter;
-          return val ? { username: String(val) } : {};
-        },
-      },
-      initial: { page: 1, limit: 10 },
+      initial: { page: 1, limit: 50 },
     });
   }
 
-  /** Grid Refresh button → re-run the current page/filter query. */
+  /** Table Refresh button → re-run the current page/filter query. */
   refreshList(): void {
     this.adapter?.reload();
-  }
-
-  /** Toolbar name box → inject a server-side `name` filter slice. */
-  onFilterChange(): void {
-    const q = this.filterName.trim();
-    this.adapter?.patchFilter({ name: q || undefined });
-  }
-
-  clearFilters(): void {
-    this.filterName = '';
-    this.adapter?.patchFilter({ name: undefined });
-    this.cdr.markForCheck();
-  }
-
-  get isFilterActive(): boolean {
-    return !!this.filterName.trim();
   }
 
   onAdd(): void {

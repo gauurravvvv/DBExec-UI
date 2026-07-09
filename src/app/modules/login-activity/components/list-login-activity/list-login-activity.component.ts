@@ -9,22 +9,29 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslateService } from '@ngx-translate/core';
-import type { ColDef } from 'ag-grid-community';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { AuditService } from 'src/app/modules/audit-logs/services/audit.service';
 import {
   UsServerListAdapter,
   UsListLoadParams,
 } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
-import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
+import type {
+  CustomTableColumn,
+  CustomTableConfig,
+} from 'src/app/shared/components/custom-table/custom-table.types';
 
 /**
- * Login activity listing — renders through `<us-data-grid>` with a
- * `UsServerListAdapter` driving the BE `/audit-logs/login-activity`
- * list call. Read-only: no bulk actions, no row actions. The page
- * header (with PDF export + clear-filter buttons) and content card
- * retain the existing styling; only the `<p-table>` was swapped out
- * for the AG Grid wrapper.
+ * Login activity listing — renders through the shared `<app-custom-table>`
+ * (the app's unified list table) driven by a `UsServerListAdapter` on the BE
+ * `/audit-logs/login-activity` list call. Read-only activity log: infinite
+ * scroll (no page controls), a single global search plus on-demand per-column
+ * filters (shared inputs). No bulk selection and no row actions — there is
+ * nothing to add, edit, or delete.
+ *
+ * The page header retains its BE-driven PDF export button; per-cell DOM is
+ * supplied via `<ng-template usGridCell>` so the visual look — username link,
+ * event badge, failure-reason text, relative timestamp, ip / user-agent text —
+ * is unchanged.
  */
 @Component({
   selector: 'app-list-login-activity',
@@ -41,62 +48,30 @@ export class ListLoginActivityComponent implements OnInit, OnDestroy {
   today = new Date();
   isExporting = false;
 
-  /* ── grid wiring ───────────────────────────────────────── */
+  /* ── custom-table wiring (unified simple table; server-driven) ──────── */
 
-  /** AG Grid column definitions — widths preserved from the old
-   *  `<p-table>` so the visual layout is unchanged. cellRenderer
-   *  templates live in the HTML as `<ng-template usGridCell>`. */
-  cols: ColDef[] = [];
+  /** Unified-table columns. Cell DOM is supplied by `<ng-template usGridCell>`
+   *  in the HTML; `filter` flags enable the on-demand per-column filter row. */
+  cols: CustomTableColumn[] = [];
 
-  gridConfig: UsDataGridConfig = {
-    enableRowSelection: false,
-    freezeFirstColumn: true,
-    enableColumnChooser: true,
-    enableAddFilter: false, // we use the BE-driven floating filters
-    enableAutoFit: true,
-    enableDensityToggle: true,
-    enableCsvExport: true,
-    enableXlsxExport: true,
-    enableRefresh: true,
-    enableSavedViews: true,
+  tableConfig: CustomTableConfig = {
+    mode: 'scroll', // infinite scroll — no page controls
+    pageSize: 50, // rows fetched per scroll page
+    globalSearch: true,
+    globalSearchKey: 'search', // BE login-activity matches a `search` filter key
+    globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
+    showColumnFilters: true,
+    enableExport: true,
+    enableDensity: true,
+    density: 'comfortable',
     gridKey: 'login-activity-list',
-    pageSizeOptions: [25, 50, 100],
-    pageSize: 25,
-    height: 'calc(100vh - 280px)',
+    height: 'flex',
     rowIdField: 'id',
   };
 
-  /** Server-side adapter — bound synchronously in ngOnInit; no
-   *  datasource gate for login activity (org-wide). */
+  /** Server-side adapter — bound synchronously in ngOnInit; no datasource
+   *  gate for login activity (org-wide). */
   adapter: UsServerListAdapter<any> | null = null;
-
-  /** Floating-filter → BE filter slice translators. Held on the
-   *  component (not just inside the adapter) so the BE-driven PDF
-   *  export can rebuild the same filter blob from the live
-   *  filterModel snapshot. */
-  private readonly filterBuilders: Record<
-    string,
-    (cell: unknown) => Record<string, unknown>
-  > = {
-    username: cell => ({ username: (cell as any)?.filter ?? cell }),
-    eventType: cell => {
-      const v = (cell as any)?.filter ?? cell;
-      return v === '' || v === null || v === undefined ? {} : { eventType: v };
-    },
-    ipAddress: cell => ({ ipAddress: (cell as any)?.filter ?? cell }),
-    createdOn: cell => {
-      // AG Grid date filter shape: {dateFrom, dateTo, type, filterType}.
-      const c = cell as any;
-      const out: Record<string, string> = {};
-      if (c?.dateFrom) out['dateFrom'] = new Date(c.dateFrom).toISOString();
-      if (c?.dateTo) {
-        const to = new Date(c.dateTo);
-        to.setHours(23, 59, 59, 999);
-        out['dateTo'] = to.toISOString();
-      }
-      return out;
-    },
-  };
 
   constructor(
     private auditService: AuditService,
@@ -106,6 +81,13 @@ export class ListLoginActivityComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.cols = this.buildColumns();
+    // Field-specific search placeholder so the user knows what's matched.
+    this.tableConfig = {
+      ...this.tableConfig,
+      globalSearchPlaceholder: this.translate.instant(
+        'LOGIN_ACTIVITY.SEARCH_PLACEHOLDER',
+      ),
+    };
     this.bindAdapter();
   }
 
@@ -119,69 +101,17 @@ export class ListLoginActivityComponent implements OnInit, OnDestroy {
     return this.adapter ? this.adapter.total() : 0;
   }
 
-  get isFilterActive(): boolean {
-    return !!this.adapter && Object.keys(this.adapter.filterModel()).length > 0;
-  }
-
   /* ── column definitions ──────────────────────────────── */
 
-  private buildColumns(): ColDef[] {
+  private buildColumns(): CustomTableColumn[] {
+    const t = (k: string) => this.translate.instant(k);
     return [
-      {
-        colId: 'username',
-        field: 'username',
-        headerName: this.translate.instant('COMMON.USERNAME'),
-        width: 192,
-        minWidth: 192,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        pinned: 'left',
-      },
-      {
-        colId: 'eventType',
-        field: 'eventType',
-        headerName: this.translate.instant('LOGIN_ACTIVITY.EVENT'),
-        width: 176,
-        minWidth: 176,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'failureReason',
-        field: 'failureReason',
-        headerName: this.translate.instant('LOGIN_ACTIVITY.FAILURE_REASON'),
-        minWidth: 224,
-        flex: 1,
-        sortable: false,
-        filter: false,
-      },
-      {
-        colId: 'createdOn',
-        field: 'createdOn',
-        headerName: this.translate.instant('LOGIN_ACTIVITY.TIMESTAMP'),
-        width: 224,
-        minWidth: 224,
-        filter: 'agDateColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'ipAddress',
-        field: 'ipAddress',
-        headerName: this.translate.instant('LOGIN_ACTIVITY.IP_ADDRESS'),
-        width: 160,
-        minWidth: 160,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'userAgent',
-        field: 'userAgent',
-        headerName: this.translate.instant('LOGIN_ACTIVITY.USER_AGENT'),
-        minWidth: 256,
-        flex: 1,
-        sortable: false,
-        filter: false,
-      },
+      { colId: 'username', field: 'username', header: t('COMMON.USERNAME'), width: '192px', frozen: true, filter: 'text' },
+      { colId: 'eventType', field: 'eventType', header: t('LOGIN_ACTIVITY.EVENT'), width: '176px', filter: 'text' },
+      { colId: 'failureReason', field: 'failureReason', header: t('LOGIN_ACTIVITY.FAILURE_REASON'), width: '224px', sortable: false },
+      { colId: 'createdOn', field: 'createdOn', header: t('LOGIN_ACTIVITY.TIMESTAMP'), width: '224px' },
+      { colId: 'ipAddress', field: 'ipAddress', header: t('LOGIN_ACTIVITY.IP_ADDRESS'), width: '160px', filter: 'text' },
+      { colId: 'userAgent', field: 'userAgent', header: t('LOGIN_ACTIVITY.USER_AGENT'), width: '256px', sortable: false },
     ];
   }
 
@@ -206,21 +136,15 @@ export class ListLoginActivityComponent implements OnInit, OnDestroy {
         rows: res?.data?.activities ?? [],
         total: res?.data?.count ?? 0,
       }),
-      // Floating-filter cell value → BE filter slice. Reuse the
-      // shared map so the export path can rebuild the same blob.
-      filterBuilders: this.filterBuilders,
-      initial: { page: 1, limit: 25 },
+      // custom-table sends PLAIN filter values (global `search` + per-column
+      // username/eventType/ipAddress), so the adapter's identity mapping
+      // passes them straight through — no AG-Grid cell unwrapping needed.
+      initial: { page: 1, limit: 50 },
     });
     this.cdr.markForCheck();
   }
 
   /* ── handlers ────────────────────────────────────────── */
-
-  clearFilters() {
-    if (!this.adapter) return;
-    this.adapter.setFilter({});
-    this.adapter.setSort([]);
-  }
 
   refreshList() {
     this.adapter?.reload();
@@ -249,15 +173,13 @@ export class ListLoginActivityComponent implements OnInit, OnDestroy {
 
   exportActivity(format: 'pdf') {
     // Reuse the live filter model so the export mirrors what the user
-    // is seeing. Run each cell through the shared filterBuilders map
-    // — same logic the adapter uses to assemble the list-call filter
-    // blob — so the BE sees an identical shape on both endpoints.
+    // is seeing. custom-table stores PLAIN filter values keyed by colId,
+    // so the blob is assembled directly — no cell unwrapping needed.
     const filter: Record<string, unknown> = {};
     const filterModel = this.adapter?.filterModel() ?? {};
     for (const [colId, cell] of Object.entries(filterModel)) {
       if (cell === null || cell === undefined || cell === '') continue;
-      const builder = this.filterBuilders[colId];
-      Object.assign(filter, builder ? builder(cell) : { [colId]: cell });
+      filter[colId] = cell;
     }
     const params: any = { format };
     if (Object.keys(filter).length > 0) {

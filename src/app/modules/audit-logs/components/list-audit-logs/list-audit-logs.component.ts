@@ -9,26 +9,27 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslateService } from '@ngx-translate/core';
-import type { ColDef } from 'ag-grid-community';
 import { GlobalService } from 'src/app/core/services/global.service';
 import {
   UsServerListAdapter,
   UsListLoadParams,
 } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
-import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
+import type {
+  CustomTableColumn,
+  CustomTableConfig,
+} from 'src/app/shared/components/custom-table/custom-table.types';
 import { AuditService } from '../../services/audit.service';
 
 /**
- * Audit-logs listing — renders through `<us-data-grid>` with a
- * `UsServerListAdapter` driving the BE `/audit-logs` list call. The
- * page header / content card / detail popup retain the existing
- * styling and behaviour; only the `<p-table>` was swapped out for
- * the AG Grid wrapper. There is no datasource dropdown on this
- * page — it lists logs at the org level, so the adapter binds
- * directly in ngOnInit.
+ * Audit-logs listing — renders through the shared `<app-custom-table>`
+ * (the app's unified list table) driven by a `UsServerListAdapter` on the
+ * BE `/audit-logs` list call. Infinite scroll (no page controls), a single
+ * global search plus on-demand per-column filters (shared inputs). Lists
+ * logs at the org level, so the adapter binds directly in ngOnInit — there
+ * is no datasource dropdown on this page.
  *
- * Read-only — no row selection, no bulk delete, no row actions
- * beyond the "view detail" popup triggered by clicking the name.
+ * Read-only — no row selection, no bulk delete, no row actions beyond the
+ * "view detail" popup triggered by clicking the name.
  */
 @Component({
   selector: 'app-list-audit-logs',
@@ -49,25 +50,24 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
   showDetailDialog = false;
   selectedLog: any = null;
 
-  /* ── grid wiring ─────────────────────────────────────── */
+  /* ── custom-table wiring (unified simple table; server-driven) ──────── */
 
-  cols: ColDef[] = [];
+  /** Unified-table columns. Cell DOM is supplied by `<ng-template usGridCell>`
+   *  in the HTML; `filter` flags enable the on-demand per-column filter row. */
+  cols: CustomTableColumn[] = [];
 
-  gridConfig: UsDataGridConfig = {
-    enableRowSelection: false,
-    freezeFirstColumn: true,
-    enableColumnChooser: true,
-    enableAddFilter: false, // we use the BE-driven floating filters
-    enableAutoFit: true,
-    enableDensityToggle: true,
-    enableCsvExport: true,
-    enableXlsxExport: true,
-    enableRefresh: true,
-    enableSavedViews: true,
+  tableConfig: CustomTableConfig = {
+    mode: 'scroll', // infinite scroll — no page controls
+    pageSize: 50, // rows fetched per scroll page
+    globalSearch: true,
+    globalSearchKey: 'search', // BE audit list matches a `search` filter key
+    globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
+    showColumnFilters: true,
+    enableExport: true,
+    enableDensity: true,
+    density: 'comfortable',
     gridKey: 'audit-logs-list',
-    pageSizeOptions: [25, 50, 100],
-    pageSize: 25,
-    height: 'calc(100vh - 280px)',
+    height: 'flex',
     rowIdField: 'id',
   };
 
@@ -81,6 +81,11 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.cols = this.buildColumns();
+    // Field-specific search placeholder so the user knows what's matched.
+    this.tableConfig = {
+      ...this.tableConfig,
+      globalSearchPlaceholder: this.translate.instant('AUDIT.SEARCH_PLACEHOLDER'),
+    };
     this.bindAdapter();
   }
 
@@ -90,92 +95,19 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
     this.adapter?.destroy();
   }
 
-  get isFilterActive(): boolean {
-    return !!this.adapter && Object.keys(this.adapter.filterModel()).length > 0;
-  }
-
   /* ── column definitions ──────────────────────────────── */
 
-  private buildColumns(): ColDef[] {
+  private buildColumns(): CustomTableColumn[] {
+    const t = (k: string) => this.translate.instant(k);
     return [
-      {
-        colId: 'entityName',
-        field: 'entityName',
-        headerName: this.translate.instant('COMMON.NAME'),
-        width: 224,
-        minWidth: 224,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        sortable: false,
-        pinned: 'left',
-      },
-      {
-        colId: 'username',
-        field: 'username',
-        headerName: this.translate.instant('AUDIT.PERFORMED_BY'),
-        width: 192,
-        minWidth: 192,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        sortable: false,
-      },
-      {
-        colId: 'action',
-        field: 'action',
-        headerName: this.translate.instant('AUDIT.ACTION'),
-        width: 144,
-        minWidth: 144,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'version',
-        field: 'version',
-        headerName: this.translate.instant('AUDIT.VERSION'),
-        width: 96,
-        minWidth: 96,
-        sortable: false,
-        filter: false,
-      },
-      {
-        colId: 'status',
-        field: 'responseSuccess',
-        headerName: this.translate.instant('COMMON.STATUS'),
-        width: 144,
-        minWidth: 144,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        sortable: false,
-      },
-      {
-        colId: 'createdOn',
-        field: 'createdOn',
-        headerName: this.translate.instant('AUDIT.TIMESTAMP'),
-        width: 224,
-        minWidth: 224,
-        filter: 'agDateColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'ipAddress',
-        field: 'ipAddress',
-        headerName: this.translate.instant('AUDIT.IP_ADDRESS'),
-        width: 160,
-        minWidth: 160,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        sortable: false,
-      },
-      {
-        colId: 'justification',
-        field: 'justification',
-        headerName: this.translate.instant('AUDIT.JUSTIFICATION'),
-        minWidth: 256,
-        flex: 1,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        sortable: false,
-      },
+      { colId: 'entityName', field: 'entityName', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text', sortable: false },
+      { colId: 'username', field: 'username', header: t('AUDIT.PERFORMED_BY'), width: '192px', filter: 'text', sortable: false },
+      { colId: 'action', field: 'action', header: t('AUDIT.ACTION'), width: '144px', filter: 'text' },
+      { colId: 'version', field: 'version', header: t('AUDIT.VERSION'), width: '96px', sortable: false },
+      { colId: 'status', field: 'responseSuccess', header: t('COMMON.STATUS'), width: '144px', filter: 'text', sortable: false },
+      { colId: 'createdOn', field: 'createdOn', header: t('AUDIT.TIMESTAMP'), width: '224px' },
+      { colId: 'ipAddress', field: 'ipAddress', header: t('AUDIT.IP_ADDRESS'), width: '160px', filter: 'text', sortable: false },
+      { colId: 'justification', field: 'justification', header: t('AUDIT.JUSTIFICATION'), width: '256px', filter: 'text', sortable: false },
     ];
   }
 
@@ -200,72 +132,16 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
         Promise.resolve().then(() => this.cdr.markForCheck());
         return { rows, total };
       },
-      // Floating-filter cell value → BE filter slice. The grid's
-      // floating filters emit AG-Grid-shaped cells; this map flattens
-      // them into the
-      // `{username, module, action, entityName, status, ipAddress,
-      //   justification, dateFrom, dateTo}` shape the BE expects.
-      filterBuilders: {
-        entityName: cell => {
-          const v = (cell as any)?.filter ?? cell;
-          return v === '' || v === null || v === undefined
-            ? {}
-            : { entityName: v };
-        },
-        username: cell => {
-          const v = (cell as any)?.filter ?? cell;
-          return v === '' || v === null || v === undefined
-            ? {}
-            : { username: v };
-        },
-        action: cell => {
-          const v = (cell as any)?.filter ?? cell;
-          return v === '' || v === null || v === undefined ? {} : { action: v };
-        },
-        status: cell => {
-          const v = (cell as any)?.filter ?? cell;
-          if (v === '' || v === null || v === undefined) return {};
-          // Accept "true"/"false" or boolean. BE expects boolean.
-          const bool = typeof v === 'boolean' ? v : String(v).toLowerCase() === 'true';
-          return { status: bool };
-        },
-        ipAddress: cell => {
-          const v = (cell as any)?.filter ?? cell;
-          return v === '' || v === null || v === undefined
-            ? {}
-            : { ipAddress: v };
-        },
-        justification: cell => {
-          const v = (cell as any)?.filter ?? cell;
-          return v === '' || v === null || v === undefined
-            ? {}
-            : { justification: v };
-        },
-        createdOn: cell => {
-          // AG Grid date filter shape: {dateFrom, dateTo, type, filterType}.
-          const c = cell as any;
-          const out: Record<string, string> = {};
-          if (c?.dateFrom) out['dateFrom'] = new Date(c.dateFrom).toISOString();
-          if (c?.dateTo) {
-            const to = new Date(c.dateTo);
-            to.setHours(23, 59, 59, 999);
-            out['dateTo'] = to.toISOString();
-          }
-          return out;
-        },
-      },
-      initial: { page: 1, limit: 25 },
+      // custom-table sends PLAIN filter values (global `search` + per-column
+      // entityName/username/action/status/ipAddress/justification), so the
+      // adapter's identity mapping passes them straight through — no AG-Grid
+      // cell unwrapping needed.
+      initial: { page: 1, limit: 50 },
     });
     this.cdr.markForCheck();
   }
 
   /* ── handlers re-pointed at the adapter ──────────────── */
-
-  clearFilters() {
-    if (!this.adapter) return;
-    this.adapter.setFilter({});
-    this.adapter.setSort([]);
-  }
 
   refreshList() {
     this.adapter?.reload();
@@ -428,40 +304,27 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
 
   /**
    * Build the BE-shape filter payload from the adapter's current
-   * filterModel. The grid stores AG-Grid-shaped cells (`{filter,
-   * type, ...}` or `{dateFrom, dateTo, ...}`); this flattens them
-   * back into the slice the BE export expects.
+   * filterModel. custom-table stores PLAIN filter values, so the slice
+   * passed to the BE export is a straight pass-through of the model.
    */
   private getExportFilterParams(): any {
     if (!this.adapter) return {};
     const model = this.adapter.filterModel();
     const filter: any = {};
 
-    const flatten = (cell: any) => (cell?.filter ?? cell);
-
-    if (model['entityName']) filter.entityName = flatten(model['entityName']);
-    if (model['username']) filter.username = flatten(model['username']);
-    if (model['action']) filter.action = flatten(model['action']);
-    if (model['ipAddress']) filter.ipAddress = flatten(model['ipAddress']);
-    if (model['justification'])
-      filter.justification = flatten(model['justification']);
+    if (model['entityName']) filter.entityName = model['entityName'];
+    if (model['username']) filter.username = model['username'];
+    if (model['action']) filter.action = model['action'];
+    if (model['ipAddress']) filter.ipAddress = model['ipAddress'];
+    if (model['justification']) filter.justification = model['justification'];
+    if (model['search']) filter.search = model['search'];
 
     if (model['status'] !== undefined && model['status'] !== null) {
-      const v = flatten(model['status']);
+      const v = model['status'];
       if (v !== '' && v !== null && v !== undefined) {
         filter.status =
           typeof v === 'boolean' ? v : String(v).toLowerCase() === 'true';
       }
-    }
-
-    const dateCell: any = model['createdOn'];
-    if (dateCell?.dateFrom) {
-      filter.dateFrom = new Date(dateCell.dateFrom).toISOString();
-    }
-    if (dateCell?.dateTo) {
-      const to = new Date(dateCell.dateTo);
-      to.setHours(23, 59, 59, 999);
-      filter.dateTo = to.toISOString();
     }
 
     return filter;

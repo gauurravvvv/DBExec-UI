@@ -6,14 +6,6 @@
       </div>
       <div class="header-actions">
         <button
-          pButton
-          [label]="'COMMON.CLEAR' | translate"
-          icon="pi pi-filter-slash"
-          (click)="clearFilters()"
-          [disabled]="!isFilterActive"
-          class="p-button-outlined p-button-danger modern-button"
-        ></button>
-        <button
           *hasPermission="'connectionManager'; level: 'write'"
           pButton
           [label]="'QUERY_RUNNER.NEW_CONNECTION' | translate"
@@ -26,12 +18,17 @@
 
     <div class="content-card">
       <div class="table-wrapper" *ngIf="adapter">
-        <us-data-grid
+        <app-custom-table
           [columns]="cols"
           [serverAdapter]="adapter"
-          [config]="gridConfig"
+          [config]="tableConfig"
           (refresh)="refreshList()"
         >
+          <!-- Empty body — always projected so only one empty state shows. -->
+          <div tableEmpty class="ct-empty-body">
+            <i class="pi pi-inbox"></i>
+            <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
+          </div>
           <ng-template usGridCell="name" let-c>
             <span class="dataset-name-link">{{ c.name }}</span>
             <span class="default-badge" *ngIf="c.isDefault"
@@ -98,7 +95,7 @@
               </button>
             </div>
           </ng-template>
-        </us-data-grid>
+        </app-custom-table>
       </div>
     </div>
   </div>
