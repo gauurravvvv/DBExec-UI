@@ -706,6 +706,21 @@ app-custom-table {
     background: var(--warning-bg, rgba(255, 152, 0, 0.08));
     border-color: var(--warning-color);
   }
+
+  // db-access role states. `no-login` is a neutral, non-error state (a group
+  // role simply can't log in) — style it like `inactive` (grey). `expired`
+  // (login role past its validUntil) is an error state — red.
+  &.no-login {
+    color: var(--secondary-color);
+    background: var(--hover-background);
+    border-color: var(--border-color);
+  }
+
+  &.expired {
+    color: var(--error-color);
+    background: var(--error-bg, rgba(244, 67, 54, 0.08));
+    border-color: var(--error-color);
+  }
 }
 
 // Card toolbar holding inline form controls (dropdowns, search
