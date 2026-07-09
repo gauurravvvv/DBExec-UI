@@ -143,9 +143,10 @@
   .p-sortable-column:focus { box-shadow: none; outline: none; }
   .p-sortable-column:hover { background: var(--border-color); }
 
-  /* Body cells — canonical density (1px divider, no zebra, hover highlight).
-     `!important` on padding/font so no residual global/page rule can change the
-     row height; this is what keeps every table's rows identical. */
+  /* Body cells — canonical density (1px divider, zebra striping, hover
+     highlight). `!important` on padding/font so no residual global/page rule
+     can change the row height; this is what keeps every table's rows
+     identical. */
   &.modern-table .p-datatable-tbody > tr,
   .p-datatable-tbody > tr {
     background: var(--card-background);
@@ -164,7 +165,18 @@
       &.ct-center { text-align: center; }
       &.ct-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
     }
-    &:hover > td { background: var(--hover-background); }
+  }
+  /* Zebra striping — alternate rows get a subtle tint (same on every table).
+     Written after the base row rule + chained `.modern-table` with !important
+     so it beats the global `.modern-table` row background. Hover wins over
+     zebra (defined last, also !important). Empty-state row excluded. */
+  &.modern-table .p-datatable-tbody > tr:nth-child(even):not(.ct-empty-row) > td,
+  .p-datatable-tbody > tr:nth-child(even):not(.ct-empty-row) > td {
+    background: var(--table-stripe, rgba(0, 0, 0, 0.025)) !important;
+  }
+  &.modern-table .p-datatable-tbody > tr:hover > td,
+  .p-datatable-tbody > tr:hover > td {
+    background: var(--hover-background) !important;
   }
 
   /* ── Shared CELL PRIMITIVES ───────────────────────────────────────────────

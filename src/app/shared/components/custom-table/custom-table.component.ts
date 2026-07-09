@@ -180,6 +180,13 @@ export class CustomTableComponent
       this.loadingMore = false;
       this.cdr.markForCheck();
     });
+    // Trigger the FIRST fetch. The adapter's constructor only seeds state — it
+    // does NOT self-load (the old us-data-grid fired the initial load itself).
+    // Fetch now unless a load is already in flight / rows are present, so every
+    // list populates on open without the host having to call reload().
+    if (!this.serverAdapter.loading() && this.serverAdapter.total() === 0) {
+      this.serverAdapter.reload();
+    }
   }
 
   private resetAccumulated(): void {
