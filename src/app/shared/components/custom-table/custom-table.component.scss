@@ -96,9 +96,14 @@
     width: 100%;
   }
 
-  /* Sticky shaded header, subtle bottom border. */
+  /* Header cells. The table also carries the global `.modern-table` class so
+     shared list styles match (status pills, per-page cell/action blocks) — and
+     the global `.modern-table.p-datatable.p-datatable-flex-scrollable` rules
+     own the STICKY header (opaque card-background, pinned rows) which is
+     exactly what we want, so we don't fight them on background/position here.
+     We only set the local layout bits (label size, divider, sort alignment)
+     and inherit stickiness from the global rule. */
   .p-datatable-thead > tr > th {
-    background: var(--hover-background);
     color: var(--text-color);
     font-size: var(--fs-control);
     font-weight: var(--fw-semibold);
@@ -146,6 +151,84 @@
       &.ct-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
     }
     &:hover > td { background: var(--hover-background); }
+  }
+
+  /* ── Shared CELL PRIMITIVES ───────────────────────────────────────────────
+     Every migrated list's cell templates use the same primitives (name link,
+     muted description/date text, count pills, row-action icon buttons). These
+     used to live under the legacy `.modern-table` wrapper (per-page + global);
+     custom-table emits `.ct-p-table`, so we restate them HERE once — reliably
+     reaching the projected `usGridCell` content — instead of relying on each
+     page's now-dead `::ng-deep .modern-table` block. Status-pill styling comes
+     from the global `.modern-table .status-pill` rule (the table also carries
+     `.modern-table`), so it is intentionally not duplicated here. */
+  .dataset-name-link {
+    color: var(--primary-color);
+    font-weight: var(--fw-semibold);
+    cursor: pointer;
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
+  }
+
+  .description-text {
+    color: var(--secondary-color);
+    font-size: var(--fs-control);
+  }
+
+  .date-text {
+    color: var(--secondary-color);
+    font-size: var(--fs-control);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Small count / member chips used in list cells (e.g. memberOf, groups). */
+  .count-pill,
+  .flag-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.1rem 0.5rem;
+    margin: 0.1rem 0.15rem 0.1rem 0;
+    border-radius: var(--radius-sm);
+    background: var(--hover-background);
+    color: var(--secondary-color);
+    font-size: var(--fs-label);
+    font-weight: var(--fw-medium);
+    white-space: nowrap;
+  }
+
+  /* Row-action icon buttons — flat ghost buttons with per-action hover tint. */
+  .row-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-2);
+
+    .icon-btn {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition:
+        background-color var(--motion-fast) ease,
+        color var(--motion-fast) ease;
+
+      i { font-size: var(--fs-body); }
+
+      &:hover { background: var(--card-background); color: var(--text-color); }
+      &.view-btn:hover { color: var(--primary-color); }
+      &.edit-btn:hover { color: var(--primary-color); }
+      &.delete-btn:hover { color: var(--error-color); }
+      &.unlock-btn { color: var(--warning-color); &:hover { color: var(--warning-hover); } }
+
+      &:disabled { opacity: 0.35; cursor: not-allowed; }
+      &:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 1px; }
+    }
   }
 
   /* Per-column filter row — shared app-custom-input in each header cell. */

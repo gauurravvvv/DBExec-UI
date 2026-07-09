@@ -719,6 +719,186 @@ td.empty-message-cell {
   }
 }
 
+/* ── custom-table cell skin ──────────────────────────────────────────────
+   The migrated table renders as `.ct-p-table` (app-custom-table), NOT the
+   legacy `.modern-table` AG-grid wrapper. The per-cell look above lives under
+   `::ng-deep .modern-table` and no longer matches, so the name link,
+   dataset/conditions cells and — most visibly — the row-action icon buttons
+   render unstyled on load. Re-scope those cell styles to `.ct-p-table` here so
+   they apply to the unified table. (Scoped to this page; shared component
+   untouched.) */
+:host ::ng-deep .ct-p-table {
+  // Name link
+  .dataset-name-link {
+    color: var(--text-color);
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-h3);
+    text-decoration: none;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+
+    &:hover {
+      color: var(--primary-color);
+    }
+  }
+
+  // Dataset / secondary text
+  .description-text {
+    color: var(--secondary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    max-width: 100%;
+  }
+
+  // Conditions summary
+  .conditions-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+
+    .conditions-count-badge {
+      background: var(--primary-color-transparent);
+      color: var(--primary-color);
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      font-size: var(--fs-control);
+      font-weight: var(--fw-semibold);
+      white-space: nowrap;
+    }
+
+    .condition-preview {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--fs-control);
+      color: var(--text-color);
+      opacity: 0.75;
+
+      .cond-col {
+        font-weight: var(--fw-medium);
+      }
+
+      .cond-op {
+        color: var(--primary-color);
+        font-size: var(--fs-micro);
+        font-weight: var(--fw-semibold);
+        opacity: 0.8;
+      }
+    }
+
+    .more-conds {
+      font-size: var(--fs-label);
+      color: var(--text-color);
+      opacity: 0.5;
+    }
+  }
+
+  // Status pill — the global `.modern-table .status-pill` rule doesn't match
+  // the unified table, so restate the pill (tinted bg + border + dot) here.
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 0.25rem 0.65rem;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-control);
+    font-weight: var(--fw-semibold);
+    line-height: 1.2;
+    white-space: nowrap;
+    border: 1px solid transparent;
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    &.active {
+      color: var(--success-color);
+      background: var(--success-bg, rgba(34, 197, 94, 0.08));
+      border-color: var(--success-color);
+    }
+
+    &.inactive {
+      color: var(--secondary-color);
+      background: var(--hover-background);
+      border-color: var(--border-color);
+    }
+  }
+
+  // Row-action icon buttons — the visible "not in a good state" symptom on
+  // load. Ghost icon buttons matching the app's list look.
+  .row-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-4);
+    transition: opacity var(--motion-base);
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: var(--radius-sm);
+      color: var(--secondary-color);
+      cursor: pointer;
+      transition: all var(--motion-base);
+
+      &:hover {
+        background: var(--hover-background);
+        color: var(--primary-color);
+      }
+
+      &.edit-btn:hover {
+        background: var(--primary-color-transparent);
+        color: var(--primary-color);
+      }
+
+      &.assign-btn:hover {
+        background: var(--success-bg);
+        color: var(--success-color);
+      }
+
+      &.delete-btn:hover {
+        background: var(--error-bg);
+        color: var(--error-color);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        &:hover {
+          background: transparent;
+          color: var(--secondary-color);
+        }
+      }
+    }
+  }
+}
+
+/* ── floating-label clip fix ──────────────────────────────────────────────
+   The datasource picker is projected into the custom-table toolbar
+   (`.ct-toolbar`), whose ancestors (.content-card / .table-wrapper) use
+   `overflow: hidden` for table-scroll isolation. The floated label sits above
+   the trigger's top edge (top: -0.5rem) and gets clipped. The existing global
+   fix only pads `.card-toolbar`; the unified table uses `.ct-toolbar`, so give
+   it the same breathing room here. */
+:host ::ng-deep .ct-toolbar {
+  padding-top: var(--space-5);
+}
+
 /* ── custom-table toolbar-left slot: the datasource picker ──────────────── */
 .ds-toolbar-start {
   display: flex;
