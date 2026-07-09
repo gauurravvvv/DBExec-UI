@@ -161,8 +161,14 @@
     <ng-template pTemplate="emptymessage">
       <tr>
         <td [attr.colspan]="visibleColumns.length" class="ct-empty">
-          <i class="pi pi-inbox"></i>
-          <span>{{ cfg.emptyMessage || ('COMMON.NO_RECORDS' | translate) }}</span>
+          <!-- Host may project a state-specific empty body (e.g. "pick a
+               datasource" / "unsupported") via [tableEmpty]; otherwise the
+               default inbox + message shows. -->
+          <ng-content select="[tableEmpty]"></ng-content>
+          <ng-container *ngIf="!hasProjectedEmpty">
+            <i class="pi pi-inbox"></i>
+            <span>{{ cfg.emptyMessage || ('COMMON.NO_RECORDS' | translate) }}</span>
+          </ng-container>
         </td>
       </tr>
     </ng-template>

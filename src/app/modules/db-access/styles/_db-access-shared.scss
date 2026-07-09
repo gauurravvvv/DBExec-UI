@@ -148,20 +148,45 @@
       }
     }
 
-    // Always-on control row: datasource picker + Type segmented control +
-    // capability badge, sharing one aligned line above the table. The picker
-    // lives here (not inside the table) so it's reachable even with nothing
-    // selected — the table below only renders once a datasource is chosen.
+    // Datasource picker + Type segmented control + capability badge, all
+    // projected into the custom-table toolbar's LEFT slot so they sit inline
+    // with the search + action icons on one row. The picker lives here (not
+    // gated behind a selected datasource) so it's always reachable; the table
+    // renders always and shows a state-specific empty body until one is picked.
     .roles-toolbar-start {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
       gap: var(--space-5);
-      padding: 0 0 var(--space-5);
+      min-width: 0;
 
-      // The shared datasource picker keeps its own width; let it sit at the
-      // start and push the chips/badge after it.
       app-datasource-picker { flex: 0 0 auto; }
+
+      // Inline capability spinner while probing the chosen datasource.
+      .cap-loading {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-3);
+        color: var(--secondary-color);
+        font-size: var(--fs-control);
+        white-space: nowrap;
+      }
+    }
+
+    // State-specific empty body projected into the table (no datasource yet /
+    // unsupported). Centred like the shared .list-hint.
+    .roles-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-4);
+      padding: var(--space-9) var(--space-6);
+      color: var(--secondary-color);
+      text-align: center;
+
+      i { font-size: 1.75rem; opacity: 0.45; &.warn { color: var(--warning-color); opacity: 1; } }
+      span { font-size: var(--fs-body); max-width: 420px; line-height: 1.5; }
     }
   }
 

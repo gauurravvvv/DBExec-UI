@@ -4,6 +4,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ContentChild,
   ContentChildren,
   ElementRef,
   EventEmitter,
@@ -32,6 +33,7 @@ import { SharedModule } from '../../shared.module';
 import { UsGridCellDirective } from '../us-data-grid/us-grid-cell.directive';
 import { UsServerListAdapter } from '../us-data-grid/us-server-list-adapter';
 import { UsPaginatorComponent } from '../us-paginator/us-paginator.component';
+import { CustomTableEmptyDirective } from './custom-table-empty.directive';
 import {
   CustomTableColumn,
   CustomTableConfig,
@@ -75,6 +77,7 @@ import {
     // and per-column filters, so the table's inputs match the app everywhere.
     SharedModule,
     UsPaginatorComponent,
+    CustomTableEmptyDirective,
   ],
   templateUrl: './custom-table.component.html',
   styleUrls: ['./custom-table.component.scss'],
@@ -111,6 +114,14 @@ export class CustomTableComponent
   @ContentChildren(UsGridCellDirective)
   private cellDirectives!: QueryList<UsGridCellDirective>;
   private cellTemplates = new Map<string, TemplateRef<unknown>>();
+
+  /** Present when the host projects a [tableEmpty] element — suppresses the
+   *  default empty message so the two don't stack. */
+  @ContentChild(CustomTableEmptyDirective)
+  private projectedEmpty?: CustomTableEmptyDirective;
+  get hasProjectedEmpty(): boolean {
+    return !!this.projectedEmpty;
+  }
 
   cfg = CUSTOM_TABLE_DEFAULTS as Required<CustomTableConfig>;
   globalSearch = '';

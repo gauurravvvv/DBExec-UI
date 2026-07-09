@@ -7,6 +7,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { UsDataGridComponent } from 'src/app/shared/components/us-data-grid/us-data-grid.component';
 import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { CustomTableComponent } from 'src/app/shared/components/custom-table/custom-table.component';
+import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-table/custom-table-empty.directive';
 import { ChangeSummaryDialogComponent } from './components/change-summary-dialog/change-summary-dialog.component';
 import { DatasourcePickerComponent } from './shared/datasource-picker/datasource-picker.component';
 

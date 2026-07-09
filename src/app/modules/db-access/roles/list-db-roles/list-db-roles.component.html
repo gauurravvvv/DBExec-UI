@@ -29,49 +29,11 @@
     </div>
 
     <div class="content-card">
-      <!-- Always-on control row: datasource picker (so it's reachable with
-           nothing selected) + Type chips + capability badge. Chips/badge only
-           mean something once a datasource is chosen, so they're gated. -->
-      <div class="roles-toolbar-start">
-        <app-datasource-picker (changed)="onDatasourceChange($event)"></app-datasource-picker>
-
-        <ng-container *ngIf="datasourceId && !unsupported() && !capabilityLoading()">
-          <div class="type-filter">
-            <button type="button" class="type-chip" [class.active]="typeFilter === 'all'" (click)="setTypeFilter('all')">
-              <i class="pi pi-list"></i>{{ 'DB_ACCESS.TYPE_ALL' | translate }}
-            </button>
-            <button type="button" class="type-chip" [class.active]="typeFilter === 'login'" (click)="setTypeFilter('login')">
-              <i class="pi pi-user"></i>{{ 'DB_ACCESS.TYPE_LOGIN' | translate }}
-            </button>
-            <button type="button" class="type-chip" [class.active]="typeFilter === 'group'" (click)="setTypeFilter('group')">
-              <i class="pi pi-users"></i>{{ 'DB_ACCESS.TYPE_GROUP' | translate }}
-            </button>
-          </div>
-
-          <span class="cap-badge full" *ngIf="capability() && canManage">
-            <i class="pi pi-check-circle"></i>{{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}
-          </span>
-          <span class="cap-badge readonly" *ngIf="capability() && !canManage">
-            <i class="pi pi-lock"></i>{{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}
-          </span>
-        </ng-container>
-      </div>
-
-      <!-- Banners for the non-ready states (no datasource / checking / unsupported) -->
-      <div class="list-hint" *ngIf="!datasourceId && !capabilityLoading()">
-        <i class="pi pi-database"></i>
-        <span>{{ 'DB_ACCESS.SELECT_DATASOURCE_HINT' | translate }}</span>
-      </div>
-      <div class="cap-loading" *ngIf="datasourceId && capabilityLoading()">
-        <i class="pi pi-spin pi-spinner"></i>
-        {{ 'DB_ACCESS.CHECKING_CAPABILITY' | translate }}
-      </div>
-      <div class="list-hint unsupported" *ngIf="datasourceId && unsupported()">
-        <i class="pi pi-info-circle"></i>
-        <span>{{ 'DB_ACCESS.UNSUPPORTED_BODY' | translate }}</span>
-      </div>
-
-      <div class="table-wrapper" *ngIf="adapter && datasourceId && !unsupported() && !capabilityLoading()">
+      <!-- The table renders ALWAYS (only needs an adapter) so its toolbar —
+           which hosts the datasource picker — is reachable with nothing
+           selected. When no datasource / checking / unsupported, the adapter
+           holds no rows and the table shows a state-specific empty message. -->
+      <div class="table-wrapper" *ngIf="adapter">
         <app-custom-table
           [columns]="cols"
           [serverAdapter]="adapter"
@@ -79,6 +41,55 @@
           [baseFilter]="tableBaseFilter"
           (refresh)="refreshList()"
         >
+          <!-- Toolbar-left slot: datasource picker (always) + Type chips +
+               capability badge (once a datasource is chosen) — all inline on
+               the table's single toolbar row, opposite the search + icons. -->
+          <div tableToolbarStart class="roles-toolbar-start">
+            <app-datasource-picker (changed)="onDatasourceChange($event)"></app-datasource-picker>
+
+            <ng-container *ngIf="datasourceId && !unsupported() && !capabilityLoading()">
+              <div class="type-filter">
+                <button type="button" class="type-chip" [class.active]="typeFilter === 'all'" (click)="setTypeFilter('all')">
+                  <i class="pi pi-list"></i>{{ 'DB_ACCESS.TYPE_ALL' | translate }}
+                </button>
+                <button type="button" class="type-chip" [class.active]="typeFilter === 'login'" (click)="setTypeFilter('login')">
+                  <i class="pi pi-user"></i>{{ 'DB_ACCESS.TYPE_LOGIN' | translate }}
+                </button>
+                <button type="button" class="type-chip" [class.active]="typeFilter === 'group'" (click)="setTypeFilter('group')">
+                  <i class="pi pi-users"></i>{{ 'DB_ACCESS.TYPE_GROUP' | translate }}
+                </button>
+              </div>
+
+              <span class="cap-badge full" *ngIf="capability() && canManage">
+                <i class="pi pi-check-circle"></i>{{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}
+              </span>
+              <span class="cap-badge readonly" *ngIf="capability() && !canManage">
+                <i class="pi pi-lock"></i>{{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}
+              </span>
+            </ng-container>
+
+            <!-- Capability spinner sits inline while the chosen datasource is
+                 being probed. -->
+            <span class="cap-loading" *ngIf="datasourceId && capabilityLoading()">
+              <i class="pi pi-spin pi-spinner"></i>{{ 'DB_ACCESS.CHECKING_CAPABILITY' | translate }}
+            </span>
+          </div>
+
+          <!-- State-specific empty body. Only rendered (and thus only
+               overriding the table's default "no records") when there is no
+               datasource yet or the chosen datasource is unsupported;
+               otherwise the table shows its own "no records". -->
+          <div tableEmpty class="roles-empty" *ngIf="!datasourceId || (datasourceId && unsupported())">
+            <ng-container *ngIf="!datasourceId">
+              <i class="pi pi-database"></i>
+              <span>{{ 'DB_ACCESS.SELECT_DATASOURCE_HINT' | translate }}</span>
+            </ng-container>
+            <ng-container *ngIf="datasourceId && unsupported()">
+              <i class="pi pi-info-circle warn"></i>
+              <span>{{ 'DB_ACCESS.UNSUPPORTED_BODY' | translate }}</span>
+            </ng-container>
+          </div>
+
           <ng-template usGridCell="name" let-role>
             <a class="dataset-name-link" (click)="onView(role)">{{ role.name }}</a>
           </ng-template>
