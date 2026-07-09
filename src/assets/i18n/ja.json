@@ -183,7 +183,15 @@
       "A_FEW_SECONDS_FROM_NOW": "数秒後"
     },
     "DEFAULT_BADGE": "デフォルト",
-    "YOU_BADGE": "自分"
+    "YOU_BADGE": "自分",
+    "FILTERS": "フィルター",
+    "FILTER": "フィルター",
+    "COMPACT": "コンパクト",
+    "COMFORTABLE": "標準",
+    "COLUMNS": "列",
+    "EXPORT": "エクスポート",
+    "NO_RECORDS": "レコードが見つかりません",
+    "SHOWING_OF": "{{total}} 件中 {{shown}} 件を表示"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名は必須です",

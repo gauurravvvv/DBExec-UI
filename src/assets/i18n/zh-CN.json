@@ -183,7 +183,15 @@
       "A_FEW_SECONDS_FROM_NOW": "几秒后"
     },
     "DEFAULT_BADGE": "默认",
-    "YOU_BADGE": "你"
+    "YOU_BADGE": "你",
+    "FILTERS": "筛选",
+    "FILTER": "筛选",
+    "COMPACT": "紧凑",
+    "COMFORTABLE": "宽松",
+    "COLUMNS": "列",
+    "EXPORT": "导出",
+    "NO_RECORDS": "未找到记录",
+    "SHOWING_OF": "显示 {{shown}} / {{total}}"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名字为必填项",

@@ -183,7 +183,15 @@
       "A_FEW_SECONDS_FROM_NOW": "em alguns segundos"
     },
     "DEFAULT_BADGE": "Padrão",
-    "YOU_BADGE": "Você"
+    "YOU_BADGE": "Você",
+    "FILTERS": "Filtros",
+    "FILTER": "Filtrar",
+    "COMPACT": "Compacto",
+    "COMFORTABLE": "Confortável",
+    "COLUMNS": "Colunas",
+    "EXPORT": "Exportar",
+    "NO_RECORDS": "Nenhum registro encontrado",
+    "SHOWING_OF": "Mostrando {{shown}} de {{total}}"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "O nome é obrigatório",

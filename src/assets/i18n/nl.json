@@ -183,7 +183,15 @@
       "A_FEW_SECONDS_FROM_NOW": "over enkele seconden"
     },
     "DEFAULT_BADGE": "Standaard",
-    "YOU_BADGE": "Jij"
+    "YOU_BADGE": "Jij",
+    "FILTERS": "Filters",
+    "FILTER": "Filteren",
+    "COMPACT": "Compact",
+    "COMFORTABLE": "Comfortabel",
+    "COLUMNS": "Kolommen",
+    "EXPORT": "Exporteren",
+    "NO_RECORDS": "Geen records gevonden",
+    "SHOWING_OF": "{{shown}} van {{total}} weergegeven"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Voornaam is verplicht",

@@ -1,0 +1,187 @@
+<div class="custom-table" [class.density-compact]="density === 'compact'">
+  <!-- ── Slim toolbar: title (left) + global search + only the enabled
+       secondary actions (right). Nothing else by default. ── -->
+  <div class="ct-toolbar" *ngIf="cfg.globalSearch || cfg.title || hasSecondaryActions">
+    <div class="ct-toolbar-left">
+      <span class="ct-title" *ngIf="cfg.title">{{ cfg.title }}</span>
+    </div>
+
+    <div class="ct-toolbar-right">
+      <!-- The one always-on search -->
+      <div class="ct-search" *ngIf="cfg.globalSearch">
+        <i class="pi pi-search"></i>
+        <input
+          type="text"
+          [ngModel]="globalSearch"
+          (ngModelChange)="onGlobalSearch($event)"
+          [placeholder]="cfg.globalSearchPlaceholder || ('COMMON.SEARCH' | translate)"
+        />
+      </div>
+
+      <!-- Filter toggle (only if any column is filterable) -->
+      <button
+        *ngIf="cfg.showColumnFilters && hasColumnFilters"
+        type="button"
+        class="ct-icon-btn"
+        [class.active]="showFilters"
+        (click)="toggleFilters()"
+        [pTooltip]="'COMMON.FILTERS' | translate"
+        tooltipPosition="bottom"
+      >
+        <i class="pi pi-filter"></i>
+      </button>
+
+      <!-- Density (compact / comfortable) -->
+      <button
+        *ngIf="cfg.enableDensity"
+        type="button"
+        class="ct-icon-btn"
+        (click)="setDensity(density === 'compact' ? 'comfortable' : 'compact')"
+        [pTooltip]="(density === 'compact' ? 'COMMON.COMFORTABLE' : 'COMMON.COMPACT') | translate"
+        tooltipPosition="bottom"
+      >
+        <i class="pi" [ngClass]="density === 'compact' ? 'pi-arrows-v' : 'pi-bars'"></i>
+      </button>
+
+      <!-- Columns show/hide -->
+      <ng-container *ngIf="cfg.enableColumnToggle">
+        <button
+          type="button"
+          class="ct-icon-btn"
+          (click)="colMenu.toggle($event)"
+          [pTooltip]="'COMMON.COLUMNS' | translate"
+          tooltipPosition="bottom"
+        >
+          <i class="pi pi-table"></i>
+        </button>
+        <p-menu #colMenu [model]="columnMenuItems" [popup]="true" appendTo="body"></p-menu>
+      </ng-container>
+
+      <!-- Export CSV / Excel -->
+      <ng-container *ngIf="cfg.enableExport">
+        <button
+          type="button"
+          class="ct-icon-btn"
+          (click)="exportMenu.toggle($event)"
+          [pTooltip]="'COMMON.EXPORT' | translate"
+          tooltipPosition="bottom"
+        >
+          <i class="pi pi-download"></i>
+        </button>
+        <p-menu #exportMenu [model]="exportMenuItems" [popup]="true" appendTo="body"></p-menu>
+      </ng-container>
+
+      <!-- Refresh (host owns the action) -->
+      <button
+        type="button"
+        class="ct-icon-btn"
+        (click)="doRefresh()"
+        [pTooltip]="'COMMON.REFRESH' | translate"
+        tooltipPosition="bottom"
+      >
+        <i class="pi" [ngClass]="loading ? 'pi-spin pi-spinner' : 'pi-refresh'"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Table ── -->
+  <p-table
+    [value]="rows"
+    [lazy]="true"
+    [loading]="loading && !loadingMore"
+    [scrollable]="true"
+    [scrollHeight]="cfg.height"
+    [virtualScroll]="isScroll"
+    [virtualScrollItemSize]="isScroll ? cfg.rowHeight : undefined"
+    [rowTrackBy]="trackRow"
+    (onLazyLoad)="onLazyLoad($event)"
+    responsiveLayout="scroll"
+    styleClass="ct-p-table"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th
+          *ngFor="let c of visibleColumns"
+          [pSortableColumn]="c.sortable !== false ? (c.field || c.colId) : undefined"
+          [ngStyle]="colStyle(c)"
+          [class.ct-frozen]="c.frozen"
+          [class.ct-right]="align(c) === 'right'"
+          [class.ct-center]="align(c) === 'center'"
+        >
+          <span class="ct-th">
+            {{ c.header }}
+            <p-sortIcon
+              *ngIf="c.sortable !== false"
+              [field]="c.field || c.colId"
+            ></p-sortIcon>
+          </span>
+        </th>
+      </tr>
+
+      <!-- On-demand per-column filter row -->
+      <tr class="ct-filter-row" *ngIf="showFilters && hasColumnFilters">
+        <th *ngFor="let c of visibleColumns" [ngStyle]="colStyle(c)">
+          <input
+            *ngIf="c.filter === 'text' || c.filter === 'numeric'"
+            class="ct-filter-input"
+            [type]="c.filter === 'numeric' ? 'number' : 'text'"
+            [ngModel]="columnFilters[c.colId]"
+            (ngModelChange)="onColumnFilter(c.colId, $event)"
+            [placeholder]="'COMMON.FILTER' | translate"
+          />
+        </th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-row>
+      <tr>
+        <td
+          *ngFor="let c of visibleColumns"
+          [ngStyle]="colStyle(c)"
+          [class.ct-frozen]="c.frozen"
+          [class.ct-right]="align(c) === 'right'"
+          [class.ct-center]="align(c) === 'center'"
+          [class.ct-mono]="c.numeric"
+        >
+          <ng-container
+            *ngIf="templateFor(c.colId) as tpl; else defaultCell"
+            [ngTemplateOutlet]="tpl"
+            [ngTemplateOutletContext]="{ $implicit: row, row: row }"
+          ></ng-container>
+          <ng-template #defaultCell>{{ row[c.field || c.colId] }}</ng-template>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="visibleColumns.length" class="ct-empty">
+          <i class="pi pi-inbox"></i>
+          <span>{{ cfg.emptyMessage || ('COMMON.NO_RECORDS' | translate) }}</span>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <!-- ── Footer ── -->
+  <!-- Scroll mode: no page controls — just a quiet count / loading line. -->
+  <div class="ct-scroll-footer" *ngIf="serverAdapter && isScroll">
+    <span class="ct-count" *ngIf="!loadingMore">
+      {{ 'COMMON.SHOWING_OF' | translate: { shown: rows.length, total: total } }}
+    </span>
+    <span class="ct-count loading" *ngIf="loadingMore">
+      <i class="pi pi-spin pi-spinner"></i> {{ 'COMMON.LOADING' | translate }}
+    </span>
+  </div>
+
+  <!-- Paginate mode: classic shared paginator. -->
+  <us-paginator
+    *ngIf="serverAdapter && !isScroll"
+    [page]="page"
+    [limit]="limit"
+    [total]="total"
+    [pageSizeOptions]="cfg.pageSizeOptions"
+    (pageChange)="onPageChange($event)"
+    (limitChange)="onLimitChange($event)"
+  ></us-paginator>
+</div>

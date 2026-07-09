@@ -183,7 +183,15 @@
       "A_FEW_SECONDS_FROM_NOW": "in wenigen Sekunden"
     },
     "DEFAULT_BADGE": "Standard",
-    "YOU_BADGE": "Sie"
+    "YOU_BADGE": "Sie",
+    "FILTERS": "Filter",
+    "FILTER": "Filtern",
+    "COMPACT": "Kompakt",
+    "COMFORTABLE": "Komfortabel",
+    "COLUMNS": "Spalten",
+    "EXPORT": "Exportieren",
+    "NO_RECORDS": "Keine Datensätze gefunden",
+    "SHOWING_OF": "{{shown}} von {{total}} angezeigt"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Vorname ist erforderlich",

@@ -95,10 +95,10 @@
       </div>
 
       <div class="table-wrapper" *ngIf="adapter && datasourceId && !unsupported() && !capabilityLoading()">
-        <us-data-grid
+        <app-custom-table
           [columns]="cols"
           [serverAdapter]="adapter"
-          [config]="gridConfig"
+          [config]="tableConfig"
           (refresh)="refreshList()"
         >
           <ng-template usGridCell="name" let-role>
@@ -178,7 +178,7 @@
               </button>
             </div>
           </ng-template>
-        </us-data-grid>
+        </app-custom-table>
       </div>
     </div>
   </div>

@@ -183,7 +183,15 @@
       "A_FEW_SECONDS_FROM_NOW": "몇 초 후"
     },
     "DEFAULT_BADGE": "기본",
-    "YOU_BADGE": "본인"
+    "YOU_BADGE": "본인",
+    "FILTERS": "필터",
+    "FILTER": "필터",
+    "COMPACT": "좁게",
+    "COMFORTABLE": "넓게",
+    "COLUMNS": "열",
+    "EXPORT": "내보내기",
+    "NO_RECORDS": "레코드가 없습니다",
+    "SHOWING_OF": "{{total}}개 중 {{shown}}개 표시"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "이름은 필수 항목입니다",

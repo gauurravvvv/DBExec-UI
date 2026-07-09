@@ -12,11 +12,13 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import type { ColDef } from 'ag-grid-community';
+import type {
+  CustomTableColumn,
+  CustomTableConfig,
+} from 'src/app/shared/components/custom-table/custom-table.types';
 import { DB_ACCESS } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { UsServerListAdapter } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
-import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
 import { DbAccessContextService } from '../../services/db-access-context.service';
 import { DbAccessService } from '../../services/db-access.service';
 import { ChangeIntent, describeChange } from '../../services/describe-change';
@@ -61,24 +63,19 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   // Current server page of roles (login + group) shown in the grid.
   roles: any[] = [];
 
-  /* ── us-data-grid wiring (identical pattern to list-user) ───────────── */
-  cols: ColDef[] = [];
-  gridConfig: UsDataGridConfig = {
-    enableRowSelection: false,
-    freezeFirstColumn: true,
-    enableColumnChooser: true,
-    enableAddFilter: false,
-    enableAutoFit: true,
-    enableDensityToggle: true,
-    enableCsvExport: true,
-    enableXlsxExport: true,
-    enableRefresh: true,
-    enableSavedViews: true,
+  /* ── custom-table wiring (unified simple table; server-driven) ──────── */
+  cols: CustomTableColumn[] = [];
+  tableConfig: CustomTableConfig = {
+    mode: 'scroll', // infinite virtual scroll — no page controls
+    pageSize: 50, // rows fetched per scroll page
+    globalSearch: false, // this screen uses its own name box in the toolbar
+    enableExport: true,
+    enableDensity: true,
+    density: 'comfortable',
     gridKey: 'db-roles-list',
-    pageSizeOptions: [10, 25, 50, 100],
-    pageSize: 10,
-    height: 'calc(100vh - 280px)',
+    height: 'calc(100vh - 300px)',
     rowIdField: 'name',
+    emptyMessage: undefined,
   };
   // Server-side adapter: the grid's page/sort + toolbar Type/name/status drive
   // a BE query (LIMIT/OFFSET + WHERE + COUNT). See buildAdapter().
@@ -150,20 +147,20 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     this.adapter?.destroy();
   }
 
-  /** AG Grid columns — widths preserved from the previous p-table. Cell DOM
-   *  is supplied by `<ng-template usGridCell>` in the HTML. Sorting/filtering
-   *  is handled client-side by the grid over the one BE page we feed it. */
-  private buildColumns(): ColDef[] {
+  /** Unified-table columns. Cell DOM is supplied by `<ng-template usGridCell>`
+   *  in the HTML; sort colIds map to BE keys via the adapter's sortFieldMap.
+   *  `field` on sortable columns is the BE sort field the header emits. */
+  private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
-      { colId: 'name', field: 'name', headerName: t('COMMON.NAME'), minWidth: 224, flex: 1, filter: 'agTextColumnFilter', filterParams: { buttons: ['reset'], suppressAndOrCondition: true }, pinned: 'left' },
-      { colId: 'type', field: 'canLogin', headerName: t('DB_ACCESS.TYPE'), width: 130, minWidth: 130 },
-      { colId: 'status', field: 'status', headerName: t('COMMON.STATUS'), width: 130, minWidth: 130 },
-      { colId: 'validUntil', field: 'validUntil', headerName: t('DB_ACCESS.EXPIRY'), width: 150, minWidth: 150 },
-      { colId: 'connectionLimit', field: 'connectionLimit', headerName: t('DB_ACCESS.CONN_LIMIT'), width: 130, minWidth: 130 },
-      { colId: 'flags', field: 'flags', headerName: t('DB_ACCESS.FLAGS'), minWidth: 190, sortable: false, filter: false },
-      { colId: 'memberOf', field: 'memberOf', headerName: t('DB_ACCESS.MEMBER_OF'), minWidth: 190, sortable: false, filter: false },
-      { colId: 'actions', headerName: t('COMMON.ACTIONS'), width: 190, minWidth: 190, sortable: false, filter: false, resizable: false, pinned: 'right' },
+      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true },
+      { colId: 'type', field: 'type', header: t('DB_ACCESS.TYPE'), width: '130px' },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '130px' },
+      { colId: 'validUntil', field: 'validUntil', header: t('DB_ACCESS.EXPIRY'), width: '150px', sortable: false },
+      { colId: 'connectionLimit', field: 'connectionLimit', header: t('DB_ACCESS.CONN_LIMIT'), width: '150px', sortable: false },
+      { colId: 'flags', field: 'flags', header: t('DB_ACCESS.FLAGS'), width: '190px', sortable: false },
+      { colId: 'memberOf', field: 'memberOf', header: t('DB_ACCESS.MEMBER_OF'), width: '190px', sortable: false },
+      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '190px', sortable: false },
     ];
   }
 
@@ -203,7 +200,9 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
         type: 'canLogin',
         status: 'status',
       },
-      initial: { page: 1, limit: 10 },
+      // Scroll page size — matches tableConfig.pageSize so the first fetch and
+      // each subsequent scroll page pull the same count.
+      initial: { page: 1, limit: 50 },
     });
   }
 

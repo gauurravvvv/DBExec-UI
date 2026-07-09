@@ -1,0 +1,230 @@
+/* app-custom-table — the unified, simple data table. Tokenized to the app
+   theme, matching the canonical list look (list-user): clean surface, sticky
+   shaded header, subtle 1px row dividers, hover highlight, NO zebra. Two
+   densities (comfortable 48px / compact 40px rows) per the research. */
+
+:host {
+  display: block;
+}
+
+.custom-table {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ── slim toolbar ─────────────────────────────────────────────────────── */
+.ct-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: 0 0 var(--space-5);
+  flex-wrap: wrap;
+
+  .ct-title {
+    font-size: var(--fs-body);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+  }
+
+  .ct-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-left: auto;
+  }
+}
+
+/* One always-on search box. */
+.ct-search {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+
+  i {
+    position: absolute;
+    left: var(--space-4);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+  input {
+    width: 15rem;
+    max-width: 40vw;
+    height: 34px;
+    padding: 0 var(--space-5) 0 2rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--card-background);
+    color: var(--text-color);
+    font-size: var(--fs-control);
+    font-family: var(--font-ui);
+    transition: border-color var(--motion-base) ease, box-shadow var(--motion-base) ease;
+
+    &::placeholder { color: var(--text-muted); }
+    &:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--primary-color-transparent);
+    }
+  }
+}
+
+/* Secondary actions — flat/ghost icon buttons (calm; matches the app). */
+.ct-icon-btn {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--motion-base) ease;
+
+  .pi { font-size: 0.9rem; }
+  &:hover { background: var(--hover-background); color: var(--primary-color); }
+  &.active { background: var(--primary-color-transparent); color: var(--primary-color); }
+}
+
+/* ── p-table skin ─────────────────────────────────────────────────────── */
+:host ::ng-deep .ct-p-table {
+  .p-datatable-table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  /* Sticky shaded header, subtle bottom border. */
+  .p-datatable-thead > tr > th {
+    background: var(--hover-background);
+    color: var(--text-color);
+    font-size: var(--fs-control);
+    font-weight: var(--fw-semibold);
+    padding: 0.5rem 0.875rem;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+
+    .ct-th {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    &.ct-right .ct-th { justify-content: flex-end; }
+    &.ct-center .ct-th { justify-content: center; }
+  }
+
+  /* Sort icon — quiet, coloured only when active. */
+  .p-sortable-column .p-sorticon {
+    color: var(--text-subtle);
+    font-size: 0.7rem;
+  }
+  .p-sortable-column.p-highlight,
+  .p-sortable-column.p-highlight .p-sorticon {
+    color: var(--primary-color);
+  }
+  .p-sortable-column:focus { box-shadow: none; outline: none; }
+  .p-sortable-column:hover { background: var(--border-color); }
+
+  /* Body cells — 1px divider, no zebra, hover highlight. */
+  .p-datatable-tbody > tr {
+    background: var(--card-background);
+    transition: background var(--motion-fast) ease;
+
+    > td {
+      padding: 0.55rem 0.875rem;
+      border: none;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-color);
+      font-size: var(--fs-control);
+      vertical-align: middle;
+
+      &.ct-right { text-align: right; }
+      &.ct-center { text-align: center; }
+      &.ct-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+    }
+    &:hover > td { background: var(--hover-background); }
+  }
+
+  /* Per-column filter row inputs. */
+  .ct-filter-row > th {
+    background: var(--card-background);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.35rem 0.6rem;
+  }
+  .ct-filter-input {
+    width: 100%;
+    height: 30px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xs);
+    background: var(--card-background);
+    color: var(--text-color);
+    font-size: var(--fs-control);
+    padding: 0 var(--space-4);
+    &:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px var(--primary-color-transparent);
+    }
+  }
+
+  /* Frozen first column. */
+  .ct-frozen {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: inherit;
+  }
+  .p-datatable-thead > tr > th.ct-frozen { background: var(--hover-background); }
+
+  /* Empty state. */
+  .ct-empty {
+    text-align: center;
+    padding: var(--space-9) var(--space-6);
+    color: var(--text-muted);
+    i { display: block; font-size: 1.6rem; margin-bottom: var(--space-4); opacity: 0.6; }
+  }
+
+  /* Loading mask — quiet. */
+  .p-datatable-loading-overlay {
+    background: color-mix(in srgb, var(--card-background) 60%, transparent);
+  }
+
+  /* Thin scrollbars matching the app. */
+  .p-datatable-wrapper {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+    &::-webkit-scrollbar { width: 8px; height: 8px; }
+    &::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 999px; }
+  }
+}
+
+/* Scroll-mode footer — a quiet count / "loading more" line (no page controls). */
+.ct-scroll-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--border-color);
+
+  .ct-count {
+    font-size: var(--fs-control);
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    &.loading { color: var(--primary-color); }
+  }
+}
+
+/* ── compact density ──────────────────────────────────────────────────── */
+/* `.density-compact` sits on `.custom-table` inside the host; reach the
+   p-table skin under it. */
+:host ::ng-deep .density-compact .ct-p-table {
+  .p-datatable-thead > tr > th { padding: 0.35rem 0.75rem; }
+  .p-datatable-tbody > tr > td { padding: 0.3rem 0.75rem; font-size: var(--fs-label); }
+}
