@@ -3582,6 +3582,11 @@
     "CASE_UPPER": "Upper-case selection",
     "CASE_LOWER": "Lower-case selection",
     "COPY_ALL": "Copy all",
-    "CLEAR_EDITOR": "Clear editor"
+    "CLEAR_EDITOR": "Clear editor",
+    "OF": "of",
+    "SERVER_MODE": "Server-side",
+    "SERVER_MODE_HINT": "Sorting, filtering and paging run on the database for this query.",
+    "PREV_PAGE": "Previous page",
+    "NEXT_PAGE": "Next page"
   }
 }

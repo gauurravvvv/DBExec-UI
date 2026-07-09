@@ -3260,7 +3260,12 @@
     "CASE_UPPER": "Selezione in maiuscolo",
     "CASE_LOWER": "Selezione in minuscolo",
     "COPY_ALL": "Copia tutto",
-    "CLEAR_EDITOR": "Svuota l'editor"
+    "CLEAR_EDITOR": "Svuota l'editor",
+    "OF": "di",
+    "SERVER_MODE": "Lato server",
+    "SERVER_MODE_HINT": "Ordinamento, filtro e paginazione vengono eseguiti sul database per questa query.",
+    "PREV_PAGE": "Pagina precedente",
+    "NEXT_PAGE": "Pagina successiva"
   },
   "DB_ACCESS": {
     "TITLE": "Gestione accessi al database",

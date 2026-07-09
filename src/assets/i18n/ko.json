@@ -3260,7 +3260,12 @@
     "CASE_UPPER": "선택 항목 대문자로",
     "CASE_LOWER": "선택 항목 소문자로",
     "COPY_ALL": "모두 복사",
-    "CLEAR_EDITOR": "편집기 지우기"
+    "CLEAR_EDITOR": "편집기 지우기",
+    "OF": "/",
+    "SERVER_MODE": "서버 측",
+    "SERVER_MODE_HINT": "이 쿼리는 정렬, 필터링, 페이징이 데이터베이스에서 실행됩니다.",
+    "PREV_PAGE": "이전 페이지",
+    "NEXT_PAGE": "다음 페이지"
   },
   "DB_ACCESS": {
     "TITLE": "데이터베이스 접근 관리",

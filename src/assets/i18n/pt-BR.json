@@ -3260,7 +3260,12 @@
     "CASE_UPPER": "Seleção em maiúsculas",
     "CASE_LOWER": "Seleção em minúsculas",
     "COPY_ALL": "Copiar tudo",
-    "CLEAR_EDITOR": "Limpar editor"
+    "CLEAR_EDITOR": "Limpar editor",
+    "OF": "de",
+    "SERVER_MODE": "No servidor",
+    "SERVER_MODE_HINT": "Ordenação, filtragem e paginação são executadas no banco de dados para esta consulta.",
+    "PREV_PAGE": "Página anterior",
+    "NEXT_PAGE": "Próxima página"
   },
   "DB_ACCESS": {
     "TITLE": "Gerenciamento de acesso ao banco de dados",

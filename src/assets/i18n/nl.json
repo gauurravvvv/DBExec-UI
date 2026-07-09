@@ -3260,7 +3260,12 @@
     "CASE_UPPER": "Selectie in hoofdletters",
     "CASE_LOWER": "Selectie in kleine letters",
     "COPY_ALL": "Alles kopiëren",
-    "CLEAR_EDITOR": "Editor wissen"
+    "CLEAR_EDITOR": "Editor wissen",
+    "OF": "van",
+    "SERVER_MODE": "Serverzijde",
+    "SERVER_MODE_HINT": "Sorteren, filteren en pagineren gebeuren voor deze query op de database.",
+    "PREV_PAGE": "Vorige pagina",
+    "NEXT_PAGE": "Volgende pagina"
   },
   "DB_ACCESS": {
     "TITLE": "Databasetoegangsbeheer",

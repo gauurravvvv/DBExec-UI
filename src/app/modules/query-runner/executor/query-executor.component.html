@@ -251,7 +251,9 @@
             </button>
           </nav>
           <div class="qx-result-actions" *ngIf="activeRows as ar">
-            <input class="qx-quickfilter" type="text"
+            <!-- Quick filter is a client-side box; hidden in server mode where
+                 per-column filters run on the database instead. -->
+            <input class="qx-quickfilter" type="text" *ngIf="!serverMode"
               [(ngModel)]="quickFilter" (ngModelChange)="onQuickFilter()"
               [placeholder]="'QUERY_RUNNER.FILTER_RESULTS' | translate" />
             <button class="qx-icon" (click)="toggleFilters()" [class.qx-active]="showFilters"
@@ -285,16 +287,22 @@
           <ng-container *ngIf="!running && results[activeResult] as r">
             <!-- Rows → AG Grid -->
             <div class="qx-grid-wrap" *ngIf="r.kind === 'rows'">
-              <!-- Quiet result-context header (rows · ms), shown even for a
-                   single result where there is no tab bar. -->
+              <!-- Quiet result-context header (rows · ms). In server mode the
+                   count reflects the FULL result and a chip flags that sort/
+                   filter run on the database. -->
               <div class="qx-result-context" *ngIf="resultContext as ctx">
                 <span class="qx-ctx-count">{{ ctx.count }}</span>
                 <span class="qx-ctx-sep">·</span>
                 <span class="qx-ctx-time">{{ ctx.elapsed }}</span>
-                <span class="qx-ctx-trunc" *ngIf="ctx.truncated">
+                <span class="qx-ctx-mode server" *ngIf="serverMode"
+                  [pTooltip]="'QUERY_RUNNER.SERVER_MODE_HINT' | translate" tooltipPosition="bottom">
+                  <i class="pi pi-server"></i> {{ 'QUERY_RUNNER.SERVER_MODE' | translate }}
+                </span>
+                <span class="qx-ctx-trunc" *ngIf="!serverMode && ctx.truncated">
                   <i class="pi pi-exclamation-triangle"></i>
                   {{ 'QUERY_RUNNER.TRUNCATED' | translate: { n: r.rows.length } }}
                 </span>
+                <i class="pi pi-spin pi-spinner qx-ctx-spin" *ngIf="serverLoading"></i>
               </div>
               <ag-grid-angular
                 class="qx-grid"
@@ -302,8 +310,28 @@
                 [rowData]="r.rows"
                 [columnDefs]="colDefs(r)"
                 [gridOptions]="gridOptions"
-                (gridReady)="onGridReady($event)">
+                (gridReady)="onGridReady($event)"
+                (sortChanged)="onSortChanged()"
+                (filterChanged)="onFilterChanged()">
               </ag-grid-angular>
+
+              <!-- Server pager — replaces AG Grid's in-grid pagination when the
+                   result is paged on the database. -->
+              <div class="qx-server-pager" *ngIf="serverMode">
+                <span class="qx-pager-range">{{ serverRangeLabel }}</span>
+                <div class="qx-pager-btns">
+                  <button class="qx-icon" (click)="serverPrev()"
+                    [disabled]="!serverHasPrev || serverLoading"
+                    [pTooltip]="'QUERY_RUNNER.PREV_PAGE' | translate" tooltipPosition="top">
+                    <i class="pi pi-chevron-left"></i>
+                  </button>
+                  <button class="qx-icon" (click)="serverNext()"
+                    [disabled]="!serverHasNext || serverLoading"
+                    [pTooltip]="'QUERY_RUNNER.NEXT_PAGE' | translate" tooltipPosition="top">
+                    <i class="pi pi-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <!-- Message -->

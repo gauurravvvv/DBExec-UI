@@ -887,6 +887,20 @@ $qx-btn-h: 34px;
   .qx-ctx-count { color: var(--text-color); font-weight: var(--fw-semibold); }
   .qx-ctx-sep { opacity: 0.5; }
   .qx-ctx-time { font-variant-numeric: tabular-nums; }
+  // "Server-side" chip — soft primary, flags that sort/filter/page hit the DB.
+  .qx-ctx-mode {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 1px 8px;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-label);
+    font-weight: var(--fw-semibold);
+    background: var(--primary-color-transparent);
+    color: var(--primary-color);
+    cursor: default;
+    i { font-size: var(--fs-label); }
+  }
   .qx-ctx-trunc {
     display: inline-flex;
     align-items: center;
@@ -894,6 +908,34 @@ $qx-btn-h: 34px;
     margin-left: auto;
     color: var(--warning-color);
     i { font-size: var(--fs-label); }
+  }
+  .qx-ctx-spin {
+    margin-left: auto;
+    font-size: var(--fs-label);
+    color: var(--primary-color);
+  }
+}
+
+// Server pager — prev/next + "1–200 of 5,240" under the grid (replaces AG
+// Grid's in-grid pagination for server-paged results).
+.qx-server-pager {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-6);
+  border-top: 1px solid var(--qx-border);
+  background: var(--secondary-background);
+  flex-shrink: 0;
+
+  .qx-pager-range {
+    font-size: var(--fs-control);
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .qx-pager-btns {
+    display: inline-flex;
+    gap: var(--space-2);
   }
 }
 .qx-grid {

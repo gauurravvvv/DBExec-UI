@@ -3260,7 +3260,12 @@
     "CASE_UPPER": "所选内容转大写",
     "CASE_LOWER": "所选内容转小写",
     "COPY_ALL": "全部复制",
-    "CLEAR_EDITOR": "清空编辑器"
+    "CLEAR_EDITOR": "清空编辑器",
+    "OF": "/",
+    "SERVER_MODE": "服务器端",
+    "SERVER_MODE_HINT": "该查询的排序、筛选和分页在数据库端执行。",
+    "PREV_PAGE": "上一页",
+    "NEXT_PAGE": "下一页"
   },
   "DB_ACCESS": {
     "TITLE": "数据库访问管理",

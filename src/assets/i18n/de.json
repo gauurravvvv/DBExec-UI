@@ -3260,7 +3260,12 @@
     "CASE_UPPER": "Auswahl in Großbuchstaben",
     "CASE_LOWER": "Auswahl in Kleinbuchstaben",
     "COPY_ALL": "Alles kopieren",
-    "CLEAR_EDITOR": "Editor leeren"
+    "CLEAR_EDITOR": "Editor leeren",
+    "OF": "von",
+    "SERVER_MODE": "Serverseitig",
+    "SERVER_MODE_HINT": "Sortieren, Filtern und Blättern laufen für diese Abfrage auf der Datenbank.",
+    "PREV_PAGE": "Vorherige Seite",
+    "NEXT_PAGE": "Nächste Seite"
   },
   "DB_ACCESS": {
     "TITLE": "Datenbankzugriffsverwaltung",

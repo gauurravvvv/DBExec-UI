@@ -253,6 +253,24 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   statusText = '';
   cursorInfo = 'Ln 1, Col 1';
 
+  // Server-side sort/filter/paging. When the BE reports the run is
+  // `derivable` (a single wrappable SELECT), the grid drives sort/filter/page
+  // by RE-RUNNING the query on the server (execute + `derived`) — AG Grid
+  // Community has no serverSide row model, so we keep the clientSide model and
+  // swap the current page's rows. When NOT derivable, everything stays
+  // in-memory (client-side), exactly as before, and this state is inert.
+  serverMode = false; // active result supports server-side ops
+  serverLoading = false; // a derived re-run is in flight
+  serverTotal = 0; // full (filtered) row count across all pages
+  serverPage = 0; // 0-based page index
+  private baseSql = ''; // the SELECT that was run (re-wrapped on each op)
+  private sortModel: { ordinal: number; dir: 'asc' | 'desc' }[] = [];
+  private filterModel: {
+    col: string;
+    op: string;
+    value?: unknown;
+  }[] = [];
+
   // Object browser (lazy)
   schemasLoading = false;
   browser: TreeSchema[] = [];
@@ -1159,11 +1177,30 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
           this.results = res.data.results as QueryResult[];
           this.statusText = this.summarize();
           this.maybeMarkError(range?.from ?? 0);
+          // Server-side eligibility: the BE flags a single wrappable SELECT as
+          // derivable. Capture the base SQL so sort/filter/page can re-wrap it.
+          const first = this.results[0];
+          this.serverMode =
+            res.data.derivable === true && !!first && first.kind === 'rows';
+          if (this.serverMode) {
+            this.baseSql = sqlText;
+            this.serverTotal =
+              (first as { total?: number }).total ??
+              (first as { rowCount: number }).rowCount;
+            this.serverPage = 0;
+            this.sortModel = [];
+            this.filterModel = [];
+          } else {
+            this.baseSql = '';
+            this.serverTotal = 0;
+            this.serverPage = 0;
+          }
         } else {
           this.results = [
             { kind: 'error', message: res?.message ?? 'Execution failed', statementIndex: 0 },
           ];
           this.statusText = 'Error';
+          this.serverMode = false;
         }
       })
       .catch(err => {
@@ -1171,6 +1208,7 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
           { kind: 'error', message: err?.message ?? 'Execution failed', statementIndex: 0 },
         ];
         this.statusText = 'Error';
+        this.serverMode = false;
       })
       .finally(() => {
         this.running = false;
@@ -1277,6 +1315,166 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
 
   onGridReady(e: GridReadyEvent): void {
     this.gridApi = e.api;
+  }
+
+  // ── server-side sort / filter / paging (derivable results) ──────────
+  //
+  // AG Grid Community has no serverSide row model, so the grid stays on the
+  // clientSide model showing ONE page. On sort/filter change we read the grid
+  // state, re-run the wrapped query on the server, and swap the page in. On a
+  // non-derivable result these handlers no-op and AG Grid's own in-memory
+  // sort/filter applies (unchanged behaviour).
+
+  get serverPageSize(): number {
+    return this.rowLimit;
+  }
+
+  /** "1–200 of 5,240" style range label for the server pager. */
+  get serverRangeLabel(): string {
+    if (!this.serverMode) return '';
+    const from = this.serverTotal === 0 ? 0 : this.serverPage * this.serverPageSize + 1;
+    const to = Math.min((this.serverPage + 1) * this.serverPageSize, this.serverTotal);
+    return `${from.toLocaleString()}–${to.toLocaleString()} ${this.translate.instant(
+      'QUERY_RUNNER.OF',
+    )} ${this.serverTotal.toLocaleString()}`;
+  }
+
+  get serverHasPrev(): boolean {
+    return this.serverMode && this.serverPage > 0;
+  }
+  get serverHasNext(): boolean {
+    return (
+      this.serverMode &&
+      (this.serverPage + 1) * this.serverPageSize < this.serverTotal
+    );
+  }
+
+  serverPrev(): void {
+    if (!this.serverHasPrev || this.serverLoading) return;
+    this.serverPage -= 1;
+    this.fetchServerPage();
+  }
+  serverNext(): void {
+    if (!this.serverHasNext || this.serverLoading) return;
+    this.serverPage += 1;
+    this.fetchServerPage();
+  }
+
+  /** Grid sort changed → capture ordinals + re-fetch page 1. */
+  onSortChanged(): void {
+    if (!this.serverMode || !this.gridApi) return;
+    const state = this.gridApi.getColumnState();
+    // Preserve the user's multi-sort order (sortIndex), map field cN → ordinal.
+    this.sortModel = state
+      .filter(s => s.sort)
+      .sort((a, b) => (a.sortIndex ?? 0) - (b.sortIndex ?? 0))
+      .map(s => ({
+        ordinal: this.fieldToOrdinal(s.colId),
+        dir: s.sort as 'asc' | 'desc',
+      }))
+      .filter(o => o.ordinal > 0);
+    this.serverPage = 0;
+    this.fetchServerPage();
+  }
+
+  /** Grid filter changed → translate to derived filters + re-fetch page 1. */
+  onFilterChanged(): void {
+    if (!this.serverMode || !this.gridApi) return;
+    const model = this.gridApi.getFilterModel() ?? {};
+    const out: { col: string; op: string; value?: unknown }[] = [];
+    for (const [field, m] of Object.entries<any>(model)) {
+      const col = this.fieldToName(field);
+      if (!col) continue;
+      // Flatten simple + (first condition of) combined filter models.
+      const cond = m?.operator ? m.condition1 ?? m : m;
+      const op = this.mapFilterOp(cond?.type, m?.filterType);
+      if (!op) continue;
+      out.push({ col, op, value: cond?.filter });
+    }
+    this.filterModel = out;
+    this.serverPage = 0;
+    this.fetchServerPage();
+  }
+
+  /** Grid column field (c0,c1,…) → 1-based output ordinal for ORDER BY. */
+  private fieldToOrdinal(field: string | null | undefined): number {
+    if (!field) return 0;
+    const m = /^c(\d+)$/.exec(field);
+    return m ? parseInt(m[1], 10) + 1 : 0;
+  }
+
+  /** Grid column field (c0,c1,…) → the real column name for filtering. */
+  private fieldToName(field: string): string | null {
+    const r = this.activeRows;
+    const col = r?.columns.find(c => c.field === field);
+    return col?.name ?? null;
+  }
+
+  /** AG Grid filter type → derived filter op. Null ⇒ unsupported (skip). */
+  private mapFilterOp(type: string | undefined, filterType: string | undefined): string | null {
+    switch (type) {
+      case 'contains':
+        return 'contains';
+      case 'notContains':
+        return 'notContains';
+      case 'equals':
+        return 'equals';
+      case 'notEqual':
+        return 'notEqual';
+      case 'startsWith':
+        return 'startsWith';
+      case 'endsWith':
+        return 'endsWith';
+      case 'blank':
+        return 'blank';
+      case 'notBlank':
+        return 'notBlank';
+      case 'greaterThan':
+        return 'gt';
+      case 'greaterThanOrEqual':
+        return 'gte';
+      case 'lessThan':
+        return 'lt';
+      case 'lessThanOrEqual':
+        return 'lte';
+      default:
+        // number 'inRange' etc. unsupported → skip (client still shows page).
+        return filterType === 'number' ? null : null;
+    }
+  }
+
+  /** Re-run the base SELECT wrapped with the current sort/filter/page. */
+  private fetchServerPage(): void {
+    if (!this.serverMode || !this.baseSql) return;
+    this.serverLoading = true;
+    this.cdr.markForCheck();
+    const derived = {
+      ...(this.sortModel.length ? { orderBy: this.sortModel } : {}),
+      ...(this.filterModel.length ? { filters: this.filterModel } : {}),
+      offset: this.serverPage * this.serverPageSize,
+      limit: this.serverPageSize,
+    };
+    this.service
+      .execute(this.connectionId, this.baseSql, this.autoCommit, null, {
+        maxRows: this.rowLimit,
+        derived,
+      })
+      .then(res => {
+        const first = res?.data?.results?.[0];
+        if (res?.status && first && first.kind === 'rows') {
+          // Replace just the active result's rows/total; keep tab position.
+          this.results = [first, ...this.results.slice(1)];
+          this.activeResult = 0;
+          this.serverTotal = (first as { total?: number }).total ?? this.serverTotal;
+        }
+      })
+      .catch(() => {
+        /* keep the previous page on error */
+      })
+      .finally(() => {
+        this.serverLoading = false;
+        this.cdr.markForCheck();
+      });
   }
 
   colDefs(r: QueryRow): ColDef[] {

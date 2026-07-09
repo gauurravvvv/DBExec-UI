@@ -243,7 +243,21 @@ export class QueryRunnerService {
     sql: string,
     write: boolean,
     executionId: string | null,
-    opts?: { explain?: boolean; analyze?: boolean; maxRows?: number },
+    opts?: {
+      explain?: boolean;
+      analyze?: boolean;
+      maxRows?: number;
+      /**
+       * Server-side sort/filter/paging for a single wrappable SELECT. When
+       * sent, the BE wraps the query and runs sort/filter/page on the DB.
+       */
+      derived?: {
+        orderBy?: { ordinal: number; dir: 'asc' | 'desc' }[];
+        filters?: { col: string; op: string; value?: unknown }[];
+        offset?: number;
+        limit?: number;
+      };
+    },
   ): Promise<any> {
     return lastValueFrom(
       this.http.apiPost(
@@ -256,6 +270,7 @@ export class QueryRunnerService {
           analyze: opts?.analyze ?? false,
           // Row cap for display (BE clamps to 50k); omitted → BE default.
           ...(opts?.maxRows ? { maxRows: opts.maxRows } : {}),
+          ...(opts?.derived ? { derived: opts.derived } : {}),
         },
         { skipLoader: true },
       ),

@@ -3260,7 +3260,12 @@
     "CASE_UPPER": "選択を大文字に",
     "CASE_LOWER": "選択を小文字に",
     "COPY_ALL": "すべてコピー",
-    "CLEAR_EDITOR": "エディターをクリア"
+    "CLEAR_EDITOR": "エディターをクリア",
+    "OF": "/",
+    "SERVER_MODE": "サーバー側",
+    "SERVER_MODE_HINT": "このクエリでは、並べ替え・フィルター・ページングはデータベース側で実行されます。",
+    "PREV_PAGE": "前のページ",
+    "NEXT_PAGE": "次のページ"
   },
   "DB_ACCESS": {
     "TITLE": "データベースアクセス管理",

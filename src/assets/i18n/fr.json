@@ -3260,7 +3260,12 @@
     "CASE_UPPER": "Sélection en majuscules",
     "CASE_LOWER": "Sélection en minuscules",
     "COPY_ALL": "Tout copier",
-    "CLEAR_EDITOR": "Vider l'éditeur"
+    "CLEAR_EDITOR": "Vider l'éditeur",
+    "OF": "sur",
+    "SERVER_MODE": "Côté serveur",
+    "SERVER_MODE_HINT": "Le tri, le filtrage et la pagination s’exécutent sur la base de données pour cette requête.",
+    "PREV_PAGE": "Page précédente",
+    "NEXT_PAGE": "Page suivante"
   },
   "DB_ACCESS": {
     "TITLE": "Gestion des accès à la base de données",
