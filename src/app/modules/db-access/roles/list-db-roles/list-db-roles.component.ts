@@ -2,16 +2,12 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  DestroyRef,
   OnDestroy,
   OnInit,
   inject,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
 import type {
   CustomTableColumn,
   CustomTableConfig,
@@ -51,7 +47,6 @@ type RoleTypeFilter = 'all' | 'login' | 'group';
 })
 export class ListDbRolesComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
-  private destroyRef = inject(DestroyRef);
 
   loading = this.dbAccess.loading;
   saving = this.dbAccess.saving;
@@ -68,15 +63,20 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   tableConfig: CustomTableConfig = {
     mode: 'scroll', // infinite virtual scroll — no page controls
     pageSize: 50, // rows fetched per scroll page
-    globalSearch: false, // this screen uses its own name box in the toolbar
+    globalSearch: true, // search box matches role name
+    globalSearchKey: 'name', // roles BE matches the `name` filter key
+    showColumnFilters: true, // Filter toggle reveals per-column filters
+    globalSearchPlaceholder: undefined,
     enableExport: true,
     enableDensity: true,
     density: 'comfortable',
     gridKey: 'db-roles-list',
-    height: 'calc(100vh - 300px)',
+    height: 'flex', // fill available height, responsive to screen size
     rowIdField: 'name',
-    emptyMessage: undefined,
   };
+  /** Table baseFilter — the Type segmented control (All/Login/Group). The
+   *  table merges this with its own search + column filters (single writer). */
+  tableBaseFilter: Record<string, unknown> = {};
   // Server-side adapter: the grid's page/sort + toolbar Type/name/status drive
   // a BE query (LIMIT/OFFSET + WHERE + COUNT). See buildAdapter().
   adapter: UsServerListAdapter<any> | null = null;
@@ -84,9 +84,6 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   // Type filter defaults to "all" — the merged screen shows everything on
   // open, with the Type column distinguishing login users from group roles.
   typeFilter: RoleTypeFilter = 'all';
-  statusOptions: { label: string; value: string }[] = [];
-  filterValues: { name: string; status: string | null } = { name: '', status: null };
-  private filter$ = new Subject<void>();
 
   // Membership dialog (group-role lifecycle).
   showMembership = false;
@@ -126,20 +123,12 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.statusOptions = [
-      { label: this.translate.instant('DB_ACCESS.STATUS_ACTIVE'), value: 'active' },
-      { label: this.translate.instant('DB_ACCESS.STATUS_NO-LOGIN'), value: 'no-login' },
-      { label: this.translate.instant('DB_ACCESS.STATUS_EXPIRED'), value: 'expired' },
-    ];
     this.deleteModeOptions = [
       { label: this.translate.instant('DB_ACCESS.REASSIGN_TO'), value: 'reassign' },
       { label: this.translate.instant('DB_ACCESS.DROP_OWNED'), value: 'drop' },
     ];
     this.cols = this.buildColumns();
     this.buildAdapter();
-    this.filter$
-      .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.applyFilters());
   }
 
   ngOnDestroy(): void {
@@ -153,9 +142,9 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
-      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true },
+      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
       { colId: 'type', field: 'type', header: t('DB_ACCESS.TYPE'), width: '130px' },
-      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '130px' },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '130px', sortable: false, filter: 'text' },
       { colId: 'validUntil', field: 'validUntil', header: t('DB_ACCESS.EXPIRY'), width: '150px', sortable: false },
       { colId: 'connectionLimit', field: 'connectionLimit', header: t('DB_ACCESS.CONN_LIMIT'), width: '150px', sortable: false },
       { colId: 'flags', field: 'flags', header: t('DB_ACCESS.FLAGS'), width: '190px', sortable: false },
@@ -206,25 +195,19 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * The single JSON filter the BE understands ({ name?, type?, status? }),
-   * assembled from the toolbar Type segmented control + name box + status.
-   */
-  private serverFilter(): Record<string, unknown> {
-    const f: Record<string, unknown> = {};
-    const name = (this.filterValues.name || '').trim();
-    if (name) f['name'] = name;
-    if (this.typeFilter === 'login') f['type'] = 'login';
-    else if (this.typeFilter === 'group') f['type'] = 'group';
-    if (this.filterValues.status) f['status'] = this.filterValues.status;
-    return f;
+  /** The Type segmented control as the table's base filter slice ({ type? }).
+   *  The table merges this with its own name search + Status column filter. */
+  private buildBaseFilter(): Record<string, unknown> {
+    if (this.typeFilter === 'login') return { type: 'login' };
+    if (this.typeFilter === 'group') return { type: 'group' };
+    return {};
   }
 
   onDatasourceChange(id: string): void {
     this.datasourceId = id || '';
     this.roles = [];
-    this.filterValues = { name: '', status: null };
     this.typeFilter = 'all';
+    this.tableBaseFilter = {};
     if (!this.datasourceId) {
       this.adapter?.reload();
       this.cdr.markForCheck();
@@ -239,12 +222,12 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     this.adapter?.reload();
   }
 
-  // ── Type filter ─────────────────────────────────────────────────────────
+  // ── Type filter (feeds the table's baseFilter; table owns setFilter) ──────
   setTypeFilter(type: RoleTypeFilter): void {
     if (this.typeFilter === type) return;
     this.typeFilter = type;
-    // Re-query page 1 on the server with the new Type slice.
-    this.adapter?.setFilter(this.serverFilter());
+    // New object reference so the table's ngOnChanges(baseFilter) fires.
+    this.tableBaseFilter = this.buildBaseFilter();
   }
 
   isLogin(role: any): boolean {
@@ -252,28 +235,12 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   }
 
   get isFilterActive(): boolean {
-    return (
-      !!this.filterValues.name ||
-      this.filterValues.status !== null ||
-      this.typeFilter !== 'all'
-    );
-  }
-
-  onFilterChange(): void {
-    // Debounced → server re-query page 1 with the merged filter.
-    this.filter$.next();
+    return this.typeFilter !== 'all';
   }
 
   clearFilters(): void {
-    this.filterValues = { name: '', status: null };
     this.typeFilter = 'all';
-    this.adapter?.setFilter(this.serverFilter());
-  }
-
-  private applyFilters(): void {
-    // Server-paged now: push the merged toolbar filter to the BE (page 1).
-    this.adapter?.setFilter(this.serverFilter());
-    this.cdr.markForCheck();
+    this.tableBaseFilter = {};
   }
 
   /** Grid Refresh button → re-fetch roles from the datasource. */

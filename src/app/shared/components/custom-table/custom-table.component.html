@@ -7,15 +7,14 @@
     </div>
 
     <div class="ct-toolbar-right">
-      <!-- The one always-on search -->
+      <!-- The one always-on search — shared input for a unified look. -->
       <div class="ct-search" *ngIf="cfg.globalSearch">
-        <i class="pi pi-search"></i>
-        <input
-          type="text"
+        <app-custom-input
           [ngModel]="globalSearch"
           (ngModelChange)="onGlobalSearch($event)"
+          icon="pi-search"
           [placeholder]="cfg.globalSearchPlaceholder || ('COMMON.SEARCH' | translate)"
-        />
+        ></app-custom-input>
       </div>
 
       <!-- Filter toggle (only if any column is filterable) -->
@@ -90,7 +89,7 @@
     [lazy]="true"
     [loading]="loading && !loadingMore"
     [scrollable]="true"
-    [scrollHeight]="cfg.height"
+    [scrollHeight]="scrollHeight"
     [virtualScroll]="isScroll"
     [virtualScrollItemSize]="isScroll ? cfg.rowHeight : undefined"
     [rowTrackBy]="trackRow"
@@ -118,17 +117,17 @@
         </th>
       </tr>
 
-      <!-- On-demand per-column filter row -->
+      <!-- On-demand per-column filter row — shared inputs (unified look). -->
       <tr class="ct-filter-row" *ngIf="showFilters && hasColumnFilters">
         <th *ngFor="let c of visibleColumns" [ngStyle]="colStyle(c)">
-          <input
+          <app-custom-input
             *ngIf="c.filter === 'text' || c.filter === 'numeric'"
-            class="ct-filter-input"
             [type]="c.filter === 'numeric' ? 'number' : 'text'"
             [ngModel]="columnFilters[c.colId]"
             (ngModelChange)="onColumnFilter(c.colId, $event)"
             [placeholder]="'COMMON.FILTER' | translate"
-          />
+            styleClass="ct-filter-input"
+          ></app-custom-input>
         </th>
       </tr>
     </ng-template>

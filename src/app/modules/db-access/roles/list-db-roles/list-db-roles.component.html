@@ -99,6 +99,7 @@
           [columns]="cols"
           [serverAdapter]="adapter"
           [config]="tableConfig"
+          [baseFilter]="tableBaseFilter"
           (refresh)="refreshList()"
         >
           <ng-template usGridCell="name" let-role>

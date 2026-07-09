@@ -67,6 +67,9 @@ export interface CustomTableConfig {
   globalSearch?: boolean;
   /** Placeholder for the global search box. */
   globalSearchPlaceholder?: string;
+  /** Filter key the global search maps to server-side. Default 'search'
+   *  (some endpoints expect a specific field, e.g. 'name' for db roles). */
+  globalSearchKey?: string;
 
   /** Per-column filter row, revealed by an on-demand Filter toggle. Default
    *  false (hidden). */
@@ -90,7 +93,8 @@ export interface CustomTableConfig {
   /** Empty-state message. */
   emptyMessage?: string;
 
-  /** Scroll height of the table body. Default 'calc(100vh - 260px)'. */
+  /** Scroll-body height. `'flex'` (default) fills the bounded flex parent —
+   *  adapts to any screen; or pass a fixed CSS length like '480px'. */
   height?: string;
 
   /** localStorage key to persist density + column visibility per consumer. */
@@ -110,11 +114,12 @@ export const CUSTOM_TABLE_DEFAULTS: Required<
   pageSizeOptions: [10, 25, 50, 100],
   rowHeight: 44,
   globalSearch: true,
+  globalSearchKey: 'search',
   showColumnFilters: false,
   enableExport: false,
   enableDensity: true,
   enableColumnToggle: false,
   density: 'comfortable',
   rowIdField: 'id',
-  height: 'calc(100vh - 260px)',
+  height: 'flex',
 };

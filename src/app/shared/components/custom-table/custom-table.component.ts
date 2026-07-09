@@ -25,6 +25,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
 
+import { SharedModule } from '../../shared.module';
 import { UsGridCellDirective } from '../us-data-grid/us-grid-cell.directive';
 import { UsServerListAdapter } from '../us-data-grid/us-server-list-adapter';
 import { UsPaginatorComponent } from '../us-paginator/us-paginator.component';
@@ -67,6 +68,9 @@ import {
     ButtonModule,
     TooltipModule,
     MenuModule,
+    // Shared form controls (app-custom-input / -dropdown) for the search box
+    // and per-column filters, so the table's inputs match the app everywhere.
+    SharedModule,
     UsPaginatorComponent,
   ],
   templateUrl: './custom-table.component.html',
@@ -82,6 +86,14 @@ export class CustomTableComponent
   @Input() columns: CustomTableColumn[] = [];
   @Input() serverAdapter?: UsServerListAdapter<Record<string, unknown>>;
   @Input() config: CustomTableConfig = {};
+
+  /**
+   * Host-owned base filter slice merged into every server request (e.g. a
+   * segmented Type control, a datasource scope). The table's own global search
+   * + per-column filters are merged ON TOP, so there's a SINGLE writer of the
+   * adapter filter (no clobbering). Set a new object to apply.
+   */
+  @Input() baseFilter: Record<string, unknown> = {};
 
   /** Host owns the actual refresh action (re-fetch). */
   @Output() refresh = new EventEmitter<void>();
@@ -126,6 +138,11 @@ export class CustomTableComponent
     }
     if (changes['serverAdapter']) this.bindAdapter();
     if (changes['columns']) this.buildColumnMenu();
+    // Host changed the base filter (e.g. Type chip) → re-run with it merged.
+    // Skip the very first change (adapter's own initial load covers it).
+    if (changes['baseFilter'] && !changes['baseFilter'].firstChange) {
+      this.pushFilter();
+    }
     this.buildExportMenu();
   }
 
@@ -204,6 +221,12 @@ export class CustomTableComponent
   get isScroll(): boolean {
     return this.cfg.mode === 'scroll';
   }
+
+  /** p-table scrollHeight — 'flex' makes the table fill its (bounded) flex
+   *  parent, adapting to any screen size; otherwise a fixed CSS length. */
+  get scrollHeight(): string {
+    return this.cfg.height === 'flex' ? 'flex' : this.cfg.height;
+  }
   get page(): number {
     return this.serverAdapter?.page() ?? 1;
   }
@@ -246,15 +269,19 @@ export class CustomTableComponent
 
   onColumnFilter(colId: string, value: unknown): void {
     this.columnFilters[colId] = value;
-    this.pushFilter();
+    // Debounce like the global search so typing doesn't fire a call per key.
+    if (this.searchDebounce) clearTimeout(this.searchDebounce);
+    this.searchDebounce = setTimeout(() => this.pushFilter(), 300);
   }
 
-  /** Merge the global search + per-column filters into the adapter filter. */
+  /** Merge host baseFilter + global search + per-column filters into ONE
+   *  adapter filter (single writer — no clobbering between the host's controls
+   *  and the table's own). */
   private pushFilter(): void {
     if (!this.serverAdapter) return;
-    const f: Record<string, unknown> = {};
+    const f: Record<string, unknown> = { ...(this.baseFilter ?? {}) };
     const g = this.globalSearch.trim();
-    if (g) f['search'] = g;
+    if (g) f[this.cfg.globalSearchKey] = g;
     for (const [k, v] of Object.entries(this.columnFilters)) {
       if (v !== null && v !== undefined && String(v).trim() !== '') f[k] = v;
     }

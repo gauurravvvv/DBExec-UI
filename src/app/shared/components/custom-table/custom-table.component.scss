@@ -4,13 +4,31 @@
    densities (comfortable 48px / compact 40px rows) per the research. */
 
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .custom-table {
   display: flex;
   flex-direction: column;
+  flex: 1;
   min-height: 0;
+}
+
+/* The p-table must fill the leftover height so scrollHeight='flex' has a
+   bounded box to size against; the scroll body then owns the scrollbar. */
+:host ::ng-deep .ct-p-table {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+
+  .p-datatable-wrapper {
+    flex: 1;
+    min-height: 0;
+  }
 }
 
 /* ── slim toolbar ─────────────────────────────────────────────────────── */
@@ -36,39 +54,12 @@
   }
 }
 
-/* One always-on search box. */
+/* One always-on search box — sizing only; the shared app-custom-input brings
+   its own field styling (icon, focus ring, tokens). */
 .ct-search {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-
-  i {
-    position: absolute;
-    left: var(--space-4);
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    pointer-events: none;
-  }
-  input {
-    width: 15rem;
-    max-width: 40vw;
-    height: 34px;
-    padding: 0 var(--space-5) 0 2rem;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    background: var(--card-background);
-    color: var(--text-color);
-    font-size: var(--fs-control);
-    font-family: var(--font-ui);
-    transition: border-color var(--motion-base) ease, box-shadow var(--motion-base) ease;
-
-    &::placeholder { color: var(--text-muted); }
-    &:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px var(--primary-color-transparent);
-    }
-  }
+  width: 15rem;
+  max-width: 40vw;
+  ::ng-deep app-custom-input { display: block; width: 100%; }
 }
 
 /* Secondary actions — flat/ghost icon buttons (calm; matches the app). */
@@ -149,26 +140,12 @@
     &:hover > td { background: var(--hover-background); }
   }
 
-  /* Per-column filter row inputs. */
+  /* Per-column filter row — shared app-custom-input in each header cell. */
   .ct-filter-row > th {
     background: var(--card-background);
     border-bottom: 1px solid var(--border-color);
-    padding: 0.35rem 0.6rem;
-  }
-  .ct-filter-input {
-    width: 100%;
-    height: 30px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-xs);
-    background: var(--card-background);
-    color: var(--text-color);
-    font-size: var(--fs-control);
-    padding: 0 var(--space-4);
-    &:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 2px var(--primary-color-transparent);
-    }
+    padding: 0.3rem 0.5rem;
+    app-custom-input { display: block; width: 100%; }
   }
 
   /* Frozen first column. */
