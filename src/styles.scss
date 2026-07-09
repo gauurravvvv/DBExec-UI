@@ -545,6 +545,29 @@ p-table {
   width: 100%;
 }
 
+// ── app-custom-table scroll chain (global, authoritative) ────────────────
+// Every list wraps <app-custom-table> in a `.table-wrapper` inside a bounded
+// `.content-card` (flex column, overflow hidden). For the table's internal
+// `.p-datatable-wrapper` to scroll, that whole chain must be flex columns that
+// SHRINK (`min-height: 0`) rather than grow to content. Per-module
+// `.table-wrapper` rules diverged (some `display:block`), so the table grew
+// past the card and got clipped with no scrollbar. Pin the contract here once
+// so every list scrolls identically, regardless of its own SCSS.
+.table-wrapper:has(app-custom-table),
+.table-wrapper:has(> app-custom-table) {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+app-custom-table {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .modern-table.p-datatable {
   min-width: 0;
   min-height: 0;
