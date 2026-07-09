@@ -139,6 +139,16 @@
   &.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr:nth-child(2) > th {
     background: var(--hover-background) !important;
   }
+  /* CRITICAL: the global rule pins the FILTER row (2nd thead row) at
+     `top: 40px`, assuming a 40px-tall label row. Our label row is ~31px, so
+     that offset floats the filter cells ~9px BELOW their row — the visible gap
+     between header and filter inputs. Pin the filter row flush to the label
+     row's real height instead. `--ct-header-h` (2rem ≈ our 0.5rem×2 padding +
+     label line-height) matches, with !important to beat the global 40px. */
+  &.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr:nth-child(2) > th,
+  .p-datatable-thead > tr:nth-child(2) > th {
+    top: 2rem !important;
+  }
 
   /* Sort icon — quiet, coloured only when active. */
   .p-sortable-column .p-sorticon {
