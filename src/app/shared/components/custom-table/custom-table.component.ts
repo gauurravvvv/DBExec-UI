@@ -116,12 +116,12 @@ export class CustomTableComponent
   private cellTemplates = new Map<string, TemplateRef<unknown>>();
 
   /** Present when the host projects a [tableEmpty] element — suppresses the
-   *  default empty message so the two don't stack. */
+   *  built-in default empty message so the two never stack. Resolved once in
+   *  ngAfterContentInit into a plain field (a getter over @ContentChild can
+   *  read stale under OnPush on first render). */
   @ContentChild(CustomTableEmptyDirective)
   private projectedEmpty?: CustomTableEmptyDirective;
-  get hasProjectedEmpty(): boolean {
-    return !!this.projectedEmpty;
-  }
+  hasProjectedEmpty = false;
 
   cfg = CUSTOM_TABLE_DEFAULTS as Required<CustomTableConfig>;
   globalSearch = '';
@@ -197,6 +197,9 @@ export class CustomTableComponent
     };
     index();
     this.cellDirectives.changes.subscribe(index);
+    // Whether the host projected a [tableEmpty] body — if so, never show the
+    // built-in default (avoids two empty states stacking).
+    this.hasProjectedEmpty = !!this.projectedEmpty;
   }
 
   /** Attach the infinite-scroll listener to the p-table's scroll body. Runs
@@ -268,6 +271,14 @@ export class CustomTableComponent
   }
   get isScroll(): boolean {
     return this.cfg.mode === 'scroll';
+  }
+
+  /** Show the column header (and filter row) only when there's data to head,
+   *  or while a fetch is in flight (so headers don't flash away). When the
+   *  table is empty and idle, hide it so the empty state is a clean centred
+   *  message, not a bare column skeleton with a ghost row beneath. */
+  get showHeader(): boolean {
+    return this.rows.length > 0 || this.loading;
   }
 
   /** p-table scrollHeight — 'flex' makes the table fill its (bounded) flex

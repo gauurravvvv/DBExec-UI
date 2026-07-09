@@ -165,7 +165,18 @@
   }
   .p-datatable-thead > tr > th.ct-frozen { background: var(--hover-background); }
 
-  /* Empty state. */
+  /* Empty state — a clean centred block, NOT a table row. The empty row/cell
+     must not carry the body-row divider or hover, or it reads as a blank
+     record. */
+  .p-datatable-tbody > tr.ct-empty-row,
+  .p-datatable-tbody > tr.ct-empty-row:hover {
+    background: transparent;
+  }
+  .p-datatable-tbody > tr.ct-empty-row > td,
+  .p-datatable-tbody > tr.ct-empty-row:hover > td {
+    border: none;
+    background: transparent;
+  }
   .ct-empty {
     text-align: center;
     padding: var(--space-9) var(--space-6);

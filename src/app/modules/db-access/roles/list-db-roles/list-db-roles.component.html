@@ -75,11 +75,11 @@
             </span>
           </div>
 
-          <!-- State-specific empty body. Only rendered (and thus only
-               overriding the table's default "no records") when there is no
-               datasource yet or the chosen datasource is unsupported;
-               otherwise the table shows its own "no records". -->
-          <div tableEmpty class="roles-empty" *ngIf="!datasourceId || (datasourceId && unsupported())">
+          <!-- State-specific empty body — ALWAYS projected (so the table
+               suppresses its own default and only ONE empty state shows). The
+               inner branch picks the message: pick-a-datasource, unsupported,
+               or the plain no-records fallback. -->
+          <div tableEmpty class="roles-empty">
             <ng-container *ngIf="!datasourceId">
               <i class="pi pi-database"></i>
               <span>{{ 'DB_ACCESS.SELECT_DATASOURCE_HINT' | translate }}</span>
@@ -87,6 +87,10 @@
             <ng-container *ngIf="datasourceId && unsupported()">
               <i class="pi pi-info-circle warn"></i>
               <span>{{ 'DB_ACCESS.UNSUPPORTED_BODY' | translate }}</span>
+            </ng-container>
+            <ng-container *ngIf="datasourceId && !unsupported()">
+              <i class="pi pi-inbox"></i>
+              <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
             </ng-container>
           </div>
 

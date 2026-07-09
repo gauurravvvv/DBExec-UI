@@ -104,7 +104,10 @@
     styleClass="ct-p-table"
   >
     <ng-template pTemplate="header">
-      <tr>
+      <!-- Header (and filter row) hide when the table is empty and idle, so
+           the empty state reads as a clean centred message rather than a bare
+           column skeleton with a ghost row under it. -->
+      <tr *ngIf="showHeader">
         <th
           *ngFor="let c of visibleColumns"
           [pSortableColumn]="c.sortable !== false ? (c.field || c.colId) : undefined"
@@ -124,7 +127,7 @@
       </tr>
 
       <!-- On-demand per-column filter row — shared inputs (unified look). -->
-      <tr class="ct-filter-row" *ngIf="showFilters && hasColumnFilters">
+      <tr class="ct-filter-row" *ngIf="showHeader && showFilters && hasColumnFilters">
         <th *ngFor="let c of visibleColumns" [ngStyle]="colStyle(c)">
           <app-custom-input
             *ngIf="c.filter === 'text' || c.filter === 'numeric'"
@@ -159,7 +162,7 @@
     </ng-template>
 
     <ng-template pTemplate="emptymessage">
-      <tr>
+      <tr class="ct-empty-row">
         <td [attr.colspan]="visibleColumns.length" class="ct-empty">
           <!-- Host may project a state-specific empty body (e.g. "pick a
                datasource" / "unsupported") via [tableEmpty]; otherwise the
