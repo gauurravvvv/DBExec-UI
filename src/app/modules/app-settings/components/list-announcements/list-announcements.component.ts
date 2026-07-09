@@ -129,7 +129,7 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
       { colId: 'name', field: 'name', header: t('ANNOUNCEMENT.ANNOUNCEMENT_TITLE'), width: '224px', frozen: true, filter: 'text' },
       { colId: 'description', field: 'description', header: t('COMMON.DESCRIPTION'), width: '320px', filter: 'text', sortable: false },
       { colId: 'targetGroup', field: 'targetGroup.name', header: t('ANNOUNCEMENT.GROUP'), width: '192px', sortable: false },
-      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px', filter: 'numeric' },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px' },
       { colId: 'activeWindow', header: t('ANNOUNCEMENT.ACTIVE_WINDOW'), width: '224px', sortable: false },
       { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px' },
       { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },

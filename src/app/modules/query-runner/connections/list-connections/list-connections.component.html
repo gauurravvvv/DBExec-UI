@@ -22,6 +22,7 @@
           [columns]="cols"
           [serverAdapter]="adapter"
           [config]="tableConfig"
+          [hasProjectedEmpty]="true"
           (refresh)="refreshList()"
         >
           <!-- Empty body — always projected so only one empty state shows. -->

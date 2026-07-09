@@ -138,7 +138,7 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
       { colId: 'description', field: 'description', header: t('COMMON.DESCRIPTION'), width: '320px', filter: 'text', sortable: false },
       { colId: 'datasetName', field: 'dataset.name', header: t('COMMON.DATASET'), width: '192px', filter: 'text', sortable: false },
       { colId: 'visuals', field: 'visuals', header: t('ANALYSES.VISUALS_COUNT'), width: '128px', sortable: false },
-      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px', filter: 'numeric' },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px' },
       { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px' },
       { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
     ];

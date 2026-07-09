@@ -151,7 +151,7 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     return [
       { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
       { colId: 'type', field: 'type', header: t('DB_ACCESS.TYPE'), width: '130px' },
-      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '130px', sortable: false, filter: 'text' },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '130px', sortable: false },
       { colId: 'validUntil', field: 'validUntil', header: t('DB_ACCESS.EXPIRY'), width: '150px', sortable: false },
       { colId: 'connectionLimit', field: 'connectionLimit', header: t('DB_ACCESS.CONN_LIMIT'), width: '150px', sortable: false },
       { colId: 'flags', field: 'flags', header: t('DB_ACCESS.FLAGS'), width: '190px', sortable: false },

@@ -113,7 +113,7 @@ export class ListOrganisationComponent implements OnInit, OnDestroy {
     return [
       { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
       { colId: 'description', field: 'description', header: t('ORG.DESCRIPTION'), width: '320px', filter: 'text', sortable: false },
-      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px', filter: 'numeric' },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px' },
       { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px' },
       { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
     ];

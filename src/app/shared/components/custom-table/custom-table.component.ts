@@ -4,7 +4,6 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  ContentChild,
   ContentChildren,
   ElementRef,
   EventEmitter,
@@ -115,13 +114,13 @@ export class CustomTableComponent
   private cellDirectives!: QueryList<UsGridCellDirective>;
   private cellTemplates = new Map<string, TemplateRef<unknown>>();
 
-  /** Present when the host projects a [tableEmpty] element — suppresses the
-   *  built-in default empty message so the two never stack. Resolved once in
-   *  ngAfterContentInit into a plain field (a getter over @ContentChild can
-   *  read stale under OnPush on first render). */
-  @ContentChild(CustomTableEmptyDirective)
-  private projectedEmpty?: CustomTableEmptyDirective;
-  hasProjectedEmpty = false;
+  /** Set true by hosts that project a [tableEmpty] body, to suppress the
+   *  built-in default empty message (otherwise the two stack). Auto-detection
+   *  via @ContentChild(ren) is unreliable here: the projected element lives
+   *  inside the p-table's `emptymessage` template (a lazily-instantiated
+   *  embedded view), which content queries don't track. An explicit input is
+   *  deterministic. */
+  @Input() hasProjectedEmpty = false;
 
   cfg = CUSTOM_TABLE_DEFAULTS as Required<CustomTableConfig>;
   globalSearch = '';
@@ -204,9 +203,6 @@ export class CustomTableComponent
     };
     index();
     this.cellDirectives.changes.subscribe(index);
-    // Whether the host projected a [tableEmpty] body — if so, never show the
-    // built-in default (avoids two empty states stacking).
-    this.hasProjectedEmpty = !!this.projectedEmpty;
   }
 
   /** Attach the infinite-scroll listener to the p-table's scroll body. Runs
@@ -280,12 +276,27 @@ export class CustomTableComponent
     return this.cfg.mode === 'scroll';
   }
 
-  /** Show the column header (and filter row) only when there's data to head,
-   *  or while a fetch is in flight (so headers don't flash away). When the
-   *  table is empty and idle, hide it so the empty state is a clean centred
-   *  message, not a bare column skeleton with a ghost row beneath. */
+  /** Show the column header (and filter row) when there's data, while a fetch
+   *  is in flight, OR whenever a filter/search is active or the filter row is
+   *  open. The last cases are critical: if a filter narrows to zero rows we
+   *  must KEEP the header + filter inputs visible so the user can edit or
+   *  clear what they typed — otherwise they'd be stranded on "No records"
+   *  with no way back. Only a truly pristine empty table hides the header. */
   get showHeader(): boolean {
-    return this.rows.length > 0 || this.loading;
+    return (
+      this.rows.length > 0 ||
+      this.loading ||
+      this.showFilters ||
+      this.hasActiveFilter
+    );
+  }
+
+  /** Any column filter or global search currently has a value. */
+  get hasActiveFilter(): boolean {
+    if (this.globalSearch.trim()) return true;
+    return Object.values(this.columnFilters).some(
+      v => v !== null && v !== undefined && String(v).trim() !== '',
+    );
   }
 
   /** p-table scrollHeight — 'flex' makes the table fill its (bounded) flex

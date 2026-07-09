@@ -117,7 +117,7 @@ export class ListDatasourceComponent implements OnInit, OnDestroy {
       { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
       { colId: 'description', field: 'description', header: t('COMMON.DESCRIPTION'), width: '320px', filter: 'text', sortable: false },
       { colId: 'type', field: 'type', header: t('COMMON.TYPE'), width: '144px', filter: 'text' },
-      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px', filter: 'numeric' },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px' },
       { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px' },
       { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
     ];

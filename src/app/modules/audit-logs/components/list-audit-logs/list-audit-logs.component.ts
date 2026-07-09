@@ -104,7 +104,7 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
       { colId: 'username', field: 'username', header: t('AUDIT.PERFORMED_BY'), width: '192px', filter: 'text', sortable: false },
       { colId: 'action', field: 'action', header: t('AUDIT.ACTION'), width: '144px', filter: 'text' },
       { colId: 'version', field: 'version', header: t('AUDIT.VERSION'), width: '96px', sortable: false },
-      { colId: 'status', field: 'responseSuccess', header: t('COMMON.STATUS'), width: '144px', filter: 'text', sortable: false },
+      { colId: 'status', field: 'responseSuccess', header: t('COMMON.STATUS'), width: '144px', sortable: false },
       { colId: 'createdOn', field: 'createdOn', header: t('AUDIT.TIMESTAMP'), width: '224px' },
       { colId: 'ipAddress', field: 'ipAddress', header: t('AUDIT.IP_ADDRESS'), width: '160px', filter: 'text', sortable: false },
       { colId: 'justification', field: 'justification', header: t('AUDIT.JUSTIFICATION'), width: '256px', filter: 'text', sortable: false },

@@ -122,7 +122,7 @@ export class ListSystemAdminComponent implements OnInit, OnDestroy {
       { colId: 'firstName', field: 'firstName', header: t('COMMON.FIRST_NAME'), width: '160px', filter: 'text' },
       { colId: 'lastName', field: 'lastName', header: t('COMMON.LAST_NAME'), width: '160px', filter: 'text' },
       { colId: 'email', field: 'email', header: t('COMMON.EMAIL'), width: '288px', filter: 'text' },
-      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px', filter: 'numeric' },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px' },
       { colId: 'lastLogin', field: 'lastLogin', header: t('COMMON.LAST_LOGIN'), width: '192px' },
       { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px' },
       { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },

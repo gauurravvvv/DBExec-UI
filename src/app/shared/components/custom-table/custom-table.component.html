@@ -104,9 +104,11 @@
     styleClass="ct-p-table modern-table"
   >
     <ng-template pTemplate="header">
-      <!-- Header (and filter row) hide when the table is empty and idle, so
-           the empty state reads as a clean centred message rather than a bare
-           column skeleton with a ghost row under it. -->
+      <!-- Header (and filter row) hide only when the table is empty AND idle
+           AND no filter is active — so a pristine empty table shows a clean
+           centred message. When a filter narrows to zero rows the header +
+           filter inputs STAY visible (showHeader accounts for active filters)
+           so the user can edit or clear what they typed. -->
       <tr *ngIf="showHeader">
         <th
           *ngFor="let c of visibleColumns"

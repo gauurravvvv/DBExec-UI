@@ -138,7 +138,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
       { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
       { colId: 'datasetName', field: 'datasetName', header: t('DASHBOARD.DATASET'), width: '192px', filter: 'text', sortable: false },
       { colId: 'datasourceName', field: 'datasource.name', header: t('COMMON.DATASOURCE'), width: '192px', filter: 'text', sortable: false },
-      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px', filter: 'numeric' },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px' },
       { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px' },
       { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
     ];

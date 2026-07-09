@@ -120,7 +120,7 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
       { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '240px', frozen: true, filter: 'text' },
       { colId: 'datasetName', field: 'dataset.name', header: t('RLS.DATASET'), width: '200px', filter: 'text', sortable: false },
       { colId: 'conditions', field: 'conditions', header: t('RLS.CONDITIONS'), width: '360px', sortable: false },
-      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px', filter: 'numeric' },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px' },
       { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
     ];
   }
