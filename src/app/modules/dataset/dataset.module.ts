@@ -4,7 +4,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { MenuModule } from 'primeng/menu';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
-import { UsDataGridComponent } from 'src/app/shared/components/us-data-grid/us-data-grid.component';
+import { CustomTableComponent } from 'src/app/shared/components/custom-table/custom-table.component';
+import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-table/custom-table-empty.directive';
 import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AddDatasetComponent } from './components/add-dataset/add-dataset.component';
@@ -35,10 +36,11 @@ import { addDatasetReducer, ADD_DATASET_FEATURE_KEY } from './store';
     DatasetRoutingModule,
     SharedModule,
     MenuModule,
-    // Standalone — AG Grid backed result grid for the editor's result
-    // sheet. Brings drag-reorder, column-resize, native floating
-    // filters, density toggle, CSV/XLSX export.
-    UsDataGridComponent,
+    // Standalone — the shared unified list table + its projected-empty
+    // directive. `UsGridCellDirective` stays: the table reuses it verbatim
+    // for per-cell templates.
+    CustomTableComponent,
+    CustomTableEmptyDirective,
     UsGridCellDirective,
     // NgRx Feature Store
     StoreModule.forFeature(ADD_DATASET_FEATURE_KEY, addDatasetReducer),

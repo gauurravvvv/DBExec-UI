@@ -339,7 +339,8 @@
     "CANNOT_UNLOCK_DEFAULT": "デフォルトのシステム管理者はこの画面からロック解除できません",
     "CANNOT_UNLOCK_SELF": "自分のアカウントはこの画面からロック解除できません",
     "DEFAULT_BADGE": "デフォルト",
-    "YOU_BADGE": "自分"
+    "YOU_BADGE": "自分",
+    "SEARCH_PLACEHOLDER": "ユーザー名・氏名・メールで管理者を検索"
   },
   "ORG": {
     "TITLE": "組織",
@@ -490,7 +491,8 @@
     "DB_SCHEMA_NOTE": "DBExec はプラットフォーム用テーブルのためにこのスキーマをデータベースに作成します。スキーマが既に存在する場合は空である必要があります。",
     "DB_SCHEMA_LOCKED": "スキーマは作成時に設定され、変更できません。",
     "SCHEMA_NOT_EMPTY": "指定したスキーマには既にオブジェクトが含まれています。空のスキーマか別の名前を選択してください。",
-    "NOT_TESTED_HINT": "保存前に接続をテストしてください"
+    "NOT_TESTED_HINT": "保存前に接続をテストしてください",
+    "SEARCH_PLACEHOLDER": "名前で組織を検索"
   },
   "ROLE": {
     "TITLE": "役割",
@@ -524,7 +526,8 @@
     "STATUS_ACTIVE": "有効",
     "STATUS_INACTIVE": "無効",
     "NAME_IMMUTABLE": "作成後にロール名を変更することはできません。",
-    "LEVEL_TOOLTIP_PREFIX": ""
+    "LEVEL_TOOLTIP_PREFIX": "",
+    "SEARCH_PLACEHOLDER": "名前または説明でロールを検索"
   },
   "GROUP": {
     "TITLE": "グループ",
@@ -552,7 +555,8 @@
     "LOCKED_SELF": "編集中に自分自身をこのグループから削除することはできません。",
     "LOCKED_SELF_PRIMARY": "あなたはプライマリ管理者であり、このグループから削除できません。",
     "PRIMARY_ADMIN": "プライマリ管理者",
-    "YOU": "自分"
+    "YOU": "自分",
+    "SEARCH_PLACEHOLDER": "名前または説明でグループを検索"
   },
   "USER": {
     "TITLE": "ユーザー",
@@ -633,7 +637,8 @@
     "HEALTH_FAILED": "前回のテスト失敗",
     "HEALTH_TESTING": "テスト中…",
     "HEALTH_NEVER_TESTED": "未テスト",
-    "TESTED": "テスト"
+    "TESTED": "テスト",
+    "SEARCH_PLACEHOLDER": "名前でデータソースを検索"
   },
   "DATASET": {
     "TITLE": "データセット",
@@ -812,7 +817,8 @@
     "EXPLAIN": "実行計画",
     "EXPLAIN_QUERY": "クエリの実行計画を表示",
     "EXPLAIN_PLAN_TITLE": "クエリの実行計画",
-    "EXPLAIN_RUNNING": "エンジンに実行計画を問い合わせ中…"
+    "EXPLAIN_RUNNING": "エンジンに実行計画を問い合わせ中…",
+    "SEARCH_PLACEHOLDER": "名前または説明でデータセットを検索"
   },
   "ANALYSES": {
     "TITLE": "分析",
@@ -1303,7 +1309,8 @@
     "A11Y_DATA_PANELS": "データ パネル",
     "A11Y_BUILD_PANELS": "ビルド パネル",
     "ADD_COLUMN": "列を追加",
-    "ASSIGN_AXES_HINT": "このグラフを表示するには軸を割り当てます"
+    "ASSIGN_AXES_HINT": "このグラフを表示するには軸を割り当てます",
+    "SEARCH_PLACEHOLDER": "名前または説明で分析を検索"
   },
   "DASHBOARD": {
     "TITLE": "ダッシュボード",
@@ -1347,7 +1354,8 @@
     "PUBLISH_SUCCESS": "ダッシュボードを公開しました",
     "PUBLISH_FAILED": "ダッシュボードを公開できませんでした",
     "PUBLISH_NO_VISUALS_HINT": "公開する前にビジュアルを1つ以上追加してください。",
-    "PUBLISH_UNSAVED_HINT": "先に分析を保存してから公開してください。"
+    "PUBLISH_UNSAVED_HINT": "先に分析を保存してから公開してください。",
+    "SEARCH_PLACEHOLDER": "名前または説明でダッシュボードを検索"
   },
   "TOAST": {
     "SUCCESS": "成功",
@@ -1960,7 +1968,8 @@
     "LOADING_ASSIGNMENTS": "Loading assignments...",
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
-    "ORGANISATION_REQUIRED": "Organisation is required"
+    "ORGANISATION_REQUIRED": "Organisation is required",
+    "SEARCH_PLACEHOLDER": "名前でルールを検索"
   },
   "THEME": {
     "PAGE_TITLE": "テーマ",
@@ -2045,7 +2054,8 @@
     "ORGANISATION_REQUIRED": "Organisation is required",
     "BACKGROUND_COLOR": "Background Color",
     "TEXT_COLOR": "Text Color",
-    "NO_ANNOUNCEMENTS_FOUND": "No announcements found"
+    "NO_ANNOUNCEMENTS_FOUND": "No announcements found",
+    "SEARCH_PLACEHOLDER": "タイトルでお知らせを検索"
   },
   "AUDIT": {
     "TITLE": "Audit Logs",
@@ -2069,7 +2079,8 @@
     "FIELD": "Field",
     "OLD_VALUE": "Old Value",
     "NEW_VALUE": "New Value",
-    "ENTITY_DETAILS": "Entity Details"
+    "ENTITY_DETAILS": "Entity Details",
+    "SEARCH_PLACEHOLDER": "ユーザー・操作・モジュールで検索"
   },
   "LOGIN_ACTIVITY": {
     "TITLE": "Login Activity",
@@ -2094,7 +2105,8 @@
     "LOGOUT": "Logout",
     "TOKEN_REFRESH": "Token Refresh",
     "PASSWORD_RESET": "Password Reset",
-    "OTP_GENERATED": "OTP Generated"
+    "OTP_GENERATED": "OTP Generated",
+    "SEARCH_PLACEHOLDER": "ユーザーまたはIPアドレスで検索"
   },
   "UNSAVED_CHANGES": {
     "TITLE": "未保存の変更",
@@ -3274,7 +3286,8 @@
     "SERVER_MODE": "サーバー側",
     "SERVER_MODE_HINT": "このクエリでは、並べ替え・フィルター・ページングはデータベース側で実行されます。",
     "PREV_PAGE": "前のページ",
-    "NEXT_PAGE": "次のページ"
+    "NEXT_PAGE": "次のページ",
+    "CONNECTIONS_SEARCH_PLACEHOLDER": "名前で接続を検索"
   },
   "DB_ACCESS": {
     "TITLE": "データベースアクセス管理",

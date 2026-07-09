@@ -339,7 +339,8 @@
     "CANNOT_UNLOCK_DEFAULT": "默认系统管理员无法从此处解锁",
     "CANNOT_UNLOCK_SELF": "您不能从此处解锁自己的账户",
     "DEFAULT_BADGE": "默认",
-    "YOU_BADGE": "你"
+    "YOU_BADGE": "你",
+    "SEARCH_PLACEHOLDER": "按用户名、姓名或邮箱搜索管理员"
   },
   "ORG": {
     "TITLE": "组织",
@@ -490,7 +491,8 @@
     "DB_SCHEMA_NOTE": "DBExec 将在您的数据库中为其平台表创建该架构。如果该架构已存在,必须为空。",
     "DB_SCHEMA_LOCKED": "模式在创建时设置，无法更改。",
     "SCHEMA_NOT_EMPTY": "指定的架构中已包含对象。请选择一个空架构或使用新名称。",
-    "NOT_TESTED_HINT": "保存前请测试连接"
+    "NOT_TESTED_HINT": "保存前请测试连接",
+    "SEARCH_PLACEHOLDER": "按名称搜索组织"
   },
   "ROLE": {
     "TITLE": "角色",
@@ -524,7 +526,8 @@
     "STATUS_ACTIVE": "活跃",
     "STATUS_INACTIVE": "非活跃",
     "NAME_IMMUTABLE": "角色名称创建后无法更改。",
-    "LEVEL_TOOLTIP_PREFIX": ""
+    "LEVEL_TOOLTIP_PREFIX": "",
+    "SEARCH_PLACEHOLDER": "按名称或描述搜索角色"
   },
   "GROUP": {
     "TITLE": "用户组",
@@ -552,7 +555,8 @@
     "LOCKED_SELF": "编辑期间您无法将自己从此组中移除。",
     "LOCKED_SELF_PRIMARY": "您是主管理员，无法从此组中移除。",
     "PRIMARY_ADMIN": "主管理员",
-    "YOU": "你"
+    "YOU": "你",
+    "SEARCH_PLACEHOLDER": "按名称或描述搜索组"
   },
   "USER": {
     "TITLE": "用户",
@@ -633,7 +637,8 @@
     "HEALTH_FAILED": "上次测试失败",
     "HEALTH_TESTING": "测试中…",
     "HEALTH_NEVER_TESTED": "从未测试",
-    "TESTED": "已测试"
+    "TESTED": "已测试",
+    "SEARCH_PLACEHOLDER": "按名称搜索数据源"
   },
   "DATASET": {
     "TITLE": "数据集",
@@ -812,7 +817,8 @@
     "EXPLAIN": "执行计划",
     "EXPLAIN_QUERY": "显示查询计划",
     "EXPLAIN_PLAN_TITLE": "查询计划",
-    "EXPLAIN_RUNNING": "正在向引擎请求计划…"
+    "EXPLAIN_RUNNING": "正在向引擎请求计划…",
+    "SEARCH_PLACEHOLDER": "按名称或描述搜索数据集"
   },
   "ANALYSES": {
     "TITLE": "分析",
@@ -1303,7 +1309,8 @@
     "A11Y_DATA_PANELS": "数据面板",
     "A11Y_BUILD_PANELS": "构建面板",
     "ADD_COLUMN": "添加列",
-    "ASSIGN_AXES_HINT": "分配轴以渲染此图表"
+    "ASSIGN_AXES_HINT": "分配轴以渲染此图表",
+    "SEARCH_PLACEHOLDER": "按名称或描述搜索分析"
   },
   "DASHBOARD": {
     "TITLE": "仪表盘",
@@ -1347,7 +1354,8 @@
     "PUBLISH_SUCCESS": "仪表板已发布",
     "PUBLISH_FAILED": "无法发布仪表板",
     "PUBLISH_NO_VISUALS_HINT": "发布前至少添加一个可视化元素。",
-    "PUBLISH_UNSAVED_HINT": "请先保存分析，然后再发布。"
+    "PUBLISH_UNSAVED_HINT": "请先保存分析，然后再发布。",
+    "SEARCH_PLACEHOLDER": "按名称或描述搜索仪表板"
   },
   "TOAST": {
     "SUCCESS": "成功",
@@ -1960,7 +1968,8 @@
     "LOADING_ASSIGNMENTS": "Loading assignments...",
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
-    "ORGANISATION_REQUIRED": "Organisation is required"
+    "ORGANISATION_REQUIRED": "Organisation is required",
+    "SEARCH_PLACEHOLDER": "按名称搜索规则"
   },
   "THEME": {
     "PAGE_TITLE": "主题",
@@ -2045,7 +2054,8 @@
     "ORGANISATION_REQUIRED": "Organisation is required",
     "BACKGROUND_COLOR": "Background Color",
     "TEXT_COLOR": "Text Color",
-    "NO_ANNOUNCEMENTS_FOUND": "No announcements found"
+    "NO_ANNOUNCEMENTS_FOUND": "No announcements found",
+    "SEARCH_PLACEHOLDER": "按标题搜索公告"
   },
   "AUDIT": {
     "TITLE": "Audit Logs",
@@ -2069,7 +2079,8 @@
     "FIELD": "Field",
     "OLD_VALUE": "Old Value",
     "NEW_VALUE": "New Value",
-    "ENTITY_DETAILS": "Entity Details"
+    "ENTITY_DETAILS": "Entity Details",
+    "SEARCH_PLACEHOLDER": "按用户、操作或模块搜索"
   },
   "LOGIN_ACTIVITY": {
     "TITLE": "Login Activity",
@@ -2094,7 +2105,8 @@
     "LOGOUT": "Logout",
     "TOKEN_REFRESH": "Token Refresh",
     "PASSWORD_RESET": "Password Reset",
-    "OTP_GENERATED": "OTP Generated"
+    "OTP_GENERATED": "OTP Generated",
+    "SEARCH_PLACEHOLDER": "按用户或IP地址搜索"
   },
   "UNSAVED_CHANGES": {
     "TITLE": "未保存的更改",
@@ -3274,7 +3286,8 @@
     "SERVER_MODE": "服务器端",
     "SERVER_MODE_HINT": "该查询的排序、筛选和分页在数据库端执行。",
     "PREV_PAGE": "上一页",
-    "NEXT_PAGE": "下一页"
+    "NEXT_PAGE": "下一页",
+    "CONNECTIONS_SEARCH_PLACEHOLDER": "按名称搜索连接"
   },
   "DB_ACCESS": {
     "TITLE": "数据库访问管理",

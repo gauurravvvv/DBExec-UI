@@ -15,7 +15,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { MenuItem } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import type { ColDef } from 'ag-grid-community';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import {
   ANALYSES,
@@ -31,16 +30,25 @@ import {
   UsServerListAdapter,
   UsListLoadParams,
 } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
-import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
+import type {
+  CustomTableColumn,
+  CustomTableConfig,
+} from 'src/app/shared/components/custom-table/custom-table.types';
 import { DatasetService } from '../../services/dataset.service';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 
 /**
- * Dataset listing — renders through `<us-data-grid>` with a
- * `UsServerListAdapter` driving the BE `/datasets` list call. The
- * page header / datasource dropdown / delete-confirm popup retain
- * the existing styling and behaviour; only the `<p-table>` was
- * swapped out for the AG Grid wrapper.
+ * Dataset listing — renders through the shared `<app-custom-table>` (the app's
+ * unified list table) driven by a `UsServerListAdapter` on the BE `/datasets`
+ * list call. Infinite scroll (no page controls), a single global search plus
+ * on-demand per-column filters (shared inputs), and per-row actions. No bulk
+ * selection.
+ *
+ * Dataset is datasource-scoped: the adapter is built only once a datasource is
+ * chosen (it needs `datasourceId` in every request), so the datasource picker
+ * is projected into the table's toolbar-left slot. The page header, QB command
+ * palette, duplicate / create-analysis dialogs and delete-confirm popup retain
+ * their existing behaviour.
  */
 @Component({
   selector: 'app-list-dataset',
@@ -53,9 +61,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
   /* ── page state — preserved from the p-table version ─── */
 
-  selectedDatasets: any[] = [];
   showDeleteConfirm = false;
-  bulkDelete = false;
   deleteJustification = '';
   datasetToDelete: string | null = null;
   showDuplicateDialog = false;
@@ -77,11 +83,6 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
   // Per-row spinner helpers.
   isDeleting = (id: string): boolean => this.datasetService.isDeleting(id);
-  get isBulkDeleting(): boolean {
-    return this.selectedDatasets.some((d: any) =>
-      this.datasetService.isDeleting(d.id),
-    );
-  }
 
   addDatasetItems: MenuItem[] = [];
 
@@ -95,33 +96,29 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   // Debouncing for QB search.
   private qbFilter$ = new Subject<void>();
 
-  /* ── grid wiring ───────────────────────────────────────── */
+  /* ── custom-table wiring (unified simple table; server-driven) ──────── */
 
-  /** AG Grid column definitions. cellRenderer templates live in
-   *  the HTML as `<ng-template usGridCell>`. */
-  cols: ColDef[] = [];
+  /** Unified-table columns. Cell DOM is supplied by `<ng-template usGridCell>`
+   *  in the HTML; `filter` flags enable the on-demand per-column filter row. */
+  cols: CustomTableColumn[] = [];
 
-  gridConfig: UsDataGridConfig = {
-    enableRowSelection: true,
-    rowSelectionMode: 'multiple',
-    freezeFirstColumn: true,
-    enableColumnChooser: true,
-    enableAddFilter: false, // we use the BE-driven floating filters
-    enableAutoFit: true,
-    enableDensityToggle: true,
-    enableCsvExport: true,
-    enableXlsxExport: true,
-    enableRefresh: true,
-    enableSavedViews: true,
+  tableConfig: CustomTableConfig = {
+    mode: 'scroll', // infinite scroll — no page controls
+    pageSize: 50, // rows fetched per scroll page
+    globalSearch: true,
+    globalSearchKey: 'search', // BE datasets list matches a `search` filter key
+    globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
+    showColumnFilters: true,
+    enableExport: true,
+    enableDensity: true,
+    density: 'comfortable',
     gridKey: 'datasets-list',
-    pageSizeOptions: [10, 25, 50, 100],
-    pageSize: 10,
-    height: 'calc(100vh - 340px)',
+    height: 'flex',
     rowIdField: 'id',
   };
 
   /** Server-side adapter — bound on first datasource selection so
-   *  the grid doesn't fire a datasets query before a datasource exists. */
+   *  the table doesn't fire a datasets query before a datasource exists. */
   adapter: UsServerListAdapter<any> | null = null;
 
   private destroyRef = inject(DestroyRef);
@@ -157,6 +154,13 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     ];
 
     this.cols = this.buildColumns();
+    // Field-specific search placeholder so the user knows what's matched.
+    this.tableConfig = {
+      ...this.tableConfig,
+      globalSearchPlaceholder: this.translate.instant(
+        'DATASET.SEARCH_PLACEHOLDER',
+      ),
+    };
 
     // Setup debounced QB search
     this.qbFilter$
@@ -181,66 +185,16 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     this.adapter?.destroy();
   }
 
-  get selectedCount(): number {
-    return this.selectedDatasets?.length || 0;
-  }
-
-  get isFilterActive(): boolean {
-    return !!this.adapter && Object.keys(this.adapter.filterModel()).length > 0;
-  }
-
   /* ── column definitions ──────────────────────────────── */
 
-  private buildColumns(): ColDef[] {
+  private buildColumns(): CustomTableColumn[] {
+    const t = (k: string) => this.translate.instant(k);
     return [
-      {
-        colId: 'name',
-        field: 'name',
-        headerName: this.translate.instant('COMMON.NAME'),
-        width: 224,
-        minWidth: 224,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        pinned: 'left',
-      },
-      {
-        colId: 'description',
-        field: 'description',
-        headerName: this.translate.instant('COMMON.DESCRIPTION'),
-        minWidth: 320,
-        flex: 1,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        sortable: false,
-      },
-      {
-        colId: 'status',
-        field: 'status',
-        headerName: this.translate.instant('COMMON.STATUS'),
-        width: 144,
-        minWidth: 144,
-        filter: 'agNumberColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'createdOn',
-        field: 'createdOn',
-        headerName: this.translate.instant('COMMON.CREATED_ON'),
-        width: 192,
-        minWidth: 192,
-        filter: 'agDateColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'actions',
-        headerName: this.translate.instant('COMMON.ACTIONS'),
-        width: 144,
-        minWidth: 144,
-        sortable: false,
-        filter: false,
-        resizable: false,
-        pinned: 'right',
-      },
+      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
+      { colId: 'description', field: 'description', header: t('COMMON.DESCRIPTION'), width: '320px', filter: 'text', sortable: false },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px', filter: 'numeric' },
+      { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px' },
+      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
     ];
   }
 
@@ -306,32 +260,12 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
         rows: res?.data?.datasets ?? [],
         total: res?.data?.totalItems ?? res?.data?.count ?? 0,
       }),
-      filterBuilders: {
-        name: cell => ({ name: (cell as any)?.filter ?? cell }),
-        description: cell => ({
-          description: (cell as any)?.filter ?? cell,
-        }),
-        status: cell => {
-          const v = (cell as any)?.filter ?? cell;
-          return v === '' || v === null || v === undefined ? {} : { status: v };
-        },
-        createdOn: cell => {
-          // AG Grid date filter shapes: {dateFrom, dateTo, type, filterType}.
-          const c = cell as any;
-          const out: Record<string, string> = {};
-          if (c?.dateFrom)
-            out['createdDateFrom'] = new Date(c.dateFrom).toISOString();
-          if (c?.dateTo) {
-            const to = new Date(c.dateTo);
-            to.setHours(23, 59, 59, 999);
-            out['createdDateTo'] = to.toISOString();
-          }
-          return out;
-        },
-      },
+      // custom-table sends PLAIN filter values (global `search` + per-column
+      // name/description/status), so the adapter's identity mapping passes
+      // them straight through — no AG-Grid cell unwrapping needed.
       initial: {
         page: 1,
-        limit: 10,
+        limit: 50,
         ...(deepLinkName ? { filter: { name: deepLinkName } } : {}),
       },
     });
@@ -339,18 +273,6 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   }
 
   /* ── handlers re-pointed at the adapter ──────────────── */
-
-  onSelectionChange(rows: any[]) {
-    this.selectedDatasets = rows;
-    this.cdr.markForCheck();
-  }
-
-  clearFilters() {
-    if (!this.adapter) return;
-    this.adapter.setFilter({});
-    this.adapter.setSort([]);
-    this.selectedDatasets = [];
-  }
 
   refreshList() {
     this.adapter?.reload();
@@ -594,21 +516,12 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.datasetToDelete = id;
-    this.bulkDelete = false;
-    this.showDeleteConfirm = true;
-  }
-
-  confirmBulkDelete() {
-    if (this.selectedCount === 0) return;
-    this.datasetToDelete = null;
-    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.datasetToDelete = null;
-    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
@@ -616,36 +529,11 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     const reason = this.deleteJustification.trim();
     if (!reason) return;
 
-    if (this.bulkDelete) {
-      const ids = this.selectedDatasets.map((d: any) => d.id);
-      if (ids.length === 0) {
-        this.cancelDelete();
-        return;
-      }
-      this.datasetService
-        .bulkDeleteDataset(ids, reason)
-        .then((res: any) => {
-          if (this.globalService.handleSuccessService(res)) {
-            this.selectedDatasets = [];
-            this.refreshList();
-          }
-          this.cdr.markForCheck();
-        })
-        .catch(() => {
-          this.cdr.markForCheck();
-        })
-        .finally(() => this.closeDeletePopup());
-      return;
-    }
-
     if (this.datasetToDelete) {
       this.datasetService
         .deleteDataset(this.datasetToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
-            this.selectedDatasets = this.selectedDatasets.filter(
-              (d: any) => d.id !== this.datasetToDelete,
-            );
             this.refreshList();
           }
           this.cdr.markForCheck();
@@ -660,7 +548,6 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   private closeDeletePopup() {
     this.showDeleteConfirm = false;
     this.datasetToDelete = null;
-    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 }

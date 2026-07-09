@@ -339,7 +339,8 @@
     "CANNOT_UNLOCK_DEFAULT": "O administrador de sistema padrão não pode ser desbloqueado por aqui",
     "CANNOT_UNLOCK_SELF": "Você não pode desbloquear sua própria conta por aqui",
     "DEFAULT_BADGE": "Padrão",
-    "YOU_BADGE": "Você"
+    "YOU_BADGE": "Você",
+    "SEARCH_PLACEHOLDER": "Pesquisar administradores por usuário, nome ou e-mail"
   },
   "ORG": {
     "TITLE": "Organizações",
@@ -490,7 +491,8 @@
     "DB_SCHEMA_NOTE": "O DBExec criará este esquema no seu banco de dados para suas tabelas de plataforma. Se o esquema já existir, ele deve estar vazio.",
     "DB_SCHEMA_LOCKED": "O esquema é definido na criação e não pode ser alterado.",
     "SCHEMA_NOT_EMPTY": "O esquema informado já contém objetos. Escolha um esquema vazio ou outro nome.",
-    "NOT_TESTED_HINT": "Teste a conexão antes de salvar"
+    "NOT_TESTED_HINT": "Teste a conexão antes de salvar",
+    "SEARCH_PLACEHOLDER": "Pesquisar organizações por nome"
   },
   "ROLE": {
     "TITLE": "Funções",
@@ -524,7 +526,8 @@
     "STATUS_ACTIVE": "Ativo",
     "STATUS_INACTIVE": "Inativo",
     "NAME_IMMUTABLE": "O nome da função não pode ser alterado após a criação.",
-    "LEVEL_TOOLTIP_PREFIX": ""
+    "LEVEL_TOOLTIP_PREFIX": "",
+    "SEARCH_PLACEHOLDER": "Pesquisar funções por nome ou descrição"
   },
   "GROUP": {
     "TITLE": "Grupos",
@@ -552,7 +555,8 @@
     "LOCKED_SELF": "Você não pode remover a si mesmo deste grupo durante a edição.",
     "LOCKED_SELF_PRIMARY": "Você é o administrador principal e não pode ser removido deste grupo.",
     "PRIMARY_ADMIN": "Admin principal",
-    "YOU": "Você"
+    "YOU": "Você",
+    "SEARCH_PLACEHOLDER": "Pesquisar grupos por nome ou descrição"
   },
   "USER": {
     "TITLE": "Usuários",
@@ -633,7 +637,8 @@
     "HEALTH_FAILED": "Último teste falhou",
     "HEALTH_TESTING": "Testando…",
     "HEALTH_NEVER_TESTED": "Nunca testado",
-    "TESTED": "testado"
+    "TESTED": "testado",
+    "SEARCH_PLACEHOLDER": "Pesquisar fontes de dados por nome"
   },
   "DATASET": {
     "TITLE": "Conjuntos de dados",
@@ -812,7 +817,8 @@
     "EXPLAIN": "Explicar",
     "EXPLAIN_QUERY": "Mostrar plano da consulta",
     "EXPLAIN_PLAN_TITLE": "Plano da consulta",
-    "EXPLAIN_RUNNING": "Solicitando o plano ao motor…"
+    "EXPLAIN_RUNNING": "Solicitando o plano ao motor…",
+    "SEARCH_PLACEHOLDER": "Pesquisar datasets por nome ou descrição"
   },
   "ANALYSES": {
     "TITLE": "Análises",
@@ -1303,7 +1309,8 @@
     "A11Y_DATA_PANELS": "Painéis de dados",
     "A11Y_BUILD_PANELS": "Painéis de construção",
     "ADD_COLUMN": "Adicionar coluna",
-    "ASSIGN_AXES_HINT": "Atribua eixos para exibir este gráfico"
+    "ASSIGN_AXES_HINT": "Atribua eixos para exibir este gráfico",
+    "SEARCH_PLACEHOLDER": "Pesquisar análises por nome ou descrição"
   },
   "DASHBOARD": {
     "TITLE": "Painéis",
@@ -1347,7 +1354,8 @@
     "PUBLISH_SUCCESS": "Painel publicado",
     "PUBLISH_FAILED": "Não foi possível publicar o painel",
     "PUBLISH_NO_VISUALS_HINT": "Adicione pelo menos um visual antes de publicar.",
-    "PUBLISH_UNSAVED_HINT": "Salve a análise primeiro e, em seguida, publique."
+    "PUBLISH_UNSAVED_HINT": "Salve a análise primeiro e, em seguida, publique.",
+    "SEARCH_PLACEHOLDER": "Pesquisar painéis por nome ou descrição"
   },
   "TOAST": {
     "SUCCESS": "Sucesso",
@@ -1960,7 +1968,8 @@
     "LOADING_ASSIGNMENTS": "Loading assignments...",
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
-    "ORGANISATION_REQUIRED": "Organisation is required"
+    "ORGANISATION_REQUIRED": "Organisation is required",
+    "SEARCH_PLACEHOLDER": "Pesquisar regras por nome"
   },
   "THEME": {
     "PAGE_TITLE": "Tema",
@@ -2045,7 +2054,8 @@
     "ORGANISATION_REQUIRED": "Organisation is required",
     "BACKGROUND_COLOR": "Background Color",
     "TEXT_COLOR": "Text Color",
-    "NO_ANNOUNCEMENTS_FOUND": "No announcements found"
+    "NO_ANNOUNCEMENTS_FOUND": "No announcements found",
+    "SEARCH_PLACEHOLDER": "Pesquisar comunicados por título"
   },
   "AUDIT": {
     "TITLE": "Audit Logs",
@@ -2069,7 +2079,8 @@
     "FIELD": "Field",
     "OLD_VALUE": "Old Value",
     "NEW_VALUE": "New Value",
-    "ENTITY_DETAILS": "Entity Details"
+    "ENTITY_DETAILS": "Entity Details",
+    "SEARCH_PLACEHOLDER": "Pesquisar por usuário, ação ou módulo"
   },
   "LOGIN_ACTIVITY": {
     "TITLE": "Login Activity",
@@ -2094,7 +2105,8 @@
     "LOGOUT": "Logout",
     "TOKEN_REFRESH": "Token Refresh",
     "PASSWORD_RESET": "Password Reset",
-    "OTP_GENERATED": "OTP Generated"
+    "OTP_GENERATED": "OTP Generated",
+    "SEARCH_PLACEHOLDER": "Pesquisar por usuário ou endereço IP"
   },
   "UNSAVED_CHANGES": {
     "TITLE": "Alterações não salvas",
@@ -3274,7 +3286,8 @@
     "SERVER_MODE": "No servidor",
     "SERVER_MODE_HINT": "Ordenação, filtragem e paginação são executadas no banco de dados para esta consulta.",
     "PREV_PAGE": "Página anterior",
-    "NEXT_PAGE": "Próxima página"
+    "NEXT_PAGE": "Próxima página",
+    "CONNECTIONS_SEARCH_PLACEHOLDER": "Pesquisar conexões por nome"
   },
   "DB_ACCESS": {
     "TITLE": "Gerenciamento de acesso ao banco de dados",

@@ -339,7 +339,8 @@
     "CANNOT_UNLOCK_DEFAULT": "L'amministratore di sistema predefinito non può essere sbloccato da qui",
     "CANNOT_UNLOCK_SELF": "Non puoi sbloccare il tuo account da qui",
     "DEFAULT_BADGE": "Predefinito",
-    "YOU_BADGE": "Tu"
+    "YOU_BADGE": "Tu",
+    "SEARCH_PLACEHOLDER": "Cerca amministratori per nome utente, nome o email"
   },
   "ORG": {
     "TITLE": "Organizzazioni",
@@ -490,7 +491,8 @@
     "DB_SCHEMA_NOTE": "DBExec creerà questo schema nel tuo database per le sue tabelle di piattaforma. Se lo schema esiste già, deve essere vuoto.",
     "DB_SCHEMA_LOCKED": "Lo schema viene impostato alla creazione e non può essere modificato.",
     "SCHEMA_NOT_EMPTY": "Lo schema indicato contiene già oggetti. Scegli uno schema vuoto o un nuovo nome.",
-    "NOT_TESTED_HINT": "Testa la connessione prima di salvare"
+    "NOT_TESTED_HINT": "Testa la connessione prima di salvare",
+    "SEARCH_PLACEHOLDER": "Cerca organizzazioni per nome"
   },
   "ROLE": {
     "TITLE": "Ruoli",
@@ -524,7 +526,8 @@
     "STATUS_ACTIVE": "Attivo",
     "STATUS_INACTIVE": "Inattivo",
     "NAME_IMMUTABLE": "Il nome del ruolo non può essere modificato dopo la creazione.",
-    "LEVEL_TOOLTIP_PREFIX": ""
+    "LEVEL_TOOLTIP_PREFIX": "",
+    "SEARCH_PLACEHOLDER": "Cerca ruoli per nome o descrizione"
   },
   "GROUP": {
     "TITLE": "Gruppi",
@@ -552,7 +555,8 @@
     "LOCKED_SELF": "Non puoi rimuovere te stesso da questo gruppo durante la modifica.",
     "LOCKED_SELF_PRIMARY": "Sei l'amministratore principale e non puoi essere rimosso da questo gruppo.",
     "PRIMARY_ADMIN": "Admin principale",
-    "YOU": "Tu"
+    "YOU": "Tu",
+    "SEARCH_PLACEHOLDER": "Cerca gruppi per nome o descrizione"
   },
   "USER": {
     "TITLE": "Utenti",
@@ -633,7 +637,8 @@
     "HEALTH_FAILED": "Ultimo test fallito",
     "HEALTH_TESTING": "Test in corso…",
     "HEALTH_NEVER_TESTED": "Mai testato",
-    "TESTED": "testato"
+    "TESTED": "testato",
+    "SEARCH_PLACEHOLDER": "Cerca origini dati per nome"
   },
   "DATASET": {
     "TITLE": "Dataset",
@@ -812,7 +817,8 @@
     "EXPLAIN": "Spiega",
     "EXPLAIN_QUERY": "Mostra il piano della query",
     "EXPLAIN_PLAN_TITLE": "Piano della query",
-    "EXPLAIN_RUNNING": "Richiesta del piano al motore…"
+    "EXPLAIN_RUNNING": "Richiesta del piano al motore…",
+    "SEARCH_PLACEHOLDER": "Cerca dataset per nome o descrizione"
   },
   "ANALYSES": {
     "TITLE": "Analisi",
@@ -1303,7 +1309,8 @@
     "A11Y_DATA_PANELS": "Pannelli dati",
     "A11Y_BUILD_PANELS": "Pannelli di costruzione",
     "ADD_COLUMN": "Aggiungi colonna",
-    "ASSIGN_AXES_HINT": "Assegna gli assi per visualizzare questo grafico"
+    "ASSIGN_AXES_HINT": "Assegna gli assi per visualizzare questo grafico",
+    "SEARCH_PLACEHOLDER": "Cerca analisi per nome o descrizione"
   },
   "DASHBOARD": {
     "TITLE": "Dashboard",
@@ -1347,7 +1354,8 @@
     "PUBLISH_SUCCESS": "Dashboard pubblicata",
     "PUBLISH_FAILED": "Impossibile pubblicare la dashboard",
     "PUBLISH_NO_VISUALS_HINT": "Aggiungi almeno un elemento visivo prima di pubblicare.",
-    "PUBLISH_UNSAVED_HINT": "Salva prima l'analisi, poi pubblica."
+    "PUBLISH_UNSAVED_HINT": "Salva prima l'analisi, poi pubblica.",
+    "SEARCH_PLACEHOLDER": "Cerca dashboard per nome o descrizione"
   },
   "TOAST": {
     "SUCCESS": "Successo",
@@ -1960,7 +1968,8 @@
     "LOADING_ASSIGNMENTS": "Loading assignments...",
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
-    "ORGANISATION_REQUIRED": "Organisation is required"
+    "ORGANISATION_REQUIRED": "Organisation is required",
+    "SEARCH_PLACEHOLDER": "Cerca regole per nome"
   },
   "THEME": {
     "PAGE_TITLE": "Tema",
@@ -2045,7 +2054,8 @@
     "ORGANISATION_REQUIRED": "Organisation is required",
     "BACKGROUND_COLOR": "Background Color",
     "TEXT_COLOR": "Text Color",
-    "NO_ANNOUNCEMENTS_FOUND": "No announcements found"
+    "NO_ANNOUNCEMENTS_FOUND": "No announcements found",
+    "SEARCH_PLACEHOLDER": "Cerca annunci per titolo"
   },
   "AUDIT": {
     "TITLE": "Audit Logs",
@@ -2069,7 +2079,8 @@
     "FIELD": "Field",
     "OLD_VALUE": "Old Value",
     "NEW_VALUE": "New Value",
-    "ENTITY_DETAILS": "Entity Details"
+    "ENTITY_DETAILS": "Entity Details",
+    "SEARCH_PLACEHOLDER": "Cerca per utente, azione o modulo"
   },
   "LOGIN_ACTIVITY": {
     "TITLE": "Login Activity",
@@ -2094,7 +2105,8 @@
     "LOGOUT": "Logout",
     "TOKEN_REFRESH": "Token Refresh",
     "PASSWORD_RESET": "Password Reset",
-    "OTP_GENERATED": "OTP Generated"
+    "OTP_GENERATED": "OTP Generated",
+    "SEARCH_PLACEHOLDER": "Cerca per utente o indirizzo IP"
   },
   "UNSAVED_CHANGES": {
     "TITLE": "Modifiche non salvate",
@@ -3274,7 +3286,8 @@
     "SERVER_MODE": "Lato server",
     "SERVER_MODE_HINT": "Ordinamento, filtro e paginazione vengono eseguiti sul database per questa query.",
     "PREV_PAGE": "Pagina precedente",
-    "NEXT_PAGE": "Pagina successiva"
+    "NEXT_PAGE": "Pagina successiva",
+    "CONNECTIONS_SEARCH_PLACEHOLDER": "Cerca connessioni per nome"
   },
   "DB_ACCESS": {
     "TITLE": "Gestione accessi al database",

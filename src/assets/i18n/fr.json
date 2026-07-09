@@ -339,7 +339,8 @@
     "CANNOT_UNLOCK_DEFAULT": "L'administrateur système par défaut ne peut pas être déverrouillé depuis cet écran",
     "CANNOT_UNLOCK_SELF": "Vous ne pouvez pas déverrouiller votre propre compte depuis cet écran",
     "DEFAULT_BADGE": "Par défaut",
-    "YOU_BADGE": "Vous"
+    "YOU_BADGE": "Vous",
+    "SEARCH_PLACEHOLDER": "Rechercher des administrateurs par identifiant, nom ou e-mail"
   },
   "ORG": {
     "TITLE": "Organisations",
@@ -490,7 +491,8 @@
     "DB_SCHEMA_NOTE": "DBExec créera ce schéma dans votre base de données pour ses tables de plateforme. Si le schéma existe déjà, il doit être vide.",
     "DB_SCHEMA_LOCKED": "Le schéma est défini à la création et ne peut pas être modifié.",
     "SCHEMA_NOT_EMPTY": "Le schéma indiqué contient déjà des objets. Choisissez un schéma vide ou un nouveau nom.",
-    "NOT_TESTED_HINT": "Tester la connexion avant d'enregistrer"
+    "NOT_TESTED_HINT": "Tester la connexion avant d'enregistrer",
+    "SEARCH_PLACEHOLDER": "Rechercher des organisations par nom"
   },
   "ROLE": {
     "TITLE": "Rôles",
@@ -524,7 +526,8 @@
     "STATUS_ACTIVE": "Actif",
     "STATUS_INACTIVE": "Inactif",
     "NAME_IMMUTABLE": "Le nom du rôle ne peut pas être modifié après sa création.",
-    "LEVEL_TOOLTIP_PREFIX": ""
+    "LEVEL_TOOLTIP_PREFIX": "",
+    "SEARCH_PLACEHOLDER": "Rechercher des rôles par nom ou description"
   },
   "GROUP": {
     "TITLE": "Groupes",
@@ -552,7 +555,8 @@
     "LOCKED_SELF": "Vous ne pouvez pas vous retirer vous-même de ce groupe pendant l'édition.",
     "LOCKED_SELF_PRIMARY": "Vous êtes l'administrateur principal et ne pouvez pas être retiré de ce groupe.",
     "PRIMARY_ADMIN": "Admin principal",
-    "YOU": "Vous"
+    "YOU": "Vous",
+    "SEARCH_PLACEHOLDER": "Rechercher des groupes par nom ou description"
   },
   "USER": {
     "TITLE": "Utilisateurs",
@@ -633,7 +637,8 @@
     "HEALTH_FAILED": "Dernier test échoué",
     "HEALTH_TESTING": "Test en cours…",
     "HEALTH_NEVER_TESTED": "Jamais testé",
-    "TESTED": "testé"
+    "TESTED": "testé",
+    "SEARCH_PLACEHOLDER": "Rechercher des sources de données par nom"
   },
   "DATASET": {
     "TITLE": "Jeux de données",
@@ -812,7 +817,8 @@
     "EXPLAIN": "Expliquer",
     "EXPLAIN_QUERY": "Afficher le plan de la requête",
     "EXPLAIN_PLAN_TITLE": "Plan de la requête",
-    "EXPLAIN_RUNNING": "Demande du plan au moteur…"
+    "EXPLAIN_RUNNING": "Demande du plan au moteur…",
+    "SEARCH_PLACEHOLDER": "Rechercher des jeux de données par nom ou description"
   },
   "ANALYSES": {
     "TITLE": "Analyses",
@@ -1303,7 +1309,8 @@
     "A11Y_DATA_PANELS": "Panneaux de données",
     "A11Y_BUILD_PANELS": "Panneaux de construction",
     "ADD_COLUMN": "Ajouter une colonne",
-    "ASSIGN_AXES_HINT": "Affectez les axes pour afficher ce graphique"
+    "ASSIGN_AXES_HINT": "Affectez les axes pour afficher ce graphique",
+    "SEARCH_PLACEHOLDER": "Rechercher des analyses par nom ou description"
   },
   "DASHBOARD": {
     "TITLE": "Tableaux de bord",
@@ -1347,7 +1354,8 @@
     "PUBLISH_SUCCESS": "Tableau de bord publié",
     "PUBLISH_FAILED": "Impossible de publier le tableau de bord",
     "PUBLISH_NO_VISUALS_HINT": "Ajoutez au moins une visualisation avant de publier.",
-    "PUBLISH_UNSAVED_HINT": "Enregistrez d'abord l'analyse, puis publiez."
+    "PUBLISH_UNSAVED_HINT": "Enregistrez d'abord l'analyse, puis publiez.",
+    "SEARCH_PLACEHOLDER": "Rechercher des tableaux de bord par nom ou description"
   },
   "TOAST": {
     "SUCCESS": "Succès",
@@ -1960,7 +1968,8 @@
     "LOADING_ASSIGNMENTS": "Loading assignments...",
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
-    "ORGANISATION_REQUIRED": "Organisation is required"
+    "ORGANISATION_REQUIRED": "Organisation is required",
+    "SEARCH_PLACEHOLDER": "Rechercher des règles par nom"
   },
   "THEME": {
     "PAGE_TITLE": "Thème",
@@ -2045,7 +2054,8 @@
     "ORGANISATION_REQUIRED": "Organisation is required",
     "BACKGROUND_COLOR": "Background Color",
     "TEXT_COLOR": "Text Color",
-    "NO_ANNOUNCEMENTS_FOUND": "No announcements found"
+    "NO_ANNOUNCEMENTS_FOUND": "No announcements found",
+    "SEARCH_PLACEHOLDER": "Rechercher des annonces par titre"
   },
   "AUDIT": {
     "TITLE": "Audit Logs",
@@ -2069,7 +2079,8 @@
     "FIELD": "Field",
     "OLD_VALUE": "Old Value",
     "NEW_VALUE": "New Value",
-    "ENTITY_DETAILS": "Entity Details"
+    "ENTITY_DETAILS": "Entity Details",
+    "SEARCH_PLACEHOLDER": "Rechercher par utilisateur, action ou module"
   },
   "LOGIN_ACTIVITY": {
     "TITLE": "Login Activity",
@@ -2094,7 +2105,8 @@
     "LOGOUT": "Logout",
     "TOKEN_REFRESH": "Token Refresh",
     "PASSWORD_RESET": "Password Reset",
-    "OTP_GENERATED": "OTP Generated"
+    "OTP_GENERATED": "OTP Generated",
+    "SEARCH_PLACEHOLDER": "Rechercher par utilisateur ou adresse IP"
   },
   "UNSAVED_CHANGES": {
     "TITLE": "Modifications non enregistrées",
@@ -3274,7 +3286,8 @@
     "SERVER_MODE": "Côté serveur",
     "SERVER_MODE_HINT": "Le tri, le filtrage et la pagination s’exécutent sur la base de données pour cette requête.",
     "PREV_PAGE": "Page précédente",
-    "NEXT_PAGE": "Page suivante"
+    "NEXT_PAGE": "Page suivante",
+    "CONNECTIONS_SEARCH_PLACEHOLDER": "Rechercher des connexions par nom"
   },
   "DB_ACCESS": {
     "TITLE": "Gestion des accès à la base de données",

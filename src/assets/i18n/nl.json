@@ -339,7 +339,8 @@
     "CANNOT_UNLOCK_DEFAULT": "De standaard-systeembeheerder kan hier niet worden ontgrendeld",
     "CANNOT_UNLOCK_SELF": "Je kunt je eigen account hier niet ontgrendelen",
     "DEFAULT_BADGE": "Standaard",
-    "YOU_BADGE": "Jij"
+    "YOU_BADGE": "Jij",
+    "SEARCH_PLACEHOLDER": "Zoek beheerders op gebruikersnaam, naam of e-mail"
   },
   "ORG": {
     "TITLE": "Organisaties",
@@ -490,7 +491,8 @@
     "DB_SCHEMA_NOTE": "DBExec maakt dit schema aan in je database voor zijn platformtabellen. Bestaat het schema al, dan moet het leeg zijn.",
     "DB_SCHEMA_LOCKED": "Het schema wordt bij aanmaken ingesteld en kan niet worden gewijzigd.",
     "SCHEMA_NOT_EMPTY": "Het opgegeven schema bevat al objecten. Kies een leeg schema of een nieuwe naam.",
-    "NOT_TESTED_HINT": "Test de verbinding voordat u opslaat"
+    "NOT_TESTED_HINT": "Test de verbinding voordat u opslaat",
+    "SEARCH_PLACEHOLDER": "Zoek organisaties op naam"
   },
   "ROLE": {
     "TITLE": "Rollen",
@@ -524,7 +526,8 @@
     "STATUS_ACTIVE": "Actief",
     "STATUS_INACTIVE": "Inactief",
     "NAME_IMMUTABLE": "De rolnaam kan na het aanmaken niet meer worden gewijzigd.",
-    "LEVEL_TOOLTIP_PREFIX": ""
+    "LEVEL_TOOLTIP_PREFIX": "",
+    "SEARCH_PLACEHOLDER": "Zoek rollen op naam of beschrijving"
   },
   "GROUP": {
     "TITLE": "Groepen",
@@ -552,7 +555,8 @@
     "LOCKED_SELF": "Je kunt jezelf niet uit deze groep verwijderen tijdens het bewerken.",
     "LOCKED_SELF_PRIMARY": "Je bent de primaire beheerder en kunt niet uit deze groep worden verwijderd.",
     "PRIMARY_ADMIN": "Primaire beheerder",
-    "YOU": "Jij"
+    "YOU": "Jij",
+    "SEARCH_PLACEHOLDER": "Zoek groepen op naam of beschrijving"
   },
   "USER": {
     "TITLE": "Gebruikers",
@@ -633,7 +637,8 @@
     "HEALTH_FAILED": "Laatste test mislukt",
     "HEALTH_TESTING": "Testen…",
     "HEALTH_NEVER_TESTED": "Nooit getest",
-    "TESTED": "getest"
+    "TESTED": "getest",
+    "SEARCH_PLACEHOLDER": "Zoek databronnen op naam"
   },
   "DATASET": {
     "TITLE": "Datasets",
@@ -812,7 +817,8 @@
     "EXPLAIN": "Plan",
     "EXPLAIN_QUERY": "Querytoolplan tonen",
     "EXPLAIN_PLAN_TITLE": "Queryplan",
-    "EXPLAIN_RUNNING": "Plan ophalen…"
+    "EXPLAIN_RUNNING": "Plan ophalen…",
+    "SEARCH_PLACEHOLDER": "Zoek datasets op naam of beschrijving"
   },
   "ANALYSES": {
     "TITLE": "Analyses",
@@ -1303,7 +1309,8 @@
     "A11Y_DATA_PANELS": "Gegevenspanelen",
     "A11Y_BUILD_PANELS": "Bouwpanelen",
     "ADD_COLUMN": "Kolom toevoegen",
-    "ASSIGN_AXES_HINT": "Wijs assen toe om dit diagram weer te geven"
+    "ASSIGN_AXES_HINT": "Wijs assen toe om dit diagram weer te geven",
+    "SEARCH_PLACEHOLDER": "Zoek analyses op naam of beschrijving"
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",
@@ -1347,7 +1354,8 @@
     "PUBLISH_SUCCESS": "Dashboard gepubliceerd",
     "PUBLISH_FAILED": "Kan dashboard niet publiceren",
     "PUBLISH_NO_VISUALS_HINT": "Voeg minstens één visualisatie toe voordat u publiceert.",
-    "PUBLISH_UNSAVED_HINT": "Sla eerst de analyse op en publiceer dan."
+    "PUBLISH_UNSAVED_HINT": "Sla eerst de analyse op en publiceer dan.",
+    "SEARCH_PLACEHOLDER": "Zoek dashboards op naam of beschrijving"
   },
   "TOAST": {
     "SUCCESS": "Succes",
@@ -1960,7 +1968,8 @@
     "LOADING_ASSIGNMENTS": "Loading assignments...",
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
-    "ORGANISATION_REQUIRED": "Organisation is required"
+    "ORGANISATION_REQUIRED": "Organisation is required",
+    "SEARCH_PLACEHOLDER": "Zoek regels op naam"
   },
   "THEME": {
     "PAGE_TITLE": "Thema",
@@ -2045,7 +2054,8 @@
     "ORGANISATION_REQUIRED": "Organisation is required",
     "BACKGROUND_COLOR": "Background Color",
     "TEXT_COLOR": "Text Color",
-    "NO_ANNOUNCEMENTS_FOUND": "No announcements found"
+    "NO_ANNOUNCEMENTS_FOUND": "No announcements found",
+    "SEARCH_PLACEHOLDER": "Zoek aankondigingen op titel"
   },
   "AUDIT": {
     "TITLE": "Audit Logs",
@@ -2069,7 +2079,8 @@
     "FIELD": "Field",
     "OLD_VALUE": "Old Value",
     "NEW_VALUE": "New Value",
-    "ENTITY_DETAILS": "Entity Details"
+    "ENTITY_DETAILS": "Entity Details",
+    "SEARCH_PLACEHOLDER": "Zoek op gebruiker, actie of module"
   },
   "LOGIN_ACTIVITY": {
     "TITLE": "Login Activity",
@@ -2094,7 +2105,8 @@
     "LOGOUT": "Logout",
     "TOKEN_REFRESH": "Token Refresh",
     "PASSWORD_RESET": "Password Reset",
-    "OTP_GENERATED": "OTP Generated"
+    "OTP_GENERATED": "OTP Generated",
+    "SEARCH_PLACEHOLDER": "Zoek op gebruiker of IP-adres"
   },
   "UNSAVED_CHANGES": {
     "TITLE": "Niet-opgeslagen wijzigingen",
@@ -3274,7 +3286,8 @@
     "SERVER_MODE": "Serverzijde",
     "SERVER_MODE_HINT": "Sorteren, filteren en pagineren gebeuren voor deze query op de database.",
     "PREV_PAGE": "Vorige pagina",
-    "NEXT_PAGE": "Volgende pagina"
+    "NEXT_PAGE": "Volgende pagina",
+    "CONNECTIONS_SEARCH_PLACEHOLDER": "Zoek verbindingen op naam"
   },
   "DB_ACCESS": {
     "TITLE": "Databasetoegangsbeheer",

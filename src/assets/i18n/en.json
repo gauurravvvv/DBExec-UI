@@ -339,7 +339,8 @@
     "CANNOT_UNLOCK_DEFAULT": "The default system admin cannot be unlocked from here",
     "CANNOT_UNLOCK_SELF": "You cannot unlock your own account from here",
     "DEFAULT_BADGE": "Default",
-    "YOU_BADGE": "You"
+    "YOU_BADGE": "You",
+    "SEARCH_PLACEHOLDER": "Search admins by username, name or email"
   },
   "ORG": {
     "TITLE": "Organisations",
@@ -494,7 +495,8 @@
     "EDIT_DB_WARNING_BODY_1": "Changing these credentials affects every user of this organisation. Authentication, dashboards, and queries will be re-routed to the new connection on save.",
     "EDIT_DB_WARNING_BODY_2": "If you change the schema, the platform's tables will be created in the new schema. Tables in the previous schema remain in your database untouched but will no longer be used by DBExec.",
     "EDIT_DB_WARNING_BODY_3": "Connection details (host, port, database, schema, or username) cannot be changed without also providing the current or new password.",
-    "NOT_TESTED_HINT": "Test the connection before saving"
+    "NOT_TESTED_HINT": "Test the connection before saving",
+    "SEARCH_PLACEHOLDER": "Search organisations by name"
   },
   "ROLE": {
     "TITLE": "Roles",
@@ -528,7 +530,8 @@
     "STATUS_ACTIVE": "Active",
     "STATUS_INACTIVE": "Inactive",
     "NAME_IMMUTABLE": "Role name cannot be changed after creation.",
-    "LEVEL_TOOLTIP_PREFIX": ""
+    "LEVEL_TOOLTIP_PREFIX": "",
+    "SEARCH_PLACEHOLDER": "Search roles by name or description"
   },
   "PERMISSIONS": {
     "TITLE": "Permissions"
@@ -562,7 +565,8 @@
     "LOCKED_SELF": "You cannot remove yourself from this group while editing.",
     "LOCKED_SELF_PRIMARY": "You are the primary admin and cannot be removed from this group.",
     "PRIMARY_ADMIN": "Primary admin",
-    "YOU": "You"
+    "YOU": "You",
+    "SEARCH_PLACEHOLDER": "Search groups by name or description"
   },
   "USER": {
     "TITLE": "Users",
@@ -685,7 +689,8 @@
     "HEALTH_FAILED": "Last test failed",
     "HEALTH_TESTING": "Testing…",
     "HEALTH_NEVER_TESTED": "Never tested",
-    "TESTED": "tested"
+    "TESTED": "tested",
+    "SEARCH_PLACEHOLDER": "Search datasources by name"
   },
   "DATASET": {
     "TITLE": "Datasets",
@@ -864,7 +869,8 @@
     "EXPLAIN": "Explain",
     "EXPLAIN_QUERY": "Show query plan",
     "EXPLAIN_PLAN_TITLE": "Query plan",
-    "EXPLAIN_RUNNING": "Asking the engine for the plan…"
+    "EXPLAIN_RUNNING": "Asking the engine for the plan…",
+    "SEARCH_PLACEHOLDER": "Search datasets by name or description"
   },
   "ANALYSES": {
     "TITLE": "Analyses",
@@ -1354,7 +1360,8 @@
     "TABLE_NO_MATCHING_ROWS": "No matching rows",
     "A11Y_DATA_PANELS": "Data panels",
     "A11Y_BUILD_PANELS": "Build panels",
-    "ADD_COLUMN": "Add Column"
+    "ADD_COLUMN": "Add Column",
+    "SEARCH_PLACEHOLDER": "Search analyses by name or description"
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",
@@ -1398,7 +1405,8 @@
     "PUBLISH_SUCCESS": "Dashboard published",
     "PUBLISH_FAILED": "Could not publish dashboard",
     "PUBLISH_NO_VISUALS_HINT": "Add at least one visual before publishing.",
-    "PUBLISH_UNSAVED_HINT": "Save the analysis first, then publish."
+    "PUBLISH_UNSAVED_HINT": "Save the analysis first, then publish.",
+    "SEARCH_PLACEHOLDER": "Search dashboards by name or description"
   },
   "TOAST": {
     "SUCCESS": "Success",
@@ -2016,7 +2024,8 @@
     "LOADING_ASSIGNMENTS": "Loading assignments...",
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
-    "ORGANISATION_REQUIRED": "Organisation is required"
+    "ORGANISATION_REQUIRED": "Organisation is required",
+    "SEARCH_PLACEHOLDER": "Search rules by name"
   },
   "THEME": {
     "PAGE_TITLE": "Theme",
@@ -2101,7 +2110,8 @@
     "ORGANISATION_REQUIRED": "Organisation is required",
     "BACKGROUND_COLOR": "Background Color",
     "TEXT_COLOR": "Text Color",
-    "NO_ANNOUNCEMENTS_FOUND": "No announcements found"
+    "NO_ANNOUNCEMENTS_FOUND": "No announcements found",
+    "SEARCH_PLACEHOLDER": "Search announcements by title"
   },
   "AUDIT": {
     "TITLE": "Audit Logs",
@@ -2125,7 +2135,8 @@
     "FIELD": "Field",
     "OLD_VALUE": "Old Value",
     "NEW_VALUE": "New Value",
-    "ENTITY_DETAILS": "Entity Details"
+    "ENTITY_DETAILS": "Entity Details",
+    "SEARCH_PLACEHOLDER": "Search by user, action or module"
   },
   "LOGIN_ACTIVITY": {
     "TITLE": "Login Activity",
@@ -2150,7 +2161,8 @@
     "LOGOUT": "Logout",
     "TOKEN_REFRESH": "Token Refresh",
     "PASSWORD_RESET": "Password Reset",
-    "OTP_GENERATED": "OTP Generated"
+    "OTP_GENERATED": "OTP Generated",
+    "SEARCH_PLACEHOLDER": "Search by user or IP address"
   },
   "UNSAVED_CHANGES": {
     "TITLE": "Unsaved Changes",
@@ -3597,6 +3609,7 @@
     "SERVER_MODE": "Server-side",
     "SERVER_MODE_HINT": "Sorting, filtering and paging run on the database for this query.",
     "PREV_PAGE": "Previous page",
-    "NEXT_PAGE": "Next page"
+    "NEXT_PAGE": "Next page",
+    "CONNECTIONS_SEARCH_PLACEHOLDER": "Search connections by name"
   }
 }
