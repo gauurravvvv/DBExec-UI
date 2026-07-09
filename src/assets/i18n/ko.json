@@ -580,7 +580,8 @@
     "CANNOT_DELETE_DEFAULT": "기본 사용자는 삭제할 수 없습니다",
     "CANNOT_DELETE_SELF": "본인을 삭제할 수 없습니다",
     "CANNOT_UNLOCK_DEFAULT": "기본 사용자는 이 화면에서 잠금 해제할 수 없습니다",
-    "CANNOT_UNLOCK_SELF": "본인 계정은 이 화면에서 잠금 해제할 수 없습니다"
+    "CANNOT_UNLOCK_SELF": "본인 계정은 이 화면에서 잠금 해제할 수 없습니다",
+    "SEARCH_PLACEHOLDER": "사용자 이름, 이름 또는 이메일로 검색"
   },
   "DATASOURCE": {
     "TITLE": "데이터소스",

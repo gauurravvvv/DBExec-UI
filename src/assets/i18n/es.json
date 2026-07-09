@@ -580,7 +580,8 @@
     "CANNOT_DELETE_DEFAULT": "El usuario predeterminado no se puede eliminar",
     "CANNOT_DELETE_SELF": "No puedes eliminarte a ti mismo",
     "CANNOT_UNLOCK_DEFAULT": "El usuario predeterminado no se puede desbloquear desde aquí",
-    "CANNOT_UNLOCK_SELF": "No puedes desbloquear tu propia cuenta desde aquí"
+    "CANNOT_UNLOCK_SELF": "No puedes desbloquear tu propia cuenta desde aquí",
+    "SEARCH_PLACEHOLDER": "Buscar por usuario, nombre o correo"
   },
   "DATASOURCE": {
     "TITLE": "Fuentes de datos",

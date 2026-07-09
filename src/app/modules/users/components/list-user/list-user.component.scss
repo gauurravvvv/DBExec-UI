@@ -865,3 +865,30 @@ td.empty-message-cell {
     color: var(--text-muted, #6b7280);
   }
 }
+
+/* ── custom-table toolbar-left slot: the Group filter dropdown ──────────── */
+.users-toolbar-start {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  min-width: 0;
+
+  // Give the server-mode Group dropdown a sensible fixed width so it sits
+  // neatly at the start of the toolbar row (opposite search + icons).
+  ::ng-deep app-custom-dropdown { display: block; width: 15rem; max-width: 40vw; }
+}
+
+/* ── projected empty body (centred; not a row) ─────────────────────────── */
+.ct-empty-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-9) var(--space-6);
+  color: var(--text-muted);
+  text-align: center;
+
+  i { font-size: 1.6rem; opacity: 0.6; }
+  span { font-size: var(--fs-body); }
+}

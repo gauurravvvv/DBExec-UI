@@ -580,7 +580,8 @@
     "CANNOT_DELETE_DEFAULT": "O usuário padrão não pode ser excluído",
     "CANNOT_DELETE_SELF": "Você não pode excluir a si mesmo",
     "CANNOT_UNLOCK_DEFAULT": "O usuário padrão não pode ser desbloqueado por aqui",
-    "CANNOT_UNLOCK_SELF": "Você não pode desbloquear sua própria conta por aqui"
+    "CANNOT_UNLOCK_SELF": "Você não pode desbloquear sua própria conta por aqui",
+    "SEARCH_PLACEHOLDER": "Pesquisar por usuário, nome ou e-mail"
   },
   "DATASOURCE": {
     "TITLE": "Fontes de dados",

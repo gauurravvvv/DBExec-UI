@@ -580,7 +580,8 @@
     "CANNOT_DELETE_DEFAULT": "デフォルトユーザーは削除できません",
     "CANNOT_DELETE_SELF": "自分自身を削除することはできません",
     "CANNOT_UNLOCK_DEFAULT": "デフォルトユーザーはこの画面からロック解除できません",
-    "CANNOT_UNLOCK_SELF": "自分のアカウントはこの画面からロック解除できません"
+    "CANNOT_UNLOCK_SELF": "自分のアカウントはこの画面からロック解除できません",
+    "SEARCH_PLACEHOLDER": "ユーザー名・氏名・メールで検索"
   },
   "DATASOURCE": {
     "TITLE": "データソース",

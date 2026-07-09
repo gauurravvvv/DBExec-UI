@@ -580,7 +580,8 @@
     "CANNOT_DELETE_DEFAULT": "默认用户无法删除",
     "CANNOT_DELETE_SELF": "您不能删除自己",
     "CANNOT_UNLOCK_DEFAULT": "默认用户无法从此处解锁",
-    "CANNOT_UNLOCK_SELF": "您不能从此处解锁自己的账户"
+    "CANNOT_UNLOCK_SELF": "您不能从此处解锁自己的账户",
+    "SEARCH_PLACEHOLDER": "按用户名、姓名或邮箱搜索"
   },
   "DATASOURCE": {
     "TITLE": "数据源",

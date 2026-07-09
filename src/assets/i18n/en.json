@@ -624,7 +624,8 @@
     "CANNOT_DELETE_DEFAULT": "The default user cannot be deleted",
     "CANNOT_DELETE_SELF": "You cannot delete yourself",
     "CANNOT_UNLOCK_DEFAULT": "The default user cannot be unlocked from here",
-    "CANNOT_UNLOCK_SELF": "You cannot unlock your own account from here"
+    "CANNOT_UNLOCK_SELF": "You cannot unlock your own account from here",
+    "SEARCH_PLACEHOLDER": "Search by username, name or email"
   },
   "DATASOURCE": {
     "TITLE": "Datasources",

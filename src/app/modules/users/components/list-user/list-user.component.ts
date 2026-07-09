@@ -9,7 +9,6 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import type { ColDef } from 'ag-grid-community';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { USER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -18,21 +17,23 @@ import {
   UsServerListAdapter,
   UsListLoadParams,
 } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
-import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
+import type {
+  CustomTableColumn,
+  CustomTableConfig,
+} from 'src/app/shared/components/custom-table/custom-table.types';
 import { UserService } from '../../services/user.service';
 
 /**
- * User listing — renders through `<us-data-grid>` with a
- * `UsServerListAdapter` driving the BE `/users` list call. The page
- * header / content card / delete-confirm popup retain the existing
- * styling and behaviour; only the `<p-table>` was swapped out for
- * the AG Grid wrapper.
+ * User listing — renders through the shared `<app-custom-table>` (the app's
+ * unified list table) driven by a `UsServerListAdapter` on the BE `/users`
+ * list call. Infinite scroll (no page controls), a single global search plus
+ * on-demand per-column filters (shared inputs), and per-row actions. No bulk
+ * selection.
  *
- * Users is org-wide (no datasource gate) but carries an extra
- * Group filter (server-mode dropdown) in the card toolbar — same
- * shape as the role-filter in the groups module, just inverted.
- * Selecting a group rebuilds the adapter so the closure captures
- * the latest `groupId`.
+ * Users is org-wide (no datasource gate) but carries an extra Group filter
+ * (server-mode dropdown) projected into the table's toolbar-left slot, so it
+ * sits inline with the search + action icons. Selecting a group rebuilds the
+ * adapter so the closure captures the latest `groupId`.
  */
 @Component({
   selector: 'app-list-user',
@@ -46,10 +47,8 @@ export class ListUserComponent implements OnInit, OnDestroy {
 
   /* ── page state ──────────────────────────────────────── */
 
-  selectedUsers: any[] = [];
   showDeleteConfirm = false;
   userToDelete: string | null = null;
-  bulkDelete = false;
   deleteJustification = '';
   today = new Date();
   statusOptions: { label: string; value: number }[] = [];
@@ -68,33 +67,25 @@ export class ListUserComponent implements OnInit, OnDestroy {
   // its own state, so other rows stay clickable.
   isDeleting = (id: string): boolean => this.userService.isDeleting(id);
   isUnlocking = (id: string): boolean => this.userService.isUnlocking(id);
-  get isBulkDeleting(): boolean {
-    return this.selectedUsers.some(u => this.userService.isDeleting(u.id));
-  }
 
-  /* ── grid wiring ───────────────────────────────────────── */
+  /* ── custom-table wiring (unified simple table; server-driven) ──────── */
 
-  /** AG Grid column definitions — widths preserved from the old
-   *  `<p-table>` so the visual layout is unchanged. cellRenderer
-   *  templates live in the HTML as `<ng-template usGridCell>`. */
-  cols: ColDef[] = [];
+  /** Unified-table columns. Cell DOM is supplied by `<ng-template usGridCell>`
+   *  in the HTML; `filter` flags enable the on-demand per-column filter row. */
+  cols: CustomTableColumn[] = [];
 
-  gridConfig: UsDataGridConfig = {
-    enableRowSelection: true,
-    rowSelectionMode: 'multiple',
-    freezeFirstColumn: true,
-    enableColumnChooser: true,
-    enableAddFilter: false, // we use the BE-driven floating filters
-    enableAutoFit: true,
-    enableDensityToggle: true,
-    enableCsvExport: true,
-    enableXlsxExport: true,
-    enableRefresh: true,
-    enableSavedViews: true,
+  tableConfig: CustomTableConfig = {
+    mode: 'scroll', // infinite scroll — no page controls
+    pageSize: 50, // rows fetched per scroll page
+    globalSearch: true,
+    globalSearchKey: 'search', // BE users list matches a `search` filter key
+    globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
+    showColumnFilters: true,
+    enableExport: true,
+    enableDensity: true,
+    density: 'comfortable',
     gridKey: 'users-list',
-    pageSizeOptions: [10, 25, 50, 100],
-    pageSize: 10,
-    height: 'calc(100vh - 280px)',
+    height: 'flex',
     rowIdField: 'id',
   };
 
@@ -118,6 +109,11 @@ export class ListUserComponent implements OnInit, OnDestroy {
     ];
 
     this.cols = this.buildColumns();
+    // Field-specific search placeholder so the user knows what's matched.
+    this.tableConfig = {
+      ...this.tableConfig,
+      globalSearchPlaceholder: this.translate.instant('USER.SEARCH_PLACEHOLDER'),
+    };
     this.loadGroupOptions();
     this.bindAdapter();
   }
@@ -130,104 +126,20 @@ export class ListUserComponent implements OnInit, OnDestroy {
     this.adapter?.destroy();
   }
 
-  get selectedCount(): number {
-    return this.selectedUsers?.length || 0;
-  }
-
-  get isFilterActive(): boolean {
-    return (
-      (!!this.adapter && Object.keys(this.adapter.filterModel()).length > 0) ||
-      !!this.selectedGroup
-    );
-  }
-
   /* ── column definitions ──────────────────────────────── */
 
-  private buildColumns(): ColDef[] {
+  private buildColumns(): CustomTableColumn[] {
+    const t = (k: string) => this.translate.instant(k);
     return [
-      {
-        colId: 'username',
-        field: 'username',
-        headerName: this.translate.instant('COMMON.USERNAME'),
-        width: 192,
-        minWidth: 192,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        pinned: 'left',
-      },
-      {
-        colId: 'firstName',
-        field: 'firstName',
-        headerName: this.translate.instant('COMMON.FIRST_NAME'),
-        width: 160,
-        minWidth: 160,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'lastName',
-        field: 'lastName',
-        headerName: this.translate.instant('COMMON.LAST_NAME'),
-        width: 160,
-        minWidth: 160,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'email',
-        field: 'email',
-        headerName: this.translate.instant('COMMON.EMAIL'),
-        minWidth: 288,
-        flex: 1,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'groups',
-        field: 'groupNames',
-        headerName: this.translate.instant('USER.GROUPS'),
-        width: 192,
-        minWidth: 192,
-        sortable: false,
-        filter: false,
-      },
-      {
-        colId: 'status',
-        field: 'status',
-        headerName: this.translate.instant('COMMON.STATUS'),
-        width: 144,
-        minWidth: 144,
-        filter: 'agNumberColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'lastLogin',
-        field: 'lastLogin',
-        headerName: this.translate.instant('COMMON.LAST_LOGIN'),
-        width: 192,
-        minWidth: 192,
-        filter: 'agDateColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'createdOn',
-        field: 'createdOn',
-        headerName: this.translate.instant('COMMON.CREATED_ON'),
-        width: 192,
-        minWidth: 192,
-        filter: 'agDateColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'actions',
-        headerName: this.translate.instant('COMMON.ACTIONS'),
-        width: 144,
-        minWidth: 144,
-        sortable: false,
-        filter: false,
-        resizable: false,
-        pinned: 'right',
-      },
+      { colId: 'username', field: 'username', header: t('COMMON.USERNAME'), width: '192px', frozen: true, filter: 'text' },
+      { colId: 'firstName', field: 'firstName', header: t('COMMON.FIRST_NAME'), width: '160px', filter: 'text' },
+      { colId: 'lastName', field: 'lastName', header: t('COMMON.LAST_NAME'), width: '160px', filter: 'text' },
+      { colId: 'email', field: 'email', header: t('COMMON.EMAIL'), width: '288px', filter: 'text' },
+      { colId: 'groups', field: 'groupNames', header: t('USER.GROUPS'), width: '192px', sortable: false },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px', sortable: false },
+      { colId: 'lastLogin', field: 'lastLogin', header: t('COMMON.LAST_LOGIN'), width: '192px', sortable: false },
+      { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px', sortable: false },
+      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
     ];
   }
 
@@ -282,7 +194,6 @@ export class ListUserComponent implements OnInit, OnDestroy {
 
   onGroupChange(groupId: string | null) {
     this.selectedGroup = groupId;
-    this.selectedUsers = [];
     // The adapter closes over selectedGroup — rebuild so the next
     // load picks up the new value.
     this.bindAdapter();
@@ -309,83 +220,21 @@ export class ListUserComponent implements OnInit, OnDestroy {
         rows: res?.data?.users ?? [],
         total: res?.data?.count ?? 0,
       }),
-      // Floating-filter cell value → BE filter slice. The grid's
-      // floating filters emit AG-Grid-shaped cells; this map
-      // flattens them into the BE-expected shape — text contains
-      // for username/firstName/lastName/email, plain value for
-      // status, and date ranges for lastLogin / createdOn.
-      filterBuilders: {
-        username: cell => ({ username: (cell as any)?.filter ?? cell }),
-        firstName: cell => ({ firstName: (cell as any)?.filter ?? cell }),
-        lastName: cell => ({ lastName: (cell as any)?.filter ?? cell }),
-        email: cell => ({ email: (cell as any)?.filter ?? cell }),
-        status: cell => {
-          const v = (cell as any)?.filter ?? cell;
-          return v === '' || v === null || v === undefined ? {} : { status: v };
-        },
-        lastLogin: cell => {
-          // AG Grid date filter shapes: {dateFrom, dateTo, type, filterType}.
-          const c = cell as any;
-          const out: Record<string, string> = {};
-          if (c?.dateFrom)
-            out['lastLoginDateFrom'] = new Date(c.dateFrom).toISOString();
-          if (c?.dateTo) {
-            const to = new Date(c.dateTo);
-            to.setHours(23, 59, 59, 999);
-            out['lastLoginDateTo'] = to.toISOString();
-          }
-          return out;
-        },
-        createdOn: cell => {
-          const c = cell as any;
-          const out: Record<string, string> = {};
-          if (c?.dateFrom)
-            out['createdDateFrom'] = new Date(c.dateFrom).toISOString();
-          if (c?.dateTo) {
-            const to = new Date(c.dateTo);
-            to.setHours(23, 59, 59, 999);
-            out['createdDateTo'] = to.toISOString();
-          }
-          return out;
-        },
-      },
-      initial: { page: 1, limit: 10 },
+      // custom-table sends PLAIN filter values (global `search` + per-column
+      // username/firstName/lastName/email), so the adapter's identity mapping
+      // passes them straight through — no AG-Grid cell unwrapping needed.
+      initial: { page: 1, limit: 50 },
     });
     this.cdr.markForCheck();
   }
 
   /* ── handlers re-pointed at the adapter ──────────────── */
 
-  onSelectionChange(rows: any[]) {
-    // Defensive — even though isRowSelectable blocks default users
-    // and self in the grid, ignore them here in case anything slips
-    // through. Same posture as roles / groups.
-    this.selectedUsers = (rows ?? []).filter(
-      r =>
-        r?.isDefault !== 1 &&
-        r?.canDelete !== false &&
-        r?.id !== this.loggedInUserId,
-    );
-    this.cdr.markForCheck();
-  }
-
-  isRowSelectable = (event: any) => !!event?.data?.canDelete;
-
-  clearFilters() {
-    if (this.adapter) {
-      this.adapter.setFilter({});
-      this.adapter.setSort([]);
-    }
-    this.selectedGroup = null;
-    this.selectedUsers = [];
-    this.bindAdapter();
-  }
-
   refreshList() {
     this.adapter?.reload();
   }
 
-  /* ── nav + bulk-delete ───────────────────────────────── */
+  /* ── nav + per-row delete ────────────────────────────── */
 
   onAddNewAdmin() {
     this.router.navigate([USER.ADD]);
@@ -409,21 +258,12 @@ export class ListUserComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.userToDelete = id;
-    this.bulkDelete = false;
-    this.showDeleteConfirm = true;
-  }
-
-  confirmBulkDelete() {
-    if (this.selectedCount === 0) return;
-    this.userToDelete = null;
-    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.userToDelete = null;
-    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
@@ -431,38 +271,11 @@ export class ListUserComponent implements OnInit, OnDestroy {
     const reason = this.deleteJustification.trim();
     if (!reason) return;
 
-    if (this.bulkDelete) {
-      const ids = this.selectedUsers.map(u => u.id);
-      if (ids.length === 0) {
-        this.cancelDelete();
-        return;
-      }
-      this.userService
-        .bulkDelete(ids, reason)
-        .then((res: any) => {
-          if (this.globalService.handleSuccessService(res)) {
-            this.selectedUsers = [];
-            this.refreshList();
-          }
-        })
-        .catch(() => {
-          /* global interceptor shows error toast */
-        })
-        .finally(() => {
-          this.closeDeletePopup();
-          this.cdr.markForCheck();
-        });
-      return;
-    }
-
     if (this.userToDelete) {
       this.userService
         .delete(this.userToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
-            this.selectedUsers = this.selectedUsers.filter(
-              u => u.id !== this.userToDelete,
-            );
             this.refreshList();
           }
         })
@@ -479,7 +292,6 @@ export class ListUserComponent implements OnInit, OnDestroy {
   private closeDeletePopup() {
     this.showDeleteConfirm = false;
     this.userToDelete = null;
-    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 }
