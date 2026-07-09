@@ -3253,7 +3253,14 @@
     "FIND_PREV": "Vorige overeenkomst",
     "CLOSE": "Sluiten",
     "REPLACE_ALL": "Alles vervangen",
-    "NO_MATCHES": "Geen resultaten"
+    "NO_MATCHES": "Geen resultaten",
+    "MINIMAP_SHOW": "Minimap tonen",
+    "MINIMAP_HIDE": "Minimap verbergen",
+    "DOWNLOAD_SQL": ".sql downloaden",
+    "CASE_UPPER": "Selectie in hoofdletters",
+    "CASE_LOWER": "Selectie in kleine letters",
+    "COPY_ALL": "Alles kopiëren",
+    "CLEAR_EDITOR": "Editor wissen"
   },
   "DB_ACCESS": {
     "TITLE": "Databasetoegangsbeheer",

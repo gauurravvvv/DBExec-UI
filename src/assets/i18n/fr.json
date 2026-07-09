@@ -3253,7 +3253,14 @@
     "FIND_PREV": "Occurrence précédente",
     "CLOSE": "Fermer",
     "REPLACE_ALL": "Tout remplacer",
-    "NO_MATCHES": "Aucun résultat"
+    "NO_MATCHES": "Aucun résultat",
+    "MINIMAP_SHOW": "Afficher la minimap",
+    "MINIMAP_HIDE": "Masquer la minimap",
+    "DOWNLOAD_SQL": "Télécharger .sql",
+    "CASE_UPPER": "Sélection en majuscules",
+    "CASE_LOWER": "Sélection en minuscules",
+    "COPY_ALL": "Tout copier",
+    "CLEAR_EDITOR": "Vider l'éditeur"
   },
   "DB_ACCESS": {
     "TITLE": "Gestion des accès à la base de données",

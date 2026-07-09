@@ -151,6 +151,11 @@ export class LauncherComponent implements OnInit {
     this.router.navigate([QUERY_RUNNER.connectionNew()]);
   }
 
+  /** Back affordance in the form header — return to the app home. */
+  goBack(): void {
+    this.router.navigate(['/app/home']);
+  }
+
   /** Verify the chosen connection, then open the executor tab. */
   open(): void {
     if (!this.canOpen || !this.selectedConnectionId) return;

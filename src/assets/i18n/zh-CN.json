@@ -3253,7 +3253,14 @@
     "FIND_PREV": "上一个匹配",
     "CLOSE": "关闭",
     "REPLACE_ALL": "全部替换",
-    "NO_MATCHES": "无结果"
+    "NO_MATCHES": "无结果",
+    "MINIMAP_SHOW": "显示缩略图",
+    "MINIMAP_HIDE": "隐藏缩略图",
+    "DOWNLOAD_SQL": "下载 .sql",
+    "CASE_UPPER": "所选内容转大写",
+    "CASE_LOWER": "所选内容转小写",
+    "COPY_ALL": "全部复制",
+    "CLEAR_EDITOR": "清空编辑器"
   },
   "DB_ACCESS": {
     "TITLE": "数据库访问管理",

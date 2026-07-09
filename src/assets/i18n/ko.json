@@ -3253,7 +3253,14 @@
     "FIND_PREV": "이전 일치",
     "CLOSE": "닫기",
     "REPLACE_ALL": "모두 바꾸기",
-    "NO_MATCHES": "결과 없음"
+    "NO_MATCHES": "결과 없음",
+    "MINIMAP_SHOW": "미니맵 표시",
+    "MINIMAP_HIDE": "미니맵 숨기기",
+    "DOWNLOAD_SQL": ".sql 다운로드",
+    "CASE_UPPER": "선택 항목 대문자로",
+    "CASE_LOWER": "선택 항목 소문자로",
+    "COPY_ALL": "모두 복사",
+    "CLEAR_EDITOR": "편집기 지우기"
   },
   "DB_ACCESS": {
     "TITLE": "데이터베이스 접근 관리",

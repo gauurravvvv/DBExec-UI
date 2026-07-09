@@ -266,10 +266,18 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   detailTable = ''; // for triggers (owning table)
 
   // AG Grid
-  // Same AG Grid theme the canonical us-data-grid uses, so the executor's
-  // result grid matches every other grid in the app (see
-  // us-data-grid.component.ts).
-  gridTheme = themeQuartz.withPart(colorSchemeLightWarm);
+  // Same AG Grid theme the canonical us-data-grid uses, plus explicit compact
+  // sizing so the executor result grid matches the app's data density. The
+  // raw ag-grid-angular here doesn't inherit us-data-grid's SCSS
+  // (--ag-font-size: 13px), so Quartz defaulted to ~14-16px text in tall
+  // ~36px rows and read "large". Pin the density via theme params.
+  gridTheme = themeQuartz.withPart(colorSchemeLightWarm).withParams({
+    fontSize: 13, // matches --fs-control (13px), the app's grid text size
+    headerFontSize: 13,
+    rowHeight: 30,
+    headerHeight: 34,
+    cellHorizontalPadding: 10,
+  });
   private gridApi: GridApi | null = null;
   quickFilter = '';
   showFilters = false;
@@ -760,6 +768,8 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     } catch {
       /* storage disabled */
     }
+    // Minimap now lives in the ⋮ menu — refresh its label/check state.
+    this.buildOverflowMenu();
   }
 
   toggleExplain(): void {
@@ -1005,17 +1015,39 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     if (file) this.readSqlFile(file);
   }
 
-  /** PrimeNG overflow menu (⋯) — the less-used actions. */
+  /**
+   * PrimeNG overflow menu (⋯) — the less-used actions PLUS the power-user
+   * toggles moved off the toolbar to declutter it (Command palette, Keyboard
+   * shortcuts, Minimap). Rebuilt when the minimap toggles so its label stays
+   * current. Labels are localised (QUERY_RUNNER.*).
+   */
   private buildOverflowMenu(): void {
+    const t = (k: string) => this.translate.instant(k);
     this.overflowItems = [
-      { label: 'Download .sql', icon: 'pi pi-download', command: () => this.downloadSql() },
+      {
+        label: t('QUERY_RUNNER.PALETTE_HINT'),
+        icon: 'pi pi-bolt',
+        command: () => this.openPalette(),
+      },
+      {
+        label: t('QUERY_RUNNER.SHORTCUTS_HINT'),
+        icon: 'pi pi-question-circle',
+        command: () => this.openShortcuts(),
+      },
+      {
+        // Live label reflects current state; menu is rebuilt on toggle.
+        label: this.minimapOn ? t('QUERY_RUNNER.MINIMAP_HIDE') : t('QUERY_RUNNER.MINIMAP_SHOW'),
+        icon: this.minimapOn ? 'pi pi-check' : 'pi pi-map',
+        command: () => this.toggleMinimap(),
+      },
       { separator: true },
-      { label: 'Go to line…', icon: 'pi pi-directions', command: () => this.openGoto() },
-      { label: 'Upper-case selection', icon: 'pi pi-arrow-up', command: () => this.transformCase('upper') },
-      { label: 'Lower-case selection', icon: 'pi pi-arrow-down', command: () => this.transformCase('lower') },
+      { label: t('QUERY_RUNNER.DOWNLOAD_SQL'), icon: 'pi pi-download', command: () => this.downloadSql() },
+      { label: t('QUERY_RUNNER.GOTO_LINE'), icon: 'pi pi-directions', command: () => this.openGoto() },
+      { label: t('QUERY_RUNNER.CASE_UPPER'), icon: 'pi pi-arrow-up', command: () => this.transformCase('upper') },
+      { label: t('QUERY_RUNNER.CASE_LOWER'), icon: 'pi pi-arrow-down', command: () => this.transformCase('lower') },
       { separator: true },
-      { label: 'Copy all', icon: 'pi pi-copy', command: () => this.copyAll() },
-      { label: 'Clear editor', icon: 'pi pi-trash', command: () => this.clearEditor() },
+      { label: t('QUERY_RUNNER.COPY_ALL'), icon: 'pi pi-copy', command: () => this.copyAll() },
+      { label: t('QUERY_RUNNER.CLEAR_EDITOR'), icon: 'pi pi-trash', command: () => this.clearEditor() },
     ];
   }
 

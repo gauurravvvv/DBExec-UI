@@ -51,11 +51,6 @@
           [pTooltip]="'QUERY_RUNNER.EXPLAIN_HINT' | translate" tooltipPosition="bottom">
           <i class="pi pi-sitemap"></i>
         </button>
-        <button pButton class="p-button-text modern-button qx-icon-btn" (click)="toggleMinimap()"
-          [class.qx-active]="minimapOn" [disabled]="!editorReady"
-          [pTooltip]="'QUERY_RUNNER.MINIMAP_HINT' | translate" tooltipPosition="bottom">
-          <i class="pi pi-map"></i>
-        </button>
       </div>
 
       <span class="qx-sep"></span>
@@ -75,17 +70,7 @@
         <span>{{ (autoCommit ? 'QUERY_RUNNER.WRITE_ON' : 'QUERY_RUNNER.READ_ONLY') | translate }}</span>
       </button>
 
-      <button pButton class="p-button-text modern-button qx-icon-btn" (click)="openPalette()"
-        [disabled]="!editorReady"
-        [pTooltip]="'QUERY_RUNNER.PALETTE_HINT' | translate" tooltipPosition="bottom">
-        <i class="pi pi-bolt"></i>
-      </button>
-      <button pButton class="p-button-text modern-button qx-icon-btn" (click)="openShortcuts()"
-        [pTooltip]="'QUERY_RUNNER.SHORTCUTS_HINT' | translate" tooltipPosition="bottom">
-        <i class="pi pi-question-circle"></i>
-      </button>
       <button pButton class="p-button-text modern-button qx-icon-btn" (click)="overflowMenu.toggle($event)"
-        [disabled]="!editorReady"
         [pTooltip]="'QUERY_RUNNER.MORE' | translate" tooltipPosition="bottom">
         <i class="pi pi-ellipsis-v"></i>
       </button>

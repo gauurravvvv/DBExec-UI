@@ -3253,7 +3253,14 @@
     "FIND_PREV": "前の一致",
     "CLOSE": "閉じる",
     "REPLACE_ALL": "すべて置換",
-    "NO_MATCHES": "結果なし"
+    "NO_MATCHES": "結果なし",
+    "MINIMAP_SHOW": "ミニマップを表示",
+    "MINIMAP_HIDE": "ミニマップを非表示",
+    "DOWNLOAD_SQL": ".sql をダウンロード",
+    "CASE_UPPER": "選択を大文字に",
+    "CASE_LOWER": "選択を小文字に",
+    "COPY_ALL": "すべてコピー",
+    "CLEAR_EDITOR": "エディターをクリア"
   },
   "DB_ACCESS": {
     "TITLE": "データベースアクセス管理",

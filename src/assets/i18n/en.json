@@ -3575,6 +3575,13 @@
     "FIND_PREV": "Previous match",
     "CLOSE": "Close",
     "REPLACE_ALL": "Replace all",
-    "NO_MATCHES": "No results"
+    "NO_MATCHES": "No results",
+    "MINIMAP_SHOW": "Show minimap",
+    "MINIMAP_HIDE": "Hide minimap",
+    "DOWNLOAD_SQL": "Download .sql",
+    "CASE_UPPER": "Upper-case selection",
+    "CASE_LOWER": "Lower-case selection",
+    "COPY_ALL": "Copy all",
+    "CLEAR_EDITOR": "Clear editor"
   }
 }
