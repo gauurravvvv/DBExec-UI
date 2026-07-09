@@ -1,7 +1,13 @@
-/* app-custom-table — the unified, simple data table. Tokenized to the app
-   theme, matching the canonical list look (list-user): clean surface, sticky
-   shaded header, subtle 1px row dividers, hover highlight, NO zebra. Two
-   densities (comfortable 48px / compact 40px rows) per the research. */
+/* app-custom-table — the unified, simple data table. Fully tokenized to the
+   app design system so it reads as the SAME language as cards / forms / dialogs:
+   - header    → --table-header-bg (cool #f8fafc) + --table-header-text
+   - row hover → --table-row-hover (brand tint), NOT a flat grey
+   - zebra     → --table-stripe
+   - dividers  → 1px --border-color
+   - spacing   → 8-pt grid (--space-*), type/icons → --fs-* / --icon-* scales
+   Every value routes through a token; only component geometry (search width,
+   icon-button hit area, chip micro-padding) is raw. Single source of truth for
+   every list — do NOT re-introduce per-page table overrides. */
 
 :host {
   display: flex;
@@ -89,7 +95,7 @@
   cursor: pointer;
   transition: all var(--motion-base) ease;
 
-  .pi { font-size: 0.9rem; }
+  .pi { font-size: var(--icon-md); }
   &:hover { background: var(--hover-background); color: var(--primary-color); }
   &.active { background: var(--primary-color-transparent); color: var(--primary-color); }
 }
@@ -114,11 +120,11 @@
      a visible gap between the header and the filter inputs. */
   &.modern-table .p-datatable-thead > tr:first-child > th,
   .p-datatable-thead > tr:first-child > th {
-    background: var(--hover-background) !important;
-    color: var(--text-muted) !important;
+    background: var(--table-header-bg) !important;
+    color: var(--table-header-text) !important;
     font-size: var(--fs-label) !important;
     font-weight: var(--fw-semibold) !important;
-    padding: 0.5rem 0.875rem !important;
+    padding: var(--space-4) var(--space-5) !important;
     border: none;
     border-bottom: 1px solid var(--border-color);
     white-space: nowrap;
@@ -135,9 +141,13 @@
   }
   /* Sticky-header rows must stay shaded too (global sets these to
      card-background !important with higher specificity). */
-  &.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr:first-child > th,
+  &.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr:first-child > th {
+    background: var(--table-header-bg) !important;
+  }
+  /* The filter row (2nd thead) is a form surface, not a header — keep it on the
+     card background so its inputs read as inputs, not part of the shaded head. */
   &.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr:nth-child(2) > th {
-    background: var(--hover-background) !important;
+    background: var(--card-background) !important;
   }
   /* CRITICAL: the global rule pins the FILTER row (2nd thead row) at
      `top: 40px`, assuming a 40px-tall label row. Our label row is ~31px, so
@@ -153,14 +163,14 @@
   /* Sort icon — quiet, coloured only when active. */
   .p-sortable-column .p-sorticon {
     color: var(--text-subtle);
-    font-size: 0.7rem;
+    font-size: var(--icon-xs);
   }
   .p-sortable-column.p-highlight,
   .p-sortable-column.p-highlight .p-sorticon {
     color: var(--primary-color);
   }
   .p-sortable-column:focus { box-shadow: none; outline: none; }
-  .p-sortable-column:hover { background: var(--border-color); }
+  .p-sortable-column:hover { background: var(--table-row-hover); }
 
   /* Body cells — canonical density (1px divider, zebra striping, hover
      highlight). `!important` on padding/font so no residual global/page rule
@@ -172,7 +182,10 @@
     transition: background var(--motion-fast) ease;
 
     > td {
-      padding: 0.55rem 0.875rem !important;
+      // Vertical padding is a shade above --space-4 (8px) so a 13px cell row
+      // lands at the app's comfortable list density; horizontal --space-5 (12px)
+      // aligns cell text to the header labels above.
+      padding: 0.5625rem var(--space-5) !important;
       border: none;
       border-bottom: 1px solid var(--border-color);
       color: var(--text-color);
@@ -195,7 +208,7 @@
   }
   &.modern-table .p-datatable-tbody > tr:hover > td,
   .p-datatable-tbody > tr:hover > td {
-    background: var(--hover-background) !important;
+    background: var(--table-row-hover) !important;
   }
 
   /* ── Shared CELL PRIMITIVES ───────────────────────────────────────────────
@@ -263,9 +276,9 @@
         background-color var(--motion-fast) ease,
         color var(--motion-fast) ease;
 
-      i { font-size: var(--fs-body); }
+      i { font-size: var(--icon-md); }
 
-      &:hover { background: var(--card-background); color: var(--text-color); }
+      &:hover { background: var(--hover-background); color: var(--text-color); }
       &.view-btn:hover { color: var(--primary-color); }
       &.edit-btn:hover { color: var(--primary-color); }
       &.delete-btn:hover { color: var(--error-color); }
@@ -294,7 +307,7 @@
     z-index: 1;
     background: inherit;
   }
-  .p-datatable-thead > tr > th.ct-frozen { background: var(--hover-background); }
+  .p-datatable-thead > tr > th.ct-frozen { background: var(--table-header-bg); }
 
   /* Empty state — a clean centred block, NOT a table row. The empty row/cell
      must not carry the body-row divider or hover, or it reads as a blank
@@ -312,7 +325,7 @@
     text-align: center;
     padding: var(--space-9) var(--space-6);
     color: var(--text-muted);
-    i { display: block; font-size: 1.6rem; margin-bottom: var(--space-4); opacity: 0.6; }
+    i { display: block; font-size: var(--icon-lg); margin-bottom: var(--space-4); opacity: 0.6; }
   }
 
   /* Loading mask — quiet. */
@@ -352,6 +365,6 @@
 /* `.density-compact` sits on `.custom-table` inside the host; reach the
    p-table skin under it. */
 :host ::ng-deep .density-compact .ct-p-table {
-  .p-datatable-thead > tr > th { padding: 0.35rem 0.75rem; }
-  .p-datatable-tbody > tr > td { padding: 0.3rem 0.75rem; font-size: var(--fs-label); }
+  .p-datatable-thead > tr > th { padding: var(--space-3) var(--space-5); }
+  .p-datatable-tbody > tr > td { padding: var(--space-3) var(--space-5); font-size: var(--fs-label); }
 }
