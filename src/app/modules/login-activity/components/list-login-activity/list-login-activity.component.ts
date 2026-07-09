@@ -62,8 +62,6 @@ export class ListLoginActivityComponent implements OnInit, OnDestroy {
     globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
     showColumnFilters: true,
     enableExport: true,
-    enableDensity: true,
-    density: 'comfortable',
     gridKey: 'login-activity-list',
     height: 'flex',
     rowIdField: 'id',

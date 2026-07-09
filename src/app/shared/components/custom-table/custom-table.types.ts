@@ -78,14 +78,8 @@ export interface CustomTableConfig {
   /** Export action (CSV + Excel). Default false. */
   enableExport?: boolean;
 
-  /** Density switch (Compact / Comfortable). Default true. */
-  enableDensity?: boolean;
-
   /** Column show/hide chooser. Default false. */
   enableColumnToggle?: boolean;
-
-  /** Starting density. Default 'comfortable'. */
-  density?: 'compact' | 'comfortable';
 
   /** Row identity field for trackBy. Default 'id'. */
   rowIdField?: string;
@@ -97,7 +91,7 @@ export interface CustomTableConfig {
    *  adapts to any screen; or pass a fixed CSS length like '480px'. */
   height?: string;
 
-  /** localStorage key to persist density + column visibility per consumer. */
+  /** localStorage key to persist column visibility per consumer. */
   gridKey?: string;
 }
 
@@ -117,9 +111,7 @@ export const CUSTOM_TABLE_DEFAULTS: Required<
   globalSearchKey: 'search',
   showColumnFilters: false,
   enableExport: false,
-  enableDensity: true,
   enableColumnToggle: false,
-  density: 'comfortable',
   rowIdField: 'id',
   height: 'flex',
 };

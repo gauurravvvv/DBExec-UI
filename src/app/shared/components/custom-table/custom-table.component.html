@@ -1,4 +1,4 @@
-<div class="custom-table" [class.density-compact]="density === 'compact'">
+<div class="custom-table">
   <!-- ── Slim toolbar: title (left) + global search + only the enabled
        secondary actions (right). Nothing else by default. ── -->
   <div class="ct-toolbar">
@@ -31,18 +31,6 @@
         tooltipPosition="bottom"
       >
         <i class="pi pi-filter"></i>
-      </button>
-
-      <!-- Density (compact / comfortable) -->
-      <button
-        *ngIf="cfg.enableDensity"
-        type="button"
-        class="ct-icon-btn"
-        (click)="setDensity(density === 'compact' ? 'comfortable' : 'compact')"
-        [pTooltip]="(density === 'compact' ? 'COMMON.COMFORTABLE' : 'COMMON.COMPACT') | translate"
-        tooltipPosition="bottom"
-      >
-        <i class="pi" [ngClass]="density === 'compact' ? 'pi-arrows-v' : 'pi-bars'"></i>
       </button>
 
       <!-- Columns show/hide -->

@@ -122,7 +122,6 @@ export const FIELD_ICONS: Record<string, string> = {
   language: 'pi-globe',
   locale: 'pi-globe',
   country: 'pi-globe',
-  ipAddress: 'pi-globe',
   userAgent: 'pi-mobile',
 
   // ── Action verbs (used as control names sometimes) ──

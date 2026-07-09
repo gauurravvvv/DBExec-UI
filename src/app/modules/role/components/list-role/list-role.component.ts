@@ -69,8 +69,6 @@ export class ListRoleComponent implements OnInit, OnDestroy {
     globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
     showColumnFilters: true,
     enableExport: true,
-    enableDensity: true,
-    density: 'comfortable',
     gridKey: 'roles-list',
     height: 'flex',
     rowIdField: 'id',

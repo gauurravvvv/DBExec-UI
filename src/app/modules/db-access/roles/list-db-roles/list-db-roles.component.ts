@@ -70,8 +70,6 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     globalSearchPlaceholder: undefined,
     showColumnFilters: true, // Filter toggle reveals per-column filters
     enableExport: true,
-    enableDensity: true,
-    density: 'comfortable',
     gridKey: 'db-roles-list',
     height: 'flex', // fill available height, responsive to screen size
     rowIdField: 'name',

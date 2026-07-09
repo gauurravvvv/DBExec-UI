@@ -361,10 +361,3 @@
   }
 }
 
-/* ── compact density ──────────────────────────────────────────────────── */
-/* `.density-compact` sits on `.custom-table` inside the host; reach the
-   p-table skin under it. */
-:host ::ng-deep .density-compact .ct-p-table {
-  .p-datatable-thead > tr > th { padding: var(--space-3) var(--space-5); }
-  .p-datatable-tbody > tr > td { padding: var(--space-3) var(--space-5); font-size: var(--fs-label); }
-}

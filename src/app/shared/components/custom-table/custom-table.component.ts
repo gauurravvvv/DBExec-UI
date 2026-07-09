@@ -125,7 +125,6 @@ export class CustomTableComponent
   cfg = CUSTOM_TABLE_DEFAULTS as Required<CustomTableConfig>;
   globalSearch = '';
   showFilters = false;
-  density: 'compact' | 'comfortable' = 'comfortable';
   /** Column visibility (colId → hidden). */
   hidden = new Set<string>();
   columnMenuItems: MenuItem[] = [];
@@ -146,7 +145,6 @@ export class CustomTableComponent
         ...CUSTOM_TABLE_DEFAULTS,
         ...this.config,
       } as Required<CustomTableConfig>;
-      this.density = this.cfg.density;
       this.restorePrefs();
       // Keep the adapter's page size in sync with the table's fetch size so
       // scroll pages / paginator pages match what the BE returns.
@@ -416,11 +414,6 @@ export class CustomTableComponent
     return this.columns.some(c => c.filter);
   }
 
-  setDensity(d: 'compact' | 'comfortable'): void {
-    this.density = d;
-    this.persistPrefs();
-  }
-
   toggleColumn(colId: string): void {
     if (this.hidden.has(colId)) this.hidden.delete(colId);
     else this.hidden.add(colId);
@@ -473,7 +466,7 @@ export class CustomTableComponent
     this.refresh.emit();
   }
 
-  // ── density + column prefs persistence (optional, per gridKey) ────────────
+  // ── column-visibility prefs persistence (optional, per gridKey) ───────────
 
   private prefsKey(): string | null {
     return this.cfg.gridKey ? `custom-table:${this.cfg.gridKey}` : null;
@@ -482,10 +475,7 @@ export class CustomTableComponent
     const key = this.prefsKey();
     if (!key) return;
     try {
-      localStorage.setItem(
-        key,
-        JSON.stringify({ density: this.density, hidden: [...this.hidden] }),
-      );
+      localStorage.setItem(key, JSON.stringify({ hidden: [...this.hidden] }));
     } catch {
       /* storage disabled */
     }
@@ -496,9 +486,7 @@ export class CustomTableComponent
     try {
       const raw = localStorage.getItem(key);
       if (!raw) return;
-      const p = JSON.parse(raw) as { density?: string; hidden?: string[] };
-      if (p.density === 'compact' || p.density === 'comfortable')
-        this.density = p.density;
+      const p = JSON.parse(raw) as { hidden?: string[] };
       if (Array.isArray(p.hidden)) this.hidden = new Set(p.hidden);
     } catch {
       /* ignore */

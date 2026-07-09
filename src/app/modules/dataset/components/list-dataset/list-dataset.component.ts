@@ -110,8 +110,6 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
     showColumnFilters: true,
     enableExport: true,
-    enableDensity: true,
-    density: 'comfortable',
     gridKey: 'datasets-list',
     height: 'flex',
     rowIdField: 'id',
