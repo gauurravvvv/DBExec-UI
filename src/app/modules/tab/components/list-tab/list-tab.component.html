@@ -7,19 +7,7 @@
       </div>
 
       <div class="header-actions">
-        <!-- Bulk Delete Button -->
-        <ng-container *hasPermission="'queryBuilderTab'; level: 'delete'">
-        <button
-          *ngIf="selectedCount > 0"
-          pButton
-          [label]="'COMMON.DELETE_COUNT' | translate: { count: selectedCount }"
-          icon="pi pi-trash"
-          (click)="confirmBulkDelete()"
-          class="p-button-raised p-button-danger modern-button"
-        ></button>
-        </ng-container>
-
-        <!-- Clear Filters Button -->
+        <!-- Clear Filters Button — resets the table's column filters + sort. -->
         <button
           pButton
           [label]="'COMMON.CLEAR' | translate"
@@ -41,12 +29,21 @@
       </div>
     </div>
 
-    <!-- Unified Toolbar & Content Card -->
+    <!-- Content Card — the unified <app-custom-table> (infinite scroll, global
+         search + on-demand per-column filters, single-row actions). The
+         datasource dropdown lives in the table's toolbar-start slot; per-cell
+         DOM via <ng-template usGridCell>. -->
     <div class="content-card">
-      <div class="card-toolbar">
-        <div class="toolbar-left">
-          <!-- Datasource Dropdown — server-driven -->
-          <div class="dropdown-field">
+      <div class="table-wrapper" *ngIf="selectedDatasource && adapter">
+        <app-custom-table
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="tableConfig"
+          [hasProjectedEmpty]="true"
+          (refresh)="refreshList()"
+        >
+          <!-- Toolbar-left slot: server-driven datasource dropdown. -->
+          <div tableToolbarStart class="tab-toolbar-start">
             <app-custom-dropdown
               [(ngModel)]="selectedDatasource"
               [serverMode]="true"
@@ -65,24 +62,13 @@
             >
             </app-custom-dropdown>
           </div>
-        </div>
-      </div>
 
-      <!-- AG Grid via us-data-grid. The grid hosts row-selection,
-           sort, floating filters, column chooser, density toggle,
-           CSV/XLSX export and saved views (gridKey='tabs-list').
-           Per-cell DOM is supplied via <ng-template usGridCell> so
-           the visual look — name link, description, sections pill,
-           status pill, date text, row-actions — matches the
-           previous PrimeNG layout exactly. -->
-      <div class="table-wrapper" *ngIf="selectedDatasource && adapter">
-        <us-data-grid
-          [columns]="cols"
-          [serverAdapter]="adapter"
-          [config]="gridConfig"
-          (selectionChange)="onSelectionChange($event)"
-          (refresh)="refreshList()"
-        >
+          <!-- Empty body — always projected so only one empty state shows. -->
+          <div tableEmpty class="ct-empty-body">
+            <i class="pi pi-inbox"></i>
+            <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
+          </div>
+
           <ng-template usGridCell="name" let-tab>
             <a
               class="dataset-name-link"
@@ -154,10 +140,11 @@
               </button>
             </div>
           </ng-template>
-        </us-data-grid>
+        </app-custom-table>
       </div>
 
-      <!-- Empty datasource state — no datasource picked yet. -->
+      <!-- Empty datasource state — no datasource picked yet (the table only
+           mounts once a datasource is selected). -->
       <div class="empty-state-inline" *ngIf="!selectedDatasource">
         <i class="pi pi-database empty-state-icon"></i>
         <span class="empty-state-text">
@@ -180,13 +167,8 @@
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
-      <p class="delete-intro" *ngIf="!bulkDelete">
+      <p class="delete-intro">
         {{ 'TAB.DELETE_SINGLE' | translate }}
-      </p>
-      <p class="delete-intro" *ngIf="bulkDelete">
-        <span
-          [innerHTML]="'TAB.DELETE_BULK' | translate: { count: selectedCount }"
-        ></span>
       </p>
 
       <ul class="delete-info-list">

@@ -1624,6 +1624,7 @@
   },
   "TAB": {
     "TITLE": "Tabs",
+    "SEARCH_PLACEHOLDER": "Search tabs by name",
     "SUBTITLE": "Organize sections into tabs for the advanced query builder",
     "ADD_TITLE": "Add Tab",
     "EDIT_TITLE": "Edit Tab",

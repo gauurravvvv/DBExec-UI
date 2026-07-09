@@ -90,7 +90,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     }
 
     // Build the full URL — all requests go to the single API server
-    const serverUrl = environment.apiServer || 'http://localhost:3000/api/v1';
+    const serverUrl = environment.apiServer || 'http://localhost:9058/api/v1';
 
     const URL = serverUrl + req.url;
 

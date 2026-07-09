@@ -10,7 +10,6 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import type { ColDef } from 'ag-grid-community';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { TAB } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -19,15 +18,18 @@ import {
   UsServerListAdapter,
   UsListLoadParams,
 } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
-import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
+import type {
+  CustomTableColumn,
+  CustomTableConfig,
+} from 'src/app/shared/components/custom-table/custom-table.types';
 import { TabService } from '../../services/tab.service';
 
 /**
- * Tab listing — renders through `<us-data-grid>` with a
- * `UsServerListAdapter` driving the BE `/tabs` list call. The page
- * header / datasource dropdown / delete-confirm popup retain the
- * existing styling and behaviour; only the `<p-table>` was swapped
- * out for the AG Grid wrapper.
+ * Tab listing — renders through the shared `<app-custom-table>` (the unified
+ * simple table used by every list) with a `UsServerListAdapter` driving the BE
+ * `/tabs` list call: infinite scroll, global search + on-demand per-column
+ * filters, single-row delete. The datasource dropdown lives in the table's
+ * toolbar-start slot; the delete-confirm popup keeps the existing styling.
  */
 @Component({
   selector: 'app-list-tab',
@@ -39,12 +41,10 @@ export class ListTabComponent implements OnInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
-  /* ── page state — UNCHANGED from the p-table version ──── */
+  /* ── page state ────────────────────────────────────────── */
 
-  selectedTabs: any[] = [];
   showDeleteConfirm = false;
   tabToDelete: string | null = null;
-  bulkDelete = false;
   deleteJustification = '';
   Math = Math;
   datasources: any[] = [];
@@ -55,36 +55,27 @@ export class ListTabComponent implements OnInit, OnDestroy {
   today = new Date();
   statusOptions: any[] = [];
 
-  /* ── grid wiring ───────────────────────────────────────── */
+  /* ── custom-table wiring (unified simple table; server-driven) ──── */
 
-  /** AG Grid column definitions — widths preserved from the old
-   *  `<p-table>` so the visual layout is unchanged. cellRenderer
-   *  templates live in the HTML as `<ng-template usGridCell>`. */
-  cols: ColDef[] = [];
+  /** Table columns — widths preserved from the previous grid. Per-cell DOM is
+   *  supplied via `<ng-template usGridCell>` in the HTML. */
+  cols: CustomTableColumn[] = [];
 
-  gridConfig: UsDataGridConfig = {
-    // Page header carries the title; the grid's own title slot is
-    // hidden by leaving it unset.
-    enableRowSelection: true,
-    rowSelectionMode: 'multiple',
-    freezeFirstColumn: true,
-    enableColumnChooser: true,
-    enableAddFilter: false, // we use the BE-driven floating filters
-    enableAutoFit: true,
-    enableDensityToggle: true,
-    enableCsvExport: true,
-    enableXlsxExport: true,
-    enableRefresh: true,
-    enableSavedViews: true,
+  tableConfig: CustomTableConfig = {
+    mode: 'scroll', // infinite scroll — no page controls
+    pageSize: 50, // rows fetched per scroll page
+    globalSearch: true,
+    globalSearchKey: 'name', // BE tabs list matches the `name` filter key
+    globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
+    showColumnFilters: true, // Filter toggle reveals per-column filters
+    enableExport: true,
     gridKey: 'tabs-list',
-    pageSizeOptions: [10, 25, 50, 100],
-    pageSize: 10,
-    height: 'calc(100vh - 340px)',
+    height: 'flex', // fill available height, responsive to screen size
     rowIdField: 'id',
   };
 
   /** Server-side adapter — bound on first datasource selection so
-   *  the grid doesn't fire a tabs query before a datasource exists. */
+   *  the table doesn't fire a tabs query before a datasource exists. */
   adapter: UsServerListAdapter<any> | null = null;
 
   constructor(
@@ -103,6 +94,11 @@ export class ListTabComponent implements OnInit, OnDestroy {
     ];
 
     this.cols = this.buildColumns();
+    // Field-specific search placeholder so the user knows what's matched.
+    this.tableConfig = {
+      ...this.tableConfig,
+      globalSearchPlaceholder: this.translate.instant('TAB.SEARCH_PLACEHOLDER'),
+    };
 
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -123,75 +119,21 @@ export class ListTabComponent implements OnInit, OnDestroy {
     this.adapter?.destroy();
   }
 
-  get selectedCount(): number {
-    return this.selectedTabs?.length || 0;
-  }
-
   get isFilterActive(): boolean {
     return !!this.adapter && Object.keys(this.adapter.filterModel()).length > 0;
   }
 
   /* ── column definitions ──────────────────────────────── */
 
-  private buildColumns(): ColDef[] {
+  private buildColumns(): CustomTableColumn[] {
+    const t = (k: string) => this.translate.instant(k);
     return [
-      {
-        colId: 'name',
-        field: 'name',
-        headerName: this.translate.instant('COMMON.NAME'),
-        width: 224,
-        minWidth: 224,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        pinned: 'left',
-      },
-      {
-        colId: 'description',
-        field: 'description',
-        headerName: this.translate.instant('COMMON.DESCRIPTION'),
-        minWidth: 320,
-        flex: 1,
-        filter: 'agTextColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-        sortable: false,
-      },
-      {
-        colId: 'sections',
-        field: 'sections',
-        headerName: this.translate.instant('COMMON.SECTIONS'),
-        width: 128,
-        minWidth: 128,
-        sortable: false,
-        filter: false,
-      },
-      {
-        colId: 'status',
-        field: 'status',
-        headerName: this.translate.instant('COMMON.STATUS'),
-        width: 144,
-        minWidth: 144,
-        filter: 'agNumberColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'createdOn',
-        field: 'createdOn',
-        headerName: this.translate.instant('COMMON.CREATED_ON'),
-        width: 192,
-        minWidth: 192,
-        filter: 'agDateColumnFilter',
-        filterParams: { buttons: ['reset'], suppressAndOrCondition: true },
-      },
-      {
-        colId: 'actions',
-        headerName: this.translate.instant('COMMON.ACTIONS'),
-        width: 112,
-        minWidth: 112,
-        sortable: false,
-        filter: false,
-        resizable: false,
-        pinned: 'right',
-      },
+      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
+      { colId: 'description', field: 'description', header: t('COMMON.DESCRIPTION'), width: '320px', filter: 'text', sortable: false },
+      { colId: 'sections', field: 'sections', header: t('COMMON.SECTIONS'), width: '128px', sortable: false },
+      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px' },
+      { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px' },
+      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '112px', sortable: false },
     ];
   }
 
@@ -257,52 +199,21 @@ export class ListTabComponent implements OnInit, OnDestroy {
         rows: res?.data?.tabs ?? [],
         total: res?.data?.count ?? 0,
       }),
-      // Floating-filter cell value → BE filter slice. The grid's
-      // floating filters emit AG-Grid-shaped cells; this map
-      // flattens them into the `{name, description, status, createdDateFrom, createdDateTo}`
-      // shape the BE expects.
-      filterBuilders: {
-        name: cell => ({ name: (cell as any)?.filter ?? cell }),
-        description: cell => ({
-          description: (cell as any)?.filter ?? cell,
-        }),
-        status: cell => {
-          const v = (cell as any)?.filter ?? cell;
-          return v === '' || v === null || v === undefined ? {} : { status: v };
-        },
-        createdOn: cell => {
-          // AG Grid date filter shapes: {dateFrom, dateTo, type, filterType}.
-          const c = cell as any;
-          const out: Record<string, string> = {};
-          if (c?.dateFrom) out['createdDateFrom'] = new Date(c.dateFrom).toISOString();
-          if (c?.dateTo) {
-            const to = new Date(c.dateTo);
-            to.setHours(23, 59, 59, 999);
-            out['createdDateTo'] = to.toISOString();
-          }
-          return out;
-        },
-      },
-      initial: { page: 1, limit: 10 },
+      // custom-table sends PLAIN filter values (global `name` search + the
+      // per-column name/description/status filters), so the adapter's identity
+      // mapping passes them straight through to the BE — no AG-Grid cell
+      // unwrapping needed.
+      initial: { page: 1, limit: 50 },
     });
-    // Selection state belongs to the listing page, not the grid.
-    // The grid emits selectionChange — we mirror it onto
-    // selectedTabs so the existing bulk-delete logic keeps working.
     this.cdr.markForCheck();
   }
 
-  /* ── handlers re-pointed at the adapter ──────────────── */
-
-  onSelectionChange(rows: any[]) {
-    this.selectedTabs = rows;
-    this.cdr.markForCheck();
-  }
+  /* ── handlers ────────────────────────────────────────── */
 
   clearFilters() {
     if (!this.adapter) return;
     this.adapter.setFilter({});
     this.adapter.setSort([]);
-    this.selectedTabs = [];
   }
 
   refreshList() {
@@ -381,77 +292,38 @@ export class ListTabComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.tabToDelete = id;
-    this.bulkDelete = false;
-    this.showDeleteConfirm = true;
-  }
-
-  confirmBulkDelete() {
-    if (this.selectedCount === 0) return;
-    this.tabToDelete = null;
-    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.tabToDelete = null;
-    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
   proceedDelete() {
     const reason = this.deleteJustification.trim();
-    if (!reason) return;
+    if (!reason || !this.tabToDelete) return;
 
-    if (this.bulkDelete) {
-      const ids = this.selectedTabs.map(t => t.id);
-      if (ids.length === 0) {
-        this.cancelDelete();
-        return;
-      }
-      this.tabService
-        .bulkDeleteTab(ids, reason)
-        .then((res: any) => {
-          if (this.globalService.handleSuccessService(res)) {
-            this.selectedTabs = [];
-            this.refreshList();
-          }
-        })
-        .catch(() => {
-          /* global interceptor shows error toast */
-        })
-        .finally(() => {
-          this.closeDeletePopup();
-          this.cdr.markForCheck();
-        });
-      return;
-    }
-
-    if (this.tabToDelete) {
-      this.tabService
-        .deleteTab(this.tabToDelete, reason)
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.selectedTabs = this.selectedTabs.filter(
-              t => t.id !== this.tabToDelete,
-            );
-            this.refreshList();
-          }
-        })
-        .catch(() => {
-          /* global interceptor shows error toast */
-        })
-        .finally(() => {
-          this.closeDeletePopup();
-          this.cdr.markForCheck();
-        });
-    }
+    this.tabService
+      .deleteTab(this.tabToDelete, reason)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response)) {
+          this.refreshList();
+        }
+      })
+      .catch(() => {
+        /* global interceptor shows error toast */
+      })
+      .finally(() => {
+        this.closeDeletePopup();
+        this.cdr.markForCheck();
+      });
   }
 
   private closeDeletePopup() {
     this.showDeleteConfirm = false;
     this.tabToDelete = null;
-    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 }

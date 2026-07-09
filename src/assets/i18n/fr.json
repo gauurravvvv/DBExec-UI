@@ -1568,6 +1568,7 @@
   },
   "TAB": {
     "TITLE": "Tabs",
+    "SEARCH_PLACEHOLDER": "Rechercher des onglets par nom",
     "SUBTITLE": "Organize sections into tabs for the advanced query builder",
     "ADD_TITLE": "Add Tab",
     "EDIT_TITLE": "Edit Tab",
