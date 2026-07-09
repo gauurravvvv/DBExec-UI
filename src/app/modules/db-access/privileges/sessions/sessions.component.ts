@@ -63,7 +63,6 @@ export class SessionsComponent implements OnInit, OnDestroy {
   unsupported = this.ctx.unsupported;
 
   datasourceId = '';
-  private allSessions: SessionRow[] = [];
   sessions: SessionRow[] = [];
   selfPid = 0;
 
@@ -86,12 +85,12 @@ export class SessionsComponent implements OnInit, OnDestroy {
     height: 'calc(100vh - 280px)',
     rowIdField: 'pid',
   };
-  // Client-side adapter: loadSessions returns the full array; `load` hands
-  // the grid the name/state/hideBackground-filtered rows applyFilters()
-  // already computes.
+  // Server-side adapter: the grid page/sort + toolbar search/state/hide-
+  // background drive a BE query (filter/sort/slice server-side). See
+  // buildAdapter().
   adapter: UsServerListAdapter<any> | null = null;
 
-  // Filters (client-side).
+  // Filters (fed to the server via serverFilter()).
   statusOptions: { label: string; value: string }[] = [];
   filterValues: { name: string; state: string | null; hideBackground: boolean } = {
     name: '',
@@ -151,18 +150,57 @@ export class SessionsComponent implements OnInit, OnDestroy {
     ];
   }
 
-  /** Client-side adapter — its `load` hands the grid the already
-   *  filtered rows the component computes in applyFilters(). */
+  /**
+   * Server-side adapter. Each `load` sends page/limit (+ sort + a JSON filter
+   * { search?, state?, backendType? }) to loadSessionsPaged → BE listSessions
+   * paged mode (filter/sort/slice server-side). `selfPid` is captured from the
+   * paged response so the caller's own row is still flagged. The toolbar
+   * search/state/hide-background feed the filter via setFilter(serverFilter()).
+   */
   private buildAdapter(): void {
     this.adapter?.destroy();
     this.adapter = new UsServerListAdapter<any>({
-      load: () => Promise.resolve({ rows: this.sessions, total: this.sessions.length }),
+      load: p => {
+        if (!this.datasourceId) return Promise.resolve({ rows: [], total: 0 });
+        return this.dbAccess
+          .loadSessionsPaged(this.datasourceId, {
+            page: p.page,
+            limit: p.limit,
+            sort: p.sort,
+            filter: p.filter,
+          })
+          .then(res => {
+            const rows = res?.status ? (res.data?.sessions ?? []) : [];
+            this.sessions = rows;
+            this.selfPid = res?.data?.selfPid ?? this.selfPid;
+            return { rows, total: res?.data?.count ?? rows.length };
+          });
+      },
       unwrap: (res: any) => ({ rows: res.rows, total: res.total }),
+      // AG Grid colId → BE sort key (whitelisted server-side in listSessions).
+      sortFieldMap: {
+        pid: 'pid',
+        user: 'user',
+        database: 'database',
+        state: 'state',
+        queryStart: 'queryStart',
+      },
       initial: { page: 1, limit: 10 },
     });
   }
 
-  /** Grid Refresh button → re-fetch the live session list. */
+  /** The JSON filter the BE understands ({ search?, state?, backendType? }). */
+  private serverFilter(): Record<string, unknown> {
+    const f: Record<string, unknown> = {};
+    const search = (this.filterValues.name || '').trim();
+    if (search) f['search'] = search;
+    if (this.filterValues.state) f['state'] = this.filterValues.state;
+    // hideBackground → only client backends (BE `backendType` contains filter).
+    if (this.filterValues.hideBackground) f['backendType'] = 'client backend';
+    return f;
+  }
+
+  /** Grid Refresh button → re-fetch the live session list (page 1). */
   refreshList(): void {
     this.refresh();
   }
@@ -170,11 +208,11 @@ export class SessionsComponent implements OnInit, OnDestroy {
   /** Emitted by the datasource picker (init hydrate + change). */
   onDatasourceChange(id: string): void {
     this.datasourceId = id || '';
-    this.allSessions = [];
     this.sessions = [];
     this.selfPid = 0;
     this.filterValues = { name: '', state: null, hideBackground: true };
     if (!this.datasourceId) {
+      this.adapter?.reload();
       this.cdr.markForCheck();
       return;
     }
@@ -183,17 +221,8 @@ export class SessionsComponent implements OnInit, OnDestroy {
 
   refresh(): void {
     if (!this.datasourceId) return;
-    this.dbAccess
-      .loadSessions(this.datasourceId)
-      .then(res => {
-        if (res?.status) {
-          this.allSessions = res.data?.sessions ?? [];
-          this.selfPid = res.data?.selfPid ?? 0;
-          this.applyFilters();
-        }
-      })
-      .catch(() => {})
-      .finally(() => this.cdr.markForCheck());
+    // Server-paged: re-fetch page 1 with the current filter.
+    this.adapter?.setFilter(this.serverFilter());
   }
 
   get isFilterActive(): boolean {
@@ -210,23 +239,8 @@ export class SessionsComponent implements OnInit, OnDestroy {
   }
 
   private applyFilters(): void {
-    const name = (this.filterValues.name || '').trim().toLowerCase();
-    const state = this.filterValues.state;
-    const hideBg = this.filterValues.hideBackground;
-    this.sessions = this.allSessions.filter(s => {
-      // Background workers have a backend_type other than 'client backend'.
-      if (hideBg && !this.isClientBackend(s)) return false;
-      if (state && (s.state || '') !== state) return false;
-      if (name) {
-        const hay = [s.user, s.database, s.applicationName, s.query, String(s.pid)]
-          .map(v => (v || '').toLowerCase())
-          .join(' ');
-        if (!hay.includes(name)) return false;
-      }
-      return true;
-    });
-    // Hand the fresh rows to the grid.
-    this.adapter?.reload();
+    // Server-paged: push the merged toolbar filter to the BE (page 1).
+    this.adapter?.setFilter(this.serverFilter());
     this.cdr.markForCheck();
   }
 

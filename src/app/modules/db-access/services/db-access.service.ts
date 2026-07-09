@@ -89,6 +89,38 @@ export class DbAccessService {
     }
   }
 
+  /**
+   * Server-paged roles for the list grid: sends page/limit (+ optional
+   * sort + JSON filter) so the BE (listRolesPaged) does LIMIT/OFFSET + WHERE
+   * + COUNT. Returns `{ roles, count }`. Does NOT touch the shared `_roles`
+   * signal (grantee pickers still use the full cached list via loadRoles).
+   */
+  loadRolesPaged(
+    datasourceId: string,
+    opts: {
+      page: number;
+      limit: number;
+      sort?: string;
+      /** JSON-stringified filter payload ({ name?, type?, status? }). */
+      filter?: string;
+    },
+  ): Promise<any> {
+    const params: Record<string, string> = {
+      page: String(opts.page),
+      limit: String(opts.limit),
+    };
+    if (opts.sort) params['sort'] = opts.sort;
+    if (opts.filter) params['filter'] = opts.filter;
+    return lastValueFrom(
+      this.http
+        .apiGet(this.base(datasourceId) + DB_ACCESS.ROLES_SUFFIX, {
+          skipLoader: true,
+          params,
+        })
+        .pipe(takeUntil(this._cancelReads$)),
+    );
+  }
+
   createRole(datasourceId: string, body: any): Promise<any> {
     this._saving.set(true);
     return lastValueFrom(
@@ -367,6 +399,32 @@ export class DbAccessService {
       this.http
         .apiGet(this.base(datasourceId) + DB_ACCESS.SESSIONS_SUFFIX, {
           skipLoader: true,
+        })
+        .pipe(takeUntil(this._cancelReads$)),
+    ).finally(() => this._loading.set(false));
+  }
+
+  /**
+   * Server-paged sessions for the list grid: page/limit (+ sort + JSON
+   * filter { search?, state?, backendType? }) → BE listSessions paged mode
+   * (filter/sort/slice server-side). Returns `{ sessions, count, selfPid }`.
+   */
+  loadSessionsPaged(
+    datasourceId: string,
+    opts: { page: number; limit: number; sort?: string; filter?: string },
+  ): Promise<any> {
+    this._loading.set(true);
+    const params: Record<string, string> = {
+      page: String(opts.page),
+      limit: String(opts.limit),
+    };
+    if (opts.sort) params['sort'] = opts.sort;
+    if (opts.filter) params['filter'] = opts.filter;
+    return lastValueFrom(
+      this.http
+        .apiGet(this.base(datasourceId) + DB_ACCESS.SESSIONS_SUFFIX, {
+          skipLoader: true,
+          params,
         })
         .pipe(takeUntil(this._cancelReads$)),
     ).finally(() => this._loading.set(false));

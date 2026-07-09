@@ -15,20 +15,11 @@ import { debounceTime } from 'rxjs/operators';
 import type { ColDef } from 'ag-grid-community';
 import { DB_ACCESS } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
 import { UsServerListAdapter } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
 import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
 import { DbAccessContextService } from '../../services/db-access-context.service';
 import { DbAccessService } from '../../services/db-access.service';
 import { ChangeIntent, describeChange } from '../../services/describe-change';
-
-type RoleSortField =
-  | 'name'
-  | 'type'
-  | 'status'
-  | 'validUntil'
-  | 'connectionLimit'
-  | 'memberCount';
 
 /** Login-type filter for the merged list. */
 type RoleTypeFilter = 'all' | 'login' | 'group';
@@ -47,8 +38,8 @@ type RoleTypeFilter = 'all' | 'login' | 'group';
  * Same list-user shell as the rest of the app: h2 above a flat card, a
  * datasource-picker toolbar, a modern table with sortable headers, filter
  * row, status pills, row-actions and a paginator refresh. The datasource is
- * chosen via the shared picker (writes ?ds= + context); roles are fetched
- * once (BE returns all) and paged client-side.
+ * chosen via the shared picker (writes ?ds= + context); roles are paged
+ * server-side (BE listRolesPaged: LIMIT/OFFSET + WHERE + COUNT).
  */
 @Component({
   selector: 'app-list-db-roles',
@@ -67,8 +58,7 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   unsupported = this.ctx.unsupported;
 
   datasourceId = '';
-  // All roles for the datasource (login + group), fetched once.
-  private allRoles: any[] = [];
+  // Current server page of roles (login + group) shown in the grid.
   roles: any[] = [];
 
   /* ── us-data-grid wiring (identical pattern to list-user) ───────────── */
@@ -90,11 +80,10 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     height: 'calc(100vh - 280px)',
     rowIdField: 'name',
   };
-  // Client-side adapter: /roles returns the full array; `load` returns the
-  // Type/name/status-filtered + sorted rows the component already computes.
+  // Server-side adapter: the grid's page/sort + toolbar Type/name/status drive
+  // a BE query (LIMIT/OFFSET + WHERE + COUNT). See buildAdapter().
   adapter: UsServerListAdapter<any> | null = null;
 
-  sortHelper = new ListSortHelper<RoleSortField>();
   // Type filter defaults to "all" — the merged screen shows everything on
   // open, with the Type column distinguishing login users from group roles.
   typeFilter: RoleTypeFilter = 'all';
@@ -178,24 +167,67 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     ];
   }
 
-  /** Client-side adapter — its `load` simply hands the grid the already
-   *  Type/name/status-filtered + sorted rows the component computes in
-   *  applyFilters(). No BE round-trip on page/sort (that's client-side). */
+  /**
+   * Server-side adapter. Each `load` sends page/limit (+ sort + a JSON filter
+   * carrying the name box, the Type segmented control, and status) to
+   * loadRolesPaged → BE listRolesPaged (LIMIT/OFFSET + WHERE + COUNT). The
+   * grid drives page + column sort; the toolbar Type/name/status feed the same
+   * filter via patchFilter. `sortFieldMap` whitelists AG Grid colIds → BE sort
+   * keys. No datasource ⇒ empty.
+   */
   private buildAdapter(): void {
     this.adapter?.destroy();
     this.adapter = new UsServerListAdapter<any>({
-      load: () => Promise.resolve({ rows: this.roles, total: this.roles.length }),
+      load: p => {
+        if (!this.datasourceId) return Promise.resolve({ rows: [], total: 0 });
+        return this.dbAccess
+          .loadRolesPaged(this.datasourceId, {
+            page: p.page,
+            limit: p.limit,
+            sort: p.sort,
+            filter: p.filter, // JSON already merged by the adapter (patchFilter)
+          })
+          .then(res => {
+            const rows = res?.status ? (res.data?.roles ?? []) : [];
+            this.roles = rows;
+            return { rows, total: res?.data?.count ?? rows.length };
+          });
+      },
       unwrap: (res: any) => ({ rows: res.rows, total: res.total }),
+      // AG Grid colId → BE sort key (pg_roles column alias, whitelisted server-
+      // side in listRolesPaged / ROLE_SORT). The toolbar Type/name/status feed
+      // the filter via patchFilter(serverFilter()), so no per-column
+      // filterBuilders here.
+      sortFieldMap: {
+        name: 'name',
+        type: 'canLogin',
+        status: 'status',
+      },
       initial: { page: 1, limit: 10 },
     });
   }
 
+  /**
+   * The single JSON filter the BE understands ({ name?, type?, status? }),
+   * assembled from the toolbar Type segmented control + name box + status.
+   */
+  private serverFilter(): Record<string, unknown> {
+    const f: Record<string, unknown> = {};
+    const name = (this.filterValues.name || '').trim();
+    if (name) f['name'] = name;
+    if (this.typeFilter === 'login') f['type'] = 'login';
+    else if (this.typeFilter === 'group') f['type'] = 'group';
+    if (this.filterValues.status) f['status'] = this.filterValues.status;
+    return f;
+  }
+
   onDatasourceChange(id: string): void {
     this.datasourceId = id || '';
-    this.allRoles = [];
     this.roles = [];
     this.filterValues = { name: '', status: null };
+    this.typeFilter = 'all';
     if (!this.datasourceId) {
+      this.adapter?.reload();
       this.cdr.markForCheck();
       return;
     }
@@ -204,22 +236,16 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
 
   load(): void {
     if (!this.datasourceId) return;
-    this.dbAccess
-      .loadRoles(this.datasourceId)
-      .then(() => {
-        // Keep ALL roles — the Type filter does the login/group slicing.
-        this.allRoles = this.dbAccess.roles() ?? [];
-        this.applyFilters();
-        this.cdr.markForCheck();
-      })
-      .catch(() => this.cdr.markForCheck());
+    // Server-paged: the adapter fetches page 1 with the current filter.
+    this.adapter?.reload();
   }
 
   // ── Type filter ─────────────────────────────────────────────────────────
   setTypeFilter(type: RoleTypeFilter): void {
     if (this.typeFilter === type) return;
     this.typeFilter = type;
-    this.applyFilters();
+    // Re-query page 1 on the server with the new Type slice.
+    this.adapter?.setFilter(this.serverFilter());
   }
 
   isLogin(role: any): boolean {
@@ -235,78 +261,25 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   }
 
   onFilterChange(): void {
+    // Debounced → server re-query page 1 with the merged filter.
     this.filter$.next();
   }
 
   clearFilters(): void {
     this.filterValues = { name: '', status: null };
     this.typeFilter = 'all';
-    this.applyFilters();
-  }
-
-  toggleSort(field: RoleSortField): void {
-    this.sortHelper.toggle(field);
-    this.applyFilters();
+    this.adapter?.setFilter(this.serverFilter());
   }
 
   private applyFilters(): void {
-    const name = (this.filterValues.name || '').trim().toLowerCase();
-    const status = this.filterValues.status;
-    let rows = this.allRoles.filter(r => {
-      // Type slice.
-      if (this.typeFilter === 'login' && !this.isLogin(r)) return false;
-      if (this.typeFilter === 'group' && this.isLogin(r)) return false;
-      // Name + status.
-      if (name && !String(r.name).toLowerCase().includes(name)) return false;
-      if (status && this.statusOf(r) !== status) return false;
-      return true;
-    });
-    rows = this.sortRows(rows);
-    this.roles = rows;
-    // Hand the fresh page to the grid.
-    this.adapter?.reload();
+    // Server-paged now: push the merged toolbar filter to the BE (page 1).
+    this.adapter?.setFilter(this.serverFilter());
     this.cdr.markForCheck();
   }
 
   /** Grid Refresh button → re-fetch roles from the datasource. */
   refreshList(): void {
     this.load();
-  }
-
-  private sortRows(rows: any[]): any[] {
-    const fields: RoleSortField[] = [
-      'name',
-      'type',
-      'status',
-      'validUntil',
-      'connectionLimit',
-      'memberCount',
-    ];
-    const active = fields
-      .map(f => ({ field: f, dir: this.sortHelper.direction(f) }))
-      .find(x => !!x.dir);
-    if (!active || !active.dir) return rows;
-    const factor = active.dir === 'desc' ? -1 : 1;
-    return [...rows].sort((a, b) => {
-      const av = this.sortValue(a, active.field);
-      const bv = this.sortValue(b, active.field);
-      if (av < bv) return -1 * factor;
-      if (av > bv) return 1 * factor;
-      return 0;
-    });
-  }
-
-  private sortValue(role: any, field: RoleSortField): any {
-    const a = role.attributes ?? role;
-    switch (field) {
-      case 'name': return String(role.name).toLowerCase();
-      case 'type': return this.isLogin(role) ? 0 : 1;
-      case 'status': return this.statusOf(role);
-      case 'validUntil': return new Date(a.validUntil ?? role.validUntil ?? 0).getTime();
-      case 'connectionLimit': return a.connectionLimit ?? role.connectionLimit ?? -1;
-      case 'memberCount': return this.memberCount(role);
-      default: return '';
-    }
   }
 
   // ── Row rendering helpers (login-aware) ─────────────────────────────────
