@@ -36,6 +36,11 @@
     width var(--motion-base) var(--ease-in-out),
     box-shadow var(--motion-base) var(--ease-in-out);
   position: relative;
+  // Sidebar chrome (esp. the .toggle-btn, which juts into the content area)
+  // must sit ABOVE the announcement banner — the banner is a sibling at the
+  // top of <main>, so without an explicit stacking context here it would
+  // paint over the toggle handle when an announcement is present.
+  z-index: var(--z-sticky);
   display: flex;
   flex-direction: column;
   user-select: none;

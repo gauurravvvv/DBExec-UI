@@ -3419,3 +3419,40 @@ body {
   }
 }
 
+// ================================================================
+// Global text-selection policy
+// ----------------------------------------------------------------
+// The app UI is non-selectable by default (desktop-app feel — labels,
+// table cells, nav, buttons can't be dragged/highlighted). Text entry and
+// code/data surfaces are explicitly RE-ENABLED below so users can still
+// select + copy where it genuinely matters: form fields, the CodeMirror
+// SQL editor, query result grids, and anything opted in via `.selectable`.
+// ================================================================
+body,
+body * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+// Re-enable selection where the user needs to type, read, or copy data.
+input,
+textarea,
+[contenteditable],
+[contenteditable] *,
+.cm-editor,
+.cm-editor *,
+.cm-content,
+.ag-root-wrapper,
+.ag-root-wrapper *,
+.ct-p-table .p-datatable-tbody,
+.ct-p-table .p-datatable-tbody *,
+.selectable,
+.selectable * {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+

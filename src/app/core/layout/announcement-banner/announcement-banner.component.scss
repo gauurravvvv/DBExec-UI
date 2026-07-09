@@ -9,7 +9,11 @@
   padding: 10px 48px;
   font-size: var(--fs-control);
   position: relative;
-  z-index: 999;
+  // Low stacking context — just enough to layer the banner's own shimmer/glow
+  // children. It must NOT sit above the sidebar chrome (the collapse handle
+  // juts over the banner's left edge), so this stays below --z-sticky (200)
+  // that the sidebar now uses. Was an arbitrary 999 that hid the toggle.
+  z-index: var(--z-base);
   overflow: hidden;
   animation: bannerSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 
