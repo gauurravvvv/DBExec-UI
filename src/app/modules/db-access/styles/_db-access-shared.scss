@@ -153,7 +153,10 @@
     // with the search + action icons on one row. The picker lives here (not
     // gated behind a selected datasource) so it's always reachable; the table
     // renders always and shows a state-specific empty body until one is picked.
-    .roles-toolbar-start {
+    // Shared by the roles list AND the sessions panel — both project the
+    // datasource picker + inline filters/badge into the custom-table toolbar.
+    .roles-toolbar-start,
+    .sessions-toolbar-start {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
@@ -174,8 +177,10 @@
     }
 
     // State-specific empty body projected into the table (no datasource yet /
-    // unsupported). Centred like the shared .list-hint.
-    .roles-empty {
+    // unsupported). Centred like the shared .list-hint. Shared by roles +
+    // sessions.
+    .roles-empty,
+    .sessions-empty {
       display: flex;
       flex-direction: column;
       align-items: center;

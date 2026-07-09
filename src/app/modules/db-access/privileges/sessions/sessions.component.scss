@@ -1,7 +1,12 @@
 @use '../../styles/db-access-shared' as db;
 
+// Sessions now renders through the shared <app-custom-table>, which owns ALL
+// table chrome (header/rows/cells/pills/actions) — so we no longer include
+// `db-access-table` here (it would override the shared component and diverge
+// from the other lists). `db-access-page` (content-card, datasource toolbar,
+// capability badge, toolbar-start + empty layout) and `db-access-dialog`
+// (confirm popup) stay.
 @include db.db-access-page;
-@include db.db-access-table;
 @include db.db-access-dialog;
 
 // Confirm popup intro text (reused from the delete wizard styling).
@@ -12,8 +17,8 @@
   margin: 0;
 }
 
-// Sessions-specific cell styling — the shared table mixin covers pills,
-// row-actions, date-text and count-pill; these are the extras.
+// Sessions-specific cell styling — the shared table covers pills, row-actions,
+// date-text and count-pill; these are the extras used by the cell templates.
 .pid-text {
   font-family: var(--font-mono, monospace);
   font-weight: var(--fw-medium);
@@ -32,12 +37,6 @@
   white-space: nowrap;
 }
 
-// The management connection's own row — subtle highlight so it reads as
-// distinct from the rows the user can act on.
-.self-row {
-  background: var(--primary-color-transparent) !important;
-}
-
 .query-text {
   display: block;
   max-width: 32rem;
@@ -49,7 +48,7 @@
   color: var(--secondary-color);
 }
 
-// "Hide background workers" filter toggle in the header filter row.
+// "Hide background workers" filter toggle — sits inline in the table toolbar.
 .hide-bg-toggle {
   display: inline-flex;
   align-items: center;

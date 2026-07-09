@@ -7,10 +7,12 @@ import {
   inject,
 } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import type { ColDef } from 'ag-grid-community';
+import type {
+  CustomTableColumn,
+  CustomTableConfig,
+} from 'src/app/shared/components/custom-table/custom-table.types';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { UsServerListAdapter } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
-import type { UsDataGridConfig } from 'src/app/shared/components/us-data-grid/us-data-grid.types';
 import { DbAccessContextService } from '../../services/db-access-context.service';
 import { DbAccessService } from '../../services/db-access.service';
 
@@ -66,23 +68,19 @@ export class SessionsComponent implements OnInit, OnDestroy {
   sessions: SessionRow[] = [];
   selfPid = 0;
 
-  /* ── us-data-grid wiring (identical pattern to list-db-roles) ───────── */
-  cols: ColDef[] = [];
-  gridConfig: UsDataGridConfig = {
-    enableRowSelection: false,
-    freezeFirstColumn: true,
-    enableColumnChooser: true,
-    enableAddFilter: false,
-    enableAutoFit: true,
-    enableDensityToggle: true,
-    enableCsvExport: true,
-    enableXlsxExport: true,
-    enableRefresh: true,
-    enableSavedViews: true,
+  /* ── custom-table wiring (unified simple table; server-driven) ──────── */
+  cols: CustomTableColumn[] = [];
+  tableConfig: CustomTableConfig = {
+    mode: 'scroll', // plain infinite scroll — no page controls
+    pageSize: 50, // rows fetched per scroll page
+    // Sessions have bespoke toolbar filters (name / state / hide-background)
+    // projected into the table's toolbar-start slot, so the table's own global
+    // search + per-column filters are off.
+    globalSearch: false,
+    showColumnFilters: false,
+    enableExport: true,
     gridKey: 'db-sessions-list',
-    pageSizeOptions: [10, 25, 50, 100],
-    pageSize: 10,
-    height: 'calc(100vh - 280px)',
+    height: 'flex', // fill available height, responsive to screen size
     rowIdField: 'pid',
   };
   // Server-side adapter: the grid page/sort + toolbar search/state/hide-
@@ -132,21 +130,22 @@ export class SessionsComponent implements OnInit, OnDestroy {
     this.adapter?.destroy();
   }
 
-  /** AG Grid columns — widths preserved from the previous p-table. Cell
-   *  DOM is supplied by `<ng-template usGridCell>` in the HTML. */
-  private buildColumns(): ColDef[] {
+  /** Table columns — widths preserved from the previous grid. Cell DOM is
+   *  supplied by `<ng-template usGridCell>` in the HTML. Only the server-
+   *  whitelisted keys (pid/user/database/state/queryStart) are sortable. */
+  private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
-      { colId: 'pid', field: 'pid', headerName: t('DB_ACCESS.PID'), width: 112, minWidth: 112, filter: 'agNumberColumnFilter', filterParams: { buttons: ['reset'], suppressAndOrCondition: true }, pinned: 'left' },
-      { colId: 'user', field: 'user', headerName: t('DB_ACCESS.SESSION_USER'), minWidth: 160 },
-      { colId: 'database', field: 'database', headerName: t('DB_ACCESS.SESSION_DATABASE'), minWidth: 144 },
-      { colId: 'clientAddr', field: 'clientAddr', headerName: t('DB_ACCESS.CLIENT_ADDR'), minWidth: 144 },
-      { colId: 'applicationName', field: 'applicationName', headerName: t('DB_ACCESS.APPLICATION'), minWidth: 160 },
-      { colId: 'state', field: 'state', headerName: t('DB_ACCESS.SESSION_STATE'), width: 160, minWidth: 160 },
-      { colId: 'waitEventType', field: 'waitEventType', headerName: t('DB_ACCESS.WAIT'), width: 128, minWidth: 128 },
-      { colId: 'query', field: 'query', headerName: t('DB_ACCESS.QUERY'), minWidth: 288, flex: 1 },
-      { colId: 'queryStart', field: 'queryStart', headerName: t('DB_ACCESS.STARTED'), width: 144, minWidth: 144 },
-      { colId: 'actions', headerName: t('COMMON.ACTIONS'), width: 144, minWidth: 144, sortable: false, filter: false, resizable: false, pinned: 'right' },
+      { colId: 'pid', field: 'pid', header: t('DB_ACCESS.PID'), width: '112px', frozen: true },
+      { colId: 'user', field: 'user', header: t('DB_ACCESS.SESSION_USER'), width: '160px' },
+      { colId: 'database', field: 'database', header: t('DB_ACCESS.SESSION_DATABASE'), width: '150px' },
+      { colId: 'clientAddr', field: 'clientAddr', header: t('DB_ACCESS.CLIENT_ADDR'), width: '150px', sortable: false },
+      { colId: 'applicationName', field: 'applicationName', header: t('DB_ACCESS.APPLICATION'), width: '170px', sortable: false },
+      { colId: 'state', field: 'state', header: t('DB_ACCESS.SESSION_STATE'), width: '160px' },
+      { colId: 'waitEventType', field: 'waitEventType', header: t('DB_ACCESS.WAIT'), width: '128px', sortable: false },
+      { colId: 'query', field: 'query', header: t('DB_ACCESS.QUERY'), width: '320px', sortable: false },
+      { colId: 'queryStart', field: 'queryStart', header: t('DB_ACCESS.STARTED'), width: '150px' },
+      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '128px', sortable: false },
     ];
   }
 
