@@ -121,335 +121,60 @@
     width: 100%;
     overflow: hidden;
 
-    ::ng-deep .modern-table {
-      .p-datatable-wrapper {
-        background: var(--card-background);
-      }
-      .p-datatable-header {
-        display: none;
-      }
-
-      // Header row
-      .p-datatable-thead > tr:first-child > th {
-        background: transparent;
-        color: var(--text-muted);
-        opacity: 1;
-        font-size: var(--fs-label);
-        font-weight: var(--fw-semibold);
-        text-transform: none;
-        letter-spacing: 0;
-        padding: var(--space-5) var(--space-6);
-        height: 40px;
-        border-bottom: 1px solid var(--border-color);
-        white-space: nowrap;
-
-        .th-content {
-          display: inline-flex;
-          align-items: center;
-          gap: var(--space-2);
-          line-height: 1;
-
-          &.actions-th {
-            justify-content: flex-end;
-            width: 100%;
-          }
-        }
-
-        &:first-child {
-          padding-left: 0;
-          padding-right: 0;
-          text-align: center;
-        }
-        &:last-child {
-          padding-right: var(--space-8);
-        }
-
-        &:focus {
-          box-shadow: none;
-        }
-
-        &.sortable-th {
-          cursor: pointer;
-          user-select: none;
-          transition: color var(--motion-fast) ease;
-
-          &:hover {
-            color: var(--text-color);
-            .sort-indicator {
-              opacity: 1;
-            }
-          }
-
-          &.is-sorted {
-            color: var(--primary-color);
-            background: transparent;
-            .sort-indicator {
-              opacity: 1;
-              .pi {
-                color: var(--primary-color);
-              }
-            }
-          }
-
-          &:focus-visible {
-            outline: 2px solid var(--primary-color);
-            outline-offset: -2px;
-          }
-
-          .sort-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--space-2);
-            margin-left: var(--space-2);
-            opacity: 0;
-            transition: opacity var(--motion-fast) ease;
-
-            &.is-sorted {
-              opacity: 1;
-            }
-
-            .pi {
-              font-size: 11px;
-              color: var(--text-muted);
-              transition: color var(--motion-fast) ease;
-            }
-
-            .sort-badge {
-              display: inline-flex;
-              align-items: center;
-              justify-content: center;
-              min-width: 14px;
-              height: 14px;
-              padding: 0 4px;
-              border-radius: var(--radius-pill);
-              background: var(--primary-color);
-              color: var(--primary-text);
-              font-size: 9px;
-              font-weight: var(--fw-bold);
-              line-height: 1;
-            }
-          }
-        }
-      }
-
-      // Filter row
-      .p-datatable-thead > tr:last-child > th {
-        padding: var(--space-4) var(--space-5);
-        height: 52px;
-        background: transparent;
-        border-bottom: 1px solid var(--border-color);
-
-        &:first-child {
-          padding-left: 0;
-          padding-right: 0;
-          text-align: center;
-        }
-        &:last-child {
-          padding-right: var(--space-8);
-        }
-
-        app-custom-dropdown,
-        app-custom-daterange,
-        app-custom-input {
-          display: block;
-          width: 100%;
-
-          .form-field {
-            gap: var(--space-0);
-          }
-
-          .p-dropdown,
-          .p-calendar {
-            width: 100% !important;
-            min-width: 0;
-          }
-        }
-      }
-
-      // Body rows
-      .p-datatable-tbody > tr {
-        background: var(--card-background);
-        transition: all var(--motion-fast) ease;
-        border-bottom: 1px solid var(--border-color);
-
-        td {
-          padding: 0.75rem 1rem;
-          vertical-align: middle;
-          color: var(--text-color);
-          font-size: var(--fs-body);
-
-          &:first-child {
-            padding-left: 2rem;
-          }
-          &:last-child {
-            padding-right: 2rem;
-          }
-        }
-
-        &:hover {
-          background-color: var(--hover-background) !important;
-        }
-      }
-
-      // Name link
-      .dataset-name-link {
-        color: var(--text-color);
-        font-weight: var(--fw-semibold);
-        font-size: var(--fs-h3);
-        text-decoration: none;
-        cursor: pointer;
-        display: block;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
-
-        &:hover {
-          color: var(--primary-color);
-        }
-      }
-
-      .description-text {
-        color: var(--secondary-color);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: block;
-        max-width: 100%;
-      }
-
-      .date-text {
-        color: var(--text-muted);
-        font-variant-numeric: tabular-nums;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: block;
-        max-width: 100%;
-      }
-
-      .justification-text {
-        max-width: 220px;
-      }
-
-      .version-badge {
-        display: inline-block;
-        padding: 3px 10px;
-        border-radius: var(--radius-xs);
-        font-size: var(--fs-label);
-        font-weight: var(--fw-semibold);
-        font-family: var(--font-mono);
-        background: var(--hover-background);
-        color: var(--text-color-secondary);
-      }
-
-      .action-badge {
-        display: inline-block;
-        padding: 3px 10px;
-        border-radius: var(--radius-xs);
-        font-size: var(--fs-label);
-        font-weight: var(--fw-semibold);
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        white-space: nowrap;
-        &.action-create {
-          background: var(--success-bg);
-          color: var(--success-color);
-        }
-        &.action-update {
-          background: var(--primary-color-transparent);
-          color: var(--primary-color);
-        }
-        &.action-delete {
-          background: var(--error-bg);
-          color: var(--error-color);
-        }
-        &.action-auth {
-          background: var(--primary-color-transparent);
-          color: var(--primary-color);
-        }
-        &.action-warning {
-          background: var(--warning-bg);
-          color: var(--warning-hover);
-        }
-        &.action-default {
-          background: var(--hover-background);
-          color: var(--secondary-color);
-        }
-      }
-
-      // Status Pill — success/fail
-
-      // Paginator
-      .p-paginator {
-        background: var(--card-background);
-        border-top: 1px solid var(--border-color);
-        justify-content: flex-end;
-        padding: 1rem 1.5rem;
-
-        .p-paginator-page,
-        .p-paginator-next,
-        .p-paginator-prev,
-        .p-paginator-first,
-        .p-paginator-last {
-          border-radius: var(--radius-sm);
-          color: var(--secondary-color);
-          min-width: 2rem;
-          height: 2rem;
-          margin: 0 0.125rem;
-          font-weight: var(--fw-medium);
-          &:hover {
-            background: var(--hover-background);
-            color: var(--text-color);
-          }
-          &.p-highlight {
-            background: var(--primary-color);
-            color: var(--primary-text);
-          }
-        }
-      }
-    }
-  }
-}
-
-td.text-center {
-  text-align: center;
-}
-td.empty-message-cell {
-  text-align: center;
-  padding: 3.5rem 2rem !important;
-  color: var(--secondary-color);
-  font-size: var(--fs-h3);
-  background: var(--card-background) !important;
-
-  .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-5);
-    max-width: 28rem;
-    margin: 0 auto;
-
-    .empty-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: var(--hover-background);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 0.5rem;
-      i {
-        font-size: var(--fs-h1);
-        color: var(--secondary-color);
-        opacity: 0.7;
-      }
-    }
-
-    .empty-title {
-      font-size: var(--fs-h3);
+    // Bespoke audit cell chips the shared table does not define. They render
+    // on projected usGridCell content, so they must reach through ::ng-deep
+    // into the shared component's emitted markup.
+    ::ng-deep .version-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: var(--radius-xs);
+      font-size: var(--fs-label);
       font-weight: var(--fw-semibold);
-      color: var(--text-color);
+      font-family: var(--font-mono);
+      background: var(--hover-background);
+      color: var(--text-color-secondary);
+    }
+
+    ::ng-deep .action-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: var(--radius-xs);
+      font-size: var(--fs-label);
+      font-weight: var(--fw-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+      &.action-create {
+        background: var(--success-bg);
+        color: var(--success-color);
+      }
+      &.action-update {
+        background: var(--primary-color-transparent);
+        color: var(--primary-color);
+      }
+      &.action-delete {
+        background: var(--error-bg);
+        color: var(--error-color);
+      }
+      &.action-auth {
+        background: var(--primary-color-transparent);
+        color: var(--primary-color);
+      }
+      &.action-warning {
+        background: var(--warning-bg);
+        color: var(--warning-hover);
+      }
+      &.action-default {
+        background: var(--hover-background);
+        color: var(--secondary-color);
+      }
+    }
+
+    // Justification cell is width-capped so long text ellipsis-truncates
+    // rather than stretch the column. The shared .description-text supplies
+    // colour/overflow; this only bounds the width.
+    ::ng-deep .justification-text {
+      max-width: 220px;
     }
   }
 }

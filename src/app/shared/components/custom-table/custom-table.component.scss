@@ -96,21 +96,25 @@
     width: 100%;
   }
 
-  /* Header cells. The table also carries the global `.modern-table` class so
-     shared list styles match (status pills, per-page cell/action blocks) — and
-     the global `.modern-table.p-datatable.p-datatable-flex-scrollable` rules
-     own the STICKY header (opaque card-background, pinned rows) which is
-     exactly what we want, so we don't fight them on background/position here.
-     We only set the local layout bits (label size, divider, sort alignment)
-     and inherit stickiness from the global rule. */
+  /* Header cells — THE canonical list-table header (shaded, left-aligned,
+     sentence-case). This is the single source of truth for every list; per-page
+     table overrides have been removed so all tables render identically. The
+     table also carries the global `.modern-table` class (for status pills +
+     flex-scrollable sticky positioning); the global rule forces a
+     card-background header with !important, so we chain `.modern-table` +
+     !important here to keep the shaded header and beat it. */
+  &.modern-table .p-datatable-thead > tr > th,
   .p-datatable-thead > tr > th {
-    color: var(--text-color);
-    font-size: var(--fs-control);
-    font-weight: var(--fw-semibold);
-    padding: 0.5rem 0.875rem;
+    background: var(--hover-background) !important;
+    color: var(--text-muted) !important;
+    font-size: var(--fs-label) !important;
+    font-weight: var(--fw-semibold) !important;
+    padding: 0.5rem 0.875rem !important;
     border: none;
     border-bottom: 1px solid var(--border-color);
     white-space: nowrap;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
 
     .ct-th {
       display: inline-flex;
@@ -119,6 +123,12 @@
     }
     &.ct-right .ct-th { justify-content: flex-end; }
     &.ct-center .ct-th { justify-content: center; }
+  }
+  /* Sticky-header rows must stay shaded too (global sets these to
+     card-background !important with higher specificity). */
+  &.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr:first-child > th,
+  &.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr:nth-child(2) > th {
+    background: var(--hover-background) !important;
   }
 
   /* Sort icon — quiet, coloured only when active. */
@@ -133,18 +143,22 @@
   .p-sortable-column:focus { box-shadow: none; outline: none; }
   .p-sortable-column:hover { background: var(--border-color); }
 
-  /* Body cells — 1px divider, no zebra, hover highlight. */
+  /* Body cells — canonical density (1px divider, no zebra, hover highlight).
+     `!important` on padding/font so no residual global/page rule can change the
+     row height; this is what keeps every table's rows identical. */
+  &.modern-table .p-datatable-tbody > tr,
   .p-datatable-tbody > tr {
     background: var(--card-background);
     transition: background var(--motion-fast) ease;
 
     > td {
-      padding: 0.55rem 0.875rem;
+      padding: 0.55rem 0.875rem !important;
       border: none;
       border-bottom: 1px solid var(--border-color);
       color: var(--text-color);
-      font-size: var(--fs-control);
+      font-size: var(--fs-control) !important;
       vertical-align: middle;
+      height: auto !important;
 
       &.ct-right { text-align: right; }
       &.ct-center { text-align: center; }

@@ -47,6 +47,14 @@ export class DatasourcePickerComponent implements OnInit, OnDestroy {
   @Input() autoHydrate = true;
 
   /**
+   * When nothing is hydrated from context, auto-select the FIRST datasource
+   * once the option list loads, so the list screens populate immediately
+   * (no "pick a datasource" dead-end). Lists want this; the Add-Role form
+   * sets it false (with autoHydrate=false) so the user always picks manually.
+   */
+  @Input() autoSelectFirst = true;
+
+  /**
    * Render the "Datasource" text as a floating label (lists) vs. a static
    * field label with a placeholder prompt (the Add-Role form, which wants an
    * explicit "Choose a datasource" cue since nothing is pre-selected).
@@ -126,6 +134,20 @@ export class DatasourcePickerComponent implements OnInit, OnDestroy {
           const items = res?.data?.datasources ?? [];
           this.preloadedDatasources = items;
           this.preloadedDatasourcesTotal = res?.data?.count ?? items.length;
+
+          // Auto-select the first datasource so the list populates on load
+          // (no "pick a datasource" dead-end). Only when nothing is already
+          // selected/hydrated and the caller opted in. Route through the same
+          // change path so context + capability + `changed` all fire.
+          if (
+            this.autoSelectFirst &&
+            !this.selectedDatasource &&
+            !this.ctx.datasourceId() &&
+            items.length
+          ) {
+            this.selectedDatasource = items[0].id;
+            this.onDatasourceChange(items[0].id);
+          }
         }
         this.cdr.markForCheck();
       })

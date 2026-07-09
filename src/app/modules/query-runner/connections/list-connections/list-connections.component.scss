@@ -1,7 +1,9 @@
 @use '../../../db-access/styles/db-access-shared' as db;
 
+// Connections renders through the shared <app-custom-table>, which owns all
+// table chrome — so we drop `db-access-table` (it would override the shared
+// component and diverge from the other lists). Page shell + dialog kept.
 @include db.db-access-page;
-@include db.db-access-table;
 @include db.db-access-dialog;
 
 .default-badge {

@@ -91,7 +91,9 @@
     }
 
     .dropdown-field {
-      // Fixed width — see audit-logs SCSS for rationale.
+      // Fixed width — `min-width` alone let the trigger grow when a
+      // long value was selected, recreating the jitter bug fixed
+      // globally in styles.scss.
       flex: 0 0 200px;
       width: 200px;
     }
@@ -119,212 +121,53 @@
     width: 100%;
     overflow: hidden;
 
-    ::ng-deep .modern-table {
-      .p-datatable-wrapper {
-        background: var(--card-background);
-      }
-      .p-datatable-header {
-        display: none;
-      }
+    // The event-badge is a bespoke login-event chip (success / failed /
+    // logout / refresh / warning) the shared table does not define. It renders
+    // on projected usGridCell content, so it must reach through ::ng-deep into
+    // the shared component's emitted markup.
+    ::ng-deep .event-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: var(--radius-xs);
+      font-size: var(--fs-label);
+      font-weight: var(--fw-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
 
-      // Header row
-      .p-datatable-thead > tr:first-child > th {
+      &.event-success {
+        background: var(--success-bg);
+        color: var(--success-color);
+      }
+      &.event-failed {
+        background: var(--error-bg);
+        color: var(--error-color);
+      }
+      &.event-logout {
+        background: var(--primary-color-transparent);
+        color: var(--primary-color);
+      }
+      &.event-refresh {
+        background: var(--primary-color-transparent);
+        color: var(--primary-color);
+      }
+      &.event-warning {
+        background: var(--warning-bg);
+        color: var(--warning-hover);
+      }
+      &.event-default {
         background: var(--hover-background);
-        color: var(--text-color);
-        opacity: 1;
-        font-size: var(--fs-label);
-        font-weight: var(--fw-semibold);
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        padding: 0.75rem 1rem;
-        border-bottom: 1px solid var(--border-color);
-
-        .th-content {
-          display: flex;
-          align-items: center;
-          gap: var(--space-4);
-        }
-
-        &:first-child {
-          padding-left: 2rem;
-        }
-        &:last-child {
-          padding-right: 2rem;
-        }
-        &:focus {
-          box-shadow: none;
-        }
-      }
-
-      // Filter row
-      .p-datatable-thead > tr:last-child > th {
-        padding: 0.5rem 0.75rem;
-        background: var(--card-background);
-        border-bottom: 1px solid var(--border-color);
-
-        &:first-child {
-          padding-left: 1rem;
-        }
-        &:last-child {
-          padding-right: 1rem;
-        }
-
-        app-custom-dropdown,
-        app-custom-daterange,
-        app-custom-input {
-          display: block;
-          width: 100%;
-
-          .form-field {
-            gap: var(--space-0);
-          }
-
-          .p-dropdown,
-          .p-calendar {
-            width: 100% !important;
-            min-width: 0;
-          }
-        }
-      }
-
-      // Body rows
-      .p-datatable-tbody > tr {
-        background: var(--card-background);
-        transition: all var(--motion-fast) ease;
-        border-bottom: 1px solid var(--border-color);
-
-        td {
-          padding: 0.75rem 1rem;
-          vertical-align: middle;
-          color: var(--text-color);
-          font-size: var(--fs-body);
-
-          &:first-child {
-            padding-left: 2rem;
-          }
-          &:last-child {
-            padding-right: 2rem;
-          }
-        }
-
-        &:hover {
-          background-color: var(--hover-background) !important;
-        }
-      }
-
-      // Name link
-      .dataset-name-link {
-        color: var(--text-color);
-        font-weight: var(--fw-semibold);
-        font-size: var(--fs-h3);
-        text-decoration: none;
-        cursor: default;
-        display: block;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
-      }
-
-      .description-text {
         color: var(--secondary-color);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: block;
-        max-width: 100%;
-      }
-
-      .date-text {
-        color: var(--text-muted);
-        font-variant-numeric: tabular-nums;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: block;
-        max-width: 100%;
-      }
-
-      .user-agent-text {
-        max-width: 220px;
-      }
-
-      .event-badge {
-        display: inline-block;
-        padding: 3px 10px;
-        border-radius: var(--radius-xs);
-        font-size: var(--fs-label);
-        font-weight: var(--fw-semibold);
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        white-space: nowrap;
-
-        &.event-success {
-          background: var(--success-bg);
-          color: var(--success-color);
-        }
-        &.event-failed {
-          background: var(--error-bg);
-          color: var(--error-color);
-        }
-        &.event-logout {
-          background: var(--primary-color-transparent);
-          color: var(--primary-color);
-        }
-        &.event-refresh {
-          background: var(--primary-color-transparent);
-          color: var(--primary-color);
-        }
-        &.event-warning {
-          background: var(--warning-bg);
-          color: var(--warning-hover);
-        }
-        &.event-default {
-          background: var(--hover-background);
-          color: var(--secondary-color);
-        }
-      }
-
-      // Paginator
-      .p-paginator {
-        background: var(--card-background);
-        border-top: 1px solid var(--border-color);
-        justify-content: flex-end;
-        padding: 1rem 1.5rem;
-
-        .p-paginator-page,
-        .p-paginator-next,
-        .p-paginator-prev,
-        .p-paginator-first,
-        .p-paginator-last {
-          border-radius: var(--radius-sm);
-          color: var(--secondary-color);
-          min-width: 2rem;
-          height: 2rem;
-          margin: 0 0.125rem;
-          font-weight: var(--fw-medium);
-          &:hover {
-            background: var(--hover-background);
-            color: var(--text-color);
-          }
-          &.p-highlight {
-            background: var(--primary-color);
-            color: var(--primary-text);
-          }
-        }
       }
     }
-  }
-}
 
-td.text-center {
-  text-align: center;
-}
-td.empty-message-cell {
-  text-align: center;
-  padding: var(--space-9) !important;
-  color: var(--secondary-color);
-  font-size: var(--fs-h3);
+    // User-agent cell is width-capped so long UA strings ellipsis-truncate
+    // rather than stretch the column. The shared .description-text supplies
+    // colour/overflow; this only bounds the width.
+    ::ng-deep .user-agent-text {
+      max-width: 220px;
+    }
+  }
 }
 
 /* ── projected empty body (centred; not a row) ─────────────────────────── */

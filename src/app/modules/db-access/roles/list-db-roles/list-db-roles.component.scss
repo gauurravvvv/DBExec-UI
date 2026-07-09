@@ -1,7 +1,12 @@
 @use '../../styles/db-access-shared' as db;
 
+// NOTE: db-roles now renders through the shared <app-custom-table>, which owns
+// ALL table chrome (header/rows/cells/pills/actions) — so we no longer include
+// `db-access-table` here (it would override the shared component and diverge
+// from the other lists). `db-access-page` (content-card, datasource toolbar,
+// type chips, capability badge) and `db-access-dialog` (delete popups) stay.
+// The mixin itself is kept for the sessions panel, which is still on us-data-grid.
 @include db.db-access-page;
-@include db.db-access-table;
 @include db.db-access-dialog;
 
 .delete-intro {
