@@ -1686,7 +1686,8 @@
       "ON": "켜짐",
       "OFF": "꺼짐",
       "ENABLE": "사용",
-      "DISABLE": "사용 안 함"
+      "DISABLE": "사용 안 함",
+      "DELIVERY_FAILING": "전달 실패"
     }
   },
   "TOAST": {

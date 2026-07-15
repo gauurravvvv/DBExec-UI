@@ -108,6 +108,15 @@
             <span class="schedule-meta">
               {{ sub.format | uppercase }} · {{ sub.timezone }}
             </span>
+            <span
+              class="schedule-failing"
+              *ngIf="sub.lastError && sub.enabled"
+              [pTooltip]="sub.lastError"
+              tooltipPosition="top"
+            >
+              <i class="pi pi-exclamation-triangle"></i>
+              {{ 'DASHBOARD.SCHEDULE.DELIVERY_FAILING' | translate }}
+            </span>
           </div>
           <div class="schedule-row-actions">
             <span

@@ -1686,7 +1686,8 @@
       "ON": "日時",
       "OFF": "オフ",
       "ENABLE": "有効にする",
-      "DISABLE": "無効にする"
+      "DISABLE": "無効にする",
+      "DELIVERY_FAILING": "配信に失敗"
     }
   },
   "TOAST": {

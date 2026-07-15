@@ -1686,7 +1686,8 @@
       "ON": "开",
       "OFF": "关",
       "ENABLE": "启用",
-      "DISABLE": "禁用"
+      "DISABLE": "禁用",
+      "DELIVERY_FAILING": "推送失败"
     }
   },
   "TOAST": {

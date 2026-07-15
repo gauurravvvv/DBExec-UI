@@ -1686,7 +1686,8 @@
       "ON": "El",
       "OFF": "Desactivado",
       "ENABLE": "Activar",
-      "DISABLE": "Desactivar"
+      "DISABLE": "Desactivar",
+      "DELIVERY_FAILING": "Error de entrega"
     }
   },
   "TOAST": {

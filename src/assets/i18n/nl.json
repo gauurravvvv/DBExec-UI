@@ -1686,7 +1686,8 @@
       "ON": "Aan",
       "OFF": "Uit",
       "ENABLE": "Inschakelen",
-      "DISABLE": "Uitschakelen"
+      "DISABLE": "Uitschakelen",
+      "DELIVERY_FAILING": "Levering mislukt"
     }
   },
   "TOAST": {

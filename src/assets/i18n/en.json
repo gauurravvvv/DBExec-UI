@@ -1689,7 +1689,8 @@
       "ON": "On",
       "OFF": "Off",
       "ENABLE": "Enable",
-      "DISABLE": "Disable"
+      "DISABLE": "Disable",
+      "DELIVERY_FAILING": "Delivery failing"
     }
   },
   "TOAST": {
