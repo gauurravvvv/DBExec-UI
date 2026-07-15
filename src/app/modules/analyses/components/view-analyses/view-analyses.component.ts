@@ -11,6 +11,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ANALYSES } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { FavouritesService } from 'src/app/shared/services/favourites.service';
+import type { FolderObjectType } from 'src/app/shared/validators/folders';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import { AnalysesService } from '../../services/analyses.service';
 
@@ -40,12 +42,16 @@ export class ViewAnalysesComponent implements OnInit, OnDestroy {
   // Custom field dialog
   showAddCustomFieldDialog = false;
 
+  /* ── favourite star (Track F) ───────────────────────────────────── */
+  readonly objectType: FolderObjectType = 'analysis';
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private datasetService: DatasetService,
     private globalService: GlobalService,
     private analysesService: AnalysesService,
+    private favouritesService: FavouritesService,
   ) {}
 
   get saving() {
@@ -55,7 +61,27 @@ export class ViewAnalysesComponent implements OnInit, OnDestroy {
   loading = this.analysesService.loading;
   isDeleting = (id: string): boolean => this.analysesService.isDeleting(id);
 
+  isFavourite(): boolean {
+    return (
+      !!this.analysisId &&
+      this.favouritesService.isFavourite(this.objectType, this.analysisId)
+    );
+  }
+
+  toggleFavourite(): void {
+    if (!this.analysisId) return;
+    this.favouritesService
+      .toggle(this.objectType, this.analysisId)
+      .then((res: any) => {
+        this.globalService.handleSuccessService(res, false);
+        this.cdr.markForCheck();
+      });
+  }
+
   ngOnInit(): void {
+    this.favouritesService
+      .refresh(this.objectType)
+      .then(() => this.cdr.markForCheck());
     this.route.params
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {

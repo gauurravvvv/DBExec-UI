@@ -246,6 +246,22 @@
               styleClass="alerts-email-chips"
             ></p-chips>
           </div>
+
+          <!-- Organization tags (Track F) -->
+          <div class="chips-field">
+            <label class="chips-label">
+              <i class="pi pi-tags"></i> {{ 'COMMON.TAGS' | translate }}
+            </label>
+            <p-chips
+              formControlName="tags"
+              [addOnBlur]="true"
+              [addOnTab]="true"
+              [allowDuplicate]="false"
+              separator=","
+              [placeholder]="'COMMON.TAGS_PLACEHOLDER' | translate"
+              styleClass="alerts-email-chips"
+            ></p-chips>
+          </div>
         </div>
       </section>
 

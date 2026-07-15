@@ -842,3 +842,19 @@
     color: var(--primary-text, #fff);
   }
 }
+
+/* ── Track F: favourite star toggle in the view header ─────────────── */
+.fav-toggle {
+  i {
+    color: #9aa7b4;
+    transition: color 0.15s ease;
+  }
+
+  &:hover i {
+    color: #f1c21b;
+  }
+
+  &.on i {
+    color: #f1c21b;
+  }
+}

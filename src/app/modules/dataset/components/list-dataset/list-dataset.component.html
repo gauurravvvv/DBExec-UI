@@ -21,8 +21,45 @@
       </div>
     </div>
 
-    <!-- Content Card -->
-    <div class="content-card">
+    <!-- Content Card — folder rail (left) + list (right), Track F -->
+    <div class="content-card org-layout">
+      <aside class="folder-rail">
+        <app-folder-tree
+          [objectType]="objectType"
+          [selectedFolderId]="selectedFolderId"
+          [canManage]="true"
+          (folderSelected)="onFolderSelected($event)"
+          (objectMoved)="onObjectMoved()"
+        ></app-folder-tree>
+      </aside>
+
+      <div class="org-main">
+        <!-- Tag-filter chips + Favourites quick-filter -->
+        <div class="org-toolbar">
+          <button
+            type="button"
+            class="fav-filter-btn"
+            [class.active]="favouritesOnly"
+            (click)="toggleFavouritesOnly()"
+            [pTooltip]="'FAVOURITE.SHOW_ONLY' | translate"
+            tooltipPosition="bottom"
+          >
+            <i class="pi" [ngClass]="favouritesOnly ? 'pi-star-fill' : 'pi-star'"></i>
+            {{ 'FAVOURITE.FAVOURITES' | translate }}
+          </button>
+          <div class="tag-filter">
+            <i class="pi pi-tags tag-filter-icon"></i>
+            <p-chips
+              [ngModel]="filterTags"
+              (ngModelChange)="onTagsChanged($event)"
+              [placeholder]="'COMMON.TAGS_FILTER_PLACEHOLDER' | translate"
+              [addOnBlur]="true"
+              separator=","
+              styleClass="tag-filter-chips"
+            ></p-chips>
+          </div>
+        </div>
+
       <!-- Unified simple table. Infinite scroll, global search + on-demand
            per-column filters (shared inputs), per-row actions. Dataset is
            datasource-scoped, so the datasource picker is projected into the
@@ -33,6 +70,7 @@
           [columns]="cols"
           [serverAdapter]="adapter"
           [config]="tableConfig"
+          [baseFilter]="listFilter"
           [hasProjectedEmpty]="true"
           (refresh)="refreshList()"
         >
@@ -63,10 +101,33 @@
             <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
           </div>
 
+          <ng-template usGridCell="favourite" let-dataset>
+            <button
+              type="button"
+              class="fav-star-btn"
+              [class.on]="isFavourite(dataset.id)"
+              (click)="toggleFavourite(dataset.id)"
+              [pTooltip]="
+                (isFavourite(dataset.id)
+                  ? 'FAVOURITE.REMOVE'
+                  : 'FAVOURITE.ADD'
+                ) | translate
+              "
+              tooltipPosition="bottom"
+            >
+              <i
+                class="pi"
+                [ngClass]="isFavourite(dataset.id) ? 'pi-star-fill' : 'pi-star'"
+              ></i>
+            </button>
+          </ng-template>
+
           <ng-template usGridCell="name" let-dataset>
             <a
               class="dataset-name-link"
               [routerLink]="['/app/datasets', dataset.id]"
+              draggable="true"
+              (dragstart)="$event.dataTransfer?.setData('text/plain', dataset.id)"
             >
               {{ dataset.name }}
             </a>
@@ -175,6 +236,8 @@
           {{ 'COMMON.SELECT_DATASOURCE' | translate }}
         </span>
       </div>
+      </div>
+      <!-- /org-main -->
     </div>
   </div>
 </div>

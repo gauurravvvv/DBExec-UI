@@ -91,6 +91,9 @@ export class EditDatasetComponent
   // save dialog so the toggle/TTL reflect the current saved state.
   datasetCacheEnabled = false;
   datasetCacheTtlSeconds: number | null = null;
+  // Track F: organizational tags loaded from the dataset, fed back into the
+  // save dialog so the chips reflect the current saved tags.
+  datasetTags: string[] = [];
   initialQuery?: string;
   originalQuery: string = ''; // Store original query from dataset
 
@@ -1833,6 +1836,8 @@ export class EditDatasetComponent
         sql,
         cacheEnabled: formData.cacheEnabled,
         cacheTtlSeconds: formData.cacheTtlSeconds,
+        // Track F: organizational tags captured in the save dialog.
+        tags: formData.tags ?? [],
       };
 
       this.datasetService
@@ -2298,6 +2303,7 @@ export class EditDatasetComponent
           this.datasetCacheEnabled = !!dataset.cacheEnabled;
           this.datasetCacheTtlSeconds =
             dataset.cacheTtlSeconds ?? null;
+          this.datasetTags = Array.isArray(dataset.tags) ? dataset.tags : [];
 
           // Set database from API response. Spread the full
           // datasource payload (rather than just {id, name}) so the

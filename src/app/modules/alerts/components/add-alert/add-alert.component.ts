@@ -150,6 +150,8 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
       cooldownMinutes: [60, [Validators.min(0), Validators.max(10080)]],
       consecutiveBreachesRequired: [1, [Validators.min(1), Validators.max(100)]],
       enabled: [true],
+      // organization (Track F): free-form tags
+      tags: [[]],
     });
 
     // A source-type change clears the picked source + its fields.

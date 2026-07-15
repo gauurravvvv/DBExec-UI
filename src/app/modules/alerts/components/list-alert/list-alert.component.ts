@@ -18,6 +18,8 @@ import type {
   CustomTableColumn,
   CustomTableConfig,
 } from 'src/app/shared/components/custom-table/custom-table.types';
+import { FavouritesService } from 'src/app/shared/services/favourites.service';
+import type { FolderObjectType } from 'src/app/shared/validators/folders';
 import { AlertService } from '../../services/alert.service';
 
 /**
@@ -77,6 +79,22 @@ export class ListAlertComponent implements OnInit, OnDestroy {
 
   adapter: UsServerListAdapter<any> | null = null;
 
+  /* ── folders / tags / favourites (Track F) ──────────────────────── */
+
+  /** Object family this list organizes — drives the folder tree + favourites. */
+  readonly objectType: FolderObjectType = 'alert';
+
+  /** Host-owned filter slice merged into every server request by the custom
+   *  table (single writer). Reassign a NEW object to trigger a re-fetch. */
+  listFilter: Record<string, unknown> = {};
+
+  selectedFolderId: string | null = null;
+  filterTags: string[] = [];
+  favouritesOnly = false;
+
+  /** Favourite-id set for this object family (from FavouritesService). */
+  favIds = this.favouritesService.ids;
+
   isDeleting = (id: string): boolean => this.alertService.isDeleting(id);
   saving = this.alertService.saving;
 
@@ -85,6 +103,7 @@ export class ListAlertComponent implements OnInit, OnDestroy {
     private router: Router,
     private globalService: GlobalService,
     private translate: TranslateService,
+    private favouritesService: FavouritesService,
   ) {}
 
   ngOnInit(): void {
@@ -96,6 +115,10 @@ export class ListAlertComponent implements OnInit, OnDestroy {
       ),
     };
     this.bindAdapter();
+    // Warm the favourite-id set so each row's star renders correct state.
+    this.favouritesService.refresh(this.objectType).then(() => {
+      this.cdr.markForCheck();
+    });
   }
 
   ngOnDestroy(): void {
@@ -108,6 +131,7 @@ export class ListAlertComponent implements OnInit, OnDestroy {
   private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
+      { colId: 'favourite', header: '', width: '56px', sortable: false, align: 'center' },
       { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '220px', frozen: true, filter: 'text' },
       { colId: 'sourceType', field: 'sourceType', header: t('ALERTS.SOURCE'), width: '128px', sortable: false },
       { colId: 'severity', field: 'severity', header: t('ALERTS.SEVERITY'), width: '128px', sortable: false },
@@ -143,6 +167,50 @@ export class ListAlertComponent implements OnInit, OnDestroy {
 
   refreshList(): void {
     this.adapter?.reload();
+  }
+
+  /* ── folders / tags / favourites (Track F) ──────────────────────── */
+
+  /** Rebuild the host filter slice from the current folder / tag / favourite
+   *  selections. Reassigns a NEW object so the custom table re-fetches. */
+  private applyOrgFilter(): void {
+    const f: Record<string, unknown> = {};
+    if (this.selectedFolderId) f['folderId'] = this.selectedFolderId;
+    if (this.filterTags.length) f['tags'] = this.filterTags;
+    if (this.favouritesOnly) f['favouritesOnly'] = true;
+    this.listFilter = f;
+  }
+
+  onFolderSelected(folderId: string | null): void {
+    this.selectedFolderId = folderId;
+    this.applyOrgFilter();
+  }
+
+  onTagsChanged(tags: string[]): void {
+    this.filterTags = tags ?? [];
+    this.applyOrgFilter();
+  }
+
+  toggleFavouritesOnly(): void {
+    this.favouritesOnly = !this.favouritesOnly;
+    this.applyOrgFilter();
+  }
+
+  onObjectMoved(): void {
+    this.refreshList();
+  }
+
+  isFavourite(id: string): boolean {
+    return this.favouritesService.isFavourite(this.objectType, id);
+  }
+
+  toggleFavourite(id: string): void {
+    this.favouritesService.toggle(this.objectType, id).then((res: any) => {
+      this.globalService.handleSuccessService(res, false);
+      // If the Favourites filter is active, re-fetch so the row drops out.
+      if (this.favouritesOnly) this.refreshList();
+      this.cdr.markForCheck();
+    });
   }
 
   trackByIndex(index: number): number {

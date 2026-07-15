@@ -16,23 +16,88 @@
       </div>
     </div>
 
-    <!-- Content -->
-    <div class="content-card">
-      <div class="table-wrapper" *ngIf="adapter">
-        <app-custom-table
-          [columns]="cols"
-          [serverAdapter]="adapter"
-          [config]="tableConfig"
-          [hasProjectedEmpty]="true"
-          (refresh)="refreshList()"
-        >
-          <div tableEmpty class="ct-empty-body">
-            <i class="pi pi-bell"></i>
-            <span>{{ 'ALERTS.NO_ALERTS' | translate }}</span>
+    <!-- Content — folder rail (left) + list (right) -->
+    <div class="content-card org-layout">
+      <!-- Left rail: shared folder tree (Track F) -->
+      <aside class="folder-rail">
+        <app-folder-tree
+          [objectType]="objectType"
+          [selectedFolderId]="selectedFolderId"
+          [canManage]="true"
+          (folderSelected)="onFolderSelected($event)"
+          (objectMoved)="onObjectMoved()"
+        ></app-folder-tree>
+      </aside>
+
+      <div class="org-main">
+        <!-- Tag-filter chips + Favourites quick-filter -->
+        <div class="org-toolbar">
+          <button
+            type="button"
+            class="fav-filter-btn"
+            [class.active]="favouritesOnly"
+            (click)="toggleFavouritesOnly()"
+            [pTooltip]="'FAVOURITE.SHOW_ONLY' | translate"
+            tooltipPosition="bottom"
+          >
+            <i class="pi" [ngClass]="favouritesOnly ? 'pi-star-fill' : 'pi-star'"></i>
+            {{ 'FAVOURITE.FAVOURITES' | translate }}
+          </button>
+          <div class="tag-filter">
+            <i class="pi pi-tags tag-filter-icon"></i>
+            <p-chips
+              [ngModel]="filterTags"
+              (ngModelChange)="onTagsChanged($event)"
+              [placeholder]="'COMMON.TAGS_FILTER_PLACEHOLDER' | translate"
+              [addOnBlur]="true"
+              separator=","
+              styleClass="tag-filter-chips"
+            ></p-chips>
           </div>
+        </div>
+
+        <div class="table-wrapper" *ngIf="adapter">
+          <app-custom-table
+            [columns]="cols"
+            [serverAdapter]="adapter"
+            [config]="tableConfig"
+            [baseFilter]="listFilter"
+            [hasProjectedEmpty]="true"
+            (refresh)="refreshList()"
+          >
+            <div tableEmpty class="ct-empty-body">
+              <i class="pi pi-bell"></i>
+              <span>{{ 'ALERTS.NO_ALERTS' | translate }}</span>
+            </div>
+
+            <ng-template usGridCell="favourite" let-alert>
+              <button
+                type="button"
+                class="fav-star-btn"
+                [class.on]="isFavourite(alert.id)"
+                (click)="toggleFavourite(alert.id)"
+                [pTooltip]="
+                  (isFavourite(alert.id)
+                    ? 'FAVOURITE.REMOVE'
+                    : 'FAVOURITE.ADD'
+                  ) | translate
+                "
+                tooltipPosition="bottom"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="isFavourite(alert.id) ? 'pi-star-fill' : 'pi-star'"
+                ></i>
+              </button>
+            </ng-template>
 
           <ng-template usGridCell="name" let-alert>
-            <a class="dataset-name-link" [routerLink]="['/app/alerts', alert.id]">
+            <a
+              class="dataset-name-link"
+              [routerLink]="['/app/alerts', alert.id]"
+              draggable="true"
+              (dragstart)="$event.dataTransfer?.setData('text/plain', alert.id)"
+            >
               {{ alert.name }}
             </a>
           </ng-template>
@@ -166,8 +231,10 @@
               </button>
             </div>
           </ng-template>
-        </app-custom-table>
+          </app-custom-table>
+        </div>
       </div>
+      <!-- /org-main -->
     </div>
   </div>
 </div>

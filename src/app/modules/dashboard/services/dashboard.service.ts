@@ -154,6 +154,8 @@ export class DashboardService {
     name?: string;
     description?: string;
     status?: 0 | 1;
+    // Track F: organizational tags applied to the published dashboard.
+    tags?: string[];
   }): Promise<any> {
     this._saving.set(true);
     try {

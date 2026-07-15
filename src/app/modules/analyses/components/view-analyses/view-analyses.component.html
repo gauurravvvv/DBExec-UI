@@ -14,6 +14,18 @@
       </div>
       <div class="header-actions" *ngIf="analysisDetails">
         <button
+          type="button"
+          class="btn-ghost fav-toggle"
+          [class.on]="isFavourite()"
+          (click)="toggleFavourite()"
+          [pTooltip]="
+            (isFavourite() ? 'FAVOURITE.REMOVE' : 'FAVOURITE.ADD') | translate
+          "
+          tooltipPosition="bottom"
+        >
+          <i class="pi" [ngClass]="isFavourite() ? 'pi-star-fill' : 'pi-star'"></i>
+        </button>
+        <button
           *hasPermission="'analyses'; level: 'write'"
           class="btn-primary"
           (click)="onEdit()"
