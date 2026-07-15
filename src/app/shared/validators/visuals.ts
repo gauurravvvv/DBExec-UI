@@ -103,6 +103,46 @@ const ratioSchema = z
 const idSchema = (msg: string) =>
   z.string({ message: msg }).uuid({ message: msg });
 
+// ── Server-side aggregation encoding (Track D) ──────────────────────
+
+/** Aggregate functions supported by buildAggregationWrap. */
+export const AGGREGATE_VALUES = [
+  'sum',
+  'avg',
+  'count',
+  'min',
+  'max',
+  'count_distinct',
+] as const;
+export type AggregateFn = (typeof AGGREGATE_VALUES)[number];
+
+/** Optional aggregate — blank / null collapses to undefined (→ stored null). */
+const aggregateSchema = z
+  .preprocess(
+    blankToUndefined,
+    z.enum(AGGREGATE_VALUES, {
+      message: 'validation.visuals.aggregate.invalid',
+    }),
+  )
+  .nullable()
+  .optional();
+
+/** dimension / measure columns — same identifier shape as axis columns. */
+const aggregationColumnSchema = z
+  .preprocess(
+    blankToUndefined,
+    z
+      .string()
+      .max(VISUAL_LIMITS.COLUMN_NAME_MAX, {
+        message: 'validation.visuals.axis.tooLong',
+      })
+      .regex(VISUAL_COLUMN_PATTERN, {
+        message: 'validation.visuals.axis.invalid',
+      }),
+  )
+  .nullable()
+  .optional();
+
 /**
  * Config blob — 40+ ECharts tunables. Shape is owned by the FE chart layer;
  * we only guarantee it is an object so the JSONB column never receives a
@@ -130,6 +170,13 @@ export const addVisualSchema = z.object({
   xAxisColumn: axisColumnSchema,
   yAxisColumn: axisColumnSchema,
   config: configSchema.optional().default({}),
+  // Track D: server-side aggregation encoding. dimensionColumn/measureColumn
+  // default to xAxisColumn/yAxisColumn on the BE when unset; null aggregate =
+  // no server aggregation (raw rows, back-compat). Multi-measure combos live
+  // in config.aggregations[] (part of the free-form config blob).
+  dimensionColumn: aggregationColumnSchema,
+  measureColumn: aggregationColumnSchema,
+  aggregate: aggregateSchema,
   widthRatio: ratioSchema,
   heightRatio: ratioSchema,
   xRatio: ratioSchema,
@@ -154,6 +201,10 @@ export const updateVisualSchema = z.object({
   xAxisColumn: axisColumnSchema,
   yAxisColumn: axisColumnSchema,
   config: configSchema.optional(),
+  // Track D: server-side aggregation encoding (all optional on update).
+  dimensionColumn: aggregationColumnSchema,
+  measureColumn: aggregationColumnSchema,
+  aggregate: aggregateSchema,
   widthRatio: ratioSchema,
   heightRatio: ratioSchema,
   xRatio: ratioSchema,

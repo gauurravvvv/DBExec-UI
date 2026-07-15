@@ -57,6 +57,10 @@ export const FILTER_NULL_OPTION_VALUES = [
   'NON_NULLS_ONLY',
 ] as const;
 
+/** Filter scope (Track B) — which visuals a filter re-runs when applied. */
+export const FILTER_SCOPE_VALUES = ['dashboard', 'tab', 'visual'] as const;
+export type FilterScope = (typeof FILTER_SCOPE_VALUES)[number];
+
 /** RLS rule subject scope. */
 export const RLS_SCOPE_VALUES = ['user', 'group'] as const;
 export type RlsScope = (typeof RLS_SCOPE_VALUES)[number];
@@ -180,41 +184,107 @@ export const filterColumnSchema = z.preprocess(
     }),
 );
 
-const filterShape = z.object({
-  name: filterNameSchema,
-  filterType: z.preprocess(
-    trimOrUndefined,
-    z.enum(FILTER_TYPE_VALUES, {
-      message: 'validation.analyses.filter.type.invalid',
+/**
+ * Scoped-filter fields (Track B). scope='tab' requires targetTabId; scope=
+ * 'visual' requires a non-empty targetVisualIds. Enforced by
+ * refineFilterScope, applied to both the create + update shapes.
+ */
+export const filterScopeSchema = z
+  .preprocess(
+    blankToUndefined,
+    z.enum(FILTER_SCOPE_VALUES, {
+      message: 'validation.analyses.filter.scope.invalid',
     }),
-  ),
-  columnName: filterColumnSchema,
-  controlType: z.preprocess(
-    trimOrUndefined,
-    z.enum(FILTER_CONTROL_VALUES, {
-      message: 'validation.analyses.filter.control.invalid',
+  )
+  .optional()
+  .default('dashboard');
+
+const filterTargetTabIdSchema = z
+  .preprocess(
+    blankToUndefined,
+    z.string().uuid({ message: 'validation.analyses.filter.targetTabId.invalid' }),
+  )
+  .nullable()
+  .optional();
+
+const filterTargetVisualIdsSchema = z
+  .array(
+    z.string().uuid({
+      message: 'validation.analyses.filter.targetVisualIds.invalid',
     }),
-  ),
-  // Free-form filter UI config; shape is owned by the visual layer.
-  config: z.record(z.string(), z.any()).optional().default({}),
-  nullOption: z
-    .preprocess(
-      blankToUndefined,
-      z.enum(FILTER_NULL_OPTION_VALUES, {
-        message: 'validation.analyses.filter.null.invalid',
+  )
+  .nullable()
+  .optional();
+
+const refineFilterScope = (
+  data: {
+    scope?: string;
+    targetTabId?: string | null;
+    targetVisualIds?: string[] | null;
+  },
+  ctx: z.RefinementCtx,
+): void => {
+  if (data.scope === undefined) return; // update: scope unchanged
+  if (data.scope === 'tab') {
+    if (!data.targetTabId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['targetTabId'],
+        message: 'validation.analyses.filter.targetTabId.required',
+      });
+    }
+  } else if (data.scope === 'visual') {
+    if (!Array.isArray(data.targetVisualIds) || data.targetVisualIds.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['targetVisualIds'],
+        message: 'validation.analyses.filter.targetVisualIds.required',
+      });
+    }
+  }
+};
+
+const filterShape = z
+  .object({
+    name: filterNameSchema,
+    filterType: z.preprocess(
+      trimOrUndefined,
+      z.enum(FILTER_TYPE_VALUES, {
+        message: 'validation.analyses.filter.type.invalid',
       }),
-    )
-    .optional()
-    .default('ALL_VALUES'),
-  isEnabled: z.boolean().optional().default(true),
-  isMandatory: z.boolean().optional().default(false),
-  sequence: z
-    .number()
-    .int({ message: 'validation.analyses.filter.sequence.invalid' })
-    .min(0, { message: 'validation.analyses.filter.sequence.invalid' })
-    .optional()
-    .default(0),
-});
+    ),
+    columnName: filterColumnSchema,
+    controlType: z.preprocess(
+      trimOrUndefined,
+      z.enum(FILTER_CONTROL_VALUES, {
+        message: 'validation.analyses.filter.control.invalid',
+      }),
+    ),
+    // Free-form filter UI config; shape is owned by the visual layer.
+    config: z.record(z.string(), z.any()).optional().default({}),
+    nullOption: z
+      .preprocess(
+        blankToUndefined,
+        z.enum(FILTER_NULL_OPTION_VALUES, {
+          message: 'validation.analyses.filter.null.invalid',
+        }),
+      )
+      .optional()
+      .default('ALL_VALUES'),
+    isEnabled: z.boolean().optional().default(true),
+    isMandatory: z.boolean().optional().default(false),
+    // Track B: scoped-filter targeting.
+    scope: filterScopeSchema,
+    targetTabId: filterTargetTabIdSchema,
+    targetVisualIds: filterTargetVisualIdsSchema,
+    sequence: z
+      .number()
+      .int({ message: 'validation.analyses.filter.sequence.invalid' })
+      .min(0, { message: 'validation.analyses.filter.sequence.invalid' })
+      .optional()
+      .default(0),
+  })
+  .superRefine(refineFilterScope);
 
 export const addAnalysisFilterSchema = z.object({
   analysisId: idSchema('validation.analyses.id.required'),
@@ -223,44 +293,57 @@ export const addAnalysisFilterSchema = z.object({
   }),
 });
 
-export const updateAnalysisFilterSchema = z.object({
-  id: idSchema('validation.analyses.filter.id.required'),
-  name: filterNameSchema.optional(),
-  filterType: z
-    .preprocess(
-      trimOrUndefined,
-      z.enum(FILTER_TYPE_VALUES, {
-        message: 'validation.analyses.filter.type.invalid',
-      }),
-    )
-    .optional(),
-  columnName: filterColumnSchema.optional(),
-  controlType: z
-    .preprocess(
-      trimOrUndefined,
-      z.enum(FILTER_CONTROL_VALUES, {
-        message: 'validation.analyses.filter.control.invalid',
-      }),
-    )
-    .optional(),
-  config: z.record(z.string(), z.any()).optional(),
-  nullOption: z
-    .preprocess(
-      blankToUndefined,
-      z.enum(FILTER_NULL_OPTION_VALUES, {
-        message: 'validation.analyses.filter.null.invalid',
-      }),
-    )
-    .optional(),
-  isEnabled: z.boolean().optional(),
-  isMandatory: z.boolean().optional(),
-  sequence: z
-    .number()
-    .int({ message: 'validation.analyses.filter.sequence.invalid' })
-    .min(0, { message: 'validation.analyses.filter.sequence.invalid' })
-    .optional(),
-  justification: analysisJustificationSchema,
-});
+export const updateAnalysisFilterSchema = z
+  .object({
+    id: idSchema('validation.analyses.filter.id.required'),
+    name: filterNameSchema.optional(),
+    filterType: z
+      .preprocess(
+        trimOrUndefined,
+        z.enum(FILTER_TYPE_VALUES, {
+          message: 'validation.analyses.filter.type.invalid',
+        }),
+      )
+      .optional(),
+    columnName: filterColumnSchema.optional(),
+    controlType: z
+      .preprocess(
+        trimOrUndefined,
+        z.enum(FILTER_CONTROL_VALUES, {
+          message: 'validation.analyses.filter.control.invalid',
+        }),
+      )
+      .optional(),
+    config: z.record(z.string(), z.any()).optional(),
+    nullOption: z
+      .preprocess(
+        blankToUndefined,
+        z.enum(FILTER_NULL_OPTION_VALUES, {
+          message: 'validation.analyses.filter.null.invalid',
+        }),
+      )
+      .optional(),
+    isEnabled: z.boolean().optional(),
+    isMandatory: z.boolean().optional(),
+    // Track B: scoped-filter targeting (all optional on update).
+    scope: z
+      .preprocess(
+        blankToUndefined,
+        z.enum(FILTER_SCOPE_VALUES, {
+          message: 'validation.analyses.filter.scope.invalid',
+        }),
+      )
+      .optional(),
+    targetTabId: filterTargetTabIdSchema,
+    targetVisualIds: filterTargetVisualIdsSchema,
+    sequence: z
+      .number()
+      .int({ message: 'validation.analyses.filter.sequence.invalid' })
+      .min(0, { message: 'validation.analyses.filter.sequence.invalid' })
+      .optional(),
+    justification: analysisJustificationSchema,
+  })
+  .superRefine(refineFilterScope);
 
 // ── Analysis composite schemas ─────────────────────────────────────
 
@@ -331,6 +414,49 @@ export type AppliedFilterInput = z.infer<typeof appliedFilterSchema>;
  * either a positive int or -1 (the sentinel for "no row cap"); the
  * controller checks `parsedLimit !== -1` to skip the LIMIT wrap.
  */
+/**
+ * Optional server-side aggregation encoding sent on a run (Track D). When
+ * present with a non-null `aggregate`, the run wraps the (post-filter) SQL in a
+ * GROUP BY. Identifiers are re-validated + double-quoted server-side
+ * (buildAggregationWrap); the columns are held to the same identifier shape as
+ * axis columns so a bad column is rejected at the gate.
+ */
+export const AGGREGATE_VALUES = [
+  'sum',
+  'avg',
+  'count',
+  'min',
+  'max',
+  'count_distinct',
+] as const;
+export type AggregateFn = (typeof AGGREGATE_VALUES)[number];
+
+const aggregationColumnSchema = z.preprocess(
+  blankToUndefined,
+  z.string().regex(APPLIED_FILTER_COLUMN_PATTERN, {
+    message: 'validation.analyses.run.aggregation.columnInvalid',
+  }),
+);
+
+export const runAggregationSchema = z.object({
+  aggregate: z.enum(AGGREGATE_VALUES, {
+    message: 'validation.analyses.run.aggregation.invalid',
+  }),
+  dimensionColumn: aggregationColumnSchema,
+  measureColumn: aggregationColumnSchema,
+  extraMeasures: z
+    .array(
+      z.object({
+        column: aggregationColumnSchema,
+        aggregate: z.enum(AGGREGATE_VALUES, {
+          message: 'validation.analyses.run.aggregation.invalid',
+        }),
+        alias: aggregationColumnSchema,
+      }),
+    )
+    .optional(),
+});
+
 export const runAnalysisQuerySchema = z.object({
   datasetId: idSchema('validation.analyses.run.datasetId.required'),
   analysisId: idSchema('validation.analyses.run.analysisId.required'),
@@ -340,6 +466,8 @@ export const runAnalysisQuerySchema = z.object({
   // Free-form record — each value is coerced + validated against its declared
   // parameter type on the BE, so the shape here is intentionally permissive.
   paramValues: z.record(z.string(), z.any()).optional(),
+  // Track D: optional server-side aggregation for the visual being previewed.
+  aggregation: runAggregationSchema.optional(),
   limit: z
     .union([z.number().int(), z.string().regex(/^-?\d+$/)])
     .optional()
