@@ -1423,6 +1423,7 @@
     "USERS": "Users",
     "GROUPS": "Groups",
     "RLS_RULES": "RLS Rules",
+    "ALERTS": "Alerts",
     "DATASOURCES": "Datasources",
     "DB_ACCESS": "Database Access",
     "DB_USERS": "Database Users",

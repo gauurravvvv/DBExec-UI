@@ -1,0 +1,356 @@
+<div class="view-category-wrapper">
+  <div class="view-category-container">
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text back-button" (click)="goBack()">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>{{ 'ALERTS.VIEW_TITLE' | translate }}</h2>
+        <span
+          class="severity-pill header-sev"
+          *ngIf="current()"
+          [ngClass]="'sev-' + current()!.severity"
+        >
+          <span class="dot"></span>
+          {{ 'ALERTS.SEVERITY_' + (current()!.severity | uppercase) | translate }}
+        </span>
+      </div>
+      <div class="header-actions" *ngIf="current()">
+        <button
+          *hasPermission="'alertManagement'; level: 'write'"
+          class="btn-ghost"
+          (click)="onTestNow()"
+          [disabled]="testing()"
+        >
+          <i
+            class="pi"
+            [ngClass]="testing() ? 'pi-spin pi-spinner' : 'pi-bolt'"
+          ></i>
+          {{ 'ALERTS.TEST_NOW' | translate }}
+        </button>
+        <button
+          *hasPermission="'alertManagement'; level: 'write'"
+          class="btn-ghost"
+          (click)="onToggle()"
+          [disabled]="saving()"
+        >
+          <i class="pi" [ngClass]="current()!.enabled ? 'pi-pause' : 'pi-play'"></i>
+          {{ (current()!.enabled ? 'ALERTS.DISABLE' : 'ALERTS.ENABLE') | translate }}
+        </button>
+        <button
+          *hasPermission="'alertManagement'; level: 'write'"
+          class="btn-ghost"
+          (click)="openSnooze()"
+        >
+          <i class="pi pi-moon"></i> {{ 'ALERTS.SNOOZE' | translate }}
+        </button>
+        <button
+          *hasPermission="'alertManagement'; level: 'write'"
+          class="btn-primary"
+          (click)="onEdit()"
+        >
+          <i class="pi pi-pencil"></i> {{ 'COMMON.EDIT' | translate }}
+        </button>
+        <button
+          *hasPermission="'alertManagement'; level: 'delete'"
+          class="btn-danger"
+          type="button"
+          (click)="confirmDelete()"
+        >
+          <i class="pi pi-trash"></i> {{ 'COMMON.DELETE' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Test-now banner -->
+    <div
+      class="test-banner"
+      *ngIf="testResult"
+      [ngClass]="{
+        breached: testResult.breached,
+        ok: testResult.breached === false && !testResult.error,
+        error: !!testResult.error,
+      }"
+    >
+      <i
+        class="pi"
+        [ngClass]="
+          testResult.error
+            ? 'pi-times-circle'
+            : testResult.breached
+              ? 'pi-exclamation-circle'
+              : 'pi-check-circle'
+        "
+      ></i>
+      <div class="test-text">
+        <strong>
+          {{
+            testResult.error
+              ? ('ALERTS.TEST_ERROR' | translate)
+              : testResult.breached
+                ? ('ALERTS.TEST_WOULD_FIRE' | translate)
+                : ('ALERTS.TEST_WOULD_NOT_FIRE' | translate)
+          }}
+        </strong>
+        <span *ngIf="testResult.observedValue !== undefined">
+          {{ 'ALERTS.OBSERVED_VALUE' | translate }}:
+          {{ testResult.observedValue | json }}
+        </span>
+        <span *ngIf="testResult.error">{{ testResult.error }}</span>
+      </div>
+    </div>
+
+    <p-tabView [(activeIndex)]="activeTab" *ngIf="current()">
+      <!-- ── DETAILS TAB ─────────────────────────────────────────── -->
+      <p-tabPanel [header]="'ALERTS.TAB_DETAILS' | translate">
+        <div class="details-grid">
+          <!-- Basic -->
+          <div class="info-section">
+            <h3><i class="pi pi-info-circle mr-2"></i>{{ 'COMMON.BASIC_INFORMATION' | translate }}</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>{{ 'ALERTS.ALERT_NAME' | translate }}</label>
+                <p>{{ current()!.name }}</p>
+              </div>
+              <div class="info-item">
+                <label>{{ 'COMMON.DESCRIPTION' | translate }}</label>
+                <p>{{ current()!.description || ('COMMON.NO_DESCRIPTION' | translate) }}</p>
+              </div>
+              <div class="info-item">
+                <label>{{ 'COMMON.STATUS' | translate }}</label>
+                <span class="status-badge" [class.active]="current()!.enabled">
+                  <i class="pi" [ngClass]="current()!.enabled ? 'pi-check-circle' : 'pi-times-circle'"></i>
+                  {{ (current()!.enabled ? 'COMMON.ENABLED' : 'COMMON.DISABLED') | translate }}
+                </span>
+              </div>
+              <div class="info-item" *ngIf="current()!.snoozedUntil">
+                <label>{{ 'ALERTS.SNOOZED_UNTIL' | translate }}</label>
+                <p class="with-icon">
+                  <i class="pi pi-moon mr-2"></i>{{ current()!.snoozedUntil | date: 'medium' }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Source -->
+          <div class="info-section">
+            <h3><i class="pi pi-database mr-2"></i>{{ 'ALERTS.SOURCE' | translate }}</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>{{ 'ALERTS.SOURCE_TYPE' | translate }}</label>
+                <p class="with-icon">
+                  <i class="pi" [ngClass]="current()!.sourceType === 'analysis' ? 'pi-chart-line' : 'pi-database'"></i>
+                  {{ 'ALERTS.SOURCE_' + (current()!.sourceType | uppercase) | translate }}
+                </p>
+              </div>
+              <div class="info-item">
+                <label>{{ 'ALERTS.SOURCE_OBJECT' | translate }}</label>
+                <p>{{ current()!.sourceName || current()!.sourceId }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Condition -->
+          <div class="info-section span-2">
+            <h3><i class="pi pi-filter mr-2"></i>{{ 'ALERTS.CONDITION' | translate }}</h3>
+
+            <!-- expression mode -->
+            <div class="condition-expression" *ngIf="current()!.conditionMode === 'expression'">
+              <code>{{ current()!.conditionExpression }}</code>
+            </div>
+
+            <!-- builder mode -->
+            <div class="condition-groups" *ngIf="current()!.conditionMode !== 'expression'">
+              <div
+                class="cond-group"
+                *ngFor="let g of conditionGroups; let gi = index; trackBy: trackByIndex"
+              >
+                <span class="group-tag" *ngIf="gi > 0">{{ 'ALERTS.OR' | translate }}</span>
+                <div class="cond-predicates">
+                  <div
+                    class="cond-predicate"
+                    *ngFor="let p of g.predicates; let pi = index; trackBy: trackByIndex"
+                  >
+                    <span class="pred-conn" *ngIf="pi > 0">{{ g.join }}</span>
+                    <span class="pred-agg" *ngIf="p.left?.aggregate && p.left?.aggregate !== 'none'">
+                      {{ 'ALERTS.AGGREGATE.' + (p.left.aggregate | uppercase) | translate }}
+                    </span>
+                    <span class="pred-field">{{ p.left?.ref }}</span>
+                    <span class="pred-op">
+                      {{ 'ALERTS.OPERATOR.' + (p.operator | uppercase) | translate }}
+                    </span>
+                    <span class="pred-val">{{ formatValue(p.right) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Schedule -->
+          <div class="info-section">
+            <h3><i class="pi pi-clock mr-2"></i>{{ 'ALERTS.SCHEDULE' | translate }}</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>{{ 'ALERTS.CRON_EXPRESSION' | translate }}</label>
+                <p><code class="cron-code">{{ current()!.cronExpression }}</code></p>
+              </div>
+              <div class="info-item">
+                <label>{{ 'ALERTS.TIMEZONE' | translate }}</label>
+                <p>{{ current()!.timezone }}</p>
+              </div>
+              <div class="info-item">
+                <label>{{ 'ALERTS.NEXT_RUN' | translate }}</label>
+                <p>{{ current()!.nextRunAt ? (current()!.nextRunAt | date: 'medium') : ('COMMON.NA' | translate) }}</p>
+              </div>
+              <div class="info-item">
+                <label>{{ 'ALERTS.LAST_RUN' | translate }}</label>
+                <p>{{ current()!.lastRunAt ? (current()!.lastRunAt | date: 'medium') : ('COMMON.NA' | translate) }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delivery + gating -->
+          <div class="info-section">
+            <h3><i class="pi pi-send mr-2"></i>{{ 'ALERTS.DELIVERY' | translate }}</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>{{ 'ALERTS.CHANNELS' | translate }}</label>
+                <p class="channels">
+                  <span class="chan" [class.on]="current()!.notifyEmail">
+                    <i class="pi pi-envelope"></i> {{ 'ALERTS.NOTIFY_EMAIL' | translate }}
+                  </span>
+                  <span class="chan" [class.on]="current()!.notifyInApp">
+                    <i class="pi pi-bell"></i> {{ 'ALERTS.NOTIFY_IN_APP' | translate }}
+                  </span>
+                </p>
+              </div>
+              <div class="info-item">
+                <label>{{ 'ALERTS.RECIPIENTS' | translate }}</label>
+                <p>
+                  {{ 'ALERTS.RECIPIENTS_SUMMARY'
+                    | translate
+                      : {
+                          users: current()!.recipients?.userIds?.length || 0,
+                          emails: current()!.recipients?.emails?.length || 0,
+                        }
+                  }}
+                </p>
+              </div>
+              <div class="info-item">
+                <label>{{ 'ALERTS.COOLDOWN_MINUTES' | translate }}</label>
+                <p>{{ current()!.cooldownMinutes }} min</p>
+              </div>
+              <div class="info-item">
+                <label>{{ 'ALERTS.CONSECUTIVE_BREACHES' | translate }}</label>
+                <p>{{ current()!.consecutiveBreachesRequired }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-tabPanel>
+
+      <!-- ── HISTORY TAB ─────────────────────────────────────────── -->
+      <p-tabPanel [header]="'ALERTS.TAB_HISTORY' | translate">
+        <app-alert-history [alertId]="alertId"></app-alert-history>
+      </p-tabPanel>
+    </p-tabView>
+  </div>
+</div>
+
+<!-- Snooze dialog -->
+<div class="confirmation-popup" *ngIf="showSnoozeDialog">
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-icon info"><i class="pi pi-moon"></i></div>
+      <h3>{{ 'ALERTS.SNOOZE_TITLE' | translate }}</h3>
+    </div>
+    <div class="standard-delete-section">
+      <p class="delete-intro">
+        {{ 'ALERTS.SNOOZE_INTRO' | translate: { name: current()?.name } }}
+      </p>
+      <div class="snooze-presets">
+        <button
+          type="button"
+          class="preset-btn"
+          *ngFor="let p of snoozePresets; trackBy: trackByIndex"
+          [class.active]="snoozeMinutes === p.value"
+          (click)="snoozeMinutes = p.value"
+        >
+          {{ p.label }}
+        </button>
+      </div>
+      <app-custom-number
+        [(ngModel)]="snoozeMinutes"
+        [label]="'ALERTS.SNOOZE_MINUTES' | translate"
+        [min]="1"
+        [max]="10080"
+        suffix=" min"
+      ></app-custom-number>
+    </div>
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelSnooze()">
+        <i class="pi pi-times"></i> {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm info"
+        (click)="proceedSnooze()"
+        [disabled]="!snoozeMinutes || saving()"
+      >
+        <i class="pi pi-moon"></i> {{ 'ALERTS.SNOOZE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete confirm -->
+<div class="confirmation-popup" *ngIf="showDeleteConfirm">
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-icon"><i class="pi pi-trash"></i></div>
+      <h3>{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
+    </div>
+    <div class="standard-delete-section">
+      <p class="delete-intro">{{ 'ALERTS.DELETE_SINGLE' | translate }}</p>
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'ALERTS.DELETE_INFO_PERMANENT' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'ALERTS.DELETE_INFO_HISTORY' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
+        </li>
+      </ul>
+      <div class="justification-section">
+        <label for="deleteJustification">
+          {{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span>
+        </label>
+        <textarea
+          id="deleteJustification"
+          [(ngModel)]="deleteJustification"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
+          rows="3"
+          maxlength="500"
+        ></textarea>
+        <small class="char-count">{{ deleteJustification.length }}/500</small>
+      </div>
+    </div>
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">
+        <i class="pi pi-times"></i> {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm"
+        (click)="proceedDelete()"
+        [disabled]="!deleteJustification.trim() || saving()"
+      >
+        <i class="pi pi-trash"></i> {{ 'COMMON.DELETE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

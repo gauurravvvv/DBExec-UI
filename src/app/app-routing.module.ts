@@ -85,6 +85,16 @@ const routes: Routes = [
           title: 'PAGE_TITLES.RLS_RULES',
         },
       },
+      {
+        path: 'alerts',
+        loadChildren: () =>
+          import('./modules/alerts/alerts.module').then(m => m.AlertsModule),
+        canActivate: [roleGuard],
+        data: {
+          permission: PERMISSIONS.ALERTS,
+          title: 'PAGE_TITLES.ALERTS',
+        },
+      },
       // Permission-gated
       {
         path: 'datasources',

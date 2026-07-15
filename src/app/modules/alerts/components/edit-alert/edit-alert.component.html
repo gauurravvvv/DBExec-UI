@@ -1,0 +1,360 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text back-button" routerLink="/app/alerts">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>{{ 'ALERTS.EDIT_TITLE' | translate }}</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          class="p-button-outlined btn-test"
+          [label]="'ALERTS.TEST_NOW' | translate"
+          [disabled]="!canSave || testing()"
+          (click)="onTestNow()"
+        >
+          <i class="pi pi-bolt mr-2"></i>
+        </button>
+        <button
+          pButton
+          type="button"
+          [label]="'COMMON.CANCEL' | translate"
+          class="p-button-outlined btn-cancel"
+          (click)="onCancel()"
+        ></button>
+        <button
+          *hasPermission="'alertManagement'; level: 'write'"
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          [label]="'COMMON.SAVE' | translate"
+          [disabled]="!canSave || !isFormDirty || saving()"
+          (click)="onSubmit()"
+        >
+          <i class="pi pi-save mr-2"></i>
+        </button>
+      </div>
+    </div>
+
+    <form [formGroup]="alertForm" class="admin-form" *ngIf="!loading()">
+      <!-- basics -->
+      <section class="form-section">
+        <h3 class="section-title">
+          <i class="pi pi-info-circle"></i>
+          {{ 'COMMON.BASIC_INFORMATION' | translate }}
+        </h3>
+        <div class="form-grid two-col">
+          <app-custom-input
+            formControlName="name"
+            [label]="'ALERTS.ALERT_NAME' | translate"
+            [placeholder]="'ALERTS.ENTER_ALERT_NAME' | translate"
+            [required]="true"
+            [showError]="
+              !!(alertForm.get('name')?.invalid && alertForm.get('name')?.touched)
+            "
+            [errorMessage]="getNameError() | translate"
+            icon="pi-bell"
+          ></app-custom-input>
+          <app-custom-input
+            formControlName="description"
+            [label]="'COMMON.DESCRIPTION' | translate"
+            [placeholder]="'COMMON.ENTER_DESCRIPTION' | translate"
+            icon="pi-align-left"
+          ></app-custom-input>
+        </div>
+      </section>
+
+      <!-- source -->
+      <section class="form-section">
+        <h3 class="section-title">
+          <i class="pi pi-database"></i> {{ 'ALERTS.SOURCE' | translate }}
+        </h3>
+        <div class="form-grid three-col">
+          <app-custom-dropdown
+            formControlName="sourceType"
+            [options]="sourceTypeOptions"
+            optionLabel="label"
+            optionValue="value"
+            [label]="'ALERTS.SOURCE_TYPE' | translate"
+            [filter]="false"
+            [autoDisplayFirst]="false"
+            [required]="true"
+            (onChangeEvent)="onSourceTypeChange()"
+            icon="pi-sitemap"
+          ></app-custom-dropdown>
+
+          <app-custom-dropdown
+            [ngModel]="selectedDatasource"
+            [ngModelOptions]="{ standalone: true }"
+            [label]="'COMMON.DATASOURCE' | translate"
+            [placeholder]="'COMMON.SELECT_DATASOURCE' | translate"
+            [serverMode]="true"
+            [fetcher]="loadDatasourcesPage"
+            [pageSize]="10"
+            [preloadedItems]="preloadedDatasources"
+            [preloadedTotal]="preloadedDatasourcesTotal"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            filterBy="name"
+            [autoDisplayFirst]="false"
+            [required]="true"
+            (onChangeEvent)="onDatasourceChange($event)"
+            icon="pi-database"
+          ></app-custom-dropdown>
+
+          <app-custom-dropdown
+            formControlName="sourceId"
+            [label]="'ALERTS.SOURCE_OBJECT' | translate"
+            [placeholder]="'ALERTS.SELECT_SOURCE' | translate"
+            [serverMode]="true"
+            [fetcher]="loadSourcesPage"
+            [pageSize]="10"
+            [preloadedItems]="preloadedSources"
+            [preloadedTotal]="preloadedSourcesTotal"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            filterBy="name"
+            [autoDisplayFirst]="false"
+            [required]="true"
+            [disabled]="!selectedDatasource"
+            (onChangeEvent)="onSourceChange($event)"
+            icon="pi-table"
+          ></app-custom-dropdown>
+        </div>
+      </section>
+
+      <!-- condition -->
+      <section class="form-section">
+        <h3 class="section-title">
+          <i class="pi pi-filter"></i> {{ 'ALERTS.CONDITION' | translate }}
+        </h3>
+        <app-alert-condition-builder
+          [fields]="fields"
+          [distinctValuesFetcher]="distinctFetcher"
+          (conditionChange)="onConditionChange($event)"
+        ></app-alert-condition-builder>
+      </section>
+
+      <!-- schedule -->
+      <section class="form-section">
+        <h3 class="section-title">
+          <i class="pi pi-clock"></i> {{ 'ALERTS.SCHEDULE' | translate }}
+        </h3>
+        <div class="cron-presets">
+          <button
+            type="button"
+            class="preset-btn"
+            *ngFor="let p of cronPresets; trackBy: trackByIndex"
+            [class.active]="alertForm.get('cronExpression')?.value === p.value"
+            (click)="applyCronPreset(p.value)"
+          >
+            {{ p.label | translate }}
+          </button>
+        </div>
+        <div class="form-grid two-col">
+          <app-custom-input
+            formControlName="cronExpression"
+            [label]="'ALERTS.CRON_EXPRESSION' | translate"
+            [placeholder]="'*/15 * * * *'"
+            [required]="true"
+            icon="pi-hashtag"
+            [hint]="'ALERTS.CRON_HINT' | translate"
+          ></app-custom-input>
+          <app-custom-dropdown
+            formControlName="timezone"
+            [options]="timezoneOptions"
+            optionLabel="label"
+            optionValue="value"
+            [label]="'ALERTS.TIMEZONE' | translate"
+            [filter]="true"
+            filterBy="label"
+            [autoDisplayFirst]="false"
+            [required]="true"
+            icon="pi-globe"
+          ></app-custom-dropdown>
+        </div>
+      </section>
+
+      <!-- delivery -->
+      <section class="form-section">
+        <h3 class="section-title">
+          <i class="pi pi-send"></i> {{ 'ALERTS.DELIVERY' | translate }}
+        </h3>
+        <div class="form-grid two-col">
+          <app-custom-dropdown
+            formControlName="severity"
+            [options]="severityOptions"
+            optionLabel="label"
+            optionValue="value"
+            [label]="'ALERTS.SEVERITY' | translate"
+            [filter]="false"
+            [autoDisplayFirst]="false"
+            [required]="true"
+            icon="pi-exclamation-triangle"
+          ></app-custom-dropdown>
+        </div>
+
+        <div class="channel-toggles">
+          <app-custom-toggle
+            formControlName="notifyInApp"
+            [label]="'ALERTS.NOTIFY_IN_APP' | translate"
+            [trueLabel]="'COMMON.ON' | translate"
+            [falseLabel]="'COMMON.OFF' | translate"
+          ></app-custom-toggle>
+          <app-custom-toggle
+            formControlName="notifyEmail"
+            [label]="'ALERTS.NOTIFY_EMAIL' | translate"
+            [trueLabel]="'COMMON.ON' | translate"
+            [falseLabel]="'COMMON.OFF' | translate"
+          ></app-custom-toggle>
+        </div>
+
+        <div class="form-grid two-col">
+          <app-custom-multiselect
+            formControlName="recipientUserIds"
+            [label]="'ALERTS.RECIPIENT_USERS' | translate"
+            [placeholder]="'ALERTS.SELECT_USERS' | translate"
+            [serverMode]="true"
+            [fetcher]="loadUsersPage"
+            [pageSize]="10"
+            [preloadedItems]="preloadedUsers"
+            [preloadedTotal]="preloadedUsersTotal"
+            optionLabel="displayLabel"
+            optionValue="id"
+            [filter]="true"
+            filterBy="displayLabel"
+            display="chip"
+            [maxSelectedLabels]="5"
+            icon="pi-users"
+          ></app-custom-multiselect>
+
+          <div class="chips-field">
+            <label class="chips-label">
+              {{ 'ALERTS.RECIPIENT_EMAILS' | translate }}
+            </label>
+            <p-chips
+              formControlName="recipientEmails"
+              [addOnBlur]="true"
+              [addOnTab]="true"
+              [allowDuplicate]="false"
+              [separator]="emailSeparator"
+              [placeholder]="'ALERTS.ADD_EMAIL' | translate"
+              styleClass="alerts-email-chips"
+            ></p-chips>
+          </div>
+        </div>
+      </section>
+
+      <!-- gating -->
+      <section class="form-section">
+        <h3 class="section-title">
+          <i class="pi pi-shield"></i> {{ 'ALERTS.GATING' | translate }}
+        </h3>
+        <div class="form-grid two-col">
+          <app-custom-number
+            formControlName="cooldownMinutes"
+            [label]="'ALERTS.COOLDOWN_MINUTES' | translate"
+            [min]="0"
+            [max]="10080"
+            suffix=" min"
+          ></app-custom-number>
+          <app-custom-number
+            formControlName="consecutiveBreachesRequired"
+            [label]="'ALERTS.CONSECUTIVE_BREACHES' | translate"
+            [min]="1"
+            [max]="100"
+          ></app-custom-number>
+        </div>
+        <app-custom-toggle
+          formControlName="enabled"
+          [label]="'COMMON.ENABLED' | translate"
+          [trueLabel]="'COMMON.ENABLED' | translate"
+          [falseLabel]="'COMMON.DISABLED' | translate"
+        ></app-custom-toggle>
+      </section>
+
+      <!-- test-now result -->
+      <section class="form-section test-result" *ngIf="testResult">
+        <div
+          class="test-banner"
+          [ngClass]="{
+            breached: testResult.breached,
+            ok: testResult.breached === false && !testResult.error,
+            error: !!testResult.error,
+          }"
+        >
+          <i
+            class="pi"
+            [ngClass]="
+              testResult.error
+                ? 'pi-times-circle'
+                : testResult.breached
+                  ? 'pi-exclamation-circle'
+                  : 'pi-check-circle'
+            "
+          ></i>
+          <div class="test-text">
+            <strong>
+              {{
+                testResult.error
+                  ? ('ALERTS.TEST_ERROR' | translate)
+                  : testResult.breached
+                    ? ('ALERTS.TEST_WOULD_FIRE' | translate)
+                    : ('ALERTS.TEST_WOULD_NOT_FIRE' | translate)
+              }}
+            </strong>
+            <span *ngIf="testResult.observedValue !== undefined">
+              {{ 'ALERTS.OBSERVED_VALUE' | translate }}:
+              {{ testResult.observedValue | json }}
+            </span>
+            <span *ngIf="testResult.error">{{ testResult.error }}</span>
+          </div>
+        </div>
+      </section>
+    </form>
+  </div>
+</div>
+
+<!-- Save confirm (justification) -->
+<div class="confirmation-popup" *ngIf="showSaveConfirm">
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-icon info"><i class="pi pi-save"></i></div>
+      <h3>{{ 'ALERTS.CONFIRM_SAVE' | translate }}</h3>
+    </div>
+    <div class="standard-delete-section">
+      <p class="delete-intro">{{ 'ALERTS.SAVE_INTRO' | translate }}</p>
+      <div class="justification-section">
+        <label for="saveJustification">
+          {{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span>
+        </label>
+        <textarea
+          id="saveJustification"
+          [(ngModel)]="saveJustification"
+          [placeholder]="'COMMON.JUSTIFICATION_UPDATE_PLACEHOLDER' | translate"
+          rows="3"
+          maxlength="500"
+        ></textarea>
+        <small class="char-count">{{ saveJustification.length }}/500</small>
+      </div>
+    </div>
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelSave()">
+        <i class="pi pi-times"></i> {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm info"
+        (click)="proceedSave()"
+        [disabled]="!saveJustification.trim() || saving()"
+      >
+        <i class="pi pi-save"></i> {{ 'COMMON.SAVE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

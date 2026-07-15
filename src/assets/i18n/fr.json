@@ -1372,6 +1372,7 @@
     "USERS": "Utilisateurs",
     "GROUPS": "Groupes",
     "RLS_RULES": "Règles RLS",
+    "ALERTS": "Alertes",
     "DATASOURCES": "Sources de données",
     "ROLES": "Rôles",
     "DATASET": "Jeu de données",

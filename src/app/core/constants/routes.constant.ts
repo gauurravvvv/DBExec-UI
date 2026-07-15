@@ -98,6 +98,7 @@ export const TAB = feature('/app/tabs');
 export const SECTION = feature('/app/sections');
 export const ROLE = feature('/app/roles');
 export const RLS_RULE = feature('/app/rls-rules');
+export const ALERT = feature('/app/alerts');
 
 // Analyses has no /new page (created from a dataset).
 export const ANALYSES = {

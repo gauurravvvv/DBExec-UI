@@ -1,0 +1,66 @@
+<div class="history-wrapper" *ngIf="adapter">
+  <app-custom-table
+    [columns]="cols"
+    [serverAdapter]="adapter"
+    [config]="tableConfig"
+    [hasProjectedEmpty]="true"
+    (refresh)="refreshList()"
+  >
+    <div tableEmpty class="ct-empty-body">
+      <i class="pi pi-history"></i>
+      <span>{{ 'ALERTS.NO_EVENTS' | translate }}</span>
+    </div>
+
+    <ng-template usGridCell="evaluatedAt" let-event>
+      <span
+        class="date-text"
+        [pTooltip]="(event.evaluatedAt | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+        tooltipPosition="top"
+      >
+        {{ event.evaluatedAt | relativeTime }}
+      </span>
+    </ng-template>
+
+    <ng-template usGridCell="eventStatus" let-event>
+      <span class="event-status" [ngClass]="'st-' + event.eventStatus">
+        <span class="dot"></span>
+        {{ 'ALERTS.EVENT_' + (event.eventStatus | uppercase) | translate }}
+      </span>
+    </ng-template>
+
+    <ng-template usGridCell="observedValue" let-event>
+      <code class="observed" [title]="formatObserved(event.observedValue)">
+        {{ formatObserved(event.observedValue) }}
+      </code>
+    </ng-template>
+
+    <ng-template usGridCell="notified" let-event>
+      <div class="notify-icons">
+        <i
+          class="pi pi-envelope"
+          [class.on]="event.emailSent"
+          [pTooltip]="'ALERTS.NOTIFY_EMAIL' | translate"
+          tooltipPosition="top"
+        ></i>
+        <i
+          class="pi pi-bell"
+          [class.on]="event.inAppSent"
+          [pTooltip]="'ALERTS.NOTIFY_IN_APP' | translate"
+          tooltipPosition="top"
+        ></i>
+      </div>
+    </ng-template>
+
+    <ng-template usGridCell="durationMs" let-event>
+      <span class="muted">
+        {{ event.durationMs != null ? event.durationMs + ' ms' : '—' }}
+      </span>
+    </ng-template>
+
+    <ng-template usGridCell="errorMessage" let-event>
+      <span class="error-text" [title]="event.errorMessage || ''">
+        {{ event.errorMessage || '—' }}
+      </span>
+    </ng-template>
+  </app-custom-table>
+</div>

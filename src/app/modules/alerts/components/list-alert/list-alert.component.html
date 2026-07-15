@@ -1,0 +1,284 @@
+<div class="dataset-page-wrapper">
+  <div class="dataset-content-container">
+    <!-- Header -->
+    <div class="page-header-section">
+      <div class="header-content">
+        <h2>{{ 'ALERTS.TITLE' | translate }}</h2>
+      </div>
+      <div class="header-actions">
+        <button
+          *hasPermission="'alertManagement'; level: 'write'"
+          class="btn-primary"
+          (click)="onAddNewAlert()"
+        >
+          <i class="pi pi-plus"></i> {{ 'ALERTS.ADD_TITLE' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content-card">
+      <div class="table-wrapper" *ngIf="adapter">
+        <app-custom-table
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="tableConfig"
+          [hasProjectedEmpty]="true"
+          (refresh)="refreshList()"
+        >
+          <div tableEmpty class="ct-empty-body">
+            <i class="pi pi-bell"></i>
+            <span>{{ 'ALERTS.NO_ALERTS' | translate }}</span>
+          </div>
+
+          <ng-template usGridCell="name" let-alert>
+            <a class="dataset-name-link" [routerLink]="['/app/alerts', alert.id]">
+              {{ alert.name }}
+            </a>
+          </ng-template>
+
+          <ng-template usGridCell="sourceType" let-alert>
+            <span class="pill">
+              <i
+                class="pi"
+                [ngClass]="
+                  alert.sourceType === 'analysis' ? 'pi-chart-line' : 'pi-database'
+                "
+              ></i>
+              {{ 'ALERTS.SOURCE_' + (alert.sourceType | uppercase) | translate }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="severity" let-alert>
+            <span
+              class="severity-pill"
+              [ngClass]="'sev-' + alert.severity"
+            >
+              <span class="dot"></span>
+              {{ 'ALERTS.SEVERITY_' + (alert.severity | uppercase) | translate }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="cronExpression" let-alert>
+            <code class="cron-code" [title]="alert.timezone">
+              {{ alert.cronExpression }}
+            </code>
+          </ng-template>
+
+          <ng-template usGridCell="nextRunAt" let-alert>
+            <span
+              class="date-text"
+              *ngIf="alert.nextRunAt; else noRun"
+              [pTooltip]="(alert.nextRunAt | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              tooltipPosition="top"
+            >
+              {{ alert.nextRunAt | relativeTime }}
+            </span>
+            <ng-template #noRun>
+              <span class="muted">{{ 'COMMON.NA' | translate }}</span>
+            </ng-template>
+          </ng-template>
+
+          <ng-template usGridCell="enabled" let-alert>
+            <span
+              class="status-pill"
+              [ngClass]="{ active: alert.enabled, inactive: !alert.enabled }"
+            >
+              <span class="dot"></span>
+              <span class="label">
+                {{
+                  alert.enabled
+                    ? ('COMMON.ENABLED' | translate)
+                    : ('COMMON.DISABLED' | translate)
+                }}
+              </span>
+            </span>
+            <span
+              class="snooze-chip"
+              *ngIf="alert.snoozedUntil"
+              [pTooltip]="(alert.snoozedUntil | date: 'medium') || ''"
+              tooltipPosition="top"
+            >
+              <i class="pi pi-moon"></i> {{ 'ALERTS.SNOOZED' | translate }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="actions" let-alert>
+            <div class="row-actions">
+              <button
+                *hasPermission="'alertManagement'; level: 'write'"
+                class="icon-btn"
+                (click)="onToggle(alert)"
+                [disabled]="saving()"
+                [pTooltip]="
+                  (alert.enabled ? 'ALERTS.DISABLE' : 'ALERTS.ENABLE') | translate
+                "
+                tooltipPosition="bottom"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="alert.enabled ? 'pi-pause' : 'pi-play'"
+                ></i>
+              </button>
+              <button
+                *hasPermission="'alertManagement'; level: 'write'"
+                class="icon-btn"
+                (click)="onTestNow(alert)"
+                [disabled]="isTesting(alert.id)"
+                [pTooltip]="'ALERTS.TEST_NOW' | translate"
+                tooltipPosition="bottom"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="isTesting(alert.id) ? 'pi-spin pi-spinner' : 'pi-bolt'"
+                ></i>
+              </button>
+              <button
+                *hasPermission="'alertManagement'; level: 'write'"
+                class="icon-btn"
+                (click)="openSnooze(alert)"
+                [pTooltip]="'ALERTS.SNOOZE' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-moon"></i>
+              </button>
+              <button
+                *hasPermission="'alertManagement'; level: 'write'"
+                class="icon-btn edit-btn"
+                (click)="onEdit(alert.id)"
+                [pTooltip]="'COMMON.EDIT' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button
+                *hasPermission="'alertManagement'; level: 'delete'"
+                class="icon-btn delete-btn"
+                (click)="confirmDelete(alert.id)"
+                [disabled]="isDeleting(alert.id)"
+                [pTooltip]="'COMMON.DELETE' | translate"
+                tooltipPosition="bottom"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="isDeleting(alert.id) ? 'pi-spin pi-spinner' : 'pi-trash'"
+                ></i>
+              </button>
+            </div>
+          </ng-template>
+        </app-custom-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Snooze dialog -->
+<div class="confirmation-popup" *ngIf="showSnoozeDialog">
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-icon info"><i class="pi pi-moon"></i></div>
+      <h3>{{ 'ALERTS.SNOOZE_TITLE' | translate }}</h3>
+    </div>
+    <div class="standard-delete-section">
+      <p class="delete-intro">
+        {{ 'ALERTS.SNOOZE_INTRO' | translate: { name: alertToSnooze?.name } }}
+      </p>
+      <div class="snooze-presets">
+        <button
+          type="button"
+          class="preset-btn"
+          *ngFor="let p of snoozePresets; trackBy: trackByIndex"
+          [class.active]="snoozeMinutes === p.value"
+          (click)="snoozeMinutes = p.value"
+        >
+          {{ p.label }}
+        </button>
+      </div>
+      <div class="snooze-custom">
+        <app-custom-number
+          [(ngModel)]="snoozeMinutes"
+          [label]="'ALERTS.SNOOZE_MINUTES' | translate"
+          [min]="1"
+          [max]="10080"
+          suffix=" min"
+        ></app-custom-number>
+      </div>
+    </div>
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelSnooze()">
+        <i class="pi pi-times"></i> {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm info"
+        (click)="proceedSnooze()"
+        [disabled]="!snoozeMinutes || saving()"
+      >
+        <i class="pi pi-moon"></i> {{ 'ALERTS.SNOOZE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete confirm -->
+<div class="confirmation-popup" *ngIf="showDeleteConfirm">
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-icon"><i class="pi pi-trash"></i></div>
+      <h3>{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
+    </div>
+    <div class="standard-delete-section">
+      <p class="delete-intro">{{ 'ALERTS.CONFIRM_DELETE_SINGLE' | translate }}</p>
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'ALERTS.DELETE_INFO_PERMANENT' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'ALERTS.DELETE_INFO_HISTORY' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
+        </li>
+      </ul>
+      <div class="justification-section">
+        <label for="deleteJustification">
+          {{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span>
+        </label>
+        <textarea
+          id="deleteJustification"
+          [(ngModel)]="deleteJustification"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
+          rows="3"
+          maxlength="500"
+        ></textarea>
+        <small class="char-count">{{ deleteJustification.length }}/500</small>
+      </div>
+    </div>
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">
+        <i class="pi pi-times"></i> {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm"
+        (click)="proceedDelete()"
+        [disabled]="
+          !deleteJustification.trim() ||
+          !!(alertToDelete && isDeleting(alertToDelete))
+        "
+      >
+        <i
+          class="pi"
+          [ngClass]="
+            !!(alertToDelete && isDeleting(alertToDelete))
+              ? 'pi-spin pi-spinner'
+              : 'pi-trash'
+          "
+        ></i>
+        {{ 'COMMON.DELETE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

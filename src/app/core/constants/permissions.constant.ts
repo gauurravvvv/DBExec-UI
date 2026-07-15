@@ -33,6 +33,7 @@ export const PERMISSIONS = {
   ANALYSES: 'analyses',
   DASHBOARD: 'dashboard',
   RLS_RULES: 'rlsRules',
+  ALERTS: 'alertManagement',
 
   // Audit & Activity
   AUDIT_LOGS: 'auditLogs',

@@ -367,6 +367,33 @@ export const RLS_RULE = {
   LIST_FOR_DATASET_PREFIX: '/rls-rules/datasets/',
 };
 
+/**
+ * Alerts — a scheduled condition on a dataset/analysis that emails +
+ * in-app-notifies recipients on breach. All under `/api/v1/alerts`;
+ * the request interceptor prepends the server base. Prefixes ending in
+ * `/` are concatenated with the alert id; suffixes complete the
+ * sub-resource. Contract mirrors the BE alerts controller (spec §5.5).
+ */
+export const ALERT = {
+  LIST: '/alerts', // GET  /alerts (server-paged)
+  ADD: '/alerts', // POST /alerts
+  GET: '/alerts/', // GET  /alerts/:alertId
+  UPDATE: '/alerts/', // PUT  /alerts/:alertId
+  DELETE: '/alerts/', // DELETE /alerts/:alertId
+  // POST /alerts/:alertId/toggle  → enable / disable
+  TOGGLE_PREFIX: '/alerts/',
+  TOGGLE_SUFFIX: '/toggle',
+  // POST /alerts/:alertId/snooze  → mute until now()+snoozeMinutes
+  SNOOZE_PREFIX: '/alerts/',
+  SNOOZE_SUFFIX: '/snooze',
+  // POST /alerts/:alertId/test  → evaluate now, don't persist state
+  TEST_PREFIX: '/alerts/',
+  TEST_SUFFIX: '/test',
+  // GET  /alerts/:alertId/events  → immutable evaluation history (server-paged)
+  EVENTS_PREFIX: '/alerts/',
+  EVENTS_SUFFIX: '/events',
+};
+
 export const ORG_POLICY = {
   GET: '/api/v1/org-policy',
   UPDATE_SECURITY: '/api/v1/org-policy/security',

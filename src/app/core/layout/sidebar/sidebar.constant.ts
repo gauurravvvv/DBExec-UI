@@ -31,6 +31,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
   { value: 'loginActivity', route: '/app/audit/logins' },
   { value: 'dashboard', route: '/app/dashboards' },
   { value: 'rlsRules', route: '/app/rls-rules' },
+  { value: 'alertManagement', route: '/app/alerts' },
   { value: 'announcementManagement', route: '/app/settings/announcements' },
   { value: 'themeManagement', route: '/app/settings/theme' },
   { value: 'brandingManagement', route: '/app/settings/branding' },

@@ -1372,6 +1372,7 @@
     "USERS": "Usuarios",
     "GROUPS": "Grupos",
     "RLS_RULES": "Reglas RLS",
+    "ALERTS": "Alertas",
     "DATASOURCES": "Fuentes de datos",
     "ROLES": "Roles",
     "DATASET": "Conjunto de datos",

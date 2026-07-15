@@ -1372,6 +1372,7 @@
     "USERS": "Gebruikers",
     "GROUPS": "Groepen",
     "RLS_RULES": "RLS-regels",
+    "ALERTS": "Waarschuwingen",
     "DATASOURCES": "Gegevensbronnen",
     "ROLES": "Rollen",
     "DATASET": "Dataset",

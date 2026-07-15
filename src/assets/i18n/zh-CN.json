@@ -1372,6 +1372,7 @@
     "USERS": "用户",
     "GROUPS": "组",
     "RLS_RULES": "RLS规则",
+    "ALERTS": "警报",
     "DATASOURCES": "数据源",
     "ROLES": "角色",
     "DATASET": "数据集",

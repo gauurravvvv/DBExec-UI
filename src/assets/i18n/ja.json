@@ -1372,6 +1372,7 @@
     "USERS": "ユーザー",
     "GROUPS": "グループ",
     "RLS_RULES": "RLSルール",
+    "ALERTS": "アラート",
     "DATASOURCES": "データソース",
     "ROLES": "ロール",
     "DATASET": "データセット",

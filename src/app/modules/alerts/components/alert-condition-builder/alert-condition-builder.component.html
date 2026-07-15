@@ -1,0 +1,208 @@
+<div class="condition-builder" [formGroup]="conditionForm">
+  <!-- ── Mode toggle: guided builder vs advanced expression ─────── -->
+  <div class="mode-switch">
+    <span class="mode-label">{{ 'ALERTS.CONDITION' | translate }}</span>
+    <div class="mode-buttons">
+      <button
+        type="button"
+        class="mode-btn"
+        [class.active]="mode === 'builder'"
+        (click)="setMode('builder')"
+      >
+        <i class="pi pi-sliders-h"></i> {{ 'ALERTS.MODE_BUILDER' | translate }}
+      </button>
+      <button
+        type="button"
+        class="mode-btn"
+        [class.active]="mode === 'expression'"
+        (click)="setMode('expression')"
+      >
+        <i class="pi pi-code"></i> {{ 'ALERTS.MODE_EXPRESSION' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ── BUILDER MODE ───────────────────────────────────────────── -->
+  <div class="builder-body" *ngIf="mode === 'builder'" formArrayName="groups">
+    <div class="builder-hint">
+      <i class="pi pi-info-circle"></i>
+      {{ 'ALERTS.CONDITION_HINT' | translate }}
+    </div>
+
+    <div
+      class="group-card"
+      *ngFor="let group of groups.controls; let gi = index; trackBy: trackByIndex"
+      [formGroupName]="gi"
+    >
+      <div class="group-header">
+        <div class="group-join">
+          <span class="group-title">
+            {{ 'ALERTS.GROUP' | translate }} {{ gi + 1 }}
+          </span>
+          <app-custom-dropdown
+            formControlName="join"
+            [options]="joinOptions"
+            optionLabel="label"
+            optionValue="value"
+            [filter]="false"
+            [autoDisplayFirst]="false"
+            styleClass="join-select"
+          ></app-custom-dropdown>
+        </div>
+        <button
+          type="button"
+          class="btn-remove-group"
+          (click)="removeGroup(gi)"
+          [disabled]="groups.length === 1"
+          [pTooltip]="'ALERTS.REMOVE_GROUP' | translate"
+          tooltipPosition="bottom"
+        >
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <!-- predicate rows -->
+      <div class="predicates" formArrayName="predicates">
+        <div
+          class="predicate-row"
+          *ngFor="
+            let predicate of predicates(group).controls;
+            let pi = index;
+            trackBy: trackByIndex
+          "
+          [formGroupName]="pi"
+        >
+          <span class="predicate-conn" *ngIf="pi > 0">
+            {{ group.get('join')?.value }}
+          </span>
+
+          <div class="predicate-fields">
+            <!-- LHS: field / formula + aggregate -->
+            <div class="predicate-left" formGroupName="left">
+              <app-custom-dropdown
+                formControlName="ref"
+                [options]="fields"
+                optionLabel="label"
+                optionValue="ref"
+                [placeholder]="'ALERTS.SELECT_FIELD' | translate"
+                [filter]="true"
+                filterBy="label"
+                [autoDisplayFirst]="false"
+                [required]="true"
+                (onChangeEvent)="onFieldChange(predicate, $event)"
+                icon="pi-hashtag"
+              ></app-custom-dropdown>
+
+              <app-custom-dropdown
+                formControlName="aggregate"
+                [options]="aggregateOptions"
+                optionLabel="label"
+                optionValue="value"
+                [filter]="false"
+                [autoDisplayFirst]="false"
+                [placeholder]="'ALERTS.AGGREGATE_LABEL' | translate"
+                icon="pi-chart-bar"
+              ></app-custom-dropdown>
+            </div>
+
+            <!-- operator -->
+            <app-custom-dropdown
+              formControlName="operator"
+              [options]="operatorOptions"
+              optionLabel="label"
+              optionValue="value"
+              [filter]="false"
+              [autoDisplayFirst]="false"
+              [required]="true"
+              (onChangeEvent)="onOperatorChange(predicate)"
+              icon="pi-filter"
+            ></app-custom-dropdown>
+
+            <!-- value-type override — standalone (the actual value lives on
+                 right.valueType; this writes through onValueTypeChange). -->
+            <app-custom-dropdown
+              *ngIf="!isNullaryOperator(getPredicateOperator(predicate))"
+              [options]="valueTypeOptions"
+              optionLabel="label"
+              optionValue="value"
+              [filter]="false"
+              [autoDisplayFirst]="false"
+              [ngModel]="getPredicateValueType(predicate)"
+              [ngModelOptions]="{ standalone: true }"
+              (onChangeEvent)="setPredicateValueType(predicate, $event)"
+              icon="pi-tag"
+              [pTooltip]="'ALERTS.VALUE_TYPE_HINT' | translate"
+              tooltipPosition="top"
+            ></app-custom-dropdown>
+
+            <!-- RHS: typed value -->
+            <div
+              class="predicate-value"
+              formGroupName="right"
+              *ngIf="!isNullaryOperator(getPredicateOperator(predicate))"
+            >
+              <app-typed-value-input
+                formControlName="value"
+                [valueType]="getPredicateValueType(predicate)"
+                [range]="isRangeOperator(getPredicateOperator(predicate))"
+                [options]="getValueOptions(predicate)"
+                [placeholder]="'ALERTS.ENTER_VALUE' | translate"
+                [showError]="
+                  !!(
+                    predicate.get('right.value')?.invalid &&
+                    predicate.get('right.value')?.touched
+                  )
+                "
+                [errorMessage]="'ALERTS.VALUE_REQUIRED' | translate"
+              ></app-typed-value-input>
+            </div>
+
+            <button
+              type="button"
+              class="btn-remove-predicate"
+              (click)="removePredicate(group, pi)"
+              [disabled]="predicates(group).length === 1"
+              [pTooltip]="'ALERTS.REMOVE_PREDICATE' | translate"
+              tooltipPosition="bottom"
+            >
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="btn-add-predicate"
+          (click)="addPredicate(group)"
+          [disabled]="predicates(group).length >= maxPredicates"
+        >
+          <i class="pi pi-plus"></i> {{ 'ALERTS.ADD_PREDICATE' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <button type="button" class="btn-add-group" (click)="addGroup()">
+      <i class="pi pi-plus-circle"></i> {{ 'ALERTS.ADD_GROUP' | translate }}
+    </button>
+  </div>
+
+  <!-- ── EXPRESSION MODE ────────────────────────────────────────── -->
+  <div class="expression-body" *ngIf="mode === 'expression'">
+    <div class="builder-hint">
+      <i class="pi pi-info-circle"></i>
+      {{ 'ALERTS.EXPRESSION_HINT' | translate }}
+    </div>
+    <app-custom-textarea
+      formControlName="expression"
+      [label]="'ALERTS.EXPRESSION' | translate"
+      [placeholder]="'ALERTS.EXPRESSION_PLACEHOLDER' | translate"
+      [rows]="4"
+    ></app-custom-textarea>
+    <div class="expression-fields" *ngIf="fields.length">
+      <span class="fields-caption">{{ 'ALERTS.AVAILABLE_FIELDS' | translate }}</span>
+      <span class="field-chip" *ngFor="let f of fields; trackBy: trackByIndex">
+        {{ f.ref }}
+      </span>
+    </div>
+  </div>
+</div>
