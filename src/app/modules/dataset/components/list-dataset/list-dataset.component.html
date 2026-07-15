@@ -21,223 +21,35 @@
       </div>
     </div>
 
-    <!-- Content Card — folder rail (left) + list (right), Track F -->
-    <div class="content-card org-layout">
-      <aside class="folder-rail">
-        <app-folder-tree
-          [objectType]="objectType"
-          [selectedFolderId]="selectedFolderId"
-          [canManage]="true"
-          (folderSelected)="onFolderSelected($event)"
-          (objectMoved)="onObjectMoved()"
-        ></app-folder-tree>
-      </aside>
-
-      <div class="org-main">
-        <!-- Tag-filter chips + Favourites quick-filter -->
-        <div class="org-toolbar">
-          <button
-            type="button"
-            class="fav-filter-btn"
-            [class.active]="favouritesOnly"
-            (click)="toggleFavouritesOnly()"
-            [pTooltip]="'FAVOURITE.SHOW_ONLY' | translate"
-            tooltipPosition="bottom"
-          >
-            <i class="pi" [ngClass]="favouritesOnly ? 'pi-star-fill' : 'pi-star'"></i>
-            {{ 'FAVOURITE.FAVOURITES' | translate }}
-          </button>
-          <div class="tag-filter">
-            <i class="pi pi-tags tag-filter-icon"></i>
-            <p-chips
-              [ngModel]="filterTags"
-              (ngModelChange)="onTagsChanged($event)"
-              [placeholder]="'COMMON.TAGS_FILTER_PLACEHOLDER' | translate"
-              [addOnBlur]="true"
-              separator=","
-              styleClass="tag-filter-chips"
-            ></p-chips>
-          </div>
-        </div>
-
-      <!-- Unified simple table. Infinite scroll, global search + on-demand
-           per-column filters (shared inputs), per-row actions. Dataset is
-           datasource-scoped, so the datasource picker is projected into the
-           toolbar's LEFT slot; the table renders only once a datasource is
-           chosen (adapter set). Per-cell DOM via <ng-template usGridCell>. -->
-      <div class="table-wrapper" *ngIf="adapter">
-        <app-custom-table
-          [columns]="cols"
-          [serverAdapter]="adapter"
-          [config]="tableConfig"
-          [baseFilter]="listFilter"
-          [hasProjectedEmpty]="true"
-          (refresh)="refreshList()"
-        >
-          <!-- Toolbar-left slot: server-driven datasource picker. -->
-          <div tableToolbarStart class="ds-toolbar-start">
-            <app-custom-dropdown
-              [(ngModel)]="selectedDatasource"
-              [serverMode]="true"
-              [fetcher]="loadDatasourcesPage"
-              [pageSize]="10"
-              [preloadedItems]="preloadedDatasources"
-              [preloadedTotal]="preloadedDatasourcesTotal"
-              optionLabel="name"
-              optionValue="id"
-              [filter]="true"
-              [floatingLabel]="true"
-              [label]="'COMMON.DATASOURCE' | translate"
-              filterBy="name"
-              (onChangeEvent)="onDBChange($event)"
-              icon="pi-database"
-            >
-            </app-custom-dropdown>
-          </div>
-
-          <!-- Empty body — always projected so only one empty state shows. -->
-          <div tableEmpty class="ct-empty-body">
-            <i class="pi pi-inbox"></i>
-            <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
-          </div>
-
-          <ng-template usGridCell="favourite" let-dataset>
-            <button
-              type="button"
-              class="fav-star-btn"
-              [class.on]="isFavourite(dataset.id)"
-              (click)="toggleFavourite(dataset.id)"
-              [pTooltip]="
-                (isFavourite(dataset.id)
-                  ? 'FAVOURITE.REMOVE'
-                  : 'FAVOURITE.ADD'
-                ) | translate
-              "
-              tooltipPosition="bottom"
-            >
-              <i
-                class="pi"
-                [ngClass]="isFavourite(dataset.id) ? 'pi-star-fill' : 'pi-star'"
-              ></i>
-            </button>
-          </ng-template>
-
-          <ng-template usGridCell="name" let-dataset>
-            <a
-              class="dataset-name-link"
-              [routerLink]="['/app/datasets', dataset.id]"
-              draggable="true"
-              (dragstart)="$event.dataTransfer?.setData('text/plain', dataset.id)"
-            >
-              {{ dataset.name }}
-            </a>
-          </ng-template>
-
-          <ng-template usGridCell="description" let-dataset>
-            <span
-              class="description-text"
-              [title]="dataset.description"
-              [class.is-truncatable]="!!dataset.description"
-            >
-              {{ dataset.description || '—' }}
-            </span>
-          </ng-template>
-
-          <ng-template usGridCell="status" let-dataset>
-            <span
-              class="status-pill"
-              [ngClass]="{
-                active: dataset.status === 1,
-                inactive: dataset.status !== 1,
-              }"
-            >
-              <span class="dot"></span>
-              <span class="label">
-                {{
-                  dataset.status === 1
-                    ? ('COMMON.ACTIVE' | translate)
-                    : ('COMMON.INACTIVE' | translate)
-                }}
-              </span>
-            </span>
-          </ng-template>
-
-          <ng-template usGridCell="createdOn" let-dataset>
-            <span
-              class="date-text"
-              [pTooltip]="(dataset.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
-              tooltipPosition="top"
-            >
-              {{ dataset.createdOn | relativeTime }}
-            </span>
-          </ng-template>
-
-          <ng-template usGridCell="actions" let-dataset>
-            <div class="row-actions">
-              <button
-                *hasPermission="'datasetManager'; level: 'write'"
-                class="icon-btn edit-btn"
-                (click)="onEdit(dataset.id)"
-                [pTooltip]="'COMMON.EDIT' | translate"
-                tooltipPosition="bottom"
-              >
-                <i class="pi pi-pencil"></i>
-              </button>
-              <button
-                *hasPermission="'datasetManager'; level: 'delete'"
-                class="icon-btn delete-btn"
-                (click)="confirmDelete(dataset.id)"
-                [pTooltip]="'COMMON.DELETE' | translate"
-                tooltipPosition="bottom"
-                [disabled]="isDeleting(dataset.id)"
-              >
-                <i
-                  class="pi"
-                  [ngClass]="
-                    isDeleting(dataset.id) ? 'pi-spin pi-spinner' : 'pi-trash'
-                  "
-                ></i>
-              </button>
-              <button
-                class="icon-btn more-btn"
-                (click)="op.toggle($event); activeDataset = dataset"
-                [pTooltip]="'COMMON.MORE' | translate"
-                tooltipPosition="bottom"
-              >
-                <i class="pi pi-ellipsis-v"></i>
-              </button>
-            </div>
-          </ng-template>
-        </app-custom-table>
-      </div>
-
-      <!-- Empty datasource state — no datasource picked yet (adapter null,
-           so the table + its toolbar picker aren't rendered). This inline
-           picker keeps the datasource selectable in that state. -->
-      <div class="empty-state-inline" *ngIf="!adapter">
-        <app-custom-dropdown
-          [(ngModel)]="selectedDatasource"
-          [serverMode]="true"
-          [fetcher]="loadDatasourcesPage"
-          [pageSize]="10"
-          [preloadedItems]="preloadedDatasources"
-          [preloadedTotal]="preloadedDatasourcesTotal"
-          optionLabel="name"
-          optionValue="id"
-          [filter]="true"
-          [floatingLabel]="true"
-          [label]="'COMMON.DATASOURCE' | translate"
-          filterBy="name"
-          (onChangeEvent)="onDBChange($event)"
-          icon="pi-database"
-        ></app-custom-dropdown>
-        <i class="pi pi-database empty-state-icon"></i>
-        <span class="empty-state-text">
-          {{ 'COMMON.SELECT_DATASOURCE' | translate }}
-        </span>
-      </div>
-      </div>
-      <!-- /org-main -->
+    <!-- Folder-first asset explorer — Folders|Tags rail + list body with
+         type icons, favourite star, and a per-row kebab. Datasource is a
+         column now, not a gate: the list shows ALL datasets by folder/tag.
+         Per-cell DOM for the module column (datasource badge) is projected
+         via <ng-template usGridCell>. -->
+    <div class="content-card">
+      <app-asset-explorer
+        *ngIf="adapter"
+        [objectType]="explorerObjectType"
+        [serverAdapter]="adapter"
+        [extraColumns]="explorerColumns"
+        [tableConfig]="tableConfig"
+        (open)="onOpen($event)"
+        (edit)="onEdit($event.id)"
+        (rename)="onRename($event)"
+        (create)="onAddNewAdmin()"
+        (copy)="onExplorerCopy($event)"
+        (remove)="confirmDelete($event.id)"
+        (moved)="refreshList()"
+      >
+        <!-- Datasource badge column (module-specific). -->
+        <ng-template usGridCell="datasource" let-dataset>
+          <span class="ds-badge" *ngIf="dataset.datasource?.name">
+            <i class="pi pi-database"></i>
+            {{ dataset.datasource.name }}
+          </span>
+          <span class="ds-badge muted" *ngIf="!dataset.datasource?.name">—</span>
+        </ng-template>
+      </app-asset-explorer>
     </div>
   </div>
 </div>

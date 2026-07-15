@@ -2373,6 +2373,8 @@ export class AddDatasetComponent
         cacheTtlSeconds: formData.cacheTtlSeconds,
         // Track F: organizational tags captured in the save dialog.
         tags: formData.tags ?? [],
+        // Folder-explorer: the save-location the user picked (null = Root).
+        ...(formData.folderId ? { folderId: formData.folderId } : {}),
       };
 
       this.datasetService

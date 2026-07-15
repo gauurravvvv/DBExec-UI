@@ -7,6 +7,8 @@ import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { CustomTableComponent } from 'src/app/shared/components/custom-table/custom-table.component';
 import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-table/custom-table-empty.directive';
 import { FolderTreeComponent } from 'src/app/shared/components/folder-tree/folder-tree.component';
+import { AssetExplorerComponent } from 'src/app/shared/components/asset-explorer/asset-explorer.component';
+import { FolderLocationFieldComponent } from 'src/app/shared/components/folder-location-field/folder-location-field.component';
 import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AddDatasetComponent } from './components/add-dataset/add-dataset.component';
@@ -45,6 +47,9 @@ import { addDatasetReducer, ADD_DATASET_FEATURE_KEY } from './store';
     UsGridCellDirective,
     // Standalone shared folder-tree rail (Track F).
     FolderTreeComponent,
+    // Folder-first explorer shell + save-location field (folder-explorer).
+    AssetExplorerComponent,
+    FolderLocationFieldComponent,
     // NgRx Feature Store
     StoreModule.forFeature(ADD_DATASET_FEATURE_KEY, addDatasetReducer),
   ],

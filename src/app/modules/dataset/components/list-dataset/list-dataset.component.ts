@@ -36,6 +36,7 @@ import type {
 } from 'src/app/shared/components/custom-table/custom-table.types';
 import { FavouritesService } from 'src/app/shared/services/favourites.service';
 import type { FolderObjectType } from 'src/app/shared/validators/folders';
+import type { ExplorerObjectType } from 'src/app/shared/helpers/asset-icon.helper';
 import { DatasetService } from '../../services/dataset.service';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 
@@ -117,18 +118,21 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     rowIdField: 'id',
   };
 
-  /** Server-side adapter — bound on first datasource selection so
-   *  the table doesn't fire a datasets query before a datasource exists. */
+  /** Server-side adapter — built once in ngOnInit; NO datasource gate now.
+   *  The folder-first explorer browses ALL org datasets by folder/tag, so the
+   *  adapter loads datasets without a datasourceId (the explorer's baseFilter
+   *  supplies folderId / tags). */
   adapter: UsServerListAdapter<any> | null = null;
 
   /* ── folders / tags / favourites (Track F) ──────────────────────── */
 
   readonly objectType: FolderObjectType = 'dataset';
-  listFilter: Record<string, unknown> = {};
-  selectedFolderId: string | null = null;
-  filterTags: string[] = [];
-  favouritesOnly = false;
+  /** objectType typed for the shared explorer input. */
+  readonly explorerObjectType: ExplorerObjectType = 'dataset';
   favIds = this.favouritesService.ids;
+
+  /** Columns the explorer inserts after its name column (datasource badge). */
+  explorerColumns: CustomTableColumn[] = [];
 
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
@@ -164,6 +168,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     ];
 
     this.cols = this.buildColumns();
+    this.explorerColumns = this.buildExplorerColumns();
     // Field-specific search placeholder so the user knows what's matched.
     this.tableConfig = {
       ...this.tableConfig,
@@ -179,14 +184,18 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
         this.loadQueryBuilders();
       });
 
+    // Build the datasource-free adapter once — the explorer browses ALL org
+    // datasets by folder/tag. A `?datasourceId=` deep-link still narrows the
+    // list (optional filter), and `?name=` still pre-searches.
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-        if (params['datasourceId'] || params['name']) {
-          this.handleDeepLinking(params);
-        } else {
-          this.loadDatasources();
-        }
+        const dsId = params['datasourceId'] || undefined;
+        const name = params['name'] || undefined;
+        this.selectedDatasource = dsId ?? null;
+        this.bindAdapter(name);
+        // Still preload the datasource list for the create-flow picker.
+        this.loadDatasources();
       });
 
     // Warm the favourite-id set so each row's star renders correct state.
@@ -241,31 +250,23 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     }
   };
 
-  onDBChange(datasourceId: any) {
-    this.selectedDatasource = datasourceId;
-    this.bindAdapter();
-  }
 
   /* ── adapter wiring ─────────────────────────────────── */
 
   /**
-   * Construct (or rebuild) the server-side adapter once a
-   * datasource has been picked. The adapter needs `datasourceId`
-   * in every request, so we close over the current selection.
+   * Construct the server-side adapter. NO datasource gate — the folder-first
+   * explorer browses ALL org datasets; folder/tag come from the explorer's
+   * baseFilter (merged by custom-table into each request's `filter`). A
+   * `datasourceId` is sent only when a deep-link / optional filter selected one.
    */
   private bindAdapter(deepLinkName?: string) {
-    if (!this.selectedDatasource) {
-      this.adapter = null;
-      return;
-    }
-    // Tear down any prior adapter so its in-flight call doesn't
-    // race the new one's first load.
     this.adapter?.destroy();
-    const dsId = this.selectedDatasource;
     this.adapter = new UsServerListAdapter<any>({
       load: (params: UsListLoadParams) =>
         this.datasetService.listDatasets({
-          datasourceId: dsId,
+          ...(this.selectedDatasource
+            ? { datasourceId: this.selectedDatasource }
+            : {}),
           page: params.page,
           limit: params.limit,
           ...(params.sort ? { sort: params.sort } : {}),
@@ -276,9 +277,6 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
         rows: res?.data?.datasets ?? [],
         total: res?.data?.totalItems ?? res?.data?.count ?? 0,
       }),
-      // custom-table sends PLAIN filter values (global `search` + per-column
-      // name/description/status), so the adapter's identity mapping passes
-      // them straight through — no AG-Grid cell unwrapping needed.
       initial: {
         page: 1,
         limit: 50,
@@ -294,61 +292,48 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     this.adapter?.reload();
   }
 
-  /* ── folders / tags / favourites (Track F) ──────────────────────── */
+  /* ── asset-explorer output handlers (Track F folder-first) ──────── */
 
-  private applyOrgFilter(): void {
-    const f: Record<string, unknown> = {};
-    if (this.selectedFolderId) f['folderId'] = this.selectedFolderId;
-    if (this.filterTags.length) f['tags'] = this.filterTags;
-    if (this.favouritesOnly) f['favouritesOnly'] = true;
-    this.listFilter = f;
+  /** Datasource badge column the explorer renders after the name. */
+  private buildExplorerColumns(): CustomTableColumn[] {
+    return [
+      {
+        colId: 'datasource',
+        field: 'datasource.name',
+        header: this.translate.instant('COMMON.DATASOURCE'),
+        width: '200px',
+        sortable: false,
+      },
+    ];
   }
 
-  onFolderSelected(folderId: string | null): void {
-    this.selectedFolderId = folderId;
-    this.applyOrgFilter();
+  /** Open (view) a dataset. */
+  onOpen(row: any): void {
+    if (row?.id) this.router.navigate([DATASET.view(row.id)]);
   }
 
-  onTagsChanged(tags: string[]): void {
-    this.filterTags = tags ?? [];
-    this.applyOrgFilter();
+  /** Rename maps to edit for datasets (no inline-rename form today). */
+  onRename(row: any): void {
+    if (row?.id) this.onEdit(row.id);
   }
 
-  toggleFavouritesOnly(): void {
-    this.favouritesOnly = !this.favouritesOnly;
-    this.applyOrgFilter();
-  }
-
-  onObjectMoved(): void {
-    this.refreshList();
-  }
-
-  isFavourite(id: string): boolean {
-    return this.favouritesService.isFavourite(this.objectType, id);
-  }
-
-  toggleFavourite(id: string): void {
-    this.favouritesService.toggle(this.objectType, id).then((res: any) => {
-      this.globalService.handleSuccessService(res, false);
-      if (this.favouritesOnly) this.refreshList();
-      this.cdr.markForCheck();
-    });
+  /** Copy from the explorer kebab → the existing duplicate dialog, carrying the
+   *  chosen target folder so the copy lands where the user picked. */
+  copyTargetFolderId: string | null = null;
+  onExplorerCopy(payload: { row: any; targetFolderId: string | null }): void {
+    this.copyTargetFolderId = payload.targetFolderId;
+    this.confirmDuplicate(payload.row);
   }
 
   /* ── deep linking — preserved ────────────────────────── */
 
-  handleDeepLinking(params: any) {
-    const datasourceId = params['datasourceId'] ? params['datasourceId'] : null;
-    const name = params['name'];
-
-    if (datasourceId) {
-      this.loadDatasources(datasourceId, name);
-    } else {
-      this.loadDatasources(undefined, name);
-    }
-  }
-
-  loadDatasources(preSelectedDbId?: string, deepLinkName?: string): Promise<void> {
+  /**
+   * Preload the org's datasources — used ONLY by the create-flow dataset-picker
+   * dialog (a dataset genuinely needs a datasource at creation). No longer
+   * gates or binds the list adapter: the folder-first explorer lists all
+   * datasets regardless of datasource.
+   */
+  loadDatasources(): Promise<void> {
     return new Promise(resolve => {
       const params = { page: DEFAULT_PAGE, limit: 10 };
       this.datasourceService
@@ -360,29 +345,14 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
             this.preloadedDatasourcesTotal =
               response?.data?.count ?? items.length;
             this.datasources = [...items];
-            if (this.datasources.length > 0) {
-              this.selectedDatasource =
-                preSelectedDbId &&
-                this.datasources.find(d => d.id === preSelectedDbId)
-                  ? preSelectedDbId
-                  : this.datasources[0].id;
-              this.bindAdapter(deepLinkName);
-            } else {
-              this.selectedDatasource = null;
-              this.adapter = null;
-            }
           } else {
             this.datasources = [];
-            this.selectedDatasource = null;
-            this.adapter = null;
           }
           this.cdr.markForCheck();
           resolve();
         })
         .catch(() => {
           this.datasources = [];
-          this.selectedDatasource = null;
-          this.adapter = null;
           this.cdr.markForCheck();
           resolve();
         });
@@ -514,8 +484,14 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     this.router.navigate([DATASET.edit(id)]);
   }
 
-  useAsAnalysis(id: string) {
-    this.analysisDatasetId = id;
+  /** The datasource id of the dataset an analysis is being created from —
+   *  captured from the row so it no longer depends on a page-level picker. */
+  private analysisDatasourceId: string | null = null;
+
+  useAsAnalysis(row: any) {
+    this.analysisDatasetId = typeof row === 'string' ? row : row?.id;
+    this.analysisDatasourceId =
+      typeof row === 'string' ? this.selectedDatasource : (row?.datasourceId ?? null);
     this.showCreateAnalysisDialog = true;
   }
 
@@ -526,7 +502,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
           name: result.name,
           description: result.description,
           datasetId: this.analysisDatasetId,
-          datasource: this.selectedDatasource,
+          datasource: this.analysisDatasourceId ?? this.selectedDatasource,
           // Track F: organizational tags captured in the create dialog.
           tags: result.tags ?? [],
         })
@@ -551,11 +527,14 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
   onDuplicateDialogClose(result: DatasetFormData | null) {
     if (result && this.datasetToDuplicate) {
+      // Prefer the folder chosen in the dialog's Location field; fall back to
+      // the explorer kebab's target; else the source folder (service default).
       this.datasetService
         .duplicateDataset(
           this.datasetToDuplicate.id,
           result.name,
           result.description,
+          result.folderId ?? this.copyTargetFolderId,
         )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
@@ -569,6 +548,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     }
     this.showDuplicateDialog = false;
     this.datasetToDuplicate = null;
+    this.copyTargetFolderId = null;
   }
 
   /* ── delete flow — UNCHANGED ─────────────────────────── */

@@ -462,14 +462,24 @@ export class DatasetService {
     }
   }
 
-  async duplicateDataset(datasetId: string, name: string, description: string) {
+  async duplicateDataset(
+    datasetId: string,
+    name: string,
+    description: string,
+    folderId?: string | null,
+  ) {
     this._saving.set(true);
     try {
-      // POST /datasets/:datasetId/duplicate
+      // POST /datasets/:datasetId/duplicate. folderId (optional) files the copy
+      // into a chosen folder; omitted → the BE leaves it in the source folder.
       return await lastValueFrom(
         this.http.apiPost(
           DATASET.DUPLICATE_PREFIX + datasetId + DATASET.DUPLICATE_SUFFIX,
-          { name, description },
+          {
+            name,
+            description,
+            ...(folderId !== undefined && folderId !== null ? { folderId } : {}),
+          },
           { skipLoader: true },
         ),
       );
