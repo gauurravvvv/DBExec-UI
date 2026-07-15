@@ -47,3 +47,36 @@ export interface ExplorerBaseFilter {
   /** Allow module-specific base-filter keys (e.g. datasourceId). */
   [key: string]: unknown;
 }
+
+/**
+ * One row in the Finder list view's flat, ordered VISIBLE list. Folders and
+ * assets are interleaved; `depth` drives the Name-cell indent and a collapsing
+ * folder removes its descendant slice from the array.
+ *
+ * The component keeps `nodes: ExplorerNode[]` as the render list and a
+ * `childrenCache: Map<folderId, ExplorerNode[]>` so re-expanding a folder is
+ * instant (R3's right-click "Refresh" will invalidate a cache entry).
+ */
+export interface ExplorerNode {
+  /** Discriminates folder rows (disclosure + folder icon) from asset rows. */
+  kind: 'folder' | 'asset';
+  /** Folder id or asset id. */
+  id: string;
+  /** Display name (folder name / asset name). */
+  name: string;
+  /** Parent folder id; null at the top level (root). */
+  parentId: string | null;
+  /** Nesting depth — 0 at root; multiplies the Name-cell indent. */
+  depth: number;
+  /** Folder rows only: whether currently expanded in place. */
+  expanded?: boolean;
+  /** Folder rows only: children request in flight. */
+  loading?: boolean;
+  /** Folder rows only: children have been fetched at least once. */
+  loaded?: boolean;
+  /** Asset rows only: the raw module row (tags, updatedOn, datasource, …). */
+  row?: any;
+  /** Asset rows only: the object family, for the per-kind icon / Kind label.
+   *  Mirrors the explorer's `objectType` (all rows share one family). */
+  objectType?: string;
+}

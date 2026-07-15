@@ -1,210 +1,269 @@
 <div class="explorer">
-  <!-- ── LEFT RAIL ─────────────────────────────────────────────── -->
-  <aside class="explorer-rail">
-    <!-- Segmented Folders | Tags toggle -->
-    <div class="rail-seg">
-      <button
-        type="button"
-        class="rail-seg-btn"
-        [class.active]="railMode === 'folders'"
-        (click)="setRailMode('folders')"
-      >
-        <i class="pi pi-folder"></i>
-        {{ 'EXPLORER.RAIL.FOLDERS' | translate }}
-      </button>
-      <button
-        type="button"
-        class="rail-seg-btn"
-        [class.active]="railMode === 'tags'"
-        (click)="setRailMode('tags')"
-      >
-        <i class="pi pi-tags"></i>
-        {{ 'EXPLORER.RAIL.TAGS' | translate }}
-      </button>
+  <!-- ── LEFT SIDEBAR (slim) ───────────────────────────────────── -->
+  <aside class="explorer-sidebar">
+    <!-- Library -->
+    <div class="sb-head">{{ 'EXPLORER.LIBRARY' | translate }}</div>
+
+    <button
+      type="button"
+      class="sb-item"
+      [class.active]="libraryView === 'all' && !selectedTag"
+      (click)="setLibraryView('all')"
+    >
+      <i class="sb-i pi pi-inbox"></i>
+      <span class="sb-lbl">{{ 'EXPLORER.ALL_ITEMS' | translate }}</span>
+    </button>
+
+    <button
+      type="button"
+      class="sb-item"
+      [class.active]="libraryView === 'favourites'"
+      (click)="setLibraryView('favourites')"
+    >
+      <i class="sb-i pi pi-star"></i>
+      <span class="sb-lbl">{{ 'EXPLORER.FAVOURITES' | translate }}</span>
+      <span class="sb-count" *ngIf="favouriteCount">{{ favouriteCount }}</span>
+    </button>
+
+    <button
+      type="button"
+      class="sb-item"
+      [class.active]="libraryView === 'recents'"
+      (click)="setLibraryView('recents')"
+    >
+      <i class="sb-i pi pi-clock"></i>
+      <span class="sb-lbl">{{ 'EXPLORER.RECENTS' | translate }}</span>
+    </button>
+
+    <!-- Tags -->
+    <div class="sb-head">{{ 'EXPLORER.RAIL.TAGS' | translate }}</div>
+
+    <div class="sb-loading" *ngIf="tagsLoading">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>{{ 'COMMON.LOADING' | translate }}</span>
     </div>
 
-    <!-- Folders mode -->
-    <div class="rail-body" *ngIf="railMode === 'folders'">
+    <ng-container *ngIf="!tagsLoading">
+      <!-- TODO (R4): replace pi-tag with a coloured .tag-dot per tag colour. -->
       <button
+        *ngFor="let t of tags"
         type="button"
-        class="rail-root-row"
-        [class.active]="!selectedFolderId && !selectedTag"
-        (click)="selectRootFolder()"
+        class="sb-item sb-tag"
+        [class.active]="selectedTag === t.tag"
+        (click)="selectTag(t.tag)"
       >
-        <i class="pi pi-inbox"></i>
-        <span>{{ 'EXPLORER.ROOT' | translate }}</span>
+        <i class="sb-i pi pi-tag"></i>
+        <span class="sb-lbl" [title]="t.tag">{{ t.tag }}</span>
+        <span class="sb-count">{{ t.count }}</span>
       </button>
 
-      <div class="rail-loading" *ngIf="foldersLoading">
-        <i class="pi pi-spin pi-spinner"></i>
-        <span>{{ 'COMMON.LOADING' | translate }}</span>
+      <div class="sb-empty" *ngIf="tags.length === 0">
+        <span>{{ 'EXPLORER.EMPTY_TAG' | translate }}</span>
       </div>
+    </ng-container>
+  </aside>
 
-      <p-tree
-        *ngIf="!foldersLoading"
-        [value]="folderNodes"
-        selectionMode="single"
-        [(selection)]="folderSelection"
-        [draggableNodes]="false"
-        [droppableNodes]="false"
-        (onNodeSelect)="onFolderNodeSelect($event)"
-        styleClass="rail-p-tree"
-        [emptyMessage]="'EXPLORER.EMPTY_FOLDER' | translate"
-      >
-        <ng-template let-node pTemplate="default">
-          <span class="rail-node-label" [title]="node.label">{{ node.label }}</span>
-        </ng-template>
-      </p-tree>
+  <!-- ── MAIN COLUMN (toolbar + list + status) ─────────────────── -->
+  <section class="explorer-main">
+    <!-- Toolbar -->
+    <div class="explorer-toolbar">
+      <span class="tb-icon" [ngClass]="typeIcon"></span>
 
-      <!-- New folder affordance -->
-      <div class="rail-create" *ngIf="canManage">
+      <div class="tb-spacer"></div>
+
+      <!-- New folder affordance (root) -->
+      <ng-container *ngIf="canManage">
         <button
           type="button"
-          class="rail-create-toggle"
-          *ngIf="!showRailCreate"
-          (click)="openRailCreate()"
+          class="tb-btn"
+          *ngIf="!showRootCreate"
+          (click)="openRootCreate()"
+          [pTooltip]="'EXPLORER.NEW_FOLDER' | translate"
+          tooltipPosition="bottom"
         >
-          <i class="pi pi-plus"></i>
-          <span>{{ 'EXPLORER.NEW_FOLDER' | translate }}</span>
+          <i class="pi pi-folder-plus"></i>
         </button>
 
-        <div class="rail-create-row" *ngIf="showRailCreate">
+        <div class="tb-create" *ngIf="showRootCreate">
           <input
             type="text"
-            class="rail-create-input"
-            [(ngModel)]="railNewFolderName"
+            class="tb-create-input"
+            [(ngModel)]="rootNewFolderName"
             [placeholder]="'EXPLORER.NEW_FOLDER' | translate"
             maxlength="120"
-            (keydown.enter)="saveRailFolder()"
-            (keydown.escape)="cancelRailCreate()"
+            (keydown.enter)="saveRootFolder()"
+            (keydown.escape)="cancelRootCreate()"
             autocomplete="off"
           />
           <button
             type="button"
-            class="rail-create-save"
-            (click)="saveRailFolder()"
-            [disabled]="!railNewFolderName.trim() || savingRailFolder"
+            class="tb-create-save"
+            (click)="saveRootFolder()"
+            [disabled]="!rootNewFolderName.trim() || savingRootFolder"
           >
-            <i class="pi" [ngClass]="savingRailFolder ? 'pi-spin pi-spinner' : 'pi-check'"></i>
+            <i class="pi" [ngClass]="savingRootFolder ? 'pi-spin pi-spinner' : 'pi-check'"></i>
           </button>
-          <button type="button" class="rail-create-cancel" (click)="cancelRailCreate()">
+          <button type="button" class="tb-create-cancel" (click)="cancelRootCreate()">
             <i class="pi pi-times"></i>
           </button>
         </div>
-      </div>
+      </ng-container>
     </div>
 
-    <!-- Tags mode -->
-    <div class="rail-body" *ngIf="railMode === 'tags'">
-      <div class="rail-loading" *ngIf="tagsLoading">
+    <!-- List -->
+    <div class="explorer-list" (contextmenu)="onRowContextMenu($event, null)">
+      <table class="finder-table">
+        <colgroup>
+          <col class="c-name" />
+          <col class="c-kind" />
+          <col class="c-mod" />
+          <col class="c-tags" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th class="sorted">{{ 'COMMON.NAME' | translate }}</th>
+            <th>{{ 'EXPLORER.COL.KIND' | translate }}</th>
+            <th>{{ 'EXPLORER.COL.MODIFIED' | translate }}</th>
+            <th>{{ 'EXPLORER.COL.TAGS' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let node of nodes; trackBy: trackNode"
+            [class.sel]="isSelected(node)"
+            (click)="onRowClick(node)"
+            (contextmenu)="onRowContextMenu($event, node)"
+          >
+            <!-- Name -->
+            <td>
+              <div class="name-cell" [style.paddingLeft.px]="node.depth * 20">
+                <!-- Disclosure (folders) / spacer (assets) -->
+                <span
+                  *ngIf="node.kind === 'folder'"
+                  class="disc"
+                  [class.open]="node.expanded"
+                  (click)="onDisclosureClick(node, $event)"
+                >
+                  <i
+                    class="pi"
+                    [ngClass]="node.loading ? 'pi-spin pi-spinner' : 'pi-chevron-right'"
+                  ></i>
+                </span>
+                <span *ngIf="node.kind === 'asset'" class="disc leaf"></span>
+
+                <!-- Icon -->
+                <i
+                  *ngIf="node.kind === 'folder'"
+                  class="ficon k-folder pi"
+                  [ngClass]="node.expanded ? 'pi-folder-open' : 'pi-folder'"
+                ></i>
+                <i
+                  *ngIf="node.kind === 'asset'"
+                  class="ficon"
+                  [ngClass]="[assetIcon(node), kindClass(node)]"
+                ></i>
+
+                <!-- Name + extension -->
+                <span
+                  *ngIf="node.kind === 'folder'"
+                  class="nm"
+                  [title]="node.name"
+                  >{{ node.name }}</span
+                >
+                <button
+                  *ngIf="node.kind === 'asset'"
+                  type="button"
+                  class="nm asset-nm"
+                  [title]="node.name"
+                  (click)="onAssetOpen(node, $event)"
+                >
+                  <span class="nm-text">{{ node.name }}</span>
+                  <span class="ext">{{ assetExtension(node) }}</span>
+                </button>
+
+                <!-- Favourite star (assets only) -->
+                <button
+                  *ngIf="node.kind === 'asset'"
+                  type="button"
+                  class="fav-star"
+                  [class.on]="isFavourite(node.id)"
+                  (click)="toggleFavourite(node.row, $event)"
+                  [pTooltip]="(isFavourite(node.id) ? 'FAVOURITE.REMOVE' : 'FAVOURITE.ADD') | translate"
+                  tooltipPosition="bottom"
+                >
+                  <i class="pi" [ngClass]="isFavourite(node.id) ? 'pi-star-fill' : 'pi-star'"></i>
+                </button>
+
+                <!-- Hover kebab -->
+                <button
+                  *ngIf="node.kind === 'asset'"
+                  type="button"
+                  class="kebab-btn"
+                  (click)="openKebab($event, node.row)"
+                  [pTooltip]="'COMMON.MORE' | translate"
+                  tooltipPosition="bottom"
+                >
+                  <i class="pi pi-ellipsis-v"></i>
+                </button>
+              </div>
+            </td>
+
+            <!-- Kind -->
+            <td class="kind-lbl">{{ kindLabel(node) }}</td>
+
+            <!-- Modified -->
+            <td class="muted tnum">
+              <span
+                *ngIf="node.kind === 'asset'"
+                [pTooltip]="((node.row?.updatedOn || node.row?.createdOn) | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+                tooltipPosition="top"
+              >
+                {{ (node.row?.updatedOn || node.row?.createdOn | date: 'dd MMM yyyy, HH:mm') || '—' }}
+              </span>
+            </td>
+
+            <!-- Tags (R4 adds coloured dots) -->
+            <td>
+              <div class="row-tags" *ngIf="node.kind === 'asset'">
+                <!-- TODO (R4): render a .tag-dot per tag colour before the text. -->
+                <span class="tag-pill" *ngFor="let tg of rowTags(node.row)">{{ tg }}</span>
+                <span class="tag-none" *ngIf="rowTags(node.row).length === 0">—</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Loading / empty states -->
+      <div class="list-loading" *ngIf="rootLoading">
         <i class="pi pi-spin pi-spinner"></i>
         <span>{{ 'COMMON.LOADING' | translate }}</span>
       </div>
 
-      <div class="rail-tag-list" *ngIf="!tagsLoading">
-        <button
-          *ngFor="let t of tags"
-          type="button"
-          class="rail-tag-chip"
-          [class.active]="selectedTag === t.tag"
-          (click)="selectTag(t.tag)"
-        >
-          <i class="pi pi-tag"></i>
-          <span class="rail-tag-name" [title]="t.tag">{{ t.tag }}</span>
-          <span class="rail-tag-count">{{ t.count }}</span>
-        </button>
-
-        <div class="rail-empty" *ngIf="tags.length === 0">
-          <i class="pi pi-tags"></i>
-          <span>{{ 'EXPLORER.EMPTY_TAG' | translate }}</span>
-        </div>
+      <div class="list-empty" *ngIf="!rootLoading && nodes.length === 0">
+        <i class="pi pi-inbox"></i>
+        <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
       </div>
     </div>
-  </aside>
 
-  <!-- ── BODY ──────────────────────────────────────────────────── -->
-  <section class="explorer-body">
-    <!-- Breadcrumb -->
-    <div class="explorer-breadcrumb">
-      <i class="pi" [ngClass]="selectedTag ? 'pi-tag' : 'pi-folder-open'"></i>
-      <span class="crumb-text">
-        {{ breadcrumb || ('EXPLORER.ROOT' | translate) }}
+    <!-- Status bar -->
+    <footer class="explorer-status">
+      <span class="crumb">
+        <i class="pi pi-inbox"></i>
+        <b>{{ 'EXPLORER.ROOT' | translate }}</b>
       </span>
-    </div>
-
-    <div class="explorer-table-wrap">
-      <app-custom-table
-        [columns]="columns"
-        [serverAdapter]="serverAdapter"
-        [config]="tableConfig"
-        [baseFilter]="tableBaseFilter"
-        [hasProjectedEmpty]="true"
-      >
-        <div tableEmpty class="explorer-empty-body">
-          <i class="pi pi-inbox"></i>
-          <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
-        </div>
-
-        <!-- Name: type icon + bold clickable name -->
-        <ng-template usGridCell="name" let-row>
-          <button type="button" class="asset-name" (click)="open.emit(row)">
-            <i class="asset-type-icon" [ngClass]="typeIcon"></i>
-            <span class="asset-name-text" [title]="row.name">{{ row.name }}</span>
-          </button>
-        </ng-template>
-
-        <!-- Tags chips -->
-        <ng-template usGridCell="tags" let-row>
-          <span class="tag-cell">
-            <span class="tag-pill" *ngFor="let tg of rowTags(row)">{{ tg }}</span>
-            <span class="tag-none" *ngIf="rowTags(row).length === 0">—</span>
-          </span>
-        </ng-template>
-
-        <!-- Updated timestamp -->
-        <ng-template usGridCell="updated" let-row>
-          <span
-            class="date-text"
-            [pTooltip]="((row.updatedOn || row.createdOn) | date: 'dd MMM yyyy, HH:mm:ss') || ''"
-            tooltipPosition="top"
-          >
-            {{ (row.updatedOn || row.createdOn | date: 'dd MMM yyyy') || '—' }}
-          </span>
-        </ng-template>
-
-        <!-- Favourite star -->
-        <ng-template usGridCell="favourite" let-row>
-          <button
-            type="button"
-            class="fav-star-btn"
-            [class.on]="isFavourite(row.id)"
-            (click)="toggleFavourite(row)"
-            [pTooltip]="(isFavourite(row.id) ? 'FAVOURITE.REMOVE' : 'FAVOURITE.ADD') | translate"
-            tooltipPosition="bottom"
-          >
-            <i class="pi" [ngClass]="isFavourite(row.id) ? 'pi-star-fill' : 'pi-star'"></i>
-          </button>
-        </ng-template>
-
-        <!-- Kebab -->
-        <ng-template usGridCell="kebab" let-row>
-          <button
-            type="button"
-            class="kebab-btn"
-            (click)="openKebab($event, row)"
-            [pTooltip]="'COMMON.MORE' | translate"
-            tooltipPosition="bottom"
-          >
-            <i class="pi pi-ellipsis-v"></i>
-          </button>
-        </ng-template>
-      </app-custom-table>
-    </div>
+      <span class="status-right">
+        {{ 'EXPLORER.STATUS_ITEMS' | translate: { count: itemCount } }}
+        · {{ folderCount }}
+        <span class="status-folders-lbl">{{ 'EXPLORER.RAIL.FOLDERS' | translate }}</span>
+      </span>
+    </footer>
   </section>
 </div>
 
 <!-- Single kebab menu, rebuilt per clicked row. Item labels are pre-translated
-     when the model is built (buildKebabItems). -->
+     when the model is built (buildKebabItems). R3 will also open this on
+     right-click of an asset row. -->
 <p-menu
   #kebabMenu
   [popup]="true"
@@ -213,7 +272,8 @@
   styleClass="explorer-kebab-menu"
 ></p-menu>
 
-<!-- ONE move/copy overlay: mini folder tree + New folder + primary button. -->
+<!-- ONE move/copy overlay: mini folder tree + New folder + primary button.
+     UNCHANGED from the previous shell. -->
 <p-overlayPanel #moveOp appendTo="body" styleClass="explorer-move-panel">
   <div class="move-panel">
     <div class="move-title">
@@ -230,7 +290,7 @@
       <span>{{ 'EXPLORER.ROOT' | translate }}</span>
     </button>
 
-    <div class="rail-loading" *ngIf="moveLoading">
+    <div class="sb-loading" *ngIf="moveLoading">
       <i class="pi pi-spin pi-spinner"></i>
       <span>{{ 'COMMON.LOADING' | translate }}</span>
     </div>

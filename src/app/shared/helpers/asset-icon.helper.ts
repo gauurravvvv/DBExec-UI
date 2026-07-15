@@ -31,3 +31,27 @@ export const ASSET_TYPE_LABEL: Record<ExplorerObjectType, string> = {
   dashboard: 'EXPLORER.TYPE.DASHBOARD',
   alert: 'EXPLORER.TYPE.ALERT',
 };
+
+/**
+ * i18n key per asset type for the Finder list's "Kind" column
+ * (Dataset / Analysis / Dashboard / Alert). Resolved via TranslateModule;
+ * keys land in EXPLORER.KIND.* (added in R5 — raw-key fallback until then).
+ */
+export const KIND_LABEL: Record<ExplorerObjectType, string> = {
+  dataset: 'EXPLORER.KIND.DATASET',
+  analysis: 'EXPLORER.KIND.ANALYSIS',
+  dashboard: 'EXPLORER.KIND.DASHBOARD',
+  alert: 'EXPLORER.KIND.ALERT',
+};
+
+/**
+ * Faux file-extension suffix rendered muted after an asset name in the list,
+ * echoing macOS Finder (Q3 Revenue.dset). Purely cosmetic — never sent to the
+ * BE or used as an id.
+ */
+export const KIND_EXTENSION: Record<ExplorerObjectType, string> = {
+  dataset: '.dset',
+  analysis: '.analysis',
+  dashboard: '.dash',
+  alert: '.alert',
+};

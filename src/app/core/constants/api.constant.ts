@@ -546,6 +546,12 @@ export const FOLDER = {
   TREE: '/folders/tree',
   // GET  /folders/tags?objectType=    listAssetTags   (tag facet {tag,count} for the Tags rail)
   TAGS: '/folders/tags',
+  // GET  /folders/:folderId/children?objectType=   listFolderChildren
+  //   Direct children (sub-folders + assets) of one folder for the Finder list
+  //   view's lazy expand. `folderId` = 'root' → top level. Built as
+  //   CHILDREN_PREFIX + folderId + CHILDREN_SUFFIX.
+  CHILDREN_PREFIX: '/folders/',
+  CHILDREN_SUFFIX: '/children',
   // PUT  /folders/:folderId/rename    renameFolder    (body: name)
   RENAME_PREFIX: '/folders/',
   RENAME_SUFFIX: '/rename',

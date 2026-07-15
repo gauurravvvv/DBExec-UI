@@ -28,6 +28,20 @@ export interface FolderRow {
 }
 
 /**
+ * The direct children of one folder, as returned by
+ * GET /folders/:folderId/children — sub-folders plus the assets filed directly
+ * under it. Powers the Finder list view's lazy in-place expand. `assets` rows
+ * are the module's own shape (id, name, tags, updatedOn, datasource, …) so the
+ * explorer renders them without a per-module adapter round-trip.
+ */
+export interface FolderChildrenResult {
+  folders: FolderRow[];
+  assets: Record<string, any>[];
+  /** True when the BE capped the asset list (very large folder). */
+  assetsTruncated?: boolean;
+}
+
+/**
  * FoldersService — the cross-cutting folder-tree CRUD used by the shared
  * `<app-folder-tree>` panel on every object list (dataset / analysis /
  * dashboard / alert). Backed by the BE folders routes (spec §5.6):
@@ -71,6 +85,31 @@ export class FoldersService {
       }),
     );
     return res?.data?.tags ?? [];
+  }
+
+  /**
+   * List the DIRECT children (sub-folders + assets) of one folder for the
+   * Finder list view's lazy expand. Pass `folderId: 'root'` for the top level.
+   * Returns `{ folders, assets, assetsTruncated? }` already unwrapped from the
+   * envelope; callers still get `{ data }` if they need the raw response, but
+   * the shaped result is the ergonomic path.
+   */
+  async listChildren(
+    objectType: FolderObjectType,
+    folderId: string,
+  ): Promise<FolderChildrenResult> {
+    const res: any = await lastValueFrom(
+      this.http.apiGet(
+        FOLDER.CHILDREN_PREFIX + folderId + FOLDER.CHILDREN_SUFFIX,
+        { params: { objectType }, skipLoader: true },
+      ),
+    );
+    const data = res?.data ?? {};
+    return {
+      folders: data.folders ?? [],
+      assets: data.assets ?? [],
+      assetsTruncated: data.assetsTruncated ?? false,
+    };
   }
 
   /** Create a folder. `parentId` null / omitted = a root folder. */
