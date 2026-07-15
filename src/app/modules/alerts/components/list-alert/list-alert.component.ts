@@ -18,19 +18,23 @@ import type {
   CustomTableColumn,
   CustomTableConfig,
 } from 'src/app/shared/components/custom-table/custom-table.types';
-import { FavouritesService } from 'src/app/shared/services/favourites.service';
-import type { FolderObjectType } from 'src/app/shared/validators/folders';
+import type { ExplorerObjectType } from 'src/app/shared/helpers/asset-icon.helper';
 import { AlertService } from '../../services/alert.service';
 
 /**
- * Alerts listing — renders through the shared `<app-custom-table>` (the app's
- * unified list table) driven by a `UsServerListAdapter` on the BE `/alerts`
- * list call. Infinite scroll (no page controls), a single global search plus
- * on-demand per-column filters, and per-row actions (enable/disable toggle,
- * snooze, test-now, edit, delete). No bulk selection.
+ * Alerts listing — renders through the shared folder-first `<app-asset-explorer>`
+ * (Track F). The explorer shell owns the Folders|Tags rail, the favourite star,
+ * the per-row kebab (open / edit / rename / move / copy / delete), and the
+ * baseFilter (folderId / tags) it merges into every server request; this host
+ * only builds the `/alerts` list adapter, supplies the alert-specific columns as
+ * `extraColumns` (source, severity, schedule, next-run, status), and handles the
+ * emitted actions.
  *
- * Unlike analyses/rls-rules, alerts are org-scoped (not datasource-scoped), so
- * the adapter binds immediately on init — no datasource picker gate.
+ * Alerts are org-scoped (not datasource-scoped), so the adapter binds
+ * unconditionally on init — no datasource gate. The alert-specific per-row
+ * lifecycle actions that AREN'T in the kebab set (enable/disable toggle, snooze,
+ * test-now) are preserved as an extra "actions" column rendered via a
+ * `usGridCell` template.
  */
 @Component({
   selector: 'app-list-alert',
@@ -61,8 +65,14 @@ export class ListAlertComponent implements OnInit, OnDestroy {
   /* ── test-now result ────────────────────────────────────────────── */
   testingId: string | null = null;
 
-  /* ── custom-table wiring ────────────────────────────────────────── */
-  cols: CustomTableColumn[] = [];
+  /* ── explorer wiring ────────────────────────────────────────────── */
+
+  /** objectType typed for the shared explorer input. */
+  readonly explorerObjectType: ExplorerObjectType = 'alert';
+
+  /** Alert-specific columns the explorer inserts after its name column:
+   *  source, severity, schedule, next-run, status, and the lifecycle actions. */
+  explorerColumns: CustomTableColumn[] = [];
 
   tableConfig: CustomTableConfig = {
     mode: 'scroll',
@@ -79,22 +89,6 @@ export class ListAlertComponent implements OnInit, OnDestroy {
 
   adapter: UsServerListAdapter<any> | null = null;
 
-  /* ── folders / tags / favourites (Track F) ──────────────────────── */
-
-  /** Object family this list organizes — drives the folder tree + favourites. */
-  readonly objectType: FolderObjectType = 'alert';
-
-  /** Host-owned filter slice merged into every server request by the custom
-   *  table (single writer). Reassign a NEW object to trigger a re-fetch. */
-  listFilter: Record<string, unknown> = {};
-
-  selectedFolderId: string | null = null;
-  filterTags: string[] = [];
-  favouritesOnly = false;
-
-  /** Favourite-id set for this object family (from FavouritesService). */
-  favIds = this.favouritesService.ids;
-
   isDeleting = (id: string): boolean => this.alertService.isDeleting(id);
   saving = this.alertService.saving;
 
@@ -103,22 +97,18 @@ export class ListAlertComponent implements OnInit, OnDestroy {
     private router: Router,
     private globalService: GlobalService,
     private translate: TranslateService,
-    private favouritesService: FavouritesService,
   ) {}
 
   ngOnInit(): void {
-    this.cols = this.buildColumns();
+    this.explorerColumns = this.buildExplorerColumns();
     this.tableConfig = {
       ...this.tableConfig,
       globalSearchPlaceholder: this.translate.instant(
         'ALERTS.SEARCH_PLACEHOLDER',
       ),
     };
+    // Alerts don't need a datasource — build the adapter unconditionally.
     this.bindAdapter();
-    // Warm the favourite-id set so each row's star renders correct state.
-    this.favouritesService.refresh(this.objectType).then(() => {
-      this.cdr.markForCheck();
-    });
   }
 
   ngOnDestroy(): void {
@@ -126,19 +116,17 @@ export class ListAlertComponent implements OnInit, OnDestroy {
     this.adapter?.destroy();
   }
 
-  /* ── column definitions ─────────────────────────────────────────── */
+  /* ── explorer columns (alert-specific extras) ───────────────────── */
 
-  private buildColumns(): CustomTableColumn[] {
-    const t = (k: string) => this.translate.instant(k);
+  private buildExplorerColumns(): CustomTableColumn[] {
+    const t = (k: string): string => this.translate.instant(k);
     return [
-      { colId: 'favourite', header: '', width: '56px', sortable: false, align: 'center' },
-      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '220px', frozen: true, filter: 'text' },
       { colId: 'sourceType', field: 'sourceType', header: t('ALERTS.SOURCE'), width: '128px', sortable: false },
       { colId: 'severity', field: 'severity', header: t('ALERTS.SEVERITY'), width: '128px', sortable: false },
       { colId: 'cronExpression', field: 'cronExpression', header: t('ALERTS.SCHEDULE'), width: '176px', sortable: false },
       { colId: 'nextRunAt', field: 'nextRunAt', header: t('ALERTS.NEXT_RUN'), width: '176px' },
       { colId: 'enabled', field: 'enabled', header: t('COMMON.STATUS'), width: '144px', sortable: false },
-      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '208px', sortable: false },
+      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '160px', sortable: false },
     ];
   }
 
@@ -169,52 +157,29 @@ export class ListAlertComponent implements OnInit, OnDestroy {
     this.adapter?.reload();
   }
 
-  /* ── folders / tags / favourites (Track F) ──────────────────────── */
+  /* ── asset-explorer output handlers (Track F folder-first) ──────── */
 
-  /** Rebuild the host filter slice from the current folder / tag / favourite
-   *  selections. Reassigns a NEW object so the custom table re-fetches. */
-  private applyOrgFilter(): void {
-    const f: Record<string, unknown> = {};
-    if (this.selectedFolderId) f['folderId'] = this.selectedFolderId;
-    if (this.filterTags.length) f['tags'] = this.filterTags;
-    if (this.favouritesOnly) f['favouritesOnly'] = true;
-    this.listFilter = f;
+  /** Open (view) an alert — existing view nav. */
+  onOpen(row: any): void {
+    if (row?.id) this.router.navigate([ALERT.view(row.id)]);
   }
 
-  onFolderSelected(folderId: string | null): void {
-    this.selectedFolderId = folderId;
-    this.applyOrgFilter();
+  /** Rename maps to edit for alerts (no inline-rename form today). */
+  onRename(row: any): void {
+    if (row?.id) this.onEdit(row.id);
   }
 
-  onTagsChanged(tags: string[]): void {
-    this.filterTags = tags ?? [];
-    this.applyOrgFilter();
-  }
-
-  toggleFavouritesOnly(): void {
-    this.favouritesOnly = !this.favouritesOnly;
-    this.applyOrgFilter();
-  }
-
-  onObjectMoved(): void {
-    this.refreshList();
-  }
-
-  isFavourite(id: string): boolean {
-    return this.favouritesService.isFavourite(this.objectType, id);
-  }
-
-  toggleFavourite(id: string): void {
-    this.favouritesService.toggle(this.objectType, id).then((res: any) => {
-      this.globalService.handleSuccessService(res, false);
-      // If the Favourites filter is active, re-fetch so the row drops out.
-      if (this.favouritesOnly) this.refreshList();
-      this.cdr.markForCheck();
-    });
-  }
-
-  trackByIndex(index: number): number {
-    return index;
+  /** Copy from the explorer kebab → duplicate the rule, filing the copy into
+   *  the chosen target folder. */
+  onExplorerCopy(payload: { row: any; targetFolderId: string | null }): void {
+    if (!payload?.row?.id) return;
+    this.alertService
+      .duplicate(payload.row.id, payload.targetFolderId)
+      .then((res: any) => {
+        if (this.globalService.handleSuccessService(res)) this.refreshList();
+        this.cdr.markForCheck();
+      })
+      .catch(() => this.cdr.markForCheck());
   }
 
   /* ── nav ────────────────────────────────────────────────────────── */
@@ -290,6 +255,10 @@ export class ListAlertComponent implements OnInit, OnDestroy {
 
   isTesting(id: string): boolean {
     return this.testingId === id;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   /* ── delete ─────────────────────────────────────────────────────── */

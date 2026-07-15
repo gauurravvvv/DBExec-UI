@@ -153,6 +153,8 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
       filterState: [null],
       // organization (Track F): free-form tags
       tags: [[]],
+      // Folder-explorer: the folder the alert is filed into (null = Root).
+      folderId: [null as string | null],
     });
 
     this.alertForm.valueChanges
@@ -191,6 +193,7 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
             enabled: rule.enabled ?? true,
             filterState: rule.filterState ?? null,
             tags: rule.tags ?? [],
+            folderId: rule.folderId ?? null,
           },
           { emitEvent: false },
         );

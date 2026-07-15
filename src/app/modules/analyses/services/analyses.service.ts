@@ -155,6 +155,31 @@ export class AnalysesService {
     );
   }
 
+  /**
+   * Duplicate an analysis. `folderId` (optional) files the copy into a chosen
+   * folder; omitted → the BE leaves it in the source folder. Mirrors the
+   * dataset duplicate flow — the folder-explorer kebab's "copy" action calls
+   * this with the target folder the user dropped the copy into.
+   * POST /analyses/:analysisId/duplicate — body: { folderId? }
+   */
+  async duplicate(id: string, folderId?: string | null) {
+    this._saving.set(true);
+    try {
+      // ANALYSES.GET is the `/analyses/` prefix; append id + `/duplicate`.
+      return await lastValueFrom(
+        this.http.apiPost(
+          ANALYSES.GET + id + '/duplicate',
+          {
+            ...(folderId !== undefined && folderId !== null ? { folderId } : {}),
+          },
+          { skipLoader: true },
+        ),
+      );
+    } finally {
+      this._saving.set(false);
+    }
+  }
+
   async deleteAnalyses(analysisId: string, justification?: string) {
     this.setDeleting(analysisId, true);
     try {

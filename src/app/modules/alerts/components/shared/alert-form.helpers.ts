@@ -260,6 +260,8 @@ export function buildAlertPayload(
       Array.isArray(formVal.tags) && formVal.tags.length
         ? formVal.tags
         : undefined,
+    // Folder-explorer: the folder the alert is filed into (null = Root).
+    ...(formVal.folderId ? { folderId: formVal.folderId } : {}),
   };
   if (formVal.id) payload.id = formVal.id;
   return payload;

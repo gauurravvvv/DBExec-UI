@@ -388,6 +388,9 @@ export const DASHBOARD = {
   RENDER_SUFFIX: '/render',
   // POST /dashboards/publish
   PUBLISH: '/dashboards/publish',
+  // POST /dashboards/:id/duplicate
+  DUPLICATE_PREFIX: '/dashboards/',
+  DUPLICATE_SUFFIX: '/duplicate',
   // POST /dashboards/:id/run
   RUN_PREFIX: '/dashboards/',
   RUN_SUFFIX: '/run',
@@ -447,6 +450,9 @@ export const ALERT = {
   GET: '/alerts/', // GET  /alerts/:alertId
   UPDATE: '/alerts/', // PUT  /alerts/:alertId
   DELETE: '/alerts/', // DELETE /alerts/:alertId
+  // POST /alerts/:alertId/duplicate  → copy rule (optional { folderId })
+  DUPLICATE_PREFIX: '/alerts/',
+  DUPLICATE_SUFFIX: '/duplicate',
   // POST /alerts/:alertId/toggle  → enable / disable
   TOGGLE_PREFIX: '/alerts/',
   TOGGLE_SUFFIX: '/toggle',

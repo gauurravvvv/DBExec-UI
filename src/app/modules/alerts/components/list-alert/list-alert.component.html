@@ -16,225 +16,130 @@
       </div>
     </div>
 
-    <!-- Content — folder rail (left) + list (right) -->
-    <div class="content-card org-layout">
-      <!-- Left rail: shared folder tree (Track F) -->
-      <aside class="folder-rail">
-        <app-folder-tree
-          [objectType]="objectType"
-          [selectedFolderId]="selectedFolderId"
-          [canManage]="true"
-          (folderSelected)="onFolderSelected($event)"
-          (objectMoved)="onObjectMoved()"
-        ></app-folder-tree>
-      </aside>
+    <!-- Folder-first asset explorer — Folders|Tags rail + list body with type
+         icon, favourite star, and a per-row kebab (open/edit/rename/move/copy/
+         delete) all owned by the shell. Alert-specific columns (source,
+         severity, schedule, next-run, status) + the enable/snooze/test lifecycle
+         actions are projected as <ng-template usGridCell> cells. -->
+    <div class="content-card">
+      <app-asset-explorer
+        *ngIf="adapter"
+        [objectType]="explorerObjectType"
+        [serverAdapter]="adapter"
+        [extraColumns]="explorerColumns"
+        [tableConfig]="tableConfig"
+        (open)="onOpen($event)"
+        (edit)="onEdit($event.id)"
+        (rename)="onRename($event)"
+        (create)="onAddNewAlert()"
+        (copy)="onExplorerCopy($event)"
+        (remove)="confirmDelete($event.id)"
+        (moved)="refreshList()"
+      >
+        <ng-template usGridCell="sourceType" let-alert>
+          <span class="pill">
+            <i
+              class="pi"
+              [ngClass]="
+                alert.sourceType === 'analysis' ? 'pi-chart-line' : 'pi-database'
+              "
+            ></i>
+            {{ 'ALERTS.SOURCE_' + (alert.sourceType | uppercase) | translate }}
+          </span>
+        </ng-template>
 
-      <div class="org-main">
-        <!-- Tag-filter chips + Favourites quick-filter -->
-        <div class="org-toolbar">
-          <button
-            type="button"
-            class="fav-filter-btn"
-            [class.active]="favouritesOnly"
-            (click)="toggleFavouritesOnly()"
-            [pTooltip]="'FAVOURITE.SHOW_ONLY' | translate"
-            tooltipPosition="bottom"
+        <ng-template usGridCell="severity" let-alert>
+          <span class="severity-pill" [ngClass]="'sev-' + alert.severity">
+            <span class="dot"></span>
+            {{ 'ALERTS.SEVERITY_' + (alert.severity | uppercase) | translate }}
+          </span>
+        </ng-template>
+
+        <ng-template usGridCell="cronExpression" let-alert>
+          <code class="cron-code" [title]="alert.timezone">
+            {{ alert.cronExpression }}
+          </code>
+        </ng-template>
+
+        <ng-template usGridCell="nextRunAt" let-alert>
+          <span
+            class="date-text"
+            *ngIf="alert.nextRunAt; else noRun"
+            [pTooltip]="(alert.nextRunAt | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+            tooltipPosition="top"
           >
-            <i class="pi" [ngClass]="favouritesOnly ? 'pi-star-fill' : 'pi-star'"></i>
-            {{ 'FAVOURITE.FAVOURITES' | translate }}
-          </button>
-          <div class="tag-filter">
-            <i class="pi pi-tags tag-filter-icon"></i>
-            <p-chips
-              [ngModel]="filterTags"
-              (ngModelChange)="onTagsChanged($event)"
-              [placeholder]="'COMMON.TAGS_FILTER_PLACEHOLDER' | translate"
-              [addOnBlur]="true"
-              separator=","
-              styleClass="tag-filter-chips"
-            ></p-chips>
-          </div>
-        </div>
-
-        <div class="table-wrapper" *ngIf="adapter">
-          <app-custom-table
-            [columns]="cols"
-            [serverAdapter]="adapter"
-            [config]="tableConfig"
-            [baseFilter]="listFilter"
-            [hasProjectedEmpty]="true"
-            (refresh)="refreshList()"
-          >
-            <div tableEmpty class="ct-empty-body">
-              <i class="pi pi-bell"></i>
-              <span>{{ 'ALERTS.NO_ALERTS' | translate }}</span>
-            </div>
-
-            <ng-template usGridCell="favourite" let-alert>
-              <button
-                type="button"
-                class="fav-star-btn"
-                [class.on]="isFavourite(alert.id)"
-                (click)="toggleFavourite(alert.id)"
-                [pTooltip]="
-                  (isFavourite(alert.id)
-                    ? 'FAVOURITE.REMOVE'
-                    : 'FAVOURITE.ADD'
-                  ) | translate
-                "
-                tooltipPosition="bottom"
-              >
-                <i
-                  class="pi"
-                  [ngClass]="isFavourite(alert.id) ? 'pi-star-fill' : 'pi-star'"
-                ></i>
-              </button>
-            </ng-template>
-
-          <ng-template usGridCell="name" let-alert>
-            <a
-              class="dataset-name-link"
-              [routerLink]="['/app/alerts', alert.id]"
-              draggable="true"
-              (dragstart)="$event.dataTransfer?.setData('text/plain', alert.id)"
-            >
-              {{ alert.name }}
-            </a>
+            {{ alert.nextRunAt | relativeTime }}
+          </span>
+          <ng-template #noRun>
+            <span class="muted">{{ 'COMMON.NA' | translate }}</span>
           </ng-template>
+        </ng-template>
 
-          <ng-template usGridCell="sourceType" let-alert>
-            <span class="pill">
+        <ng-template usGridCell="enabled" let-alert>
+          <span
+            class="status-pill"
+            [ngClass]="{ active: alert.enabled, inactive: !alert.enabled }"
+          >
+            <span class="dot"></span>
+            <span class="label">
+              {{
+                alert.enabled
+                  ? ('COMMON.ENABLED' | translate)
+                  : ('COMMON.DISABLED' | translate)
+              }}
+            </span>
+          </span>
+          <span
+            class="snooze-chip"
+            *ngIf="alert.snoozedUntil"
+            [pTooltip]="(alert.snoozedUntil | date: 'medium') || ''"
+            tooltipPosition="top"
+          >
+            <i class="pi pi-moon"></i> {{ 'ALERTS.SNOOZED' | translate }}
+          </span>
+        </ng-template>
+
+        <!-- Alert-specific per-row actions NOT covered by the kebab set:
+             enable/disable toggle, test-now, and snooze. -->
+        <ng-template usGridCell="actions" let-alert>
+          <div class="row-actions">
+            <button
+              *hasPermission="'alertManagement'; level: 'write'"
+              class="icon-btn"
+              (click)="onToggle(alert)"
+              [disabled]="saving()"
+              [pTooltip]="
+                (alert.enabled ? 'ALERTS.DISABLE' : 'ALERTS.ENABLE') | translate
+              "
+              tooltipPosition="bottom"
+            >
+              <i class="pi" [ngClass]="alert.enabled ? 'pi-pause' : 'pi-play'"></i>
+            </button>
+            <button
+              *hasPermission="'alertManagement'; level: 'write'"
+              class="icon-btn"
+              (click)="onTestNow(alert)"
+              [disabled]="isTesting(alert.id)"
+              [pTooltip]="'ALERTS.TEST_NOW' | translate"
+              tooltipPosition="bottom"
+            >
               <i
                 class="pi"
-                [ngClass]="
-                  alert.sourceType === 'analysis' ? 'pi-chart-line' : 'pi-database'
-                "
+                [ngClass]="isTesting(alert.id) ? 'pi-spin pi-spinner' : 'pi-bolt'"
               ></i>
-              {{ 'ALERTS.SOURCE_' + (alert.sourceType | uppercase) | translate }}
-            </span>
-          </ng-template>
-
-          <ng-template usGridCell="severity" let-alert>
-            <span
-              class="severity-pill"
-              [ngClass]="'sev-' + alert.severity"
+            </button>
+            <button
+              *hasPermission="'alertManagement'; level: 'write'"
+              class="icon-btn"
+              (click)="openSnooze(alert)"
+              [pTooltip]="'ALERTS.SNOOZE' | translate"
+              tooltipPosition="bottom"
             >
-              <span class="dot"></span>
-              {{ 'ALERTS.SEVERITY_' + (alert.severity | uppercase) | translate }}
-            </span>
-          </ng-template>
-
-          <ng-template usGridCell="cronExpression" let-alert>
-            <code class="cron-code" [title]="alert.timezone">
-              {{ alert.cronExpression }}
-            </code>
-          </ng-template>
-
-          <ng-template usGridCell="nextRunAt" let-alert>
-            <span
-              class="date-text"
-              *ngIf="alert.nextRunAt; else noRun"
-              [pTooltip]="(alert.nextRunAt | date: 'dd MMM yyyy, HH:mm:ss') || ''"
-              tooltipPosition="top"
-            >
-              {{ alert.nextRunAt | relativeTime }}
-            </span>
-            <ng-template #noRun>
-              <span class="muted">{{ 'COMMON.NA' | translate }}</span>
-            </ng-template>
-          </ng-template>
-
-          <ng-template usGridCell="enabled" let-alert>
-            <span
-              class="status-pill"
-              [ngClass]="{ active: alert.enabled, inactive: !alert.enabled }"
-            >
-              <span class="dot"></span>
-              <span class="label">
-                {{
-                  alert.enabled
-                    ? ('COMMON.ENABLED' | translate)
-                    : ('COMMON.DISABLED' | translate)
-                }}
-              </span>
-            </span>
-            <span
-              class="snooze-chip"
-              *ngIf="alert.snoozedUntil"
-              [pTooltip]="(alert.snoozedUntil | date: 'medium') || ''"
-              tooltipPosition="top"
-            >
-              <i class="pi pi-moon"></i> {{ 'ALERTS.SNOOZED' | translate }}
-            </span>
-          </ng-template>
-
-          <ng-template usGridCell="actions" let-alert>
-            <div class="row-actions">
-              <button
-                *hasPermission="'alertManagement'; level: 'write'"
-                class="icon-btn"
-                (click)="onToggle(alert)"
-                [disabled]="saving()"
-                [pTooltip]="
-                  (alert.enabled ? 'ALERTS.DISABLE' : 'ALERTS.ENABLE') | translate
-                "
-                tooltipPosition="bottom"
-              >
-                <i
-                  class="pi"
-                  [ngClass]="alert.enabled ? 'pi-pause' : 'pi-play'"
-                ></i>
-              </button>
-              <button
-                *hasPermission="'alertManagement'; level: 'write'"
-                class="icon-btn"
-                (click)="onTestNow(alert)"
-                [disabled]="isTesting(alert.id)"
-                [pTooltip]="'ALERTS.TEST_NOW' | translate"
-                tooltipPosition="bottom"
-              >
-                <i
-                  class="pi"
-                  [ngClass]="isTesting(alert.id) ? 'pi-spin pi-spinner' : 'pi-bolt'"
-                ></i>
-              </button>
-              <button
-                *hasPermission="'alertManagement'; level: 'write'"
-                class="icon-btn"
-                (click)="openSnooze(alert)"
-                [pTooltip]="'ALERTS.SNOOZE' | translate"
-                tooltipPosition="bottom"
-              >
-                <i class="pi pi-moon"></i>
-              </button>
-              <button
-                *hasPermission="'alertManagement'; level: 'write'"
-                class="icon-btn edit-btn"
-                (click)="onEdit(alert.id)"
-                [pTooltip]="'COMMON.EDIT' | translate"
-                tooltipPosition="bottom"
-              >
-                <i class="pi pi-pencil"></i>
-              </button>
-              <button
-                *hasPermission="'alertManagement'; level: 'delete'"
-                class="icon-btn delete-btn"
-                (click)="confirmDelete(alert.id)"
-                [disabled]="isDeleting(alert.id)"
-                [pTooltip]="'COMMON.DELETE' | translate"
-                tooltipPosition="bottom"
-              >
-                <i
-                  class="pi"
-                  [ngClass]="isDeleting(alert.id) ? 'pi-spin pi-spinner' : 'pi-trash'"
-                ></i>
-              </button>
-            </div>
-          </ng-template>
-          </app-custom-table>
-        </div>
-      </div>
-      <!-- /org-main -->
+              <i class="pi pi-moon"></i>
+            </button>
+          </div>
+        </ng-template>
+      </app-asset-explorer>
     </div>
   </div>
 </div>

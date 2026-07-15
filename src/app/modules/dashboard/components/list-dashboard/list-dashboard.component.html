@@ -7,221 +7,60 @@
       </div>
     </div>
 
-    <!-- Content Card — folder rail (left) + list (right), Track F -->
-    <div class="content-card org-layout">
-      <aside class="folder-rail">
-        <app-folder-tree
-          [objectType]="objectType"
-          [selectedFolderId]="selectedFolderId"
-          [canManage]="true"
-          (folderSelected)="onFolderSelected($event)"
-          (objectMoved)="onObjectMoved()"
-        ></app-folder-tree>
-      </aside>
+    <!-- Folder-first asset explorer — Folders|Tags rail + list body with
+         type icons, favourite star, and a per-row kebab. Datasource is a
+         column now, not a gate: the list shows ALL dashboards by folder/tag.
+         Per-cell DOM for the module columns (dataset / datasource / status)
+         is projected via <ng-template usGridCell>. Dashboards are view-only,
+         so open/edit/rename all route to the viewer. -->
+    <div class="content-card">
+      <app-asset-explorer
+        *ngIf="adapter"
+        [objectType]="explorerObjectType"
+        [serverAdapter]="adapter"
+        [extraColumns]="explorerColumns"
+        [tableConfig]="tableConfig"
+        (open)="onOpen($event)"
+        (edit)="onView($event.id)"
+        (rename)="onRename($event)"
+        (copy)="onExplorerCopy($event)"
+        (remove)="confirmDelete($event.id)"
+        (moved)="refreshList()"
+      >
+        <!-- Source dataset (module-specific). -->
+        <ng-template usGridCell="datasetName" let-dashboard>
+          <span class="description-text" [title]="dashboard.datasetName">
+            {{ dashboard.datasetName || '—' }}
+          </span>
+        </ng-template>
 
-      <div class="org-main">
-        <!-- Tag-filter chips + Favourites quick-filter -->
-        <div class="org-toolbar">
-          <button
-            type="button"
-            class="fav-filter-btn"
-            [class.active]="favouritesOnly"
-            (click)="toggleFavouritesOnly()"
-            [pTooltip]="'FAVOURITE.SHOW_ONLY' | translate"
-            tooltipPosition="bottom"
+        <!-- Datasource badge (module-specific). -->
+        <ng-template usGridCell="datasourceName" let-dashboard>
+          <span class="description-text" [title]="dashboard.datasource?.name">
+            {{ dashboard.datasource?.name || '—' }}
+          </span>
+        </ng-template>
+
+        <!-- Status pill (module-specific). -->
+        <ng-template usGridCell="status" let-dashboard>
+          <span
+            class="status-pill"
+            [ngClass]="{
+              active: dashboard.status === 1,
+              inactive: dashboard.status !== 1,
+            }"
           >
-            <i class="pi" [ngClass]="favouritesOnly ? 'pi-star-fill' : 'pi-star'"></i>
-            {{ 'FAVOURITE.FAVOURITES' | translate }}
-          </button>
-          <div class="tag-filter">
-            <i class="pi pi-tags tag-filter-icon"></i>
-            <p-chips
-              [ngModel]="filterTags"
-              (ngModelChange)="onTagsChanged($event)"
-              [placeholder]="'COMMON.TAGS_FILTER_PLACEHOLDER' | translate"
-              [addOnBlur]="true"
-              separator=","
-              styleClass="tag-filter-chips"
-            ></p-chips>
-          </div>
-        </div>
-
-      <!-- Unified simple table. Infinite scroll, global search + on-demand
-           per-column filters (shared inputs), per-row actions. Dashboard is
-           datasource-scoped, so the datasource picker is projected into the
-           toolbar's LEFT slot; the table renders only once a datasource is
-           chosen (adapter set). Per-cell DOM via <ng-template usGridCell>. -->
-      <div class="table-wrapper" *ngIf="adapter">
-        <app-custom-table
-          [columns]="cols"
-          [serverAdapter]="adapter"
-          [config]="tableConfig"
-          [baseFilter]="listFilter"
-          [hasProjectedEmpty]="true"
-          (refresh)="refreshList()"
-        >
-          <!-- Toolbar-left slot: server-driven datasource picker. -->
-          <div tableToolbarStart class="ds-toolbar-start">
-            <app-custom-dropdown
-              [(ngModel)]="selectedDatasource"
-              [serverMode]="true"
-              [fetcher]="loadDatasourcesPage"
-              [pageSize]="10"
-              [preloadedItems]="preloadedDatasources"
-              [preloadedTotal]="preloadedDatasourcesTotal"
-              optionLabel="name"
-              optionValue="id"
-              [filter]="true"
-              [floatingLabel]="true"
-              [label]="'COMMON.DATASOURCE' | translate"
-              filterBy="name"
-              (onChangeEvent)="onDBChange($event)"
-              icon="pi-database"
-            >
-            </app-custom-dropdown>
-          </div>
-
-          <!-- Empty body — always projected so only one empty state shows. -->
-          <div tableEmpty class="ct-empty-body">
-            <i class="pi pi-inbox"></i>
-            <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
-          </div>
-
-          <ng-template usGridCell="favourite" let-dashboard>
-            <button
-              type="button"
-              class="fav-star-btn"
-              [class.on]="isFavourite(dashboard.id)"
-              (click)="toggleFavourite(dashboard.id)"
-              [pTooltip]="
-                (isFavourite(dashboard.id)
-                  ? 'FAVOURITE.REMOVE'
-                  : 'FAVOURITE.ADD'
-                ) | translate
-              "
-              tooltipPosition="bottom"
-            >
-              <i
-                class="pi"
-                [ngClass]="isFavourite(dashboard.id) ? 'pi-star-fill' : 'pi-star'"
-              ></i>
-            </button>
-          </ng-template>
-
-          <ng-template usGridCell="name" let-dashboard>
-            <a
-              class="dataset-name-link"
-              [routerLink]="['/app/dashboards', dashboard.id]"
-              draggable="true"
-              (dragstart)="$event.dataTransfer?.setData('text/plain', dashboard.id)"
-            >
-              {{ dashboard.name }}
-            </a>
-          </ng-template>
-
-          <ng-template usGridCell="datasetName" let-dashboard>
-            <span class="description-text" [title]="dashboard.datasetName">
-              {{ dashboard.datasetName }}
+            <span class="dot"></span>
+            <span class="label">
+              {{
+                dashboard.status === 1
+                  ? ('COMMON.ACTIVE' | translate)
+                  : ('COMMON.INACTIVE' | translate)
+              }}
             </span>
-          </ng-template>
-
-          <ng-template usGridCell="datasourceName" let-dashboard>
-            <span
-              class="description-text"
-              [title]="dashboard.datasource?.name"
-            >
-              {{ dashboard.datasource?.name }}
-            </span>
-          </ng-template>
-
-          <ng-template usGridCell="status" let-dashboard>
-            <span
-              class="status-pill"
-              [ngClass]="{
-                active: dashboard.status === 1,
-                inactive: dashboard.status !== 1,
-              }"
-            >
-              <span class="dot"></span>
-              <span class="label">
-                {{
-                  dashboard.status === 1
-                    ? ('COMMON.ACTIVE' | translate)
-                    : ('COMMON.INACTIVE' | translate)
-                }}
-              </span>
-            </span>
-          </ng-template>
-
-          <ng-template usGridCell="createdOn" let-dashboard>
-            <span
-              class="date-text"
-              [pTooltip]="(dashboard.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
-              tooltipPosition="top"
-            >
-              {{ dashboard.createdOn | relativeTime }}
-            </span>
-          </ng-template>
-
-          <ng-template usGridCell="actions" let-dashboard>
-            <div class="row-actions">
-              <button
-                class="icon-btn view-btn"
-                (click)="onView(dashboard.id)"
-                [pTooltip]="'COMMON.VIEW' | translate"
-                tooltipPosition="bottom"
-              >
-                <i class="pi pi-eye"></i>
-              </button>
-              <button
-                *hasPermission="'dashboard'; level: 'delete'"
-                class="icon-btn delete-btn"
-                (click)="confirmDelete(dashboard.id)"
-                [pTooltip]="'COMMON.DELETE' | translate"
-                tooltipPosition="bottom"
-                [disabled]="isDeleting(dashboard.id)"
-              >
-                <i
-                  class="pi"
-                  [ngClass]="
-                    isDeleting(dashboard.id)
-                      ? 'pi-spin pi-spinner'
-                      : 'pi-trash'
-                  "
-                ></i>
-              </button>
-            </div>
-          </ng-template>
-        </app-custom-table>
-      </div>
-
-      <!-- Empty datasource state — no datasource picked yet (adapter null,
-           so the table + its toolbar picker aren't rendered). This inline
-           picker keeps the datasource selectable in that state. -->
-      <div class="empty-state-inline" *ngIf="!adapter">
-        <app-custom-dropdown
-          [(ngModel)]="selectedDatasource"
-          [serverMode]="true"
-          [fetcher]="loadDatasourcesPage"
-          [pageSize]="10"
-          [preloadedItems]="preloadedDatasources"
-          [preloadedTotal]="preloadedDatasourcesTotal"
-          optionLabel="name"
-          optionValue="id"
-          [filter]="true"
-          [floatingLabel]="true"
-          [label]="'COMMON.DATASOURCE' | translate"
-          filterBy="name"
-          (onChangeEvent)="onDBChange($event)"
-          icon="pi-database"
-        ></app-custom-dropdown>
-        <i class="pi pi-database empty-state-icon"></i>
-        <span class="empty-state-text">
-          {{ 'COMMON.SELECT_DATASOURCE' | translate }}
-        </span>
-      </div>
-      </div>
-      <!-- /org-main -->
+          </span>
+        </ng-template>
+      </app-asset-explorer>
     </div>
   </div>
 </div>

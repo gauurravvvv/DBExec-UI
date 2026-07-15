@@ -7,6 +7,8 @@ import { MenuModule } from 'primeng/menu';
 import { CustomTableComponent } from 'src/app/shared/components/custom-table/custom-table.component';
 import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-table/custom-table-empty.directive';
 import { FolderTreeComponent } from 'src/app/shared/components/folder-tree/folder-tree.component';
+import { AssetExplorerComponent } from 'src/app/shared/components/asset-explorer/asset-explorer.component';
+import { FolderLocationFieldComponent } from 'src/app/shared/components/folder-location-field/folder-location-field.component';
 import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedChartsModule } from 'src/app/shared/modules/shared-charts.module';
@@ -68,6 +70,9 @@ import {
     UsGridCellDirective,
     // Standalone shared folder-tree rail (Track F).
     FolderTreeComponent,
+    // Folder-first explorer shell + save-location field (folder-explorer).
+    AssetExplorerComponent,
+    FolderLocationFieldComponent,
     // NgRx feature stores. Two slices — dataset cache + filter slice.
     StoreModule.forFeature(ADD_ANALYSES_FEATURE_KEY, addAnalysesReducer),
     StoreModule.forFeature(ANALYSES_FILTER_FEATURE_KEY, analysesFilterReducer),
