@@ -2371,6 +2371,8 @@ export class AddDatasetComponent
         sql,
         cacheEnabled: formData.cacheEnabled,
         cacheTtlSeconds: formData.cacheTtlSeconds,
+        // Track F: organizational tags captured in the save dialog.
+        tags: formData.tags ?? [],
       };
 
       this.datasetService

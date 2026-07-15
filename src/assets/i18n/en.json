@@ -198,7 +198,10 @@
     "MAX": "Max",
     "TRUE": "True",
     "FALSE": "False",
-    "NO_MATCHING_RECORDS": "No matching records"
+    "NO_MATCHING_RECORDS": "No matching records",
+    "TAGS": "Tags",
+    "TAGS_PLACEHOLDER": "Add a tag and press Enter",
+    "TAGS_FILTER_PLACEHOLDER": "Filter by tags…"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "First name is required",
@@ -3317,6 +3320,39 @@
           "tooLong": "Dashboard name must not exceed 255 characters"
         }
       }
+    },
+    "folders": {
+      "name": {
+        "required": "Folder name is required",
+        "tooLong": "Folder name is too long (max 120 characters)",
+        "invalid": "Folder name contains invalid characters"
+      },
+      "objectType": {
+        "invalid": "Invalid object type"
+      },
+      "parentId": {
+        "invalid": "Invalid parent folder"
+      },
+      "id": {
+        "required": "A valid folder id is required"
+      },
+      "objectId": {
+        "required": "A valid object id is required"
+      },
+      "sequence": {
+        "invalid": "Invalid sequence value"
+      },
+      "justification": {
+        "tooLong": "Justification is too long (max 500 characters)"
+      }
+    },
+    "favourites": {
+      "objectType": {
+        "invalid": "Invalid object type"
+      },
+      "objectId": {
+        "required": "A valid object id is required"
+      }
     }
   },
   "DB_ACCESS": {
@@ -3801,5 +3837,26 @@
     "PREV_PAGE": "Previous page",
     "NEXT_PAGE": "Next page",
     "CONNECTIONS_SEARCH_PLACEHOLDER": "Search connections by name"
+  },
+  "FOLDER": {
+    "TITLE": "Folders",
+    "ALL": "All items",
+    "NEW": "New folder",
+    "NEW_SUBFOLDER": "New subfolder",
+    "RENAME": "Rename folder",
+    "DELETE": "Delete folder",
+    "NAME": "Folder name",
+    "NAME_PLACEHOLDER": "Enter a folder name",
+    "EMPTY": "No folders yet",
+    "CONFIRM_DELETE": "Delete the folder \"{{name}}\"?",
+    "DELETE_DETACH_INFO": "Items in this folder are not deleted — they are moved out of the folder.",
+    "MOVE_TO": "Move to folder",
+    "MOVED": "Moved to folder"
+  },
+  "FAVOURITE": {
+    "FAVOURITES": "Favourites",
+    "SHOW_ONLY": "Show favourites only",
+    "ADD": "Add to favourites",
+    "REMOVE": "Remove from favourites"
   }
 }

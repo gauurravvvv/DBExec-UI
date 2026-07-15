@@ -606,3 +606,19 @@
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* ── Track F: favourite star toggle in the view header ─────────────── */
+.fav-toggle {
+  i {
+    color: #9aa7b4;
+    transition: color 0.15s ease;
+  }
+
+  &:hover i {
+    color: #f1c21b;
+  }
+
+  &.on i {
+    color: #f1c21b;
+  }
+}

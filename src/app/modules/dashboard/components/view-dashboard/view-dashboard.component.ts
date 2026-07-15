@@ -17,6 +17,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { MenuItem } from 'primeng/api';
 import { DASHBOARD as DB_ROUTES } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { FavouritesService } from 'src/app/shared/services/favourites.service';
+import type { FolderObjectType } from 'src/app/shared/validators/folders';
 import {
   exportDashboardPdf,
   exportDashboardPng,
@@ -48,6 +50,10 @@ export class ViewDashboardComponent
 {
   private destroyRef = inject(DestroyRef);
   private _dashboardService = inject(DashboardService);
+  private favouritesService = inject(FavouritesService);
+
+  /* ── favourite star (Track F) ───────────────────────────────────── */
+  readonly objectType: FolderObjectType = 'dashboard';
 
   // Signal refs from service. `rendering` covers the heavier
   // render() call; `isDeleting(id)` drives the per-dashboard delete
@@ -207,6 +213,9 @@ export class ViewDashboardComponent
 
   ngOnInit(): void {
     this.buildExportMenu();
+    this.favouritesService
+      .refresh(this.objectType)
+      .then(() => this.cdr.markForCheck());
     this.route.params
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
@@ -215,6 +224,23 @@ export class ViewDashboardComponent
           this._dashboardService.resetCurrent();
           this.loadDashboard();
         }
+      });
+  }
+
+  isFavourite(): boolean {
+    return (
+      !!this.dashboardId &&
+      this.favouritesService.isFavourite(this.objectType, this.dashboardId)
+    );
+  }
+
+  toggleFavourite(): void {
+    if (!this.dashboardId) return;
+    this.favouritesService
+      .toggle(this.objectType, this.dashboardId)
+      .then((res: any) => {
+        this.globalService.handleSuccessService(res, false);
+        this.cdr.markForCheck();
       });
   }
 

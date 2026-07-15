@@ -10,6 +10,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ALERT } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { FavouritesService } from 'src/app/shared/services/favourites.service';
+import type { FolderObjectType } from 'src/app/shared/validators/folders';
 import { AlertService } from '../../services/alert.service';
 
 /**
@@ -51,18 +53,36 @@ export class ViewAlertComponent implements OnInit, OnDestroy {
 
   testResult: { breached?: boolean; observedValue?: any; error?: string } | null = null;
 
+  /* ── favourite star (Track F) ───────────────────────────────────── */
+  readonly objectType: FolderObjectType = 'alert';
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private alertService: AlertService,
     private globalService: GlobalService,
     private translate: TranslateService,
+    private favouritesService: FavouritesService,
   ) {}
 
   ngOnInit(): void {
     this.alertId = this.route.snapshot.params['id'];
     this.alertService.resetCurrent();
     this.loadAlert();
+    this.favouritesService
+      .refresh(this.objectType)
+      .then(() => this.cdr.markForCheck());
+  }
+
+  isFavourite(): boolean {
+    return this.favouritesService.isFavourite(this.objectType, this.alertId);
+  }
+
+  toggleFavourite(): void {
+    this.favouritesService.toggle(this.objectType, this.alertId).then((res: any) => {
+      this.globalService.handleSuccessService(res, false);
+      this.cdr.markForCheck();
+    });
   }
 
   ngOnDestroy(): void {

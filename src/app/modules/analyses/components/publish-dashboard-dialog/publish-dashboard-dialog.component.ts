@@ -30,6 +30,8 @@ export interface PublishDashboardPayload {
   dashboardId?: string;
   name?: string;
   description?: string;
+  // Track F: free-form organizational tags on the published dashboard.
+  tags?: string[];
 }
 
 /**
@@ -110,13 +112,15 @@ export class PublishDashboardDialogComponent implements OnInit, OnChanges {
       name: ['', [zodValidator(dashboardNameSchema)]],
       description: ['', [zodValidator(analysisDescriptionSchema)]],
       dashboardId: [''],
+      // Track F: organizational tags for the published dashboard.
+      tags: [[] as string[]],
     });
   }
 
   private reset() {
     this.mode = 'new';
     this.confirmingOverwrite = false;
-    this.form?.reset({ name: '', description: '', dashboardId: '' });
+    this.form?.reset({ name: '', description: '', dashboardId: '', tags: [] });
     this.applyValidators();
   }
 
@@ -188,10 +192,12 @@ export class PublishDashboardDialogComponent implements OnInit, OnChanges {
     const name = (this.form.get('name')?.value || '').trim();
     const description = (this.form.get('description')?.value || '').trim();
     const dashboardId = this.form.get('dashboardId')?.value || undefined;
+    const tags: string[] = this.form.get('tags')?.value ?? [];
 
     const payload: PublishDashboardPayload = {
       mode: this.mode,
       description: description || undefined,
+      tags: tags.length ? tags : undefined,
     };
     if (this.mode === 'new') {
       payload.name = name;

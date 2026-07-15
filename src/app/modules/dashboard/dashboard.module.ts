@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CustomTableComponent } from 'src/app/shared/components/custom-table/custom-table.component';
 import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-table/custom-table-empty.directive';
+import { FolderTreeComponent } from 'src/app/shared/components/folder-tree/folder-tree.component';
 import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedChartsModule } from 'src/app/shared/modules/shared-charts.module';
@@ -31,6 +32,8 @@ import { DashboardRoutingModule } from './dashboard-routing.module';
     CustomTableComponent,
     CustomTableEmptyDirective,
     UsGridCellDirective,
+    // Standalone shared folder-tree rail (Track F).
+    FolderTreeComponent,
   ],
 })
 export class DashboardModule {}

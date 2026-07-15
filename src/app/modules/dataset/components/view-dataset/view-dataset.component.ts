@@ -8,6 +8,8 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { DATASET, QUERY_BUILDER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { FavouritesService } from 'src/app/shared/services/favourites.service';
+import type { FolderObjectType } from 'src/app/shared/validators/folders';
 import { DatasetService } from '../../services/dataset.service';
 
 @Component({
@@ -66,13 +68,31 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
   loading = this.datasetService.loading;
   isDeleting = (id: string): boolean => this.datasetService.isDeleting(id);
 
+  /* ── favourite star (Track F) ───────────────────────────────────── */
+  readonly objectType: FolderObjectType = 'dataset';
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private datasetService: DatasetService,
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
+    private favouritesService: FavouritesService,
   ) {}
+
+  isFavourite(): boolean {
+    const id = this.datasetData?.id;
+    return !!id && this.favouritesService.isFavourite(this.objectType, id);
+  }
+
+  toggleFavourite(): void {
+    const id = this.datasetData?.id;
+    if (!id) return;
+    this.favouritesService.toggle(this.objectType, id).then((res: any) => {
+      this.globalService.handleSuccessService(res, false);
+      this.cdr.markForCheck();
+    });
+  }
 
   isArray = Array.isArray;
 
@@ -203,6 +223,9 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadDatasetData();
+    this.favouritesService
+      .refresh(this.objectType)
+      .then(() => this.cdr.markForCheck());
   }
 
   async loadDatasetData() {

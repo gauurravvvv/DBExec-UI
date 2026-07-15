@@ -22,6 +22,8 @@ import type {
   CustomTableColumn,
   CustomTableConfig,
 } from 'src/app/shared/components/custom-table/custom-table.types';
+import { FavouritesService } from 'src/app/shared/services/favourites.service';
+import type { FolderObjectType } from 'src/app/shared/validators/folders';
 import { AnalysesService } from '../../services/analyses.service';
 
 /**
@@ -86,6 +88,15 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
    *  the table doesn't fire an analyses query before a datasource exists. */
   adapter: UsServerListAdapter<any> | null = null;
 
+  /* ── folders / tags / favourites (Track F) ──────────────────────── */
+
+  readonly objectType: FolderObjectType = 'analysis';
+  listFilter: Record<string, unknown> = {};
+  selectedFolderId: string | null = null;
+  filterTags: string[] = [];
+  favouritesOnly = false;
+  favIds = this.favouritesService.ids;
+
   constructor(
     private datasourceService: DatasourceService,
     private analysesService: AnalysesService,
@@ -93,6 +104,7 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
     private globalService: GlobalService,
     private route: ActivatedRoute,
     private translate: TranslateService,
+    private favouritesService: FavouritesService,
   ) {}
 
   ngOnInit() {
@@ -119,6 +131,11 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
           this.loadDatasources();
         }
       });
+
+    // Warm the favourite-id set so each row's star renders correct state.
+    this.favouritesService
+      .refresh(this.objectType)
+      .then(() => this.cdr.markForCheck());
   }
 
   ngOnDestroy() {
@@ -132,6 +149,7 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
   private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
+      { colId: 'favourite', header: '', width: '56px', sortable: false, align: 'center' },
       { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
       { colId: 'description', field: 'description', header: t('COMMON.DESCRIPTION'), width: '320px', filter: 'text', sortable: false },
       { colId: 'datasetName', field: 'dataset.name', header: t('COMMON.DATASET'), width: '192px', filter: 'text', sortable: false },
@@ -221,6 +239,47 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
 
   refreshList() {
     this.adapter?.reload();
+  }
+
+  /* ── folders / tags / favourites (Track F) ──────────────────────── */
+
+  private applyOrgFilter(): void {
+    const f: Record<string, unknown> = {};
+    if (this.selectedFolderId) f['folderId'] = this.selectedFolderId;
+    if (this.filterTags.length) f['tags'] = this.filterTags;
+    if (this.favouritesOnly) f['favouritesOnly'] = true;
+    this.listFilter = f;
+  }
+
+  onFolderSelected(folderId: string | null): void {
+    this.selectedFolderId = folderId;
+    this.applyOrgFilter();
+  }
+
+  onTagsChanged(tags: string[]): void {
+    this.filterTags = tags ?? [];
+    this.applyOrgFilter();
+  }
+
+  toggleFavouritesOnly(): void {
+    this.favouritesOnly = !this.favouritesOnly;
+    this.applyOrgFilter();
+  }
+
+  onObjectMoved(): void {
+    this.refreshList();
+  }
+
+  isFavourite(id: string): boolean {
+    return this.favouritesService.isFavourite(this.objectType, id);
+  }
+
+  toggleFavourite(id: string): void {
+    this.favouritesService.toggle(this.objectType, id).then((res: any) => {
+      this.globalService.handleSuccessService(res, false);
+      if (this.favouritesOnly) this.refreshList();
+      this.cdr.markForCheck();
+    });
   }
 
   /* ── deep linking — preserved ────────────────────────── */

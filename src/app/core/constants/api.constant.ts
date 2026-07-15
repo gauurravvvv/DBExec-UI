@@ -487,3 +487,38 @@ export const NOTIFICATION = {
   // POST — mark every unread row read for the logged-in user
   READ_ALL: '/notifications/read-all',
 };
+
+/**
+ * Folders — a nested organizational tree for viz objects (Track F). One tree
+ * per `objectType` (dataset / analysis / dashboard / alert), scoped to the
+ * caller's org. Prefixes ending in `/` are concatenated with the folder id.
+ * Contract mirrors the BE folders controller (spec §5.6).
+ */
+export const FOLDER = {
+  // POST /folders                     createFolder    (body: name, objectType, parentId?)
+  CREATE: '/folders',
+  // GET  /folders/tree?objectType=    listFolderTree  (the whole tree for one family)
+  TREE: '/folders/tree',
+  // PUT  /folders/:folderId/rename    renameFolder    (body: name)
+  RENAME_PREFIX: '/folders/',
+  RENAME_SUFFIX: '/rename',
+  // PUT  /folders/:folderId/move      moveFolder      (body: parentId | null)
+  MOVE_PREFIX: '/folders/',
+  MOVE_SUFFIX: '/move',
+  // DELETE /folders/:folderId         deleteFolder    (detaches its objects → folderId null)
+  DELETE: '/folders/',
+  // PUT  /folders/move-object         move an object into a folder (or to root)
+  MOVE_OBJECT: '/folders/move-object',
+};
+
+/**
+ * Favourites — a per-user star on a viz object (Track F). Strictly personal:
+ * keyed on the logged-in user, invisible to others, never snapshotted.
+ * Contract mirrors the BE favourites controller (spec §5.6).
+ */
+export const FAVOURITE = {
+  // POST /favourites/toggle           toggleFavourite (body: objectType, objectId) → { favourited }
+  TOGGLE: '/favourites/toggle',
+  // GET  /favourites?objectType=      listFavourites  (the caller's favourited object ids)
+  LIST: '/favourites',
+};

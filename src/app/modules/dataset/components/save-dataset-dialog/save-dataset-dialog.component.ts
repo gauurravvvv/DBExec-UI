@@ -28,6 +28,8 @@ export interface DatasetFormData {
   // or the user left the TTL blank (server falls back to its default).
   cacheEnabled: boolean;
   cacheTtlSeconds: number | null;
+  // Track F: free-form organizational tags (string[]).
+  tags: string[];
 }
 
 @Component({
@@ -46,6 +48,8 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
   // values on edit; both default to "off / server default" on create.
   @Input() initialCacheEnabled = false;
   @Input() initialCacheTtlSeconds: number | null = null;
+  // Track F: initial tags on edit; empty on create.
+  @Input() initialTags: string[] = [];
   // Drives the confirm button's spinner — parent passes the
   // datasetService.saving signal (or any boolean) so the dialog can
   // show progress while the POST/PUT runs without the global blocker.
@@ -84,6 +88,7 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
         justification: '',
         cacheEnabled: !!this.initialCacheEnabled,
         cacheTtlSeconds: this.initialCacheTtlSeconds ?? null,
+        tags: this.initialTags ?? [],
       });
 
       const justificationControl = this.datasetForm.get('justification');
@@ -125,6 +130,8 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
         null,
         [zodValidator(datasetCacheTtlSecondsSchema)],
       ],
+      // Track F: organizational tags.
+      tags: [[] as string[]],
     });
   }
 
@@ -161,6 +168,7 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
           cacheEnabled && rawTtl !== null && rawTtl !== '' && rawTtl !== undefined
             ? Number(rawTtl)
             : null,
+        tags: this.datasetForm.get('tags')?.value ?? [],
       };
       if (this.showJustification) {
         formData.justification = this.datasetForm

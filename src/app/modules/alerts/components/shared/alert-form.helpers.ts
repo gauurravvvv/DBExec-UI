@@ -255,6 +255,11 @@ export function buildAlertPayload(
     cooldownMinutes: formVal.cooldownMinutes ?? 60,
     consecutiveBreachesRequired: formVal.consecutiveBreachesRequired ?? 1,
     enabled: formVal.enabled ?? true,
+    // Track F: free-form organizational tags (string[]). Omitted when empty.
+    tags:
+      Array.isArray(formVal.tags) && formVal.tags.length
+        ? formVal.tags
+        : undefined,
   };
   if (formVal.id) payload.id = formVal.id;
   return payload;

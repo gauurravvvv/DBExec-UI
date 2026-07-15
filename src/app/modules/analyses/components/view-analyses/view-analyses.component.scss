@@ -741,3 +741,35 @@
     line-height: 1.5;
   }
 }
+
+/* ── Track F: favourite star toggle in the view header ─────────────── */
+.fav-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--surface-border, #ced4da);
+  background: var(--surface-card, #ffffff);
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+
+  i {
+    color: #9aa7b4;
+    transition: color 0.15s ease;
+  }
+
+  &:hover {
+    border-color: #f1c21b;
+    i {
+      color: #f1c21b;
+    }
+  }
+
+  &.on i {
+    color: #f1c21b;
+  }
+}

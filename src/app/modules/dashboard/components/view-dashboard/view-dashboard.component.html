@@ -67,6 +67,19 @@
         </div>
       </div>
       <div class="header-actions">
+        <!-- Favourite star toggle (Track F) -->
+        <button
+          type="button"
+          class="header-icon-btn fav-toggle"
+          [class.on]="isFavourite()"
+          (click)="toggleFavourite()"
+          [pTooltip]="
+            (isFavourite() ? 'FAVOURITE.REMOVE' : 'FAVOURITE.ADD') | translate
+          "
+          tooltipPosition="bottom"
+        >
+          <i class="pi" [ngClass]="isFavourite() ? 'pi-star-fill' : 'pi-star'"></i>
+        </button>
         <!--
           Filter-panel toggle — icon-only, segmented-button feel.
           Active state when the sidebar is open. Hidden when the

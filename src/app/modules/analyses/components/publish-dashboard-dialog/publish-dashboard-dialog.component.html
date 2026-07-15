@@ -67,6 +67,21 @@
           </small>
         </div>
 
+        <!-- Organization tags (Track F) -->
+        <div class="form-field">
+          <label class="tags-label">
+            <i class="pi pi-tags"></i> {{ 'COMMON.TAGS' | translate }}
+          </label>
+          <p-chips
+            formControlName="tags"
+            [addOnBlur]="true"
+            [addOnTab]="true"
+            [allowDuplicate]="false"
+            separator=","
+            [placeholder]="'COMMON.TAGS_PLACEHOLDER' | translate"
+          ></p-chips>
+        </div>
+
         <p class="hint">
           <i class="pi pi-info-circle"></i>
           {{ 'DASHBOARD.PUBLISH_NEW_HINT' | translate }}
