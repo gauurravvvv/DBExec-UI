@@ -5,6 +5,7 @@ import {
   ANALYSES,
   ANALYSES_VISUAL,
   ANALYSIS_FILTER,
+  ANALYSIS_PARAMETER,
   DATASET,
   DATASOURCE,
   SYSTEM_ADMIN,
@@ -232,6 +233,104 @@ export class AnalysesService {
         skipLoader: true,
       }),
     );
+  }
+
+  // ── Visual CRUD (Slice 3) ─────────────────────────────────────────
+  // Dedicated per-visual endpoints. The bulk `updateAnalyses` path
+  // (which spawns a new analysis version and rewrites every visual)
+  // stays for the Save-analysis flow; these are for surgical single-
+  // visual mutations from the builder. Each maps one-to-one to a BE
+  // controller under src/modules/visuals/.
+  //
+  // A visual payload carries the Visual + VisualConfig fields flattened:
+  //   { title, colSpan, rowSpan, widthRatio, heightRatio, xRatio, yRatio,
+  //     chartType, xAxisColumn, yAxisColumn, zAxisColumn, config,
+  //     crossFilterEnabled?, drillDimensions?, sequence? }
+  // The BE splits these across the two 1:1 tables transactionally.
+
+  /**
+   * Create a single visual on an analysis.
+   * POST /visuals/:analysisId
+   */
+  async addVisual(analysisId: string, visual: any) {
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(
+        this.http.apiPost(ANALYSES_VISUAL.ADD + analysisId, visual, {
+          skipLoader: true,
+        }),
+      );
+    } finally {
+      this._saving.set(false);
+    }
+  }
+
+  /**
+   * Update a single visual (+ its config) in place.
+   * PUT /visuals/:analysisId/:visualId
+   */
+  async updateVisual(analysisId: string, visualId: string, visual: any) {
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(
+        this.http.apiPut(
+          ANALYSES_VISUAL.UPDATE + analysisId + '/' + visualId,
+          visual,
+          { skipLoader: true },
+        ),
+      );
+    } finally {
+      this._saving.set(false);
+    }
+  }
+
+  /**
+   * Delete a single visual. Justification flows to the BE audit log,
+   * mirroring the analysis/filter delete pattern.
+   * DELETE /visuals/:analysisId/:visualId
+   */
+  async deleteVisual(
+    analysisId: string,
+    visualId: string,
+    justification?: string,
+  ) {
+    this.setDeleting(visualId, true);
+    try {
+      return await lastValueFrom(
+        this.http.apiDelete(
+          ANALYSES_VISUAL.DELETE + analysisId + '/' + visualId,
+          { body: { justification }, skipLoader: true },
+        ),
+      );
+    } finally {
+      this.setDeleting(visualId, false);
+    }
+  }
+
+  /**
+   * Persist a new visual ordering. `order` is the ordered list of
+   * { id, sequence } — the BE updates each Visual.sequence in one
+   * transaction. Used after drag-reorder on the canvas / visual list.
+   * PUT /visuals/:analysisId/reorder
+   */
+  async reorderVisuals(
+    analysisId: string,
+    order: Array<{ id: string; sequence: number }>,
+  ) {
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(
+        this.http.apiPut(
+          ANALYSES_VISUAL.REORDER_PREFIX +
+            analysisId +
+            ANALYSES_VISUAL.REORDER_SUFFIX,
+          { order },
+          { skipLoader: true },
+        ),
+      );
+    } finally {
+      this._saving.set(false);
+    }
   }
 
   async updateAnalyses(payload: any, justification?: string) {
@@ -535,17 +634,27 @@ export class AnalysesService {
    * Run a dataset query in the context of an analysis.
    * Returns data enriched with both dataset-level and analysis-level custom fields.
    * POST /analyses/:analysisId/run
+   *
+   * `parameters` (spec §4.1/§6): resolved `{ key, value }` pairs for the
+   * analysis's typed parameters. The BE substitutes them into the dataset
+   * SQL as `{{param.<key>}}` at compile time (parameterized, not
+   * string-concatenated). Omitted when empty so an analysis with no
+   * parameters sends the same payload as before.
    */
   async runAnalysisQuery(payload: {
     datasetId: string;
     analysisId: string;
     filters?: any[];
+    parameters?: Array<{ key: string; value: any }>;
     limit?: number;
   }) {
-    const { datasetId, analysisId, filters, limit } = payload;
+    const { datasetId, analysisId, filters, parameters, limit } = payload;
     const body: any = { datasetId, analysisId };
     if (filters && filters.length > 0) {
       body.filters = filters;
+    }
+    if (parameters && parameters.length > 0) {
+      body.parameters = parameters;
     }
     if (limit !== undefined) {
       body.limit = limit;
@@ -561,6 +670,76 @@ export class AnalysesService {
       );
     } finally {
       this._running.set(false);
+    }
+  }
+
+  // ── Analysis parameters (Slice 4) ─────────────────────────────────
+  // Typed reusable inputs on an analysis. CRUD mirrors the analysis-
+  // filter methods above; the BE module lives at
+  // src/modules/analysis-parameters/ and the shared Zod contract at
+  // src/app/shared/validators/analysis-parameters.ts.
+
+  /**
+   * List an analysis's parameters (ordered by sequence).
+   * GET /analysis-parameters/:analysisId
+   */
+  listParameters(analysisId: string) {
+    return lastValueFrom(
+      this.http.apiGet(ANALYSIS_PARAMETER.LIST + analysisId, {
+        skipLoader: true,
+      }),
+    );
+  }
+
+  /**
+   * Create a parameter on an analysis.
+   * POST /analysis-parameters
+   */
+  async addParameter(payload: any) {
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(
+        this.http.apiPost(ANALYSIS_PARAMETER.ADD, payload, {
+          skipLoader: true,
+        }),
+      );
+    } finally {
+      this._saving.set(false);
+    }
+  }
+
+  /**
+   * Update a parameter.
+   * PUT /analysis-parameters/:parameterId
+   */
+  async updateParameter(parameterId: string, payload: any) {
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(
+        this.http.apiPut(ANALYSIS_PARAMETER.UPDATE + parameterId, payload, {
+          skipLoader: true,
+        }),
+      );
+    } finally {
+      this._saving.set(false);
+    }
+  }
+
+  /**
+   * Delete a parameter. Justification flows to the BE audit log.
+   * DELETE /analysis-parameters/:parameterId
+   */
+  async deleteParameter(parameterId: string, justification?: string) {
+    this.setDeleting(parameterId, true);
+    try {
+      return await lastValueFrom(
+        this.http.apiDelete(ANALYSIS_PARAMETER.DELETE + parameterId, {
+          body: { justification },
+          skipLoader: true,
+        }),
+      );
+    } finally {
+      this.setDeleting(parameterId, false);
     }
   }
 }

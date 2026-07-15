@@ -59,6 +59,46 @@ export class ViewDashboardComponent
   appliedFilters: any[] = [];
 
   /**
+   * Server-side missing-field warnings from the render endpoint. Each
+   * entry is `{ scope, id, label, missingColumns }` — a snapshot
+   * visual/filter/field whose bound column the LIVE dataset no longer
+   * projects. Surfaced as a dashboard-level banner (see the template)
+   * in addition to the per-visual placeholder that keys off the
+   * loaded data sample. Empty by default.
+   */
+  serverWarnings: {
+    scope: 'visual' | 'filter' | 'field';
+    id: string;
+    label: string;
+    missingColumns: string[];
+  }[] = [];
+
+  /**
+   * True only when the BE actually enumerated the live dataset columns.
+   * When false (e.g. a datasource engine that doesn't expose column
+   * metadata) an empty `serverWarnings` means "not checked", not "all
+   * good" — so we suppress the banner rather than imply a clean bill.
+   */
+  fieldsChecked = false;
+
+  /** Whether the missing-field banner is expanded to show the detail
+   *  list. Collapsed by default so it stays a one-line signal. */
+  warningsExpanded = false;
+
+  /**
+   * Publish-time metadata for the "Published from … · snapshot vN"
+   * breadcrumb: `{ sourceAnalysisId, publishedAt, snapshotVersion,
+   * datasetName }`. datasetName is resolved live; the rest are frozen
+   * at publish. Null until the render response arrives.
+   */
+  meta: {
+    sourceAnalysisId: string | null;
+    publishedAt: string | null;
+    snapshotVersion: number | null;
+    datasetName: string | null;
+  } | null = null;
+
+  /**
    * Fetcher factory passed to the shared filter-bar so its dropdowns
    * resolve distinct values via the dashboard's own endpoint instead
    * of the analyses one. Each per-filter call resolves the dashboard's
@@ -236,6 +276,14 @@ export class ViewDashboardComponent
         if (data) {
           this.dashboard = data;
           this.filters = data.filters || [];
+          // Additive fields from the hardened render endpoint — default
+          // safely when an older BE omits them.
+          this.serverWarnings = Array.isArray(data.warnings)
+            ? data.warnings
+            : [];
+          this.fieldsChecked = data.fieldsChecked === true;
+          this.meta = data.meta || null;
+          this.warningsExpanded = false;
           this.mapVisualsFromResponse(data.visuals || []);
           this.executeQuery();
         } else {
@@ -555,6 +603,54 @@ export class ViewDashboardComponent
 
   trackByVisualId(index: number, visual: Visual): string {
     return visual.id;
+  }
+
+  // ── Missing-field banner ──
+
+  /**
+   * Show the dashboard-level banner only when the BE actually checked
+   * the live columns AND found at least one dropped reference. When
+   * detection couldn't run (fieldsChecked=false) we stay silent — the
+   * per-visual placeholder still guards individual charts from painting
+   * bogus data off the loaded sample.
+   */
+  get hasFieldWarnings(): boolean {
+    return this.fieldsChecked && this.serverWarnings.length > 0;
+  }
+
+  /** Total number of distinct columns flagged as missing across all
+   *  references — drives the banner's summary count. */
+  get missingFieldCount(): number {
+    const cols = new Set<string>();
+    for (const w of this.serverWarnings) {
+      for (const c of w.missingColumns || []) cols.add(c);
+    }
+    return cols.size;
+  }
+
+  toggleWarnings(): void {
+    this.warningsExpanded = !this.warningsExpanded;
+    this.cdr.markForCheck();
+  }
+
+  /** i18n key for a warning row's scope, so the banner can label each
+   *  entry ("Visual" / "Filter" / "Field"). */
+  scopeLabelKey(scope: string): string {
+    switch (scope) {
+      case 'visual':
+        return 'DASHBOARD.WARNING_SCOPE_VISUAL';
+      case 'filter':
+        return 'DASHBOARD.WARNING_SCOPE_FILTER';
+      default:
+        return 'DASHBOARD.WARNING_SCOPE_FIELD';
+    }
+  }
+
+  trackByWarning(
+    index: number,
+    w: { scope: string; id: string },
+  ): string {
+    return `${w.scope}:${w.id}`;
   }
 
   // ── Navigation ──

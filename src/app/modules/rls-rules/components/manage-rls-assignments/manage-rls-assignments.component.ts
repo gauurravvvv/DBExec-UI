@@ -226,8 +226,10 @@ export class ManageRlsAssignmentsComponent implements OnInit {
   }
 
   removeAssignment(assignment: any): void {
+    // Assignments are identified by their (scope, scopeId) pair — they
+    // have no standalone id (they live inside the rule's array).
     this.rlsRulesService
-      .deleteAssignment(assignment.id)
+      .deleteAssignment({ scope: assignment.scope, scopeId: assignment.scopeId })
       .then((response: any) => {
         if (this.globalService.handleSuccessService(response)) {
           this.loadAssignments();

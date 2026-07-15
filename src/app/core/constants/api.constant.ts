@@ -291,6 +291,21 @@ export const ANALYSES_VISUAL = {
   // GET /visuals/:analysisId
   // GET /visuals/:analysisId?include=config
   LIST: '/visuals/',
+  // POST /visuals/:analysisId — create a single visual + its config
+  ADD: '/visuals/', // POST /visuals/:analysisId
+  UPDATE: '/visuals/', // PUT /visuals/:analysisId/:visualId
+  DELETE: '/visuals/', // DELETE /visuals/:analysisId/:visualId
+  // PUT /visuals/:analysisId/reorder — body: { order: [{ id, sequence }] }
+  REORDER_PREFIX: '/visuals/',
+  REORDER_SUFFIX: '/reorder',
+};
+
+export const ANALYSIS_PARAMETER = {
+  // GET /analysis-parameters/:analysisId — list an analysis's parameters
+  LIST: '/analysis-parameters/', // GET /analysis-parameters/:analysisId
+  ADD: '/analysis-parameters', // POST /analysis-parameters
+  UPDATE: '/analysis-parameters/', // PUT /analysis-parameters/:parameterId
+  DELETE: '/analysis-parameters/', // DELETE /analysis-parameters/:parameterId
 };
 
 export const ANALYSIS_FILTER = {

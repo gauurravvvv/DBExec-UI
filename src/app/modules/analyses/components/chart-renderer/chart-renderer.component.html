@@ -6,6 +6,7 @@
     [chartWidth]="chartWidth"
     [chartHeight]="chartHeight"
     [data]="getDisplayData(visual)"
+    (chartSelect)="chartSelect.emit($event)"
   ></app-table-visual>
 </ng-container>
 
@@ -34,6 +35,7 @@
       [chartWidth]="chartWidth"
       [chartHeight]="chartHeight"
       [data]="getDisplayData(visual)"
+      (chartSelect)="chartSelect.emit($event)"
     ></app-echart-visual>
   </ng-template>
 </ng-container>

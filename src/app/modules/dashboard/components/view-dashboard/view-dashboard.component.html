@@ -15,24 +15,56 @@
         >
           <i class="pi pi-arrow-left back-icon"></i>
         </button>
-        <h2>{{ dashboard?.name || ('DASHBOARD.DASHBOARD' | translate) }}</h2>
-        <span
-          *ngIf="dashboard"
-          class="status-badge"
-          [class.active]="dashboard.status === 1"
-        >
-          <i
-            class="pi"
-            [ngClass]="
-              dashboard.status === 1 ? 'pi-check-circle' : 'pi-times-circle'
-            "
-          ></i>
-          {{
-            dashboard.status === 1
-              ? ('DASHBOARD.LIVE' | translate)
-              : ('COMMON.INACTIVE' | translate)
-          }}
-        </span>
+        <div class="title-block">
+          <div class="title-row">
+            <h2>{{ dashboard?.name || ('DASHBOARD.DASHBOARD' | translate) }}</h2>
+            <span
+              *ngIf="dashboard"
+              class="status-badge"
+              [class.active]="dashboard.status === 1"
+            >
+              <i
+                class="pi"
+                [ngClass]="
+                  dashboard.status === 1 ? 'pi-check-circle' : 'pi-times-circle'
+                "
+              ></i>
+              {{
+                dashboard.status === 1
+                  ? ('DASHBOARD.LIVE' | translate)
+                  : ('COMMON.INACTIVE' | translate)
+              }}
+            </span>
+          </div>
+          <!--
+            Snapshot breadcrumb — "Published from <dataset> · snapshot vN".
+            A dashboard is a point-in-time snapshot; this line makes that
+            explicit so viewers understand the layout is frozen (the data
+            is still live). Only rendered when the render endpoint sent
+            publish metadata.
+          -->
+          <div
+            class="snapshot-breadcrumb"
+            *ngIf="meta && (meta.datasetName || meta.snapshotVersion)"
+          >
+            <i class="pi pi-camera"></i>
+            <span *ngIf="meta.datasetName">
+              {{
+                'DASHBOARD.PUBLISHED_FROM_DATASET'
+                  | translate: { dataset: meta.datasetName }
+              }}
+            </span>
+            <span class="dot-sep" *ngIf="meta.datasetName && meta.snapshotVersion"
+              >&middot;</span
+            >
+            <span *ngIf="meta.snapshotVersion">
+              {{
+                'DASHBOARD.SNAPSHOT_VERSION'
+                  | translate: { version: meta.snapshotVersion }
+              }}
+            </span>
+          </div>
+        </div>
       </div>
       <div class="header-actions">
         <!--
@@ -72,6 +104,63 @@
 
     <!-- Centered branded loader while the dashboard renders. -->
     <app-content-loader *ngIf="loading() || rendering()"></app-content-loader>
+
+    <!--
+      Dashboard-level missing-field banner. Driven by the render
+      endpoint's server-side check of the LIVE dataset columns against
+      the snapshot's bound columns (visual axes, filter targets, native
+      fields). Because a dashboard's dataset SQL is live while its
+      layout is frozen, a column can vanish from under a snapshotted
+      visual — this banner tells the viewer up front, before they wonder
+      why a chart is blank. Collapsible: one-line summary by default,
+      expands to the per-reference detail. Only shown when the BE
+      actually checked (fieldsChecked) and found something.
+    -->
+    <div
+      class="missing-field-banner"
+      *ngIf="!loading() && !rendering() && dashboard && hasFieldWarnings"
+      role="status"
+    >
+      <div class="banner-summary" (click)="toggleWarnings()">
+        <i class="pi pi-exclamation-triangle banner-icon"></i>
+        <span class="banner-text">
+          {{
+            'DASHBOARD.FIELDS_MISSING_BANNER'
+              | translate
+                : {
+                    count: missingFieldCount,
+                    refs: serverWarnings.length
+                  }
+          }}
+        </span>
+        <button
+          type="button"
+          class="banner-toggle"
+          [attr.aria-expanded]="warningsExpanded"
+          [attr.aria-label]="
+            (warningsExpanded ? 'COMMON.COLLAPSE' : 'COMMON.EXPAND') | translate
+          "
+        >
+          <i
+            class="pi"
+            [ngClass]="warningsExpanded ? 'pi-chevron-up' : 'pi-chevron-down'"
+          ></i>
+        </button>
+      </div>
+      <ul class="banner-detail" *ngIf="warningsExpanded">
+        <li
+          *ngFor="let w of serverWarnings; trackBy: trackByWarning"
+          class="banner-detail-row"
+        >
+          <span class="scope-chip">{{ scopeLabelKey(w.scope) | translate }}</span>
+          <span class="ref-label">{{ w.label }}</span>
+          <span class="missing-cols">{{ w.missingColumns.join(', ') }}</span>
+        </li>
+      </ul>
+      <div class="banner-help" *ngIf="warningsExpanded">
+        {{ 'DASHBOARD.FIELDS_MISSING_HELP' | translate }}
+      </div>
+    </div>
 
     <!-- Content Section — sidebar on the left, canvas filling the rest. -->
     <div

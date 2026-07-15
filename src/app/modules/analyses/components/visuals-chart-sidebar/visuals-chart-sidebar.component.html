@@ -164,6 +164,47 @@
           </div>
         </ng-container>
       </ng-container>
+
+      <!-- ── Interactions (cross-filter + drill-down, spec §6) ──────── -->
+      <div class="section-divider"></div>
+      <div class="axis-selection-title">
+        {{ 'ANALYSES.INTERACTIONS' | translate }}
+      </div>
+
+      <!-- Cross-filter opt-in. When on, clicking a data point in this
+           visual filters the sibling visuals. -->
+      <div class="interaction-row">
+        <app-custom-toggle
+          [label]="'ANALYSES.CROSSFILTER_ENABLE' | translate"
+          [ngModel]="focusedVisual.crossFilterEnabled || false"
+          [showStatusLabel]="false"
+          (onChange)="toggleCrossFilterEnabled()"
+        ></app-custom-toggle>
+      </div>
+      <small class="interaction-hint">
+        {{ 'ANALYSES.CROSSFILTER_HINT' | translate }}
+      </small>
+
+      <!-- Drill path — an ordered dimension stack. Clicking a category
+           descends to the next dimension; a breadcrumb ascends. -->
+      <div class="interaction-row drill-row">
+        <app-custom-multiselect
+          [label]="'ANALYSES.DRILL_DIMENSIONS' | translate"
+          [options]="drillDimensionOptions"
+          optionLabel="label"
+          optionValue="value"
+          display="chip"
+          [filter]="true"
+          filterBy="label"
+          [placeholder]="'ANALYSES.DRILL_PICK_DIMENSIONS' | translate"
+          [ngModel]="drillDimensions"
+          (ngModelChange)="onDrillDimensionsChange($event)"
+          [appendTo]="'body'"
+        ></app-custom-multiselect>
+      </div>
+      <small class="interaction-hint">
+        {{ 'ANALYSES.DRILL_HINT' | translate }}
+      </small>
     </div>
   </div>
 </div>

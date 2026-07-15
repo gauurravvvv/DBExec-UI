@@ -12,10 +12,12 @@ import { HttpClientService } from 'src/app/core/services/http-client.service';
  *  PUT    /rls-rules/:ruleId                      update
  *  DELETE /rls-rules/:ruleId                      delete
  *
- * Assignments (FE → user/group rule binding) used to live here. Those
- * endpoints never existed on the BE, so the methods were dead — they
- * have been removed. If the assignments UI is ever brought back, both
- * the BE routes and these methods need to be added together.
+ * Assignments (which users/groups a rule applies to) are stored ON the
+ * rule as an `assignments[]` array — there is no separate assignments
+ * endpoint. The manage-assignments panel therefore loads the rule,
+ * mutates `assignments[]`, and PUTs the whole rule back through the
+ * existing update route. This keeps the subject list transactional with
+ * the rest of the rule and needs no extra BE surface.
  */
 @Injectable({ providedIn: 'root' })
 export class RlsRulesService {
@@ -126,23 +128,74 @@ export class RlsRulesService {
     this._assignments.set([]);
   }
 
-  // ── Assignment methods (stubs) ─────────────────────────────────
-  // The BE has no /rls-rules/.../assignments routes. The
-  // manage-rls-assignments component calls these — keeping them as
-  // throwing stubs so tsc passes and any accidental call surfaces a
-  // clear runtime error instead of a misleading 404. Re-implement
-  // alongside the matching BE routes if the assignments UI ships.
-  private notImplemented(): never {
-    throw new Error('RLS rule assignments are not implemented yet');
+  // ── Assignment methods (rule-embedded) ─────────────────────────
+  // Assignments live on the rule as `assignments[]`. These helpers read
+  // and mutate that array in the `_assignments` signal, persisting via
+  // the rule update route. `_assignmentsRuleId` tracks which rule the
+  // signal currently holds so add/remove can PUT the right record.
+  private _assignmentsRuleId: string | null = null;
+
+  async loadAssignments(ruleId: string): Promise<any> {
+    this._assignmentsRuleId = ruleId;
+    const res: any = await lastValueFrom(
+      this.http.apiGet(RLS_RULE.GET + ruleId),
+    );
+    if (res?.status) {
+      const list = Array.isArray(res.data?.assignments)
+        ? res.data.assignments
+        : [];
+      this._assignments.set(list);
+    } else {
+      this._assignments.set([]);
+    }
+    return res;
   }
-  loadAssignments(_ruleId: string): Promise<any> {
-    return this.notImplemented();
+
+  /** Append a subject and persist the rule. `payload` = { ruleId, scope, scopeId }. */
+  async addAssignment(payload: {
+    ruleId: string;
+    scope: string;
+    scopeId: string;
+  }): Promise<any> {
+    const current = this._assignments();
+    // Ignore exact duplicates so the same subject isn't added twice.
+    const exists = current.some(
+      (a: any) => a.scope === payload.scope && a.scopeId === payload.scopeId,
+    );
+    const next = exists
+      ? current
+      : [...current, { scope: payload.scope, scopeId: payload.scopeId }];
+    const res = await this.update({
+      id: payload.ruleId,
+      assignments: next.map((a: any) => ({
+        scope: a.scope,
+        scopeId: a.scopeId,
+      })),
+      justification: 'Update RLS rule assignments',
+    });
+    if ((res as any)?.status) this._assignments.set(next);
+    return res;
   }
-  addAssignment(_payload: any): Promise<any> {
-    return this.notImplemented();
-  }
-  deleteAssignment(_assignmentId: string): Promise<any> {
-    return this.notImplemented();
+
+  /** Remove a subject by scope+scopeId and persist the rule. */
+  async deleteAssignment(target: {
+    scope: string;
+    scopeId: string;
+  }): Promise<any> {
+    if (!this._assignmentsRuleId) return { status: false };
+    const next = this._assignments().filter(
+      (a: any) => !(a.scope === target.scope && a.scopeId === target.scopeId),
+    );
+    const res = await this.update({
+      id: this._assignmentsRuleId,
+      assignments: next.map((a: any) => ({
+        scope: a.scope,
+        scopeId: a.scopeId,
+      })),
+      justification: 'Update RLS rule assignments',
+    });
+    if ((res as any)?.status) this._assignments.set(next);
+    return res;
   }
 
   // ── Legacy promise-based methods (kept for backward compat) ────────────

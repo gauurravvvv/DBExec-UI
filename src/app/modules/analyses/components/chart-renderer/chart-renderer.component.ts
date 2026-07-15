@@ -1,8 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  EventEmitter,
   Input,
   OnChanges,
+  Output,
   SimpleChanges,
 } from '@angular/core';
 import {
@@ -54,6 +56,15 @@ export class ChartRendererComponent implements OnChanges {
    * template.
    */
   @Input() dataVersion = 0;
+
+  /**
+   * Bubbles the inner echart-visual / table-visual `chartSelect` up to the
+   * analysis view so the interaction bus (cross-filter / drill-down, spec
+   * §6) can act on a data-point click. Payload is the raw ECharts click
+   * event (echarts) or `{ row }` (table). Terminated unused until a parent
+   * binds it — the analysis view is the sole consumer.
+   */
+  @Output() chartSelect = new EventEmitter<any>();
 
   /** Shallow clone of `visual.config` rebuilt on every configVersion bump. */
   chartConfigRef: any = {};

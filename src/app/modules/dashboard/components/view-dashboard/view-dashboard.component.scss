@@ -50,6 +50,40 @@
           font-weight: var(--fw-semibold);
           color: var(--text-color);
         }
+
+        // Stacks the title row (name + status) over the snapshot
+        // breadcrumb so the "you are here" identity reads top-to-bottom.
+        .title-block {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+
+          .title-row {
+            display: flex;
+            align-items: center;
+            gap: var(--space-5);
+          }
+        }
+
+        // "Published from <dataset> · snapshot vN" — a quiet metadata
+        // line, not a heading. Muted colour + small size so it sits
+        // under the title without competing.
+        .snapshot-breadcrumb {
+          display: flex;
+          align-items: center;
+          gap: var(--space-2);
+          font-size: var(--fs-caption, 12px);
+          color: var(--secondary-color);
+
+          i {
+            font-size: var(--fs-caption, 12px);
+            color: var(--secondary-color) !important;
+          }
+
+          .dot-sep {
+            opacity: 0.6;
+          }
+        }
       }
 
       .back-button {
@@ -173,6 +207,111 @@
 
   i {
     font-size: var(--fs-body);
+  }
+}
+
+// ===================================================================
+// Missing-field banner
+// ===================================================================
+// Full-width strip between the header and the canvas. Warns the viewer
+// that one or more snapshotted references (visual axis, filter, native
+// field) point at a column the LIVE dataset no longer projects. Uses
+// the shared warning token so it reads as "attention", not "error".
+// Collapsible: the summary row is always visible; the detail list +
+// help text unfold on click.
+.missing-field-banner {
+  flex-shrink: 0;
+  margin: var(--space-4) var(--space-7) 0;
+  border: 1px solid var(--warning-color);
+  border-left-width: 3px;
+  border-radius: var(--radius-sm);
+  background: var(--warning-bg, rgba(255, 152, 0, 0.08));
+  color: var(--text-color);
+  overflow: hidden;
+
+  .banner-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    cursor: pointer;
+    user-select: none;
+
+    .banner-icon {
+      color: var(--warning-color);
+      font-size: var(--fs-body);
+      flex-shrink: 0;
+    }
+
+    .banner-text {
+      flex: 1;
+      font-size: var(--fs-control);
+      font-weight: var(--fw-medium);
+    }
+
+    .banner-toggle {
+      background: transparent;
+      border: none;
+      color: var(--secondary-color);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-2);
+      border-radius: var(--radius-sm);
+
+      &:hover {
+        color: var(--warning-hover, var(--warning-color));
+        background: var(--warning-color-bg, rgba(255, 152, 0, 0.1));
+      }
+    }
+  }
+
+  .banner-detail {
+    list-style: none;
+    margin: var(--space-0);
+    padding: var(--space-0) var(--space-4) var(--space-2)
+      calc(var(--space-4) + var(--fs-body) + var(--space-3));
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+
+    .banner-detail-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      font-size: var(--fs-caption, 12px);
+      flex-wrap: wrap;
+
+      .scope-chip {
+        text-transform: uppercase;
+        font-size: 10px;
+        font-weight: var(--fw-semibold);
+        letter-spacing: 0.04em;
+        padding: 1px 6px;
+        border-radius: var(--radius-sm);
+        background: var(--warning-color-bg, rgba(255, 152, 0, 0.1));
+        color: var(--warning-hover, var(--warning-color));
+        flex-shrink: 0;
+      }
+
+      .ref-label {
+        font-weight: var(--fw-medium);
+        color: var(--text-color);
+      }
+
+      .missing-cols {
+        color: var(--secondary-color);
+        font-family: var(--font-mono, monospace);
+      }
+    }
+  }
+
+  .banner-help {
+    padding: var(--space-0) var(--space-4) var(--space-3)
+      calc(var(--space-4) + var(--fs-body) + var(--space-3));
+    font-size: var(--fs-caption, 12px);
+    color: var(--secondary-color);
   }
 }
 

@@ -41,8 +41,13 @@ import {
 } from '../../constants/charts.constants';
 import { createVisual, Visual } from '../../models';
 import { RoleKey } from '../../models/visual.model';
+import type { ParameterValue } from '../../models/analysis-parameter.model';
 import { ChartDataTransformerService } from '../../services';
 import { AnalysesService } from '../../services/analyses.service';
+import { AnalysisInteractionService } from '../../services/analysis-interaction.service';
+import { fieldFitsRole, ROLE_EXPECTED_KIND } from '../../utils/field-type.util';
+import type { AnalysisParameter } from '../../models/analysis-parameter.model';
+import type { CrossFilterEvent } from '../../models/interaction.model';
 import {
   AddAnalysesActions,
   AnalysesFilterActions,
@@ -68,6 +73,10 @@ import { PublishDashboardPayload } from '../publish-dashboard-dialog/publish-das
   templateUrl: './edit-analyses.component.html',
   styleUrls: ['./edit-analyses.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // One interaction bus per open editor — provided here (not root) so
+  // cross-filter / drill state is isolated to this analysis and reset
+  // when the user leaves.
+  providers: [AnalysisInteractionService],
 })
 export class EditAnalysesComponent
   implements OnInit, AfterViewInit, OnDestroy, HasUnsavedChanges
@@ -348,7 +357,17 @@ export class EditAnalysesComponent
     private chartDataTransformer: ChartDataTransformerService,
     private translate: TranslateService,
     private dashboardService: DashboardService,
+    public interaction: AnalysisInteractionService,
   ) {}
+
+  // ─── Analysis parameters (Slice 4) ──────────────────────────────────
+  /** The analysis's typed parameters, surfaced in the parameter bar. */
+  parameters: AnalysisParameter[] = [];
+  /** Last-applied parameter values, merged into every runAnalysisQuery. */
+  appliedParameters: ParameterValue[] = [];
+  /** Last-applied analysis filters, kept so a cross-filter/drill re-run
+   *  preserves the user's filter selection. */
+  private appliedFilters: any[] = [];
 
   get saving() {
     return this.analysesService.saving;
@@ -672,12 +691,52 @@ export class EditAnalysesComponent
           this.checkCachedDataAndLoad();
         }
 
+        // Load the analysis's typed parameters for the parameter bar.
+        this.loadParameters();
+
         this.cdr.markForCheck();
       })
       .catch(error => {
         console.error('Error loading analysis bootstrap:', error);
         this.cdr.markForCheck();
       });
+  }
+
+  /**
+   * Load the analysis's typed parameters (spec §4.1). Seeds
+   * `appliedParameters` from each parameter's default so the first
+   * dataset query already carries sensible substitutions. Failures are
+   * non-fatal — an analysis with no parameters just shows no bar.
+   */
+  loadParameters(): void {
+    if (!this.analysisId) return;
+    this.analysesService
+      .listParameters(this.analysisId)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.parameters = response.data?.parameters || response.data || [];
+          // Seed applied values from defaults so the initial run is scoped.
+          this.appliedParameters = this.parameters.map(p => ({
+            key: p.key,
+            value: p.defaultValue ?? null,
+          }));
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        // Endpoint may not exist yet on an older BE — degrade quietly.
+        this.cdr.markForCheck();
+      });
+  }
+
+  /**
+   * Parameter bar `apply` handler. Stores the resolved values and
+   * re-runs the dataset query so the new `{{param.<key>}}` substitutions
+   * take effect across every visual.
+   */
+  onParametersApplied(values: ParameterValue[]): void {
+    this.appliedParameters = values;
+    this.loadDatasetData();
   }
 
   /**
@@ -829,11 +888,21 @@ export class EditAnalysesComponent
       }),
     );
 
+    // Merge the user's applied filters with any cross-filter / drill
+    // predicates derived from the interaction bus (spec §6). Parameters
+    // ride along so the BE can substitute {{param.<key>}} at compile time.
+    const interactionFilters = this.interaction.toRunQueryFilters();
+    const mergedFilters = [...this.appliedFilters, ...interactionFilters];
+
     this.analysesService
       .runAnalysisQuery({
         datasetId: this.datasetId,
         analysisId: this.analysisId,
         limit: this.DATA_ROW_LIMIT,
+        ...(mergedFilters.length > 0 ? { filters: mergedFilters } : {}),
+        ...(this.appliedParameters.length > 0
+          ? { parameters: this.appliedParameters }
+          : {}),
       })
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
@@ -946,6 +1015,17 @@ export class EditAnalysesComponent
               : visualData.config
                 ? { ...getDefaultChartConfig(), ...visualData.config }
                 : getDefaultChartConfig(),
+            // Advanced-interaction opt-ins — read from either the flat
+            // visual row or its config blob (BE may stamp either). Default
+            // to off / empty so legacy visuals stay non-interactive.
+            crossFilterEnabled:
+              visualData.crossFilterEnabled ??
+              visualConfig.crossFilterEnabled ??
+              false,
+            drillDimensions:
+              visualData.drillDimensions ??
+              visualConfig.drillDimensions ??
+              [],
             chartData: [],
             // No two-phase skeleton anymore — everything we need is
             // already in the response. Mark loaded immediately so
@@ -1847,6 +1927,117 @@ export class EditAnalysesComponent
     this.isConfigSidebarOpen = false;
   }
 
+  // ─── Advanced interactions: cross-filter + drill-down (spec §6) ──────
+
+  /**
+   * A visual emitted a data-point click (chart-renderer forwards the
+   * echart-visual / table-visual `chartSelect`). We resolve the clicked
+   * category, then:
+   *   - if the visual declares a drill stack → descend one level;
+   *   - else if the visual has cross-filter enabled → apply a cross-filter
+   *     to the sibling visuals.
+   * Either way we re-run the query so the canvas reflects the new scope.
+   */
+  onVisualChartSelect(visual: Visual, event: any): void {
+    const columnName = visual.xAxisColumn;
+    const value = this.extractClickedValue(event);
+    if (value === null || value === undefined) return;
+
+    // Drill takes precedence when configured — a drillable click descends
+    // rather than cross-filtering, matching the user's mental model of
+    // "click a bar to go deeper".
+    const dims = visual.drillDimensions || [];
+    if (dims.length > 1) {
+      this.interaction.drillDown(dims, value, String(value));
+      this.loadDatasetData();
+      this.cdr.markForCheck();
+      return;
+    }
+
+    if (visual.crossFilterEnabled && columnName) {
+      const evt: CrossFilterEvent = {
+        sourceVisualId: visual.id,
+        columnName,
+        value,
+      };
+      this.interaction.applyCrossFilter(evt);
+      this.loadDatasetData();
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * Pull the clicked category out of the heterogeneous click payloads:
+   * ECharts emits `{ name, value, ... }`; the table emits `{ row }`. We
+   * prefer the series `name` (the category tick), fall back to the first
+   * cell of a table row.
+   */
+  private extractClickedValue(event: any): string | number | null {
+    if (event == null) return null;
+    if (typeof event === 'string' || typeof event === 'number') return event;
+    if (event.name !== undefined && event.name !== null) return event.name;
+    if (event.row && typeof event.row === 'object') {
+      const first = Object.values(event.row)[0];
+      if (typeof first === 'string' || typeof first === 'number') return first;
+    }
+    if (Array.isArray(event.value) && event.value.length) {
+      const v = event.value[0];
+      if (typeof v === 'string' || typeof v === 'number') return v;
+    }
+    return null;
+  }
+
+  /**
+   * Toggle cross-filtering on a visual. When turning it off we also drop
+   * any cross-filter this visual currently contributes, then re-run so the
+   * siblings recover. Marks dirty so the flag persists on next save.
+   */
+  toggleCrossFilter(visual: Visual, event?: Event): void {
+    if (event) event.stopPropagation();
+    visual.crossFilterEnabled = !visual.crossFilterEnabled;
+    this.markDirty();
+    if (!visual.crossFilterEnabled) {
+      this.interaction.clearCrossFilterFrom(visual.id);
+      this.loadDatasetData();
+    }
+    this.cdr.markForCheck();
+  }
+
+  /** True when any cross-filter / drill scope is active on the analysis. */
+  get hasActiveInteractions(): boolean {
+    return this.interaction.hasActiveInteractions();
+  }
+
+  /** Breadcrumb click — ascend to a drill level (index -1 = root). */
+  drillTo(index: number): void {
+    this.interaction.drillUpTo(index);
+    this.loadDatasetData();
+    this.cdr.markForCheck();
+  }
+
+  /** Clear every cross-filter + reset the drill path, then re-run. */
+  clearInteractions(): void {
+    this.interaction.reset();
+    this.loadDatasetData();
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * The chart sidebar changed a visual's interaction config (cross-filter
+   * opt-in / drill dimensions). Mark dirty so it persists on save. If the
+   * focused visual just lost cross-filtering, drop any cross-filter it was
+   * contributing so the siblings recover immediately.
+   */
+  onVisualInteractionChanged(): void {
+    this.markDirty();
+    const v = this.getFocusedVisual();
+    if (v && !v.crossFilterEnabled) {
+      this.interaction.clearCrossFilterFrom(v.id);
+      if (this.interaction.hasActiveInteractions()) this.loadDatasetData();
+    }
+    this.cdr.markForCheck();
+  }
+
   onChartTypeSelected(): void {
     this.markDirty();
     const visual = this.getFocusedVisual();
@@ -1896,6 +2087,27 @@ export class EditAnalysesComponent
     this.cdr.markForCheck();
   }
 
+  /**
+   * Typed encoding (spec §7 / Slice 3): does this field's dataType fit the
+   * role slot the user is currently filling? Measures (numeric) belong on
+   * value/Y roles, dimensions (string/date/boolean) on category/X roles.
+   * Returns true when no axis selection is active or the role is
+   * unconstrained, so field cards only dim while a constrained slot is
+   * being filled. Drives the `field-mismatch` class + click guard below.
+   */
+  fieldFitsActiveRole(field: any): boolean {
+    if (!this.activeAxisSelection) return true;
+    return fieldFitsRole(this.activeAxisSelection, field?.dataType);
+  }
+
+  /** True when the active role constrains the field type AND this field
+   *  doesn't fit — used to grey the card and show a hint. */
+  isFieldTypeMismatch(field: any): boolean {
+    if (!this.activeAxisSelection) return false;
+    if (!ROLE_EXPECTED_KIND[this.activeAxisSelection]) return false;
+    return !this.fieldFitsActiveRole(field);
+  }
+
   onFieldClick(field: any): void {
     // Table visuals don't have axis slots; clicking a field toggles
     // whether that column is shown in the table.
@@ -1906,6 +2118,29 @@ export class EditAnalysesComponent
       isTableChartType(focused.chartType)
     ) {
       this.toggleTableColumn(focused, field);
+      return;
+    }
+
+    // Typed-encoding guard: block dropping an ill-typed field into a
+    // constrained role (e.g. a text column onto the numeric Y-axis). We
+    // warn instead of silently accepting so the chart transformer never
+    // gets a category where it expects a measure.
+    if (
+      this.activeAxisSelection &&
+      this.focusedVisualId &&
+      this.isFieldTypeMismatch(field)
+    ) {
+      const expected =
+        ROLE_EXPECTED_KIND[this.activeAxisSelection] === 'measure'
+          ? this.translate.instant('ANALYSES.ENCODING_MEASURE')
+          : this.translate.instant('ANALYSES.ENCODING_DIMENSION');
+      this.globalService.showWarn(
+        this.translate.instant('ANALYSES.ENCODING_MISMATCH_DETAIL', {
+          field: field?.columnToView ?? '',
+          kind: expected,
+        }),
+        this.translate.instant('ANALYSES.ENCODING_MISMATCH_TITLE'),
+      );
       return;
     }
 
@@ -2379,6 +2614,12 @@ export class EditAnalysesComponent
         yAxisColumn: visual.yAxisColumn || null,
         zAxisColumn: visual.zAxisColumn || null,
         config: visual.config ? { ...visual.config } : null,
+        // Advanced-interaction opt-ins (spec §6) — persisted so the
+        // author's cross-filter / drill setup survives save + publish.
+        crossFilterEnabled: !!visual.crossFilterEnabled,
+        drillDimensions: Array.isArray(visual.drillDimensions)
+          ? visual.drillDimensions
+          : [],
       }));
 
       const updatePayload = {

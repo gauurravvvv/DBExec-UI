@@ -11,6 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import { AnalysesService } from '../../services/analyses.service';
+import { suggestFilterType, toValueType } from '../../utils/field-type.util';
 
 export interface ConfiguredFilter {
   tempId: string;
@@ -599,8 +600,47 @@ export class FilterDialogComponent implements OnChanges {
     if (this.filterDialogColumn && !this.filterDialogName) {
       this.filterDialogName = this.filterDialogColumn.columnToView;
     }
-    if (this.filterDialogColumn) {
+    // Type-deterministic control selection (spec §7): derive a sensible
+    // filter type from the picked column's dataType so the user doesn't
+    // have to reason about it. Only auto-pick when no type is set yet
+    // (fresh add) — never clobber an explicit choice or an edit-mode
+    // rehydration. Boolean fields fall back to `category` because the BE
+    // filterEngine handles them via the IN path (no dedicated boolean
+    // operator branch), while the numeric/date/string suggestions map to
+    // their native filter types.
+    let typeAutoPicked = false;
+    if (this.filterDialogColumn && !this.filterDialogType) {
+      const suggested = suggestFilterType(this.filterDialogColumn.dataType);
+      this.filterDialogType =
+        suggested === 'boolean' ? 'category' : suggested;
+      // Reuse the existing type-change plumbing to sync control/operator/
+      // default-value shape to the freshly-picked type. onFilterTypeChange
+      // already triggers loadColumnDistinctValues for category types, so
+      // we skip the extra load below to avoid a redundant fetch.
+      this.onFilterTypeChange();
+      typeAutoPicked = true;
+    }
+    if (this.filterDialogColumn && !typeAutoPicked) {
       this.loadColumnDistinctValues();
+    }
+  }
+
+  /**
+   * Human hint describing the detected data type of the picked column —
+   * shown next to the type dropdown so the user understands why a type
+   * was pre-selected. Empty when no column is chosen.
+   */
+  get detectedTypeHintKey(): string | null {
+    if (!this.filterDialogColumn) return null;
+    switch (toValueType(this.filterDialogColumn.dataType)) {
+      case 'number':
+        return 'ANALYSES.DETECTED_TYPE_NUMBER';
+      case 'date':
+        return 'ANALYSES.DETECTED_TYPE_DATE';
+      case 'boolean':
+        return 'ANALYSES.DETECTED_TYPE_BOOLEAN';
+      default:
+        return 'ANALYSES.DETECTED_TYPE_STRING';
     }
   }
 

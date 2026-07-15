@@ -1,0 +1,63 @@
+<!-- Parameter bar — renders only when the analysis has parameters. Each
+     parameter uses the shared typed-value input so its dataType picks the
+     control. -->
+<div class="param-bar" *ngIf="parameters && parameters.length > 0">
+  <div class="param-bar__head">
+    <i class="pi pi-sliders-h"></i>
+    <span>{{ 'ANALYSES.PARAMETERS' | translate }}</span>
+  </div>
+
+  <div class="param-controls">
+    <div
+      class="param-control"
+      *ngFor="let p of parameters; trackBy: trackByKey"
+    >
+      <label class="param-label">
+        {{ p.name }}
+        <span
+          class="param-required"
+          *ngIf="p.isRequired"
+          [pTooltip]="'ANALYSES.PARAM_REQUIRED' | translate"
+          >*</span
+        >
+      </label>
+      <app-analysis-typed-value-input
+        [valueType]="valueTypeFor(p)"
+        [options]="optionsFor(p)"
+        [allowCustomString]="allowCustomFor(p)"
+        [placeholder]="p.name"
+        [ngModel]="values[p.key]"
+        [ngModelOptions]="{ standalone: true }"
+        (ngModelChange)="onValueChange(p, $event)"
+      ></app-analysis-typed-value-input>
+    </div>
+  </div>
+
+  <div class="param-actions">
+    <button
+      type="button"
+      class="btn-apply"
+      (click)="applyValues()"
+      [disabled]="hasMissingRequired"
+      [pTooltip]="
+        hasMissingRequired
+          ? ('ANALYSES.PARAM_FILL_REQUIRED' | translate)
+          : ('ANALYSES.PARAM_APPLY_TOOLTIP' | translate)
+      "
+      tooltipPosition="top"
+    >
+      <i class="pi pi-check"></i>
+      {{ 'COMMON.APPLY' | translate }}
+    </button>
+    <button
+      type="button"
+      class="btn-clear"
+      (click)="resetValues()"
+      [pTooltip]="'ANALYSES.PARAM_RESET_TOOLTIP' | translate"
+      tooltipPosition="top"
+    >
+      <i class="pi pi-refresh"></i>
+      {{ 'COMMON.RESET' | translate }}
+    </button>
+  </div>
+</div>

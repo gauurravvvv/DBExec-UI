@@ -1,0 +1,108 @@
+.param-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-5);
+  padding: 8px 16px;
+  background: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+.param-bar__head {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  align-self: center;
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-control);
+  color: var(--text-color-secondary);
+
+  i {
+    font-size: var(--fs-control);
+  }
+}
+
+.param-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.param-control {
+  min-width: 160px;
+  max-width: 240px;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.param-label {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
+  color: var(--text-color);
+
+  .param-required {
+    color: var(--danger-color, #d9534f);
+    margin-left: 2px;
+  }
+}
+
+.param-actions {
+  display: flex;
+  gap: var(--space-5);
+  align-items: center;
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: 0.65rem 1.25rem;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-control);
+    cursor: pointer;
+    transition: all var(--motion-base) ease;
+
+    i {
+      font-size: var(--fs-control);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-apply {
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--primary-hover)
+    );
+    color: var(--primary-text);
+    box-shadow: 0 4px 10px var(--primary-color-transparent);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 15px var(--primary-color-transparent);
+    }
+  }
+
+  .btn-clear {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    box-shadow: var(--shadow-sm);
+
+    &:hover:not(:disabled) {
+      background: var(--hover-background);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+  }
+}

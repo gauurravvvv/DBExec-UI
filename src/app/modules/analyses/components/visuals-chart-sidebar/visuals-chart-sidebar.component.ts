@@ -24,6 +24,7 @@ import {
   isTableChartType,
 } from '../../constants/charts.constants';
 import { RoleKey, Visual } from '../../models/visual.model';
+import { toFieldKind } from '../../utils/field-type.util';
 
 /**
  * A single slot in the field-mapping panel. Driven by the chart's
@@ -123,6 +124,12 @@ export class VisualsChartSidebarComponent implements OnInit, OnDestroy {
   @Output() chartTypeSelected = new EventEmitter<void>();
   @Output() axisSelectionStarted = new EventEmitter<RoleKey | null>();
   @Output() axisFieldCleared = new EventEmitter<void>();
+  /**
+   * Fired when the visual's interaction config (cross-filter opt-in or
+   * drill dimensions, spec §6) changes, so the parent can mark dirty and
+   * re-run if a live drill/cross-filter is affected.
+   */
+  @Output() interactionChanged = new EventEmitter<void>();
 
   // Chart type checkers
   isHeatMapChartType = isHeatMapChartType;
@@ -434,6 +441,43 @@ export class VisualsChartSidebarComponent implements OnInit, OnDestroy {
         f.columnToUse === columnToUse || f.columnToView === columnToUse,
     );
     return field?.columnToView || columnToUse;
+  }
+
+  // ─── Interactions config (cross-filter + drill, spec §6) ────────────
+
+  /** Toggle whether clicking this visual broadcasts a cross-filter. */
+  toggleCrossFilterEnabled(): void {
+    if (!this.focusedVisual) return;
+    this.focusedVisual.crossFilterEnabled = !this.focusedVisual
+      .crossFilterEnabled;
+    this.interactionChanged.emit();
+  }
+
+  /**
+   * Dimension fields eligible for the drill stack — every non-numeric
+   * field (categories / dates). Numeric measures aren't drill levels.
+   * Shaped as { label, value } for the multiselect; value = columnToUse.
+   */
+  get drillDimensionOptions(): { label: string; value: string }[] {
+    return (this.allFields || [])
+      .filter((f: any) => toFieldKind(f?.dataType) === 'dimension')
+      .map((f: any) => ({
+        label: f.columnToView || f.columnToUse,
+        value: f.columnToUse || f.columnToView,
+      }))
+      .filter(o => !!o.value);
+  }
+
+  /** Current drill dimensions (ordered) for the multiselect model. */
+  get drillDimensions(): string[] {
+    return this.focusedVisual?.drillDimensions ?? [];
+  }
+
+  /** Persist a new drill-dimension selection onto the visual. */
+  onDrillDimensionsChange(cols: string[]): void {
+    if (!this.focusedVisual) return;
+    this.focusedVisual.drillDimensions = Array.isArray(cols) ? cols : [];
+    this.interactionChanged.emit();
   }
 
   trackByIndex(index: number): number {

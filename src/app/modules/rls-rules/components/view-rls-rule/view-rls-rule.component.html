@@ -56,6 +56,25 @@
               </p>
             </div>
             <div class="info-item">
+              <label>{{ 'RLS.SECURITY_TYPE' | translate }}</label>
+              <p class="with-icon">
+                <i
+                  class="pi mr-2"
+                  [ngClass]="
+                    current()!.securityType === 'column'
+                      ? 'pi-eye-slash'
+                      : 'pi-filter'
+                  "
+                ></i>
+                {{
+                  (current()!.securityType === 'column'
+                    ? 'RLS.SECURITY_TYPE_COLUMN'
+                    : 'RLS.SECURITY_TYPE_ROW'
+                  ) | translate
+                }}
+              </p>
+            </div>
+            <div class="info-item">
               <label>{{ 'COMMON.STATUS' | translate }}</label>
               <span class="status-badge" [class.active]="current()!.isEnabled">
                 <i
@@ -112,8 +131,8 @@
           </ng-template>
         </div>
 
-        <!-- Filter Conditions -->
-        <div class="info-section">
+        <!-- Filter Conditions (row security) -->
+        <div class="info-section" *ngIf="current()!.securityType !== 'column'">
           <h3>
             <i class="pi pi-filter mr-2"></i>
             {{ 'RLS.FILTER_CONDITIONS' | translate }}
@@ -159,6 +178,52 @@
             <i class="pi pi-info-circle"></i>
             {{ 'RLS.ALL_CONDITIONS_ANDED_TOGETHER' | translate }}
           </p>
+        </div>
+
+        <!-- Masked Columns (column security) -->
+        <div class="info-section" *ngIf="current()!.securityType === 'column'">
+          <h3>
+            <i class="pi pi-eye-slash mr-2"></i>
+            {{ 'RLS.MASKED_COLUMNS' | translate }}
+            <span class="count-badge">{{
+              current()!.maskedColumns?.length || 0
+            }}</span>
+          </h3>
+          <div
+            class="conditions-table"
+            *ngIf="current()!.maskedColumns?.length; else noMasked"
+          >
+            <div class="conditions-table-header">
+              <span>{{ 'RLS.COLUMN' | translate }}</span>
+              <span>{{ 'RLS.MASK_STRATEGY' | translate }}</span>
+              <span>{{ 'RLS.MASK_VALUE' | translate }}</span>
+            </div>
+            <div
+              class="condition-table-row"
+              *ngFor="
+                let mc of current()!.maskedColumns;
+                let i = index;
+                trackBy: trackByIndex
+              "
+            >
+              <span class="cond-index">{{ i + 1 }}</span>
+              <span class="cond-column">
+                <i class="pi pi-eye-slash"></i> {{ mc.columnName }}
+              </span>
+              <span class="operator-badge">{{ mc.strategy }}</span>
+              <div class="cond-values">
+                <span class="value-chip" *ngIf="mc.strategy === 'redact'">{{
+                  mc.maskValue || '***'
+                }}</span>
+                <span class="value-chip" *ngIf="mc.strategy !== 'redact'">{{
+                  'COMMON.NA' | translate
+                }}</span>
+              </div>
+            </div>
+          </div>
+          <ng-template #noMasked>
+            <div class="no-data">{{ 'RLS.NO_MASKED_COLUMNS' | translate }}</div>
+          </ng-template>
         </div>
       </div>
     </div>

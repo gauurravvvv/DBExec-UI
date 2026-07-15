@@ -461,3 +461,20 @@
     color: var(--text-muted);
   }
 }
+
+// ─── Interactions config (cross-filter + drill, spec §6) ─────────────
+.interaction-row {
+  margin: var(--space-2) 0;
+
+  &.drill-row {
+    margin-top: var(--space-3);
+  }
+}
+
+.interaction-hint {
+  display: block;
+  color: var(--text-muted);
+  font-size: var(--fs-micro);
+  line-height: 1.4;
+  margin-bottom: var(--space-3);
+}

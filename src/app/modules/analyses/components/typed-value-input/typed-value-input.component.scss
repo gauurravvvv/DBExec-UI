@@ -1,0 +1,22 @@
+.typed-value {
+  width: 100%;
+
+  .range-pair {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+
+    > app-custom-number,
+    > app-custom-calendar {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    .range-sep {
+      flex: 0 0 auto;
+      font-size: var(--fs-caption);
+      color: var(--text-color-secondary);
+      text-transform: lowercase;
+    }
+  }
+}

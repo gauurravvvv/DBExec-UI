@@ -29,6 +29,8 @@ import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from 'src/app/modules/dataset/services/dataset.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { GroupService } from 'src/app/modules/groups/services/group.service';
+import { UserService } from 'src/app/modules/users/services/user.service';
 import { RlsRulesService } from '../../services/rls-rules.service';
 
 function nonEmptyArray(control: AbstractControl): ValidationErrors | null {
@@ -75,8 +77,46 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     { label: 'BETWEEN', value: 'BETWEEN' },
   ];
 
+  // Row vs column security. Row → conditions[]; column → maskedColumns[].
+  securityTypeOptions = [
+    { label: this.translate.instant('RLS.SECURITY_TYPE_ROW'), value: 'row' },
+    {
+      label: this.translate.instant('RLS.SECURITY_TYPE_COLUMN'),
+      value: 'column',
+    },
+  ];
+
+  scopeOptions = [
+    { label: this.translate.instant('RLS.USER'), value: 'user' },
+    { label: this.translate.instant('RLS.GROUP'), value: 'group' },
+  ];
+
+  maskStrategyOptions = [
+    { label: this.translate.instant('RLS.MASK_HIDE'), value: 'hide' },
+    { label: this.translate.instant('RLS.MASK_NULL'), value: 'null' },
+    { label: this.translate.instant('RLS.MASK_REDACT'), value: 'redact' },
+  ];
+
+  // Per-assignment-row scope-target options, keyed by row index. Users
+  // and groups are fetched lazily when a row's scope is chosen.
+  scopeTargetsByRow: { [index: number]: { label: string; value: string }[] } =
+    {};
+  isLoadingScopeTargets: { [index: number]: boolean } = {};
+
   get conditions(): FormArray {
     return this.rlsForm.get('conditions') as FormArray;
+  }
+
+  get assignments(): FormArray {
+    return this.rlsForm.get('assignments') as FormArray;
+  }
+
+  get maskedColumns(): FormArray {
+    return this.rlsForm.get('maskedColumns') as FormArray;
+  }
+
+  get securityType(): string {
+    return this.rlsForm.get('securityType')?.value ?? 'row';
   }
 
   constructor(
@@ -86,6 +126,8 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     private datasourceService: DatasourceService,
     private datasetService: DatasetService,
     private rlsRulesService: RlsRulesService,
+    private userService: UserService,
+    private groupService: GroupService,
     private translate: TranslateService,
   ) {
     this.initForm();
@@ -101,6 +143,8 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
 
   ngOnInit() {
     this.loadDatasources();
+    // Seed the first assignment row's target dropdown.
+    this.loadScopeTargets(0, 'user');
   }
 
   initForm() {
@@ -109,11 +153,14 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
       name: ['', [zodValidator(rlsRuleNameSchema)]],
       description: ['', [zodValidator(analysisDescriptionSchema)]],
       datasetId: ['', [zodValidator(analysisDatasetSchema)]],
+      securityType: ['row', Validators.required],
       conditions: this.fb.array([this.createCondition()]),
+      maskedColumns: this.fb.array([] as FormGroup[]),
+      assignments: this.fb.array([this.createAssignment()]),
       isEnabled: [true],
     });
 
-    // Dataset changes → load columns, reset conditions
+    // Dataset changes → load columns, reset conditions + masked columns
     this.rlsForm
       .get('datasetId')
       ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
@@ -122,9 +169,30 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
         this.columnValuesCache = {};
         this.isLoadingColumnValues = {};
         this.resetConditions();
+        this.maskedColumns.clear();
+        // Keep the column-security section showing one empty row when it
+        // is the active mode, so switching datasets doesn't blank it out.
+        if (this.securityType === 'column') {
+          this.maskedColumns.push(this.createMaskedColumn());
+        }
         if (value) {
           this.loadDatasetColumns();
         }
+      });
+
+    // Security type changes → flip which section is authoritative.
+    this.rlsForm
+      .get('securityType')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((type: string) => {
+        if (type === 'column') {
+          if (this.maskedColumns.length === 0)
+            this.maskedColumns.push(this.createMaskedColumn());
+        } else {
+          if (this.conditions.length === 0)
+            this.conditions.push(this.createCondition());
+        }
+        this.rlsForm.markAsDirty();
       });
   }
 
@@ -133,6 +201,21 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
       columnName: ['', Validators.required],
       operator: ['IN', Validators.required],
       values: [[], nonEmptyArray],
+    });
+  }
+
+  createMaskedColumn(): FormGroup {
+    return this.fb.group({
+      columnName: ['', Validators.required],
+      strategy: ['hide', Validators.required],
+      maskValue: [''],
+    });
+  }
+
+  createAssignment(): FormGroup {
+    return this.fb.group({
+      scope: ['user', Validators.required],
+      scopeId: ['', Validators.required],
     });
   }
 
@@ -151,6 +234,85 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
   resetConditions(): void {
     this.conditions.clear();
     this.conditions.push(this.createCondition());
+  }
+
+  addMaskedColumn() {
+    this.maskedColumns.push(this.createMaskedColumn());
+    this.rlsForm.markAsDirty();
+  }
+
+  removeMaskedColumn(index: number) {
+    if (this.maskedColumns.length > 1) {
+      this.maskedColumns.removeAt(index);
+      this.rlsForm.markAsDirty();
+    }
+  }
+
+  addAssignment() {
+    const idx = this.assignments.length;
+    this.assignments.push(this.createAssignment());
+    this.loadScopeTargets(idx, 'user');
+    this.rlsForm.markAsDirty();
+  }
+
+  removeAssignment(index: number) {
+    if (this.assignments.length > 1) {
+      this.assignments.removeAt(index);
+      delete this.scopeTargetsByRow[index];
+      delete this.isLoadingScopeTargets[index];
+      this.rlsForm.markAsDirty();
+    }
+  }
+
+  /** A row's scope flipped user↔group — clear its target + refetch. */
+  onAssignmentScopeChange(index: number, scope: string): void {
+    this.assignments.at(index)?.get('scopeId')?.setValue('');
+    this.scopeTargetsByRow[index] = [];
+    if (scope) this.loadScopeTargets(index, scope);
+  }
+
+  /** Fetch users or groups for an assignment row's target dropdown. */
+  loadScopeTargets(index: number, scope: string): void {
+    this.isLoadingScopeTargets[index] = true;
+    const params = { page: DEFAULT_PAGE, limit: 50 };
+    const done = (items: { label: string; value: string }[]) => {
+      this.scopeTargetsByRow[index] = items;
+      this.isLoadingScopeTargets[index] = false;
+      this.cdr.markForCheck();
+    };
+    if (scope === 'user') {
+      this.userService
+        .listUser({ ...params, excludeDefault: true })
+        .then((res: any) => {
+          if (this.globalService.handleSuccessService(res, false)) {
+            done(
+              (res?.data?.users ?? []).map((u: any) => ({
+                label: `${u.firstName} ${u.lastName ?? ''}`.trim(),
+                value: u.id,
+              })),
+            );
+          } else done([]);
+        })
+        .catch(() => done([]));
+    } else {
+      this.groupService
+        .listGroups(params)
+        .then((res: any) => {
+          if (this.globalService.handleSuccessService(res, false)) {
+            done(
+              (res?.data?.groups ?? []).map((g: any) => ({
+                label: g.name,
+                value: g.id,
+              })),
+            );
+          } else done([]);
+        })
+        .catch(() => done([]));
+    }
+  }
+
+  getScopeTargets(index: number): { label: string; value: string }[] {
+    return this.scopeTargetsByRow[index] ?? [];
   }
 
   loadDatasources() {
@@ -350,30 +512,52 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
 
   onSubmit() {
     this.rlsForm.markAllAsTouched();
-    if (this.rlsForm.valid) {
-      const formVal = this.rlsForm.value;
-      const payload = {
-        ...formVal,
-        conditions: formVal.conditions.map((c: any) => ({
-          columnName: c.columnName,
-          operator: c.operator,
-          values: Array.isArray(c.values) ? c.values : [c.values],
-        })),
-      };
+    if (!this.rlsForm.valid) return;
 
-      this.rlsRulesService
-        .add(payload)
-        .then((response: any) => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.rlsForm.markAsPristine();
-            this.router.navigate([RLS_RULE.LIST]);
-          }
-          this.cdr.markForCheck();
-        })
-        .catch(() => {
-          this.cdr.markForCheck();
-        });
+    const formVal = this.rlsForm.value;
+    const type = formVal.securityType === 'column' ? 'column' : 'row';
+
+    const payload: any = {
+      name: formVal.name,
+      description: formVal.description,
+      datasetId: formVal.datasetId,
+      securityType: type,
+      isEnabled: formVal.isEnabled,
+      assignments: (formVal.assignments || []).map((a: any) => ({
+        scope: a.scope,
+        scopeId: a.scopeId,
+      })),
+    };
+
+    if (type === 'column') {
+      payload.maskedColumns = (formVal.maskedColumns || []).map((m: any) => ({
+        columnName: m.columnName,
+        strategy: m.strategy || 'hide',
+        // Only carry maskValue for redact — the BE ignores it otherwise.
+        ...(m.strategy === 'redact' && m.maskValue
+          ? { maskValue: m.maskValue }
+          : {}),
+      }));
+    } else {
+      payload.conditions = (formVal.conditions || []).map((c: any) => ({
+        columnName: c.columnName,
+        operator: c.operator,
+        values: Array.isArray(c.values) ? c.values : [c.values],
+      }));
     }
+
+    this.rlsRulesService
+      .add(payload)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response)) {
+          this.rlsForm.markAsPristine();
+          this.router.navigate([RLS_RULE.LIST]);
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   onCancel() {

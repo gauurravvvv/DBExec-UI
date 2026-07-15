@@ -79,6 +79,31 @@
           </ng-template>
 
           <ng-template usGridCell="conditions" let-rule>
+            <!-- Column-security rules summarise their masked columns. -->
+            <div
+              class="conditions-summary"
+              *ngIf="rule.securityType === 'column'; else rowConds"
+            >
+              <span class="conditions-count-badge">
+                {{
+                  'RLS.MASKED_COLUMN_COUNT'
+                    | translate: { count: rule.maskedColumns?.length || 0 }
+                }}
+              </span>
+              <ng-container
+                *ngFor="
+                  let mc of rule.maskedColumns;
+                  let i = index;
+                  trackBy: trackByIndex
+                "
+              >
+                <span class="condition-preview" *ngIf="i < 2">
+                  <span class="cond-col">{{ mc.columnName }}</span>
+                  <span class="cond-op">{{ mc.strategy }}</span>
+                </span>
+              </ng-container>
+            </div>
+            <ng-template #rowConds>
             <div
               class="conditions-summary"
               *ngIf="rule.conditions?.length; else noConds"
@@ -109,6 +134,7 @@
               </span>
             </div>
             <ng-template #noConds><span>-</span></ng-template>
+            </ng-template>
           </ng-template>
 
           <ng-template usGridCell="status" let-rule>

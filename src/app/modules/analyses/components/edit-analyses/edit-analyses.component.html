@@ -317,6 +317,13 @@
                   [class.field-hidden]="
                     isFocusedVisualTable() && !isFieldVisibleInTable(field)
                   "
+                  [class.field-mismatch]="isFieldTypeMismatch(field)"
+                  [pTooltip]="
+                    isFieldTypeMismatch(field)
+                      ? ('ANALYSES.ENCODING_MISMATCH_HINT' | translate)
+                      : null
+                  "
+                  tooltipPosition="right"
                   (click)="onFieldClick(field)"
                 >
                   <div
@@ -360,6 +367,13 @@
                   [class.field-hidden]="
                     isFocusedVisualTable() && !isFieldVisibleInTable(field)
                   "
+                  [class.field-mismatch]="isFieldTypeMismatch(field)"
+                  [pTooltip]="
+                    isFieldTypeMismatch(field)
+                      ? ('ANALYSES.ENCODING_MISMATCH_HINT' | translate)
+                      : null
+                  "
+                  tooltipPosition="right"
                   (click)="onFieldClick(field)"
                 >
                   <div
@@ -430,6 +444,7 @@
         (chartTypeSelected)="onChartTypeSelected()"
         (axisSelectionStarted)="onAxisSelectionStarted($event)"
         (axisFieldCleared)="onAxisFieldCleared()"
+        (interactionChanged)="onVisualInteractionChanged()"
       ></app-visuals-chart-sidebar>
     </div>
 
@@ -557,6 +572,74 @@
 
     <!-- Center Container -->
     <div class="editor-container" #canvasContainer>
+      <!-- Analysis parameter bar (spec §4.1) — renders only when the
+           analysis has typed parameters. Applying re-runs every visual
+           with the new {{param.<key>}} substitutions. -->
+      <app-analysis-parameter-bar
+        [parameters]="parameters"
+        (apply)="onParametersApplied($event)"
+      ></app-analysis-parameter-bar>
+
+      <!-- Interaction breadcrumb (spec §6) — surfaces the active drill
+           path + a clear-all for cross-filters. Only shown while an
+           interaction is scoping the canvas. -->
+      <div class="interaction-bar" *ngIf="hasActiveInteractions">
+        <div class="drill-breadcrumb" *ngIf="interaction.drillPath().length">
+          <i class="pi pi-sitemap"></i>
+          <button
+            type="button"
+            class="crumb crumb--root"
+            (click)="drillTo(-1)"
+          >
+            {{ 'ANALYSES.DRILL_ALL' | translate }}
+          </button>
+          <ng-container
+            *ngFor="
+              let level of interaction.drillPath();
+              let i = index;
+              trackBy: trackByIndex
+            "
+          >
+            <i class="pi pi-angle-right crumb-sep"></i>
+            <button
+              type="button"
+              class="crumb"
+              [class.crumb--current]="i === interaction.drillPath().length - 1"
+              (click)="drillTo(i)"
+            >
+              {{ level.label }}
+            </button>
+          </ng-container>
+        </div>
+
+        <div
+          class="crossfilter-chips"
+          *ngIf="interaction.crossFilters().length"
+        >
+          <span
+            class="crossfilter-chip"
+            *ngFor="
+              let cf of interaction.crossFilters();
+              trackBy: trackByIndex
+            "
+          >
+            <i class="pi pi-filter"></i>
+            {{ cf.columnName }} = {{ cf.value }}
+          </span>
+        </div>
+
+        <button
+          type="button"
+          class="interaction-clear"
+          (click)="clearInteractions()"
+          [pTooltip]="'ANALYSES.INTERACTION_CLEAR_TOOLTIP' | translate"
+          tooltipPosition="bottom"
+        >
+          <i class="pi pi-times"></i>
+          {{ 'ANALYSES.INTERACTION_CLEAR' | translate }}
+        </button>
+      </div>
+
       <div
         class="canvas-area"
         *ngIf="visuals.length > 0"
@@ -591,6 +674,27 @@
             <!-- Action buttons (no chart-type switcher; users change
                  chart type via the Layers + Visuals sidebars only) -->
             <div class="visual-action-buttons">
+              <!-- Cross-filter opt-in (spec §6). Only meaningful on
+                   charts with a category axis; clicking a point when
+                   enabled filters the sibling visuals. Highlighted when
+                   active so the author sees which visuals broadcast. -->
+              <i
+                *ngIf="
+                  visual.chartType &&
+                  !isTableChartType(visual.chartType) &&
+                  hasRequiredChartFields(visual)
+                "
+                class="pi pi-filter action-icon crossfilter-icon"
+                [class.active]="visual.crossFilterEnabled"
+                (click)="toggleCrossFilter(visual, $event)"
+                [pTooltip]="
+                  (visual.crossFilterEnabled
+                    ? 'ANALYSES.CROSSFILTER_ON'
+                    : 'ANALYSES.CROSSFILTER_OFF'
+                  ) | translate
+                "
+                tooltipPosition="top"
+              ></i>
               <i
                 *ngIf="
                   visual.chartType &&
@@ -741,6 +845,7 @@
                   [chartHeight]="visual.height - 35"
                   [configVersion]="chartConfigVersion"
                   [dataVersion]="chartDataVersion"
+                  (chartSelect)="onVisualChartSelect(visual, $event)"
                 ></app-chart-renderer>
               </div>
             </ng-container>

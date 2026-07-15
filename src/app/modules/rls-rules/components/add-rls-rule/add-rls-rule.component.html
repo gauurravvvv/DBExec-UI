@@ -102,8 +102,33 @@
         >
         </app-custom-dropdown>
 
-        <!-- Filter Conditions -->
-        <div class="conditions-section" formArrayName="conditions">
+        <!-- Security type: row filter vs column masking -->
+        <app-custom-dropdown
+          formControlName="securityType"
+          [options]="securityTypeOptions"
+          optionLabel="label"
+          optionValue="value"
+          [label]="'RLS.SECURITY_TYPE' | translate"
+          [autoDisplayFirst]="false"
+          [required]="true"
+          icon="pi-shield"
+        ></app-custom-dropdown>
+        <div class="conditions-hint">
+          <i class="pi pi-info-circle"></i>
+          {{
+            (securityType === 'column'
+              ? 'RLS.SECURITY_TYPE_COLUMN_HINT'
+              : 'RLS.SECURITY_TYPE_ROW_HINT'
+            ) | translate
+          }}
+        </div>
+
+        <!-- Filter Conditions (row security) -->
+        <div
+          class="conditions-section"
+          formArrayName="conditions"
+          *ngIf="securityType === 'row'"
+        >
           <div class="conditions-header">
             <span class="conditions-label">
               {{ 'RLS.FILTER_CONDITIONS' | translate }}
@@ -197,6 +222,168 @@
                   [errorMessage]="'RLS.VALUES_REQUIRED' | translate"
                   icon="pi-tag"
                 ></app-custom-multiselect>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Masked Columns (column security) -->
+        <div
+          class="conditions-section"
+          formArrayName="maskedColumns"
+          *ngIf="securityType === 'column'"
+        >
+          <div class="conditions-header">
+            <span class="conditions-label">
+              {{ 'RLS.MASKED_COLUMNS' | translate }}
+              <span class="required">*</span>
+            </span>
+            <button
+              type="button"
+              class="btn-add-condition"
+              (click)="addMaskedColumn()"
+            >
+              <i class="pi pi-plus"></i> {{ 'RLS.ADD_MASKED_COLUMN' | translate }}
+            </button>
+          </div>
+          <div class="conditions-hint">
+            <i class="pi pi-info-circle"></i>
+            {{ 'RLS.MASKED_COLUMNS_HINT' | translate }}
+          </div>
+          <div
+            class="condition-row"
+            *ngFor="
+              let mc of maskedColumns.controls;
+              let i = index;
+              trackBy: trackByIndex
+            "
+            [formGroupName]="i"
+          >
+            <div class="condition-fields">
+              <div class="condition-top-row">
+                <app-custom-dropdown
+                  formControlName="columnName"
+                  [options]="datasetColumns"
+                  optionLabel="columnToView"
+                  optionValue="columnToUse"
+                  [placeholder]="'RLS.SELECT_COLUMN' | translate"
+                  [filter]="true"
+                  filterBy="columnToView"
+                  [autoDisplayFirst]="false"
+                  [required]="true"
+                  [showError]="
+                    !!(
+                      maskedColumns.at(i).get('columnName')?.invalid &&
+                      maskedColumns.at(i).get('columnName')?.touched
+                    )
+                  "
+                  [errorMessage]="'RLS.COLUMN_REQUIRED' | translate"
+                  icon="pi-eye-slash"
+                ></app-custom-dropdown>
+                <app-custom-dropdown
+                  formControlName="strategy"
+                  [options]="maskStrategyOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  [autoDisplayFirst]="false"
+                  [required]="true"
+                  icon="pi-lock"
+                ></app-custom-dropdown>
+                <button
+                  type="button"
+                  class="btn-remove-condition"
+                  (click)="removeMaskedColumn(i)"
+                  [disabled]="maskedColumns.length === 1"
+                  [pTooltip]="'RLS.REMOVE_MASKED_COLUMN' | translate"
+                  tooltipPosition="bottom"
+                >
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+              <div
+                class="condition-values-row"
+                *ngIf="maskedColumns.at(i).get('strategy')?.value === 'redact'"
+              >
+                <app-custom-input
+                  formControlName="maskValue"
+                  [label]="'RLS.MASK_VALUE' | translate"
+                  [placeholder]="'RLS.MASK_VALUE_PLACEHOLDER' | translate"
+                  icon="pi-asterisk"
+                ></app-custom-input>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Assignments (who the rule applies to) -->
+        <div class="conditions-section" formArrayName="assignments">
+          <div class="conditions-header">
+            <span class="conditions-label">
+              {{ 'RLS.ASSIGNMENTS' | translate }}
+              <span class="required">*</span>
+            </span>
+            <button
+              type="button"
+              class="btn-add-condition"
+              (click)="addAssignment()"
+            >
+              <i class="pi pi-plus"></i> {{ 'RLS.ADD_ASSIGNMENT' | translate }}
+            </button>
+          </div>
+          <div class="conditions-hint">
+            <i class="pi pi-info-circle"></i>
+            {{ 'RLS.ASSIGNMENTS_HINT' | translate }}
+          </div>
+          <div
+            class="condition-row"
+            *ngFor="
+              let asg of assignments.controls;
+              let i = index;
+              trackBy: trackByIndex
+            "
+            [formGroupName]="i"
+          >
+            <div class="condition-fields">
+              <div class="condition-top-row">
+                <app-custom-dropdown
+                  formControlName="scope"
+                  [options]="scopeOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  [autoDisplayFirst]="false"
+                  [required]="true"
+                  (onChangeEvent)="onAssignmentScopeChange(i, $event)"
+                  icon="pi-users"
+                ></app-custom-dropdown>
+                <app-custom-dropdown
+                  formControlName="scopeId"
+                  [options]="getScopeTargets(i)"
+                  optionLabel="label"
+                  optionValue="value"
+                  [placeholder]="'RLS.SELECT_TARGET' | translate"
+                  [filter]="true"
+                  filterBy="label"
+                  [autoDisplayFirst]="false"
+                  [required]="true"
+                  [showError]="
+                    !!(
+                      assignments.at(i).get('scopeId')?.invalid &&
+                      assignments.at(i).get('scopeId')?.touched
+                    )
+                  "
+                  [errorMessage]="'RLS.TARGET_REQUIRED' | translate"
+                  icon="pi-user"
+                ></app-custom-dropdown>
+                <button
+                  type="button"
+                  class="btn-remove-condition"
+                  (click)="removeAssignment(i)"
+                  [disabled]="assignments.length === 1"
+                  [pTooltip]="'RLS.REMOVE_ASSIGNMENT' | translate"
+                  tooltipPosition="bottom"
+                >
+                  <i class="pi pi-trash"></i>
+                </button>
               </div>
             </div>
           </div>

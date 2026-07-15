@@ -70,6 +70,22 @@ export const RLS_OPERATOR_VALUES = [
 ] as const;
 export type RlsOperator = (typeof RLS_OPERATOR_VALUES)[number];
 
+/**
+ * RLS security kind. `row` filters which rows a subject sees (WHERE
+ * predicates); `column` hides / masks which columns a subject sees.
+ */
+export const RLS_SECURITY_TYPE_VALUES = ['row', 'column'] as const;
+export type RlsSecurityType = (typeof RLS_SECURITY_TYPE_VALUES)[number];
+
+/**
+ * Column-masking strategy for `securityType='column'` rules.
+ * - `hide`   → drop the column key from every result row.
+ * - `null`   → keep the key but replace the value with null.
+ * - `redact` → replace the value with `maskValue` (default '***').
+ */
+export const RLS_MASK_STRATEGY_VALUES = ['hide', 'null', 'redact'] as const;
+export type RlsMaskStrategy = (typeof RLS_MASK_STRATEGY_VALUES)[number];
+
 /** Publish-dashboard mode. */
 export const DASHBOARD_PUBLISH_MODES = ['new', 'existing'] as const;
 export type DashboardPublishMode = (typeof DASHBOARD_PUBLISH_MODES)[number];
@@ -319,6 +335,11 @@ export const runAnalysisQuerySchema = z.object({
   datasetId: idSchema('validation.analyses.run.datasetId.required'),
   analysisId: idSchema('validation.analyses.run.analysisId.required'),
   filters: z.array(appliedFilterSchema).optional(),
+  // Run-time values for the analysis's declared parameters, keyed by parameter
+  // `key`. Substituted into {{param.<key>}} tokens by parameterSubstitution.
+  // Free-form record — each value is coerced + validated against its declared
+  // parameter type on the BE, so the shape here is intentionally permissive.
+  paramValues: z.record(z.string(), z.any()).optional(),
   limit: z
     .union([z.number().int(), z.string().regex(/^-?\d+$/)])
     .optional()
@@ -405,18 +426,13 @@ const refineRlsOperatorValues = (
   }
 };
 
-export const addRlsRuleSchema = z
+/**
+ * A single row predicate inside `conditions[]`. Mirrors the legacy flat
+ * (columnName, operator, values) triple; the same operator/value
+ * invariants are enforced by `refineRlsOperatorValues` applied per row.
+ */
+export const rlsConditionSchema = z
   .object({
-    name: rlsRuleNameSchema,
-    description: analysisDescriptionSchema,
-    datasetId: idSchema('validation.analyses.rls.dataset.required'),
-    scope: z.preprocess(
-      trimOrUndefined,
-      z.enum(RLS_SCOPE_VALUES, {
-        message: 'validation.analyses.rls.scope.invalid',
-      }),
-    ),
-    scopeId: idSchema('validation.analyses.rls.scopeId.required'),
     columnName: rlsColumnNameSchema,
     operator: z
       .preprocess(
@@ -430,8 +446,146 @@ export const addRlsRuleSchema = z
     values: z
       .array(z.any())
       .min(1, { message: 'validation.analyses.rls.values.atLeastOne' }),
+  })
+  .superRefine(refineRlsOperatorValues);
+
+/** A single subject binding inside `assignments[]`. */
+export const rlsAssignmentSchema = z.object({
+  scope: z.preprocess(
+    trimOrUndefined,
+    z.enum(RLS_SCOPE_VALUES, {
+      message: 'validation.analyses.rls.scope.invalid',
+    }),
+  ),
+  scopeId: idSchema('validation.analyses.rls.scopeId.required'),
+});
+
+/** A single column-masking directive inside `maskedColumns[]`. */
+export const rlsMaskedColumnSchema = z.object({
+  columnName: rlsColumnNameSchema,
+  strategy: z
+    .preprocess(
+      trimOrUndefined,
+      z.enum(RLS_MASK_STRATEGY_VALUES, {
+        message: 'validation.analyses.rls.mask.strategyInvalid',
+      }),
+    )
+    .optional()
+    .default('hide'),
+  // Only meaningful for strategy='redact'; free-form short token.
+  maskValue: z.preprocess(
+    trimOrUndefined,
+    z
+      .string()
+      .max(50, { message: 'validation.analyses.rls.mask.maskValueTooLong' })
+      .optional(),
+  ),
+});
+
+const rlsSecurityTypeSchema = z
+  .preprocess(
+    trimOrUndefined,
+    z.enum(RLS_SECURITY_TYPE_VALUES, {
+      message: 'validation.analyses.rls.securityType.invalid',
+    }),
+  )
+  .optional()
+  .default('row');
+
+/**
+ * Cross-shape rule for the array-model RLS payload. Enforces:
+ * - row rules → at least one condition;
+ * - column rules → at least one masked column;
+ * - every rule → at least one subject, taken from `assignments[]` or
+ *   the legacy flat scope/scopeId pair.
+ *
+ * The legacy flat single-predicate path (bare columnName/operator/
+ * values with no `conditions[]`) is still accepted so older FE builds
+ * and API clients keep working.
+ */
+const refineRlsRule = (
+  data: {
+    securityType?: string;
+    conditions?: unknown[];
+    maskedColumns?: unknown[];
+    assignments?: unknown[];
+    scope?: string;
+    scopeId?: string;
+    columnName?: string;
+  },
+  ctx: z.RefinementCtx,
+): void => {
+  const type = data.securityType ?? 'row';
+  const hasConditions = (data.conditions?.length ?? 0) > 0;
+  const hasLegacyPredicate = !!data.columnName;
+  const hasMasked = (data.maskedColumns?.length ?? 0) > 0;
+  const hasAssignments = (data.assignments?.length ?? 0) > 0;
+  const hasLegacySubject = !!data.scope && !!data.scopeId;
+
+  if (type === 'column') {
+    if (!hasMasked) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['maskedColumns'],
+        message: 'validation.analyses.rls.mask.atLeastOne',
+      });
+    }
+  } else {
+    // row
+    if (!hasConditions && !hasLegacyPredicate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['conditions'],
+        message: 'validation.analyses.rls.conditions.atLeastOne',
+      });
+    }
+  }
+
+  if (!hasAssignments && !hasLegacySubject) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['assignments'],
+      message: 'validation.analyses.rls.assignments.atLeastOne',
+    });
+  }
+};
+
+export const addRlsRuleSchema = z
+  .object({
+    name: rlsRuleNameSchema,
+    description: analysisDescriptionSchema,
+    datasetId: idSchema('validation.analyses.rls.dataset.required'),
+    securityType: rlsSecurityTypeSchema,
+
+    // Array model (preferred).
+    conditions: z.array(rlsConditionSchema).optional().default([]),
+    assignments: z.array(rlsAssignmentSchema).optional().default([]),
+    maskedColumns: z.array(rlsMaskedColumnSchema).optional().default([]),
+
+    // Legacy flat single-predicate / single-subject (still accepted).
+    scope: z
+      .preprocess(
+        trimOrUndefined,
+        z.enum(RLS_SCOPE_VALUES, {
+          message: 'validation.analyses.rls.scope.invalid',
+        }),
+      )
+      .optional(),
+    scopeId: idSchema('validation.analyses.rls.scopeId.required').optional(),
+    columnName: rlsColumnNameSchema.optional(),
+    operator: z
+      .preprocess(
+        trimOrUndefined,
+        z.enum(RLS_OPERATOR_VALUES, {
+          message: 'validation.analyses.rls.operator.invalid',
+        }),
+      )
+      .optional()
+      .default('IN'),
+    values: z.array(z.any()).optional(),
     isEnabled: z.boolean().optional().default(true),
   })
+  .superRefine(refineRlsRule)
   .superRefine(refineRlsOperatorValues);
 export type AddRlsRuleInput = z.infer<typeof addRlsRuleSchema>;
 
@@ -440,6 +594,19 @@ export const updateRlsRuleSchema = z
     id: idSchema('validation.analyses.rls.id.required'),
     name: rlsRuleNameSchema.optional(),
     description: analysisDescriptionSchema,
+    securityType: z
+      .preprocess(
+        trimOrUndefined,
+        z.enum(RLS_SECURITY_TYPE_VALUES, {
+          message: 'validation.analyses.rls.securityType.invalid',
+        }),
+      )
+      .optional(),
+
+    conditions: z.array(rlsConditionSchema).optional(),
+    assignments: z.array(rlsAssignmentSchema).optional(),
+    maskedColumns: z.array(rlsMaskedColumnSchema).optional(),
+
     scope: z
       .preprocess(
         trimOrUndefined,
@@ -466,6 +633,7 @@ export const updateRlsRuleSchema = z
     justification: analysisJustificationSchema,
   })
   .superRefine(refineRlsOperatorValues);
+export type UpdateRlsRuleInput = z.infer<typeof updateRlsRuleSchema>;
 
 // ── Dashboard publish field schemas (used directly by FE form) ─────
 

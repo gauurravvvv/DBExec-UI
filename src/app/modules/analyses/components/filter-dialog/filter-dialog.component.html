@@ -84,6 +84,16 @@
             (onChangeEvent)="onFilterTypeChange()"
             icon="pi-th-large"
           ></app-custom-dropdown>
+          <!-- Detected-type hint (spec §7): tells the user which control
+               family the picked column's dataType maps to, and explains
+               the auto-selected filter type. -->
+          <small
+            class="filter-detected-type"
+            *ngIf="detectedTypeHintKey as hintKey"
+          >
+            <i class="pi pi-info-circle"></i>
+            {{ hintKey | translate }}
+          </small>
         </div>
         <div class="filter-dialog-field filter-dialog-field--required">
           <app-custom-dropdown

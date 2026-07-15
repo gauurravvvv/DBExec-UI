@@ -1,0 +1,124 @@
+<!-- One editor per valueType. Single-value vs range branch on [range]. -->
+<div class="typed-value" [class.is-range]="range">
+  <!-- ── SINGLE VALUE ─────────────────────────────────────────── -->
+  <ng-container *ngIf="!range">
+    <!-- number -->
+    <app-custom-number
+      *ngIf="valueType === 'number'"
+      [ngModel]="value"
+      [ngModelOptions]="{ standalone: true }"
+      [placeholder]="placeholder"
+      [numberDisabled]="disabled"
+      [showError]="showError"
+      [errorMessage]="errorMessage"
+      (onChangeEvent)="onSingleChange($event)"
+    ></app-custom-number>
+
+    <!-- date -->
+    <app-custom-calendar
+      *ngIf="valueType === 'date'"
+      [ngModel]="asDate(value)"
+      [ngModelOptions]="{ standalone: true }"
+      [placeholder]="placeholder"
+      [showTime]="true"
+      [showError]="showError"
+      [errorMessage]="errorMessage"
+      (onChangeEvent)="onSingleChange($event)"
+    ></app-custom-calendar>
+
+    <!-- string -->
+    <app-custom-dropdown
+      *ngIf="valueType === 'string'"
+      [ngModel]="value"
+      [ngModelOptions]="{ standalone: true }"
+      [options]="options"
+      optionLabel="label"
+      optionValue="value"
+      [placeholder]="placeholder"
+      [filter]="true"
+      filterBy="label"
+      [editable]="allowCustomString"
+      [showClear]="true"
+      [autoDisplayFirst]="false"
+      [disabled]="disabled"
+      [showError]="showError"
+      [errorMessage]="errorMessage"
+      (onChangeEvent)="onSingleChange($event)"
+    ></app-custom-dropdown>
+
+    <!-- boolean -->
+    <app-custom-toggle
+      *ngIf="valueType === 'boolean'"
+      [ngModel]="value"
+      [ngModelOptions]="{ standalone: true }"
+      [trueValue]="true"
+      [falseValue]="false"
+      [trueLabel]="'COMMON.TRUE' | translate"
+      [falseLabel]="'COMMON.FALSE' | translate"
+      (onChange)="onSingleChange($event.checked)"
+    ></app-custom-toggle>
+  </ng-container>
+
+  <!-- ── RANGE (numeric_range / between) ───────────────────────── -->
+  <ng-container *ngIf="range">
+    <div class="range-pair">
+      <!-- LOW -->
+      <ng-container [ngSwitch]="valueType">
+        <app-custom-number
+          *ngSwitchCase="'number'"
+          [ngModel]="rangeValue[0]"
+          [ngModelOptions]="{ standalone: true }"
+          [placeholder]="'COMMON.MIN' | translate"
+          [numberDisabled]="disabled"
+          (onChangeEvent)="onRangeChange(0, $event)"
+        ></app-custom-number>
+        <app-custom-calendar
+          *ngSwitchCase="'date'"
+          [ngModel]="asDate(rangeValue[0])"
+          [ngModelOptions]="{ standalone: true }"
+          [placeholder]="'COMMON.MIN' | translate"
+          [showTime]="true"
+          (onChangeEvent)="onRangeChange(0, $event)"
+        ></app-custom-calendar>
+        <app-custom-number
+          *ngSwitchDefault
+          [ngModel]="rangeValue[0]"
+          [ngModelOptions]="{ standalone: true }"
+          [placeholder]="'COMMON.MIN' | translate"
+          [numberDisabled]="disabled"
+          (onChangeEvent)="onRangeChange(0, $event)"
+        ></app-custom-number>
+      </ng-container>
+
+      <span class="range-sep">{{ 'COMMON.AND' | translate }}</span>
+
+      <!-- HIGH -->
+      <ng-container [ngSwitch]="valueType">
+        <app-custom-number
+          *ngSwitchCase="'number'"
+          [ngModel]="rangeValue[1]"
+          [ngModelOptions]="{ standalone: true }"
+          [placeholder]="'COMMON.MAX' | translate"
+          [numberDisabled]="disabled"
+          (onChangeEvent)="onRangeChange(1, $event)"
+        ></app-custom-number>
+        <app-custom-calendar
+          *ngSwitchCase="'date'"
+          [ngModel]="asDate(rangeValue[1])"
+          [ngModelOptions]="{ standalone: true }"
+          [placeholder]="'COMMON.MAX' | translate"
+          [showTime]="true"
+          (onChangeEvent)="onRangeChange(1, $event)"
+        ></app-custom-calendar>
+        <app-custom-number
+          *ngSwitchDefault
+          [ngModel]="rangeValue[1]"
+          [ngModelOptions]="{ standalone: true }"
+          [placeholder]="'COMMON.MAX' | translate"
+          [numberDisabled]="disabled"
+          (onChangeEvent)="onRangeChange(1, $event)"
+        ></app-custom-number>
+      </ng-container>
+    </div>
+  </ng-container>
+</div>

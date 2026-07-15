@@ -211,6 +211,23 @@ export interface Visual {
 
   /** Whether this visual encountered an error during data loading */
   error?: boolean;
+
+  // ─── Advanced interactions (spec §6) ────────────────────────────────
+
+  /**
+   * Cross-filter opt-in. When true, clicking a data point in this visual
+   * emits a filter that constrains the OTHER visuals on the same analysis.
+   * Off by default so charts stay static until the author opts in.
+   */
+  crossFilterEnabled?: boolean;
+
+  /**
+   * Ordered drill dimensions for this visual. When set (length > 0),
+   * clicking a category descends to the next dimension in the list and a
+   * breadcrumb lets the user ascend. Empty/undefined = no drill behaviour.
+   * Column keys reference dataset/analysis field `columnToUse` values.
+   */
+  drillDimensions?: string[];
 }
 
 /**
@@ -306,5 +323,7 @@ export function createVisual(id: string, config: any): Visual {
     timeColumn: null,
     chartData: [],
     config,
+    crossFilterEnabled: false,
+    drillDimensions: [],
   };
 }
