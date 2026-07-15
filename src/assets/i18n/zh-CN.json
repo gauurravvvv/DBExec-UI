@@ -1478,7 +1478,11 @@
       "NEW_TAB_NAME": "选项卡 {{n}}",
       "CONFIRM_DELETE": "删除此选项卡？",
       "CONFIRM_DELETE_MSG": "删除选项卡\"{{name}}\"？其视觉对象将移动到第一个剩余选项卡。",
-      "DELETE_REASSIGN_INFO": "此选项卡上的视觉对象将重新分配到第一个剩余选项卡。"
+      "DELETE_REASSIGN_INFO": "此选项卡上的视觉对象将重新分配到第一个剩余选项卡。",
+      "ADD_TAB_TYPE": "添加选项卡",
+      "TYPE_CHART": "图表",
+      "TYPE_TABLE": "表格",
+      "TYPE_KPI": "KPI"
     },
     "AGG": {
       "DIMENSION": "维度",
@@ -3994,5 +3998,38 @@
     "SHOW_ONLY": "仅显示收藏",
     "ADD": "添加到收藏",
     "REMOVE": "从收藏中移除"
+  },
+  "EXPLORER": {
+    "RAIL": {
+      "FOLDERS": "文件夹",
+      "TAGS": "标签"
+    },
+    "ROOT": "全部项目",
+    "NEW_FOLDER": "新建文件夹",
+    "LOCATION": "位置",
+    "MOVE_HERE": "移动到此处",
+    "COPY_HERE": "复制到此处",
+    "EMPTY_FOLDER": "此文件夹为空",
+    "EMPTY_TAG": "没有带此标签的项目",
+    "COL": {
+      "TAGS": "标签",
+      "UPDATED": "更新时间"
+    },
+    "KEBAB": {
+      "OPEN": "打开",
+      "EDIT": "编辑",
+      "RENAME": "重命名",
+      "MOVE": "移动到…",
+      "COPY": "复制到…",
+      "FAVOURITE": "添加到收藏",
+      "UNFAVOURITE": "从收藏移除",
+      "DELETE": "删除"
+    },
+    "TYPE": {
+      "DATASET": "数据集",
+      "ANALYSIS": "分析",
+      "DASHBOARD": "仪表板",
+      "ALERT": "告警"
+    }
   }
 }

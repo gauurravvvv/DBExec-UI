@@ -1478,7 +1478,11 @@
       "NEW_TAB_NAME": "Pestaña {{n}}",
       "CONFIRM_DELETE": "¿Eliminar esta pestaña?",
       "CONFIRM_DELETE_MSG": "¿Eliminar la pestaña «{{name}}»? Sus visualizaciones se moverán a la primera pestaña restante.",
-      "DELETE_REASSIGN_INFO": "Las visualizaciones de esta pestaña se reasignarán a la primera pestaña restante."
+      "DELETE_REASSIGN_INFO": "Las visualizaciones de esta pestaña se reasignarán a la primera pestaña restante.",
+      "ADD_TAB_TYPE": "Añadir una pestaña",
+      "TYPE_CHART": "Gráfico",
+      "TYPE_TABLE": "Tabla",
+      "TYPE_KPI": "KPI"
     },
     "AGG": {
       "DIMENSION": "Dimensión",
@@ -3994,5 +3998,38 @@
     "SHOW_ONLY": "Mostrar solo favoritos",
     "ADD": "Añadir a favoritos",
     "REMOVE": "Quitar de favoritos"
+  },
+  "EXPLORER": {
+    "RAIL": {
+      "FOLDERS": "Carpetas",
+      "TAGS": "Etiquetas"
+    },
+    "ROOT": "Todos los elementos",
+    "NEW_FOLDER": "Nueva carpeta",
+    "LOCATION": "Ubicación",
+    "MOVE_HERE": "Mover aquí",
+    "COPY_HERE": "Copiar aquí",
+    "EMPTY_FOLDER": "Esta carpeta está vacía",
+    "EMPTY_TAG": "No hay elementos con esta etiqueta",
+    "COL": {
+      "TAGS": "Etiquetas",
+      "UPDATED": "Actualizado"
+    },
+    "KEBAB": {
+      "OPEN": "Abrir",
+      "EDIT": "Editar",
+      "RENAME": "Renombrar",
+      "MOVE": "Mover a…",
+      "COPY": "Copiar a…",
+      "FAVOURITE": "Añadir a favoritos",
+      "UNFAVOURITE": "Quitar de favoritos",
+      "DELETE": "Eliminar"
+    },
+    "TYPE": {
+      "DATASET": "Conjunto de datos",
+      "ANALYSIS": "Análisis",
+      "DASHBOARD": "Panel",
+      "ALERT": "Alerta"
+    }
   }
 }

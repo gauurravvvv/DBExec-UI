@@ -1478,7 +1478,11 @@
       "NEW_TAB_NAME": "Scheda {{n}}",
       "CONFIRM_DELETE": "Eliminare questa scheda?",
       "CONFIRM_DELETE_MSG": "Eliminare la scheda \"{{name}}\"? Le sue visualizzazioni verranno spostate nella prima scheda rimanente.",
-      "DELETE_REASSIGN_INFO": "Le visualizzazioni di questa scheda verranno riassegnate alla prima scheda rimanente."
+      "DELETE_REASSIGN_INFO": "Le visualizzazioni di questa scheda verranno riassegnate alla prima scheda rimanente.",
+      "ADD_TAB_TYPE": "Aggiungi una scheda",
+      "TYPE_CHART": "Grafico",
+      "TYPE_TABLE": "Tabella",
+      "TYPE_KPI": "KPI"
     },
     "AGG": {
       "DIMENSION": "Dimensione",
@@ -3994,5 +3998,38 @@
     "SHOW_ONLY": "Mostra solo i preferiti",
     "ADD": "Aggiungi ai preferiti",
     "REMOVE": "Rimuovi dai preferiti"
+  },
+  "EXPLORER": {
+    "RAIL": {
+      "FOLDERS": "Cartelle",
+      "TAGS": "Tag"
+    },
+    "ROOT": "Tutti gli elementi",
+    "NEW_FOLDER": "Nuova cartella",
+    "LOCATION": "Posizione",
+    "MOVE_HERE": "Sposta qui",
+    "COPY_HERE": "Copia qui",
+    "EMPTY_FOLDER": "Questa cartella è vuota",
+    "EMPTY_TAG": "Nessun elemento con questo tag",
+    "COL": {
+      "TAGS": "Tag",
+      "UPDATED": "Aggiornato"
+    },
+    "KEBAB": {
+      "OPEN": "Apri",
+      "EDIT": "Modifica",
+      "RENAME": "Rinomina",
+      "MOVE": "Sposta in…",
+      "COPY": "Copia in…",
+      "FAVOURITE": "Aggiungi ai preferiti",
+      "UNFAVOURITE": "Rimuovi dai preferiti",
+      "DELETE": "Elimina"
+    },
+    "TYPE": {
+      "DATASET": "Set di dati",
+      "ANALYSIS": "Analisi",
+      "DASHBOARD": "Dashboard",
+      "ALERT": "Avviso"
+    }
   }
 }

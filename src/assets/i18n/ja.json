@@ -1478,7 +1478,11 @@
       "NEW_TAB_NAME": "タブ {{n}}",
       "CONFIRM_DELETE": "このタブを削除しますか？",
       "CONFIRM_DELETE_MSG": "タブ「{{name}}」を削除しますか？ ビジュアルは最初の残りのタブに移動されます。",
-      "DELETE_REASSIGN_INFO": "このタブのビジュアルは最初の残りのタブに再割り当てされます。"
+      "DELETE_REASSIGN_INFO": "このタブのビジュアルは最初の残りのタブに再割り当てされます。",
+      "ADD_TAB_TYPE": "タブを追加",
+      "TYPE_CHART": "グラフ",
+      "TYPE_TABLE": "テーブル",
+      "TYPE_KPI": "KPI"
     },
     "AGG": {
       "DIMENSION": "ディメンション",
@@ -3994,5 +3998,38 @@
     "SHOW_ONLY": "お気に入りのみ表示",
     "ADD": "お気に入りに追加",
     "REMOVE": "お気に入りから削除"
+  },
+  "EXPLORER": {
+    "RAIL": {
+      "FOLDERS": "フォルダー",
+      "TAGS": "タグ"
+    },
+    "ROOT": "すべての項目",
+    "NEW_FOLDER": "新しいフォルダー",
+    "LOCATION": "保存先",
+    "MOVE_HERE": "ここへ移動",
+    "COPY_HERE": "ここへコピー",
+    "EMPTY_FOLDER": "このフォルダーは空です",
+    "EMPTY_TAG": "このタグの項目はありません",
+    "COL": {
+      "TAGS": "タグ",
+      "UPDATED": "更新日"
+    },
+    "KEBAB": {
+      "OPEN": "開く",
+      "EDIT": "編集",
+      "RENAME": "名前を変更",
+      "MOVE": "移動先…",
+      "COPY": "コピー先…",
+      "FAVOURITE": "お気に入りに追加",
+      "UNFAVOURITE": "お気に入りから削除",
+      "DELETE": "削除"
+    },
+    "TYPE": {
+      "DATASET": "データセット",
+      "ANALYSIS": "分析",
+      "DASHBOARD": "ダッシュボード",
+      "ALERT": "アラート"
+    }
   }
 }

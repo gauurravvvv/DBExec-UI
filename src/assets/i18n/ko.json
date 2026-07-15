@@ -1478,7 +1478,11 @@
       "NEW_TAB_NAME": "탭 {{n}}",
       "CONFIRM_DELETE": "이 탭을 삭제하시겠습니까?",
       "CONFIRM_DELETE_MSG": "\"{{name}}\" 탭을 삭제하시겠습니까? 시각화는 남은 첫 번째 탭으로 이동합니다.",
-      "DELETE_REASSIGN_INFO": "이 탭의 시각화는 남은 첫 번째 탭으로 재할당됩니다."
+      "DELETE_REASSIGN_INFO": "이 탭의 시각화는 남은 첫 번째 탭으로 재할당됩니다.",
+      "ADD_TAB_TYPE": "탭 추가",
+      "TYPE_CHART": "차트",
+      "TYPE_TABLE": "테이블",
+      "TYPE_KPI": "KPI"
     },
     "AGG": {
       "DIMENSION": "차원",
@@ -3994,5 +3998,38 @@
     "SHOW_ONLY": "즐겨찾기만 표시",
     "ADD": "즐겨찾기에 추가",
     "REMOVE": "즐겨찾기에서 제거"
+  },
+  "EXPLORER": {
+    "RAIL": {
+      "FOLDERS": "폴더",
+      "TAGS": "태그"
+    },
+    "ROOT": "모든 항목",
+    "NEW_FOLDER": "새 폴더",
+    "LOCATION": "위치",
+    "MOVE_HERE": "여기로 이동",
+    "COPY_HERE": "여기로 복사",
+    "EMPTY_FOLDER": "이 폴더는 비어 있습니다",
+    "EMPTY_TAG": "이 태그의 항목이 없습니다",
+    "COL": {
+      "TAGS": "태그",
+      "UPDATED": "업데이트됨"
+    },
+    "KEBAB": {
+      "OPEN": "열기",
+      "EDIT": "편집",
+      "RENAME": "이름 바꾸기",
+      "MOVE": "이동…",
+      "COPY": "복사…",
+      "FAVOURITE": "즐겨찾기에 추가",
+      "UNFAVOURITE": "즐겨찾기에서 제거",
+      "DELETE": "삭제"
+    },
+    "TYPE": {
+      "DATASET": "데이터셋",
+      "ANALYSIS": "분석",
+      "DASHBOARD": "대시보드",
+      "ALERT": "알림"
+    }
   }
 }

@@ -1478,7 +1478,11 @@
       "NEW_TAB_NAME": "Onglet {{n}}",
       "CONFIRM_DELETE": "Supprimer cet onglet ?",
       "CONFIRM_DELETE_MSG": "Supprimer l'onglet « {{name}} » ? Ses visuels sont déplacés vers le premier onglet restant.",
-      "DELETE_REASSIGN_INFO": "Les visuels de cet onglet sont réaffectés au premier onglet restant."
+      "DELETE_REASSIGN_INFO": "Les visuels de cet onglet sont réaffectés au premier onglet restant.",
+      "ADD_TAB_TYPE": "Ajouter un onglet",
+      "TYPE_CHART": "Graphique",
+      "TYPE_TABLE": "Tableau",
+      "TYPE_KPI": "KPI"
     },
     "AGG": {
       "DIMENSION": "Dimension",
@@ -3994,5 +3998,38 @@
     "SHOW_ONLY": "Afficher uniquement les favoris",
     "ADD": "Ajouter aux favoris",
     "REMOVE": "Retirer des favoris"
+  },
+  "EXPLORER": {
+    "RAIL": {
+      "FOLDERS": "Dossiers",
+      "TAGS": "Étiquettes"
+    },
+    "ROOT": "Tous les éléments",
+    "NEW_FOLDER": "Nouveau dossier",
+    "LOCATION": "Emplacement",
+    "MOVE_HERE": "Déplacer ici",
+    "COPY_HERE": "Copier ici",
+    "EMPTY_FOLDER": "Ce dossier est vide",
+    "EMPTY_TAG": "Aucun élément avec cette étiquette",
+    "COL": {
+      "TAGS": "Étiquettes",
+      "UPDATED": "Mis à jour"
+    },
+    "KEBAB": {
+      "OPEN": "Ouvrir",
+      "EDIT": "Modifier",
+      "RENAME": "Renommer",
+      "MOVE": "Déplacer vers…",
+      "COPY": "Copier vers…",
+      "FAVOURITE": "Ajouter aux favoris",
+      "UNFAVOURITE": "Retirer des favoris",
+      "DELETE": "Supprimer"
+    },
+    "TYPE": {
+      "DATASET": "Jeu de données",
+      "ANALYSIS": "Analyse",
+      "DASHBOARD": "Tableau de bord",
+      "ALERT": "Alerte"
+    }
   }
 }

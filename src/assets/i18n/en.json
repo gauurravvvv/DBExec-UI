@@ -1481,7 +1481,11 @@
       "NEW_TAB_NAME": "Tab {{n}}",
       "CONFIRM_DELETE": "Delete this tab?",
       "CONFIRM_DELETE_MSG": "Delete the tab \"{{name}}\"? Its visuals move to the first remaining tab.",
-      "DELETE_REASSIGN_INFO": "Visuals on this tab will be reassigned to the first remaining tab."
+      "DELETE_REASSIGN_INFO": "Visuals on this tab will be reassigned to the first remaining tab.",
+      "ADD_TAB_TYPE": "Add a tab",
+      "TYPE_CHART": "Chart",
+      "TYPE_TABLE": "Table",
+      "TYPE_KPI": "KPI"
     },
     "AGG": {
       "DIMENSION": "Dimension",
@@ -3991,5 +3995,38 @@
     "SHOW_ONLY": "Show favourites only",
     "ADD": "Add to favourites",
     "REMOVE": "Remove from favourites"
+  },
+  "EXPLORER": {
+    "RAIL": {
+      "FOLDERS": "Folders",
+      "TAGS": "Tags"
+    },
+    "ROOT": "All items",
+    "NEW_FOLDER": "New folder",
+    "LOCATION": "Location",
+    "MOVE_HERE": "Move here",
+    "COPY_HERE": "Copy here",
+    "EMPTY_FOLDER": "This folder is empty",
+    "EMPTY_TAG": "No items with this tag",
+    "COL": {
+      "TAGS": "Tags",
+      "UPDATED": "Updated"
+    },
+    "KEBAB": {
+      "OPEN": "Open",
+      "EDIT": "Edit",
+      "RENAME": "Rename",
+      "MOVE": "Move to…",
+      "COPY": "Copy to…",
+      "FAVOURITE": "Add to favourites",
+      "UNFAVOURITE": "Remove from favourites",
+      "DELETE": "Delete"
+    },
+    "TYPE": {
+      "DATASET": "Dataset",
+      "ANALYSIS": "Analysis",
+      "DASHBOARD": "Dashboard",
+      "ALERT": "Alert"
+    }
   }
 }

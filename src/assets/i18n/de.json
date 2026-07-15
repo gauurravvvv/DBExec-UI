@@ -1478,7 +1478,11 @@
       "NEW_TAB_NAME": "Registerkarte {{n}}",
       "CONFIRM_DELETE": "Diese Registerkarte löschen?",
       "CONFIRM_DELETE_MSG": "Registerkarte „{{name}}\" löschen? Ihre Visualisierungen werden auf die erste verbleibende Registerkarte verschoben.",
-      "DELETE_REASSIGN_INFO": "Visualisierungen auf dieser Registerkarte werden der ersten verbleibenden Registerkarte neu zugewiesen."
+      "DELETE_REASSIGN_INFO": "Visualisierungen auf dieser Registerkarte werden der ersten verbleibenden Registerkarte neu zugewiesen.",
+      "ADD_TAB_TYPE": "Registerkarte hinzufügen",
+      "TYPE_CHART": "Diagramm",
+      "TYPE_TABLE": "Tabelle",
+      "TYPE_KPI": "KPI"
     },
     "AGG": {
       "DIMENSION": "Dimension",
@@ -3994,5 +3998,38 @@
     "SHOW_ONLY": "Nur Favoriten anzeigen",
     "ADD": "Zu Favoriten hinzufügen",
     "REMOVE": "Aus Favoriten entfernen"
+  },
+  "EXPLORER": {
+    "RAIL": {
+      "FOLDERS": "Ordner",
+      "TAGS": "Tags"
+    },
+    "ROOT": "Alle Elemente",
+    "NEW_FOLDER": "Neuer Ordner",
+    "LOCATION": "Speicherort",
+    "MOVE_HERE": "Hierher verschieben",
+    "COPY_HERE": "Hierher kopieren",
+    "EMPTY_FOLDER": "Dieser Ordner ist leer",
+    "EMPTY_TAG": "Keine Elemente mit diesem Tag",
+    "COL": {
+      "TAGS": "Tags",
+      "UPDATED": "Aktualisiert"
+    },
+    "KEBAB": {
+      "OPEN": "Öffnen",
+      "EDIT": "Bearbeiten",
+      "RENAME": "Umbenennen",
+      "MOVE": "Verschieben nach…",
+      "COPY": "Kopieren nach…",
+      "FAVOURITE": "Zu Favoriten hinzufügen",
+      "UNFAVOURITE": "Aus Favoriten entfernen",
+      "DELETE": "Löschen"
+    },
+    "TYPE": {
+      "DATASET": "Datensatz",
+      "ANALYSIS": "Analyse",
+      "DASHBOARD": "Dashboard",
+      "ALERT": "Warnung"
+    }
   }
 }

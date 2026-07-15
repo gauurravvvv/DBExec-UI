@@ -1478,7 +1478,11 @@
       "NEW_TAB_NAME": "Aba {{n}}",
       "CONFIRM_DELETE": "Excluir esta aba?",
       "CONFIRM_DELETE_MSG": "Excluir a aba \"{{name}}\"? Seus visuais serão movidos para a primeira aba restante.",
-      "DELETE_REASSIGN_INFO": "Os visuais desta aba serão reatribuídos à primeira aba restante."
+      "DELETE_REASSIGN_INFO": "Os visuais desta aba serão reatribuídos à primeira aba restante.",
+      "ADD_TAB_TYPE": "Adicionar uma aba",
+      "TYPE_CHART": "Gráfico",
+      "TYPE_TABLE": "Tabela",
+      "TYPE_KPI": "KPI"
     },
     "AGG": {
       "DIMENSION": "Dimensão",
@@ -3994,5 +3998,38 @@
     "SHOW_ONLY": "Mostrar apenas favoritos",
     "ADD": "Adicionar aos favoritos",
     "REMOVE": "Remover dos favoritos"
+  },
+  "EXPLORER": {
+    "RAIL": {
+      "FOLDERS": "Pastas",
+      "TAGS": "Tags"
+    },
+    "ROOT": "Todos os itens",
+    "NEW_FOLDER": "Nova pasta",
+    "LOCATION": "Local",
+    "MOVE_HERE": "Mover para cá",
+    "COPY_HERE": "Copiar para cá",
+    "EMPTY_FOLDER": "Esta pasta está vazia",
+    "EMPTY_TAG": "Nenhum item com esta tag",
+    "COL": {
+      "TAGS": "Tags",
+      "UPDATED": "Atualizado"
+    },
+    "KEBAB": {
+      "OPEN": "Abrir",
+      "EDIT": "Editar",
+      "RENAME": "Renomear",
+      "MOVE": "Mover para…",
+      "COPY": "Copiar para…",
+      "FAVOURITE": "Adicionar aos favoritos",
+      "UNFAVOURITE": "Remover dos favoritos",
+      "DELETE": "Excluir"
+    },
+    "TYPE": {
+      "DATASET": "Conjunto de dados",
+      "ANALYSIS": "Análise",
+      "DASHBOARD": "Painel",
+      "ALERT": "Alerta"
+    }
   }
 }

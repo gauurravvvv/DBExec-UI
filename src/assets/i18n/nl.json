@@ -1478,7 +1478,11 @@
       "NEW_TAB_NAME": "Tabblad {{n}}",
       "CONFIRM_DELETE": "Dit tabblad verwijderen?",
       "CONFIRM_DELETE_MSG": "Tabblad \"{{name}}\" verwijderen? De visuals worden verplaatst naar het eerste resterende tabblad.",
-      "DELETE_REASSIGN_INFO": "Visuals op dit tabblad worden opnieuw toegewezen aan het eerste resterende tabblad."
+      "DELETE_REASSIGN_INFO": "Visuals op dit tabblad worden opnieuw toegewezen aan het eerste resterende tabblad.",
+      "ADD_TAB_TYPE": "Een tabblad toevoegen",
+      "TYPE_CHART": "Grafiek",
+      "TYPE_TABLE": "Tabel",
+      "TYPE_KPI": "KPI"
     },
     "AGG": {
       "DIMENSION": "Dimensie",
@@ -3994,5 +3998,38 @@
     "SHOW_ONLY": "Alleen favorieten tonen",
     "ADD": "Aan favorieten toevoegen",
     "REMOVE": "Uit favorieten verwijderen"
+  },
+  "EXPLORER": {
+    "RAIL": {
+      "FOLDERS": "Mappen",
+      "TAGS": "Tags"
+    },
+    "ROOT": "Alle items",
+    "NEW_FOLDER": "Nieuwe map",
+    "LOCATION": "Locatie",
+    "MOVE_HERE": "Hierheen verplaatsen",
+    "COPY_HERE": "Hierheen kopiëren",
+    "EMPTY_FOLDER": "Deze map is leeg",
+    "EMPTY_TAG": "Geen items met deze tag",
+    "COL": {
+      "TAGS": "Tags",
+      "UPDATED": "Bijgewerkt"
+    },
+    "KEBAB": {
+      "OPEN": "Openen",
+      "EDIT": "Bewerken",
+      "RENAME": "Naam wijzigen",
+      "MOVE": "Verplaatsen naar…",
+      "COPY": "Kopiëren naar…",
+      "FAVOURITE": "Aan favorieten toevoegen",
+      "UNFAVOURITE": "Uit favorieten verwijderen",
+      "DELETE": "Verwijderen"
+    },
+    "TYPE": {
+      "DATASET": "Dataset",
+      "ANALYSIS": "Analyse",
+      "DASHBOARD": "Dashboard",
+      "ALERT": "Waarschuwing"
+    }
   }
 }
