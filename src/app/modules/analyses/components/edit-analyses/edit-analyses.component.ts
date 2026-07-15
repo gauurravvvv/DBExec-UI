@@ -1755,15 +1755,70 @@ export class EditAnalysesComponent
     this.cdr.markForCheck();
   }
 
-  /** Create a new tab and switch to it. */
-  addTab(): void {
+  /* ── quick tab-add control (type + name, chip-styled) ─────────────── */
+
+  /**
+   * Tab "types" offered in the quick-add control. A type is a semantic preset
+   * that maps to the tab's `icon` (the analysis_tab entity has no `type`
+   * column — icon carries the intent), so no schema change is needed. The FE
+   * shows these as icon chips + an i18n label.
+   */
+  readonly tabTypePresets: { type: string; icon: string; labelKey: string }[] =
+    [
+      { type: 'chart', icon: 'pi pi-chart-bar', labelKey: 'ANALYSES.TABS.TYPE_CHART' },
+      { type: 'table', icon: 'pi pi-table', labelKey: 'ANALYSES.TABS.TYPE_TABLE' },
+      { type: 'kpi', icon: 'pi pi-hashtag', labelKey: 'ANALYSES.TABS.TYPE_KPI' },
+    ];
+
+  /** Quick-add popover state. */
+  newTabType = 'chart';
+  newTabName = '';
+
+  /** Reset the quick-add form when its popover opens. */
+  onOpenAddTab(): void {
+    this.newTabType = 'chart';
+    this.newTabName = '';
+  }
+
+  /** Icon for the currently-selected quick-add type. */
+  private iconForType(type: string): string {
+    return (
+      this.tabTypePresets.find(p => p.type === type)?.icon ?? 'pi pi-chart-bar'
+    );
+  }
+
+  /**
+   * Add a tab from the quick-add control: a chosen type (→ icon) + an optional
+   * name (defaults to the "Tab N" name). Switches to the new tab.
+   */
+  addTabTyped(op?: { hide: () => void }): void {
+    if (this.isTabBusy || !this.analysisId) return;
+    const name =
+      this.newTabName.trim() ||
+      this.translate.instant('ANALYSES.TABS.NEW_TAB_NAME', {
+        n: this.tabs.length + 1,
+      });
+    this.addTab(name, this.iconForType(this.newTabType));
+    op?.hide();
+  }
+
+  /** Create a new tab and switch to it. Optional name + icon (from quick-add);
+   *  falls back to a generated "Tab N" name when none is supplied. */
+  addTab(name?: string, icon?: string | null): void {
     if (this.isTabBusy || !this.analysisId) return;
     this.isTabBusy = true;
-    const name = this.translate.instant('ANALYSES.TABS.NEW_TAB_NAME', {
-      n: this.tabs.length + 1,
-    });
+    const tabName =
+      name?.trim() ||
+      this.translate.instant('ANALYSES.TABS.NEW_TAB_NAME', {
+        n: this.tabs.length + 1,
+      });
     this.analysisTabsService
-      .add({ analysisId: this.analysisId, name, sequence: this.tabs.length })
+      .add({
+        analysisId: this.analysisId,
+        name: tabName,
+        icon: icon ?? null,
+        sequence: this.tabs.length,
+      })
       .then((response: any) => {
         if (this.globalService.handleSuccessService(response, true)) {
           const tab: AnalysisTab = response.data?.tab ?? response.data;

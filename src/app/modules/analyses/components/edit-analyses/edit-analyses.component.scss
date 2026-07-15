@@ -4673,6 +4673,103 @@
   }
 }
 
+/* ─── Quick add-tab control (type chips + name) ─────────────────────── */
+.add-tab-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 260px;
+  padding: var(--space-1);
+
+  .add-tab-label {
+    font-size: var(--fs-label);
+    font-weight: var(--fw-semibold, 600);
+    color: var(--text-color);
+  }
+
+  .add-tab-types {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .add-tab-type-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-color-secondary, var(--text-muted));
+    font-size: var(--fs-label);
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--motion-fast) ease;
+
+    i {
+      font-size: 0.9rem;
+    }
+
+    &:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    &.active {
+      border-color: var(--primary-color);
+      background: var(--primary-color-transparent, rgba(0, 120, 211, 0.12));
+      color: var(--primary-color);
+      font-weight: var(--fw-medium);
+    }
+  }
+
+  .add-tab-name {
+    width: 100%;
+    height: 36px;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xs);
+    background: var(--input-background, var(--card-background));
+    color: var(--text-color);
+    font-size: var(--fs-body, 0.9rem);
+    font-family: inherit;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+  }
+
+  .add-tab-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .add-tab-btn.primary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border: none;
+    border-radius: var(--radius-xs);
+    background: var(--primary-color);
+    color: #fff;
+    font-size: var(--fs-label);
+    font-weight: var(--fw-medium);
+    cursor: pointer;
+    transition: filter var(--motion-fast) ease;
+
+    &:hover:not(:disabled) {
+      filter: brightness(1.05);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
 /* ─── Move-visual-to-tab overlay menu ───────────────────────────────── */
 .move-tab-menu {
   position: absolute;

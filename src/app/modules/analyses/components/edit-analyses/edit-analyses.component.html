@@ -711,13 +711,53 @@
         <button
           type="button"
           class="analysis-tab-add"
-          (click)="addTab()"
+          (click)="onOpenAddTab(); addTabOp.toggle($event)"
           [disabled]="isTabBusy"
           [pTooltip]="'ANALYSES.TABS.ADD' | translate"
           tooltipPosition="bottom"
         >
           <i class="pi pi-plus"></i>
         </button>
+
+        <!-- Quick add-tab control: pick a type (→ icon) + name, chip-styled. -->
+        <p-overlayPanel #addTabOp appendTo="body" styleClass="add-tab-panel">
+          <div class="add-tab-form">
+            <div class="add-tab-label">
+              {{ 'ANALYSES.TABS.ADD_TAB_TYPE' | translate }}
+            </div>
+            <div class="add-tab-types">
+              <button
+                type="button"
+                class="add-tab-type-chip"
+                *ngFor="let preset of tabTypePresets"
+                [class.active]="newTabType === preset.type"
+                (click)="newTabType = preset.type"
+              >
+                <i [class]="preset.icon"></i>
+                <span>{{ preset.labelKey | translate }}</span>
+              </button>
+            </div>
+            <input
+              type="text"
+              class="add-tab-name"
+              [(ngModel)]="newTabName"
+              (keydown.enter)="addTabTyped(addTabOp)"
+              [placeholder]="'ANALYSES.TABS.NEW_TAB_NAME' | translate: { n: tabs.length + 1 }"
+              autocomplete="off"
+            />
+            <div class="add-tab-actions">
+              <button
+                type="button"
+                class="add-tab-btn primary"
+                [disabled]="isTabBusy"
+                (click)="addTabTyped(addTabOp)"
+              >
+                <i class="pi pi-plus"></i>
+                {{ 'ANALYSES.TABS.ADD' | translate }}
+              </button>
+            </div>
+          </div>
+        </p-overlayPanel>
         <span class="analysis-tab-spacer"></span>
         <button
           type="button"
