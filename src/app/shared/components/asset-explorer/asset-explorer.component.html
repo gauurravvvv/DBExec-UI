@@ -1,0 +1,312 @@
+<div class="explorer">
+  <!-- ── LEFT RAIL ─────────────────────────────────────────────── -->
+  <aside class="explorer-rail">
+    <!-- Segmented Folders | Tags toggle -->
+    <div class="rail-seg">
+      <button
+        type="button"
+        class="rail-seg-btn"
+        [class.active]="railMode === 'folders'"
+        (click)="setRailMode('folders')"
+      >
+        <i class="pi pi-folder"></i>
+        {{ 'EXPLORER.RAIL.FOLDERS' | translate }}
+      </button>
+      <button
+        type="button"
+        class="rail-seg-btn"
+        [class.active]="railMode === 'tags'"
+        (click)="setRailMode('tags')"
+      >
+        <i class="pi pi-tags"></i>
+        {{ 'EXPLORER.RAIL.TAGS' | translate }}
+      </button>
+    </div>
+
+    <!-- Folders mode -->
+    <div class="rail-body" *ngIf="railMode === 'folders'">
+      <button
+        type="button"
+        class="rail-root-row"
+        [class.active]="!selectedFolderId && !selectedTag"
+        (click)="selectRootFolder()"
+      >
+        <i class="pi pi-inbox"></i>
+        <span>{{ 'EXPLORER.ROOT' | translate }}</span>
+      </button>
+
+      <div class="rail-loading" *ngIf="foldersLoading">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>{{ 'COMMON.LOADING' | translate }}</span>
+      </div>
+
+      <p-tree
+        *ngIf="!foldersLoading"
+        [value]="folderNodes"
+        selectionMode="single"
+        [(selection)]="folderSelection"
+        [draggableNodes]="false"
+        [droppableNodes]="false"
+        (onNodeSelect)="onFolderNodeSelect($event)"
+        styleClass="rail-p-tree"
+        [emptyMessage]="'EXPLORER.EMPTY_FOLDER' | translate"
+      >
+        <ng-template let-node pTemplate="default">
+          <span class="rail-node-label" [title]="node.label">{{ node.label }}</span>
+        </ng-template>
+      </p-tree>
+
+      <!-- New folder affordance -->
+      <div class="rail-create" *ngIf="canManage">
+        <button
+          type="button"
+          class="rail-create-toggle"
+          *ngIf="!showRailCreate"
+          (click)="openRailCreate()"
+        >
+          <i class="pi pi-plus"></i>
+          <span>{{ 'EXPLORER.NEW_FOLDER' | translate }}</span>
+        </button>
+
+        <div class="rail-create-row" *ngIf="showRailCreate">
+          <input
+            type="text"
+            class="rail-create-input"
+            [(ngModel)]="railNewFolderName"
+            [placeholder]="'EXPLORER.NEW_FOLDER' | translate"
+            maxlength="120"
+            (keydown.enter)="saveRailFolder()"
+            (keydown.escape)="cancelRailCreate()"
+            autocomplete="off"
+          />
+          <button
+            type="button"
+            class="rail-create-save"
+            (click)="saveRailFolder()"
+            [disabled]="!railNewFolderName.trim() || savingRailFolder"
+          >
+            <i class="pi" [ngClass]="savingRailFolder ? 'pi-spin pi-spinner' : 'pi-check'"></i>
+          </button>
+          <button type="button" class="rail-create-cancel" (click)="cancelRailCreate()">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tags mode -->
+    <div class="rail-body" *ngIf="railMode === 'tags'">
+      <div class="rail-loading" *ngIf="tagsLoading">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>{{ 'COMMON.LOADING' | translate }}</span>
+      </div>
+
+      <div class="rail-tag-list" *ngIf="!tagsLoading">
+        <button
+          *ngFor="let t of tags"
+          type="button"
+          class="rail-tag-chip"
+          [class.active]="selectedTag === t.tag"
+          (click)="selectTag(t.tag)"
+        >
+          <i class="pi pi-tag"></i>
+          <span class="rail-tag-name" [title]="t.tag">{{ t.tag }}</span>
+          <span class="rail-tag-count">{{ t.count }}</span>
+        </button>
+
+        <div class="rail-empty" *ngIf="tags.length === 0">
+          <i class="pi pi-tags"></i>
+          <span>{{ 'EXPLORER.EMPTY_TAG' | translate }}</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── BODY ──────────────────────────────────────────────────── -->
+  <section class="explorer-body">
+    <!-- Breadcrumb -->
+    <div class="explorer-breadcrumb">
+      <i class="pi" [ngClass]="selectedTag ? 'pi-tag' : 'pi-folder-open'"></i>
+      <span class="crumb-text">
+        {{ breadcrumb || ('EXPLORER.ROOT' | translate) }}
+      </span>
+    </div>
+
+    <div class="explorer-table-wrap">
+      <app-custom-table
+        [columns]="columns"
+        [serverAdapter]="serverAdapter"
+        [config]="tableConfig"
+        [baseFilter]="tableBaseFilter"
+        [hasProjectedEmpty]="true"
+      >
+        <div tableEmpty class="explorer-empty-body">
+          <i class="pi pi-inbox"></i>
+          <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
+        </div>
+
+        <!-- Name: type icon + bold clickable name -->
+        <ng-template usGridCell="name" let-row>
+          <button type="button" class="asset-name" (click)="open.emit(row)">
+            <i class="asset-type-icon" [ngClass]="typeIcon"></i>
+            <span class="asset-name-text" [title]="row.name">{{ row.name }}</span>
+          </button>
+        </ng-template>
+
+        <!-- Tags chips -->
+        <ng-template usGridCell="tags" let-row>
+          <span class="tag-cell">
+            <span class="tag-pill" *ngFor="let tg of rowTags(row)">{{ tg }}</span>
+            <span class="tag-none" *ngIf="rowTags(row).length === 0">—</span>
+          </span>
+        </ng-template>
+
+        <!-- Updated timestamp -->
+        <ng-template usGridCell="updated" let-row>
+          <span
+            class="date-text"
+            [pTooltip]="((row.updatedOn || row.createdOn) | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+            tooltipPosition="top"
+          >
+            {{ (row.updatedOn || row.createdOn | date: 'dd MMM yyyy') || '—' }}
+          </span>
+        </ng-template>
+
+        <!-- Favourite star -->
+        <ng-template usGridCell="favourite" let-row>
+          <button
+            type="button"
+            class="fav-star-btn"
+            [class.on]="isFavourite(row.id)"
+            (click)="toggleFavourite(row)"
+            [pTooltip]="(isFavourite(row.id) ? 'FAVOURITE.REMOVE' : 'FAVOURITE.ADD') | translate"
+            tooltipPosition="bottom"
+          >
+            <i class="pi" [ngClass]="isFavourite(row.id) ? 'pi-star-fill' : 'pi-star'"></i>
+          </button>
+        </ng-template>
+
+        <!-- Kebab -->
+        <ng-template usGridCell="kebab" let-row>
+          <button
+            type="button"
+            class="kebab-btn"
+            (click)="openKebab($event, row)"
+            [pTooltip]="'COMMON.MORE' | translate"
+            tooltipPosition="bottom"
+          >
+            <i class="pi pi-ellipsis-v"></i>
+          </button>
+        </ng-template>
+      </app-custom-table>
+    </div>
+  </section>
+</div>
+
+<!-- Single kebab menu, rebuilt per clicked row. Item labels are pre-translated
+     when the model is built (buildKebabItems). -->
+<p-menu
+  #kebabMenu
+  [popup]="true"
+  appendTo="body"
+  [model]="kebabItems"
+  styleClass="explorer-kebab-menu"
+></p-menu>
+
+<!-- ONE move/copy overlay: mini folder tree + New folder + primary button. -->
+<p-overlayPanel #moveOp appendTo="body" styleClass="explorer-move-panel">
+  <div class="move-panel">
+    <div class="move-title">
+      {{ (moveIsCopy ? 'EXPLORER.KEBAB.COPY' : 'EXPLORER.KEBAB.MOVE') | translate }}
+    </div>
+
+    <button
+      type="button"
+      class="move-root-row"
+      [class.active]="!moveTargetFolderId"
+      (click)="selectMoveRoot()"
+    >
+      <i class="pi pi-inbox"></i>
+      <span>{{ 'EXPLORER.ROOT' | translate }}</span>
+    </button>
+
+    <div class="rail-loading" *ngIf="moveLoading">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>{{ 'COMMON.LOADING' | translate }}</span>
+    </div>
+
+    <p-tree
+      *ngIf="!moveLoading"
+      [value]="moveNodes"
+      selectionMode="single"
+      [(selection)]="moveSelection"
+      [draggableNodes]="false"
+      [droppableNodes]="false"
+      (onNodeSelect)="onMoveNodeSelect($event)"
+      styleClass="rail-p-tree"
+      [emptyMessage]="'EXPLORER.EMPTY_FOLDER' | translate"
+    >
+      <ng-template let-node pTemplate="default">
+        <span class="rail-node-label" [title]="node.label">{{ node.label }}</span>
+      </ng-template>
+    </p-tree>
+
+    <div class="move-create">
+      <button
+        type="button"
+        class="rail-create-toggle"
+        *ngIf="!showMoveCreate"
+        (click)="openMoveCreate()"
+      >
+        <i class="pi pi-plus"></i>
+        <span>{{ 'EXPLORER.NEW_FOLDER' | translate }}</span>
+      </button>
+
+      <div class="rail-create-row" *ngIf="showMoveCreate">
+        <input
+          type="text"
+          class="rail-create-input"
+          [(ngModel)]="moveNewFolderName"
+          [placeholder]="'EXPLORER.NEW_FOLDER' | translate"
+          maxlength="120"
+          (keydown.enter)="saveMoveFolder()"
+          (keydown.escape)="cancelMoveCreate()"
+          autocomplete="off"
+        />
+        <button
+          type="button"
+          class="rail-create-save"
+          (click)="saveMoveFolder()"
+          [disabled]="!moveNewFolderName.trim() || savingMoveFolder"
+        >
+          <i class="pi" [ngClass]="savingMoveFolder ? 'pi-spin pi-spinner' : 'pi-check'"></i>
+        </button>
+        <button type="button" class="rail-create-cancel" (click)="cancelMoveCreate()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="move-actions">
+      <button
+        type="button"
+        class="move-primary"
+        *ngIf="!moveIsCopy"
+        (click)="confirmMove()"
+        [disabled]="moving"
+      >
+        <i class="pi" [ngClass]="moving ? 'pi-spin pi-spinner' : 'pi-folder'"></i>
+        {{ 'EXPLORER.MOVE_HERE' | translate }}
+      </button>
+      <button
+        type="button"
+        class="move-primary"
+        *ngIf="moveIsCopy"
+        (click)="confirmCopy()"
+      >
+        <i class="pi pi-copy"></i>
+        {{ 'EXPLORER.COPY_HERE' | translate }}
+      </button>
+    </div>
+  </div>
+</p-overlayPanel>

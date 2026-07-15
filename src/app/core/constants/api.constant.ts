@@ -538,6 +538,8 @@ export const FOLDER = {
   CREATE: '/folders',
   // GET  /folders/tree?objectType=    listFolderTree  (the whole tree for one family)
   TREE: '/folders/tree',
+  // GET  /folders/tags?objectType=    listAssetTags   (tag facet {tag,count} for the Tags rail)
+  TAGS: '/folders/tags',
   // PUT  /folders/:folderId/rename    renameFolder    (body: name)
   RENAME_PREFIX: '/folders/',
   RENAME_SUFFIX: '/rename',

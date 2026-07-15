@@ -1,0 +1,99 @@
+<div class="loc-field" [class.disabled]="disabled">
+  <label class="loc-label" *ngIf="label">{{ label | translate }}</label>
+
+  <!-- Read-only trigger: shows the resolved folder path or the Root label. -->
+  <button
+    type="button"
+    class="loc-trigger"
+    [class.is-placeholder]="!pathLabel"
+    (click)="toggle($event)"
+    [disabled]="disabled"
+  >
+    <i class="pi pi-folder loc-trigger-icon"></i>
+    <span class="loc-trigger-text">
+      {{ pathLabel || ('EXPLORER.ROOT' | translate) }}
+    </span>
+    <i class="pi pi-chevron-down loc-trigger-caret"></i>
+  </button>
+</div>
+
+<!-- Folder picker overlay -->
+<p-overlayPanel #op appendTo="body" styleClass="loc-overlay-panel">
+  <div class="loc-panel">
+    <!-- Root / no-folder option -->
+    <button
+      type="button"
+      class="loc-root-row"
+      [class.active]="!folderId"
+      (click)="selectRoot()"
+    >
+      <i class="pi pi-inbox"></i>
+      <span>{{ 'EXPLORER.ROOT' | translate }}</span>
+    </button>
+
+    <div class="loc-loading" *ngIf="loading">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>{{ 'COMMON.LOADING' | translate }}</span>
+    </div>
+
+    <p-tree
+      *ngIf="!loading"
+      [value]="nodes"
+      selectionMode="single"
+      [(selection)]="selection"
+      [draggableNodes]="false"
+      [droppableNodes]="false"
+      (onNodeSelect)="onNodeSelect($event)"
+      styleClass="loc-p-tree"
+      [emptyMessage]="'EXPLORER.EMPTY_FOLDER' | translate"
+    >
+      <ng-template let-node pTemplate="default">
+        <span class="loc-node-label" [title]="node.label">{{ node.label }}</span>
+      </ng-template>
+    </p-tree>
+
+    <!-- Inline new-folder affordance -->
+    <div class="loc-create">
+      <button
+        type="button"
+        class="loc-create-toggle"
+        *ngIf="!showCreateRow"
+        (click)="openCreateRow()"
+      >
+        <i class="pi pi-plus"></i>
+        <span>{{ 'EXPLORER.NEW_FOLDER' | translate }}</span>
+      </button>
+
+      <div class="loc-create-row" *ngIf="showCreateRow">
+        <input
+          type="text"
+          class="loc-create-input"
+          [(ngModel)]="newFolderName"
+          [placeholder]="'EXPLORER.NEW_FOLDER' | translate"
+          maxlength="120"
+          (keydown.enter)="saveNewFolder()"
+          (keydown.escape)="cancelCreateRow()"
+          autocomplete="off"
+        />
+        <button
+          type="button"
+          class="loc-create-save"
+          (click)="saveNewFolder()"
+          [disabled]="!newFolderName.trim() || savingFolder"
+        >
+          <i
+            class="pi"
+            [ngClass]="savingFolder ? 'pi-spin pi-spinner' : 'pi-check'"
+          ></i>
+        </button>
+        <button
+          type="button"
+          class="loc-create-cancel"
+          (click)="cancelCreateRow()"
+        >
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</p-overlayPanel>

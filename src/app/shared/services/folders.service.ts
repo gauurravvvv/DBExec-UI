@@ -57,6 +57,22 @@ export class FoldersService {
     );
   }
 
+  /**
+   * Tag facet for the explorer's Tags rail — every distinct tag on the org's
+   * assets of this objectType with its usage count, sorted by count desc.
+   */
+  async listTags(
+    objectType: FolderObjectType,
+  ): Promise<{ tag: string; count: number }[]> {
+    const res: any = await lastValueFrom(
+      this.http.apiGet(FOLDER.TAGS, {
+        params: { objectType },
+        skipLoader: true,
+      }),
+    );
+    return res?.data?.tags ?? [];
+  }
+
   /** Create a folder. `parentId` null / omitted = a root folder. */
   create(payload: {
     name: string;
