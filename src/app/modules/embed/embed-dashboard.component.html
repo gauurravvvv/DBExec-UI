@@ -1,0 +1,88 @@
+<div class="embed-root">
+  <!-- Slim public header: name + a subtle "powered by" mark. No app chrome. -->
+  <header class="embed-header" *ngIf="!error">
+    <span class="embed-name">{{ dashboardName }}</span>
+    <span class="embed-brand">DBExec</span>
+  </header>
+
+  <!-- Loading -->
+  <div class="embed-state" *ngIf="loading">
+    <i class="pi pi-spin pi-spinner"></i>
+    <span>{{ 'DASHBOARD.LOADING' | translate }}</span>
+  </div>
+
+  <!-- Invalid / expired / revoked link -->
+  <div class="embed-state error" *ngIf="error">
+    <i class="pi pi-lock"></i>
+    <h3>{{ 'DASHBOARD.EMBED.UNAVAILABLE_TITLE' | translate }}</h3>
+    <p>{{ 'DASHBOARD.EMBED.UNAVAILABLE_BODY' | translate }}</p>
+  </div>
+
+  <!-- Canvas -->
+  <div class="embed-canvas" #canvas *ngIf="!loading && !error">
+    <div class="embed-empty" *ngIf="visuals.length === 0">
+      <i class="pi pi-chart-bar"></i>
+      <p>{{ 'DASHBOARD.NO_VISUALS' | translate }}</p>
+    </div>
+
+    <div class="embed-grid" *ngIf="visuals.length > 0">
+      <div
+        class="embed-visual"
+        *ngFor="let visual of visuals; trackBy: trackByVisualId"
+        [style.grid-column]="visual.gridCol + 1 + ' / span ' + visual.colSpan"
+        [style.grid-row]="visual.gridRow + 1 + ' / span ' + visual.rowSpan"
+      >
+        <div class="embed-visual-title">
+          {{ visual.title || ('DASHBOARD.UNTITLED_VISUAL' | translate) }}
+        </div>
+        <div class="embed-visual-body">
+          <!-- Table visual: read-only inline render (charts use echart-visual). -->
+          <ng-container *ngIf="visual.chartType === 'table'; else chartTpl">
+            <div class="embed-table-wrap">
+              <table
+                class="embed-table"
+                *ngIf="getDisplayData(visual).length > 0; else noRows"
+              >
+                <thead>
+                  <tr>
+                    <th
+                      *ngFor="
+                        let col of getDisplayData(visual)[0] | keyvalue
+                      "
+                    >
+                      {{ col.key }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of getDisplayData(visual)">
+                    <td *ngFor="let cell of row | keyvalue">
+                      {{ cell.value }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <ng-template #noRows>
+                <div class="embed-novalue">
+                  {{ 'COMMON.NO_MATCHING_RECORDS' | translate }}
+                </div>
+              </ng-template>
+            </div>
+          </ng-container>
+
+          <!-- Chart visual. -->
+          <ng-template #chartTpl>
+            <app-echart-visual
+              *ngIf="visual.chartType"
+              [chartType]="visual.chartType!"
+              [chartConfig]="visual.config"
+              [chartWidth]="visual.width"
+              [chartHeight]="visual.height"
+              [data]="getDisplayData(visual)"
+            ></app-echart-visual>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

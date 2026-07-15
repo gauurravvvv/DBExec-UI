@@ -1547,6 +1547,11 @@
       "PNG": "Exportar como PNG",
       "PDF": "Exportar como PDF",
       "CSV": "Exportar datos (CSV)"
+    },
+    "LOADING": "Cargando…",
+    "EMBED": {
+      "UNAVAILABLE_TITLE": "Este dashboard no está disponible",
+      "UNAVAILABLE_BODY": "Este enlace de compartir no es válido, ha expirado o ha sido revocado. Contacta con la persona que lo compartió contigo."
     }
   },
   "TOAST": {
@@ -1587,7 +1592,8 @@
     "DB_USERS": "Usuarios de la base de datos",
     "DB_ROLES": "Usuarios y roles de la base de datos",
     "DB_PRIVILEGES": "Privilegios y acceso",
-    "QUERY_RUNNER": "Ejecutor de consultas"
+    "QUERY_RUNNER": "Ejecutor de consultas",
+    "EMBED_DASHBOARD": "Dashboard"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Mejore su experiencia de\ngestión de fuentes de datos",

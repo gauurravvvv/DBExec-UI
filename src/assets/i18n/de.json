@@ -1547,6 +1547,11 @@
       "PNG": "Als PNG exportieren",
       "PDF": "Als PDF exportieren",
       "CSV": "Daten exportieren (CSV)"
+    },
+    "LOADING": "Wird geladen…",
+    "EMBED": {
+      "UNAVAILABLE_TITLE": "Dieses Dashboard ist nicht verfügbar",
+      "UNAVAILABLE_BODY": "Dieser Freigabelink ist ungültig, abgelaufen oder wurde widerrufen. Bitte wenden Sie sich an die Person, die ihn geteilt hat."
     }
   },
   "TOAST": {
@@ -1587,7 +1592,8 @@
     "DB_USERS": "Datenbankbenutzer",
     "DB_ROLES": "Datenbankbenutzer & Rollen",
     "DB_PRIVILEGES": "Rechte & Zugriff",
-    "QUERY_RUNNER": "Abfrage-Runner"
+    "QUERY_RUNNER": "Abfrage-Runner",
+    "EMBED_DASHBOARD": "Dashboard"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Verbessern Sie Ihr Datenquellen-\nManagement-Erlebnis",

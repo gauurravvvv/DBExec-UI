@@ -1547,6 +1547,11 @@
       "PNG": "Exporteren als PNG",
       "PDF": "Exporteren als PDF",
       "CSV": "Gegevens exporteren (CSV)"
+    },
+    "LOADING": "Laden…",
+    "EMBED": {
+      "UNAVAILABLE_TITLE": "Dit dashboard is niet beschikbaar",
+      "UNAVAILABLE_BODY": "Deze deellink is ongeldig, verlopen of ingetrokken. Neem contact op met de persoon die hem heeft gedeeld."
     }
   },
   "TOAST": {
@@ -1587,7 +1592,8 @@
     "DB_USERS": "Databasegebruikers",
     "DB_ROLES": "Databasegebruikers & rollen",
     "DB_PRIVILEGES": "Rechten & toegang",
-    "QUERY_RUNNER": "Query-uitvoerder"
+    "QUERY_RUNNER": "Query-uitvoerder",
+    "EMBED_DASHBOARD": "Dashboard"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Verbeter uw ervaring met\ngegevensbronbeheer",

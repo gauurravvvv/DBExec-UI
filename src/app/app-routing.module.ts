@@ -294,6 +294,19 @@ const routes: Routes = [
       title: 'PAGE_TITLES.QUERY_RUNNER',
     },
   },
+  // Public dashboard embed — UNAUTHENTICATED, token-guarded, OUTSIDE the
+  // `app` shell (no sidebar/topbar, no auth/role guard). The BE mints links
+  // as /embed/dashboard/:token; the viewer resolves everything from the
+  // opaque token via the public render/run endpoints. Deliberately carries
+  // no guards so an anonymous viewer (or an <iframe>) can open it.
+  {
+    path: 'embed/dashboard/:token',
+    loadChildren: () =>
+      import('./modules/embed/embed-dashboard.module').then(
+        m => m.EmbedDashboardModule,
+      ),
+    data: { title: 'PAGE_TITLES.EMBED_DASHBOARD' },
+  },
   // Anything unknown lands on a real 404 page rather than silently
   // bouncing to /login. Inside the authenticated shell so the user
   // keeps the sidebar/topbar and can navigate away cleanly.

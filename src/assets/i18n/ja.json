@@ -1547,6 +1547,11 @@
       "PNG": "PNGとしてエクスポート",
       "PDF": "PDFとしてエクスポート",
       "CSV": "データをエクスポート (CSV)"
+    },
+    "LOADING": "読み込み中…",
+    "EMBED": {
+      "UNAVAILABLE_TITLE": "このダッシュボードは利用できません",
+      "UNAVAILABLE_BODY": "この共有リンクは無効か、有効期限が切れているか、取り消されています。共有した担当者にお問い合わせください。"
     }
   },
   "TOAST": {
@@ -1587,7 +1592,8 @@
     "DB_USERS": "データベースユーザー",
     "DB_ROLES": "データベースユーザーとロール",
     "DB_PRIVILEGES": "権限とアクセス",
-    "QUERY_RUNNER": "クエリランナー"
+    "QUERY_RUNNER": "クエリランナー",
+    "EMBED_DASHBOARD": "ダッシュボード"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "データソース管理体験を\n向上させましょう",

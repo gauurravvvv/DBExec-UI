@@ -1550,6 +1550,11 @@
       "PNG": "Export as PNG",
       "PDF": "Export as PDF",
       "CSV": "Export data (CSV)"
+    },
+    "LOADING": "Loading…",
+    "EMBED": {
+      "UNAVAILABLE_TITLE": "This dashboard is unavailable",
+      "UNAVAILABLE_BODY": "This share link is invalid, has expired, or has been revoked. Please contact the person who shared it with you."
     }
   },
   "TOAST": {
@@ -1590,7 +1595,8 @@
     "RESET_PASSWORD": "Reset Password",
     "SET_PASSWORD": "Set Password",
     "NOT_FOUND": "Page Not Found",
-    "RELAY": "Signing in"
+    "RELAY": "Signing in",
+    "EMBED_DASHBOARD": "Dashboard"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Elevate Your Datasource\nManagement Experience",

@@ -1547,6 +1547,11 @@
       "PNG": "PNG로 내보내기",
       "PDF": "PDF로 내보내기",
       "CSV": "데이터 내보내기 (CSV)"
+    },
+    "LOADING": "로드 중…",
+    "EMBED": {
+      "UNAVAILABLE_TITLE": "이 대시보드를 사용할 수 없습니다",
+      "UNAVAILABLE_BODY": "이 공유 링크가 유효하지 않거나 만료되었거나 철회되었습니다. 링크를 공유한 사람에게 문의하세요."
     }
   },
   "TOAST": {
@@ -1587,7 +1592,8 @@
     "DB_USERS": "데이터베이스 사용자",
     "DB_ROLES": "데이터베이스 사용자 및 역할",
     "DB_PRIVILEGES": "권한 및 접근",
-    "QUERY_RUNNER": "쿼리 러너"
+    "QUERY_RUNNER": "쿼리 러너",
+    "EMBED_DASHBOARD": "대시보드"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "데이터 소스\n관리 경험을 향상시키세요",
