@@ -199,6 +199,9 @@ export class DashboardService {
     dashboardId: string;
     filters?: any[];
     limit?: number;
+    // Pre-load gate parameter values ({ key, value }[]) substituted into
+    // the snapshotted SQL server-side (Dashboard & Analysis v2, Track C).
+    paramValues?: { key: string; value: any }[];
     // Force a live re-run + cache re-store, bypassing any fresh cached
     // entry (wired to the "refresh cached data" action).
     refresh?: boolean;
@@ -346,7 +349,11 @@ export class DashboardService {
   /** POST /public/dashboards/:token/run → snapshot SQL (RLS-hardened). */
   async runPublicQuery(
     token: string,
-    body: { filters?: any[]; limit?: number },
+    body: {
+      filters?: any[];
+      limit?: number;
+      paramValues?: { key: string; value: any }[];
+    },
   ): Promise<any> {
     return lastValueFrom(
       this.http.apiPost(

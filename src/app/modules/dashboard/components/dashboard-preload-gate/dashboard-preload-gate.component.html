@@ -1,0 +1,140 @@
+<!--
+  Blocking pre-load gate. Rendered alone (no canvas) while the dashboard
+  withholds every query until the viewer supplies the required inputs.
+-->
+<div class="preload-gate-overlay">
+  <div class="preload-gate-card" role="dialog" aria-modal="true">
+    <div class="gate-head">
+      <div class="gate-icon"><i class="pi pi-sliders-h"></i></div>
+      <h2 class="gate-title">{{ 'DASHBOARD.GATE.TITLE' | translate }}</h2>
+      <p class="gate-subtitle">{{ 'DASHBOARD.GATE.SUBTITLE' | translate }}</p>
+    </div>
+
+    <div class="gate-body">
+      <!-- Required parameters -->
+      <div class="gate-section" *ngIf="requiredParameters.length > 0">
+        <div class="gate-section-label">
+          {{ 'DASHBOARD.GATE.PARAMETERS' | translate }}
+        </div>
+        <div
+          class="gate-field"
+          *ngFor="let p of requiredParameters; trackBy: trackParam"
+        >
+          <ng-container [ngSwitch]="paramControl(p)">
+            <app-custom-dropdown
+              *ngSwitchCase="'dropdown'"
+              [label]="p.name"
+              [required]="true"
+              [options]="paramOptions(p)"
+              optionLabel="label"
+              optionValue="value"
+              [ngModel]="paramValues[p.key]"
+              (ngModelChange)="onParamChange(p, $event)"
+              [ngModelOptions]="{ standalone: true }"
+            ></app-custom-dropdown>
+
+            <app-custom-number
+              *ngSwitchCase="'number'"
+              [label]="p.name"
+              [required]="true"
+              [ngModel]="paramValues[p.key]"
+              (ngModelChange)="onParamChange(p, $event)"
+              [ngModelOptions]="{ standalone: true }"
+            ></app-custom-number>
+
+            <app-custom-calendar
+              *ngSwitchCase="'calendar'"
+              [label]="p.name"
+              [required]="true"
+              [showTime]="false"
+              [ngModel]="paramValues[p.key]"
+              (ngModelChange)="onParamChange(p, $event)"
+              [ngModelOptions]="{ standalone: true }"
+            ></app-custom-calendar>
+
+            <app-custom-toggle
+              *ngSwitchCase="'toggle'"
+              [label]="p.name"
+              [ngModel]="paramValues[p.key]"
+              (ngModelChange)="onParamChange(p, $event)"
+              [ngModelOptions]="{ standalone: true }"
+            ></app-custom-toggle>
+
+            <app-custom-input
+              *ngSwitchDefault
+              [label]="p.name"
+              [required]="true"
+              [ngModel]="paramValues[p.key]"
+              (ngModelChange)="onParamChange(p, $event)"
+              [ngModelOptions]="{ standalone: true }"
+            ></app-custom-input>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Mandatory filters -->
+      <div class="gate-section" *ngIf="mandatoryFilters.length > 0">
+        <div class="gate-section-label">
+          {{ 'DASHBOARD.GATE.FILTERS' | translate }}
+        </div>
+        <div
+          class="gate-field"
+          *ngFor="let f of mandatoryFilters; trackBy: trackFilter"
+        >
+          <ng-container [ngSwitch]="filterControl(f)">
+            <app-custom-number
+              *ngSwitchCase="'number'"
+              [label]="f.name"
+              [required]="true"
+              [ngModel]="filterValues[f.id]"
+              (ngModelChange)="onFilterChange(f, $event)"
+              [ngModelOptions]="{ standalone: true }"
+            ></app-custom-number>
+
+            <app-custom-calendar
+              *ngSwitchCase="'calendar'"
+              [label]="f.name"
+              [required]="true"
+              [showTime]="false"
+              [ngModel]="filterValues[f.id]"
+              (ngModelChange)="onFilterChange(f, $event)"
+              [ngModelOptions]="{ standalone: true }"
+            ></app-custom-calendar>
+
+            <app-custom-toggle
+              *ngSwitchCase="'toggle'"
+              [label]="f.name"
+              [ngModel]="filterValues[f.id]"
+              (ngModelChange)="onFilterChange(f, $event)"
+              [ngModelOptions]="{ standalone: true }"
+            ></app-custom-toggle>
+
+            <app-custom-input
+              *ngSwitchDefault
+              [label]="f.name"
+              [required]="true"
+              [ngModel]="filterValues[f.id]"
+              (ngModelChange)="onFilterChange(f, $event)"
+              [ngModelOptions]="{ standalone: true }"
+            ></app-custom-input>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <div class="gate-actions">
+      <button
+        type="button"
+        class="gate-load-btn"
+        [disabled]="!isValid"
+        (click)="submit()"
+      >
+        <i class="pi pi-play"></i>
+        <span>{{ 'DASHBOARD.GATE.LOAD' | translate }}</span>
+      </button>
+      <p class="gate-hint" *ngIf="!isValid">
+        {{ 'DASHBOARD.GATE.REQUIRED_HINT' | translate }}
+      </p>
+    </div>
+  </div>
+</div>

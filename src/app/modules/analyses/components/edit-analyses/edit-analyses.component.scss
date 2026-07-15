@@ -4558,3 +4558,236 @@
     }
   }
 }
+
+/* ─── Analysis tab strip (Track A4) ─────────────────────────────────── */
+.analysis-tab-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
+  flex: 0 0 auto;
+
+  &--empty {
+    border-bottom: 1px dashed var(--border-color);
+  }
+}
+
+.analysis-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1, 4px) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xs);
+  background: var(--card-background);
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--motion-fast) ease;
+
+  &:hover {
+    background: var(--hover-background);
+    color: var(--text-color);
+  }
+
+  &.active {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: var(--primary-color-transparent, rgba(var(--primary-color-rgb), 0.08));
+    font-weight: var(--fw-semibold);
+  }
+
+  &__name {
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity var(--motion-fast) ease;
+  }
+
+  &:hover &__actions,
+  &.active &__actions {
+    opacity: 1;
+  }
+
+  &__rename {
+    border: 1px solid var(--primary-color);
+    border-radius: var(--radius-xs);
+    padding: 2px 6px;
+    font-size: var(--fs-label);
+    min-width: 120px;
+  }
+
+  .tab-act {
+    font-size: var(--fs-micro);
+    padding: 2px;
+    border-radius: var(--radius-xs);
+    color: var(--text-muted);
+
+    &:hover {
+      color: var(--primary-color);
+      background: var(--hover-background);
+    }
+
+    &--danger:hover {
+      color: var(--error-color);
+    }
+  }
+}
+
+.analysis-tab-add {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1, 4px) var(--space-3);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+  cursor: pointer;
+  transition: all var(--motion-fast) ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &--labelled {
+    font-weight: var(--fw-medium);
+  }
+}
+
+/* ─── Move-visual-to-tab overlay menu ───────────────────────────────── */
+.move-tab-menu {
+  position: absolute;
+  top: 28px;
+  right: 6px;
+  z-index: 30;
+  min-width: 160px;
+  padding: var(--space-2);
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--a-radius-sm, var(--radius-xs));
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+
+  &__label {
+    font-size: var(--fs-micro);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 2px 6px 6px;
+  }
+
+  &__item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: var(--space-2) var(--space-3);
+    border: none;
+    background: transparent;
+    color: var(--text-color);
+    font-size: var(--fs-label);
+    border-radius: var(--radius-xs);
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: var(--hover-background);
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+  }
+}
+
+/* ─── Canvas widgets (Track E3) ─────────────────────────────────────── */
+.analysis-tab-spacer {
+  flex: 1 1 auto;
+}
+
+.widget-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+}
+
+.canvas-widget {
+  position: relative;
+  min-width: 200px;
+  max-width: 340px;
+  padding: var(--space-4);
+  border: 1px solid var(--border-color);
+  border-radius: var(--a-radius-sm, var(--radius-xs));
+  background: var(--card-background);
+
+  &__actions {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity var(--motion-fast) ease;
+
+    i {
+      cursor: pointer;
+      font-size: var(--fs-micro);
+      color: var(--text-muted);
+
+      &:hover {
+        color: var(--primary-color);
+      }
+    }
+  }
+
+  &:hover &__actions {
+    opacity: 1;
+  }
+
+  &__text {
+    white-space: pre-wrap;
+    font-size: var(--fs-body);
+    color: var(--text-color);
+    line-height: 1.5;
+  }
+
+  &--kpi {
+    text-align: center;
+  }
+
+  &__kpi {
+    .kpi-label {
+      font-size: var(--fs-label);
+      color: var(--text-muted);
+      margin-bottom: var(--space-2);
+    }
+    .kpi-value {
+      font-size: var(--fs-h1, 24px);
+      font-weight: var(--fw-semibold);
+      color: var(--primary-color);
+    }
+    .kpi-meta {
+      margin-top: var(--space-2);
+      font-size: var(--fs-micro);
+      color: var(--text-muted);
+    }
+  }
+}

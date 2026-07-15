@@ -309,3 +309,21 @@
     }
   }
 }
+
+/* Filter scope badge (Track B) */
+.filter-scope-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  margin-bottom: 4px;
+  border-radius: 999px;
+  font-size: var(--fs-micro, 11px);
+  font-weight: var(--fw-medium, 500);
+  color: var(--primary-color, #2563eb);
+  background: var(--primary-color-transparent, rgba(37, 99, 235, 0.1));
+
+  i {
+    font-size: 10px;
+  }
+}

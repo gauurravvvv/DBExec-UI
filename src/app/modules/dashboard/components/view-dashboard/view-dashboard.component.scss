@@ -722,3 +722,123 @@
     }
   }
 }
+
+/* ── Dashboard & Analysis v2 additions ───────────────────────────── */
+
+// Right column wrapper: tab strip stacked above the canvas. Takes the
+// row space the canvas-container used to occupy directly.
+.canvas-column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// Tab strip (Track A4) — house-styled horizontal tabs above the canvas.
+.dashboard-tab-strip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px 0;
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  overflow-x: auto;
+  flex: 0 0 auto;
+
+  .dashboard-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: none;
+    background: transparent;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted, #6b7280);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease;
+
+    &:hover {
+      color: var(--text-color, #333);
+    }
+
+    &.active {
+      color: var(--primary-color, #2196f3);
+      border-bottom-color: var(--primary-color, #2196f3);
+      font-weight: 600;
+    }
+
+    i {
+      font-size: 12px;
+    }
+  }
+}
+
+// Widget tile — sits on the same grid as visuals.
+.widget-box {
+  position: relative;
+  background: var(--card-background, #fff);
+  border: 1.5px solid var(--border-color, #e0e0e0);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  padding: 12px 14px;
+  box-sizing: border-box;
+}
+
+// Cross-filter-enabled visuals advertise the click affordance.
+.visual-box.cross-filter-source {
+  cursor: pointer;
+}
+
+// Auto-refresh indicator in the header.
+.auto-refresh-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-color, #2196f3);
+  background: var(--primary-color-transparent, rgba(33, 150, 243, 0.12));
+  white-space: nowrap;
+
+  i {
+    font-size: 11px;
+  }
+}
+
+// Active cross-filter chip (clear affordance).
+.cross-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--primary-color, #2196f3);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-color, #2196f3);
+  background: var(--primary-color-transparent, rgba(33, 150, 243, 0.1));
+  cursor: pointer;
+  max-width: 240px;
+
+  .cf-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .cf-clear {
+    font-size: 10px;
+  }
+
+  &:hover {
+    background: var(--primary-color, #2196f3);
+    color: var(--primary-text, #fff);
+  }
+}

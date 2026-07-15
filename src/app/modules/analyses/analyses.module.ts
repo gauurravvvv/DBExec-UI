@@ -12,6 +12,7 @@ import { SharedChartsModule } from 'src/app/shared/modules/shared-charts.module'
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AnalysesRoutingModule } from './analyses-routing.module';
 import { AnalysisParameterBarComponent } from './components/analysis-parameter-bar/analysis-parameter-bar.component';
+import { AnalysisWidgetEditorComponent } from './components/analysis-widget-editor/analysis-widget-editor.component';
 import { ChartRendererComponent } from './components/chart-renderer/chart-renderer.component';
 import { EditAnalysesComponent } from './components/edit-analyses/edit-analyses.component';
 import { FilterDialogComponent } from './components/filter-dialog/filter-dialog.component';
@@ -46,6 +47,8 @@ import {
     // later, filter/alert) value controls from a field's dataType.
     AnalysisParameterBarComponent,
     TypedValueInputComponent,
+    // Track E3 — canvas widget (text / KPI) authoring dialog.
+    AnalysisWidgetEditorComponent,
   ],
   imports: [
     CommonModule,

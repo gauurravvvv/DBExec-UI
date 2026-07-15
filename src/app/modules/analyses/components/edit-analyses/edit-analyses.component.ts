@@ -45,6 +45,14 @@ import type { ParameterValue } from '../../models/analysis-parameter.model';
 import { ChartDataTransformerService } from '../../services';
 import { AnalysesService } from '../../services/analyses.service';
 import { AnalysisInteractionService } from '../../services/analysis-interaction.service';
+import {
+  AnalysisTab,
+  AnalysisTabsService,
+} from '../../services/analysis-tabs.service';
+import {
+  AnalysisWidget,
+  AnalysisWidgetsService,
+} from '../../services/analysis-widgets.service';
 import { fieldFitsRole, ROLE_EXPECTED_KIND } from '../../utils/field-type.util';
 import type { AnalysisParameter } from '../../models/analysis-parameter.model';
 import type { CrossFilterEvent } from '../../models/interaction.model';
@@ -158,10 +166,11 @@ export class EditAnalysesComponent
 
   // Filtered visuals based on search query
   get filteredVisuals(): Visual[] {
+    const scoped = this.visualsInActiveTab;
     if (!this.visualListSearchQuery) {
-      return this.visuals;
+      return scoped;
     }
-    return this.visuals.filter((visual: any) =>
+    return scoped.filter((visual: any) =>
       visual.title
         .toLowerCase()
         .includes(this.visualListSearchQuery.toLowerCase()),
@@ -358,6 +367,8 @@ export class EditAnalysesComponent
     private translate: TranslateService,
     private dashboardService: DashboardService,
     public interaction: AnalysisInteractionService,
+    private analysisTabsService: AnalysisTabsService,
+    private analysisWidgetsService: AnalysisWidgetsService,
   ) {}
 
   // ─── Analysis parameters (Slice 4) ──────────────────────────────────
@@ -564,7 +575,13 @@ export class EditAnalysesComponent
 
   private placeVisualsOnGrid(): void {
     const occupied = new Set<string>();
-    for (const visual of this.visuals) {
+    // Only the active tab's visuals are laid out — the others aren't
+    // rendered on the canvas, so packing them would leave phantom gaps.
+    const laidOut =
+      this.tabs.length === 0
+        ? this.visuals
+        : this.visuals.filter(v => this.matchesActiveTab(v));
+    for (const visual of laidOut) {
       const colSpan = Math.min(visual.colSpan, this.GRID_COLUMNS);
       let placed = false;
       for (let row = 0; !placed && row < 500; row++) {
@@ -693,6 +710,12 @@ export class EditAnalysesComponent
 
         // Load the analysis's typed parameters for the parameter bar.
         this.loadParameters();
+
+        // Load the analysis's tabs for the tab strip (Track A4).
+        this.loadTabs();
+
+        // Load the analysis's canvas widgets (Track E3).
+        this.loadWidgets();
 
         this.cdr.markForCheck();
       })
@@ -850,6 +873,11 @@ export class EditAnalysesComponent
           isEnabled: f.isEnabled !== false,
           isMandatory: !!f.isMandatory,
           sequence: f.sequence ?? 0,
+          scope: f.scope ?? 'dashboard',
+          targetTabId: f.targetTabId ?? null,
+          targetVisualIds: Array.isArray(f.targetVisualIds)
+            ? f.targetVisualIds
+            : [],
         }));
         this.cdr.markForCheck();
       });
@@ -994,6 +1022,7 @@ export class EditAnalysesComponent
 
           const visual: any = {
             id: visualData.id,
+            tabId: visualData.tabId ?? visualConfig.tabId ?? null,
             title: visualData.title || this.translate.instant('COMMON.LOADING'),
             x: visualData.x || 0,
             y: visualData.y || 0,
@@ -1010,6 +1039,16 @@ export class EditAnalysesComponent
               visualConfig.yAxisColumn || visualData.yAxisColumn || null,
             zAxisColumn:
               visualConfig.zAxisColumn || visualData.zAxisColumn || null,
+            // Track D: server-side aggregation encoding. Read from the
+            // flat visual_config row (BE stamps them there); null =
+            // raw rows (back-compat).
+            dimensionColumn:
+              visualConfig.dimensionColumn ||
+              visualData.dimensionColumn ||
+              null,
+            measureColumn:
+              visualConfig.measureColumn || visualData.measureColumn || null,
+            aggregate: visualConfig.aggregate || visualData.aggregate || null,
             config: visualConfig.config
               ? { ...getDefaultChartConfig(), ...visualConfig.config }
               : visualData.config
@@ -1105,7 +1144,12 @@ export class EditAnalysesComponent
       return;
     }
 
-    if (visual.chartType && visual.xAxisColumn && visual.yAxisColumn) {
+    // Server-aggregated visuals encode their category/measure via
+    // dimensionColumn/aggregate (buildMapping re-points x=dimension,
+    // y="value"), so they don't need x/y axis columns set to transform.
+    const hasAxisPair = !!(visual.xAxisColumn && visual.yAxisColumn);
+    const isAggregated = !!(visual.aggregate && visual.dimensionColumn);
+    if (visual.chartType && (hasAxisPair || isAggregated)) {
       visual.chartData = this.chartDataTransformer.transformData(
         visual.chartType,
         this.rawGraphData,
@@ -1439,6 +1483,16 @@ export class EditAnalysesComponent
     }, 350); // Match CSS transition duration
   }
 
+  /** Tab options for the filter-dialog's scope=tab target dropdown. */
+  get filterTabOptions(): { label: string; value: string }[] {
+    return (this.tabs || []).map(t => ({ label: t.name, value: t.id }));
+  }
+
+  /** Visual options for the filter-dialog's scope=visual target picker. */
+  get filterVisualOptions(): { label: string; value: string }[] {
+    return (this.visuals || []).map(v => ({ label: v.title, value: v.id }));
+  }
+
   addFilter(): void {
     this.editingFilter = null;
     this.showFilterDialog = true;
@@ -1598,6 +1652,11 @@ export class EditAnalysesComponent
             isEnabled: filter.isEnabled !== false,
             isMandatory: !!filter.isMandatory,
             sequence: filter.sequence ?? 0,
+            scope: filter.scope ?? 'dashboard',
+            targetTabId: filter.targetTabId ?? null,
+            targetVisualIds: Array.isArray(filter.targetVisualIds)
+              ? filter.targetVisualIds
+              : [],
           },
         }),
       );
@@ -1609,6 +1668,354 @@ export class EditAnalysesComponent
         analysisId: this.analysisId,
       }),
     );
+  }
+
+  // ─── Multi-tab (Track A4) ────────────────────────────────────────
+  /** Named tabs for this analysis (ordered by sequence). */
+  tabs: AnalysisTab[] = [];
+  /** Currently active tab id. null = no tabs yet (single implicit tab). */
+  activeTabId: string | null = null;
+  /** Inline-rename state for a tab header. */
+  editingTabId: string | null = null;
+  editingTabName = '';
+  /** In-flight guard so rapid tab actions don't double-fire. */
+  isTabBusy = false;
+  /** Delete-tab confirmation popup state. */
+  showDeleteTabConfirm = false;
+  tabToDelete: AnalysisTab | null = null;
+  tabDeleteJustification = '';
+  /** Move-visual-to-tab menu state (which visual's menu is open). */
+  moveMenuVisualId: string | null = null;
+
+  /**
+   * Load the analysis's tabs. Seeds `activeTabId` to the first tab.
+   * Failures are non-fatal — an analysis with no tabs renders as one
+   * implicit tab (activeTabId stays null and matchesActiveTab passes all).
+   */
+  loadTabs(): void {
+    if (!this.analysisId) return;
+    this.analysisTabsService
+      .list(this.analysisId)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          const list = response.data?.tabs ?? response.data ?? [];
+          this.tabs = Array.isArray(list) ? list : [];
+          this.tabs.sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0));
+          if (this.tabs.length > 0 && !this.activeTabId) {
+            this.activeTabId = this.tabs[0].id;
+          }
+          this.placeVisualsOnGrid();
+          this.recalculateAllVisualDimensions();
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        // Older BE without the tabs endpoint — degrade to single tab.
+        this.cdr.markForCheck();
+      });
+  }
+
+  /** First tab id (the implicit home for untagged visuals). */
+  private get firstTabId(): string | null {
+    return this.tabs.length > 0 ? this.tabs[0].id : null;
+  }
+
+  /**
+   * Does this visual belong to the active tab? With no tabs, every
+   * visual matches (single implicit tab). A visual with a null tabId
+   * counts as belonging to the first tab.
+   */
+  matchesActiveTab(visual: Visual): boolean {
+    if (this.tabs.length === 0) return true;
+    const owning = visual.tabId ?? this.firstTabId;
+    return owning === this.activeTabId;
+  }
+
+  /** Visuals shown on the canvas for the active tab. */
+  get visualsInActiveTab(): Visual[] {
+    if (this.tabs.length === 0) return this.visuals;
+    return this.visuals.filter(v => this.matchesActiveTab(v));
+  }
+
+  /** Sibling visuals (active tab, excluding focused) for the config sidebar. */
+  get siblingVisualsForConfig(): { id: string; title: string }[] {
+    return this.visualsInActiveTab
+      .filter(v => v.id !== this.focusedVisualId)
+      .map(v => ({ id: v.id, title: v.title }));
+  }
+
+  /** Switch the active tab; re-place the newly-visible visuals. */
+  selectTab(tabId: string): void {
+    if (this.activeTabId === tabId) return;
+    this.activeTabId = tabId;
+    this.focusedVisualId = null;
+    this.isConfigSidebarOpen = false;
+    this.placeVisualsOnGrid();
+    this.recalculateAllVisualDimensions();
+    this.cdr.markForCheck();
+  }
+
+  /** Create a new tab and switch to it. */
+  addTab(): void {
+    if (this.isTabBusy || !this.analysisId) return;
+    this.isTabBusy = true;
+    const name = this.translate.instant('ANALYSES.TABS.NEW_TAB_NAME', {
+      n: this.tabs.length + 1,
+    });
+    this.analysisTabsService
+      .add({ analysisId: this.analysisId, name, sequence: this.tabs.length })
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, true)) {
+          const tab: AnalysisTab = response.data?.tab ?? response.data;
+          if (tab && tab.id) {
+            this.tabs = [...this.tabs, tab];
+            this.activeTabId = tab.id;
+          }
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => this.cdr.markForCheck())
+      .finally(() => {
+        this.isTabBusy = false;
+        this.cdr.markForCheck();
+      });
+  }
+
+  /** Begin inline rename of a tab header. */
+  startRenameTab(tab: AnalysisTab, event: Event): void {
+    event.stopPropagation();
+    this.editingTabId = tab.id;
+    this.editingTabName = tab.name;
+  }
+
+  /** Commit an inline tab rename. Empty / unchanged names are dropped. */
+  finishRenameTab(): void {
+    const tabId = this.editingTabId;
+    const name = (this.editingTabName || '').trim();
+    this.editingTabId = null;
+    if (!tabId) return;
+    const tab = this.tabs.find(t => t.id === tabId);
+    if (!tab || !name || name === tab.name) return;
+    const prev = tab.name;
+    tab.name = name; // optimistic
+    this.analysisTabsService
+      .update(tabId, { name })
+      .then((response: any) => {
+        if (!this.globalService.handleSuccessService(response, true)) {
+          tab.name = prev; // revert on failure
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        tab.name = prev;
+        this.cdr.markForCheck();
+      });
+  }
+
+  onTabNameKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      this.finishRenameTab();
+    } else if (event.key === 'Escape') {
+      this.editingTabId = null;
+    }
+  }
+
+  /** Open the delete-tab confirmation popup. */
+  confirmDeleteTab(tab: AnalysisTab, event: Event): void {
+    event.stopPropagation();
+    this.tabToDelete = tab;
+    this.tabDeleteJustification = '';
+    this.showDeleteTabConfirm = true;
+  }
+
+  cancelDeleteTab(): void {
+    this.showDeleteTabConfirm = false;
+    this.tabToDelete = null;
+    this.tabDeleteJustification = '';
+  }
+
+  /** Delete a tab (BE reassigns its visuals to the first remaining tab). */
+  proceedDeleteTab(): void {
+    const tab = this.tabToDelete;
+    const reason = this.tabDeleteJustification.trim();
+    if (!tab || this.isTabBusy) return;
+    this.isTabBusy = true;
+    this.analysisTabsService
+      .delete(tab.id, reason || undefined)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, true)) {
+          this.tabs = this.tabs.filter(t => t.id !== tab.id);
+          // Reassign in-memory visuals off the deleted tab to the first
+          // remaining tab so the canvas matches the BE's reassignment.
+          const fallback = this.firstTabId;
+          this.visuals.forEach(v => {
+            if ((v.tabId ?? null) === tab.id) v.tabId = fallback;
+          });
+          if (this.activeTabId === tab.id) {
+            this.activeTabId = fallback;
+          }
+          this.placeVisualsOnGrid();
+          this.recalculateAllVisualDimensions();
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => this.cdr.markForCheck())
+      .finally(() => {
+        this.isTabBusy = false;
+        this.cancelDeleteTab();
+        this.cdr.markForCheck();
+      });
+  }
+
+  /** Reorder: move a tab one slot left/right, persisting the new order. */
+  moveTab(tab: AnalysisTab, direction: -1 | 1): void {
+    if (this.isTabBusy) return;
+    const idx = this.tabs.findIndex(t => t.id === tab.id);
+    const target = idx + direction;
+    if (idx < 0 || target < 0 || target >= this.tabs.length) return;
+    const next = [...this.tabs];
+    [next[idx], next[target]] = [next[target], next[idx]];
+    next.forEach((t, i) => (t.sequence = i));
+    this.tabs = next;
+    this.isTabBusy = true;
+    this.analysisTabsService
+      .reorder(
+        this.analysisId,
+        next.map(t => t.id),
+      )
+      .then((response: any) => {
+        this.globalService.handleSuccessService(response, false);
+        this.cdr.markForCheck();
+      })
+      .catch(() => this.cdr.markForCheck())
+      .finally(() => {
+        this.isTabBusy = false;
+        this.cdr.markForCheck();
+      });
+  }
+
+  /** Toggle the per-visual "move to tab" menu. */
+  toggleMoveMenu(visualId: string, event: Event): void {
+    event.stopPropagation();
+    this.moveMenuVisualId = this.moveMenuVisualId === visualId ? null : visualId;
+  }
+
+  /**
+   * Move a visual to a different tab. Optimistic local re-tag + a save-time
+   * persist (tabId rides the visual's config payload on the next save).
+   * Marks dirty so the change survives.
+   */
+  moveVisualToTab(visual: Visual, tabId: string, event?: Event): void {
+    if (event) event.stopPropagation();
+    this.moveMenuVisualId = null;
+    if ((visual.tabId ?? this.firstTabId) === tabId) return;
+    visual.tabId = tabId;
+    this.markDirty();
+    if (this.focusedVisualId === visual.id) {
+      this.focusedVisualId = null;
+      this.isConfigSidebarOpen = false;
+    }
+    this.placeVisualsOnGrid();
+    this.recalculateAllVisualDimensions();
+    this.cdr.markForCheck();
+  }
+
+  trackByTabId(_: number, tab: AnalysisTab): string {
+    return tab.id;
+  }
+
+  // ─── Canvas widgets (Track E3) ───────────────────────────────────
+  /** Non-visual content blocks (text / KPI) on the canvas. */
+  widgets: AnalysisWidget[] = [];
+  showWidgetEditor = false;
+  editingWidget: AnalysisWidget | null = null;
+
+  /** Widgets in the active tab (mirrors matchesActiveTab for visuals). */
+  get widgetsInActiveTab(): AnalysisWidget[] {
+    if (this.tabs.length === 0) return this.widgets;
+    const first = this.tabs.length > 0 ? this.tabs[0].id : null;
+    return this.widgets.filter(
+      w => (w.tabId ?? first) === this.activeTabId,
+    );
+  }
+
+  /** Numeric-ish field options for the KPI measure picker. */
+  get measureFieldOptions(): { label: string; value: string }[] {
+    return (this.allFields || [])
+      .map((f: any) => {
+        const value = f?.columnToUse ?? f?.columnToView ?? f;
+        if (typeof value !== 'string' || !value) return null;
+        const label = f?.columnToView || value;
+        return { label, value };
+      })
+      .filter((o): o is { label: string; value: string } => o !== null);
+  }
+
+  /** Load the analysis's widgets (non-fatal against an older BE). */
+  loadWidgets(): void {
+    if (!this.analysisId) return;
+    this.analysisWidgetsService
+      .list(this.analysisId)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          const list = response.data?.widgets ?? response.data ?? [];
+          this.widgets = Array.isArray(list) ? list : [];
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => this.cdr.markForCheck());
+  }
+
+  openAddWidget(): void {
+    this.editingWidget = null;
+    this.showWidgetEditor = true;
+  }
+
+  openEditWidget(widget: AnalysisWidget): void {
+    this.editingWidget = widget;
+    this.showWidgetEditor = true;
+  }
+
+  /** Widget-editor (saved) handler — patch in place or append. */
+  onWidgetSaved(widget: AnalysisWidget): void {
+    if (!widget) return;
+    const idx = this.widgets.findIndex(w => w.id === widget.id);
+    if (idx >= 0) {
+      const next = [...this.widgets];
+      next[idx] = widget;
+      this.widgets = next;
+    } else {
+      this.widgets = [...this.widgets, widget];
+    }
+    this.cdr.markForCheck();
+  }
+
+  /** Delete a widget (BE audit gets no justification for widgets). */
+  removeWidget(widget: AnalysisWidget, event?: Event): void {
+    if (event) event.stopPropagation();
+    if (!widget?.id) {
+      this.widgets = this.widgets.filter(w => w !== widget);
+      this.cdr.markForCheck();
+      return;
+    }
+    this.analysisWidgetsService
+      .delete(widget.id)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, true)) {
+          this.widgets = this.widgets.filter(w => w.id !== widget.id);
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => this.cdr.markForCheck());
+  }
+
+  /** Extract a KPI tile's display config (typed helper for the template). */
+  kpiConfig(widget: AnalysisWidget): any {
+    return widget?.config || {};
+  }
+
+  trackByWidgetId(_: number, widget: AnalysisWidget): string {
+    return widget.id;
   }
 
   addVisual(): void {
@@ -1624,6 +2031,9 @@ export class EditAnalysesComponent
     // renamed it. The user editing the title clears `titleKey`.
     visual.titleKey = 'ANALYSES.UNTITLED_VISUAL';
     visual.title = this.translate.instant(visual.titleKey);
+    // New visuals belong to the active tab (Track A4). null when the
+    // analysis has no tabs yet (single implicit tab).
+    visual.tabId = this.activeTabId;
 
     // Default grid size: 12 columns (half width), 6 rows
     this.visuals.push(visual);
@@ -2600,6 +3010,8 @@ export class EditAnalysesComponent
       const visualConfigurations = this.visuals.map(visual => ({
         id: visual.id,
         title: visual.title,
+        // Track A4: owning tab (null = default/first tab).
+        tabId: visual.tabId ?? null,
         // Grid spans for responsive sizing
         colSpan: visual.colSpan,
         rowSpan: visual.rowSpan,
@@ -2613,6 +3025,12 @@ export class EditAnalysesComponent
         xAxisColumn: visual.xAxisColumn || null,
         yAxisColumn: visual.yAxisColumn || null,
         zAxisColumn: visual.zAxisColumn || null,
+        // Track D: server-side aggregation encoding. Persisted so the
+        // author's dimension/measure/aggregate survives save + publish.
+        // null aggregate = no server aggregation (raw rows, back-compat).
+        dimensionColumn: visual.dimensionColumn || null,
+        measureColumn: visual.measureColumn || null,
+        aggregate: visual.aggregate || null,
         config: visual.config ? { ...visual.config } : null,
         // Advanced-interaction opt-ins (spec §6) — persisted so the
         // author's cross-filter / drill setup survives save + publish.

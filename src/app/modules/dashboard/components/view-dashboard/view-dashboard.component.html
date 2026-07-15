@@ -68,6 +68,61 @@
       </div>
       <div class="header-actions">
         <!--
+          Auto-refresh indicator — shows the interval + live countdown.
+          Purely informational (the timer re-runs queries automatically);
+          hidden when the dashboard has no auto-refresh configured.
+        -->
+        <span
+          class="auto-refresh-indicator"
+          *ngIf="autoRefreshActive && !gateOpen"
+          data-export-ignore
+          [pTooltip]="'DASHBOARD.AUTO_REFRESH.TOOLTIP' | translate"
+          tooltipPosition="bottom"
+        >
+          <i class="pi pi-sync"></i>
+          {{
+            'DASHBOARD.AUTO_REFRESH.INDICATOR'
+              | translate: { seconds: autoRefreshCountdown }
+          }}
+        </span>
+
+        <!--
+          Cross-filter active chip + clear affordance. Shows the source
+          column/value constraining the target visuals; clicking clears it.
+        -->
+        <button
+          type="button"
+          class="cross-filter-chip"
+          *ngIf="hasActiveCrossFilter"
+          data-export-ignore
+          (click)="clearCrossFilter()"
+          [pTooltip]="'DASHBOARD.CROSS_FILTER.CLEAR' | translate"
+          tooltipPosition="bottom"
+        >
+          <i class="pi pi-filter-fill"></i>
+          <span class="cf-text">{{ crossFilterLabel }}</span>
+          <i class="pi pi-times cf-clear"></i>
+        </button>
+
+        <!--
+          Edit inputs — re-opens the blocking pre-load gate so the viewer
+          can change the required parameters/filters. Only when the
+          dashboard uses a gate and it's currently closed.
+        -->
+        <button
+          type="button"
+          class="header-icon-btn"
+          *ngIf="requiresPreloadGate && !gateOpen"
+          data-export-ignore
+          (click)="editInputs()"
+          [pTooltip]="'DASHBOARD.GATE.EDIT_INPUTS' | translate"
+          tooltipPosition="bottom"
+          [attr.aria-label]="'DASHBOARD.GATE.EDIT_INPUTS' | translate"
+        >
+          <i class="pi pi-sliders-h"></i>
+        </button>
+
+        <!--
           Filter-panel toggle — icon-only, segmented-button feel.
           Active state when the sidebar is open. Hidden when the
           analysis has zero filters configured (nothing to show).
@@ -77,7 +132,7 @@
           class="header-icon-btn"
           [class.is-active]="isFilterSidebarOpen"
           (click)="toggleFilterSidebar()"
-          *ngIf="filters.length > 0"
+          *ngIf="filters.length > 0 && !gateOpen"
           [pTooltip]="'DASHBOARD.FILTERS' | translate"
           tooltipPosition="bottom"
           [attr.aria-label]="'DASHBOARD.FILTERS' | translate"
@@ -132,11 +187,39 @@
         >
           <i class="pi pi-share-alt"></i>
         </button>
+
+        <!-- Schedule delivery (scheduled email PNG/PDF). -->
+        <button
+          type="button"
+          class="header-icon-btn"
+          data-export-ignore
+          (click)="openSchedule()"
+          [disabled]="!dashboardId"
+          [pTooltip]="'DASHBOARD.SCHEDULE.BUTTON' | translate"
+          tooltipPosition="bottom"
+          [attr.aria-label]="'DASHBOARD.SCHEDULE.BUTTON' | translate"
+        >
+          <i class="pi pi-calendar-clock"></i>
+        </button>
       </div>
     </div>
 
     <!-- Centered branded loader while the dashboard renders. -->
     <app-content-loader *ngIf="loading() || rendering()"></app-content-loader>
+
+    <!--
+      Blocking pre-load gate (Track C3). When the dashboard requires
+      inputs, this is the ONLY thing shown — the content section below is
+      withheld and no query runs until the viewer submits.
+    -->
+    <app-dashboard-preload-gate
+      *ngIf="!loading() && !rendering() && dashboard && gateOpen"
+      [parameters]="parameters"
+      [mandatoryFilters]="mandatoryFilters"
+      [seededParamValues]="gateSeedParams"
+      [seededFilterValues]="gateSeedFilters"
+      (submitted)="onGateSubmit($event)"
+    ></app-dashboard-preload-gate>
 
     <!--
       Dashboard-level missing-field banner. Driven by the render
@@ -151,7 +234,7 @@
     -->
     <div
       class="missing-field-banner"
-      *ngIf="!loading() && !rendering() && dashboard && hasFieldWarnings"
+      *ngIf="!loading() && !rendering() && dashboard && !gateOpen && hasFieldWarnings"
       role="status"
     >
       <div class="banner-summary" (click)="toggleWarnings()">
@@ -198,7 +281,7 @@
     <!-- Content Section — sidebar on the left, canvas filling the rest. -->
     <div
       class="content-section"
-      *ngIf="!loading() && !rendering() && dashboard"
+      *ngIf="!loading() && !rendering() && dashboard && !gateOpen"
     >
       <!--
         Filter sidebar — mirrors the Edit Analysis chrome (260px panel,
@@ -246,10 +329,31 @@
         </div>
       </div>
 
-      <!-- Canvas Container -->
-      <div class="canvas-container" #canvasContainer>
+      <!-- Right column: tab strip (multi-tab only) + canvas -->
+      <div class="canvas-column">
+        <!--
+          Tab strip (Track A4). Rendered only when the dashboard has >1
+          tab; single/implicit-tab dashboards render exactly as before.
+        -->
+        <div class="dashboard-tab-strip" *ngIf="showTabStrip" role="tablist">
+          <button
+            type="button"
+            class="dashboard-tab"
+            *ngFor="let tab of tabs; trackBy: trackByTabId"
+            role="tab"
+            [class.active]="tab.id === activeTabId"
+            [attr.aria-selected]="tab.id === activeTabId"
+            (click)="selectTab(tab.id)"
+          >
+            <i class="pi" [ngClass]="tab.icon" *ngIf="tab.icon"></i>
+            <span>{{ tab.name }}</span>
+          </button>
+        </div>
+
+        <!-- Canvas Container -->
+        <div class="canvas-container" #canvasContainer>
         <!-- Empty State -->
-        <div class="empty-state" *ngIf="visuals.length === 0">
+        <div class="empty-state" *ngIf="activeTabEmpty">
           <i class="pi pi-chart-bar"></i>
           <h3>{{ 'DASHBOARD.NO_VISUALS' | translate }}</h3>
           <p>
@@ -258,14 +362,28 @@
         </div>
 
         <!-- Canvas Area -->
-        <div class="canvas-area" *ngIf="visuals.length > 0">
+        <div class="canvas-area" *ngIf="!activeTabEmpty">
+          <!-- Widgets (text / KPI) share the grid with visuals. -->
+          <div
+            class="widget-box"
+            *ngFor="let widget of visibleWidgets; trackBy: trackByWidgetId"
+            [style.grid-column]="'span ' + widgetColSpan(widget)"
+            [style.grid-row]="'span ' + widgetRowSpan(widget)"
+          >
+            <app-dashboard-widget
+              [widget]="widget"
+              [data]="rawData"
+            ></app-dashboard-widget>
+          </div>
+
           <div
             class="visual-box"
-            *ngFor="let visual of visuals; trackBy: trackByVisualId"
+            *ngFor="let visual of visibleVisuals; trackBy: trackByVisualId"
             [style.grid-column]="
               visual.gridCol + 1 + ' / span ' + visual.colSpan
             "
             [style.grid-row]="visual.gridRow + 1 + ' / span ' + visual.rowSpan"
+            [class.cross-filter-source]="isCrossFilterSource(visual)"
           >
             <!-- Inline Title -->
             <div class="visual-inline-title">
@@ -378,6 +496,7 @@
                     [chartWidth]="visual.width"
                     [chartHeight]="visual.height - 35"
                     [data]="getDisplayData(visual)"
+                    (chartSelect)="onVisualChartSelect(visual, $event)"
                   ></app-echart-visual>
                 </ng-template>
               </ng-container>
@@ -393,6 +512,7 @@
             </div>
           </div>
         </div>
+        </div>
       </div>
     </div>
   </div>
@@ -406,3 +526,11 @@
   [dashboardName]="dashboard?.name || ''"
   (closed)="shareVisible = false"
 ></app-share-dashboard-dialog>
+
+<!-- Schedule delivery dialog (scheduled email PNG/PDF). -->
+<app-schedule-delivery-dialog
+  [visible]="scheduleVisible"
+  [dashboardId]="dashboardId"
+  [dashboardName]="dashboard?.name || ''"
+  (closed)="scheduleVisible = false"
+></app-schedule-delivery-dialog>

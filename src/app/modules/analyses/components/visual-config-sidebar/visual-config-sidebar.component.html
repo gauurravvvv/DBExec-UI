@@ -45,6 +45,300 @@
         ></app-custom-dropdown>
       </div>
 
+      <!-- ===== Data: server-side aggregation (Track D4) ===== -->
+      <div
+        class="config-section"
+        *ngIf="!isTableChartType(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.DATA_SECTION' | translate }}
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.AGG.DIMENSION' | translate }}</label>
+          <app-custom-dropdown
+            [options]="allFieldOptions"
+            [(ngModel)]="focusedVisual.dimensionColumn"
+            optionLabel="label"
+            optionValue="value"
+            [showClear]="true"
+            appendTo="body"
+            icon="pi-tags"
+            [placeholder]="'ANALYSES.AGG.DIMENSION_PH' | translate"
+          ></app-custom-dropdown>
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.AGG.MEASURE' | translate }}</label>
+          <app-custom-dropdown
+            [options]="measureFieldOptions"
+            [(ngModel)]="focusedVisual.measureColumn"
+            optionLabel="label"
+            optionValue="value"
+            [showClear]="true"
+            appendTo="body"
+            icon="pi-hashtag"
+            [placeholder]="'ANALYSES.AGG.MEASURE_PH' | translate"
+          ></app-custom-dropdown>
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.AGG.AGGREGATE' | translate }}</label>
+          <app-custom-dropdown
+            [options]="aggregateOptions"
+            [(ngModel)]="aggregateValue"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            icon="pi-percentage"
+          ></app-custom-dropdown>
+        </div>
+
+        <!-- Combo: extra measures for multi-measure charts -->
+        <div class="config-subsection" *ngIf="focusedVisual.aggregate">
+          <div class="config-row">
+            <label>{{ 'ANALYSES.AGG.EXTRA_MEASURES' | translate }}</label>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-plus"
+              class="p-button-text p-button-sm"
+              (click)="addComboMeasure()"
+              [title]="'ANALYSES.AGG.ADD_MEASURE' | translate"
+            ></button>
+          </div>
+          <div
+            class="config-card"
+            *ngFor="let m of comboMeasures; let i = index; trackBy: trackByIndex"
+          >
+            <div class="config-group">
+              <app-custom-dropdown
+                [options]="measureFieldOptions"
+                [ngModel]="m.column"
+                (ngModelChange)="updateComboMeasure(i, 'column', $event)"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+                [placeholder]="'ANALYSES.AGG.MEASURE_PH' | translate"
+              ></app-custom-dropdown>
+            </div>
+            <div class="config-group">
+              <app-custom-dropdown
+                [options]="comboAggregateOptions"
+                [ngModel]="m.aggregate"
+                (ngModelChange)="updateComboMeasure(i, 'aggregate', $event)"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+              ></app-custom-dropdown>
+            </div>
+            <div class="config-group">
+              <app-custom-input
+                [ngModel]="m.alias"
+                (ngModelChange)="updateComboMeasure(i, 'alias', $event)"
+                [placeholder]="'ANALYSES.AGG.ALIAS_PH' | translate"
+              ></app-custom-input>
+            </div>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-trash"
+              class="p-button-text p-button-sm p-button-danger"
+              (click)="removeComboMeasure(i)"
+              [title]="'COMMON.DELETE' | translate"
+            ></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Analytics: dual-axis / trend / small-multiples (E1) ===== -->
+      <div
+        class="config-section"
+        *ngIf="supportsCartesianAnalytics(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.ANALYTICS.SECTION' | translate }}
+        </div>
+
+        <!-- Dual-axis -->
+        <div class="config-row">
+          <label>{{ 'ANALYSES.ANALYTICS.DUAL_AXIS' | translate }}</label>
+          <app-custom-toggle
+            [ngModel]="dualAxisEnabled"
+            (ngModelChange)="setDualAxisEnabled($event)"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+        <div class="config-subsection" *ngIf="dualAxisEnabled">
+          <div class="config-group">
+            <label>{{ 'ANALYSES.ANALYTICS.RIGHT_AXIS_NAME' | translate }}</label>
+            <app-custom-input
+              [(ngModel)]="focusedVisual.config.dualAxis.rightAxisName"
+              [placeholder]="'ANALYSES.ANALYTICS.RIGHT_AXIS_NAME' | translate"
+            ></app-custom-input>
+          </div>
+          <div class="config-row">
+            <label>{{ 'ANALYSES.ANALYTICS.SERIES_MAP' | translate }}</label>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-plus"
+              class="p-button-text p-button-sm"
+              (click)="addDualAxisSeries()"
+              [title]="'ANALYSES.ANALYTICS.ADD_SERIES' | translate"
+            ></button>
+          </div>
+          <div
+            class="config-card"
+            *ngFor="
+              let sr of dualAxisSeries;
+              let i = index;
+              trackBy: trackByIndex
+            "
+          >
+            <div class="config-group">
+              <app-custom-input
+                [ngModel]="sr.name"
+                (ngModelChange)="updateDualAxisSeries(i, 'name', $event)"
+                [placeholder]="'ANALYSES.ANALYTICS.SERIES_NAME_PH' | translate"
+              ></app-custom-input>
+            </div>
+            <div class="config-group">
+              <app-custom-dropdown
+                [options]="dualAxisSeriesTypeOptions"
+                [ngModel]="sr.type"
+                (ngModelChange)="updateDualAxisSeries(i, 'type', $event)"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+              ></app-custom-dropdown>
+            </div>
+            <div class="config-group">
+              <app-custom-dropdown
+                [options]="dualAxisSideOptions"
+                [ngModel]="sr.yAxisIndex"
+                (ngModelChange)="updateDualAxisSeries(i, 'yAxisIndex', $event)"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+              ></app-custom-dropdown>
+            </div>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-trash"
+              class="p-button-text p-button-sm p-button-danger"
+              (click)="removeDualAxisSeries(i)"
+              [title]="'COMMON.DELETE' | translate"
+            ></button>
+          </div>
+        </div>
+
+        <!-- Trend -->
+        <div class="config-group">
+          <label>{{ 'ANALYSES.ANALYTICS.TREND' | translate }}</label>
+          <app-custom-dropdown
+            [options]="trendTypeOptions"
+            [ngModel]="trendType"
+            (ngModelChange)="setTrendType($event)"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            icon="pi-chart-line"
+          ></app-custom-dropdown>
+        </div>
+        <div class="config-group" *ngIf="trendType === 'movingAverage'">
+          <label>{{ 'ANALYSES.ANALYTICS.WINDOW' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="trendWindow"
+            [min]="2"
+            [max]="60"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+        <div class="config-group" *ngIf="trendType === 'forecast'">
+          <label>{{ 'ANALYSES.ANALYTICS.FORECAST_PERIODS' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="trendForecastPeriods"
+            [min]="1"
+            [max]="60"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+
+        <!-- Small multiples -->
+        <div class="config-row">
+          <label>{{ 'ANALYSES.ANALYTICS.SMALL_MULTIPLES' | translate }}</label>
+          <app-custom-toggle
+            [ngModel]="smallMultiplesEnabled"
+            (ngModelChange)="setSmallMultiplesEnabled($event)"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+        <div class="config-subsection" *ngIf="smallMultiplesEnabled">
+          <div class="config-group">
+            <label>{{ 'ANALYSES.ANALYTICS.FACET_COLUMN' | translate }}</label>
+            <app-custom-dropdown
+              [options]="allFieldOptions"
+              [(ngModel)]="smallMultiplesFacetColumn"
+              optionLabel="label"
+              optionValue="value"
+              [showClear]="true"
+              appendTo="body"
+            ></app-custom-dropdown>
+          </div>
+          <div class="config-group">
+            <label>{{ 'ANALYSES.ANALYTICS.MAX_COLS' | translate }}</label>
+            <app-custom-number
+              [(ngModel)]="smallMultiplesMaxCols"
+              [min]="1"
+              [max]="6"
+              [showButtons]="true"
+            ></app-custom-number>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Interaction: cross-filter (E2) ===== -->
+      <div
+        class="config-section"
+        *ngIf="!isTableChartType(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.INTERACTION.SECTION' | translate }}
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.INTERACTION.CROSS_FILTER' | translate }}</label>
+          <app-custom-toggle
+            [ngModel]="crossFilterEnabled"
+            (ngModelChange)="setCrossFilterEnabled($event)"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+        <div class="config-subsection" *ngIf="crossFilterEnabled">
+          <div class="config-group">
+            <label>{{ 'ANALYSES.INTERACTION.TARGETS' | translate }}</label>
+            <app-custom-dropdown
+              [options]="crossFilterTargetOptions"
+              [(ngModel)]="crossFilterTargetMode"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              icon="pi-filter"
+            ></app-custom-dropdown>
+          </div>
+          <div class="config-group" *ngIf="crossFilterTargetMode === 'visuals'">
+            <label>{{ 'ANALYSES.INTERACTION.TARGET_VISUALS' | translate }}</label>
+            <app-custom-multiselect
+              [options]="siblingVisualOptions"
+              [(ngModel)]="crossFilterVisualIds"
+              optionLabel="label"
+              optionValue="value"
+              display="chip"
+              appendTo="body"
+              [placeholder]="'ANALYSES.INTERACTION.SELECT_VISUALS' | translate"
+            ></app-custom-multiselect>
+          </div>
+        </div>
+      </div>
+
       <!-- ===== Table-specific options ===== -->
       <div
         class="config-section"

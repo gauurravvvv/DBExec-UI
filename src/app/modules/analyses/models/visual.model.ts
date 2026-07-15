@@ -11,6 +11,29 @@ export interface ChartDataPoint {
 }
 
 /**
+ * Aggregate functions supported by the server-side aggregation wrap
+ * (Track D). Mirrors AGGREGATE_VALUES in shared/validators/visuals.ts.
+ */
+export type AggregateFn =
+  | 'sum'
+  | 'avg'
+  | 'count'
+  | 'min'
+  | 'max'
+  | 'count_distinct';
+
+/**
+ * One extra combo measure for multi-measure charts. Persisted in
+ * visual.config.aggregations[] and echoed into the aggregation SQL wrap
+ * as `AGG(column) AS alias` alongside the primary measure.
+ */
+export interface AggregationMeasure {
+  column: string;
+  aggregate: AggregateFn;
+  alias: string;
+}
+
+/**
  * Multi-series data for complex charts (line, area, polar, heat-map)
  */
 export interface ChartSeriesData {
@@ -105,6 +128,12 @@ export interface Visual {
   /** Unique identifier for the visual */
   id: string;
 
+  /**
+   * Owning tab id (Track A). null / undefined = the default (first)
+   * tab, for back-compat with analyses authored before multi-tab.
+   */
+  tabId?: string | null;
+
   /** Display title of the visual */
   title: string;
 
@@ -165,6 +194,19 @@ export interface Visual {
 
   /** Column name for Z-axis / third dimension (heat-map) */
   zAxisColumn: string | null;
+
+  // ─── Server-side aggregation encoding (Track D) ─────────────────────
+  // When `aggregate` is set, the BE groups rows server-side over the full
+  // dataset: SELECT dimensionColumn, AGG(measureColumn) AS value GROUP BY
+  // dimensionColumn. `config.aggregations` carries extra combo measures.
+  // All null = no server aggregation, raw rows (back-compat).
+
+  /** Category column to GROUP BY (defaults to xAxisColumn on the BE). */
+  dimensionColumn?: string | null;
+  /** Numeric column the aggregate runs over (defaults to yAxisColumn). */
+  measureColumn?: string | null;
+  /** Aggregate function, or null for no server-side aggregation. */
+  aggregate?: AggregateFn | null;
 
   // ─── Per-chart role columns ─────────────────────────────────────────────
   // Optional fields. Only the columns relevant to the selected chart type
@@ -285,6 +327,7 @@ export interface FieldLabels {
 export function createVisual(id: string, config: any): Visual {
   return {
     id,
+    tabId: null,
     // Default English value lives here as a no-Angular fallback for
     // any caller that constructs visuals outside the editor (tests,
     // placeholder, hydration before TranslateService is ready).
@@ -309,6 +352,9 @@ export function createVisual(id: string, config: any): Visual {
     xAxisColumn: null,
     yAxisColumn: null,
     zAxisColumn: null,
+    dimensionColumn: null,
+    measureColumn: null,
+    aggregate: null,
     openColumn: null,
     highColumn: null,
     lowColumn: null,

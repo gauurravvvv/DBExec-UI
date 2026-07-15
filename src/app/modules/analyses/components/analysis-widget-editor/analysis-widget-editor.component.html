@@ -1,0 +1,130 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(560px, 92vw)' }"
+  styleClass="widget-editor-dialog"
+  [closable]="true"
+  [showHeader]="true"
+  (onHide)="onHide()"
+>
+  <ng-template pTemplate="header">
+    <div class="widget-editor-header">
+      <div class="widget-editor-header__icon" aria-hidden="true">
+        <i class="pi pi-th-large"></i>
+      </div>
+      <div class="widget-editor-header__text">
+        <h3>
+          {{
+            editingWidget
+              ? ('DASHBOARD.WIDGET.EDIT' | translate)
+              : ('DASHBOARD.WIDGET.ADD' | translate)
+          }}
+        </h3>
+        <p>{{ 'DASHBOARD.WIDGET.SUBTITLE' | translate }}</p>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="widget-editor-form">
+    <div class="config-group">
+      <label>{{ 'DASHBOARD.WIDGET.TYPE' | translate }}</label>
+      <app-custom-dropdown
+        [options]="widgetTypeOptions"
+        [(ngModel)]="widgetType"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+      ></app-custom-dropdown>
+    </div>
+
+    <!-- Text / markdown -->
+    <div class="config-group" *ngIf="widgetType === 'text'">
+      <label>{{ 'DASHBOARD.WIDGET.MARKDOWN' | translate }}</label>
+      <app-custom-input
+        [(ngModel)]="markdown"
+        inputMode="textarea"
+        [rows]="6"
+        [maxLength]="20000"
+        [placeholder]="'DASHBOARD.WIDGET.MARKDOWN_PH' | translate"
+      ></app-custom-input>
+    </div>
+
+    <!-- KPI -->
+    <ng-container *ngIf="widgetType === 'kpi'">
+      <div class="config-group">
+        <label>{{ 'DASHBOARD.WIDGET.KPI_LABEL' | translate }}</label>
+        <app-custom-input
+          [(ngModel)]="kpiLabel"
+          [maxLength]="255"
+          [placeholder]="'DASHBOARD.WIDGET.KPI_LABEL_PH' | translate"
+        ></app-custom-input>
+      </div>
+      <div class="config-group">
+        <label>{{ 'DASHBOARD.WIDGET.KPI_MEASURE' | translate }}</label>
+        <app-custom-dropdown
+          [options]="measureOptions"
+          [(ngModel)]="kpiMeasure"
+          optionLabel="label"
+          optionValue="value"
+          [editable]="true"
+          appendTo="body"
+          [placeholder]="'ANALYSES.AGG.MEASURE_PH' | translate"
+        ></app-custom-dropdown>
+      </div>
+      <div class="config-group">
+        <label>{{ 'DASHBOARD.WIDGET.KPI_AGGREGATE' | translate }}</label>
+        <app-custom-dropdown
+          [options]="aggregateOptions"
+          [(ngModel)]="kpiAggregate"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+        ></app-custom-dropdown>
+      </div>
+      <div class="config-group">
+        <label>{{ 'DASHBOARD.WIDGET.KPI_FORMAT' | translate }}</label>
+        <app-custom-dropdown
+          [options]="formatOptions"
+          [(ngModel)]="kpiFormat"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+        ></app-custom-dropdown>
+      </div>
+      <div class="config-group">
+        <label>{{ 'DASHBOARD.WIDGET.KPI_TARGET' | translate }}</label>
+        <app-custom-number
+          [(ngModel)]="kpiTargetValue"
+        ></app-custom-number>
+      </div>
+      <div class="config-group">
+        <label>{{ 'DASHBOARD.WIDGET.KPI_COMPARE' | translate }}</label>
+        <app-custom-input
+          [(ngModel)]="kpiComparePeriod"
+          [maxLength]="64"
+          [placeholder]="'DASHBOARD.WIDGET.KPI_COMPARE_PH' | translate"
+        ></app-custom-input>
+      </div>
+    </ng-container>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      class="p-button-text"
+      (click)="cancel()"
+      [disabled]="isSaving"
+      [label]="'COMMON.CANCEL' | translate"
+    ></button>
+    <button
+      pButton
+      type="button"
+      (click)="save()"
+      [disabled]="isSaveDisabled"
+      [label]="'COMMON.SAVE' | translate"
+    ></button>
+  </ng-template>
+</p-dialog>

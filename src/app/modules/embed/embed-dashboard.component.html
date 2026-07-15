@@ -2,7 +2,20 @@
   <!-- Slim public header: name + a subtle "powered by" mark. No app chrome. -->
   <header class="embed-header" *ngIf="!error">
     <span class="embed-name">{{ dashboardName }}</span>
-    <span class="embed-brand">DBExec</span>
+    <div class="embed-header-right">
+      <!-- Active cross-filter chip (clear affordance) — embed parity. -->
+      <button
+        type="button"
+        class="embed-cross-filter"
+        *ngIf="hasActiveCrossFilter"
+        (click)="clearCrossFilter()"
+      >
+        <i class="pi pi-filter-fill"></i>
+        <span class="cf-text">{{ crossFilterLabel }}</span>
+        <i class="pi pi-times"></i>
+      </button>
+      <span class="embed-brand">DBExec</span>
+    </div>
   </header>
 
   <!-- Loading -->
@@ -18,19 +31,64 @@
     <p>{{ 'DASHBOARD.EMBED.UNAVAILABLE_BODY' | translate }}</p>
   </div>
 
+  <!--
+    Blocking pre-load gate (embed parity). When required, the gate is the
+    ONLY thing shown and no query runs until the anonymous viewer submits.
+  -->
+  <app-dashboard-preload-gate
+    *ngIf="!loading && !error && gateOpen"
+    [parameters]="parameters"
+    [mandatoryFilters]="mandatoryFilters"
+    (submitted)="onGateSubmit($event)"
+  ></app-dashboard-preload-gate>
+
   <!-- Canvas -->
-  <div class="embed-canvas" #canvas *ngIf="!loading && !error">
-    <div class="embed-empty" *ngIf="visuals.length === 0">
+  <div
+    class="embed-canvas"
+    #canvas
+    *ngIf="!loading && !error && !gateOpen"
+  >
+    <!-- Tab strip (embed parity) — only when >1 tab. -->
+    <div class="embed-tab-strip" *ngIf="showTabStrip" role="tablist">
+      <button
+        type="button"
+        class="embed-tab"
+        *ngFor="let tab of tabs; trackBy: trackByTabId"
+        role="tab"
+        [class.active]="tab.id === activeTabId"
+        [attr.aria-selected]="tab.id === activeTabId"
+        (click)="selectTab(tab.id)"
+      >
+        <i class="pi" [ngClass]="tab.icon" *ngIf="tab.icon"></i>
+        <span>{{ tab.name }}</span>
+      </button>
+    </div>
+
+    <div class="embed-empty" *ngIf="activeTabEmpty">
       <i class="pi pi-chart-bar"></i>
       <p>{{ 'DASHBOARD.NO_VISUALS' | translate }}</p>
     </div>
 
-    <div class="embed-grid" *ngIf="visuals.length > 0">
+    <div class="embed-grid" *ngIf="!activeTabEmpty">
+      <!-- Widgets (text / KPI) share the grid with visuals. -->
+      <div
+        class="embed-widget"
+        *ngFor="let widget of visibleWidgets; trackBy: trackByWidgetId"
+        [style.grid-column]="'span ' + widgetColSpan(widget)"
+        [style.grid-row]="'span ' + widgetRowSpan(widget)"
+      >
+        <app-dashboard-widget
+          [widget]="widget"
+          [data]="rawData"
+        ></app-dashboard-widget>
+      </div>
+
       <div
         class="embed-visual"
-        *ngFor="let visual of visuals; trackBy: trackByVisualId"
+        *ngFor="let visual of visibleVisuals; trackBy: trackByVisualId"
         [style.grid-column]="visual.gridCol + 1 + ' / span ' + visual.colSpan"
         [style.grid-row]="visual.gridRow + 1 + ' / span ' + visual.rowSpan"
+        [class.cross-filter-source]="isCrossFilterSource(visual)"
       >
         <div class="embed-visual-title">
           {{ visual.title || ('DASHBOARD.UNTITLED_VISUAL' | translate) }}
@@ -79,6 +137,7 @@
               [chartWidth]="visual.width"
               [chartHeight]="visual.height"
               [data]="getDisplayData(visual)"
+              (chartSelect)="onVisualChartSelect(visual, $event)"
             ></app-echart-visual>
           </ng-template>
         </div>

@@ -24,7 +24,16 @@ export interface ConfiguredFilter {
   isEnabled: boolean;
   isMandatory: boolean;
   sequence: number;
+  // Filter scope (Track B) — which visuals this filter re-runs when
+  // applied. 'dashboard' (default) = all; 'tab' = one tab's visuals;
+  // 'visual' = an explicit list.
+  scope?: FilterScope;
+  targetTabId?: string | null;
+  targetVisualIds?: string[];
 }
+
+/** Allowed filter scopes (mirror of FILTER_SCOPE_VALUES). */
+export type FilterScope = 'dashboard' | 'tab' | 'visual';
 
 export const FILTER_OPERATOR_KEYS: Record<
   string,
@@ -97,6 +106,10 @@ export class FilterDialogComponent implements OnChanges {
   @Input() datasetId: string = '';
   @Input() analysisId: string = '';
   @Input() configuredFiltersCount: number = 0;
+  /** Tab options for the scope=tab target dropdown ({ label, value }). */
+  @Input() tabOptions: { label: string; value: string }[] = [];
+  /** Visual options for the scope=visual target multiselect. */
+  @Input() visualOptions: { label: string; value: string }[] = [];
 
   @Output() visibleChange = new EventEmitter<boolean>();
   /**
@@ -114,6 +127,10 @@ export class FilterDialogComponent implements OnChanges {
   filterDialogName: string = '';
   filterDialogEnabled: boolean = true;
   filterDialogMandatory: boolean = false;
+  // Scope authoring (Track B). Default 'dashboard' = re-runs all visuals.
+  filterDialogScope: FilterScope = 'dashboard';
+  filterDialogTargetTabId: string | null = null;
+  filterDialogTargetVisualIds: string[] = [];
   filterDialogOperator: string = '';
   filterDialogNullOption: string = 'ALL_VALUES';
   filterDialogDefaultValue: any = null;
@@ -206,7 +223,24 @@ export class FilterDialogComponent implements OnChanges {
       label: this.translate.instant(o.labelKey),
       value: o.value,
     }));
+    this.scopeOptions = [
+      {
+        label: this.translate.instant('ANALYSES.FILTER.SCOPE_DASHBOARD'),
+        value: 'dashboard',
+      },
+      {
+        label: this.translate.instant('ANALYSES.FILTER.SCOPE_TAB'),
+        value: 'tab',
+      },
+      {
+        label: this.translate.instant('ANALYSES.FILTER.SCOPE_VISUAL'),
+        value: 'visual',
+      },
+    ];
   }
+
+  /** Scope dropdown options (dashboard / tab / visual). */
+  scopeOptions: { label: string; value: FilterScope }[] = [];
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible) {
@@ -231,6 +265,11 @@ export class FilterDialogComponent implements OnChanges {
     this.filterDialogName = filter.name;
     this.filterDialogEnabled = filter.isEnabled;
     this.filterDialogMandatory = filter.isMandatory;
+    this.filterDialogScope = filter.scope || 'dashboard';
+    this.filterDialogTargetTabId = filter.targetTabId ?? null;
+    this.filterDialogTargetVisualIds = Array.isArray(filter.targetVisualIds)
+      ? [...filter.targetVisualIds]
+      : [];
 
     const config = filter.config || {};
     this.filterDialogOperator = config.matchOperator || '';
@@ -258,6 +297,9 @@ export class FilterDialogComponent implements OnChanges {
     this.filterDialogName = '';
     this.filterDialogEnabled = true;
     this.filterDialogMandatory = false;
+    this.filterDialogScope = 'dashboard';
+    this.filterDialogTargetTabId = null;
+    this.filterDialogTargetVisualIds = [];
     this.filterDialogOperator = '';
     this.filterDialogNullOption = 'ALL_VALUES';
     this.filterDialogDefaultValue = null;
@@ -277,6 +319,38 @@ export class FilterDialogComponent implements OnChanges {
 
   cancel(): void {
     this.visibleChange.emit(false);
+  }
+
+  /**
+   * Build the scope slice of the save payload. Only emits the target
+   * fields relevant to the chosen scope so a stale targetTabId /
+   * targetVisualIds from a previous scope never leaks to the BE (the
+   * scoped-filter superRefine there requires the matching target).
+   */
+  private buildScopePayload(): {
+    scope: FilterScope;
+    targetTabId: string | null;
+    targetVisualIds: string[];
+  } {
+    return {
+      scope: this.filterDialogScope,
+      targetTabId:
+        this.filterDialogScope === 'tab' ? this.filterDialogTargetTabId : null,
+      targetVisualIds:
+        this.filterDialogScope === 'visual'
+          ? this.filterDialogTargetVisualIds
+          : [],
+    };
+  }
+
+  /**
+   * When the scope changes, clear the target that no longer applies so
+   * the picker for the new scope starts clean.
+   */
+  onScopeChange(): void {
+    if (this.filterDialogScope !== 'tab') this.filterDialogTargetTabId = null;
+    if (this.filterDialogScope !== 'visual')
+      this.filterDialogTargetVisualIds = [];
   }
 
   async save(): Promise<void> {
@@ -359,6 +433,7 @@ export class FilterDialogComponent implements OnChanges {
           isEnabled: this.filterDialogEnabled,
           isMandatory: this.filterDialogMandatory,
           sequence: this.editingFilter.sequence,
+          ...this.buildScopePayload(),
         });
       } else {
         res = await this.analysesService.addFilters({
@@ -374,6 +449,7 @@ export class FilterDialogComponent implements OnChanges {
               isEnabled: this.filterDialogEnabled,
               isMandatory: this.filterDialogMandatory,
               sequence: this.configuredFiltersCount,
+              ...this.buildScopePayload(),
             },
           ],
         });

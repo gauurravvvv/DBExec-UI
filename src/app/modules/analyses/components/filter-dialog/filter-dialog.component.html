@@ -201,6 +201,46 @@
           ></app-custom-toggle>
         </div>
       </div>
+
+      <!-- Filter scope (Track B) — which visuals this filter re-runs. -->
+      <div class="filter-dialog-row" *ngIf="filterDialogType">
+        <div class="filter-dialog-field">
+          <app-custom-dropdown
+            [options]="scopeOptions"
+            [(ngModel)]="filterDialogScope"
+            (ngModelChange)="onScopeChange()"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            [label]="'ANALYSES.FILTER.SCOPE' | translate"
+            icon="pi-filter"
+          ></app-custom-dropdown>
+        </div>
+        <div class="filter-dialog-field" *ngIf="filterDialogScope === 'tab'">
+          <app-custom-dropdown
+            [options]="tabOptions"
+            [(ngModel)]="filterDialogTargetTabId"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            [label]="'ANALYSES.FILTER.SCOPE_TARGET_TAB' | translate"
+            [placeholder]="'ANALYSES.FILTER.SCOPE_TARGET_TAB' | translate"
+            icon="pi-folder"
+          ></app-custom-dropdown>
+        </div>
+        <div class="filter-dialog-field" *ngIf="filterDialogScope === 'visual'">
+          <app-custom-multiselect
+            [options]="visualOptions"
+            [(ngModel)]="filterDialogTargetVisualIds"
+            optionLabel="label"
+            optionValue="value"
+            display="chip"
+            appendTo="body"
+            [label]="'ANALYSES.FILTER.SCOPE_TARGET_VISUALS' | translate"
+            [placeholder]="'ANALYSES.FILTER.SCOPE_TARGET_VISUALS' | translate"
+          ></app-custom-multiselect>
+        </div>
+      </div>
     </section>
 
     <!-- ─── Section 3 — Default value ───────────────────────────── -->

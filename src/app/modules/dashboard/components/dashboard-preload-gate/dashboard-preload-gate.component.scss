@@ -1,0 +1,131 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.preload-gate-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100%;
+  padding: 32px 16px;
+  box-sizing: border-box;
+}
+
+.preload-gate-card {
+  width: 100%;
+  max-width: 460px;
+  background: var(--card-background, #ffffff);
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg, 0 8px 24px rgba(0, 0, 0, 0.12));
+  padding: 28px 28px 24px;
+  box-sizing: border-box;
+}
+
+.gate-head {
+  text-align: center;
+  margin-bottom: 20px;
+
+  .gate-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 12px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-color-transparent, rgba(33, 150, 243, 0.15));
+    color: var(--primary-color, #2196f3);
+    font-size: 22px;
+  }
+
+  .gate-title {
+    margin: 0 0 6px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-color, #333);
+  }
+
+  .gate-subtitle {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-muted, #6b7280);
+  }
+}
+
+.gate-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-height: 52vh;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.gate-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gate-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-subtle, #9ca3af);
+}
+
+.gate-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.gate-actions {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.gate-load-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 16px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--primary-text, #ffffff);
+  background: var(--primary-color, #2196f3);
+  transition: background 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--primary-hover, #1976d2);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  i {
+    font-size: 13px;
+  }
+}
+
+.gate-hint {
+  margin: 0;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted, #6b7280);
+}

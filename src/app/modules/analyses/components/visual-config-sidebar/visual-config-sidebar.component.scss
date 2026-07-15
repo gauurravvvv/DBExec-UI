@@ -197,3 +197,23 @@
     opacity: 1;
   }
 }
+
+/* ─── Data / Analytics / Interaction authoring (v2) ─────────────────── */
+.config-subsection {
+  margin: var(--space-2, 8px) 0 var(--space-3, 12px);
+  padding-left: var(--space-3, 12px);
+  border-left: 2px solid var(--border-color, #e5e7eb);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+}
+
+.config-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+  padding: var(--space-2, 8px);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: var(--radius-xs, 6px);
+  background: var(--a-bg-surface, rgba(0, 0, 0, 0.02));
+}

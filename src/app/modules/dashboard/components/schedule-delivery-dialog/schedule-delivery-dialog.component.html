@@ -1,0 +1,175 @@
+<p-dialog
+  [visible]="visible"
+  (visibleChange)="$event ? null : close()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  [style]="{ width: '520px', maxWidth: '95vw' }"
+  [header]="'DASHBOARD.SCHEDULE.TITLE' | translate"
+  appendTo="body"
+  styleClass="schedule-delivery-dialog"
+>
+  <form [formGroup]="form" class="schedule-form">
+    <p class="schedule-hint">
+      {{ 'DASHBOARD.SCHEDULE.HINT' | translate: { name: dashboardName } }}
+    </p>
+
+    <div class="form-grid two-col">
+      <app-custom-dropdown
+        formControlName="cronExpression"
+        [label]="'DASHBOARD.SCHEDULE.FREQUENCY' | translate"
+        [options]="cronPresets"
+        optionLabel="label"
+        optionValue="value"
+        
+        [filter]="false"
+      ></app-custom-dropdown>
+
+      <app-custom-dropdown
+        formControlName="timezone"
+        [label]="'DASHBOARD.SCHEDULE.TIMEZONE' | translate"
+        [options]="timezoneOptions"
+        optionLabel="label"
+        optionValue="value"
+        [filter]="true"
+        filterBy="label"
+      ></app-custom-dropdown>
+    </div>
+
+    <div class="form-grid">
+      <app-custom-dropdown
+        formControlName="format"
+        [label]="'DASHBOARD.SCHEDULE.FORMAT' | translate"
+        [options]="formatOptions"
+        optionLabel="label"
+        optionValue="value"
+        
+        [filter]="false"
+      ></app-custom-dropdown>
+    </div>
+
+    <div class="form-grid two-col">
+      <app-custom-multiselect
+        formControlName="recipientUserIds"
+        [label]="'DASHBOARD.SCHEDULE.RECIPIENT_USERS' | translate"
+        [placeholder]="'DASHBOARD.SCHEDULE.SELECT_USERS' | translate"
+        [serverMode]="true"
+        [fetcher]="loadUsersPage"
+        [pageSize]="10"
+        optionLabel="displayLabel"
+        optionValue="id"
+        [filter]="true"
+        filterBy="displayLabel"
+        display="chip"
+        [maxSelectedLabels]="5"
+        icon="pi-users"
+      ></app-custom-multiselect>
+
+      <div class="chips-field">
+        <label class="chips-label">
+          {{ 'DASHBOARD.SCHEDULE.RECIPIENT_EMAILS' | translate }}
+        </label>
+        <p-chips
+          formControlName="recipientEmails"
+          [addOnBlur]="true"
+          [addOnTab]="true"
+          [allowDuplicate]="false"
+          [separator]="emailSeparator"
+          [placeholder]="'DASHBOARD.SCHEDULE.ADD_EMAIL' | translate"
+          styleClass="schedule-email-chips"
+        ></p-chips>
+      </div>
+    </div>
+
+    <!-- Existing schedules -->
+    <div class="existing-schedules">
+      <div class="existing-head">
+        {{ 'DASHBOARD.SCHEDULE.EXISTING' | translate }}
+      </div>
+
+      <div class="schedule-loading" *ngIf="loading">
+        <i class="pi pi-spin pi-spinner"></i>
+      </div>
+
+      <div class="schedule-empty" *ngIf="!loading && subscriptions.length === 0">
+        {{ 'DASHBOARD.SCHEDULE.NONE' | translate }}
+      </div>
+
+      <ul class="schedule-list" *ngIf="!loading && subscriptions.length > 0">
+        <li
+          class="schedule-row"
+          *ngFor="let sub of subscriptions; trackBy: trackSub"
+        >
+          <div class="schedule-info">
+            <span class="schedule-freq">
+              {{ cronLabel(sub.cronExpression) }}
+            </span>
+            <span class="schedule-meta">
+              {{ sub.format | uppercase }} · {{ sub.timezone }}
+            </span>
+          </div>
+          <div class="schedule-row-actions">
+            <span
+              class="schedule-status"
+              [class.on]="sub.enabled"
+              [class.off]="!sub.enabled"
+            >
+              {{
+                (sub.enabled
+                  ? 'DASHBOARD.SCHEDULE.ON'
+                  : 'DASHBOARD.SCHEDULE.OFF'
+                ) | translate
+              }}
+            </span>
+            <button
+              type="button"
+              class="row-icon-btn"
+              (click)="toggle(sub)"
+              [pTooltip]="
+                (sub.enabled
+                  ? 'DASHBOARD.SCHEDULE.DISABLE'
+                  : 'DASHBOARD.SCHEDULE.ENABLE'
+                ) | translate
+              "
+              tooltipPosition="top"
+            >
+              <i
+                class="pi"
+                [ngClass]="sub.enabled ? 'pi-pause' : 'pi-play'"
+              ></i>
+            </button>
+            <button
+              type="button"
+              class="row-icon-btn danger"
+              (click)="remove(sub)"
+              [pTooltip]="'COMMON.DELETE' | translate"
+              tooltipPosition="top"
+            >
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <button
+      type="button"
+      class="dialog-btn secondary"
+      (click)="close()"
+    >
+      {{ 'COMMON.CLOSE' | translate }}
+    </button>
+    <button
+      type="button"
+      class="dialog-btn primary"
+      [disabled]="!canSave"
+      (click)="save()"
+    >
+      <i class="pi" [ngClass]="saving ? 'pi-spin pi-spinner' : 'pi-calendar-plus'"></i>
+      <span>{{ 'DASHBOARD.SCHEDULE.CREATE' | translate }}</span>
+    </button>
+  </ng-template>
+</p-dialog>

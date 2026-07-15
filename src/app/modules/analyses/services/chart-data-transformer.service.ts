@@ -1214,7 +1214,7 @@ export class ChartDataTransformerService {
    * forward. New roles added to Visual only need to be added here.
    */
   buildMapping(visual: any): ChartDataMapping {
-    return {
+    const mapping: ChartDataMapping = {
       xAxisColumn: visual.xAxisColumn ?? null,
       yAxisColumn: visual.yAxisColumn ?? null,
       zAxisColumn: visual.zAxisColumn ?? null,
@@ -1231,5 +1231,32 @@ export class ChartDataTransformerService {
       latColumn: visual.latColumn ?? null,
       timeColumn: visual.timeColumn ?? null,
     };
+
+    // ── Server-side aggregation shape (Track D) ──────────────────────
+    // When the visual declares an `aggregate`, the BE has already
+    // grouped the rows: each row is { <dimensionColumn>: <cat>, value:
+    // <agg>, [alias]: <agg>, ... } (buildAggregationWrap aliases the
+    // primary measure AS "value" and each extra combo measure AS its
+    // alias). Re-point the mapping so the standard category+value
+    // transforms read the dimension for X and the "value" alias for Y —
+    // x = dimension, y = value. Extra combo aliases (config.aggregations)
+    // feed the multi-series value columns so combo charts pick them up.
+    // No-op when `aggregate` is absent (raw-row back-compat).
+    if (visual.aggregate) {
+      mapping.xAxisColumn = visual.dimensionColumn ?? visual.xAxisColumn ?? null;
+      mapping.yAxisColumn = 'value';
+      const extras = Array.isArray(visual.config?.aggregations)
+        ? visual.config.aggregations
+            .map((a: any) => a?.alias)
+            .filter((v: any) => typeof v === 'string' && v.length > 0)
+        : [];
+      if (extras.length > 0) {
+        // Prepend "value" so the primary measure is the first series and
+        // the combo aliases follow, matching the aggregation column order.
+        mapping.valueColumns = ['value', ...extras];
+      }
+    }
+
+    return mapping;
   }
 }

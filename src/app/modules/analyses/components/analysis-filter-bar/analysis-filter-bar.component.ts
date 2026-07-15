@@ -148,6 +148,20 @@ export class AnalysisFilterBarComponent
   }
 
   /**
+   * Scope chip label for a filter (Track B). Returns an i18n key for a
+   * small badge shown on scoped filters so the viewer knows a filter
+   * only re-runs a subset. Returns '' for dashboard-scope (default) or
+   * a filter with no scope set — the chip is then not rendered.
+   */
+  scopeChipKey(filter: any): string {
+    const scope = filter?.scope;
+    if (!scope || scope === 'dashboard') return '';
+    if (scope === 'tab') return 'ANALYSES.FILTER.SCOPE_CHIP_TAB';
+    if (scope === 'visual') return 'ANALYSES.FILTER.SCOPE_CHIP_VISUAL';
+    return '';
+  }
+
+  /**
    * Filters that render inline in the bar. When maxVisible is unset
    * or zero, every visible filter qualifies (legacy behaviour).
    * Otherwise we slice off the first N to keep the bar from wrapping

@@ -4,6 +4,7 @@ import {
   ConditionalRule,
   resolveConditionalStyle,
 } from './conditional-formatting.helper';
+import { forecast, linearTrend, movingAverage } from './trend.helper';
 
 // ========= Chart Typography =========
 // ECharts is canvas-rendered and does not resolve CSS variables. To stay in
@@ -4099,6 +4100,230 @@ const SIMPLE_BUILDERS: Record<string, DataConfigBuilder> = {
   polygons3d: buildPolygons3DChartOption,
 };
 
+// ========= Chart analytics (Track E1): dual-axis / trend / small-multiples =========
+//
+// These post-process a built cartesian option (bar / line / area). Each is a
+// strict NO-OP when its config key is absent, so existing charts render byte-
+// identically. They read the transformed shape the builders already produced:
+// option.series[i] = { name, type, data: number[] }, option.xAxis.data =
+// category names. Non-cartesian charts (pie, gauge, geo, …) skip this pass.
+
+/**
+ * True only for a fresh single-grid cartesian option: a category X axis, a
+ * value Y axis (both plain objects, not arrays), and a series array. Once a
+ * pass has promoted the axes to arrays (dual-axis / small-multiples) this
+ * returns false, so a second decorator won't re-wrap an already-decorated
+ * option.
+ */
+function isCartesianOption(option: any): boolean {
+  if (!option) return false;
+  if (Array.isArray(option.xAxis) || Array.isArray(option.yAxis)) return false;
+  const x = option.xAxis;
+  const y = option.yAxis;
+  const hasCat = x && x.type === 'category';
+  const hasVal = y && y.type === 'value';
+  return !!(hasCat && hasVal && Array.isArray(option.series));
+}
+
+/**
+ * Dual-axis: add a second (right) value axis and route the named series to
+ * it, optionally switching a series' render type (bar/line) for a combo.
+ * config.dualAxis = { series: [{ name, type?, yAxisIndex? }], rightAxisName? }.
+ * No-op when config.dualAxis / its series list is absent/empty.
+ */
+function applyDualAxis(option: any, config: any): void {
+  const cfg = config?.dualAxis;
+  if (!cfg || !Array.isArray(cfg.series) || cfg.series.length === 0) return;
+  if (!isCartesianOption(option)) return;
+
+  // Promote the single value yAxis to an array with a mirrored right axis.
+  const leftAxis = option.yAxis;
+  const rightAxis = {
+    ...leftAxis,
+    name: cfg.rightAxisName || '',
+    // The right axis gets its own scale; don't inherit the left's fixed min/max.
+    min: undefined,
+    max: undefined,
+    splitLine: { show: false },
+  };
+  option.yAxis = [leftAxis, { ...rightAxis, position: 'right' }];
+
+  const byName = new Map<string, any>();
+  for (const entry of cfg.series) {
+    if (entry && typeof entry.name === 'string') byName.set(entry.name, entry);
+  }
+  option.series = (option.series || []).map((sr: any) => {
+    const entry = byName.get(sr.name);
+    if (!entry) return { ...sr, yAxisIndex: 0 };
+    return {
+      ...sr,
+      type: entry.type === 'bar' || entry.type === 'line' ? entry.type : sr.type,
+      yAxisIndex: entry.yAxisIndex === 1 ? 1 : 0,
+    };
+  });
+}
+
+/**
+ * Trend: append a computed overlay line series derived from the FIRST base
+ * series' values. config.trend = { type, window?, forecastPeriods?,
+ * seriesName? }. type 'none' (or absent) is a no-op.
+ *   - linear         → least-squares regression line over the series.
+ *   - movingAverage  → trailing SMA with `window` (default 3).
+ *   - forecast       → regression line projected `forecastPeriods` steps
+ *                       past the last category (extends xAxis.data too).
+ */
+function applyTrend(option: any, config: any): void {
+  const cfg = config?.trend;
+  if (!cfg || !cfg.type || cfg.type === 'none') return;
+  if (!isCartesianOption(option)) return;
+  const base = (option.series || [])[0];
+  if (!base || !Array.isArray(base.data) || base.data.length === 0) return;
+
+  // Series data can be bare numbers or { value } points (conditional
+  // formatting wraps them). Normalise to a numeric array for the maths.
+  const values: Array<number | null> = base.data.map((d: any) =>
+    d && typeof d === 'object' && 'value' in d ? Number(d.value) : Number(d),
+  );
+
+  let overlay: Array<number | null> = [];
+  let name = cfg.seriesName || 'Trend';
+  if (cfg.type === 'linear') {
+    overlay = linearTrend(values);
+  } else if (cfg.type === 'movingAverage') {
+    overlay = movingAverage(values, cfg.window || 3);
+  } else if (cfg.type === 'forecast') {
+    const periods = cfg.forecastPeriods || 3;
+    overlay = forecast(values, periods);
+    // Extend the category axis with projected placeholders so the tail
+    // has x positions to land on.
+    if (option.xAxis && Array.isArray(option.xAxis.data)) {
+      const start = option.xAxis.data.length;
+      for (let i = 0; i < periods; i++) {
+        option.xAxis.data = [...option.xAxis.data, `+${i + 1}`];
+      }
+      // Right-pad every existing series so lengths stay aligned.
+      option.series = (option.series || []).map((sr: any) =>
+        Array.isArray(sr.data)
+          ? { ...sr, data: [...sr.data, ...new Array(periods).fill(null)] }
+          : sr,
+      );
+    }
+  } else {
+    return;
+  }
+
+  option.series = [
+    ...(option.series || []),
+    {
+      name,
+      type: 'line',
+      data: overlay,
+      smooth: true,
+      symbol: 'none',
+      lineStyle: { type: 'dashed', width: 2 },
+      // Dashed overlay rides the left axis by default; harmless when the
+      // chart has no second axis (yAxisIndex 0 always exists).
+      yAxisIndex: 0,
+      z: 5,
+      silent: true,
+    },
+  ];
+}
+
+/**
+ * Small-multiples (facet): split a multi-series cartesian option into a
+ * grid of sub-charts, one per series. config.smallMultiples = { facetColumn?,
+ * maxCols? }. The transformed shape already carries one series per facet
+ * value, so each series becomes its own grid cell sharing the category axis.
+ * No-op when disabled or when there is <=1 series to facet.
+ */
+function applySmallMultiples(option: any, config: any): void {
+  const cfg = config?.smallMultiples;
+  const enabled =
+    cfg && (cfg.enabled === true || cfg.facetColumn) && !Array.isArray(option.yAxis);
+  if (!enabled) return;
+  if (!isCartesianOption(option)) return;
+  const series = option.series || [];
+  if (series.length <= 1) return;
+
+  const maxCols = Math.max(1, Math.min(6, Math.floor(cfg.maxCols || 2)));
+  const count = series.length;
+  const cols = Math.min(maxCols, count);
+  const rows = Math.ceil(count / cols);
+
+  const categories =
+    option.xAxis && Array.isArray(option.xAxis.data) ? option.xAxis.data : [];
+  const baseX = option.xAxis || { type: 'category' };
+  const baseY = option.yAxis || { type: 'value' };
+
+  const grids: any[] = [];
+  const xAxes: any[] = [];
+  const yAxes: any[] = [];
+  const gapPct = 6;
+  const cellW = (100 - gapPct * (cols + 1)) / cols;
+  const cellH = (100 - gapPct * (rows + 1)) / rows;
+
+  const newSeries = series.map((sr: any, idx: number) => {
+    const r = Math.floor(idx / cols);
+    const c = idx % cols;
+    const left = gapPct + c * (cellW + gapPct);
+    const top = gapPct + r * (cellH + gapPct);
+    grids.push({
+      left: `${left}%`,
+      top: `${top}%`,
+      width: `${cellW}%`,
+      height: `${cellH}%`,
+      containLabel: true,
+    });
+    xAxes.push({ ...baseX, gridIndex: idx, data: categories });
+    yAxes.push({ ...baseY, gridIndex: idx });
+    return {
+      ...sr,
+      xAxisIndex: idx,
+      yAxisIndex: idx,
+    };
+  });
+
+  option.grid = grids;
+  option.xAxis = xAxes;
+  option.yAxis = yAxes;
+  option.series = newSeries;
+  // A per-facet title band reads cleaner than one shared legend.
+  option.title = grids.map((g: any, idx: number) => ({
+    text: String(series[idx].name ?? ''),
+    left: g.left,
+    top: `calc(${g.top} - 2%)`,
+    textStyle: { fontSize: 12, fontWeight: 600, color: CHART_COLOR_STRONG },
+  }));
+  option.legend = { show: false };
+}
+
+/**
+ * Apply the cartesian analytics pass in a fixed order: dual-axis first (it
+ * defines the axis array), then trend (appends a series that should ride an
+ * existing axis), then small-multiples last (it re-shapes axes into a grid
+ * array and would otherwise clobber the dual-axis work — the two are
+ * mutually exclusive in the authoring UI, but ordering keeps it safe).
+ */
+function applyCartesianAnalytics(
+  option: any,
+  config: any,
+  chartType: string,
+): any {
+  const CARTESIAN = /^(bar-|line|area)/;
+  if (!CARTESIAN.test(chartType)) return option;
+  if (!option || typeof option !== 'object') return option;
+  try {
+    applyDualAxis(option, config);
+    applyTrend(option, config);
+    applySmallMultiples(option, config);
+  } catch {
+    // Analytics are additive polish — never let a malformed config blank
+    // the whole chart. Fall back to the un-decorated option.
+  }
+  return option;
+}
+
 /**
  * Unified dispatcher — routes chartType to the correct build function.
  * Handles node+link charts (sankey, graph, etc.), typed charts (bar, line, etc.),
@@ -4121,7 +4346,10 @@ export function buildChartOption(
   // Charts that need chartType variant
   const typedBuilder = CHART_TYPE_BUILDERS[chartType];
   if (typedBuilder) {
-    return typedBuilder(data, config, chartType);
+    const built = typedBuilder(data, config, chartType);
+    // Track E1: dual-axis / trend / small-multiples post-process. No-op
+    // for non-cartesian types and when the config keys are absent.
+    return applyCartesianAnalytics(built, config, chartType);
   }
 
   // Simple (data, config) charts

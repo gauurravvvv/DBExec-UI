@@ -1,0 +1,27 @@
+<!-- Text (markdown) widget -->
+<div class="widget-text" *ngIf="widgetType === 'text'">
+  <div class="widget-markdown" [innerHTML]="safeHtml"></div>
+</div>
+
+<!-- KPI (big-number) widget -->
+<div class="widget-kpi" *ngIf="widgetType === 'kpi'">
+  <div class="kpi-label" *ngIf="kpiLabel">{{ kpiLabel }}</div>
+  <div class="kpi-value">{{ kpiValue }}</div>
+  <div
+    class="kpi-compare"
+    *ngIf="compareState"
+    [class.up]="compareState === 'up'"
+    [class.down]="compareState === 'down'"
+    [class.flat]="compareState === 'flat'"
+  >
+    <i
+      class="pi"
+      [ngClass]="{
+        'pi-arrow-up': compareState === 'up',
+        'pi-arrow-down': compareState === 'down',
+        'pi-minus': compareState === 'flat'
+      }"
+    ></i>
+    <span>{{ compareText }}</span>
+  </div>
+</div>

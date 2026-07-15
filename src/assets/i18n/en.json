@@ -1464,6 +1464,80 @@
       "MAX": "Max",
       "LOW_COLOR": "Low color",
       "HIGH_COLOR": "High color"
+    },
+    "DATA_SECTION": "Data",
+    "DEFAULT_TAB": "Main",
+    "TABS": {
+      "ADD": "Add tab",
+      "RENAME": "Rename",
+      "DELETE": "Delete tab",
+      "MOVE_LEFT": "Move left",
+      "MOVE_RIGHT": "Move right",
+      "MOVE_VISUAL": "Move to tab",
+      "MOVE_TO": "Move to",
+      "NEW_TAB_NAME": "Tab {{n}}",
+      "CONFIRM_DELETE": "Delete this tab?",
+      "CONFIRM_DELETE_MSG": "Delete the tab \"{{name}}\"? Its visuals move to the first remaining tab.",
+      "DELETE_REASSIGN_INFO": "Visuals on this tab will be reassigned to the first remaining tab."
+    },
+    "AGG": {
+      "DIMENSION": "Dimension",
+      "DIMENSION_PH": "Group by column",
+      "MEASURE": "Measure",
+      "MEASURE_PH": "Numeric column",
+      "AGGREGATE": "Aggregate",
+      "NONE": "None (raw rows)",
+      "SUM": "Sum",
+      "AVG": "Average",
+      "COUNT": "Count",
+      "MIN": "Min",
+      "MAX": "Max",
+      "COUNT_DISTINCT": "Count distinct",
+      "EXTRA_MEASURES": "Extra measures",
+      "ADD_MEASURE": "Add measure",
+      "ALIAS_PH": "Alias"
+    },
+    "ANALYTICS": {
+      "SECTION": "Analytics",
+      "DUAL_AXIS": "Dual axis",
+      "RIGHT_AXIS_NAME": "Right axis name",
+      "SERIES_MAP": "Series axis mapping",
+      "ADD_SERIES": "Add series",
+      "SERIES_NAME_PH": "Series name",
+      "SERIES_BAR": "Bar",
+      "SERIES_LINE": "Line",
+      "AXIS_LEFT": "Left axis",
+      "AXIS_RIGHT": "Right axis",
+      "TREND": "Trend line",
+      "TREND_NONE": "None",
+      "TREND_LINEAR": "Linear regression",
+      "TREND_MOVING_AVG": "Moving average",
+      "TREND_FORECAST": "Forecast",
+      "WINDOW": "Window",
+      "FORECAST_PERIODS": "Forecast periods",
+      "SMALL_MULTIPLES": "Small multiples",
+      "FACET_COLUMN": "Facet column",
+      "MAX_COLS": "Max columns"
+    },
+    "INTERACTION": {
+      "SECTION": "Interaction",
+      "CROSS_FILTER": "Cross-filter",
+      "TARGETS": "Applies to",
+      "TARGET_SAME_TAB": "Same tab",
+      "TARGET_DASHBOARD": "Whole dashboard",
+      "TARGET_SELECTED": "Selected visuals",
+      "TARGET_VISUALS": "Target visuals",
+      "SELECT_VISUALS": "Select visuals"
+    },
+    "FILTER": {
+      "SCOPE": "Scope",
+      "SCOPE_DASHBOARD": "Whole dashboard",
+      "SCOPE_TAB": "One tab",
+      "SCOPE_VISUAL": "Specific visuals",
+      "SCOPE_TARGET_TAB": "Target tab",
+      "SCOPE_TARGET_VISUALS": "Target visuals",
+      "SCOPE_CHIP_TAB": "Tab",
+      "SCOPE_CHIP_VISUAL": "Visuals"
     }
   },
   "DASHBOARD": {
@@ -1555,6 +1629,64 @@
     "EMBED": {
       "UNAVAILABLE_TITLE": "This dashboard is unavailable",
       "UNAVAILABLE_BODY": "This share link is invalid, has expired, or has been revoked. Please contact the person who shared it with you."
+    },
+    "WIDGET": {
+      "ADD": "Add widget",
+      "EDIT": "Edit widget",
+      "SUBTITLE": "A text note or a KPI tile on the canvas.",
+      "TYPE": "Widget type",
+      "TYPE_TEXT": "Text / Markdown",
+      "TYPE_KPI": "KPI tile",
+      "MARKDOWN": "Content",
+      "MARKDOWN_PH": "Write a note (Markdown supported)…",
+      "KPI_LABEL": "Label",
+      "KPI_LABEL_PH": "e.g. Total revenue",
+      "KPI_MEASURE": "Measure",
+      "KPI_AGGREGATE": "Aggregate",
+      "KPI_FORMAT": "Format",
+      "FORMAT_NUMBER": "Number",
+      "FORMAT_CURRENCY": "Currency",
+      "FORMAT_PERCENT": "Percent",
+      "KPI_TARGET": "Target",
+      "KPI_COMPARE": "Compare period",
+      "KPI_COMPARE_PH": "e.g. previous month"
+    },
+    "GATE": {
+      "TITLE": "Inputs required",
+      "SUBTITLE": "Fill in the required inputs to load this dashboard. Nothing runs until you continue.",
+      "PARAMETERS": "Parameters",
+      "FILTERS": "Filters",
+      "LOAD": "Load dashboard",
+      "REQUIRED_HINT": "Fill in every required input to continue.",
+      "EDIT_INPUTS": "Edit inputs"
+    },
+    "AUTO_REFRESH": {
+      "INDICATOR": "auto-refresh: {{seconds}}s",
+      "TOOLTIP": "This dashboard refreshes its data automatically."
+    },
+    "CROSS_FILTER": {
+      "CLEAR": "Clear cross-filter"
+    },
+    "SCHEDULE": {
+      "BUTTON": "Schedule delivery",
+      "TITLE": "Schedule delivery",
+      "HINT": "Email a {{name}} snapshot on a schedule. Recipients receive the rendered dashboard.",
+      "FREQUENCY": "Frequency",
+      "TIMEZONE": "Timezone",
+      "FORMAT": "Format",
+      "FORMAT_PDF": "PDF",
+      "FORMAT_PNG": "PNG (image)",
+      "RECIPIENT_USERS": "Recipients (users)",
+      "SELECT_USERS": "Select users",
+      "RECIPIENT_EMAILS": "Recipients (emails)",
+      "ADD_EMAIL": "Add email and press Enter",
+      "EXISTING": "Existing schedules",
+      "NONE": "No delivery schedules yet.",
+      "CREATE": "Create schedule",
+      "ON": "On",
+      "OFF": "Off",
+      "ENABLE": "Enable",
+      "DISABLE": "Disable"
     }
   },
   "TOAST": {

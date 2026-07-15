@@ -55,6 +55,14 @@
          (overlay) iterators above so the two paths stay in sync.
          `let-filter` shadows the outer-scope `filter` from the *ngFor. -->
     <ng-template #filterChip let-filter>
+      <!-- Scope chip (Track B) — a small badge on scoped filters so the
+           viewer knows this filter only re-runs a tab / specific visuals.
+           Hidden for dashboard-scope (the default). -->
+      <span class="filter-scope-chip" *ngIf="scopeChipKey(filter)">
+        <i class="pi pi-filter"></i>
+        {{ scopeChipKey(filter) | translate }}
+      </span>
+
       <!-- Column-missing empty state.
            If the BE flagged the target column as no longer in the
            dataset SQL output, the dropdown can't render — replace it

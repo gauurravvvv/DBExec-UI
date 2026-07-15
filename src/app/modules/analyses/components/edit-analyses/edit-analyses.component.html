@@ -567,8 +567,20 @@
       [datasetId]="datasetId"
       [analysisId]="analysisId"
       [configuredFiltersCount]="configuredFilters.length"
+      [tabOptions]="filterTabOptions"
+      [visualOptions]="filterVisualOptions"
       (saved)="onFilterSaved($event)"
     ></app-filter-dialog>
+
+    <!-- Canvas widget authoring dialog (Track E3). -->
+    <app-analysis-widget-editor
+      [(visible)]="showWidgetEditor"
+      [analysisId]="analysisId"
+      [activeTabId]="activeTabId"
+      [editingWidget]="editingWidget"
+      [measureOptions]="measureFieldOptions"
+      (saved)="onWidgetSaved($event)"
+    ></app-analysis-widget-editor>
 
     <!-- Center Container -->
     <div class="editor-container" #canvasContainer>
@@ -640,15 +652,116 @@
         </button>
       </div>
 
+      <!-- Analysis tab strip (Track A4). Hidden until the analysis has at
+           least one named tab; an un-tabbed analysis renders as one implicit
+           tab with no strip. -->
+      <div class="analysis-tab-strip" *ngIf="tabs.length > 0">
+        <div
+          class="analysis-tab"
+          *ngFor="let tab of tabs; let ti = index; trackBy: trackByTabId"
+          [class.active]="tab.id === activeTabId"
+          (click)="selectTab(tab.id)"
+        >
+          <ng-container *ngIf="editingTabId !== tab.id">
+            <span
+              class="analysis-tab__name"
+              (dblclick)="startRenameTab(tab, $event)"
+              >{{ tab.name }}</span
+            >
+            <span class="analysis-tab__actions">
+              <i
+                class="pi pi-angle-left tab-act"
+                *ngIf="ti > 0"
+                (click)="moveTab(tab, -1); $event.stopPropagation()"
+                [pTooltip]="'ANALYSES.TABS.MOVE_LEFT' | translate"
+                tooltipPosition="bottom"
+              ></i>
+              <i
+                class="pi pi-angle-right tab-act"
+                *ngIf="ti < tabs.length - 1"
+                (click)="moveTab(tab, 1); $event.stopPropagation()"
+                [pTooltip]="'ANALYSES.TABS.MOVE_RIGHT' | translate"
+                tooltipPosition="bottom"
+              ></i>
+              <i
+                class="pi pi-pencil tab-act"
+                (click)="startRenameTab(tab, $event)"
+                [pTooltip]="'ANALYSES.TABS.RENAME' | translate"
+                tooltipPosition="bottom"
+              ></i>
+              <i
+                class="pi pi-times tab-act tab-act--danger"
+                *ngIf="tabs.length > 1"
+                (click)="confirmDeleteTab(tab, $event)"
+                [pTooltip]="'ANALYSES.TABS.DELETE' | translate"
+                tooltipPosition="bottom"
+              ></i>
+            </span>
+          </ng-container>
+          <input
+            *ngIf="editingTabId === tab.id"
+            class="analysis-tab__rename"
+            [(ngModel)]="editingTabName"
+            (blur)="finishRenameTab()"
+            (keydown)="onTabNameKeydown($event)"
+            (click)="$event.stopPropagation()"
+            autofocus
+          />
+        </div>
+        <button
+          type="button"
+          class="analysis-tab-add"
+          (click)="addTab()"
+          [disabled]="isTabBusy"
+          [pTooltip]="'ANALYSES.TABS.ADD' | translate"
+          tooltipPosition="bottom"
+        >
+          <i class="pi pi-plus"></i>
+        </button>
+        <span class="analysis-tab-spacer"></span>
+        <button
+          type="button"
+          class="analysis-tab-add analysis-tab-add--labelled"
+          (click)="openAddWidget()"
+          [pTooltip]="'DASHBOARD.WIDGET.ADD' | translate"
+          tooltipPosition="bottom"
+        >
+          <i class="pi pi-th-large"></i>
+          {{ 'DASHBOARD.WIDGET.ADD' | translate }}
+        </button>
+      </div>
+
+      <!-- When there are NO tabs yet, still offer an "add tab" affordance so
+           the author can start organising an existing analysis into pages. -->
+      <div class="analysis-tab-strip analysis-tab-strip--empty" *ngIf="tabs.length === 0">
+        <button
+          type="button"
+          class="analysis-tab-add analysis-tab-add--labelled"
+          (click)="addTab()"
+          [disabled]="isTabBusy"
+        >
+          <i class="pi pi-plus"></i>
+          {{ 'ANALYSES.TABS.ADD' | translate }}
+        </button>
+        <button
+          type="button"
+          class="analysis-tab-add analysis-tab-add--labelled"
+          (click)="openAddWidget()"
+        >
+          <i class="pi pi-th-large"></i>
+          {{ 'DASHBOARD.WIDGET.ADD' | translate }}
+        </button>
+      </div>
+
       <div
         class="canvas-area"
-        *ngIf="visuals.length > 0"
+        *ngIf="visualsInActiveTab.length > 0 || widgetsInActiveTab.length > 0"
         (click)="clearFocus()"
         (dragover)="onCanvasDragOver($event)"
       >
         <div
           class="visual-box"
-          *ngFor="let visual of visuals; trackBy: trackByVisualId"
+          *ngFor="let visual of visualsInActiveTab; trackBy: trackByVisualId"
           [class.focused]="focusedVisualId === visual.id"
           [class.disabled]="
             focusedVisualId !== null && focusedVisualId !== visual.id
@@ -707,6 +820,31 @@
                 [pTooltip]="'ANALYSES.MAXIMIZE' | translate"
                 tooltipPosition="top"
               ></i>
+              <i
+                *ngIf="tabs.length > 1"
+                class="pi pi-arrow-right-arrow-left action-icon move-tab-icon"
+                (click)="toggleMoveMenu(visual.id, $event)"
+                [pTooltip]="'ANALYSES.TABS.MOVE_VISUAL' | translate"
+                tooltipPosition="top"
+              ></i>
+              <div
+                class="move-tab-menu"
+                *ngIf="moveMenuVisualId === visual.id"
+                (click)="$event.stopPropagation()"
+              >
+                <div class="move-tab-menu__label">
+                  {{ 'ANALYSES.TABS.MOVE_TO' | translate }}
+                </div>
+                <button
+                  type="button"
+                  class="move-tab-menu__item"
+                  *ngFor="let t of tabs; trackBy: trackByTabId"
+                  [disabled]="(visual.tabId || (tabs.length ? tabs[0].id : null)) === t.id"
+                  (click)="moveVisualToTab(visual, t.id, $event)"
+                >
+                  {{ t.name }}
+                </button>
+              </div>
               <i
                 class="pi pi-times action-icon remove-icon"
                 (click)="removeVisual(visual.id); $event.stopPropagation()"
@@ -895,8 +1033,51 @@
         </div>
       </div>
 
+      <!-- Canvas widgets (Track E3) — text/markdown notes + KPI tiles.
+           Rendered outside the visual grid as a simple flow row so they
+           don't fight the CSS grid placement engine; they carry their own
+           edit / delete affordances. -->
+      <div class="widget-strip" *ngIf="widgetsInActiveTab.length > 0">
+        <div
+          class="canvas-widget"
+          *ngFor="let w of widgetsInActiveTab; trackBy: trackByWidgetId"
+          [class.canvas-widget--kpi]="w.widgetType === 'kpi'"
+        >
+          <div class="canvas-widget__actions">
+            <i
+              class="pi pi-pencil"
+              (click)="openEditWidget(w)"
+              [pTooltip]="'COMMON.EDIT' | translate"
+              tooltipPosition="top"
+            ></i>
+            <i
+              class="pi pi-times"
+              (click)="removeWidget(w, $event)"
+              [pTooltip]="'COMMON.DELETE' | translate"
+              tooltipPosition="top"
+            ></i>
+          </div>
+          <div class="canvas-widget__text" *ngIf="w.widgetType === 'text'">
+            {{ $any(w.config).markdown }}
+          </div>
+          <div class="canvas-widget__kpi" *ngIf="w.widgetType === 'kpi'">
+            <div class="kpi-label">{{ kpiConfig(w).label }}</div>
+            <div class="kpi-value">
+              {{ kpiConfig(w).aggregate | uppercase }}({{ kpiConfig(w).measure }})
+            </div>
+            <div class="kpi-meta" *ngIf="kpiConfig(w).targetValue !== undefined">
+              {{ 'DASHBOARD.WIDGET.KPI_TARGET' | translate }}:
+              {{ kpiConfig(w).targetValue }}
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Empty State — subtle, quieter copy + custom SVG icon -->
-      <div class="empty-state" *ngIf="visuals.length === 0">
+      <div
+        class="empty-state"
+        *ngIf="visualsInActiveTab.length === 0 && widgetsInActiveTab.length === 0"
+      >
         <i class="ci ci-visualization empty-state__icon" aria-hidden="true"></i>
         <h3 class="empty-state__title">
           {{ 'ANALYSES.NO_VISUALS_YET' | translate }}
@@ -917,6 +1098,7 @@
       *ngIf="isConfigSidebarOpen && focusedVisualId && focusedVisual?.chartType"
       [focusedVisual]="focusedVisual"
       [allFields]="allFields"
+      [siblingVisuals]="siblingVisualsForConfig"
       (close)="closeConfigSidebar()"
       (configChanged)="markDirty()"
     ></app-visual-config-sidebar>
@@ -1088,6 +1270,81 @@
         ></i>
         {{
           isDeletingFilter
+            ? ('ANALYSES.DELETING' | translate)
+            : ('COMMON.DELETE' | translate)
+        }}
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Delete-tab confirmation (Track A4). Deleting a tab reassigns its
+     visuals to the first remaining tab (BE-side); the justification is
+     optional and flows to the audit log. Reuses the .confirmation-popup
+     chrome. -->
+<div class="confirmation-popup" *ngIf="showDeleteTabConfirm">
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-trash"></i>
+      </div>
+      <h3>{{ 'ANALYSES.TABS.CONFIRM_DELETE' | translate }}</h3>
+    </div>
+    <div class="standard-delete-section">
+      <p class="delete-intro" *ngIf="tabToDelete">
+        {{
+          'ANALYSES.TABS.CONFIRM_DELETE_MSG' | translate: { name: tabToDelete.name }
+        }}
+      </p>
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'ANALYSES.TABS.DELETE_REASSIGN_INFO' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
+        </li>
+      </ul>
+
+      <div class="justification-section">
+        <app-custom-input
+          [(ngModel)]="tabDeleteJustification"
+          [label]="'COMMON.JUSTIFICATION' | translate"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
+          inputMode="textarea"
+          [rows]="3"
+          [maxLength]="500"
+          icon="pi-info-circle"
+        ></app-custom-input>
+        <small class="char-count">{{ tabDeleteJustification.length }}/500</small>
+      </div>
+    </div>
+    <div class="popup-actions">
+      <button
+        class="btn-cancel"
+        type="button"
+        (click)="cancelDeleteTab()"
+        [disabled]="isTabBusy"
+      >
+        <i class="pi pi-times"></i>
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm"
+        type="button"
+        (click)="proceedDeleteTab()"
+        [disabled]="isTabBusy"
+      >
+        <i
+          class="pi"
+          [class.pi-spin]="isTabBusy"
+          [class.pi-spinner]="isTabBusy"
+          [class.pi-trash]="!isTabBusy"
+        ></i>
+        {{
+          isTabBusy
             ? ('ANALYSES.DELETING' | translate)
             : ('COMMON.DELETE' | translate)
         }}

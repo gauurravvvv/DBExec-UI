@@ -316,6 +316,29 @@ export const ANALYSIS_FILTER = {
   VALUES_BATCH: '/analysis-filters/values',
 };
 
+// Analysis tabs (Dashboard & Analysis v2, Track A) - named pages inside
+// an analysis. All under `/api/v1/analysis-tabs`; the request interceptor
+// prepends the server base. Prefixes ending in `/` are concatenated with
+// the tab id. Gated server-side by `analyses` WRITE (READ for list).
+export const ANALYSIS_TAB = {
+  // GET /analysis-tabs/:analysisId - list an analysis's tabs (path param)
+  LIST: '/analysis-tabs/',
+  ADD: '/analysis-tabs', // POST /analysis-tabs
+  UPDATE: '/analysis-tabs/', // PUT /analysis-tabs/:tabId
+  DELETE: '/analysis-tabs/', // DELETE /analysis-tabs/:tabId
+  REORDER: '/analysis-tabs/reorder', // PUT /analysis-tabs/reorder
+};
+
+// Analysis widgets (Dashboard & Analysis v2, Track E3) - non-visual
+// content blocks (text/markdown notes + KPI tiles) on an analysis canvas.
+export const ANALYSIS_WIDGET = {
+  // GET /analysis-widgets?analysisId=:analysisId - list widgets
+  LIST: '/analysis-widgets',
+  ADD: '/analysis-widgets', // POST /analysis-widgets
+  UPDATE: '/analysis-widgets/', // PUT /analysis-widgets/:widgetId
+  DELETE: '/analysis-widgets/', // DELETE /analysis-widgets/:widgetId
+};
+
 export const GLOBAL_SEARCH = {
   SEARCH: '/search',
 };
@@ -384,6 +407,22 @@ export const PUBLIC_DASHBOARD = {
   RENDER_PREFIX: '/public/dashboards/', // GET  /public/dashboards/:token
   RUN_PREFIX: '/public/dashboards/', // POST /public/dashboards/:token/run
   RUN_SUFFIX: '/run',
+};
+
+// Dashboard subscriptions — per-dashboard scheduled email delivery
+// (PNG/PDF). All under `/api/v1/dashboard-subscriptions`; the request
+// interceptor prepends the server base. Prefixes ending in `/` are
+// concatenated with the subscription id; suffixes complete the
+// sub-resource. Gated server-side by `dashboard` WRITE + ownership.
+export const DASHBOARD_SUBSCRIPTION = {
+  LIST: '/dashboard-subscriptions', // GET  /dashboard-subscriptions?dashboardId=
+  ADD: '/dashboard-subscriptions', // POST /dashboard-subscriptions
+  GET: '/dashboard-subscriptions/', // GET  /dashboard-subscriptions/:id
+  UPDATE: '/dashboard-subscriptions/', // PUT  /dashboard-subscriptions/:id
+  DELETE: '/dashboard-subscriptions/', // DELETE /dashboard-subscriptions/:id
+  // POST /dashboard-subscriptions/:id/toggle  → enable / disable
+  TOGGLE_PREFIX: '/dashboard-subscriptions/',
+  TOGGLE_SUFFIX: '/toggle',
 };
 
 export const RLS_RULE = {

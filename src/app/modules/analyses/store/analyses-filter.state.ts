@@ -61,6 +61,10 @@ export interface AnalysesFilterDef {
   isEnabled: boolean;
   isMandatory: boolean;
   sequence: number;
+  // Filter scope (Track B) — optional; absent = 'dashboard'.
+  scope?: 'dashboard' | 'tab' | 'visual';
+  targetTabId?: string | null;
+  targetVisualIds?: string[];
 }
 
 /** Stable cache key for an options request. Mirrors the encoding

@@ -10,6 +10,9 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { ListDashboardComponent } from './components/list-dashboard/list-dashboard.component';
 import { ViewDashboardComponent } from './components/view-dashboard/view-dashboard.component';
 import { ShareDashboardDialogComponent } from './components/share-dashboard-dialog/share-dashboard-dialog.component';
+import { DashboardPreloadGateComponent } from './components/dashboard-preload-gate/dashboard-preload-gate.component';
+import { DashboardWidgetComponent } from './components/dashboard-widget/dashboard-widget.component';
+import { ScheduleDeliveryDialogComponent } from './components/schedule-delivery-dialog/schedule-delivery-dialog.component';
 import { DashboardRoutingModule } from './dashboard-routing.module';
 
 @NgModule({
@@ -31,6 +34,11 @@ import { DashboardRoutingModule } from './dashboard-routing.module';
     CustomTableComponent,
     CustomTableEmptyDirective,
     UsGridCellDirective,
+    // Standalone dashboard-consume components (Dashboard & Analysis v2).
+    // Shared with the standalone embed viewer via their own imports.
+    DashboardPreloadGateComponent,
+    DashboardWidgetComponent,
+    ScheduleDeliveryDialogComponent,
   ],
 })
 export class DashboardModule {}

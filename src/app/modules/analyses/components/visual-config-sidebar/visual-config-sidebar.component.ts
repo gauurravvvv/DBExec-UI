@@ -114,6 +114,7 @@ import {
   TREE_ORIENTATIONS,
 } from '../../constants/charts.constants';
 import { Visual } from '../../models';
+import type { AggregateFn, AggregationMeasure } from '../../models/visual.model';
 import {
   ConditionalRule,
   ConditionalOperator,
@@ -166,6 +167,11 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
    * otherwise be empty on first paint).
    */
   @Input() allFields: any[] = [];
+  /**
+   * Sibling visuals on the same analysis (id + title), used by the
+   * Interaction section's explicit cross-filter target multiselect.
+   */
+  @Input() siblingVisuals: { id: string; title: string }[] = [];
   @Output() close = new EventEmitter<void>();
   @Output() configChanged = new EventEmitter<void>();
 
@@ -286,6 +292,378 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     private cdr: ChangeDetectorRef,
   ) {}
 
+  // ══════════════════════════════════════════════════════════════════
+  // Data + Analytics + Interaction authoring (Dashboard & Analysis v2)
+  // ══════════════════════════════════════════════════════════════════
+
+  /**
+   * Aggregate function options for the Data section (Track D4) and the
+   * combo extra-measure editor. Labels are i18n keys resolved in the
+   * template via | translate on optionLabel through the localize pass
+   * below (kept as raw keys; we translate inline in the getters).
+   */
+  readonly aggregateOptions: { label: string; value: AggregateFn | '' }[] = [
+    { label: 'ANALYSES.AGG.NONE', value: '' },
+    { label: 'ANALYSES.AGG.SUM', value: 'sum' },
+    { label: 'ANALYSES.AGG.AVG', value: 'avg' },
+    { label: 'ANALYSES.AGG.COUNT', value: 'count' },
+    { label: 'ANALYSES.AGG.MIN', value: 'min' },
+    { label: 'ANALYSES.AGG.MAX', value: 'max' },
+    { label: 'ANALYSES.AGG.COUNT_DISTINCT', value: 'count_distinct' },
+  ];
+
+  /** Aggregate options WITHOUT the "none" entry — for combo extra measures. */
+  readonly comboAggregateOptions: { label: string; value: AggregateFn }[] = [
+    { label: 'ANALYSES.AGG.SUM', value: 'sum' },
+    { label: 'ANALYSES.AGG.AVG', value: 'avg' },
+    { label: 'ANALYSES.AGG.COUNT', value: 'count' },
+    { label: 'ANALYSES.AGG.MIN', value: 'min' },
+    { label: 'ANALYSES.AGG.MAX', value: 'max' },
+    { label: 'ANALYSES.AGG.COUNT_DISTINCT', value: 'count_distinct' },
+  ];
+
+  /** Trend types for the Analytics section (Track E1). */
+  readonly trendTypeOptions: { label: string; value: string }[] = [
+    { label: 'ANALYSES.ANALYTICS.TREND_NONE', value: 'none' },
+    { label: 'ANALYSES.ANALYTICS.TREND_LINEAR', value: 'linear' },
+    { label: 'ANALYSES.ANALYTICS.TREND_MOVING_AVG', value: 'movingAverage' },
+    { label: 'ANALYSES.ANALYTICS.TREND_FORECAST', value: 'forecast' },
+  ];
+
+  /** Per-series render types for the dual-axis editor. */
+  readonly dualAxisSeriesTypeOptions: { label: string; value: string }[] = [
+    { label: 'ANALYSES.ANALYTICS.SERIES_BAR', value: 'bar' },
+    { label: 'ANALYSES.ANALYTICS.SERIES_LINE', value: 'line' },
+  ];
+
+  /** Left / right axis choices for the dual-axis editor. */
+  readonly dualAxisSideOptions: { label: string; value: number }[] = [
+    { label: 'ANALYSES.ANALYTICS.AXIS_LEFT', value: 0 },
+    { label: 'ANALYSES.ANALYTICS.AXIS_RIGHT', value: 1 },
+  ];
+
+  /** Cross-filter target-mode choices for the Interaction section (E2). */
+  readonly crossFilterTargetOptions: { label: string; value: string }[] = [
+    { label: 'ANALYSES.INTERACTION.TARGET_SAME_TAB', value: 'same-tab' },
+    { label: 'ANALYSES.INTERACTION.TARGET_DASHBOARD', value: 'dashboard' },
+    { label: 'ANALYSES.INTERACTION.TARGET_SELECTED', value: 'visuals' },
+  ];
+
+  /** True for the cartesian families the analytics sections support. */
+  supportsCartesianAnalytics(chartType: string | null | undefined): boolean {
+    if (!chartType) return false;
+    return /^(bar-|line|area)/.test(chartType);
+  }
+
+  /** All fields as { label, value } for column dropdowns. */
+  get allFieldOptions(): { label: string; value: string }[] {
+    return (this.allFields || [])
+      .map((f: any) => {
+        const value = f?.columnToUse ?? f?.columnToView ?? f;
+        if (typeof value !== 'string' || !value) return null;
+        const label = f?.columnToView || this.humaniseFieldName(value);
+        return { label, value };
+      })
+      .filter((o): o is { label: string; value: string } => o !== null);
+  }
+
+  /** Heuristic: does this field's dataType read as numeric (a measure)? */
+  private isNumericFieldType(dataType: unknown): boolean {
+    if (typeof dataType !== 'string') return false;
+    const t = dataType.toLowerCase();
+    return (
+      t.includes('int') ||
+      t.includes('numeric') ||
+      t.includes('decimal') ||
+      t.includes('float') ||
+      t.includes('double') ||
+      t.includes('real') ||
+      t.includes('serial') ||
+      t.includes('money') ||
+      t.includes('number')
+    );
+  }
+
+  /**
+   * Numeric-field options for the Measure dropdown. When no field carries
+   * a recognisable numeric dataType (e.g. schema without type hints) we
+   * fall back to all fields so the picker is never empty.
+   */
+  get measureFieldOptions(): { label: string; value: string }[] {
+    const numeric = (this.allFields || []).filter((f: any) =>
+      this.isNumericFieldType(f?.dataType),
+    );
+    const source = numeric.length > 0 ? numeric : this.allFields || [];
+    return source
+      .map((f: any) => {
+        const value = f?.columnToUse ?? f?.columnToView ?? f;
+        if (typeof value !== 'string' || !value) return null;
+        const label = f?.columnToView || this.humaniseFieldName(value);
+        return { label, value };
+      })
+      .filter((o): o is { label: string; value: string } => o !== null);
+  }
+
+  // ── Data section: aggregate binding (top-level visual fields) ────────
+
+  /** Two-way bind for the Aggregate dropdown ('' → null on the model). */
+  get aggregateValue(): AggregateFn | '' {
+    return (this.focusedVisual?.aggregate as AggregateFn) ?? '';
+  }
+  set aggregateValue(v: AggregateFn | '') {
+    if (!this.focusedVisual) return;
+    this.focusedVisual.aggregate = v ? (v as AggregateFn) : null;
+  }
+
+  // ── Data section: combo extra measures (config.aggregations[]) ───────
+
+  get comboMeasures(): AggregationMeasure[] {
+    const list = this.focusedVisual?.config?.aggregations;
+    return Array.isArray(list) ? list : [];
+  }
+
+  addComboMeasure(): void {
+    if (!this.focusedVisual?.config) return;
+    const cfg = this.focusedVisual.config;
+    const list: AggregationMeasure[] = Array.isArray(cfg.aggregations)
+      ? [...cfg.aggregations]
+      : [];
+    const n = list.length + 1;
+    list.push({ column: '', aggregate: 'sum', alias: 'measure_' + n });
+    cfg.aggregations = list;
+  }
+
+  updateComboMeasure(
+    index: number,
+    key: 'column' | 'aggregate' | 'alias',
+    value: string,
+  ): void {
+    const cfg = this.focusedVisual?.config;
+    if (!cfg || !Array.isArray(cfg.aggregations)) return;
+    const list = cfg.aggregations.map((m: AggregationMeasure) => ({ ...m }));
+    if (!list[index]) return;
+    (list[index] as any)[key] = value;
+    cfg.aggregations = list;
+  }
+
+  removeComboMeasure(index: number): void {
+    const cfg = this.focusedVisual?.config;
+    if (!cfg || !Array.isArray(cfg.aggregations)) return;
+    const list = [...cfg.aggregations];
+    list.splice(index, 1);
+    cfg.aggregations = list;
+  }
+
+  trackByIndex(i: number): number {
+    return i;
+  }
+
+  // ── Analytics section: dual-axis series editor (config.dualAxis) ─────
+
+  get dualAxisEnabled(): boolean {
+    return !!this.focusedVisual?.config?.dualAxis;
+  }
+  setDualAxisEnabled(on: boolean): void {
+    if (!this.focusedVisual?.config) return;
+    const cfg = this.focusedVisual.config;
+    if (on) {
+      cfg.dualAxis = cfg.dualAxis && Array.isArray(cfg.dualAxis.series)
+        ? { ...cfg.dualAxis }
+        : { series: [], rightAxisName: '' };
+    } else {
+      delete cfg.dualAxis;
+    }
+  }
+
+  get dualAxisSeries(): { name: string; type: string; yAxisIndex: number }[] {
+    const list = this.focusedVisual?.config?.dualAxis?.series;
+    return Array.isArray(list) ? list : [];
+  }
+
+  addDualAxisSeries(): void {
+    if (!this.focusedVisual?.config) return;
+    const cfg = this.focusedVisual.config;
+    if (!cfg.dualAxis) cfg.dualAxis = { series: [], rightAxisName: '' };
+    const series = Array.isArray(cfg.dualAxis.series)
+      ? [...cfg.dualAxis.series]
+      : [];
+    series.push({ name: '', type: 'line', yAxisIndex: 1 });
+    cfg.dualAxis = { ...cfg.dualAxis, series };
+  }
+
+  updateDualAxisSeries(
+    index: number,
+    key: 'name' | 'type' | 'yAxisIndex',
+    value: string | number,
+  ): void {
+    const cfg = this.focusedVisual?.config;
+    if (!cfg?.dualAxis || !Array.isArray(cfg.dualAxis.series)) return;
+    const series = cfg.dualAxis.series.map((x: any) => ({ ...x }));
+    if (!series[index]) return;
+    (series[index] as any)[key] = value;
+    cfg.dualAxis = { ...cfg.dualAxis, series };
+  }
+
+  removeDualAxisSeries(index: number): void {
+    const cfg = this.focusedVisual?.config;
+    if (!cfg?.dualAxis || !Array.isArray(cfg.dualAxis.series)) return;
+    const series = [...cfg.dualAxis.series];
+    series.splice(index, 1);
+    cfg.dualAxis = { ...cfg.dualAxis, series };
+  }
+
+  // ── Analytics section: trend (config.trend) ─────────────────────────
+
+  get trendType(): string {
+    return this.focusedVisual?.config?.trend?.type ?? 'none';
+  }
+  setTrendType(type: string): void {
+    if (!this.focusedVisual?.config) return;
+    const cfg = this.focusedVisual.config;
+    if (!type || type === 'none') {
+      delete cfg.trend;
+      return;
+    }
+    const prev = cfg.trend || {};
+    cfg.trend = {
+      type,
+      window: prev.window ?? 3,
+      forecastPeriods: prev.forecastPeriods ?? 3,
+    };
+  }
+
+  get trendWindow(): number {
+    return this.focusedVisual?.config?.trend?.window ?? 3;
+  }
+  set trendWindow(v: number) {
+    if (!this.focusedVisual?.config?.trend) return;
+    this.focusedVisual.config.trend = {
+      ...this.focusedVisual.config.trend,
+      window: v,
+    };
+  }
+
+  get trendForecastPeriods(): number {
+    return this.focusedVisual?.config?.trend?.forecastPeriods ?? 3;
+  }
+  set trendForecastPeriods(v: number) {
+    if (!this.focusedVisual?.config?.trend) return;
+    this.focusedVisual.config.trend = {
+      ...this.focusedVisual.config.trend,
+      forecastPeriods: v,
+    };
+  }
+
+  // ── Analytics section: small-multiples (config.smallMultiples) ───────
+
+  get smallMultiplesEnabled(): boolean {
+    return !!this.focusedVisual?.config?.smallMultiples?.enabled;
+  }
+  setSmallMultiplesEnabled(on: boolean): void {
+    if (!this.focusedVisual?.config) return;
+    const cfg = this.focusedVisual.config;
+    if (on) {
+      const prev = cfg.smallMultiples || {};
+      cfg.smallMultiples = {
+        enabled: true,
+        facetColumn: prev.facetColumn ?? null,
+        maxCols: prev.maxCols ?? 2,
+      };
+    } else {
+      delete cfg.smallMultiples;
+    }
+  }
+
+  get smallMultiplesFacetColumn(): string | null {
+    return this.focusedVisual?.config?.smallMultiples?.facetColumn ?? null;
+  }
+  set smallMultiplesFacetColumn(v: string | null) {
+    if (!this.focusedVisual?.config?.smallMultiples) return;
+    this.focusedVisual.config.smallMultiples = {
+      ...this.focusedVisual.config.smallMultiples,
+      facetColumn: v || null,
+    };
+  }
+
+  get smallMultiplesMaxCols(): number {
+    return this.focusedVisual?.config?.smallMultiples?.maxCols ?? 2;
+  }
+  set smallMultiplesMaxCols(v: number) {
+    if (!this.focusedVisual?.config?.smallMultiples) return;
+    this.focusedVisual.config.smallMultiples = {
+      ...this.focusedVisual.config.smallMultiples,
+      maxCols: v,
+    };
+  }
+
+  // ── Interaction section: cross-filter (config.interaction) ──────────
+
+  get crossFilterEnabled(): boolean {
+    return !!this.focusedVisual?.config?.interaction?.crossFilter?.enabled;
+  }
+  setCrossFilterEnabled(on: boolean): void {
+    if (!this.focusedVisual?.config) return;
+    const cfg = this.focusedVisual.config;
+    const prev = cfg.interaction?.crossFilter || {};
+    cfg.interaction = {
+      ...(cfg.interaction || {}),
+      crossFilter: {
+        enabled: on,
+        targets: prev.targets ?? 'same-tab',
+        ...(Array.isArray(prev.visualIds) ? { visualIds: prev.visualIds } : {}),
+      },
+    };
+    // Mirror onto the flat visual flag so the existing interaction bus in
+    // edit-analyses (which reads visual.crossFilterEnabled) stays in sync.
+    if (this.focusedVisual) this.focusedVisual.crossFilterEnabled = on;
+  }
+
+  /** Target mode: 'same-tab' | 'dashboard' | 'visuals' (explicit ids). */
+  get crossFilterTargetMode(): string {
+    const t = this.focusedVisual?.config?.interaction?.crossFilter?.targets;
+    if (t === 'dashboard') return 'dashboard';
+    if (t && typeof t === 'object' && Array.isArray(t.visualIds)) return 'visuals';
+    return 'same-tab';
+  }
+  set crossFilterTargetMode(mode: string) {
+    if (!this.focusedVisual?.config?.interaction?.crossFilter) return;
+    const cf = this.focusedVisual.config.interaction.crossFilter;
+    let targets: any = 'same-tab';
+    if (mode === 'dashboard') targets = 'dashboard';
+    else if (mode === 'visuals')
+      targets = { visualIds: Array.isArray(cf.targets?.visualIds) ? cf.targets.visualIds : [] };
+    this.focusedVisual.config.interaction = {
+      ...this.focusedVisual.config.interaction,
+      crossFilter: { ...cf, targets },
+    };
+  }
+
+  /** Explicit target visual ids (only meaningful when target mode = visuals). */
+  get crossFilterVisualIds(): string[] {
+    const t = this.focusedVisual?.config?.interaction?.crossFilter?.targets;
+    return t && typeof t === 'object' && Array.isArray(t.visualIds)
+      ? t.visualIds
+      : [];
+  }
+  set crossFilterVisualIds(ids: string[]) {
+    if (!this.focusedVisual?.config?.interaction?.crossFilter) return;
+    const cf = this.focusedVisual.config.interaction.crossFilter;
+    this.focusedVisual.config.interaction = {
+      ...this.focusedVisual.config.interaction,
+      crossFilter: { ...cf, targets: { visualIds: ids || [] } },
+    };
+  }
+
+  /**
+   * Sibling visuals (excluding this one) as multiselect options for the
+   * explicit-target picker. Sourced from the optional siblingVisuals input.
+   */
+  get siblingVisualOptions(): { label: string; value: string }[] {
+    return (this.siblingVisuals || [])
+      .filter(v => v && v.id && v.id !== this.focusedVisual?.id)
+      .map(v => ({ label: v.title || v.id, value: v.id }));
+  }
+
   ngOnInit(): void {
     this.localizeDropdownOptions();
     this.langSubscription = this.translate.onLangChange.subscribe(() => {
@@ -390,6 +768,11 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
       x: this.focusedVisual.xAxisColumn,
       y: this.focusedVisual.yAxisColumn,
       z: this.focusedVisual.zAxisColumn,
+      // Track D: server aggregation lives in top-level visual fields, not
+      // config — include them so the Data section's edits fire configChanged.
+      dim: this.focusedVisual.dimensionColumn,
+      measure: this.focusedVisual.measureColumn,
+      agg: this.focusedVisual.aggregate,
       title: this.focusedVisual.title,
       chartType: this.focusedVisual.chartType,
     });

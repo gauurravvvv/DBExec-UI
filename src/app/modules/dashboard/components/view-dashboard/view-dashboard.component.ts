@@ -34,8 +34,13 @@ import {
   isSankeyChartType,
 } from '../../../analyses/constants/charts.constants';
 import { Visual } from '../../../analyses/models/visual.model';
+import type { AnalysisParameter } from '../../../analyses/models/analysis-parameter.model';
 import { ChartDataTransformerService } from '../../../analyses/services/chart-data-transformer.service';
 import { DashboardService } from '../../services/dashboard.service';
+import { DashboardCrossFilter } from '../../services/dashboard-interaction';
+import type { DashboardWidget } from '../dashboard-widget/dashboard-widget.component';
+import type { PreloadGateResult } from '../dashboard-preload-gate/dashboard-preload-gate.component';
+import type { ParameterValue } from '../../../analyses/models/analysis-parameter.model';
 
 @Component({
   selector: 'app-view-dashboard',
@@ -63,6 +68,44 @@ export class ViewDashboardComponent
   filters: any[] = [];
   rawData: any[] = [];
   appliedFilters: any[] = [];
+
+  // ── Multi-tab (Dashboard & Analysis v2, Track A4) ───────────────────
+  /** Snapshot tabs from the render response (ordered by sequence). */
+  tabs: any[] = [];
+  /** Active tab id; null when the dashboard is single/implicit-tab. */
+  activeTabId: string | null = null;
+
+  // ── Widgets (Track E3) ──────────────────────────────────────────────
+  /** Text / KPI tiles placed on the grid alongside visuals. */
+  widgets: DashboardWidget[] = [];
+
+  // ── Pre-load gate (Track C3) ────────────────────────────────────────
+  /** Required parameters + mandatory filters + flag from render. */
+  parameters: AnalysisParameter[] = [];
+  mandatoryFilters: any[] = [];
+  requiresPreloadGate = false;
+  /** True while the blocking gate is shown (no query runs). */
+  gateOpen = false;
+  /** Values submitted from the gate, fed into every runQuery. */
+  private preloadParamValues: ParameterValue[] = [];
+  private preloadFilterValues: any[] = [];
+  /** Raw seed maps so re-opening ("Edit inputs") restores prior input. */
+  gateSeedParams: ParameterValue[] | null = null;
+  gateSeedFilters: Record<string, any> | null = null;
+
+  // ── Cross-filter (Track E2) — dashboard-local, configurable targets ─
+  crossFilter = new DashboardCrossFilter();
+
+  // ── Auto-refresh (Track E4) ─────────────────────────────────────────
+  /** Interval seconds from the render response; null/0 = off. */
+  autoRefreshSeconds: number | null = null;
+  private autoRefreshTimer: any = null;
+  /** Countdown shown in the toolbar indicator. */
+  autoRefreshCountdown = 0;
+  private countdownTimer: any = null;
+
+  // ── Schedule delivery dialog (Track E4) ─────────────────────────────
+  scheduleVisible = false;
 
   /**
    * Server-side missing-field warnings from the render endpoint. Each
@@ -297,6 +340,7 @@ export class ViewDashboardComponent
       this.resizeObserver.disconnect();
     }
     clearTimeout(this.resizeDebounceTimer);
+    this.stopAutoRefresh();
   }
 
   private trySetupCanvas(): void {
@@ -364,8 +408,38 @@ export class ViewDashboardComponent
           this.fieldsChecked = data.fieldsChecked === true;
           this.meta = data.meta || null;
           this.warningsExpanded = false;
+
+          // Dashboard & Analysis v2 additive render fields.
+          this.tabs = Array.isArray(data.tabs) ? data.tabs : [];
+          this.activeTabId = this.tabs.length > 0 ? this.tabs[0].id : null;
+          this.widgets = Array.isArray(data.widgets) ? data.widgets : [];
+          this.parameters = Array.isArray(data.parameters)
+            ? data.parameters
+            : [];
+          this.mandatoryFilters = Array.isArray(data.mandatoryFilters)
+            ? data.mandatoryFilters
+            : [];
+          this.requiresPreloadGate = data.requiresPreloadGate === true;
+          this.autoRefreshSeconds =
+            typeof data.autoRefreshSeconds === 'number' &&
+            data.autoRefreshSeconds > 0
+              ? data.autoRefreshSeconds
+              : null;
+
+          this.crossFilter.clear();
           this.mapVisualsFromResponse(data.visuals || []);
-          this.executeQuery();
+
+          // Blocking gate: withhold every query until the viewer submits
+          // the required inputs. Otherwise run immediately + arm refresh.
+          if (this.requiresPreloadGate) {
+            this.gateOpen = true;
+            this.stopAutoRefresh();
+            this.cdr.markForCheck();
+          } else {
+            this.gateOpen = false;
+            this.executeQuery();
+            this.startAutoRefresh();
+          }
         } else {
           this.cdr.markForCheck();
         }
@@ -406,6 +480,8 @@ export class ViewDashboardComponent
         zAxisColumn: v.visualConfig?.config?.zAxisColumn || null,
         chartData: [],
         config: v.visualConfig?.config || {},
+        // Owning tab (multi-tab render). null = default/implicit tab.
+        tabId: v.tabId ?? null,
         loading: true,
         loaded: false,
         error: false,
@@ -418,8 +494,96 @@ export class ViewDashboardComponent
     this.recalculateAllVisualDimensions();
   }
 
+  // ── Tabs ──────────────────────────────────────────────────────────
+
+  /** True when a visible tab strip should render (>1 tab). */
+  get showTabStrip(): boolean {
+    return this.tabs.length > 1;
+  }
+
+  /** Visuals belonging to the active tab (all when single/implicit). */
+  get visibleVisuals(): Visual[] {
+    if (!this.showTabStrip) return this.visuals;
+    return this.visuals.filter(
+      v => (v.tabId ?? null) === this.activeTabId,
+    );
+  }
+
+  /** Widgets belonging to the active tab. */
+  get visibleWidgets(): DashboardWidget[] {
+    if (!this.showTabStrip) return this.widgets;
+    return this.widgets.filter(
+      w => (w.tabId ?? null) === this.activeTabId,
+    );
+  }
+
+  /** True when the active tab has neither visuals nor widgets. */
+  get activeTabEmpty(): boolean {
+    return this.visibleVisuals.length === 0 && this.visibleWidgets.length === 0;
+  }
+
+  selectTab(tabId: string): void {
+    if (this.activeTabId === tabId) return;
+    this.activeTabId = tabId;
+    // A cross-filter is scoped to the tab it was raised on; switching
+    // tabs clears it so the new tab starts clean.
+    if (this.crossFilter.isActive()) {
+      this.crossFilter.clear();
+    }
+    this.cdr.markForCheck();
+    // Re-place + re-measure the now-visible grid after the DOM updates.
+    setTimeout(() => {
+      this.placeVisualsOnGrid();
+      this.recalculateAllVisualDimensions();
+    }, 0);
+  }
+
+  trackByTabId(_i: number, t: any): string {
+    return t.id;
+  }
+
+  trackByWidgetId(_i: number, w: DashboardWidget): string {
+    return w.id;
+  }
+
+  /** Grid placement (col/row span) for a widget from its ratios. */
+  widgetColSpan(w: DashboardWidget): number {
+    const r = parseFloat(String(w.widthRatio)) || 0.25;
+    return Math.max(1, Math.round(r * this.GRID_COLUMNS));
+  }
+  widgetRowSpan(w: DashboardWidget): number {
+    const r = parseFloat(String(w.heightRatio)) || 0.2;
+    return Math.max(1, Math.round(r * this.GRID_ROWS));
+  }
+
+  /**
+   * The effective run-query filter set for ONE visual: the dashboard's
+   * applied filters + the pre-load gate's mandatory filters + this
+   * visual's cross-filter contribution (empty unless it's a target of an
+   * active cross-filter). Base filters apply to every visual; only the
+   * cross-filter part differs per visual, which is what lets a click
+   * constrain just the configured target set.
+   */
+  private effectiveFiltersFor(visual: Visual, base: any[]): any[] {
+    return [
+      ...base,
+      ...this.preloadFilterValues,
+      ...this.crossFilter.filtersFor(visual),
+    ];
+  }
+
+  /**
+   * Run the dashboard query and paint the visuals. When no cross-filter
+   * is active every visual shares one filter set → a single run (the
+   * common, cheap case, identical to before). When a cross-filter IS
+   * active, visuals are grouped by their effective filter signature so
+   * targets (extra predicate) and non-targets (base only) each run once,
+   * and every result is fanned back to its own visuals.
+   */
   executeQuery(filters?: any[]): void {
     if (!this.dashboard) return;
+    // Never run while the blocking gate is up.
+    if (this.gateOpen) return;
 
     // Stamp this call with a fresh id and capture it locally; any
     // older in-flight queries will see their captured id no longer
@@ -434,56 +598,80 @@ export class ViewDashboardComponent
       v.error = false;
     });
 
-    // limit: -1 tells the BE to skip the LIMIT wrap entirely and
-    // return the full result set. Dashboards are consumption surfaces
-    // where the user expects "real" totals/averages/proportions over
-    // the complete population — a sampled cap would silently distort
-    // every aggregate they see. Edit Analysis still uses the default
-    // cap (1000) because that surface is for building charts, where a
-    // representative sample is sufficient and faster to iterate on.
-    // Post-snapshot: dashboards run their own snapshotted SQL via
-    // /dashboard/run instead of poking the live analyses endpoint.
-    // Source analysis edits no longer affect dashboard query results.
-    const payload: any = {
-      dashboardId: this.dashboard.id,
-      limit: -1,
-    };
-
+    // Base applied filters: an explicit arg overrides; `undefined` means
+    // "no filter change" (keep the current appliedFilters); an empty
+    // array clears them.
     if (filters && filters.length > 0) {
-      payload.filters = filters;
       this.appliedFilters = filters;
-    } else if (!filters) {
+    } else if (filters && filters.length === 0) {
       this.appliedFilters = [];
+    } else if (!filters) {
+      // keep this.appliedFilters as-is (auto-refresh / cross-filter re-run)
+    }
+    const base = this.appliedFilters || [];
+
+    // Group visuals by their effective-filter signature so identical
+    // queries run once. `limit: -1` → BE returns the full population
+    // (consumption surface; a sampled cap would distort aggregates).
+    const groups = new Map<string, { filters: any[]; visuals: Visual[] }>();
+    for (const v of this.visuals) {
+      const eff = this.effectiveFiltersFor(v, base);
+      const sig = JSON.stringify(eff);
+      const g = groups.get(sig);
+      if (g) g.visuals.push(v);
+      else groups.set(sig, { filters: eff, visuals: [v] });
     }
 
-    this._dashboardService
-      .runQuery(payload)
-      .then(response => {
-        // Stale response — a newer executeQuery has already fired
-        // since this one was issued. Drop the result silently so
-        // we don't overwrite fresher chart data.
-        if (queryId !== this.currentQueryId) return;
+    const runs = Array.from(groups.values()).map(group => {
+      const payload: any = { dashboardId: this.dashboard.id, limit: -1 };
+      if (group.filters.length > 0) payload.filters = group.filters;
+      // Pre-load gate parameter values feed the substitution on every run.
+      if (this.preloadParamValues.length > 0) {
+        payload.paramValues = this.preloadParamValues;
+      }
+      return this._dashboardService
+        .runQuery(payload)
+        .then(response => ({ group, response, ok: true as const }))
+        .catch(() => ({ group, response: null, ok: false as const }));
+    });
 
+    Promise.all(runs)
+      .then(results => {
+        // Stale response — a newer executeQuery has already fired.
+        if (queryId !== this.currentQueryId) return;
         this.isDataLoading.set(false);
 
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.rawData = response.data || [];
-          this.transformAllVisuals();
-        } else {
-          this.visuals.forEach(v => {
-            v.loading = false;
-            v.error = true;
-          });
+        // Keep the first successful group's rows as the "dashboard rawData"
+        // (drives CSV export + KPI widgets). Cross-filtered groups don't
+        // change the export baseline.
+        let baselineSet = false;
+
+        for (const r of results) {
+          if (
+            r.ok &&
+            r.response &&
+            this.globalService.handleSuccessService(r.response, false)
+          ) {
+            const rows = r.response.data || [];
+            if (!baselineSet) {
+              this.rawData = rows;
+              baselineSet = true;
+            }
+            for (const v of r.group.visuals) this.paintVisual(v, rows);
+          } else {
+            for (const v of r.group.visuals) {
+              v.loading = false;
+              v.error = true;
+            }
+          }
         }
+
         this.cdr.markForCheck();
         // Canvas container is behind *ngIf, set up observer after DOM renders
         setTimeout(() => this.trySetupCanvas(), 0);
       })
       .catch(() => {
-        // Same staleness guard on the error path — don't flash an
-        // error banner from a superseded query.
         if (queryId !== this.currentQueryId) return;
-
         this.isDataLoading.set(false);
         this.visuals.forEach(v => {
           v.loading = false;
@@ -494,22 +682,23 @@ export class ViewDashboardComponent
       });
   }
 
+  /** Transform + paint one visual from its own (possibly targeted) rows. */
+  private paintVisual(visual: Visual, rows: any[]): void {
+    if (visual.chartType && visual.xAxisColumn && visual.yAxisColumn) {
+      visual.chartData = this.chartDataTransformer.transformData(
+        visual.chartType,
+        rows,
+        this.chartDataTransformer.buildMapping(visual),
+      ) as any[];
+    } else {
+      visual.chartData = [];
+    }
+    visual.loading = false;
+    visual.loaded = true;
+  }
+
   transformAllVisuals(): void {
-    this.visuals.forEach(visual => {
-      if (visual.chartType && visual.xAxisColumn && visual.yAxisColumn) {
-        visual.chartData = this.chartDataTransformer.transformData(
-          visual.chartType,
-          this.rawData,
-          this.chartDataTransformer.buildMapping(visual),
-        ) as any[];
-        visual.loading = false;
-        visual.loaded = true;
-      } else {
-        visual.chartData = [];
-        visual.loading = false;
-        visual.loaded = true;
-      }
-    });
+    this.visuals.forEach(visual => this.paintVisual(visual, this.rawData));
     this.cdr.markForCheck();
   }
 
@@ -520,15 +709,148 @@ export class ViewDashboardComponent
   }
 
   onFiltersCleared(): void {
-    this.executeQuery();
+    // Explicit clear — pass an empty array so executeQuery resets the
+    // applied filters (an `undefined` arg means "keep current").
+    this.executeQuery([]);
   }
 
   onRefresh(): void {
-    if (this.appliedFilters.length > 0) {
-      this.executeQuery(this.appliedFilters);
-    } else {
-      this.executeQuery();
+    // Re-run with the current applied filters + cross-filter state.
+    this.executeQuery();
+  }
+
+  // ── Pre-load gate (Track C3) ────────────────────────────────────────
+
+  /**
+   * The gate submitted valid inputs. Store the parameter + filter values,
+   * hide the gate, run every query with them, and arm auto-refresh.
+   */
+  onGateSubmit(result: PreloadGateResult): void {
+    this.preloadParamValues = result.paramValues || [];
+    this.preloadFilterValues = result.filterValues || [];
+    // Seed maps so re-opening restores the same inputs.
+    this.gateSeedParams = this.preloadParamValues;
+    this.gateSeedFilters = {};
+    for (const fv of this.preloadFilterValues) {
+      if (fv?.filterId) {
+        this.gateSeedFilters[fv.filterId] =
+          fv.values?.[0] ?? fv.rangeMin ?? fv.dateRangeStart ?? null;
+      }
     }
+    this.gateOpen = false;
+    this.cdr.markForCheck();
+    this.executeQuery();
+    this.startAutoRefresh();
+  }
+
+  /** Re-open the blocking gate ("Edit inputs"); pauses auto-refresh. */
+  editInputs(): void {
+    this.gateOpen = true;
+    this.stopAutoRefresh();
+    this.cdr.markForCheck();
+  }
+
+  // ── Cross-filter (Track E2) ─────────────────────────────────────────
+
+  /** True when a visual has cross-filter opt-in (drives the click cursor). */
+  isCrossFilterSource(visual: Visual): boolean {
+    return DashboardCrossFilter.isEnabled(visual);
+  }
+
+  /**
+   * A visual emitted a data-point click. If it's cross-filter-enabled,
+   * resolve the clicked value, set the active cross-filter, and re-run
+   * only the configured target visuals.
+   */
+  onVisualChartSelect(visual: Visual, event: any): void {
+    if (!DashboardCrossFilter.isEnabled(visual)) return;
+    const value = this.extractClickedValue(event);
+    const column = visual.xAxisColumn;
+    if (this.crossFilter.apply(visual, column, value)) {
+      this.executeQuery();
+      this.cdr.markForCheck();
+    }
+  }
+
+  /** Clear the active cross-filter and restore all visuals. */
+  clearCrossFilter(): void {
+    if (!this.crossFilter.isActive()) return;
+    this.crossFilter.clear();
+    this.executeQuery();
+    this.cdr.markForCheck();
+  }
+
+  get hasActiveCrossFilter(): boolean {
+    return this.crossFilter.isActive();
+  }
+
+  /** Human summary of the active cross-filter for the chip label. */
+  get crossFilterLabel(): string {
+    const cf = this.crossFilter.current();
+    if (!cf) return '';
+    return `${cf.columnName}: ${cf.value}`;
+  }
+
+  /**
+   * Pull the clicked category out of the ECharts click payload
+   * (`{ name, value }`) or a table row (`{ row }`).
+   */
+  private extractClickedValue(event: any): string | number | null {
+    if (event == null) return null;
+    if (typeof event === 'string' || typeof event === 'number') return event;
+    if (event.name !== undefined && event.name !== null) return event.name;
+    if (event.row && typeof event.row === 'object') {
+      const first = Object.values(event.row)[0];
+      if (typeof first === 'string' || typeof first === 'number') return first;
+    }
+    if (Array.isArray(event.value) && event.value.length) {
+      const v = event.value[0];
+      if (typeof v === 'string' || typeof v === 'number') return v;
+    }
+    return null;
+  }
+
+  // ── Auto-refresh (Track E4) ─────────────────────────────────────────
+
+  private startAutoRefresh(): void {
+    this.stopAutoRefresh();
+    if (!this.autoRefreshSeconds || this.autoRefreshSeconds <= 0) return;
+    this.autoRefreshCountdown = this.autoRefreshSeconds;
+    // Re-run on the interval; pause implicitly while the gate is open
+    // (the tick short-circuits because executeQuery bails when gateOpen).
+    this.autoRefreshTimer = setInterval(() => {
+      if (this.gateOpen) return;
+      this.autoRefreshCountdown = this.autoRefreshSeconds!;
+      this.executeQuery();
+    }, this.autoRefreshSeconds * 1000);
+    // 1s visible countdown for the indicator.
+    this.countdownTimer = setInterval(() => {
+      if (this.gateOpen) return;
+      this.autoRefreshCountdown = Math.max(0, this.autoRefreshCountdown - 1);
+      this.cdr.markForCheck();
+    }, 1000);
+  }
+
+  private stopAutoRefresh(): void {
+    if (this.autoRefreshTimer) {
+      clearInterval(this.autoRefreshTimer);
+      this.autoRefreshTimer = null;
+    }
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
+      this.countdownTimer = null;
+    }
+  }
+
+  get autoRefreshActive(): boolean {
+    return !!this.autoRefreshSeconds && this.autoRefreshSeconds > 0;
+  }
+
+  // ── Schedule delivery (Track E4) ────────────────────────────────────
+
+  openSchedule(): void {
+    if (!this.dashboardId) return;
+    this.scheduleVisible = true;
   }
 
   // ── Grid Layout ──
