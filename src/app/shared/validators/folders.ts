@@ -4,10 +4,12 @@
  *   BE: src/shared/validators/folders.ts
  *   FE: src/app/shared/validators/folders.ts
  *
- * Single source of truth for the folders surface: create / rename / move a
- * node in the per-objectType organizational tree (Track F). Both the FE
- * folder-tree editor and the BE zodValidate middleware consume these schemas
- * so the contract can never drift between client and server.
+ * Single source of truth for the folders surface (Track F2): create /
+ * rename / move / delete / list-tree of the nested organizational tree that
+ * groups datasets / analyses / dashboards / alerts. One tree per `objectType`
+ * per organisation; `parentId` builds the hierarchy (null = a root folder).
+ * Both the FE folder-tree panel and the BE zodValidate middleware consume
+ * these schemas so the client / server contract can never drift.
  * ─────────────────────────────────────────────────────────────────────
  */
 import { z } from 'zod';
@@ -17,6 +19,7 @@ import { z } from 'zod';
 export const FOLDER_LIMITS = {
   NAME_MIN: 1,
   NAME_MAX: 120,
+  JUSTIFICATION_MAX: 500,
 } as const;
 
 /** The four object families a folder tree can organize. */
@@ -28,7 +31,7 @@ export const FOLDER_OBJECT_TYPES = [
 ] as const;
 export type FolderObjectType = (typeof FOLDER_OBJECT_TYPES)[number];
 
-/** Folder display name — same family as analysis / tab names. */
+/** Folder display name — same family as analysis / tab / filter names. */
 export const FOLDER_NAME_PATTERN = /^[A-Za-z0-9][A-Za-z0-9 ._-]*$/;
 
 // ── Internal helpers ───────────────────────────────────────────────
@@ -68,10 +71,7 @@ export const folderObjectTypeSchema = z.enum(FOLDER_OBJECT_TYPES, {
   message: 'validation.folders.objectType.invalid',
 });
 
-/**
- * Parent id — optional; `null` / blank collapses to undefined (→ a root
- * folder). When present it must be a uuid.
- */
+/** Parent folder id — blank / null collapses to undefined (→ a root folder). */
 export const folderParentIdSchema = z
   .preprocess(
     blankToUndefined,
@@ -80,28 +80,70 @@ export const folderParentIdSchema = z
   .nullable()
   .optional();
 
+export const folderJustificationSchema = z.preprocess(
+  blankToUndefined,
+  z
+    .string()
+    .max(FOLDER_LIMITS.JUSTIFICATION_MAX, {
+      message: 'validation.folders.justification.tooLong',
+    })
+    .optional(),
+);
+
 // ── Payload schemas ────────────────────────────────────────────────
 
-/** Create a folder. objectType picks the tree; parentId nests it. */
+/** Create a folder. `objectType` scopes the tree; org fields re-derived on BE. */
 export const createFolderSchema = z.object({
   name: folderNameSchema,
   objectType: folderObjectTypeSchema,
   parentId: folderParentIdSchema,
+  sequence: z
+    .number()
+    .int({ message: 'validation.folders.sequence.invalid' })
+    .min(0, { message: 'validation.folders.sequence.invalid' })
+    .optional(),
 });
 export type CreateFolderInput = z.infer<typeof createFolderSchema>;
 
-/** Rename a folder — name only; id comes from the `:folderId` path param. */
+/** Rename a folder. `id` comes from the `:folderId` path param. */
 export const renameFolderSchema = z.object({
+  id: idSchema('validation.folders.id.required'),
   name: folderNameSchema,
 });
 export type RenameFolderInput = z.infer<typeof renameFolderSchema>;
 
 /**
- * Move a folder — reparent under a new parent (or to the root when parentId
- * is omitted / null). The BE guards against cycles (a folder can't become its
- * own descendant) before persisting.
+ * Move (reparent) a folder. `parentId` null = move to root. The BE guards
+ * against cycles (a folder cannot become its own descendant) before persisting.
  */
 export const moveFolderSchema = z.object({
+  id: idSchema('validation.folders.id.required'),
   parentId: folderParentIdSchema,
+  sequence: z
+    .number()
+    .int({ message: 'validation.folders.sequence.invalid' })
+    .min(0, { message: 'validation.folders.sequence.invalid' })
+    .optional(),
 });
 export type MoveFolderInput = z.infer<typeof moveFolderSchema>;
+
+/** Delete a folder. Detaches its objects (folderId → null) per the BE. */
+export const deleteFolderSchema = z.object({
+  id: idSchema('validation.folders.id.required'),
+  justification: folderJustificationSchema,
+});
+export type DeleteFolderInput = z.infer<typeof deleteFolderSchema>;
+
+/**
+ * Move an object into a folder (or to root when folderId is null). The BE
+ * verifies the folder belongs to the same org + objectType before persisting.
+ */
+export const moveObjectToFolderSchema = z.object({
+  objectType: folderObjectTypeSchema,
+  objectId: idSchema('validation.folders.objectId.required'),
+  folderId: z
+    .preprocess(blankToUndefined, idSchema('validation.folders.id.required'))
+    .nullable()
+    .optional(),
+});
+export type MoveObjectToFolderInput = z.infer<typeof moveObjectToFolderSchema>;

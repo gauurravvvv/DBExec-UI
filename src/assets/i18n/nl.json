@@ -198,7 +198,10 @@
     "MAX": "Max",
     "TRUE": "Waar",
     "FALSE": "Onwaar",
-    "NO_MATCHING_RECORDS": "Geen overeenkomende records"
+    "NO_MATCHING_RECORDS": "Geen overeenkomende records",
+    "TAGS": "Labels",
+    "TAGS_PLACEHOLDER": "Voeg een tag toe en druk op Enter",
+    "TAGS_FILTER_PLACEHOLDER": "Filteren op tags…"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Voornaam is verplicht",
@@ -1461,6 +1464,80 @@
       "MAX": "Max",
       "LOW_COLOR": "Lage kleur",
       "HIGH_COLOR": "Hoge kleur"
+    },
+    "DATA_SECTION": "Gegevens",
+    "DEFAULT_TAB": "Hoofd",
+    "TABS": {
+      "ADD": "Tabblad toevoegen",
+      "RENAME": "Naam wijzigen",
+      "DELETE": "Tabblad verwijderen",
+      "MOVE_LEFT": "Naar links verplaatsen",
+      "MOVE_RIGHT": "Naar rechts verplaatsen",
+      "MOVE_VISUAL": "Naar tabblad verplaatsen",
+      "MOVE_TO": "Verplaatsen naar",
+      "NEW_TAB_NAME": "Tabblad {{n}}",
+      "CONFIRM_DELETE": "Dit tabblad verwijderen?",
+      "CONFIRM_DELETE_MSG": "Tabblad \"{{name}}\" verwijderen? De visuals worden verplaatst naar het eerste resterende tabblad.",
+      "DELETE_REASSIGN_INFO": "Visuals op dit tabblad worden opnieuw toegewezen aan het eerste resterende tabblad."
+    },
+    "AGG": {
+      "DIMENSION": "Dimensie",
+      "DIMENSION_PH": "Groeperen op kolom",
+      "MEASURE": "Meetwaarde",
+      "MEASURE_PH": "Numerieke kolom",
+      "AGGREGATE": "Aggregeren",
+      "NONE": "Geen (ruwe rijen)",
+      "SUM": "Som",
+      "AVG": "Gemiddelde",
+      "COUNT": "Aantal",
+      "MIN": "Min",
+      "MAX": "Max",
+      "COUNT_DISTINCT": "Aantal uniek",
+      "EXTRA_MEASURES": "Extra meetwaarden",
+      "ADD_MEASURE": "Meetwaarde toevoegen",
+      "ALIAS_PH": "Alias"
+    },
+    "ANALYTICS": {
+      "SECTION": "Analyse",
+      "DUAL_AXIS": "Dubbele as",
+      "RIGHT_AXIS_NAME": "Naam rechteras",
+      "SERIES_MAP": "Serie-astoewijzing",
+      "ADD_SERIES": "Reeks toevoegen",
+      "SERIES_NAME_PH": "Reeksnaam",
+      "SERIES_BAR": "Staaf",
+      "SERIES_LINE": "Lijn",
+      "AXIS_LEFT": "Linkeras",
+      "AXIS_RIGHT": "Rechteras",
+      "TREND": "Trendlijn",
+      "TREND_NONE": "Geen",
+      "TREND_LINEAR": "Lineaire regressie",
+      "TREND_MOVING_AVG": "Voortschrijdend gemiddelde",
+      "TREND_FORECAST": "Voorspelling",
+      "WINDOW": "Venster",
+      "FORECAST_PERIODS": "Voorspellingsperioden",
+      "SMALL_MULTIPLES": "Kleine veelvouden",
+      "FACET_COLUMN": "Facetkolom",
+      "MAX_COLS": "Max. kolommen"
+    },
+    "INTERACTION": {
+      "SECTION": "Interactie",
+      "CROSS_FILTER": "Kruisfilter",
+      "TARGETS": "Van toepassing op",
+      "TARGET_SAME_TAB": "Zelfde tabblad",
+      "TARGET_DASHBOARD": "Hele dashboard",
+      "TARGET_SELECTED": "Geselecteerde visuals",
+      "TARGET_VISUALS": "Doelvisuals",
+      "SELECT_VISUALS": "Visuals selecteren"
+    },
+    "FILTER": {
+      "SCOPE": "Bereik",
+      "SCOPE_DASHBOARD": "Hele dashboard",
+      "SCOPE_TAB": "Eén tabblad",
+      "SCOPE_VISUAL": "Specifieke visuals",
+      "SCOPE_TARGET_TAB": "Doeltabblad",
+      "SCOPE_TARGET_VISUALS": "Doelvisuals",
+      "SCOPE_CHIP_TAB": "Tabblad",
+      "SCOPE_CHIP_VISUAL": "Visuals"
     }
   },
   "DASHBOARD": {
@@ -1552,6 +1629,64 @@
     "EMBED": {
       "UNAVAILABLE_TITLE": "Dit dashboard is niet beschikbaar",
       "UNAVAILABLE_BODY": "Deze deellink is ongeldig, verlopen of ingetrokken. Neem contact op met de persoon die hem heeft gedeeld."
+    },
+    "WIDGET": {
+      "ADD": "Widget toevoegen",
+      "EDIT": "Widget bewerken",
+      "SUBTITLE": "Een tekstnotitie of een KPI-tegel op het canvas.",
+      "TYPE": "Widgettype",
+      "TYPE_TEXT": "Tekst / Markdown",
+      "TYPE_KPI": "KPI-tegel",
+      "MARKDOWN": "Inhoud",
+      "MARKDOWN_PH": "Schrijf een notitie (Markdown ondersteund)…",
+      "KPI_LABEL": "Label",
+      "KPI_LABEL_PH": "bijv. Totale omzet",
+      "KPI_MEASURE": "Meetwaarde",
+      "KPI_AGGREGATE": "Aggregeren",
+      "KPI_FORMAT": "Notatie",
+      "FORMAT_NUMBER": "Getal",
+      "FORMAT_CURRENCY": "Valuta",
+      "FORMAT_PERCENT": "Percentage",
+      "KPI_TARGET": "Doel",
+      "KPI_COMPARE": "Vergelijkingsperiode",
+      "KPI_COMPARE_PH": "bijv. vorige maand"
+    },
+    "GATE": {
+      "TITLE": "Invoer vereist",
+      "SUBTITLE": "Vul de vereiste invoer in om dit dashboard te laden. Er wordt niets uitgevoerd totdat u doorgaat.",
+      "PARAMETERS": "Parameters",
+      "FILTERS": "Filters",
+      "LOAD": "Dashboard laden",
+      "REQUIRED_HINT": "Vul elke vereiste invoer in om door te gaan.",
+      "EDIT_INPUTS": "Invoer bewerken"
+    },
+    "AUTO_REFRESH": {
+      "INDICATOR": "automatisch vernieuwen: {{seconds}}s",
+      "TOOLTIP": "Dit dashboard vernieuwt zijn gegevens automatisch."
+    },
+    "CROSS_FILTER": {
+      "CLEAR": "Kruisfilter wissen"
+    },
+    "SCHEDULE": {
+      "BUTTON": "Levering plannen",
+      "TITLE": "Levering plannen",
+      "HINT": "E-mail een {{name}}-momentopname volgens een schema. Ontvangers krijgen het gerenderde dashboard.",
+      "FREQUENCY": "Frequentie",
+      "TIMEZONE": "Tijdzone",
+      "FORMAT": "Notatie",
+      "FORMAT_PDF": "PDF",
+      "FORMAT_PNG": "PNG (afbeelding)",
+      "RECIPIENT_USERS": "Ontvangers (gebruikers)",
+      "SELECT_USERS": "Gebruikers selecteren",
+      "RECIPIENT_EMAILS": "Ontvangers (e-mails)",
+      "ADD_EMAIL": "Voeg een e-mail toe en druk op Enter",
+      "EXISTING": "Bestaande schema's",
+      "NONE": "Nog geen leveringsschema's.",
+      "CREATE": "Schema maken",
+      "ON": "Aan",
+      "OFF": "Uit",
+      "ENABLE": "Inschakelen",
+      "DISABLE": "Uitschakelen"
     }
   },
   "TOAST": {
@@ -3320,6 +3455,39 @@
           "tooLong": "De dashboardnaam mag niet langer zijn dan 255 tekens"
         }
       }
+    },
+    "folders": {
+      "name": {
+        "required": "Mapnaam is verplicht",
+        "tooLong": "Mapnaam is te lang (max. 120 tekens)",
+        "invalid": "Mapnaam bevat ongeldige tekens"
+      },
+      "objectType": {
+        "invalid": "Ongeldig objecttype"
+      },
+      "parentId": {
+        "invalid": "Ongeldige bovenliggende map"
+      },
+      "id": {
+        "required": "Een geldig map-id is vereist"
+      },
+      "objectId": {
+        "required": "Een geldig object-id is vereist"
+      },
+      "sequence": {
+        "invalid": "Ongeldige volgordewaarde"
+      },
+      "justification": {
+        "tooLong": "Motivering is te lang (max. 500 tekens)"
+      }
+    },
+    "favourites": {
+      "objectType": {
+        "invalid": "Ongeldig objecttype"
+      },
+      "objectId": {
+        "required": "Een geldig object-id is vereist"
+      }
     }
   },
   "QUERY_RUNNER": {
@@ -3804,5 +3972,26 @@
     "SELECT_SEQUENCES": "Sequenties selecteren",
     "SELECT_FUNCTIONS": "Functies selecteren",
     "SEARCH_ROLES_PLACEHOLDER": "Zoek gebruikers en rollen op naam"
+  },
+  "FOLDER": {
+    "TITLE": "Mappen",
+    "ALL": "Alle items",
+    "NEW": "Nieuwe map",
+    "NEW_SUBFOLDER": "Nieuwe submap",
+    "RENAME": "Map hernoemen",
+    "DELETE": "Map verwijderen",
+    "NAME": "Mapnaam",
+    "NAME_PLACEHOLDER": "Voer een mapnaam in",
+    "EMPTY": "Nog geen mappen",
+    "CONFIRM_DELETE": "De map \"{{name}}\" verwijderen?",
+    "DELETE_DETACH_INFO": "Items in deze map worden niet verwijderd — ze worden uit de map verplaatst.",
+    "MOVE_TO": "Naar map verplaatsen",
+    "MOVED": "Naar map verplaatst"
+  },
+  "FAVOURITE": {
+    "FAVOURITES": "Favorieten",
+    "SHOW_ONLY": "Alleen favorieten tonen",
+    "ADD": "Aan favorieten toevoegen",
+    "REMOVE": "Uit favorieten verwijderen"
   }
 }

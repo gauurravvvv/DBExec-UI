@@ -198,7 +198,10 @@
     "MAX": "Max",
     "TRUE": "Wahr",
     "FALSE": "Falsch",
-    "NO_MATCHING_RECORDS": "Keine übereinstimmenden Datensätze"
+    "NO_MATCHING_RECORDS": "Keine übereinstimmenden Datensätze",
+    "TAGS": "Schlagwörter",
+    "TAGS_PLACEHOLDER": "Tag hinzufügen und Enter drücken",
+    "TAGS_FILTER_PLACEHOLDER": "Nach Tags filtern…"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Vorname ist erforderlich",
@@ -1461,6 +1464,80 @@
       "MAX": "Max",
       "LOW_COLOR": "Farbe für niedrige Werte",
       "HIGH_COLOR": "Farbe für hohe Werte"
+    },
+    "DATA_SECTION": "Daten",
+    "DEFAULT_TAB": "Haupt",
+    "TABS": {
+      "ADD": "Registerkarte hinzufügen",
+      "RENAME": "Umbenennen",
+      "DELETE": "Registerkarte löschen",
+      "MOVE_LEFT": "Nach links verschieben",
+      "MOVE_RIGHT": "Nach rechts verschieben",
+      "MOVE_VISUAL": "In Registerkarte verschieben",
+      "MOVE_TO": "Verschieben nach",
+      "NEW_TAB_NAME": "Registerkarte {{n}}",
+      "CONFIRM_DELETE": "Diese Registerkarte löschen?",
+      "CONFIRM_DELETE_MSG": "Registerkarte „{{name}}\" löschen? Ihre Visualisierungen werden auf die erste verbleibende Registerkarte verschoben.",
+      "DELETE_REASSIGN_INFO": "Visualisierungen auf dieser Registerkarte werden der ersten verbleibenden Registerkarte neu zugewiesen."
+    },
+    "AGG": {
+      "DIMENSION": "Dimension",
+      "DIMENSION_PH": "Nach Spalte gruppieren",
+      "MEASURE": "Kennzahl",
+      "MEASURE_PH": "Numerische Spalte",
+      "AGGREGATE": "Aggregieren",
+      "NONE": "Keine (Rohzeilen)",
+      "SUM": "Summe",
+      "AVG": "Durchschnitt",
+      "COUNT": "Anzahl",
+      "MIN": "Min",
+      "MAX": "Max",
+      "COUNT_DISTINCT": "Eindeutige Anzahl",
+      "EXTRA_MEASURES": "Weitere Kennzahlen",
+      "ADD_MEASURE": "Kennzahl hinzufügen",
+      "ALIAS_PH": "Alias"
+    },
+    "ANALYTICS": {
+      "SECTION": "Analysen",
+      "DUAL_AXIS": "Doppelte Achse",
+      "RIGHT_AXIS_NAME": "Name der rechten Achse",
+      "SERIES_MAP": "Serien-Achsenzuordnung",
+      "ADD_SERIES": "Serie hinzufügen",
+      "SERIES_NAME_PH": "Serienname",
+      "SERIES_BAR": "Balken",
+      "SERIES_LINE": "Linie",
+      "AXIS_LEFT": "Linke Achse",
+      "AXIS_RIGHT": "Rechte Achse",
+      "TREND": "Trendlinie",
+      "TREND_NONE": "Keine",
+      "TREND_LINEAR": "Lineare Regression",
+      "TREND_MOVING_AVG": "Gleitender Durchschnitt",
+      "TREND_FORECAST": "Prognose",
+      "WINDOW": "Fenster",
+      "FORECAST_PERIODS": "Prognosezeiträume",
+      "SMALL_MULTIPLES": "Kleine Vielfache",
+      "FACET_COLUMN": "Facettenspalte",
+      "MAX_COLS": "Max. Spalten"
+    },
+    "INTERACTION": {
+      "SECTION": "Interaktion",
+      "CROSS_FILTER": "Kreuzfilter",
+      "TARGETS": "Gilt für",
+      "TARGET_SAME_TAB": "Gleiche Registerkarte",
+      "TARGET_DASHBOARD": "Gesamtes Dashboard",
+      "TARGET_SELECTED": "Ausgewählte Visualisierungen",
+      "TARGET_VISUALS": "Zielvisualisierungen",
+      "SELECT_VISUALS": "Visualisierungen auswählen"
+    },
+    "FILTER": {
+      "SCOPE": "Bereich",
+      "SCOPE_DASHBOARD": "Gesamtes Dashboard",
+      "SCOPE_TAB": "Eine Registerkarte",
+      "SCOPE_VISUAL": "Bestimmte Visualisierungen",
+      "SCOPE_TARGET_TAB": "Zielregisterkarte",
+      "SCOPE_TARGET_VISUALS": "Zielvisualisierungen",
+      "SCOPE_CHIP_TAB": "Registerkarte",
+      "SCOPE_CHIP_VISUAL": "Visualisierungen"
     }
   },
   "DASHBOARD": {
@@ -1552,6 +1629,64 @@
     "EMBED": {
       "UNAVAILABLE_TITLE": "Dieses Dashboard ist nicht verfügbar",
       "UNAVAILABLE_BODY": "Dieser Freigabelink ist ungültig, abgelaufen oder wurde widerrufen. Bitte wenden Sie sich an die Person, die ihn geteilt hat."
+    },
+    "WIDGET": {
+      "ADD": "Widget hinzufügen",
+      "EDIT": "Widget bearbeiten",
+      "SUBTITLE": "Eine Textnotiz oder eine KPI-Kachel auf der Arbeitsfläche.",
+      "TYPE": "Widget-Typ",
+      "TYPE_TEXT": "Text / Markdown",
+      "TYPE_KPI": "KPI-Kachel",
+      "MARKDOWN": "Inhalt",
+      "MARKDOWN_PH": "Notiz schreiben (Markdown unterstützt)…",
+      "KPI_LABEL": "Bezeichnung",
+      "KPI_LABEL_PH": "z. B. Gesamtumsatz",
+      "KPI_MEASURE": "Kennzahl",
+      "KPI_AGGREGATE": "Aggregieren",
+      "KPI_FORMAT": "Format",
+      "FORMAT_NUMBER": "Zahl",
+      "FORMAT_CURRENCY": "Währung",
+      "FORMAT_PERCENT": "Prozent",
+      "KPI_TARGET": "Ziel",
+      "KPI_COMPARE": "Vergleichszeitraum",
+      "KPI_COMPARE_PH": "z. B. Vormonat"
+    },
+    "GATE": {
+      "TITLE": "Eingaben erforderlich",
+      "SUBTITLE": "Füllen Sie die erforderlichen Eingaben aus, um dieses Dashboard zu laden. Bis Sie fortfahren, wird nichts ausgeführt.",
+      "PARAMETERS": "Parameter",
+      "FILTERS": "Filter",
+      "LOAD": "Dashboard laden",
+      "REQUIRED_HINT": "Füllen Sie jede erforderliche Eingabe aus, um fortzufahren.",
+      "EDIT_INPUTS": "Eingaben bearbeiten"
+    },
+    "AUTO_REFRESH": {
+      "INDICATOR": "Auto-Aktualisierung: {{seconds}}s",
+      "TOOLTIP": "Dieses Dashboard aktualisiert seine Daten automatisch."
+    },
+    "CROSS_FILTER": {
+      "CLEAR": "Kreuzfilter löschen"
+    },
+    "SCHEDULE": {
+      "BUTTON": "Zustellung planen",
+      "TITLE": "Zustellung planen",
+      "HINT": "Senden Sie einen {{name}}-Snapshot nach Zeitplan per E-Mail. Empfänger erhalten das gerenderte Dashboard.",
+      "FREQUENCY": "Häufigkeit",
+      "TIMEZONE": "Zeitzone",
+      "FORMAT": "Format",
+      "FORMAT_PDF": "PDF",
+      "FORMAT_PNG": "PNG (Bild)",
+      "RECIPIENT_USERS": "Empfänger (Benutzer)",
+      "SELECT_USERS": "Benutzer auswählen",
+      "RECIPIENT_EMAILS": "Empfänger (E-Mails)",
+      "ADD_EMAIL": "E-Mail hinzufügen und Enter drücken",
+      "EXISTING": "Vorhandene Zeitpläne",
+      "NONE": "Noch keine Zustellungspläne.",
+      "CREATE": "Zeitplan erstellen",
+      "ON": "Am",
+      "OFF": "Aus",
+      "ENABLE": "Aktivieren",
+      "DISABLE": "Deaktivieren"
     }
   },
   "TOAST": {
@@ -3320,6 +3455,39 @@
           "tooLong": "Der Dashboard-Name darf 255 Zeichen nicht überschreiten"
         }
       }
+    },
+    "folders": {
+      "name": {
+        "required": "Ordnername ist erforderlich",
+        "tooLong": "Ordnername ist zu lang (max. 120 Zeichen)",
+        "invalid": "Ordnername enthält ungültige Zeichen"
+      },
+      "objectType": {
+        "invalid": "Ungültiger Objekttyp"
+      },
+      "parentId": {
+        "invalid": "Ungültiger übergeordneter Ordner"
+      },
+      "id": {
+        "required": "Eine gültige Ordner-ID ist erforderlich"
+      },
+      "objectId": {
+        "required": "Eine gültige Objekt-ID ist erforderlich"
+      },
+      "sequence": {
+        "invalid": "Ungültiger Reihenfolgewert"
+      },
+      "justification": {
+        "tooLong": "Begründung ist zu lang (max. 500 Zeichen)"
+      }
+    },
+    "favourites": {
+      "objectType": {
+        "invalid": "Ungültiger Objekttyp"
+      },
+      "objectId": {
+        "required": "Eine gültige Objekt-ID ist erforderlich"
+      }
     }
   },
   "QUERY_RUNNER": {
@@ -3804,5 +3972,26 @@
     "SELECT_SEQUENCES": "Sequenzen auswählen",
     "SELECT_FUNCTIONS": "Funktionen auswählen",
     "SEARCH_ROLES_PLACEHOLDER": "Benutzer & Rollen nach Namen suchen"
+  },
+  "FOLDER": {
+    "TITLE": "Ordner",
+    "ALL": "Alle Elemente",
+    "NEW": "Neuer Ordner",
+    "NEW_SUBFOLDER": "Neuer Unterordner",
+    "RENAME": "Ordner umbenennen",
+    "DELETE": "Ordner löschen",
+    "NAME": "Ordnername",
+    "NAME_PLACEHOLDER": "Ordnernamen eingeben",
+    "EMPTY": "Noch keine Ordner",
+    "CONFIRM_DELETE": "Ordner „{{name}}“ löschen?",
+    "DELETE_DETACH_INFO": "Elemente in diesem Ordner werden nicht gelöscht — sie werden aus dem Ordner verschoben.",
+    "MOVE_TO": "In Ordner verschieben",
+    "MOVED": "In Ordner verschoben"
+  },
+  "FAVOURITE": {
+    "FAVOURITES": "Favoriten",
+    "SHOW_ONLY": "Nur Favoriten anzeigen",
+    "ADD": "Zu Favoriten hinzufügen",
+    "REMOVE": "Aus Favoriten entfernen"
   }
 }

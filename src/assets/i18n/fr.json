@@ -198,7 +198,10 @@
     "MAX": "Max",
     "TRUE": "Vrai",
     "FALSE": "Faux",
-    "NO_MATCHING_RECORDS": "Aucun enregistrement correspondant"
+    "NO_MATCHING_RECORDS": "Aucun enregistrement correspondant",
+    "TAGS": "Étiquettes",
+    "TAGS_PLACEHOLDER": "Ajoutez une étiquette et appuyez sur Entrée",
+    "TAGS_FILTER_PLACEHOLDER": "Filtrer par étiquettes…"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Le prénom est requis",
@@ -1461,6 +1464,80 @@
       "MAX": "Max",
       "LOW_COLOR": "Couleur basse",
       "HIGH_COLOR": "Couleur haute"
+    },
+    "DATA_SECTION": "Données",
+    "DEFAULT_TAB": "Principal",
+    "TABS": {
+      "ADD": "Ajouter un onglet",
+      "RENAME": "Renommer",
+      "DELETE": "Supprimer l'onglet",
+      "MOVE_LEFT": "Déplacer vers la gauche",
+      "MOVE_RIGHT": "Déplacer vers la droite",
+      "MOVE_VISUAL": "Déplacer vers l'onglet",
+      "MOVE_TO": "Déplacer vers",
+      "NEW_TAB_NAME": "Onglet {{n}}",
+      "CONFIRM_DELETE": "Supprimer cet onglet ?",
+      "CONFIRM_DELETE_MSG": "Supprimer l'onglet « {{name}} » ? Ses visuels sont déplacés vers le premier onglet restant.",
+      "DELETE_REASSIGN_INFO": "Les visuels de cet onglet sont réaffectés au premier onglet restant."
+    },
+    "AGG": {
+      "DIMENSION": "Dimension",
+      "DIMENSION_PH": "Grouper par colonne",
+      "MEASURE": "Mesure",
+      "MEASURE_PH": "Colonne numérique",
+      "AGGREGATE": "Agréger",
+      "NONE": "Aucune (lignes brutes)",
+      "SUM": "Somme",
+      "AVG": "Moyenne",
+      "COUNT": "Nombre",
+      "MIN": "Min",
+      "MAX": "Max",
+      "COUNT_DISTINCT": "Nombre distinct",
+      "EXTRA_MEASURES": "Mesures supplémentaires",
+      "ADD_MEASURE": "Ajouter une mesure",
+      "ALIAS_PH": "Alias"
+    },
+    "ANALYTICS": {
+      "SECTION": "Analyses",
+      "DUAL_AXIS": "Double axe",
+      "RIGHT_AXIS_NAME": "Nom de l'axe droit",
+      "SERIES_MAP": "Mappage des axes de séries",
+      "ADD_SERIES": "Ajouter une série",
+      "SERIES_NAME_PH": "Nom de la série",
+      "SERIES_BAR": "Barre",
+      "SERIES_LINE": "Ligne",
+      "AXIS_LEFT": "Axe gauche",
+      "AXIS_RIGHT": "Axe droit",
+      "TREND": "Courbe de tendance",
+      "TREND_NONE": "Aucune",
+      "TREND_LINEAR": "Régression linéaire",
+      "TREND_MOVING_AVG": "Moyenne mobile",
+      "TREND_FORECAST": "Prévision",
+      "WINDOW": "Fenêtre",
+      "FORECAST_PERIODS": "Périodes de prévision",
+      "SMALL_MULTIPLES": "Petits multiples",
+      "FACET_COLUMN": "Colonne de facette",
+      "MAX_COLS": "Colonnes max."
+    },
+    "INTERACTION": {
+      "SECTION": "Interaction",
+      "CROSS_FILTER": "Filtre croisé",
+      "TARGETS": "S'applique à",
+      "TARGET_SAME_TAB": "Même onglet",
+      "TARGET_DASHBOARD": "Tout le tableau de bord",
+      "TARGET_SELECTED": "Visuels sélectionnés",
+      "TARGET_VISUALS": "Visuels cibles",
+      "SELECT_VISUALS": "Sélectionner des visuels"
+    },
+    "FILTER": {
+      "SCOPE": "Portée",
+      "SCOPE_DASHBOARD": "Tout le tableau de bord",
+      "SCOPE_TAB": "Un onglet",
+      "SCOPE_VISUAL": "Visuels spécifiques",
+      "SCOPE_TARGET_TAB": "Onglet cible",
+      "SCOPE_TARGET_VISUALS": "Visuels cibles",
+      "SCOPE_CHIP_TAB": "Onglet",
+      "SCOPE_CHIP_VISUAL": "Visuels"
     }
   },
   "DASHBOARD": {
@@ -1552,6 +1629,64 @@
     "EMBED": {
       "UNAVAILABLE_TITLE": "Ce tableau de bord est indisponible",
       "UNAVAILABLE_BODY": "Ce lien de partage est invalide, a expiré ou a été révoqué. Veuillez contacter la personne qui vous l’a partagé."
+    },
+    "WIDGET": {
+      "ADD": "Ajouter un widget",
+      "EDIT": "Modifier le widget",
+      "SUBTITLE": "Une note de texte ou une vignette KPI sur le canevas.",
+      "TYPE": "Type de widget",
+      "TYPE_TEXT": "Texte / Markdown",
+      "TYPE_KPI": "Vignette KPI",
+      "MARKDOWN": "Contenu",
+      "MARKDOWN_PH": "Écrire une note (Markdown pris en charge)…",
+      "KPI_LABEL": "Libellé",
+      "KPI_LABEL_PH": "p. ex. Chiffre d'affaires total",
+      "KPI_MEASURE": "Mesure",
+      "KPI_AGGREGATE": "Agréger",
+      "KPI_FORMAT": "Format",
+      "FORMAT_NUMBER": "Nombre",
+      "FORMAT_CURRENCY": "Devise",
+      "FORMAT_PERCENT": "Pourcentage",
+      "KPI_TARGET": "Cible",
+      "KPI_COMPARE": "Période de comparaison",
+      "KPI_COMPARE_PH": "p. ex. mois précédent"
+    },
+    "GATE": {
+      "TITLE": "Saisies requises",
+      "SUBTITLE": "Renseignez les saisies requises pour charger ce tableau de bord. Rien ne s'exécute tant que vous ne continuez pas.",
+      "PARAMETERS": "Paramètres",
+      "FILTERS": "Filtres",
+      "LOAD": "Charger le tableau de bord",
+      "REQUIRED_HINT": "Renseignez chaque saisie requise pour continuer.",
+      "EDIT_INPUTS": "Modifier les saisies"
+    },
+    "AUTO_REFRESH": {
+      "INDICATOR": "actualisation auto : {{seconds}} s",
+      "TOOLTIP": "Ce tableau de bord actualise ses données automatiquement."
+    },
+    "CROSS_FILTER": {
+      "CLEAR": "Effacer le filtre croisé"
+    },
+    "SCHEDULE": {
+      "BUTTON": "Planifier la livraison",
+      "TITLE": "Planifier la livraison",
+      "HINT": "Envoyez par e-mail un instantané {{name}} selon un calendrier. Les destinataires reçoivent le tableau de bord rendu.",
+      "FREQUENCY": "Fréquence",
+      "TIMEZONE": "Fuseau horaire",
+      "FORMAT": "Format",
+      "FORMAT_PDF": "PDF",
+      "FORMAT_PNG": "PNG (image)",
+      "RECIPIENT_USERS": "Destinataires (utilisateurs)",
+      "SELECT_USERS": "Sélectionner des utilisateurs",
+      "RECIPIENT_EMAILS": "Destinataires (e-mails)",
+      "ADD_EMAIL": "Ajoutez un e-mail et appuyez sur Entrée",
+      "EXISTING": "Calendriers existants",
+      "NONE": "Aucun calendrier de livraison pour le moment.",
+      "CREATE": "Créer un calendrier",
+      "ON": "Le",
+      "OFF": "Désactivé",
+      "ENABLE": "Activer",
+      "DISABLE": "Désactiver"
     }
   },
   "TOAST": {
@@ -3320,6 +3455,39 @@
           "tooLong": "Le nom du tableau de bord ne doit pas dépasser 255 caractères"
         }
       }
+    },
+    "folders": {
+      "name": {
+        "required": "Le nom du dossier est obligatoire",
+        "tooLong": "Le nom du dossier est trop long (120 caractères max.)",
+        "invalid": "Le nom du dossier contient des caractères non valides"
+      },
+      "objectType": {
+        "invalid": "Type d’objet non valide"
+      },
+      "parentId": {
+        "invalid": "Dossier parent non valide"
+      },
+      "id": {
+        "required": "Un id de dossier valide est requis"
+      },
+      "objectId": {
+        "required": "Un id d’objet valide est requis"
+      },
+      "sequence": {
+        "invalid": "Valeur de séquence non valide"
+      },
+      "justification": {
+        "tooLong": "La justification est trop longue (500 caractères max.)"
+      }
+    },
+    "favourites": {
+      "objectType": {
+        "invalid": "Type d’objet non valide"
+      },
+      "objectId": {
+        "required": "Un id d’objet valide est requis"
+      }
     }
   },
   "QUERY_RUNNER": {
@@ -3804,5 +3972,26 @@
     "SELECT_SEQUENCES": "Sélectionner les séquences",
     "SELECT_FUNCTIONS": "Sélectionner les fonctions",
     "SEARCH_ROLES_PLACEHOLDER": "Rechercher utilisateurs et rôles par nom"
+  },
+  "FOLDER": {
+    "TITLE": "Dossiers",
+    "ALL": "Tous les éléments",
+    "NEW": "Nouveau dossier",
+    "NEW_SUBFOLDER": "Nouveau sous-dossier",
+    "RENAME": "Renommer le dossier",
+    "DELETE": "Supprimer le dossier",
+    "NAME": "Nom du dossier",
+    "NAME_PLACEHOLDER": "Saisissez un nom de dossier",
+    "EMPTY": "Aucun dossier pour le moment",
+    "CONFIRM_DELETE": "Supprimer le dossier « {{name}} » ?",
+    "DELETE_DETACH_INFO": "Les éléments de ce dossier ne sont pas supprimés — ils sont sortis du dossier.",
+    "MOVE_TO": "Déplacer vers un dossier",
+    "MOVED": "Déplacé vers le dossier"
+  },
+  "FAVOURITE": {
+    "FAVOURITES": "Favoris",
+    "SHOW_ONLY": "Afficher uniquement les favoris",
+    "ADD": "Ajouter aux favoris",
+    "REMOVE": "Retirer des favoris"
   }
 }

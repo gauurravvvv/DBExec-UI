@@ -198,7 +198,10 @@
     "MAX": "最大",
     "TRUE": "真",
     "FALSE": "偽",
-    "NO_MATCHING_RECORDS": "一致するレコードはありません"
+    "NO_MATCHING_RECORDS": "一致するレコードはありません",
+    "TAGS": "タグ",
+    "TAGS_PLACEHOLDER": "タグを追加して Enter キーを押す",
+    "TAGS_FILTER_PLACEHOLDER": "タグで絞り込む…"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名は必須です",
@@ -1461,6 +1464,80 @@
       "MAX": "最大",
       "LOW_COLOR": "低値の色",
       "HIGH_COLOR": "高値の色"
+    },
+    "DATA_SECTION": "データ",
+    "DEFAULT_TAB": "メイン",
+    "TABS": {
+      "ADD": "タブを追加",
+      "RENAME": "名前を変更",
+      "DELETE": "タブを削除",
+      "MOVE_LEFT": "左へ移動",
+      "MOVE_RIGHT": "右へ移動",
+      "MOVE_VISUAL": "タブへ移動",
+      "MOVE_TO": "移動先",
+      "NEW_TAB_NAME": "タブ {{n}}",
+      "CONFIRM_DELETE": "このタブを削除しますか？",
+      "CONFIRM_DELETE_MSG": "タブ「{{name}}」を削除しますか？ ビジュアルは最初の残りのタブに移動されます。",
+      "DELETE_REASSIGN_INFO": "このタブのビジュアルは最初の残りのタブに再割り当てされます。"
+    },
+    "AGG": {
+      "DIMENSION": "ディメンション",
+      "DIMENSION_PH": "列でグループ化",
+      "MEASURE": "メジャー",
+      "MEASURE_PH": "数値列",
+      "AGGREGATE": "集計",
+      "NONE": "なし（生データ行）",
+      "SUM": "合計",
+      "AVG": "平均",
+      "COUNT": "件数",
+      "MIN": "最小",
+      "MAX": "最大",
+      "COUNT_DISTINCT": "個別件数",
+      "EXTRA_MEASURES": "追加メジャー",
+      "ADD_MEASURE": "メジャーを追加",
+      "ALIAS_PH": "エイリアス"
+    },
+    "ANALYTICS": {
+      "SECTION": "分析",
+      "DUAL_AXIS": "2軸",
+      "RIGHT_AXIS_NAME": "右軸の名前",
+      "SERIES_MAP": "系列軸マッピング",
+      "ADD_SERIES": "系列を追加",
+      "SERIES_NAME_PH": "系列名",
+      "SERIES_BAR": "棒",
+      "SERIES_LINE": "折れ線",
+      "AXIS_LEFT": "左軸",
+      "AXIS_RIGHT": "右軸",
+      "TREND": "トレンドライン",
+      "TREND_NONE": "なし",
+      "TREND_LINEAR": "線形回帰",
+      "TREND_MOVING_AVG": "移動平均",
+      "TREND_FORECAST": "予測",
+      "WINDOW": "ウィンドウ",
+      "FORECAST_PERIODS": "予測期間",
+      "SMALL_MULTIPLES": "スモールマルチプル",
+      "FACET_COLUMN": "ファセット列",
+      "MAX_COLS": "最大列数"
+    },
+    "INTERACTION": {
+      "SECTION": "インタラクション",
+      "CROSS_FILTER": "クロスフィルター",
+      "TARGETS": "適用先",
+      "TARGET_SAME_TAB": "同じタブ",
+      "TARGET_DASHBOARD": "ダッシュボード全体",
+      "TARGET_SELECTED": "選択したビジュアル",
+      "TARGET_VISUALS": "対象ビジュアル",
+      "SELECT_VISUALS": "ビジュアルを選択"
+    },
+    "FILTER": {
+      "SCOPE": "範囲",
+      "SCOPE_DASHBOARD": "ダッシュボード全体",
+      "SCOPE_TAB": "1つのタブ",
+      "SCOPE_VISUAL": "特定のビジュアル",
+      "SCOPE_TARGET_TAB": "対象タブ",
+      "SCOPE_TARGET_VISUALS": "対象ビジュアル",
+      "SCOPE_CHIP_TAB": "タブ",
+      "SCOPE_CHIP_VISUAL": "ビジュアル"
     }
   },
   "DASHBOARD": {
@@ -1552,6 +1629,64 @@
     "EMBED": {
       "UNAVAILABLE_TITLE": "このダッシュボードは利用できません",
       "UNAVAILABLE_BODY": "この共有リンクは無効か、有効期限が切れているか、取り消されています。共有した担当者にお問い合わせください。"
+    },
+    "WIDGET": {
+      "ADD": "ウィジェットを追加",
+      "EDIT": "ウィジェットを編集",
+      "SUBTITLE": "キャンバス上のテキストメモまたは KPI タイル。",
+      "TYPE": "ウィジェットの種類",
+      "TYPE_TEXT": "テキスト / Markdown",
+      "TYPE_KPI": "KPI タイル",
+      "MARKDOWN": "コンテンツ",
+      "MARKDOWN_PH": "メモを書く（Markdown 対応）…",
+      "KPI_LABEL": "ラベル",
+      "KPI_LABEL_PH": "例：総売上",
+      "KPI_MEASURE": "メジャー",
+      "KPI_AGGREGATE": "集計",
+      "KPI_FORMAT": "書式",
+      "FORMAT_NUMBER": "数値",
+      "FORMAT_CURRENCY": "通貨",
+      "FORMAT_PERCENT": "パーセント",
+      "KPI_TARGET": "目標",
+      "KPI_COMPARE": "比較期間",
+      "KPI_COMPARE_PH": "例：前月"
+    },
+    "GATE": {
+      "TITLE": "入力が必要です",
+      "SUBTITLE": "このダッシュボードを読み込むには必須の入力を行ってください。続行するまで何も実行されません。",
+      "PARAMETERS": "パラメーター",
+      "FILTERS": "フィルター",
+      "LOAD": "ダッシュボードを読み込む",
+      "REQUIRED_HINT": "続行するにはすべての必須入力を行ってください。",
+      "EDIT_INPUTS": "入力を編集"
+    },
+    "AUTO_REFRESH": {
+      "INDICATOR": "自動更新：{{seconds}}秒",
+      "TOOLTIP": "このダッシュボードはデータを自動的に更新します。"
+    },
+    "CROSS_FILTER": {
+      "CLEAR": "クロスフィルターをクリア"
+    },
+    "SCHEDULE": {
+      "BUTTON": "配信をスケジュール",
+      "TITLE": "配信をスケジュール",
+      "HINT": "{{name}} スナップショットをスケジュールに従ってメール送信します。受信者はレンダリングされたダッシュボードを受け取ります。",
+      "FREQUENCY": "頻度",
+      "TIMEZONE": "タイムゾーン",
+      "FORMAT": "形式",
+      "FORMAT_PDF": "PDF",
+      "FORMAT_PNG": "PNG（画像）",
+      "RECIPIENT_USERS": "受信者（ユーザー）",
+      "SELECT_USERS": "ユーザーを選択",
+      "RECIPIENT_EMAILS": "受信者（メール）",
+      "ADD_EMAIL": "メールを追加して Enter キーを押す",
+      "EXISTING": "既存のスケジュール",
+      "NONE": "まだ配信スケジュールはありません。",
+      "CREATE": "スケジュールを作成",
+      "ON": "日時",
+      "OFF": "オフ",
+      "ENABLE": "有効にする",
+      "DISABLE": "無効にする"
     }
   },
   "TOAST": {
@@ -3320,6 +3455,39 @@
           "tooLong": "ダッシュボード名は 255 文字以内で入力してください"
         }
       }
+    },
+    "folders": {
+      "name": {
+        "required": "フォルダー名は必須です",
+        "tooLong": "フォルダー名が長すぎます（最大120文字）",
+        "invalid": "フォルダー名に無効な文字が含まれています"
+      },
+      "objectType": {
+        "invalid": "無効なオブジェクトタイプです"
+      },
+      "parentId": {
+        "invalid": "無効な親フォルダーです"
+      },
+      "id": {
+        "required": "有効なフォルダーIDが必要です"
+      },
+      "objectId": {
+        "required": "有効なオブジェクトIDが必要です"
+      },
+      "sequence": {
+        "invalid": "無効な並び順の値です"
+      },
+      "justification": {
+        "tooLong": "理由が長すぎます（最大500文字）"
+      }
+    },
+    "favourites": {
+      "objectType": {
+        "invalid": "無効なオブジェクトタイプです"
+      },
+      "objectId": {
+        "required": "有効なオブジェクトIDが必要です"
+      }
     }
   },
   "QUERY_RUNNER": {
@@ -3804,5 +3972,26 @@
     "SELECT_SEQUENCES": "シーケンスを選択",
     "SELECT_FUNCTIONS": "関数を選択",
     "SEARCH_ROLES_PLACEHOLDER": "名前でユーザーとロールを検索"
+  },
+  "FOLDER": {
+    "TITLE": "フォルダー",
+    "ALL": "すべての項目",
+    "NEW": "新しいフォルダー",
+    "NEW_SUBFOLDER": "新しいサブフォルダー",
+    "RENAME": "フォルダー名を変更",
+    "DELETE": "フォルダーを削除",
+    "NAME": "フォルダー名",
+    "NAME_PLACEHOLDER": "フォルダー名を入力",
+    "EMPTY": "フォルダーはまだありません",
+    "CONFIRM_DELETE": "フォルダー「{{name}}」を削除しますか？",
+    "DELETE_DETACH_INFO": "このフォルダー内の項目は削除されません。フォルダーの外に移動されます。",
+    "MOVE_TO": "フォルダーに移動",
+    "MOVED": "フォルダーに移動しました"
+  },
+  "FAVOURITE": {
+    "FAVOURITES": "お気に入り",
+    "SHOW_ONLY": "お気に入りのみ表示",
+    "ADD": "お気に入りに追加",
+    "REMOVE": "お気に入りから削除"
   }
 }

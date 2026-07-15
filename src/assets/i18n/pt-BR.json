@@ -198,7 +198,10 @@
     "MAX": "Máx",
     "TRUE": "Verdadeiro",
     "FALSE": "Falso",
-    "NO_MATCHING_RECORDS": "Nenhum registro correspondente"
+    "NO_MATCHING_RECORDS": "Nenhum registro correspondente",
+    "TAGS": "Tags",
+    "TAGS_PLACEHOLDER": "Adicione uma tag e pressione Enter",
+    "TAGS_FILTER_PLACEHOLDER": "Filtrar por tags…"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "O nome é obrigatório",
@@ -1461,6 +1464,80 @@
       "MAX": "Máx",
       "LOW_COLOR": "Cor baixa",
       "HIGH_COLOR": "Cor alta"
+    },
+    "DATA_SECTION": "Dados",
+    "DEFAULT_TAB": "Principal",
+    "TABS": {
+      "ADD": "Adicionar aba",
+      "RENAME": "Renomear",
+      "DELETE": "Excluir aba",
+      "MOVE_LEFT": "Mover para a esquerda",
+      "MOVE_RIGHT": "Mover para a direita",
+      "MOVE_VISUAL": "Mover para a aba",
+      "MOVE_TO": "Mover para",
+      "NEW_TAB_NAME": "Aba {{n}}",
+      "CONFIRM_DELETE": "Excluir esta aba?",
+      "CONFIRM_DELETE_MSG": "Excluir a aba \"{{name}}\"? Seus visuais serão movidos para a primeira aba restante.",
+      "DELETE_REASSIGN_INFO": "Os visuais desta aba serão reatribuídos à primeira aba restante."
+    },
+    "AGG": {
+      "DIMENSION": "Dimensão",
+      "DIMENSION_PH": "Agrupar por coluna",
+      "MEASURE": "Medida",
+      "MEASURE_PH": "Coluna numérica",
+      "AGGREGATE": "Agregar",
+      "NONE": "Nenhuma (linhas brutas)",
+      "SUM": "Soma",
+      "AVG": "Média",
+      "COUNT": "Contagem",
+      "MIN": "Mín",
+      "MAX": "Máx",
+      "COUNT_DISTINCT": "Contagem distinta",
+      "EXTRA_MEASURES": "Medidas extras",
+      "ADD_MEASURE": "Adicionar medida",
+      "ALIAS_PH": "Alias"
+    },
+    "ANALYTICS": {
+      "SECTION": "Análises",
+      "DUAL_AXIS": "Eixo duplo",
+      "RIGHT_AXIS_NAME": "Nome do eixo direito",
+      "SERIES_MAP": "Mapeamento de eixos de séries",
+      "ADD_SERIES": "Adicionar série",
+      "SERIES_NAME_PH": "Nome da série",
+      "SERIES_BAR": "Barra",
+      "SERIES_LINE": "Linha",
+      "AXIS_LEFT": "Eixo esquerdo",
+      "AXIS_RIGHT": "Eixo direito",
+      "TREND": "Linha de tendência",
+      "TREND_NONE": "Nenhuma",
+      "TREND_LINEAR": "Regressão linear",
+      "TREND_MOVING_AVG": "Média móvel",
+      "TREND_FORECAST": "Previsão",
+      "WINDOW": "Janela",
+      "FORECAST_PERIODS": "Períodos de previsão",
+      "SMALL_MULTIPLES": "Múltiplos pequenos",
+      "FACET_COLUMN": "Coluna de faceta",
+      "MAX_COLS": "Máx. de colunas"
+    },
+    "INTERACTION": {
+      "SECTION": "Interação",
+      "CROSS_FILTER": "Filtro cruzado",
+      "TARGETS": "Aplica-se a",
+      "TARGET_SAME_TAB": "Mesma aba",
+      "TARGET_DASHBOARD": "Todo o painel",
+      "TARGET_SELECTED": "Visuais selecionados",
+      "TARGET_VISUALS": "Visuais de destino",
+      "SELECT_VISUALS": "Selecionar visuais"
+    },
+    "FILTER": {
+      "SCOPE": "Escopo",
+      "SCOPE_DASHBOARD": "Todo o painel",
+      "SCOPE_TAB": "Uma aba",
+      "SCOPE_VISUAL": "Visuais específicos",
+      "SCOPE_TARGET_TAB": "Aba de destino",
+      "SCOPE_TARGET_VISUALS": "Visuais de destino",
+      "SCOPE_CHIP_TAB": "Aba",
+      "SCOPE_CHIP_VISUAL": "Visuais"
     }
   },
   "DASHBOARD": {
@@ -1552,6 +1629,64 @@
     "EMBED": {
       "UNAVAILABLE_TITLE": "Este dashboard está indisponível",
       "UNAVAILABLE_BODY": "Este link de compartilhamento é inválido, expirou ou foi revogado. Entre em contato com a pessoa que o compartilhou."
+    },
+    "WIDGET": {
+      "ADD": "Adicionar widget",
+      "EDIT": "Editar widget",
+      "SUBTITLE": "Uma nota de texto ou um bloco de KPI no canvas.",
+      "TYPE": "Tipo de widget",
+      "TYPE_TEXT": "Texto / Markdown",
+      "TYPE_KPI": "Bloco de KPI",
+      "MARKDOWN": "Conteúdo",
+      "MARKDOWN_PH": "Escreva uma nota (Markdown compatível)…",
+      "KPI_LABEL": "Rótulo",
+      "KPI_LABEL_PH": "ex.: Receita total",
+      "KPI_MEASURE": "Medida",
+      "KPI_AGGREGATE": "Agregar",
+      "KPI_FORMAT": "Formato",
+      "FORMAT_NUMBER": "Número",
+      "FORMAT_CURRENCY": "Moeda",
+      "FORMAT_PERCENT": "Porcentagem",
+      "KPI_TARGET": "Meta",
+      "KPI_COMPARE": "Período de comparação",
+      "KPI_COMPARE_PH": "ex.: mês anterior"
+    },
+    "GATE": {
+      "TITLE": "Entradas obrigatórias",
+      "SUBTITLE": "Preencha as entradas obrigatórias para carregar este painel. Nada é executado até você continuar.",
+      "PARAMETERS": "Parâmetros",
+      "FILTERS": "Filtros",
+      "LOAD": "Carregar painel",
+      "REQUIRED_HINT": "Preencha cada entrada obrigatória para continuar.",
+      "EDIT_INPUTS": "Editar entradas"
+    },
+    "AUTO_REFRESH": {
+      "INDICATOR": "atualização automática: {{seconds}}s",
+      "TOOLTIP": "Este painel atualiza seus dados automaticamente."
+    },
+    "CROSS_FILTER": {
+      "CLEAR": "Limpar filtro cruzado"
+    },
+    "SCHEDULE": {
+      "BUTTON": "Agendar entrega",
+      "TITLE": "Agendar entrega",
+      "HINT": "Envie por e-mail um instantâneo {{name}} conforme um agendamento. Os destinatários recebem o painel renderizado.",
+      "FREQUENCY": "Frequência",
+      "TIMEZONE": "Fuso horário",
+      "FORMAT": "Formato",
+      "FORMAT_PDF": "PDF",
+      "FORMAT_PNG": "PNG (imagem)",
+      "RECIPIENT_USERS": "Destinatários (usuários)",
+      "SELECT_USERS": "Selecionar usuários",
+      "RECIPIENT_EMAILS": "Destinatários (e-mails)",
+      "ADD_EMAIL": "Adicione um e-mail e pressione Enter",
+      "EXISTING": "Agendamentos existentes",
+      "NONE": "Ainda não há agendamentos de entrega.",
+      "CREATE": "Criar agendamento",
+      "ON": "Em",
+      "OFF": "Desativado",
+      "ENABLE": "Ativar",
+      "DISABLE": "Desativar"
     }
   },
   "TOAST": {
@@ -3320,6 +3455,39 @@
           "tooLong": "O nome do dashboard não deve exceder 255 caracteres"
         }
       }
+    },
+    "folders": {
+      "name": {
+        "required": "O nome da pasta é obrigatório",
+        "tooLong": "O nome da pasta é muito longo (máx. 120 caracteres)",
+        "invalid": "O nome da pasta contém caracteres inválidos"
+      },
+      "objectType": {
+        "invalid": "Tipo de objeto inválido"
+      },
+      "parentId": {
+        "invalid": "Pasta pai inválida"
+      },
+      "id": {
+        "required": "É necessário um id de pasta válido"
+      },
+      "objectId": {
+        "required": "É necessário um id de objeto válido"
+      },
+      "sequence": {
+        "invalid": "Valor de sequência inválido"
+      },
+      "justification": {
+        "tooLong": "A justificativa é muito longa (máx. 500 caracteres)"
+      }
+    },
+    "favourites": {
+      "objectType": {
+        "invalid": "Tipo de objeto inválido"
+      },
+      "objectId": {
+        "required": "É necessário um id de objeto válido"
+      }
     }
   },
   "QUERY_RUNNER": {
@@ -3804,5 +3972,26 @@
     "SELECT_SEQUENCES": "Selecionar sequências",
     "SELECT_FUNCTIONS": "Selecionar funções",
     "SEARCH_ROLES_PLACEHOLDER": "Pesquisar usuários e funções por nome"
+  },
+  "FOLDER": {
+    "TITLE": "Pastas",
+    "ALL": "Todos os itens",
+    "NEW": "Nova pasta",
+    "NEW_SUBFOLDER": "Nova subpasta",
+    "RENAME": "Renomear pasta",
+    "DELETE": "Excluir pasta",
+    "NAME": "Nome da pasta",
+    "NAME_PLACEHOLDER": "Digite um nome de pasta",
+    "EMPTY": "Ainda não há pastas",
+    "CONFIRM_DELETE": "Excluir a pasta \"{{name}}\"?",
+    "DELETE_DETACH_INFO": "Os itens nesta pasta não são excluídos — eles são movidos para fora da pasta.",
+    "MOVE_TO": "Mover para a pasta",
+    "MOVED": "Movido para a pasta"
+  },
+  "FAVOURITE": {
+    "FAVOURITES": "Favoritos",
+    "SHOW_ONLY": "Mostrar apenas favoritos",
+    "ADD": "Adicionar aos favoritos",
+    "REMOVE": "Remover dos favoritos"
   }
 }

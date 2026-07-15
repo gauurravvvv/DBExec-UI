@@ -198,7 +198,10 @@
     "MAX": "最大",
     "TRUE": "真",
     "FALSE": "假",
-    "NO_MATCHING_RECORDS": "无匹配记录"
+    "NO_MATCHING_RECORDS": "无匹配记录",
+    "TAGS": "标签",
+    "TAGS_PLACEHOLDER": "添加标签并按 Enter",
+    "TAGS_FILTER_PLACEHOLDER": "按标签筛选…"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名字为必填项",
@@ -1461,6 +1464,80 @@
       "MAX": "最大值",
       "LOW_COLOR": "低值颜色",
       "HIGH_COLOR": "高值颜色"
+    },
+    "DATA_SECTION": "数据",
+    "DEFAULT_TAB": "主",
+    "TABS": {
+      "ADD": "添加选项卡",
+      "RENAME": "重命名",
+      "DELETE": "删除选项卡",
+      "MOVE_LEFT": "左移",
+      "MOVE_RIGHT": "右移",
+      "MOVE_VISUAL": "移动到选项卡",
+      "MOVE_TO": "移动到",
+      "NEW_TAB_NAME": "选项卡 {{n}}",
+      "CONFIRM_DELETE": "删除此选项卡？",
+      "CONFIRM_DELETE_MSG": "删除选项卡\"{{name}}\"？其视觉对象将移动到第一个剩余选项卡。",
+      "DELETE_REASSIGN_INFO": "此选项卡上的视觉对象将重新分配到第一个剩余选项卡。"
+    },
+    "AGG": {
+      "DIMENSION": "维度",
+      "DIMENSION_PH": "按列分组",
+      "MEASURE": "度量",
+      "MEASURE_PH": "数值列",
+      "AGGREGATE": "聚合",
+      "NONE": "无（原始行）",
+      "SUM": "求和",
+      "AVG": "平均值",
+      "COUNT": "计数",
+      "MIN": "最小值",
+      "MAX": "最大值",
+      "COUNT_DISTINCT": "去重计数",
+      "EXTRA_MEASURES": "额外度量",
+      "ADD_MEASURE": "添加度量",
+      "ALIAS_PH": "别名"
+    },
+    "ANALYTICS": {
+      "SECTION": "分析",
+      "DUAL_AXIS": "双轴",
+      "RIGHT_AXIS_NAME": "右轴名称",
+      "SERIES_MAP": "系列轴映射",
+      "ADD_SERIES": "添加系列",
+      "SERIES_NAME_PH": "系列名称",
+      "SERIES_BAR": "柱形",
+      "SERIES_LINE": "折线",
+      "AXIS_LEFT": "左轴",
+      "AXIS_RIGHT": "右轴",
+      "TREND": "趋势线",
+      "TREND_NONE": "无",
+      "TREND_LINEAR": "线性回归",
+      "TREND_MOVING_AVG": "移动平均",
+      "TREND_FORECAST": "预测",
+      "WINDOW": "窗口",
+      "FORECAST_PERIODS": "预测周期",
+      "SMALL_MULTIPLES": "小型多组图",
+      "FACET_COLUMN": "分面列",
+      "MAX_COLS": "最大列数"
+    },
+    "INTERACTION": {
+      "SECTION": "交互",
+      "CROSS_FILTER": "交叉筛选",
+      "TARGETS": "应用于",
+      "TARGET_SAME_TAB": "同一选项卡",
+      "TARGET_DASHBOARD": "整个仪表板",
+      "TARGET_SELECTED": "所选视觉对象",
+      "TARGET_VISUALS": "目标视觉对象",
+      "SELECT_VISUALS": "选择视觉对象"
+    },
+    "FILTER": {
+      "SCOPE": "范围",
+      "SCOPE_DASHBOARD": "整个仪表板",
+      "SCOPE_TAB": "一个选项卡",
+      "SCOPE_VISUAL": "特定视觉对象",
+      "SCOPE_TARGET_TAB": "目标选项卡",
+      "SCOPE_TARGET_VISUALS": "目标视觉对象",
+      "SCOPE_CHIP_TAB": "选项卡",
+      "SCOPE_CHIP_VISUAL": "视觉对象"
     }
   },
   "DASHBOARD": {
@@ -1552,6 +1629,64 @@
     "EMBED": {
       "UNAVAILABLE_TITLE": "此仪表板不可用",
       "UNAVAILABLE_BODY": "此共享链接无效、已过期或已被撤销。请联系与您共享它的人。"
+    },
+    "WIDGET": {
+      "ADD": "添加小组件",
+      "EDIT": "编辑小组件",
+      "SUBTITLE": "画布上的文本备注或 KPI 磁贴。",
+      "TYPE": "小组件类型",
+      "TYPE_TEXT": "文本 / Markdown",
+      "TYPE_KPI": "KPI 磁贴",
+      "MARKDOWN": "内容",
+      "MARKDOWN_PH": "写一条备注（支持 Markdown）…",
+      "KPI_LABEL": "标签",
+      "KPI_LABEL_PH": "例如：总收入",
+      "KPI_MEASURE": "度量",
+      "KPI_AGGREGATE": "聚合",
+      "KPI_FORMAT": "格式",
+      "FORMAT_NUMBER": "数字",
+      "FORMAT_CURRENCY": "货币",
+      "FORMAT_PERCENT": "百分比",
+      "KPI_TARGET": "目标",
+      "KPI_COMPARE": "比较期间",
+      "KPI_COMPARE_PH": "例如：上个月"
+    },
+    "GATE": {
+      "TITLE": "需要输入",
+      "SUBTITLE": "填写必填输入以加载此仪表板。在您继续之前不会运行任何内容。",
+      "PARAMETERS": "参数",
+      "FILTERS": "筛选器",
+      "LOAD": "加载仪表板",
+      "REQUIRED_HINT": "填写每个必填输入以继续。",
+      "EDIT_INPUTS": "编辑输入"
+    },
+    "AUTO_REFRESH": {
+      "INDICATOR": "自动刷新：{{seconds}} 秒",
+      "TOOLTIP": "此仪表板会自动刷新其数据。"
+    },
+    "CROSS_FILTER": {
+      "CLEAR": "清除交叉筛选"
+    },
+    "SCHEDULE": {
+      "BUTTON": "安排推送",
+      "TITLE": "安排推送",
+      "HINT": "按计划通过电子邮件发送 {{name}} 快照。收件人将收到渲染后的仪表板。",
+      "FREQUENCY": "频率",
+      "TIMEZONE": "时区",
+      "FORMAT": "格式",
+      "FORMAT_PDF": "PDF",
+      "FORMAT_PNG": "PNG（图片）",
+      "RECIPIENT_USERS": "收件人（用户）",
+      "SELECT_USERS": "选择用户",
+      "RECIPIENT_EMAILS": "收件人（电子邮件）",
+      "ADD_EMAIL": "添加电子邮件并按 Enter",
+      "EXISTING": "现有计划",
+      "NONE": "尚无推送计划。",
+      "CREATE": "创建计划",
+      "ON": "开",
+      "OFF": "关",
+      "ENABLE": "启用",
+      "DISABLE": "禁用"
     }
   },
   "TOAST": {
@@ -3320,6 +3455,39 @@
           "tooLong": "仪表板名称不得超过 255 个字符"
         }
       }
+    },
+    "folders": {
+      "name": {
+        "required": "文件夹名称为必填项",
+        "tooLong": "文件夹名称过长（最多 120 个字符）",
+        "invalid": "文件夹名称包含无效字符"
+      },
+      "objectType": {
+        "invalid": "对象类型无效"
+      },
+      "parentId": {
+        "invalid": "父文件夹无效"
+      },
+      "id": {
+        "required": "需要有效的文件夹 ID"
+      },
+      "objectId": {
+        "required": "需要有效的对象 ID"
+      },
+      "sequence": {
+        "invalid": "排序值无效"
+      },
+      "justification": {
+        "tooLong": "理由过长（最多 500 个字符）"
+      }
+    },
+    "favourites": {
+      "objectType": {
+        "invalid": "对象类型无效"
+      },
+      "objectId": {
+        "required": "需要有效的对象 ID"
+      }
     }
   },
   "QUERY_RUNNER": {
@@ -3804,5 +3972,26 @@
     "SELECT_SEQUENCES": "选择序列",
     "SELECT_FUNCTIONS": "选择函数",
     "SEARCH_ROLES_PLACEHOLDER": "按名称搜索用户和角色"
+  },
+  "FOLDER": {
+    "TITLE": "文件夹",
+    "ALL": "所有项目",
+    "NEW": "新建文件夹",
+    "NEW_SUBFOLDER": "新建子文件夹",
+    "RENAME": "重命名文件夹",
+    "DELETE": "删除文件夹",
+    "NAME": "文件夹名称",
+    "NAME_PLACEHOLDER": "输入文件夹名称",
+    "EMPTY": "暂无文件夹",
+    "CONFIRM_DELETE": "删除文件夹“{{name}}”？",
+    "DELETE_DETACH_INFO": "此文件夹中的项目不会被删除，只会移出该文件夹。",
+    "MOVE_TO": "移动到文件夹",
+    "MOVED": "已移动到文件夹"
+  },
+  "FAVOURITE": {
+    "FAVOURITES": "收藏",
+    "SHOW_ONLY": "仅显示收藏",
+    "ADD": "添加到收藏",
+    "REMOVE": "从收藏中移除"
   }
 }

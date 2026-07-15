@@ -198,7 +198,10 @@
     "MAX": "최대",
     "TRUE": "참",
     "FALSE": "거짓",
-    "NO_MATCHING_RECORDS": "일치하는 레코드 없음"
+    "NO_MATCHING_RECORDS": "일치하는 레코드 없음",
+    "TAGS": "태그",
+    "TAGS_PLACEHOLDER": "태그를 추가하고 Enter 키 누르기",
+    "TAGS_FILTER_PLACEHOLDER": "태그로 필터…"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "이름은 필수 항목입니다",
@@ -1461,6 +1464,80 @@
       "MAX": "최댓값",
       "LOW_COLOR": "낮은 값 색상",
       "HIGH_COLOR": "높은 값 색상"
+    },
+    "DATA_SECTION": "데이터",
+    "DEFAULT_TAB": "기본",
+    "TABS": {
+      "ADD": "탭 추가",
+      "RENAME": "이름 바꾸기",
+      "DELETE": "탭 삭제",
+      "MOVE_LEFT": "왼쪽으로 이동",
+      "MOVE_RIGHT": "오른쪽으로 이동",
+      "MOVE_VISUAL": "탭으로 이동",
+      "MOVE_TO": "이동 위치",
+      "NEW_TAB_NAME": "탭 {{n}}",
+      "CONFIRM_DELETE": "이 탭을 삭제하시겠습니까?",
+      "CONFIRM_DELETE_MSG": "\"{{name}}\" 탭을 삭제하시겠습니까? 시각화는 남은 첫 번째 탭으로 이동합니다.",
+      "DELETE_REASSIGN_INFO": "이 탭의 시각화는 남은 첫 번째 탭으로 재할당됩니다."
+    },
+    "AGG": {
+      "DIMENSION": "차원",
+      "DIMENSION_PH": "열 기준 그룹화",
+      "MEASURE": "측정값",
+      "MEASURE_PH": "숫자 열",
+      "AGGREGATE": "집계",
+      "NONE": "없음(원시 행)",
+      "SUM": "합계",
+      "AVG": "평균",
+      "COUNT": "개수",
+      "MIN": "최소",
+      "MAX": "최대",
+      "COUNT_DISTINCT": "고유 개수",
+      "EXTRA_MEASURES": "추가 측정값",
+      "ADD_MEASURE": "측정값 추가",
+      "ALIAS_PH": "별칭"
+    },
+    "ANALYTICS": {
+      "SECTION": "분석",
+      "DUAL_AXIS": "이중 축",
+      "RIGHT_AXIS_NAME": "오른쪽 축 이름",
+      "SERIES_MAP": "계열 축 매핑",
+      "ADD_SERIES": "계열 추가",
+      "SERIES_NAME_PH": "계열 이름",
+      "SERIES_BAR": "막대",
+      "SERIES_LINE": "선",
+      "AXIS_LEFT": "왼쪽 축",
+      "AXIS_RIGHT": "오른쪽 축",
+      "TREND": "추세선",
+      "TREND_NONE": "없음",
+      "TREND_LINEAR": "선형 회귀",
+      "TREND_MOVING_AVG": "이동 평균",
+      "TREND_FORECAST": "예측",
+      "WINDOW": "창",
+      "FORECAST_PERIODS": "예측 기간",
+      "SMALL_MULTIPLES": "스몰 멀티플",
+      "FACET_COLUMN": "패싯 열",
+      "MAX_COLS": "최대 열"
+    },
+    "INTERACTION": {
+      "SECTION": "상호작용",
+      "CROSS_FILTER": "교차 필터",
+      "TARGETS": "적용 대상",
+      "TARGET_SAME_TAB": "같은 탭",
+      "TARGET_DASHBOARD": "전체 대시보드",
+      "TARGET_SELECTED": "선택한 시각화",
+      "TARGET_VISUALS": "대상 시각화",
+      "SELECT_VISUALS": "시각화 선택"
+    },
+    "FILTER": {
+      "SCOPE": "범위",
+      "SCOPE_DASHBOARD": "전체 대시보드",
+      "SCOPE_TAB": "한 탭",
+      "SCOPE_VISUAL": "특정 시각화",
+      "SCOPE_TARGET_TAB": "대상 탭",
+      "SCOPE_TARGET_VISUALS": "대상 시각화",
+      "SCOPE_CHIP_TAB": "탭",
+      "SCOPE_CHIP_VISUAL": "시각화"
     }
   },
   "DASHBOARD": {
@@ -1552,6 +1629,64 @@
     "EMBED": {
       "UNAVAILABLE_TITLE": "이 대시보드를 사용할 수 없습니다",
       "UNAVAILABLE_BODY": "이 공유 링크가 유효하지 않거나 만료되었거나 철회되었습니다. 링크를 공유한 사람에게 문의하세요."
+    },
+    "WIDGET": {
+      "ADD": "위젯 추가",
+      "EDIT": "위젯 편집",
+      "SUBTITLE": "캔버스의 텍스트 메모 또는 KPI 타일.",
+      "TYPE": "위젯 유형",
+      "TYPE_TEXT": "텍스트 / Markdown",
+      "TYPE_KPI": "KPI 타일",
+      "MARKDOWN": "내용",
+      "MARKDOWN_PH": "메모 작성 (Markdown 지원)…",
+      "KPI_LABEL": "레이블",
+      "KPI_LABEL_PH": "예: 총매출",
+      "KPI_MEASURE": "측정값",
+      "KPI_AGGREGATE": "집계",
+      "KPI_FORMAT": "형식",
+      "FORMAT_NUMBER": "숫자",
+      "FORMAT_CURRENCY": "통화",
+      "FORMAT_PERCENT": "백분율",
+      "KPI_TARGET": "목표",
+      "KPI_COMPARE": "비교 기간",
+      "KPI_COMPARE_PH": "예: 이전 달"
+    },
+    "GATE": {
+      "TITLE": "입력 필요",
+      "SUBTITLE": "이 대시보드를 로드하려면 필수 입력을 채우세요. 계속하기 전에는 아무것도 실행되지 않습니다.",
+      "PARAMETERS": "매개변수",
+      "FILTERS": "필터",
+      "LOAD": "대시보드 로드",
+      "REQUIRED_HINT": "계속하려면 모든 필수 입력을 채우세요.",
+      "EDIT_INPUTS": "입력 편집"
+    },
+    "AUTO_REFRESH": {
+      "INDICATOR": "자동 새로 고침: {{seconds}}초",
+      "TOOLTIP": "이 대시보드는 데이터를 자동으로 새로 고칩니다."
+    },
+    "CROSS_FILTER": {
+      "CLEAR": "교차 필터 지우기"
+    },
+    "SCHEDULE": {
+      "BUTTON": "전달 예약",
+      "TITLE": "전달 예약",
+      "HINT": "{{name}} 스냅샷을 일정에 따라 이메일로 보냅니다. 수신자는 렌더링된 대시보드를 받습니다.",
+      "FREQUENCY": "빈도",
+      "TIMEZONE": "시간대",
+      "FORMAT": "형식",
+      "FORMAT_PDF": "PDF",
+      "FORMAT_PNG": "PNG (이미지)",
+      "RECIPIENT_USERS": "수신자(사용자)",
+      "SELECT_USERS": "사용자 선택",
+      "RECIPIENT_EMAILS": "수신자(이메일)",
+      "ADD_EMAIL": "이메일을 추가하고 Enter 키 누르기",
+      "EXISTING": "기존 일정",
+      "NONE": "아직 전달 일정이 없습니다.",
+      "CREATE": "일정 만들기",
+      "ON": "켜짐",
+      "OFF": "꺼짐",
+      "ENABLE": "사용",
+      "DISABLE": "사용 안 함"
     }
   },
   "TOAST": {
@@ -3320,6 +3455,39 @@
           "tooLong": "대시보드 이름은 255자를 초과할 수 없습니다"
         }
       }
+    },
+    "folders": {
+      "name": {
+        "required": "폴더 이름은 필수입니다",
+        "tooLong": "폴더 이름이 너무 깁니다(최대 120자)",
+        "invalid": "폴더 이름에 잘못된 문자가 포함되어 있습니다"
+      },
+      "objectType": {
+        "invalid": "잘못된 객체 유형입니다"
+      },
+      "parentId": {
+        "invalid": "잘못된 상위 폴더입니다"
+      },
+      "id": {
+        "required": "유효한 폴더 ID가 필요합니다"
+      },
+      "objectId": {
+        "required": "유효한 객체 ID가 필요합니다"
+      },
+      "sequence": {
+        "invalid": "잘못된 순서 값입니다"
+      },
+      "justification": {
+        "tooLong": "사유가 너무 깁니다(최대 500자)"
+      }
+    },
+    "favourites": {
+      "objectType": {
+        "invalid": "잘못된 객체 유형입니다"
+      },
+      "objectId": {
+        "required": "유효한 객체 ID가 필요합니다"
+      }
     }
   },
   "QUERY_RUNNER": {
@@ -3804,5 +3972,26 @@
     "SELECT_SEQUENCES": "시퀀스 선택",
     "SELECT_FUNCTIONS": "함수 선택",
     "SEARCH_ROLES_PLACEHOLDER": "이름으로 사용자 및 역할 검색"
+  },
+  "FOLDER": {
+    "TITLE": "폴더",
+    "ALL": "모든 항목",
+    "NEW": "새 폴더",
+    "NEW_SUBFOLDER": "새 하위 폴더",
+    "RENAME": "폴더 이름 바꾸기",
+    "DELETE": "폴더 삭제",
+    "NAME": "폴더 이름",
+    "NAME_PLACEHOLDER": "폴더 이름을 입력하세요",
+    "EMPTY": "폴더가 아직 없습니다",
+    "CONFIRM_DELETE": "폴더 \"{{name}}\"을(를) 삭제하시겠습니까?",
+    "DELETE_DETACH_INFO": "이 폴더의 항목은 삭제되지 않고 폴더 밖으로 이동됩니다.",
+    "MOVE_TO": "폴더로 이동",
+    "MOVED": "폴더로 이동됨"
+  },
+  "FAVOURITE": {
+    "FAVOURITES": "즐겨찾기",
+    "SHOW_ONLY": "즐겨찾기만 표시",
+    "ADD": "즐겨찾기에 추가",
+    "REMOVE": "즐겨찾기에서 제거"
   }
 }
