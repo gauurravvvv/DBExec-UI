@@ -8,6 +8,17 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
+import {
+  ConditionalRule,
+  resolveConditionalStyle,
+} from 'src/app/shared/helpers/conditional-formatting.helper';
+import {
+  buildPivot,
+  PivotColumn,
+  PivotResult,
+  PivotRow,
+  stubValue,
+} from 'src/app/shared/helpers/pivot.helper';
 
 /**
  * Auto-detected column descriptor for the table visual. Derived from
@@ -39,11 +50,19 @@ interface TableColumn {
  *   - Striped rows toggle bound to config
  *   - Row-number column toggle bound to config
  *
- * Out of scope (v1):
+ * v2 additions (config-gated, additive):
+ *   - Pivot / crosstab render mode when config.pivot.enabled — flat rows
+ *     are cross-tabulated (rows × columns × measure + totals) via the
+ *     shared pivot helper. Flat mode is unchanged when pivot is absent.
+ *   - Conditional cell formatting via config.conditionalFormatting[] —
+ *     per-cell text / background colour, sharing the same rule evaluator
+ *     as the chart path.
+ *
+ * Out of scope:
  *   - Multi-column sort, column reorder, column resize
  *   - Column-header filter inputs (the analysis filter sidebar
  *     already filters the dataset upstream)
- *   - Pivot/matrix mode, conditional formatting, CSV export,
+ *   - Row/column subtotals in pivot (grand totals only), CSV export,
  *     frozen columns — separate spec each.
  */
 @Component({
@@ -61,6 +80,13 @@ export class TableVisualComponent implements OnChanges {
   @Output() chartSelect = new EventEmitter<any>();
 
   columns: TableColumn[] = [];
+
+  /**
+   * Pivot render state. Populated in ngOnChanges when config.pivot.enabled
+   * and the config is usable; `pivot.ok === false` means we fall back to the
+   * flat table. Kept as a separate render path so the flat mode is untouched.
+   */
+  pivot: PivotResult = { columns: [], rows: [], ok: false };
 
   /**
    * Virtual scroll kicks in past this row count. Below it, a plain
@@ -81,8 +107,17 @@ export class TableVisualComponent implements OnChanges {
     // the user toggles a column visibility in the Properties sidebar.
     if (changes['data'] || changes['chartConfig']) {
       this.columns = this.filterVisibleColumns(this.allColumns);
+      // Pivot is a separate render path — recompute whenever data or config
+      // changes. buildPivot returns ok:false when the pivot config is absent
+      // or unusable, in which case the template renders the flat table.
+      this.pivot = buildPivot(this.data, this.chartConfig?.pivot);
       this.cdr.markForCheck();
     }
+  }
+
+  /** True when the pivot render path should be used instead of flat mode. */
+  get isPivot(): boolean {
+    return this.chartConfig?.pivot?.enabled === true && this.pivot.ok;
   }
 
   /**
@@ -149,6 +184,76 @@ export class TableVisualComponent implements OnChanges {
       }
     }
     return String(value);
+  }
+
+  /**
+   * Conditional cell styling — returns an ngStyle object (color /
+   * background-color) for a cell, or {} when no rule matches. Shares the
+   * exact same rule evaluator as the chart path so the two surfaces agree on
+   * when a rule fires. `row` provides whole-row context for cross-field rules.
+   *
+   * Kept separate from formatCell (which returns display text) so both flat
+   * and pivot modes can call it independently of formatting.
+   */
+  cellStyle(value: any, field: string, row?: any): { [k: string]: string } {
+    const rules: ConditionalRule[] = this.conditionalRules;
+    if (rules.length === 0) return {};
+    // A rule with no targetField tests this cell's value; a rule with a
+    // targetField tests that field on the row (falling back to the value when
+    // the row is absent).
+    const match = resolveConditionalStyle(
+      rules,
+      value,
+      row ?? { [field]: value },
+      ['cell', 'text', 'background'],
+    );
+    if (!match) return {};
+    const style: { [k: string]: string } = {};
+    const surface = match.appliesTo;
+    if (surface === 'text') {
+      if (match.color) style['color'] = match.color;
+    } else {
+      // 'cell' | 'background' → paint background; optional explicit text colour.
+      if (match.color) style['background-color'] = match.color;
+      if (match.textColor) style['color'] = match.textColor;
+    }
+    return style;
+  }
+
+  /** Normalised conditional-formatting rule list off the config blob. */
+  private get conditionalRules(): ConditionalRule[] {
+    const r = this.chartConfig?.conditionalFormatting;
+    return Array.isArray(r) ? r : [];
+  }
+
+  // ── Pivot render helpers (template-facing) ──
+
+  /** Format a pivot cell value for display (numbers get grouped/rounded). */
+  formatPivotCell(row: PivotRow, col: PivotColumn): string {
+    if (col.kind === 'stub') {
+      const v = stubValue(row, col);
+      return v === null || v === undefined || v === '' ? '—' : String(v);
+    }
+    const v = row.cells[col.key];
+    if (v === null || v === undefined) return '—';
+    if (!Number.isFinite(v)) return String(v);
+    return Number.isInteger(v)
+      ? v.toLocaleString()
+      : v.toLocaleString(undefined, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2,
+        });
+  }
+
+  /** Conditional styling for a pivot measure/total cell. */
+  pivotCellStyle(row: PivotRow, col: PivotColumn): { [k: string]: string } {
+    if (col.kind === 'stub') return {};
+    const v = row.cells[col.key];
+    return this.cellStyle(v, col.key);
+  }
+
+  trackByPivotCol(_: number, col: PivotColumn): string {
+    return col.key;
   }
 
   onRowClick(row: any): void {

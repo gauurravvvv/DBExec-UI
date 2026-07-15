@@ -197,7 +197,8 @@
     "MIN": "Min",
     "MAX": "Max",
     "TRUE": "Waar",
-    "FALSE": "Onwaar"
+    "FALSE": "Onwaar",
+    "NO_MATCHING_RECORDS": "Geen overeenkomende records"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Voornaam is verplicht",
@@ -872,7 +873,17 @@
     "EXPLAIN_RUNNING": "Plan ophalen…",
     "SEARCH_PLACEHOLDER": "Zoek datasets op naam of beschrijving",
     "RUN": "Uitvoeren",
-    "QUERY_TIMEOUT": "De query duurde te lang en is geannuleerd. Probeer de resultatenset te beperken of controleer de database op langlopende query's."
+    "QUERY_TIMEOUT": "De query duurde te lang en is geannuleerd. Probeer de resultatenset te beperken of controleer de database op langlopende query's.",
+    "CACHE": {
+      "LABEL": "Resultaten cachen",
+      "HINT": "Sla queryresultaten op in cache en hergebruik ze binnen de geldigheidsperiode om herhaalde uitvoeringen te versnellen.",
+      "ON": "Aan",
+      "OFF": "Uit",
+      "TTL_LABEL": "Cacheduur",
+      "TTL_PLACEHOLDER": "e.g. 300",
+      "SECONDS": "seconden",
+      "TTL_HINT": "Hoe lang gecachte resultaten geldig blijven voordat de query opnieuw wordt uitgevoerd."
+    }
   },
   "ANALYSES": {
     "TITLE": "Analyses",
@@ -1389,7 +1400,68 @@
     "DETECTED_TYPE_NUMBER": "Numerieke kolom gedetecteerd — numerieke besturingselementen worden voorgesteld.",
     "DETECTED_TYPE_DATE": "Datum/tijd-kolom gedetecteerd — datumbesturingselementen worden voorgesteld.",
     "DETECTED_TYPE_BOOLEAN": "Booleaanse kolom gedetecteerd — een waardelijst wordt voorgesteld.",
-    "DETECTED_TYPE_STRING": "Tekstkolom gedetecteerd — vervolgkeuzelijsten voor waarden worden voorgesteld."
+    "DETECTED_TYPE_STRING": "Tekstkolom gedetecteerd — vervolgkeuzelijsten voor waarden worden voorgesteld.",
+    "CF": {
+      "TITLE": "Voorwaardelijke opmaak",
+      "HINT": "Kleur gegevenspunten of tabelcellen wanneer een waarde aan een voorwaarde voldoet.",
+      "RULE": "Regel",
+      "ADD_RULE": "Regel toevoegen",
+      "TARGET_FIELD": "Veld",
+      "TARGET_FIELD_PH": "Kies een veld",
+      "DATA_TYPE": "Type",
+      "OPERATOR": "Voorwaarde",
+      "VALUE": "Waarde",
+      "VALUE_PH": "Voer een waarde in",
+      "COLOR": "Kleur",
+      "APPLIES_TO": "Van toepassing op"
+    },
+    "PIVOT": {
+      "TITLE": "Pivot / kruistabel",
+      "ENABLE": "Pivotmodus inschakelen",
+      "ROWS": "Rijen",
+      "ROWS_PH": "Velden om te groeperen als rijen",
+      "COLUMNS": "Kolommen",
+      "COLUMNS_PH": "Velden om te spreiden over kolommen",
+      "MEASURE": "Maatstaf",
+      "MEASURE_PH": "Waardenveld om samen te voegen",
+      "AGGREGATION": "Aggregatie",
+      "ROW_TOTALS": "Rijtotalen",
+      "COLUMN_TOTALS": "Kolomtotalen"
+    },
+    "REFLINE": {
+      "TITLE": "Referentielijnen en annotaties",
+      "LINE": "Referentielijn",
+      "LINES": "Referentielijnen",
+      "ADD_LINE": "Lijn toevoegen",
+      "BAND": "Referentieband",
+      "BANDS": "Referentiebanden",
+      "ADD_BAND": "Band toevoegen",
+      "ANNOTATION": "Annotatie",
+      "ANNOTATIONS": "Annotaties",
+      "ADD_ANNOTATION": "Annotatie toevoegen",
+      "TYPE_LABEL": "Type",
+      "VALUE": "Waarde",
+      "LABEL": "Label",
+      "LABEL_PH": "Optioneel label",
+      "COLOR": "Kleur",
+      "STYLE": "Stijl",
+      "AXIS_LABEL": "As",
+      "FROM": "Van",
+      "TO": "Tot",
+      "ANNO_X": "X-positie",
+      "ANNO_X_PH": "Categorie of X-waarde",
+      "ANNO_Y": "Y-waarde"
+    },
+    "COLORSCALE": {
+      "TITLE": "Kleurschaal",
+      "ENABLE": "Kleur op waarde",
+      "SHOW": "Legenda tonen",
+      "TYPE": "Schaaltype",
+      "MIN": "Min",
+      "MAX": "Max",
+      "LOW_COLOR": "Lage kleur",
+      "HIGH_COLOR": "Hoge kleur"
+    }
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",

@@ -2369,6 +2369,8 @@ export class AddDatasetComponent
         description: formData.description,
         datasource: this.selectedDatasourceObj.id,
         sql,
+        cacheEnabled: formData.cacheEnabled,
+        cacheTtlSeconds: formData.cacheTtlSeconds,
       };
 
       this.datasetService

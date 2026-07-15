@@ -197,7 +197,8 @@
     "MIN": "最小",
     "MAX": "最大",
     "TRUE": "真",
-    "FALSE": "假"
+    "FALSE": "假",
+    "NO_MATCHING_RECORDS": "无匹配记录"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名字为必填项",
@@ -872,7 +873,17 @@
     "EXPLAIN_RUNNING": "正在向引擎请求计划…",
     "SEARCH_PLACEHOLDER": "按名称或描述搜索数据集",
     "RUN": "运行",
-    "QUERY_TIMEOUT": "查询耗时过长已被取消。请尝试缩小结果集，或检查数据库中是否存在长时间运行的查询。"
+    "QUERY_TIMEOUT": "查询耗时过长已被取消。请尝试缩小结果集，或检查数据库中是否存在长时间运行的查询。",
+    "CACHE": {
+      "LABEL": "结果缓存",
+      "HINT": "缓存查询结果并在生存时间内重复使用，以加速重复运行。",
+      "ON": "开启",
+      "OFF": "关闭",
+      "TTL_LABEL": "缓存时长",
+      "TTL_PLACEHOLDER": "e.g. 300",
+      "SECONDS": "秒",
+      "TTL_HINT": "缓存结果在查询重新运行前保持有效的时长。"
+    }
   },
   "ANALYSES": {
     "TITLE": "分析",
@@ -1389,7 +1400,68 @@
     "DETECTED_TYPE_NUMBER": "检测到数值列 — 建议使用数值控件。",
     "DETECTED_TYPE_DATE": "检测到日期/时间列 — 建议使用日期控件。",
     "DETECTED_TYPE_BOOLEAN": "检测到布尔列 — 建议使用值列表。",
-    "DETECTED_TYPE_STRING": "检测到文本列 — 建议使用值下拉菜单。"
+    "DETECTED_TYPE_STRING": "检测到文本列 — 建议使用值下拉菜单。",
+    "CF": {
+      "TITLE": "条件格式",
+      "HINT": "当某值满足条件时，为数据点或表格单元格着色。",
+      "RULE": "规则",
+      "ADD_RULE": "添加规则",
+      "TARGET_FIELD": "字段",
+      "TARGET_FIELD_PH": "选择字段",
+      "DATA_TYPE": "类型",
+      "OPERATOR": "条件",
+      "VALUE": "值",
+      "VALUE_PH": "输入值",
+      "COLOR": "颜色",
+      "APPLIES_TO": "应用于"
+    },
+    "PIVOT": {
+      "TITLE": "透视 / 交叉表",
+      "ENABLE": "启用透视模式",
+      "ROWS": "行",
+      "ROWS_PH": "作为行分组的字段",
+      "COLUMNS": "列",
+      "COLUMNS_PH": "展开为列的字段",
+      "MEASURE": "度量",
+      "MEASURE_PH": "要聚合的值字段",
+      "AGGREGATION": "聚合方式",
+      "ROW_TOTALS": "行合计",
+      "COLUMN_TOTALS": "列合计"
+    },
+    "REFLINE": {
+      "TITLE": "参考线与注释",
+      "LINE": "参考线",
+      "LINES": "参考线",
+      "ADD_LINE": "添加线",
+      "BAND": "参考带",
+      "BANDS": "参考带",
+      "ADD_BAND": "添加带",
+      "ANNOTATION": "注释",
+      "ANNOTATIONS": "注释",
+      "ADD_ANNOTATION": "添加注释",
+      "TYPE_LABEL": "类型",
+      "VALUE": "值",
+      "LABEL": "标签",
+      "LABEL_PH": "可选标签",
+      "COLOR": "颜色",
+      "STYLE": "样式",
+      "AXIS_LABEL": "轴",
+      "FROM": "从",
+      "TO": "至",
+      "ANNO_X": "X 位置",
+      "ANNO_X_PH": "类别或 X 值",
+      "ANNO_Y": "Y 值"
+    },
+    "COLORSCALE": {
+      "TITLE": "色阶",
+      "ENABLE": "按值着色",
+      "SHOW": "显示图例",
+      "TYPE": "比例类型",
+      "MIN": "最小值",
+      "MAX": "最大值",
+      "LOW_COLOR": "低值颜色",
+      "HIGH_COLOR": "高值颜色"
+    }
   },
   "DASHBOARD": {
     "TITLE": "仪表盘",

@@ -150,7 +150,8 @@ export class DatasetService {
   }
 
   async addDataset(payload: any) {
-    const { name, description, datasource, sql } = payload;
+    const { name, description, datasource, sql, cacheEnabled, cacheTtlSeconds } =
+      payload;
     this._saving.set(true);
     try {
       return await lastValueFrom(
@@ -161,6 +162,11 @@ export class DatasetService {
             description,
             datasource,
             sql,
+            // Result-cache config — omitted keys leave the server
+            // default (caching off). Only sent when the caller manages
+            // caching (the save dialog always provides cacheEnabled).
+            ...(cacheEnabled !== undefined ? { cacheEnabled } : {}),
+            ...(cacheTtlSeconds !== undefined ? { cacheTtlSeconds } : {}),
           },
           { skipLoader: true },
         ),
@@ -376,7 +382,8 @@ export class DatasetService {
   }
 
   async updateDataset(payload: any, justification?: string) {
-    const { id, name, description, datasource, sql } = payload;
+    const { id, name, description, datasource, sql, cacheEnabled, cacheTtlSeconds } =
+      payload;
     this._saving.set(true);
     try {
       return await lastValueFrom(
@@ -389,6 +396,10 @@ export class DatasetService {
             datasource,
             sql,
             justification,
+            // Result-cache config — omitted keys leave the field
+            // unchanged server-side.
+            ...(cacheEnabled !== undefined ? { cacheEnabled } : {}),
+            ...(cacheTtlSeconds !== undefined ? { cacheTtlSeconds } : {}),
           },
           { skipLoader: true },
         ),
@@ -468,10 +479,14 @@ export class DatasetService {
   }
 
   runDatasetQuery(payload: any) {
-    const { datasetId, filters } = payload;
+    const { datasetId, filters, refresh } = payload;
     const body: any = { datasetId };
     if (filters && filters.length > 0) {
       body.filters = filters;
+    }
+    // Bypass any fresh cache entry and re-store (refresh action).
+    if (refresh) {
+      body.refresh = true;
     }
     // POST /datasets/:datasetId/run
     return lastValueFrom(

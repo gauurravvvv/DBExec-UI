@@ -11,6 +11,8 @@ import {
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import {
+  DATASET_CACHE_TTL_LIMITS,
+  datasetCacheTtlSecondsSchema,
   datasetDescriptionSchema,
   datasetJustificationRequiredSchema,
   datasetJustificationSchema,
@@ -22,6 +24,10 @@ export interface DatasetFormData {
   name: string;
   description: string;
   justification?: string;
+  // Result-cache config. `cacheTtlSeconds` is null when caching is off
+  // or the user left the TTL blank (server falls back to its default).
+  cacheEnabled: boolean;
+  cacheTtlSeconds: number | null;
 }
 
 @Component({
@@ -36,6 +42,10 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
   @Input() initialDescription = '';
   @Input() dialogTitle = '';
   @Input() showJustification = false;
+  // Result-cache initial state — parent passes the loaded dataset's
+  // values on edit; both default to "off / server default" on create.
+  @Input() initialCacheEnabled = false;
+  @Input() initialCacheTtlSeconds: number | null = null;
   // Drives the confirm button's spinner — parent passes the
   // datasetService.saving signal (or any boolean) so the dialog can
   // show progress while the POST/PUT runs without the global blocker.
@@ -43,6 +53,10 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
   @Output() close = new EventEmitter<DatasetFormData | null>();
 
   datasetForm!: FormGroup;
+
+  // Advisory TTL bounds surfaced to the number control (BE clamps too).
+  readonly cacheTtlMin = DATASET_CACHE_TTL_LIMITS.MIN_SECONDS;
+  readonly cacheTtlMax = DATASET_CACHE_TTL_LIMITS.MAX_SECONDS;
 
   constructor(
     private fb: FormBuilder,
@@ -68,6 +82,8 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
         name: this.initialName,
         description: this.initialDescription,
         justification: '',
+        cacheEnabled: !!this.initialCacheEnabled,
+        cacheTtlSeconds: this.initialCacheTtlSeconds ?? null,
       });
 
       const justificationControl = this.datasetForm.get('justification');
@@ -101,7 +117,24 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
       name: ['', [zodValidator(datasetNameSchema)]],
       description: ['', [zodValidator(datasetDescriptionSchema)]],
       justification: ['', [zodValidator(datasetJustificationSchema)]],
+      // Result-cache config. The toggle is a plain boolean; the TTL is
+      // validated against the SAME shared schema the BE uses so an
+      // out-of-range value is caught here first.
+      cacheEnabled: [false],
+      cacheTtlSeconds: [
+        null,
+        [zodValidator(datasetCacheTtlSecondsSchema)],
+      ],
     });
+  }
+
+  /** True when the cache toggle is on — drives the TTL field's *ngIf. */
+  get cacheEnabled(): boolean {
+    return !!this.datasetForm?.get('cacheEnabled')?.value;
+  }
+
+  getCacheTtlError(): string {
+    return this.fieldError('cacheTtlSeconds');
   }
 
   fieldError(fieldName: string): string {
@@ -116,9 +149,18 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
 
   onSubmit() {
     if (this.datasetForm.valid) {
+      const cacheEnabled = !!this.datasetForm.get('cacheEnabled')?.value;
+      const rawTtl = this.datasetForm.get('cacheTtlSeconds')?.value;
       const formData: DatasetFormData = {
         name: this.datasetForm.get('name')?.value.trim(),
         description: this.datasetForm.get('description')?.value.trim(),
+        cacheEnabled,
+        // Only send a TTL when caching is on AND a value was entered;
+        // otherwise null so the server uses its default.
+        cacheTtlSeconds:
+          cacheEnabled && rawTtl !== null && rawTtl !== '' && rawTtl !== undefined
+            ? Number(rawTtl)
+            : null,
       };
       if (this.showJustification) {
         formData.justification = this.datasetForm

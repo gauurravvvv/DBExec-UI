@@ -197,7 +197,8 @@
     "MIN": "Mín",
     "MAX": "Máx",
     "TRUE": "Verdadero",
-    "FALSE": "Falso"
+    "FALSE": "Falso",
+    "NO_MATCHING_RECORDS": "No hay registros coincidentes"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "El nombre es obligatorio",
@@ -872,7 +873,17 @@
     "EXPLAIN_RUNNING": "Solicitando el plan al motor…",
     "SEARCH_PLACEHOLDER": "Buscar conjuntos de datos por nombre o descripción",
     "RUN": "Ejecutar",
-    "QUERY_TIMEOUT": "La consulta tardó demasiado y fue cancelada. Intente acotar el conjunto de resultados o revise la base de datos en busca de consultas de larga duración."
+    "QUERY_TIMEOUT": "La consulta tardó demasiado y fue cancelada. Intente acotar el conjunto de resultados o revise la base de datos en busca de consultas de larga duración.",
+    "CACHE": {
+      "LABEL": "Caché de resultados",
+      "HINT": "Almacena en caché los resultados de las consultas y los reutiliza dentro del tiempo de vida para acelerar ejecuciones repetidas.",
+      "ON": "Activado",
+      "OFF": "Desactivado",
+      "TTL_LABEL": "Duración de caché",
+      "TTL_PLACEHOLDER": "e.g. 300",
+      "SECONDS": "segundos",
+      "TTL_HINT": "Tiempo que los resultados en caché permanecen válidos antes de que la consulta se vuelva a ejecutar."
+    }
   },
   "ANALYSES": {
     "TITLE": "Análisis",
@@ -1389,7 +1400,68 @@
     "DETECTED_TYPE_NUMBER": "Columna numérica detectada — se sugieren controles numéricos.",
     "DETECTED_TYPE_DATE": "Columna de fecha/hora detectada — se sugieren controles de fecha.",
     "DETECTED_TYPE_BOOLEAN": "Columna booleana detectada — se sugiere una lista de valores.",
-    "DETECTED_TYPE_STRING": "Columna de texto detectada — se sugieren listas desplegables de valores."
+    "DETECTED_TYPE_STRING": "Columna de texto detectada — se sugieren listas desplegables de valores.",
+    "CF": {
+      "TITLE": "Formato condicional",
+      "HINT": "Colorea puntos de datos o celdas de tabla cuando un valor cumple una condición.",
+      "RULE": "Regla",
+      "ADD_RULE": "Agregar regla",
+      "TARGET_FIELD": "Campo",
+      "TARGET_FIELD_PH": "Elegir un campo",
+      "DATA_TYPE": "Tipo",
+      "OPERATOR": "Condición",
+      "VALUE": "Valor",
+      "VALUE_PH": "Ingresar un valor",
+      "COLOR": "Color",
+      "APPLIES_TO": "Aplicar a"
+    },
+    "PIVOT": {
+      "TITLE": "Tabla dinámica / tabulación cruzada",
+      "ENABLE": "Activar modo dinámico",
+      "ROWS": "Filas",
+      "ROWS_PH": "Campos para agrupar como filas",
+      "COLUMNS": "Columnas",
+      "COLUMNS_PH": "Campos para distribuir en columnas",
+      "MEASURE": "Medida",
+      "MEASURE_PH": "Campo de valor para agregar",
+      "AGGREGATION": "Agregación",
+      "ROW_TOTALS": "Totales de fila",
+      "COLUMN_TOTALS": "Totales de columna"
+    },
+    "REFLINE": {
+      "TITLE": "Líneas de referencia y anotaciones",
+      "LINE": "Línea de referencia",
+      "LINES": "Líneas de referencia",
+      "ADD_LINE": "Agregar línea",
+      "BAND": "Banda de referencia",
+      "BANDS": "Bandas de referencia",
+      "ADD_BAND": "Agregar banda",
+      "ANNOTATION": "Anotación",
+      "ANNOTATIONS": "Anotaciones",
+      "ADD_ANNOTATION": "Agregar anotación",
+      "TYPE_LABEL": "Tipo",
+      "VALUE": "Valor",
+      "LABEL": "Etiqueta",
+      "LABEL_PH": "Etiqueta opcional",
+      "COLOR": "Color",
+      "STYLE": "Estilo",
+      "AXIS_LABEL": "Eje",
+      "FROM": "Desde",
+      "TO": "Hasta",
+      "ANNO_X": "Posición X",
+      "ANNO_X_PH": "Categoría o valor X",
+      "ANNO_Y": "Valor Y"
+    },
+    "COLORSCALE": {
+      "TITLE": "Escala de color",
+      "ENABLE": "Color por valor",
+      "SHOW": "Mostrar leyenda",
+      "TYPE": "Tipo de escala",
+      "MIN": "Mín",
+      "MAX": "Máx",
+      "LOW_COLOR": "Color bajo",
+      "HIGH_COLOR": "Color alto"
+    }
   },
   "DASHBOARD": {
     "TITLE": "Paneles",

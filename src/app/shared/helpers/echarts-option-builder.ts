@@ -1,5 +1,9 @@
 import * as echarts from 'echarts';
 import { COLOR_PALETTES } from './chart-config.helper';
+import {
+  ConditionalRule,
+  resolveConditionalStyle,
+} from './conditional-formatting.helper';
 
 // ========= Chart Typography =========
 // ECharts is canvas-rendered and does not resolve CSS variables. To stay in
@@ -451,6 +455,295 @@ function buildDataLabel(config: any, defaultPosition?: string): any {
   };
 }
 
+// ========= Reference lines / bands / annotations =========
+//
+// These three overlays are ECharts SERIES-level keys (markLine / markArea /
+// markPoint). buildMarkOverlays reads the config arrays and returns the three
+// keys so the cartesian builders can spread them onto each series object.
+//
+// CRITICAL reset discipline: chart updates merge via setOption(opt, false).
+// A series that once carried a markLine keeps it unless the next option
+// explicitly clears it. So buildMarkOverlays ALWAYS returns all three keys —
+// with `{ data: [] }` (an empty overlay) when the corresponding config array
+// is absent — mirroring the dataZoom `[]` / perfFlags `large:false` resets
+// already used throughout this file.
+
+/** A single reference line spec authored in the Properties pane. */
+interface ReferenceLineSpec {
+  /** Aggregate the line tracks, or 'constant' for a fixed value. */
+  type?: 'constant' | 'average' | 'min' | 'max' | 'median';
+  /** Which axis the line is perpendicular to: value lines sit on 'y'. */
+  axis?: 'x' | 'y';
+  /** Fixed value for type='constant'. */
+  value?: number;
+  label?: string;
+  color?: string;
+  lineStyle?: 'solid' | 'dashed' | 'dotted';
+  width?: number;
+}
+
+interface ReferenceBandSpec {
+  axis?: 'x' | 'y';
+  from?: number;
+  to?: number;
+  label?: string;
+  color?: string;
+  opacity?: number;
+}
+
+interface AnnotationSpec {
+  /** Data coordinate [x, y] OR a category name for x. */
+  x?: number | string;
+  y?: number;
+  label?: string;
+  color?: string;
+  symbol?: string;
+  symbolSize?: number;
+}
+
+/**
+ * Build the series-level markLine / markArea / markPoint overlays from
+ * config.referenceLines[], config.referenceBands[], config.annotations[].
+ *
+ * markLine supports ECharts' built-in statistical types ('average', 'min',
+ * 'max') natively via `{ type }`; 'median' is not built in, so it is not
+ * emitted as a stat line (the editor still offers 'average' which covers the
+ * common central-tendency case). 'constant' emits a fixed `{ yAxis }` /
+ * `{ xAxis }` line. Reference bands become paired markArea coordinates.
+ * Annotations become markPoint items at explicit coordinates.
+ */
+function buildMarkOverlays(config: any): {
+  markLine: any;
+  markArea: any;
+  markPoint: any;
+} {
+  const lines: ReferenceLineSpec[] = Array.isArray(config?.referenceLines)
+    ? config.referenceLines
+    : [];
+  const bands: ReferenceBandSpec[] = Array.isArray(config?.referenceBands)
+    ? config.referenceBands
+    : [];
+  const annos: AnnotationSpec[] = Array.isArray(config?.annotations)
+    ? config.annotations
+    : [];
+
+  // ── markLine ──
+  const markLineData = lines
+    .map(l => {
+      const onX = l.axis === 'x';
+      const common: any = {
+        name: l.label || '',
+        label: l.label
+          ? {
+              show: true,
+              formatter: l.label,
+              position: onX ? 'insideEndTop' : 'insideEndTop',
+              ...CHART_TYPOGRAPHY.dataLabel,
+              fontFamily: CHART_TYPOGRAPHY.fontFamily,
+            }
+          : { show: false },
+        lineStyle: {
+          color: l.color || '#ef4444',
+          type: l.lineStyle || 'dashed',
+          width: l.width || 1.5,
+        },
+      };
+      if (!l.type || l.type === 'constant') {
+        if (l.value === undefined || l.value === null || l.value === ('' as any))
+          return null;
+        return onX
+          ? { ...common, xAxis: l.value }
+          : { ...common, yAxis: l.value };
+      }
+      // Statistical lines: ECharts supports average/min/max natively. median
+      // is unsupported as a stat type, so fall back to average.
+      const statType =
+        l.type === 'average'
+          ? 'average'
+          : l.type === 'min'
+            ? 'min'
+            : l.type === 'max'
+              ? 'max'
+              : 'average';
+      return { ...common, type: statType };
+    })
+    .filter((x): x is any => x !== null);
+
+  // ── markArea ──
+  const markAreaData = bands
+    .map(b => {
+      if (b.from === undefined || b.to === undefined) return null;
+      const onX = b.axis === 'x';
+      const startEnd = onX
+        ? [{ xAxis: b.from }, { xAxis: b.to }]
+        : [{ yAxis: b.from }, { yAxis: b.to }];
+      // Attach label + fill to the FIRST boundary object (ECharts convention).
+      (startEnd[0] as any).itemStyle = {
+        color: b.color || 'rgba(239,68,68,0.08)',
+        opacity: b.opacity ?? 1,
+      };
+      if (b.label) {
+        (startEnd[0] as any).name = b.label;
+        (startEnd[0] as any).label = {
+          show: true,
+          ...CHART_TYPOGRAPHY.dataLabel,
+          fontFamily: CHART_TYPOGRAPHY.fontFamily,
+        };
+      }
+      return startEnd;
+    })
+    .filter((x): x is any => x !== null);
+
+  // ── markPoint ──
+  const markPointData = annos
+    .map(a => {
+      if (a.x === undefined && a.y === undefined) return null;
+      const coord: any[] = [a.x ?? null, a.y ?? null];
+      return {
+        name: a.label || '',
+        coord,
+        value: a.label || '',
+        symbol: a.symbol || 'pin',
+        symbolSize: a.symbolSize || 40,
+        itemStyle: { color: a.color || '#f59e0b' },
+        label: a.label
+          ? {
+              show: true,
+              formatter: a.label,
+              ...CHART_TYPOGRAPHY.dataLabel,
+              color: '#ffffff',
+              fontFamily: CHART_TYPOGRAPHY.fontFamily,
+            }
+          : { show: false },
+      };
+    })
+    .filter((x): x is any => x !== null);
+
+  return {
+    // Always return the key with an explicit (possibly empty) data array so
+    // merge-mode setOption clears a stale overlay when its config is removed.
+    markLine: {
+      symbol: ['none', 'none'],
+      data: markLineData,
+    },
+    markArea: { data: markAreaData },
+    markPoint: { data: markPointData },
+  };
+}
+
+// ========= visualMap (continuous / piecewise colour scale) =========
+//
+// visualMap is a TOP-LEVEL option key (not series-level). Generalised from
+// the heat-map inline block so any value-driven builder (bar/scatter/bubble/
+// tree-map) can map a measure magnitude to colour. Returns undefined when the
+// feature is off so an explicit `option.visualMap = buildVisualMap(...)`
+// assignment clears a stale scale under merge-mode setOption.
+
+const VISUAL_MAP_DEFAULT_RANGE = ['#e0f2fe', '#0369a1'];
+
+/**
+ * Build a top-level visualMap from config.visualMap* keys. `dataMin`/`dataMax`
+ * provide the domain when the user has not pinned an explicit min/max.
+ * `dimension` targets which datum dimension drives the colour (default: the
+ * value/last dimension). Returns undefined when config.visualMapEnabled is not
+ * truthy so the caller can assign undefined to reset.
+ */
+function buildVisualMap(
+  config: any,
+  dataMin: number,
+  dataMax: number,
+  dimension?: number,
+): any | undefined {
+  if (!config?.visualMapEnabled) return undefined;
+  const min = config.visualMapMin ?? dataMin;
+  const max = config.visualMapMax ?? dataMax;
+  const range =
+    Array.isArray(config.visualMapColors) && config.visualMapColors.length >= 2
+      ? config.visualMapColors
+      : VISUAL_MAP_DEFAULT_RANGE;
+  const base: any = {
+    show: config.visualMapShow !== false,
+    type: config.visualMapType || 'continuous',
+    min: Number.isFinite(min) ? min : 0,
+    max: Number.isFinite(max) ? max : 100,
+    calculable: config.visualMapCalculable !== false,
+    orient: config.visualMapOrient || 'horizontal',
+    left: 'center',
+    bottom: 5,
+    inRange: { color: range },
+    textStyle: {
+      ...CHART_TYPOGRAPHY.axisLabel,
+      fontFamily: CHART_TYPOGRAPHY.fontFamily,
+    },
+  };
+  if (dimension !== undefined) base.dimension = dimension;
+  // Piecewise honours an optional split count.
+  if (base.type === 'piecewise' && config.visualMapSplitNumber) {
+    base.splitNumber = config.visualMapSplitNumber;
+  }
+  return base;
+}
+
+// ========= Conditional formatting (per-datum colour rules) =========
+//
+// Discrete, rule-based per-datum colour. Promotes bare data values to
+// `{ value, itemStyle:{ color } }` objects when a rule matches. Complements
+// buildVisualMap (continuous ranges): visualMap for gradients, this for
+// explicit threshold colours. Reads config.conditionalFormatting[].
+
+const CF_CHART_SURFACES: ('bar' | 'point' | 'text')[] = ['bar', 'point', 'text'];
+
+/**
+ * Map a data array to conditionally-coloured points. Each element may be a
+ * bare number, a `{ value }` object, or an `{ name, value }` object; the
+ * matched rule's colour is merged into `itemStyle.color` while preserving any
+ * existing itemStyle. Non-matching points are returned UNCHANGED so the base
+ * palette / gradient still applies.
+ *
+ * `rows` (optional, parallel to dataPoints) supplies whole-row context so a
+ * rule can colour a bar by a *different* field than the one plotted.
+ * `valueField` names the plotted measure so a rule with no targetField tests
+ * the right value.
+ */
+function applyConditionalFormatting(
+  dataPoints: any[],
+  config: any,
+  rows?: any[],
+  valueField?: string,
+): any[] {
+  const rules: ConditionalRule[] = Array.isArray(config?.conditionalFormatting)
+    ? config.conditionalFormatting
+    : [];
+  if (rules.length === 0 || !Array.isArray(dataPoints)) return dataPoints;
+
+  return dataPoints.map((pt, i) => {
+    // Extract the scalar the rule tests + carry the existing shape forward.
+    const isObj = pt !== null && typeof pt === 'object' && !Array.isArray(pt);
+    const rawValue = isObj ? (pt as any).value : pt;
+    const row: Record<string, any> | undefined = rows?.[i]
+      ? rows[i]
+      : valueField && rawValue !== undefined
+        ? { [valueField]: rawValue }
+        : undefined;
+
+    const match = resolveConditionalStyle(
+      rules,
+      rawValue,
+      row,
+      CF_CHART_SURFACES,
+    );
+    if (!match || !match.color) return pt;
+
+    // Promote to an object datum carrying itemStyle.color.
+    const baseItemStyle = isObj ? (pt as any).itemStyle || {} : {};
+    const merged: any = {
+      ...(isObj ? pt : { value: pt }),
+      itemStyle: { ...baseItemStyle, color: match.color },
+    };
+    return merged;
+  });
+}
+
 function buildCategoryAxis(
   config: any,
   categories: string[],
@@ -773,6 +1066,12 @@ export function buildBarChartOption(
   // which resets cleanly under merge-mode setOption.
   Object.assign(barSeriesBase, buildPerfFlags(config));
 
+  // Reference lines / bands / annotations — spread onto the shared base so
+  // every bar variant carries them. buildMarkOverlays returns empty data
+  // arrays when nothing is configured, which clears cleanly under merge-mode
+  // setOption.
+  Object.assign(barSeriesBase, buildMarkOverlays(config));
+
   if (isMulti) {
     const sourceData = multiData && multiData.length > 0 ? multiData : data;
     const { categories, seriesList } = convertMultiSeries(sourceData);
@@ -854,7 +1153,7 @@ export function buildBarChartOption(
 
     // Use colorful bars by assigning per-item colors from palette
     const colors = getColors(config.colorScheme);
-    const coloredValues = values.map((v, i) => ({
+    const baseColoredValues = values.map((v, i) => ({
       value: v,
       itemStyle: config.gradient
         ? {
@@ -865,6 +1164,16 @@ export function buildBarChartOption(
           }
         : { color: colors[i % colors.length] },
     }));
+    // Overlay conditional-formatting colours — a matched rule replaces the
+    // palette colour for that datum; non-matching bars keep the palette.
+    // `data` carries the original row so cross-field rules resolve. No-op
+    // when config.conditionalFormatting is empty.
+    const coloredValues = applyConditionalFormatting(
+      baseColoredValues,
+      config,
+      data,
+      'value',
+    );
 
     if (config.legend) {
       // For legend to work on single-series bar charts, each category
@@ -961,6 +1270,19 @@ export function buildBarChartOption(
     }
   }
 
+  // Optional value-driven colour scale (colour by measure magnitude). Assign
+  // explicitly (undefined when off) so a stale scale is dropped under
+  // merge-mode setOption. Domain derived from the flat single-series values;
+  // for multi-series the user-pinned min/max still drive it.
+  const barVals = (Array.isArray(data) ? data : [])
+    .map((d: any) => (d && typeof d === 'object' ? Number(d.value) : Number(d)))
+    .filter((n: number) => Number.isFinite(n));
+  option.visualMap = buildVisualMap(
+    config,
+    barVals.length ? Math.min(...barVals) : 0,
+    barVals.length ? Math.max(...barVals) : 100,
+  );
+
   return option;
 }
 
@@ -989,10 +1311,15 @@ export function buildLineChartOption(
     toolbox: buildToolbox(config),
     xAxis: buildCategoryAxis(config, categories, 'x'),
     yAxis: buildValueAxis(config, 'y'),
-    series: seriesList.map(s => ({
+    // markLine/markArea/markPoint render once per chart, so attach the
+    // overlays to the FIRST series only (spreading onto every series would
+    // draw the reference line N times). Empty when nothing configured.
+    series: seriesList.map((s, si) => ({
       name: s.name,
       type: 'line',
-      data: s.values,
+      // Promote bare values to conditionally-coloured points when a rule
+      // matches (line points are bare numbers otherwise). No-op when no rules.
+      data: applyConditionalFormatting(s.values, config, undefined, 'value'),
       smooth: step ? false : smooth,
       step: step || undefined,
       ...(isStacked ? { stack: 'total' } : {}),
@@ -1010,6 +1337,7 @@ export function buildLineChartOption(
           ? { opacity: config.rangeFillOpacity }
           : undefined,
       emphasis: buildEmphasis(config, 'series'),
+      ...(si === 0 ? buildMarkOverlays(config) : {}),
       ...(config.endLabel ? { endLabel: { show: true } } : {}),
       ...(config.sampling && config.sampling !== 'none'
         ? { sampling: config.sampling }
@@ -1094,7 +1422,11 @@ export function buildAreaChartOption(
     );
     option.yAxis.max = 100;
     option.yAxis.axisLabel = { formatter: '{value}%' };
-    option.series = seriesList.map(s => ({
+    // Normalized mode recomputes values as percentages, so per-datum
+    // conditional colouring on raw measures does not apply; only the
+    // overlays (reference lines/bands/annotations) attach — to the first
+    // series to avoid N-fold duplication.
+    option.series = seriesList.map((s, si) => ({
       ...lineSeriesBase,
       name: s.name,
       type: 'line',
@@ -1105,9 +1437,10 @@ export function buildAreaChartOption(
       ),
       smooth: step ? false : smooth,
       step: step || undefined,
+      ...(si === 0 ? buildMarkOverlays(config) : {}),
     }));
   } else {
-    option.series = seriesList.map(s => ({
+    option.series = seriesList.map((s, si) => ({
       ...lineSeriesBase,
       name: s.name,
       type: 'line',
@@ -1116,9 +1449,12 @@ export function buildAreaChartOption(
         opacity: areaOpacity,
         ...(config.areaOrigin ? { origin: config.areaOrigin } : {}),
       },
-      data: s.values,
+      // Conditional per-datum colour (no-op when no rules). Overlays attach
+      // to the first series only.
+      data: applyConditionalFormatting(s.values, config, undefined, 'value'),
       smooth: step ? false : smooth,
       step: step || undefined,
+      ...(si === 0 ? buildMarkOverlays(config) : {}),
     }));
   }
 
@@ -1792,10 +2128,34 @@ export function buildScatterChartOption(
   // plot each point at [x, y] on TWO value axes. The previous version used
   // the category name as X and a per-category count as Y on a category x-axis,
   // which flattened every point onto a single horizontal line.
-  const series = data.map((group: any) => ({
+  // Conditional formatting on scatter tests the Y coordinate of each point.
+  // When any rule matches, the point is promoted to a `{ value:[x,y],
+  // itemStyle:{color} }` object; otherwise it stays a bare `[x,y]` pair.
+  const cfRules = Array.isArray(config?.conditionalFormatting)
+    ? config.conditionalFormatting
+    : [];
+  const colorScatterPoint = (pt: any): any => {
+    const pair = [pt.x, pt.y];
+    if (cfRules.length === 0) return pair;
+    const promoted = applyConditionalFormatting(
+      [{ value: pair, itemStyle: {} }],
+      config,
+      [{ value: pt.y }],
+      'value',
+    )[0];
+    // If no rule matched, applyConditionalFormatting returns the object
+    // unchanged with an empty itemStyle — collapse back to a bare pair so the
+    // palette colour applies.
+    if (promoted && promoted.itemStyle && promoted.itemStyle.color) {
+      return promoted;
+    }
+    return pair;
+  };
+
+  const series = data.map((group: any, si: number) => ({
     name: String(group.name),
     type: isEffect ? 'effectScatter' : 'scatter',
-    data: (group.series || []).map((pt: any) => [pt.x, pt.y]),
+    data: (group.series || []).map((pt: any) => colorScatterPoint(pt)),
     symbol: config.scatterSymbolShape || 'circle',
     symbolSize: config.scatterSymbolSize || 10,
     ...(isEffect
@@ -1810,6 +2170,8 @@ export function buildScatterChartOption(
         }
       : buildPerfFlags(config)),
     label: buildDataLabel(config),
+    // Reference overlays render once — attach to the first series only.
+    ...(si === 0 ? buildMarkOverlays(config) : {}),
     emphasis: {
       focus: config.emphasis || 'series',
       ...(config.emphasisScale === true ? { scale: true } : {}),
@@ -1847,6 +2209,21 @@ export function buildScatterChartOption(
   if (zoom.length) {
     option.grid.bottom = (option.grid.bottom || 30) + 40;
   }
+
+  // Value-driven colour scale keyed to the Y dimension. Explicit assign so a
+  // stale scale drops under merge-mode setOption.
+  const yVals: number[] = [];
+  (Array.isArray(data) ? data : []).forEach((g: any) =>
+    (g?.series || []).forEach((pt: any) => {
+      if (Number.isFinite(Number(pt?.y))) yVals.push(Number(pt.y));
+    }),
+  );
+  option.visualMap = buildVisualMap(
+    config,
+    yVals.length ? Math.min(...yVals) : 0,
+    yVals.length ? Math.max(...yVals) : 100,
+    1, // colour by the Y (dimension index 1) of each [x, y] point
+  );
 
   return option;
 }
@@ -2129,6 +2506,8 @@ export function buildWaterfallChartOption(data: any[], config: any): any {
           ...(borderRadius ? { borderRadius } : {}),
         },
         label: buildDataLabel(config, 'top'),
+        // Reference overlays render once — attach to a single visible series.
+        ...buildMarkOverlays(config),
       },
       {
         name: 'Decrease',
@@ -2237,6 +2616,8 @@ export function buildBoxPlotChartOption(data: any[], config: any): any {
           config.boxplotBoxWidth ?? 7,
           config.boxplotBoxMaxWidth ?? 50,
         ],
+        // Reference lines / bands / annotations. Empty when unconfigured.
+        ...buildMarkOverlays(config),
       },
     ],
   };
@@ -2680,6 +3061,8 @@ export function buildCandlestickChartOption(
             config.candleBearBorderColor || config.candleBearColor || '#00da3c',
         },
         ...(config.candleBarWidth ? { barWidth: config.candleBarWidth } : {}),
+        // Reference lines / bands / annotations. Empty when unconfigured.
+        ...buildMarkOverlays(config),
       },
     ],
   };

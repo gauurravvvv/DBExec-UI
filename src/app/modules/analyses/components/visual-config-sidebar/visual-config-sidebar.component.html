@@ -3068,6 +3068,511 @@
           ></app-custom-toggle>
         </div>
       </div>
+
+      <!-- ═══════════════ PIVOT / CROSSTAB (table only) ═══════════════ -->
+      <div
+        class="config-section"
+        *ngIf="isTableChartType(focusedVisual.chartType)"
+      >
+        <div class="section-title">{{ 'ANALYSES.PIVOT.TITLE' | translate }}</div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.PIVOT.ENABLE' | translate }}</label>
+          <app-custom-toggle
+            [ngModel]="pivotEnabled"
+            (ngModelChange)="setPivotEnabled($event)"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+
+        <ng-container *ngIf="pivotEnabled">
+          <div class="config-group">
+            <label>{{ 'ANALYSES.PIVOT.ROWS' | translate }}</label>
+            <app-custom-multiselect
+              [options]="fieldOptions"
+              [(ngModel)]="ensurePivot().rows"
+              optionLabel="label"
+              optionValue="value"
+              display="chip"
+              appendTo="body"
+              [placeholder]="'ANALYSES.PIVOT.ROWS_PH' | translate"
+            ></app-custom-multiselect>
+          </div>
+          <div class="config-group">
+            <label>{{ 'ANALYSES.PIVOT.COLUMNS' | translate }}</label>
+            <app-custom-multiselect
+              [options]="fieldOptions"
+              [(ngModel)]="ensurePivot().columns"
+              optionLabel="label"
+              optionValue="value"
+              display="chip"
+              appendTo="body"
+              [placeholder]="'ANALYSES.PIVOT.COLUMNS_PH' | translate"
+            ></app-custom-multiselect>
+          </div>
+          <div class="config-group">
+            <label>{{ 'ANALYSES.PIVOT.MEASURE' | translate }}</label>
+            <app-custom-dropdown
+              [options]="fieldOptions"
+              [(ngModel)]="ensurePivot().measure"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              [showClear]="true"
+              icon="pi-hashtag"
+              [placeholder]="'ANALYSES.PIVOT.MEASURE_PH' | translate"
+            ></app-custom-dropdown>
+          </div>
+          <div class="config-group">
+            <label>{{ 'ANALYSES.PIVOT.AGGREGATION' | translate }}</label>
+            <app-custom-dropdown
+              [options]="pivotAggregationOptions"
+              [(ngModel)]="ensurePivot().aggregation"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              icon="pi-calculator"
+            ></app-custom-dropdown>
+          </div>
+          <div class="config-row">
+            <label>{{ 'ANALYSES.PIVOT.ROW_TOTALS' | translate }}</label>
+            <app-custom-toggle
+              [(ngModel)]="ensurePivot().showRowTotals"
+              [showStatusLabel]="false"
+            ></app-custom-toggle>
+          </div>
+          <div class="config-row">
+            <label>{{ 'ANALYSES.PIVOT.COLUMN_TOTALS' | translate }}</label>
+            <app-custom-toggle
+              [(ngModel)]="ensurePivot().showColumnTotals"
+              [showStatusLabel]="false"
+            ></app-custom-toggle>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- ═══════════════ CONDITIONAL FORMATTING ═══════════════ -->
+      <div
+        class="config-section"
+        *ngIf="
+          isTableChartType(focusedVisual.chartType) ||
+          supportsChartConditionalFormatting(focusedVisual.chartType)
+        "
+      >
+        <div class="section-title">{{ 'ANALYSES.CF.TITLE' | translate }}</div>
+        <p class="config-hint">{{ 'ANALYSES.CF.HINT' | translate }}</p>
+
+        <div
+          class="rule-card"
+          *ngFor="let rule of conditionalRules; let i = index; trackBy: trackByRuleId"
+        >
+          <div class="rule-card__head">
+            <span class="rule-card__title"
+              >{{ 'ANALYSES.CF.RULE' | translate }} {{ i + 1 }}</span
+            >
+            <div class="rule-card__actions">
+              <app-custom-toggle
+                [(ngModel)]="rule.enabled"
+                [showStatusLabel]="false"
+              ></app-custom-toggle>
+              <button
+                type="button"
+                class="rule-remove-btn"
+                (click)="removeConditionalRule(i)"
+                [title]="'COMMON.REMOVE' | translate"
+              >
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="config-group">
+            <label>{{ 'ANALYSES.CF.TARGET_FIELD' | translate }}</label>
+            <app-custom-dropdown
+              [options]="fieldOptions"
+              [(ngModel)]="rule.targetField"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              [showClear]="true"
+              [placeholder]="'ANALYSES.CF.TARGET_FIELD_PH' | translate"
+            ></app-custom-dropdown>
+          </div>
+
+          <div class="config-group config-group--split">
+            <div class="split-col">
+              <label>{{ 'ANALYSES.CF.OPERATOR' | translate }}</label>
+              <app-custom-dropdown
+                [options]="conditionalOperatorOptions"
+                [(ngModel)]="rule.operator"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+              ></app-custom-dropdown>
+            </div>
+            <div class="split-col">
+              <label>{{ 'ANALYSES.CF.DATA_TYPE' | translate }}</label>
+              <app-custom-dropdown
+                [options]="conditionalDataTypeOptions"
+                [(ngModel)]="rule.dataType"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+              ></app-custom-dropdown>
+            </div>
+          </div>
+
+          <!-- Typed value input(s). Date type shows a calendar; number/string
+               show a number/text input. Second operand only for between. -->
+          <ng-container *ngIf="operandCount(rule.operator) >= 1">
+            <div class="config-group">
+              <label>{{ 'ANALYSES.CF.VALUE' | translate }}</label>
+              <app-custom-calendar
+                *ngIf="rule.dataType === 'date'"
+                [(ngModel)]="rule.value"
+                [showTime]="false"
+                appendTo="body"
+              ></app-custom-calendar>
+              <app-custom-number
+                *ngIf="rule.dataType === 'number'"
+                [(ngModel)]="rule.value"
+              ></app-custom-number>
+              <app-custom-input
+                *ngIf="rule.dataType !== 'date' && rule.dataType !== 'number'"
+                [(ngModel)]="rule.value"
+                [placeholder]="'ANALYSES.CF.VALUE_PH' | translate"
+              ></app-custom-input>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="operandCount(rule.operator) >= 2">
+            <div class="config-group">
+              <label>{{ 'ANALYSES.CF.VALUE2' | translate }}</label>
+              <app-custom-calendar
+                *ngIf="rule.dataType === 'date'"
+                [(ngModel)]="rule.value2"
+                [showTime]="false"
+                appendTo="body"
+              ></app-custom-calendar>
+              <app-custom-number
+                *ngIf="rule.dataType === 'number'"
+                [(ngModel)]="rule.value2"
+              ></app-custom-number>
+              <app-custom-input
+                *ngIf="rule.dataType !== 'date' && rule.dataType !== 'number'"
+                [(ngModel)]="rule.value2"
+                [placeholder]="'ANALYSES.CF.VALUE_PH' | translate"
+              ></app-custom-input>
+            </div>
+          </ng-container>
+
+          <div class="config-group config-group--split">
+            <div class="split-col">
+              <label>{{ 'ANALYSES.CF.APPLIES_TO' | translate }}</label>
+              <app-custom-dropdown
+                [options]="conditionalAppliesToOptions"
+                [(ngModel)]="rule.appliesTo"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+              ></app-custom-dropdown>
+            </div>
+            <div class="split-col">
+              <label>{{ 'ANALYSES.CF.COLOR' | translate }}</label>
+              <input
+                type="color"
+                class="color-swatch"
+                [(ngModel)]="rule.color"
+                [title]="'ANALYSES.CF.COLOR' | translate"
+              />
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="add-rule-btn" (click)="addConditionalRule()">
+          <i class="pi pi-plus"></i>
+          <span>{{ 'ANALYSES.CF.ADD_RULE' | translate }}</span>
+        </button>
+      </div>
+
+      <!-- ═══════════════ REFERENCE LINES & ANNOTATIONS ═══════════════ -->
+      <div
+        class="config-section"
+        *ngIf="supportsReferenceLines(focusedVisual.chartType)"
+      >
+        <div class="section-title">{{ 'ANALYSES.REFLINE.TITLE' | translate }}</div>
+
+        <!-- Reference lines -->
+        <div class="subsection-title">
+          {{ 'ANALYSES.REFLINE.LINES' | translate }}
+        </div>
+        <div
+          class="rule-card"
+          *ngFor="let line of referenceLines; let i = index; trackBy: trackByGenId"
+        >
+          <div class="rule-card__head">
+            <span class="rule-card__title"
+              >{{ 'ANALYSES.REFLINE.LINE' | translate }} {{ i + 1 }}</span
+            >
+            <button
+              type="button"
+              class="rule-remove-btn"
+              (click)="removeReferenceLine(i)"
+              [title]="'COMMON.REMOVE' | translate"
+            >
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+          <div class="config-group config-group--split">
+            <div class="split-col">
+              <label>{{ 'ANALYSES.REFLINE.TYPE_LABEL' | translate }}</label>
+              <app-custom-dropdown
+                [options]="referenceLineTypeOptions"
+                [(ngModel)]="line.type"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+              ></app-custom-dropdown>
+            </div>
+            <div class="split-col">
+              <label>{{ 'ANALYSES.REFLINE.AXIS_LABEL' | translate }}</label>
+              <app-custom-dropdown
+                [options]="referenceAxisOptions"
+                [(ngModel)]="line.axis"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+              ></app-custom-dropdown>
+            </div>
+          </div>
+          <div class="config-group" *ngIf="line.type === 'constant'">
+            <label>{{ 'ANALYSES.REFLINE.VALUE' | translate }}</label>
+            <app-custom-number [(ngModel)]="line.value"></app-custom-number>
+          </div>
+          <div class="config-group">
+            <label>{{ 'ANALYSES.REFLINE.LABEL' | translate }}</label>
+            <app-custom-input
+              [(ngModel)]="line.label"
+              [maxLength]="60"
+              [placeholder]="'ANALYSES.REFLINE.LABEL_PH' | translate"
+            ></app-custom-input>
+          </div>
+          <div class="config-group config-group--split">
+            <div class="split-col">
+              <label>{{ 'ANALYSES.REFLINE.STYLE' | translate }}</label>
+              <app-custom-dropdown
+                [options]="referenceLineStyleOptions"
+                [(ngModel)]="line.lineStyle"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+              ></app-custom-dropdown>
+            </div>
+            <div class="split-col">
+              <label>{{ 'ANALYSES.REFLINE.COLOR' | translate }}</label>
+              <input
+                type="color"
+                class="color-swatch"
+                [(ngModel)]="line.color"
+              />
+            </div>
+          </div>
+        </div>
+        <button type="button" class="add-rule-btn" (click)="addReferenceLine()">
+          <i class="pi pi-plus"></i>
+          <span>{{ 'ANALYSES.REFLINE.ADD_LINE' | translate }}</span>
+        </button>
+
+        <!-- Reference bands -->
+        <div class="subsection-title">
+          {{ 'ANALYSES.REFLINE.BANDS' | translate }}
+        </div>
+        <div
+          class="rule-card"
+          *ngFor="let band of referenceBands; let i = index; trackBy: trackByGenId"
+        >
+          <div class="rule-card__head">
+            <span class="rule-card__title"
+              >{{ 'ANALYSES.REFLINE.BAND' | translate }} {{ i + 1 }}</span
+            >
+            <button
+              type="button"
+              class="rule-remove-btn"
+              (click)="removeReferenceBand(i)"
+              [title]="'COMMON.REMOVE' | translate"
+            >
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+          <div class="config-group">
+            <label>{{ 'ANALYSES.REFLINE.AXIS_LABEL' | translate }}</label>
+            <app-custom-dropdown
+              [options]="referenceAxisOptions"
+              [(ngModel)]="band.axis"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+            ></app-custom-dropdown>
+          </div>
+          <div class="config-group config-group--split">
+            <div class="split-col">
+              <label>{{ 'ANALYSES.REFLINE.FROM' | translate }}</label>
+              <app-custom-number [(ngModel)]="band.from"></app-custom-number>
+            </div>
+            <div class="split-col">
+              <label>{{ 'ANALYSES.REFLINE.TO' | translate }}</label>
+              <app-custom-number [(ngModel)]="band.to"></app-custom-number>
+            </div>
+          </div>
+          <div class="config-group config-group--split">
+            <div class="split-col">
+              <label>{{ 'ANALYSES.REFLINE.LABEL' | translate }}</label>
+              <app-custom-input
+                [(ngModel)]="band.label"
+                [maxLength]="60"
+              ></app-custom-input>
+            </div>
+            <div class="split-col">
+              <label>{{ 'ANALYSES.REFLINE.COLOR' | translate }}</label>
+              <input
+                type="color"
+                class="color-swatch"
+                [(ngModel)]="band.color"
+              />
+            </div>
+          </div>
+        </div>
+        <button type="button" class="add-rule-btn" (click)="addReferenceBand()">
+          <i class="pi pi-plus"></i>
+          <span>{{ 'ANALYSES.REFLINE.ADD_BAND' | translate }}</span>
+        </button>
+
+        <!-- Annotations -->
+        <div class="subsection-title">
+          {{ 'ANALYSES.REFLINE.ANNOTATIONS' | translate }}
+        </div>
+        <div
+          class="rule-card"
+          *ngFor="let anno of annotations; let i = index; trackBy: trackByGenId"
+        >
+          <div class="rule-card__head">
+            <span class="rule-card__title"
+              >{{ 'ANALYSES.REFLINE.ANNOTATION' | translate }} {{ i + 1 }}</span
+            >
+            <button
+              type="button"
+              class="rule-remove-btn"
+              (click)="removeAnnotation(i)"
+              [title]="'COMMON.REMOVE' | translate"
+            >
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+          <div class="config-group config-group--split">
+            <div class="split-col">
+              <label>{{ 'ANALYSES.REFLINE.ANNO_X' | translate }}</label>
+              <app-custom-input
+                [(ngModel)]="anno.x"
+                [placeholder]="'ANALYSES.REFLINE.ANNO_X_PH' | translate"
+              ></app-custom-input>
+            </div>
+            <div class="split-col">
+              <label>{{ 'ANALYSES.REFLINE.ANNO_Y' | translate }}</label>
+              <app-custom-number [(ngModel)]="anno.y"></app-custom-number>
+            </div>
+          </div>
+          <div class="config-group config-group--split">
+            <div class="split-col">
+              <label>{{ 'ANALYSES.REFLINE.LABEL' | translate }}</label>
+              <app-custom-input
+                [(ngModel)]="anno.label"
+                [maxLength]="60"
+              ></app-custom-input>
+            </div>
+            <div class="split-col">
+              <label>{{ 'ANALYSES.REFLINE.COLOR' | translate }}</label>
+              <input
+                type="color"
+                class="color-swatch"
+                [(ngModel)]="anno.color"
+              />
+            </div>
+          </div>
+        </div>
+        <button type="button" class="add-rule-btn" (click)="addAnnotation()">
+          <i class="pi pi-plus"></i>
+          <span>{{ 'ANALYSES.REFLINE.ADD_ANNOTATION' | translate }}</span>
+        </button>
+      </div>
+
+      <!-- ═══════════════ VALUE COLOUR SCALE (visualMap) ═══════════════ -->
+      <div
+        class="config-section"
+        *ngIf="supportsVisualMap(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.COLORSCALE.TITLE' | translate }}
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.COLORSCALE.ENABLE' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.visualMapEnabled"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
+        <ng-container *ngIf="focusedVisual.config.visualMapEnabled">
+          <div class="config-row">
+            <label>{{ 'ANALYSES.COLORSCALE.SHOW' | translate }}</label>
+            <app-custom-toggle
+              [(ngModel)]="focusedVisual.config.visualMapShow"
+              [showStatusLabel]="false"
+            ></app-custom-toggle>
+          </div>
+          <div class="config-group">
+            <label>{{ 'ANALYSES.COLORSCALE.TYPE' | translate }}</label>
+            <app-custom-dropdown
+              [options]="visualMapTypeOptions"
+              [(ngModel)]="focusedVisual.config.visualMapType"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+            ></app-custom-dropdown>
+          </div>
+          <div class="config-group config-group--split">
+            <div class="split-col">
+              <label>{{ 'ANALYSES.COLORSCALE.MIN' | translate }}</label>
+              <app-custom-number
+                [(ngModel)]="focusedVisual.config.visualMapMin"
+              ></app-custom-number>
+            </div>
+            <div class="split-col">
+              <label>{{ 'ANALYSES.COLORSCALE.MAX' | translate }}</label>
+              <app-custom-number
+                [(ngModel)]="focusedVisual.config.visualMapMax"
+              ></app-custom-number>
+            </div>
+          </div>
+          <div class="config-group config-group--split">
+            <div class="split-col">
+              <label>{{ 'ANALYSES.COLORSCALE.LOW_COLOR' | translate }}</label>
+              <input
+                type="color"
+                class="color-swatch"
+                [ngModel]="(focusedVisual.config.visualMapColors || [])[0] || '#e0f2fe'"
+                (ngModelChange)="setVisualMapColor(0, $event)"
+              />
+            </div>
+            <div class="split-col">
+              <label>{{ 'ANALYSES.COLORSCALE.HIGH_COLOR' | translate }}</label>
+              <input
+                type="color"
+                class="color-swatch"
+                [ngModel]="(focusedVisual.config.visualMapColors || [])[1] || '#0369a1'"
+                (ngModelChange)="setVisualMapColor(1, $event)"
+              />
+            </div>
+          </div>
+        </ng-container>
+      </div>
     </div>
   </div>
 </div>

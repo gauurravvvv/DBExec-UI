@@ -45,6 +45,43 @@
           </small>
         </div>
 
+        <!-- Result cache -->
+        <div class="form-field cache-section">
+          <app-custom-toggle
+            formControlName="cacheEnabled"
+            [label]="'DATASET.CACHE.LABEL' | translate"
+            [trueLabel]="'DATASET.CACHE.ON' | translate"
+            [falseLabel]="'DATASET.CACHE.OFF' | translate"
+          >
+          </app-custom-toggle>
+          <small class="cache-hint">
+            {{ 'DATASET.CACHE.HINT' | translate }}
+          </small>
+
+          <!-- TTL only relevant when caching is on -->
+          <div class="cache-ttl-field" *ngIf="cacheEnabled">
+            <app-custom-number
+              formControlName="cacheTtlSeconds"
+              [label]="'DATASET.CACHE.TTL_LABEL' | translate"
+              [placeholder]="'DATASET.CACHE.TTL_PLACEHOLDER' | translate"
+              [min]="cacheTtlMin"
+              [max]="cacheTtlMax"
+              [suffix]="' ' + ('DATASET.CACHE.SECONDS' | translate)"
+              [showError]="
+                !!(
+                  datasetForm.get('cacheTtlSeconds')?.invalid &&
+                  datasetForm.get('cacheTtlSeconds')?.touched
+                )
+              "
+              [errorMessage]="getCacheTtlError()"
+            >
+            </app-custom-number>
+            <small class="cache-hint">
+              {{ 'DATASET.CACHE.TTL_HINT' | translate }}
+            </small>
+          </div>
+        </div>
+
         <!-- Justification (for updates) -->
         <div class="form-field justification-section" *ngIf="showJustification">
           <label for="justification"

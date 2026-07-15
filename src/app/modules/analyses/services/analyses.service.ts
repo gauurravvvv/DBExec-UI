@@ -647,8 +647,13 @@ export class AnalysesService {
     filters?: any[];
     parameters?: Array<{ key: string; value: any }>;
     limit?: number;
+    // Force a live re-run + cache re-store, bypassing any fresh cached
+    // entry. Wired to the "refresh cached data" action; omitted (falsy)
+    // for a normal run so a cache hit is served when available.
+    refresh?: boolean;
   }) {
-    const { datasetId, analysisId, filters, parameters, limit } = payload;
+    const { datasetId, analysisId, filters, parameters, limit, refresh } =
+      payload;
     const body: any = { datasetId, analysisId };
     if (filters && filters.length > 0) {
       body.filters = filters;
@@ -658,6 +663,9 @@ export class AnalysesService {
     }
     if (limit !== undefined) {
       body.limit = limit;
+    }
+    if (refresh) {
+      body.refresh = true;
     }
     this._running.set(true);
     try {

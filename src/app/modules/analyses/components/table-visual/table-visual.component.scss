@@ -120,3 +120,32 @@
     }
   }
 }
+
+// ============================================================================
+// PIVOT / CROSSTAB decorations. Stub (row-dimension) columns read as a quiet
+// left rail; the grand-total row + total column are emphasised so the reader
+// can find the aggregate at a glance. Conditional-format inline styles win
+// over these (they set background-color directly on the <td>).
+// ============================================================================
+::ng-deep .table-visual__pivot {
+  // Stub columns: left dimension labels — medium weight, subtle tint so they
+  // separate visually from the numeric measure grid.
+  th.pivot-stub-head,
+  td.pivot-stub-cell {
+    font-weight: var(--fw-medium);
+    background: var(--hover-background);
+    color: var(--text-color);
+  }
+
+  // Total column header + the grand-total row: stronger weight + a hairline
+  // separator so the aggregate stands apart from the body.
+  th.pivot-total-head {
+    font-weight: var(--fw-semibold, 600);
+  }
+
+  .p-datatable-tbody > tr.pivot-total-row > td {
+    font-weight: var(--fw-semibold, 600);
+    border-top: 1px solid var(--border-color, #e5e7eb);
+    background: var(--hover-background);
+  }
+}

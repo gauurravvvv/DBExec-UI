@@ -87,6 +87,10 @@ export class EditDatasetComponent
   datasetName: string = '';
   datasetDescription: string = '';
   datasetStatus: number = 1;
+  // Result-cache config, loaded from the dataset and fed back into the
+  // save dialog so the toggle/TTL reflect the current saved state.
+  datasetCacheEnabled = false;
+  datasetCacheTtlSeconds: number | null = null;
   initialQuery?: string;
   originalQuery: string = ''; // Store original query from dataset
 
@@ -1827,6 +1831,8 @@ export class EditDatasetComponent
         description: formData.description,
         datasource: this.selectedDatasourceObj.id,
         sql,
+        cacheEnabled: formData.cacheEnabled,
+        cacheTtlSeconds: formData.cacheTtlSeconds,
       };
 
       this.datasetService
@@ -2289,6 +2295,9 @@ export class EditDatasetComponent
           this.datasetName = dataset.name || '';
           this.datasetDescription = dataset.description || '';
           this.datasetStatus = dataset.status || 1;
+          this.datasetCacheEnabled = !!dataset.cacheEnabled;
+          this.datasetCacheTtlSeconds =
+            dataset.cacheTtlSeconds ?? null;
 
           // Set database from API response. Spread the full
           // datasource payload (rather than just {id, name}) so the

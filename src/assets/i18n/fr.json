@@ -197,7 +197,8 @@
     "MIN": "Min",
     "MAX": "Max",
     "TRUE": "Vrai",
-    "FALSE": "Faux"
+    "FALSE": "Faux",
+    "NO_MATCHING_RECORDS": "Aucun enregistrement correspondant"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Le prénom est requis",
@@ -872,7 +873,17 @@
     "EXPLAIN_RUNNING": "Demande du plan au moteur…",
     "SEARCH_PLACEHOLDER": "Rechercher des jeux de données par nom ou description",
     "RUN": "Exécuter",
-    "QUERY_TIMEOUT": "La requête a pris trop de temps et a été annulée. Essayez de restreindre l'ensemble de résultats ou vérifiez la base de données pour les requêtes longues."
+    "QUERY_TIMEOUT": "La requête a pris trop de temps et a été annulée. Essayez de restreindre l'ensemble de résultats ou vérifiez la base de données pour les requêtes longues.",
+    "CACHE": {
+      "LABEL": "Mise en cache des résultats",
+      "HINT": "Mettez en cache les résultats des requêtes et réutilisez-les pendant la durée de vie pour accélérer les exécutions répétées.",
+      "ON": "Activé",
+      "OFF": "Désactivé",
+      "TTL_LABEL": "Durée du cache",
+      "TTL_PLACEHOLDER": "e.g. 300",
+      "SECONDS": "secondes",
+      "TTL_HINT": "Durée pendant laquelle les résultats mis en cache restent valides avant que la requête ne se réexécute."
+    }
   },
   "ANALYSES": {
     "TITLE": "Analyses",
@@ -1389,7 +1400,68 @@
     "DETECTED_TYPE_NUMBER": "Colonne numérique détectée — des contrôles numériques sont suggérés.",
     "DETECTED_TYPE_DATE": "Colonne date/heure détectée — des contrôles de date sont suggérés.",
     "DETECTED_TYPE_BOOLEAN": "Colonne booléenne détectée — une liste de valeurs est suggérée.",
-    "DETECTED_TYPE_STRING": "Colonne texte détectée — des listes déroulantes de valeurs sont suggérées."
+    "DETECTED_TYPE_STRING": "Colonne texte détectée — des listes déroulantes de valeurs sont suggérées.",
+    "CF": {
+      "TITLE": "Mise en forme conditionnelle",
+      "HINT": "Colorez les points de données ou les cellules de tableau lorsqu'une valeur satisfait une condition.",
+      "RULE": "Règle",
+      "ADD_RULE": "Ajouter une règle",
+      "TARGET_FIELD": "Champ",
+      "TARGET_FIELD_PH": "Choisir un champ",
+      "DATA_TYPE": "Type",
+      "OPERATOR": "Condition",
+      "VALUE": "Valeur",
+      "VALUE_PH": "Saisir une valeur",
+      "COLOR": "Couleur",
+      "APPLIES_TO": "S'applique à"
+    },
+    "PIVOT": {
+      "TITLE": "Tableau croisé dynamique",
+      "ENABLE": "Activer le mode pivot",
+      "ROWS": "Lignes",
+      "ROWS_PH": "Champs à regrouper en lignes",
+      "COLUMNS": "Colonnes",
+      "COLUMNS_PH": "Champs à répartir en colonnes",
+      "MEASURE": "Mesure",
+      "MEASURE_PH": "Champ valeur à agréger",
+      "AGGREGATION": "Agrégation",
+      "ROW_TOTALS": "Totaux des lignes",
+      "COLUMN_TOTALS": "Totaux des colonnes"
+    },
+    "REFLINE": {
+      "TITLE": "Lignes de référence et annotations",
+      "LINE": "Ligne de référence",
+      "LINES": "Lignes de référence",
+      "ADD_LINE": "Ajouter une ligne",
+      "BAND": "Bande de référence",
+      "BANDS": "Bandes de référence",
+      "ADD_BAND": "Ajouter une bande",
+      "ANNOTATION": "Annotation",
+      "ANNOTATIONS": "Annotations",
+      "ADD_ANNOTATION": "Ajouter une annotation",
+      "TYPE_LABEL": "Type",
+      "VALUE": "Valeur",
+      "LABEL": "Étiquette",
+      "LABEL_PH": "Étiquette facultative",
+      "COLOR": "Couleur",
+      "STYLE": "Style",
+      "AXIS_LABEL": "Axe",
+      "FROM": "De",
+      "TO": "À",
+      "ANNO_X": "Position X",
+      "ANNO_X_PH": "Catégorie ou valeur X",
+      "ANNO_Y": "Valeur Y"
+    },
+    "COLORSCALE": {
+      "TITLE": "Échelle de couleurs",
+      "ENABLE": "Couleur par valeur",
+      "SHOW": "Afficher la légende",
+      "TYPE": "Type d'échelle",
+      "MIN": "Min",
+      "MAX": "Max",
+      "LOW_COLOR": "Couleur basse",
+      "HIGH_COLOR": "Couleur haute"
+    }
   },
   "DASHBOARD": {
     "TITLE": "Tableaux de bord",

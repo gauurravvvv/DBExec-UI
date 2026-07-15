@@ -9,16 +9,68 @@
     <p>{{ 'ANALYSES.TABLE_NO_DATA' | translate }}</p>
   </div>
 
+  <!-- ===== PIVOT / CROSSTAB mode ===== -->
+  <p-table
+    *ngIf="data?.length && isPivot"
+    [value]="pivot.rows"
+    [columns]="pivot.columns"
+    [scrollable]="true"
+    scrollHeight="flex"
+    [rowHover]="true"
+    styleClass="p-datatable-sm modern-table table-visual__table table-visual__pivot"
+    [tableStyle]="{ 'min-width': '100%' }"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th
+          *ngFor="let col of pivot.columns; trackBy: trackByPivotCol"
+          [class.is-numeric]="col.numeric"
+          [class.pivot-stub-head]="col.kind === 'stub'"
+          [class.pivot-total-head]="col.kind === 'total'"
+        >
+          <div class="th-content">
+            <span>{{ col.header }}</span>
+          </div>
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-row>
+      <tr class="modern-row" [class.pivot-total-row]="row.isTotal">
+        <td
+          *ngFor="let col of pivot.columns; trackBy: trackByPivotCol"
+          [class.is-numeric]="col.numeric"
+          [class.pivot-stub-cell]="col.kind === 'stub'"
+          [ngStyle]="pivotCellStyle(row, col)"
+        >
+          <span class="cell-text">{{ formatPivotCell(row, col) }}</span>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr class="empty-row">
+        <td [attr.colspan]="pivot.columns.length" class="empty-message-cell">
+          <div class="empty-state-inline">
+            <i class="pi pi-search empty-state-icon"></i>
+            <span class="empty-state-text">{{ 'ANALYSES.TABLE_NO_MATCHING_ROWS' | translate }}</span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
   <!-- Empty state when data exists but no columns are selected. Tables
-       start hidden-by-default so the user opts each field in. -->
-  <div class="table-visual__empty" *ngIf="data?.length && columns.length === 0">
+       start hidden-by-default so the user opts each field in. Flat mode only. -->
+  <div
+    class="table-visual__empty"
+    *ngIf="data?.length && !isPivot && columns.length === 0"
+  >
     <i class="pi pi-eye-slash"></i>
     <p>{{ 'ANALYSES.TABLE_PICK_COLUMNS_PROMPT' | translate }}</p>
   </div>
 
-  <!-- The table itself. Same .modern-table family as the listings -->
+  <!-- ===== FLAT mode (default) ===== -->
   <p-table
-    *ngIf="data?.length && columns.length > 0"
+    *ngIf="data?.length && !isPivot && columns.length > 0"
     [value]="data"
     [columns]="columns"
     [scrollable]="true"
@@ -50,6 +102,7 @@
         <td
           *ngFor="let col of columns; trackBy: trackByIndex"
           [class.is-numeric]="col.numeric"
+          [ngStyle]="cellStyle(row[col.field], col.field, row)"
         >
           <span class="cell-text" [title]="row[col.field]">
             {{ formatCell(row[col.field], col) }}

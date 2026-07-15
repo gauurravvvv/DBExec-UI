@@ -160,6 +160,40 @@ export const datasetFieldNameSchema = z.preprocess(
 /** Status flag — 0 inactive, 1 active. */
 const statusSchema = z.union([z.literal(0), z.literal(1)]).optional();
 
+// ── Result-cache config ────────────────────────────────────────────
+// Opt-in per-dataset result caching. Both fields are optional on the
+// wire so a caller that doesn't manage caching sends the same payload
+// as before; the controller only mutates a field that was actually
+// present. TTL bounds mirror the BE config (DATASET_CACHE_MIN/MAX_TTL_
+// SECONDS) so the FE can reject an out-of-range value before the round
+// trip — the BE clamps rather than rejects, so these are advisory.
+export const DATASET_CACHE_TTL_LIMITS = {
+  MIN_SECONDS: 10,
+  MAX_SECONDS: 86_400,
+} as const;
+
+/** Cache on/off toggle. */
+export const datasetCacheEnabledSchema = z.boolean().optional();
+
+/**
+ * Per-dataset TTL in seconds. Accepts null / '' to clear the override
+ * (server falls back to its default TTL). A provided number must be a
+ * positive integer within the advisory bounds.
+ */
+export const datasetCacheTtlSecondsSchema = z.preprocess(
+  (v: unknown) => (v === '' || v === null ? undefined : v),
+  z
+    .number({ message: 'validation.datasets.cacheTtl.invalid' })
+    .int({ message: 'validation.datasets.cacheTtl.invalid' })
+    .min(DATASET_CACHE_TTL_LIMITS.MIN_SECONDS, {
+      message: 'validation.datasets.cacheTtl.tooShort',
+    })
+    .max(DATASET_CACHE_TTL_LIMITS.MAX_SECONDS, {
+      message: 'validation.datasets.cacheTtl.tooLong',
+    })
+    .optional(),
+);
+
 // ── Composite schemas ──────────────────────────────────────────────
 
 /** SQL-authored Save dataset. */
@@ -168,6 +202,8 @@ export const addDatasetSchema = z.object({
   description: datasetDescriptionSchema,
   datasource: datasourceIdSchema,
   sql: sqlSchema,
+  cacheEnabled: datasetCacheEnabledSchema,
+  cacheTtlSeconds: datasetCacheTtlSecondsSchema,
 });
 export type AddDatasetInput = z.infer<typeof addDatasetSchema>;
 
@@ -180,6 +216,8 @@ export const updateDatasetSchema = z.object({
   sql: sqlSchema,
   status: statusSchema,
   justification: datasetJustificationSchema,
+  cacheEnabled: datasetCacheEnabledSchema,
+  cacheTtlSeconds: datasetCacheTtlSecondsSchema,
 });
 export type UpdateDatasetInput = z.infer<typeof updateDatasetSchema>;
 

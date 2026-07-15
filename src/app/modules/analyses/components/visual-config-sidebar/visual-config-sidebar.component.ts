@@ -114,6 +114,16 @@ import {
   TREE_ORIENTATIONS,
 } from '../../constants/charts.constants';
 import { Visual } from '../../models';
+import {
+  ConditionalRule,
+  ConditionalOperator,
+  CONDITIONAL_OPERATOR_OPTIONS,
+  operandCount,
+} from 'src/app/shared/helpers/conditional-formatting.helper';
+import {
+  PivotAggregation,
+  PIVOT_AGGREGATION_OPTIONS,
+} from 'src/app/shared/helpers/pivot.helper';
 
 @Component({
   selector: 'app-visual-config-sidebar',
@@ -353,6 +363,22 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     this.boxplotLayouts = localize(BOXPLOT_LAYOUTS);
     this.pictorialSymbolPositions = localize(PICTORIAL_SYMBOL_POSITIONS);
     this.sankeyNodeAligns = localize(SANKEY_NODE_ALIGNS);
+    // Conditional-formatting / reference-line / pivot dropdowns. localize
+    // preserves extra fields (e.g. operator `operands`) via the object spread.
+    // Always derive from the stable RAW_* / CONST sources so a language change
+    // never double-translates an already-localized label.
+    this.conditionalOperatorOptions = localize(CONDITIONAL_OPERATOR_OPTIONS);
+    this.pivotAggregationOptions = localize(PIVOT_AGGREGATION_OPTIONS);
+    this.referenceLineTypeOptions = localize(
+      VisualConfigSidebarComponent.RAW_REFLINE_TYPES,
+    );
+    this.referenceAxisOptions = localize(VisualConfigSidebarComponent.RAW_REF_AXIS);
+    this.conditionalAppliesToOptions = localize(
+      VisualConfigSidebarComponent.RAW_CF_APPLIES,
+    );
+    this.conditionalDataTypeOptions = localize(
+      VisualConfigSidebarComponent.RAW_CF_DTYPES,
+    );
   }
 
   ngDoCheck(): void {
@@ -494,4 +520,296 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
   funnelLabelPositionOptions = FUNNEL_LABEL_POSITION_OPTIONS;
   themeRiverLabelPositionOptions = THEME_RIVER_LABEL_POSITION_OPTIONS;
   shadingModeOptions = SHADING_MODE_OPTIONS;
+
+  // ═══════════════════════════════════════════════════════════════════
+  // Conditional formatting / reference lines / pivot — editor state
+  // ═══════════════════════════════════════════════════════════════════
+
+  // Localized display copies (labels resolved to the active locale in
+  // localizeDropdownOptions, re-derived from the stable RAW_* sources below
+  // on every language change — never localize an already-localized array).
+  conditionalOperatorOptions = CONDITIONAL_OPERATOR_OPTIONS;
+  pivotAggregationOptions = PIVOT_AGGREGATION_OPTIONS;
+  referenceLineTypeOptions = VisualConfigSidebarComponent.RAW_REFLINE_TYPES;
+  referenceAxisOptions = VisualConfigSidebarComponent.RAW_REF_AXIS;
+  conditionalAppliesToOptions = VisualConfigSidebarComponent.RAW_CF_APPLIES;
+  conditionalDataTypeOptions = VisualConfigSidebarComponent.RAW_CF_DTYPES;
+
+  /** Line-style dropdown reused from the shared (already-localized) styles. */
+  referenceLineStyleOptions = GRID_LINE_STYLES;
+
+  // Stable i18n-keyed sources (never mutated) for the four local arrays.
+  private static readonly RAW_REFLINE_TYPES = [
+    { label: 'ANALYSES.REFLINE.TYPE.CONSTANT', value: 'constant' },
+    { label: 'ANALYSES.REFLINE.TYPE.AVERAGE', value: 'average' },
+    { label: 'ANALYSES.REFLINE.TYPE.MIN', value: 'min' },
+    { label: 'ANALYSES.REFLINE.TYPE.MAX', value: 'max' },
+  ];
+  private static readonly RAW_REF_AXIS = [
+    { label: 'ANALYSES.REFLINE.AXIS.Y', value: 'y' },
+    { label: 'ANALYSES.REFLINE.AXIS.X', value: 'x' },
+  ];
+  private static readonly RAW_CF_APPLIES = [
+    { label: 'ANALYSES.CF.APPLIES.CELL', value: 'cell' },
+    { label: 'ANALYSES.CF.APPLIES.TEXT', value: 'text' },
+    { label: 'ANALYSES.CF.APPLIES.BAR', value: 'bar' },
+    { label: 'ANALYSES.CF.APPLIES.POINT', value: 'point' },
+  ];
+  private static readonly RAW_CF_DTYPES = [
+    { label: 'ANALYSES.CF.DTYPE.NUMBER', value: 'number' },
+    { label: 'ANALYSES.CF.DTYPE.STRING', value: 'string' },
+    { label: 'ANALYSES.CF.DTYPE.DATE', value: 'date' },
+  ];
+
+  /**
+   * Column options for target-field / pivot dropdowns. Sourced from
+   * allFields (preferred) with a chartData-key fallback, shaped as
+   * { label, value } for the custom dropdowns/multiselects.
+   */
+  get fieldOptions(): { label: string; value: string }[] {
+    return this.tableAvailableColumns.map(c => ({
+      label: this.tableColumnLabel(c),
+      value: c,
+    }));
+  }
+
+  // ── Feature gating ──
+
+  /** Reference lines/bands/annotations apply to cartesian chart families. */
+  supportsReferenceLines(chartType: string | null): boolean {
+    return (
+      this.isBarChartType(chartType) ||
+      this.isLineChartType(chartType) ||
+      this.isAreaChartType(chartType) ||
+      this.isScatterChartType(chartType) ||
+      this.isWaterfallChartType(chartType) ||
+      this.isBoxChartType(chartType) ||
+      this.isCandlestickChartType(chartType)
+    );
+  }
+
+  /** Per-datum conditional colour applies to value-mapped cartesian charts. */
+  supportsChartConditionalFormatting(chartType: string | null): boolean {
+    return (
+      this.isBarChartType(chartType) ||
+      this.isLineChartType(chartType) ||
+      this.isAreaChartType(chartType) ||
+      this.isScatterChartType(chartType)
+    );
+  }
+
+  /** A value-driven colour scale (visualMap) — bar + scatter for now. */
+  supportsVisualMap(chartType: string | null): boolean {
+    return this.isBarChartType(chartType) || this.isScatterChartType(chartType);
+  }
+
+  /** How many operand inputs an operator needs (0/1/2) — for template *ngIf. */
+  operandCount(op: ConditionalOperator | undefined): 0 | 1 | 2 {
+    return operandCount(op);
+  }
+
+  // ── Conditional-formatting rule CRUD ──
+
+  get conditionalRules(): ConditionalRule[] {
+    const cfg = this.focusedVisual?.config;
+    if (!cfg) return [];
+    if (!Array.isArray(cfg.conditionalFormatting)) cfg.conditionalFormatting = [];
+    return cfg.conditionalFormatting;
+  }
+
+  addConditionalRule(): void {
+    if (!this.focusedVisual?.config) return;
+    const cfg = this.focusedVisual.config;
+    const list: ConditionalRule[] = Array.isArray(cfg.conditionalFormatting)
+      ? [...cfg.conditionalFormatting]
+      : [];
+    // Table visuals default the paint surface to 'cell'; charts to 'bar'.
+    const defaultApplies = this.isTableChartType(this.focusedVisual.chartType)
+      ? 'cell'
+      : this.isScatterChartType(this.focusedVisual.chartType)
+        ? 'point'
+        : 'bar';
+    list.push({
+      id: this.genId(),
+      targetField: '',
+      operator: 'gt',
+      value: null,
+      value2: null,
+      color: '#fde68a',
+      appliesTo: defaultApplies as any,
+      dataType: 'number',
+      enabled: true,
+    });
+    cfg.conditionalFormatting = list;
+  }
+
+  removeConditionalRule(index: number): void {
+    const cfg = this.focusedVisual?.config;
+    if (!cfg || !Array.isArray(cfg.conditionalFormatting)) return;
+    const list = [...cfg.conditionalFormatting];
+    list.splice(index, 1);
+    cfg.conditionalFormatting = list;
+  }
+
+  trackByRuleId(_: number, rule: ConditionalRule): string {
+    return rule.id || String(_);
+  }
+
+  // ── Reference-line CRUD ──
+
+  get referenceLines(): any[] {
+    const cfg = this.focusedVisual?.config;
+    if (!cfg) return [];
+    if (!Array.isArray(cfg.referenceLines)) cfg.referenceLines = [];
+    return cfg.referenceLines;
+  }
+
+  addReferenceLine(): void {
+    if (!this.focusedVisual?.config) return;
+    const cfg = this.focusedVisual.config;
+    const list = Array.isArray(cfg.referenceLines) ? [...cfg.referenceLines] : [];
+    list.push({
+      id: this.genId(),
+      type: 'constant',
+      axis: 'y',
+      value: 0,
+      label: '',
+      color: '#ef4444',
+      lineStyle: 'dashed',
+      width: 1.5,
+    });
+    cfg.referenceLines = list;
+  }
+
+  removeReferenceLine(index: number): void {
+    const cfg = this.focusedVisual?.config;
+    if (!cfg || !Array.isArray(cfg.referenceLines)) return;
+    const list = [...cfg.referenceLines];
+    list.splice(index, 1);
+    cfg.referenceLines = list;
+  }
+
+  // ── Reference-band CRUD ──
+
+  get referenceBands(): any[] {
+    const cfg = this.focusedVisual?.config;
+    if (!cfg) return [];
+    if (!Array.isArray(cfg.referenceBands)) cfg.referenceBands = [];
+    return cfg.referenceBands;
+  }
+
+  addReferenceBand(): void {
+    if (!this.focusedVisual?.config) return;
+    const cfg = this.focusedVisual.config;
+    const list = Array.isArray(cfg.referenceBands) ? [...cfg.referenceBands] : [];
+    list.push({
+      id: this.genId(),
+      axis: 'y',
+      from: 0,
+      to: 0,
+      label: '',
+      color: 'rgba(239,68,68,0.10)',
+      opacity: 1,
+    });
+    cfg.referenceBands = list;
+  }
+
+  removeReferenceBand(index: number): void {
+    const cfg = this.focusedVisual?.config;
+    if (!cfg || !Array.isArray(cfg.referenceBands)) return;
+    const list = [...cfg.referenceBands];
+    list.splice(index, 1);
+    cfg.referenceBands = list;
+  }
+
+  // ── Annotation CRUD ──
+
+  get annotations(): any[] {
+    const cfg = this.focusedVisual?.config;
+    if (!cfg) return [];
+    if (!Array.isArray(cfg.annotations)) cfg.annotations = [];
+    return cfg.annotations;
+  }
+
+  addAnnotation(): void {
+    if (!this.focusedVisual?.config) return;
+    const cfg = this.focusedVisual.config;
+    const list = Array.isArray(cfg.annotations) ? [...cfg.annotations] : [];
+    list.push({
+      id: this.genId(),
+      x: '',
+      y: 0,
+      label: '',
+      color: '#f59e0b',
+    });
+    cfg.annotations = list;
+  }
+
+  removeAnnotation(index: number): void {
+    const cfg = this.focusedVisual?.config;
+    if (!cfg || !Array.isArray(cfg.annotations)) return;
+    const list = [...cfg.annotations];
+    list.splice(index, 1);
+    cfg.annotations = list;
+  }
+
+  trackByGenId(_: number, item: any): string {
+    return item?.id || String(_);
+  }
+
+  // ── Pivot config ──
+
+  /** Ensure a pivot config object exists (lazily) and return it. */
+  ensurePivot(): any {
+    const cfg = this.focusedVisual?.config;
+    if (!cfg) return {};
+    if (!cfg.pivot || typeof cfg.pivot !== 'object') {
+      cfg.pivot = {
+        enabled: false,
+        rows: [],
+        columns: [],
+        measure: '',
+        aggregation: 'sum' as PivotAggregation,
+        showRowTotals: true,
+        showColumnTotals: true,
+      };
+    }
+    if (!Array.isArray(cfg.pivot.rows)) cfg.pivot.rows = [];
+    if (!Array.isArray(cfg.pivot.columns)) cfg.pivot.columns = [];
+    return cfg.pivot;
+  }
+
+  get pivotEnabled(): boolean {
+    return this.focusedVisual?.config?.pivot?.enabled === true;
+  }
+
+  setPivotEnabled(on: boolean): void {
+    const p = this.ensurePivot();
+    p.enabled = on;
+  }
+
+  /**
+   * Set the low (index 0) or high (index 1) endpoint colour of the
+   * value-driven colour scale (ECharts visualMap). Persisted in
+   * config.visualMapColors as a two-element [low, high] tuple. Mutates
+   * config in place — the snapshot-diff watcher picks up the change and
+   * fires configChanged, matching every other setter in this editor.
+   */
+  setVisualMapColor(index: 0 | 1, color: string): void {
+    if (!this.focusedVisual?.config) return;
+    const cfg = this.focusedVisual.config;
+    const colors: string[] = Array.isArray(cfg.visualMapColors)
+      ? [...cfg.visualMapColors]
+      : [];
+    // Keep a stable two-slot tuple so the other endpoint isn't lost when
+    // only one swatch has been touched yet.
+    while (colors.length < 2) colors.push(colors.length === 0 ? '#e0f2fe' : '#0369a1');
+    colors[index] = color;
+    cfg.visualMapColors = colors;
+  }
+
+  /** Short random id for editor row identity + overlay tracking. */
+  private genId(): string {
+    return 'cf_' + Math.random().toString(36).slice(2, 10);
+  }
 }

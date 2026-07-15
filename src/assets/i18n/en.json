@@ -197,7 +197,8 @@
     "MIN": "Min",
     "MAX": "Max",
     "TRUE": "True",
-    "FALSE": "False"
+    "FALSE": "False",
+    "NO_MATCHING_RECORDS": "No matching records"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "First name is required",
@@ -876,7 +877,17 @@
     "EXPLAIN_QUERY": "Show query plan",
     "EXPLAIN_PLAN_TITLE": "Query plan",
     "EXPLAIN_RUNNING": "Asking the engine for the plan…",
-    "SEARCH_PLACEHOLDER": "Search datasets by name or description"
+    "SEARCH_PLACEHOLDER": "Search datasets by name or description",
+    "CACHE": {
+      "LABEL": "Result caching",
+      "HINT": "Cache query results and reuse them within the time-to-live to speed up repeat runs.",
+      "ON": "On",
+      "OFF": "Off",
+      "TTL_LABEL": "Cache duration",
+      "TTL_PLACEHOLDER": "e.g. 300",
+      "SECONDS": "seconds",
+      "TTL_HINT": "How long cached results stay fresh before the query re-runs."
+    }
   },
   "ANALYSES": {
     "TITLE": "Analyses",
@@ -1392,7 +1403,68 @@
     "DETECTED_TYPE_NUMBER": "Detected a numeric column — numeric controls are suggested.",
     "DETECTED_TYPE_DATE": "Detected a date/time column — date controls are suggested.",
     "DETECTED_TYPE_BOOLEAN": "Detected a boolean column — a value list is suggested.",
-    "DETECTED_TYPE_STRING": "Detected a text column — value dropdowns are suggested."
+    "DETECTED_TYPE_STRING": "Detected a text column — value dropdowns are suggested.",
+    "CF": {
+      "TITLE": "Conditional formatting",
+      "HINT": "Color data points or table cells when a value meets a condition.",
+      "RULE": "Rule",
+      "ADD_RULE": "Add rule",
+      "TARGET_FIELD": "Field",
+      "TARGET_FIELD_PH": "Choose a field",
+      "DATA_TYPE": "Type",
+      "OPERATOR": "Condition",
+      "VALUE": "Value",
+      "VALUE_PH": "Enter a value",
+      "COLOR": "Color",
+      "APPLIES_TO": "Applies to"
+    },
+    "PIVOT": {
+      "TITLE": "Pivot / crosstab",
+      "ENABLE": "Enable pivot mode",
+      "ROWS": "Rows",
+      "ROWS_PH": "Fields to group as rows",
+      "COLUMNS": "Columns",
+      "COLUMNS_PH": "Fields to spread across columns",
+      "MEASURE": "Measure",
+      "MEASURE_PH": "Value field to aggregate",
+      "AGGREGATION": "Aggregation",
+      "ROW_TOTALS": "Row totals",
+      "COLUMN_TOTALS": "Column totals"
+    },
+    "REFLINE": {
+      "TITLE": "Reference lines & annotations",
+      "LINE": "Reference line",
+      "LINES": "Reference lines",
+      "ADD_LINE": "Add line",
+      "BAND": "Reference band",
+      "BANDS": "Reference bands",
+      "ADD_BAND": "Add band",
+      "ANNOTATION": "Annotation",
+      "ANNOTATIONS": "Annotations",
+      "ADD_ANNOTATION": "Add annotation",
+      "TYPE_LABEL": "Type",
+      "VALUE": "Value",
+      "LABEL": "Label",
+      "LABEL_PH": "Optional label",
+      "COLOR": "Color",
+      "STYLE": "Style",
+      "AXIS_LABEL": "Axis",
+      "FROM": "From",
+      "TO": "To",
+      "ANNO_X": "X position",
+      "ANNO_X_PH": "Category or X value",
+      "ANNO_Y": "Y value"
+    },
+    "COLORSCALE": {
+      "TITLE": "Color scale",
+      "ENABLE": "Color by value",
+      "SHOW": "Show legend",
+      "TYPE": "Scale type",
+      "MIN": "Min",
+      "MAX": "Max",
+      "LOW_COLOR": "Low color",
+      "HIGH_COLOR": "High color"
+    }
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",

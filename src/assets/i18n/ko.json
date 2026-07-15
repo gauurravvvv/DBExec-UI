@@ -197,7 +197,8 @@
     "MIN": "최소",
     "MAX": "최대",
     "TRUE": "참",
-    "FALSE": "거짓"
+    "FALSE": "거짓",
+    "NO_MATCHING_RECORDS": "일치하는 레코드 없음"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "이름은 필수 항목입니다",
@@ -872,7 +873,17 @@
     "EXPLAIN_RUNNING": "엔진에 실행 계획 요청 중…",
     "SEARCH_PLACEHOLDER": "이름 또는 설명으로 데이터셋 검색",
     "RUN": "실행",
-    "QUERY_TIMEOUT": "쿼리가 너무 오래 걸려 취소되었습니다. 결과 집합을 좁히거나 오래 실행 중인 쿼리를 데이터베이스에서 확인하세요."
+    "QUERY_TIMEOUT": "쿼리가 너무 오래 걸려 취소되었습니다. 결과 집합을 좁히거나 오래 실행 중인 쿼리를 데이터베이스에서 확인하세요.",
+    "CACHE": {
+      "LABEL": "결과 캐싱",
+      "HINT": "쿼리 결과를 캐시하고 유효 시간 내에 재사용하여 반복 실행 속도를 높입니다.",
+      "ON": "켜기",
+      "OFF": "끄기",
+      "TTL_LABEL": "캐시 지속 시간",
+      "TTL_PLACEHOLDER": "e.g. 300",
+      "SECONDS": "초",
+      "TTL_HINT": "쿼리가 다시 실행되기 전 캐시된 결과가 유효한 시간."
+    }
   },
   "ANALYSES": {
     "TITLE": "분석",
@@ -1389,7 +1400,68 @@
     "DETECTED_TYPE_NUMBER": "숫자 열이 감지되었습니다 — 숫자 컨트롤이 제안됩니다.",
     "DETECTED_TYPE_DATE": "날짜/시간 열이 감지되었습니다 — 날짜 컨트롤이 제안됩니다.",
     "DETECTED_TYPE_BOOLEAN": "부울 열이 감지되었습니다 — 값 목록이 제안됩니다.",
-    "DETECTED_TYPE_STRING": "텍스트 열이 감지되었습니다 — 값 드롭다운이 제안됩니다."
+    "DETECTED_TYPE_STRING": "텍스트 열이 감지되었습니다 — 값 드롭다운이 제안됩니다.",
+    "CF": {
+      "TITLE": "조건부 서식",
+      "HINT": "값이 조건을 충족하면 데이터 포인트 또는 표 셀에 색을 적용합니다.",
+      "RULE": "규칙",
+      "ADD_RULE": "규칙 추가",
+      "TARGET_FIELD": "필드",
+      "TARGET_FIELD_PH": "필드 선택",
+      "DATA_TYPE": "유형",
+      "OPERATOR": "조건",
+      "VALUE": "값",
+      "VALUE_PH": "값 입력",
+      "COLOR": "색상",
+      "APPLIES_TO": "적용 대상"
+    },
+    "PIVOT": {
+      "TITLE": "피벗 / 교차 분석",
+      "ENABLE": "피벗 모드 사용",
+      "ROWS": "행",
+      "ROWS_PH": "행으로 그룹화할 필드",
+      "COLUMNS": "열",
+      "COLUMNS_PH": "열로 분산할 필드",
+      "MEASURE": "측정값",
+      "MEASURE_PH": "집계할 값 필드",
+      "AGGREGATION": "집계",
+      "ROW_TOTALS": "행 합계",
+      "COLUMN_TOTALS": "열 합계"
+    },
+    "REFLINE": {
+      "TITLE": "참조선 및 주석",
+      "LINE": "참조선",
+      "LINES": "참조선",
+      "ADD_LINE": "선 추가",
+      "BAND": "참조 범위",
+      "BANDS": "참조 범위",
+      "ADD_BAND": "범위 추가",
+      "ANNOTATION": "주석",
+      "ANNOTATIONS": "주석",
+      "ADD_ANNOTATION": "주석 추가",
+      "TYPE_LABEL": "유형",
+      "VALUE": "값",
+      "LABEL": "레이블",
+      "LABEL_PH": "선택적 레이블",
+      "COLOR": "색상",
+      "STYLE": "스타일",
+      "AXIS_LABEL": "축",
+      "FROM": "시작",
+      "TO": "끝",
+      "ANNO_X": "X 위치",
+      "ANNO_X_PH": "카테고리 또는 X 값",
+      "ANNO_Y": "Y 값"
+    },
+    "COLORSCALE": {
+      "TITLE": "색상 척도",
+      "ENABLE": "값으로 색상 지정",
+      "SHOW": "범례 표시",
+      "TYPE": "척도 유형",
+      "MIN": "최솟값",
+      "MAX": "최댓값",
+      "LOW_COLOR": "낮은 값 색상",
+      "HIGH_COLOR": "높은 값 색상"
+    }
   },
   "DASHBOARD": {
     "TITLE": "대시보드",

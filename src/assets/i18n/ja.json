@@ -197,7 +197,8 @@
     "MIN": "最小",
     "MAX": "最大",
     "TRUE": "真",
-    "FALSE": "偽"
+    "FALSE": "偽",
+    "NO_MATCHING_RECORDS": "一致するレコードはありません"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名は必須です",
@@ -872,7 +873,17 @@
     "EXPLAIN_RUNNING": "エンジンに実行計画を問い合わせ中…",
     "SEARCH_PLACEHOLDER": "名前または説明でデータセットを検索",
     "RUN": "実行",
-    "QUERY_TIMEOUT": "クエリの実行時間が長すぎてキャンセルされました。結果セットを絞り込むか、長時間実行中のクエリをデータベースで確認してください。"
+    "QUERY_TIMEOUT": "クエリの実行時間が長すぎてキャンセルされました。結果セットを絞り込むか、長時間実行中のクエリをデータベースで確認してください。",
+    "CACHE": {
+      "LABEL": "結果キャッシュ",
+      "HINT": "クエリ結果をキャッシュし、有効期限内に再利用することで繰り返し実行を高速化します。",
+      "ON": "オン",
+      "OFF": "オフ",
+      "TTL_LABEL": "キャッシュ期間",
+      "TTL_PLACEHOLDER": "e.g. 300",
+      "SECONDS": "秒",
+      "TTL_HINT": "キャッシュされた結果がクエリを再実行するまで有効な時間。"
+    }
   },
   "ANALYSES": {
     "TITLE": "分析",
@@ -1389,7 +1400,68 @@
     "DETECTED_TYPE_NUMBER": "数値列を検出しました — 数値コントロールが提案されます。",
     "DETECTED_TYPE_DATE": "日付/時刻列を検出しました — 日付コントロールが提案されます。",
     "DETECTED_TYPE_BOOLEAN": "ブール列を検出しました — 値リストが提案されます。",
-    "DETECTED_TYPE_STRING": "テキスト列を検出しました — 値ドロップダウンが提案されます。"
+    "DETECTED_TYPE_STRING": "テキスト列を検出しました — 値ドロップダウンが提案されます。",
+    "CF": {
+      "TITLE": "条件付き書式",
+      "HINT": "値が条件を満たすとき、データポイントまたは表のセルに色を付けます。",
+      "RULE": "ルール",
+      "ADD_RULE": "ルールを追加",
+      "TARGET_FIELD": "フィールド",
+      "TARGET_FIELD_PH": "フィールドを選択",
+      "DATA_TYPE": "型",
+      "OPERATOR": "条件",
+      "VALUE": "値",
+      "VALUE_PH": "値を入力",
+      "COLOR": "色",
+      "APPLIES_TO": "適用対象"
+    },
+    "PIVOT": {
+      "TITLE": "ピボット / クロス集計",
+      "ENABLE": "ピボットモードを有効化",
+      "ROWS": "行",
+      "ROWS_PH": "行としてグループ化するフィールド",
+      "COLUMNS": "列",
+      "COLUMNS_PH": "列に展開するフィールド",
+      "MEASURE": "メジャー",
+      "MEASURE_PH": "集計する値フィールド",
+      "AGGREGATION": "集計方法",
+      "ROW_TOTALS": "行の合計",
+      "COLUMN_TOTALS": "列の合計"
+    },
+    "REFLINE": {
+      "TITLE": "参照線とアノテーション",
+      "LINE": "参照線",
+      "LINES": "参照線",
+      "ADD_LINE": "線を追加",
+      "BAND": "参照帯",
+      "BANDS": "参照帯",
+      "ADD_BAND": "帯を追加",
+      "ANNOTATION": "アノテーション",
+      "ANNOTATIONS": "アノテーション",
+      "ADD_ANNOTATION": "アノテーションを追加",
+      "TYPE_LABEL": "種類",
+      "VALUE": "値",
+      "LABEL": "ラベル",
+      "LABEL_PH": "任意のラベル",
+      "COLOR": "色",
+      "STYLE": "スタイル",
+      "AXIS_LABEL": "軸",
+      "FROM": "開始",
+      "TO": "終了",
+      "ANNO_X": "X位置",
+      "ANNO_X_PH": "カテゴリまたはX値",
+      "ANNO_Y": "Y値"
+    },
+    "COLORSCALE": {
+      "TITLE": "カラースケール",
+      "ENABLE": "値で色分け",
+      "SHOW": "凡例を表示",
+      "TYPE": "スケールの種類",
+      "MIN": "最小",
+      "MAX": "最大",
+      "LOW_COLOR": "低値の色",
+      "HIGH_COLOR": "高値の色"
+    }
   },
   "DASHBOARD": {
     "TITLE": "ダッシュボード",

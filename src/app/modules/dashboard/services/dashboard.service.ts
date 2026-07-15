@@ -196,6 +196,9 @@ export class DashboardService {
     dashboardId: string;
     filters?: any[];
     limit?: number;
+    // Force a live re-run + cache re-store, bypassing any fresh cached
+    // entry (wired to the "refresh cached data" action).
+    refresh?: boolean;
   }): Promise<any> {
     // POST /dashboards/:id/run
     return lastValueFrom(
