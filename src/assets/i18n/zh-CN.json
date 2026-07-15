@@ -192,7 +192,12 @@
     "EXPORT": "导出",
     "NO_RECORDS": "未找到记录",
     "SHOWING_OF": "显示 {{shown}} / {{total}}",
-    "GROUP": "组"
+    "GROUP": "组",
+    "AND": "和",
+    "MIN": "最小",
+    "MAX": "最大",
+    "TRUE": "真",
+    "FALSE": "假"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名字为必填项",
@@ -493,7 +498,11 @@
     "DB_SCHEMA_LOCKED": "模式在创建时设置，无法更改。",
     "SCHEMA_NOT_EMPTY": "指定的架构中已包含对象。请选择一个空架构或使用新名称。",
     "NOT_TESTED_HINT": "保存前请测试连接",
-    "SEARCH_PLACEHOLDER": "按名称搜索组织"
+    "SEARCH_PLACEHOLDER": "按名称搜索组织",
+    "EDIT_DB_WARNING_TITLE": "主数据库更改",
+    "EDIT_DB_WARNING_BODY_1": "更改这些凭据会影响该组织的所有用户。保存后，身份验证、仪表板和查询将切换到新连接。",
+    "EDIT_DB_WARNING_BODY_2": "如果更改架构，平台表格将在新架构中创建。旧架构中的表格将保留在您的数据库中，但 DBExec 将不再使用它们。",
+    "EDIT_DB_WARNING_BODY_3": "连接详情（主机、端口、数据库、架构或用户名）不能在未同时提供当前或新密码的情况下更改。"
   },
   "ROLE": {
     "TITLE": "角色",
@@ -586,7 +595,41 @@
     "CANNOT_DELETE_SELF": "您不能删除自己",
     "CANNOT_UNLOCK_DEFAULT": "默认用户无法从此处解锁",
     "CANNOT_UNLOCK_SELF": "您不能从此处解锁自己的账户",
-    "SEARCH_PLACEHOLDER": "按用户名、姓名或邮箱搜索"
+    "SEARCH_PLACEHOLDER": "按用户名、姓名或邮箱搜索",
+    "BULK_ADD_BTN": "批量添加",
+    "BULK_ADD_TITLE": "批量添加用户",
+    "BULK_ADD_INTRO": "上传 CSV 文件以一次性创建多个用户。我们将先验证文件，并在创建前让您查看问题。",
+    "BULK_ADD_NEED_TEMPLATE": "需要一个起点吗？",
+    "BULK_ADD_TEMPLATE_HINT": "下载示例 CSV 并填写您的用户信息。",
+    "BULK_ADD_DOWNLOAD_TEMPLATE": "下载模板",
+    "BULK_ADD_CSV_FILE": "CSV 文件",
+    "BULK_ADD_FILE_REQUIRED": "请选择一个 CSV 文件",
+    "BULK_ADD_TOTAL_ROWS": "总行数",
+    "BULK_ADD_VALID": "有效",
+    "BULK_ADD_INVALID": "无效",
+    "BULK_ADD_BACK": "返回",
+    "BULK_ADD_ADD_MORE": "添加更多用户",
+    "BULK_ADD_BACK_TO_USERS": "返回用户列表",
+    "BULK_ADD_PICK_FILE": "未选择文件",
+    "BULK_ADD_BROWSE": "浏览",
+    "BULK_ADD_PICK_ORG_FIRST": "请先选择组织",
+    "BULK_ADD_LIMIT_HINT": "每次上传最多 500 个用户，最大文件大小 5 MB。",
+    "BULK_ADD_GROUP_HINT": "在 groupNames 列中使用竖线分隔的名称，例如 Marketing|Analytics。",
+    "BULK_ADD_VALIDATE_BTN": "验证",
+    "BULK_ADD_VALIDATING": "正在验证 CSV…",
+    "BULK_ADD_CREATING": "正在创建用户…",
+    "BULK_ADD_CANNOT_CREATE": "个用户无法创建",
+    "BULK_ADD_READY_TO_CREATE": "个用户有效，可以创建",
+    "BULK_ADD_INVALID_ROWS": "发现问题",
+    "BULK_ADD_DOWNLOAD_INVALID": "下载无效行",
+    "BULK_ADD_ROW": "行",
+    "BULK_ADD_REASON": "原因",
+    "BULK_ADD_PROCEED_PROMPT": "是否仅使用有效用户继续？",
+    "BULK_ADD_NO_VALID_ROWS": "没有可创建的有效行。请修复以上问题后重新上传。",
+    "BULK_ADD_PROCEED": "继续",
+    "BULK_ADD_CREATED_SUCCESS": "个用户创建成功",
+    "BULK_ADD_CREATED_FAILED": "个用户创建失败",
+    "BULK_ADD_RACE_FAILURES": "创建过程中的失败"
   },
   "DATASOURCE": {
     "TITLE": "数据源",
@@ -639,7 +682,15 @@
     "HEALTH_TESTING": "测试中…",
     "HEALTH_NEVER_TESTED": "从未测试",
     "TESTED": "已测试",
-    "SEARCH_PLACEHOLDER": "按名称搜索数据源"
+    "SEARCH_PLACEHOLDER": "按名称搜索数据源",
+    "ACCOUNT": "账户",
+    "WAREHOUSE": "Warehouse",
+    "ROLE": "角色",
+    "DEFAULT_PORT": "默认端口",
+    "ENTER_ACCOUNT": "例如 xy12345.us-east-1.aws",
+    "ENTER_WAREHOUSE": "例如 COMPUTE_WH",
+    "ENTER_ROLE": "可选 — 例如 ANALYST",
+    "ENTER_SCHEMA": "可选 — 例如 PUBLIC"
   },
   "DATASET": {
     "TITLE": "数据集",
@@ -819,7 +870,9 @@
     "EXPLAIN_QUERY": "显示查询计划",
     "EXPLAIN_PLAN_TITLE": "查询计划",
     "EXPLAIN_RUNNING": "正在向引擎请求计划…",
-    "SEARCH_PLACEHOLDER": "按名称或描述搜索数据集"
+    "SEARCH_PLACEHOLDER": "按名称或描述搜索数据集",
+    "RUN": "运行",
+    "QUERY_TIMEOUT": "查询耗时过长已被取消。请尝试缩小结果集，或检查数据库中是否存在长时间运行的查询。"
   },
   "ANALYSES": {
     "TITLE": "分析",
@@ -1311,7 +1364,32 @@
     "A11Y_BUILD_PANELS": "构建面板",
     "ADD_COLUMN": "添加列",
     "ASSIGN_AXES_HINT": "分配轴以渲染此图表",
-    "SEARCH_PLACEHOLDER": "按名称或描述搜索分析"
+    "SEARCH_PLACEHOLDER": "按名称或描述搜索分析",
+    "ENCODING_MEASURE": "度量",
+    "ENCODING_DIMENSION": "维度",
+    "ENCODING_MISMATCH_TITLE": "字段类型不匹配",
+    "ENCODING_MISMATCH_DETAIL": "\"{{field}}\" 不适合此槽位 — 此处需要 {{kind}}。",
+    "ENCODING_MISMATCH_HINT": "此字段的类型与所选角色不匹配。",
+    "INTERACTIONS": "交互",
+    "CROSSFILTER_ENABLE": "点击时交叉筛选",
+    "CROSSFILTER_HINT": "启用后，点击此视觉对象中的数据点将筛选此分析中的其他视觉对象。",
+    "CROSSFILTER_ON": "交叉筛选已启用 — 点击数据点以筛选其他图表",
+    "CROSSFILTER_OFF": "启用交叉筛选",
+    "DRILL_DIMENSIONS": "下钻路径",
+    "DRILL_PICK_DIMENSIONS": "选择要下钻的维度",
+    "DRILL_HINT": "有序的下钻维度。点击类别向下钻取；使用面包屑导航返回上级。",
+    "DRILL_ALL": "全部",
+    "INTERACTION_CLEAR": "清除",
+    "INTERACTION_CLEAR_TOOLTIP": "清除所有交叉筛选并重置下钻路径",
+    "PARAMETERS": "参数",
+    "PARAM_REQUIRED": "必填",
+    "PARAM_APPLY_TOOLTIP": "应用参数值并重新运行",
+    "PARAM_FILL_REQUIRED": "请先填写所有必填参数",
+    "PARAM_RESET_TOOLTIP": "将参数重置为默认值",
+    "DETECTED_TYPE_NUMBER": "检测到数值列 — 建议使用数值控件。",
+    "DETECTED_TYPE_DATE": "检测到日期/时间列 — 建议使用日期控件。",
+    "DETECTED_TYPE_BOOLEAN": "检测到布尔列 — 建议使用值列表。",
+    "DETECTED_TYPE_STRING": "检测到文本列 — 建议使用值下拉菜单。"
   },
   "DASHBOARD": {
     "TITLE": "仪表盘",
@@ -1356,7 +1434,14 @@
     "PUBLISH_FAILED": "无法发布仪表板",
     "PUBLISH_NO_VISUALS_HINT": "发布前至少添加一个可视化元素。",
     "PUBLISH_UNSAVED_HINT": "请先保存分析，然后再发布。",
-    "SEARCH_PLACEHOLDER": "按名称或描述搜索仪表板"
+    "SEARCH_PLACEHOLDER": "按名称或描述搜索仪表板",
+    "PUBLISHED_FROM_DATASET": "从 {{dataset}} 发布",
+    "SNAPSHOT_VERSION": "快照 v{{version}}",
+    "FIELDS_MISSING_BANNER": "此仪表板引用的 {{count}} 个字段在数据集中已不存在（{{refs}} 处受影响）。",
+    "FIELDS_MISSING_HELP": "仪表板布局在发布时已保存为快照，但数据集自那时起已发生变化。请从源分析重新发布，或联系仪表板所有者。",
+    "WARNING_SCOPE_VISUAL": "可视化",
+    "WARNING_SCOPE_FILTER": "筛选器",
+    "WARNING_SCOPE_FIELD": "字段"
   },
   "TOAST": {
     "SUCCESS": "成功",
@@ -1391,7 +1476,12 @@
     "RESET_PASSWORD": "重置密码",
     "SET_PASSWORD": "设置密码",
     "NOT_FOUND": "页面未找到",
-    "RELAY": "正在登录"
+    "RELAY": "正在登录",
+    "DB_ACCESS": "数据库访问",
+    "DB_USERS": "数据库用户",
+    "DB_ROLES": "数据库用户与角色",
+    "DB_PRIVILEGES": "权限与访问",
+    "QUERY_RUNNER": "查询运行器"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "提升您的数据源\n管理体验",
@@ -1972,7 +2062,28 @@
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
     "ORGANISATION_REQUIRED": "Organisation is required",
-    "SEARCH_PLACEHOLDER": "按名称搜索规则"
+    "SEARCH_PLACEHOLDER": "按名称搜索规则",
+    "MASKED_COLUMN_COUNT": "{{count}} 个掩码列",
+    "SECURITY_TYPE": "安全类型",
+    "SECURITY_TYPE_ROW": "行级安全",
+    "SECURITY_TYPE_COLUMN": "列级安全",
+    "SECURITY_TYPE_ROW_HINT": "限制已分配用户或组可以查看的行。条件以 AND 逻辑合并。",
+    "SECURITY_TYPE_COLUMN_HINT": "对已分配的用户或组隐藏或屏蔽特定列。行仍然可见，但受保护的值不可见。",
+    "MASKED_COLUMNS": "掩码列",
+    "MASKED_COLUMNS_HINT": "选择要保护的列以及在查询结果中如何屏蔽每列。",
+    "ADD_MASKED_COLUMN": "添加掩码列",
+    "REMOVE_MASKED_COLUMN": "删除掩码列",
+    "NO_MASKED_COLUMNS": "未定义掩码列",
+    "MASK_STRATEGY": "策略",
+    "MASK_HIDE": "隐藏列",
+    "MASK_NULL": "空值（null）",
+    "MASK_REDACT": "编辑值",
+    "MASK_VALUE": "掩码值",
+    "MASK_VALUE_PLACEHOLDER": "替代显示的值（例如 ***）",
+    "ASSIGNMENTS_HINT": "添加此规则适用的用户或组。",
+    "SELECT_TARGET": "选择用户或组",
+    "TARGET_REQUIRED": "需要用户或组",
+    "COLUMN_SECURITY": "列级安全"
   },
   "THEME": {
     "PAGE_TITLE": "主题",
@@ -3065,7 +3176,24 @@
           "invalid": "无效的运算符"
         },
         "values": {
-          "atLeastOne": "至少需要一个值"
+          "atLeastOne": "至少需要一个值",
+          "betweenExactlyTwo": "BETWEEN 需要恰好两个值",
+          "betweenNumeric": "BETWEEN 的值必须为数值",
+          "equalsExactlyOne": "EQUALS 需要恰好一个值；多个值请使用 IN"
+        },
+        "securityType": {
+          "invalid": "安全类型必须为行或列"
+        },
+        "conditions": {
+          "atLeastOne": "至少需要一个筛选条件"
+        },
+        "assignments": {
+          "atLeastOne": "至少需要一个用户或组分配"
+        },
+        "mask": {
+          "atLeastOne": "至少需要一个掩码列",
+          "strategyInvalid": "掩码策略必须为隐藏、null 或编辑",
+          "maskValueTooLong": "掩码值不得超过 50 个字符"
         }
       },
       "dashboard": {

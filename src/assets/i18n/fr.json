@@ -192,7 +192,12 @@
     "EXPORT": "Exporter",
     "NO_RECORDS": "Aucun enregistrement trouvé",
     "SHOWING_OF": "Affichage de {{shown}} sur {{total}}",
-    "GROUP": "Groupe"
+    "GROUP": "Groupe",
+    "AND": "et",
+    "MIN": "Min",
+    "MAX": "Max",
+    "TRUE": "Vrai",
+    "FALSE": "Faux"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Le prénom est requis",
@@ -493,7 +498,11 @@
     "DB_SCHEMA_LOCKED": "Le schéma est défini à la création et ne peut pas être modifié.",
     "SCHEMA_NOT_EMPTY": "Le schéma indiqué contient déjà des objets. Choisissez un schéma vide ou un nouveau nom.",
     "NOT_TESTED_HINT": "Tester la connexion avant d'enregistrer",
-    "SEARCH_PLACEHOLDER": "Rechercher des organisations par nom"
+    "SEARCH_PLACEHOLDER": "Rechercher des organisations par nom",
+    "EDIT_DB_WARNING_TITLE": "Modifications de la base de données maître",
+    "EDIT_DB_WARNING_BODY_1": "La modification de ces identifiants affecte tous les utilisateurs de cette organisation. L'authentification, les tableaux de bord et les requêtes seront redirigés vers la nouvelle connexion lors de l'enregistrement.",
+    "EDIT_DB_WARNING_BODY_2": "Si vous modifiez le schéma, les tables de la plateforme seront créées dans le nouveau schéma. Les tables de l'ancien schéma resteront intactes dans votre base de données, mais ne seront plus utilisées par DBExec.",
+    "EDIT_DB_WARNING_BODY_3": "Les détails de connexion (hôte, port, base de données, schéma ou nom d'utilisateur) ne peuvent pas être modifiés sans fournir également le mot de passe actuel ou le nouveau."
   },
   "ROLE": {
     "TITLE": "Rôles",
@@ -586,7 +595,41 @@
     "CANNOT_DELETE_SELF": "Vous ne pouvez pas vous supprimer vous-même",
     "CANNOT_UNLOCK_DEFAULT": "L'utilisateur par défaut ne peut pas être déverrouillé depuis cet écran",
     "CANNOT_UNLOCK_SELF": "Vous ne pouvez pas déverrouiller votre propre compte depuis cet écran",
-    "SEARCH_PLACEHOLDER": "Rechercher par identifiant, nom ou e-mail"
+    "SEARCH_PLACEHOLDER": "Rechercher par identifiant, nom ou e-mail",
+    "BULK_ADD_BTN": "Ajout en masse",
+    "BULK_ADD_TITLE": "Ajouter des utilisateurs en masse",
+    "BULK_ADD_INTRO": "Importez un CSV pour créer plusieurs utilisateurs à la fois. Nous validerons le fichier en premier et vous permettrons de vérifier les problèmes avant toute création.",
+    "BULK_ADD_NEED_TEMPLATE": "Besoin d'un point de départ ?",
+    "BULK_ADD_TEMPLATE_HINT": "Téléchargez le CSV d'exemple et renseignez vos utilisateurs.",
+    "BULK_ADD_DOWNLOAD_TEMPLATE": "Télécharger le modèle",
+    "BULK_ADD_CSV_FILE": "Fichier CSV",
+    "BULK_ADD_FILE_REQUIRED": "Veuillez choisir un fichier CSV",
+    "BULK_ADD_TOTAL_ROWS": "Total des lignes",
+    "BULK_ADD_VALID": "Valide",
+    "BULK_ADD_INVALID": "Non valide",
+    "BULK_ADD_BACK": "Retour",
+    "BULK_ADD_ADD_MORE": "Ajouter d'autres utilisateurs",
+    "BULK_ADD_BACK_TO_USERS": "Retour aux utilisateurs",
+    "BULK_ADD_PICK_FILE": "Aucun fichier sélectionné",
+    "BULK_ADD_BROWSE": "Parcourir",
+    "BULK_ADD_PICK_ORG_FIRST": "Sélectionnez d'abord une organisation",
+    "BULK_ADD_LIMIT_HINT": "Jusqu'à 500 utilisateurs par import. Taille maximale du fichier 5 MB.",
+    "BULK_ADD_GROUP_HINT": "Utilisez la colonne groupNames avec des noms séparés par des barres verticales, ex. Marketing|Analytics.",
+    "BULK_ADD_VALIDATE_BTN": "Valider",
+    "BULK_ADD_VALIDATING": "Validation du CSV…",
+    "BULK_ADD_CREATING": "Création des utilisateurs…",
+    "BULK_ADD_CANNOT_CREATE": "utilisateurs ne peuvent pas être créés",
+    "BULK_ADD_READY_TO_CREATE": "utilisateurs sont valides et prêts à être créés",
+    "BULK_ADD_INVALID_ROWS": "Problèmes détectés",
+    "BULK_ADD_DOWNLOAD_INVALID": "Télécharger les lignes invalides",
+    "BULK_ADD_ROW": "Ligne",
+    "BULK_ADD_REASON": "Raison",
+    "BULK_ADD_PROCEED_PROMPT": "Voulez-vous continuer uniquement avec les utilisateurs valides ?",
+    "BULK_ADD_NO_VALID_ROWS": "Aucune ligne valide à créer. Corrigez les problèmes ci-dessus et réimportez.",
+    "BULK_ADD_PROCEED": "Continuer",
+    "BULK_ADD_CREATED_SUCCESS": "utilisateurs créés avec succès",
+    "BULK_ADD_CREATED_FAILED": "utilisateurs n'ont pas pu être créés",
+    "BULK_ADD_RACE_FAILURES": "Échecs lors de la création"
   },
   "DATASOURCE": {
     "TITLE": "Sources de données",
@@ -639,7 +682,15 @@
     "HEALTH_TESTING": "Test en cours…",
     "HEALTH_NEVER_TESTED": "Jamais testé",
     "TESTED": "testé",
-    "SEARCH_PLACEHOLDER": "Rechercher des sources de données par nom"
+    "SEARCH_PLACEHOLDER": "Rechercher des sources de données par nom",
+    "ACCOUNT": "Compte",
+    "WAREHOUSE": "Warehouse",
+    "ROLE": "Rôle",
+    "DEFAULT_PORT": "Port par défaut",
+    "ENTER_ACCOUNT": "ex. xy12345.us-east-1.aws",
+    "ENTER_WAREHOUSE": "ex. COMPUTE_WH",
+    "ENTER_ROLE": "Optionnel — ex. ANALYST",
+    "ENTER_SCHEMA": "Optionnel — ex. PUBLIC"
   },
   "DATASET": {
     "TITLE": "Jeux de données",
@@ -819,7 +870,9 @@
     "EXPLAIN_QUERY": "Afficher le plan de la requête",
     "EXPLAIN_PLAN_TITLE": "Plan de la requête",
     "EXPLAIN_RUNNING": "Demande du plan au moteur…",
-    "SEARCH_PLACEHOLDER": "Rechercher des jeux de données par nom ou description"
+    "SEARCH_PLACEHOLDER": "Rechercher des jeux de données par nom ou description",
+    "RUN": "Exécuter",
+    "QUERY_TIMEOUT": "La requête a pris trop de temps et a été annulée. Essayez de restreindre l'ensemble de résultats ou vérifiez la base de données pour les requêtes longues."
   },
   "ANALYSES": {
     "TITLE": "Analyses",
@@ -1311,7 +1364,32 @@
     "A11Y_BUILD_PANELS": "Panneaux de construction",
     "ADD_COLUMN": "Ajouter une colonne",
     "ASSIGN_AXES_HINT": "Affectez les axes pour afficher ce graphique",
-    "SEARCH_PLACEHOLDER": "Rechercher des analyses par nom ou description"
+    "SEARCH_PLACEHOLDER": "Rechercher des analyses par nom ou description",
+    "ENCODING_MEASURE": "mesure",
+    "ENCODING_DIMENSION": "dimension",
+    "ENCODING_MISMATCH_TITLE": "Type de champ incompatible",
+    "ENCODING_MISMATCH_DETAIL": "\"{{field}}\" ne convient pas à ce slot — il attend une {{kind}}.",
+    "ENCODING_MISMATCH_HINT": "Le type de ce champ ne correspond pas au rôle sélectionné.",
+    "INTERACTIONS": "Interactions",
+    "CROSSFILTER_ENABLE": "Filtre croisé au clic",
+    "CROSSFILTER_HINT": "Lorsqu'activé, cliquer sur un point de données dans ce visuel filtre les autres visuels de cette analyse.",
+    "CROSSFILTER_ON": "Filtre croisé actif — cliquez sur un point pour filtrer",
+    "CROSSFILTER_OFF": "Activer le filtre croisé",
+    "DRILL_DIMENSIONS": "Chemin d'exploration",
+    "DRILL_PICK_DIMENSIONS": "Choisir les dimensions à explorer",
+    "DRILL_HINT": "Dimensions ordonnées à parcourir. Cliquez sur une catégorie pour descendre ; utilisez le fil d'Ariane pour remonter.",
+    "DRILL_ALL": "Tout",
+    "INTERACTION_CLEAR": "Effacer",
+    "INTERACTION_CLEAR_TOOLTIP": "Effacer tous les filtres croisés et réinitialiser le chemin d'exploration",
+    "PARAMETERS": "Paramètres",
+    "PARAM_REQUIRED": "Obligatoire",
+    "PARAM_APPLY_TOOLTIP": "Appliquer les valeurs des paramètres et relancer",
+    "PARAM_FILL_REQUIRED": "Remplissez d'abord tous les paramètres obligatoires",
+    "PARAM_RESET_TOOLTIP": "Réinitialiser les paramètres à leurs valeurs par défaut",
+    "DETECTED_TYPE_NUMBER": "Colonne numérique détectée — des contrôles numériques sont suggérés.",
+    "DETECTED_TYPE_DATE": "Colonne date/heure détectée — des contrôles de date sont suggérés.",
+    "DETECTED_TYPE_BOOLEAN": "Colonne booléenne détectée — une liste de valeurs est suggérée.",
+    "DETECTED_TYPE_STRING": "Colonne texte détectée — des listes déroulantes de valeurs sont suggérées."
   },
   "DASHBOARD": {
     "TITLE": "Tableaux de bord",
@@ -1356,7 +1434,14 @@
     "PUBLISH_FAILED": "Impossible de publier le tableau de bord",
     "PUBLISH_NO_VISUALS_HINT": "Ajoutez au moins une visualisation avant de publier.",
     "PUBLISH_UNSAVED_HINT": "Enregistrez d'abord l'analyse, puis publiez.",
-    "SEARCH_PLACEHOLDER": "Rechercher des tableaux de bord par nom ou description"
+    "SEARCH_PLACEHOLDER": "Rechercher des tableaux de bord par nom ou description",
+    "PUBLISHED_FROM_DATASET": "Publié depuis {{dataset}}",
+    "SNAPSHOT_VERSION": "instantané v{{version}}",
+    "FIELDS_MISSING_BANNER": "{{count}} champ(s) référencé(s) par ce tableau de bord ne sont plus dans le jeu de données ({{refs}} emplacement(s) affecté(s)).",
+    "FIELDS_MISSING_HELP": "La disposition du tableau de bord a été sauvegardée en instantané à la publication, mais le jeu de données a changé depuis. Republiez depuis l'analyse source ou contactez le propriétaire du tableau de bord.",
+    "WARNING_SCOPE_VISUAL": "Visuel",
+    "WARNING_SCOPE_FILTER": "Filtre",
+    "WARNING_SCOPE_FIELD": "Champ"
   },
   "TOAST": {
     "SUCCESS": "Succès",
@@ -1391,7 +1476,12 @@
     "RESET_PASSWORD": "Réinitialiser le mot de passe",
     "SET_PASSWORD": "Définir le mot de passe",
     "NOT_FOUND": "Page introuvable",
-    "RELAY": "Connexion"
+    "RELAY": "Connexion",
+    "DB_ACCESS": "Accès à la base de données",
+    "DB_USERS": "Utilisateurs de la base de données",
+    "DB_ROLES": "Utilisateurs et rôles de la base de données",
+    "DB_PRIVILEGES": "Privilèges et accès",
+    "QUERY_RUNNER": "Exécuteur de requêtes"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Améliorez votre expérience\nde gestion de sources de données",
@@ -1972,7 +2062,28 @@
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
     "ORGANISATION_REQUIRED": "Organisation is required",
-    "SEARCH_PLACEHOLDER": "Rechercher des règles par nom"
+    "SEARCH_PLACEHOLDER": "Rechercher des règles par nom",
+    "MASKED_COLUMN_COUNT": "{{count}} colonne(s) masquée(s)",
+    "SECURITY_TYPE": "Type de sécurité",
+    "SECURITY_TYPE_ROW": "Sécurité des lignes",
+    "SECURITY_TYPE_COLUMN": "Sécurité des colonnes",
+    "SECURITY_TYPE_ROW_HINT": "Restreint les lignes visibles par les utilisateurs ou groupes assignés. Les conditions sont combinées par ET.",
+    "SECURITY_TYPE_COLUMN_HINT": "Masquer ou réduire des colonnes spécifiques pour les utilisateurs ou groupes assignés. Les lignes restent visibles ; les valeurs protégées non.",
+    "MASKED_COLUMNS": "Colonnes masquées",
+    "MASKED_COLUMNS_HINT": "Choisissez les colonnes à protéger et comment chacune est masquée dans les résultats de requête.",
+    "ADD_MASKED_COLUMN": "Ajouter une colonne masquée",
+    "REMOVE_MASKED_COLUMN": "Supprimer la colonne masquée",
+    "NO_MASKED_COLUMNS": "Aucune colonne masquée définie",
+    "MASK_STRATEGY": "Stratégie",
+    "MASK_HIDE": "Masquer la colonne",
+    "MASK_NULL": "Valeur vide (null)",
+    "MASK_REDACT": "Caviarder la valeur",
+    "MASK_VALUE": "Valeur de masque",
+    "MASK_VALUE_PLACEHOLDER": "Valeur affichée à la place (ex. ***)",
+    "ASSIGNMENTS_HINT": "Ajoutez les utilisateurs ou groupes auxquels cette règle s'applique.",
+    "SELECT_TARGET": "Sélectionner un utilisateur ou un groupe",
+    "TARGET_REQUIRED": "Un utilisateur ou un groupe est requis",
+    "COLUMN_SECURITY": "Sécurité des colonnes"
   },
   "THEME": {
     "PAGE_TITLE": "Thème",
@@ -3065,7 +3176,24 @@
           "invalid": "Opérateur invalide"
         },
         "values": {
-          "atLeastOne": "Au moins une valeur est requise"
+          "atLeastOne": "Au moins une valeur est requise",
+          "betweenExactlyTwo": "BETWEEN nécessite exactement deux valeurs",
+          "betweenNumeric": "Les valeurs de BETWEEN doivent être numériques",
+          "equalsExactlyOne": "EQUALS nécessite exactement une valeur ; utilisez IN pour plusieurs valeurs"
+        },
+        "securityType": {
+          "invalid": "Le type de sécurité doit être ligne ou colonne"
+        },
+        "conditions": {
+          "atLeastOne": "Au moins une condition de filtre est requise"
+        },
+        "assignments": {
+          "atLeastOne": "Au moins une affectation d'utilisateur ou de groupe est requise"
+        },
+        "mask": {
+          "atLeastOne": "Au moins une colonne masquée est requise",
+          "strategyInvalid": "La stratégie de masque doit être masquer, null ou caviarder",
+          "maskValueTooLong": "La valeur de masque ne doit pas dépasser 50 caractères"
         }
       },
       "dashboard": {

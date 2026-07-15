@@ -192,7 +192,12 @@
     "EXPORT": "Exportieren",
     "NO_RECORDS": "Keine Datensätze gefunden",
     "SHOWING_OF": "{{shown}} von {{total}} angezeigt",
-    "GROUP": "Gruppe"
+    "GROUP": "Gruppe",
+    "AND": "und",
+    "MIN": "Min",
+    "MAX": "Max",
+    "TRUE": "Wahr",
+    "FALSE": "Falsch"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Vorname ist erforderlich",
@@ -493,7 +498,11 @@
     "DB_SCHEMA_LOCKED": "Das Schema wird bei der Erstellung festgelegt und kann nicht geändert werden.",
     "SCHEMA_NOT_EMPTY": "Das angegebene Schema enthält bereits Objekte. Wählen Sie ein leeres Schema oder einen neuen Namen.",
     "NOT_TESTED_HINT": "Verbindung vor dem Speichern testen",
-    "SEARCH_PLACEHOLDER": "Organisationen nach Name suchen"
+    "SEARCH_PLACEHOLDER": "Organisationen nach Name suchen",
+    "EDIT_DB_WARNING_TITLE": "Änderungen an der Master-Datenbank",
+    "EDIT_DB_WARNING_BODY_1": "Das Ändern dieser Zugangsdaten betrifft alle Benutzer dieser Organisation. Authentifizierung, Dashboards und Abfragen werden beim Speichern auf die neue Verbindung umgeleitet.",
+    "EDIT_DB_WARNING_BODY_2": "Wenn Sie das Schema ändern, werden die Tabellen der Plattform im neuen Schema erstellt. Tabellen im vorherigen Schema verbleiben unverändert in Ihrer Datenbank, werden jedoch von DBExec nicht mehr verwendet.",
+    "EDIT_DB_WARNING_BODY_3": "Verbindungsdetails (Host, Port, Datenbank, Schema oder Benutzername) können nicht geändert werden, ohne auch das aktuelle oder neue Passwort anzugeben."
   },
   "ROLE": {
     "TITLE": "Rollen",
@@ -586,7 +595,41 @@
     "CANNOT_DELETE_SELF": "Sie können sich nicht selbst löschen",
     "CANNOT_UNLOCK_DEFAULT": "Der Standardbenutzer kann hier nicht entsperrt werden",
     "CANNOT_UNLOCK_SELF": "Sie können Ihr eigenes Konto hier nicht entsperren",
-    "SEARCH_PLACEHOLDER": "Suche nach Benutzername, Name oder E-Mail"
+    "SEARCH_PLACEHOLDER": "Suche nach Benutzername, Name oder E-Mail",
+    "BULK_ADD_BTN": "Massenhinzufügen",
+    "BULK_ADD_TITLE": "Benutzer massenweise hinzufügen",
+    "BULK_ADD_INTRO": "Laden Sie eine CSV-Datei hoch, um mehrere Benutzer auf einmal zu erstellen. Wir validieren die Datei zuerst und lassen Sie alle Probleme prüfen, bevor etwas erstellt wird.",
+    "BULK_ADD_NEED_TEMPLATE": "Brauchen Sie einen Ausgangspunkt?",
+    "BULK_ADD_TEMPLATE_HINT": "Laden Sie die Beispiel-CSV herunter und tragen Sie Ihre Benutzer ein.",
+    "BULK_ADD_DOWNLOAD_TEMPLATE": "Vorlage herunterladen",
+    "BULK_ADD_CSV_FILE": "CSV-Datei",
+    "BULK_ADD_FILE_REQUIRED": "Bitte wählen Sie eine CSV-Datei",
+    "BULK_ADD_TOTAL_ROWS": "Zeilen gesamt",
+    "BULK_ADD_VALID": "Gültig",
+    "BULK_ADD_INVALID": "Ungültig",
+    "BULK_ADD_BACK": "Zurück",
+    "BULK_ADD_ADD_MORE": "Weitere Benutzer hinzufügen",
+    "BULK_ADD_BACK_TO_USERS": "Zurück zu Benutzern",
+    "BULK_ADD_PICK_FILE": "Keine Datei ausgewählt",
+    "BULK_ADD_BROWSE": "Durchsuchen",
+    "BULK_ADD_PICK_ORG_FIRST": "Wählen Sie zuerst eine Organisation aus",
+    "BULK_ADD_LIMIT_HINT": "Bis zu 500 Benutzer pro Upload. Maximale Dateigröße 5 MB.",
+    "BULK_ADD_GROUP_HINT": "Verwenden Sie die Spalte groupNames mit durch Pipe getrennten Namen, z. B. Marketing|Analytics.",
+    "BULK_ADD_VALIDATE_BTN": "Validieren",
+    "BULK_ADD_VALIDATING": "CSV wird validiert…",
+    "BULK_ADD_CREATING": "Benutzer werden erstellt…",
+    "BULK_ADD_CANNOT_CREATE": "Benutzer können nicht erstellt werden",
+    "BULK_ADD_READY_TO_CREATE": "Benutzer sind gültig und können erstellt werden",
+    "BULK_ADD_INVALID_ROWS": "Probleme gefunden",
+    "BULK_ADD_DOWNLOAD_INVALID": "Ungültige Zeilen herunterladen",
+    "BULK_ADD_ROW": "Zeile",
+    "BULK_ADD_REASON": "Grund",
+    "BULK_ADD_PROCEED_PROMPT": "Möchten Sie nur mit den gültigen Benutzern fortfahren?",
+    "BULK_ADD_NO_VALID_ROWS": "Keine gültigen Zeilen zum Erstellen. Beheben Sie die obigen Probleme und laden Sie die Datei erneut hoch.",
+    "BULK_ADD_PROCEED": "Fortfahren",
+    "BULK_ADD_CREATED_SUCCESS": "Benutzer erfolgreich erstellt",
+    "BULK_ADD_CREATED_FAILED": "Benutzer konnten nicht erstellt werden",
+    "BULK_ADD_RACE_FAILURES": "Fehler beim Erstellen"
   },
   "DATASOURCE": {
     "TITLE": "Datenquellen",
@@ -639,7 +682,15 @@
     "HEALTH_TESTING": "Testen…",
     "HEALTH_NEVER_TESTED": "Nie getestet",
     "TESTED": "getestet",
-    "SEARCH_PLACEHOLDER": "Datenquellen nach Name suchen"
+    "SEARCH_PLACEHOLDER": "Datenquellen nach Name suchen",
+    "ACCOUNT": "Konto",
+    "WAREHOUSE": "Warehouse",
+    "ROLE": "Rolle",
+    "DEFAULT_PORT": "Standardport",
+    "ENTER_ACCOUNT": "z. B. xy12345.us-east-1.aws",
+    "ENTER_WAREHOUSE": "z. B. COMPUTE_WH",
+    "ENTER_ROLE": "Optional — z. B. ANALYST",
+    "ENTER_SCHEMA": "Optional — z. B. PUBLIC"
   },
   "DATASET": {
     "TITLE": "Datensätze",
@@ -819,7 +870,9 @@
     "EXPLAIN_QUERY": "Abfrageplan anzeigen",
     "EXPLAIN_PLAN_TITLE": "Abfrageplan",
     "EXPLAIN_RUNNING": "Plan wird vom Modul angefordert…",
-    "SEARCH_PLACEHOLDER": "Datensätze nach Name oder Beschreibung suchen"
+    "SEARCH_PLACEHOLDER": "Datensätze nach Name oder Beschreibung suchen",
+    "RUN": "Ausführen",
+    "QUERY_TIMEOUT": "Die Abfrage hat zu lange gedauert und wurde abgebrochen. Schränken Sie die Ergebnismenge ein oder prüfen Sie die Datenbank auf lang laufende Abfragen."
   },
   "ANALYSES": {
     "TITLE": "Analysen",
@@ -1311,7 +1364,32 @@
     "A11Y_BUILD_PANELS": "Bereiche erstellen",
     "ADD_COLUMN": "Spalte hinzufügen",
     "ASSIGN_AXES_HINT": "Achsen zuweisen, um dieses Diagramm anzuzeigen",
-    "SEARCH_PLACEHOLDER": "Analysen nach Name oder Beschreibung suchen"
+    "SEARCH_PLACEHOLDER": "Analysen nach Name oder Beschreibung suchen",
+    "ENCODING_MEASURE": "Kennzahl",
+    "ENCODING_DIMENSION": "Dimension",
+    "ENCODING_MISMATCH_TITLE": "Feldtyp nicht kompatibel",
+    "ENCODING_MISMATCH_DETAIL": "\"{{field}}\" passt nicht in diesen Slot — erwartet wird eine {{kind}}.",
+    "ENCODING_MISMATCH_HINT": "Der Feldtyp passt nicht zur gewählten Rolle.",
+    "INTERACTIONS": "Interaktionen",
+    "CROSSFILTER_ENABLE": "Kreuzfilter bei Klick",
+    "CROSSFILTER_HINT": "Wenn aktiviert, filtert ein Klick auf einen Datenpunkt in dieser Visualisierung die anderen Visualisierungen in dieser Analyse.",
+    "CROSSFILTER_ON": "Kreuzfilter aktiv — Punkt anklicken zum Filtern",
+    "CROSSFILTER_OFF": "Kreuzfilter aktivieren",
+    "DRILL_DIMENSIONS": "Drill-down-Pfad",
+    "DRILL_PICK_DIMENSIONS": "Dimensionen für den Drill-down auswählen",
+    "DRILL_HINT": "Geordnete Dimensionen zum Durchlaufen. Kategorie anklicken zum Absteigen; Breadcrumb zum Zurückgehen verwenden.",
+    "DRILL_ALL": "Alle",
+    "INTERACTION_CLEAR": "Zurücksetzen",
+    "INTERACTION_CLEAR_TOOLTIP": "Alle Kreuzfilter löschen und Drill-Pfad zurücksetzen",
+    "PARAMETERS": "Parameter",
+    "PARAM_REQUIRED": "Pflichtfeld",
+    "PARAM_APPLY_TOOLTIP": "Parameterwerte anwenden und neu ausführen",
+    "PARAM_FILL_REQUIRED": "Zuerst alle Pflichtparameter ausfüllen",
+    "PARAM_RESET_TOOLTIP": "Parameter auf Standardwerte zurücksetzen",
+    "DETECTED_TYPE_NUMBER": "Numerische Spalte erkannt — numerische Steuerelemente werden empfohlen.",
+    "DETECTED_TYPE_DATE": "Datums-/Zeitspalte erkannt — Datumssteuerelemente werden empfohlen.",
+    "DETECTED_TYPE_BOOLEAN": "Boolesche Spalte erkannt — eine Werteliste wird empfohlen.",
+    "DETECTED_TYPE_STRING": "Textspalte erkannt — Wert-Dropdowns werden empfohlen."
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",
@@ -1356,7 +1434,14 @@
     "PUBLISH_FAILED": "Dashboard konnte nicht veröffentlicht werden",
     "PUBLISH_NO_VISUALS_HINT": "Fügen Sie mindestens eine Visualisierung hinzu, bevor Sie veröffentlichen.",
     "PUBLISH_UNSAVED_HINT": "Speichern Sie zuerst die Analyse, dann veröffentlichen.",
-    "SEARCH_PLACEHOLDER": "Dashboards nach Name oder Beschreibung suchen"
+    "SEARCH_PLACEHOLDER": "Dashboards nach Name oder Beschreibung suchen",
+    "PUBLISHED_FROM_DATASET": "Veröffentlicht aus {{dataset}}",
+    "SNAPSHOT_VERSION": "Snapshot v{{version}}",
+    "FIELDS_MISSING_BANNER": "{{count}} Feld(er), auf die dieses Dashboard verweist, sind nicht mehr im Datensatz vorhanden ({{refs}} Stelle(n) betroffen).",
+    "FIELDS_MISSING_HELP": "Das Dashboard-Layout wurde beim Veröffentlichen als Snapshot gespeichert, aber der Datensatz hat sich seitdem geändert. Aus der Quellanalyse erneut veröffentlichen oder den Dashboard-Inhaber kontaktieren.",
+    "WARNING_SCOPE_VISUAL": "Visualisierung",
+    "WARNING_SCOPE_FILTER": "Filter",
+    "WARNING_SCOPE_FIELD": "Feld"
   },
   "TOAST": {
     "SUCCESS": "Erfolg",
@@ -1391,7 +1476,12 @@
     "RESET_PASSWORD": "Passwort zurücksetzen",
     "SET_PASSWORD": "Passwort festlegen",
     "NOT_FOUND": "Seite nicht gefunden",
-    "RELAY": "Anmeldung läuft"
+    "RELAY": "Anmeldung läuft",
+    "DB_ACCESS": "Datenbankzugriff",
+    "DB_USERS": "Datenbankbenutzer",
+    "DB_ROLES": "Datenbankbenutzer & Rollen",
+    "DB_PRIVILEGES": "Rechte & Zugriff",
+    "QUERY_RUNNER": "Abfrage-Runner"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Verbessern Sie Ihr Datenquellen-\nManagement-Erlebnis",
@@ -1972,7 +2062,28 @@
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
     "ORGANISATION_REQUIRED": "Organisation is required",
-    "SEARCH_PLACEHOLDER": "Regeln nach Name suchen"
+    "SEARCH_PLACEHOLDER": "Regeln nach Name suchen",
+    "MASKED_COLUMN_COUNT": "{{count}} maskierte Spalte(n)",
+    "SECURITY_TYPE": "Sicherheitstyp",
+    "SECURITY_TYPE_ROW": "Zeilensicherheit",
+    "SECURITY_TYPE_COLUMN": "Spaltensicherheit",
+    "SECURITY_TYPE_ROW_HINT": "Legt fest, welche Zeilen die zugewiesenen Benutzer oder Gruppen sehen dürfen. Bedingungen werden mit UND verknüpft.",
+    "SECURITY_TYPE_COLUMN_HINT": "Bestimmte Spalten für zugewiesene Benutzer oder Gruppen ausblenden oder maskieren. Zeilen bleiben sichtbar; geschützte Werte nicht.",
+    "MASKED_COLUMNS": "Maskierte Spalten",
+    "MASKED_COLUMNS_HINT": "Spalten auswählen und festlegen, wie jede in Abfrageergebnissen maskiert wird.",
+    "ADD_MASKED_COLUMN": "Maskierte Spalte hinzufügen",
+    "REMOVE_MASKED_COLUMN": "Maskierte Spalte entfernen",
+    "NO_MASKED_COLUMNS": "Keine maskierten Spalten definiert",
+    "MASK_STRATEGY": "Strategie",
+    "MASK_HIDE": "Spalte ausblenden",
+    "MASK_NULL": "Leerer Wert (null)",
+    "MASK_REDACT": "Wert schwärzen",
+    "MASK_VALUE": "Maskierungswert",
+    "MASK_VALUE_PLACEHOLDER": "Angezeigter Wert (z.B. ***)",
+    "ASSIGNMENTS_HINT": "Benutzer oder Gruppen hinzufügen, auf die diese Regel angewendet wird.",
+    "SELECT_TARGET": "Benutzer oder Gruppe auswählen",
+    "TARGET_REQUIRED": "Benutzer oder Gruppe erforderlich",
+    "COLUMN_SECURITY": "Spaltensicherheit"
   },
   "THEME": {
     "PAGE_TITLE": "Design",
@@ -3065,7 +3176,24 @@
           "invalid": "Ungültiger Operator"
         },
         "values": {
-          "atLeastOne": "Mindestens ein Wert ist erforderlich"
+          "atLeastOne": "Mindestens ein Wert ist erforderlich",
+          "betweenExactlyTwo": "BETWEEN erfordert genau zwei Werte",
+          "betweenNumeric": "BETWEEN-Werte müssen numerisch sein",
+          "equalsExactlyOne": "EQUALS erfordert genau einen Wert; für mehrere Werte IN verwenden"
+        },
+        "securityType": {
+          "invalid": "Sicherheitstyp muss entweder Zeile oder Spalte sein"
+        },
+        "conditions": {
+          "atLeastOne": "Mindestens eine Filterbedingung ist erforderlich"
+        },
+        "assignments": {
+          "atLeastOne": "Mindestens eine Benutzer- oder Gruppenzuweisung ist erforderlich"
+        },
+        "mask": {
+          "atLeastOne": "Mindestens eine maskierte Spalte ist erforderlich",
+          "strategyInvalid": "Maskierungsstrategie muss Ausblenden, Null oder Schwärzen sein",
+          "maskValueTooLong": "Maskierungswert darf 50 Zeichen nicht überschreiten"
         }
       },
       "dashboard": {

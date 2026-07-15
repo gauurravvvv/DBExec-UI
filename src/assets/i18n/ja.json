@@ -192,7 +192,12 @@
     "EXPORT": "エクスポート",
     "NO_RECORDS": "レコードが見つかりません",
     "SHOWING_OF": "{{total}} 件中 {{shown}} 件を表示",
-    "GROUP": "グループ"
+    "GROUP": "グループ",
+    "AND": "および",
+    "MIN": "最小",
+    "MAX": "最大",
+    "TRUE": "真",
+    "FALSE": "偽"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "名は必須です",
@@ -493,7 +498,11 @@
     "DB_SCHEMA_LOCKED": "スキーマは作成時に設定され、変更できません。",
     "SCHEMA_NOT_EMPTY": "指定したスキーマには既にオブジェクトが含まれています。空のスキーマか別の名前を選択してください。",
     "NOT_TESTED_HINT": "保存前に接続をテストしてください",
-    "SEARCH_PLACEHOLDER": "名前で組織を検索"
+    "SEARCH_PLACEHOLDER": "名前で組織を検索",
+    "EDIT_DB_WARNING_TITLE": "マスターデータベースの変更",
+    "EDIT_DB_WARNING_BODY_1": "この認証情報を変更すると、この組織のすべてのユーザーに影響します。保存時に、認証・ダッシュボード・クエリが新しい接続に切り替わります。",
+    "EDIT_DB_WARNING_BODY_2": "スキーマを変更すると、プラットフォームのテーブルが新しいスキーマに作成されます。以前のスキーマのテーブルはデータベースにそのまま残りますが、DBExec では使用されなくなります。",
+    "EDIT_DB_WARNING_BODY_3": "接続情報（ホスト、ポート、データベース、スキーマ、またはユーザー名）を変更する場合は、現在または新しいパスワードも必ず入力してください。"
   },
   "ROLE": {
     "TITLE": "役割",
@@ -586,7 +595,41 @@
     "CANNOT_DELETE_SELF": "自分自身を削除することはできません",
     "CANNOT_UNLOCK_DEFAULT": "デフォルトユーザーはこの画面からロック解除できません",
     "CANNOT_UNLOCK_SELF": "自分のアカウントはこの画面からロック解除できません",
-    "SEARCH_PLACEHOLDER": "ユーザー名・氏名・メールで検索"
+    "SEARCH_PLACEHOLDER": "ユーザー名・氏名・メールで検索",
+    "BULK_ADD_BTN": "一括追加",
+    "BULK_ADD_TITLE": "ユーザーの一括追加",
+    "BULK_ADD_INTRO": "CSVをアップロードして複数のユーザーを一度に作成します。ファイルをまず検証し、作成前に問題を確認できます。",
+    "BULK_ADD_NEED_TEMPLATE": "開始点が必要ですか？",
+    "BULK_ADD_TEMPLATE_HINT": "サンプルCSVをダウンロードして、ユーザー情報を入力してください。",
+    "BULK_ADD_DOWNLOAD_TEMPLATE": "テンプレートをダウンロード",
+    "BULK_ADD_CSV_FILE": "CSVファイル",
+    "BULK_ADD_FILE_REQUIRED": "CSVファイルを選択してください",
+    "BULK_ADD_TOTAL_ROWS": "合計行数",
+    "BULK_ADD_VALID": "有効",
+    "BULK_ADD_INVALID": "無効",
+    "BULK_ADD_BACK": "戻る",
+    "BULK_ADD_ADD_MORE": "ユーザーを追加",
+    "BULK_ADD_BACK_TO_USERS": "ユーザー一覧に戻る",
+    "BULK_ADD_PICK_FILE": "ファイル未選択",
+    "BULK_ADD_BROWSE": "参照",
+    "BULK_ADD_PICK_ORG_FIRST": "最初に組織を選択してください",
+    "BULK_ADD_LIMIT_HINT": "1回のアップロードで最大500ユーザー。最大ファイルサイズ 5 MB。",
+    "BULK_ADD_GROUP_HINT": "groupNames 列にパイプ区切りの名前を使用してください（例: Marketing|Analytics）。",
+    "BULK_ADD_VALIDATE_BTN": "検証",
+    "BULK_ADD_VALIDATING": "CSVを検証中…",
+    "BULK_ADD_CREATING": "ユーザーを作成中…",
+    "BULK_ADD_CANNOT_CREATE": "件のユーザーを作成できません",
+    "BULK_ADD_READY_TO_CREATE": "件のユーザーが有効で作成可能です",
+    "BULK_ADD_INVALID_ROWS": "問題が見つかりました",
+    "BULK_ADD_DOWNLOAD_INVALID": "無効な行をダウンロード",
+    "BULK_ADD_ROW": "行",
+    "BULK_ADD_REASON": "理由",
+    "BULK_ADD_PROCEED_PROMPT": "有効なユーザーのみで続行しますか？",
+    "BULK_ADD_NO_VALID_ROWS": "作成できる有効な行がありません。上記の問題を修正して再アップロードしてください。",
+    "BULK_ADD_PROCEED": "続行",
+    "BULK_ADD_CREATED_SUCCESS": "件のユーザーが正常に作成されました",
+    "BULK_ADD_CREATED_FAILED": "件のユーザーを作成できませんでした",
+    "BULK_ADD_RACE_FAILURES": "作成中のエラー"
   },
   "DATASOURCE": {
     "TITLE": "データソース",
@@ -639,7 +682,15 @@
     "HEALTH_TESTING": "テスト中…",
     "HEALTH_NEVER_TESTED": "未テスト",
     "TESTED": "テスト",
-    "SEARCH_PLACEHOLDER": "名前でデータソースを検索"
+    "SEARCH_PLACEHOLDER": "名前でデータソースを検索",
+    "ACCOUNT": "アカウント",
+    "WAREHOUSE": "Warehouse",
+    "ROLE": "ロール",
+    "DEFAULT_PORT": "デフォルトポート",
+    "ENTER_ACCOUNT": "例: xy12345.us-east-1.aws",
+    "ENTER_WAREHOUSE": "例: COMPUTE_WH",
+    "ENTER_ROLE": "任意 — 例: ANALYST",
+    "ENTER_SCHEMA": "任意 — 例: PUBLIC"
   },
   "DATASET": {
     "TITLE": "データセット",
@@ -819,7 +870,9 @@
     "EXPLAIN_QUERY": "クエリの実行計画を表示",
     "EXPLAIN_PLAN_TITLE": "クエリの実行計画",
     "EXPLAIN_RUNNING": "エンジンに実行計画を問い合わせ中…",
-    "SEARCH_PLACEHOLDER": "名前または説明でデータセットを検索"
+    "SEARCH_PLACEHOLDER": "名前または説明でデータセットを検索",
+    "RUN": "実行",
+    "QUERY_TIMEOUT": "クエリの実行時間が長すぎてキャンセルされました。結果セットを絞り込むか、長時間実行中のクエリをデータベースで確認してください。"
   },
   "ANALYSES": {
     "TITLE": "分析",
@@ -1311,7 +1364,32 @@
     "A11Y_BUILD_PANELS": "ビルド パネル",
     "ADD_COLUMN": "列を追加",
     "ASSIGN_AXES_HINT": "このグラフを表示するには軸を割り当てます",
-    "SEARCH_PLACEHOLDER": "名前または説明で分析を検索"
+    "SEARCH_PLACEHOLDER": "名前または説明で分析を検索",
+    "ENCODING_MEASURE": "メジャー",
+    "ENCODING_DIMENSION": "ディメンション",
+    "ENCODING_MISMATCH_TITLE": "フィールド型の不一致",
+    "ENCODING_MISMATCH_DETAIL": "\"{{field}}\" はこのスロットに適合しません — {{kind}} が必要です。",
+    "ENCODING_MISMATCH_HINT": "このフィールドの型は選択したロールに適合しません。",
+    "INTERACTIONS": "インタラクション",
+    "CROSSFILTER_ENABLE": "クリック時にクロスフィルター",
+    "CROSSFILTER_HINT": "オンにすると、このビジュアルのデータポイントをクリックすることで、この分析の他のビジュアルがフィルターされます。",
+    "CROSSFILTER_ON": "クロスフィルター有効 — ポイントをクリックしてフィルター",
+    "CROSSFILTER_OFF": "クロスフィルターを有効にする",
+    "DRILL_DIMENSIONS": "ドリルダウンパス",
+    "DRILL_PICK_DIMENSIONS": "ドリルスルーするディメンションを選択",
+    "DRILL_HINT": "ドリルスルーする順序付きディメンション。カテゴリをクリックして下位へ移動、パンくずリストで上位へ戻ります。",
+    "DRILL_ALL": "すべて",
+    "INTERACTION_CLEAR": "クリア",
+    "INTERACTION_CLEAR_TOOLTIP": "すべてのクロスフィルターをクリアしてドリルパスをリセット",
+    "PARAMETERS": "パラメーター",
+    "PARAM_REQUIRED": "必須",
+    "PARAM_APPLY_TOOLTIP": "パラメーター値を適用して再実行",
+    "PARAM_FILL_REQUIRED": "最初にすべての必須パラメーターを入力してください",
+    "PARAM_RESET_TOOLTIP": "パラメーターをデフォルト値にリセット",
+    "DETECTED_TYPE_NUMBER": "数値列を検出しました — 数値コントロールが提案されます。",
+    "DETECTED_TYPE_DATE": "日付/時刻列を検出しました — 日付コントロールが提案されます。",
+    "DETECTED_TYPE_BOOLEAN": "ブール列を検出しました — 値リストが提案されます。",
+    "DETECTED_TYPE_STRING": "テキスト列を検出しました — 値ドロップダウンが提案されます。"
   },
   "DASHBOARD": {
     "TITLE": "ダッシュボード",
@@ -1356,7 +1434,14 @@
     "PUBLISH_FAILED": "ダッシュボードを公開できませんでした",
     "PUBLISH_NO_VISUALS_HINT": "公開する前にビジュアルを1つ以上追加してください。",
     "PUBLISH_UNSAVED_HINT": "先に分析を保存してから公開してください。",
-    "SEARCH_PLACEHOLDER": "名前または説明でダッシュボードを検索"
+    "SEARCH_PLACEHOLDER": "名前または説明でダッシュボードを検索",
+    "PUBLISHED_FROM_DATASET": "{{dataset}} から発行",
+    "SNAPSHOT_VERSION": "スナップショット v{{version}}",
+    "FIELDS_MISSING_BANNER": "このダッシュボードで参照されている {{count}} 個のフィールドがデータセットに存在しません（{{refs}} 箇所が影響を受けています）。",
+    "FIELDS_MISSING_HELP": "ダッシュボードのレイアウトは発行時にスナップショットとして保存されましたが、データセットがその後変更されています。ソース分析から再発行するか、ダッシュボードのオーナーに連絡してください。",
+    "WARNING_SCOPE_VISUAL": "ビジュアル",
+    "WARNING_SCOPE_FILTER": "フィルター",
+    "WARNING_SCOPE_FIELD": "フィールド"
   },
   "TOAST": {
     "SUCCESS": "成功",
@@ -1391,7 +1476,12 @@
     "RESET_PASSWORD": "パスワードのリセット",
     "SET_PASSWORD": "パスワード設定",
     "NOT_FOUND": "ページが見つかりません",
-    "RELAY": "ログイン中"
+    "RELAY": "ログイン中",
+    "DB_ACCESS": "データベースアクセス",
+    "DB_USERS": "データベースユーザー",
+    "DB_ROLES": "データベースユーザーとロール",
+    "DB_PRIVILEGES": "権限とアクセス",
+    "QUERY_RUNNER": "クエリランナー"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "データソース管理体験を\n向上させましょう",
@@ -1972,7 +2062,28 @@
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
     "ORGANISATION_REQUIRED": "Organisation is required",
-    "SEARCH_PLACEHOLDER": "名前でルールを検索"
+    "SEARCH_PLACEHOLDER": "名前でルールを検索",
+    "MASKED_COLUMN_COUNT": "{{count}} 個のマスク列",
+    "SECURITY_TYPE": "セキュリティタイプ",
+    "SECURITY_TYPE_ROW": "行レベルセキュリティ",
+    "SECURITY_TYPE_COLUMN": "列レベルセキュリティ",
+    "SECURITY_TYPE_ROW_HINT": "割り当てられたユーザーまたはグループが閲覧できる行を制限します。条件はANDで結合されます。",
+    "SECURITY_TYPE_COLUMN_HINT": "割り当てられたユーザーまたはグループに対して特定の列を非表示またはマスクします。行は引き続き表示されますが、保護された値は表示されません。",
+    "MASKED_COLUMNS": "マスク列",
+    "MASKED_COLUMNS_HINT": "保護する列と、クエリ結果で各列をどのようにマスクするかを選択します。",
+    "ADD_MASKED_COLUMN": "マスク列を追加",
+    "REMOVE_MASKED_COLUMN": "マスク列を削除",
+    "NO_MASKED_COLUMNS": "マスク列が定義されていません",
+    "MASK_STRATEGY": "方法",
+    "MASK_HIDE": "列を非表示",
+    "MASK_NULL": "空白値（null）",
+    "MASK_REDACT": "値を墨消し",
+    "MASK_VALUE": "マスク値",
+    "MASK_VALUE_PLACEHOLDER": "代わりに表示する値（例: ***）",
+    "ASSIGNMENTS_HINT": "このルールを適用するユーザーまたはグループを追加します。",
+    "SELECT_TARGET": "ユーザーまたはグループを選択",
+    "TARGET_REQUIRED": "ユーザーまたはグループが必要です",
+    "COLUMN_SECURITY": "列レベルセキュリティ"
   },
   "THEME": {
     "PAGE_TITLE": "テーマ",
@@ -3065,7 +3176,24 @@
           "invalid": "無効な演算子"
         },
         "values": {
-          "atLeastOne": "少なくとも 1 つの値を指定してください"
+          "atLeastOne": "少なくとも 1 つの値を指定してください",
+          "betweenExactlyTwo": "BETWEENには値が正確に2つ必要です",
+          "betweenNumeric": "BETWEENの値は数値である必要があります",
+          "equalsExactlyOne": "EQUALSには値が正確に1つ必要です。複数の値にはINを使用してください"
+        },
+        "securityType": {
+          "invalid": "セキュリティタイプは行または列である必要があります"
+        },
+        "conditions": {
+          "atLeastOne": "少なくとも1つのフィルター条件が必要です"
+        },
+        "assignments": {
+          "atLeastOne": "少なくとも1つのユーザーまたはグループの割り当てが必要です"
+        },
+        "mask": {
+          "atLeastOne": "少なくとも1つのマスク列が必要です",
+          "strategyInvalid": "マスク方法は非表示、null、または墨消しである必要があります",
+          "maskValueTooLong": "マスク値は50文字を超えてはなりません"
         }
       },
       "dashboard": {

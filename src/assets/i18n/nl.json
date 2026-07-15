@@ -192,7 +192,12 @@
     "EXPORT": "Exporteren",
     "NO_RECORDS": "Geen records gevonden",
     "SHOWING_OF": "{{shown}} van {{total}} weergegeven",
-    "GROUP": "Groep"
+    "GROUP": "Groep",
+    "AND": "en",
+    "MIN": "Min",
+    "MAX": "Max",
+    "TRUE": "Waar",
+    "FALSE": "Onwaar"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "Voornaam is verplicht",
@@ -493,7 +498,11 @@
     "DB_SCHEMA_LOCKED": "Het schema wordt bij aanmaken ingesteld en kan niet worden gewijzigd.",
     "SCHEMA_NOT_EMPTY": "Het opgegeven schema bevat al objecten. Kies een leeg schema of een nieuwe naam.",
     "NOT_TESTED_HINT": "Test de verbinding voordat u opslaat",
-    "SEARCH_PLACEHOLDER": "Zoek organisaties op naam"
+    "SEARCH_PLACEHOLDER": "Zoek organisaties op naam",
+    "EDIT_DB_WARNING_TITLE": "Wijzigingen masterdatabase",
+    "EDIT_DB_WARNING_BODY_1": "Het wijzigen van deze gegevens heeft gevolgen voor alle gebruikers van deze organisatie. Verificatie, dashboards en query's worden bij het opslaan omgeleid naar de nieuwe verbinding.",
+    "EDIT_DB_WARNING_BODY_2": "Als u het schema wijzigt, worden de tabellen van het platform aangemaakt in het nieuwe schema. Tabellen in het vorige schema blijven onaangetast in uw database, maar worden niet meer gebruikt door DBExec.",
+    "EDIT_DB_WARNING_BODY_3": "Verbindingsdetails (host, poort, database, schema of gebruikersnaam) kunnen niet worden gewijzigd zonder ook het huidige of nieuwe wachtwoord op te geven."
   },
   "ROLE": {
     "TITLE": "Rollen",
@@ -586,7 +595,41 @@
     "CANNOT_DELETE_SELF": "Je kunt jezelf niet verwijderen",
     "CANNOT_UNLOCK_DEFAULT": "De standaardgebruiker kan hier niet worden ontgrendeld",
     "CANNOT_UNLOCK_SELF": "Je kunt je eigen account hier niet ontgrendelen",
-    "SEARCH_PLACEHOLDER": "Zoek op gebruikersnaam, naam of e-mail"
+    "SEARCH_PLACEHOLDER": "Zoek op gebruikersnaam, naam of e-mail",
+    "BULK_ADD_BTN": "Bulk toevoegen",
+    "BULK_ADD_TITLE": "Gebruikers bulksgewijs toevoegen",
+    "BULK_ADD_INTRO": "Upload een CSV om meerdere gebruikers tegelijk aan te maken. We valideren het bestand eerst en laten u problemen controleren voordat er iets wordt aangemaakt.",
+    "BULK_ADD_NEED_TEMPLATE": "Heeft u een startpunt nodig?",
+    "BULK_ADD_TEMPLATE_HINT": "Download de voorbeeld-CSV en vul uw gebruikers in.",
+    "BULK_ADD_DOWNLOAD_TEMPLATE": "Sjabloon downloaden",
+    "BULK_ADD_CSV_FILE": "CSV-bestand",
+    "BULK_ADD_FILE_REQUIRED": "Kies een CSV-bestand",
+    "BULK_ADD_TOTAL_ROWS": "Totaal rijen",
+    "BULK_ADD_VALID": "Geldig",
+    "BULK_ADD_INVALID": "Ongeldig",
+    "BULK_ADD_BACK": "Terug",
+    "BULK_ADD_ADD_MORE": "Meer gebruikers toevoegen",
+    "BULK_ADD_BACK_TO_USERS": "Terug naar gebruikers",
+    "BULK_ADD_PICK_FILE": "Geen bestand geselecteerd",
+    "BULK_ADD_BROWSE": "Bladeren",
+    "BULK_ADD_PICK_ORG_FIRST": "Selecteer eerst een organisatie",
+    "BULK_ADD_LIMIT_HINT": "Tot 500 gebruikers per upload. Maximale bestandsgrootte 5 MB.",
+    "BULK_ADD_GROUP_HINT": "Gebruik de kolom groupNames met door pipe gescheiden namen, bijv. Marketing|Analytics.",
+    "BULK_ADD_VALIDATE_BTN": "Valideren",
+    "BULK_ADD_VALIDATING": "CSV valideren…",
+    "BULK_ADD_CREATING": "Gebruikers aanmaken…",
+    "BULK_ADD_CANNOT_CREATE": "gebruikers kunnen niet worden aangemaakt",
+    "BULK_ADD_READY_TO_CREATE": "gebruikers zijn geldig en klaar om aan te maken",
+    "BULK_ADD_INVALID_ROWS": "Problemen gevonden",
+    "BULK_ADD_DOWNLOAD_INVALID": "Ongeldige rijen downloaden",
+    "BULK_ADD_ROW": "Rij",
+    "BULK_ADD_REASON": "Reden",
+    "BULK_ADD_PROCEED_PROMPT": "Wilt u doorgaan met alleen de geldige gebruikers?",
+    "BULK_ADD_NO_VALID_ROWS": "Geen geldige rijen om aan te maken. Los de bovenstaande problemen op en upload opnieuw.",
+    "BULK_ADD_PROCEED": "Doorgaan",
+    "BULK_ADD_CREATED_SUCCESS": "gebruikers succesvol aangemaakt",
+    "BULK_ADD_CREATED_FAILED": "gebruikers konden niet worden aangemaakt",
+    "BULK_ADD_RACE_FAILURES": "Fouten tijdens aanmaken"
   },
   "DATASOURCE": {
     "TITLE": "Databronnen",
@@ -639,7 +682,15 @@
     "HEALTH_TESTING": "Testen…",
     "HEALTH_NEVER_TESTED": "Nooit getest",
     "TESTED": "getest",
-    "SEARCH_PLACEHOLDER": "Zoek databronnen op naam"
+    "SEARCH_PLACEHOLDER": "Zoek databronnen op naam",
+    "ACCOUNT": "Account",
+    "WAREHOUSE": "Warehouse",
+    "ROLE": "Rol",
+    "DEFAULT_PORT": "Standaardpoort",
+    "ENTER_ACCOUNT": "bijv. xy12345.us-east-1.aws",
+    "ENTER_WAREHOUSE": "bijv. COMPUTE_WH",
+    "ENTER_ROLE": "Optioneel — bijv. ANALYST",
+    "ENTER_SCHEMA": "Optioneel — bijv. PUBLIC"
   },
   "DATASET": {
     "TITLE": "Datasets",
@@ -819,7 +870,9 @@
     "EXPLAIN_QUERY": "Querytoolplan tonen",
     "EXPLAIN_PLAN_TITLE": "Queryplan",
     "EXPLAIN_RUNNING": "Plan ophalen…",
-    "SEARCH_PLACEHOLDER": "Zoek datasets op naam of beschrijving"
+    "SEARCH_PLACEHOLDER": "Zoek datasets op naam of beschrijving",
+    "RUN": "Uitvoeren",
+    "QUERY_TIMEOUT": "De query duurde te lang en is geannuleerd. Probeer de resultatenset te beperken of controleer de database op langlopende query's."
   },
   "ANALYSES": {
     "TITLE": "Analyses",
@@ -1311,7 +1364,32 @@
     "A11Y_BUILD_PANELS": "Bouwpanelen",
     "ADD_COLUMN": "Kolom toevoegen",
     "ASSIGN_AXES_HINT": "Wijs assen toe om dit diagram weer te geven",
-    "SEARCH_PLACEHOLDER": "Zoek analyses op naam of beschrijving"
+    "SEARCH_PLACEHOLDER": "Zoek analyses op naam of beschrijving",
+    "ENCODING_MEASURE": "meting",
+    "ENCODING_DIMENSION": "dimensie",
+    "ENCODING_MISMATCH_TITLE": "Veldtype komt niet overeen",
+    "ENCODING_MISMATCH_DETAIL": "\"{{field}}\" past niet in dit slot — verwacht wordt een {{kind}}.",
+    "ENCODING_MISMATCH_HINT": "Het type van dit veld past niet bij de geselecteerde rol.",
+    "INTERACTIONS": "Interacties",
+    "CROSSFILTER_ENABLE": "Kruisfilter bij klik",
+    "CROSSFILTER_HINT": "Wanneer ingeschakeld, filtert klikken op een datapunt in deze visual de andere visuals in deze analyse.",
+    "CROSSFILTER_ON": "Kruisfilter actief — klik op een punt om te filteren",
+    "CROSSFILTER_OFF": "Kruisfilter inschakelen",
+    "DRILL_DIMENSIONS": "Drill-down pad",
+    "DRILL_PICK_DIMENSIONS": "Selecteer dimensies voor drill-through",
+    "DRILL_HINT": "Geordende dimensies om doorheen te boren. Klik op een categorie om af te dalen; gebruik de breadcrumb om terug te gaan.",
+    "DRILL_ALL": "Alles",
+    "INTERACTION_CLEAR": "Wissen",
+    "INTERACTION_CLEAR_TOOLTIP": "Alle kruisfilters wissen en het drill-pad resetten",
+    "PARAMETERS": "Parameters",
+    "PARAM_REQUIRED": "Verplicht",
+    "PARAM_APPLY_TOOLTIP": "Parameterwaarden toepassen en opnieuw uitvoeren",
+    "PARAM_FILL_REQUIRED": "Vul eerst alle verplichte parameters in",
+    "PARAM_RESET_TOOLTIP": "Parameters terugzetten naar standaardwaarden",
+    "DETECTED_TYPE_NUMBER": "Numerieke kolom gedetecteerd — numerieke besturingselementen worden voorgesteld.",
+    "DETECTED_TYPE_DATE": "Datum/tijd-kolom gedetecteerd — datumbesturingselementen worden voorgesteld.",
+    "DETECTED_TYPE_BOOLEAN": "Booleaanse kolom gedetecteerd — een waardelijst wordt voorgesteld.",
+    "DETECTED_TYPE_STRING": "Tekstkolom gedetecteerd — vervolgkeuzelijsten voor waarden worden voorgesteld."
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",
@@ -1356,7 +1434,14 @@
     "PUBLISH_FAILED": "Kan dashboard niet publiceren",
     "PUBLISH_NO_VISUALS_HINT": "Voeg minstens één visualisatie toe voordat u publiceert.",
     "PUBLISH_UNSAVED_HINT": "Sla eerst de analyse op en publiceer dan.",
-    "SEARCH_PLACEHOLDER": "Zoek dashboards op naam of beschrijving"
+    "SEARCH_PLACEHOLDER": "Zoek dashboards op naam of beschrijving",
+    "PUBLISHED_FROM_DATASET": "Gepubliceerd vanuit {{dataset}}",
+    "SNAPSHOT_VERSION": "snapshot v{{version}}",
+    "FIELDS_MISSING_BANNER": "{{count}} veld(en) waarnaar dit dashboard verwijst, zijn niet meer aanwezig in de dataset ({{refs}} locatie(s) getroffen).",
+    "FIELDS_MISSING_HELP": "De dashboardindeling is bij publicatie als snapshot opgeslagen, maar de dataset is sindsdien gewijzigd. Publiceer opnieuw vanuit de bronanalyse of neem contact op met de dashboardeigenaar.",
+    "WARNING_SCOPE_VISUAL": "Visual",
+    "WARNING_SCOPE_FILTER": "Filter",
+    "WARNING_SCOPE_FIELD": "Veld"
   },
   "TOAST": {
     "SUCCESS": "Succes",
@@ -1391,7 +1476,12 @@
     "RESET_PASSWORD": "Wachtwoord resetten",
     "SET_PASSWORD": "Wachtwoord instellen",
     "NOT_FOUND": "Pagina niet gevonden",
-    "RELAY": "Aanmelden"
+    "RELAY": "Aanmelden",
+    "DB_ACCESS": "Databasetoegang",
+    "DB_USERS": "Databasegebruikers",
+    "DB_ROLES": "Databasegebruikers & rollen",
+    "DB_PRIVILEGES": "Rechten & toegang",
+    "QUERY_RUNNER": "Query-uitvoerder"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Verbeter uw ervaring met\ngegevensbronbeheer",
@@ -1972,7 +2062,28 @@
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
     "ORGANISATION_REQUIRED": "Organisation is required",
-    "SEARCH_PLACEHOLDER": "Zoek regels op naam"
+    "SEARCH_PLACEHOLDER": "Zoek regels op naam",
+    "MASKED_COLUMN_COUNT": "{{count}} gemaskeerde kolom(men)",
+    "SECURITY_TYPE": "Beveiligingstype",
+    "SECURITY_TYPE_ROW": "Rijbeveiliging",
+    "SECURITY_TYPE_COLUMN": "Kolombeveiliging",
+    "SECURITY_TYPE_ROW_HINT": "Beperkt welke rijen de toegewezen gebruikers of groepen kunnen zien. Voorwaarden worden gecombineerd met EN.",
+    "SECURITY_TYPE_COLUMN_HINT": "Verberg of maskeer specifieke kolommen voor toegewezen gebruikers of groepen. Rijen blijven zichtbaar; beveiligde waarden niet.",
+    "MASKED_COLUMNS": "Gemaskeerde kolommen",
+    "MASKED_COLUMNS_HINT": "Kies de kolommen om te beveiligen en hoe elke kolom wordt gemaskeerd in queryresultaten.",
+    "ADD_MASKED_COLUMN": "Gemaskeerde kolom toevoegen",
+    "REMOVE_MASKED_COLUMN": "Gemaskeerde kolom verwijderen",
+    "NO_MASKED_COLUMNS": "Geen gemaskeerde kolommen gedefinieerd",
+    "MASK_STRATEGY": "Strategie",
+    "MASK_HIDE": "Kolom verbergen",
+    "MASK_NULL": "Lege waarde (null)",
+    "MASK_REDACT": "Waarde redigeren",
+    "MASK_VALUE": "Maskerwaarde",
+    "MASK_VALUE_PLACEHOLDER": "Getoonde waarde (bijv. ***)",
+    "ASSIGNMENTS_HINT": "Voeg de gebruikers of groepen toe waarop deze regel van toepassing is.",
+    "SELECT_TARGET": "Gebruiker of groep selecteren",
+    "TARGET_REQUIRED": "Een gebruiker of groep is vereist",
+    "COLUMN_SECURITY": "Kolombeveiliging"
   },
   "THEME": {
     "PAGE_TITLE": "Thema",
@@ -3065,7 +3176,24 @@
           "invalid": "Ongeldige operator"
         },
         "values": {
-          "atLeastOne": "Er is minstens één waarde vereist"
+          "atLeastOne": "Er is minstens één waarde vereist",
+          "betweenExactlyTwo": "BETWEEN vereist exact twee waarden",
+          "betweenNumeric": "BETWEEN-waarden moeten numeriek zijn",
+          "equalsExactlyOne": "EQUALS vereist exact één waarde; gebruik IN voor meerdere waarden"
+        },
+        "securityType": {
+          "invalid": "Het beveiligingstype moet rij of kolom zijn"
+        },
+        "conditions": {
+          "atLeastOne": "Minimaal één filtervoorwaarde is vereist"
+        },
+        "assignments": {
+          "atLeastOne": "Minimaal één gebruikers- of groepstoewijzing is vereist"
+        },
+        "mask": {
+          "atLeastOne": "Minimaal één gemaskeerde kolom is vereist",
+          "strategyInvalid": "De maskerstrategie moet verbergen, null of redigeren zijn",
+          "maskValueTooLong": "De maskerwaarde mag niet meer dan 50 tekens bevatten"
         }
       },
       "dashboard": {

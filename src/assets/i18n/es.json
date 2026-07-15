@@ -192,7 +192,12 @@
     "EXPORT": "Exportar",
     "NO_RECORDS": "No se encontraron registros",
     "SHOWING_OF": "Mostrando {{shown}} de {{total}}",
-    "GROUP": "Grupo"
+    "GROUP": "Grupo",
+    "AND": "y",
+    "MIN": "Mín",
+    "MAX": "Máx",
+    "TRUE": "Verdadero",
+    "FALSE": "Falso"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "El nombre es obligatorio",
@@ -493,7 +498,11 @@
     "DB_SCHEMA_LOCKED": "El esquema se establece al crear y no se puede cambiar.",
     "SCHEMA_NOT_EMPTY": "El esquema indicado ya contiene objetos. Elige un esquema vacío o un nombre nuevo.",
     "NOT_TESTED_HINT": "Pruebe la conexión antes de guardar",
-    "SEARCH_PLACEHOLDER": "Buscar organizaciones por nombre"
+    "SEARCH_PLACEHOLDER": "Buscar organizaciones por nombre",
+    "EDIT_DB_WARNING_TITLE": "Cambios en la base de datos maestra",
+    "EDIT_DB_WARNING_BODY_1": "Cambiar estas credenciales afecta a todos los usuarios de esta organización. La autenticación, los paneles y las consultas se redirigirán a la nueva conexión al guardar.",
+    "EDIT_DB_WARNING_BODY_2": "Si cambia el esquema, las tablas de la plataforma se crearán en el nuevo esquema. Las tablas del esquema anterior permanecerán en su base de datos sin cambios, pero DBExec dejará de utilizarlas.",
+    "EDIT_DB_WARNING_BODY_3": "Los detalles de conexión (host, puerto, base de datos, esquema o nombre de usuario) no pueden modificarse sin proporcionar también la contraseña actual o la nueva."
   },
   "ROLE": {
     "TITLE": "Roles",
@@ -586,7 +595,41 @@
     "CANNOT_DELETE_SELF": "No puedes eliminarte a ti mismo",
     "CANNOT_UNLOCK_DEFAULT": "El usuario predeterminado no se puede desbloquear desde aquí",
     "CANNOT_UNLOCK_SELF": "No puedes desbloquear tu propia cuenta desde aquí",
-    "SEARCH_PLACEHOLDER": "Buscar por usuario, nombre o correo"
+    "SEARCH_PLACEHOLDER": "Buscar por usuario, nombre o correo",
+    "BULK_ADD_BTN": "Agregar en masa",
+    "BULK_ADD_TITLE": "Agregar usuarios en masa",
+    "BULK_ADD_INTRO": "Suba un CSV para crear múltiples usuarios a la vez. Validaremos el archivo primero y le permitiremos revisar cualquier problema antes de crear nada.",
+    "BULK_ADD_NEED_TEMPLATE": "¿Necesita un punto de partida?",
+    "BULK_ADD_TEMPLATE_HINT": "Descargue el CSV de muestra y complete sus usuarios.",
+    "BULK_ADD_DOWNLOAD_TEMPLATE": "Descargar plantilla",
+    "BULK_ADD_CSV_FILE": "Archivo CSV",
+    "BULK_ADD_FILE_REQUIRED": "Por favor, elija un archivo CSV",
+    "BULK_ADD_TOTAL_ROWS": "Total de filas",
+    "BULK_ADD_VALID": "Válido",
+    "BULK_ADD_INVALID": "No válido",
+    "BULK_ADD_BACK": "Volver",
+    "BULK_ADD_ADD_MORE": "Agregar más usuarios",
+    "BULK_ADD_BACK_TO_USERS": "Volver a usuarios",
+    "BULK_ADD_PICK_FILE": "Ningún archivo seleccionado",
+    "BULK_ADD_BROWSE": "Explorar",
+    "BULK_ADD_PICK_ORG_FIRST": "Seleccione una organización primero",
+    "BULK_ADD_LIMIT_HINT": "Hasta 500 usuarios por carga. Tamaño máximo de archivo 5 MB.",
+    "BULK_ADD_GROUP_HINT": "Use la columna groupNames con nombres separados por barra vertical, p. ej. Marketing|Analytics.",
+    "BULK_ADD_VALIDATE_BTN": "Validar",
+    "BULK_ADD_VALIDATING": "Validando CSV…",
+    "BULK_ADD_CREATING": "Creando usuarios…",
+    "BULK_ADD_CANNOT_CREATE": "usuarios no se pueden crear",
+    "BULK_ADD_READY_TO_CREATE": "usuarios son válidos y están listos para crear",
+    "BULK_ADD_INVALID_ROWS": "Problemas encontrados",
+    "BULK_ADD_DOWNLOAD_INVALID": "Descargar filas no válidas",
+    "BULK_ADD_ROW": "Fila",
+    "BULK_ADD_REASON": "Motivo",
+    "BULK_ADD_PROCEED_PROMPT": "¿Desea continuar solo con los usuarios válidos?",
+    "BULK_ADD_NO_VALID_ROWS": "No hay filas válidas para crear. Corrija los problemas anteriores y vuelva a subir.",
+    "BULK_ADD_PROCEED": "Continuar",
+    "BULK_ADD_CREATED_SUCCESS": "usuarios creados correctamente",
+    "BULK_ADD_CREATED_FAILED": "usuarios no pudieron crearse",
+    "BULK_ADD_RACE_FAILURES": "Errores durante la creación"
   },
   "DATASOURCE": {
     "TITLE": "Fuentes de datos",
@@ -639,7 +682,15 @@
     "HEALTH_TESTING": "Probando…",
     "HEALTH_NEVER_TESTED": "Nunca probado",
     "TESTED": "probado",
-    "SEARCH_PLACEHOLDER": "Buscar orígenes de datos por nombre"
+    "SEARCH_PLACEHOLDER": "Buscar orígenes de datos por nombre",
+    "ACCOUNT": "Cuenta",
+    "WAREHOUSE": "Warehouse",
+    "ROLE": "Rol",
+    "DEFAULT_PORT": "Puerto predeterminado",
+    "ENTER_ACCOUNT": "p. ej. xy12345.us-east-1.aws",
+    "ENTER_WAREHOUSE": "p. ej. COMPUTE_WH",
+    "ENTER_ROLE": "Opcional — p. ej. ANALYST",
+    "ENTER_SCHEMA": "Opcional — p. ej. PUBLIC"
   },
   "DATASET": {
     "TITLE": "Conjuntos de datos",
@@ -819,7 +870,9 @@
     "EXPLAIN_QUERY": "Mostrar plan de consulta",
     "EXPLAIN_PLAN_TITLE": "Plan de consulta",
     "EXPLAIN_RUNNING": "Solicitando el plan al motor…",
-    "SEARCH_PLACEHOLDER": "Buscar conjuntos de datos por nombre o descripción"
+    "SEARCH_PLACEHOLDER": "Buscar conjuntos de datos por nombre o descripción",
+    "RUN": "Ejecutar",
+    "QUERY_TIMEOUT": "La consulta tardó demasiado y fue cancelada. Intente acotar el conjunto de resultados o revise la base de datos en busca de consultas de larga duración."
   },
   "ANALYSES": {
     "TITLE": "Análisis",
@@ -1311,7 +1364,32 @@
     "A11Y_BUILD_PANELS": "Paneles de construcción",
     "ADD_COLUMN": "Añadir columna",
     "ASSIGN_AXES_HINT": "Asigne ejes para mostrar este gráfico",
-    "SEARCH_PLACEHOLDER": "Buscar análisis por nombre o descripción"
+    "SEARCH_PLACEHOLDER": "Buscar análisis por nombre o descripción",
+    "ENCODING_MEASURE": "medida",
+    "ENCODING_DIMENSION": "dimensión",
+    "ENCODING_MISMATCH_TITLE": "Tipo de campo incompatible",
+    "ENCODING_MISMATCH_DETAIL": "\"{{field}}\" no encaja en este campo — se espera una {{kind}}.",
+    "ENCODING_MISMATCH_HINT": "El tipo de este campo no es compatible con el rol seleccionado.",
+    "INTERACTIONS": "Interacciones",
+    "CROSSFILTER_ENABLE": "Filtro cruzado al hacer clic",
+    "CROSSFILTER_HINT": "Cuando está activado, hacer clic en un punto de datos en este visual filtra los demás visuales de este análisis.",
+    "CROSSFILTER_ON": "Filtro cruzado activo — haz clic en un punto para filtrar",
+    "CROSSFILTER_OFF": "Activar filtro cruzado",
+    "DRILL_DIMENSIONS": "Ruta de desglose",
+    "DRILL_PICK_DIMENSIONS": "Seleccionar dimensiones para el desglose",
+    "DRILL_HINT": "Dimensiones ordenadas para recorrer. Haz clic en una categoría para bajar; usa el rastro de navegación para subir.",
+    "DRILL_ALL": "Todo",
+    "INTERACTION_CLEAR": "Limpiar",
+    "INTERACTION_CLEAR_TOOLTIP": "Eliminar todos los filtros cruzados y restablecer la ruta de desglose",
+    "PARAMETERS": "Parámetros",
+    "PARAM_REQUIRED": "Obligatorio",
+    "PARAM_APPLY_TOOLTIP": "Aplicar valores de parámetros y volver a ejecutar",
+    "PARAM_FILL_REQUIRED": "Completa primero todos los parámetros obligatorios",
+    "PARAM_RESET_TOOLTIP": "Restablecer parámetros a sus valores predeterminados",
+    "DETECTED_TYPE_NUMBER": "Columna numérica detectada — se sugieren controles numéricos.",
+    "DETECTED_TYPE_DATE": "Columna de fecha/hora detectada — se sugieren controles de fecha.",
+    "DETECTED_TYPE_BOOLEAN": "Columna booleana detectada — se sugiere una lista de valores.",
+    "DETECTED_TYPE_STRING": "Columna de texto detectada — se sugieren listas desplegables de valores."
   },
   "DASHBOARD": {
     "TITLE": "Paneles",
@@ -1356,7 +1434,14 @@
     "PUBLISH_FAILED": "No se pudo publicar el panel",
     "PUBLISH_NO_VISUALS_HINT": "Agregue al menos un elemento visual antes de publicar.",
     "PUBLISH_UNSAVED_HINT": "Guarde el análisis primero y luego publique.",
-    "SEARCH_PLACEHOLDER": "Buscar paneles por nombre o descripción"
+    "SEARCH_PLACEHOLDER": "Buscar paneles por nombre o descripción",
+    "PUBLISHED_FROM_DATASET": "Publicado desde {{dataset}}",
+    "SNAPSHOT_VERSION": "instantánea v{{version}}",
+    "FIELDS_MISSING_BANNER": "{{count}} campo(s) referenciado(s) por este panel ya no están en el conjunto de datos ({{refs}} lugar(es) afectado(s)).",
+    "FIELDS_MISSING_HELP": "El diseño del panel se guardó como instantánea al publicarse, pero el conjunto de datos ha cambiado desde entonces. Vuelve a publicar desde el análisis fuente o contacta al propietario del panel.",
+    "WARNING_SCOPE_VISUAL": "Visual",
+    "WARNING_SCOPE_FILTER": "Filtro",
+    "WARNING_SCOPE_FIELD": "Campo"
   },
   "TOAST": {
     "SUCCESS": "Éxito",
@@ -1391,7 +1476,12 @@
     "RESET_PASSWORD": "Restablecer contraseña",
     "SET_PASSWORD": "Establecer contraseña",
     "NOT_FOUND": "Página no encontrada",
-    "RELAY": "Iniciando sesión"
+    "RELAY": "Iniciando sesión",
+    "DB_ACCESS": "Acceso a la base de datos",
+    "DB_USERS": "Usuarios de la base de datos",
+    "DB_ROLES": "Usuarios y roles de la base de datos",
+    "DB_PRIVILEGES": "Privilegios y acceso",
+    "QUERY_RUNNER": "Ejecutor de consultas"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Mejore su experiencia de\ngestión de fuentes de datos",
@@ -1972,7 +2062,28 @@
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
     "ORGANISATION_REQUIRED": "Organisation is required",
-    "SEARCH_PLACEHOLDER": "Buscar reglas por nombre"
+    "SEARCH_PLACEHOLDER": "Buscar reglas por nombre",
+    "MASKED_COLUMN_COUNT": "{{count}} columna(s) enmascarada(s)",
+    "SECURITY_TYPE": "Tipo de seguridad",
+    "SECURITY_TYPE_ROW": "Seguridad de fila",
+    "SECURITY_TYPE_COLUMN": "Seguridad de columna",
+    "SECURITY_TYPE_ROW_HINT": "Restringe qué filas pueden ver los usuarios o grupos asignados. Las condiciones se combinan con AND.",
+    "SECURITY_TYPE_COLUMN_HINT": "Ocultar o enmascarar columnas específicas para los usuarios o grupos asignados. Las filas siguen siendo visibles; los valores protegidos no.",
+    "MASKED_COLUMNS": "Columnas enmascaradas",
+    "MASKED_COLUMNS_HINT": "Elige las columnas a proteger y cómo se enmascara cada una en los resultados de consulta.",
+    "ADD_MASKED_COLUMN": "Agregar columna enmascarada",
+    "REMOVE_MASKED_COLUMN": "Eliminar columna enmascarada",
+    "NO_MASKED_COLUMNS": "No hay columnas enmascaradas definidas",
+    "MASK_STRATEGY": "Estrategia",
+    "MASK_HIDE": "Ocultar columna",
+    "MASK_NULL": "Valor vacío (nulo)",
+    "MASK_REDACT": "Redactar valor",
+    "MASK_VALUE": "Valor de máscara",
+    "MASK_VALUE_PLACEHOLDER": "Valor mostrado en su lugar (ej. ***)",
+    "ASSIGNMENTS_HINT": "Agrega los usuarios o grupos a los que se aplica esta regla.",
+    "SELECT_TARGET": "Seleccionar usuario o grupo",
+    "TARGET_REQUIRED": "Se requiere un usuario o grupo",
+    "COLUMN_SECURITY": "Seguridad de columna"
   },
   "THEME": {
     "PAGE_TITLE": "Tema",
@@ -3065,7 +3176,24 @@
           "invalid": "Operador no válido"
         },
         "values": {
-          "atLeastOne": "Se requiere al menos un valor"
+          "atLeastOne": "Se requiere al menos un valor",
+          "betweenExactlyTwo": "BETWEEN requiere exactamente dos valores",
+          "betweenNumeric": "Los valores de BETWEEN deben ser numéricos",
+          "equalsExactlyOne": "EQUALS requiere exactamente un valor; usa IN para múltiples valores"
+        },
+        "securityType": {
+          "invalid": "El tipo de seguridad debe ser fila o columna"
+        },
+        "conditions": {
+          "atLeastOne": "Se requiere al menos una condición de filtro"
+        },
+        "assignments": {
+          "atLeastOne": "Se requiere al menos una asignación de usuario o grupo"
+        },
+        "mask": {
+          "atLeastOne": "Se requiere al menos una columna enmascarada",
+          "strategyInvalid": "La estrategia de máscara debe ser ocultar, nulo o redactar",
+          "maskValueTooLong": "El valor de máscara no debe superar 50 caracteres"
         }
       },
       "dashboard": {

@@ -192,7 +192,12 @@
     "EXPORT": "Export",
     "NO_RECORDS": "No records found",
     "SHOWING_OF": "Showing {{shown}} of {{total}}",
-    "GROUP": "Group"
+    "GROUP": "Group",
+    "AND": "and",
+    "MIN": "Min",
+    "MAX": "Max",
+    "TRUE": "True",
+    "FALSE": "False"
   },
   "VALIDATION": {
     "FIRST_NAME_REQUIRED": "First name is required",
@@ -1362,7 +1367,32 @@
     "A11Y_DATA_PANELS": "Data panels",
     "A11Y_BUILD_PANELS": "Build panels",
     "ADD_COLUMN": "Add Column",
-    "SEARCH_PLACEHOLDER": "Search analyses by name or description"
+    "SEARCH_PLACEHOLDER": "Search analyses by name or description",
+    "ENCODING_MEASURE": "measure",
+    "ENCODING_DIMENSION": "dimension",
+    "ENCODING_MISMATCH_TITLE": "Field type mismatch",
+    "ENCODING_MISMATCH_DETAIL": "\"{{field}}\" doesn't fit this slot — it expects a {{kind}}.",
+    "ENCODING_MISMATCH_HINT": "This field's type doesn't fit the selected role.",
+    "INTERACTIONS": "Interactions",
+    "CROSSFILTER_ENABLE": "Cross-filter on click",
+    "CROSSFILTER_HINT": "When on, clicking a data point in this visual filters the other visuals on this analysis.",
+    "CROSSFILTER_ON": "Cross-filter enabled — click a point to filter siblings",
+    "CROSSFILTER_OFF": "Enable cross-filtering",
+    "DRILL_DIMENSIONS": "Drill-down path",
+    "DRILL_PICK_DIMENSIONS": "Pick dimensions to drill through",
+    "DRILL_HINT": "Ordered dimensions to drill through. Click a category to descend; use the breadcrumb to go back up.",
+    "DRILL_ALL": "All",
+    "INTERACTION_CLEAR": "Clear",
+    "INTERACTION_CLEAR_TOOLTIP": "Clear all cross-filters and reset the drill path",
+    "PARAMETERS": "Parameters",
+    "PARAM_REQUIRED": "Required",
+    "PARAM_APPLY_TOOLTIP": "Apply parameter values and re-run",
+    "PARAM_FILL_REQUIRED": "Fill in all required parameters first",
+    "PARAM_RESET_TOOLTIP": "Reset parameters to their defaults",
+    "DETECTED_TYPE_NUMBER": "Detected a numeric column — numeric controls are suggested.",
+    "DETECTED_TYPE_DATE": "Detected a date/time column — date controls are suggested.",
+    "DETECTED_TYPE_BOOLEAN": "Detected a boolean column — a value list is suggested.",
+    "DETECTED_TYPE_STRING": "Detected a text column — value dropdowns are suggested."
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",
@@ -1388,6 +1418,13 @@
     "NO_CHART_CONFIGURED": "No chart configured",
     "VISUAL_FIELD_MISSING": "Field no longer available",
     "VISUAL_FIELD_MISSING_DESC_VIEWER": "{{fields}} — contact the dashboard owner.",
+    "PUBLISHED_FROM_DATASET": "Published from {{dataset}}",
+    "SNAPSHOT_VERSION": "snapshot v{{version}}",
+    "FIELDS_MISSING_BANNER": "{{count}} field(s) referenced by this dashboard are no longer in the dataset ({{refs}} place(s) affected).",
+    "FIELDS_MISSING_HELP": "The dashboard layout was snapshotted at publish time, but the dataset has changed since. Republish from the source analysis to refresh it, or contact the dashboard owner.",
+    "WARNING_SCOPE_VISUAL": "Visual",
+    "WARNING_SCOPE_FILTER": "Filter",
+    "WARNING_SCOPE_FIELD": "Field",
     "PUBLISH": "Publish",
     "PUBLISH_DASHBOARD_TITLE": "Publish dashboard",
     "PUBLISH_FROM_ANALYSIS": "From analysis:",
@@ -1974,6 +2011,7 @@
     "DATASET": "Dataset",
     "CONDITIONS": "Conditions",
     "CONDITION_COUNT": "{{count}} condition(s)",
+    "MASKED_COLUMN_COUNT": "{{count}} masked column(s)",
     "MORE_CONDITIONS": "+{{count}} more",
     "SEARCH_DATASET": "Search Dataset",
     "SELECT_DATASOURCE_MSG": "Please select a datasource to view RLS rules",
@@ -2028,7 +2066,27 @@
     "NO_ASSIGNMENTS_ADD_MSG": "No assignments yet. Add users or groups above.",
     "REMOVE_ASSIGNMENT": "Remove assignment",
     "ORGANISATION_REQUIRED": "Organisation is required",
-    "SEARCH_PLACEHOLDER": "Search rules by name"
+    "SEARCH_PLACEHOLDER": "Search rules by name",
+    "SECURITY_TYPE": "Security Type",
+    "SECURITY_TYPE_ROW": "Row Security",
+    "SECURITY_TYPE_COLUMN": "Column Security",
+    "SECURITY_TYPE_ROW_HINT": "Restrict which rows the assigned users or groups can see. Conditions are AND-ed together.",
+    "SECURITY_TYPE_COLUMN_HINT": "Hide or mask specific columns for the assigned users or groups. Rows are still visible; protected values are not.",
+    "MASKED_COLUMNS": "Masked Columns",
+    "MASKED_COLUMNS_HINT": "Choose the columns to protect and how each one is masked in query results.",
+    "ADD_MASKED_COLUMN": "Add Masked Column",
+    "REMOVE_MASKED_COLUMN": "Remove masked column",
+    "NO_MASKED_COLUMNS": "No masked columns defined",
+    "MASK_STRATEGY": "Strategy",
+    "MASK_HIDE": "Hide column",
+    "MASK_NULL": "Blank value (null)",
+    "MASK_REDACT": "Redact value",
+    "MASK_VALUE": "Mask Value",
+    "MASK_VALUE_PLACEHOLDER": "Value shown instead (e.g. ***)",
+    "ASSIGNMENTS_HINT": "Add the users or groups this rule applies to.",
+    "SELECT_TARGET": "Select user or group",
+    "TARGET_REQUIRED": "A user or group is required",
+    "COLUMN_SECURITY": "Column Security"
   },
   "THEME": {
     "PAGE_TITLE": "Theme",
@@ -3115,7 +3173,24 @@
           "invalid": "Invalid operator"
         },
         "values": {
-          "atLeastOne": "At least one value is required"
+          "atLeastOne": "At least one value is required",
+          "betweenExactlyTwo": "BETWEEN requires exactly two values",
+          "betweenNumeric": "BETWEEN values must be numeric",
+          "equalsExactlyOne": "EQUALS requires exactly one value; use IN for multiple values"
+        },
+        "securityType": {
+          "invalid": "Security type must be either row or column"
+        },
+        "conditions": {
+          "atLeastOne": "At least one filter condition is required"
+        },
+        "assignments": {
+          "atLeastOne": "At least one user or group assignment is required"
+        },
+        "mask": {
+          "atLeastOne": "At least one masked column is required",
+          "strategyInvalid": "Mask strategy must be hide, null or redact",
+          "maskValueTooLong": "Mask value must not exceed 50 characters"
         }
       },
       "dashboard": {
