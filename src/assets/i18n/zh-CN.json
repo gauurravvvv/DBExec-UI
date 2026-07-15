@@ -1513,7 +1513,41 @@
     "FIELDS_MISSING_HELP": "仪表板布局在发布时已保存为快照，但数据集自那时起已发生变化。请从源分析重新发布，或联系仪表板所有者。",
     "WARNING_SCOPE_VISUAL": "可视化",
     "WARNING_SCOPE_FILTER": "筛选器",
-    "WARNING_SCOPE_FIELD": "字段"
+    "WARNING_SCOPE_FIELD": "字段",
+    "SHARE": {
+      "TITLE": "共享仪表板",
+      "ANON_WARNING": "任何拥有共享链接的人都可以在不登录的情况下查看此仪表板的已发布快照。行级别安全性仍对匿名查看者有效。",
+      "COPY_NOW": "请立即复制此链接 — 它不会再次显示。",
+      "LABEL": "标签",
+      "LABEL_PH": "用于标识此链接的可选名称",
+      "EXPIRY": "过期时间",
+      "EXPIRY_PH": "永不过期",
+      "EXPIRY_HINT": "留空表示链接永不过期。",
+      "CREATE": "创建链接",
+      "CREATED": "共享链接已创建",
+      "CREATE_FAILED": "无法创建共享链接",
+      "EXISTING": "现有链接",
+      "NONE": "暂无共享链接",
+      "UNTITLED": "未命名链接",
+      "STATUS_ACTIVE": "有效",
+      "STATUS_EXPIRED": "已过期",
+      "STATUS_REVOKED": "已撤销",
+      "EXPIRES": "过期于",
+      "REVOKE": "撤销",
+      "REVOKE_CONFIRM": "撤销此链接？",
+      "REVOKED": "共享链接已撤销",
+      "REVOKE_FAILED": "无法撤销链接",
+      "COPY": "复制链接",
+      "COPIED": "链接已复制到剪贴板",
+      "COPY_FAILED": "无法复制链接",
+      "BUTTON": "共享"
+    },
+    "EXPORT": {
+      "TOOLTIP": "导出仪表板",
+      "PNG": "导出为 PNG",
+      "PDF": "导出为 PDF",
+      "CSV": "导出数据 (CSV)"
+    }
   },
   "TOAST": {
     "SUCCESS": "成功",

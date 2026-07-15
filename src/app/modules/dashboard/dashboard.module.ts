@@ -9,10 +9,15 @@ import { SharedChartsModule } from 'src/app/shared/modules/shared-charts.module'
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ListDashboardComponent } from './components/list-dashboard/list-dashboard.component';
 import { ViewDashboardComponent } from './components/view-dashboard/view-dashboard.component';
+import { ShareDashboardDialogComponent } from './components/share-dashboard-dialog/share-dashboard-dialog.component';
 import { DashboardRoutingModule } from './dashboard-routing.module';
 
 @NgModule({
-  declarations: [ListDashboardComponent, ViewDashboardComponent],
+  declarations: [
+    ListDashboardComponent,
+    ViewDashboardComponent,
+    ShareDashboardDialogComponent,
+  ],
   imports: [
     CommonModule,
     FormsModule,

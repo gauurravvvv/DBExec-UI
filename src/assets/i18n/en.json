@@ -1516,7 +1516,41 @@
     "PUBLISH_FAILED": "Could not publish dashboard",
     "PUBLISH_NO_VISUALS_HINT": "Add at least one visual before publishing.",
     "PUBLISH_UNSAVED_HINT": "Save the analysis first, then publish.",
-    "SEARCH_PLACEHOLDER": "Search dashboards by name or description"
+    "SEARCH_PLACEHOLDER": "Search dashboards by name or description",
+    "SHARE": {
+      "TITLE": "Share dashboard",
+      "ANON_WARNING": "Anyone with a share link can view this dashboard's published snapshot without signing in. Row-level security is still enforced for anonymous viewers.",
+      "COPY_NOW": "Copy this link now — it won't be shown again.",
+      "LABEL": "Label",
+      "LABEL_PH": "Optional name to recognize this link",
+      "EXPIRY": "Expires",
+      "EXPIRY_PH": "No expiry",
+      "EXPIRY_HINT": "Leave empty for a link that never expires.",
+      "CREATE": "Create link",
+      "CREATED": "Share link created",
+      "CREATE_FAILED": "Could not create the share link",
+      "EXISTING": "Existing links",
+      "NONE": "No share links yet",
+      "UNTITLED": "Untitled link",
+      "STATUS_ACTIVE": "Active",
+      "STATUS_EXPIRED": "Expired",
+      "STATUS_REVOKED": "Revoked",
+      "EXPIRES": "Expires",
+      "REVOKE": "Revoke",
+      "REVOKE_CONFIRM": "Revoke this link?",
+      "REVOKED": "Share link revoked",
+      "REVOKE_FAILED": "Could not revoke the link",
+      "COPY": "Copy link",
+      "COPIED": "Link copied to clipboard",
+      "COPY_FAILED": "Could not copy the link",
+      "BUTTON": "Share"
+    },
+    "EXPORT": {
+      "TOOLTIP": "Export dashboard",
+      "PNG": "Export as PNG",
+      "PDF": "Export as PDF",
+      "CSV": "Export data (CSV)"
+    }
   },
   "TOAST": {
     "SUCCESS": "Success",

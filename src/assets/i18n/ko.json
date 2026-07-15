@@ -1513,7 +1513,41 @@
     "FIELDS_MISSING_HELP": "대시보드 레이아웃은 게시 시점에 스냅숏으로 저장되었지만 데이터 세트가 그 이후 변경되었습니다. 소스 분석에서 다시 게시하거나 대시보드 소유자에게 문의하세요.",
     "WARNING_SCOPE_VISUAL": "시각적 개체",
     "WARNING_SCOPE_FILTER": "필터",
-    "WARNING_SCOPE_FIELD": "필드"
+    "WARNING_SCOPE_FIELD": "필드",
+    "SHARE": {
+      "TITLE": "대시보드 공유",
+      "ANON_WARNING": "공유 링크가 있는 사람은 누구나 로그인 없이 이 대시보드의 게시된 스냅샷을 볼 수 있습니다. 행 수준 보안은 익명 사용자에게도 계속 적용됩니다.",
+      "COPY_NOW": "지금 이 링크를 복사하세요 — 다시 표시되지 않습니다.",
+      "LABEL": "레이블",
+      "LABEL_PH": "이 링크를 식별할 선택적 이름",
+      "EXPIRY": "만료일",
+      "EXPIRY_PH": "만료 없음",
+      "EXPIRY_HINT": "만료되지 않는 링크를 원하면 비워 두세요.",
+      "CREATE": "링크 생성",
+      "CREATED": "공유 링크가 생성되었습니다",
+      "CREATE_FAILED": "공유 링크를 생성할 수 없습니다",
+      "EXISTING": "기존 링크",
+      "NONE": "공유 링크가 없습니다",
+      "UNTITLED": "이름 없는 링크",
+      "STATUS_ACTIVE": "활성",
+      "STATUS_EXPIRED": "만료됨",
+      "STATUS_REVOKED": "철회됨",
+      "EXPIRES": "만료",
+      "REVOKE": "철회",
+      "REVOKE_CONFIRM": "이 링크를 철회하시겠습니까?",
+      "REVOKED": "공유 링크가 철회되었습니다",
+      "REVOKE_FAILED": "링크를 철회할 수 없습니다",
+      "COPY": "링크 복사",
+      "COPIED": "링크가 클립보드에 복사되었습니다",
+      "COPY_FAILED": "링크를 복사할 수 없습니다",
+      "BUTTON": "공유"
+    },
+    "EXPORT": {
+      "TOOLTIP": "대시보드 내보내기",
+      "PNG": "PNG로 내보내기",
+      "PDF": "PDF로 내보내기",
+      "CSV": "데이터 내보내기 (CSV)"
+    }
   },
   "TOAST": {
     "SUCCESS": "성공",

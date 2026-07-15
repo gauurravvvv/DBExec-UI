@@ -1513,7 +1513,41 @@
     "FIELDS_MISSING_HELP": "Il layout del dashboard è stato salvato come snapshot al momento della pubblicazione, ma il dataset è cambiato da allora. Ripubblica dall'analisi sorgente o contatta il proprietario del dashboard.",
     "WARNING_SCOPE_VISUAL": "Visual",
     "WARNING_SCOPE_FILTER": "Filtro",
-    "WARNING_SCOPE_FIELD": "Campo"
+    "WARNING_SCOPE_FIELD": "Campo",
+    "SHARE": {
+      "TITLE": "Condividi dashboard",
+      "ANON_WARNING": "Chiunque abbia un link di condivisione può visualizzare lo snapshot pubblicato di questo dashboard senza effettuare l'accesso. La sicurezza a livello di riga è comunque applicata per i visitatori anonimi.",
+      "COPY_NOW": "Copia questo link ora — non verrà mostrato di nuovo.",
+      "LABEL": "Etichetta",
+      "LABEL_PH": "Nome opzionale per identificare questo link",
+      "EXPIRY": "Scadenza",
+      "EXPIRY_PH": "Nessuna scadenza",
+      "EXPIRY_HINT": "Lascia vuoto per un link senza scadenza.",
+      "CREATE": "Crea link",
+      "CREATED": "Link di condivisione creato",
+      "CREATE_FAILED": "Impossibile creare il link di condivisione",
+      "EXISTING": "Link esistenti",
+      "NONE": "Nessun link di condivisione",
+      "UNTITLED": "Link senza titolo",
+      "STATUS_ACTIVE": "Attivo",
+      "STATUS_EXPIRED": "Scaduto",
+      "STATUS_REVOKED": "Revocato",
+      "EXPIRES": "Scade",
+      "REVOKE": "Revoca",
+      "REVOKE_CONFIRM": "Revocare questo link?",
+      "REVOKED": "Link di condivisione revocato",
+      "REVOKE_FAILED": "Impossibile revocare il link",
+      "COPY": "Copia link",
+      "COPIED": "Link copiato negli appunti",
+      "COPY_FAILED": "Impossibile copiare il link",
+      "BUTTON": "Condividi"
+    },
+    "EXPORT": {
+      "TOOLTIP": "Esporta dashboard",
+      "PNG": "Esporta come PNG",
+      "PDF": "Esporta come PDF",
+      "CSV": "Esporta dati (CSV)"
+    }
   },
   "TOAST": {
     "SUCCESS": "Successo",

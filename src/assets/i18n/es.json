@@ -1513,7 +1513,41 @@
     "FIELDS_MISSING_HELP": "El diseño del panel se guardó como instantánea al publicarse, pero el conjunto de datos ha cambiado desde entonces. Vuelve a publicar desde el análisis fuente o contacta al propietario del panel.",
     "WARNING_SCOPE_VISUAL": "Visual",
     "WARNING_SCOPE_FILTER": "Filtro",
-    "WARNING_SCOPE_FIELD": "Campo"
+    "WARNING_SCOPE_FIELD": "Campo",
+    "SHARE": {
+      "TITLE": "Compartir dashboard",
+      "ANON_WARNING": "Cualquier persona con un enlace de compartir puede ver la instantánea publicada de este dashboard sin iniciar sesión. La seguridad a nivel de fila se aplica igualmente para los espectadores anónimos.",
+      "COPY_NOW": "Copia este enlace ahora — no se mostrará de nuevo.",
+      "LABEL": "Etiqueta",
+      "LABEL_PH": "Nombre opcional para identificar este enlace",
+      "EXPIRY": "Vencimiento",
+      "EXPIRY_PH": "Sin vencimiento",
+      "EXPIRY_HINT": "Deja en blanco para un enlace que nunca vence.",
+      "CREATE": "Crear enlace",
+      "CREATED": "Enlace de compartir creado",
+      "CREATE_FAILED": "No se pudo crear el enlace de compartir",
+      "EXISTING": "Enlaces existentes",
+      "NONE": "Aún no hay enlaces de compartir",
+      "UNTITLED": "Enlace sin título",
+      "STATUS_ACTIVE": "Activo",
+      "STATUS_EXPIRED": "Vencido",
+      "STATUS_REVOKED": "Revocado",
+      "EXPIRES": "Vence",
+      "REVOKE": "Revocar",
+      "REVOKE_CONFIRM": "¿Revocar este enlace?",
+      "REVOKED": "Enlace de compartir revocado",
+      "REVOKE_FAILED": "No se pudo revocar el enlace",
+      "COPY": "Copiar enlace",
+      "COPIED": "Enlace copiado al portapapeles",
+      "COPY_FAILED": "No se pudo copiar el enlace",
+      "BUTTON": "Compartir"
+    },
+    "EXPORT": {
+      "TOOLTIP": "Exportar dashboard",
+      "PNG": "Exportar como PNG",
+      "PDF": "Exportar como PDF",
+      "CSV": "Exportar datos (CSV)"
+    }
   },
   "TOAST": {
     "SUCCESS": "Éxito",

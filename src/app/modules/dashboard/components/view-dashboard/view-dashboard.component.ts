@@ -14,8 +14,14 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { MenuItem } from 'primeng/api';
 import { DASHBOARD as DB_ROUTES } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import {
+  exportDashboardPdf,
+  exportDashboardPng,
+  exportRowsCsv,
+} from '../../services/dashboard-export.util';
 import { FilterFetcher } from 'src/app/modules/analyses/components/analysis-filter-bar/analysis-filter-bar.component';
 import {
   getMissingFieldsForVisual,
@@ -185,6 +191,11 @@ export class ViewDashboardComponent
 
   isCardChartType = isCardChartType;
 
+  // ── Share + export ───────────────────────────────────────────────
+  shareVisible = false;
+  exporting = false;
+  exportItems: MenuItem[] = [];
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -195,6 +206,7 @@ export class ViewDashboardComponent
   ) {}
 
   ngOnInit(): void {
+    this.buildExportMenu();
     this.route.params
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
@@ -208,6 +220,74 @@ export class ViewDashboardComponent
 
   ngAfterViewInit(): void {
     this.trySetupCanvas();
+  }
+
+  // ── Share + export ───────────────────────────────────────────────
+
+  /** Open the public-embed share-links dialog. */
+  openShare(): void {
+    if (!this.dashboardId) return;
+    this.shareVisible = true;
+  }
+
+  private buildExportMenu(): void {
+    this.exportItems = [
+      {
+        label: this.translate.instant('DASHBOARD.EXPORT.PNG'),
+        icon: 'pi pi-image',
+        command: () => void this.onExportPng(),
+      },
+      {
+        label: this.translate.instant('DASHBOARD.EXPORT.PDF'),
+        icon: 'pi pi-file-pdf',
+        command: () => void this.onExportPdf(),
+      },
+      {
+        label: this.translate.instant('DASHBOARD.EXPORT.CSV'),
+        icon: 'pi pi-file-excel',
+        command: () => this.onExportCsv(),
+      },
+    ];
+  }
+
+  private get exportTitle(): string {
+    return this.dashboard?.name || 'dashboard';
+  }
+
+  async onExportPng(): Promise<void> {
+    const node = this.canvasContainer?.nativeElement;
+    if (!node || this.exporting) return;
+    this.exporting = true;
+    this.cdr.markForCheck();
+    try {
+      await exportDashboardPng(node, this.exportTitle);
+    } finally {
+      this.exporting = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  async onExportPdf(): Promise<void> {
+    const node = this.canvasContainer?.nativeElement;
+    if (!node || this.exporting) return;
+    this.exporting = true;
+    this.cdr.markForCheck();
+    try {
+      await exportDashboardPdf(node, this.exportTitle);
+    } finally {
+      this.exporting = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * Export the raw row set backing the dashboard as CSV. Uses the loaded
+   * rows (post-filter) so the download matches what's on screen.
+   */
+  onExportCsv(): void {
+    const rows = Array.isArray(this.rawData) ? this.rawData : [];
+    if (!rows.length) return;
+    exportRowsCsv(rows as Array<Record<string, unknown>>, this.exportTitle);
   }
 
   ngOnDestroy(): void {

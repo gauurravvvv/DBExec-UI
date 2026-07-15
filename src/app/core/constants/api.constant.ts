@@ -371,6 +371,19 @@ export const DASHBOARD = {
   // POST /dashboards/:dashboardId/distinct-values
   DISTINCT_VALUES_PREFIX: '/dashboards/',
   DISTINCT_VALUES_SUFFIX: '/distinct-values',
+  // Share links (authed management) — /dashboards/:dashboardId/share-tokens
+  //   GET  list · POST create · DELETE /:tokenId revoke
+  SHARE_TOKENS_PREFIX: '/dashboards/',
+  SHARE_TOKENS_SUFFIX: '/share-tokens',
+};
+
+// Public dashboard embed — UNAUTHENTICATED, token-guarded. Called only by
+// the standalone /embed viewer (no x-auth-token). Base is deliberately the
+// /public/dashboards mount that sits outside the auth middleware chain.
+export const PUBLIC_DASHBOARD = {
+  RENDER_PREFIX: '/public/dashboards/', // GET  /public/dashboards/:token
+  RUN_PREFIX: '/public/dashboards/', // POST /public/dashboards/:token/run
+  RUN_SUFFIX: '/run',
 };
 
 export const RLS_RULE = {

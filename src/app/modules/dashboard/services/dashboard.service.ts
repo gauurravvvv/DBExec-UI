@@ -1,6 +1,9 @@
 import { Injectable, signal } from '@angular/core';
 import { EmptyError, Subject, lastValueFrom, takeUntil } from 'rxjs';
-import { DASHBOARD } from 'src/app/core/constants/api.constant';
+import {
+  DASHBOARD,
+  PUBLIC_DASHBOARD,
+} from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 /**
@@ -268,5 +271,89 @@ export class DashboardService {
   resetCurrent(): void {
     this._current.set(null);
     this._rendered.set(null);
+  }
+
+  // ── Share links (authed management) ──────────────────────────────
+  // Mint / list / revoke public share tokens for a dashboard. All three
+  // are gated server-side by dashboard WRITE + ownership; the raw token
+  // is returned ONLY by createShareToken and only once.
+
+  /** GET /dashboards/:id/share-tokens → the dashboard's share links. */
+  async listShareTokens(dashboardId: string): Promise<any[]> {
+    const res: any = await lastValueFrom(
+      this.http.apiGet(
+        DASHBOARD.SHARE_TOKENS_PREFIX +
+          dashboardId +
+          DASHBOARD.SHARE_TOKENS_SUFFIX,
+        { skipLoader: true },
+      ),
+    );
+    return res?.data ?? [];
+  }
+
+  /**
+   * POST /dashboards/:id/share-tokens → mint a link. The response's
+   * `data.token` (raw) + `data.url` are surfaced to the user exactly
+   * once; the server only stores the hash.
+   */
+  async createShareToken(
+    dashboardId: string,
+    body: { label?: string; expiresAt?: string | null },
+  ): Promise<any> {
+    return lastValueFrom(
+      this.http.apiPost(
+        DASHBOARD.SHARE_TOKENS_PREFIX +
+          dashboardId +
+          DASHBOARD.SHARE_TOKENS_SUFFIX,
+        body,
+        { skipLoader: true },
+      ),
+    );
+  }
+
+  /** DELETE /dashboards/:id/share-tokens/:tokenId → revoke a link. */
+  async revokeShareToken(
+    dashboardId: string,
+    tokenId: string,
+    justification?: string,
+  ): Promise<any> {
+    return lastValueFrom(
+      this.http.apiDelete(
+        DASHBOARD.SHARE_TOKENS_PREFIX +
+          dashboardId +
+          DASHBOARD.SHARE_TOKENS_SUFFIX +
+          '/' +
+          tokenId,
+        { body: { justification }, skipLoader: true },
+      ),
+    );
+  }
+
+  // ── Public embed (UNAUTHENTICATED, token-guarded) ────────────────
+  // Used only by the standalone /embed viewer. The BE public route
+  // resolves org + enforces RLS from the token; no JWT is required
+  // (the empty auth header the interceptor sends is ignored there).
+
+  /** GET /public/dashboards/:token → snapshot layout + visuals. */
+  async renderPublic(token: string): Promise<any> {
+    return lastValueFrom(
+      this.http.apiGet(PUBLIC_DASHBOARD.RENDER_PREFIX + token, {
+        skipLoader: true,
+      }),
+    );
+  }
+
+  /** POST /public/dashboards/:token/run → snapshot SQL (RLS-hardened). */
+  async runPublicQuery(
+    token: string,
+    body: { filters?: any[]; limit?: number },
+  ): Promise<any> {
+    return lastValueFrom(
+      this.http.apiPost(
+        PUBLIC_DASHBOARD.RUN_PREFIX + token + PUBLIC_DASHBOARD.RUN_SUFFIX,
+        body,
+        { skipLoader: true },
+      ),
+    );
   }
 }

@@ -1,0 +1,160 @@
+<p-dialog
+  [visible]="visible"
+  (visibleChange)="!$event && close()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  styleClass="share-dashboard-dialog"
+  [style]="{ width: '560px', maxWidth: '94vw' }"
+>
+  <ng-template pTemplate="header">
+    <div class="dlg-header">
+      <i class="pi pi-share-alt"></i>
+      <div class="dlg-header-text">
+        <span class="dlg-title">{{ 'DASHBOARD.SHARE.TITLE' | translate }}</span>
+        <span class="dlg-sub" *ngIf="dashboardName">{{ dashboardName }}</span>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="share-body">
+    <!-- Anonymous-access warning: this is the security-relevant hint. -->
+    <div class="share-warning">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>{{ 'DASHBOARD.SHARE.ANON_WARNING' | translate }}</span>
+    </div>
+
+    <!-- Just-minted link: shown once, copy-now banner. -->
+    <div class="fresh-link" *ngIf="freshUrl">
+      <div class="fresh-link-head">
+        <i class="pi pi-check-circle"></i>
+        <span>{{ 'DASHBOARD.SHARE.COPY_NOW' | translate }}</span>
+      </div>
+      <div class="fresh-link-row">
+        <input type="text" readonly [value]="freshUrl" class="link-input" />
+        <button
+          type="button"
+          class="btn-icon"
+          (click)="copy(freshUrl)"
+          [attr.aria-label]="'DASHBOARD.SHARE.COPY' | translate"
+          [pTooltip]="'DASHBOARD.SHARE.COPY' | translate"
+        >
+          <i class="pi pi-copy"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Create form -->
+    <div class="create-form">
+      <div class="form-field">
+        <label>{{ 'DASHBOARD.SHARE.LABEL' | translate }}</label>
+        <input
+          type="text"
+          class="text-input"
+          [(ngModel)]="label"
+          [placeholder]="'DASHBOARD.SHARE.LABEL_PH' | translate"
+          maxlength="100"
+        />
+      </div>
+      <div class="form-field">
+        <label>{{ 'DASHBOARD.SHARE.EXPIRY' | translate }}</label>
+        <p-calendar
+          [(ngModel)]="expiresAt"
+          [minDate]="minExpiry"
+          [showTime]="false"
+          [showIcon]="true"
+          appendTo="body"
+          dateFormat="yy-mm-dd"
+          [placeholder]="'DASHBOARD.SHARE.EXPIRY_PH' | translate"
+          styleClass="w-full"
+        ></p-calendar>
+        <small class="hint">{{ 'DASHBOARD.SHARE.EXPIRY_HINT' | translate }}</small>
+      </div>
+      <button
+        type="button"
+        class="btn-primary create-btn"
+        (click)="createLink()"
+        [disabled]="creating"
+      >
+        <i class="pi" [ngClass]="creating ? 'pi-spin pi-spinner' : 'pi-plus'"></i>
+        {{ 'DASHBOARD.SHARE.CREATE' | translate }}
+      </button>
+    </div>
+
+    <!-- Existing links -->
+    <div class="links-section">
+      <div class="links-head">
+        {{ 'DASHBOARD.SHARE.EXISTING' | translate }}
+      </div>
+
+      <div class="links-loading" *ngIf="loading">
+        <i class="pi pi-spin pi-spinner"></i>
+      </div>
+
+      <div class="links-empty" *ngIf="!loading && tokens.length === 0">
+        {{ 'DASHBOARD.SHARE.NONE' | translate }}
+      </div>
+
+      <div class="link-row" *ngFor="let tok of tokens">
+        <div class="link-meta">
+          <span class="link-label">
+            {{ tok.label || ('DASHBOARD.SHARE.UNTITLED' | translate) }}
+          </span>
+          <span class="link-status" [ngClass]="isActive(tok) ? 'ok' : 'off'">
+            {{
+              (tok.revokedAt
+                ? 'DASHBOARD.SHARE.STATUS_REVOKED'
+                : isExpired(tok)
+                  ? 'DASHBOARD.SHARE.STATUS_EXPIRED'
+                  : 'DASHBOARD.SHARE.STATUS_ACTIVE'
+              ) | translate
+            }}
+          </span>
+          <span class="link-expiry" *ngIf="tok.expiresAt">
+            {{ 'DASHBOARD.SHARE.EXPIRES' | translate }}:
+            {{ tok.expiresAt | date: 'medium' }}
+          </span>
+        </div>
+
+        <div class="link-actions" *ngIf="isActive(tok)">
+          <ng-container *ngIf="!isRevokeArmed(tok.id)">
+            <button
+              type="button"
+              class="btn-danger-text"
+              (click)="askRevoke(tok.id)"
+              [disabled]="revokingId === tok.id"
+            >
+              <i
+                class="pi"
+                [ngClass]="revokingId === tok.id ? 'pi-spin pi-spinner' : 'pi-ban'"
+              ></i>
+              {{ 'DASHBOARD.SHARE.REVOKE' | translate }}
+            </button>
+          </ng-container>
+          <ng-container *ngIf="isRevokeArmed(tok.id)">
+            <span class="confirm-text">{{
+              'DASHBOARD.SHARE.REVOKE_CONFIRM' | translate
+            }}</span>
+            <button
+              type="button"
+              class="btn-danger-text"
+              (click)="confirmRevoke(tok.id)"
+            >
+              {{ 'COMMON.YES' | translate }}
+            </button>
+            <button type="button" class="btn-plain-text" (click)="cancelRevoke()">
+              {{ 'COMMON.NO' | translate }}
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button type="button" class="btn-plain" (click)="close()">
+      {{ 'COMMON.CLOSE' | translate }}
+    </button>
+  </ng-template>
+</p-dialog>

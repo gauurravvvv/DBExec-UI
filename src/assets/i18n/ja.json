@@ -1513,7 +1513,41 @@
     "FIELDS_MISSING_HELP": "ダッシュボードのレイアウトは発行時にスナップショットとして保存されましたが、データセットがその後変更されています。ソース分析から再発行するか、ダッシュボードのオーナーに連絡してください。",
     "WARNING_SCOPE_VISUAL": "ビジュアル",
     "WARNING_SCOPE_FILTER": "フィルター",
-    "WARNING_SCOPE_FIELD": "フィールド"
+    "WARNING_SCOPE_FIELD": "フィールド",
+    "SHARE": {
+      "TITLE": "ダッシュボードを共有",
+      "ANON_WARNING": "共有リンクを持つ人は誰でも、サインインなしでこのダッシュボードの公開スナップショットを閲覧できます。行レベルのセキュリティは匿名の閲覧者にも引き続き適用されます。",
+      "COPY_NOW": "このリンクを今すぐコピーしてください — 再表示されません。",
+      "LABEL": "ラベル",
+      "LABEL_PH": "このリンクを識別するための任意の名前",
+      "EXPIRY": "有効期限",
+      "EXPIRY_PH": "有効期限なし",
+      "EXPIRY_HINT": "有効期限のないリンクにするには空のままにしてください。",
+      "CREATE": "リンクを作成",
+      "CREATED": "共有リンクを作成しました",
+      "CREATE_FAILED": "共有リンクを作成できませんでした",
+      "EXISTING": "既存のリンク",
+      "NONE": "共有リンクはまだありません",
+      "UNTITLED": "無題のリンク",
+      "STATUS_ACTIVE": "有効",
+      "STATUS_EXPIRED": "期限切れ",
+      "STATUS_REVOKED": "無効化済み",
+      "EXPIRES": "有効期限",
+      "REVOKE": "無効化",
+      "REVOKE_CONFIRM": "このリンクを無効化しますか？",
+      "REVOKED": "共有リンクを無効化しました",
+      "REVOKE_FAILED": "リンクを無効化できませんでした",
+      "COPY": "リンクをコピー",
+      "COPIED": "リンクをクリップボードにコピーしました",
+      "COPY_FAILED": "リンクをコピーできませんでした",
+      "BUTTON": "共有"
+    },
+    "EXPORT": {
+      "TOOLTIP": "ダッシュボードをエクスポート",
+      "PNG": "PNGとしてエクスポート",
+      "PDF": "PDFとしてエクスポート",
+      "CSV": "データをエクスポート (CSV)"
+    }
   },
   "TOAST": {
     "SUCCESS": "成功",

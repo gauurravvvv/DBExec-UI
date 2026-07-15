@@ -1513,7 +1513,41 @@
     "FIELDS_MISSING_HELP": "La disposition du tableau de bord a été sauvegardée en instantané à la publication, mais le jeu de données a changé depuis. Republiez depuis l'analyse source ou contactez le propriétaire du tableau de bord.",
     "WARNING_SCOPE_VISUAL": "Visuel",
     "WARNING_SCOPE_FILTER": "Filtre",
-    "WARNING_SCOPE_FIELD": "Champ"
+    "WARNING_SCOPE_FIELD": "Champ",
+    "SHARE": {
+      "TITLE": "Partager le tableau de bord",
+      "ANON_WARNING": "Toute personne disposant d'un lien de partage peut consulter l'instantané publié de ce tableau de bord sans se connecter. La sécurité au niveau des lignes reste appliquée pour les visiteurs anonymes.",
+      "COPY_NOW": "Copiez ce lien maintenant — il ne sera plus affiché.",
+      "LABEL": "Libellé",
+      "LABEL_PH": "Nom optionnel pour identifier ce lien",
+      "EXPIRY": "Expiration",
+      "EXPIRY_PH": "Sans expiration",
+      "EXPIRY_HINT": "Laissez vide pour un lien sans date d'expiration.",
+      "CREATE": "Créer le lien",
+      "CREATED": "Lien de partage créé",
+      "CREATE_FAILED": "Impossible de créer le lien de partage",
+      "EXISTING": "Liens existants",
+      "NONE": "Aucun lien de partage",
+      "UNTITLED": "Lien sans titre",
+      "STATUS_ACTIVE": "Actif",
+      "STATUS_EXPIRED": "Expiré",
+      "STATUS_REVOKED": "Révoqué",
+      "EXPIRES": "Expire",
+      "REVOKE": "Révoquer",
+      "REVOKE_CONFIRM": "Révoquer ce lien ?",
+      "REVOKED": "Lien de partage révoqué",
+      "REVOKE_FAILED": "Impossible de révoquer le lien",
+      "COPY": "Copier le lien",
+      "COPIED": "Lien copié dans le presse-papiers",
+      "COPY_FAILED": "Impossible de copier le lien",
+      "BUTTON": "Partager"
+    },
+    "EXPORT": {
+      "TOOLTIP": "Exporter le tableau de bord",
+      "PNG": "Exporter en PNG",
+      "PDF": "Exporter en PDF",
+      "CSV": "Exporter les données (CSV)"
+    }
   },
   "TOAST": {
     "SUCCESS": "Succès",

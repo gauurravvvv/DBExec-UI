@@ -1513,7 +1513,41 @@
     "FIELDS_MISSING_HELP": "Das Dashboard-Layout wurde beim Veröffentlichen als Snapshot gespeichert, aber der Datensatz hat sich seitdem geändert. Aus der Quellanalyse erneut veröffentlichen oder den Dashboard-Inhaber kontaktieren.",
     "WARNING_SCOPE_VISUAL": "Visualisierung",
     "WARNING_SCOPE_FILTER": "Filter",
-    "WARNING_SCOPE_FIELD": "Feld"
+    "WARNING_SCOPE_FIELD": "Feld",
+    "SHARE": {
+      "TITLE": "Dashboard teilen",
+      "ANON_WARNING": "Jeder mit einem Freigabelink kann den veröffentlichten Snapshot dieses Dashboards ohne Anmeldung einsehen. Die Sicherheit auf Zeilenebene wird für anonyme Betrachter weiterhin durchgesetzt.",
+      "COPY_NOW": "Diesen Link jetzt kopieren – er wird nicht erneut angezeigt.",
+      "LABEL": "Bezeichnung",
+      "LABEL_PH": "Optionaler Name zur Identifikation dieses Links",
+      "EXPIRY": "Ablaufdatum",
+      "EXPIRY_PH": "Kein Ablaufdatum",
+      "EXPIRY_HINT": "Leer lassen für einen Link ohne Ablaufdatum.",
+      "CREATE": "Link erstellen",
+      "CREATED": "Freigabelink erstellt",
+      "CREATE_FAILED": "Freigabelink konnte nicht erstellt werden",
+      "EXISTING": "Vorhandene Links",
+      "NONE": "Noch keine Freigabelinks",
+      "UNTITLED": "Unbenannter Link",
+      "STATUS_ACTIVE": "Aktiv",
+      "STATUS_EXPIRED": "Abgelaufen",
+      "STATUS_REVOKED": "Widerrufen",
+      "EXPIRES": "Läuft ab",
+      "REVOKE": "Widerrufen",
+      "REVOKE_CONFIRM": "Diesen Link widerrufen?",
+      "REVOKED": "Freigabelink widerrufen",
+      "REVOKE_FAILED": "Link konnte nicht widerrufen werden",
+      "COPY": "Link kopieren",
+      "COPIED": "Link in Zwischenablage kopiert",
+      "COPY_FAILED": "Link konnte nicht kopiert werden",
+      "BUTTON": "Teilen"
+    },
+    "EXPORT": {
+      "TOOLTIP": "Dashboard exportieren",
+      "PNG": "Als PNG exportieren",
+      "PDF": "Als PDF exportieren",
+      "CSV": "Daten exportieren (CSV)"
+    }
   },
   "TOAST": {
     "SUCCESS": "Erfolg",

@@ -99,6 +99,39 @@
             [ngClass]="isDataLoading() ? 'pi-spin pi-spinner' : 'pi-refresh'"
           ></i>
         </button>
+
+        <!-- Export menu (PNG / PDF). data-export-ignore keeps the toolbar
+             out of the captured image. -->
+        <button
+          type="button"
+          class="header-icon-btn"
+          data-export-ignore
+          (click)="exportMenu.toggle($event)"
+          [disabled]="exporting || visuals.length === 0"
+          [pTooltip]="'DASHBOARD.EXPORT.TOOLTIP' | translate"
+          tooltipPosition="bottom"
+          [attr.aria-label]="'DASHBOARD.EXPORT.TOOLTIP' | translate"
+        >
+          <i
+            class="pi"
+            [ngClass]="exporting ? 'pi-spin pi-spinner' : 'pi-download'"
+          ></i>
+        </button>
+        <p-menu #exportMenu [popup]="true" [model]="exportItems" appendTo="body"></p-menu>
+
+        <!-- Share (public embed links). -->
+        <button
+          type="button"
+          class="header-icon-btn"
+          data-export-ignore
+          (click)="openShare()"
+          [disabled]="!dashboardId"
+          [pTooltip]="'DASHBOARD.SHARE.BUTTON' | translate"
+          tooltipPosition="bottom"
+          [attr.aria-label]="'DASHBOARD.SHARE.BUTTON' | translate"
+        >
+          <i class="pi pi-share-alt"></i>
+        </button>
       </div>
     </div>
 
@@ -364,3 +397,12 @@
     </div>
   </div>
 </div>
+
+<!-- Share links dialog (public embed). Mounted at root so its overlay
+     isn't clipped by the dashboard's scroll containers. -->
+<app-share-dashboard-dialog
+  [visible]="shareVisible"
+  [dashboardId]="dashboardId"
+  [dashboardName]="dashboard?.name || ''"
+  (closed)="shareVisible = false"
+></app-share-dashboard-dialog>

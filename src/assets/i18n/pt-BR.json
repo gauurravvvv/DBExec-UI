@@ -1513,7 +1513,41 @@
     "FIELDS_MISSING_HELP": "O layout do painel foi salvo como instantâneo no momento da publicação, mas o conjunto de dados foi alterado desde então. Republique a partir da análise de origem ou entre em contato com o proprietário do painel.",
     "WARNING_SCOPE_VISUAL": "Visual",
     "WARNING_SCOPE_FILTER": "Filtro",
-    "WARNING_SCOPE_FIELD": "Campo"
+    "WARNING_SCOPE_FIELD": "Campo",
+    "SHARE": {
+      "TITLE": "Compartilhar dashboard",
+      "ANON_WARNING": "Qualquer pessoa com um link de compartilhamento pode visualizar o snapshot publicado deste dashboard sem fazer login. A segurança em nível de linha continua sendo aplicada para visitantes anônimos.",
+      "COPY_NOW": "Copie este link agora — ele não será exibido novamente.",
+      "LABEL": "Rótulo",
+      "LABEL_PH": "Nome opcional para identificar este link",
+      "EXPIRY": "Validade",
+      "EXPIRY_PH": "Sem validade",
+      "EXPIRY_HINT": "Deixe em branco para um link sem data de validade.",
+      "CREATE": "Criar link",
+      "CREATED": "Link de compartilhamento criado",
+      "CREATE_FAILED": "Não foi possível criar o link de compartilhamento",
+      "EXISTING": "Links existentes",
+      "NONE": "Nenhum link de compartilhamento ainda",
+      "UNTITLED": "Link sem título",
+      "STATUS_ACTIVE": "Ativo",
+      "STATUS_EXPIRED": "Expirado",
+      "STATUS_REVOKED": "Revogado",
+      "EXPIRES": "Expira",
+      "REVOKE": "Revogar",
+      "REVOKE_CONFIRM": "Revogar este link?",
+      "REVOKED": "Link de compartilhamento revogado",
+      "REVOKE_FAILED": "Não foi possível revogar o link",
+      "COPY": "Copiar link",
+      "COPIED": "Link copiado para a área de transferência",
+      "COPY_FAILED": "Não foi possível copiar o link",
+      "BUTTON": "Compartilhar"
+    },
+    "EXPORT": {
+      "TOOLTIP": "Exportar dashboard",
+      "PNG": "Exportar como PNG",
+      "PDF": "Exportar como PDF",
+      "CSV": "Exportar dados (CSV)"
+    }
   },
   "TOAST": {
     "SUCCESS": "Sucesso",

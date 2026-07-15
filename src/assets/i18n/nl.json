@@ -1513,7 +1513,41 @@
     "FIELDS_MISSING_HELP": "De dashboardindeling is bij publicatie als snapshot opgeslagen, maar de dataset is sindsdien gewijzigd. Publiceer opnieuw vanuit de bronanalyse of neem contact op met de dashboardeigenaar.",
     "WARNING_SCOPE_VISUAL": "Visual",
     "WARNING_SCOPE_FILTER": "Filter",
-    "WARNING_SCOPE_FIELD": "Veld"
+    "WARNING_SCOPE_FIELD": "Veld",
+    "SHARE": {
+      "TITLE": "Dashboard delen",
+      "ANON_WARNING": "Iedereen met een deellink kan de gepubliceerde momentopname van dit dashboard bekijken zonder in te loggen. Beveiliging op rijniveau blijft van toepassing op anonieme bezoekers.",
+      "COPY_NOW": "Kopieer deze link nu — hij wordt niet opnieuw getoond.",
+      "LABEL": "Label",
+      "LABEL_PH": "Optionele naam om deze link te herkennen",
+      "EXPIRY": "Vervaldatum",
+      "EXPIRY_PH": "Geen vervaldatum",
+      "EXPIRY_HINT": "Leeg laten voor een link die nooit verloopt.",
+      "CREATE": "Link aanmaken",
+      "CREATED": "Deellink aangemaakt",
+      "CREATE_FAILED": "Kon de deellink niet aanmaken",
+      "EXISTING": "Bestaande links",
+      "NONE": "Nog geen deellinks",
+      "UNTITLED": "Naamloze link",
+      "STATUS_ACTIVE": "Actief",
+      "STATUS_EXPIRED": "Verlopen",
+      "STATUS_REVOKED": "Ingetrokken",
+      "EXPIRES": "Verloopt",
+      "REVOKE": "Intrekken",
+      "REVOKE_CONFIRM": "Deze link intrekken?",
+      "REVOKED": "Deellink ingetrokken",
+      "REVOKE_FAILED": "Kon de link niet intrekken",
+      "COPY": "Link kopiëren",
+      "COPIED": "Link gekopieerd naar klembord",
+      "COPY_FAILED": "Kon de link niet kopiëren",
+      "BUTTON": "Delen"
+    },
+    "EXPORT": {
+      "TOOLTIP": "Dashboard exporteren",
+      "PNG": "Exporteren als PNG",
+      "PDF": "Exporteren als PDF",
+      "CSV": "Gegevens exporteren (CSV)"
+    }
   },
   "TOAST": {
     "SUCCESS": "Succes",
