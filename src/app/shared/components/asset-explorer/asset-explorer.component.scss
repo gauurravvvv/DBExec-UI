@@ -786,6 +786,133 @@ tbody tr.sel .kebab-btn {
   }
 }
 
+/* Move/copy DIALOG — appended to <body>, so its inner markup lives OUTSIDE
+   this component's :host scope. Style it via a global ::ng-deep block keyed
+   on the dialog's styleClass. */
+:host ::ng-deep .explorer-move-dialog {
+  .move-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .move-root-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    padding: 8px 10px;
+    font-size: var(--fs-control);
+    font-family: inherit;
+    color: var(--text-color);
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+
+    &:hover {
+      background: var(--hover-bg, rgba(0, 0, 0, 0.04));
+    }
+
+    &.active {
+      border-color: var(--primary-color);
+      background: var(--primary-color-lighter, rgba(59, 130, 246, 0.1));
+      color: var(--primary-color);
+    }
+  }
+
+  .move-create {
+    padding-top: 4px;
+
+    .rail-create-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      background: transparent;
+      color: var(--primary-color);
+      font-size: var(--fs-control);
+      font-family: inherit;
+      cursor: pointer;
+      padding: 4px 2px;
+    }
+
+    .rail-create-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      .rail-create-input {
+        flex: 1 1 auto;
+        min-width: 0;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        padding: 7px 10px;
+        font-size: var(--fs-control);
+        font-family: inherit;
+      }
+
+      .rail-create-save,
+      .rail-create-cancel {
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        background: var(--surface-card, #fff);
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .move-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+
+    .move-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 9px 16px;
+      font-size: var(--fs-control);
+      font-weight: var(--fw-semibold);
+      font-family: inherit;
+      color: var(--primary-text);
+      background: var(--primary-color);
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        background: var(--primary-hover);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+
+    .move-cancel {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 9px 16px;
+      font-size: var(--fs-control);
+      font-weight: var(--fw-medium);
+      font-family: inherit;
+      color: var(--text-color);
+      background: transparent;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--hover-bg, rgba(0, 0, 0, 0.04));
+      }
+    }
+  }
+}
+
 /* Respect reduced motion: no disclosure rotate transition. */
 @media (prefers-reduced-motion: reduce) {
   .disc i {

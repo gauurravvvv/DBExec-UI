@@ -15,11 +15,14 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { MenuItem, TreeNode } from 'primeng/api';
+import { ConfirmationService, MenuItem, TreeNode } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { ContextMenu, ContextMenuModule } from 'primeng/contextmenu';
+import { DialogModule } from 'primeng/dialog';
 import { MenuModule } from 'primeng/menu';
 import { Menu } from 'primeng/menu';
-import { OverlayPanel, OverlayPanelModule } from 'primeng/overlaypanel';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { TooltipModule } from 'primeng/tooltip';
 import { TreeModule } from 'primeng/tree';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -84,6 +87,9 @@ type LibraryView = 'all' | 'favourites' | 'recents';
     ButtonModule,
     TooltipModule,
     ScrollingModule,
+    ContextMenuModule,
+    ConfirmPopupModule,
+    DialogModule,
     // Kept so consumers' projected `<ng-template usGridCell="…">` still parses
     // (the module column DOM is now read directly in the Kind cell, but the
     // directive must remain a valid host import for API compatibility).
@@ -92,6 +98,9 @@ type LibraryView = 'all' | 'favourites' | 'recents';
   templateUrl: './asset-explorer.component.html',
   styleUrls: ['./asset-explorer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // Scoped ConfirmationService so the explorer's own confirm-popup
+  // (folder delete) doesn't collide with a host page's global one.
+  providers: [ConfirmationService],
 })
 export class AssetExplorerComponent implements OnInit, OnChanges {
   private cdr = inject(ChangeDetectorRef);
@@ -99,6 +108,7 @@ export class AssetExplorerComponent implements OnInit, OnChanges {
   private favouritesService = inject(FavouritesService);
   private globalService = inject(GlobalService);
   private translate = inject(TranslateService);
+  private confirmationService = inject(ConfirmationService);
 
   /** Which object family this explorer lists. Required. */
   @Input() objectType!: ExplorerObjectType;
@@ -135,7 +145,10 @@ export class AssetExplorerComponent implements OnInit, OnChanges {
   @Output() moved = new EventEmitter<{ row: any; targetFolderId: string | null }>();
 
   @ViewChild('kebabMenu') kebabMenu?: Menu;
-  @ViewChild('moveOp') moveOp?: OverlayPanel;
+  @ViewChild('ctxMenu') ctxMenu?: ContextMenu;
+
+  /** Move/copy is a centered modal dialog (not a corner overlay). */
+  showMoveDialog = false;
 
   /* ── Finder tree state ───────────────────────────────────────────── */
 
@@ -171,6 +184,27 @@ export class AssetExplorerComponent implements OnInit, OnChanges {
   kebabItems: MenuItem[] = [];
   private kebabRow: any = null;
 
+  /* ── right-click context menu (R3) ───────────────────────────────── */
+  ctxItems: MenuItem[] = [];
+
+  /* ── inline folder rename (R3) ───────────────────────────────────── */
+  /** nodeKey of the folder currently being renamed in place, or null. */
+  renamingKey: string | null = null;
+  renameValue = '';
+  savingRename = false;
+
+  /* ── inline "new sub-folder" (R3) ────────────────────────────────── */
+  /** id of the folder a new sub-folder is being created under, or null. */
+  createChildParentId: string | null = null;
+  childNewFolderName = '';
+  savingChildFolder = false;
+
+  /* ── flat filtered view (Favourites / Recents / by-tag) ──────────── */
+  /** When true, `nodes` holds a FLAT asset list (no folder tree) produced
+   *  by a Library filter; disclosure + folder rows are suppressed. */
+  flatView = false;
+  flatLoading = false;
+
   /* ── move/copy overlay state (UNCHANGED behaviour) ───────────────── */
   moveRow: any = null;
   moveNodes: FolderNode[] = [];
@@ -197,6 +231,7 @@ export class AssetExplorerComponent implements OnInit, OnChanges {
     this.columns = this.buildColumns();
     this.baseFilter = {};
     this.loadRoot();
+    this.loadTags();
     // Warm favourite state so stars render and the sidebar count is accurate.
     this.favouritesService.refresh(this.objectType).then(() => {
       this.favouriteCount = this.currentFavouriteCount();
@@ -214,7 +249,9 @@ export class AssetExplorerComponent implements OnInit, OnChanges {
       this.selectedKey = null;
       this.childrenCache.clear();
       this.libraryView = 'all';
+      this.flatView = false;
       this.loadRoot();
+      this.loadTags();
     }
   }
 
@@ -245,6 +282,7 @@ export class AssetExplorerComponent implements OnInit, OnChanges {
   /** Load the top level (folderId 'root') into `nodes`. */
   loadRoot(): void {
     if (!this.objectType) return;
+    this.flatView = false;
     this.rootLoading = true;
     this.nodes = [];
     this.foldersService
@@ -387,24 +425,236 @@ export class AssetExplorerComponent implements OnInit, OnChanges {
   }
 
   /**
-   * TODO (R3): right-click a row / empty space opens a context menu.
-   *  - asset row → reuse buildKebabItems(row) at the pointer;
-   *  - folder row / empty space → New folder · New tag · Refresh
-   *    (Refresh = childrenCache.delete(folderId) then re-expand).
-   *  Left as a no-op stub so the seam is obvious.
+   * Right-click a row (or empty space) opens the context menu, its items
+   * tailored to the target: asset rows reuse the kebab actions; folder rows
+   * add New sub-folder / Rename / Delete / Refresh; empty space offers New
+   * folder / Refresh. The menu is a PrimeNG p-contextMenu anchored at the
+   * pointer via its own `.show(event)`.
    */
-  onRowContextMenu(_event: MouseEvent, _node: ExplorerNode | null): void {
-    // no-op for R2
+  onRowContextMenu(event: MouseEvent, node: ExplorerNode | null): void {
+    // Don't hijack right-click while renaming inline (let the browser's
+    // native input context menu work).
+    if (node && this.renamingKey === this.nodeKey(node)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (node) this.selectedKey = this.nodeKey(node);
+    this.ctxItems = this.buildContextItems(node);
+    this.ctxMenu?.show(event);
+    this.cdr.markForCheck();
+  }
+
+  /** Build the context-menu model for the right-clicked target. */
+  private buildContextItems(node: ExplorerNode | null): MenuItem[] {
+    const t = (k: string): string => this.translate.instant(k);
+
+    // Asset row → the same actions as the hover kebab.
+    if (node && node.kind === 'asset') {
+      return this.buildKebabItems(node.row);
+    }
+
+    // Folder row → folder-scoped operations.
+    if (node && node.kind === 'folder') {
+      const items: MenuItem[] = [];
+      if (this.canManage) {
+        items.push({
+          label: t('EXPLORER.CTX.NEW_SUBFOLDER'),
+          icon: 'pi pi-folder-plus',
+          command: () => this.startCreateChild(node),
+        });
+        items.push({
+          label: t('EXPLORER.CTX.RENAME'),
+          icon: 'pi pi-pencil',
+          command: () => this.startRename(node),
+        });
+        items.push({ separator: true });
+        items.push({
+          label: t('EXPLORER.CTX.DELETE'),
+          icon: 'pi pi-trash',
+          styleClass: 'kebab-danger',
+          command: () => this.confirmDeleteFolder(node),
+        });
+        items.push({ separator: true });
+      }
+      items.push({
+        label: t('EXPLORER.CTX.REFRESH'),
+        icon: 'pi pi-refresh',
+        command: () => this.refreshFolder(node),
+      });
+      return items;
+    }
+
+    // Empty space (node === null) → root-scoped operations.
+    const items: MenuItem[] = [];
+    if (this.canManage) {
+      items.push({
+        label: t('EXPLORER.CTX.NEW_FOLDER'),
+        icon: 'pi pi-folder-plus',
+        command: () => this.openRootCreate(),
+      });
+      items.push({ separator: true });
+    }
+    items.push({
+      label: t('EXPLORER.CTX.REFRESH'),
+      icon: 'pi pi-refresh',
+      command: () => this.refreshTree(),
+    });
+    return items;
+  }
+
+  /* ── folder: inline rename ───────────────────────────────────────── */
+
+  startRename(node: ExplorerNode): void {
+    if (node.kind !== 'folder') return;
+    this.renamingKey = this.nodeKey(node);
+    this.renameValue = node.name;
+    this.cdr.markForCheck();
+    // Focus + select the inline input once it renders.
+    setTimeout(() => {
+      const el = document.querySelector<HTMLInputElement>(
+        '.finder-table .rename-input',
+      );
+      if (el) {
+        el.focus();
+        el.select();
+      }
+    });
+  }
+
+  cancelRename(): void {
+    this.renamingKey = null;
+    this.renameValue = '';
+    this.cdr.markForCheck();
+  }
+
+  saveRename(node: ExplorerNode): void {
+    const name = this.renameValue.trim();
+    if (!name || this.savingRename || name === node.name) {
+      this.cancelRename();
+      return;
+    }
+    this.savingRename = true;
+    this.foldersService
+      .rename(node.id, name)
+      .then((res: any) => {
+        if (this.globalService.handleSuccessService(res)) {
+          node.name = name; // reflect in place without a full reload
+        }
+        this.savingRename = false;
+        this.renamingKey = null;
+        this.renameValue = '';
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.savingRename = false;
+        this.cdr.markForCheck();
+      });
+  }
+
+  /* ── folder: delete (confirm popup) ──────────────────────────────── */
+
+  confirmDeleteFolder(node: ExplorerNode): void {
+    if (node.kind !== 'folder') return;
+    this.confirmationService.confirm({
+      // A generic DOM anchor; the confirm-popup finds the trigger element.
+      target: document.activeElement as HTMLElement,
+      message: this.translate.instant('EXPLORER.DELETE_FOLDER') + ' “' + node.name + '”?',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: this.translate.instant('COMMON.DELETE') || 'Delete',
+      rejectLabel: this.translate.instant('COMMON.CANCEL') || 'Cancel',
+      accept: () => this.deleteFolder(node),
+    });
+  }
+
+  private deleteFolder(node: ExplorerNode): void {
+    this.foldersService
+      .delete(node.id)
+      .then((res: any) => {
+        if (this.globalService.handleSuccessService(res)) {
+          this.refreshTree();
+        }
+      })
+      .catch(() => {
+        /* interceptor surfaces the error toast */
+      });
+  }
+
+  /* ── folder: new sub-folder (inline under the folder) ────────────── */
+
+  startCreateChild(node: ExplorerNode): void {
+    if (node.kind !== 'folder') return;
+    this.createChildParentId = node.id;
+    this.childNewFolderName = '';
+    // Make sure the parent is expanded so the input row is visible.
+    if (!node.expanded) this.expandFolder(node);
+    this.cdr.markForCheck();
+  }
+
+  cancelCreateChild(): void {
+    this.createChildParentId = null;
+    this.childNewFolderName = '';
+    this.cdr.markForCheck();
+  }
+
+  saveChildFolder(): void {
+    const name = this.childNewFolderName.trim();
+    const parentId = this.createChildParentId;
+    if (!name || !parentId || this.savingChildFolder) return;
+    this.savingChildFolder = true;
+    this.foldersService
+      .create({ name, objectType: this.objectType, parentId })
+      .then((res: any) => {
+        if (this.globalService.handleSuccessService(res)) {
+          this.createChildParentId = null;
+          this.childNewFolderName = '';
+          // Invalidate the parent's cache and re-expand so the new child shows.
+          this.childrenCache.delete(parentId);
+          const parent = this.nodes.find(
+            n => n.kind === 'folder' && n.id === parentId,
+          );
+          if (parent) {
+            // collapse-then-expand to re-splice fresh children
+            if (parent.expanded) this.collapseFolder(parent);
+            this.expandFolder(parent);
+          }
+        }
+        this.savingChildFolder = false;
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.savingChildFolder = false;
+        this.cdr.markForCheck();
+      });
+  }
+
+  /** Right-click "Refresh" on a folder: drop its cache + re-expand. */
+  refreshFolder(node: ExplorerNode): void {
+    if (node.kind !== 'folder') return;
+    this.childrenCache.delete(node.id);
+    if (node.expanded) {
+      this.collapseFolder(node);
+      this.expandFolder(node);
+    }
+    this.cdr.markForCheck();
   }
 
   /* ── sidebar: library + tags ─────────────────────────────────────── */
 
   setLibraryView(view: LibraryView): void {
     this.libraryView = view;
-    // TODO (R4): 'favourites'/'recents' filter the tree; for R2 they only
-    // set the active state — 'all' stays the source of truth.
     this.selectedTag = null;
-    this.cdr.markForCheck();
+    if (view === 'all') {
+      // Back to the folder tree.
+      this.flatView = false;
+      this.loadRoot();
+      return;
+    }
+    // Favourites → server-filtered flat list. Recents → all assets, sorted
+    // by most-recently-updated client-side (the list endpoints have no
+    // dedicated "recents" filter; sorting the flat set is exact enough).
+    this.loadFlat(
+      view === 'favourites' ? { favouritesOnly: true } : {},
+      view === 'recents',
+    );
   }
 
   loadTags(): void {
@@ -425,16 +675,83 @@ export class AssetExplorerComponent implements OnInit, OnChanges {
   }
 
   /**
-   * Click a sidebar tag. R2 = minimal: toggle the active state only (no tree
-   * re-query — listChildren has no tag filter). R4 will drive a flat, filtered
-   * "matching assets" view + coloured dots.
+   * Click a sidebar tag → a flat, filtered "assets with this tag" view
+   * (folders hidden). Clicking the active tag again clears the filter and
+   * returns to the folder tree.
    */
   selectTag(tag: string): void {
-    this.selectedTag = this.selectedTag === tag ? null : tag;
+    if (this.selectedTag === tag) {
+      this.selectedTag = null;
+      this.libraryView = 'all';
+      this.flatView = false;
+      this.loadRoot();
+      return;
+    }
+    this.selectedTag = tag;
     this.libraryView = 'all';
-    // TODO (R4): apply a flat tag filter (serverAdapter {tags:[tag]} or a
-    // dedicated endpoint) and render matches without the folder tree.
+    this.loadFlat({ tags: [tag] });
+  }
+
+  /**
+   * Load a FLAT asset list matching a Library filter (favourites / recents /
+   * tag) via the host module's own list endpoint (serverAdapter.loadOnce),
+   * then render the rows as depth-0 asset nodes with no folder tree. Falls
+   * back to an empty list (never the tree) if no adapter was supplied.
+   */
+  private loadFlat(
+    filter: Record<string, unknown>,
+    sortByRecent = false,
+  ): void {
+    this.flatView = true;
+    this.flatLoading = true;
+    this.nodes = [];
     this.cdr.markForCheck();
+
+    if (!this.serverAdapter) {
+      // No adapter → can't run a module list; show empty rather than the tree.
+      this.flatLoading = false;
+      this.cdr.markForCheck();
+      return;
+    }
+
+    const params = {
+      page: 1,
+      limit: 500,
+      ...(Object.keys(filter).length
+        ? { filter: JSON.stringify(filter) }
+        : {}),
+    };
+
+    this.serverAdapter
+      .loadOnce(params)
+      .then(res => {
+        let rows = (res?.rows ?? []) as Record<string, any>[];
+        if (sortByRecent) {
+          rows = [...rows]
+            .sort((a, b) => {
+              const av = new Date(a['updatedOn'] || a['createdOn'] || 0).getTime();
+              const bv = new Date(b['updatedOn'] || b['createdOn'] || 0).getTime();
+              return bv - av;
+            })
+            .slice(0, 50);
+        }
+        this.nodes = rows.map(a => ({
+          kind: 'asset' as const,
+          id: a['id'],
+          name: a['name'],
+          parentId: (a['folderId'] as string | null) ?? null,
+          depth: 0,
+          row: a,
+          objectType: this.objectType,
+        }));
+        this.flatLoading = false;
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.nodes = [];
+        this.flatLoading = false;
+        this.cdr.markForCheck();
+      });
   }
 
   /* ── favourites (UNCHANGED wiring) ───────────────────────────────── */
@@ -529,8 +846,8 @@ export class AssetExplorerComponent implements OnInit, OnChanges {
     this.showMoveCreate = false;
     this.moveNewFolderName = '';
     this.loadMoveTree();
-    const anchor = document.activeElement as HTMLElement | null;
-    if (anchor) this.moveOp?.show(new Event('click'), anchor);
+    this.showMoveDialog = true;
+    this.cdr.markForCheck();
   }
 
   private loadMoveTree(): void {
@@ -622,7 +939,7 @@ export class AssetExplorerComponent implements OnInit, OnChanges {
         if (this.globalService.handleSuccessService(res)) {
           this.moved.emit({ row, targetFolderId: target });
           this.refreshTree();
-          this.moveOp?.hide();
+          this.showMoveDialog = false;
         }
         this.moving = false;
         this.cdr.markForCheck();
@@ -637,7 +954,8 @@ export class AssetExplorerComponent implements OnInit, OnChanges {
   confirmCopy(): void {
     if (!this.moveRow) return;
     this.copy.emit({ row: this.moveRow, targetFolderId: this.moveTargetFolderId });
-    this.moveOp?.hide();
+    this.showMoveDialog = false;
+    this.cdr.markForCheck();
   }
 
   /* ── toolbar: new folder at root ─────────────────────────────────── */
@@ -679,7 +997,11 @@ export class AssetExplorerComponent implements OnInit, OnChanges {
   private refreshTree(): void {
     this.childrenCache.clear();
     this.selectedKey = null;
+    this.selectedTag = null;
+    this.libraryView = 'all';
+    this.flatView = false;
     this.loadRoot();
+    this.loadTags();
   }
 
   /* ── helpers ─────────────────────────────────────────────────────── */

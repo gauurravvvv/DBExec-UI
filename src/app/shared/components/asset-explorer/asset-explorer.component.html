@@ -128,8 +128,8 @@
           </tr>
         </thead>
         <tbody>
+          <ng-container *ngFor="let node of nodes; trackBy: trackNode">
           <tr
-            *ngFor="let node of nodes; trackBy: trackNode"
             [class.sel]="isSelected(node)"
             (click)="onRowClick(node)"
             (contextmenu)="onRowContextMenu($event, node)"
@@ -164,12 +164,26 @@
                 ></i>
 
                 <!-- Name + extension -->
-                <span
-                  *ngIf="node.kind === 'folder'"
-                  class="nm"
-                  [title]="node.name"
-                  >{{ node.name }}</span
-                >
+                <!-- Folder name (inline rename when active) -->
+                <ng-container *ngIf="node.kind === 'folder'">
+                  <input
+                    *ngIf="renamingKey === nodeKey(node); else folderNameLabel"
+                    type="text"
+                    class="rename-input"
+                    [(ngModel)]="renameValue"
+                    maxlength="120"
+                    autocomplete="off"
+                    (click)="$event.stopPropagation()"
+                    (keydown.enter)="saveRename(node)"
+                    (keydown.escape)="cancelRename()"
+                    (blur)="saveRename(node)"
+                    #renameBox
+                    (mousedown)="$event.stopPropagation()"
+                  />
+                  <ng-template #folderNameLabel>
+                    <span class="nm" [title]="node.name">{{ node.name }}</span>
+                  </ng-template>
+                </ng-container>
                 <button
                   *ngIf="node.kind === 'asset'"
                   type="button"
@@ -231,16 +245,51 @@
               </div>
             </td>
           </tr>
+
+          <!-- Inline "new sub-folder" input, rendered under the folder it's
+               being created in (right after that folder's own row). -->
+          <tr
+            *ngIf="node.kind === 'folder' && createChildParentId === node.id"
+            class="child-create-row"
+          >
+            <td colspan="4">
+              <div class="name-cell" [style.paddingLeft.px]="(node.depth + 1) * 20 + 4">
+                <i class="ficon k-folder pi pi-folder"></i>
+                <input
+                  type="text"
+                  class="rename-input"
+                  [(ngModel)]="childNewFolderName"
+                  [placeholder]="'EXPLORER.NEW_SUBFOLDER' | translate"
+                  maxlength="120"
+                  autocomplete="off"
+                  (keydown.enter)="saveChildFolder()"
+                  (keydown.escape)="cancelCreateChild()"
+                />
+                <button
+                  type="button"
+                  class="tb-create-save"
+                  (click)="saveChildFolder()"
+                  [disabled]="!childNewFolderName.trim() || savingChildFolder"
+                >
+                  <i class="pi" [ngClass]="savingChildFolder ? 'pi-spin pi-spinner' : 'pi-check'"></i>
+                </button>
+                <button type="button" class="tb-create-cancel" (click)="cancelCreateChild()">
+                  <i class="pi pi-times"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          </ng-container>
         </tbody>
       </table>
 
       <!-- Loading / empty states -->
-      <div class="list-loading" *ngIf="rootLoading">
+      <div class="list-loading" *ngIf="rootLoading || flatLoading">
         <i class="pi pi-spin pi-spinner"></i>
         <span>{{ 'COMMON.LOADING' | translate }}</span>
       </div>
 
-      <div class="list-empty" *ngIf="!rootLoading && nodes.length === 0">
+      <div class="list-empty" *ngIf="!rootLoading && !flatLoading && nodes.length === 0">
         <i class="pi pi-inbox"></i>
         <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
       </div>
@@ -248,9 +297,21 @@
 
     <!-- Status bar -->
     <footer class="explorer-status">
-      <span class="crumb">
+      <span class="crumb" *ngIf="!selectedTag && libraryView === 'all'">
         <i class="pi pi-inbox"></i>
-        <b>{{ 'EXPLORER.ROOT' | translate }}</b>
+        <b>{{ 'EXPLORER.ALL_ITEMS' | translate }}</b>
+      </span>
+      <span class="crumb" *ngIf="!selectedTag && libraryView === 'favourites'">
+        <i class="pi pi-star-fill"></i>
+        <b>{{ 'EXPLORER.FAVOURITES' | translate }}</b>
+      </span>
+      <span class="crumb" *ngIf="!selectedTag && libraryView === 'recents'">
+        <i class="pi pi-clock"></i>
+        <b>{{ 'EXPLORER.RECENTS' | translate }}</b>
+      </span>
+      <span class="crumb" *ngIf="selectedTag">
+        <i class="pi pi-tag"></i>
+        <b>{{ selectedTag }}</b>
       </span>
       <span class="status-right">
         {{ 'EXPLORER.STATUS_ITEMS' | translate: { count: itemCount } }}
@@ -262,8 +323,7 @@
 </div>
 
 <!-- Single kebab menu, rebuilt per clicked row. Item labels are pre-translated
-     when the model is built (buildKebabItems). R3 will also open this on
-     right-click of an asset row. -->
+     when the model is built (buildKebabItems). -->
 <p-menu
   #kebabMenu
   [popup]="true"
@@ -272,14 +332,32 @@
   styleClass="explorer-kebab-menu"
 ></p-menu>
 
-<!-- ONE move/copy overlay: mini folder tree + New folder + primary button.
-     UNCHANGED from the previous shell. -->
-<p-overlayPanel #moveOp appendTo="body" styleClass="explorer-move-panel">
-  <div class="move-panel">
-    <div class="move-title">
-      {{ (moveIsCopy ? 'EXPLORER.KEBAB.COPY' : 'EXPLORER.KEBAB.MOVE') | translate }}
-    </div>
+<!-- Right-click context menu — model rebuilt per target (asset / folder /
+     empty space) in onRowContextMenu, then shown at the pointer. -->
+<p-contextMenu
+  #ctxMenu
+  [model]="ctxItems"
+  appendTo="body"
+  styleClass="explorer-kebab-menu"
+></p-contextMenu>
 
+<!-- Confirm popup for folder delete. -->
+<p-confirmPopup></p-confirmPopup>
+
+<!-- Move / copy: a centered MODAL dialog (folder tree + New folder + primary
+     button). Replaces the old corner overlay-panel. -->
+<p-dialog
+  [(visible)]="showMoveDialog"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  appendTo="body"
+  styleClass="explorer-move-dialog"
+  [style]="{ width: '440px', maxWidth: '92vw' }"
+  [header]="(moveIsCopy ? 'EXPLORER.KEBAB.COPY' : 'EXPLORER.KEBAB.MOVE') | translate"
+>
+  <div class="move-panel">
     <button
       type="button"
       class="move-root-row"
@@ -347,7 +425,17 @@
       </div>
     </div>
 
+  </div>
+
+  <ng-template pTemplate="footer">
     <div class="move-actions">
+      <button
+        type="button"
+        class="move-cancel"
+        (click)="showMoveDialog = false"
+      >
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
       <button
         type="button"
         class="move-primary"
@@ -368,5 +456,5 @@
         {{ 'EXPLORER.COPY_HERE' | translate }}
       </button>
     </div>
-  </div>
-</p-overlayPanel>
+  </ng-template>
+</p-dialog>

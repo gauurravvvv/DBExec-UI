@@ -1,4 +1,11 @@
-import { Observable, Subject, Subscription, from, isObservable } from 'rxjs';
+import {
+  Observable,
+  Subject,
+  Subscription,
+  firstValueFrom,
+  from,
+  isObservable,
+} from 'rxjs';
 import { signal } from '@angular/core';
 
 /**
@@ -261,6 +268,24 @@ export class UsServerListAdapter<TRow = unknown> {
         ? JSON.stringify(filterPayload)
         : undefined,
     };
+  }
+
+  /**
+   * One-shot fetch that does NOT touch the grid's page / sort / filter
+   * state or its `rows`/`total` signals. Runs the configured `load` +
+   * `unwrap` for an arbitrary params payload and resolves to
+   * `{ rows, total }`. The Finder explorer uses this for its flat
+   * "Favourites / Recents / by tag" views, reusing each module's own
+   * list endpoint + unwrap logic instead of duplicating them.
+   */
+  async loadOnce(params: UsListLoadParams): Promise<UsListResponse<TRow>> {
+    const unwrap = this.cfg.unwrap ?? defaultUnwrap<TRow>;
+    const result = this.cfg.load(params);
+    const obs$: Observable<unknown> = isObservable(result)
+      ? result
+      : from(result as Promise<unknown>);
+    const res = await firstValueFrom(obs$);
+    return unwrap(res);
   }
 
   /** Tear-down hook — call from the host component's ngOnDestroy
