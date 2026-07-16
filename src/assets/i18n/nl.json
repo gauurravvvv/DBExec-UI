@@ -993,7 +993,30 @@
       "MAX": "Max",
       "AVG": "Gem.",
       "BASED_ON_PREVIEW": "Gebaseerd op voorbeeldrijen"
-    }
+    },
+    "CALC_FIELDS_TITLE": "Berekende velden",
+    "CALC_FIELDS_SUBTITLE": "Leid nieuwe kolommen af uit een veilige formule-expressie",
+    "CALC_FIELDS_COUNT": "{{count}} berekend(e) veld(en)",
+    "CALC_FIELDS_EMPTY": "Nog geen berekende velden. Voeg er een toe om een nieuwe kolom af te leiden.",
+    "CALC_FIELDS_BACK_TO_LIST": "Terug naar lijst",
+    "CALC_FIELD_ADD": "Berekend veld toevoegen",
+    "CALC_FIELD_EDIT": "Berekend veld bewerken",
+    "CALC_FIELD_NAME": "Veldnaam",
+    "CALC_FIELD_NAME_PH": "bijv. profit_margin",
+    "CALC_FIELD_DATA_TYPE": "Gegevenstype",
+    "CALC_FIELD_EXPRESSION": "Expressie",
+    "CALC_FIELD_EXPRESSION_PH": "bijv. ROUND((revenue - cost) / revenue * 100, 2)",
+    "CALC_FIELD_EXPRESSION_HELP": "Toegestaan: + - * / %, vergelijkingen, AND/OR/NOT, CASE WHEN, CAST, ABS/ROUND/FLOOR/CEIL/COALESCE/LENGTH/UPPER/LOWER/TRIM/CONCAT en kolomnamen.",
+    "CALC_FIELD_VALIDATED": "Expressie is geldig.",
+    "CALC_FIELD_VALIDATION_FAILED": "Expressie kon niet worden gevalideerd.",
+    "CALC_FIELD_LIST_FAILED": "Kon berekende velden niet laden.",
+    "CALC_FIELD_DELETE_TITLE": "Berekend veld verwijderen?",
+    "CALC_FIELD_DELETE_MESSAGE": "Dit berekende veld wordt verwijderd. Analyses die het gebruiken kunnen worden beïnvloed.",
+    "CALC_FIELD_TYPE_AUTO": "Automatisch (afleiden)",
+    "CALC_FIELD_TYPE_NUMERIC": "Numeriek",
+    "CALC_FIELD_TYPE_TEXT": "Tekst",
+    "CALC_FIELD_TYPE_DATE": "Datum",
+    "CALC_FIELD_TYPE_BOOLEAN": "Booleaans"
   },
   "ANALYSES": {
     "TITLE": "Analyses",
@@ -1537,7 +1560,10 @@
       "MEASURE_PH": "Waardenveld om samen te voegen",
       "AGGREGATION": "Aggregatie",
       "ROW_TOTALS": "Rijtotalen",
-      "COLUMN_TOTALS": "Kolomtotalen"
+      "COLUMN_TOTALS": "Kolomtotalen",
+      "SERVER_TOTALS": "Servertotalen",
+      "GRAND_TOTAL": "Eindtotaal",
+      "SUBTOTALS": "Subtotalen"
     },
     "REFLINE": {
       "TITLE": "Referentielijnen en annotaties",
@@ -3812,6 +3838,46 @@
       },
       "objectId": {
         "required": "Een geldig object-id is vereist"
+      }
+    },
+    "calculatedFields": {
+      "name": {
+        "required": "Veldnaam is vereist",
+        "invalid": "Naam moet beginnen met een letter of underscore en mag alleen letters, cijfers en underscores bevatten",
+        "tooLong": "Veldnaam is te lang"
+      },
+      "expression": {
+        "required": "Expressie is vereist",
+        "tooLong": "Expressie is te lang"
+      },
+      "dataType": {
+        "invalid": "Ongeldig gegevenstype"
+      },
+      "datasetId": {
+        "required": "Dataset is vereist"
+      },
+      "id": {
+        "required": "Veld-id is vereist"
+      }
+    },
+    "pivotTotals": {
+      "key": {
+        "required": "Totaalsleutel is vereist",
+        "invalid": "Ongeldige totaalsleutel"
+      },
+      "countKey": {
+        "invalid": "Ongeldige telsleutel"
+      },
+      "aggregate": {
+        "invalid": "Ongeldige aggregatie"
+      },
+      "dimensionKeys": {
+        "required": "Minstens één dimensie is vereist",
+        "tooMany": "Te veel dimensies"
+      },
+      "measures": {
+        "required": "Minstens één meting is vereist",
+        "tooMany": "Te veel metingen"
       }
     }
   },

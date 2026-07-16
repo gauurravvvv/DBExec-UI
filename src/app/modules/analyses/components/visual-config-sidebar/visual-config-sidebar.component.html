@@ -3715,6 +3715,30 @@
               [showStatusLabel]="false"
             ></app-custom-toggle>
           </div>
+
+          <!-- Server-side totals (Feature 5): asks the BE to append
+               grand-total + subtotal rows to the run response. -->
+          <div class="config-subsection">
+            <div class="config-subtitle">
+              {{ 'ANALYSES.PIVOT.SERVER_TOTALS' | translate }}
+            </div>
+            <div class="config-row">
+              <label>{{ 'ANALYSES.PIVOT.GRAND_TOTAL' | translate }}</label>
+              <app-custom-toggle
+                [ngModel]="pivotGrandTotal"
+                (ngModelChange)="setPivotGrandTotal($event)"
+                [showStatusLabel]="false"
+              ></app-custom-toggle>
+            </div>
+            <div class="config-row">
+              <label>{{ 'ANALYSES.PIVOT.SUBTOTALS' | translate }}</label>
+              <app-custom-toggle
+                [ngModel]="pivotSubtotals"
+                (ngModelChange)="setPivotSubtotals($event)"
+                [showStatusLabel]="false"
+              ></app-custom-toggle>
+            </div>
+          </div>
         </ng-container>
       </div>
 

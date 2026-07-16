@@ -1476,6 +1476,43 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     p.enabled = on;
   }
 
+  // ── Server-side pivot totals (Feature 5) ────────────────────────────
+  //
+  // Distinct from the ECharts-local showRow/ColumnTotals above: this
+  // config asks the BE to append grand-total + per-group subtotal ROWS to
+  // the run response (surfaced at response.meta.pivotTotals). It is sent
+  // as `config.pivotTotals` = { grandTotal, subtotals, dimensionKeys[],
+  // measures[] } on the run payload (see edit-analyses.loadDatasetData).
+  // dimensionKeys / measures are derived from the pivot config's rows +
+  // measure when the run is assembled, so here we only own the two
+  // on/off toggles. Kept in its own region, well away from the Slice-4
+  // aggregate dropdown.
+
+  private ensurePivotTotals(): any {
+    const cfg = this.focusedVisual?.config;
+    if (!cfg) return {};
+    if (!cfg.pivotTotals || typeof cfg.pivotTotals !== 'object') {
+      cfg.pivotTotals = { grandTotal: false, subtotals: false };
+    }
+    return cfg.pivotTotals;
+  }
+
+  get pivotGrandTotal(): boolean {
+    return this.focusedVisual?.config?.pivotTotals?.grandTotal === true;
+  }
+  setPivotGrandTotal(on: boolean): void {
+    const pt = this.ensurePivotTotals();
+    this.focusedVisual!.config.pivotTotals = { ...pt, grandTotal: on };
+  }
+
+  get pivotSubtotals(): boolean {
+    return this.focusedVisual?.config?.pivotTotals?.subtotals === true;
+  }
+  setPivotSubtotals(on: boolean): void {
+    const pt = this.ensurePivotTotals();
+    this.focusedVisual!.config.pivotTotals = { ...pt, subtotals: on };
+  }
+
   /**
    * Set the low (index 0) or high (index 1) endpoint colour of the
    * value-driven colour scale (ECharts visualMap). Persisted in

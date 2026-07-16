@@ -6,6 +6,7 @@
     [chartWidth]="chartWidth"
     [chartHeight]="chartHeight"
     [data]="getDisplayData(visual)"
+    [totalRows]="visual.pivotTotalRows || []"
     (chartSelect)="chartSelect.emit($event)"
   ></app-table-visual>
 </ng-container>

@@ -514,4 +514,22 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
       this.loadDatasetData();
     }
   }
+
+  // ── Calculated fields (safe-expression REST surface) ────────────────
+  showCalcFieldsDialog = false;
+
+  openCalcFieldsDialog(): void {
+    this.showCalcFieldsDialog = true;
+  }
+
+  onCalcFieldsDialogClose(): void {
+    this.showCalcFieldsDialog = false;
+  }
+
+  onCalcFieldsChanged(): void {
+    // A calc field was added/edited/deleted — re-fetch so the new
+    // fields surface in the dataset (and downstream in the analysis
+    // field picker, which sources from the same dataset fields).
+    this.loadDatasetData();
+  }
 }

@@ -676,8 +676,13 @@ export class AnalysesService {
     // entry. Wired to the "refresh cached data" action; omitted (falsy)
     // for a normal run so a cache hit is served when available.
     refresh?: boolean;
+    // Pivot totals config (Feature 5): asks the BE to append grand-total
+    // + per-group subtotal rows, returned at response.meta.pivotTotals.
+    // Shape validated by shared/validators/pivotTotals.ts. Omitted (and
+    // thus a byte-identical payload) when no table visual requests totals.
+    pivotTotals?: any;
   }) {
-    const { datasetId, analysisId, filters, parameters, limit, refresh } =
+    const { datasetId, analysisId, filters, parameters, limit, refresh, pivotTotals } =
       payload;
     const body: any = { datasetId, analysisId };
     if (filters && filters.length > 0) {
@@ -691,6 +696,9 @@ export class AnalysesService {
     }
     if (refresh) {
       body.refresh = true;
+    }
+    if (pivotTotals) {
+      body.pivotTotals = pivotTotals;
     }
     this._running.set(true);
     try {

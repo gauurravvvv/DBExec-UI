@@ -993,7 +993,30 @@
       "MAX": "Max",
       "AVG": "Durchschn.",
       "BASED_ON_PREVIEW": "Basierend auf Vorschauzeilen"
-    }
+    },
+    "CALC_FIELDS_TITLE": "Berechnete Felder",
+    "CALC_FIELDS_SUBTITLE": "Neue Spalten aus einem sicheren Formelausdruck ableiten",
+    "CALC_FIELDS_COUNT": "{{count}} berechnete(s) Feld(er)",
+    "CALC_FIELDS_EMPTY": "Noch keine berechneten Felder. Fügen Sie eines hinzu, um eine neue Spalte abzuleiten.",
+    "CALC_FIELDS_BACK_TO_LIST": "Zurück zur Liste",
+    "CALC_FIELD_ADD": "Berechnetes Feld hinzufügen",
+    "CALC_FIELD_EDIT": "Berechnetes Feld bearbeiten",
+    "CALC_FIELD_NAME": "Feldname",
+    "CALC_FIELD_NAME_PH": "z. B. profit_margin",
+    "CALC_FIELD_DATA_TYPE": "Datentyp",
+    "CALC_FIELD_EXPRESSION": "Ausdruck",
+    "CALC_FIELD_EXPRESSION_PH": "z. B. ROUND((revenue - cost) / revenue * 100, 2)",
+    "CALC_FIELD_EXPRESSION_HELP": "Erlaubt: + - * / %, Vergleiche, AND/OR/NOT, CASE WHEN, CAST, ABS/ROUND/FLOOR/CEIL/COALESCE/LENGTH/UPPER/LOWER/TRIM/CONCAT und Spaltennamen.",
+    "CALC_FIELD_VALIDATED": "Ausdruck ist gültig.",
+    "CALC_FIELD_VALIDATION_FAILED": "Ausdruck konnte nicht validiert werden.",
+    "CALC_FIELD_LIST_FAILED": "Berechnete Felder konnten nicht geladen werden.",
+    "CALC_FIELD_DELETE_TITLE": "Berechnetes Feld löschen?",
+    "CALC_FIELD_DELETE_MESSAGE": "Dieses berechnete Feld wird entfernt. Analysen, die es verwenden, können betroffen sein.",
+    "CALC_FIELD_TYPE_AUTO": "Automatisch (ableiten)",
+    "CALC_FIELD_TYPE_NUMERIC": "Numerisch",
+    "CALC_FIELD_TYPE_TEXT": "Text",
+    "CALC_FIELD_TYPE_DATE": "Datum",
+    "CALC_FIELD_TYPE_BOOLEAN": "Boolescher Wert"
   },
   "ANALYSES": {
     "TITLE": "Analysen",
@@ -1537,7 +1560,10 @@
       "MEASURE_PH": "Wertfeld für Aggregation",
       "AGGREGATION": "Aggregation",
       "ROW_TOTALS": "Zeilensummen",
-      "COLUMN_TOTALS": "Spaltensummen"
+      "COLUMN_TOTALS": "Spaltensummen",
+      "SERVER_TOTALS": "Server-Summen",
+      "GRAND_TOTAL": "Gesamtsumme",
+      "SUBTOTALS": "Zwischensummen"
     },
     "REFLINE": {
       "TITLE": "Referenzlinien & Anmerkungen",
@@ -3812,6 +3838,46 @@
       },
       "objectId": {
         "required": "Eine gültige Objekt-ID ist erforderlich"
+      }
+    },
+    "calculatedFields": {
+      "name": {
+        "required": "Feldname ist erforderlich",
+        "invalid": "Der Name muss mit einem Buchstaben oder Unterstrich beginnen und darf nur Buchstaben, Ziffern und Unterstriche enthalten",
+        "tooLong": "Feldname ist zu lang"
+      },
+      "expression": {
+        "required": "Ausdruck ist erforderlich",
+        "tooLong": "Ausdruck ist zu lang"
+      },
+      "dataType": {
+        "invalid": "Ungültiger Datentyp"
+      },
+      "datasetId": {
+        "required": "Datensatz ist erforderlich"
+      },
+      "id": {
+        "required": "Feld-ID ist erforderlich"
+      }
+    },
+    "pivotTotals": {
+      "key": {
+        "required": "Summenschlüssel ist erforderlich",
+        "invalid": "Ungültiger Summenschlüssel"
+      },
+      "countKey": {
+        "invalid": "Ungültiger Zählschlüssel"
+      },
+      "aggregate": {
+        "invalid": "Ungültige Aggregation"
+      },
+      "dimensionKeys": {
+        "required": "Mindestens eine Dimension ist erforderlich",
+        "tooMany": "Zu viele Dimensionen"
+      },
+      "measures": {
+        "required": "Mindestens ein Maß ist erforderlich",
+        "tooMany": "Zu viele Maße"
       }
     }
   },

@@ -993,7 +993,30 @@
       "MAX": "최대",
       "AVG": "평균",
       "BASED_ON_PREVIEW": "미리보기 행 기준"
-    }
+    },
+    "CALC_FIELDS_TITLE": "계산 필드",
+    "CALC_FIELDS_SUBTITLE": "안전한 수식에서 새 열을 파생합니다",
+    "CALC_FIELDS_COUNT": "계산 필드 {{count}}개",
+    "CALC_FIELDS_EMPTY": "아직 계산 필드가 없습니다. 추가하여 새 열을 파생하세요.",
+    "CALC_FIELDS_BACK_TO_LIST": "목록으로 돌아가기",
+    "CALC_FIELD_ADD": "계산 필드 추가",
+    "CALC_FIELD_EDIT": "계산 필드 편집",
+    "CALC_FIELD_NAME": "필드 이름",
+    "CALC_FIELD_NAME_PH": "예: profit_margin",
+    "CALC_FIELD_DATA_TYPE": "데이터 유형",
+    "CALC_FIELD_EXPRESSION": "식",
+    "CALC_FIELD_EXPRESSION_PH": "예: ROUND((revenue - cost) / revenue * 100, 2)",
+    "CALC_FIELD_EXPRESSION_HELP": "허용: + - * / %, 비교, AND/OR/NOT, CASE WHEN, CAST, ABS/ROUND/FLOOR/CEIL/COALESCE/LENGTH/UPPER/LOWER/TRIM/CONCAT 및 열 이름.",
+    "CALC_FIELD_VALIDATED": "식이 유효합니다.",
+    "CALC_FIELD_VALIDATION_FAILED": "식을 검증할 수 없습니다.",
+    "CALC_FIELD_LIST_FAILED": "계산 필드를 불러올 수 없습니다.",
+    "CALC_FIELD_DELETE_TITLE": "계산 필드를 삭제하시겠습니까?",
+    "CALC_FIELD_DELETE_MESSAGE": "이 계산 필드가 제거됩니다. 이를 사용하는 분석이 영향을 받을 수 있습니다.",
+    "CALC_FIELD_TYPE_AUTO": "자동 (추론)",
+    "CALC_FIELD_TYPE_NUMERIC": "숫자",
+    "CALC_FIELD_TYPE_TEXT": "텍스트",
+    "CALC_FIELD_TYPE_DATE": "날짜",
+    "CALC_FIELD_TYPE_BOOLEAN": "부울"
   },
   "ANALYSES": {
     "TITLE": "분석",
@@ -1537,7 +1560,10 @@
       "MEASURE_PH": "집계할 값 필드",
       "AGGREGATION": "집계",
       "ROW_TOTALS": "행 합계",
-      "COLUMN_TOTALS": "열 합계"
+      "COLUMN_TOTALS": "열 합계",
+      "SERVER_TOTALS": "서버 합계",
+      "GRAND_TOTAL": "총계",
+      "SUBTOTALS": "소계"
     },
     "REFLINE": {
       "TITLE": "참조선 및 주석",
@@ -3812,6 +3838,46 @@
       },
       "objectId": {
         "required": "유효한 객체 ID가 필요합니다"
+      }
+    },
+    "calculatedFields": {
+      "name": {
+        "required": "필드 이름은 필수입니다",
+        "invalid": "이름은 문자 또는 밑줄로 시작하고 문자, 숫자, 밑줄만 포함해야 합니다",
+        "tooLong": "필드 이름이 너무 깁니다"
+      },
+      "expression": {
+        "required": "식은 필수입니다",
+        "tooLong": "식이 너무 깁니다"
+      },
+      "dataType": {
+        "invalid": "잘못된 데이터 유형"
+      },
+      "datasetId": {
+        "required": "데이터 세트는 필수입니다"
+      },
+      "id": {
+        "required": "필드 ID는 필수입니다"
+      }
+    },
+    "pivotTotals": {
+      "key": {
+        "required": "합계 키는 필수입니다",
+        "invalid": "잘못된 합계 키"
+      },
+      "countKey": {
+        "invalid": "잘못된 개수 키"
+      },
+      "aggregate": {
+        "invalid": "잘못된 집계"
+      },
+      "dimensionKeys": {
+        "required": "최소 하나의 차원이 필요합니다",
+        "tooMany": "차원이 너무 많습니다"
+      },
+      "measures": {
+        "required": "최소 하나의 측정값이 필요합니다",
+        "tooMany": "측정값이 너무 많습니다"
       }
     }
   },

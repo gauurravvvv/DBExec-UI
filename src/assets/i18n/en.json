@@ -997,7 +997,30 @@
       "MAX": "Max",
       "AVG": "Avg",
       "BASED_ON_PREVIEW": "Based on preview rows"
-    }
+    },
+    "CALC_FIELDS_TITLE": "Calculated fields",
+    "CALC_FIELDS_SUBTITLE": "Derive new columns from a safe formula expression",
+    "CALC_FIELDS_COUNT": "{{count}} calculated field(s)",
+    "CALC_FIELDS_EMPTY": "No calculated fields yet. Add one to derive a new column.",
+    "CALC_FIELDS_BACK_TO_LIST": "Back to list",
+    "CALC_FIELD_ADD": "Add calculated field",
+    "CALC_FIELD_EDIT": "Edit calculated field",
+    "CALC_FIELD_NAME": "Field name",
+    "CALC_FIELD_NAME_PH": "e.g. profit_margin",
+    "CALC_FIELD_DATA_TYPE": "Data type",
+    "CALC_FIELD_EXPRESSION": "Expression",
+    "CALC_FIELD_EXPRESSION_PH": "e.g. ROUND((revenue - cost) / revenue * 100, 2)",
+    "CALC_FIELD_EXPRESSION_HELP": "Allowed: + - * / %, comparisons, AND/OR/NOT, CASE WHEN, CAST, ABS/ROUND/FLOOR/CEIL/COALESCE/LENGTH/UPPER/LOWER/TRIM/CONCAT, and column names.",
+    "CALC_FIELD_VALIDATED": "Expression is valid.",
+    "CALC_FIELD_VALIDATION_FAILED": "Expression could not be validated.",
+    "CALC_FIELD_LIST_FAILED": "Could not load calculated fields.",
+    "CALC_FIELD_DELETE_TITLE": "Delete calculated field?",
+    "CALC_FIELD_DELETE_MESSAGE": "This calculated field will be removed. Analyses using it may be affected.",
+    "CALC_FIELD_TYPE_AUTO": "Auto (infer)",
+    "CALC_FIELD_TYPE_NUMERIC": "Numeric",
+    "CALC_FIELD_TYPE_TEXT": "Text",
+    "CALC_FIELD_TYPE_DATE": "Date",
+    "CALC_FIELD_TYPE_BOOLEAN": "Boolean"
   },
   "ANALYSES": {
     "TITLE": "Analyses",
@@ -1540,7 +1563,10 @@
       "MEASURE_PH": "Value field to aggregate",
       "AGGREGATION": "Aggregation",
       "ROW_TOTALS": "Row totals",
-      "COLUMN_TOTALS": "Column totals"
+      "COLUMN_TOTALS": "Column totals",
+      "SERVER_TOTALS": "Server totals",
+      "GRAND_TOTAL": "Grand total",
+      "SUBTOTALS": "Subtotals"
     },
     "REFLINE": {
       "TITLE": "Reference lines & annotations",
@@ -3809,6 +3835,46 @@
       },
       "objectId": {
         "required": "A valid object id is required"
+      }
+    },
+    "calculatedFields": {
+      "name": {
+        "required": "Field name is required",
+        "invalid": "Name must start with a letter or underscore and contain only letters, digits and underscores",
+        "tooLong": "Field name is too long"
+      },
+      "expression": {
+        "required": "Expression is required",
+        "tooLong": "Expression is too long"
+      },
+      "dataType": {
+        "invalid": "Invalid data type"
+      },
+      "datasetId": {
+        "required": "Dataset is required"
+      },
+      "id": {
+        "required": "Field id is required"
+      }
+    },
+    "pivotTotals": {
+      "key": {
+        "required": "Total key is required",
+        "invalid": "Invalid total key"
+      },
+      "countKey": {
+        "invalid": "Invalid count key"
+      },
+      "aggregate": {
+        "invalid": "Invalid aggregate"
+      },
+      "dimensionKeys": {
+        "required": "At least one dimension is required",
+        "tooMany": "Too many dimensions"
+      },
+      "measures": {
+        "required": "At least one measure is required",
+        "tooMany": "Too many measures"
       }
     }
   },

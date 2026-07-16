@@ -77,6 +77,14 @@ export class TableVisualComponent implements OnChanges {
   @Input() chartWidth: number | undefined;
   @Input() chartHeight: number | undefined;
 
+  /**
+   * Server-side pivot total rows (Feature 5). Each row is a plain row
+   * object (same key shape as a data row) tagged with `__rowType`:
+   * 'subtotal' | 'grand'. Rendered after the flat data rows, styled
+   * distinctly (bold + tinted). Empty / absent = no totals shown.
+   */
+  @Input() totalRows: any[] = [];
+
   @Output() chartSelect = new EventEmitter<any>();
 
   columns: TableColumn[] = [];
@@ -258,6 +266,27 @@ export class TableVisualComponent implements OnChanges {
 
   onRowClick(row: any): void {
     this.chartSelect.emit({ row });
+  }
+
+  // ── Server-side total rows (Feature 5) ──
+
+  /** True when the BE returned total/subtotal rows to render. */
+  get hasTotalRows(): boolean {
+    return Array.isArray(this.totalRows) && this.totalRows.length > 0;
+  }
+
+  /** Grand-total rows get a heavier treatment than subtotals. */
+  isGrandTotalRow(row: any): boolean {
+    return row?.__rowType === 'grand';
+  }
+
+  /**
+   * Cell text for a total row. The BE echoes the same column keys as the
+   * data rows, so we reuse formatCell; the internal `__rowType` tag is
+   * never a rendered column (columns come from the data sample).
+   */
+  formatTotalCell(row: any, col: TableColumn): string {
+    return this.formatCell(row?.[col.field], col);
   }
 
   trackByIndex(i: number): number {

@@ -185,6 +185,27 @@ export const DATASET = {
   FRESHNESS_SUFFIX: '/freshness',
 };
 
+/**
+ * Calculated fields (derived formula columns) — the safe-expression
+ * REST surface. Distinct from the dataset `/fields` custom-field
+ * subresource: these compile a whitelisted expression grammar against
+ * the dataset's known columns and surface back as usable dataset fields.
+ *   - POST   /calculated-fields                 add
+ *   - POST   /calculated-fields/validate        compile-only preview
+ *   - GET    /calculated-fields/dataset/:id     list for a dataset
+ *   - PUT    /calculated-fields/:id             update
+ *   - DELETE /calculated-fields/:id             delete
+ */
+export const CALCULATED_FIELD = {
+  ADD: '/calculated-fields',
+  VALIDATE: '/calculated-fields/validate',
+  // GET /calculated-fields/dataset/:datasetId
+  LIST_FOR_DATASET_PREFIX: '/calculated-fields/dataset/',
+  // PUT/DELETE /calculated-fields/:id
+  UPDATE: '/calculated-fields/', // PUT /calculated-fields/:id
+  DELETE: '/calculated-fields/', // DELETE /calculated-fields/:id
+};
+
 export const TAB = {
   LIST: '/tabs',
   ADD: '/tabs',
