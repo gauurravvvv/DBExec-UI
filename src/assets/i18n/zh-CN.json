@@ -949,6 +949,21 @@
       "CHECKING_DEPENDENCIES": "正在检查依赖项…",
       "DELETE_GUARD_MESSAGE": "被 {{analyses}} 个分析、{{dashboards}} 个仪表板、{{rls}} 条 RLS 规则使用 — 删除可能导致它们失效。",
       "DELETE_GUARD_ACK": "我了解删除此数据集可能会破坏依赖它的项。"
+    },
+    "PARAMS": {
+      "TITLE": "参数",
+      "ADD_PARAMETER": "添加参数",
+      "TYPE": "类型",
+      "LABEL": "标签",
+      "DEFAULT": "默认值",
+      "REQUIRED": "必填",
+      "STATIC_VALUES": "静态值",
+      "FROM_QUERY": "来自查询",
+      "SOURCE_DATASET": "源数据集",
+      "VALUE_COLUMN": "值列",
+      "LABEL_COLUMN": "标签列",
+      "RUN_WITH_PARAMS": "使用参数运行",
+      "REQUIRED_ERROR": "参数 {{name}} 为必填项"
     }
   },
   "ANALYSES": {

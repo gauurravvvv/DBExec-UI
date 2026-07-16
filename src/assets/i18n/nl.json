@@ -949,6 +949,21 @@
       "CHECKING_DEPENDENCIES": "Afhankelijkheden controleren…",
       "DELETE_GUARD_MESSAGE": "Gebruikt door {{analyses}} analyses, {{dashboards}} dashboards, {{rls}} RLS-regels — verwijderen kan ze breken.",
       "DELETE_GUARD_ACK": "Ik begrijp dat het verwijderen van deze dataset afhankelijke items kan breken."
+    },
+    "PARAMS": {
+      "TITLE": "Parameters",
+      "ADD_PARAMETER": "Parameter toevoegen",
+      "TYPE": "Type",
+      "LABEL": "Label",
+      "DEFAULT": "Standaardwaarde",
+      "REQUIRED": "Verplicht",
+      "STATIC_VALUES": "Statische waarden",
+      "FROM_QUERY": "Uit query",
+      "SOURCE_DATASET": "Brondataset",
+      "VALUE_COLUMN": "Waardekolom",
+      "LABEL_COLUMN": "Labelkolom",
+      "RUN_WITH_PARAMS": "Uitvoeren met parameters",
+      "REQUIRED_ERROR": "Parameter {{name}} is verplicht"
     }
   },
   "ANALYSES": {

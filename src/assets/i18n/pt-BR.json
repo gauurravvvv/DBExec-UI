@@ -949,6 +949,21 @@
       "CHECKING_DEPENDENCIES": "Verificando dependências…",
       "DELETE_GUARD_MESSAGE": "Usado por {{analyses}} análises, {{dashboards}} painéis, {{rls}} regras RLS — excluir pode quebrá-los.",
       "DELETE_GUARD_ACK": "Entendo que excluir este conjunto de dados pode quebrar itens dependentes."
+    },
+    "PARAMS": {
+      "TITLE": "Parâmetros",
+      "ADD_PARAMETER": "Adicionar parâmetro",
+      "TYPE": "Tipo",
+      "LABEL": "Rótulo",
+      "DEFAULT": "Valor padrão",
+      "REQUIRED": "Obrigatório",
+      "STATIC_VALUES": "Valores estáticos",
+      "FROM_QUERY": "De consulta",
+      "SOURCE_DATASET": "Conjunto de dados de origem",
+      "VALUE_COLUMN": "Coluna de valor",
+      "LABEL_COLUMN": "Coluna de rótulo",
+      "RUN_WITH_PARAMS": "Executar com parâmetros",
+      "REQUIRED_ERROR": "O parâmetro {{name}} é obrigatório"
     }
   },
   "ANALYSES": {

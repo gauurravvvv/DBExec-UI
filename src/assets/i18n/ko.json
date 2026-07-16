@@ -949,6 +949,21 @@
       "CHECKING_DEPENDENCIES": "종속성 확인 중…",
       "DELETE_GUARD_MESSAGE": "{{analyses}}개 분석, {{dashboards}}개 대시보드, {{rls}}개 RLS 규칙에서 사용 중입니다. 삭제하면 손상될 수 있습니다.",
       "DELETE_GUARD_ACK": "이 데이터셋을 삭제하면 종속된 항목이 손상될 수 있음을 이해합니다."
+    },
+    "PARAMS": {
+      "TITLE": "매개변수",
+      "ADD_PARAMETER": "매개변수 추가",
+      "TYPE": "유형",
+      "LABEL": "레이블",
+      "DEFAULT": "기본값",
+      "REQUIRED": "필수",
+      "STATIC_VALUES": "정적 값",
+      "FROM_QUERY": "쿼리에서",
+      "SOURCE_DATASET": "소스 데이터셋",
+      "VALUE_COLUMN": "값 열",
+      "LABEL_COLUMN": "레이블 열",
+      "RUN_WITH_PARAMS": "매개변수로 실행",
+      "REQUIRED_ERROR": "매개변수 {{name}}은(는) 필수입니다"
     }
   },
   "ANALYSES": {

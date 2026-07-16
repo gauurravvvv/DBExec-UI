@@ -949,6 +949,21 @@
       "CHECKING_DEPENDENCIES": "依存関係を確認しています…",
       "DELETE_GUARD_MESSAGE": "{{analyses}} 件の分析、{{dashboards}} 件のダッシュボード、{{rls}} 件の RLS ルールで使用されています。削除すると壊れる可能性があります。",
       "DELETE_GUARD_ACK": "このデータセットを削除すると依存する項目が壊れる可能性があることを理解しました。"
+    },
+    "PARAMS": {
+      "TITLE": "パラメーター",
+      "ADD_PARAMETER": "パラメーターを追加",
+      "TYPE": "種類",
+      "LABEL": "ラベル",
+      "DEFAULT": "既定値",
+      "REQUIRED": "必須",
+      "STATIC_VALUES": "静的な値",
+      "FROM_QUERY": "クエリから",
+      "SOURCE_DATASET": "ソースデータセット",
+      "VALUE_COLUMN": "値の列",
+      "LABEL_COLUMN": "ラベルの列",
+      "RUN_WITH_PARAMS": "パラメーターを指定して実行",
+      "REQUIRED_ERROR": "パラメーター {{name}} は必須です"
     }
   },
   "ANALYSES": {

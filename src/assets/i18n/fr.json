@@ -949,6 +949,21 @@
       "CHECKING_DEPENDENCIES": "Vérification des dépendances…",
       "DELETE_GUARD_MESSAGE": "Utilisé par {{analyses}} analyses, {{dashboards}} tableaux de bord, {{rls}} règles RLS — la suppression peut les casser.",
       "DELETE_GUARD_ACK": "Je comprends que la suppression de ce jeu de données peut casser les éléments dépendants."
+    },
+    "PARAMS": {
+      "TITLE": "Paramètres",
+      "ADD_PARAMETER": "Ajouter un paramètre",
+      "TYPE": "Type",
+      "LABEL": "Libellé",
+      "DEFAULT": "Valeur par défaut",
+      "REQUIRED": "Obligatoire",
+      "STATIC_VALUES": "Valeurs statiques",
+      "FROM_QUERY": "À partir d'une requête",
+      "SOURCE_DATASET": "Jeu de données source",
+      "VALUE_COLUMN": "Colonne de valeur",
+      "LABEL_COLUMN": "Colonne de libellé",
+      "RUN_WITH_PARAMS": "Exécuter avec les paramètres",
+      "REQUIRED_ERROR": "Le paramètre {{name}} est obligatoire"
     }
   },
   "ANALYSES": {

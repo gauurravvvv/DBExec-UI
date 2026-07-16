@@ -66,6 +66,7 @@ import {
   selectSchemaByKey,
 } from '../../store';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
+import { DatasetParamConfig } from '../../helpers/param-tokens.helper';
 
 // Declare Monaco and window for TypeScript
 declare const monaco: any;
@@ -107,111 +108,6 @@ export class AddDatasetComponent
   isLoadingEditor = true;
   isLoadingSchema = false;
   isExecutingQuery = false;
-
-  /**
-   * UUID of the in-flight query, generated FE-side before the POST
-   * fires so the Cancel button can reference it immediately. Cleared
-   * when the query resolves (success or error). The BE registers the
-   * id in its in-process cancel registry and accepts it on the
-   * /queries/cancel endpoint to fire engine-specific cancellation.
-   */
-  activeQueryRequestId: string | null = null;
-
-  /**
-   * Explain panel state. Populated by `runExplain()` and shown in a
-   * dialog. `plan` is whatever shape the engine returned (PG/MySQL
-   * give JSON; Oracle gives text). We pretty-print via JSON.stringify
-   * on display.
-   */
-  showExplainDialog = false;
-  explainState: {
-    loading: boolean;
-    error: string | null;
-    plan: unknown | null;
-    engine: string;
-    durationMs: number | null;
-  } = { loading: false, error: null, plan: null, engine: '', durationMs: null };
-
-  /**
-   * Computed JSON string for the Explain dialog. Pretty-prints any
-   * structured plan; falls back to the engine's raw string when the
-   * driver didn't pre-parse (Snowflake / Oracle).
-   */
-  get explainPlanText(): string {
-    const p = this.explainState.plan;
-    if (p == null) return '';
-    if (typeof p === 'string') return p;
-    try {
-      return JSON.stringify(p, null, 2);
-    } catch {
-      return String(p);
-    }
-  }
-
-  /**
-   * Fire the BE explain endpoint with whatever SQL is in the editor.
-   * Opens the dialog optimistically so the user sees a loading state
-   * while the BE rounds-trips the EXPLAIN.
-   */
-  runExplain(): void {
-    const editor = this.editor;
-    const sql = (editor?.getValue() || this.currentQuery || '').trim();
-    if (!sql) return;
-    if (!this.selectedDatasourceObj?.id) return;
-
-    this.showExplainDialog = true;
-    this.explainState = {
-      loading: true,
-      error: null,
-      plan: null,
-      engine: '',
-      durationMs: null,
-    };
-    this.cdr.markForCheck();
-
-    this.queryService
-      .explainQuery({
-        datasourceId: this.selectedDatasourceObj.id,
-        query: sql,
-      })
-      .subscribe({
-        next: (res: any) => {
-          if (res?.status && res.data) {
-            this.explainState = {
-              loading: false,
-              error: null,
-              plan: res.data.plan,
-              engine: res.data.engine ?? '',
-              durationMs: res.data.durationMs ?? null,
-            };
-          } else {
-            this.explainState = {
-              loading: false,
-              error: res?.message ?? 'Explain failed',
-              plan: null,
-              engine: '',
-              durationMs: null,
-            };
-          }
-          this.cdr.markForCheck();
-        },
-        error: (err: any) => {
-          this.explainState = {
-            loading: false,
-            error: err?.error?.message ?? err?.message ?? 'Explain failed',
-            plan: null,
-            engine: '',
-            durationMs: null,
-          };
-          this.cdr.markForCheck();
-        },
-      });
-  }
-
-  closeExplainDialog(): void {
-    this.showExplainDialog = false;
-    this.cdr.markForCheck();
-  }
   monacoLoadFailed = false;
   queryResult: QueryResult | null = null;
 
@@ -226,91 +122,6 @@ export class AddDatasetComponent
   get hasAnyColumnType(): boolean {
     const types = this.queryResult?.columnTypes;
     return !!types && Object.keys(types).length > 0;
-  }
-
-  /**
-   * Cached column definitions for the AG Grid result. Rebuilt whenever
-   * the queryResult changes (see the response handler). Kept as a
-   * field rather than a getter so AG Grid's input doesn't churn on
-   * every CD pass — re-running colDef construction on each tick
-   * causes the grid to re-init and lose user state (column order,
-   * widths, filter inputs).
-   */
-  resultColDefs: any[] = [];
-
-  /**
-   * Map our BE `columnTypes` vocabulary onto AG Grid ColDef[]. Sets
-   * the per-column filter type (numeric / date / set / text), cell
-   * data type for sorting + formatting, and resizable/sortable
-   * flags. The first row in the result also gets a row-number column
-   * pinned left for visual consistency with the previous PrimeNG
-   * layout.
-   */
-  private buildResultColDefs(): any[] {
-    if (!this.queryResult || this.queryResult.columns.length === 0) return [];
-    const columns = this.queryResult.columns;
-    const types = this.queryResult.columnTypes ?? {};
-
-    const rowIndexCol: any = {
-      colId: '__rowIndex',
-      headerName: '#',
-      valueGetter: (params: any) =>
-        params?.node?.rowIndex != null ? params.node.rowIndex + 1 : '',
-      width: 64,
-      minWidth: 56,
-      maxWidth: 96,
-      pinned: 'left',
-      sortable: false,
-      filter: false,
-      resizable: false,
-      suppressMenu: true,
-      cellClass: 'us-row-index-cell',
-    };
-
-    const dataCols = columns.map((name: string) => {
-      const t = (types[name] ?? 'text').toLowerCase();
-      // AG Grid v32 ColDef.
-      const def: any = {
-        colId: name,
-        field: name,
-        headerName: name,
-        sortable: true,
-        resizable: true,
-        // Show the type as a tooltip on the header instead of a chip
-        // — matches the cleaner AG Grid header style.
-        headerTooltip: types[name] ? `${name} · ${types[name]}` : name,
-      };
-
-      if (t === 'integer' || t === 'numeric') {
-        def.filter = 'agNumberColumnFilter';
-        def.cellDataType = 'number';
-        def.type = 'numericColumn';
-      } else if (t === 'date' || t === 'timestamp') {
-        def.filter = 'agDateColumnFilter';
-        def.cellDataType = 'dateString';
-      } else if (t === 'boolean') {
-        def.filter = 'agSetColumnFilter';
-        def.cellDataType = 'boolean';
-      } else if (t === 'json') {
-        def.filter = 'agTextColumnFilter';
-        // Pretty-print object/array cells.
-        def.valueFormatter = (params: any) => {
-          if (params.value == null) return '';
-          if (typeof params.value === 'string') return params.value;
-          try {
-            return JSON.stringify(params.value);
-          } catch {
-            return String(params.value);
-          }
-        };
-      } else {
-        def.filter = 'agTextColumnFilter';
-      }
-
-      return def;
-    });
-
-    return [rowIndexCol, ...dataCols];
   }
 
   /**
@@ -397,6 +208,13 @@ export class AddDatasetComponent
   datasources: DatasourceSchema[] = [];
   currentQuery = '';
 
+  // ── Query parameters ({{name}}) ───────────────────────────────────
+  /** Debounced SQL snapshot fed to the params panel for token scanning. */
+  paramsSql = '';
+  /** Configured params, collected from the panel; saved as paramsConfig. */
+  paramsConfig: DatasetParamConfig[] = [];
+  private sqlParamScan$ = new Subject<string>();
+
   // Theme monitoring. Default to the app's light theme ('vs'), not
   // 'vs-dark' — Monaco's setTheme is GLOBAL, so a stale dark default
   // could leak into the editor when it re-creates. getCurrentTheme()
@@ -469,34 +287,10 @@ export class AddDatasetComponent
   // Save as Dataset Dialog
   showDatasetDialog = false;
 
-  /**
-   * BE safety-violation banner. Set when /datasets save returns
-   * `data.code === 'SAFETY_VIOLATION'`. Persistent (not a toast)
-   * because the user needs to see the offending token while
-   * editing the SQL. Cleared on any keystroke in the editor.
-   *
-   * Shape mirrors the BE response: `reason` is the human message
-   * and `offendingToken` is what the validator pointed at (a
-   * keyword like DELETE or a punctuation like `;`).
-   */
-  sqlSafetyError: { reason: string; offendingToken: string | null } | null =
-    null;
-
   // Results bottom sheet
   showResultsPopup = false;
   resultRows = 25;
   resultPage = 1;
-
-  /**
-   * Zero-based row index of the first row on the current page. Bound
-   * to PrimeNG `[first]` on the results table so the paginator's
-   * active-page chip stays in sync with the BE-returned page after
-   * each lazy load. Without this, `[value]` changing rows out from
-   * under the table caused PrimeNG to reset `first` to 0 and the
-   * paginator visually snapped back to page 1 even though the rows
-   * displayed were page N.
-   */
-  resultFirst = 0;
   isExportingResults = false;
   resultFilterValues: { [key: string]: string } = {};
   private resultFilterSubject = new Subject<void>();
@@ -692,10 +486,8 @@ export class AddDatasetComponent
       .subscribe(() => {
         if (!this.lastExecutedQuery) return;
 
-        // Reset to first page on filter change. resultFirst pairs
-        // with resultPage so the paginator highlight resets too.
+        // Reset to first page on filter change
         this.resultPage = 1;
-        this.resultFirst = 0;
 
         // Build filter object from non-empty filter values
         const filter: { [key: string]: string } = {};
@@ -711,6 +503,15 @@ export class AddDatasetComponent
           this.resultRows,
           filter,
         );
+      });
+
+    // Debounced SQL → params panel. Re-scanning on every keystroke would
+    // thrash the tokenizer; 400ms matches the feel of the dialect lint.
+    this.sqlParamScan$
+      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
+      .subscribe(sql => {
+        this.paramsSql = sql;
+        this.cdr.markForCheck();
       });
 
     // The popup flow forwards `datasourceId` and an optional `schema`
@@ -1038,19 +839,6 @@ export class AddDatasetComponent
   }
 
   ngOnDestroy(): void {
-    // If a query is in-flight when the user navigates away, fire
-    // the engine cancel so the warehouse worker doesn't keep
-    // grinding for the full statement_timeout. Fire-and-forget —
-    // no error handling because the component is unmounting and
-    // there's no UI to surface anything to.
-    if (this.activeQueryRequestId && this.selectedDatasourceObj?.id) {
-      const id = this.activeQueryRequestId;
-      this.activeQueryRequestId = null;
-      this.queryService
-        .cancelQuery({ requestId: id, datasourceId: this.selectedDatasourceObj.id })
-        .subscribe({ next: () => undefined, error: () => undefined });
-    }
-
     this.resultFilterSubject.complete();
 
     if (this.paneResizeObserver) {
@@ -1183,15 +971,15 @@ export class AddDatasetComponent
           this.currentQuery = this.editor.getValue();
           this.sqlValidatorService.validateDebounced(this.editor.getModel());
           this.scheduleDialectLint();
-          // Any keystroke invalidates the last safety verdict — the
-          // banner clears so the next save attempt gets a fresh check.
-          this.clearSqlSafetyError();
+          this.sqlParamScan$.next(this.currentQuery);
           this.cdr.markForCheck();
         });
 
         // Initial validation
         this.sqlValidatorService.validate(this.editor.getModel());
         this.scheduleDialectLint();
+        // Seed the params panel with the initial editor content.
+        this.paramsSql = this.currentQuery;
 
         // Add keyboard shortcuts via service
         this.monacoIntelliSenseService.registerKeyboardShortcuts(
@@ -1559,7 +1347,6 @@ export class AddDatasetComponent
     if (this.isExecutingQuery) return;
     const query = this.editor?.getValue() || this.currentQuery;
     this.resultPage = 1;
-    this.resultFirst = 0;
     this.resultFilterValues = {};
     // Deliberately leave `queryResult` in place until the new
     // result lands. Nulling it would unmount the sheet (the
@@ -1576,7 +1363,6 @@ export class AddDatasetComponent
   executeSelectedQuery(selectedText: string): void {
     if (this.isExecutingQuery) return;
     this.resultPage = 1;
-    this.resultFirst = 0;
     this.resultFilterValues = {};
     // See executeCompleteQuery — same anti-flicker reasoning.
     this.executeQueryForDatasource(selectedText);
@@ -1725,7 +1511,6 @@ export class AddDatasetComponent
   clearResultFilters(): void {
     this.resultFilterValues = {};
     this.resultPage = 1;
-    this.resultFirst = 0;
     if (this.lastExecutedQuery) {
       this.executeQueryForDatasource(
         this.lastExecutedQuery,
@@ -1794,23 +1579,13 @@ export class AddDatasetComponent
 
   onResultsLazyLoad(event: any): void {
     this.lastResultsLazyEvent = event;
-    const first = event.first || 0;
     const page =
-      Math.floor(first / (event.rows || this.resultRows)) + 1;
+      Math.floor((event.first || 0) / (event.rows || this.resultRows)) + 1;
     const limit = event.rows || this.resultRows;
 
     if (!this.lastExecutedQuery) return;
 
     this.resultPage = page;
-    // Mirror the offset PrimeNG asked for back onto our bound
-    // `[first]` so a subsequent `[value]` change (the lazy fetch
-    // returning rows) doesn't reset the paginator highlight to 0.
-    // markForCheck is required because this component is OnPush —
-    // the lazy event fires outside Angular's normal CD path and
-    // without a mark the new resultFirst value isn't flushed to
-    // PrimeNG's [first] binding until the next external trigger.
-    this.resultFirst = first;
-    this.cdr.markForCheck();
     if (this.resultRows !== limit) {
       this.resultRows = limit;
       // User changed page size — persist so the new choice
@@ -2044,28 +1819,22 @@ export class AddDatasetComponent
     this.cdr.markForCheck();
   }
 
-  /**
-   * Show the result sheet. By default this is a pure show-and-uncollapse
-   * with NO pagination reset — pagination/filter-driven re-runs reuse
-   * the existing page state. Pass `resetPagination: true` from new-query
-   * call sites (executeCompleteQuery / executeSelectedQuery) where the
-   * user has issued a fresh query and previous page state would be
-   * meaningless. The lazy-load response path must call with default
-   * (false) so clicking Next doesn't snap back to page 1.
-   */
-  private surfaceResultSheet(opts: { resetPagination?: boolean } = {}): void {
+  private surfaceResultSheet(): void {
     this.showResultsPopup = true;
     if (this.isResultSheetCollapsed) {
       this.isResultSheetCollapsed = false;
       this.persistSheetCollapsed(false);
     }
-    if (opts.resetPagination) {
-      if (this.resultsTable) {
-        this.resultsTable.first = 0;
-      }
-      this.resultPage = 1;
-      this.resultFirst = 0;
+    // Snap the table's internal "first row index" back to 0 so a
+    // 200-row → 7-row result transition doesn't leave the grid
+    // showing page 4 of nothing. PrimeNG's <p-table>.first is the
+    // index of the first row of the current page; setting it to 0
+    // is the minimal reset (filter inputs + sort survive — see
+    // .reset() if a fuller wipe is ever wanted).
+    if (this.resultsTable) {
+      this.resultsTable.first = 0;
     }
+    this.resultPage = 1;
   }
 
   /**
@@ -2137,34 +1906,6 @@ export class AddDatasetComponent
     this.persistSheetHeight(this.resultSheetHeightPx);
   }
 
-  /**
-   * Fire the cancel endpoint for the in-flight query. The pending
-   * executeQuery POST will surface a "query cancelled" engine error
-   * via the existing typed-error code path; we don't need to
-   * unsubscribe the observable. Optimistically toggle
-   * `isExecutingQuery = false` so the Run button is reachable
-   * immediately — the BE engine cancel is fire-and-forget from the
-   * FE's perspective.
-   */
-  cancelActiveQuery(): void {
-    const id = this.activeQueryRequestId;
-    if (!id || !this.selectedDatasourceObj?.id) return;
-
-    this.isExecutingQuery = false;
-    this.activeQueryRequestId = null;
-    this.cdr.markForCheck();
-
-    this.queryService
-      .cancelQuery({
-        requestId: id,
-        datasourceId: this.selectedDatasourceObj.id,
-      })
-      .subscribe({
-        next: () => { /* engine-side cancel done */ },
-        error: () => { /* swallow — UI already reverted */ },
-      });
-  }
-
   private executeQueryForDatasource(
     query: string,
     page: number = 1,
@@ -2189,20 +1930,11 @@ export class AddDatasetComponent
 
     const startTime = Date.now();
 
-    // Mint the requestId BEFORE the POST fires so the Cancel button
-    // has the id immediately. Stored on the component so the cancel
-    // handler can reach it. Cleared on response (success or error).
-    this.activeQueryRequestId =
-      typeof crypto !== 'undefined' && 'randomUUID' in crypto
-        ? crypto.randomUUID()
-        : `q-${Date.now()}-${Math.floor(Math.random() * 1e9)}`;
-
     const payload: any = {
       datasourceId: this.selectedDatasourceObj.id,
       query: query,
       page: page,
       limit: limit,
-      requestId: this.activeQueryRequestId,
     };
 
     if (Object.keys(filter).length > 0) {
@@ -2215,11 +1947,6 @@ export class AddDatasetComponent
       .subscribe({
         next: (response: IAPIResponse<QueryExecuteData>) => {
           if (!response.status) {
-            // The BE now ships `data.errorKind` and (for safety
-            // violations) `data.offendingToken`. Surface both on
-            // the queryResult so the pane can pick a typed icon +
-            // recovery hint without parsing the engine message.
-            const errData: any = response.data ?? {};
             this.queryResult = {
               columns: [],
               rows: [],
@@ -2228,14 +1955,12 @@ export class AddDatasetComponent
               error:
                 response.message ||
                 this.translate.instant('DATASET.QUERY_EXECUTION_FAILED'),
-              errorKind: errData.errorKind || 'unknown',
-              offendingToken: errData.offendingToken ?? null,
             };
             // Surface the error in the sheet so the user sees what
             // failed instead of staring at a Run button that
             // appeared to do nothing.
             this.surfaceResultSheet();
-            this.isExecutingQuery = false; this.activeQueryRequestId = null;
+            this.isExecutingQuery = false;
             this.cdr.markForCheck();
             return;
           }
@@ -2252,7 +1977,7 @@ export class AddDatasetComponent
             // Show the message banner (DDL, "0 rows affected", etc.)
             // in the sheet even though there are no rows to render.
             this.surfaceResultSheet();
-            this.isExecutingQuery = false; this.activeQueryRequestId = null;
+            this.isExecutingQuery = false;
             this.cdr.markForCheck();
             return;
           }
@@ -2268,34 +1993,8 @@ export class AddDatasetComponent
             rows: Array.isArray(data.data) ? data.data : [],
             rowCount: data.rowCount ?? 0,
             executionTime,
-            executionMs: data.executionMs,
-            truncated: data.truncated ?? false,
-            warnings: Array.isArray(data.warnings) ? data.warnings : [],
             query: data.query,
           };
-
-          // Rebuild AG Grid ColDefs for the new result so the grid
-          // gets fresh per-column filter types + formatters. Done
-          // before the PrimeNG-paginator workaround below because
-          // the grid swap will eventually retire that.
-          this.resultColDefs = this.buildResultColDefs();
-
-          // PrimeNG resets internal `first` to 0 when `[value]`
-          // changes — even in lazy mode. Our `[first]="resultFirst"`
-          // binding only re-pushes on a JS-level change to that
-          // value, so when the user clicks Next (resultFirst goes
-          // 0 → 25 → next time 25 → 50 → ...) the binding eventually
-          // misses a beat. Defer the direct write to the next
-          // macrotask so it runs AFTER PrimeNG's CD cycle has
-          // re-processed `[value]` and reset its internal first.
-          // This is the rock-solid path used by PrimeNG community
-          // for this exact lazy-paginator-reset issue.
-          setTimeout(() => {
-            if (this.resultsTable && this.resultsTable.first !== this.resultFirst) {
-              this.resultsTable.first = this.resultFirst;
-              this.cdr.markForCheck();
-            }
-          }, 0);
 
           // Auto-fit column widths to the content of this result,
           // then flex the last column to absorb leftover container
@@ -2315,7 +2014,7 @@ export class AddDatasetComponent
             this.surfaceResultSheet();
           }
 
-          this.isExecutingQuery = false; this.activeQueryRequestId = null;
+          this.isExecutingQuery = false;
           this.cdr.markForCheck();
         },
         error: (error: any) => {
@@ -2349,7 +2048,7 @@ export class AddDatasetComponent
           // — surface the failure in the sheet so it's visible.
           this.surfaceResultSheet();
 
-          this.isExecutingQuery = false; this.activeQueryRequestId = null;
+          this.isExecutingQuery = false;
           this.cdr.markForCheck();
         },
       });
@@ -2364,45 +2063,28 @@ export class AddDatasetComponent
       // Get the SQL query
       const sql = this.editor?.getValue() || this.currentQuery;
 
-      const payload = {
+      const payload: any = {
         name: formData.name,
         description: formData.description,
         datasource: this.selectedDatasourceObj.id,
         sql,
-        cacheEnabled: formData.cacheEnabled,
-        cacheTtlSeconds: formData.cacheTtlSeconds,
-        // Track F: organizational tags captured in the save dialog.
-        tags: formData.tags ?? [],
-        // Folder-explorer: the save-location the user picked (null = Root).
-        ...(formData.folderId ? { folderId: formData.folderId } : {}),
       };
+      // Persist the {{name}} parameter configuration alongside the SQL.
+      // Empty when the SQL declares no tokens, so param-less datasets
+      // send the same payload as before.
+      if (this.paramsConfig.length > 0) {
+        payload.paramsConfig = this.paramsConfig;
+      }
 
       this.datasetService
         .addDataset(payload)
         .then(response => {
-          // Safety-violation responses are 400s with a structured
-          // `data.code === 'SAFETY_VIOLATION'` payload. Catch them
-          // BEFORE the generic toast handler so we can pin the
-          // reason + offending token above the editor — toasts
-          // disappear and the user loses context.
-          if (
-            response &&
-            response.status === false &&
-            response.data?.code === 'SAFETY_VIOLATION'
-          ) {
-            this.sqlSafetyError = {
-              reason: response.message ?? 'SQL was rejected by the safety check.',
-              offendingToken: response.data?.offendingToken ?? null,
-            };
-            this.cdr.markForCheck();
-            return;
-          }
-
           if (this.globalService.handleSuccessService(response, true)) {
-            // Saved cleanly — clear any prior banner.
-            this.sqlSafetyError = null;
+            // Navigate to dataset list
             this._saved = true;
             this.router.navigate([DATASET.LIST]);
+            // Dataset saved successfully
+            // Now proceed with pending change if any
             if (this.pendingDatasourceChange) {
               this.proceedWithDatasourceChange(this.pendingDatasourceChange);
               this.pendingDatasourceChange = null;
@@ -2417,16 +2099,13 @@ export class AddDatasetComponent
   }
 
   /**
-   * Called by the editor's keystroke handler. The banner stays sticky
-   * across re-saves of the same offending SQL (so the user sees the
-   * full reason) but disappears the moment they edit, because their
-   * next save attempt re-runs the validator on whatever they typed.
+   * Params panel emitted an updated config (a token was added/removed
+   * or a row's type/label/default/source changed). Store it so it rides
+   * along on the next save.
    */
-  clearSqlSafetyError(): void {
-    if (this.sqlSafetyError) {
-      this.sqlSafetyError = null;
-      this.cdr.markForCheck();
-    }
+  onParamsConfigChange(config: DatasetParamConfig[]): void {
+    this.paramsConfig = config;
+    this.cdr.markForCheck();
   }
 
   toggleDatasourceSidebar(): void {

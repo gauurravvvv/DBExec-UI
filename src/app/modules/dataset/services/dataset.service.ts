@@ -150,26 +150,35 @@ export class DatasetService {
   }
 
   async addDataset(payload: any) {
-    const { name, description, datasource, sql, cacheEnabled, cacheTtlSeconds } =
-      payload;
+    const {
+      name,
+      description,
+      datasource,
+      sql,
+      cacheEnabled,
+      cacheTtlSeconds,
+      paramsConfig,
+    } = payload;
+    const body: any = {
+      name,
+      description,
+      datasource,
+      sql,
+      // Result-cache config — omitted keys leave the server default
+      // (caching off). Only sent when the caller manages caching (the
+      // save dialog always provides cacheEnabled).
+      ...(cacheEnabled !== undefined ? { cacheEnabled } : {}),
+      ...(cacheTtlSeconds !== undefined ? { cacheTtlSeconds } : {}),
+    };
+    // Attach paramsConfig only when the SQL actually declared {{params}} —
+    // an empty/absent array keeps the wire identical to pre-params callers.
+    if (Array.isArray(paramsConfig) && paramsConfig.length > 0) {
+      body.paramsConfig = paramsConfig;
+    }
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPost(
-          DATASET.ADD,
-          {
-            name,
-            description,
-            datasource,
-            sql,
-            // Result-cache config — omitted keys leave the server
-            // default (caching off). Only sent when the caller manages
-            // caching (the save dialog always provides cacheEnabled).
-            ...(cacheEnabled !== undefined ? { cacheEnabled } : {}),
-            ...(cacheTtlSeconds !== undefined ? { cacheTtlSeconds } : {}),
-          },
-          { skipLoader: true },
-        ),
+        this.http.apiPost(DATASET.ADD, body, { skipLoader: true }),
       );
     } finally {
       this._saving.set(false);
@@ -409,27 +418,36 @@ export class DatasetService {
   }
 
   async updateDataset(payload: any, justification?: string) {
-    const { id, name, description, datasource, sql, cacheEnabled, cacheTtlSeconds } =
-      payload;
+    const {
+      id,
+      name,
+      description,
+      datasource,
+      sql,
+      cacheEnabled,
+      cacheTtlSeconds,
+      paramsConfig,
+    } = payload;
+    const body: any = {
+      id,
+      name,
+      description,
+      datasource,
+      sql,
+      justification,
+      // Result-cache config — omitted keys leave the field unchanged.
+      ...(cacheEnabled !== undefined ? { cacheEnabled } : {}),
+      ...(cacheTtlSeconds !== undefined ? { cacheTtlSeconds } : {}),
+    };
+    // Send an explicit array (even empty) so removing every {{token}}
+    // from the SQL clears a previously-saved paramsConfig on the BE.
+    if (Array.isArray(paramsConfig)) {
+      body.paramsConfig = paramsConfig;
+    }
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPut(
-          DATASET.UPDATE + id,
-          {
-            id,
-            name,
-            description,
-            datasource,
-            sql,
-            justification,
-            // Result-cache config — omitted keys leave the field
-            // unchanged server-side.
-            ...(cacheEnabled !== undefined ? { cacheEnabled } : {}),
-            ...(cacheTtlSeconds !== undefined ? { cacheTtlSeconds } : {}),
-          },
-          { skipLoader: true },
-        ),
+        this.http.apiPut(DATASET.UPDATE + id, body, { skipLoader: true }),
       );
     } finally {
       this._saving.set(false);
@@ -516,10 +534,18 @@ export class DatasetService {
   }
 
   runDatasetQuery(payload: any) {
-    const { datasetId, filters, refresh } = payload;
+    const { datasetId, filters, refresh, params, limit } = payload;
     const body: any = { datasetId };
     if (filters && filters.length > 0) {
       body.filters = filters;
+    }
+    // Query-parameter values ({{name}} → bound value). Sent only when
+    // present so a param-less dataset run keeps the same wire shape.
+    if (params && Object.keys(params).length > 0) {
+      body.params = params;
+    }
+    if (limit !== undefined && limit !== null) {
+      body.limit = limit;
     }
     // Bypass any fresh cache entry and re-store (refresh action).
     if (refresh) {
@@ -530,6 +556,34 @@ export class DatasetService {
       this.http.apiPost(
         DATASET.RUN_QUERY_PREFIX + datasetId + DATASET.RUN_QUERY_SUFFIX,
         body,
+        { skipLoader: true },
+      ),
+    );
+  }
+
+  /**
+   * Fetch options for a query-based dropdown parameter.
+   *
+   * `datasetId` (first arg) is the dataset whose param we're populating;
+   * the body's `datasetId` is the SOURCE dataset the options come from.
+   * The BE runs that source dataset and projects value/label columns,
+   * returning a BARE array `[{ value, label }]` in `data`.
+   */
+  getParamOptions(
+    datasetId: string,
+    source: {
+      datasetId: string;
+      valueColumn: string;
+      labelColumn?: string;
+      search?: string;
+      limit?: number;
+    },
+  ) {
+    // POST /datasets/:datasetId/param-options
+    return lastValueFrom(
+      this.http.apiPost(
+        DATASET.PARAM_OPTIONS_PREFIX + datasetId + DATASET.PARAM_OPTIONS_SUFFIX,
+        source,
         { skipLoader: true },
       ),
     );

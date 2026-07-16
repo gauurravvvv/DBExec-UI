@@ -61,6 +61,8 @@ import {
   selectSchemaByKey,
 } from '../../store';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
+import { DatasetParamConfig } from '../../helpers/param-tokens.helper';
+import { DatasetParamRunError } from '../dataset-params-panel/dataset-params-panel.component';
 
 // Declare Monaco and window for TypeScript
 declare const monaco: any;
@@ -87,13 +89,6 @@ export class EditDatasetComponent
   datasetName: string = '';
   datasetDescription: string = '';
   datasetStatus: number = 1;
-  // Result-cache config, loaded from the dataset and fed back into the
-  // save dialog so the toggle/TTL reflect the current saved state.
-  datasetCacheEnabled = false;
-  datasetCacheTtlSeconds: number | null = null;
-  // Track F: organizational tags loaded from the dataset, fed back into the
-  // save dialog so the chips reflect the current saved tags.
-  datasetTags: string[] = [];
   initialQuery?: string;
   originalQuery: string = ''; // Store original query from dataset
 
@@ -101,76 +96,21 @@ export class EditDatasetComponent
   isLoadingEditor = true;
   isLoadingSchema = false;
   isExecutingQuery = false;
-  /** Mirror of add-dataset.activeQueryRequestId — see there. */
-  activeQueryRequestId: string | null = null;
-
-  /** Explain dialog state — mirror of add-dataset. */
-  showExplainDialog = false;
-  explainState: {
-    loading: boolean;
-    error: string | null;
-    plan: unknown | null;
-    engine: string;
-    durationMs: number | null;
-  } = { loading: false, error: null, plan: null, engine: '', durationMs: null };
-
-  get explainPlanText(): string {
-    const p = this.explainState.plan;
-    if (p == null) return '';
-    if (typeof p === 'string') return p;
-    try {
-      return JSON.stringify(p, null, 2);
-    } catch {
-      return String(p);
-    }
-  }
-
-  runExplain(): void {
-    const sql = (this.editor?.getValue() || this.currentQuery || '').trim();
-    if (!sql || !this.selectedDatasourceObj?.id) return;
-    this.showExplainDialog = true;
-    this.explainState = { loading: true, error: null, plan: null, engine: '', durationMs: null };
-    this.cdr.markForCheck();
-    this.queryService
-      .explainQuery({ datasourceId: this.selectedDatasourceObj.id, query: sql })
-      .subscribe({
-        next: (res: any) => {
-          if (res?.status && res.data) {
-            this.explainState = {
-              loading: false, error: null,
-              plan: res.data.plan,
-              engine: res.data.engine ?? '',
-              durationMs: res.data.durationMs ?? null,
-            };
-          } else {
-            this.explainState = {
-              loading: false,
-              error: res?.message ?? 'Explain failed',
-              plan: null, engine: '', durationMs: null,
-            };
-          }
-          this.cdr.markForCheck();
-        },
-        error: (err: any) => {
-          this.explainState = {
-            loading: false,
-            error: err?.error?.message ?? err?.message ?? 'Explain failed',
-            plan: null, engine: '', durationMs: null,
-          };
-          this.cdr.markForCheck();
-        },
-      });
-  }
-
-  closeExplainDialog(): void {
-    this.showExplainDialog = false;
-    this.cdr.markForCheck();
-  }
-
   monacoLoadFailed = false;
   queryResult: QueryResult | null = null;
   datasources: DatasourceSchema[] = [];
   currentQuery = '';
+
+  // ── Query parameters ({{name}}) ───────────────────────────────────
+  /** Debounced SQL snapshot fed to the params panel for token scanning. */
+  paramsSql = '';
+  /** Configured params (seeded from the dataset, edited via the panel). */
+  paramsConfig: DatasetParamConfig[] = [];
+  /** Last-run param error (MISSING_REQUIRED_PARAM / UNKNOWN_PARAM). */
+  paramRunError: DatasetParamRunError | null = null;
+  /** True while a run-with-params request is in flight. */
+  isRunningWithParams = false;
+  private sqlParamScan$ = new Subject<string>();
 
   // Theme monitoring. Default to the app's light theme ('vs'), not
   // 'vs-dark' — Monaco's setTheme is GLOBAL, so a stale dark default
@@ -199,28 +139,10 @@ export class EditDatasetComponent
   // Save as Dataset Dialog
   showDatasetDialog = false;
 
-  /**
-   * Persistent banner for BE SAFETY_VIOLATION responses. Mirrors the
-   * add-dataset implementation — see that file for the rationale on
-   * "why a sticky banner instead of a toast" (the user needs the
-   * offending token visible while they edit the SQL).
-   */
-  sqlSafetyError: { reason: string; offendingToken: string | null } | null =
-    null;
-
   // Results Popup
   showResultsPopup = false;
   resultRows = 25;
   resultPage = 1;
-
-  /**
-   * Zero-based first-row index for the paginator. Bound to PrimeNG
-   * `[first]` so the active-page highlight stays in sync with the
-   * BE-returned page after each lazy load. See add-dataset for the
-   * same rationale — without this, `[value]` mutations from the
-   * lazy fetch reset the paginator visually to page 1.
-   */
-  resultFirst = 0;
   isExportingResults = false;
   resultFilterValues: { [key: string]: string } = {};
   private resultFilterSubject = new Subject<void>();
@@ -240,76 +162,6 @@ export class EditDatasetComponent
   get hasAnyColumnType(): boolean {
     const types = this.queryResult?.columnTypes;
     return !!types && Object.keys(types).length > 0;
-  }
-
-  /**
-   * Cached column definitions for the AG Grid result. Same pattern
-   * + helper as add-dataset — see there for the full rationale on
-   * why this is a field rather than a getter.
-   */
-  resultColDefs: any[] = [];
-
-  private buildResultColDefs(): any[] {
-    if (!this.queryResult || this.queryResult.columns.length === 0) return [];
-    const columns = this.queryResult.columns;
-    const types = this.queryResult.columnTypes ?? {};
-
-    const rowIndexCol: any = {
-      colId: '__rowIndex',
-      headerName: '#',
-      valueGetter: (params: any) =>
-        params?.node?.rowIndex != null ? params.node.rowIndex + 1 : '',
-      width: 64,
-      minWidth: 56,
-      maxWidth: 96,
-      pinned: 'left',
-      sortable: false,
-      filter: false,
-      resizable: false,
-      suppressMenu: true,
-      cellClass: 'us-row-index-cell',
-    };
-
-    const dataCols = columns.map((name: string) => {
-      const t = (types[name] ?? 'text').toLowerCase();
-      const def: any = {
-        colId: name,
-        field: name,
-        headerName: name,
-        sortable: true,
-        resizable: true,
-        headerTooltip: types[name] ? `${name} · ${types[name]}` : name,
-      };
-
-      if (t === 'integer' || t === 'numeric') {
-        def.filter = 'agNumberColumnFilter';
-        def.cellDataType = 'number';
-        def.type = 'numericColumn';
-      } else if (t === 'date' || t === 'timestamp') {
-        def.filter = 'agDateColumnFilter';
-        def.cellDataType = 'dateString';
-      } else if (t === 'boolean') {
-        def.filter = 'agSetColumnFilter';
-        def.cellDataType = 'boolean';
-      } else if (t === 'json') {
-        def.filter = 'agTextColumnFilter';
-        def.valueFormatter = (params: any) => {
-          if (params.value == null) return '';
-          if (typeof params.value === 'string') return params.value;
-          try {
-            return JSON.stringify(params.value);
-          } catch {
-            return String(params.value);
-          }
-        };
-      } else {
-        def.filter = 'agTextColumnFilter';
-      }
-
-      return def;
-    });
-
-    return [rowIndexCol, ...dataCols];
   }
 
   // ── Bottom-sheet state (mirrors add-dataset) ──────────────────────
@@ -480,10 +332,8 @@ export class EditDatasetComponent
       .subscribe(() => {
         if (!this.lastExecutedQuery) return;
 
-        // Reset to first page on filter change. resultFirst pairs
-        // with resultPage so the paginator highlight resets too.
+        // Reset to first page on filter change
         this.resultPage = 1;
-        this.resultFirst = 0;
 
         // Build filter object from non-empty filter values
         const filter: { [key: string]: string } = {};
@@ -499,6 +349,14 @@ export class EditDatasetComponent
           this.resultRows,
           filter,
         );
+      });
+
+    // Debounced SQL → params panel. See add-dataset for the rationale.
+    this.sqlParamScan$
+      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
+      .subscribe(sql => {
+        this.paramsSql = sql;
+        this.cdr.markForCheck();
       });
 
     // Fetch datasetId from route params
@@ -606,16 +464,6 @@ export class EditDatasetComponent
   }
 
   ngOnDestroy(): void {
-    // Mirror of add-dataset — cancel any in-flight query so the
-    // warehouse worker doesn't keep grinding after navigate-away.
-    if (this.activeQueryRequestId && this.selectedDatasourceObj?.id) {
-      const id = this.activeQueryRequestId;
-      this.activeQueryRequestId = null;
-      this.queryService
-        .cancelQuery({ requestId: id, datasourceId: this.selectedDatasourceObj.id })
-        .subscribe({ next: () => undefined, error: () => undefined });
-    }
-
     this.resultFilterSubject.complete();
 
     if (this.paneResizeObserver) {
@@ -749,10 +597,7 @@ export class EditDatasetComponent
         this.editor.onDidChangeModelContent(() => {
           this.currentQuery = this.editor.getValue();
           this.scheduleDialectLint();
-          // Editor changed — invalidate any stale safety verdict so
-          // the next save attempt re-runs the BE validator from
-          // scratch and the user isn't stuck on an outdated banner.
-          this.clearSqlSafetyError();
+          this.sqlParamScan$.next(this.currentQuery);
           this.cdr.markForCheck();
         });
 
@@ -1141,7 +986,6 @@ export class EditDatasetComponent
     if (this.isExecutingQuery) return;
     const query = this.editor?.getValue() || this.currentQuery;
     this.resultPage = 1;
-    this.resultFirst = 0;
     this.resultFilterValues = {};
     // Leave queryResult in place until the new result lands —
     // avoids the *ngIf flicker that would otherwise unmount the
@@ -1156,7 +1000,6 @@ export class EditDatasetComponent
   executeSelectedQuery(selectedText: string): void {
     if (this.isExecutingQuery) return;
     this.resultPage = 1;
-    this.resultFirst = 0;
     this.resultFilterValues = {};
     // See executeCompleteQuery — same anti-flicker reasoning.
     this.executeQueryForDatasource(selectedText);
@@ -1291,7 +1134,6 @@ export class EditDatasetComponent
   clearResultFilters(): void {
     this.resultFilterValues = {};
     this.resultPage = 1;
-    this.resultFirst = 0;
     if (this.lastExecutedQuery) {
       this.executeQueryForDatasource(
         this.lastExecutedQuery,
@@ -1360,21 +1202,14 @@ export class EditDatasetComponent
 
   onResultsLazyLoad(event: any): void {
     this.lastResultsLazyEvent = event;
-    const first = event.first || 0;
     const page =
-      Math.floor(first / (event.rows || this.resultRows)) + 1;
+      Math.floor((event.first || 0) / (event.rows || this.resultRows)) + 1;
     const limit = event.rows || this.resultRows;
 
     if (!this.lastExecutedQuery) return;
 
     this.resultPage = page;
     this.resultRows = limit;
-    // Mirror the offset PrimeNG asked for back onto our bound
-    // `[first]` so a subsequent `[value]` change doesn't reset the
-    // paginator highlight to page 1. markForCheck because this
-    // component is OnPush.
-    this.resultFirst = first;
-    this.cdr.markForCheck();
 
     // Build filter object from non-empty filter values
     const filter: { [key: string]: string } = {};
@@ -1385,29 +1220,6 @@ export class EditDatasetComponent
     }
 
     this.executeQueryForDatasource(this.lastExecutedQuery, page, limit, filter);
-  }
-
-  /**
-   * Cancel the in-flight query. Mirror of add-dataset — see there
-   * for the rationale on the optimistic UI revert.
-   */
-  cancelActiveQuery(): void {
-    const id = this.activeQueryRequestId;
-    if (!id || !this.selectedDatasourceObj?.id) return;
-
-    this.isExecutingQuery = false;
-    this.activeQueryRequestId = null;
-    this.cdr.markForCheck();
-
-    this.queryService
-      .cancelQuery({
-        requestId: id,
-        datasourceId: this.selectedDatasourceObj.id,
-      })
-      .subscribe({
-        next: () => { /* engine cancel done */ },
-        error: () => { /* swallow */ },
-      });
   }
 
   private executeQueryForDatasource(
@@ -1426,12 +1238,6 @@ export class EditDatasetComponent
 
     this.isExecutingQuery = true;
     this.lastExecutedQuery = query;
-    // Mint requestId BEFORE the POST so the Cancel button has the id
-    // immediately. Mirror of add-dataset.
-    this.activeQueryRequestId =
-      typeof crypto !== 'undefined' && 'randomUUID' in crypto
-        ? crypto.randomUUID()
-        : `q-${Date.now()}-${Math.floor(Math.random() * 1e9)}`;
 
     const startTime = Date.now();
 
@@ -1440,7 +1246,6 @@ export class EditDatasetComponent
       query: query,
       page: page,
       limit: limit,
-      requestId: this.activeQueryRequestId,
     };
 
     if (Object.keys(filter).length > 0) {
@@ -1453,10 +1258,6 @@ export class EditDatasetComponent
       .subscribe({
         next: (response: IAPIResponse<QueryExecuteData>) => {
           if (!response.status) {
-            // Mirror the add-dataset path — pick up errorKind +
-            // offendingToken so the pane renders a typed error
-            // instead of one generic red box.
-            const errData: any = response.data ?? {};
             this.queryResult = {
               columns: [],
               rows: [],
@@ -1465,11 +1266,9 @@ export class EditDatasetComponent
               error:
                 response.message ||
                 this.translate.instant('DATASET.QUERY_EXECUTION_FAILED'),
-              errorKind: errData.errorKind || 'unknown',
-              offendingToken: errData.offendingToken ?? null,
             };
             this.surfaceResultSheet();
-            this.isExecutingQuery = false; this.activeQueryRequestId = null;
+            this.isExecutingQuery = false;
             this.cdr.markForCheck();
             return;
           }
@@ -1484,7 +1283,7 @@ export class EditDatasetComponent
               message: response.message,
             };
             this.surfaceResultSheet();
-            this.isExecutingQuery = false; this.activeQueryRequestId = null;
+            this.isExecutingQuery = false;
             this.cdr.markForCheck();
             return;
           }
@@ -1500,25 +1299,8 @@ export class EditDatasetComponent
             rows: Array.isArray(data.data) ? data.data : [],
             rowCount: data.rowCount ?? 0,
             executionTime,
-            executionMs: data.executionMs,
-            truncated: data.truncated ?? false,
-            warnings: Array.isArray(data.warnings) ? data.warnings : [],
             query: data.query,
           };
-
-          // Rebuild AG Grid ColDefs for the new result. Same as
-          // add-dataset.
-          this.resultColDefs = this.buildResultColDefs();
-
-          // PrimeNG resets internal `first` to 0 when `[value]` changes.
-          // Deferred direct write so this runs AFTER PrimeNG's CD
-          // cycle. See add-dataset for the full rationale.
-          setTimeout(() => {
-            if (this.resultsTable && this.resultsTable.first !== this.resultFirst) {
-              this.resultsTable.first = this.resultFirst;
-              this.cdr.markForCheck();
-            }
-          }, 0);
 
           // Auto-fit columns to content. Columns keep their natural
           // measured widths; the trailing strip stays blank if total
@@ -1533,7 +1315,7 @@ export class EditDatasetComponent
             this.surfaceResultSheet();
           }
 
-          this.isExecutingQuery = false; this.activeQueryRequestId = null;
+          this.isExecutingQuery = false;
           this.cdr.markForCheck();
         },
         error: (error: any) => {
@@ -1564,7 +1346,7 @@ export class EditDatasetComponent
           };
           this.surfaceResultSheet();
 
-          this.isExecutingQuery = false; this.activeQueryRequestId = null;
+          this.isExecutingQuery = false;
           this.cdr.markForCheck();
         },
       });
@@ -1651,25 +1433,16 @@ export class EditDatasetComponent
     }
   }
 
-  /**
-   * Show the result sheet. Pagination reset is opt-in via the
-   * `resetPagination` flag so the lazy-load response path can call
-   * this without snapping the paginator back to page 1. See
-   * add-dataset for the full rationale.
-   */
-  private surfaceResultSheet(opts: { resetPagination?: boolean } = {}): void {
+  private surfaceResultSheet(): void {
     this.showResultsPopup = true;
     if (this.isResultSheetCollapsed) {
       this.isResultSheetCollapsed = false;
       this.persistSheetCollapsed(false);
     }
-    if (opts.resetPagination) {
-      if (this.resultsTable) {
-        this.resultsTable.first = 0;
-      }
-      this.resultPage = 1;
-      this.resultFirst = 0;
+    if (this.resultsTable) {
+      this.resultsTable.first = 0;
     }
+    this.resultPage = 1;
   }
 
   onSheetDragStart(event: MouseEvent): void {
@@ -1834,34 +1607,15 @@ export class EditDatasetComponent
         description: formData.description,
         datasource: this.selectedDatasourceObj.id,
         sql,
-        cacheEnabled: formData.cacheEnabled,
-        cacheTtlSeconds: formData.cacheTtlSeconds,
-        // Track F: organizational tags captured in the save dialog.
-        tags: formData.tags ?? [],
+        // Always send the current config (even []) so removing every
+        // {{token}} clears a previously-saved paramsConfig on the BE.
+        paramsConfig: this.paramsConfig,
       };
 
       this.datasetService
         .updateDataset(saveData, (formData.justification || '').trim())
         .then(response => {
-          // Same SAFETY_VIOLATION handling as add-dataset — pin a
-          // persistent banner so the user can see the offending
-          // token while they edit the SQL, instead of a toast
-          // that fades.
-          if (
-            response &&
-            response.status === false &&
-            response.data?.code === 'SAFETY_VIOLATION'
-          ) {
-            this.sqlSafetyError = {
-              reason: response.message ?? 'SQL was rejected by the safety check.',
-              offendingToken: response.data?.offendingToken ?? null,
-            };
-            this.cdr.markForCheck();
-            return;
-          }
-
           if (this.globalService.handleSuccessService(response, true)) {
-            this.sqlSafetyError = null;
             this.originalQuery = this.editor?.getValue() || this.currentQuery;
             this.router.navigate([DATASET.LIST]);
           }
@@ -1873,15 +1627,105 @@ export class EditDatasetComponent
     }
   }
 
+  /** Params panel emitted an updated config; keep it for the next save. */
+  onParamsConfigChange(config: DatasetParamConfig[]): void {
+    this.paramsConfig = config;
+    this.cdr.markForCheck();
+  }
+
   /**
-   * Mirror of add-dataset's clearer — runs on every editor keystroke
-   * so the banner doesn't outlive the SQL that produced it.
+   * Run the SAVED dataset with the current parameter values via
+   * POST /datasets/:id/run. Unlike the ad-hoc editor preview (which hits
+   * /queries/execute and can't bind {{name}} tokens), this path lets the
+   * BE substitute + bind the params safely. A MISSING_REQUIRED_PARAM /
+   * UNKNOWN_PARAM 400 is surfaced back onto the offending param row.
    */
-  clearSqlSafetyError(): void {
-    if (this.sqlSafetyError) {
-      this.sqlSafetyError = null;
-      this.cdr.markForCheck();
-    }
+  onRunWithParams(params: Record<string, any>): void {
+    if (!this.datasetId) return;
+    this.paramRunError = null;
+    this.isRunningWithParams = true;
+    this.isExecutingQuery = true;
+    const startTime = Date.now();
+
+    this.datasetService
+      .runDatasetQuery({
+        datasetId: this.datasetId,
+        params,
+        limit: this.resultRows,
+      })
+      .then((response: any) => {
+        if (!response?.status) {
+          // Pull the structured param error out of the response body so
+          // the panel can highlight the specific param.
+          const errData = response?.data;
+          if (
+            errData &&
+            (errData.code === 'MISSING_REQUIRED_PARAM' ||
+              errData.code === 'UNKNOWN_PARAM')
+          ) {
+            this.paramRunError = { code: errData.code, param: errData.param };
+          }
+          this.queryResult = {
+            columns: [],
+            rows: [],
+            rowCount: 0,
+            executionTime: `${Date.now() - startTime}ms`,
+            error:
+              response?.message ||
+              this.translate.instant('DATASET.QUERY_EXECUTION_FAILED'),
+          };
+          this.surfaceResultSheet();
+          return;
+        }
+
+        // runDatasetQuery returns a BARE array of enriched row objects;
+        // derive the column list from the first row's keys.
+        const rows: any[] = Array.isArray(response.data) ? response.data : [];
+        const columns = rows.length > 0 ? Object.keys(rows[0]) : [];
+        this.queryResult = {
+          columns,
+          columnTypes: {},
+          rows,
+          rowCount: rows.length,
+          executionTime: `${Date.now() - startTime}ms`,
+        };
+        this.columnWidths = measureColumnWidths(
+          this.queryResult.columns,
+          this.queryResult.rows,
+          this.queryResult.columnTypes,
+        );
+        if (columns.length > 0) {
+          this.surfaceResultSheet();
+        }
+      })
+      .catch((error: any) => {
+        // Non-2xx surfaces here too (HttpClient throws). Dig the param
+        // code out of the error envelope.
+        const errData = error?.error?.data ?? error?.data;
+        if (
+          errData &&
+          (errData.code === 'MISSING_REQUIRED_PARAM' ||
+            errData.code === 'UNKNOWN_PARAM')
+        ) {
+          this.paramRunError = { code: errData.code, param: errData.param };
+        }
+        this.queryResult = {
+          columns: [],
+          rows: [],
+          rowCount: 0,
+          executionTime: `${Date.now() - startTime}ms`,
+          error:
+            error?.error?.message ||
+            error?.message ||
+            this.translate.instant('DATASET.QUERY_EXECUTION_FAILED'),
+        };
+        this.surfaceResultSheet();
+      })
+      .finally(() => {
+        this.isRunningWithParams = false;
+        this.isExecutingQuery = false;
+        this.cdr.markForCheck();
+      });
   }
 
   toggleDatasourceSidebar(): void {
@@ -2300,10 +2144,11 @@ export class EditDatasetComponent
           this.datasetName = dataset.name || '';
           this.datasetDescription = dataset.description || '';
           this.datasetStatus = dataset.status || 1;
-          this.datasetCacheEnabled = !!dataset.cacheEnabled;
-          this.datasetCacheTtlSeconds =
-            dataset.cacheTtlSeconds ?? null;
-          this.datasetTags = Array.isArray(dataset.tags) ? dataset.tags : [];
+          // Seed the saved {{name}} parameter configuration so the panel
+          // renders the author's existing types/labels/defaults/sources.
+          this.paramsConfig = Array.isArray(dataset.paramsConfig)
+            ? dataset.paramsConfig
+            : [];
 
           // Set database from API response. Spread the full
           // datasource payload (rather than just {id, name}) so the
@@ -2325,6 +2170,9 @@ export class EditDatasetComponent
             this.initialQuery = sqlQuery;
             this.currentQuery = sqlQuery;
             this.originalQuery = sqlQuery; // Store original query for reset
+            // Seed the params panel so tokens are scanned on first paint,
+            // not only after the first keystroke.
+            this.paramsSql = sqlQuery;
 
             // Initialize editor with the query
             if (!this.editor) {

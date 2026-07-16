@@ -953,6 +953,21 @@
       "CHECKING_DEPENDENCIES": "Checking dependencies…",
       "DELETE_GUARD_MESSAGE": "Used by {{analyses}} analyses, {{dashboards}} dashboards, {{rls}} RLS rules — deleting may break them.",
       "DELETE_GUARD_ACK": "I understand deleting this dataset may break dependent items."
+    },
+    "PARAMS": {
+      "TITLE": "Parameters",
+      "ADD_PARAMETER": "Add parameter",
+      "TYPE": "Type",
+      "LABEL": "Label",
+      "DEFAULT": "Default",
+      "REQUIRED": "Required",
+      "STATIC_VALUES": "Static values",
+      "FROM_QUERY": "From query",
+      "SOURCE_DATASET": "Source dataset",
+      "VALUE_COLUMN": "Value column",
+      "LABEL_COLUMN": "Label column",
+      "RUN_WITH_PARAMS": "Run with parameters",
+      "REQUIRED_ERROR": "Parameter {{name}} is required"
     }
   },
   "ANALYSES": {

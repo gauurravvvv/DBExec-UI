@@ -13,6 +13,7 @@ import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-g
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AddDatasetComponent } from './components/add-dataset/add-dataset.component';
+import { DatasetParamsPanelComponent } from './components/dataset-params-panel/dataset-params-panel.component';
 import { EditDatasetFieldsDialogComponent } from './components/edit-dataset-fields-dialog/edit-dataset-fields-dialog.component';
 import { EditDatasetComponent } from './components/edit-dataset/edit-dataset.component';
 import { ListDatasetComponent } from './components/list-dataset/list-dataset.component';
@@ -53,6 +54,8 @@ import { addDatasetReducer, ADD_DATASET_FEATURE_KEY } from './store';
     FolderLocationFieldComponent,
     // Canonical shared chip / status-pill / count / tag element.
     ChipComponent,
+    // Standalone {{name}} query-parameters panel (embedded in add/edit).
+    DatasetParamsPanelComponent,
     // NgRx Feature Store
     StoreModule.forFeature(ADD_DATASET_FEATURE_KEY, addDatasetReducer),
   ],

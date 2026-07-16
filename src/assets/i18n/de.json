@@ -949,6 +949,21 @@
       "CHECKING_DEPENDENCIES": "Abhängigkeiten werden geprüft…",
       "DELETE_GUARD_MESSAGE": "Verwendet von {{analyses}} Analysen, {{dashboards}} Dashboards, {{rls}} RLS-Regeln — Löschen kann sie beschädigen.",
       "DELETE_GUARD_ACK": "Ich verstehe, dass das Löschen dieses Datensatzes abhängige Elemente beschädigen kann."
+    },
+    "PARAMS": {
+      "TITLE": "Parameter",
+      "ADD_PARAMETER": "Parameter hinzufügen",
+      "TYPE": "Typ",
+      "LABEL": "Bezeichnung",
+      "DEFAULT": "Standardwert",
+      "REQUIRED": "Erforderlich",
+      "STATIC_VALUES": "Statische Werte",
+      "FROM_QUERY": "Aus Abfrage",
+      "SOURCE_DATASET": "Quelldatensatz",
+      "VALUE_COLUMN": "Wertspalte",
+      "LABEL_COLUMN": "Bezeichnungsspalte",
+      "RUN_WITH_PARAMS": "Mit Parametern ausführen",
+      "REQUIRED_ERROR": "Parameter {{name}} ist erforderlich"
     }
   },
   "ANALYSES": {

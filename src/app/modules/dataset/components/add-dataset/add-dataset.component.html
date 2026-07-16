@@ -50,18 +50,18 @@
            editor's autocomplete is scoped to. Uses the same icon
            class + label as the Add/Edit Datasource form for visual
            consistency. -->
-      <app-chip
+      <div
+        class="db-type-badge"
         *ngIf="selectedDbTypeOption"
-        variant="pill"
-        [icon]="selectedDbTypeOption.iconClass"
         [title]="
           ('DATASET.ACTIVE_DIALECT' | translate) +
           ': ' +
           selectedDbTypeOption.label
         "
       >
-        {{ selectedDbTypeOption.label }}
-      </app-chip>
+        <i [class]="selectedDbTypeOption.iconClass" aria-hidden="true"></i>
+        <span>{{ selectedDbTypeOption.label }}</span>
+      </div>
     </div>
     <div class="toolbar-right">
       <button
@@ -128,35 +128,7 @@
       >
         <i class="pi pi-trash" aria-hidden="true"></i>
       </button>
-      <!-- Explain button — runs EXPLAIN against the user's SQL
-           without executing it. Shows the plan in a dialog (raw
-           JSON pretty-printed). Hidden while a query is in flight
-           since the Run/Cancel toggle owns the row at that moment. -->
       <button
-        *ngIf="!isExecutingQuery"
-        pButton
-        class="btn-explain"
-        (click)="runExplain()"
-        [disabled]="
-          isLoadingEditor ||
-          !selectedDatasourceObj ||
-          !editor ||
-          isQueryEmpty ||
-          scopedSchemaUnavailable
-        "
-        [title]="'DATASET.EXPLAIN_QUERY' | translate"
-        [attr.aria-label]="'DATASET.EXPLAIN_QUERY' | translate"
-      >
-        <i class="pi pi-search" aria-hidden="true"></i>
-        <span class="btn-run-label">{{ 'DATASET.EXPLAIN' | translate }}</span>
-      </button>
-      <!-- Run button — hidden while the query is in flight; replaced
-           by the Cancel button below. Splitting into two buttons (vs
-           one toggle) keeps each button's `[disabled]` rules
-           independent and matches how every desktop DB IDE
-           (DBeaver / DataGrip) renders this. -->
-      <button
-        *ngIf="!isExecutingQuery"
         pButton
         class="btn-run"
         (click)="executeQuery()"
@@ -164,31 +136,19 @@
           isLoadingEditor ||
           !selectedDatasourceObj ||
           !editor ||
+          isExecutingQuery ||
           isQueryEmpty ||
           scopedSchemaUnavailable
         "
         [title]="'DATASET.EXECUTE_QUERY' | translate"
         [attr.aria-label]="'DATASET.EXECUTE_QUERY' | translate"
       >
-        <i class="pi pi-play" aria-hidden="true"></i>
+        <i
+          class="pi"
+          [ngClass]="isExecutingQuery ? 'pi-spin pi-spinner' : 'pi-play'"
+          aria-hidden="true"
+        ></i>
         <span class="btn-run-label">{{ 'DATASET.RUN' | translate }}</span>
-      </button>
-      <!-- Cancel button — only rendered while the query is in
-           flight. Hitting it fires /queries/cancel which the BE
-           routes to the engine-specific cancellation primitive
-           (pg_cancel_backend, KILL QUERY, SYSTEM$CANCEL_QUERY).
-           Click optimistically swaps the UI back to the Run button
-           via cancelActiveQuery(). -->
-      <button
-        *ngIf="isExecutingQuery"
-        pButton
-        class="btn-run btn-run--cancel"
-        (click)="cancelActiveQuery()"
-        [title]="'DATASET.CANCEL_QUERY' | translate"
-        [attr.aria-label]="'DATASET.CANCEL_QUERY' | translate"
-      >
-        <i class="pi pi-times" aria-hidden="true"></i>
-        <span class="btn-run-label">{{ 'COMMON.CANCEL' | translate }}</span>
       </button>
     </div>
   </div>
@@ -494,38 +454,6 @@
           </div>
         </div>
 
-        <!-- SQL safety banner — pinned above the editor when the BE
-             rejected the save with code='SAFETY_VIOLATION'. Clears on
-             next keystroke. Not a toast — the user needs to see the
-             reason + offending token while editing the SQL. -->
-        <div
-          class="sql-safety-banner"
-          *ngIf="sqlSafetyError"
-          role="alert"
-        >
-          <i class="pi pi-shield"></i>
-          <div class="banner-body">
-            <div class="banner-title">
-              {{ 'DATASET.SAFETY_BANNER_TITLE' | translate }}
-            </div>
-            <div class="banner-reason">
-              {{ sqlSafetyError.reason }}
-              <code
-                *ngIf="sqlSafetyError.offendingToken"
-                class="offending-token"
-              >{{ sqlSafetyError.offendingToken }}</code>
-            </div>
-          </div>
-          <button
-            type="button"
-            class="banner-dismiss"
-            (click)="clearSqlSafetyError()"
-            [attr.aria-label]="'COMMON.DISMISS' | translate"
-          >
-            <i class="pi pi-times"></i>
-          </button>
-        </div>
-
         <div
           class="editor-container"
           [hidden]="isLoadingEditor || monacoLoadFailed"
@@ -577,6 +505,20 @@
           </button>
         </div>
       </div>
+
+      <!--
+        Query parameters panel. Self-hiding: renders only when the SQL
+        declares at least one live {{token}}. In add-mode the dataset
+        does not exist yet, so run-with-params is disabled (canRun=false)
+        — the panel is used to CONFIGURE the params, which save with the
+        dataset. The preview above runs the raw datasource query.
+      -->
+      <app-dataset-params-panel
+        [sql]="paramsSql"
+        [paramsConfig]="paramsConfig"
+        [canRun]="false"
+        (paramsConfigChange)="onParamsConfigChange($event)"
+      ></app-dataset-params-panel>
 
       <!--
         (Removed) Legacy floating "✓ N rows in Xms — View Results — ×"
@@ -684,6 +626,37 @@
                 [pTooltip]="'COMMON.CLEAR' | translate"
                 tooltipPosition="bottom"
               ></button>
+              <!-- Chevron toggle: collapse-to-strip when expanded,
+                   expand-from-strip when collapsed. Custom 20px
+                   button (not pButton) so it stays out of PrimeNG's
+                   button-sizing rules and reads as a quiet chevron
+                   icon instead of an action chip. -->
+              <button
+                type="button"
+                class="sheet-chevron-btn"
+                (click)="toggleResultSheet()"
+                [pTooltip]="
+                  (isResultSheetCollapsed
+                    ? 'DATASET.SHOW_RESULTS'
+                    : 'DATASET.HIDE_RESULTS'
+                  ) | translate
+                "
+                tooltipPosition="bottom"
+                [attr.aria-label]="
+                  (isResultSheetCollapsed
+                    ? 'DATASET.SHOW_RESULTS'
+                    : 'DATASET.HIDE_RESULTS'
+                  ) | translate
+                "
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    isResultSheetCollapsed ? 'pi-chevron-up' : 'pi-chevron-down'
+                  "
+                  aria-hidden="true"
+                ></i>
+              </button>
               <!-- Dismiss — drops the result entirely. Only the
                    user's next query brings the sheet back. -->
               <button
@@ -708,88 +681,14 @@
                table alive — just CSS-hidden — so expanding is
                instant and free. -->
           <div class="results-popup-body" [hidden]="isResultSheetCollapsed">
-            <!-- Error Message — typed by errorKind so the icon +
-                 title + hint match what actually failed. The fallback
-                 'unknown' branch shows the engine's raw message; that's
-                 the right move for a driver error we don't recognise. -->
-            <div
-              *ngIf="queryResult.error"
-              class="results-error-card"
-              [attr.data-kind]="queryResult.errorKind || 'unknown'"
-            >
+            <!-- Error Message -->
+            <div class="results-error-card" *ngIf="queryResult.error">
               <div class="error-icon-wrapper">
-                <i
-                  class="pi"
-                  [ngClass]="{
-                    'pi-lock': queryResult.errorKind === 'permission_denied',
-                    'pi-code': queryResult.errorKind === 'syntax',
-                    'pi-clock': queryResult.errorKind === 'timeout',
-                    'pi-wifi': queryResult.errorKind === 'connection',
-                    'pi-search': queryResult.errorKind === 'object_not_found',
-                    'pi-shield': queryResult.errorKind === 'safety_violation',
-                    'pi-times': !queryResult.errorKind || queryResult.errorKind === 'unknown'
-                  }"
-                ></i>
+                <i class="pi pi-times"></i>
               </div>
-              <h4>
-                <ng-container [ngSwitch]="queryResult.errorKind">
-                  <span *ngSwitchCase="'permission_denied'">{{
-                    'DATASET.ERROR_KIND_PERMISSION_DENIED' | translate
-                  }}</span>
-                  <span *ngSwitchCase="'syntax'">{{
-                    'DATASET.ERROR_KIND_SYNTAX' | translate
-                  }}</span>
-                  <span *ngSwitchCase="'timeout'">{{
-                    'DATASET.ERROR_KIND_TIMEOUT' | translate
-                  }}</span>
-                  <span *ngSwitchCase="'connection'">{{
-                    'DATASET.ERROR_KIND_CONNECTION' | translate
-                  }}</span>
-                  <span *ngSwitchCase="'object_not_found'">{{
-                    'DATASET.ERROR_KIND_OBJECT_NOT_FOUND' | translate
-                  }}</span>
-                  <span *ngSwitchCase="'safety_violation'">{{
-                    'DATASET.ERROR_KIND_SAFETY_VIOLATION' | translate
-                  }}</span>
-                  <span *ngSwitchDefault>{{
-                    'DATASET.QUERY_EXECUTION_FAILED' | translate
-                  }}</span>
-                </ng-container>
-              </h4>
+              <h4>{{ 'DATASET.QUERY_EXECUTION_FAILED' | translate }}</h4>
               <div class="error-message-box">
                 <code>{{ queryResult.error }}</code>
-                <app-chip
-                  *ngIf="queryResult.offendingToken"
-                  variant="tag"
-                  tone="error"
-                  size="sm"
-                  [title]="'DATASET.OFFENDING_TOKEN_TOOLTIP' | translate"
-                >{{ queryResult.offendingToken }}</app-chip>
-              </div>
-              <!-- Per-kind recovery hint. Plain copy, not a CTA — the
-                   user's real action is to edit their SQL above. -->
-              <div class="error-hint" *ngIf="queryResult.errorKind">
-                <i class="pi pi-info-circle"></i>
-                <ng-container [ngSwitch]="queryResult.errorKind">
-                  <span *ngSwitchCase="'permission_denied'">{{
-                    'DATASET.ERROR_HINT_PERMISSION_DENIED' | translate
-                  }}</span>
-                  <span *ngSwitchCase="'syntax'">{{
-                    'DATASET.ERROR_HINT_SYNTAX' | translate
-                  }}</span>
-                  <span *ngSwitchCase="'timeout'">{{
-                    'DATASET.ERROR_HINT_TIMEOUT' | translate
-                  }}</span>
-                  <span *ngSwitchCase="'connection'">{{
-                    'DATASET.ERROR_HINT_CONNECTION' | translate
-                  }}</span>
-                  <span *ngSwitchCase="'object_not_found'">{{
-                    'DATASET.ERROR_HINT_OBJECT_NOT_FOUND' | translate
-                  }}</span>
-                  <span *ngSwitchCase="'safety_violation'">{{
-                    'DATASET.ERROR_HINT_SAFETY_VIOLATION' | translate
-                  }}</span>
-                </ng-container>
               </div>
               <div class="error-meta" *ngIf="queryResult.executionTime">
                 <i class="pi pi-clock"></i>
@@ -830,39 +729,7 @@
               <p>{{ 'DATASET.QUERY_RETURNED_ZERO' | translate }}</p>
             </div>
 
-            <!-- Truncation banner — shown above the table when the BE
-                 clipped the result at the row cap. Tells the user there
-                 are more rows and how to see them. -->
-            <div
-              *ngIf="!queryResult.error && queryResult.truncated"
-              class="results-banner results-banner--truncated"
-              role="status"
-            >
-              <i class="pi pi-info-circle"></i>
-              <span>{{ 'DATASET.TRUNCATED_BANNER' | translate }}</span>
-            </div>
-
-            <!-- Warnings strip — BE non-fatal notes (type discovery
-                 skipped, limit clamped, etc). Distinct from errors. -->
-            <div
-              *ngIf="
-                !queryResult.error &&
-                queryResult.warnings &&
-                queryResult.warnings.length > 0
-              "
-              class="results-banner results-banner--warning"
-              role="status"
-            >
-              <i class="pi pi-exclamation-triangle"></i>
-              <ul class="warnings-list">
-                <li *ngFor="let w of queryResult.warnings">{{ w }}</li>
-              </ul>
-            </div>
-
-            <!-- Results Table with PrimeNG. AG Grid was previously
-                 wired here; reverted back to p-table per design
-                 direction. The lazy paginator + onLazyLoad pair drives
-                 the BE-paginated query result endpoint. -->
+            <!-- Results Table with PrimeNG -->
             <div
               class="results-table-container"
               *ngIf="!queryResult.error && queryResult.columns.length > 0"
@@ -871,7 +738,6 @@
                 #resultsTable
                 [value]="queryResult.rows"
                 [rows]="resultRows"
-                [first]="resultFirst"
                 [paginator]="isPaginationEnabled"
                 [lazy]="isPaginationEnabled"
                 (onLazyLoad)="onResultsLazyLoad($event)"
@@ -919,9 +785,14 @@
                     >
                       <div class="th-content">
                         {{ col }}
-                        <!-- Type chip only when the BE discovered at
-                             least one column type. Postgres always
-                             fills this via pg_typeof. -->
+                        <!--
+                          Render the type chip only when the BE was able to
+                          discover types for at least one column. Some
+                          dialects don't (yet) ship driver field metadata
+                          through to columnTypes — hiding the whole chip is
+                          cleaner than a wall of em-dashes. Postgres still
+                          fills this in via pg_typeof.
+                        -->
                         <span
                           class="column-datatype"
                           *ngIf="
@@ -959,6 +830,33 @@
                     <td pFrozenColumn class="row-number-cell">
                       {{ rowIndex + 1 }}
                     </td>
+                    <!--
+                      Each cell goes through the cellFormat pipe so:
+                        - BIGINT / NUMBER / DECIMAL stay as the original
+                          string (no precision-losing Number cast) and
+                          right-align with the .numeric-cell class.
+                        - MySQL BIT (Buffer-shaped JSON) renders as
+                          true/false or hex, not [object Object].
+                        - Dates produce a deterministic ISO string.
+                        - JSON values pretty-print inside a <pre> with a
+                          capped height so a fat document doesn't dominate
+                          the grid.
+                        - NULL gets the muted, italicised placeholder via
+                          the .null-value class + the translated copy.
+                    -->
+                    <!--
+                      One pipe invocation per cell via `*ngIf as`: the
+                      pipe runs once and the resulting object is reused
+                      for the class binding, the (suppressed-for-JSON)
+                      title, and the inner switch. The previous version
+                      ran the pipe four times per cell — fine perf-wise
+                      with a pure pipe, ugly to read.
+
+                      JSON cells render the compact `summary` by default
+                      (e.g. `{ id, name, +3 }`) so a fat document doesn't
+                      make every row in the grid 6em tall. Clicking the
+                      row expands it to the full pretty-printed form.
+                    -->
                     <ng-container
                       *ngFor="
                         let col of queryResult.columns;
@@ -1125,63 +1023,6 @@
   (close)="onDatasetDialogClose($event)"
 >
 </app-save-dataset-dialog>
-
-<!-- EXPLAIN Plan Dialog — shows the engine's parse + plan for the
-     current editor SQL. PG/MySQL/Snowflake return JSON which we
-     pretty-print; Oracle returns text we render verbatim. Styled
-     to match the confirmation-popup convention used by every other
-     dataset dialog (save-dataset, change-confirm) so it reads as
-     part of the same surface family. -->
-<div class="confirmation-popup" *ngIf="showExplainDialog">
-  <div class="popup-content explain-plan-popup">
-    <!-- Header -->
-    <div class="popup-header">
-      <div class="popup-icon">
-        <i class="pi pi-search"></i>
-      </div>
-      <h3>{{ 'DATASET.EXPLAIN_PLAN_TITLE' | translate }}</h3>
-      <div class="explain-plan-popup__meta">
-        <span
-          *ngIf="explainState.engine"
-          class="explain-plan-popup__engine"
-        >{{ explainState.engine }}</span>
-        <span
-          *ngIf="explainState.durationMs != null"
-          class="explain-plan-popup__duration"
-        >{{ explainState.durationMs }}ms</span>
-      </div>
-    </div>
-
-    <!-- Body -->
-    <div class="popup-body explain-plan-popup__body">
-      <div class="explain-plan-popup__loading" *ngIf="explainState.loading">
-        <i class="pi pi-spin pi-spinner"></i>
-        <span>{{ 'DATASET.EXPLAIN_RUNNING' | translate }}</span>
-      </div>
-
-      <div
-        *ngIf="!explainState.loading && explainState.error"
-        class="explain-plan-popup__error"
-      >
-        <i class="pi pi-exclamation-triangle"></i>
-        <code>{{ explainState.error }}</code>
-      </div>
-
-      <pre
-        *ngIf="!explainState.loading && !explainState.error && explainPlanText"
-        class="explain-plan-popup__plan"
-      >{{ explainPlanText }}</pre>
-    </div>
-
-    <!-- Actions — read-only dialog, so only a Close affordance. -->
-    <div class="popup-actions">
-      <button class="btn-cancel" (click)="closeExplainDialog()">
-        <i class="pi pi-times"></i>
-        {{ 'COMMON.CLOSE' | translate }}
-      </button>
-    </div>
-  </div>
-</div>
 
 <!-- Hidden File Input for SQL Import -->
 <input type="file" #fileInput hidden (change)="onFileSelected($event)" />

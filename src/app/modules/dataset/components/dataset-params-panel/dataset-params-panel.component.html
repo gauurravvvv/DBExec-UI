@@ -1,0 +1,208 @@
+<!--
+  Parameters panel — renders only when the SQL declares at least one
+  live {{token}}. Collapsible; each row configures ONE param and offers a
+  compact value control for the preview run.
+-->
+<section class="params-panel" *ngIf="hasParams">
+  <header class="params-panel__header" (click)="toggleCollapsed()">
+    <button
+      type="button"
+      class="params-panel__toggle"
+      [attr.aria-expanded]="!collapsed"
+    >
+      <i class="pi" [ngClass]="collapsed ? 'pi-chevron-right' : 'pi-chevron-down'"></i>
+      <i class="pi pi-sliders-h params-panel__icon"></i>
+      <span class="params-panel__title">
+        {{ 'DATASET.PARAMS.TITLE' | translate }}
+      </span>
+      <span class="params-panel__count">{{ params.length }}</span>
+    </button>
+
+    <button
+      type="button"
+      class="params-panel__run"
+      [disabled]="!canRun || running"
+      [attr.title]="'DATASET.PARAMS.RUN_WITH_PARAMS' | translate"
+      (click)="$event.stopPropagation(); onRun()"
+    >
+      <i class="pi" [ngClass]="running ? 'pi-spin pi-spinner' : 'pi-play'"></i>
+      <span>{{ 'DATASET.PARAMS.RUN_WITH_PARAMS' | translate }}</span>
+    </button>
+  </header>
+
+  <div class="params-panel__body" *ngIf="!collapsed">
+    <div
+      class="param-row"
+      *ngFor="let param of params; trackBy: trackByName"
+      [class.param-row--error]="isErrored(param)"
+    >
+      <!-- Token name (read-only — it comes from the SQL) -->
+      <div class="param-row__name">
+        <code>{{ tokenDisplay(param) }}</code>
+        <small class="param-row__error-msg" *ngIf="isErrored(param)">
+          {{ 'DATASET.PARAMS.REQUIRED_ERROR' | translate: { name: param.name } }}
+        </small>
+      </div>
+
+      <!-- ── Config controls ─────────────────────────────────────── -->
+      <div class="param-row__config">
+        <app-custom-dropdown
+          class="param-row__type"
+          [options]="typeOptions"
+          [ngModel]="param.type"
+          (ngModelChange)="onTypeChange(param, $event)"
+          optionLabel="label"
+          optionValue="value"
+          [filter]="false"
+          [label]="'DATASET.PARAMS.TYPE' | translate"
+        ></app-custom-dropdown>
+
+        <app-custom-input
+          class="param-row__label"
+          [ngModel]="param.label"
+          (ngModelChange)="onLabelChange(param, $event)"
+          [label]="'DATASET.PARAMS.LABEL' | translate"
+          [maxLength]="200"
+        ></app-custom-input>
+
+        <!-- Default value — typed to match the param type -->
+        <ng-container [ngSwitch]="param.type">
+          <app-custom-number
+            *ngSwitchCase="'number'"
+            class="param-row__default"
+            [ngModel]="param.default"
+            (ngModelChange)="onDefaultChange(param, $event)"
+            [label]="'DATASET.PARAMS.DEFAULT' | translate"
+          ></app-custom-number>
+
+          <app-custom-input
+            *ngSwitchDefault
+            class="param-row__default"
+            [ngModel]="param.default"
+            (ngModelChange)="onDefaultChange(param, $event)"
+            [label]="'DATASET.PARAMS.DEFAULT' | translate"
+          ></app-custom-input>
+        </ng-container>
+
+        <div class="param-row__required">
+          <app-custom-toggle
+            [ngModel]="!!param.required"
+            (ngModelChange)="onRequiredChange(param, $event)"
+            [trueLabel]="'DATASET.PARAMS.REQUIRED' | translate"
+            [falseLabel]="'DATASET.PARAMS.REQUIRED' | translate"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+          <span class="param-row__required-label">
+            {{ 'DATASET.PARAMS.REQUIRED' | translate }}
+          </span>
+        </div>
+      </div>
+
+      <!-- ── Dropdown source config ──────────────────────────────── -->
+      <div class="param-row__source" *ngIf="param.type === 'dropdown'">
+        <div class="param-row__source-toggle">
+          <label
+            class="source-chip"
+            *ngFor="let opt of sourceOptions"
+            [class.source-chip--active]="sourceOf(param) === opt.value"
+          >
+            <input
+              type="radio"
+              [name]="'src-' + param.name"
+              [value]="opt.value"
+              [checked]="sourceOf(param) === opt.value"
+              (change)="onSourceChange(param, $any(opt.value))"
+            />
+            {{ opt.labelKey | translate }}
+          </label>
+        </div>
+
+        <!-- Static list -->
+        <div class="param-row__static" *ngIf="sourceOf(param) === 'static'">
+          <p-chips
+            [ngModel]="staticValues(param)"
+            (ngModelChange)="onStaticValuesChange(param, $event)"
+            [addOnBlur]="true"
+            [addOnTab]="true"
+            [allowDuplicate]="false"
+            [placeholder]="'DATASET.PARAMS.STATIC_VALUES' | translate"
+          ></p-chips>
+        </div>
+
+        <!-- Query-based source -->
+        <div class="param-row__query" *ngIf="sourceOf(param) === 'query'">
+          <app-custom-dropdown
+            class="param-row__query-dataset"
+            [options]="datasetOptions"
+            [ngModel]="queryOptions(param).datasetId"
+            (ngModelChange)="onQuerySourceDatasetChange(param, $event)"
+            optionLabel="name"
+            optionValue="id"
+            [label]="'DATASET.PARAMS.SOURCE_DATASET' | translate"
+            [filter]="true"
+            filterBy="name"
+          ></app-custom-dropdown>
+
+          <app-custom-input
+            class="param-row__query-col"
+            [ngModel]="queryOptions(param).valueColumn"
+            (ngModelChange)="onValueColumnChange(param, $event)"
+            [label]="'DATASET.PARAMS.VALUE_COLUMN' | translate"
+          ></app-custom-input>
+
+          <app-custom-input
+            class="param-row__query-col"
+            [ngModel]="queryOptions(param).labelColumn"
+            (ngModelChange)="onLabelColumnChange(param, $event)"
+            [label]="'DATASET.PARAMS.LABEL_COLUMN' | translate"
+          ></app-custom-input>
+        </div>
+      </div>
+
+      <!-- ── Value control (for the preview run) ─────────────────── -->
+      <div class="param-row__value">
+        <span class="param-row__value-label">
+          {{ param.label || param.name }}
+        </span>
+
+        <ng-container [ngSwitch]="param.type">
+          <app-custom-number
+            *ngSwitchCase="'number'"
+            [ngModel]="values[param.name]"
+            (ngModelChange)="onValueChange(param, $event)"
+          ></app-custom-number>
+
+          <app-custom-calendar
+            *ngSwitchCase="'date'"
+            [ngModel]="values[param.name]"
+            (ngModelChange)="onValueChange(param, $event)"
+            [showTime]="false"
+          ></app-custom-calendar>
+
+          <app-custom-daterange
+            *ngSwitchCase="'daterange'"
+            [ngModel]="values[param.name]"
+            (ngModelChange)="onValueChange(param, $event)"
+          ></app-custom-daterange>
+
+          <app-custom-dropdown
+            *ngSwitchCase="'dropdown'"
+            [options]="valueDropdownOptions(param)"
+            [ngModel]="values[param.name]"
+            (ngModelChange)="onValueChange(param, $event)"
+            optionLabel="label"
+            optionValue="value"
+            [showClear]="true"
+            [emptyMessage]="optionsLoading[param.name] ? '…' : ''"
+          ></app-custom-dropdown>
+
+          <app-custom-input
+            *ngSwitchDefault
+            [ngModel]="values[param.name]"
+            (ngModelChange)="onValueChange(param, $event)"
+          ></app-custom-input>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</section>
