@@ -149,3 +149,20 @@
     background: var(--hover-background);
   }
 }
+
+// Server-side total rows (Feature 5) rendered in the flat-table footer.
+// Subtotals get a subtle tint + medium weight; the grand total gets the
+// heaviest treatment + a hairline top rule so it reads as the bottom line.
+::ng-deep .table-visual__table {
+  tr.table-visual__total-row > td {
+    font-weight: var(--fw-semibold, 600);
+    background: var(--hover-background);
+    border-top: 1px solid var(--border-color, #e5e7eb);
+  }
+
+  tr.table-visual__total-row.is-grand-total > td {
+    font-weight: var(--fw-bold, 700);
+    background: var(--primary-color-transparent, rgba(59, 130, 246, 0.08));
+    border-top: 2px solid var(--border-color, #e5e7eb);
+  }
+}

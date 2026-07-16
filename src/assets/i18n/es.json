@@ -993,7 +993,30 @@
       "MAX": "Máx",
       "AVG": "Prom",
       "BASED_ON_PREVIEW": "Según las filas de vista previa"
-    }
+    },
+    "CALC_FIELDS_TITLE": "Campos calculados",
+    "CALC_FIELDS_SUBTITLE": "Derive nuevas columnas a partir de una expresión de fórmula segura",
+    "CALC_FIELDS_COUNT": "{{count}} campo(s) calculado(s)",
+    "CALC_FIELDS_EMPTY": "Aún no hay campos calculados. Agregue uno para derivar una nueva columna.",
+    "CALC_FIELDS_BACK_TO_LIST": "Volver a la lista",
+    "CALC_FIELD_ADD": "Agregar campo calculado",
+    "CALC_FIELD_EDIT": "Editar campo calculado",
+    "CALC_FIELD_NAME": "Nombre del campo",
+    "CALC_FIELD_NAME_PH": "p. ej. profit_margin",
+    "CALC_FIELD_DATA_TYPE": "Tipo de dato",
+    "CALC_FIELD_EXPRESSION": "Expresión",
+    "CALC_FIELD_EXPRESSION_PH": "p. ej. ROUND((revenue - cost) / revenue * 100, 2)",
+    "CALC_FIELD_EXPRESSION_HELP": "Permitido: + - * / %, comparaciones, AND/OR/NOT, CASE WHEN, CAST, ABS/ROUND/FLOOR/CEIL/COALESCE/LENGTH/UPPER/LOWER/TRIM/CONCAT y nombres de columnas.",
+    "CALC_FIELD_VALIDATED": "La expresión es válida.",
+    "CALC_FIELD_VALIDATION_FAILED": "No se pudo validar la expresión.",
+    "CALC_FIELD_LIST_FAILED": "No se pudieron cargar los campos calculados.",
+    "CALC_FIELD_DELETE_TITLE": "¿Eliminar campo calculado?",
+    "CALC_FIELD_DELETE_MESSAGE": "Este campo calculado se eliminará. Los análisis que lo usan pueden verse afectados.",
+    "CALC_FIELD_TYPE_AUTO": "Automático (inferir)",
+    "CALC_FIELD_TYPE_NUMERIC": "Numérico",
+    "CALC_FIELD_TYPE_TEXT": "Texto",
+    "CALC_FIELD_TYPE_DATE": "Fecha",
+    "CALC_FIELD_TYPE_BOOLEAN": "Booleano"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "No se puede crear el análisis: falta el conjunto de datos de origen. Inténtelo de nuevo desde un dataset.",
@@ -1539,7 +1562,10 @@
       "MEASURE_PH": "Campo de valor para agregar",
       "AGGREGATION": "Agregación",
       "ROW_TOTALS": "Totales de fila",
-      "COLUMN_TOTALS": "Totales de columna"
+      "COLUMN_TOTALS": "Totales de columna",
+      "SERVER_TOTALS": "Totales del servidor",
+      "GRAND_TOTAL": "Total general",
+      "SUBTOTALS": "Subtotales"
     },
     "REFLINE": {
       "TITLE": "Líneas de referencia y anotaciones",
@@ -3819,6 +3845,46 @@
       },
       "objectId": {
         "required": "Se requiere un id de objeto válido"
+      }
+    },
+    "calculatedFields": {
+      "name": {
+        "required": "El nombre del campo es obligatorio",
+        "invalid": "El nombre debe comenzar con una letra o guion bajo y contener solo letras, dígitos y guiones bajos",
+        "tooLong": "El nombre del campo es demasiado largo"
+      },
+      "expression": {
+        "required": "La expresión es obligatoria",
+        "tooLong": "La expresión es demasiado larga"
+      },
+      "dataType": {
+        "invalid": "Tipo de dato no válido"
+      },
+      "datasetId": {
+        "required": "El conjunto de datos es obligatorio"
+      },
+      "id": {
+        "required": "El id del campo es obligatorio"
+      }
+    },
+    "pivotTotals": {
+      "key": {
+        "required": "La clave de total es obligatoria",
+        "invalid": "Clave de total no válida"
+      },
+      "countKey": {
+        "invalid": "Clave de conteo no válida"
+      },
+      "aggregate": {
+        "invalid": "Agregado no válido"
+      },
+      "dimensionKeys": {
+        "required": "Se requiere al menos una dimensión",
+        "tooMany": "Demasiadas dimensiones"
+      },
+      "measures": {
+        "required": "Se requiere al menos una medida",
+        "tooMany": "Demasiadas medidas"
       }
     }
   },

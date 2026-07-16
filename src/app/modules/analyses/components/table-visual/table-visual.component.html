@@ -123,5 +123,23 @@
         </td>
       </tr>
     </ng-template>
+
+    <!-- Server-side totals (Feature 5): grand-total + subtotal rows the
+         BE appended, pinned in the table footer and styled distinctly. -->
+    <ng-template pTemplate="footer" *ngIf="hasTotalRows">
+      <tr
+        *ngFor="let totalRow of totalRows; trackBy: trackByIndex"
+        class="table-visual__total-row"
+        [class.is-grand-total]="isGrandTotalRow(totalRow)"
+      >
+        <td *ngIf="showRowNumbers" class="table-visual__row-num"></td>
+        <td
+          *ngFor="let col of columns; trackBy: trackByIndex"
+          [class.is-numeric]="col.numeric"
+        >
+          <span class="cell-text">{{ formatTotalCell(totalRow, col) }}</span>
+        </td>
+      </tr>
+    </ng-template>
   </p-table>
 </div>

@@ -993,7 +993,30 @@
       "MAX": "最大值",
       "AVG": "平均值",
       "BASED_ON_PREVIEW": "基于预览行"
-    }
+    },
+    "CALC_FIELDS_TITLE": "计算字段",
+    "CALC_FIELDS_SUBTITLE": "从安全的公式表达式派生新列",
+    "CALC_FIELDS_COUNT": "{{count}} 个计算字段",
+    "CALC_FIELDS_EMPTY": "尚无计算字段。添加一个以派生新列。",
+    "CALC_FIELDS_BACK_TO_LIST": "返回列表",
+    "CALC_FIELD_ADD": "添加计算字段",
+    "CALC_FIELD_EDIT": "编辑计算字段",
+    "CALC_FIELD_NAME": "字段名称",
+    "CALC_FIELD_NAME_PH": "例如 profit_margin",
+    "CALC_FIELD_DATA_TYPE": "数据类型",
+    "CALC_FIELD_EXPRESSION": "表达式",
+    "CALC_FIELD_EXPRESSION_PH": "例如 ROUND((revenue - cost) / revenue * 100, 2)",
+    "CALC_FIELD_EXPRESSION_HELP": "允许：+ - * / %、比较、AND/OR/NOT、CASE WHEN、CAST、ABS/ROUND/FLOOR/CEIL/COALESCE/LENGTH/UPPER/LOWER/TRIM/CONCAT 以及列名。",
+    "CALC_FIELD_VALIDATED": "表达式有效。",
+    "CALC_FIELD_VALIDATION_FAILED": "无法验证表达式。",
+    "CALC_FIELD_LIST_FAILED": "无法加载计算字段。",
+    "CALC_FIELD_DELETE_TITLE": "删除计算字段？",
+    "CALC_FIELD_DELETE_MESSAGE": "此计算字段将被删除。使用它的分析可能会受到影响。",
+    "CALC_FIELD_TYPE_AUTO": "自动（推断）",
+    "CALC_FIELD_TYPE_NUMERIC": "数值",
+    "CALC_FIELD_TYPE_TEXT": "文本",
+    "CALC_FIELD_TYPE_DATE": "日期",
+    "CALC_FIELD_TYPE_BOOLEAN": "布尔值"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "无法创建分析：缺少源数据集。请从数据集重试。",
@@ -1539,7 +1562,10 @@
       "MEASURE_PH": "要聚合的值字段",
       "AGGREGATION": "聚合方式",
       "ROW_TOTALS": "行合计",
-      "COLUMN_TOTALS": "列合计"
+      "COLUMN_TOTALS": "列合计",
+      "SERVER_TOTALS": "服务器合计",
+      "GRAND_TOTAL": "总计",
+      "SUBTOTALS": "小计"
     },
     "REFLINE": {
       "TITLE": "参考线与注释",
@@ -3819,6 +3845,46 @@
       },
       "objectId": {
         "required": "需要有效的对象 ID"
+      }
+    },
+    "calculatedFields": {
+      "name": {
+        "required": "字段名称为必填项",
+        "invalid": "名称必须以字母或下划线开头，且只能包含字母、数字和下划线",
+        "tooLong": "字段名称过长"
+      },
+      "expression": {
+        "required": "表达式为必填项",
+        "tooLong": "表达式过长"
+      },
+      "dataType": {
+        "invalid": "无效的数据类型"
+      },
+      "datasetId": {
+        "required": "数据集为必填项"
+      },
+      "id": {
+        "required": "字段 id 为必填项"
+      }
+    },
+    "pivotTotals": {
+      "key": {
+        "required": "合计键为必填项",
+        "invalid": "无效的合计键"
+      },
+      "countKey": {
+        "invalid": "无效的计数键"
+      },
+      "aggregate": {
+        "invalid": "无效的聚合"
+      },
+      "dimensionKeys": {
+        "required": "至少需要一个维度",
+        "tooMany": "维度过多"
+      },
+      "measures": {
+        "required": "至少需要一个度量",
+        "tooMany": "度量过多"
       }
     }
   },

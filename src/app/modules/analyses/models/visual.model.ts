@@ -323,6 +323,15 @@ export interface Visual {
    * Column keys reference dataset/analysis field `columnToUse` values.
    */
   drillDimensions?: string[];
+
+  /**
+   * Server-side pivot total rows (Feature 5), populated at run time from
+   * response.meta.pivotTotals when config.pivotTotals is enabled on a
+   * table visual. Each row is a data-shaped object tagged with
+   * `__rowType: 'subtotal' | 'grand'`. Rendered by table-visual as
+   * distinct footer rows. Not persisted — derived per run.
+   */
+  pivotTotalRows?: any[];
 }
 
 /**

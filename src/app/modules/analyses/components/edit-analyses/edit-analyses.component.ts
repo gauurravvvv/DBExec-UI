@@ -979,6 +979,11 @@ export class EditAnalysesComponent
     const interactionFilters = this.interaction.toRunQueryFilters();
     const mergedFilters = [...this.appliedFilters, ...interactionFilters];
 
+    // Feature 5: if a table visual has server-side totals configured,
+    // attach the pivotTotals run-config so the BE appends grand/subtotal
+    // rows (returned at response.meta.pivotTotals). Omitted when none.
+    const pivotTotals = this.buildPivotTotalsConfig();
+
     this.analysesService
       .runAnalysisQuery({
         datasetId: this.datasetId,
@@ -988,9 +993,13 @@ export class EditAnalysesComponent
         ...(this.appliedParameters.length > 0
           ? { parameters: this.appliedParameters }
           : {}),
+        ...(pivotTotals ? { pivotTotals } : {}),
       })
-      .then(response => {
+      .then((response: any) => {
         if (this.globalService.handleSuccessService(response, false)) {
+          // Stash any server-returned totals onto the owning table visual
+          // so table-visual can render them as distinct rows.
+          this.applyPivotTotalsFromResponse(response);
           this.store.dispatch(
             AddAnalysesActions.loadDatasetDataSuccess({
               datasetId: this.datasetId,
@@ -1019,6 +1028,77 @@ export class EditAnalysesComponent
           }),
         );
       });
+  }
+
+  // ── Pivot totals (Feature 5) ────────────────────────────────────────
+  //
+  // A table visual can opt into server-side totals via
+  // config.pivotTotals.{grandTotal,subtotals}. When set, we assemble the
+  // run-config the BE expects (dimensionKeys from the pivot rows, measures
+  // from the pivot measure + aggregation) and attach it to the run.
+  // Only the FIRST such visual contributes a config (one totals block per
+  // run); its returned rows are stashed back onto that visual.
+
+  /** The first table visual (in the active tab) requesting server totals. */
+  private firstPivotTotalsVisual(): any | null {
+    for (const v of this.visuals) {
+      if (!isTableChartType(v.chartType)) continue;
+      const pt = (v as any)?.config?.pivotTotals;
+      if (pt && (pt.grandTotal === true || pt.subtotals === true)) return v;
+    }
+    return null;
+  }
+
+  /**
+   * Build the pivotTotals run-config for the owning visual, or null when
+   * none applies or the pivot config isn't complete enough to total.
+   * dimensionKeys come from the pivot rows; measures from the single pivot
+   * measure paired with its aggregation.
+   */
+  private buildPivotTotalsConfig(): any | null {
+    const visual = this.firstPivotTotalsVisual();
+    if (!visual) return null;
+    const pivot = visual.config?.pivot;
+    const pt = visual.config?.pivotTotals;
+    const rows: string[] = Array.isArray(pivot?.rows) ? pivot.rows : [];
+    const measure: string = pivot?.measure || '';
+    const aggregation: string = pivot?.aggregation || 'sum';
+    // The BE validator needs at least one dimension key + one measure.
+    if (rows.length === 0 || !measure) return null;
+    return {
+      grandTotal: pt.grandTotal === true,
+      subtotals: pt.subtotals === true,
+      dimensionKeys: rows,
+      measures: [{ key: measure, aggregate: aggregation }],
+    };
+  }
+
+  /**
+   * Copy the server-returned totals (response.meta.pivotTotals) onto the
+   * owning table visual as `pivotTotalRows` so table-visual renders them
+   * as distinct grand-total / subtotal rows. Clears the field when the
+   * response carries no totals so stale rows never linger.
+   */
+  private applyPivotTotalsFromResponse(response: any): void {
+    const visual = this.firstPivotTotalsVisual();
+    if (!visual) return;
+    const meta = response?.meta?.pivotTotals;
+    if (!meta) {
+      (visual as any).pivotTotalRows = [];
+      return;
+    }
+    const rows: any[] = [];
+    // Subtotal rows first (grouped), grand total last, matching how a
+    // spreadsheet reads bottom-up.
+    if (Array.isArray(meta.subtotalRows)) {
+      for (const r of meta.subtotalRows) {
+        rows.push({ ...r, __rowType: 'subtotal' });
+      }
+    }
+    if (meta.grandTotalRow) {
+      rows.push({ ...meta.grandTotalRow, __rowType: 'grand' });
+    }
+    (visual as any).pivotTotalRows = rows;
   }
 
   /**

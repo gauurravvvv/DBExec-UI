@@ -993,7 +993,30 @@
       "MAX": "Max",
       "AVG": "Moy",
       "BASED_ON_PREVIEW": "D'après les lignes d'aperçu"
-    }
+    },
+    "CALC_FIELDS_TITLE": "Champs calculés",
+    "CALC_FIELDS_SUBTITLE": "Dérivez de nouvelles colonnes à partir d'une expression de formule sécurisée",
+    "CALC_FIELDS_COUNT": "{{count}} champ(s) calculé(s)",
+    "CALC_FIELDS_EMPTY": "Aucun champ calculé pour l'instant. Ajoutez-en un pour dériver une nouvelle colonne.",
+    "CALC_FIELDS_BACK_TO_LIST": "Retour à la liste",
+    "CALC_FIELD_ADD": "Ajouter un champ calculé",
+    "CALC_FIELD_EDIT": "Modifier le champ calculé",
+    "CALC_FIELD_NAME": "Nom du champ",
+    "CALC_FIELD_NAME_PH": "ex. profit_margin",
+    "CALC_FIELD_DATA_TYPE": "Type de données",
+    "CALC_FIELD_EXPRESSION": "Expression",
+    "CALC_FIELD_EXPRESSION_PH": "ex. ROUND((revenue - cost) / revenue * 100, 2)",
+    "CALC_FIELD_EXPRESSION_HELP": "Autorisé : + - * / %, comparaisons, AND/OR/NOT, CASE WHEN, CAST, ABS/ROUND/FLOOR/CEIL/COALESCE/LENGTH/UPPER/LOWER/TRIM/CONCAT et noms de colonnes.",
+    "CALC_FIELD_VALIDATED": "L'expression est valide.",
+    "CALC_FIELD_VALIDATION_FAILED": "Impossible de valider l'expression.",
+    "CALC_FIELD_LIST_FAILED": "Impossible de charger les champs calculés.",
+    "CALC_FIELD_DELETE_TITLE": "Supprimer le champ calculé ?",
+    "CALC_FIELD_DELETE_MESSAGE": "Ce champ calculé sera supprimé. Les analyses qui l'utilisent peuvent être affectées.",
+    "CALC_FIELD_TYPE_AUTO": "Automatique (déduire)",
+    "CALC_FIELD_TYPE_NUMERIC": "Numérique",
+    "CALC_FIELD_TYPE_TEXT": "Texte",
+    "CALC_FIELD_TYPE_DATE": "Date",
+    "CALC_FIELD_TYPE_BOOLEAN": "Booléen"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "Impossible de créer l'analyse : le jeu de données source est manquant. Réessayez à partir d'un dataset.",
@@ -1539,7 +1562,10 @@
       "MEASURE_PH": "Champ valeur à agréger",
       "AGGREGATION": "Agrégation",
       "ROW_TOTALS": "Totaux des lignes",
-      "COLUMN_TOTALS": "Totaux des colonnes"
+      "COLUMN_TOTALS": "Totaux des colonnes",
+      "SERVER_TOTALS": "Totaux serveur",
+      "GRAND_TOTAL": "Total général",
+      "SUBTOTALS": "Sous-totaux"
     },
     "REFLINE": {
       "TITLE": "Lignes de référence et annotations",
@@ -3819,6 +3845,46 @@
       },
       "objectId": {
         "required": "Un id d’objet valide est requis"
+      }
+    },
+    "calculatedFields": {
+      "name": {
+        "required": "Le nom du champ est requis",
+        "invalid": "Le nom doit commencer par une lettre ou un tiret bas et ne contenir que des lettres, chiffres et tirets bas",
+        "tooLong": "Le nom du champ est trop long"
+      },
+      "expression": {
+        "required": "L'expression est requise",
+        "tooLong": "L'expression est trop longue"
+      },
+      "dataType": {
+        "invalid": "Type de données non valide"
+      },
+      "datasetId": {
+        "required": "Le jeu de données est requis"
+      },
+      "id": {
+        "required": "L'identifiant du champ est requis"
+      }
+    },
+    "pivotTotals": {
+      "key": {
+        "required": "La clé de total est requise",
+        "invalid": "Clé de total non valide"
+      },
+      "countKey": {
+        "invalid": "Clé de comptage non valide"
+      },
+      "aggregate": {
+        "invalid": "Agrégat non valide"
+      },
+      "dimensionKeys": {
+        "required": "Au moins une dimension est requise",
+        "tooMany": "Trop de dimensions"
+      },
+      "measures": {
+        "required": "Au moins une mesure est requise",
+        "tooMany": "Trop de mesures"
       }
     }
   },
