@@ -194,6 +194,160 @@ export const datasetCacheTtlSecondsSchema = z.preprocess(
     .optional(),
 );
 
+// ── Rich column metadata (slice 1) ─────────────────────────────────
+// Per-column display hints persisted on DatasetField. All optional on
+// the wire and additive — a caller that doesn't manage metadata sends
+// the same field payload as before. None of these change the SQL
+// result; they are downstream-picker / rendering hints only.
+
+/** Semantic role of a column. */
+export const DATASET_FIELD_ROLE_VALUES = ['dimension', 'measure'] as const;
+export type DatasetFieldRole = (typeof DATASET_FIELD_ROLE_VALUES)[number];
+
+/** Default aggregation applied to a measure downstream. */
+export const DATASET_FIELD_AGGREGATION_VALUES = [
+  'sum',
+  'avg',
+  'count',
+  'countDistinct',
+  'min',
+  'max',
+  'none',
+] as const;
+export type DatasetFieldAggregation =
+  (typeof DATASET_FIELD_AGGREGATION_VALUES)[number];
+
+/** Format-hint kinds. */
+export const DATASET_FIELD_FORMAT_KIND_VALUES = [
+  'number',
+  'currency',
+  'percent',
+  'date',
+  'datetime',
+  'text',
+] as const;
+export type DatasetFieldFormatKind =
+  (typeof DATASET_FIELD_FORMAT_KIND_VALUES)[number];
+
+export const datasetFieldDescriptionSchema = z.preprocess(
+  blankToUndefined,
+  z
+    .string()
+    .max(DATASET_LIMITS.DESCRIPTION_MAX, {
+      message: 'validation.datasets.field.description.tooLong',
+    })
+    .optional(),
+);
+
+export const datasetFieldRoleSchema = z.preprocess(
+  blankToUndefined,
+  z
+    .enum(DATASET_FIELD_ROLE_VALUES, {
+      message: 'validation.datasets.field.role.invalid',
+    })
+    .optional(),
+);
+
+export const datasetFieldAggregationSchema = z.preprocess(
+  blankToUndefined,
+  z
+    .enum(DATASET_FIELD_AGGREGATION_VALUES, {
+      message: 'validation.datasets.field.aggregation.invalid',
+    })
+    .optional(),
+);
+
+/**
+ * Format hint object. Kept permissive on the numeric / string extras
+ * (decimals / currencyCode / dateFormat / thousands) — the FE renders
+ * whatever it recognises and ignores the rest. `kind` is the only
+ * constrained key.
+ */
+export const datasetFieldFormatHintSchema = z
+  .object({
+    kind: z.enum(DATASET_FIELD_FORMAT_KIND_VALUES, {
+      message: 'validation.datasets.field.formatHint.kind.invalid',
+    }),
+    decimals: z.number().int().min(0).max(10).optional(),
+    currencyCode: z.string().max(8).optional(),
+    dateFormat: z.string().max(64).optional(),
+    thousands: z.boolean().optional(),
+  })
+  .nullable()
+  .optional();
+
+export const datasetFieldVisibleSchema = z.boolean().optional();
+
+export const datasetFieldTypeOverrideSchema = z.preprocess(
+  blankToUndefined,
+  z
+    .string()
+    .max(64, { message: 'validation.datasets.field.typeOverride.tooLong' })
+    .optional(),
+);
+
+// ── Query parameters ({{name}} tokens) — slice 2 ───────────────────
+// Declared on the dataset (Dataset.paramsConfig). Mirrors the entity
+// jsonb shape. `options` is a discriminated-ish union of a static list
+// OR a query-based source (another dataset's value/label columns).
+
+/** Parameter control types for {{name}} tokens. */
+export const DATASET_PARAM_TYPE_VALUES = [
+  'text',
+  'number',
+  'date',
+  'daterange',
+  'dropdown',
+] as const;
+export type DatasetParamType = (typeof DATASET_PARAM_TYPE_VALUES)[number];
+
+/** {{name}} tokens are SQL identifiers — same shape the BE tokenizer accepts. */
+export const DATASET_PARAM_NAME_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
+const datasetParamStaticOptionsSchema = z.object({
+  static: z.array(z.string()).optional(),
+});
+
+const datasetParamQueryOptionsSchema = z.object({
+  datasetId: z.string().optional(),
+  valueColumn: z.string().optional(),
+  labelColumn: z.string().optional(),
+});
+
+/** A single declared parameter. */
+export const datasetParamSchema = z.object({
+  name: z.preprocess(
+    trimOrUndefined,
+    z
+      .string({ message: 'validation.datasets.param.name.required' })
+      .regex(DATASET_PARAM_NAME_PATTERN, {
+        message: 'validation.datasets.param.name.invalid',
+      }),
+  ),
+  type: z.enum(DATASET_PARAM_TYPE_VALUES, {
+    message: 'validation.datasets.param.type.invalid',
+  }),
+  label: z.preprocess(blankToUndefined, z.string().max(200).optional()),
+  // default / required / options are free-form-ish; the run path binds
+  // the value regardless of declared type.
+  default: z.any().optional(),
+  required: z.boolean().optional(),
+  options: z
+    .union([datasetParamStaticOptionsSchema, datasetParamQueryOptionsSchema])
+    .optional(),
+});
+export type DatasetParamInput = z.infer<typeof datasetParamSchema>;
+
+/**
+ * paramsConfig on add/update dataset. Accepts null / '' to clear.
+ * Optional on the wire so a caller that doesn't manage params sends the
+ * same payload as before.
+ */
+export const datasetParamsConfigSchema = z.preprocess(
+  (v: unknown) => (v === '' || v === null ? undefined : v),
+  z.array(datasetParamSchema).optional(),
+);
+
 // ── Composite schemas ──────────────────────────────────────────────
 
 /** SQL-authored Save dataset. */
@@ -204,6 +358,7 @@ export const addDatasetSchema = z.object({
   sql: sqlSchema,
   cacheEnabled: datasetCacheEnabledSchema,
   cacheTtlSeconds: datasetCacheTtlSecondsSchema,
+  paramsConfig: datasetParamsConfigSchema,
 });
 export type AddDatasetInput = z.infer<typeof addDatasetSchema>;
 
@@ -218,6 +373,7 @@ export const updateDatasetSchema = z.object({
   justification: datasetJustificationSchema,
   cacheEnabled: datasetCacheEnabledSchema,
   cacheTtlSeconds: datasetCacheTtlSecondsSchema,
+  paramsConfig: datasetParamsConfigSchema,
 });
 export type UpdateDatasetInput = z.infer<typeof updateDatasetSchema>;
 
@@ -277,6 +433,13 @@ export const addDatasetFieldSchema = z.object({
   dataType: z.preprocess(blankToUndefined, z.string().optional()),
   analysisId: z.preprocess(blankToUndefined, z.string().optional()),
   used_field_ids: z.array(z.string()).optional(),
+  // Rich column metadata (slice 1) — all optional + additive.
+  description: datasetFieldDescriptionSchema,
+  role: datasetFieldRoleSchema,
+  defaultAggregation: datasetFieldAggregationSchema,
+  formatHint: datasetFieldFormatHintSchema,
+  isVisible: datasetFieldVisibleSchema,
+  typeOverride: datasetFieldTypeOverrideSchema,
 });
 
 /** Update custom calculated field. */
@@ -288,4 +451,11 @@ export const updateDatasetFieldSchema = z.object({
   customLogic: z.preprocess(blankToUndefined, z.string().optional()),
   dataType: z.preprocess(blankToUndefined, z.string().optional()),
   justification: datasetJustificationSchema,
+  // Rich column metadata (slice 1) — all optional + additive.
+  description: datasetFieldDescriptionSchema,
+  role: datasetFieldRoleSchema,
+  defaultAggregation: datasetFieldAggregationSchema,
+  formatHint: datasetFieldFormatHintSchema,
+  isVisible: datasetFieldVisibleSchema,
+  typeOverride: datasetFieldTypeOverrideSchema,
 });
