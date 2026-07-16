@@ -272,6 +272,53 @@
           ></app-custom-number>
         </div>
 
+        <!-- Quick calc (Slice B) — per-measure derived series. -->
+        <div class="config-group">
+          <label>{{ 'ANALYSES.ANALYTICS.QUICK_CALC' | translate }}</label>
+          <app-custom-dropdown
+            [options]="quickCalcOptions"
+            [(ngModel)]="quickCalc"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            icon="pi-calculator"
+          ></app-custom-dropdown>
+        </div>
+        <div class="config-group" *ngIf="quickCalc === 'moving_average'">
+          <label>{{ 'ANALYSES.ANALYTICS.MOVING_AVG_WINDOW' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="movingAverageWindow"
+            [min]="2"
+            [max]="60"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+
+        <!-- Period-over-period (Slice B). -->
+        <div class="config-group">
+          <label>{{ 'ANALYSES.ANALYTICS.COMPARE' | translate }}</label>
+          <app-custom-dropdown
+            [options]="compareModeOptions"
+            [(ngModel)]="compareMode"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            icon="pi-clock"
+          ></app-custom-dropdown>
+        </div>
+        <div class="config-group" *ngIf="compareMode">
+          <label>{{ 'ANALYSES.ANALYTICS.COMPARE_DATE_COLUMN' | translate }}</label>
+          <app-custom-dropdown
+            [options]="allFieldOptions"
+            [(ngModel)]="compareDateColumn"
+            optionLabel="label"
+            optionValue="value"
+            [showClear]="true"
+            appendTo="body"
+            [placeholder]="'ANALYSES.ANALYTICS.COMPARE_DATE_COLUMN_PH' | translate"
+          ></app-custom-dropdown>
+        </div>
+
         <!-- Small multiples -->
         <div class="config-row">
           <label>{{ 'ANALYSES.ANALYTICS.SMALL_MULTIPLES' | translate }}</label>

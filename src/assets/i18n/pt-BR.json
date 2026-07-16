@@ -1632,7 +1632,32 @@
       "MAX_COLS": "Máx. de colunas",
       "TREND_LOG": "Logarítmica",
       "TREND_POLY": "Polinomial",
-      "POLY_DEGREE": "Grau do polinômio"
+      "POLY_DEGREE": "Grau do polinômio",
+      "QUICK_CALC": "Cálculo rápido",
+      "QUICK_CALC_NONE": "Nenhum",
+      "QUICK_CALC_RUNNING_TOTAL": "Total acumulado",
+      "QUICK_CALC_PERCENT_OF_TOTAL": "Porcentagem do total",
+      "QUICK_CALC_DIFFERENCE": "Diferença",
+      "QUICK_CALC_PERCENT_DIFFERENCE": "Diferença percentual",
+      "QUICK_CALC_MOVING_AVERAGE": "Média móvel",
+      "QUICK_CALC_RANK": "Classificação",
+      "MOVING_AVG_WINDOW": "Janela da média móvel",
+      "COMPARE": "Comparar com",
+      "COMPARE_NONE": "Nenhum",
+      "COMPARE_PREVIOUS_PERIOD": "Período anterior",
+      "COMPARE_SAME_PERIOD_LAST_YEAR": "Mesmo período do ano anterior",
+      "COMPARE_DATE_COLUMN": "Coluna de data",
+      "COMPARE_DATE_COLUMN_PH": "Coluna para ordenar os períodos"
+    },
+    "KPI": {
+      "DATE_COLUMN": "Coluna de data da tendência",
+      "DATE_COLUMN_PH": "Coluna para o minigráfico",
+      "COMPARE_MODE": "Comparar com",
+      "COMPARE_NONE": "Nenhum",
+      "COMPARE_PREVIOUS_PERIOD": "Período anterior",
+      "COMPARE_SAME_PERIOD_LAST_YEAR": "Mesmo período do ano anterior",
+      "VS_PRIOR": "vs. anterior",
+      "TARGET": "Meta"
     },
     "INTERACTION": {
       "SECTION": "Interação",

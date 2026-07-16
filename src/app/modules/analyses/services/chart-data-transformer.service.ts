@@ -5,6 +5,12 @@ import {
   MultiSeriesData,
   SingleSeriesData,
 } from '../models';
+import {
+  AnalysisAnalyticsService,
+  CompareMode,
+  Point,
+  QuickCalc,
+} from './analysis-analytics.service';
 
 /**
  * Chart type categories for determining data format
@@ -76,6 +82,8 @@ const MAX_LABEL_LENGTH = 25;
   providedIn: 'root',
 })
 export class ChartDataTransformerService {
+  constructor(private analytics: AnalysisAnalyticsService) {}
+
   /**
    * Transform raw data into the appropriate chart format based on chart type
    * @param chartType - The type of chart (e.g., 'bar-vertical', 'line', 'heat-map')
@@ -84,6 +92,21 @@ export class ChartDataTransformerService {
    * @returns Transformed data array in the correct format for the chart
    */
   transformData(
+    chartType: string | null,
+    rawData: any[],
+    mapping: ChartDataMapping,
+  ): ChartData {
+    const shaped = this.transformDataRaw(chartType, rawData, mapping);
+    // Slice B: apply the per-measure quick calc + period-over-period
+    // compare to the shaped {name,value} series after the base transform.
+    return this.applyAnalytics(chartType, shaped, mapping);
+  }
+
+  /**
+   * Base transform (pre-analytics). Split out so applyAnalytics can layer
+   * the quick-calc / compare transforms onto the shaped result.
+   */
+  private transformDataRaw(
     chartType: string | null,
     rawData: any[],
     mapping: ChartDataMapping,
@@ -268,6 +291,94 @@ export class ChartDataTransformerService {
       );
       return [];
     }
+  }
+
+  /**
+   * Slice B — layer the analytics transforms onto the shaped chart data.
+   * Handles both single-series (`{name,value}[]`) and multi-series
+   * (`{name,series:[…]}[]`) shapes; each numeric series is transformed
+   * in the order the base transform emitted it.
+   *
+   *  1. Quick calc (running total / % of total / difference / % diff /
+   *     moving average / rank) — applied per series.
+   *  2. Period-over-period — when a compare mode is set, appends a
+   *     "prior period" companion series (multi-series shapes only, where
+   *     a secondary series reads cleanly on a time chart).
+   *
+   * A no-op (returns the input) when neither is configured, so untouched
+   * charts keep their exact previous shape/labels.
+   */
+  applyAnalytics(
+    chartType: string | null,
+    data: ChartData,
+    mapping: ChartDataMapping,
+  ): ChartData {
+    const calc: QuickCalc = mapping.quickCalc ?? null;
+    const compareMode: CompareMode = mapping.compareMode ?? null;
+    if (!calc && !compareMode) return data;
+    if (!Array.isArray(data) || data.length === 0) return data;
+
+    const win = mapping.movingAverageWindow ?? 3;
+
+    // Single-series shape — array of {name,value}.
+    if (this.isSingleSeriesShape(data)) {
+      const pts = data as unknown as Point[];
+      const calced = calc
+        ? this.analytics.applyQuickCalcToPoints(pts, calc, win)
+        : pts;
+      // A compare on a single-series chart can't add a second series
+      // (there's no series wrapper), so we leave the shape as-is; the
+      // KPI card + multi-series charts carry the compare visualisation.
+      return calced as unknown as ChartData;
+    }
+
+    // Multi-series shape — array of {name, series:[{name,value}]}.
+    const multi = data as MultiSeriesData[];
+    const transformed: MultiSeriesData[] = multi.map(s => ({
+      name: s.name,
+      series: calc
+        ? this.analytics.applyQuickCalcToPoints(s.series as Point[], calc, win)
+        : s.series,
+    }));
+
+    if (compareMode) {
+      // Append a prior-period companion for the FIRST measure series so the
+      // time chart shows current vs prior. Uses the base (pre-quick-calc)
+      // series so the comparison reflects real values.
+      const base = multi[0]?.series as Point[] | undefined;
+      if (base && base.length > 1) {
+        const { previous } = this.analytics.splitForCompare(base, compareMode);
+        if (previous.length > 0) {
+          // Re-align prior points onto the current category labels so the
+          // two series share an x-axis.
+          const current = multi[0].series as Point[];
+          const offset = current.length - previous.length;
+          const aligned: Point[] = current.map((p, i) => {
+            const idx = i - offset;
+            return {
+              name: p.name,
+              value:
+                idx >= 0 && idx < previous.length ? previous[idx].value : 0,
+            };
+          });
+          transformed.push({
+            name: this.PRIOR_SERIES_NAME,
+            series: aligned,
+          });
+        }
+      }
+    }
+
+    return transformed;
+  }
+
+  /** Label used for the appended prior-period companion series. */
+  private readonly PRIOR_SERIES_NAME = 'Prior period';
+
+  /** True when `data` is the flat single-series `{name,value}[]` shape. */
+  private isSingleSeriesShape(data: ChartData): boolean {
+    const first = (data as any[])[0];
+    return !!first && typeof first === 'object' && !('series' in first);
   }
 
   /**
@@ -1325,6 +1436,10 @@ export class ChartDataTransformerService {
       latColumn: visual.latColumn ?? null,
       timeColumn: visual.timeColumn ?? null,
       histogramBins: Number(visual.config?.histogramBins) || 0,
+      // Slice B analytics — quick calc + compare read off the visual config.
+      quickCalc: visual.config?.quickCalc ?? null,
+      movingAverageWindow: Number(visual.config?.movingAverageWindow) || 3,
+      compareMode: visual.config?.compare?.mode ?? null,
     };
 
     // ── Server-side aggregation shape (Track D) ──────────────────────

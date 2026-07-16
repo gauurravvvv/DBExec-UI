@@ -1,0 +1,71 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.kpi-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  text-align: center;
+
+  &__label {
+    font-size: var(--fs-label);
+    color: var(--text-muted);
+  }
+
+  &__value {
+    font-size: var(--fs-h1, 24px);
+    font-weight: var(--fw-semibold);
+    color: var(--primary-color);
+    line-height: 1.1;
+  }
+
+  // ── Comparison-to-prior badge ──────────────────────────────────────
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-medium, 500);
+    padding: 2px 8px;
+    border-radius: var(--radius-pill, 999px);
+    background: var(--surface-muted, rgba(0, 0, 0, 0.04));
+
+    &--up {
+      color: var(--success-color, #16a34a);
+      background: var(--success-bg, rgba(22, 163, 74, 0.1));
+    }
+    &--down {
+      color: var(--error-color, #dc2626);
+      background: var(--error-bg, rgba(220, 38, 38, 0.1));
+    }
+    &--flat {
+      color: var(--text-muted);
+    }
+  }
+
+  &__arrow {
+    font-size: 0.75em;
+    line-height: 1;
+  }
+
+  &__vs {
+    color: var(--text-muted);
+    font-weight: var(--fw-regular, 400);
+  }
+
+  // ── Sparkline strip ────────────────────────────────────────────────
+  &__spark {
+    width: 100%;
+    height: 48px;
+    margin-top: var(--space-2, 8px);
+  }
+
+  &__target {
+    margin-top: var(--space-1, 4px);
+    font-size: var(--fs-micro);
+    color: var(--text-muted);
+  }
+}

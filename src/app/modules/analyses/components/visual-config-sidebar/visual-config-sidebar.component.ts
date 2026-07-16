@@ -361,6 +361,30 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     { label: 'ANALYSES.ANALYTICS.AXIS_RIGHT', value: 1 },
   ];
 
+  /**
+   * Quick-calc options (Slice B). Raw i18n keys; `quickCalcOptions` is the
+   * localized copy bound by the template (swapped in localizeDropdownOptions
+   * + on language change), same pattern as trendTypeOptions.
+   */
+  readonly quickCalcOptionsRaw: { label: string; value: string }[] = [
+    { label: 'ANALYSES.ANALYTICS.QUICK_CALC_NONE', value: '' },
+    { label: 'ANALYSES.ANALYTICS.QUICK_CALC_RUNNING_TOTAL', value: 'running_total' },
+    { label: 'ANALYSES.ANALYTICS.QUICK_CALC_PERCENT_OF_TOTAL', value: 'percent_of_total' },
+    { label: 'ANALYSES.ANALYTICS.QUICK_CALC_DIFFERENCE', value: 'difference' },
+    { label: 'ANALYSES.ANALYTICS.QUICK_CALC_PERCENT_DIFFERENCE', value: 'percent_difference' },
+    { label: 'ANALYSES.ANALYTICS.QUICK_CALC_MOVING_AVERAGE', value: 'moving_average' },
+    { label: 'ANALYSES.ANALYTICS.QUICK_CALC_RANK', value: 'rank' },
+  ];
+  quickCalcOptions: { label: string; value: string }[] = [];
+
+  /** Period-over-period compare modes (Slice B). */
+  readonly compareModeOptionsRaw: { label: string; value: string }[] = [
+    { label: 'ANALYSES.ANALYTICS.COMPARE_NONE', value: '' },
+    { label: 'ANALYSES.ANALYTICS.COMPARE_PREVIOUS_PERIOD', value: 'previous_period' },
+    { label: 'ANALYSES.ANALYTICS.COMPARE_SAME_PERIOD_LAST_YEAR', value: 'same_period_last_year' },
+  ];
+  compareModeOptions: { label: string; value: string }[] = [];
+
   /** Cross-filter target-mode choices for the Interaction section (E2). */
   readonly crossFilterTargetOptions: { label: string; value: string }[] = [
     { label: 'ANALYSES.INTERACTION.TARGET_SAME_TAB', value: 'same-tab' },
@@ -592,6 +616,61 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
       ...this.focusedVisual.config.trend,
       degree: v,
     };
+  }
+
+  // ── Analytics section: quick calc (config.quickCalc) — Slice B ───────
+
+  /** Two-way bind for the Quick calc dropdown ('' clears the key). */
+  get quickCalc(): string {
+    return this.focusedVisual?.config?.quickCalc ?? '';
+  }
+  set quickCalc(v: string) {
+    if (!this.focusedVisual?.config) return;
+    const cfg = this.focusedVisual.config;
+    if (!v) {
+      delete cfg.quickCalc;
+    } else {
+      cfg.quickCalc = v;
+      // Seed a sensible default window the first time moving average is picked.
+      if (v === 'moving_average' && !cfg.movingAverageWindow) {
+        cfg.movingAverageWindow = 3;
+      }
+    }
+  }
+
+  get movingAverageWindow(): number {
+    return this.focusedVisual?.config?.movingAverageWindow ?? 3;
+  }
+  set movingAverageWindow(v: number) {
+    if (this.focusedVisual?.config) {
+      this.focusedVisual.config.movingAverageWindow = v;
+    }
+  }
+
+  // ── Analytics section: period-over-period (config.compare) — Slice B ─
+
+  /** Two-way bind for the compare-mode dropdown ('' removes config.compare). */
+  get compareMode(): string {
+    return this.focusedVisual?.config?.compare?.mode ?? '';
+  }
+  set compareMode(v: string) {
+    if (!this.focusedVisual?.config) return;
+    const cfg = this.focusedVisual.config;
+    if (!v) {
+      delete cfg.compare;
+      return;
+    }
+    cfg.compare = { ...(cfg.compare || {}), mode: v };
+  }
+
+  /** Date column that orders rows into periods for the compare. */
+  get compareDateColumn(): string {
+    return this.focusedVisual?.config?.compare?.dateColumn ?? '';
+  }
+  set compareDateColumn(v: string) {
+    if (!this.focusedVisual?.config) return;
+    const cfg = this.focusedVisual.config;
+    cfg.compare = { ...(cfg.compare || { mode: 'previous_period' }), dateColumn: v || null };
   }
 
   // ── Per-visual controls (Slice C): sort / limit / stacking / null / format ──
@@ -968,6 +1047,9 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     this.formatTargetOptions = localize(VISUAL_FORMAT_TARGET_OPTIONS);
     // Trend types include the new log/poly fits; localize the display copy.
     this.trendTypeOptions = localize(this.trendTypeOptionsRaw);
+    // Slice B — quick calc + period-over-period.
+    this.quickCalcOptions = localize(this.quickCalcOptionsRaw);
+    this.compareModeOptions = localize(this.compareModeOptionsRaw);
   }
 
   ngDoCheck(): void {

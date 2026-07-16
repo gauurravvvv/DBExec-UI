@@ -1632,7 +1632,32 @@
       "MAX_COLS": "Max. kolommen",
       "TREND_LOG": "Logaritmisch",
       "TREND_POLY": "Polynomiaal",
-      "POLY_DEGREE": "Polynoomgraad"
+      "POLY_DEGREE": "Polynoomgraad",
+      "QUICK_CALC": "Snelle berekening",
+      "QUICK_CALC_NONE": "Geen",
+      "QUICK_CALC_RUNNING_TOTAL": "Doorlopend totaal",
+      "QUICK_CALC_PERCENT_OF_TOTAL": "Percentage van totaal",
+      "QUICK_CALC_DIFFERENCE": "Verschil",
+      "QUICK_CALC_PERCENT_DIFFERENCE": "Procentueel verschil",
+      "QUICK_CALC_MOVING_AVERAGE": "Voortschrijdend gemiddelde",
+      "QUICK_CALC_RANK": "Rang",
+      "MOVING_AVG_WINDOW": "Venster voortschrijdend gemiddelde",
+      "COMPARE": "Vergelijken met",
+      "COMPARE_NONE": "Geen",
+      "COMPARE_PREVIOUS_PERIOD": "Vorige periode",
+      "COMPARE_SAME_PERIOD_LAST_YEAR": "Dezelfde periode vorig jaar",
+      "COMPARE_DATE_COLUMN": "Datumkolom",
+      "COMPARE_DATE_COLUMN_PH": "Kolom om perioden te ordenen"
+    },
+    "KPI": {
+      "DATE_COLUMN": "Trend-datumkolom",
+      "DATE_COLUMN_PH": "Kolom voor de sparkline",
+      "COMPARE_MODE": "Vergelijken met",
+      "COMPARE_NONE": "Geen",
+      "COMPARE_PREVIOUS_PERIOD": "Vorige periode",
+      "COMPARE_SAME_PERIOD_LAST_YEAR": "Dezelfde periode vorig jaar",
+      "VS_PRIOR": "t.o.v. vorige",
+      "TARGET": "Doel"
     },
     "INTERACTION": {
       "SECTION": "Interactie",

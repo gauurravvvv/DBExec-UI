@@ -1632,7 +1632,32 @@
       "MAX_COLS": "Colonnes max.",
       "TREND_LOG": "Logarithmique",
       "TREND_POLY": "Polynomiale",
-      "POLY_DEGREE": "Degré du polynôme"
+      "POLY_DEGREE": "Degré du polynôme",
+      "QUICK_CALC": "Calcul rapide",
+      "QUICK_CALC_NONE": "Aucun",
+      "QUICK_CALC_RUNNING_TOTAL": "Total cumulé",
+      "QUICK_CALC_PERCENT_OF_TOTAL": "Pourcentage du total",
+      "QUICK_CALC_DIFFERENCE": "Différence",
+      "QUICK_CALC_PERCENT_DIFFERENCE": "Différence en pourcentage",
+      "QUICK_CALC_MOVING_AVERAGE": "Moyenne mobile",
+      "QUICK_CALC_RANK": "Rang",
+      "MOVING_AVG_WINDOW": "Fenêtre de moyenne mobile",
+      "COMPARE": "Comparer à",
+      "COMPARE_NONE": "Aucun",
+      "COMPARE_PREVIOUS_PERIOD": "Période précédente",
+      "COMPARE_SAME_PERIOD_LAST_YEAR": "Même période l'an dernier",
+      "COMPARE_DATE_COLUMN": "Colonne de date",
+      "COMPARE_DATE_COLUMN_PH": "Colonne pour ordonner les périodes"
+    },
+    "KPI": {
+      "DATE_COLUMN": "Colonne de date de tendance",
+      "DATE_COLUMN_PH": "Colonne pour le graphique sparkline",
+      "COMPARE_MODE": "Comparer à",
+      "COMPARE_NONE": "Aucun",
+      "COMPARE_PREVIOUS_PERIOD": "Période précédente",
+      "COMPARE_SAME_PERIOD_LAST_YEAR": "Même période l'an dernier",
+      "VS_PRIOR": "vs préc.",
+      "TARGET": "Cible"
     },
     "INTERACTION": {
       "SECTION": "Interaction",

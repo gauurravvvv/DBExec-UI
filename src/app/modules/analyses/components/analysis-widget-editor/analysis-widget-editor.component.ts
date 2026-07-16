@@ -39,6 +39,12 @@ export class AnalysisWidgetEditorComponent implements OnChanges {
   @Input() editingWidget: AnalysisWidget | null = null;
   /** Numeric fields for the KPI measure dropdown ({ label, value }). */
   @Input() measureOptions: { label: string; value: string }[] = [];
+  /**
+   * All fields for the KPI date-column dropdown ({ label, value }). Used
+   * to order the trend sparkline + derive the period-over-period delta.
+   * Falls back to measureOptions when not supplied.
+   */
+  @Input() dimensionOptions: { label: string; value: string }[] = [];
 
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() saved = new EventEmitter<AnalysisWidget>();
@@ -52,6 +58,9 @@ export class AnalysisWidgetEditorComponent implements OnChanges {
   kpiFormat = 'number';
   kpiComparePeriod = '';
   kpiTargetValue: number | null = null;
+  // Slice B — trend + delta.
+  kpiDateColumn = '';
+  kpiCompareMode = '';
   isSaving = false;
 
   readonly widgetTypeOptions: { label: string; value: WidgetType }[] = [
@@ -77,6 +86,23 @@ export class AnalysisWidgetEditorComponent implements OnChanges {
     { label: 'DASHBOARD.WIDGET.FORMAT_PERCENT', value: 'percent' },
   ];
 
+  /** Period-over-period compare-mode options for the KPI (Slice B). */
+  readonly compareModeOptions: { label: string; value: string }[] = [
+    { label: 'ANALYSES.KPI.COMPARE_NONE', value: '' },
+    { label: 'ANALYSES.KPI.COMPARE_PREVIOUS_PERIOD', value: 'previous_period' },
+    {
+      label: 'ANALYSES.KPI.COMPARE_SAME_PERIOD_LAST_YEAR',
+      value: 'same_period_last_year',
+    },
+  ];
+
+  /** Date-column options — dimensionOptions when set, else measureOptions. */
+  get dateColumnOptions(): { label: string; value: string }[] {
+    return this.dimensionOptions.length
+      ? this.dimensionOptions
+      : this.measureOptions;
+  }
+
   constructor(
     private widgetsService: AnalysisWidgetsService,
     private globalService: GlobalService,
@@ -99,6 +125,8 @@ export class AnalysisWidgetEditorComponent implements OnChanges {
     this.kpiFormat = 'number';
     this.kpiComparePeriod = '';
     this.kpiTargetValue = null;
+    this.kpiDateColumn = '';
+    this.kpiCompareMode = '';
   }
 
   private populate(w: AnalysisWidget): void {
@@ -114,6 +142,8 @@ export class AnalysisWidgetEditorComponent implements OnChanges {
       this.kpiFormat = k.format || 'number';
       this.kpiComparePeriod = k.comparePeriod || '';
       this.kpiTargetValue = typeof k.targetValue === 'number' ? k.targetValue : null;
+      this.kpiDateColumn = k.dateColumn || '';
+      this.kpiCompareMode = k.compareMode || '';
     }
   }
 
@@ -143,6 +173,10 @@ export class AnalysisWidgetEditorComponent implements OnChanges {
     };
     if (this.kpiComparePeriod.trim()) cfg.comparePeriod = this.kpiComparePeriod.trim();
     if (typeof this.kpiTargetValue === 'number') cfg.targetValue = this.kpiTargetValue;
+    if (this.kpiDateColumn) cfg.dateColumn = this.kpiDateColumn;
+    if (this.kpiCompareMode) {
+      cfg.compareMode = this.kpiCompareMode as KpiWidgetConfig['compareMode'];
+    }
     return cfg;
   }
 

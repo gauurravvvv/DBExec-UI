@@ -594,6 +594,7 @@
       [activeTabId]="activeTabId"
       [editingWidget]="editingWidget"
       [measureOptions]="measureFieldOptions"
+      [dimensionOptions]="measureFieldOptions"
       (saved)="onWidgetSaved($event)"
     ></app-analysis-widget-editor>
 
@@ -1116,14 +1117,10 @@
             {{ $any(w.config).markdown }}
           </div>
           <div class="canvas-widget__kpi" *ngIf="w.widgetType === 'kpi'">
-            <div class="kpi-label">{{ kpiConfig(w).label }}</div>
-            <div class="kpi-value">
-              {{ kpiConfig(w).aggregate | uppercase }}({{ kpiConfig(w).measure }})
-            </div>
-            <div class="kpi-meta" *ngIf="kpiConfig(w).targetValue !== undefined">
-              {{ 'DASHBOARD.WIDGET.KPI_TARGET' | translate }}:
-              {{ kpiConfig(w).targetValue }}
-            </div>
+            <app-kpi-card
+              [config]="kpiConfig(w)"
+              [data]="rawGraphData"
+            ></app-kpi-card>
           </div>
         </div>
       </div>

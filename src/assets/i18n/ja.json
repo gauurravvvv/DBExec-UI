@@ -1632,7 +1632,32 @@
       "MAX_COLS": "最大列数",
       "TREND_LOG": "対数",
       "TREND_POLY": "多項式",
-      "POLY_DEGREE": "多項式の次数"
+      "POLY_DEGREE": "多項式の次数",
+      "QUICK_CALC": "クイック計算",
+      "QUICK_CALC_NONE": "なし",
+      "QUICK_CALC_RUNNING_TOTAL": "累計",
+      "QUICK_CALC_PERCENT_OF_TOTAL": "合計に対する割合",
+      "QUICK_CALC_DIFFERENCE": "差分",
+      "QUICK_CALC_PERCENT_DIFFERENCE": "差分（％）",
+      "QUICK_CALC_MOVING_AVERAGE": "移動平均",
+      "QUICK_CALC_RANK": "順位",
+      "MOVING_AVG_WINDOW": "移動平均のウィンドウ",
+      "COMPARE": "比較対象",
+      "COMPARE_NONE": "なし",
+      "COMPARE_PREVIOUS_PERIOD": "前の期間",
+      "COMPARE_SAME_PERIOD_LAST_YEAR": "前年同期",
+      "COMPARE_DATE_COLUMN": "日付列",
+      "COMPARE_DATE_COLUMN_PH": "期間を並べ替える列"
+    },
+    "KPI": {
+      "DATE_COLUMN": "トレンドの日付列",
+      "DATE_COLUMN_PH": "スパークライン用の列",
+      "COMPARE_MODE": "比較対象",
+      "COMPARE_NONE": "なし",
+      "COMPARE_PREVIOUS_PERIOD": "前の期間",
+      "COMPARE_SAME_PERIOD_LAST_YEAR": "前年同期",
+      "VS_PRIOR": "前期比",
+      "TARGET": "目標"
     },
     "INTERACTION": {
       "SECTION": "インタラクション",

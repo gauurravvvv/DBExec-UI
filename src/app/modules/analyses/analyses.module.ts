@@ -19,6 +19,7 @@ import { AnalysisParameterBarComponent } from './components/analysis-parameter-b
 import { AnalysisWidgetEditorComponent } from './components/analysis-widget-editor/analysis-widget-editor.component';
 import { ChartRendererComponent } from './components/chart-renderer/chart-renderer.component';
 import { EditAnalysesComponent } from './components/edit-analyses/edit-analyses.component';
+import { KpiCardComponent } from './components/kpi-card/kpi-card.component';
 import { FilterDialogComponent } from './components/filter-dialog/filter-dialog.component';
 import { ListAnalysesComponent } from './components/list-analyses/list-analyses.component';
 import { PublishDashboardDialogComponent } from './components/publish-dashboard-dialog/publish-dashboard-dialog.component';
@@ -53,6 +54,8 @@ import {
     TypedValueInputComponent,
     // Track E3 — canvas widget (text / KPI) authoring dialog.
     AnalysisWidgetEditorComponent,
+    // Slice B — KPI tile with big number + sparkline + delta badge.
+    KpiCardComponent,
   ],
   imports: [
     CommonModule,

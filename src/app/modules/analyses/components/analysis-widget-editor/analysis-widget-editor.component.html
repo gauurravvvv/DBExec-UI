@@ -107,6 +107,31 @@
           [placeholder]="'DASHBOARD.WIDGET.KPI_COMPARE_PH' | translate"
         ></app-custom-input>
       </div>
+
+      <!-- Trend + delta (Slice B) -->
+      <div class="config-group">
+        <label>{{ 'ANALYSES.KPI.DATE_COLUMN' | translate }}</label>
+        <app-custom-dropdown
+          [options]="dateColumnOptions"
+          [(ngModel)]="kpiDateColumn"
+          optionLabel="label"
+          optionValue="value"
+          [editable]="true"
+          [showClear]="true"
+          appendTo="body"
+          [placeholder]="'ANALYSES.KPI.DATE_COLUMN_PH' | translate"
+        ></app-custom-dropdown>
+      </div>
+      <div class="config-group">
+        <label>{{ 'ANALYSES.KPI.COMPARE_MODE' | translate }}</label>
+        <app-custom-dropdown
+          [options]="compareModeOptions"
+          [(ngModel)]="kpiCompareMode"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+        ></app-custom-dropdown>
+      </div>
     </ng-container>
   </div>
 

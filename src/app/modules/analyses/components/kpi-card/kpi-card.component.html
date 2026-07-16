@@ -1,0 +1,31 @@
+<div class="kpi-card">
+  <div class="kpi-card__label">{{ label }}</div>
+
+  <div class="kpi-card__value">{{ valueText }}</div>
+
+  <!-- Comparison-to-prior badge (period-over-period). -->
+  <div
+    class="kpi-card__badge"
+    *ngIf="badgeState"
+    [class.kpi-card__badge--up]="badgeState === 'up'"
+    [class.kpi-card__badge--down]="badgeState === 'down'"
+    [class.kpi-card__badge--flat]="badgeState === 'flat'"
+  >
+    <span class="kpi-card__arrow" aria-hidden="true">{{ badgeArrow }}</span>
+    <span class="kpi-card__delta">{{ badgeText }}</span>
+    <span class="kpi-card__vs">{{ 'ANALYSES.KPI.VS_PRIOR' | translate }}</span>
+  </div>
+
+  <!-- Sparkline of the measure over the date dimension. -->
+  <div class="kpi-card__spark" *ngIf="sparkData.length > 1">
+    <app-echart-visual
+      chartType="line"
+      [chartConfig]="sparkConfig"
+      [data]="sparkData"
+      [chartHeight]="48"
+    ></app-echart-visual>
+  </div>
+
+  <!-- Target badge (independent of compare). -->
+  <div class="kpi-card__target" *ngIf="targetText">{{ targetText }}</div>
+</div>

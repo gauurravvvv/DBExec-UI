@@ -28,6 +28,14 @@ export interface KpiWidgetConfig {
   format: string;
   comparePeriod?: string;
   targetValue?: number;
+  // ── Trend + delta (Slice B) ────────────────────────────────────────
+  /** Date/time column that orders rows into a sparkline trend. */
+  dateColumn?: string | null;
+  /**
+   * Period-over-period comparison mode powering the delta badge. Prior
+   * period is derived client-side from the trend series.
+   */
+  compareMode?: 'previous_period' | 'same_period_last_year' | null;
 }
 
 /**

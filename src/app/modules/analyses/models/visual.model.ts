@@ -80,6 +80,24 @@ export interface ChartDataMapping {
    * transform layer, which owns the binning, can honour the author's choice.
    */
   histogramBins?: number;
+
+  // ── Analytics quick-calc + compare (Slice B) ────────────────────────
+  // Sourced from `config.quickCalc` / `config.movingAverageWindow` /
+  // `config.compare` by buildMapping. The transformer applies these to the
+  // shaped {name,value} series after the base transform. null/absent = raw.
+  /** Per-measure quick calc applied post-transform (running total, etc.). */
+  quickCalc?:
+    | 'running_total'
+    | 'percent_of_total'
+    | 'difference'
+    | 'percent_difference'
+    | 'moving_average'
+    | 'rank'
+    | null;
+  /** Window size for the moving-average quick calc. */
+  movingAverageWindow?: number;
+  /** Period-over-period comparison mode. */
+  compareMode?: 'previous_period' | 'same_period_last_year' | null;
 }
 
 /**
@@ -125,6 +143,31 @@ export type RoleKey =
 export interface ChartRolesSpec {
   required: RoleKey[];
   optional: RoleKey[];
+}
+
+/**
+ * Analytics keys the Analyses transform path reads off the free-form
+ * `Visual.config` (jsonb). Documented as a typed shape even though
+ * `Visual.config` stays `any` for back-compat with the many other config
+ * keys. All optional — absent means "no analytics transform".
+ */
+export interface VisualAnalyticsConfig {
+  /** Per-measure quick calc; null/absent = raw values. */
+  quickCalc?:
+    | 'running_total'
+    | 'percent_of_total'
+    | 'difference'
+    | 'percent_difference'
+    | 'moving_average'
+    | 'rank'
+    | null;
+  /** Window (in points) for the moving-average quick calc. Default 3. */
+  movingAverageWindow?: number;
+  /** Period-over-period comparison config. */
+  compare?: {
+    mode?: 'previous_period' | 'same_period_last_year' | null;
+    dateColumn?: string | null;
+  };
 }
 
 /**

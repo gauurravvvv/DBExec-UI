@@ -1632,7 +1632,32 @@
       "MAX_COLS": "最大列数",
       "TREND_LOG": "对数",
       "TREND_POLY": "多项式",
-      "POLY_DEGREE": "多项式次数"
+      "POLY_DEGREE": "多项式次数",
+      "QUICK_CALC": "快速计算",
+      "QUICK_CALC_NONE": "无",
+      "QUICK_CALC_RUNNING_TOTAL": "累计总和",
+      "QUICK_CALC_PERCENT_OF_TOTAL": "占总计百分比",
+      "QUICK_CALC_DIFFERENCE": "差值",
+      "QUICK_CALC_PERCENT_DIFFERENCE": "百分比差值",
+      "QUICK_CALC_MOVING_AVERAGE": "移动平均",
+      "QUICK_CALC_RANK": "排名",
+      "MOVING_AVG_WINDOW": "移动平均窗口",
+      "COMPARE": "对比",
+      "COMPARE_NONE": "无",
+      "COMPARE_PREVIOUS_PERIOD": "上一周期",
+      "COMPARE_SAME_PERIOD_LAST_YEAR": "去年同期",
+      "COMPARE_DATE_COLUMN": "日期列",
+      "COMPARE_DATE_COLUMN_PH": "用于排序周期的列"
+    },
+    "KPI": {
+      "DATE_COLUMN": "趋势日期列",
+      "DATE_COLUMN_PH": "迷你图使用的列",
+      "COMPARE_MODE": "对比",
+      "COMPARE_NONE": "无",
+      "COMPARE_PREVIOUS_PERIOD": "上一周期",
+      "COMPARE_SAME_PERIOD_LAST_YEAR": "去年同期",
+      "VS_PRIOR": "较上期",
+      "TARGET": "目标"
     },
     "INTERACTION": {
       "SECTION": "交互",

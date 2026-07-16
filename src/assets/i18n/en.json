@@ -1635,7 +1635,32 @@
       "MAX_COLS": "Max columns",
       "TREND_LOG": "Logarithmic",
       "TREND_POLY": "Polynomial",
-      "POLY_DEGREE": "Polynomial Degree"
+      "POLY_DEGREE": "Polynomial Degree",
+      "QUICK_CALC": "Quick calc",
+      "QUICK_CALC_NONE": "None",
+      "QUICK_CALC_RUNNING_TOTAL": "Running total",
+      "QUICK_CALC_PERCENT_OF_TOTAL": "Percent of total",
+      "QUICK_CALC_DIFFERENCE": "Difference",
+      "QUICK_CALC_PERCENT_DIFFERENCE": "Percent difference",
+      "QUICK_CALC_MOVING_AVERAGE": "Moving average",
+      "QUICK_CALC_RANK": "Rank",
+      "MOVING_AVG_WINDOW": "Moving average window",
+      "COMPARE": "Compare to",
+      "COMPARE_NONE": "None",
+      "COMPARE_PREVIOUS_PERIOD": "Previous period",
+      "COMPARE_SAME_PERIOD_LAST_YEAR": "Same period last year",
+      "COMPARE_DATE_COLUMN": "Date column",
+      "COMPARE_DATE_COLUMN_PH": "Column to order periods"
+    },
+    "KPI": {
+      "DATE_COLUMN": "Trend date column",
+      "DATE_COLUMN_PH": "Column for the sparkline",
+      "COMPARE_MODE": "Compare to",
+      "COMPARE_NONE": "None",
+      "COMPARE_PREVIOUS_PERIOD": "Previous period",
+      "COMPARE_SAME_PERIOD_LAST_YEAR": "Same period last year",
+      "VS_PRIOR": "vs prior",
+      "TARGET": "Target"
     },
     "INTERACTION": {
       "SECTION": "Interaction",

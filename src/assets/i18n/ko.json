@@ -1632,7 +1632,32 @@
       "MAX_COLS": "최대 열",
       "TREND_LOG": "로그",
       "TREND_POLY": "다항식",
-      "POLY_DEGREE": "다항식 차수"
+      "POLY_DEGREE": "다항식 차수",
+      "QUICK_CALC": "빠른 계산",
+      "QUICK_CALC_NONE": "없음",
+      "QUICK_CALC_RUNNING_TOTAL": "누계",
+      "QUICK_CALC_PERCENT_OF_TOTAL": "전체 대비 비율",
+      "QUICK_CALC_DIFFERENCE": "차이",
+      "QUICK_CALC_PERCENT_DIFFERENCE": "백분율 차이",
+      "QUICK_CALC_MOVING_AVERAGE": "이동 평균",
+      "QUICK_CALC_RANK": "순위",
+      "MOVING_AVG_WINDOW": "이동 평균 창",
+      "COMPARE": "비교 대상",
+      "COMPARE_NONE": "없음",
+      "COMPARE_PREVIOUS_PERIOD": "이전 기간",
+      "COMPARE_SAME_PERIOD_LAST_YEAR": "전년 동기",
+      "COMPARE_DATE_COLUMN": "날짜 열",
+      "COMPARE_DATE_COLUMN_PH": "기간을 정렬할 열"
+    },
+    "KPI": {
+      "DATE_COLUMN": "추세 날짜 열",
+      "DATE_COLUMN_PH": "스파크라인용 열",
+      "COMPARE_MODE": "비교 대상",
+      "COMPARE_NONE": "없음",
+      "COMPARE_PREVIOUS_PERIOD": "이전 기간",
+      "COMPARE_SAME_PERIOD_LAST_YEAR": "전년 동기",
+      "VS_PRIOR": "이전 대비",
+      "TARGET": "목표"
     },
     "INTERACTION": {
       "SECTION": "상호작용",

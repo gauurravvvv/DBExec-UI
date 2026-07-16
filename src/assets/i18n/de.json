@@ -1632,7 +1632,32 @@
       "MAX_COLS": "Max. Spalten",
       "TREND_LOG": "Logarithmisch",
       "TREND_POLY": "Polynomisch",
-      "POLY_DEGREE": "Polynomgrad"
+      "POLY_DEGREE": "Polynomgrad",
+      "QUICK_CALC": "Schnellberechnung",
+      "QUICK_CALC_NONE": "Keine",
+      "QUICK_CALC_RUNNING_TOTAL": "Laufende Summe",
+      "QUICK_CALC_PERCENT_OF_TOTAL": "Prozent des Gesamtwerts",
+      "QUICK_CALC_DIFFERENCE": "Differenz",
+      "QUICK_CALC_PERCENT_DIFFERENCE": "Prozentuale Differenz",
+      "QUICK_CALC_MOVING_AVERAGE": "Gleitender Durchschnitt",
+      "QUICK_CALC_RANK": "Rang",
+      "MOVING_AVG_WINDOW": "Fenster für gleitenden Durchschnitt",
+      "COMPARE": "Vergleichen mit",
+      "COMPARE_NONE": "Keine",
+      "COMPARE_PREVIOUS_PERIOD": "Vorheriger Zeitraum",
+      "COMPARE_SAME_PERIOD_LAST_YEAR": "Gleicher Zeitraum im Vorjahr",
+      "COMPARE_DATE_COLUMN": "Datumsspalte",
+      "COMPARE_DATE_COLUMN_PH": "Spalte zum Ordnen der Zeiträume"
+    },
+    "KPI": {
+      "DATE_COLUMN": "Trend-Datumsspalte",
+      "DATE_COLUMN_PH": "Spalte für die Sparkline",
+      "COMPARE_MODE": "Vergleichen mit",
+      "COMPARE_NONE": "Keine",
+      "COMPARE_PREVIOUS_PERIOD": "Vorheriger Zeitraum",
+      "COMPARE_SAME_PERIOD_LAST_YEAR": "Gleicher Zeitraum im Vorjahr",
+      "VS_PRIOR": "ggü. Vorperiode",
+      "TARGET": "Ziel"
     },
     "INTERACTION": {
       "SECTION": "Interaktion",
