@@ -97,24 +97,21 @@
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.STATUS' | translate }}</label>
-              <span
-                class="status-badge"
-                [class.active]="analysisDetails.status === 1"
+              <app-chip
+                variant="status"
+                [tone]="analysisDetails.status === 1 ? 'success' : 'error'"
+                [icon]="
+                  analysisDetails.status === 1
+                    ? 'pi pi-check-circle'
+                    : 'pi pi-times-circle'
+                "
               >
-                <i
-                  class="pi"
-                  [ngClass]="
-                    analysisDetails.status === 1
-                      ? 'pi-check-circle'
-                      : 'pi-times-circle'
-                  "
-                ></i>
                 {{
                   analysisDetails.status === 1
                     ? ('COMMON.ACTIVE' | translate)
                     : ('COMMON.INACTIVE' | translate)
                 }}
-              </span>
+              </app-chip>
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.CREATED_ON' | translate }}</label>
@@ -131,9 +128,11 @@
           <h3>
             <i class="pi pi-list mr-2"></i>
             {{ 'ANALYSES.DATASET_FIELDS' | translate }}
-            <span class="count-badge">{{
-              datasetDetails?.datasetFields?.length || 0
-            }}</span>
+            <app-chip
+              variant="count"
+              size="sm"
+              [count]="datasetDetails?.datasetFields?.length || 0"
+            ></app-chip>
           </h3>
           <div class="column-mapping-container">
             <div
@@ -186,7 +185,7 @@
             <h3>
               <i class="pi pi-sliders-h mr-2"></i>
               {{ 'ANALYSES.ANALYSIS_FIELDS' | translate }}
-              <span class="count-badge">{{ analysisFields.length || 0 }}</span>
+              <app-chip variant="count" size="sm" [count]="analysisFields.length || 0"></app-chip>
             </h3>
             <button
               *hasPermission="'analyses'; level: 'write'"
@@ -247,7 +246,7 @@
           <h3>
             <i class="pi pi-chart-bar mr-2"></i>
             {{ 'ANALYSES.VISUALS' | translate }}
-            <span class="count-badge">{{ visuals.length || 0 }}</span>
+            <app-chip variant="count" size="sm" [count]="visuals.length || 0"></app-chip>
           </h3>
           <div class="fields-list">
             <div

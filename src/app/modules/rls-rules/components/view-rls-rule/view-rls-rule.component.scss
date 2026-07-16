@@ -71,33 +71,10 @@
       }
     }
 
-    .operator-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 3px 10px;
-      background: var(--primary-color-transparent);
-      color: var(--primary-color);
-      border-radius: var(--radius-lg);
-      font-size: var(--fs-control);
-      font-weight: var(--fw-semibold);
-      letter-spacing: 0.03em;
-      width: fit-content;
-    }
-
     .cond-values {
       display: flex;
       flex-wrap: wrap;
       gap: var(--space-3);
-
-      .value-chip {
-        padding: 3px 10px;
-        background: var(--hover-background);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-lg);
-        font-size: var(--fs-control);
-        color: var(--text-color);
-      }
     }
   }
 }
@@ -286,16 +263,6 @@
               color: var(--text-color);
               opacity: 0.7;
             }
-
-            .count-badge {
-              margin-left: 8px;
-              background: var(--hover-background);
-              padding: 2px 8px;
-              border-radius: var(--radius-lg);
-              font-size: var(--fs-label);
-              color: var(--text-color);
-              opacity: 0.7;
-            }
           }
 
           .info-grid {
@@ -371,28 +338,6 @@
   }
 }
 
-.status-badge {
-  padding: 4px 8px;
-  border-radius: var(--radius-lg);
-  font-size: var(--fs-control);
-  font-weight: var(--fw-medium);
-  display: inline-block;
-
-  &.active {
-    background: rgba(var(--success-rgb), 0.15);
-    color: var(--success-color);
-  }
-
-  &:not(.active) {
-    background: rgba(var(--error-rgb), 0.15);
-    color: var(--error-color);
-  }
-
-  i {
-    margin-right: 4px;
-  }
-}
-
 .loading-state {
   display: flex;
   justify-content: center;
@@ -415,15 +360,6 @@ h3 {
   i {
     color: var(--secondary-color);
   }
-
-  .count-badge {
-    margin-left: 8px;
-    background: var(--hover-background);
-    padding: 2px 8px;
-    border-radius: var(--radius-lg);
-    font-size: var(--fs-label);
-    color: var(--secondary-color);
-  }
 }
 
 .info-item {
@@ -434,12 +370,6 @@ h3 {
     i {
       color: var(--secondary-color);
     }
-  }
-}
-
-.status-badge {
-  i {
-    margin-right: 4px;
   }
 }
 
@@ -491,16 +421,6 @@ h3 {
     font-size: var(--fs-body);
     color: var(--text-color);
     font-weight: var(--fw-medium);
-  }
-
-  .assignment-type-badge {
-    font-size: var(--fs-label);
-    padding: 2px 8px;
-    border-radius: var(--radius-md);
-    background: var(--primary-color-transparent);
-    color: var(--primary-color);
-    font-weight: var(--fw-semibold);
-    text-transform: capitalize;
   }
 }
 

@@ -85,18 +85,21 @@
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.STATUS' | translate }}</label>
-              <span class="status-badge" [class.active]="datasetData.status === 1">
-                <i class="pi" [ngClass]="
-                    datasetData.status === 1
-                      ? 'pi-check-circle'
-                      : 'pi-times-circle'
-                  "></i>
+              <app-chip
+                variant="status"
+                [tone]="datasetData.status === 1 ? 'success' : 'error'"
+                [icon]="
+                  datasetData.status === 1
+                    ? 'pi pi-check-circle'
+                    : 'pi pi-times-circle'
+                "
+              >
                 {{
                 datasetData.status === 1
                 ? ('COMMON.ACTIVE' | translate)
                 : ('COMMON.INACTIVE' | translate)
                 }}
-              </span>
+              </app-chip>
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.ORGANISATION' | translate }}</label>
@@ -222,9 +225,11 @@
             <h3>
               <i class="pi pi-list mr-2"></i>
               {{ 'DATASET.FIELDS' | translate }}
-              <span class="count-badge">{{
-                datasetData.datasetFields?.length || 0
-                }}</span>
+              <app-chip
+                variant="count"
+                size="sm"
+                [count]="datasetData.datasetFields?.length || 0"
+              ></app-chip>
             </h3>
             <button
               *hasPermission="'datasetManager'; level: 'write'"
@@ -300,9 +305,11 @@
           <h3>
             <i class="pi pi-chart-bar mr-2"></i>
             {{ 'DATASET.ANALYSES' | translate }}
-            <span class="count-badge">{{
-              datasetData.analyses?.length || 0
-              }}</span>
+            <app-chip
+              variant="count"
+              size="sm"
+              [count]="datasetData.analyses?.length || 0"
+            ></app-chip>
           </h3>
           <div class="fields-list">
             <div class="field-item" *ngFor="
@@ -329,9 +336,12 @@
           <h3>
             <i class="pi pi-sitemap mr-2"></i>
             {{ 'DATASET.LINEAGE' | translate }}
-            <span class="count-badge" *ngIf="lineage">{{
-              lineage.totalConsumers
-            }}</span>
+            <app-chip
+              variant="count"
+              size="sm"
+              *ngIf="lineage"
+              [count]="lineage.totalConsumers"
+            ></app-chip>
           </h3>
 
           <div class="lineage-loading" *ngIf="isLoadingLineage && !lineage">
@@ -349,7 +359,7 @@
                 <h4>
                   <i class="pi pi-gauge"></i>
                   {{ 'DATASET.LINEAGE_DASHBOARDS' | translate }}
-                  <span class="count-badge">{{ lineage.dashboards.length }}</span>
+                  <app-chip variant="count" size="sm" [count]="lineage.dashboards.length"></app-chip>
                 </h4>
                 <ul class="lineage-list">
                   <li *ngFor="let d of lineage.dashboards">
@@ -363,7 +373,7 @@
                 <h4>
                   <i class="pi pi-filter"></i>
                   {{ 'DATASET.LINEAGE_RLS_RULES' | translate }}
-                  <span class="count-badge">{{ lineage.rlsRules.length }}</span>
+                  <app-chip variant="count" size="sm" [count]="lineage.rlsRules.length"></app-chip>
                 </h4>
                 <ul class="lineage-list">
                   <li *ngFor="let r of lineage.rlsRules">

@@ -28,21 +28,24 @@
       >
         <!-- Dataset-name badge column (module-specific). -->
         <ng-template usGridCell="datasetName" let-analysis>
-          <span class="ds-badge" *ngIf="analysis.dataset?.name">
-            <i class="pi pi-database"></i>
+          <app-chip
+            *ngIf="analysis.dataset?.name"
+            variant="tag"
+            icon="pi pi-database"
+          >
             {{ analysis.dataset.name }}
-          </span>
+          </app-chip>
           <span class="ds-badge muted" *ngIf="!analysis.dataset?.name">—</span>
         </ng-template>
 
         <!-- Visuals-count column (module-specific). -->
         <ng-template usGridCell="visuals" let-analysis>
-          <span class="pill">
+          <app-chip variant="count" size="sm">
             {{
               'ANALYSES.VISUALS_LABEL'
                 | translate: { count: analysis.visuals?.length || 0 }
             }}
-          </span>
+          </app-chip>
         </ng-template>
       </app-asset-explorer>
     </div>

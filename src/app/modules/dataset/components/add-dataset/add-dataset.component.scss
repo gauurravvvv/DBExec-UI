@@ -123,34 +123,6 @@
     // scoped to. Visual style follows the dbType pills used elsewhere
     // (list-datasource list view) so it reads as a familiar token, not
     // an action button.
-    .db-type-badge {
-      // Compact dialect chip — quiet by design. Sits between the
-      // datasource name and the action buttons; the user reads it
-      // once to confirm "yes this is the engine I expected" and
-      // then ignores it. Smaller padding + label font keeps it
-      // visually subordinate to the datasource name next to it.
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-1, 4px);
-      padding: 2px 8px;
-      border-radius: var(--radius-pill, 999px);
-      background: var(--card-background);
-      border: 1px solid var(--border-color);
-      font-size: var(--fs-label, 12px);
-      font-weight: var(--fw-medium, 500);
-      color: var(--secondary-color);
-      white-space: nowrap;
-      user-select: none;
-      line-height: 1.4;
-
-      i {
-        font-size: 11px;
-        line-height: 1;
-        color: var(--primary-color);
-        opacity: 0.85;
-      }
-    }
-
     .toolbar-title {
       margin: var(--space-0);
       font-size: var(--fs-h3);
@@ -1625,23 +1597,6 @@
     // it's intentional protective behaviour, not a driver failure.
     &[data-kind='safety_violation'] .error-icon-wrapper {
       background: var(--error-bg);
-    }
-
-    // Offending-token chip — surfaces the keyword the safety
-    // validator pointed at (e.g. DELETE, ;, INTO) next to the engine
-    // message in a monospace pill so the user can spot it.
-    .offending-token-chip {
-      display: inline-block;
-      margin-left: var(--space-3);
-      padding: 2px 8px;
-      background: var(--card-background);
-      border: 1px solid var(--error-color);
-      border-radius: var(--radius-xs);
-      color: var(--error-color);
-      font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
-      font-size: var(--fs-label);
-      font-weight: var(--fw-medium);
-      vertical-align: middle;
     }
 
     // Per-kind recovery hint. Smaller than the title; reads like a

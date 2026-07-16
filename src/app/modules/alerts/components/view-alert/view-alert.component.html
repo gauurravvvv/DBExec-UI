@@ -6,14 +6,20 @@
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>{{ 'ALERTS.VIEW_TITLE' | translate }}</h2>
-        <span
-          class="severity-pill header-sev"
+        <app-chip
           *ngIf="current()"
-          [ngClass]="'sev-' + current()!.severity"
+          variant="status"
+          class="header-sev"
+          [tone]="
+            current()!.severity === 'critical'
+              ? 'error'
+              : current()!.severity === 'warning'
+                ? 'warning'
+                : 'info'
+          "
         >
-          <span class="dot"></span>
           {{ 'ALERTS.SEVERITY_' + (current()!.severity | uppercase) | translate }}
-        </span>
+        </app-chip>
       </div>
       <div class="header-actions" *ngIf="current()">
         <button
@@ -130,10 +136,13 @@
               </div>
               <div class="info-item">
                 <label>{{ 'COMMON.STATUS' | translate }}</label>
-                <span class="status-badge" [class.active]="current()!.enabled">
-                  <i class="pi" [ngClass]="current()!.enabled ? 'pi-check-circle' : 'pi-times-circle'"></i>
+                <app-chip
+                  variant="status"
+                  [tone]="current()!.enabled ? 'success' : 'error'"
+                  [icon]="current()!.enabled ? 'pi pi-check-circle' : 'pi pi-times-circle'"
+                >
                   {{ (current()!.enabled ? 'COMMON.ENABLED' : 'COMMON.DISABLED') | translate }}
-                </span>
+                </app-chip>
               </div>
               <div class="info-item" *ngIf="current()!.snoozedUntil">
                 <label>{{ 'ALERTS.SNOOZED_UNTIL' | translate }}</label>

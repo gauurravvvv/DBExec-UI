@@ -18,23 +18,20 @@
         <div class="title-block">
           <div class="title-row">
             <h2>{{ dashboard?.name || ('DASHBOARD.DASHBOARD' | translate) }}</h2>
-            <span
+            <app-chip
               *ngIf="dashboard"
-              class="status-badge"
-              [class.active]="dashboard.status === 1"
+              variant="status"
+              [tone]="dashboard.status === 1 ? 'success' : 'neutral'"
+              [icon]="
+                dashboard.status === 1 ? 'pi pi-check-circle' : 'pi pi-times-circle'
+              "
             >
-              <i
-                class="pi"
-                [ngClass]="
-                  dashboard.status === 1 ? 'pi-check-circle' : 'pi-times-circle'
-                "
-              ></i>
               {{
                 dashboard.status === 1
                   ? ('DASHBOARD.LIVE' | translate)
                   : ('COMMON.INACTIVE' | translate)
               }}
-            </span>
+            </app-chip>
           </div>
           <!--
             Snapshot breadcrumb — "Published from <dataset> · snapshot vN".
@@ -103,19 +100,20 @@
           Cross-filter active chip + clear affordance. Shows the source
           column/value constraining the target visuals; clicking clears it.
         -->
-        <button
-          type="button"
-          class="cross-filter-chip"
+        <app-chip
           *ngIf="hasActiveCrossFilter"
           data-export-ignore
-          (click)="clearCrossFilter()"
-          [pTooltip]="'DASHBOARD.CROSS_FILTER.CLEAR' | translate"
-          tooltipPosition="bottom"
+          variant="filter"
+          tone="primary"
+          [active]="true"
+          icon="pi pi-filter-fill"
+          [removable]="true"
+          [title]="'DASHBOARD.CROSS_FILTER.CLEAR' | translate"
+          (clicked)="clearCrossFilter()"
+          (removed)="clearCrossFilter()"
         >
-          <i class="pi pi-filter-fill"></i>
-          <span class="cf-text">{{ crossFilterLabel }}</span>
-          <i class="pi pi-times cf-clear"></i>
-        </button>
+          {{ crossFilterLabel }}
+        </app-chip>
 
         <!--
           Edit inputs — re-opens the blocking pre-load gate so the viewer
@@ -281,7 +279,7 @@
           *ngFor="let w of serverWarnings; trackBy: trackByWarning"
           class="banner-detail-row"
         >
-          <span class="scope-chip">{{ scopeLabelKey(w.scope) | translate }}</span>
+          <app-chip variant="tag" size="sm">{{ scopeLabelKey(w.scope) | translate }}</app-chip>
           <span class="ref-label">{{ w.label }}</span>
           <span class="missing-cols">{{ w.missingColumns.join(', ') }}</span>
         </li>
@@ -319,9 +317,12 @@
             <div class="dataset-label">
               {{ 'DASHBOARD.FILTERS' | translate }}
             </div>
-            <span class="visual-count-badge" *ngIf="filters.length > 0">
-              {{ filters.length }}
-            </span>
+            <app-chip
+              variant="count"
+              size="sm"
+              *ngIf="filters.length > 0"
+              [count]="filters.length"
+            ></app-chip>
           </div>
           <div class="sidebar-divider"></div>
           <div class="sidebar-content-inner">

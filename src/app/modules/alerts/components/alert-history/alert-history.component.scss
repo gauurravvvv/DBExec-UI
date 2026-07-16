@@ -10,36 +10,6 @@
   color: var(--text-color);
 }
 
-.event-status {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-pill, 999px);
-  font-size: var(--fs-caption);
-  font-weight: var(--fw-medium);
-
-  .dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: currentColor;
-  }
-
-  &.st-breached {
-    background: var(--warning-bg, rgba(245, 158, 11, 0.14));
-    color: var(--warning-color, #d97706);
-  }
-  &.st-ok {
-    background: var(--success-bg, rgba(16, 185, 129, 0.12));
-    color: var(--success-color, #059669);
-  }
-  &.st-error {
-    background: var(--error-bg, rgba(220, 38, 38, 0.12));
-    color: var(--error-color, #dc2626);
-  }
-}
-
 .observed {
   font-family: var(--font-mono, monospace);
   font-size: var(--fs-caption);

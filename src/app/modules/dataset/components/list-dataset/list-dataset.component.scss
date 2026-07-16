@@ -500,16 +500,6 @@
       }
     }
 
-    .cmd-badge {
-      font-size: var(--fs-micro);
-      font-weight: var(--fw-semibold);
-      color: var(--secondary-color);
-      background: var(--hover-background);
-      padding: 0.1rem 0.45rem;
-      border-radius: var(--radius-xs);
-      flex-shrink: 0;
-    }
-
     .cmd-search-spinner {
       color: var(--primary-color);
       font-size: var(--fs-body);

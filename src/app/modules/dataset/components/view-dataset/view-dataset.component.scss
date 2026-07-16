@@ -234,16 +234,6 @@
               color: var(--text-color);
               opacity: 0.7;
             }
-
-            .count-badge {
-              margin-left: 8px;
-              background: var(--hover-background);
-              padding: 2px 8px;
-              border-radius: var(--radius-lg);
-              font-size: var(--fs-label);
-              color: var(--text-color);
-              opacity: 0.7;
-            }
           }
 
           .info-grid {
@@ -763,27 +753,6 @@
   }
 }
 
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: 4px 12px;
-  border-radius: var(--radius-lg);
-  font-size: var(--fs-control);
-  font-weight: var(--fw-medium);
-  background: var(--error-color-transparent);
-  color: var(--error-color);
-
-  &.active {
-    background: var(--success-color-transparent);
-    color: var(--success-color);
-  }
-
-  i {
-    font-size: var(--fs-body);
-  }
-}
-
 // 5. Popups & Modals
 .confirmation-popup {
   position: fixed;
@@ -1037,14 +1006,6 @@
     letter-spacing: 0.04em;
 
     i { color: var(--primary-color); }
-
-    .count-badge {
-      // Override the page's h3-scope badge styling for this nested
-      // h4 — slightly smaller so it doesn't compete with the section
-      // header.
-      font-size: var(--fs-micro);
-      padding: 2px 8px;
-    }
   }
 
   .lineage-list {

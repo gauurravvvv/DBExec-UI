@@ -22,10 +22,18 @@
     </ng-template>
 
     <ng-template usGridCell="eventStatus" let-event>
-      <span class="event-status" [ngClass]="'st-' + event.eventStatus">
-        <span class="dot"></span>
+      <app-chip
+        variant="status"
+        [tone]="
+          event.eventStatus === 'ok'
+            ? 'success'
+            : event.eventStatus === 'breached'
+              ? 'warning'
+              : 'error'
+        "
+      >
         {{ 'ALERTS.EVENT_' + (event.eventStatus | uppercase) | translate }}
-      </span>
+      </app-chip>
     </ng-template>
 
     <ng-template usGridCell="observedValue" let-event>
