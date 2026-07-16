@@ -6,13 +6,14 @@
         <h2>{{ 'ALERTS.TITLE' | translate }}</h2>
       </div>
       <div class="header-actions">
-        <button
+        <app-button
           *hasPermission="'alertManagement'; level: 'write'"
-          class="btn-primary"
-          (click)="onAddNewAlert()"
+          variant="primary"
+          icon="pi pi-plus"
+          (clicked)="onAddNewAlert()"
         >
-          <i class="pi pi-plus"></i> {{ 'ALERTS.ADD_TITLE' | translate }}
-        </button>
+          {{ 'ALERTS.ADD_TITLE' | translate }}
+        </app-button>
       </div>
     </div>
 
@@ -30,10 +31,20 @@
           [hasProjectedEmpty]="true"
           (refresh)="refreshList()"
         >
-          <!-- Empty body — always projected so only one empty state shows. -->
+          <!-- Empty body — always projected so only one empty state shows.
+               Friendly icon + heading + guidance + a create CTA. -->
           <div tableEmpty class="ct-empty-body">
-            <i class="pi pi-bell"></i>
-            <span>{{ 'ALERTS.NO_ALERTS' | translate }}</span>
+            <div class="empty-icon"><i class="pi pi-bell"></i></div>
+            <span class="empty-title">{{ 'ALERTS.NO_ALERTS' | translate }}</span>
+            <span class="empty-hint">{{ 'ALERTS.NO_ALERTS_HINT' | translate }}</span>
+            <app-button
+              *hasPermission="'alertManagement'; level: 'write'"
+              variant="primary"
+              icon="pi pi-plus"
+              (clicked)="onAddNewAlert()"
+            >
+              {{ 'ALERTS.CREATE_FIRST' | translate }}
+            </app-button>
           </div>
 
           <ng-template usGridCell="name" let-alert>
@@ -115,62 +126,64 @@
              test-now, snooze, edit, and delete. -->
         <ng-template usGridCell="actions" let-alert>
           <div class="row-actions">
-            <button
+            <app-button
               *hasPermission="'alertManagement'; level: 'write'"
-              class="icon-btn"
-              (click)="onToggle(alert)"
+              variant="icon"
+              size="sm"
+              [icon]="alert.enabled ? 'pi pi-pause' : 'pi pi-play'"
               [disabled]="saving()"
               [pTooltip]="
                 (alert.enabled ? 'ALERTS.DISABLE' : 'ALERTS.ENABLE') | translate
               "
               tooltipPosition="bottom"
-            >
-              <i class="pi" [ngClass]="alert.enabled ? 'pi-pause' : 'pi-play'"></i>
-            </button>
-            <button
+              [title]="(alert.enabled ? 'ALERTS.DISABLE' : 'ALERTS.ENABLE') | translate"
+              (clicked)="onToggle(alert)"
+            ></app-button>
+            <app-button
               *hasPermission="'alertManagement'; level: 'write'"
-              class="icon-btn"
-              (click)="onTestNow(alert)"
+              variant="icon"
+              size="sm"
+              icon="pi pi-bolt"
+              [loading]="isTesting(alert.id)"
               [disabled]="isTesting(alert.id)"
               [pTooltip]="'ALERTS.TEST_NOW' | translate"
               tooltipPosition="bottom"
-            >
-              <i
-                class="pi"
-                [ngClass]="isTesting(alert.id) ? 'pi-spin pi-spinner' : 'pi-bolt'"
-              ></i>
-            </button>
-            <button
+              [title]="'ALERTS.TEST_NOW' | translate"
+              (clicked)="onTestNow(alert)"
+            ></app-button>
+            <app-button
               *hasPermission="'alertManagement'; level: 'write'"
-              class="icon-btn"
-              (click)="openSnooze(alert)"
+              variant="icon"
+              size="sm"
+              icon="pi pi-moon"
               [pTooltip]="'ALERTS.SNOOZE' | translate"
               tooltipPosition="bottom"
-            >
-              <i class="pi pi-moon"></i>
-            </button>
-            <button
+              [title]="'ALERTS.SNOOZE' | translate"
+              (clicked)="openSnooze(alert)"
+            ></app-button>
+            <app-button
               *hasPermission="'alertManagement'; level: 'write'"
-              class="icon-btn edit-btn"
-              (click)="onEdit(alert.id)"
+              variant="icon"
+              size="sm"
+              icon="pi pi-pencil"
+              class="edit-btn"
               [pTooltip]="'COMMON.EDIT' | translate"
               tooltipPosition="bottom"
-            >
-              <i class="pi pi-pencil"></i>
-            </button>
-            <button
+              [title]="'COMMON.EDIT' | translate"
+              (clicked)="onEdit(alert.id)"
+            ></app-button>
+            <app-button
               *hasPermission="'alertManagement'; level: 'delete'"
-              class="icon-btn delete-btn"
-              (click)="confirmDelete(alert.id)"
+              variant="icon"
+              size="sm"
+              [icon]="isDeleting(alert.id) ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+              class="delete-btn"
               [disabled]="isDeleting(alert.id)"
               [pTooltip]="'COMMON.DELETE' | translate"
               tooltipPosition="bottom"
-            >
-              <i
-                class="pi"
-                [ngClass]="isDeleting(alert.id) ? 'pi-spin pi-spinner' : 'pi-trash'"
-              ></i>
-            </button>
+              [title]="'COMMON.DELETE' | translate"
+              (clicked)="confirmDelete(alert.id)"
+            ></app-button>
           </div>
         </ng-template>
         </app-custom-table>
@@ -198,7 +211,7 @@
           [class.active]="snoozeMinutes === p.value"
           (click)="snoozeMinutes = p.value"
         >
-          {{ p.label }}
+          {{ p.label | translate }}
         </button>
       </div>
       <div class="snooze-custom">
@@ -212,16 +225,18 @@
       </div>
     </div>
     <div class="popup-actions">
-      <button class="btn-cancel" (click)="cancelSnooze()">
-        <i class="pi pi-times"></i> {{ 'COMMON.CANCEL' | translate }}
-      </button>
-      <button
-        class="btn-confirm info"
-        (click)="proceedSnooze()"
+      <app-button variant="secondary" icon="pi pi-times" (clicked)="cancelSnooze()">
+        {{ 'COMMON.CANCEL' | translate }}
+      </app-button>
+      <app-button
+        variant="primary"
+        icon="pi pi-moon"
+        [loading]="saving()"
         [disabled]="!snoozeMinutes || saving()"
+        (clicked)="proceedSnooze()"
       >
-        <i class="pi pi-moon"></i> {{ 'ALERTS.SNOOZE' | translate }}
-      </button>
+        {{ 'ALERTS.SNOOZE' | translate }}
+      </app-button>
     </div>
   </div>
 </div>
@@ -265,27 +280,21 @@
       </div>
     </div>
     <div class="popup-actions">
-      <button class="btn-cancel" (click)="cancelDelete()">
-        <i class="pi pi-times"></i> {{ 'COMMON.CANCEL' | translate }}
-      </button>
-      <button
-        class="btn-confirm"
-        (click)="proceedDelete()"
+      <app-button variant="secondary" icon="pi pi-times" (clicked)="cancelDelete()">
+        {{ 'COMMON.CANCEL' | translate }}
+      </app-button>
+      <app-button
+        variant="danger"
+        icon="pi pi-trash"
+        [loading]="!!(alertToDelete && isDeleting(alertToDelete))"
         [disabled]="
           !deleteJustification.trim() ||
           !!(alertToDelete && isDeleting(alertToDelete))
         "
+        (clicked)="proceedDelete()"
       >
-        <i
-          class="pi"
-          [ngClass]="
-            !!(alertToDelete && isDeleting(alertToDelete))
-              ? 'pi-spin pi-spinner'
-              : 'pi-trash'
-          "
-        ></i>
         {{ 'COMMON.DELETE' | translate }}
-      </button>
+      </app-button>
     </div>
   </div>
 </div>

@@ -2,9 +2,13 @@
   <div class="view-category-container">
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text back-button" (click)="goBack()">
-          <i class="pi pi-arrow-left"></i>
-        </button>
+        <app-button
+          variant="icon"
+          icon="pi pi-arrow-left"
+          class="back-button"
+          [title]="'COMMON.BACK' | translate"
+          (clicked)="goBack()"
+        ></app-button>
         <h2>{{ 'ALERTS.VIEW_TITLE' | translate }}</h2>
         <app-chip
           *ngIf="current()"
@@ -22,61 +26,62 @@
         </app-chip>
       </div>
       <div class="header-actions" *ngIf="current()">
-        <button
-          type="button"
-          class="btn-ghost fav-toggle"
+        <app-button
+          variant="ghost"
+          class="fav-toggle"
           [class.on]="isFavourite()"
-          (click)="toggleFavourite()"
+          [icon]="isFavourite() ? 'pi pi-star-fill' : 'pi pi-star'"
           [pTooltip]="
             (isFavourite() ? 'FAVOURITE.REMOVE' : 'FAVOURITE.ADD') | translate
           "
           tooltipPosition="bottom"
-        >
-          <i class="pi" [ngClass]="isFavourite() ? 'pi-star-fill' : 'pi-star'"></i>
-        </button>
-        <button
+          [title]="(isFavourite() ? 'FAVOURITE.REMOVE' : 'FAVOURITE.ADD') | translate"
+          (clicked)="toggleFavourite()"
+        ></app-button>
+        <app-button
           *hasPermission="'alertManagement'; level: 'write'"
-          class="btn-ghost"
-          (click)="onTestNow()"
+          variant="ghost"
+          icon="pi pi-bolt"
+          [loading]="testing()"
           [disabled]="testing()"
+          (clicked)="onTestNow()"
         >
-          <i
-            class="pi"
-            [ngClass]="testing() ? 'pi-spin pi-spinner' : 'pi-bolt'"
-          ></i>
           {{ 'ALERTS.TEST_NOW' | translate }}
-        </button>
-        <button
+        </app-button>
+        <app-button
           *hasPermission="'alertManagement'; level: 'write'"
-          class="btn-ghost"
-          (click)="onToggle()"
+          variant="ghost"
+          [icon]="current()!.enabled ? 'pi pi-pause' : 'pi pi-play'"
+          [loading]="saving()"
           [disabled]="saving()"
+          (clicked)="onToggle()"
         >
-          <i class="pi" [ngClass]="current()!.enabled ? 'pi-pause' : 'pi-play'"></i>
           {{ (current()!.enabled ? 'ALERTS.DISABLE' : 'ALERTS.ENABLE') | translate }}
-        </button>
-        <button
+        </app-button>
+        <app-button
           *hasPermission="'alertManagement'; level: 'write'"
-          class="btn-ghost"
-          (click)="openSnooze()"
+          variant="ghost"
+          icon="pi pi-moon"
+          (clicked)="openSnooze()"
         >
-          <i class="pi pi-moon"></i> {{ 'ALERTS.SNOOZE' | translate }}
-        </button>
-        <button
+          {{ 'ALERTS.SNOOZE' | translate }}
+        </app-button>
+        <app-button
           *hasPermission="'alertManagement'; level: 'write'"
-          class="btn-primary"
-          (click)="onEdit()"
+          variant="primary"
+          icon="pi pi-pencil"
+          (clicked)="onEdit()"
         >
-          <i class="pi pi-pencil"></i> {{ 'COMMON.EDIT' | translate }}
-        </button>
-        <button
+          {{ 'COMMON.EDIT' | translate }}
+        </app-button>
+        <app-button
           *hasPermission="'alertManagement'; level: 'delete'"
-          class="btn-danger"
-          type="button"
-          (click)="confirmDelete()"
+          variant="danger"
+          icon="pi pi-trash"
+          (clicked)="confirmDelete()"
         >
-          <i class="pi pi-trash"></i> {{ 'COMMON.DELETE' | translate }}
-        </button>
+          {{ 'COMMON.DELETE' | translate }}
+        </app-button>
       </div>
     </div>
 
@@ -297,7 +302,7 @@
           [class.active]="snoozeMinutes === p.value"
           (click)="snoozeMinutes = p.value"
         >
-          {{ p.label }}
+          {{ p.label | translate }}
         </button>
       </div>
       <app-custom-number
@@ -309,16 +314,18 @@
       ></app-custom-number>
     </div>
     <div class="popup-actions">
-      <button class="btn-cancel" (click)="cancelSnooze()">
-        <i class="pi pi-times"></i> {{ 'COMMON.CANCEL' | translate }}
-      </button>
-      <button
-        class="btn-confirm info"
-        (click)="proceedSnooze()"
+      <app-button variant="secondary" icon="pi pi-times" (clicked)="cancelSnooze()">
+        {{ 'COMMON.CANCEL' | translate }}
+      </app-button>
+      <app-button
+        variant="primary"
+        icon="pi pi-moon"
+        [loading]="saving()"
         [disabled]="!snoozeMinutes || saving()"
+        (clicked)="proceedSnooze()"
       >
-        <i class="pi pi-moon"></i> {{ 'ALERTS.SNOOZE' | translate }}
-      </button>
+        {{ 'ALERTS.SNOOZE' | translate }}
+      </app-button>
     </div>
   </div>
 </div>

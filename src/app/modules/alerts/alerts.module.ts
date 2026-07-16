@@ -7,6 +7,8 @@ import { CustomTableComponent } from 'src/app/shared/components/custom-table/cus
 import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-table/custom-table-empty.directive';
 import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { EmailChipsInputComponent } from './components/shared/email-chips-input/email-chips-input.component';
 import { AddAlertComponent } from './components/add-alert/add-alert.component';
 import { AlertConditionBuilderComponent } from './components/alert-condition-builder/alert-condition-builder.component';
 import { AlertHistoryComponent } from './components/alert-history/alert-history.component';
@@ -40,6 +42,10 @@ import { AlertsRoutingModule } from './alerts-routing.module';
     UsGridCellDirective,
     // Canonical shared chip / status-pill / severity / count element.
     ChipComponent,
+    // Canonical shared button (primary/secondary/ghost/danger/icon).
+    ButtonComponent,
+    // Recipient-email / tag chip editor (app-chip based).
+    EmailChipsInputComponent,
   ],
 })
 export class AlertsModule {}

@@ -72,7 +72,6 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
   severityOptions = SEVERITY_OPTIONS.map(o => ({ ...o }));
   timezoneOptions = TIMEZONE_OPTIONS;
   cronPresets = CRON_PRESETS;
-  emailSeparator = /,|;| /;
 
   /* datasource + source dropdowns */
   selectedDatasource = '';

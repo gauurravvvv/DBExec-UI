@@ -24,25 +24,8 @@
         align-items: center;
         gap: var(--space-6);
 
-        .back-button {
-          padding: 0 !important;
-          width: 36px;
-          height: 36px;
-          border-radius: 50% !important;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: transparent !important;
-          color: var(--text-color) !important;
-          min-width: 0;
-          border: none !important;
-
-          &:hover {
-            background: var(--hover-background) !important;
-          }
-          i {
-            font-size: var(--fs-h2);
-          }
+        .back-button ::ng-deep .app-btn {
+          border-radius: 50%;
         }
 
         h2 {
@@ -145,7 +128,11 @@
 .channel-toggles {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-8);
+  gap: var(--space-5);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 }
 
 .chips-field {
@@ -157,16 +144,6 @@
     font-size: var(--fs-control);
     font-weight: var(--fw-medium);
     color: var(--text-color);
-  }
-
-  ::ng-deep .p-chips,
-  ::ng-deep .p-chips .p-inputtext {
-    width: 100%;
-  }
-  ::ng-deep .p-chips .p-chips-multiple-container {
-    width: 100%;
-    border-radius: var(--radius-sm);
-    border-color: var(--border-color);
   }
 }
 
@@ -226,8 +203,4 @@
       color: var(--error-color, #dc2626);
     }
   }
-}
-
-.mr-2 {
-  margin-right: var(--space-2);
 }
