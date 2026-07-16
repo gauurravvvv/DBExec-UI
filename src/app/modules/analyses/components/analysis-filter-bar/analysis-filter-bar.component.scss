@@ -120,6 +120,29 @@
   font-style: italic;
 }
 
+// Relative-preset badge (Slice D, item 2) — under a date-range control
+// whose window is driven by a live preset (Last 7 days, MTD, …).
+.filter-preset-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  font-size: var(--fs-micro);
+  color: var(--primary-color);
+
+  i.pi {
+    font-size: var(--fs-micro);
+  }
+}
+
+// Apply-vs-Live mode toggle (Slice D, item 4) — sits at the left of the
+// action row. Keeps the toggle visually distinct from the buttons.
+.filter-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  margin-right: var(--space-3);
+}
+
 // Stale-value warning row — appears under the dropdown when saved
 // defaults reference values no longer in source data. Each chip is
 // clickable to dismiss; the chart query will still attempt the

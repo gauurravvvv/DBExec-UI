@@ -246,6 +246,12 @@
           [numberOfMonths]="2"
           (onChangeEvent)="onFilterChange(filter, appliedValues[filter.id])"
         ></app-custom-daterange>
+        <!-- Relative-preset badge (item 2) — signals the range is
+             driven by a live preset that re-resolves at apply time. -->
+        <small class="filter-preset-hint" *ngIf="relativePresetLabel(filter)">
+          <i class="pi pi-history"></i>
+          {{ relativePresetLabel(filter) | translate }}
+        </small>
       </div>
 
       <!-- Single date — equality picker. -->
@@ -300,8 +306,20 @@
     first-time viewers who never see it on a fresh dashboard.
   -->
   <div class="filter-actions">
+    <!-- Apply-vs-Live mode toggle (Slice D, item 4). Live auto-applies
+         on change (debounced); Apply batches behind the Apply button.
+         Seeded from the surface's default, then user-owned. -->
+    <div class="filter-mode-toggle">
+      <app-custom-toggle
+        [ngModel]="liveMode"
+        (ngModelChange)="onLiveModeChange($event)"
+        [label]="'ANALYSES.FILTER.MODE' | translate"
+        [trueLabel]="'ANALYSES.FILTER.MODE_LIVE' | translate"
+        [falseLabel]="'ANALYSES.FILTER.MODE_APPLY' | translate"
+      ></app-custom-toggle>
+    </div>
     <button
-      *ngIf="!autoApply"
+      *ngIf="!liveMode"
       class="btn-apply"
       (click)="applyFilters()"
       [disabled]="!hasActiveFilters"

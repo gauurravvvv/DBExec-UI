@@ -12,6 +12,12 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import { AnalysesService } from '../../services/analyses.service';
 import { suggestFilterType, toValueType } from '../../utils/field-type.util';
+import {
+  RELATIVE_DATE_PRESETS,
+  RelativeDatePreset,
+  isRelativePreset,
+  resolveRelativePreset,
+} from './relative-date-presets.util';
 
 export interface ConfiguredFilter {
   tempId: string;
@@ -153,6 +159,28 @@ export class FilterDialogComponent implements OnChanges {
   isLoadingFilterValues: boolean = false;
   isSavingFilter: boolean = false;
 
+  // ── Relative-date preset (Slice D, item 2) ───────────────────────
+  // For time_range filters only. 'custom' keeps the absolute date-range
+  // picker; every other value is resolved live by the filter bar at
+  // apply time. Persisted on config.relativePreset.
+  filterDialogRelativePreset: RelativeDatePreset = 'custom';
+
+  // ── Curated category allow-list (Slice D, item 5) ────────────────
+  // When ON for a category filter, the runtime dropdown is restricted
+  // to this curated subset (persisted on config.categoryValues) rather
+  // than every distinct value in the source. The default value is
+  // constrained to the allow-list at save.
+  filterDialogRestrictCategory: boolean = false;
+  filterDialogCategoryAllowList: any[] = [];
+
+  // ── Cascading / linked filters (Slice D, item 3) ─────────────────
+  // Optional parent filter id (persisted on config.dependsOnFilterId).
+  // When set, the runtime bar re-fetches this filter's options
+  // constrained by the parent's current selection.
+  filterDialogDependsOnFilterId: string | null = null;
+  /** Sibling filters (this analysis) eligible as a cascade parent. */
+  parentFilterOptions: { label: string; value: string }[] = [];
+
   /**
    * Save is disabled when any required field is missing OR while a
    * save is in flight. Exposed as a getter so the template can both
@@ -186,6 +214,8 @@ export class FilterDialogComponent implements OnChanges {
   operatorOptions: { label: string; value: string }[] = [];
   nullOptions: { label: string; value: string }[] = [];
   dateFormatOptions = DATE_FORMAT_OPTIONS;
+  /** Relative-date preset dropdown options (built in the constructor). */
+  relativePresetOptions: { label: string; value: RelativeDatePreset }[] = [];
 
   private columnValuesCache: {
     [columnName: string]: { label: string; value: string }[];
@@ -237,6 +267,10 @@ export class FilterDialogComponent implements OnChanges {
         value: 'visual',
       },
     ];
+    this.relativePresetOptions = RELATIVE_DATE_PRESETS.map(p => ({
+      label: this.translate.instant(p.labelKey),
+      value: p.value,
+    }));
   }
 
   /** Scope dropdown options (dashboard / tab / visual). */
@@ -249,6 +283,41 @@ export class FilterDialogComponent implements OnChanges {
       } else {
         this.resetForm();
       }
+      // Load the analysis's other filters so the cascade "depends on"
+      // dropdown (item 3) has candidate parents. Excludes self when
+      // editing so a filter can't depend on itself.
+      this.loadParentFilterOptions();
+    }
+  }
+
+  /**
+   * Populate parentFilterOptions with sibling filters usable as a
+   * cascade parent. Fetched lazily on dialog-open so the dialog stays
+   * self-contained (no new @Input threaded from the editor). A parent
+   * must be a category filter (its selection narrows a child's options
+   * via an extra WHERE), can't be the filter being edited, and can't
+   * itself already depend on this filter (avoids a 2-cycle).
+   */
+  private async loadParentFilterOptions(): Promise<void> {
+    this.parentFilterOptions = [];
+    if (!this.analysisId) return;
+    try {
+      const res: any = await this.analysesService.listFilters(this.analysisId);
+      const rows: any[] = Array.isArray(res?.data) ? res.data : [];
+      const selfId = this.editingFilter?.tempId ?? null;
+      this.parentFilterOptions = rows
+        .filter(
+          f =>
+            f.filterType === 'category' &&
+            f.id !== selfId &&
+            // Guard against the trivial cycle: a candidate parent that
+            // already points back at us can't also be our parent.
+            (f.config?.dependsOnFilterId ?? null) !== selfId,
+        )
+        .map(f => ({ label: f.name, value: f.id }));
+    } catch (err) {
+      // Non-fatal — the cascade picker just shows no candidates.
+      console.error('Failed to load parent filter options', err);
     }
   }
 
@@ -282,6 +351,23 @@ export class FilterDialogComponent implements OnChanges {
       filter.filterType,
     );
 
+    // Relative-date preset (item 2). Absent / unknown → 'custom' so the
+    // absolute date-range picker stays the default.
+    this.filterDialogRelativePreset = isRelativePreset(config.relativePreset)
+      ? config.relativePreset
+      : 'custom';
+
+    // Cascade parent (item 3).
+    this.filterDialogDependsOnFilterId = config.dependsOnFilterId ?? null;
+
+    // Curated category allow-list (item 5). Restrict is inferred from
+    // the presence of a non-empty categoryValues array on load.
+    const savedAllow: any[] = Array.isArray(config.categoryValues)
+      ? config.categoryValues
+      : [];
+    this.filterDialogRestrictCategory = savedAllow.length > 0;
+    this.filterDialogCategoryAllowList = [...savedAllow];
+
     this.updateControlTypeOptions();
     this.updateOperatorOptions();
 
@@ -308,6 +394,10 @@ export class FilterDialogComponent implements OnChanges {
     this.filterDialogDateFormat = 'yy-mm-dd';
     this.filterDialogCategoryValues = [];
     this.filterDialogStaleDefaults = [];
+    this.filterDialogRelativePreset = 'custom';
+    this.filterDialogRestrictCategory = false;
+    this.filterDialogCategoryAllowList = [];
+    this.filterDialogDependsOnFilterId = null;
     this.isLoadingFilterValues = false;
     this.controlTypeOptions = [];
     this.operatorOptions = [];
@@ -353,6 +443,60 @@ export class FilterDialogComponent implements OnChanges {
       this.filterDialogTargetVisualIds = [];
   }
 
+  /**
+   * Options the default-value picker draws from. When the curated
+   * allow-list (item 5) is active, the default can only be one of the
+   * curated values; otherwise it's the full distinct set. Keeps the
+   * "default is a valid selection" invariant at authoring time.
+   */
+  get categoryDefaultOptions(): { label: string; value: string }[] {
+    if (this.filterDialogRestrictCategory) {
+      const allow = new Set(
+        this.filterDialogCategoryAllowList.map(v => String(v)),
+      );
+      return this.filterDialogCategoryValues.filter(o =>
+        allow.has(String(o.value)),
+      );
+    }
+    return this.filterDialogCategoryValues;
+  }
+
+  /**
+   * Toggle handler for the curated allow-list (item 5). Turning it OFF
+   * clears the list and any now-orphaned default; turning it ON leaves
+   * the list empty for the author to curate (save validates non-empty).
+   */
+  onRestrictCategoryChange(): void {
+    if (!this.filterDialogRestrictCategory) {
+      this.filterDialogCategoryAllowList = [];
+    }
+    this.constrainDefaultToAllowList();
+  }
+
+  /**
+   * When the allow-list changes, drop any default-value entries that
+   * are no longer in it so the persisted default can't sit outside the
+   * curated set.
+   */
+  onCategoryAllowListChange(): void {
+    this.constrainDefaultToAllowList();
+  }
+
+  /** Prune filterDialogDefaultValue to the current allow-list (no-op
+   *  when restrict is off). Preserves the single-vs-array shape. */
+  private constrainDefaultToAllowList(): void {
+    if (!this.filterDialogRestrictCategory) return;
+    const allow = new Set(
+      this.filterDialogCategoryAllowList.map(v => String(v)),
+    );
+    const dv = this.filterDialogDefaultValue;
+    if (Array.isArray(dv)) {
+      this.filterDialogDefaultValue = dv.filter(v => allow.has(String(v)));
+    } else if (dv !== null && dv !== undefined && dv !== '') {
+      if (!allow.has(String(dv))) this.filterDialogDefaultValue = '';
+    }
+  }
+
   async save(): Promise<void> {
     if (
       !this.filterDialogColumn ||
@@ -383,6 +527,10 @@ export class FilterDialogComponent implements OnChanges {
     if (this.filterDialogType === 'time_range') {
       const val = this.filterDialogDefaultValue;
       if (
+        // Only enforce the absolute-range sanity check when the author
+        // kept the Custom preset — for a live preset the [start,end] is
+        // resolved at apply time, not authored here.
+        this.filterDialogRelativePreset === 'custom' &&
         Array.isArray(val) &&
         val[0] instanceof Date &&
         val[1] instanceof Date &&
@@ -394,6 +542,20 @@ export class FilterDialogComponent implements OnChanges {
         });
         return;
       }
+    }
+
+    // Curated category allow-list validation (item 5). When the author
+    // turned Restrict on, the allow-list must have at least one value.
+    if (
+      this.filterDialogType === 'category' &&
+      this.filterDialogRestrictCategory &&
+      this.filterDialogCategoryAllowList.length === 0
+    ) {
+      this.globalService.handleErrorService({
+        status: false,
+        message: this.translate.instant('ANALYSES.FILTER.CATEGORY_LIST_EMPTY'),
+      });
+      return;
     }
 
     const columnName =
@@ -416,6 +578,41 @@ export class FilterDialogComponent implements OnChanges {
       config.dateFormat = this.filterDialogDateFormat;
     }
     this.buildDefaultValueConfig(config, this.filterDialogType);
+
+    // ── Relative-date preset (item 2) ────────────────────────────────
+    // Only meaningful for time_range. Persist the chosen preset id;
+    // when it's a live preset (not 'custom') also stamp a resolved
+    // start/end so a publish-time snapshot has concrete bounds even
+    // before the bar resolves it. The bar re-resolves at apply time so
+    // a live dashboard always reflects the current clock.
+    if (this.filterDialogType === 'time_range') {
+      config.relativePreset = this.filterDialogRelativePreset;
+      if (this.filterDialogRelativePreset !== 'custom') {
+        const resolved = resolveRelativePreset(this.filterDialogRelativePreset);
+        if (resolved) {
+          config.dateRangeStart = resolved.start.toISOString();
+          config.dateRangeEnd = resolved.end.toISOString();
+        }
+      }
+    }
+
+    // ── Curated category allow-list (item 5) ─────────────────────────
+    // Persist the allow-list only when Restrict is ON and it's a
+    // category filter. Storing [] / omitting means "all distinct
+    // values" (the existing behaviour), so the key is only written when
+    // there's an actual curated subset.
+    if (
+      this.filterDialogType === 'category' &&
+      this.filterDialogRestrictCategory &&
+      this.filterDialogCategoryAllowList.length > 0
+    ) {
+      config.categoryValues = [...this.filterDialogCategoryAllowList];
+    }
+
+    // ── Cascade parent (item 3) ──────────────────────────────────────
+    if (this.filterDialogDependsOnFilterId) {
+      config.dependsOnFilterId = this.filterDialogDependsOnFilterId;
+    }
 
     this.isSavingFilter = true;
 

@@ -16,6 +16,11 @@ import {
   FilterOptionsCacheService,
   FilterValuesResult,
 } from '../../services/filter-options-cache.service';
+import {
+  RELATIVE_DATE_PRESETS,
+  isRelativePreset,
+  resolveRelativePreset,
+} from '../filter-dialog/relative-date-presets.util';
 
 /**
  * Per-filter UI state — what the template branches on. The bar's
@@ -108,6 +113,26 @@ export class AnalysisFilterBarComponent
   private static readonly AUTO_APPLY_DEBOUNCE_MS = 300;
   private autoApplyTimer: any = null;
 
+  /**
+   * Apply-vs-Live mode (Slice D, item 4). Per-analysis, user-toggleable
+   * in the bar. Seeded from the `autoApply` @Input so each surface keeps
+   * its historical default (dashboard = live, editor = batched-apply),
+   * but the viewer can flip it: Live auto-applies on change (debounced),
+   * Apply batches changes behind an explicit Apply button. Set once in
+   * ngOnInit / ngOnChanges from the input, then owned locally.
+   */
+  liveMode = false;
+  /** Guards the one-time seed of liveMode from the autoApply input. */
+  private liveModeSeeded = false;
+
+  /** Toggle handler for the Live/Apply switch. Flipping INTO live mode
+   *  immediately applies whatever is currently selected so the canvas
+   *  catches up to the batched selection. */
+  onLiveModeChange(live: boolean): void {
+    this.liveMode = live;
+    if (this.liveMode) this.applyFilters();
+  }
+
   // ── Hosted-mode inputs ───────────────────────────────────────────
   /** When present, switches into hosted mode and the bar stops calling
    *  AnalysesService.listFilters / cache.open itself. */
@@ -162,6 +187,20 @@ export class AnalysisFilterBarComponent
   }
 
   /**
+   * i18n label key for a time_range filter's live relative preset
+   * (item 2), or '' when the filter uses an absolute/custom range. The
+   * template renders a small badge from it so viewers know the range is
+   * clock-driven.
+   */
+  relativePresetLabel(filter: any): string {
+    if (filter?.filterType !== 'time_range') return '';
+    const preset = filter?.config?.relativePreset;
+    if (!isRelativePreset(preset) || preset === 'custom') return '';
+    const match = RELATIVE_DATE_PRESETS.find(p => p.value === preset);
+    return match ? match.labelKey : '';
+  }
+
+  /**
    * Filters that render inline in the bar. When maxVisible is unset
    * or zero, every visible filter qualifies (legacy behaviour).
    * Otherwise we slice off the first N to keep the bar from wrapping
@@ -207,7 +246,15 @@ export class AnalysisFilterBarComponent
   }
 
   ngOnInit(): void {
+    this.seedLiveMode();
     if (this.serviceMode) this.loadFilters();
+  }
+
+  /** One-time seed of liveMode from the autoApply input. */
+  private seedLiveMode(): void {
+    if (this.liveModeSeeded) return;
+    this.liveMode = this.autoApply;
+    this.liveModeSeeded = true;
   }
 
   ngOnDestroy(): void {
@@ -221,6 +268,11 @@ export class AnalysisFilterBarComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    // Seed the live/apply mode from autoApply on the first time the
+    // input lands (may be after ngOnInit if bound asynchronously).
+    if (changes['autoApply'] && !this.liveModeSeeded) {
+      this.seedLiveMode();
+    }
     // Host swapped the analysis or the filter list — drop any in-flight
     // selections so we don't apply stale values to the new analysis.
     if (changes['analysisId'] && !changes['analysisId'].firstChange) {
@@ -318,6 +370,22 @@ export class AnalysisFilterBarComponent
         page: number;
         limit: number;
       }) => {
+        // Cascading (item 3): when this filter depends on a parent that
+        // currently has a selection, bypass the shared cache and hit
+        // the batch endpoint directly so we can pass parentSelections
+        // (the cache key doesn't include the parent constraint). The BE
+        // accepts parentSelections today and will constrain results
+        // once its cascade support lands — forward-compatible.
+        const parentSelections = this.parentSelectionsFor(filter);
+        if (parentSelections) {
+          const result = await this.fetchWithParentConstraint(filter, args, {
+            parentSelections,
+          });
+          this.applyResultToInternalState(filter.id, result);
+          if (!result.ok) return { items: [], total: 0 };
+          return { items: result.values, total: result.total };
+        }
+
         const result = await this.optionsCache.get(this.analysisId, filter.id, {
           search: args.search || undefined,
           page: args.page,
@@ -331,6 +399,57 @@ export class AnalysisFilterBarComponent
 
     this.fetcherCache.set(filter.id, fetcher);
     return fetcher;
+  }
+
+  /**
+   * Direct (uncached) batch fetch for a cascaded filter, carrying the
+   * parent's selection as `parentSelections`. Kept off the shared
+   * FilterOptionsCache because that cache keys only on search+page — a
+   * parent-constrained result must not be served for an unconstrained
+   * request (or vice-versa). Normalises the batch response into the
+   * FilterValuesResult union the internal state expects.
+   */
+  private async fetchWithParentConstraint(
+    filter: any,
+    args: { search: string; page: number; limit: number },
+    extra: { parentSelections: Record<string, (string | number)[]> },
+  ): Promise<FilterValuesResult> {
+    try {
+      const res: any = await this.analysesService.getFilterValuesBatch({
+        analysisId: this.analysisId,
+        requests: [
+          {
+            filterId: filter.id,
+            search: args.search || undefined,
+            page: args.page,
+            pageSize: args.limit,
+            parentSelections: extra.parentSelections,
+          },
+        ],
+      });
+      const raw = res?.data?.results?.[filter.id];
+      if (!res?.status || !raw || raw.ok === false) {
+        return {
+          ok: false,
+          error: (raw?.error as any) || 'sql_error',
+          message: raw?.message || 'Filter values unavailable',
+        };
+      }
+      return {
+        ok: true,
+        values: raw.values ?? [],
+        total: raw.total ?? 0,
+        totalApproximate: !!raw.totalApproximate,
+        truncated: !!raw.truncated,
+        nextPage: raw.nextPage ?? null,
+      };
+    } catch (err: any) {
+      return {
+        ok: false,
+        error: 'sql_error',
+        message: err?.message || 'Network error',
+      };
+    }
   }
 
   private applyResultToInternalState(
@@ -395,6 +514,15 @@ export class AnalysisFilterBarComponent
         const d = new Date(config.defaultValue);
         if (!isNaN(d.getTime())) this.appliedValues[f.id] = d;
       } else if (f.filterType === 'time_range') {
+        // Relative preset (item 2): when a live preset is configured,
+        // resolve it to a concrete [start, end] against the current
+        // clock so the picker shows today's window. 'custom'/absent
+        // falls through to the saved absolute range below.
+        const resolved = resolveRelativePreset(config.relativePreset);
+        if (resolved) {
+          this.appliedValues[f.id] = [resolved.start, resolved.end];
+          continue;
+        }
         const dates: Date[] = [];
         if (config.dateRangeStart) {
           const d = new Date(config.dateRangeStart);
@@ -498,13 +626,69 @@ export class AnalysisFilterBarComponent
 
   onFilterChange(filter: any, value: any): void {
     this.appliedValues[filter.id] = value;
-    // In auto-apply mode (dashboard) a value change re-emits filters
-    // after a short debounce. We do NOT touch the existing Apply
-    // button flow — applyFilters() works the same regardless of
-    // mode; auto-apply just calls it for the user.
-    if (this.autoApply) {
+    // Cascading (item 3): if any other filter declares this one as its
+    // parent, its option set is now stale — clear the child's selection
+    // and force a re-fetch constrained by the new parent value.
+    this.invalidateDependents(filter.id);
+    // In live mode a value change re-emits filters after a short
+    // debounce. We do NOT touch the existing Apply button flow —
+    // applyFilters() works the same regardless of mode; live mode just
+    // calls it for the user.
+    if (this.liveMode) {
       this.scheduleAutoApply();
     }
+  }
+
+  /**
+   * Cascading re-fetch (item 3). When `parentId`'s value changes, every
+   * filter whose config.dependsOnFilterId === parentId has an option
+   * set that no longer matches the parent selection. We:
+   *   1. clear the child's current selection (it may now be invalid),
+   *   2. drop its cached options + memoised fetcher so the next open
+   *      re-fetches constrained by the new parent value.
+   * In service mode the rebuilt fetcher passes parentSelections to the
+   * BE; in hosted mode the host's fetcher is used verbatim, so the
+   * child simply refreshes (the constraint applies once the host wires
+   * parentSelections through — the BE contract is forward-compatible).
+   */
+  private invalidateDependents(parentId: string): void {
+    for (const child of this.visibleFilters) {
+      if (child?.config?.dependsOnFilterId !== parentId) continue;
+      // Drop the child's now-inconsistent selection.
+      delete this.appliedValues[child.id];
+      // Invalidate memoised fetcher + cached options so the next open
+      // re-queries with the new parent constraint.
+      this.fetcherCache.delete(child.id);
+      if (this.serviceMode) {
+        this.optionsCache.clearFilter(child.id);
+        const s = this.internalState[child.id];
+        if (s) {
+          s.options = [];
+          s.total = 0;
+        }
+      }
+    }
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Build the parentSelections map for a filter that declares a cascade
+   * parent (config.dependsOnFilterId). Shape matches the BE contract:
+   *   { [parentFilterId]: (string|number)[] }
+   * Empty / no-parent → undefined so the fetch payload stays lean.
+   */
+  private parentSelectionsFor(
+    filter: any,
+  ): Record<string, (string | number)[]> | undefined {
+    const parentId: string | undefined = filter?.config?.dependsOnFilterId;
+    if (!parentId) return undefined;
+    const val = this.appliedValues[parentId];
+    if (val === null || val === undefined || val === '') return undefined;
+    const values = (Array.isArray(val) ? val : [val]).filter(
+      v => v !== null && v !== undefined && v !== '',
+    );
+    if (values.length === 0) return undefined;
+    return { [parentId]: values };
   }
 
   /** Schedule a debounced auto-apply. Successive value changes within
@@ -518,7 +702,27 @@ export class AnalysisFilterBarComponent
     );
   }
 
+  /**
+   * Refresh the applied value of every time_range filter that uses a
+   * live relative preset (item 2) so the [start, end] reflects the
+   * current clock at apply time. Custom / absolute ranges are left
+   * untouched. Called from applyFilters (both manual + debounced).
+   */
+  private refreshRelativePresets(): void {
+    for (const f of this.visibleFilters) {
+      if (f.filterType !== 'time_range') continue;
+      const resolved = resolveRelativePreset(f.config?.relativePreset);
+      if (resolved) {
+        this.appliedValues[f.id] = [resolved.start, resolved.end];
+      }
+    }
+  }
+
   applyFilters(): void {
+    // Re-resolve any live relative-date presets (item 2) against the
+    // current clock so a long-open surface queries today's window, not
+    // the window resolved when the bar first loaded.
+    this.refreshRelativePresets();
     const applied = this.visibleFilters
       .filter(f => {
         const val = this.appliedValues[f.id];

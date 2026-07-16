@@ -632,7 +632,7 @@ export class AnalysesService {
    * batch — each filterId in the response carries its own ok/error.
    *
    * Body shape:
-   *   { analysisId, requests: [{ filterId, search?, page?, pageSize? }, ...] }
+   *   { analysisId, requests: [{ filterId, search?, page?, pageSize?, parentSelections? }, ...] }
    * Response shape:
    *   { status: true, data: { results: { [filterId]: FilterValuesResult } } }
    */
@@ -646,6 +646,11 @@ export class AnalysesService {
       search?: string;
       page?: number;
       pageSize?: number;
+      // Cascading filters (Slice D, item 3): parent filter selections
+      // used to constrain this filter's distinct values. Keyed by
+      // parent filterId → selected value(s). Accepted by the BE Joi
+      // schema today; honoured once the BE cascade query support lands.
+      parentSelections?: Record<string, (string | number)[]>;
     }>;
   }) {
     return lastValueFrom(

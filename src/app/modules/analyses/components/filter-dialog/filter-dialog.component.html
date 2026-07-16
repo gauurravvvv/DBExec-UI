@@ -170,6 +170,29 @@
         </div>
       </div>
 
+      <!-- Relative-date preset (Slice D, item 2) — time_range only.
+           'Custom' keeps the absolute date-range picker in the Default
+           section; any other preset resolves live at apply time. -->
+      <div
+        class="filter-dialog-field"
+        *ngIf="filterDialogType === 'time_range'"
+      >
+        <app-custom-dropdown
+          [options]="relativePresetOptions"
+          [(ngModel)]="filterDialogRelativePreset"
+          optionLabel="label"
+          optionValue="value"
+          [label]="'ANALYSES.FILTER.RELATIVE_PRESET' | translate"
+          [autoDisplayFirst]="false"
+          appendTo="body"
+          icon="pi-history"
+        ></app-custom-dropdown>
+        <small class="field-hint">
+          <i class="pi pi-info-circle"></i>
+          {{ 'ANALYSES.FILTER.RELATIVE_PRESET_HINT' | translate }}
+        </small>
+      </div>
+
       <!-- Placeholder text — visible once a type is picked. -->
       <div class="filter-dialog-field" *ngIf="filterDialogType">
         <app-custom-input
@@ -178,6 +201,31 @@
           icon="pi-pencil"
           [placeholder]="'ANALYSES.PLACEHOLDER_HINT' | translate"
         ></app-custom-input>
+      </div>
+
+      <!-- Cascade parent (Slice D, item 3) — category filters only.
+           When set, this filter's runtime options are re-fetched
+           constrained by the parent filter's current selection. -->
+      <div
+        class="filter-dialog-field"
+        *ngIf="filterDialogType === 'category'"
+      >
+        <app-custom-dropdown
+          [options]="parentFilterOptions"
+          [(ngModel)]="filterDialogDependsOnFilterId"
+          optionLabel="label"
+          optionValue="value"
+          [label]="'ANALYSES.FILTER.DEPENDS_ON' | translate"
+          [placeholder]="'ANALYSES.FILTER.DEPENDS_ON_NONE' | translate"
+          [showClear]="true"
+          [autoDisplayFirst]="false"
+          appendTo="body"
+          icon="pi-sitemap"
+        ></app-custom-dropdown>
+        <small class="field-hint">
+          <i class="pi pi-info-circle"></i>
+          {{ 'ANALYSES.FILTER.DEPENDS_ON_HINT' | translate }}
+        </small>
       </div>
 
       <!-- Toggles in-flow with the rest of the behaviour fields,
@@ -249,11 +297,55 @@
         {{ 'ANALYSES.FILTER_SECTION_DEFAULT' | translate }}
       </h4>
 
+      <!-- Curated allow-list (Slice D, item 5) — category filters only.
+           When ON, the runtime dropdown (and the default-value picker
+           below) is restricted to a curated subset the author picks,
+           persisted on config.categoryValues. -->
+      <div class="filter-dialog-field" *ngIf="filterDialogType === 'category'">
+        <app-custom-toggle
+          [ngModel]="filterDialogRestrictCategory"
+          (ngModelChange)="
+            filterDialogRestrictCategory = $event; onRestrictCategoryChange()
+          "
+          [label]="'ANALYSES.FILTER.RESTRICT_VALUES' | translate"
+          [trueLabel]="'ANALYSES.FILTER.RESTRICT_ON' | translate"
+          [falseLabel]="'ANALYSES.FILTER.RESTRICT_OFF' | translate"
+        ></app-custom-toggle>
+      </div>
+
+      <div
+        class="filter-dialog-field"
+        *ngIf="filterDialogType === 'category' && filterDialogRestrictCategory"
+      >
+        <app-custom-multiselect
+          [options]="filterDialogCategoryValues"
+          [(ngModel)]="filterDialogCategoryAllowList"
+          (ngModelChange)="onCategoryAllowListChange()"
+          [label]="'ANALYSES.FILTER.ALLOWED_VALUES' | translate"
+          optionValue="value"
+          [placeholder]="
+            isLoadingFilterValues
+              ? ('ANALYSES.LOADING_VALUES' | translate)
+              : ('ANALYSES.FILTER.SELECT_ALLOWED_VALUES' | translate)
+          "
+          [filter]="true"
+          display="chip"
+          [maxSelectedLabels]="3"
+          [selectedItemsLabel]="'ANALYSES.FILTER_N_SELECTED' | translate"
+          appendTo="body"
+          icon="pi-check-square"
+        ></app-custom-multiselect>
+        <small class="field-hint">
+          <i class="pi pi-info-circle"></i>
+          {{ 'ANALYSES.FILTER.ALLOWED_VALUES_HINT' | translate }}
+        </small>
+      </div>
+
       <!-- Category — default-value control is chosen by the control
            type: 'dropdown' (Single Select) → single-pick app-custom-dropdown,
-           'list' (Multi Select) → app-custom-multiselect. Both share
-           the same options list (filterDialogCategoryValues) and the
-           same stale-defaults UI underneath. -->
+           'list' (Multi Select) → app-custom-multiselect. Options come
+           from categoryDefaultOptions so the default can only be one of
+           the curated values when the allow-list is active. -->
       <div
         class="filter-dialog-field"
         *ngIf="
@@ -261,7 +353,7 @@
         "
       >
         <app-custom-dropdown
-          [options]="filterDialogCategoryValues"
+          [options]="categoryDefaultOptions"
           [(ngModel)]="filterDialogDefaultValue"
           [label]="'ANALYSES.DEFAULT_VALUE_LABEL' | translate"
           optionLabel="label"
@@ -288,7 +380,7 @@
         "
       >
         <app-custom-multiselect
-          [options]="filterDialogCategoryValues"
+          [options]="categoryDefaultOptions"
           [(ngModel)]="filterDialogDefaultValue"
           [label]="'ANALYSES.DEFAULT_VALUES' | translate"
           optionValue="value"
@@ -404,10 +496,16 @@
         ></app-custom-calendar>
       </div>
 
-      <!-- Time range -->
+      <!-- Time range — absolute custom range. Only shown when the
+           relative preset is 'custom'; a live preset (Last 7 days, MTD,
+           …) resolves its range at apply time so there's nothing to
+           author here. -->
       <div
         class="filter-dialog-field"
-        *ngIf="filterDialogType === 'time_range'"
+        *ngIf="
+          filterDialogType === 'time_range' &&
+          filterDialogRelativePreset === 'custom'
+        "
       >
         <app-custom-daterange
           [(ngModel)]="filterDialogDefaultValue"
@@ -423,6 +521,21 @@
           [numberOfMonths]="2"
           appendTo="body"
         ></app-custom-daterange>
+      </div>
+
+      <!-- Live-preset summary — replaces the manual picker so the author
+           sees what the chosen preset resolves to right now. -->
+      <div
+        class="filter-dialog-field"
+        *ngIf="
+          filterDialogType === 'time_range' &&
+          filterDialogRelativePreset !== 'custom'
+        "
+      >
+        <small class="field-hint">
+          <i class="pi pi-clock"></i>
+          {{ 'ANALYSES.FILTER.RELATIVE_PRESET_ACTIVE' | translate }}
+        </small>
       </div>
     </section>
   </div>
