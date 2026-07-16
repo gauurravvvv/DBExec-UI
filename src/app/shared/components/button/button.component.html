@@ -1,0 +1,20 @@
+<button
+  [type]="type"
+  class="app-btn"
+  [ngClass]="[
+    'v-' + variant,
+    'sz-' + size,
+    block ? 'is-block' : '',
+    isIconOnly ? 'is-icon' : '',
+    loading ? 'is-loading' : ''
+  ]"
+  [disabled]="disabled || loading"
+  [attr.title]="title || null"
+  [attr.aria-label]="isIconOnly ? (title || null) : null"
+  (click)="onClick($event)"
+>
+  <i *ngIf="loading" class="app-btn-ico pi pi-spin pi-spinner"></i>
+  <i *ngIf="!loading && icon" class="app-btn-ico" [ngClass]="icon"></i>
+  <span *ngIf="!isIconOnly" class="app-btn-label"><ng-content></ng-content></span>
+  <i *ngIf="!loading && trailingIcon" class="app-btn-ico trailing" [ngClass]="trailingIcon"></i>
+</button>

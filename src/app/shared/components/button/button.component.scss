@@ -1,0 +1,123 @@
+/* app-button — single tokenised action button. All colour/radius/size from
+   _theme-variables.scss so it tracks the theme (incl. dark). */
+
+:host {
+  display: inline-flex;
+  vertical-align: middle;
+}
+:host(.block-host) {
+  display: flex;
+  width: 100%;
+}
+
+.app-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  font-family: var(--font-ui);
+  font-size: var(--fs-control);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-snug);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--motion-fast) var(--ease-out),
+    border-color var(--motion-fast) var(--ease-out),
+    color var(--motion-fast) var(--ease-out),
+    opacity var(--motion-fast) var(--ease-out);
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .app-btn-ico {
+    font-size: 0.9em;
+    line-height: 1;
+  }
+}
+
+.app-btn.is-block {
+  width: 100%;
+}
+.app-btn.is-loading {
+  cursor: progress;
+}
+
+/* ── sizes ─────────────────────────────────────────────── */
+.app-btn.sz-sm {
+  padding: 5px 11px;
+  font-size: var(--fs-label);
+  gap: 6px;
+}
+.app-btn.sz-lg {
+  padding: 11px 22px;
+  font-size: var(--fs-body);
+}
+
+/* ── icon-only (square) ────────────────────────────────── */
+.app-btn.is-icon {
+  padding: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  &.sz-sm { width: 28px; height: 28px; }
+  &.sz-lg { width: 40px; height: 40px; }
+  .app-btn-ico { font-size: 1em; }
+}
+
+/* ── variants ──────────────────────────────────────────── */
+.app-btn.v-primary {
+  background: var(--primary-color);
+  color: var(--primary-text);
+  &:hover:not(:disabled) { background: var(--primary-hover); }
+}
+
+.app-btn.v-secondary {
+  background: transparent;
+  border-color: var(--border-color);
+  color: var(--text-color);
+  &:hover:not(:disabled) {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+}
+
+.app-btn.v-ghost {
+  background: transparent;
+  color: var(--text-color);
+  &:hover:not(:disabled) {
+    background: var(--hover-bg, rgba(0, 0, 0, 0.05));
+  }
+}
+
+.app-btn.v-danger {
+  background: var(--error-color);
+  color: #fff;
+  &:hover:not(:disabled) { filter: brightness(0.94); }
+}
+
+/* icon variant = ghost-shaped square by default; callers set tone via a
+   wrapping class or the danger/primary variant + is-icon if they need it.
+   Base icon look is subtle/neutral. */
+.app-btn.v-icon {
+  background: transparent;
+  color: var(--text-muted);
+  &:hover:not(:disabled) {
+    background: var(--hover-bg, rgba(0, 0, 0, 0.05));
+    color: var(--primary-color);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-btn { transition: none; }
+}
