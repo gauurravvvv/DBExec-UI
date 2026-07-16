@@ -706,6 +706,18 @@
                 [pTooltip]="'ANALYSES.TABS.RENAME' | translate"
                 tooltipPosition="bottom"
               ></i>
+              <!-- Duplicate tab (Slice F, item 2) — clones the tab + all its
+                   visuals into a new "… (copy)" tab. -->
+              <app-button
+                variant="icon"
+                size="sm"
+                icon="pi pi-clone"
+                class="tab-act-btn"
+                [loading]="duplicatingTab"
+                [disabled]="isTabBusy"
+                [title]="'ANALYSES.AUTHORING.DUPLICATE_TAB' | translate"
+                (clicked)="duplicateTab(tab, $event)"
+              ></app-button>
               <i
                 class="pi pi-times tab-act tab-act--danger"
                 *ngIf="tabs.length > 1"
@@ -876,6 +888,62 @@
                 [pTooltip]="'ANALYSES.MAXIMIZE' | translate"
                 tooltipPosition="top"
               ></i>
+
+              <!-- Full-screen focus (Slice F, item 5) — expands this visual
+                   into the maximized overlay (ESC / backdrop / × to close). -->
+              <app-button
+                *ngIf="
+                  visual.chartType &&
+                  (hasRequiredChartFields(visual) ||
+                    isLines3dChartType(visual.chartType) ||
+                    isPolygons3dChartType(visual.chartType))
+                "
+                variant="icon"
+                size="sm"
+                icon="pi pi-expand"
+                class="visual-action-btn"
+                [title]="'ANALYSES.AUTHORING.FOCUS' | translate"
+                (clicked)="focusVisual(visual, $event)"
+              ></app-button>
+
+              <!-- Duplicate visual (Slice F, item 1) — clones the visual +
+                   its config into the same tab as "… (copy)". -->
+              <app-button
+                variant="icon"
+                size="sm"
+                icon="pi pi-copy"
+                class="visual-action-btn"
+                [loading]="duplicatingVisualId === visual.id"
+                [disabled]="!!duplicatingVisualId"
+                [title]="'ANALYSES.AUTHORING.DUPLICATE' | translate"
+                (clicked)="duplicateVisual(visual, $event)"
+              ></app-button>
+
+              <!-- Export PNG (Slice F, item 3) — ECharts data-URL download.
+                   Skipped gracefully for table visuals (no chart instance). -->
+              <app-button
+                *ngIf="
+                  visual.chartType && !isTableChartType(visual.chartType)
+                "
+                variant="icon"
+                size="sm"
+                icon="pi pi-image"
+                class="visual-action-btn"
+                [title]="'ANALYSES.AUTHORING.EXPORT_PNG' | translate"
+                (clicked)="exportVisualPng(visual, $event)"
+              ></app-button>
+
+              <!-- Export CSV (Slice F, item 3) — current underlying rows.
+                   Always available, including for table visuals. -->
+              <app-button
+                *ngIf="visual.chartType"
+                variant="icon"
+                size="sm"
+                icon="pi pi-file-export"
+                class="visual-action-btn"
+                [title]="'ANALYSES.AUTHORING.EXPORT_CSV' | translate"
+                (clicked)="exportVisualCsv(visual, $event)"
+              ></app-button>
               <i
                 *ngIf="tabs.length > 1"
                 class="pi pi-arrow-right-arrow-left action-icon move-tab-icon"

@@ -1592,6 +1592,19 @@
       "TYPE_TABLE": "Tabelle",
       "TYPE_KPI": "KPI"
     },
+    "AUTHORING": {
+      "DUPLICATE": "Duplizieren",
+      "DUPLICATE_TAB": "Registerkarte duplizieren",
+      "EXPORT_PNG": "PNG exportieren",
+      "EXPORT_CSV": "CSV exportieren",
+      "FOCUS": "Fokus",
+      "SEARCH_FIELDS": "Felder suchen",
+      "COPY_SUFFIX": "(Kopie)",
+      "TAB_DUPLICATED": "Registerkarte dupliziert",
+      "EXPORT_PNG_TABLE_SKIP": "Der PNG-Export ist für Tabellenvisualisierungen nicht verfügbar. Verwenden Sie stattdessen CSV.",
+      "EXPORT_PNG_UNAVAILABLE": "Das Diagrammbild ist noch nicht bereit. Versuchen Sie es gleich erneut.",
+      "EXPORT_CSV_EMPTY": "Nichts zu exportieren – diese Visualisierung enthält noch keine Daten."
+    },
     "AGG": {
       "DIMENSION": "Dimension",
       "DIMENSION_PH": "Nach Spalte gruppieren",

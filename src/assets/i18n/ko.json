@@ -1592,6 +1592,19 @@
       "TYPE_TABLE": "테이블",
       "TYPE_KPI": "KPI"
     },
+    "AUTHORING": {
+      "DUPLICATE": "복제",
+      "DUPLICATE_TAB": "탭 복제",
+      "EXPORT_PNG": "PNG 내보내기",
+      "EXPORT_CSV": "CSV 내보내기",
+      "FOCUS": "포커스",
+      "SEARCH_FIELDS": "필드 검색",
+      "COPY_SUFFIX": "(복사본)",
+      "TAB_DUPLICATED": "탭이 복제되었습니다",
+      "EXPORT_PNG_TABLE_SKIP": "PNG 내보내기는 테이블 시각화에서 사용할 수 없습니다. 대신 CSV를 사용하세요.",
+      "EXPORT_PNG_UNAVAILABLE": "차트 이미지가 아직 준비되지 않았습니다. 잠시 후 다시 시도하세요.",
+      "EXPORT_CSV_EMPTY": "내보낼 항목이 없습니다. 이 시각화에는 아직 데이터가 없습니다."
+    },
     "AGG": {
       "DIMENSION": "차원",
       "DIMENSION_PH": "열 기준 그룹화",

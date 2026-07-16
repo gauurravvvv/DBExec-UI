@@ -11,6 +11,7 @@ import { AssetExplorerComponent } from 'src/app/shared/components/asset-explorer
 import { FolderLocationFieldComponent } from 'src/app/shared/components/folder-location-field/folder-location-field.component';
 import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedChartsModule } from 'src/app/shared/modules/shared-charts.module';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -79,6 +80,9 @@ import {
     FolderLocationFieldComponent,
     // Canonical shared chip / status-pill / count / tag / filter element.
     ChipComponent,
+    // Canonical shared button — used for the Slice F authoring actions
+    // (duplicate visual/tab, export PNG/CSV, focus).
+    ButtonComponent,
     // NgRx feature stores. Two slices — dataset cache + filter slice.
     StoreModule.forFeature(ADD_ANALYSES_FEATURE_KEY, addAnalysesReducer),
     StoreModule.forFeature(ANALYSES_FILTER_FEATURE_KEY, analysesFilterReducer),

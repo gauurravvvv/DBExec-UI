@@ -1592,6 +1592,19 @@
       "TYPE_TABLE": "Tabel",
       "TYPE_KPI": "KPI"
     },
+    "AUTHORING": {
+      "DUPLICATE": "Dupliceren",
+      "DUPLICATE_TAB": "Tabblad dupliceren",
+      "EXPORT_PNG": "PNG exporteren",
+      "EXPORT_CSV": "CSV exporteren",
+      "FOCUS": "Focus",
+      "SEARCH_FIELDS": "Velden zoeken",
+      "COPY_SUFFIX": "(kopie)",
+      "TAB_DUPLICATED": "Tabblad gedupliceerd",
+      "EXPORT_PNG_TABLE_SKIP": "PNG-export is niet beschikbaar voor tabelvisuals. Gebruik in plaats daarvan CSV.",
+      "EXPORT_PNG_UNAVAILABLE": "De grafiekafbeelding is nog niet klaar. Probeer het zo opnieuw.",
+      "EXPORT_CSV_EMPTY": "Niets om te exporteren — deze visual heeft nog geen gegevens."
+    },
     "AGG": {
       "DIMENSION": "Dimensie",
       "DIMENSION_PH": "Groeperen op kolom",

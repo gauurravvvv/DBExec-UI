@@ -9,8 +9,10 @@ import {
   inject,
   OnDestroy,
   OnInit,
+  QueryList,
   signal,
   ViewChild,
+  ViewChildren,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -41,6 +43,14 @@ import {
 } from '../../constants/charts.constants';
 import { createVisual, Visual } from '../../models';
 import { RoleKey } from '../../models/visual.model';
+import { ChartRendererComponent } from '../chart-renderer/chart-renderer.component';
+import {
+  columnsFromRows,
+  downloadDataUrl,
+  downloadTextFile,
+  rowsToCsv,
+  safeFileStem,
+} from '../../utils/visual-export.util';
 import type { ParameterValue } from '../../models/analysis-parameter.model';
 import { ChartDataTransformerService } from '../../services';
 import { AnalysesService } from '../../services/analyses.service';
@@ -334,6 +344,22 @@ export class EditAnalysesComponent
 
   // Canvas container reference and dimensions for responsive sizing
   @ViewChild('canvasContainer') canvasContainer!: ElementRef<HTMLDivElement>;
+
+  /**
+   * Every chart-renderer currently painted on the canvas — one per visual
+   * (each bound via `[visual]`). The per-visual "Export PNG" action matches
+   * on the bound visual id to find the right renderer and pull its live
+   * ECharts data-URL. Rebuilt automatically by Angular whenever the canvas
+   * re-renders (tab switch, add/remove/duplicate visual).
+   */
+  @ViewChildren(ChartRendererComponent)
+  chartRenderers!: QueryList<ChartRendererComponent>;
+
+  // ── Authoring QoL busy flags (Slice F) ───────────────────────────────
+  /** Per-visual duplicate in flight, keyed by source visual id. */
+  duplicatingVisualId: string | null = null;
+  /** Tab-duplicate in flight (reuses isTabBusy semantics but named for clarity). */
+  duplicatingTab = false;
   canvasWidth: number = 1000; // Default fallback
   canvasHeight: number = 600; // Default fallback
 
@@ -2141,6 +2167,254 @@ export class EditAnalysesComponent
 
   trackByVisualId(index: number, visual: Visual): string {
     return visual.id;
+  }
+
+  // ─── Duplicate / export / focus (Slice F) ────────────────────────────
+
+  /**
+   * Build the flattened create-payload the `POST /visuals/:analysisId`
+   * endpoint expects from a source visual. Mirrors the field set the bulk
+   * save (handleSaveDialogClose) persists, so a duplicate round-trips
+   * identically. `overrides` lets the caller stamp a new title / tabId /
+   * position without mutating the source.
+   */
+  private buildVisualCreatePayload(
+    source: Visual,
+    overrides: Partial<{
+      title: string;
+      tabId: string | null;
+      colSpan: number;
+      rowSpan: number;
+    }> = {},
+  ): any {
+    return {
+      title: overrides.title ?? source.title,
+      tabId: overrides.tabId ?? source.tabId ?? null,
+      colSpan: overrides.colSpan ?? source.colSpan,
+      rowSpan: overrides.rowSpan ?? source.rowSpan,
+      widthRatio: source.widthRatio,
+      heightRatio: source.heightRatio,
+      xRatio: source.xRatio,
+      yRatio: source.yRatio,
+      chartType: source.chartType,
+      xAxisColumn: source.xAxisColumn || null,
+      yAxisColumn: source.yAxisColumn || null,
+      zAxisColumn: source.zAxisColumn || null,
+      dimensionColumn: source.dimensionColumn || null,
+      measureColumn: source.measureColumn || null,
+      aggregate: source.aggregate || null,
+      // Deep-clone the config blob so the copy owns its own object graph —
+      // otherwise later edits to one would bleed into the other in memory
+      // before the next reload.
+      config: source.config
+        ? JSON.parse(JSON.stringify(source.config))
+        : null,
+      crossFilterEnabled: !!source.crossFilterEnabled,
+      drillDimensions: Array.isArray(source.drillDimensions)
+        ? [...source.drillDimensions]
+        : [],
+    };
+  }
+
+  /**
+   * Localised "… (copy)" title, capped so repeated duplication doesn't grow
+   * unbounded. Uses the i18n COPY_SUFFIX so the label reads naturally per
+   * locale.
+   */
+  private copyTitle(title: string): string {
+    const suffix = this.translate.instant('ANALYSES.AUTHORING.COPY_SUFFIX');
+    return `${title} ${suffix}`.trim();
+  }
+
+  /**
+   * Duplicate a single visual (item 1). Clones the Visual + its VisualConfig
+   * via the create endpoint using the source's flattened config, with a
+   * "(copy)" title, the same owning tab, and a small position offset (one
+   * extra grid row's worth of rowSpan shift is handled by the auto-placer on
+   * reload). Refreshes the canvas from the server so ids / sequence stay
+   * authoritative.
+   */
+  duplicateVisual(visual: Visual, event?: Event): void {
+    if (event) event.stopPropagation();
+    if (this.duplicatingVisualId || !this.analysisId) return;
+    this.duplicatingVisualId = visual.id;
+    this.cdr.markForCheck();
+
+    const payload = this.buildVisualCreatePayload(visual, {
+      title: this.copyTitle(visual.title),
+      tabId: visual.tabId ?? this.activeTabId ?? null,
+    });
+
+    this.analysesService
+      .addVisual(this.analysisId, payload)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, true)) {
+          // Server owns visual ids + placement; reload the hydrated list so
+          // the clone appears with its real id and the grid re-packs.
+          this.loadAllVisuals();
+        }
+        this.cdr.markForCheck();
+      })
+      .catch((err: any) => {
+        this.globalService.handleErrorService(err);
+        this.cdr.markForCheck();
+      })
+      .finally(() => {
+        this.duplicatingVisualId = null;
+        this.cdr.markForCheck();
+      });
+  }
+
+  /**
+   * Duplicate a tab and all its visuals (item 2). No BE deep-copy endpoint
+   * exists, so we do it client-side: create the new tab, then create each
+   * source visual under the new tabId. Kept deliberately simple — sequential
+   * awaits so a failure surfaces on the offending visual rather than racing.
+   * Switches to the new tab and reloads the canvas at the end.
+   */
+  async duplicateTab(tab: AnalysisTab, event?: Event): Promise<void> {
+    if (event) event.stopPropagation();
+    if (this.duplicatingTab || this.isTabBusy || !this.analysisId) return;
+    this.duplicatingTab = true;
+    this.isTabBusy = true;
+    this.cdr.markForCheck();
+
+    try {
+      // Snapshot the source tab's visuals BEFORE creating the new tab so a
+      // concurrent reload can't shift the set under us.
+      const sourceVisuals = this.visuals.filter(
+        v => (v.tabId ?? this.firstTabId) === tab.id,
+      );
+
+      const tabRes: any = await this.analysisTabsService.add({
+        analysisId: this.analysisId,
+        name: this.copyTitle(tab.name),
+        icon: tab.icon ?? null,
+        sequence: this.tabs.length,
+      });
+      if (!this.globalService.handleSuccessService(tabRes, false)) {
+        return;
+      }
+      const newTab: AnalysisTab = tabRes.data?.tab ?? tabRes.data;
+      if (!newTab || !newTab.id) return;
+
+      this.tabs = [...this.tabs, newTab];
+
+      // Create each source visual under the new tab. Sequential so errors
+      // are attributable and we don't hammer the BE with a burst.
+      for (const sv of sourceVisuals) {
+        const payload = this.buildVisualCreatePayload(sv, {
+          tabId: newTab.id,
+        });
+        const vRes: any = await this.analysesService.addVisual(
+          this.analysisId,
+          payload,
+        );
+        // Non-fatal per visual — surface but keep going so a single bad
+        // visual doesn't abandon the rest of the copied tab.
+        this.globalService.handleSuccessService(vRes, false);
+      }
+
+      this.globalService.showInfo(
+        this.translate.instant('ANALYSES.AUTHORING.TAB_DUPLICATED'),
+      );
+      this.activeTabId = newTab.id;
+      // Reload so the copied visuals hydrate with their real ids under the
+      // new tab, then re-place them on the grid for the now-active tab.
+      this.loadAllVisuals();
+    } catch (err) {
+      this.globalService.handleErrorService(err);
+    } finally {
+      this.duplicatingTab = false;
+      this.isTabBusy = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * Find the live chart-renderer for a visual by matching the
+   * `data-visual-id` attribute the template stamps on each renderer's host.
+   * Returns undefined for table/card visuals or when the canvas hasn't
+   * painted the visual yet.
+   */
+  private rendererForVisual(
+    visualId: string,
+  ): ChartRendererComponent | undefined {
+    if (!this.chartRenderers) return undefined;
+    return this.chartRenderers.find(
+      r => (r.visual?.id ?? null) === visualId,
+    );
+  }
+
+  /**
+   * Export a visual as a PNG (item 3). Pulls the live ECharts data-URL via
+   * the renderer → echart-visual chain and triggers a download. Non-ECharts
+   * visuals (tables) have no chart instance, so PNG is skipped with a gentle
+   * info toast rather than a hard error.
+   */
+  exportVisualPng(visual: Visual, event?: Event): void {
+    if (event) event.stopPropagation();
+    if (isTableChartType(visual.chartType)) {
+      this.globalService.showInfo(
+        this.translate.instant('ANALYSES.AUTHORING.EXPORT_PNG_TABLE_SKIP'),
+      );
+      return;
+    }
+    const renderer = this.rendererForVisual(visual.id);
+    const dataUrl = renderer?.getPngDataUrl() ?? null;
+    if (!dataUrl) {
+      this.globalService.showInfo(
+        this.translate.instant('ANALYSES.AUTHORING.EXPORT_PNG_UNAVAILABLE'),
+      );
+      return;
+    }
+    downloadDataUrl(dataUrl, `${safeFileStem(visual.title)}.png`);
+  }
+
+  /**
+   * Export a visual's current underlying rows as CSV (item 3). For tables the
+   * rows are the raw dataset projection; for charts they're the shaped
+   * chartData the visual is rendering. Column order is derived from the rows
+   * so the export mirrors exactly what's on screen. Always available — even
+   * for table visuals that can't produce a PNG.
+   */
+  exportVisualCsv(visual: Visual, event?: Event): void {
+    if (event) event.stopPropagation();
+    const rows: any[] = Array.isArray(visual.chartData) ? visual.chartData : [];
+    if (!rows.length) {
+      this.globalService.showInfo(
+        this.translate.instant('ANALYSES.AUTHORING.EXPORT_CSV_EMPTY'),
+      );
+      return;
+    }
+    const columns = columnsFromRows(rows);
+    const csv = rowsToCsv(columns, rows);
+    downloadTextFile(
+      csv,
+      `${safeFileStem(visual.title)}.csv`,
+      'text/csv;charset=utf-8',
+    );
+  }
+
+  /**
+   * Full-screen focus toggle for a single visual (item 5). Reuses the
+   * existing maximized-visual overlay which re-renders the chart large; the
+   * overlay closes on backdrop click, its close button, or ESC (see the
+   * host ESC handler below).
+   */
+  focusVisual(visual: Visual, event?: Event): void {
+    if (event) event.stopPropagation();
+    this.maximizedVisual = visual;
+    this.cdr.markForCheck();
+  }
+
+  /** ESC closes the full-screen focus overlay when one is open. */
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    if (this.maximizedVisual) {
+      this.minimizeVisual();
+      this.cdr.markForCheck();
+    }
   }
 
   trackById(index: number, item: any): any {

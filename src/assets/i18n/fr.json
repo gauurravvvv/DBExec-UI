@@ -1592,6 +1592,19 @@
       "TYPE_TABLE": "Tableau",
       "TYPE_KPI": "KPI"
     },
+    "AUTHORING": {
+      "DUPLICATE": "Dupliquer",
+      "DUPLICATE_TAB": "Dupliquer l'onglet",
+      "EXPORT_PNG": "Exporter en PNG",
+      "EXPORT_CSV": "Exporter en CSV",
+      "FOCUS": "Focus",
+      "SEARCH_FIELDS": "Rechercher des champs",
+      "COPY_SUFFIX": "(copie)",
+      "TAB_DUPLICATED": "Onglet dupliqué",
+      "EXPORT_PNG_TABLE_SKIP": "L'export PNG n'est pas disponible pour les visualisations de type tableau. Utilisez plutôt le CSV.",
+      "EXPORT_PNG_UNAVAILABLE": "L'image du graphique n'est pas encore prête. Réessayez dans un instant.",
+      "EXPORT_CSV_EMPTY": "Rien à exporter : cette visualisation n'a pas encore de données."
+    },
     "AGG": {
       "DIMENSION": "Dimension",
       "DIMENSION_PH": "Grouper par colonne",

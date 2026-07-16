@@ -256,4 +256,26 @@ export class EchartVisualComponent
   onChartClick(event: any): void {
     this.chartSelect.emit(event);
   }
+
+  /**
+   * Export the current chart as a PNG data URL. Returns null when the
+   * ECharts instance hasn't initialised yet (render gate still closed,
+   * chart disposed) so callers can degrade gracefully. `pixelRatio: 2`
+   * yields a crisp 2× raster; the white background keeps the export
+   * readable when pasted onto light surfaces (ECharts defaults to a
+   * transparent canvas).
+   */
+  getPngDataUrl(): string | null {
+    const ec = this.echartsInstance;
+    if (!ec || typeof ec.getDataURL !== 'function') return null;
+    try {
+      return ec.getDataURL({
+        type: 'png',
+        pixelRatio: 2,
+        backgroundColor: '#fff',
+      });
+    } catch {
+      return null;
+    }
+  }
 }

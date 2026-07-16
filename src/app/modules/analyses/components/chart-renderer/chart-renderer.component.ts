@@ -6,7 +6,9 @@ import {
   OnChanges,
   Output,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
+import { EchartVisualComponent } from 'src/app/shared/components/echart-visual/echart-visual.component';
 import {
   getChartRoles,
   isCardChartType,
@@ -68,6 +70,14 @@ export class ChartRendererComponent implements OnChanges {
 
   /** Shallow clone of `visual.config` rebuilt on every configVersion bump. */
   chartConfigRef: any = {};
+
+  /**
+   * The inner ECharts visual, present only when this renderer is showing an
+   * ECharts-backed chart (not a table / card). Used by the parent's per-visual
+   * "Export PNG" action to reach the live ECharts instance for getDataURL().
+   * Undefined for table/card visuals — the caller falls back gracefully.
+   */
+  @ViewChild(EchartVisualComponent) private echartVisual?: EchartVisualComponent;
 
   isCardChartType = isCardChartType;
   isTableChartType = isTableChartType;
@@ -139,5 +149,15 @@ export class ChartRendererComponent implements OnChanges {
     // there, and tooltips fired on fake values). The parent
     // template's empty-state branches own the "no data" UX now.
     return visual?.chartData ?? [];
+  }
+
+  /**
+   * PNG data URL of the currently-rendered ECharts chart, or null when
+   * this visual isn't ECharts-backed (table / card) or the chart hasn't
+   * initialised. Delegates to the inner echart-visual's getPngDataUrl().
+   * Used by the edit canvas's per-visual "Export PNG" action.
+   */
+  getPngDataUrl(): string | null {
+    return this.echartVisual?.getPngDataUrl() ?? null;
   }
 }

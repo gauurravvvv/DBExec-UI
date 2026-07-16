@@ -1592,6 +1592,19 @@
       "TYPE_TABLE": "表格",
       "TYPE_KPI": "KPI"
     },
+    "AUTHORING": {
+      "DUPLICATE": "复制",
+      "DUPLICATE_TAB": "复制标签页",
+      "EXPORT_PNG": "导出 PNG",
+      "EXPORT_CSV": "导出 CSV",
+      "FOCUS": "聚焦",
+      "SEARCH_FIELDS": "搜索字段",
+      "COPY_SUFFIX": "（副本）",
+      "TAB_DUPLICATED": "标签页已复制",
+      "EXPORT_PNG_TABLE_SKIP": "PNG 导出不适用于表格可视化。请改用 CSV。",
+      "EXPORT_PNG_UNAVAILABLE": "图表图像尚未就绪。请稍后重试。",
+      "EXPORT_CSV_EMPTY": "没有可导出的内容——此可视化尚无数据。"
+    },
     "AGG": {
       "DIMENSION": "维度",
       "DIMENSION_PH": "按列分组",

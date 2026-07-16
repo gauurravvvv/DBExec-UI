@@ -1592,6 +1592,19 @@
       "TYPE_TABLE": "テーブル",
       "TYPE_KPI": "KPI"
     },
+    "AUTHORING": {
+      "DUPLICATE": "複製",
+      "DUPLICATE_TAB": "タブを複製",
+      "EXPORT_PNG": "PNG をエクスポート",
+      "EXPORT_CSV": "CSV をエクスポート",
+      "FOCUS": "フォーカス",
+      "SEARCH_FIELDS": "フィールドを検索",
+      "COPY_SUFFIX": "(コピー)",
+      "TAB_DUPLICATED": "タブを複製しました",
+      "EXPORT_PNG_TABLE_SKIP": "PNG エクスポートはテーブルビジュアルでは利用できません。代わりに CSV を使用してください。",
+      "EXPORT_PNG_UNAVAILABLE": "チャート画像はまだ準備できていません。しばらくしてからもう一度お試しください。",
+      "EXPORT_CSV_EMPTY": "エクスポートするものがありません。このビジュアルにはまだデータがありません。"
+    },
     "AGG": {
       "DIMENSION": "ディメンション",
       "DIMENSION_PH": "列でグループ化",

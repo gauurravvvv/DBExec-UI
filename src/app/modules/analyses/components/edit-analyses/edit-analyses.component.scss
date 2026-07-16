@@ -3967,6 +3967,39 @@
       color: var(--primary-color);
       background: rgba(var(--primary-color-rgb), 0.12);
     }
+
+    // Slice F authoring actions (app-button, variant="icon"): duplicate,
+    // export PNG/CSV, focus. Sized to sit flush with the .action-icon glyphs.
+    .visual-action-btn {
+      display: inline-flex;
+
+      ::ng-deep .app-btn.is-icon {
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+        padding: 0;
+        border-radius: var(--a-radius-sm);
+        color: var(--text-muted);
+        background: transparent;
+        transition:
+          color var(--motion-fast) ease,
+          background var(--motion-fast) ease;
+
+        .app-btn-ico {
+          font-size: 12px;
+        }
+
+        &:hover:not(:disabled) {
+          color: var(--primary-color);
+          background: var(--a-bg-hover);
+        }
+
+        &:disabled {
+          opacity: 0.4;
+          cursor: default;
+        }
+      }
+    }
   }
 }
 
@@ -4641,6 +4674,36 @@
 
     &--danger:hover {
       color: var(--error-color);
+    }
+  }
+
+  // Slice F — duplicate-tab action (app-button, variant="icon"), sized to
+  // sit inline with the .tab-act glyphs in the tab-header action row.
+  .tab-act-btn {
+    display: inline-flex;
+
+    ::ng-deep .app-btn.is-icon {
+      width: auto;
+      min-width: 0;
+      height: auto;
+      padding: 2px;
+      border-radius: var(--radius-xs);
+      color: var(--text-muted);
+      background: transparent;
+
+      .app-btn-ico {
+        font-size: var(--fs-micro);
+      }
+
+      &:hover:not(:disabled) {
+        color: var(--primary-color);
+        background: var(--hover-background);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
     }
   }
 }
