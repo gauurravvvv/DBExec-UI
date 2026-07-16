@@ -63,7 +63,11 @@ import {
   AnalysisWidget,
   AnalysisWidgetsService,
 } from '../../services/analysis-widgets.service';
-import { fieldFitsRole, ROLE_EXPECTED_KIND } from '../../utils/field-type.util';
+import {
+  fieldFitsRoleMeta,
+  ROLE_EXPECTED_KIND,
+  defaultAggregationOf,
+} from '../../utils/field-type.util';
 import type { AnalysisParameter } from '../../models/analysis-parameter.model';
 import type { CrossFilterEvent } from '../../models/interaction.model';
 import {
@@ -287,16 +291,43 @@ export class EditAnalysesComponent
     this._cachedAllFields = [...datasetFields, ...analysisFields];
   }
 
+  /**
+   * "Show hidden fields" toggle. The BE now marks fields isVisible=false and
+   * returns them separately (hiddenDatasetFields); the picker hides those by
+   * default. This toggle reveals them for the rare case an author needs a
+   * hidden column. Off by default.
+   */
+  showHiddenFields = false;
+
+  /**
+   * A field is hidden from the default picker when its BE metadata carries
+   * isVisible === false. Defensive: only an explicit `false` hides — undefined/
+   * null (legacy fields with no metadata) stays visible, so nothing regresses.
+   * Analysis-scoped custom fields are never treated as hidden.
+   */
+  private isFieldHidden(field: any): boolean {
+    return field?._scope === 'dataset' && field?.isVisible === false;
+  }
+
+  /** True when any dataset field is marked isVisible=false (drives the toggle). */
+  get hasHiddenFields(): boolean {
+    return this._cachedAllFields.some((f: any) => this.isFieldHidden(f));
+  }
+
   // Filtered fields based on search query
   get filteredDatasetFields(): any[] {
     const fields = this._cachedAllFields;
     if (!fields.length) {
       return [];
     }
+    // Exclude isVisible=false fields unless the author opted to show hidden.
+    const visible = this.showHiddenFields
+      ? fields
+      : fields.filter((field: any) => !this.isFieldHidden(field));
     if (!this.datasetFieldsSearchQuery) {
-      return fields;
+      return visible;
     }
-    return fields.filter((field: any) =>
+    return visible.filter((field: any) =>
       field.columnToView
         .toLowerCase()
         .includes(this.datasetFieldsSearchQuery.toLowerCase()),
@@ -2836,7 +2867,9 @@ export class EditAnalysesComponent
    */
   fieldFitsActiveRole(field: any): boolean {
     if (!this.activeAxisSelection) return true;
-    return fieldFitsRole(this.activeAxisSelection, field?.dataType);
+    // Metadata-aware: honours the field's BE `role` (measure/dimension) when
+    // present, falling back to the dataType heuristic for legacy fields.
+    return fieldFitsRoleMeta(this.activeAxisSelection, field);
   }
 
   /** True when the active role constrains the field type AND this field
@@ -2894,6 +2927,11 @@ export class EditAnalysesComponent
         // valueColumns) keep the active selection open so the user can
         // pick more columns without re-clicking the slot.
         this.applyRoleSelection(visual, this.activeAxisSelection, fieldName);
+        // Field-metadata consumption: when a measure lands on a value role and
+        // the field declares a defaultAggregation, pre-select it — but only if
+        // the visual has no aggregate yet, so we never clobber an author's
+        // explicit choice. Additive; no-op for fields without the metadata.
+        this.applyDefaultAggregation(visual, this.activeAxisSelection, field);
         this.updateVisualChartData(visual);
         const stayOpen =
           this.activeAxisSelection === 'indicators' ||
@@ -2978,6 +3016,35 @@ export class EditAnalysesComponent
         break;
       }
     }
+  }
+
+  /**
+   * Roles that carry a measure (a quantity you aggregate). When a field lands
+   * on one of these AND declares a defaultAggregation, we pre-select it.
+   */
+  private static readonly MEASURE_ROLES = new Set<string>([
+    'yAxis',
+    'zAxis',
+    'valueColumns',
+    'sample',
+  ]);
+
+  /**
+   * Field-metadata consumption (defaultAggregation): when a measure with a
+   * declared defaultAggregation is dropped on a value role and the visual has
+   * no aggregate selected yet, pre-select that aggregate so the author starts
+   * from the field's intended default. Never overwrites an existing choice, and
+   * a no-op for fields without the metadata — purely additive.
+   */
+  private applyDefaultAggregation(
+    visual: any,
+    role: RoleKey,
+    field: any,
+  ): void {
+    if (!EditAnalysesComponent.MEASURE_ROLES.has(role)) return;
+    if (visual.aggregate) return; // respect an explicit prior choice
+    const agg = defaultAggregationOf(field);
+    if (agg) visual.aggregate = agg;
   }
 
   /**

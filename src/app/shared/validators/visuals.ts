@@ -113,6 +113,10 @@ export const AGGREGATE_VALUES = [
   'min',
   'max',
   'count_distinct',
+  'median',
+  'percentile',
+  'stddev',
+  'variance',
 ] as const;
 export type AggregateFn = (typeof AGGREGATE_VALUES)[number];
 

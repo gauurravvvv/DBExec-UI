@@ -91,6 +91,17 @@
           ></app-custom-dropdown>
         </div>
 
+        <!-- Percentile rank P — only when aggregate = percentile. -->
+        <div class="config-group" *ngIf="isPercentileAggregate">
+          <label>{{ 'ANALYSES.AGG.PERCENTILE_LABEL' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="percentileValue"
+            [min]="1"
+            [max]="99"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+
         <!-- Combo: extra measures for multi-measure charts -->
         <div class="config-subsection" *ngIf="focusedVisual.aggregate">
           <div class="config-row">

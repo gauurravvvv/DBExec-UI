@@ -14,6 +14,7 @@
  * ─────────────────────────────────────────────────────────────────────
  */
 import { z } from 'zod';
+import { pivotTotalsConfigSchema } from './pivotTotals';
 
 // ── Standard patterns ──────────────────────────────────────────────
 
@@ -508,6 +509,10 @@ export const AGGREGATE_VALUES = [
   'min',
   'max',
   'count_distinct',
+  'median',
+  'percentile',
+  'stddev',
+  'variance',
 ] as const;
 export type AggregateFn = (typeof AGGREGATE_VALUES)[number];
 
@@ -518,12 +523,26 @@ const aggregationColumnSchema = z.preprocess(
   }),
 );
 
+/**
+ * Percentile P for aggregate='percentile' — the 0..100 rank the dialect-aware
+ * percentile aggregate resolves (e.g. PERCENTILE_CONT). Open interval (0,100);
+ * optional (ignored by every other aggregate). Present on the top-level
+ * aggregation and on each extraMeasures entry so a multi-measure combo can mix
+ * percentiles at different ranks.
+ */
+const percentileSchema = z
+  .number()
+  .gt(0)
+  .lt(100)
+  .optional();
+
 export const runAggregationSchema = z.object({
   aggregate: z.enum(AGGREGATE_VALUES, {
     message: 'validation.analyses.run.aggregation.invalid',
   }),
   dimensionColumn: aggregationColumnSchema,
   measureColumn: aggregationColumnSchema,
+  percentile: percentileSchema,
   extraMeasures: z
     .array(
       z.object({
@@ -532,6 +551,7 @@ export const runAggregationSchema = z.object({
           message: 'validation.analyses.run.aggregation.invalid',
         }),
         alias: aggregationColumnSchema,
+        percentile: percentileSchema,
       }),
     )
     .optional(),
@@ -548,6 +568,9 @@ export const runAnalysisQuerySchema = z.object({
   paramValues: z.record(z.string(), z.any()).optional(),
   // Track D: optional server-side aggregation for the visual being previewed.
   aggregation: runAggregationSchema.optional(),
+  // Feature B: optional pivot totals / subtotals config a table / pivot visual
+  // attaches so the run appends grand-total + per-group subtotal rows.
+  pivotTotals: pivotTotalsConfigSchema.optional(),
   limit: z
     .union([z.number().int(), z.string().regex(/^-?\d+$/)])
     .optional()

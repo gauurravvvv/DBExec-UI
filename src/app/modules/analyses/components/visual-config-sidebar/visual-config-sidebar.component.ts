@@ -321,6 +321,11 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     { label: 'ANALYSES.AGG.MIN', value: 'min' },
     { label: 'ANALYSES.AGG.MAX', value: 'max' },
     { label: 'ANALYSES.AGG.COUNT_DISTINCT', value: 'count_distinct' },
+    // Dialect-aware statistical aggregates (BE: median/percentile/stddev/variance).
+    { label: 'ANALYSES.AGG.MEDIAN', value: 'median' },
+    { label: 'ANALYSES.AGG.PERCENTILE', value: 'percentile' },
+    { label: 'ANALYSES.AGG.STDDEV', value: 'stddev' },
+    { label: 'ANALYSES.AGG.VARIANCE', value: 'variance' },
   ];
 
   /** Aggregate options WITHOUT the "none" entry — for combo extra measures. */
@@ -331,6 +336,10 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     { label: 'ANALYSES.AGG.MIN', value: 'min' },
     { label: 'ANALYSES.AGG.MAX', value: 'max' },
     { label: 'ANALYSES.AGG.COUNT_DISTINCT', value: 'count_distinct' },
+    { label: 'ANALYSES.AGG.MEDIAN', value: 'median' },
+    { label: 'ANALYSES.AGG.PERCENTILE', value: 'percentile' },
+    { label: 'ANALYSES.AGG.STDDEV', value: 'stddev' },
+    { label: 'ANALYSES.AGG.VARIANCE', value: 'variance' },
   ];
 
   /**
@@ -465,6 +474,36 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
   set aggregateValue(v: AggregateFn | '') {
     if (!this.focusedVisual) return;
     this.focusedVisual.aggregate = v ? (v as AggregateFn) : null;
+    // Leaving 'percentile' drops the now-irrelevant P so a later switch back
+    // starts from the default rather than a stale value.
+    if (v !== 'percentile' && this.focusedVisual.config) {
+      delete this.focusedVisual.config.percentile;
+    }
+  }
+
+  /** True when the primary aggregate is 'percentile' — reveals the P input. */
+  get isPercentileAggregate(): boolean {
+    return this.focusedVisual?.aggregate === 'percentile';
+  }
+
+  /**
+   * Percentile rank P (0..100, default 90) for aggregate='percentile'. Bound
+   * into the config blob so it rides on every payload the visual's `config`
+   * already travels on (updateVisual whole-visual PUT, save/publish
+   * visualConfigurations, duplicate) — the same route `aggregate` uses. The BE
+   * run schema reads it off the aggregation object (percentile), resolved
+   * server-side by the dialect-aware PERCENTILE_CONT aggregate.
+   */
+  get percentileValue(): number {
+    const p = this.focusedVisual?.config?.percentile;
+    return typeof p === 'number' && isFinite(p) ? p : 90;
+  }
+  set percentileValue(v: number) {
+    if (!this.focusedVisual?.config) return;
+    // Clamp defensively to the BE's open (0,100) interval; the numeric input's
+    // min/max already constrain the UI but a raw model write could exceed it.
+    const clamped = Math.min(99, Math.max(1, Math.round(Number(v) || 90)));
+    this.focusedVisual.config.percentile = clamped;
   }
 
   // ── Data section: combo extra measures (config.aggregations[]) ───────
