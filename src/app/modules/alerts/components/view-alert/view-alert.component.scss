@@ -262,39 +262,6 @@
   }
 }
 
-.status-badge {
-  padding: 4px 10px;
-  border-radius: var(--radius-pill, 999px);
-  font-size: var(--fs-caption);
-  font-weight: var(--fw-medium);
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  background: var(--surface-ground);
-  color: var(--text-color-secondary);
-
-  &.active {
-    background: var(--success-bg, rgba(16, 185, 129, 0.12));
-    color: var(--success-color, #059669);
-  }
-}
-
-.severity-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-pill, 999px);
-  font-size: var(--fs-caption);
-  font-weight: var(--fw-medium);
-
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-
-  &.sev-info { background: var(--info-bg, rgba(59,130,246,0.12)); color: var(--info-color, #2563eb); }
-  &.sev-warning { background: var(--warning-bg, rgba(245,158,11,0.14)); color: var(--warning-color, #d97706); }
-  &.sev-critical { background: var(--error-bg, rgba(220,38,38,0.12)); color: var(--error-color, #dc2626); }
-}
-
 .cron-code {
   font-family: var(--font-mono, monospace);
   font-size: var(--fs-caption);

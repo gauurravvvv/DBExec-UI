@@ -139,27 +139,26 @@
               }}{{ slot.required ? '' : ' ' + ('ANALYSES.OPTIONAL_SUFFIX' | translate) }}
             </div>
             <div class="axis-chips">
-              <span
-                class="axis-chip"
+              <app-chip
+                variant="tag"
+                [removable]="true"
                 *ngFor="
                   let col of asArray(getRoleValue(slot.key));
                   trackBy: trackByIndex
                 "
+                (removed)="removeFromMultiRole(slot.key, col, $event)"
               >
                 {{ getFieldDisplayName(col) }}
-                <i
-                  class="pi pi-times"
-                  (click)="removeFromMultiRole(slot.key, col, $event)"
-                ></i>
-              </span>
-              <button
-                type="button"
-                class="axis-chip add-chip"
-                (click)="startAxisSelection(slot.key)"
+              </app-chip>
+              <app-chip
+                variant="filter"
+                class="add-chip"
+                icon="pi pi-plus"
+                [clickable]="true"
+                (clicked)="startAxisSelection(slot.key)"
               >
-                <i class="pi pi-plus"></i>
-                <span>{{ 'ANALYSES.ADD_COLUMN' | translate }}</span>
-              </button>
+                {{ 'ANALYSES.ADD_COLUMN' | translate }}
+              </app-chip>
             </div>
           </div>
         </ng-container>

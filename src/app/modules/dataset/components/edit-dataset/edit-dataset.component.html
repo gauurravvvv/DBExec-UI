@@ -37,18 +37,18 @@
            datasource. Shown so the user knows which dialect the
            editor's autocomplete is scoped to before they start
            editing. -->
-      <div
-        class="db-type-badge"
+      <app-chip
         *ngIf="selectedDbTypeOption"
+        variant="pill"
+        [icon]="selectedDbTypeOption.iconClass"
         [title]="
           ('DATASET.ACTIVE_DIALECT' | translate) +
           ': ' +
           selectedDbTypeOption.label
         "
       >
-        <i [class]="selectedDbTypeOption.iconClass" aria-hidden="true"></i>
-        <span>{{ selectedDbTypeOption.label }}</span>
-      </div>
+        {{ selectedDbTypeOption.label }}
+      </app-chip>
     </div>
     <div class="toolbar-right">
       <button
@@ -664,11 +664,13 @@
               </h4>
               <div class="error-message-box">
                 <code>{{ queryResult.error }}</code>
-                <span
+                <app-chip
                   *ngIf="queryResult.offendingToken"
-                  class="offending-token-chip"
+                  variant="tag"
+                  tone="error"
+                  size="sm"
                   [title]="'DATASET.OFFENDING_TOKEN_TOOLTIP' | translate"
-                >{{ queryResult.offendingToken }}</span>
+                >{{ queryResult.offendingToken }}</app-chip>
               </div>
               <div class="error-hint" *ngIf="queryResult.errorKind">
                 <i class="pi pi-info-circle"></i>

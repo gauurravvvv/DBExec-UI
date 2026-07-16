@@ -6,6 +6,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { CustomTableComponent } from 'src/app/shared/components/custom-table/custom-table.component';
 import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-table/custom-table-empty.directive';
 import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
+import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
 import { AddRlsRuleComponent } from './components/add-rls-rule/add-rls-rule.component';
 import { EditRlsRuleComponent } from './components/edit-rls-rule/edit-rls-rule.component';
 import { ListRlsRuleComponent } from './components/list-rls-rule/list-rls-rule.component';
@@ -34,6 +35,8 @@ import { RlsRulesRoutingModule } from './rls-rules-routing.module';
     CustomTableComponent,
     CustomTableEmptyDirective,
     UsGridCellDirective,
+    // Canonical shared chip / status-pill / count / tag element.
+    ChipComponent,
   ],
 })
 export class RlsRulesModule {}

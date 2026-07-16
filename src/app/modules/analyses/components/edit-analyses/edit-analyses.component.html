@@ -176,9 +176,12 @@
       <div class="sidebar-content">
         <div class="sidebar-header-info">
           <div class="dataset-label">{{ 'ANALYSES.LAYERS' | translate }}</div>
-          <span class="visual-count-badge" *ngIf="visuals.length > 0">
-            {{ visuals.length }}
-          </span>
+          <app-chip
+            variant="count"
+            size="sm"
+            *ngIf="visuals.length > 0"
+            [count]="visuals.length"
+          ></app-chip>
         </div>
         <div class="sidebar-divider"></div>
         <div class="sidebar-content-inner">
@@ -230,9 +233,12 @@
       <div class="sidebar-content">
         <div class="sidebar-header-info">
           <div class="dataset-label">{{ 'ANALYSES.DATA' | translate }}</div>
-          <span class="visual-count-badge" *ngIf="allFields.length > 0">
-            {{ allFields.length }}
-          </span>
+          <app-chip
+            variant="count"
+            size="sm"
+            *ngIf="allFields.length > 0"
+            [count]="allFields.length"
+          ></app-chip>
           <!--
             Refresh icon — re-fetches dataset fields, analysis fields,
             AND the filter list (via invalidating the analyses-filter
@@ -453,9 +459,12 @@
       <div class="sidebar-content">
         <div class="sidebar-header-info">
           <div class="dataset-label">{{ 'ANALYSES.FILTERS' | translate }}</div>
-          <span class="visual-count-badge" *ngIf="configuredFilters.length > 0">
-            {{ configuredFilters.length }}
-          </span>
+          <app-chip
+            variant="count"
+            size="sm"
+            *ngIf="configuredFilters.length > 0"
+            [count]="configuredFilters.length"
+          ></app-chip>
         </div>
         <div class="sidebar-divider"></div>
         <div class="sidebar-content-inner">
@@ -533,14 +542,20 @@
                 <small>{{ getFilterConfigSummary(filter) }}</small>
               </div>
               <div class="filter-card-badges">
-                <span
-                  class="badge badge-mandatory"
+                <app-chip
+                  variant="status"
+                  tone="warning"
+                  size="sm"
                   *ngIf="filter.isMandatory"
-                  >{{ 'ANALYSES.REQUIRED' | translate }}</span
+                  >{{ 'ANALYSES.REQUIRED' | translate }}</app-chip
                 >
-                <span class="badge badge-disabled" *ngIf="!filter.isEnabled">{{
-                  'ANALYSES.DISABLED' | translate
-                }}</span>
+                <app-chip
+                  variant="status"
+                  tone="neutral"
+                  size="sm"
+                  *ngIf="!filter.isEnabled"
+                  >{{ 'ANALYSES.DISABLED' | translate }}</app-chip
+                >
               </div>
             </div>
           </div>
@@ -628,16 +643,17 @@
           class="crossfilter-chips"
           *ngIf="interaction.crossFilters().length"
         >
-          <span
-            class="crossfilter-chip"
+          <app-chip
+            variant="tag"
+            tone="primary"
+            icon="pi pi-filter"
             *ngFor="
               let cf of interaction.crossFilters();
               trackBy: trackByIndex
             "
           >
-            <i class="pi pi-filter"></i>
             {{ cf.columnName }} = {{ cf.value }}
-          </span>
+          </app-chip>
         </div>
 
         <button
@@ -726,16 +742,15 @@
               {{ 'ANALYSES.TABS.ADD_TAB_TYPE' | translate }}
             </div>
             <div class="add-tab-types">
-              <button
-                type="button"
-                class="add-tab-type-chip"
+              <app-chip
+                variant="filter"
                 *ngFor="let preset of tabTypePresets"
-                [class.active]="newTabType === preset.type"
-                (click)="newTabType = preset.type"
+                [icon]="preset.icon"
+                [active]="newTabType === preset.type"
+                (clicked)="newTabType = preset.type"
               >
-                <i [class]="preset.icon"></i>
-                <span>{{ preset.labelKey | translate }}</span>
-              </button>
+                {{ preset.labelKey | translate }}
+              </app-chip>
             </div>
             <input
               type="text"

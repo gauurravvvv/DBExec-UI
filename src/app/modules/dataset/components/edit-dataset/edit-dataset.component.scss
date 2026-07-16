@@ -161,29 +161,6 @@
     // Engine badge — compact dialect chip, same rule as
     // add-dataset.component.scss. Quiet by design so it reads as
     // confirmation, not a CTA.
-    .db-type-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-1, 4px);
-      padding: 2px 8px;
-      border-radius: var(--radius-pill, 999px);
-      background: var(--card-background);
-      border: 1px solid var(--border-color);
-      font-size: var(--fs-label, 12px);
-      font-weight: var(--fw-medium, 500);
-      color: var(--secondary-color);
-      white-space: nowrap;
-      user-select: none;
-      line-height: 1.4;
-
-      i {
-        font-size: 11px;
-        line-height: 1;
-        color: var(--primary-color);
-        opacity: 0.85;
-      }
-    }
-
     .toolbar-title {
       margin: var(--space-0);
       font-size: var(--fs-h3);
@@ -2088,20 +2065,6 @@ td.empty-message-cell {
     &[data-kind='timeout'] .error-message-box,
     &[data-kind='connection'] .error-message-box {
       border-left-color: var(--warning-color, #d97706);
-    }
-
-    .offending-token-chip {
-      display: inline-block;
-      margin-left: var(--space-3);
-      padding: 2px 8px;
-      background: var(--card-background);
-      border: 1px solid var(--error-color);
-      border-radius: var(--radius-xs);
-      color: var(--error-color);
-      font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
-      font-size: var(--fs-label);
-      font-weight: var(--fw-medium);
-      vertical-align: middle;
     }
 
     .error-hint {

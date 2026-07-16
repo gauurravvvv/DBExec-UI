@@ -43,22 +43,16 @@
 
         <!-- Status pill (module-specific). -->
         <ng-template usGridCell="status" let-dashboard>
-          <span
-            class="status-pill"
-            [ngClass]="{
-              active: dashboard.status === 1,
-              inactive: dashboard.status !== 1,
-            }"
+          <app-chip
+            variant="status"
+            [tone]="dashboard.status === 1 ? 'success' : 'neutral'"
           >
-            <span class="dot"></span>
-            <span class="label">
-              {{
-                dashboard.status === 1
-                  ? ('COMMON.ACTIVE' | translate)
-                  : ('COMMON.INACTIVE' | translate)
-              }}
-            </span>
-          </span>
+            {{
+              dashboard.status === 1
+                ? ('COMMON.ACTIVE' | translate)
+                : ('COMMON.INACTIVE' | translate)
+            }}
+          </app-chip>
         </ng-template>
       </app-asset-explorer>
     </div>

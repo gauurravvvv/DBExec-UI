@@ -76,19 +76,19 @@
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.STATUS' | translate }}</label>
-              <span class="status-badge" [class.active]="current()!.isEnabled">
-                <i
-                  class="pi"
-                  [ngClass]="
-                    current()!.isEnabled ? 'pi-check-circle' : 'pi-times-circle'
-                  "
-                ></i>
+              <app-chip
+                variant="status"
+                [tone]="current()!.isEnabled ? 'success' : 'error'"
+                [icon]="
+                  current()!.isEnabled ? 'pi pi-check-circle' : 'pi pi-times-circle'
+                "
+              >
                 {{
                   current()!.isEnabled
                     ? ('COMMON.ENABLED' | translate)
                     : ('COMMON.DISABLED' | translate)
                 }}
-              </span>
+              </app-chip>
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.CREATED_ON' | translate }}</label>
@@ -104,9 +104,11 @@
         <div class="info-section">
           <h3>
             <i class="pi pi-users mr-2"></i> {{ 'RLS.ASSIGNMENTS' | translate }}
-            <span class="count-badge">{{
-              current()!.assignments?.length || 0
-            }}</span>
+            <app-chip
+              variant="count"
+              size="sm"
+              [count]="current()!.assignments?.length || 0"
+            ></app-chip>
           </h3>
           <div
             class="assignments-list"
@@ -123,7 +125,7 @@
               <span class="assignment-name">{{
                 a.scopeName || a.scopeId
               }}</span>
-              <span class="assignment-type-badge">{{ a.scope }}</span>
+              <app-chip variant="tag" size="sm">{{ a.scope }}</app-chip>
             </div>
           </div>
           <ng-template #noAssignments>
@@ -136,9 +138,11 @@
           <h3>
             <i class="pi pi-filter mr-2"></i>
             {{ 'RLS.FILTER_CONDITIONS' | translate }}
-            <span class="count-badge">{{
-              current()!.conditions?.length || 0
-            }}</span>
+            <app-chip
+              variant="count"
+              size="sm"
+              [count]="current()!.conditions?.length || 0"
+            ></app-chip>
           </h3>
           <div
             class="conditions-table"
@@ -161,12 +165,13 @@
               <span class="cond-column">
                 <i class="pi pi-filter-fill"></i> {{ cond.columnName }}
               </span>
-              <span class="operator-badge">{{ cond.operator }}</span>
+              <app-chip variant="tag" size="sm">{{ cond.operator }}</app-chip>
               <div class="cond-values">
-                <span
-                  class="value-chip"
+                <app-chip
+                  variant="tag"
+                  size="sm"
                   *ngFor="let v of cond.values; trackBy: trackByIndex"
-                  >{{ v }}</span
+                  >{{ v }}</app-chip
                 >
               </div>
             </div>
@@ -185,9 +190,11 @@
           <h3>
             <i class="pi pi-eye-slash mr-2"></i>
             {{ 'RLS.MASKED_COLUMNS' | translate }}
-            <span class="count-badge">{{
-              current()!.maskedColumns?.length || 0
-            }}</span>
+            <app-chip
+              variant="count"
+              size="sm"
+              [count]="current()!.maskedColumns?.length || 0"
+            ></app-chip>
           </h3>
           <div
             class="conditions-table"
@@ -210,14 +217,14 @@
               <span class="cond-column">
                 <i class="pi pi-eye-slash"></i> {{ mc.columnName }}
               </span>
-              <span class="operator-badge">{{ mc.strategy }}</span>
+              <app-chip variant="tag" size="sm">{{ mc.strategy }}</app-chip>
               <div class="cond-values">
-                <span class="value-chip" *ngIf="mc.strategy === 'redact'">{{
+                <app-chip variant="tag" size="sm" *ngIf="mc.strategy === 'redact'">{{
                   mc.maskValue || '***'
-                }}</span>
-                <span class="value-chip" *ngIf="mc.strategy !== 'redact'">{{
+                }}</app-chip>
+                <app-chip variant="tag" size="sm" *ngIf="mc.strategy !== 'redact'">{{
                   'COMMON.NA' | translate
-                }}</span>
+                }}</app-chip>
               </div>
             </div>
           </div>

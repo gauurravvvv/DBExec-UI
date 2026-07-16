@@ -339,16 +339,6 @@
         align-items: center;
         gap: var(--space-3);
 
-        .conditions-count-badge {
-          background: var(--primary-color-transparent);
-          color: var(--primary-color);
-          padding: 2px 8px;
-          border-radius: var(--radius-pill);
-          font-size: var(--fs-control);
-          font-weight: var(--fw-semibold);
-          white-space: nowrap;
-        }
-
         .condition-preview {
           display: inline-flex;
           align-items: center;
@@ -762,16 +752,6 @@ td.empty-message-cell {
     align-items: center;
     gap: var(--space-3);
 
-    .conditions-count-badge {
-      background: var(--primary-color-transparent);
-      color: var(--primary-color);
-      padding: 2px 8px;
-      border-radius: var(--radius-pill);
-      font-size: var(--fs-control);
-      font-weight: var(--fw-semibold);
-      white-space: nowrap;
-    }
-
     .condition-preview {
       display: inline-flex;
       align-items: center;
@@ -796,41 +776,6 @@ td.empty-message-cell {
       font-size: var(--fs-label);
       color: var(--text-color);
       opacity: 0.5;
-    }
-  }
-
-  // Status pill — the global `.modern-table .status-pill` rule doesn't match
-  // the unified table, so restate the pill (tinted bg + border + dot) here.
-  .status-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-3);
-    padding: 0.25rem 0.65rem;
-    border-radius: var(--radius-pill);
-    font-size: var(--fs-control);
-    font-weight: var(--fw-semibold);
-    line-height: 1.2;
-    white-space: nowrap;
-    border: 1px solid transparent;
-
-    .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: currentColor;
-      flex-shrink: 0;
-    }
-
-    &.active {
-      color: var(--success-color);
-      background: var(--success-bg, rgba(34, 197, 94, 0.08));
-      border-color: var(--success-color);
-    }
-
-    &.inactive {
-      color: var(--secondary-color);
-      background: var(--hover-background);
-      border-color: var(--border-color);
     }
   }
 

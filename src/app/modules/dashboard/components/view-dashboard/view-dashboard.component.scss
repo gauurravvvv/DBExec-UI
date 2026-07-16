@@ -189,27 +189,6 @@
 }
 
 // Status Badge
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: 4px 12px;
-  border-radius: var(--radius-lg);
-  font-size: var(--fs-control);
-  font-weight: var(--fw-medium);
-  background: var(--error-color-transparent);
-  color: var(--error-color);
-
-  &.active {
-    background: var(--success-color-transparent);
-    color: var(--success-color);
-  }
-
-  i {
-    font-size: var(--fs-body);
-  }
-}
-
 // ===================================================================
 // Missing-field banner
 // ===================================================================
@@ -282,18 +261,6 @@
       gap: var(--space-3);
       font-size: var(--fs-caption, 12px);
       flex-wrap: wrap;
-
-      .scope-chip {
-        text-transform: uppercase;
-        font-size: 10px;
-        font-weight: var(--fw-semibold);
-        letter-spacing: 0.04em;
-        padding: 1px 6px;
-        border-radius: var(--radius-sm);
-        background: var(--warning-color-bg, rgba(255, 152, 0, 0.1));
-        color: var(--warning-hover, var(--warning-color));
-        flex-shrink: 0;
-      }
 
       .ref-label {
         font-weight: var(--fw-medium);
@@ -372,16 +339,6 @@
       margin: 0;
     }
 
-    .visual-count-badge {
-      background-color: var(--primary-color);
-      color: var(--primary-text);
-      font-size: var(--fs-micro);
-      font-weight: var(--fw-semibold);
-      padding: 2px 8px;
-      border-radius: var(--radius-lg);
-      min-width: 20px;
-      text-align: center;
-    }
   }
 
   .sidebar-divider {
@@ -813,36 +770,6 @@
 }
 
 // Active cross-filter chip (clear affordance).
-.cross-filter-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border: 1px solid var(--primary-color, #2196f3);
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--primary-color, #2196f3);
-  background: var(--primary-color-transparent, rgba(33, 150, 243, 0.1));
-  cursor: pointer;
-  max-width: 240px;
-
-  .cf-text {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .cf-clear {
-    font-size: 10px;
-  }
-
-  &:hover {
-    background: var(--primary-color, #2196f3);
-    color: var(--primary-text, #fff);
-  }
-}
-
 /* ── Track F: favourite star toggle in the view header ─────────────── */
 .fav-toggle {
   i {

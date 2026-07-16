@@ -30,9 +30,12 @@
       >
         <i class="pi pi-refresh mr-1"></i>
         {{ 'DASHBOARD.PUBLISH_AS_EXISTING' | translate }}
-        <span class="count-pill" *ngIf="existingDashboards.length">
-          {{ existingDashboards.length }}
-        </span>
+        <app-chip
+          variant="count"
+          size="sm"
+          *ngIf="existingDashboards.length"
+          [count]="existingDashboards.length"
+        ></app-chip>
       </button>
     </div>
 

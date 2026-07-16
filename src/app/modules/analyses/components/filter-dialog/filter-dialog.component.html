@@ -331,13 +331,15 @@
           <span class="filter-stale-label">
             {{ 'ANALYSES.FILTER_STALE_VALUES' | translate }}
           </span>
-          <span
-            class="filter-stale-chip"
+          <app-chip
+            variant="tag"
+            tone="warning"
+            size="sm"
             *ngFor="let v of filterDialogStaleDefaults"
             [title]="'ANALYSES.FILTER_STALE_TOOLTIP' | translate"
           >
             {{ v }}
-          </span>
+          </app-chip>
           <button
             type="button"
             class="filter-stale-remove-all"

@@ -43,10 +43,13 @@
       >
         <!-- Datasource badge column (module-specific). -->
         <ng-template usGridCell="datasource" let-dataset>
-          <span class="ds-badge" *ngIf="dataset.datasource?.name">
-            <i class="pi pi-database"></i>
+          <app-chip
+            *ngIf="dataset.datasource?.name"
+            variant="tag"
+            icon="pi pi-database"
+          >
             {{ dataset.datasource.name }}
-          </span>
+          </app-chip>
           <span class="ds-badge muted" *ngIf="!dataset.datasource?.name">—</span>
         </ng-template>
       </app-asset-explorer>
@@ -197,11 +200,12 @@
         class="cmd-search-input"
         autocomplete="off"
       />
-      <span
-        class="cmd-badge"
+      <app-chip
+        variant="count"
+        size="sm"
         *ngIf="!loadingQueryBuilders && qbTotalRecords > 0"
-        >{{ qbTotalRecords }}</span
-      >
+        [count]="qbTotalRecords"
+      ></app-chip>
       <i
         class="pi pi-spin pi-spinner cmd-search-spinner"
         *ngIf="loadingQueryBuilders"

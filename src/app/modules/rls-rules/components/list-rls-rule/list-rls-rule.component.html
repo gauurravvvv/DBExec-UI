@@ -84,12 +84,12 @@
               class="conditions-summary"
               *ngIf="rule.securityType === 'column'; else rowConds"
             >
-              <span class="conditions-count-badge">
+              <app-chip variant="count" size="sm">
                 {{
                   'RLS.MASKED_COLUMN_COUNT'
                     | translate: { count: rule.maskedColumns?.length || 0 }
                 }}
-              </span>
+              </app-chip>
               <ng-container
                 *ngFor="
                   let mc of rule.maskedColumns;
@@ -108,12 +108,12 @@
               class="conditions-summary"
               *ngIf="rule.conditions?.length; else noConds"
             >
-              <span class="conditions-count-badge">
+              <app-chip variant="count" size="sm">
                 {{
                   'RLS.CONDITION_COUNT'
                     | translate: { count: rule.conditions.length }
                 }}
-              </span>
+              </app-chip>
               <ng-container
                 *ngFor="
                   let c of rule.conditions;
@@ -138,20 +138,16 @@
           </ng-template>
 
           <ng-template usGridCell="status" let-rule>
-            <span
-              class="status-pill"
-              [ngClass]="{
-                active: rule.status === 1,
-                inactive: rule.status !== 1,
-              }"
+            <app-chip
+              variant="status"
+              [tone]="rule.status === 1 ? 'success' : 'neutral'"
             >
-              <span class="dot"></span>
               {{
                 rule.status === 1
                   ? ('COMMON.ACTIVE' | translate)
                   : ('COMMON.INACTIVE' | translate)
               }}
-            </span>
+            </app-chip>
           </ng-template>
 
           <ng-template usGridCell="actions" let-rule>
