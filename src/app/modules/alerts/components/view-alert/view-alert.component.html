@@ -369,16 +369,18 @@
       </div>
     </div>
     <div class="popup-actions">
-      <button class="btn-cancel" (click)="cancelDelete()">
-        <i class="pi pi-times"></i> {{ 'COMMON.CANCEL' | translate }}
-      </button>
-      <button
-        class="btn-confirm"
-        (click)="proceedDelete()"
+      <app-button variant="secondary" icon="pi pi-times" (clicked)="cancelDelete()">
+        {{ 'COMMON.CANCEL' | translate }}
+      </app-button>
+      <app-button
+        variant="danger"
+        icon="pi pi-trash"
+        [loading]="saving()"
         [disabled]="!deleteJustification.trim() || saving()"
+        (clicked)="proceedDelete()"
       >
-        <i class="pi pi-trash"></i> {{ 'COMMON.DELETE' | translate }}
-      </button>
+        {{ 'COMMON.DELETE' | translate }}
+      </app-button>
     </div>
   </div>
 </div>

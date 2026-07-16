@@ -488,8 +488,6 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
           description: result.description,
           datasetId: this.analysisDatasetId,
           datasource: this.analysisDatasourceId ?? this.selectedDatasource,
-          // Track F: organizational tags captured in the create dialog.
-          tags: result.tags ?? [],
         })
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response, true)) {

@@ -20,8 +20,6 @@ export interface AnalysisFormData {
   name: string;
   description: string;
   justification?: string;
-  // Track F: free-form organizational tags (string[]).
-  tags?: string[];
 }
 
 @Component({
@@ -34,7 +32,6 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
   @Input() visible = false;
   @Input() initialName = '';
   @Input() initialDescription = '';
-  @Input() initialTags: string[] = [];
   @Input() dialogTitle = '';
   @Input() showJustification = false;
   // Drives the Save button's spinner. Parent passes
@@ -70,7 +67,6 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
       this.analysisForm.patchValue({
         name: this.initialName,
         description: this.initialDescription,
-        tags: this.initialTags ?? [],
       });
       this.saveJustification = '';
     }
@@ -91,8 +87,6 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
     this.analysisForm = this.fb.group({
       name: ['', [zodValidator(analysisNameSchema)]],
       description: ['', [zodValidator(analysisDescriptionSchema)]],
-      // Track F: organizational tags.
-      tags: [[] as string[]],
     });
   }
 
@@ -113,7 +107,6 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
       const formData: AnalysisFormData = {
         name: this.analysisForm.get('name')?.value.trim(),
         description: this.analysisForm.get('description')?.value.trim(),
-        tags: this.analysisForm.get('tags')?.value ?? [],
       };
       if (this.showJustification) {
         formData.justification = this.saveJustification.trim();
