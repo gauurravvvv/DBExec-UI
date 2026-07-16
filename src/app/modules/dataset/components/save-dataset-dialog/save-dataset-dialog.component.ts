@@ -30,8 +30,6 @@ export interface DatasetFormData {
   cacheTtlSeconds: number | null;
   // Track F: free-form organizational tags (string[]).
   tags: string[];
-  // Folder-explorer: the folder the dataset is filed into (null = Root).
-  folderId: string | null;
 }
 
 @Component({
@@ -52,8 +50,6 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
   @Input() initialCacheTtlSeconds: number | null = null;
   // Track F: initial tags on edit; empty on create.
   @Input() initialTags: string[] = [];
-  // Folder-explorer: initial folder on edit; null (Root) on create.
-  @Input() initialFolderId: string | null = null;
   // Drives the confirm button's spinner — parent passes the
   // datasetService.saving signal (or any boolean) so the dialog can
   // show progress while the POST/PUT runs without the global blocker.
@@ -93,7 +89,6 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
         cacheEnabled: !!this.initialCacheEnabled,
         cacheTtlSeconds: this.initialCacheTtlSeconds ?? null,
         tags: this.initialTags ?? [],
-        folderId: this.initialFolderId ?? null,
       });
 
       const justificationControl = this.datasetForm.get('justification');
@@ -137,8 +132,6 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
       ],
       // Track F: organizational tags.
       tags: [[] as string[]],
-      // Folder-explorer: chosen folder (null = Root).
-      folderId: [null as string | null],
     });
   }
 
@@ -176,7 +169,6 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
             ? Number(rawTtl)
             : null,
         tags: this.datasetForm.get('tags')?.value ?? [],
-        folderId: this.datasetForm.get('folderId')?.value ?? null,
       };
       if (this.showJustification) {
         formData.justification = this.datasetForm

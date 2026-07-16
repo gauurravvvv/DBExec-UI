@@ -7,54 +7,120 @@
       </div>
     </div>
 
-    <!-- Folder-first asset explorer — Folders|Tags rail + list body with
-         type icons, favourite star, and a per-row kebab. Datasource is a
-         column now, not a gate: the list shows ALL dashboards by folder/tag.
-         Per-cell DOM for the module columns (dataset / datasource / status)
-         is projected via <ng-template usGridCell>. Dashboards are view-only,
-         so open/edit/rename all route to the viewer. -->
+    <!-- Unified simple table. Infinite scroll, global search + on-demand
+         per-column filters (shared inputs), favourite star, per-row actions.
+         Dashboards are view-only. Per-cell DOM for the module columns
+         (dataset / datasource / status) is projected via <ng-template
+         usGridCell>. -->
     <div class="content-card">
-      <app-asset-explorer
-        *ngIf="adapter"
-        [objectType]="explorerObjectType"
-        [serverAdapter]="adapter"
-        [extraColumns]="explorerColumns"
-        [tableConfig]="tableConfig"
-        (open)="onOpen($event)"
-        (edit)="onView($event.id)"
-        (rename)="onRename($event)"
-        (copy)="onExplorerCopy($event)"
-        (remove)="confirmDelete($event.id)"
-        (moved)="refreshList()"
-      >
-        <!-- Source dataset (module-specific). -->
-        <ng-template usGridCell="datasetName" let-dashboard>
-          <span class="description-text" [title]="dashboard.datasetName">
-            {{ dashboard.datasetName || '—' }}
-          </span>
-        </ng-template>
+      <div class="table-wrapper" *ngIf="adapter">
+        <app-custom-table
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="tableConfig"
+          [hasProjectedEmpty]="true"
+          (refresh)="refreshList()"
+        >
+          <!-- Empty body — always projected so only one empty state shows. -->
+          <div tableEmpty class="ct-empty-body">
+            <i class="pi pi-inbox"></i>
+            <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
+          </div>
 
-        <!-- Datasource badge (module-specific). -->
-        <ng-template usGridCell="datasourceName" let-dashboard>
-          <span class="description-text" [title]="dashboard.datasource?.name">
-            {{ dashboard.datasource?.name || '—' }}
-          </span>
-        </ng-template>
+          <ng-template usGridCell="favourite" let-dashboard>
+            <button
+              type="button"
+              class="fav-star-btn"
+              [class.on]="isFavourite(dashboard.id)"
+              (click)="toggleFavourite(dashboard.id)"
+              [pTooltip]="
+                (isFavourite(dashboard.id)
+                  ? 'FAVOURITE.REMOVE'
+                  : 'FAVOURITE.ADD'
+                ) | translate
+              "
+              tooltipPosition="bottom"
+            >
+              <i
+                class="pi"
+                [ngClass]="isFavourite(dashboard.id) ? 'pi-star-fill' : 'pi-star'"
+              ></i>
+            </button>
+          </ng-template>
 
-        <!-- Status pill (module-specific). -->
-        <ng-template usGridCell="status" let-dashboard>
-          <app-chip
-            variant="status"
-            [tone]="dashboard.status === 1 ? 'success' : 'neutral'"
-          >
-            {{
-              dashboard.status === 1
-                ? ('COMMON.ACTIVE' | translate)
-                : ('COMMON.INACTIVE' | translate)
-            }}
-          </app-chip>
-        </ng-template>
-      </app-asset-explorer>
+          <ng-template usGridCell="name" let-dashboard>
+            <a class="dataset-name-link" [routerLink]="['/app/dashboards', dashboard.id]">
+              {{ dashboard.name }}
+            </a>
+          </ng-template>
+
+          <!-- Source dataset (module-specific). -->
+          <ng-template usGridCell="datasetName" let-dashboard>
+            <span class="description-text" [title]="dashboard.datasetName">
+              {{ dashboard.datasetName || '—' }}
+            </span>
+          </ng-template>
+
+          <!-- Datasource badge (module-specific). -->
+          <ng-template usGridCell="datasourceName" let-dashboard>
+            <span class="description-text" [title]="dashboard.datasource?.name">
+              {{ dashboard.datasource?.name || '—' }}
+            </span>
+          </ng-template>
+
+          <!-- Status pill (module-specific). -->
+          <ng-template usGridCell="status" let-dashboard>
+            <app-chip
+              variant="status"
+              [tone]="dashboard.status === 1 ? 'success' : 'neutral'"
+            >
+              {{
+                dashboard.status === 1
+                  ? ('COMMON.ACTIVE' | translate)
+                  : ('COMMON.INACTIVE' | translate)
+              }}
+            </app-chip>
+          </ng-template>
+
+          <ng-template usGridCell="createdOn" let-dashboard>
+            <span
+              class="date-text"
+              [pTooltip]="(dashboard.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              tooltipPosition="top"
+            >
+              {{ dashboard.createdOn | relativeTime }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="actions" let-dashboard>
+            <div class="row-actions">
+              <button
+                class="icon-btn view-btn"
+                (click)="onView(dashboard.id)"
+                [pTooltip]="'COMMON.VIEW' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-eye"></i>
+              </button>
+              <button
+                *hasPermission="'dashboard'; level: 'delete'"
+                class="icon-btn delete-btn"
+                (click)="confirmDelete(dashboard.id)"
+                [pTooltip]="'COMMON.DELETE' | translate"
+                tooltipPosition="bottom"
+                [disabled]="isDeleting(dashboard.id)"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    isDeleting(dashboard.id) ? 'pi-spin pi-spinner' : 'pi-trash'
+                  "
+                ></i>
+              </button>
+            </div>
+          </ng-template>
+        </app-custom-table>
+      </div>
     </div>
   </div>
 </div>

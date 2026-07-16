@@ -18,23 +18,18 @@ import type {
   CustomTableColumn,
   CustomTableConfig,
 } from 'src/app/shared/components/custom-table/custom-table.types';
-import type { ExplorerObjectType } from 'src/app/shared/helpers/asset-icon.helper';
 import { AlertService } from '../../services/alert.service';
 
 /**
- * Alerts listing — renders through the shared folder-first `<app-asset-explorer>`
- * (Track F). The explorer shell owns the Folders|Tags rail, the favourite star,
- * the per-row kebab (open / edit / rename / move / copy / delete), and the
- * baseFilter (folderId / tags) it merges into every server request; this host
- * only builds the `/alerts` list adapter, supplies the alert-specific columns as
- * `extraColumns` (source, severity, schedule, next-run, status), and handles the
- * emitted actions.
+ * Alerts listing — renders through the shared `<app-custom-table>` (the app's
+ * unified list table) driven by a `UsServerListAdapter` on the BE `/alerts`
+ * list call. Infinite scroll (no page controls), a single global search plus
+ * on-demand per-column filters, and per-row actions. No bulk selection.
  *
  * Alerts are org-scoped (not datasource-scoped), so the adapter binds
  * unconditionally on init — no datasource gate. The alert-specific per-row
- * lifecycle actions that AREN'T in the kebab set (enable/disable toggle, snooze,
- * test-now) are preserved as an extra "actions" column rendered via a
- * `usGridCell` template.
+ * lifecycle actions (enable/disable toggle, snooze, test-now, edit, delete)
+ * are rendered via the "actions" column's `usGridCell` template.
  */
 @Component({
   selector: 'app-list-alert',
@@ -65,14 +60,11 @@ export class ListAlertComponent implements OnInit, OnDestroy {
   /* ── test-now result ────────────────────────────────────────────── */
   testingId: string | null = null;
 
-  /* ── explorer wiring ────────────────────────────────────────────── */
+  /* ── custom-table wiring (unified simple table; server-driven) ──────── */
 
-  /** objectType typed for the shared explorer input. */
-  readonly explorerObjectType: ExplorerObjectType = 'alert';
-
-  /** Alert-specific columns the explorer inserts after its name column:
-   *  source, severity, schedule, next-run, status, and the lifecycle actions. */
-  explorerColumns: CustomTableColumn[] = [];
+  /** Unified-table columns. Cell DOM is supplied by `<ng-template usGridCell>`
+   *  in the HTML; `filter` flags enable the on-demand per-column filter row. */
+  cols: CustomTableColumn[] = [];
 
   tableConfig: CustomTableConfig = {
     mode: 'scroll',
@@ -100,7 +92,7 @@ export class ListAlertComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.explorerColumns = this.buildExplorerColumns();
+    this.cols = this.buildColumns();
     this.tableConfig = {
       ...this.tableConfig,
       globalSearchPlaceholder: this.translate.instant(
@@ -116,11 +108,12 @@ export class ListAlertComponent implements OnInit, OnDestroy {
     this.adapter?.destroy();
   }
 
-  /* ── explorer columns (alert-specific extras) ───────────────────── */
+  /* ── column definitions ─────────────────────────────────────────── */
 
-  private buildExplorerColumns(): CustomTableColumn[] {
+  private buildColumns(): CustomTableColumn[] {
     const t = (k: string): string => this.translate.instant(k);
     return [
+      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
       { colId: 'sourceType', field: 'sourceType', header: t('ALERTS.SOURCE'), width: '128px', sortable: false },
       { colId: 'severity', field: 'severity', header: t('ALERTS.SEVERITY'), width: '128px', sortable: false },
       { colId: 'cronExpression', field: 'cronExpression', header: t('ALERTS.SCHEDULE'), width: '176px', sortable: false },
@@ -155,31 +148,6 @@ export class ListAlertComponent implements OnInit, OnDestroy {
 
   refreshList(): void {
     this.adapter?.reload();
-  }
-
-  /* ── asset-explorer output handlers (Track F folder-first) ──────── */
-
-  /** Open (view) an alert — existing view nav. */
-  onOpen(row: any): void {
-    if (row?.id) this.router.navigate([ALERT.view(row.id)]);
-  }
-
-  /** Rename maps to edit for alerts (no inline-rename form today). */
-  onRename(row: any): void {
-    if (row?.id) this.onEdit(row.id);
-  }
-
-  /** Copy from the explorer kebab → duplicate the rule, filing the copy into
-   *  the chosen target folder. */
-  onExplorerCopy(payload: { row: any; targetFolderId: string | null }): void {
-    if (!payload?.row?.id) return;
-    this.alertService
-      .duplicate(payload.row.id, payload.targetFolderId)
-      .then((res: any) => {
-        if (this.globalService.handleSuccessService(res)) this.refreshList();
-        this.cdr.markForCheck();
-      })
-      .catch(() => this.cdr.markForCheck());
   }
 
   /* ── nav ────────────────────────────────────────────────────────── */

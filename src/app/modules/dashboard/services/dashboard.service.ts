@@ -170,19 +170,16 @@ export class DashboardService {
 
   /**
    * Duplicate a dashboard — the BE clones the snapshot into a fresh
-   * dashboard. `folderId` (optional) files the copy into a chosen folder;
-   * omitted → the BE leaves it in the source folder.
+   * dashboard.
    */
-  async duplicate(id: string, folderId?: string | null): Promise<any> {
+  async duplicate(id: string): Promise<any> {
     this._saving.set(true);
     try {
       // POST /dashboards/:id/duplicate
       return await lastValueFrom(
         this.http.apiPost(
           DASHBOARD.DUPLICATE_PREFIX + id + DASHBOARD.DUPLICATE_SUFFIX,
-          {
-            ...(folderId !== undefined && folderId !== null ? { folderId } : {}),
-          },
+          {},
           { skipLoader: true },
         ),
       );

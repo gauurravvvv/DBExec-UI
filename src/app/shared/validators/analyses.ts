@@ -437,21 +437,11 @@ export type UpdateAnalysisInput = z.infer<typeof updateAnalysisSchema>;
 /**
  * Deep-duplicate an analysis. The source id arrives on the URL path
  * (POST /:analysisId/duplicate → idFromParam copies it into body.id),
- * so `id` is required here. `folderId` is optional — when supplied the
- * copy is filed into that folder; null / omitted keeps the source's
- * folder. No name field: the controller derives `<name> (copy)`.
+ * so `id` is required here. No name field: the controller derives
+ * `<name> (copy)`.
  */
 export const duplicateAnalysisSchema = z.object({
   id: analysisIdSchema,
-  folderId: z
-    .preprocess(
-      blankToUndefined,
-      z
-        .string()
-        .uuid({ message: 'validation.analyses.folderId.invalid' }),
-    )
-    .nullable()
-    .optional(),
 });
 export type DuplicateAnalysisInput = z.infer<typeof duplicateAnalysisSchema>;
 
@@ -933,18 +923,10 @@ export type PublishDashboardInput = z.infer<typeof publishDashboardSchema>;
 /**
  * Deep-duplicate a dashboard. The source id arrives on the URL path
  * (POST /:dashboardId/duplicate → idFromParam copies it into body.id),
- * so `id` is required here. `folderId` is optional — when supplied the
- * copy is filed into that folder; null / omitted keeps the source's
- * folder. No name field: the controller derives `<name> (copy)`.
+ * so `id` is required here. No name field: the controller derives
+ * `<name> (copy)`.
  */
 export const duplicateDashboardSchema = z.object({
   id: idSchema('validation.analyses.dashboard.id.required'),
-  folderId: z
-    .preprocess(
-      blankToUndefined,
-      z.string().uuid({ message: 'validation.analyses.folderId.invalid' }),
-    )
-    .nullable()
-    .optional(),
 });
 export type DuplicateDashboardInput = z.infer<typeof duplicateDashboardSchema>;

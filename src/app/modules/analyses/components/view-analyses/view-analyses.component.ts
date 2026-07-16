@@ -12,7 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ANALYSES } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { FavouritesService } from 'src/app/shared/services/favourites.service';
-import type { FolderObjectType } from 'src/app/shared/validators/folders';
+import type { FavouriteObjectType } from 'src/app/shared/validators/favourites';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import { AnalysesService } from '../../services/analyses.service';
 
@@ -43,7 +43,7 @@ export class ViewAnalysesComponent implements OnInit, OnDestroy {
   showAddCustomFieldDialog = false;
 
   /* ── favourite star (Track F) ───────────────────────────────────── */
-  readonly objectType: FolderObjectType = 'analysis';
+  readonly objectType: FavouriteObjectType = 'analysis';
 
   constructor(
     private route: ActivatedRoute,

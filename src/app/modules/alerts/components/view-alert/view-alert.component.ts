@@ -11,7 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { ALERT } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { FavouritesService } from 'src/app/shared/services/favourites.service';
-import type { FolderObjectType } from 'src/app/shared/validators/folders';
+import type { FavouriteObjectType } from 'src/app/shared/validators/favourites';
 import { AlertService } from '../../services/alert.service';
 
 /**
@@ -54,7 +54,7 @@ export class ViewAlertComponent implements OnInit, OnDestroy {
   testResult: { breached?: boolean; observedValue?: any; error?: string } | null = null;
 
   /* ── favourite star (Track F) ───────────────────────────────────── */
-  readonly objectType: FolderObjectType = 'alert';
+  readonly objectType: FavouriteObjectType = 'alert';
 
   constructor(
     private route: ActivatedRoute,

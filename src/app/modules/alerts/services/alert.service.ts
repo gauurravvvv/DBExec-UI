@@ -182,19 +182,16 @@ export class AlertService {
   }
 
   /**
-   * Duplicate an alert rule. POST /alerts/:alertId/duplicate. `folderId`
-   * (optional) files the copy into a chosen folder; omitted → the BE leaves it
-   * in the source folder. Mirrors dataset.service.duplicateDataset.
+   * Duplicate an alert rule. POST /alerts/:alertId/duplicate.
+   * Mirrors dataset.service.duplicateDataset.
    */
-  async duplicate(alertId: string, folderId?: string | null): Promise<any> {
+  async duplicate(alertId: string): Promise<any> {
     this._saving.set(true);
     try {
       return await lastValueFrom(
         this.http.apiPost(
           ALERT.DUPLICATE_PREFIX + alertId + ALERT.DUPLICATE_SUFFIX,
-          {
-            ...(folderId !== undefined && folderId !== null ? { folderId } : {}),
-          },
+          {},
           { skipLoader: true },
         ),
       );

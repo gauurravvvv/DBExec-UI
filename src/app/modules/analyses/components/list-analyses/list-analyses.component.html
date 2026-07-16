@@ -7,47 +7,143 @@
       </div>
     </div>
 
-    <!-- Folder-first asset explorer — Folders|Tags rail + list body with
-         type icons, favourite star, and a per-row kebab. Datasource is no
-         longer a gate: the list shows ALL analyses by folder/tag. Per-cell DOM
-         for the module columns (dataset-name badge + visuals count) is
-         projected via <ng-template usGridCell>. -->
+    <!-- Unified simple table. Infinite scroll, global search + on-demand
+         per-column filters (shared inputs), favourite star, per-row actions.
+         Per-cell DOM for the module columns (dataset-name badge + visuals
+         count) is projected via <ng-template usGridCell>. -->
     <div class="content-card">
-      <app-asset-explorer
-        *ngIf="adapter"
-        [objectType]="explorerObjectType"
-        [serverAdapter]="adapter"
-        [extraColumns]="explorerColumns"
-        [tableConfig]="tableConfig"
-        (open)="onOpen($event)"
-        (edit)="onEdit($event.id)"
-        (rename)="onRename($event)"
-        (copy)="onExplorerCopy($event)"
-        (remove)="confirmDelete($event.id)"
-        (moved)="refreshList()"
-      >
-        <!-- Dataset-name badge column (module-specific). -->
-        <ng-template usGridCell="datasetName" let-analysis>
-          <app-chip
-            *ngIf="analysis.dataset?.name"
-            variant="tag"
-            icon="pi pi-database"
-          >
-            {{ analysis.dataset.name }}
-          </app-chip>
-          <span class="ds-badge muted" *ngIf="!analysis.dataset?.name">—</span>
-        </ng-template>
+      <div class="table-wrapper" *ngIf="adapter">
+        <app-custom-table
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="tableConfig"
+          [hasProjectedEmpty]="true"
+          (refresh)="refreshList()"
+        >
+          <!-- Empty body — always projected so only one empty state shows. -->
+          <div tableEmpty class="ct-empty-body">
+            <i class="pi pi-inbox"></i>
+            <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
+          </div>
 
-        <!-- Visuals-count column (module-specific). -->
-        <ng-template usGridCell="visuals" let-analysis>
-          <app-chip variant="count" size="sm">
-            {{
-              'ANALYSES.VISUALS_LABEL'
-                | translate: { count: analysis.visuals?.length || 0 }
-            }}
-          </app-chip>
-        </ng-template>
-      </app-asset-explorer>
+          <ng-template usGridCell="favourite" let-analysis>
+            <button
+              type="button"
+              class="fav-star-btn"
+              [class.on]="isFavourite(analysis.id)"
+              (click)="toggleFavourite(analysis.id)"
+              [pTooltip]="
+                (isFavourite(analysis.id)
+                  ? 'FAVOURITE.REMOVE'
+                  : 'FAVOURITE.ADD'
+                ) | translate
+              "
+              tooltipPosition="bottom"
+            >
+              <i
+                class="pi"
+                [ngClass]="isFavourite(analysis.id) ? 'pi-star-fill' : 'pi-star'"
+              ></i>
+            </button>
+          </ng-template>
+
+          <ng-template usGridCell="name" let-analysis>
+            <a class="dataset-name-link" [routerLink]="['/app/analyses', analysis.id]">
+              {{ analysis.name }}
+            </a>
+          </ng-template>
+
+          <ng-template usGridCell="description" let-analysis>
+            <span
+              class="description-text"
+              [title]="analysis.description"
+              [class.is-truncatable]="!!analysis.description"
+            >
+              {{ analysis.description || '—' }}
+            </span>
+          </ng-template>
+
+          <!-- Dataset-name badge column (module-specific). -->
+          <ng-template usGridCell="datasetName" let-analysis>
+            <app-chip
+              *ngIf="analysis.dataset?.name"
+              variant="tag"
+              icon="pi pi-database"
+            >
+              {{ analysis.dataset.name }}
+            </app-chip>
+            <span class="ds-badge muted" *ngIf="!analysis.dataset?.name">—</span>
+          </ng-template>
+
+          <!-- Visuals-count column (module-specific). -->
+          <ng-template usGridCell="visuals" let-analysis>
+            <app-chip variant="count" size="sm">
+              {{
+                'ANALYSES.VISUALS_LABEL'
+                  | translate: { count: analysis.visuals?.length || 0 }
+              }}
+            </app-chip>
+          </ng-template>
+
+          <ng-template usGridCell="status" let-analysis>
+            <span
+              class="status-pill"
+              [ngClass]="{
+                active: analysis.status === 1,
+                inactive: analysis.status !== 1,
+              }"
+            >
+              <span class="dot"></span>
+              <span class="label">
+                {{
+                  analysis.status === 1
+                    ? ('COMMON.ACTIVE' | translate)
+                    : ('COMMON.INACTIVE' | translate)
+                }}
+              </span>
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="createdOn" let-analysis>
+            <span
+              class="date-text"
+              [pTooltip]="(analysis.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              tooltipPosition="top"
+            >
+              {{ analysis.createdOn | relativeTime }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="actions" let-analysis>
+            <div class="row-actions">
+              <button
+                *hasPermission="'analyses'; level: 'write'"
+                class="icon-btn edit-btn"
+                (click)="onEdit(analysis.id)"
+                [pTooltip]="'COMMON.EDIT' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button
+                *hasPermission="'analyses'; level: 'delete'"
+                class="icon-btn delete-btn"
+                (click)="confirmDelete(analysis.id)"
+                [pTooltip]="'COMMON.DELETE' | translate"
+                tooltipPosition="bottom"
+                [disabled]="isDeleting(analysis.id)"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    isDeleting(analysis.id) ? 'pi-spin pi-spinner' : 'pi-trash'
+                  "
+                ></i>
+              </button>
+            </div>
+          </ng-template>
+        </app-custom-table>
+      </div>
     </div>
   </div>
 </div>

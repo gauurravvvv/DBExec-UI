@@ -16,27 +16,33 @@
       </div>
     </div>
 
-    <!-- Folder-first asset explorer — Folders|Tags rail + list body with type
-         icon, favourite star, and a per-row kebab (open/edit/rename/move/copy/
-         delete) all owned by the shell. Alert-specific columns (source,
-         severity, schedule, next-run, status) + the enable/snooze/test lifecycle
-         actions are projected as <ng-template usGridCell> cells. -->
+    <!-- Unified simple table. Infinite scroll, global search + on-demand
+         per-column filters, per-row lifecycle actions. Alert-specific columns
+         (source, severity, schedule, next-run, status) + the enable/snooze/
+         test/edit/delete actions are projected as <ng-template usGridCell>
+         cells. -->
     <div class="content-card">
-      <app-asset-explorer
-        *ngIf="adapter"
-        [objectType]="explorerObjectType"
-        [serverAdapter]="adapter"
-        [extraColumns]="explorerColumns"
-        [tableConfig]="tableConfig"
-        (open)="onOpen($event)"
-        (edit)="onEdit($event.id)"
-        (rename)="onRename($event)"
-        (create)="onAddNewAlert()"
-        (copy)="onExplorerCopy($event)"
-        (remove)="confirmDelete($event.id)"
-        (moved)="refreshList()"
-      >
-        <ng-template usGridCell="sourceType" let-alert>
+      <div class="table-wrapper" *ngIf="adapter">
+        <app-custom-table
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="tableConfig"
+          [hasProjectedEmpty]="true"
+          (refresh)="refreshList()"
+        >
+          <!-- Empty body — always projected so only one empty state shows. -->
+          <div tableEmpty class="ct-empty-body">
+            <i class="pi pi-bell"></i>
+            <span>{{ 'ALERTS.NO_ALERTS' | translate }}</span>
+          </div>
+
+          <ng-template usGridCell="name" let-alert>
+            <a class="dataset-name-link" [routerLink]="['/app/alerts', alert.id]">
+              {{ alert.name }}
+            </a>
+          </ng-template>
+
+          <ng-template usGridCell="sourceType" let-alert>
           <app-chip
             variant="pill"
             [icon]="
@@ -105,8 +111,8 @@
           </app-chip>
         </ng-template>
 
-        <!-- Alert-specific per-row actions NOT covered by the kebab set:
-             enable/disable toggle, test-now, and snooze. -->
+        <!-- Alert-specific per-row lifecycle actions: enable/disable toggle,
+             test-now, snooze, edit, and delete. -->
         <ng-template usGridCell="actions" let-alert>
           <div class="row-actions">
             <button
@@ -143,9 +149,32 @@
             >
               <i class="pi pi-moon"></i>
             </button>
+            <button
+              *hasPermission="'alertManagement'; level: 'write'"
+              class="icon-btn edit-btn"
+              (click)="onEdit(alert.id)"
+              [pTooltip]="'COMMON.EDIT' | translate"
+              tooltipPosition="bottom"
+            >
+              <i class="pi pi-pencil"></i>
+            </button>
+            <button
+              *hasPermission="'alertManagement'; level: 'delete'"
+              class="icon-btn delete-btn"
+              (click)="confirmDelete(alert.id)"
+              [disabled]="isDeleting(alert.id)"
+              [pTooltip]="'COMMON.DELETE' | translate"
+              tooltipPosition="bottom"
+            >
+              <i
+                class="pi"
+                [ngClass]="isDeleting(alert.id) ? 'pi-spin pi-spinner' : 'pi-trash'"
+              ></i>
+            </button>
           </div>
         </ng-template>
-      </app-asset-explorer>
+        </app-custom-table>
+      </div>
     </div>
   </div>
 </div>

@@ -6,9 +6,6 @@ import { StoreModule } from '@ngrx/store';
 import { MenuModule } from 'primeng/menu';
 import { CustomTableComponent } from 'src/app/shared/components/custom-table/custom-table.component';
 import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-table/custom-table-empty.directive';
-import { FolderTreeComponent } from 'src/app/shared/components/folder-tree/folder-tree.component';
-import { AssetExplorerComponent } from 'src/app/shared/components/asset-explorer/asset-explorer.component';
-import { FolderLocationFieldComponent } from 'src/app/shared/components/folder-location-field/folder-location-field.component';
 import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
@@ -73,11 +70,6 @@ import {
     CustomTableComponent,
     CustomTableEmptyDirective,
     UsGridCellDirective,
-    // Standalone shared folder-tree rail (Track F).
-    FolderTreeComponent,
-    // Folder-first explorer shell + save-location field (folder-explorer).
-    AssetExplorerComponent,
-    FolderLocationFieldComponent,
     // Canonical shared chip / status-pill / count / tag / filter element.
     ChipComponent,
     // Canonical shared button — used for the Slice F authoring actions

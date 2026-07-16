@@ -152,8 +152,6 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
       enabled: [true],
       // organization (Track F): free-form tags
       tags: [[]],
-      // Folder-explorer: the folder the alert is filed into (null = Root).
-      folderId: [null as string | null],
     });
 
     // A source-type change clears the picked source + its fields.

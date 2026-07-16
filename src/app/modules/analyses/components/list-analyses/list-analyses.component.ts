@@ -23,8 +23,7 @@ import type {
   CustomTableConfig,
 } from 'src/app/shared/components/custom-table/custom-table.types';
 import { FavouritesService } from 'src/app/shared/services/favourites.service';
-import type { FolderObjectType } from 'src/app/shared/validators/folders';
-import type { ExplorerObjectType } from 'src/app/shared/helpers/asset-icon.helper';
+import type { FavouriteObjectType } from 'src/app/shared/validators/favourites';
 import { AnalysesService } from '../../services/analyses.service';
 
 /**
@@ -34,12 +33,10 @@ import { AnalysesService } from '../../services/analyses.service';
  * on-demand per-column filters (shared inputs), and per-row actions. No bulk
  * selection.
  *
- * Folder-first now: the list renders through the shared `<app-asset-explorer>`
- * shell (Folders|Tags rail + favourite + kebab). There is NO datasource gate —
- * the adapter is built once in `ngOnInit` and browses ALL org analyses by
- * folder/tag. A `?datasourceId=` deep-link still narrows the list (optional
- * filter) and `?name=` still pre-searches. The page header and delete-confirm
- * popup retain their existing behaviour.
+ * There is NO datasource gate — the adapter is built once in `ngOnInit` and
+ * browses ALL org analyses. A `?datasourceId=` deep-link still narrows the list
+ * (optional filter) and `?name=` still pre-searches. The page header and
+ * delete-confirm popup retain their existing behaviour.
  */
 @Component({
   selector: 'app-list-analyses',
@@ -87,22 +84,24 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
     rowIdField: 'id',
   };
 
-  /** Server-side adapter — built once in ngOnInit; NO datasource gate now.
-   *  The folder-first explorer browses ALL org analyses by folder/tag, so the
-   *  adapter loads analyses without a datasourceId (the explorer's baseFilter
-   *  supplies folderId / tags). */
+  /** Server-side adapter — built once in ngOnInit; NO datasource gate. The
+   *  list browses ALL org analyses; a `?datasourceId=` deep-link narrows it
+   *  via the optional datasource filter. */
   adapter: UsServerListAdapter<any> | null = null;
 
-  /* ── folder-first explorer (Track F) ──────────────────────── */
+  /* ── favourites ─────────────────────────────────────────────────── */
 
-  readonly objectType: FolderObjectType = 'analysis';
-  /** objectType typed for the shared explorer input. */
-  readonly explorerObjectType: ExplorerObjectType = 'analysis';
+  readonly objectType: FavouriteObjectType = 'analysis';
   favIds = this.favouritesService.ids;
 
-  /** Columns the explorer inserts after its name column
-   *  (dataset-name badge + visuals count). */
-  explorerColumns: CustomTableColumn[] = [];
+  /** Per-row favourite star helpers (delegate to the shared service). */
+  isFavourite = (id: string): boolean =>
+    this.favouritesService.isFavourite(this.objectType, id);
+  toggleFavourite(id: string): void {
+    this.favouritesService
+      .toggle(this.objectType, id)
+      .then(() => this.cdr.markForCheck());
+  }
 
   constructor(
     private datasourceService: DatasourceService,
@@ -121,7 +120,6 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
     ];
 
     this.cols = this.buildColumns();
-    this.explorerColumns = this.buildExplorerColumns();
     // Field-specific search placeholder so the user knows what's matched.
     this.tableConfig = {
       ...this.tableConfig,
@@ -130,9 +128,9 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
       ),
     };
 
-    // Build the datasource-free adapter once — the explorer browses ALL org
-    // analyses by folder/tag. A `?datasourceId=` deep-link still narrows the
-    // list (optional filter), and `?name=` still pre-searches.
+    // Build the datasource-free adapter once — the list browses ALL org
+    // analyses. A `?datasourceId=` deep-link still narrows the list (optional
+    // filter), and `?name=` still pre-searches.
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
@@ -202,10 +200,9 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
   /* ── adapter wiring ─────────────────────────────────── */
 
   /**
-   * Construct the server-side adapter. NO datasource gate — the folder-first
-   * explorer browses ALL org analyses; folder/tag come from the explorer's
-   * baseFilter (merged by custom-table into each request's `filter`). A
-   * `datasourceId` is sent only when a deep-link / optional filter selected one.
+   * Construct the server-side adapter. NO datasource gate — the list browses
+   * ALL org analyses. A `datasourceId` is sent only when a deep-link / optional
+   * filter selected one.
    */
   private bindAdapter(deepLinkName?: string) {
     this.adapter?.destroy();
@@ -244,60 +241,10 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
     this.adapter?.reload();
   }
 
-  /* ── asset-explorer output handlers (Track F folder-first) ──────── */
-
-  /** Dataset-name badge + visuals-count columns the explorer renders after the
-   *  name — reuses the existing datasetName / visuals cell templates. */
-  private buildExplorerColumns(): CustomTableColumn[] {
-    const t = (k: string) => this.translate.instant(k);
-    return [
-      {
-        colId: 'datasetName',
-        field: 'dataset.name',
-        header: t('COMMON.DATASET'),
-        width: '192px',
-        sortable: false,
-      },
-      {
-        colId: 'visuals',
-        field: 'visuals',
-        header: t('ANALYSES.VISUALS_COUNT'),
-        width: '128px',
-        sortable: false,
-      },
-    ];
-  }
-
-  /** Open (view) an analysis from the explorer's open action. */
-  onOpen(row: any): void {
-    if (row?.id) this.onView(row.id);
-  }
-
-  /** Rename maps to edit for analyses (no inline-rename form today). */
-  onRename(row: any): void {
-    if (row?.id) this.onEdit(row.id);
-  }
-
-  /** Copy from the explorer kebab → duplicate the analysis, filing the copy
-   *  into the target folder the user picked. */
-  onExplorerCopy(payload: { row: any; targetFolderId: string | null }): void {
-    if (!payload?.row?.id) return;
-    this.analysesService
-      .duplicate(payload.row.id, payload.targetFolderId)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.refreshList();
-        }
-      })
-      .catch(() => {
-        /* global interceptor shows error toast */
-      });
-  }
-
   /**
    * Preload the org's datasources — kept for any create-from-dataset flow that
    * needs a datasource at creation. No longer gates or binds the list adapter:
-   * the folder-first explorer lists all analyses regardless of datasource.
+   * the list shows all analyses regardless of datasource.
    */
   loadDatasources(): Promise<void> {
     return new Promise(resolve => {

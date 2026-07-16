@@ -461,7 +461,7 @@ export const ALERT = {
   GET: '/alerts/', // GET  /alerts/:alertId
   UPDATE: '/alerts/', // PUT  /alerts/:alertId
   DELETE: '/alerts/', // DELETE /alerts/:alertId
-  // POST /alerts/:alertId/duplicate  → copy rule (optional { folderId })
+  // POST /alerts/:alertId/duplicate  → copy rule
   DUPLICATE_PREFIX: '/alerts/',
   DUPLICATE_SUFFIX: '/duplicate',
   // POST /alerts/:alertId/toggle  → enable / disable
@@ -542,37 +542,6 @@ export const NOTIFICATION = {
   UNREAD_COUNT: '/notifications/unread-count',
   // POST — mark every unread row read for the logged-in user
   READ_ALL: '/notifications/read-all',
-};
-
-/**
- * Folders — a nested organizational tree for viz objects (Track F). One tree
- * per `objectType` (dataset / analysis / dashboard / alert), scoped to the
- * caller's org. Prefixes ending in `/` are concatenated with the folder id.
- * Contract mirrors the BE folders controller (spec §5.6).
- */
-export const FOLDER = {
-  // POST /folders                     createFolder    (body: name, objectType, parentId?)
-  CREATE: '/folders',
-  // GET  /folders/tree?objectType=    listFolderTree  (the whole tree for one family)
-  TREE: '/folders/tree',
-  // GET  /folders/tags?objectType=    listAssetTags   (tag facet {tag,count} for the Tags rail)
-  TAGS: '/folders/tags',
-  // GET  /folders/:folderId/children?objectType=   listFolderChildren
-  //   Direct children (sub-folders + assets) of one folder for the Finder list
-  //   view's lazy expand. `folderId` = 'root' → top level. Built as
-  //   CHILDREN_PREFIX + folderId + CHILDREN_SUFFIX.
-  CHILDREN_PREFIX: '/folders/',
-  CHILDREN_SUFFIX: '/children',
-  // PUT  /folders/:folderId/rename    renameFolder    (body: name)
-  RENAME_PREFIX: '/folders/',
-  RENAME_SUFFIX: '/rename',
-  // PUT  /folders/:folderId/move      moveFolder      (body: parentId | null)
-  MOVE_PREFIX: '/folders/',
-  MOVE_SUFFIX: '/move',
-  // DELETE /folders/:folderId         deleteFolder    (detaches its objects → folderId null)
-  DELETE: '/folders/',
-  // PUT  /folders/move-object         move an object into a folder (or to root)
-  MOVE_OBJECT: '/folders/move-object',
 };
 
 /**

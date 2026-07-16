@@ -18,7 +18,7 @@ import { MenuItem } from 'primeng/api';
 import { DASHBOARD as DB_ROUTES } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { FavouritesService } from 'src/app/shared/services/favourites.service';
-import type { FolderObjectType } from 'src/app/shared/validators/folders';
+import type { FavouriteObjectType } from 'src/app/shared/validators/favourites';
 import {
   exportDashboardPdf,
   exportDashboardPng,
@@ -58,7 +58,7 @@ export class ViewDashboardComponent
   private favouritesService = inject(FavouritesService);
 
   /* ── favourite star (Track F) ───────────────────────────────────── */
-  readonly objectType: FolderObjectType = 'dashboard';
+  readonly objectType: FavouriteObjectType = 'dashboard';
 
   // Signal refs from service. `rendering` covers the heavier
   // render() call; `isDeleting(id)` drives the per-dashboard delete

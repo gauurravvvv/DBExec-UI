@@ -35,8 +35,7 @@ import type {
   CustomTableConfig,
 } from 'src/app/shared/components/custom-table/custom-table.types';
 import { FavouritesService } from 'src/app/shared/services/favourites.service';
-import type { FolderObjectType } from 'src/app/shared/validators/folders';
-import type { ExplorerObjectType } from 'src/app/shared/helpers/asset-icon.helper';
+import type { FavouriteObjectType } from 'src/app/shared/validators/favourites';
 import { DatasetService } from '../../services/dataset.service';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 
@@ -47,9 +46,8 @@ import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.comp
  * on-demand per-column filters (shared inputs), and per-row actions. No bulk
  * selection.
  *
- * Dataset is datasource-scoped: the adapter is built only once a datasource is
- * chosen (it needs `datasourceId` in every request), so the datasource picker
- * is projected into the table's toolbar-left slot. The page header, QB command
+ * The list browses ALL org datasets; a datasource picker is projected into the
+ * table's toolbar-left slot as an optional filter. The page header, QB command
  * palette, duplicate / create-analysis dialogs and delete-confirm popup retain
  * their existing behaviour.
  */
@@ -118,21 +116,24 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     rowIdField: 'id',
   };
 
-  /** Server-side adapter — built once in ngOnInit; NO datasource gate now.
-   *  The folder-first explorer browses ALL org datasets by folder/tag, so the
-   *  adapter loads datasets without a datasourceId (the explorer's baseFilter
-   *  supplies folderId / tags). */
+  /** Server-side adapter — built once in ngOnInit; NO datasource gate. The
+   *  list browses ALL org datasets; a `?datasourceId=` deep-link narrows it
+   *  via the optional datasource filter. */
   adapter: UsServerListAdapter<any> | null = null;
 
-  /* ── folders / tags / favourites (Track F) ──────────────────────── */
+  /* ── favourites ─────────────────────────────────────────────────── */
 
-  readonly objectType: FolderObjectType = 'dataset';
-  /** objectType typed for the shared explorer input. */
-  readonly explorerObjectType: ExplorerObjectType = 'dataset';
+  readonly objectType: FavouriteObjectType = 'dataset';
   favIds = this.favouritesService.ids;
 
-  /** Columns the explorer inserts after its name column (datasource badge). */
-  explorerColumns: CustomTableColumn[] = [];
+  /** Per-row favourite star helpers (delegate to the shared service). */
+  isFavourite = (id: string): boolean =>
+    this.favouritesService.isFavourite(this.objectType, id);
+  toggleFavourite(id: string): void {
+    this.favouritesService
+      .toggle(this.objectType, id)
+      .then(() => this.cdr.markForCheck());
+  }
 
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
@@ -168,7 +169,6 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     ];
 
     this.cols = this.buildColumns();
-    this.explorerColumns = this.buildExplorerColumns();
     // Field-specific search placeholder so the user knows what's matched.
     this.tableConfig = {
       ...this.tableConfig,
@@ -184,9 +184,9 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
         this.loadQueryBuilders();
       });
 
-    // Build the datasource-free adapter once — the explorer browses ALL org
-    // datasets by folder/tag. A `?datasourceId=` deep-link still narrows the
-    // list (optional filter), and `?name=` still pre-searches.
+    // Build the datasource-free adapter once — the list browses ALL org
+    // datasets. A `?datasourceId=` deep-link still narrows the list (optional
+    // filter), and `?name=` still pre-searches.
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
@@ -216,6 +216,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     return [
       { colId: 'favourite', header: '', width: '56px', sortable: false, align: 'center' },
       { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
+      { colId: 'datasource', field: 'datasource.name', header: t('COMMON.DATASOURCE'), width: '200px', sortable: false },
       { colId: 'description', field: 'description', header: t('COMMON.DESCRIPTION'), width: '320px', filter: 'text', sortable: false },
       { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px' },
       { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px' },
@@ -254,10 +255,9 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   /* ── adapter wiring ─────────────────────────────────── */
 
   /**
-   * Construct the server-side adapter. NO datasource gate — the folder-first
-   * explorer browses ALL org datasets; folder/tag come from the explorer's
-   * baseFilter (merged by custom-table into each request's `filter`). A
-   * `datasourceId` is sent only when a deep-link / optional filter selected one.
+   * Construct the server-side adapter. NO datasource gate — the list browses
+   * ALL org datasets. A `datasourceId` is sent only when a deep-link / optional
+   * filter selected one.
    */
   private bindAdapter(deepLinkName?: string) {
     this.adapter?.destroy();
@@ -292,37 +292,10 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     this.adapter?.reload();
   }
 
-  /* ── asset-explorer output handlers (Track F folder-first) ──────── */
-
-  /** Datasource badge column the explorer renders after the name. */
-  private buildExplorerColumns(): CustomTableColumn[] {
-    return [
-      {
-        colId: 'datasource',
-        field: 'datasource.name',
-        header: this.translate.instant('COMMON.DATASOURCE'),
-        width: '200px',
-        sortable: false,
-      },
-    ];
-  }
-
-  /** Open (view) a dataset. */
-  onOpen(row: any): void {
-    if (row?.id) this.router.navigate([DATASET.view(row.id)]);
-  }
-
-  /** Rename maps to edit for datasets (no inline-rename form today). */
-  onRename(row: any): void {
-    if (row?.id) this.onEdit(row.id);
-  }
-
-  /** Copy from the explorer kebab → the existing duplicate dialog, carrying the
-   *  chosen target folder so the copy lands where the user picked. */
-  copyTargetFolderId: string | null = null;
-  onExplorerCopy(payload: { row: any; targetFolderId: string | null }): void {
-    this.copyTargetFolderId = payload.targetFolderId;
-    this.confirmDuplicate(payload.row);
+  /** Datasource filter changed — rebuild the adapter so the list re-queries
+   *  scoped to (or cleared of) the selected datasource. */
+  onDatasourceChange(): void {
+    this.bindAdapter();
   }
 
   /* ── deep linking — preserved ────────────────────────── */
@@ -330,8 +303,8 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   /**
    * Preload the org's datasources — used ONLY by the create-flow dataset-picker
    * dialog (a dataset genuinely needs a datasource at creation). No longer
-   * gates or binds the list adapter: the folder-first explorer lists all
-   * datasets regardless of datasource.
+   * gates or binds the list adapter: the list shows all datasets regardless of
+   * datasource.
    */
   loadDatasources(): Promise<void> {
     return new Promise(resolve => {
@@ -527,14 +500,11 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
   onDuplicateDialogClose(result: DatasetFormData | null) {
     if (result && this.datasetToDuplicate) {
-      // Prefer the folder chosen in the dialog's Location field; fall back to
-      // the explorer kebab's target; else the source folder (service default).
       this.datasetService
         .duplicateDataset(
           this.datasetToDuplicate.id,
           result.name,
           result.description,
-          result.folderId ?? this.copyTargetFolderId,
         )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
@@ -548,7 +518,6 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     }
     this.showDuplicateDialog = false;
     this.datasetToDuplicate = null;
-    this.copyTargetFolderId = null;
   }
 
   /* ── delete flow — UNCHANGED ─────────────────────────── */

@@ -21,8 +21,7 @@ import type {
   CustomTableConfig,
 } from 'src/app/shared/components/custom-table/custom-table.types';
 import { FavouritesService } from 'src/app/shared/services/favourites.service';
-import type { FolderObjectType } from 'src/app/shared/validators/folders';
-import type { ExplorerObjectType } from 'src/app/shared/helpers/asset-icon.helper';
+import type { FavouriteObjectType } from 'src/app/shared/validators/favourites';
 import { DashboardService } from '../../services/dashboard.service';
 
 /**
@@ -32,12 +31,10 @@ import { DashboardService } from '../../services/dashboard.service';
  * on-demand per-column filters (shared inputs), and per-row actions. No bulk
  * selection.
  *
- * Folder-first: the list now renders through the shared `<app-asset-explorer>`
- * (Folders|Tags rail + list body with type icons, favourite star, per-row
- * kebab). Dashboards do NOT require a datasource — the adapter loads ALL org
- * dashboards by folder/tag; a `?datasourceId=` deep-link still narrows as an
- * optional filter and `?name=` still pre-searches. The page header and
- * delete-confirm popup retain their existing behaviour.
+ * Dashboards do NOT require a datasource — the adapter loads ALL org
+ * dashboards; a `?datasourceId=` deep-link still narrows as an optional filter
+ * and `?name=` still pre-searches. The page header and delete-confirm popup
+ * retain their existing behaviour.
  */
 @Component({
   selector: 'app-list-dashboard',
@@ -82,21 +79,24 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     rowIdField: 'id',
   };
 
-  /** Server-side adapter — built once in ngOnInit; NO datasource gate now.
-   *  The folder-first explorer browses ALL org dashboards by folder/tag, so the
-   *  adapter loads dashboards without a datasourceId (the explorer's baseFilter
-   *  supplies folderId / tags). */
+  /** Server-side adapter — built once in ngOnInit; NO datasource gate. The
+   *  list browses ALL org dashboards; a `?datasourceId=` deep-link narrows it
+   *  via the optional datasource filter. */
   adapter: UsServerListAdapter<any> | null = null;
 
-  /* ── folders / tags / favourites (Track F) ──────────────────────── */
+  /* ── favourites ─────────────────────────────────────────────────── */
 
-  readonly objectType: FolderObjectType = 'dashboard';
-  /** objectType typed for the shared explorer input. */
-  readonly explorerObjectType: ExplorerObjectType = 'dashboard';
+  readonly objectType: FavouriteObjectType = 'dashboard';
   favIds = this.favouritesService.ids;
 
-  /** Columns the explorer inserts after its name column (module-specific). */
-  explorerColumns: CustomTableColumn[] = [];
+  /** Per-row favourite star helpers (delegate to the shared service). */
+  isFavourite = (id: string): boolean =>
+    this.favouritesService.isFavourite(this.objectType, id);
+  toggleFavourite(id: string): void {
+    this.favouritesService
+      .toggle(this.objectType, id)
+      .then(() => this.cdr.markForCheck());
+  }
 
   constructor(
     private dashboardService: DashboardService,
@@ -114,7 +114,6 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     ];
 
     this.cols = this.buildColumns();
-    this.explorerColumns = this.buildExplorerColumns();
     // Field-specific search placeholder so the user knows what's matched.
     this.tableConfig = {
       ...this.tableConfig,
@@ -123,9 +122,9 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
       ),
     };
 
-    // Build the datasource-free adapter once — the explorer browses ALL org
-    // dashboards by folder/tag. A `?datasourceId=` deep-link still narrows the
-    // list (optional filter), and `?name=` still pre-searches.
+    // Build the datasource-free adapter once — the list browses ALL org
+    // dashboards. A `?datasourceId=` deep-link still narrows the list (optional
+    // filter), and `?name=` still pre-searches.
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
@@ -165,10 +164,9 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
   /* ── adapter wiring ─────────────────────────────────── */
 
   /**
-   * Construct the server-side adapter. NO datasource gate — the folder-first
-   * explorer browses ALL org dashboards; folder/tag come from the explorer's
-   * baseFilter (merged by custom-table into each request's `filter`). A
-   * `datasourceId` is sent only when a deep-link / optional filter selected one.
+   * Construct the server-side adapter. NO datasource gate — the list browses
+   * ALL org dashboards. A `datasourceId` is sent only when a deep-link /
+   * optional filter selected one.
    */
   private bindAdapter(deepLinkName?: string) {
     this.adapter?.destroy();
@@ -201,45 +199,6 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
 
   refreshList() {
     this.adapter?.reload();
-  }
-
-  /* ── asset-explorer output handlers (Track F folder-first) ──────── */
-
-  /** Module-specific columns the explorer renders after the name column:
-   *  the source dataset, its datasource, and the status pill. */
-  private buildExplorerColumns(): CustomTableColumn[] {
-    const t = (k: string) => this.translate.instant(k);
-    return [
-      { colId: 'datasetName', field: 'datasetName', header: t('DASHBOARD.DATASET'), width: '192px', sortable: false },
-      { colId: 'datasourceName', field: 'datasource.name', header: t('COMMON.DATASOURCE'), width: '192px', sortable: false },
-      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px', sortable: false },
-    ];
-  }
-
-  /** Open (view) a dashboard — dashboards are view-only. */
-  onOpen(row: any): void {
-    if (row?.id) this.onView(row.id);
-  }
-
-  /** Rename maps to view for dashboards (view-only, no edit/rename form). */
-  onRename(row: any): void {
-    if (row?.id) this.onView(row.id);
-  }
-
-  /** Copy from the explorer kebab → duplicate the dashboard into the chosen
-   *  target folder (null = source folder), then refresh the list. */
-  onExplorerCopy(payload: { row: any; targetFolderId: string | null }): void {
-    if (!payload?.row?.id) return;
-    this.dashboardService
-      .duplicate(payload.row.id, payload.targetFolderId)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.refreshList();
-        }
-      })
-      .catch(() => {
-        /* global interceptor shows error toast */
-      });
   }
 
   /* ── nav + delete ───────────────────────────────────── */
