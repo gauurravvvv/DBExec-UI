@@ -39,7 +39,14 @@
               "node_modules/primeicons/primeicons.css"
             ],
             "scripts": [],
-            "allowedCommonJsDependencies": ["nearley"]
+            "allowedCommonJsDependencies": [
+              "nearley",
+              "canvg",
+              "html2canvas",
+              "raf",
+              "rgbcolor",
+              "core-js"
+            ]
           },
           "configurations": {
             "production": {
