@@ -69,12 +69,18 @@
                 ></app-custom-binary-checkbox>
               </span>
 
-              <span class="cap-badge full" *ngIf="capability() && canManage">
-                <i class="pi pi-check-circle"></i>{{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}
-              </span>
-              <span class="cap-badge readonly" *ngIf="capability() && !canManage">
-                <i class="pi pi-lock"></i>{{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}
-              </span>
+              <app-chip
+                variant="badge"
+                tone="success"
+                icon="pi pi-check-circle"
+                *ngIf="capability() && canManage"
+              >{{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}</app-chip>
+              <app-chip
+                variant="badge"
+                tone="neutral"
+                icon="pi pi-lock"
+                *ngIf="capability() && !canManage"
+              >{{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}</app-chip>
             </ng-container>
 
             <!-- Capability spinner sits inline while the chosen datasource is
@@ -105,7 +111,7 @@
 
           <ng-template usGridCell="pid" let-s>
             <span class="pid-text">{{ s.pid }}</span>
-            <span class="self-tag" *ngIf="isSelf(s)">{{ 'DB_ACCESS.THIS_SESSION' | translate }}</span>
+            <app-chip variant="tag" tone="primary" size="sm" *ngIf="isSelf(s)">{{ 'DB_ACCESS.THIS_SESSION' | translate }}</app-chip>
           </ng-template>
 
           <ng-template usGridCell="user" let-s>
@@ -122,14 +128,18 @@
 
           <ng-template usGridCell="applicationName" let-s>
             <span class="description-text" [title]="s.applicationName">{{ s.applicationName || '—' }}</span>
-            <span class="count-pill" *ngIf="!isClientBackend(s)">{{ s.backendType }}</span>
+            <app-chip variant="tag" size="sm" *ngIf="!isClientBackend(s)">{{ s.backendType }}</app-chip>
           </ng-template>
 
           <ng-template usGridCell="state" let-s>
-            <span class="status-pill" [ngClass]="stateClass(s)">
-              <span class="dot"></span>
+            <app-chip
+              variant="status"
+              size="sm"
+              [tone]="stateTone(s)"
+              [dot]="'currentColor'"
+            >
               {{ stateLabel(s) }}
-            </span>
+            </app-chip>
           </ng-template>
 
           <ng-template usGridCell="waitEventType" let-s>

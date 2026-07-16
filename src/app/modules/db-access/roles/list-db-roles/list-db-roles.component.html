@@ -50,23 +50,38 @@
 
             <ng-container *ngIf="datasourceId && !unsupported() && !capabilityLoading()">
               <div class="type-filter">
-                <button type="button" class="type-chip" [class.active]="typeFilter === 'all'" (click)="setTypeFilter('all')">
-                  <i class="pi pi-list"></i>{{ 'DB_ACCESS.TYPE_ALL' | translate }}
-                </button>
-                <button type="button" class="type-chip" [class.active]="typeFilter === 'login'" (click)="setTypeFilter('login')">
-                  <i class="pi pi-user"></i>{{ 'DB_ACCESS.TYPE_LOGIN' | translate }}
-                </button>
-                <button type="button" class="type-chip" [class.active]="typeFilter === 'group'" (click)="setTypeFilter('group')">
-                  <i class="pi pi-users"></i>{{ 'DB_ACCESS.TYPE_GROUP' | translate }}
-                </button>
+                <app-chip
+                  variant="filter"
+                  icon="pi pi-list"
+                  [active]="typeFilter === 'all'"
+                  (clicked)="setTypeFilter('all')"
+                >{{ 'DB_ACCESS.TYPE_ALL' | translate }}</app-chip>
+                <app-chip
+                  variant="filter"
+                  icon="pi pi-user"
+                  [active]="typeFilter === 'login'"
+                  (clicked)="setTypeFilter('login')"
+                >{{ 'DB_ACCESS.TYPE_LOGIN' | translate }}</app-chip>
+                <app-chip
+                  variant="filter"
+                  icon="pi pi-users"
+                  [active]="typeFilter === 'group'"
+                  (clicked)="setTypeFilter('group')"
+                >{{ 'DB_ACCESS.TYPE_GROUP' | translate }}</app-chip>
               </div>
 
-              <span class="cap-badge full" *ngIf="capability() && canManage">
-                <i class="pi pi-check-circle"></i>{{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}
-              </span>
-              <span class="cap-badge readonly" *ngIf="capability() && !canManage">
-                <i class="pi pi-lock"></i>{{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}
-              </span>
+              <app-chip
+                variant="badge"
+                tone="success"
+                icon="pi pi-check-circle"
+                *ngIf="capability() && canManage"
+              >{{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}</app-chip>
+              <app-chip
+                variant="badge"
+                tone="neutral"
+                icon="pi pi-lock"
+                *ngIf="capability() && !canManage"
+              >{{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}</app-chip>
             </ng-container>
 
             <!-- Capability spinner sits inline while the chosen datasource is
@@ -100,17 +115,25 @@
           </ng-template>
 
           <ng-template usGridCell="type" let-role>
-            <span class="type-badge" [class.login]="isLogin(role)" [class.group]="!isLogin(role)">
-              <i class="pi" [ngClass]="isLogin(role) ? 'pi-user' : 'pi-users'"></i>
+            <app-chip
+              variant="badge"
+              size="sm"
+              [tone]="isLogin(role) ? 'primary' : 'neutral'"
+              [icon]="isLogin(role) ? 'pi pi-user' : 'pi pi-users'"
+            >
               {{ (isLogin(role) ? 'DB_ACCESS.TYPE_LOGIN' : 'DB_ACCESS.TYPE_GROUP') | translate }}
-            </span>
+            </app-chip>
           </ng-template>
 
           <ng-template usGridCell="status" let-role>
-            <span class="status-pill" [ngClass]="statusOf(role)">
-              <span class="dot"></span>
+            <app-chip
+              variant="status"
+              size="sm"
+              [tone]="statusToneOf(role)"
+              [dot]="'currentColor'"
+            >
               {{ 'DB_ACCESS.STATUS_' + (statusOf(role) | uppercase) | translate }}
-            </span>
+            </app-chip>
           </ng-template>
 
           <ng-template usGridCell="validUntil" let-role>
@@ -128,12 +151,12 @@
           </ng-template>
 
           <ng-template usGridCell="flags" let-role>
-            <span *ngFor="let f of flagsOf(role)" class="flag-chip">{{ f }}</span>
+            <app-chip variant="tag" tone="primary" size="sm" *ngFor="let f of flagsOf(role)">{{ f }}</app-chip>
             <span class="description-text" *ngIf="!flagsOf(role).length">—</span>
           </ng-template>
 
           <ng-template usGridCell="memberOf" let-role>
-            <span *ngFor="let m of (role.memberOf ?? [])" class="count-pill">{{ m }}</span>
+            <app-chip variant="tag" size="sm" *ngFor="let m of (role.memberOf ?? [])">{{ m }}</app-chip>
             <span class="description-text" *ngIf="!(role.memberOf ?? []).length">—</span>
           </ng-template>
 

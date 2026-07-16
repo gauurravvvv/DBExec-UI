@@ -260,6 +260,18 @@ export class SessionsComponent implements OnInit, OnDestroy {
     return 'inactive';
   }
 
+  /** Map the pg session state to an app-chip semantic tone. */
+  stateTone(s: SessionRow): 'success' | 'error' | 'neutral' {
+    switch (this.stateClass(s)) {
+      case 'active':
+        return 'success';
+      case 'expired':
+        return 'error';
+      default:
+        return 'neutral';
+    }
+  }
+
   stateLabel(s: SessionRow): string {
     return s.state || this.translate.instant('DB_ACCESS.SESSION_STATE_UNKNOWN');
   }

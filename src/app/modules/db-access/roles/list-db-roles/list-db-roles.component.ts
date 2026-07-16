@@ -273,6 +273,18 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     return 'active';
   }
 
+  /** Map a role's lifecycle status to an app-chip semantic tone. */
+  statusToneOf(role: any): 'success' | 'error' | 'neutral' {
+    switch (this.statusOf(role)) {
+      case 'active':
+        return 'success';
+      case 'expired':
+        return 'error';
+      default:
+        return 'neutral';
+    }
+  }
+
   connLimitOf(role: any): string {
     const a = role.attributes ?? role;
     const cl = a.connectionLimit ?? role.connectionLimit;

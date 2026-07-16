@@ -108,44 +108,14 @@
       }
     }
 
-    // Type filter — segmented control (All / Login users / Group roles) in
-    // the toolbar of the merged "Database Users & Roles" list.
+    // Type filter — All / Login users / Group roles facet chips (shared
+    // <app-chip variant="filter">) in the toolbar of the merged "Database
+    // Users & Roles" list. The container is a plain inline-flex row; each
+    // facet carries its own outline/active styling.
     .type-filter {
       display: inline-flex;
       align-items: center;
-      gap: 2px;
-      padding: 2px;
-      border-radius: var(--radius-sm);
-      background: var(--hover-background);
-
-      .type-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 5px 12px;
-        border: none;
-        background: transparent;
-        color: var(--secondary-color);
-        border-radius: var(--radius-xs);
-        font-size: var(--fs-control);
-        font-weight: var(--fw-medium);
-        cursor: pointer;
-        transition: all 0.15s ease;
-
-        i {
-          font-size: var(--fs-label);
-        }
-
-        &:hover {
-          color: var(--primary-color);
-        }
-
-        &.active {
-          background: var(--card-background);
-          color: var(--primary-color);
-          box-shadow: var(--shadow-xs, 0 1px 2px rgba(0, 0, 0, 0.08));
-        }
-      }
+      gap: var(--space-3);
     }
 
     // Datasource picker + Type segmented control + capability badge, all
@@ -243,31 +213,14 @@
   // — previously these sat in db-access-table and were invisible on the
   // composer screen, which only includes db-access-page + db-access-composer.
 
-  // Capability badge (full / read-only) — inline-flex + matched line-height
-  // so it centres on the SAME baseline as the neighbouring buttons in the
-  // flex header row (was sitting low next to Active Sessions / Apply).
-  .cap-badge {
-    display: inline-flex;
-    align-items: center;
+  // Capability badge (full / read-only) now renders through the shared
+  // <app-chip variant="badge">; centre it on the header/toolbar baseline
+  // next to the neighbouring buttons (was sitting low next to Active
+  // Sessions / Apply).
+  .header-actions app-chip,
+  .roles-toolbar-start app-chip,
+  .sessions-toolbar-start app-chip {
     align-self: center;
-    gap: var(--space-3);
-    padding: 5px 12px;
-    border-radius: var(--radius-pill);
-    font-size: var(--fs-control);
-    font-weight: var(--fw-medium);
-    line-height: 1.2;
-    white-space: nowrap;
-
-    i { font-size: var(--fs-control); }
-
-    &.full {
-      background: var(--success-bg, rgba(34, 197, 94, 0.12));
-      color: var(--success-color, #16a34a);
-    }
-    &.readonly {
-      background: var(--hover-background);
-      color: var(--secondary-color);
-    }
   }
 
   // Inline hint / empty prompt (no datasource, unsupported). Sits inside the
@@ -619,102 +572,11 @@
     max-width: 100%;
   }
 
-  // Status pill — matches the global `.modern-table .status-pill` spec
-  // (padding / border / dot size / state colours) so pills read the same
-  // whether they render inside a table (where the global rule wins) or in
-  // a hero-sub (view screen, where only this partial applies). The
-  // no-login / expired variants extend the shared active/inactive/locked
-  // set for db-role lifecycle states.
-  .status-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-3);
-    padding: 0.25rem 0.65rem;
-    border-radius: var(--radius-pill);
-    font-size: var(--fs-control);
-    font-weight: var(--fw-semibold);
-    line-height: 1.2;
-    white-space: nowrap;
-    border: 1px solid transparent;
-
-    .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: currentColor;
-      flex-shrink: 0;
-    }
-
-    &.active {
-      color: var(--success-color);
-      background: var(--success-bg, rgba(34, 197, 94, 0.08));
-      border-color: var(--success-color);
-    }
-    &.inactive,
-    &.no-login {
-      color: var(--secondary-color);
-      background: var(--hover-background);
-      border-color: var(--border-color);
-    }
-    &.locked {
-      color: var(--warning-color);
-      background: var(--warning-bg, rgba(255, 152, 0, 0.08));
-      border-color: var(--warning-color);
-    }
-    &.expired {
-      color: var(--error-color);
-      background: var(--error-bg);
-      border-color: var(--error-color);
-    }
-  }
-
-  .flag-chip {
-    display: inline-block;
-    background: var(--primary-color-transparent);
-    color: var(--primary-color);
-    padding: 1px 8px;
-    margin: 1px 2px;
-    border-radius: var(--radius-pill);
-    font-size: var(--fs-label);
-    font-weight: var(--fw-medium);
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-  }
-
-  // Type badge — distinguishes a login user from a group role in the merged
-  // "Database Users & Roles" list (and the view hero). Login = primary,
-  // group = neutral/secondary.
-  .type-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 10px;
-    border-radius: var(--radius-pill);
-    font-size: var(--fs-label);
-    font-weight: var(--fw-medium);
-    white-space: nowrap;
-
-    i {
-      font-size: var(--fs-label);
-    }
-
-    &.login {
-      color: var(--primary-color);
-      background: var(--primary-color-transparent);
-    }
-    &.group {
-      color: var(--secondary-color);
-      background: var(--hover-background);
-    }
-  }
-
-  .count-pill {
-    background: var(--hover-background);
-    color: var(--secondary-color);
-    padding: 2px 8px;
-    border-radius: var(--radius-pill);
-    font-size: var(--fs-control);
-  }
+  // Status / flag / type / member chips now render through the shared
+  // <app-chip> (variant status/tag/badge/count) — the bespoke .status-pill /
+  // .flag-chip / .type-badge / .count-pill rules were removed from this
+  // mixin once every db-access template migrated to app-chip. Chips in table
+  // cells keep the shared component's own tokenised look.
 
   // Row action buttons — verbatim from list-user / list-datasource so the
   // edit/delete/view icon group is pixel-identical to the rest of the app
@@ -1811,20 +1673,8 @@
         align-items: center;
         gap: var(--space-4);
 
-        .rule-incomplete-chip {
-          display: inline-flex;
-          align-items: center;
-          gap: 3px;
-          text-transform: none;
-          letter-spacing: 0;
-          font-weight: var(--fw-medium);
-          font-size: var(--fs-label);
-          color: var(--warning-color, #b45309);
-          background: var(--warning-bg, rgba(217, 119, 6, 0.12));
-          padding: 1px 7px;
-          border-radius: var(--radius-pill);
-          i { font-size: 0.7rem; }
-        }
+        // The "incomplete" flag now renders through the shared
+        // <app-chip variant="badge" tone="warning">.
       }
 
       // Remove-rule (×) — same borderless icon-button treatment as the list
@@ -2095,21 +1945,8 @@
           align-items: center;
           gap: var(--space-2);
           flex-shrink: 0;
-
-          .eff-source {
-            font-size: var(--fs-label);
-            color: var(--secondary-color);
-            padding: 1px 6px;
-            border-radius: var(--radius-xs);
-            background: var(--secondary-background);
-            white-space: nowrap;
-
-            &.direct {
-              color: var(--primary-color);
-              background: var(--primary-color-transparent);
-              font-weight: var(--fw-medium);
-            }
-          }
+          // Source labels (Direct / via-role) render through the shared
+          // <app-chip variant="tag">.
         }
       }
 
@@ -2118,25 +1955,10 @@
         flex-wrap: nowrap;
         align-items: center;
         gap: var(--space-2);
-
-        // Self-contained chip styling — the shared .flag-chip lives in the
-        // db-access-table mixin, which this screen doesn't include, so define
-        // the look here rather than depend on it.
-        .flag-chip {
+        // Privilege chips (+ the "+N more" chip) render through the shared
+        // <app-chip variant="tag">; keep them from shrinking in the row.
+        app-chip {
           flex-shrink: 0;
-          display: inline-block;
-          background: var(--primary-color-transparent);
-          color: var(--primary-color);
-          padding: 1px 7px;
-          border-radius: var(--radius-pill);
-          font-size: var(--fs-label);
-          font-weight: var(--fw-medium);
-          letter-spacing: 0.02em;
-          white-space: nowrap;
-        }
-        .flag-chip.more {
-          background: var(--secondary-background);
-          color: var(--secondary-color);
         }
       }
     }
