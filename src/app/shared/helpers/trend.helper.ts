@@ -85,6 +85,99 @@ export function linearTrend(
 }
 
 /**
+ * Logarithmic trend: fit y = a·ln(x) + b (least squares on ln(x)). x is the
+ * 1-based category index (ln(0) is undefined, so we shift by 1). Returns an
+ * index-aligned overlay. Falls back to a flat mean line when there are fewer
+ * than two usable points.
+ */
+export function logTrend(values: Array<number | null | undefined>): number[] {
+  const points: Point[] = [];
+  values.forEach((v, i) => {
+    const y = toFinite(v);
+    if (y !== null) points.push({ x: Math.log(i + 1), y });
+  });
+  const { slope, intercept } = linearRegression(points);
+  return values.map((_, i) => slope * Math.log(i + 1) + intercept);
+}
+
+/**
+ * Polynomial trend of the given degree (2 = quadratic, 3 = cubic, …) fitted by
+ * ordinary least squares over the Vandermonde system, solved with
+ * Gauss-Jordan elimination. Degree is clamped to [2, 6] and to (usable
+ * points − 1) so the system stays determined. Returns an index-aligned
+ * overlay; on a singular/underdetermined system it degrades to a linear fit.
+ */
+export function polyTrend(
+  values: Array<number | null | undefined>,
+  degree: number,
+): number[] {
+  const pts: Point[] = [];
+  values.forEach((v, i) => {
+    const y = toFinite(v);
+    if (y !== null) pts.push({ x: i, y });
+  });
+  const n = pts.length;
+  const deg = Math.max(2, Math.min(6, Math.min(Math.floor(degree || 2), n - 1)));
+  if (n < 3 || deg < 2) {
+    // Not enough spread for a curve — fall back to the straight-line fit.
+    return linearTrend(values);
+  }
+
+  // Normal equations: (Xᵀ X) c = Xᵀ y, where X is the Vandermonde matrix.
+  const m = deg + 1;
+  const ata: number[][] = Array.from({ length: m }, () => new Array(m).fill(0));
+  const aty: number[] = new Array(m).fill(0);
+  for (const p of pts) {
+    const powers: number[] = [1];
+    for (let k = 1; k < m; k++) powers[k] = powers[k - 1] * p.x;
+    for (let r = 0; r < m; r++) {
+      for (let c = 0; c < m; c++) ata[r][c] += powers[r] * powers[c];
+      aty[r] += powers[r] * p.y;
+    }
+  }
+
+  const coeffs = solveLinearSystem(ata, aty);
+  if (!coeffs) return linearTrend(values);
+
+  return values.map((_, i) => {
+    let y = 0;
+    let xp = 1;
+    for (let k = 0; k < m; k++) {
+      y += coeffs[k] * xp;
+      xp *= i;
+    }
+    return y;
+  });
+}
+
+/**
+ * Gauss-Jordan solve of A·x = b for a small square system. Returns null when
+ * the matrix is singular (near-zero pivot) so callers can fall back.
+ */
+function solveLinearSystem(A: number[][], b: number[]): number[] | null {
+  const n = b.length;
+  // Augmented matrix.
+  const M = A.map((row, i) => [...row, b[i]]);
+  for (let col = 0; col < n; col++) {
+    // Partial pivot.
+    let pivot = col;
+    for (let r = col + 1; r < n; r++) {
+      if (Math.abs(M[r][col]) > Math.abs(M[pivot][col])) pivot = r;
+    }
+    if (Math.abs(M[pivot][col]) < 1e-12) return null;
+    [M[col], M[pivot]] = [M[pivot], M[col]];
+    const pv = M[col][col];
+    for (let c = col; c <= n; c++) M[col][c] /= pv;
+    for (let r = 0; r < n; r++) {
+      if (r === col) continue;
+      const factor = M[r][col];
+      for (let c = col; c <= n; c++) M[r][c] -= factor * M[col][c];
+    }
+  }
+  return M.map(row => row[n]);
+}
+
+/**
  * Trailing simple moving average over values with the given window.
  * Position i averages the up-to-window most recent non-gap values ending
  * at i (inclusive). Positions with no usable value in range emit null so

@@ -262,6 +262,15 @@
             [showButtons]="true"
           ></app-custom-number>
         </div>
+        <div class="config-group" *ngIf="trendType === 'poly'">
+          <label>{{ 'ANALYSES.ANALYTICS.POLY_DEGREE' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="trendDegree"
+            [min]="2"
+            [max]="6"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
 
         <!-- Small multiples -->
         <div class="config-row">
@@ -293,6 +302,178 @@
               [showButtons]="true"
             ></app-custom-number>
           </div>
+        </div>
+      </div>
+
+      <!-- ===== Data & Format (Slice C): sort / top-N / stacking / null / format ===== -->
+      <div
+        class="config-section"
+        *ngIf="supportsPerVisualControls(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.VISUAL.DATA_FORMAT_SECTION' | translate }}
+        </div>
+
+        <!-- Sort -->
+        <div class="config-group">
+          <label>{{ 'ANALYSES.VISUAL.SORT' | translate }}</label>
+          <app-custom-dropdown
+            [options]="sortByOptions"
+            [(ngModel)]="sortBy"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            icon="pi-sort-alt"
+          ></app-custom-dropdown>
+        </div>
+        <div class="config-group" *ngIf="sortBy !== 'none'">
+          <label>{{ 'ANALYSES.VISUAL.SORT_DIRECTION' | translate }}</label>
+          <app-custom-dropdown
+            [options]="sortDirOptions"
+            [(ngModel)]="sortDir"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          ></app-custom-dropdown>
+        </div>
+
+        <!-- Top-N / Bottom-N -->
+        <div class="config-group">
+          <label>{{ 'ANALYSES.VISUAL.LIMIT' | translate }}</label>
+          <app-custom-dropdown
+            [options]="limitModeOptions"
+            [(ngModel)]="limitMode"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            icon="pi-filter"
+          ></app-custom-dropdown>
+        </div>
+        <div class="config-group" *ngIf="limitMode !== 'none'">
+          <label>{{ 'ANALYSES.VISUAL.LIMIT_COUNT' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="limitN"
+            [min]="1"
+            [max]="1000"
+            [showButtons]="true"
+          ></app-custom-number>
+        </div>
+
+        <!-- Stacking (bar / area / combo) -->
+        <div class="config-group">
+          <label>{{ 'ANALYSES.VISUAL.STACKING_TITLE' | translate }}</label>
+          <app-custom-dropdown
+            [options]="stackingOptions"
+            [(ngModel)]="stacking"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            icon="pi-server"
+          ></app-custom-dropdown>
+        </div>
+
+        <!-- Null handling -->
+        <div class="config-group">
+          <label>{{ 'ANALYSES.VISUAL.NULL_HANDLING_TITLE' | translate }}</label>
+          <app-custom-dropdown
+            [options]="nullHandlingOptions"
+            [(ngModel)]="nullHandling"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          ></app-custom-dropdown>
+        </div>
+
+        <!-- Per-field number/date format -->
+        <div class="config-group">
+          <label>{{ 'ANALYSES.VISUAL.FORMAT_TITLE' | translate }}</label>
+          <app-custom-dropdown
+            [options]="formatKindOptions"
+            [(ngModel)]="formatKind"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            icon="pi-hashtag"
+          ></app-custom-dropdown>
+        </div>
+        <ng-container *ngIf="formatKind !== 'auto'">
+          <div class="config-group">
+            <label>{{ 'ANALYSES.VISUAL.FORMAT_TARGET_TITLE' | translate }}</label>
+            <app-custom-dropdown
+              [options]="formatTargetOptions"
+              [(ngModel)]="formatTarget"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+            ></app-custom-dropdown>
+          </div>
+          <div
+            class="config-group"
+            *ngIf="formatKind === 'number' || formatKind === 'currency' || formatKind === 'percent'"
+          >
+            <label>{{ 'ANALYSES.VISUAL.FORMAT_DECIMALS' | translate }}</label>
+            <app-custom-number
+              [(ngModel)]="formatDecimals"
+              [min]="0"
+              [max]="6"
+              [showButtons]="true"
+            ></app-custom-number>
+          </div>
+          <div class="config-group" *ngIf="formatKind === 'currency'">
+            <label>{{ 'ANALYSES.VISUAL.FORMAT_CURRENCY' | translate }}</label>
+            <app-custom-input
+              [(ngModel)]="formatCurrencyCode"
+              [maxLength]="3"
+              [placeholder]="'USD'"
+              icon="pi-dollar"
+            ></app-custom-input>
+          </div>
+          <div class="config-group" *ngIf="formatKind === 'date'">
+            <label>{{ 'ANALYSES.VISUAL.FORMAT_DATE' | translate }}</label>
+            <app-custom-input
+              [(ngModel)]="formatDateFormat"
+              [maxLength]="20"
+              [placeholder]="'YYYY-MM-DD'"
+              icon="pi-calendar"
+            ></app-custom-input>
+          </div>
+          <div
+            class="config-row"
+            *ngIf="formatKind === 'number' || formatKind === 'currency' || formatKind === 'percent'"
+          >
+            <label>{{ 'ANALYSES.VISUAL.FORMAT_THOUSANDS' | translate }}</label>
+            <app-custom-toggle
+              [(ngModel)]="formatThousands"
+              [showStatusLabel]="false"
+            ></app-custom-toggle>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- ===== Histogram (auto-binned bars) ===== -->
+      <div
+        class="config-section"
+        *ngIf="isHistogramChartType(focusedVisual.chartType)"
+      >
+        <div class="section-title">
+          {{ 'ANALYSES.VISUAL.HISTOGRAM_SECTION' | translate }}
+        </div>
+        <div class="config-group">
+          <label>{{ 'ANALYSES.VISUAL.HISTOGRAM_BINS' | translate }}</label>
+          <app-custom-number
+            [(ngModel)]="focusedVisual.config.histogramBins"
+            [min]="0"
+            [max]="50"
+            [showButtons]="true"
+            [placeholder]="'ANALYSES.AUTO' | translate"
+          ></app-custom-number>
+        </div>
+        <div class="config-row">
+          <label>{{ 'ANALYSES.VISUAL.HISTOGRAM_SHOW_COUNTS' | translate }}</label>
+          <app-custom-toggle
+            [(ngModel)]="focusedVisual.config.histogramShowCounts"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
         </div>
       </div>
 
@@ -470,6 +651,37 @@
             [showStatusLabel]="false"
           ></app-custom-toggle>
         </div>
+        <!-- Value-axis scale type + explicit min/max (Slice C).
+             Only meaningful for cartesian value axes. -->
+        <ng-container *ngIf="supportsPerVisualControls(focusedVisual.chartType)">
+          <div class="config-group">
+            <label>{{ 'ANALYSES.VISUAL.AXIS_SCALE_TYPE' | translate }}</label>
+            <app-custom-dropdown
+              [options]="axisScaleOptions"
+              [(ngModel)]="yAxisScaleType"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              icon="pi-chart-line"
+            ></app-custom-dropdown>
+          </div>
+          <div class="config-group">
+            <label>{{ 'ANALYSES.VISUAL.AXIS_MIN' | translate }}</label>
+            <app-custom-number
+              [(ngModel)]="yScaleMin"
+              [showButtons]="false"
+              [placeholder]="'ANALYSES.AUTO' | translate"
+            ></app-custom-number>
+          </div>
+          <div class="config-group">
+            <label>{{ 'ANALYSES.VISUAL.AXIS_MAX' | translate }}</label>
+            <app-custom-number
+              [(ngModel)]="yScaleMax"
+              [showButtons]="false"
+              [placeholder]="'ANALYSES.AUTO' | translate"
+            ></app-custom-number>
+          </div>
+        </ng-container>
         <div class="config-row">
           <label>{{ 'ANALYSES.BOUNDARY_GAP' | translate }}</label>
           <app-custom-toggle
@@ -532,6 +744,21 @@
               [showButtons]="true"
               suffix="px"
             ></app-custom-number>
+          </div>
+          <!-- Label content: raw value vs % of total (Slice C). -->
+          <div
+            class="config-group"
+            *ngIf="supportsPerVisualControls(focusedVisual.chartType)"
+          >
+            <label>{{ 'ANALYSES.VISUAL.LABEL_CONTENT_TITLE' | translate }}</label>
+            <app-custom-dropdown
+              [options]="labelContentOptions"
+              [(ngModel)]="labelContent"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              icon="pi-percentage"
+            ></app-custom-dropdown>
           </div>
         </ng-container>
       </div>

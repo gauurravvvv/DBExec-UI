@@ -1629,7 +1629,10 @@
       "FORECAST_PERIODS": "Prognosezeiträume",
       "SMALL_MULTIPLES": "Kleine Vielfache",
       "FACET_COLUMN": "Facettenspalte",
-      "MAX_COLS": "Max. Spalten"
+      "MAX_COLS": "Max. Spalten",
+      "TREND_LOG": "Logarithmisch",
+      "TREND_POLY": "Polynomisch",
+      "POLY_DEGREE": "Polynomgrad"
     },
     "INTERACTION": {
       "SECTION": "Interaktion",
@@ -1680,6 +1683,71 @@
       "MODE": "Filtermodus",
       "MODE_LIVE": "Live",
       "MODE_APPLY": "Anwenden"
+    },
+    "VISUAL": {
+      "DATA_FORMAT_SECTION": "Daten & Format",
+      "SORT": "Sortierung",
+      "SORT_DIRECTION": "Sortierrichtung",
+      "SORT_BY": {
+        "NONE": "Keine",
+        "AXIS": "Nach Achse",
+        "MEASURE": "Nach Kennzahl"
+      },
+      "SORT_DIR": {
+        "ASC": "Aufsteigend",
+        "DESC": "Absteigend"
+      },
+      "LIMIT": "Begrenzung",
+      "LIMIT_COUNT": "Anzahl",
+      "LIMIT_MODE": {
+        "NONE": "Keine",
+        "TOP": "Top N",
+        "BOTTOM": "Untere N"
+      },
+      "STACKING_TITLE": "Stapelung",
+      "STACKING": {
+        "NONE": "Keine",
+        "STACKED": "Gestapelt",
+        "PERCENT": "100 % gestapelt"
+      },
+      "LABEL_CONTENT_TITLE": "Beschriftungsinhalt",
+      "LABEL_CONTENT": {
+        "VALUE": "Wert",
+        "PERCENT": "Prozent vom Gesamtwert"
+      },
+      "NULL_HANDLING_TITLE": "Nullwertbehandlung",
+      "NULL_HANDLING": {
+        "GAP": "Als Lücke anzeigen",
+        "ZERO": "Als Null behandeln",
+        "HIDE": "Ausblenden"
+      },
+      "AXIS_SCALE_TYPE": "Achsenskala",
+      "AXIS_SCALE": {
+        "LINEAR": "Linear",
+        "LOG": "Logarithmisch"
+      },
+      "AXIS_MIN": "Achsenminimum",
+      "AXIS_MAX": "Achsenmaximum",
+      "FORMAT_TITLE": "Zahlen-/Datumsformat",
+      "FORMAT_KIND": {
+        "AUTO": "Automatisch",
+        "NUMBER": "Zahl",
+        "CURRENCY": "Währung",
+        "PERCENT": "Prozent",
+        "DATE": "Datum"
+      },
+      "FORMAT_TARGET_TITLE": "Anwenden auf",
+      "FORMAT_TARGET": {
+        "VALUE": "Wertachse",
+        "CATEGORY": "Kategorieachse"
+      },
+      "FORMAT_DECIMALS": "Dezimalstellen",
+      "FORMAT_CURRENCY": "Währungscode",
+      "FORMAT_DATE": "Datumsformat",
+      "FORMAT_THOUSANDS": "Tausendertrennzeichen",
+      "HISTOGRAM_SECTION": "Histogramm",
+      "HISTOGRAM_BINS": "Anzahl der Klassen",
+      "HISTOGRAM_SHOW_COUNTS": "Anzahl anzeigen"
     }
   },
   "DASHBOARD": {
@@ -2946,7 +3014,8 @@
       "FLOW": "Fluss",
       "SPECIAL": "Spezial",
       "FINANCIAL": "Finanzdiagramme",
-      "3D_CHARTS": "3D-Diagramme"
+      "3D_CHARTS": "3D-Diagramme",
+      "COMBO": "Kombidiagramme"
     },
     "BAR_VERTICAL": {
       "NAME": "Balkendiagramm",
@@ -3179,6 +3248,14 @@
     "POLYGONS3D": {
       "NAME": "Polygons 3D",
       "DESCRIPTION": "Extruded 3D polygon regions rendered on a globe, grouped by name with longitude/latitude vertices"
+    },
+    "COMBO": {
+      "NAME": "Kombi (Doppelachse)",
+      "DESCRIPTION": "Balken und eine Linie auf unabhängigen linken/rechten Wertachsen"
+    },
+    "HISTOGRAM": {
+      "NAME": "Histogramm",
+      "DESCRIPTION": "Verteilung einer numerischen Spalte in automatisch berechnete Klassen"
     }
   },
   "ROLE_LABELS": {

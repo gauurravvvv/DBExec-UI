@@ -112,6 +112,17 @@ import {
   TREE_EDGE_SHAPES,
   TREE_LAYOUTS,
   TREE_ORIENTATIONS,
+  isComboChartType,
+  isHistogramChartType,
+  VISUAL_SORT_BY_OPTIONS,
+  VISUAL_SORT_DIR_OPTIONS,
+  VISUAL_LIMIT_MODE_OPTIONS,
+  VISUAL_STACKING_OPTIONS,
+  VISUAL_LABEL_CONTENT_OPTIONS,
+  VISUAL_NULL_HANDLING_OPTIONS,
+  VISUAL_AXIS_SCALE_OPTIONS,
+  VISUAL_FORMAT_KIND_OPTIONS,
+  VISUAL_FORMAT_TARGET_OPTIONS,
 } from '../../constants/charts.constants';
 import { Visual } from '../../models';
 import type { AggregateFn, AggregationMeasure } from '../../models/visual.model';
@@ -322,13 +333,21 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     { label: 'ANALYSES.AGG.COUNT_DISTINCT', value: 'count_distinct' },
   ];
 
-  /** Trend types for the Analytics section (Track E1). */
-  readonly trendTypeOptions: { label: string; value: string }[] = [
+  /**
+   * Trend types for the Analytics section (Track E1). Extended with
+   * logarithmic + polynomial fits (Slice E). `trendTypeOptionsRaw` holds the
+   * i18n keys; `trendTypeOptions` is the localized copy the template binds to
+   * (swapped in localizeDropdownOptions + on language change).
+   */
+  readonly trendTypeOptionsRaw: { label: string; value: string }[] = [
     { label: 'ANALYSES.ANALYTICS.TREND_NONE', value: 'none' },
     { label: 'ANALYSES.ANALYTICS.TREND_LINEAR', value: 'linear' },
+    { label: 'ANALYSES.ANALYTICS.TREND_LOG', value: 'log' },
+    { label: 'ANALYSES.ANALYTICS.TREND_POLY', value: 'poly' },
     { label: 'ANALYSES.ANALYTICS.TREND_MOVING_AVG', value: 'movingAverage' },
     { label: 'ANALYSES.ANALYTICS.TREND_FORECAST', value: 'forecast' },
   ];
+  trendTypeOptions: { label: string; value: string }[] = [];
 
   /** Per-series render types for the dual-axis editor. */
   readonly dualAxisSeriesTypeOptions: { label: string; value: string }[] = [
@@ -352,7 +371,16 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
   /** True for the cartesian families the analytics sections support. */
   supportsCartesianAnalytics(chartType: string | null | undefined): boolean {
     if (!chartType) return false;
-    return /^(bar-|line|area)/.test(chartType);
+    return /^(bar-|line|area|combo|histogram)/.test(chartType);
+  }
+
+  /**
+   * True for the cartesian families the per-visual formatting controls
+   * (sort / top-N / stacking / null / axis scale / format) apply to. Same
+   * family as the analytics sections.
+   */
+  supportsPerVisualControls(chartType: string | null | undefined): boolean {
+    return this.supportsCartesianAnalytics(chartType);
   }
 
   /** All fields as { label, value } for column dropdowns. */
@@ -552,6 +580,177 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
       ...this.focusedVisual.config.trend,
       forecastPeriods: v,
     };
+  }
+
+  /** Polynomial degree (2 = quadratic, 3 = cubic, …) for the poly trend fit. */
+  get trendDegree(): number {
+    return this.focusedVisual?.config?.trend?.degree ?? 2;
+  }
+  set trendDegree(v: number) {
+    if (!this.focusedVisual?.config?.trend) return;
+    this.focusedVisual.config.trend = {
+      ...this.focusedVisual.config.trend,
+      degree: v,
+    };
+  }
+
+  // ── Per-visual controls (Slice C): sort / limit / stacking / null / format ──
+  // All read/write flat config keys. Getters default to the passthrough value
+  // so an un-configured visual shows the neutral option.
+
+  get sortBy(): string {
+    return this.focusedVisual?.config?.sortBy ?? 'none';
+  }
+  set sortBy(v: string) {
+    if (this.focusedVisual?.config) this.focusedVisual.config.sortBy = v;
+  }
+
+  get sortDir(): string {
+    return this.focusedVisual?.config?.sortDir ?? 'desc';
+  }
+  set sortDir(v: string) {
+    if (this.focusedVisual?.config) this.focusedVisual.config.sortDir = v;
+  }
+
+  get limitMode(): string {
+    return this.focusedVisual?.config?.limitMode ?? 'none';
+  }
+  set limitMode(v: string) {
+    if (this.focusedVisual?.config) this.focusedVisual.config.limitMode = v;
+  }
+
+  get limitN(): number {
+    return this.focusedVisual?.config?.limitN ?? 10;
+  }
+  set limitN(v: number) {
+    if (this.focusedVisual?.config) this.focusedVisual.config.limitN = v;
+  }
+
+  get stacking(): string {
+    return this.focusedVisual?.config?.stacking ?? 'none';
+  }
+  set stacking(v: string) {
+    if (this.focusedVisual?.config) this.focusedVisual.config.stacking = v;
+  }
+
+  get labelContent(): string {
+    return this.focusedVisual?.config?.labelContent ?? 'value';
+  }
+  set labelContent(v: string) {
+    if (this.focusedVisual?.config) this.focusedVisual.config.labelContent = v;
+  }
+
+  get nullHandling(): string {
+    return this.focusedVisual?.config?.nullHandling ?? 'gap';
+  }
+  set nullHandling(v: string) {
+    if (this.focusedVisual?.config) this.focusedVisual.config.nullHandling = v;
+  }
+
+  get yAxisScaleType(): string {
+    return this.focusedVisual?.config?.yAxisScaleType ?? 'linear';
+  }
+  set yAxisScaleType(v: string) {
+    if (this.focusedVisual?.config) this.focusedVisual.config.yAxisScaleType = v;
+  }
+
+  get yScaleMin(): number | null {
+    const v = this.focusedVisual?.config?.yScaleMin;
+    return typeof v === 'number' ? v : null;
+  }
+  set yScaleMin(v: number | null) {
+    if (!this.focusedVisual?.config) return;
+    this.focusedVisual.config.yScaleMin =
+      v === null || v === undefined ? undefined : v;
+  }
+
+  get yScaleMax(): number | null {
+    const v = this.focusedVisual?.config?.yScaleMax;
+    return typeof v === 'number' ? v : null;
+  }
+  set yScaleMax(v: number | null) {
+    if (!this.focusedVisual?.config) return;
+    this.focusedVisual.config.yScaleMax =
+      v === null || v === undefined ? undefined : v;
+  }
+
+  // ── Per-field number/date format (config.valueFormat = formatHint) ──────
+  // formatHint shape: { kind, decimals, currencyCode, dateFormat, thousands,
+  // target }. `kind: 'auto'` (the default) means no override.
+
+  private ensureValueFormat(): any {
+    if (!this.focusedVisual?.config) return null;
+    const cfg = this.focusedVisual.config;
+    if (!cfg.valueFormat || typeof cfg.valueFormat !== 'object') {
+      cfg.valueFormat = {
+        kind: 'auto',
+        decimals: 2,
+        currencyCode: 'USD',
+        dateFormat: 'YYYY-MM-DD',
+        thousands: true,
+        target: 'value',
+      };
+    }
+    return cfg.valueFormat;
+  }
+
+  get formatKind(): string {
+    return this.focusedVisual?.config?.valueFormat?.kind ?? 'auto';
+  }
+  set formatKind(v: string) {
+    const fmt = this.ensureValueFormat();
+    if (!fmt || !this.focusedVisual?.config) return;
+    if (v === 'auto') {
+      // Reset to passthrough — drop the whole hint so the builder no-ops.
+      this.focusedVisual.config.valueFormat = null;
+      return;
+    }
+    this.focusedVisual.config.valueFormat = { ...fmt, kind: v };
+  }
+
+  get formatTarget(): string {
+    return this.focusedVisual?.config?.valueFormat?.target ?? 'value';
+  }
+  set formatTarget(v: string) {
+    const fmt = this.ensureValueFormat();
+    if (!fmt) return;
+    this.focusedVisual!.config.valueFormat = { ...fmt, target: v };
+  }
+
+  get formatDecimals(): number {
+    return this.focusedVisual?.config?.valueFormat?.decimals ?? 2;
+  }
+  set formatDecimals(v: number) {
+    const fmt = this.ensureValueFormat();
+    if (!fmt) return;
+    this.focusedVisual!.config.valueFormat = { ...fmt, decimals: v };
+  }
+
+  get formatCurrencyCode(): string {
+    return this.focusedVisual?.config?.valueFormat?.currencyCode ?? 'USD';
+  }
+  set formatCurrencyCode(v: string) {
+    const fmt = this.ensureValueFormat();
+    if (!fmt) return;
+    this.focusedVisual!.config.valueFormat = { ...fmt, currencyCode: v };
+  }
+
+  get formatDateFormat(): string {
+    return this.focusedVisual?.config?.valueFormat?.dateFormat ?? 'YYYY-MM-DD';
+  }
+  set formatDateFormat(v: string) {
+    const fmt = this.ensureValueFormat();
+    if (!fmt) return;
+    this.focusedVisual!.config.valueFormat = { ...fmt, dateFormat: v };
+  }
+
+  get formatThousands(): boolean {
+    return this.focusedVisual?.config?.valueFormat?.thousands ?? true;
+  }
+  set formatThousands(v: boolean) {
+    const fmt = this.ensureValueFormat();
+    if (!fmt) return;
+    this.focusedVisual!.config.valueFormat = { ...fmt, thousands: v };
   }
 
   // ── Analytics section: small-multiples (config.smallMultiples) ───────
@@ -757,6 +956,18 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     this.conditionalDataTypeOptions = localize(
       VisualConfigSidebarComponent.RAW_CF_DTYPES,
     );
+    // Per-visual controls (Slice C).
+    this.sortByOptions = localize(VISUAL_SORT_BY_OPTIONS);
+    this.sortDirOptions = localize(VISUAL_SORT_DIR_OPTIONS);
+    this.limitModeOptions = localize(VISUAL_LIMIT_MODE_OPTIONS);
+    this.stackingOptions = localize(VISUAL_STACKING_OPTIONS);
+    this.labelContentOptions = localize(VISUAL_LABEL_CONTENT_OPTIONS);
+    this.nullHandlingOptions = localize(VISUAL_NULL_HANDLING_OPTIONS);
+    this.axisScaleOptions = localize(VISUAL_AXIS_SCALE_OPTIONS);
+    this.formatKindOptions = localize(VISUAL_FORMAT_KIND_OPTIONS);
+    this.formatTargetOptions = localize(VISUAL_FORMAT_TARGET_OPTIONS);
+    // Trend types include the new log/poly fits; localize the display copy.
+    this.trendTypeOptions = localize(this.trendTypeOptionsRaw);
   }
 
   ngDoCheck(): void {
@@ -838,6 +1049,8 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
   isFlowLinesChartType = isFlowLinesChartType;
   isLines3dChartType = isLines3dChartType;
   isPolygons3dChartType = isPolygons3dChartType;
+  isComboChartType = isComboChartType;
+  isHistogramChartType = isHistogramChartType;
   hasAxisLabels = hasAxisLabels;
   is3DCoordinateChartType = is3DCoordinateChartType;
 
@@ -853,6 +1066,16 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
 
   // Dropdown options
   colorSchemes = COLOR_SCHEMES;
+  // Per-visual controls (Slice C). Localised in localizeDropdownOptions().
+  sortByOptions = VISUAL_SORT_BY_OPTIONS;
+  sortDirOptions = VISUAL_SORT_DIR_OPTIONS;
+  limitModeOptions = VISUAL_LIMIT_MODE_OPTIONS;
+  stackingOptions = VISUAL_STACKING_OPTIONS;
+  labelContentOptions = VISUAL_LABEL_CONTENT_OPTIONS;
+  nullHandlingOptions = VISUAL_NULL_HANDLING_OPTIONS;
+  axisScaleOptions = VISUAL_AXIS_SCALE_OPTIONS;
+  formatKindOptions = VISUAL_FORMAT_KIND_OPTIONS;
+  formatTargetOptions = VISUAL_FORMAT_TARGET_OPTIONS;
   legendPositions = LEGEND_POSITIONS;
   legendTypes = LEGEND_TYPES;
   labelPositions = LABEL_POSITIONS;

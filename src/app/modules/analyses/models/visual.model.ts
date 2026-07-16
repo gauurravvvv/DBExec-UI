@@ -74,6 +74,12 @@ export interface ChartDataMapping {
   lngColumn?: string | null;
   latColumn?: string | null;
   timeColumn?: string | null;
+  /**
+   * Histogram: number of bins to compute client-side. 0 / undefined → auto
+   * (Sturges' rule). Sourced from `config.histogramBins` by buildMapping so the
+   * transform layer, which owns the binning, can honour the author's choice.
+   */
+  histogramBins?: number;
 }
 
 /**

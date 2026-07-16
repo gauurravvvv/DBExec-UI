@@ -1629,7 +1629,10 @@
       "FORECAST_PERIODS": "予測期間",
       "SMALL_MULTIPLES": "スモールマルチプル",
       "FACET_COLUMN": "ファセット列",
-      "MAX_COLS": "最大列数"
+      "MAX_COLS": "最大列数",
+      "TREND_LOG": "対数",
+      "TREND_POLY": "多項式",
+      "POLY_DEGREE": "多項式の次数"
     },
     "INTERACTION": {
       "SECTION": "インタラクション",
@@ -1680,6 +1683,71 @@
       "MODE": "フィルターモード",
       "MODE_LIVE": "ライブ",
       "MODE_APPLY": "適用"
+    },
+    "VISUAL": {
+      "DATA_FORMAT_SECTION": "データと書式",
+      "SORT": "並べ替え",
+      "SORT_DIRECTION": "並べ替え方向",
+      "SORT_BY": {
+        "NONE": "なし",
+        "AXIS": "軸で",
+        "MEASURE": "メジャーで"
+      },
+      "SORT_DIR": {
+        "ASC": "昇順",
+        "DESC": "降順"
+      },
+      "LIMIT": "制限",
+      "LIMIT_COUNT": "件数",
+      "LIMIT_MODE": {
+        "NONE": "なし",
+        "TOP": "上位N件",
+        "BOTTOM": "下位N件"
+      },
+      "STACKING_TITLE": "積み上げ",
+      "STACKING": {
+        "NONE": "なし",
+        "STACKED": "積み上げ",
+        "PERCENT": "100%積み上げ"
+      },
+      "LABEL_CONTENT_TITLE": "ラベル内容",
+      "LABEL_CONTENT": {
+        "VALUE": "値",
+        "PERCENT": "合計に対する割合"
+      },
+      "NULL_HANDLING_TITLE": "NULLの処理",
+      "NULL_HANDLING": {
+        "GAP": "空白として表示",
+        "ZERO": "ゼロとして扱う",
+        "HIDE": "非表示"
+      },
+      "AXIS_SCALE_TYPE": "軸のスケール",
+      "AXIS_SCALE": {
+        "LINEAR": "線形",
+        "LOG": "対数"
+      },
+      "AXIS_MIN": "軸の最小値",
+      "AXIS_MAX": "軸の最大値",
+      "FORMAT_TITLE": "数値・日付書式",
+      "FORMAT_KIND": {
+        "AUTO": "自動",
+        "NUMBER": "数値",
+        "CURRENCY": "通貨",
+        "PERCENT": "パーセント",
+        "DATE": "日付"
+      },
+      "FORMAT_TARGET_TITLE": "適用先",
+      "FORMAT_TARGET": {
+        "VALUE": "値軸",
+        "CATEGORY": "カテゴリ軸"
+      },
+      "FORMAT_DECIMALS": "小数点以下の桁数",
+      "FORMAT_CURRENCY": "通貨コード",
+      "FORMAT_DATE": "日付書式",
+      "FORMAT_THOUSANDS": "桁区切り",
+      "HISTOGRAM_SECTION": "ヒストグラム",
+      "HISTOGRAM_BINS": "ビンの数",
+      "HISTOGRAM_SHOW_COUNTS": "件数を表示"
     }
   },
   "DASHBOARD": {
@@ -2946,7 +3014,8 @@
       "FLOW": "フロー",
       "SPECIAL": "特殊",
       "FINANCIAL": "金融",
-      "3D_CHARTS": "3D グラフ"
+      "3D_CHARTS": "3D グラフ",
+      "COMBO": "コンボチャート"
     },
     "BAR_VERTICAL": {
       "NAME": "棒グラフ",
@@ -3179,6 +3248,14 @@
     "POLYGONS3D": {
       "NAME": "Polygons 3D",
       "DESCRIPTION": "Extruded 3D polygon regions rendered on a globe, grouped by name with longitude/latitude vertices"
+    },
+    "COMBO": {
+      "NAME": "コンボ（2軸）",
+      "DESCRIPTION": "独立した左右の値軸上の棒と折れ線"
+    },
+    "HISTOGRAM": {
+      "NAME": "ヒストグラム",
+      "DESCRIPTION": "数値列を自動計算したビンに分布"
     }
   },
   "ROLE_LABELS": {

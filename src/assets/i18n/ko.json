@@ -1629,7 +1629,10 @@
       "FORECAST_PERIODS": "예측 기간",
       "SMALL_MULTIPLES": "스몰 멀티플",
       "FACET_COLUMN": "패싯 열",
-      "MAX_COLS": "최대 열"
+      "MAX_COLS": "최대 열",
+      "TREND_LOG": "로그",
+      "TREND_POLY": "다항식",
+      "POLY_DEGREE": "다항식 차수"
     },
     "INTERACTION": {
       "SECTION": "상호작용",
@@ -1680,6 +1683,71 @@
       "MODE": "필터 모드",
       "MODE_LIVE": "실시간",
       "MODE_APPLY": "적용"
+    },
+    "VISUAL": {
+      "DATA_FORMAT_SECTION": "데이터 및 형식",
+      "SORT": "정렬",
+      "SORT_DIRECTION": "정렬 방향",
+      "SORT_BY": {
+        "NONE": "없음",
+        "AXIS": "축 기준",
+        "MEASURE": "측정값 기준"
+      },
+      "SORT_DIR": {
+        "ASC": "오름차순",
+        "DESC": "내림차순"
+      },
+      "LIMIT": "제한",
+      "LIMIT_COUNT": "개수",
+      "LIMIT_MODE": {
+        "NONE": "없음",
+        "TOP": "상위 N",
+        "BOTTOM": "하위 N"
+      },
+      "STACKING_TITLE": "누적",
+      "STACKING": {
+        "NONE": "없음",
+        "STACKED": "누적",
+        "PERCENT": "100% 누적"
+      },
+      "LABEL_CONTENT_TITLE": "레이블 내용",
+      "LABEL_CONTENT": {
+        "VALUE": "값",
+        "PERCENT": "전체 대비 백분율"
+      },
+      "NULL_HANDLING_TITLE": "NULL 처리",
+      "NULL_HANDLING": {
+        "GAP": "공백으로 표시",
+        "ZERO": "0으로 처리",
+        "HIDE": "숨기기"
+      },
+      "AXIS_SCALE_TYPE": "축 눈금",
+      "AXIS_SCALE": {
+        "LINEAR": "선형",
+        "LOG": "로그"
+      },
+      "AXIS_MIN": "축 최소값",
+      "AXIS_MAX": "축 최대값",
+      "FORMAT_TITLE": "숫자/날짜 형식",
+      "FORMAT_KIND": {
+        "AUTO": "자동",
+        "NUMBER": "숫자",
+        "CURRENCY": "통화",
+        "PERCENT": "백분율",
+        "DATE": "날짜"
+      },
+      "FORMAT_TARGET_TITLE": "적용 대상",
+      "FORMAT_TARGET": {
+        "VALUE": "값 축",
+        "CATEGORY": "범주 축"
+      },
+      "FORMAT_DECIMALS": "소수 자릿수",
+      "FORMAT_CURRENCY": "통화 코드",
+      "FORMAT_DATE": "날짜 형식",
+      "FORMAT_THOUSANDS": "천 단위 구분 기호",
+      "HISTOGRAM_SECTION": "히스토그램",
+      "HISTOGRAM_BINS": "구간 수",
+      "HISTOGRAM_SHOW_COUNTS": "개수 표시"
     }
   },
   "DASHBOARD": {
@@ -2946,7 +3014,8 @@
       "FLOW": "플로우",
       "SPECIAL": "특수",
       "FINANCIAL": "금융",
-      "3D_CHARTS": "3D 차트"
+      "3D_CHARTS": "3D 차트",
+      "COMBO": "콤보 차트"
     },
     "BAR_VERTICAL": {
       "NAME": "막대 차트",
@@ -3179,6 +3248,14 @@
     "POLYGONS3D": {
       "NAME": "Polygons 3D",
       "DESCRIPTION": "Extruded 3D polygon regions rendered on a globe, grouped by name with longitude/latitude vertices"
+    },
+    "COMBO": {
+      "NAME": "콤보(이중 축)",
+      "DESCRIPTION": "독립적인 좌우 값 축의 막대와 선"
+    },
+    "HISTOGRAM": {
+      "NAME": "히스토그램",
+      "DESCRIPTION": "숫자 열을 자동 계산된 구간으로 분포"
     }
   },
   "ROLE_LABELS": {

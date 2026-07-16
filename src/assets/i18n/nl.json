@@ -1629,7 +1629,10 @@
       "FORECAST_PERIODS": "Voorspellingsperioden",
       "SMALL_MULTIPLES": "Kleine veelvouden",
       "FACET_COLUMN": "Facetkolom",
-      "MAX_COLS": "Max. kolommen"
+      "MAX_COLS": "Max. kolommen",
+      "TREND_LOG": "Logaritmisch",
+      "TREND_POLY": "Polynomiaal",
+      "POLY_DEGREE": "Polynoomgraad"
     },
     "INTERACTION": {
       "SECTION": "Interactie",
@@ -1680,6 +1683,71 @@
       "MODE": "Filtermodus",
       "MODE_LIVE": "Live",
       "MODE_APPLY": "Toepassen"
+    },
+    "VISUAL": {
+      "DATA_FORMAT_SECTION": "Gegevens & opmaak",
+      "SORT": "Sorteren",
+      "SORT_DIRECTION": "Sorteervolgorde",
+      "SORT_BY": {
+        "NONE": "Geen",
+        "AXIS": "Op as",
+        "MEASURE": "Op meetwaarde"
+      },
+      "SORT_DIR": {
+        "ASC": "Oplopend",
+        "DESC": "Aflopend"
+      },
+      "LIMIT": "Limiet",
+      "LIMIT_COUNT": "Aantal",
+      "LIMIT_MODE": {
+        "NONE": "Geen",
+        "TOP": "Top N",
+        "BOTTOM": "Onderste N"
+      },
+      "STACKING_TITLE": "Stapelen",
+      "STACKING": {
+        "NONE": "Geen",
+        "STACKED": "Gestapeld",
+        "PERCENT": "100% gestapeld"
+      },
+      "LABEL_CONTENT_TITLE": "Labelinhoud",
+      "LABEL_CONTENT": {
+        "VALUE": "Waarde",
+        "PERCENT": "Percentage van totaal"
+      },
+      "NULL_HANDLING_TITLE": "Verwerking van null-waarden",
+      "NULL_HANDLING": {
+        "GAP": "Weergeven als leegte",
+        "ZERO": "Behandelen als nul",
+        "HIDE": "Verbergen"
+      },
+      "AXIS_SCALE_TYPE": "Asschaal",
+      "AXIS_SCALE": {
+        "LINEAR": "Lineair",
+        "LOG": "Logaritmisch"
+      },
+      "AXIS_MIN": "Asminimum",
+      "AXIS_MAX": "Asmaximum",
+      "FORMAT_TITLE": "Getal-/datumnotatie",
+      "FORMAT_KIND": {
+        "AUTO": "Automatisch",
+        "NUMBER": "Getal",
+        "CURRENCY": "Valuta",
+        "PERCENT": "Percentage",
+        "DATE": "Datum"
+      },
+      "FORMAT_TARGET_TITLE": "Toepassen op",
+      "FORMAT_TARGET": {
+        "VALUE": "Waardeas",
+        "CATEGORY": "Categorieas"
+      },
+      "FORMAT_DECIMALS": "Decimalen",
+      "FORMAT_CURRENCY": "Valutacode",
+      "FORMAT_DATE": "Datumnotatie",
+      "FORMAT_THOUSANDS": "Scheidingsteken voor duizendtallen",
+      "HISTOGRAM_SECTION": "Histogram",
+      "HISTOGRAM_BINS": "Aantal klassen",
+      "HISTOGRAM_SHOW_COUNTS": "Aantallen weergeven"
     }
   },
   "DASHBOARD": {
@@ -2946,7 +3014,8 @@
       "FLOW": "Stroom",
       "SPECIAL": "Speciaal",
       "FINANCIAL": "Financieel",
-      "3D_CHARTS": "3D-diagrammen"
+      "3D_CHARTS": "3D-diagrammen",
+      "COMBO": "Combinatiegrafieken"
     },
     "BAR_VERTICAL": {
       "NAME": "Staafdiagram",
@@ -3179,6 +3248,14 @@
     "POLYGONS3D": {
       "NAME": "Polygons 3D",
       "DESCRIPTION": "Extruded 3D polygon regions rendered on a globe, grouped by name with longitude/latitude vertices"
+    },
+    "COMBO": {
+      "NAME": "Combinatie (dubbele as)",
+      "DESCRIPTION": "Balken en een lijn op onafhankelijke linker-/rechterwaardeassen"
+    },
+    "HISTOGRAM": {
+      "NAME": "Histogram",
+      "DESCRIPTION": "Verdeling van een numerieke kolom in automatisch berekende klassen"
     }
   },
   "ROLE_LABELS": {

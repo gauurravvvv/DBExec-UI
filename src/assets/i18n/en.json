@@ -1632,7 +1632,10 @@
       "FORECAST_PERIODS": "Forecast periods",
       "SMALL_MULTIPLES": "Small multiples",
       "FACET_COLUMN": "Facet column",
-      "MAX_COLS": "Max columns"
+      "MAX_COLS": "Max columns",
+      "TREND_LOG": "Logarithmic",
+      "TREND_POLY": "Polynomial",
+      "POLY_DEGREE": "Polynomial Degree"
     },
     "INTERACTION": {
       "SECTION": "Interaction",
@@ -1683,6 +1686,71 @@
       "MODE": "Filter mode",
       "MODE_LIVE": "Live",
       "MODE_APPLY": "Apply"
+    },
+    "VISUAL": {
+      "DATA_FORMAT_SECTION": "Data & Format",
+      "SORT": "Sort",
+      "SORT_DIRECTION": "Sort Direction",
+      "SORT_BY": {
+        "NONE": "None",
+        "AXIS": "By Axis",
+        "MEASURE": "By Measure"
+      },
+      "SORT_DIR": {
+        "ASC": "Ascending",
+        "DESC": "Descending"
+      },
+      "LIMIT": "Limit",
+      "LIMIT_COUNT": "Count",
+      "LIMIT_MODE": {
+        "NONE": "None",
+        "TOP": "Top N",
+        "BOTTOM": "Bottom N"
+      },
+      "STACKING_TITLE": "Stacking",
+      "STACKING": {
+        "NONE": "None",
+        "STACKED": "Stacked",
+        "PERCENT": "100% Stacked"
+      },
+      "LABEL_CONTENT_TITLE": "Label Content",
+      "LABEL_CONTENT": {
+        "VALUE": "Value",
+        "PERCENT": "Percent of Total"
+      },
+      "NULL_HANDLING_TITLE": "Null Handling",
+      "NULL_HANDLING": {
+        "GAP": "Show as Gap",
+        "ZERO": "Treat as Zero",
+        "HIDE": "Hide"
+      },
+      "AXIS_SCALE_TYPE": "Axis Scale",
+      "AXIS_SCALE": {
+        "LINEAR": "Linear",
+        "LOG": "Logarithmic"
+      },
+      "AXIS_MIN": "Axis Minimum",
+      "AXIS_MAX": "Axis Maximum",
+      "FORMAT_TITLE": "Number / Date Format",
+      "FORMAT_KIND": {
+        "AUTO": "Automatic",
+        "NUMBER": "Number",
+        "CURRENCY": "Currency",
+        "PERCENT": "Percent",
+        "DATE": "Date"
+      },
+      "FORMAT_TARGET_TITLE": "Apply To",
+      "FORMAT_TARGET": {
+        "VALUE": "Value Axis",
+        "CATEGORY": "Category Axis"
+      },
+      "FORMAT_DECIMALS": "Decimal Places",
+      "FORMAT_CURRENCY": "Currency Code",
+      "FORMAT_DATE": "Date Format",
+      "FORMAT_THOUSANDS": "Thousands Separator",
+      "HISTOGRAM_SECTION": "Histogram",
+      "HISTOGRAM_BINS": "Number of Bins",
+      "HISTOGRAM_SHOW_COUNTS": "Show Counts"
     }
   },
   "DASHBOARD": {
@@ -3181,7 +3249,16 @@
       "FLOW": "Flow",
       "SPECIAL": "Special",
       "FINANCIAL": "Financial",
-      "3D_CHARTS": "3D Charts"
+      "3D_CHARTS": "3D Charts",
+      "COMBO": "Combo Charts"
+    },
+    "COMBO": {
+      "NAME": "Combo (Dual-Axis)",
+      "DESCRIPTION": "Bars and a line on independent left/right value axes"
+    },
+    "HISTOGRAM": {
+      "NAME": "Histogram",
+      "DESCRIPTION": "Distribution of a numeric column into auto-computed bins"
     }
   },
   "ROLE_LABELS": {

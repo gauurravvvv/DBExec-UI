@@ -1629,7 +1629,10 @@
       "FORECAST_PERIODS": "Períodos de previsión",
       "SMALL_MULTIPLES": "Múltiplos pequeños",
       "FACET_COLUMN": "Columna de faceta",
-      "MAX_COLS": "Columnas máx."
+      "MAX_COLS": "Columnas máx.",
+      "TREND_LOG": "Logarítmica",
+      "TREND_POLY": "Polinómica",
+      "POLY_DEGREE": "Grado del polinomio"
     },
     "INTERACTION": {
       "SECTION": "Interacción",
@@ -1680,6 +1683,71 @@
       "MODE": "Modo de filtro",
       "MODE_LIVE": "En vivo",
       "MODE_APPLY": "Aplicar"
+    },
+    "VISUAL": {
+      "DATA_FORMAT_SECTION": "Datos y formato",
+      "SORT": "Ordenar",
+      "SORT_DIRECTION": "Dirección de orden",
+      "SORT_BY": {
+        "NONE": "Ninguno",
+        "AXIS": "Por eje",
+        "MEASURE": "Por medida"
+      },
+      "SORT_DIR": {
+        "ASC": "Ascendente",
+        "DESC": "Descendente"
+      },
+      "LIMIT": "Límite",
+      "LIMIT_COUNT": "Cantidad",
+      "LIMIT_MODE": {
+        "NONE": "Ninguno",
+        "TOP": "Primeros N",
+        "BOTTOM": "Últimos N"
+      },
+      "STACKING_TITLE": "Apilado",
+      "STACKING": {
+        "NONE": "Ninguno",
+        "STACKED": "Apilado",
+        "PERCENT": "Apilado al 100 %"
+      },
+      "LABEL_CONTENT_TITLE": "Contenido de etiqueta",
+      "LABEL_CONTENT": {
+        "VALUE": "Valor",
+        "PERCENT": "Porcentaje del total"
+      },
+      "NULL_HANDLING_TITLE": "Gestión de nulos",
+      "NULL_HANDLING": {
+        "GAP": "Mostrar como hueco",
+        "ZERO": "Tratar como cero",
+        "HIDE": "Ocultar"
+      },
+      "AXIS_SCALE_TYPE": "Escala del eje",
+      "AXIS_SCALE": {
+        "LINEAR": "Lineal",
+        "LOG": "Logarítmica"
+      },
+      "AXIS_MIN": "Mínimo del eje",
+      "AXIS_MAX": "Máximo del eje",
+      "FORMAT_TITLE": "Formato de número/fecha",
+      "FORMAT_KIND": {
+        "AUTO": "Automático",
+        "NUMBER": "Número",
+        "CURRENCY": "Moneda",
+        "PERCENT": "Porcentaje",
+        "DATE": "Fecha"
+      },
+      "FORMAT_TARGET_TITLE": "Aplicar a",
+      "FORMAT_TARGET": {
+        "VALUE": "Eje de valores",
+        "CATEGORY": "Eje de categorías"
+      },
+      "FORMAT_DECIMALS": "Decimales",
+      "FORMAT_CURRENCY": "Código de moneda",
+      "FORMAT_DATE": "Formato de fecha",
+      "FORMAT_THOUSANDS": "Separador de miles",
+      "HISTOGRAM_SECTION": "Histograma",
+      "HISTOGRAM_BINS": "Número de intervalos",
+      "HISTOGRAM_SHOW_COUNTS": "Mostrar recuentos"
     }
   },
   "DASHBOARD": {
@@ -2946,7 +3014,8 @@
       "FLOW": "Flujo",
       "SPECIAL": "Especiales",
       "FINANCIAL": "Financieros",
-      "3D_CHARTS": "Gráficos 3D"
+      "3D_CHARTS": "Gráficos 3D",
+      "COMBO": "Gráficos combinados"
     },
     "BAR_VERTICAL": {
       "NAME": "Gráfico de barras",
@@ -3179,6 +3248,14 @@
     "POLYGONS3D": {
       "NAME": "Polygons 3D",
       "DESCRIPTION": "Extruded 3D polygon regions rendered on a globe, grouped by name with longitude/latitude vertices"
+    },
+    "COMBO": {
+      "NAME": "Combinado (doble eje)",
+      "DESCRIPTION": "Barras y una línea en ejes de valores izquierdo/derecho independientes"
+    },
+    "HISTOGRAM": {
+      "NAME": "Histograma",
+      "DESCRIPTION": "Distribución de una columna numérica en intervalos calculados automáticamente"
     }
   },
   "ROLE_LABELS": {

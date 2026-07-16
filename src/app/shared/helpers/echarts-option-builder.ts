@@ -4,7 +4,13 @@ import {
   ConditionalRule,
   resolveConditionalStyle,
 } from './conditional-formatting.helper';
-import { forecast, linearTrend, movingAverage } from './trend.helper';
+import {
+  forecast,
+  linearTrend,
+  logTrend,
+  movingAverage,
+  polyTrend,
+} from './trend.helper';
 
 // ========= Chart Typography =========
 // ECharts is canvas-rendered and does not resolve CSS variables. To stay in
@@ -1474,6 +1480,52 @@ export function buildAreaChartOption(
   }
 
   return option;
+}
+
+// ========= Combo Chart (bars + line, dual-axis) =========
+//
+// Combo reuses the multi-series bar path: the transformer hands us the same
+// wrapped shape ({name, series:[{name,value}]}) the 2D/stacked bars use, so we
+// build a grouped vertical-bar option here and let applyCartesianAnalytics →
+// applyDualAxis switch per-series render type + axis afterwards. Everything the
+// bar builder honours (grid, legend, zoom, labels, reference overlays) carries
+// through untouched. When only a single series is present it still renders as a
+// clean bar chart.
+export function buildComboChartOption(
+  data: any[],
+  config: any,
+  _chartType: string,
+): any {
+  // Force the multi-series bar layout by routing through the vertical 2D bar
+  // path (grouped bars). Downstream dual-axis handles line/secondary-axis.
+  return buildBarChartOption(data, config, 'bar-vertical-2d', data);
+}
+
+// ========= Histogram (auto-binned bars) =========
+//
+// The transformer bins the numeric column client-side into {name, value}[]
+// (name = bin range, value = frequency). We render those as a single-series
+// vertical bar with no category gap so the bars read as a continuous
+// distribution. Data-label / axis controls flow through the shared bar path.
+export function buildHistogramChartOption(
+  data: any[],
+  config: any,
+  _chartType: string,
+): any {
+  // Histogram bars should touch (distribution look): zero the category gap
+  // unless the author overrode it, and default the value axis name to a
+  // frequency label. Build through the single-series vertical bar path.
+  const histCfg = {
+    ...config,
+    barCategoryGap:
+      config.barCategoryGap != null && config.barCategoryGap !== ''
+        ? config.barCategoryGap
+        : '2%',
+    // "Show counts" surfaces the frequency as a data label. Falls back to the
+    // generic showDataLabel toggle when the histogram-specific flag is unset.
+    showDataLabel: config.histogramShowCounts === true || config.showDataLabel,
+  };
+  return buildBarChartOption(data, histCfg, 'bar-vertical');
 }
 
 // ========= Pie Chart =========
@@ -4057,6 +4109,12 @@ const CHART_TYPE_BUILDERS: Record<string, DataConfigTypeBuilder> = {
   area: buildAreaChartOption,
   'area-stacked': buildAreaChartOption,
   'area-normalized': buildAreaChartOption,
+  // Combo (bars + line, dual-axis) and histogram (auto-binned bars) both build
+  // on the bar option path; combo additionally runs through applyDualAxis to
+  // switch per-series render type / axis. See buildComboChartOption /
+  // buildHistogramChartOption below.
+  combo: buildComboChartOption,
+  histogram: buildHistogramChartOption,
   pie: buildPieChartOption,
   'pie-advanced': buildPieChartOption,
   'pie-grid': buildPieChartOption,
@@ -4125,14 +4183,366 @@ function isCartesianOption(option: any): boolean {
   return !!(hasCat && hasVal && Array.isArray(option.series));
 }
 
+// ========= Per-visual controls (Slice C) =========
+//
+// These post-process a fresh single-grid cartesian option (bar / line / area /
+// combo / histogram) using the config keys surfaced in the Properties pane.
+// Every one is a strict NO-OP at its default/passthrough value so untouched
+// visuals render byte-identically. They run BEFORE dual-axis / small-multiples
+// promote the axes to arrays, so they only need to handle the single-axis shape.
+
+/** Read the numeric value out of a series datum (bare number or { value }). */
+function datumValue(d: any): number {
+  if (d && typeof d === 'object' && 'value' in d) return Number((d as any).value);
+  return Number(d);
+}
+
+/**
+ * Format a numeric (or date) value using the dataset formatHint shape
+ * { kind, decimals, currencyCode, dateFormat, thousands }. Mirrors the hint
+ * contract used across datasets so a currency/percent/decimal/date format set
+ * on a field renders consistently in charts. Returns a string; passes through
+ * non-finite input untouched (so category strings survive).
+ */
+function formatValueByHint(value: any, hint: any): string {
+  if (!hint || !hint.kind || hint.kind === 'auto') {
+    return value == null ? '' : String(value);
+  }
+  if (hint.kind === 'date') {
+    const d = value instanceof Date ? value : new Date(value);
+    if (isNaN(d.getTime())) return value == null ? '' : String(value);
+    // Minimal token formatter for the common patterns; default ISO date.
+    const fmt = hint.dateFormat || 'YYYY-MM-DD';
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return fmt
+      .replace(/YYYY/g, String(d.getFullYear()))
+      .replace(/MM/g, pad(d.getMonth() + 1))
+      .replace(/DD/g, pad(d.getDate()))
+      .replace(/HH/g, pad(d.getHours()))
+      .replace(/mm/g, pad(d.getMinutes()));
+  }
+  const num = typeof value === 'number' ? value : Number(value);
+  if (!isFinite(num)) return value == null ? '' : String(value);
+  const decimals =
+    typeof hint.decimals === 'number' && hint.decimals >= 0 ? hint.decimals : 2;
+  if (hint.kind === 'percent') {
+    // Hint values are treated as ratios when < 1 across the board would be
+    // ambiguous; follow the dataset convention of formatting the raw number
+    // as a percentage of its own magnitude (value already scaled upstream).
+    return (
+      (hint.thousands
+        ? num.toLocaleString(undefined, {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals,
+          })
+        : num.toFixed(decimals)) + '%'
+    );
+  }
+  if (hint.kind === 'currency') {
+    try {
+      return num.toLocaleString(undefined, {
+        style: 'currency',
+        currency: hint.currencyCode || 'USD',
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      });
+    } catch {
+      return num.toFixed(decimals);
+    }
+  }
+  // Plain number.
+  return hint.thousands
+    ? num.toLocaleString(undefined, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      })
+    : num.toFixed(decimals);
+}
+
+/**
+ * Sort + Top-N/Bottom-N. Reorders the category axis and realigns EVERY series'
+ * data array to the new order. Sort key is the axis label ('axis') or the sum
+ * of the series values at each category ('measure'). Top-N/Bottom-N then trims
+ * to the N categories with the largest / smallest measure totals (independent
+ * of the display sort). No-op when both controls are at their defaults.
+ */
+function applySortAndLimit(option: any, config: any): void {
+  if (!isCartesianOption(option)) return;
+  const cats: any[] =
+    option.xAxis && Array.isArray(option.xAxis.data) ? option.xAxis.data : [];
+  if (cats.length === 0) return;
+  const series: any[] = option.series || [];
+
+  const sortBy = config?.sortBy;
+  const limitMode = config?.limitMode;
+  const sortActive = sortBy === 'axis' || sortBy === 'measure';
+  const limitActive =
+    (limitMode === 'top' || limitMode === 'bottom') &&
+    Number(config?.limitN) > 0;
+  if (!sortActive && !limitActive) return;
+
+  // Per-category measure total across all series.
+  const totals = cats.map((_, i) =>
+    series.reduce((sum, s) => {
+      const d = Array.isArray(s.data) ? s.data[i] : undefined;
+      const v = datumValue(d);
+      return sum + (isFinite(v) ? v : 0);
+    }, 0),
+  );
+
+  // Build an index order.
+  let order = cats.map((_, i) => i);
+  const dir = config?.sortDir === 'asc' ? 1 : -1;
+  if (sortBy === 'axis') {
+    order.sort((a, b) => {
+      const av = String(cats[a]);
+      const bv = String(cats[b]);
+      return av < bv ? -1 * dir : av > bv ? 1 * dir : 0;
+    });
+  } else if (sortBy === 'measure') {
+    order.sort((a, b) => (totals[a] - totals[b]) * dir);
+  }
+
+  // Top-N / Bottom-N by measure total (uses a dedicated ranking independent of
+  // the display sort so "Top 5" always means the 5 largest).
+  if (limitActive) {
+    const n = Math.max(1, Math.floor(Number(config.limitN)));
+    const byMeasure = cats.map((_, i) => i);
+    byMeasure.sort((a, b) => totals[b] - totals[a]); // desc
+    const keep = new Set(
+      (limitMode === 'bottom' ? byMeasure.slice(-n) : byMeasure.slice(0, n)),
+    );
+    order = order.filter(i => keep.has(i));
+  }
+
+  // Apply the order to categories + every series' data array.
+  option.xAxis.data = order.map(i => cats[i]);
+  option.series = series.map(s => ({
+    ...s,
+    data: Array.isArray(s.data) ? order.map(i => s.data[i]) : s.data,
+  }));
+}
+
+/**
+ * Stacking override: 'none' | 'stacked' | 'percent'. Overrides whatever the
+ * chart-type variant produced so any bar/area/combo can be (100%-)stacked from
+ * the Properties pane. 'percent' recomputes each datum as its share of the
+ * per-category total across the stacked series. No-op at 'none'/unset.
+ */
+function applyStackingOverride(option: any, config: any): void {
+  const mode = config?.stacking;
+  if (mode !== 'stacked' && mode !== 'percent') return;
+  if (!isCartesianOption(option)) return;
+  const series: any[] = option.series || [];
+  if (series.length === 0) return;
+
+  if (mode === 'percent') {
+    const len = Math.max(...series.map(s => (Array.isArray(s.data) ? s.data.length : 0)));
+    const totals = new Array(len).fill(0);
+    for (let i = 0; i < len; i++) {
+      totals[i] = series.reduce((sum, s) => {
+        const v = datumValue(Array.isArray(s.data) ? s.data[i] : 0);
+        return sum + (isFinite(v) ? v : 0);
+      }, 0);
+    }
+    option.series = series.map(s => ({
+      ...s,
+      stack: 'total',
+      data: Array.isArray(s.data)
+        ? s.data.map((d: any, i: number) => {
+            const v = datumValue(d);
+            return totals[i] ? +((v / totals[i]) * 100).toFixed(2) : 0;
+          })
+        : s.data,
+    }));
+    // Pin the value axis to 0–100 %.
+    const yAxis = Array.isArray(option.yAxis) ? option.yAxis[0] : option.yAxis;
+    if (yAxis) {
+      yAxis.max = 100;
+      yAxis.axisLabel = { ...(yAxis.axisLabel || {}), formatter: '{value}%' };
+    }
+  } else {
+    option.series = series.map(s => ({ ...s, stack: 'total' }));
+  }
+}
+
+/**
+ * Null handling: 'gap' (default — leave nulls as breaks), 'zero' (replace null
+ * with 0), 'hide' (drop the datum → treated as a gap but also connectNulls off).
+ * Applied across every series' data array. No-op at 'gap'/unset.
+ */
+function applyNullHandling(option: any, config: any): void {
+  const mode = config?.nullHandling;
+  if (mode !== 'zero' && mode !== 'hide') return;
+  if (!isCartesianOption(option)) return;
+  option.series = (option.series || []).map((s: any) => {
+    if (!Array.isArray(s.data)) return s;
+    const data = s.data.map((d: any) => {
+      const isNull =
+        d === null ||
+        d === undefined ||
+        (typeof d === 'object' && (d.value === null || d.value === undefined));
+      if (!isNull) return d;
+      return mode === 'zero' ? 0 : null;
+    });
+    return mode === 'hide' ? { ...s, data, connectNulls: false } : { ...s, data };
+  });
+}
+
+/**
+ * Value-axis scale + explicit min/max. 'log' switches yAxis.type to 'log'
+ * (ECharts requires strictly positive data — falls back silently to linear when
+ * any value is <= 0). Explicit yScaleMin / yScaleMax pin the domain. No-op when
+ * everything is at its default.
+ */
+function applyValueAxisScale(option: any, config: any): void {
+  if (!isCartesianOption(option)) return;
+  const yAxis = option.yAxis;
+  if (!yAxis || yAxis.type !== 'value') return;
+
+  if (config?.yAxisScaleType === 'log') {
+    // Guard: log axis is invalid with non-positive data.
+    const series: any[] = option.series || [];
+    const allPositive = series.every(s =>
+      Array.isArray(s.data)
+        ? s.data.every((d: any) => {
+            const v = datumValue(d);
+            return !isFinite(v) || v > 0;
+          })
+        : true,
+    );
+    if (allPositive) yAxis.type = 'log';
+  }
+  if (typeof config?.yScaleMin === 'number' && isFinite(config.yScaleMin)) {
+    yAxis.min = config.yScaleMin;
+  }
+  if (typeof config?.yScaleMax === 'number' && isFinite(config.yScaleMax)) {
+    yAxis.max = config.yScaleMax;
+  }
+}
+
+/**
+ * Per-field number/date format (config.valueFormat = formatHint). Attaches a
+ * formatter to the value axis labels, the tooltip values, and the data labels
+ * so a currency/percent/decimal/date choice renders everywhere the measure
+ * appears. `valueFormat.target === 'category'` decorates the category axis
+ * instead. No-op when config.valueFormat is absent.
+ */
+function applyPerFieldFormat(option: any, config: any): void {
+  const hint = config?.valueFormat;
+  if (!hint || !hint.kind || hint.kind === 'auto') return;
+  if (!isCartesianOption(option)) return;
+
+  const target = hint.target === 'category' ? 'category' : 'value';
+  const fmt = (v: any) => formatValueByHint(v, hint);
+
+  if (target === 'category') {
+    const xAxis = option.xAxis;
+    if (xAxis) {
+      xAxis.axisLabel = {
+        ...(xAxis.axisLabel || {}),
+        formatter: (v: any) => fmt(v),
+      };
+    }
+    return;
+  }
+
+  // Value axis labels.
+  const yAxis = option.yAxis;
+  if (yAxis && yAxis.type === 'value') {
+    yAxis.axisLabel = {
+      ...(yAxis.axisLabel || {}),
+      formatter: (v: any) => fmt(v),
+    };
+  }
+  // Data labels on each series.
+  option.series = (option.series || []).map((s: any) => {
+    if (!s.label || s.label.show !== true) return s;
+    return {
+      ...s,
+      label: { ...s.label, formatter: (p: any) => fmt(p.value) },
+    };
+  });
+  // Tooltip values (only when a custom formatter isn't already installed —
+  // custom formatters, e.g. the legend single-series bar path, own their own
+  // rendering).
+  if (option.tooltip && typeof option.tooltip.formatter !== 'function') {
+    option.tooltip = {
+      ...option.tooltip,
+      valueFormatter: (v: any) => fmt(v),
+    };
+  }
+}
+
+/**
+ * Data-label content: 'value' (default) or 'percent' (share of the
+ * per-category total across series). Only meaningful when data labels are on.
+ * No-op at 'value'/unset. Skips when a per-field format already set a formatter
+ * (an explicit numeric format takes precedence over a %-of-total label).
+ */
+function applyDataLabelContent(option: any, config: any): void {
+  if (config?.labelContent !== 'percent') return;
+  if (config?.valueFormat && config.valueFormat.kind && config.valueFormat.kind !== 'auto') return;
+  if (!isCartesianOption(option)) return;
+  const series: any[] = option.series || [];
+  const len = Math.max(
+    0,
+    ...series.map(s => (Array.isArray(s.data) ? s.data.length : 0)),
+  );
+  const totals = new Array(len).fill(0);
+  for (let i = 0; i < len; i++) {
+    totals[i] = series.reduce((sum, s) => {
+      const v = datumValue(Array.isArray(s.data) ? s.data[i] : 0);
+      return sum + (isFinite(v) ? v : 0);
+    }, 0);
+  }
+  option.series = series.map(s => {
+    if (!s.label || s.label.show !== true) return s;
+    return {
+      ...s,
+      label: {
+        ...s.label,
+        formatter: (p: any) => {
+          const t = totals[p.dataIndex] || 0;
+          const v = Number(p.value);
+          return t ? ((v / t) * 100).toFixed(1) + '%' : '0%';
+        },
+      },
+    };
+  });
+}
+
 /**
  * Dual-axis: add a second (right) value axis and route the named series to
  * it, optionally switching a series' render type (bar/line) for a combo.
  * config.dualAxis = { series: [{ name, type?, yAxisIndex? }], rightAxisName? }.
  * No-op when config.dualAxis / its series list is absent/empty.
  */
-function applyDualAxis(option: any, config: any): void {
-  const cfg = config?.dualAxis;
+function applyDualAxis(option: any, config: any, chartType?: string): void {
+  let cfg = config?.dualAxis;
+  const isCombo = chartType === 'combo';
+
+  // Combo charts always want a dual-axis layout. When the author hasn't set up
+  // an explicit series map, synthesise a sensible default from the built
+  // series: keep every series as a bar on the primary axis except the LAST,
+  // which renders as a line on the secondary axis — the canonical
+  // "bars + line" combo. Explicit config.dualAxis always overrides this.
+  const haveExplicit =
+    cfg && Array.isArray(cfg.series) && cfg.series.length > 0;
+  if (!haveExplicit && isCombo && isCartesianOption(option)) {
+    const built = option.series || [];
+    if (built.length >= 1) {
+      const lastName = String(built[built.length - 1]?.name ?? '');
+      cfg = {
+        rightAxisName: config?.dualAxis?.rightAxisName || '',
+        series:
+          built.length >= 2
+            ? [{ name: lastName, type: 'line', yAxisIndex: 1 }]
+            : [{ name: lastName, type: 'line', yAxisIndex: 0 }],
+      };
+    }
+  }
+
   if (!cfg || !Array.isArray(cfg.series) || cfg.series.length === 0) return;
   if (!isCartesianOption(option)) return;
 
@@ -4189,6 +4599,10 @@ function applyTrend(option: any, config: any): void {
   let name = cfg.seriesName || 'Trend';
   if (cfg.type === 'linear') {
     overlay = linearTrend(values);
+  } else if (cfg.type === 'log') {
+    overlay = logTrend(values);
+  } else if (cfg.type === 'poly') {
+    overlay = polyTrend(values, cfg.degree || 2);
   } else if (cfg.type === 'movingAverage') {
     overlay = movingAverage(values, cfg.window || 3);
   } else if (cfg.type === 'forecast') {
@@ -4310,11 +4724,26 @@ function applyCartesianAnalytics(
   config: any,
   chartType: string,
 ): any {
-  const CARTESIAN = /^(bar-|line|area)/;
+  // combo + histogram are cartesian bar-family variants and get the same
+  // analytics pass (dual-axis / trend / small-multiples).
+  const CARTESIAN = /^(bar-|line|area|combo|histogram)/;
   if (!CARTESIAN.test(chartType)) return option;
   if (!option || typeof option !== 'object') return option;
   try {
-    applyDualAxis(option, config);
+    // Per-visual controls (Slice C) run first — while the option still has the
+    // single-grid shape (plain xAxis / yAxis objects). They reshape data
+    // (sort / limit / null / stacking) and decorate axes/labels/tooltips
+    // (scale / format / label-content).
+    applySortAndLimit(option, config);
+    applyNullHandling(option, config);
+    applyStackingOverride(option, config);
+    applyDataLabelContent(option, config);
+    applyValueAxisScale(option, config);
+    applyPerFieldFormat(option, config);
+    // Then the structural analytics (Track E1): dual-axis first (defines the
+    // axis array), trend next (appends a series), small-multiples last
+    // (re-shapes axes into a grid).
+    applyDualAxis(option, config, chartType);
     applyTrend(option, config);
     applySmallMultiples(option, config);
   } catch {

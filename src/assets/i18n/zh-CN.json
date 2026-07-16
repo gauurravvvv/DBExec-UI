@@ -1629,7 +1629,10 @@
       "FORECAST_PERIODS": "预测周期",
       "SMALL_MULTIPLES": "小型多组图",
       "FACET_COLUMN": "分面列",
-      "MAX_COLS": "最大列数"
+      "MAX_COLS": "最大列数",
+      "TREND_LOG": "对数",
+      "TREND_POLY": "多项式",
+      "POLY_DEGREE": "多项式次数"
     },
     "INTERACTION": {
       "SECTION": "交互",
@@ -1680,6 +1683,71 @@
       "MODE": "筛选模式",
       "MODE_LIVE": "实时",
       "MODE_APPLY": "应用"
+    },
+    "VISUAL": {
+      "DATA_FORMAT_SECTION": "数据与格式",
+      "SORT": "排序",
+      "SORT_DIRECTION": "排序方向",
+      "SORT_BY": {
+        "NONE": "无",
+        "AXIS": "按轴",
+        "MEASURE": "按度量"
+      },
+      "SORT_DIR": {
+        "ASC": "升序",
+        "DESC": "降序"
+      },
+      "LIMIT": "限制",
+      "LIMIT_COUNT": "数量",
+      "LIMIT_MODE": {
+        "NONE": "无",
+        "TOP": "前 N 项",
+        "BOTTOM": "后 N 项"
+      },
+      "STACKING_TITLE": "堆叠",
+      "STACKING": {
+        "NONE": "无",
+        "STACKED": "堆叠",
+        "PERCENT": "100% 堆叠"
+      },
+      "LABEL_CONTENT_TITLE": "标签内容",
+      "LABEL_CONTENT": {
+        "VALUE": "值",
+        "PERCENT": "占总计的百分比"
+      },
+      "NULL_HANDLING_TITLE": "空值处理",
+      "NULL_HANDLING": {
+        "GAP": "显示为间隙",
+        "ZERO": "视为零",
+        "HIDE": "隐藏"
+      },
+      "AXIS_SCALE_TYPE": "轴刻度",
+      "AXIS_SCALE": {
+        "LINEAR": "线性",
+        "LOG": "对数"
+      },
+      "AXIS_MIN": "轴最小值",
+      "AXIS_MAX": "轴最大值",
+      "FORMAT_TITLE": "数字/日期格式",
+      "FORMAT_KIND": {
+        "AUTO": "自动",
+        "NUMBER": "数字",
+        "CURRENCY": "货币",
+        "PERCENT": "百分比",
+        "DATE": "日期"
+      },
+      "FORMAT_TARGET_TITLE": "应用于",
+      "FORMAT_TARGET": {
+        "VALUE": "值轴",
+        "CATEGORY": "类别轴"
+      },
+      "FORMAT_DECIMALS": "小数位数",
+      "FORMAT_CURRENCY": "货币代码",
+      "FORMAT_DATE": "日期格式",
+      "FORMAT_THOUSANDS": "千位分隔符",
+      "HISTOGRAM_SECTION": "直方图",
+      "HISTOGRAM_BINS": "区间数",
+      "HISTOGRAM_SHOW_COUNTS": "显示计数"
     }
   },
   "DASHBOARD": {
@@ -2946,7 +3014,8 @@
       "FLOW": "流向图",
       "SPECIAL": "特殊图",
       "FINANCIAL": "金融图",
-      "3D_CHARTS": "3D 图表"
+      "3D_CHARTS": "3D 图表",
+      "COMBO": "组合图"
     },
     "BAR_VERTICAL": {
       "NAME": "柱状图",
@@ -3179,6 +3248,14 @@
     "POLYGONS3D": {
       "NAME": "Polygons 3D",
       "DESCRIPTION": "Extruded 3D polygon regions rendered on a globe, grouped by name with longitude/latitude vertices"
+    },
+    "COMBO": {
+      "NAME": "组合图（双轴）",
+      "DESCRIPTION": "在独立的左右数值轴上显示柱状和折线"
+    },
+    "HISTOGRAM": {
+      "NAME": "直方图",
+      "DESCRIPTION": "将数值列分布到自动计算的区间中"
     }
   },
   "ROLE_LABELS": {

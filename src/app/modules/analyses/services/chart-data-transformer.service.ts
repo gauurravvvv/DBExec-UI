@@ -41,6 +41,12 @@ const MULTI_BAR_CHART_TYPES = [
   'bar-horizontal-normalized',
 ];
 const CANDLESTICK_CHART_TYPE = 'candlestick';
+// Combo (bars + line dual-axis) shares the multi-series-by-value-columns shape:
+// x = category, yAxis = first measure, valueColumns = the rest. Which series
+// renders as a line / rides the secondary axis is decided in the option builder
+// from config.dualAxis. Histogram bins a single numeric column client-side.
+const COMBO_CHART_TYPE = 'combo';
+const HISTOGRAM_CHART_TYPE = 'histogram';
 const HIERARCHY_CHART_TYPES = ['tree-map', 'sunburst', 'tree'];
 const RADAR_CHART_TYPE = 'radar';
 const PARALLEL_CHART_TYPE = 'parallel';
@@ -153,10 +159,19 @@ export class ChartDataTransformerService {
         return this.transformTo3DFormat(rawData, mapping, chartType);
       }
 
+      // Histogram — auto-bin a single numeric column into frequency buckets.
+      if (chartType === HISTOGRAM_CHART_TYPE) {
+        return this.transformToHistogram(rawData, mapping);
+      }
+
       // ── New per-family transformers (Phase 2) ────────────────────────
       // Multi-series bars (2D / stacked / normalized) need a wrapped
-      // shape — single series can't stack against itself.
-      if (MULTI_BAR_CHART_TYPES.includes(chartType)) {
+      // shape — single series can't stack against itself. Combo (bars + line
+      // dual-axis) uses the identical multi-series-by-value-columns shape.
+      if (
+        MULTI_BAR_CHART_TYPES.includes(chartType) ||
+        chartType === COMBO_CHART_TYPE
+      ) {
         return this.transformToMultiSeriesByValueColumns(rawData, mapping);
       }
 
@@ -801,6 +816,11 @@ export class ChartDataTransformerService {
       return { field1: 'Category', field2: 'Values' };
     }
 
+    // Histogram bins a single numeric column; field2 is the computed frequency.
+    if (chartType === HISTOGRAM_CHART_TYPE) {
+      return { field1: 'Value', field2: 'Frequency' };
+    }
+
     if (
       chartType === SANKEY_CHART_TYPE ||
       chartType === GRAPH_CHART_TYPE ||
@@ -870,6 +890,12 @@ export class ChartDataTransformerService {
       return !!visual.yAxisColumn;
     }
 
+    // Histogram bins a single numeric column — only the X (measure) role is
+    // required; Y is the computed frequency.
+    if (visual.chartType === 'histogram') {
+      return !!visual.xAxisColumn;
+    }
+
     return !!(visual.xAxisColumn && visual.yAxisColumn);
   }
 
@@ -911,6 +937,74 @@ export class ChartDataTransformerService {
         })),
       };
     });
+  }
+
+  /**
+   * Histogram — auto-bin the numeric `xAxisColumn` into frequency buckets and
+   * return `{name, value}[]` where name is the bin range label and value is the
+   * count of rows in that bin. Bin count comes from `mapping.histogramBins`;
+   * 0/undefined falls back to Sturges' rule (⌈log2(n)⌉ + 1), capped to [1, 50].
+   *
+   * Non-numeric / null cells are skipped. When the column has no numeric spread
+   * (all identical, or < 2 usable values) a single bucket is returned so the
+   * chart still renders rather than blanking.
+   */
+  private transformToHistogram(
+    rawData: any[],
+    mapping: ChartDataMapping,
+  ): SingleSeriesData[] {
+    const col = mapping.xAxisColumn;
+    if (!col) return [];
+
+    const values: number[] = [];
+    rawData.forEach(row => {
+      const raw = row[col];
+      if (raw === null || raw === undefined || raw === '') return;
+      const n = typeof raw === 'number' ? raw : Number(raw);
+      if (Number.isFinite(n)) values.push(n);
+    });
+    if (values.length === 0) return [];
+
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    if (min === max) {
+      // No spread — one bucket holding every row.
+      return [{ name: this.formatBinBoundary(min), value: values.length }];
+    }
+
+    // Bin count: explicit config wins; otherwise Sturges' rule.
+    const requested = Math.floor(mapping.histogramBins || 0);
+    const sturges = Math.ceil(Math.log2(values.length)) + 1;
+    const binCount = Math.max(1, Math.min(50, requested > 0 ? requested : sturges));
+
+    const width = (max - min) / binCount;
+    const counts = new Array(binCount).fill(0);
+    values.forEach(v => {
+      // Last bin is inclusive of max so the maximum value isn't dropped.
+      let idx = Math.floor((v - min) / width);
+      if (idx >= binCount) idx = binCount - 1;
+      if (idx < 0) idx = 0;
+      counts[idx] += 1;
+    });
+
+    return counts.map((count, i) => {
+      const lo = min + i * width;
+      const hi = i === binCount - 1 ? max : lo + width;
+      return {
+        name: `${this.formatBinBoundary(lo)}–${this.formatBinBoundary(hi)}`,
+        value: count,
+      };
+    });
+  }
+
+  /** Compact numeric label for a histogram bin edge. */
+  private formatBinBoundary(n: number): string {
+    if (!Number.isFinite(n)) return '';
+    // Keep small decimals readable; round wide ranges to whole numbers.
+    const abs = Math.abs(n);
+    if (abs >= 1000) return String(Math.round(n));
+    if (Number.isInteger(n)) return String(n);
+    return n.toFixed(2);
   }
 
   /**
@@ -1230,6 +1324,7 @@ export class ChartDataTransformerService {
       lngColumn: visual.lngColumn ?? null,
       latColumn: visual.latColumn ?? null,
       timeColumn: visual.timeColumn ?? null,
+      histogramBins: Number(visual.config?.histogramBins) || 0,
     };
 
     // ── Server-side aggregation shape (Track D) ──────────────────────

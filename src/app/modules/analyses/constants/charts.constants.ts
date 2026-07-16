@@ -59,6 +59,15 @@ export const CHART_TYPES = [
     rotate: true,
   },
 
+  // Combo / dual-axis (bars + line on independent Y axes)
+  {
+    id: 'combo',
+    name: 'CHART_TYPES.COMBO.NAME',
+    icon: 'pi pi-chart-bar',
+    category: 'CHART_TYPES.CATEGORIES.COMBO',
+    description: 'CHART_TYPES.COMBO.DESCRIPTION',
+  },
+
   // Line Charts
   {
     id: 'line',
@@ -186,6 +195,13 @@ export const CHART_TYPES = [
     icon: 'pi pi-window-minimize',
     category: 'CHART_TYPES.CATEGORIES.STATISTICAL',
     description: 'CHART_TYPES.BOX_CHART.DESCRIPTION',
+  },
+  {
+    id: 'histogram',
+    name: 'CHART_TYPES.HISTOGRAM.NAME',
+    icon: 'pi pi-chart-bar',
+    category: 'CHART_TYPES.CATEGORIES.STATISTICAL',
+    description: 'CHART_TYPES.HISTOGRAM.DESCRIPTION',
   },
 
   // Scatter Charts
@@ -679,6 +695,72 @@ export const RIPPLE_BRUSH_TYPE_OPTIONS = [
   { label: 'CHART_OPTIONS.RIPPLE_BRUSH_TYPE.FILL', value: 'fill' },
 ];
 
+// ════════════════════════════════════════════════════════════════════
+// Per-visual control option sets (Slice C — market-parity formatting)
+// Labels resolve under ANALYSES.VISUAL.* (added to all 10 locales).
+// ════════════════════════════════════════════════════════════════════
+
+// Sort: order the categories by their axis label or by the measure value.
+export const VISUAL_SORT_BY_OPTIONS = [
+  { label: 'ANALYSES.VISUAL.SORT_BY.NONE', value: 'none' },
+  { label: 'ANALYSES.VISUAL.SORT_BY.AXIS', value: 'axis' },
+  { label: 'ANALYSES.VISUAL.SORT_BY.MEASURE', value: 'measure' },
+];
+
+export const VISUAL_SORT_DIR_OPTIONS = [
+  { label: 'ANALYSES.VISUAL.SORT_DIR.ASC', value: 'asc' },
+  { label: 'ANALYSES.VISUAL.SORT_DIR.DESC', value: 'desc' },
+];
+
+// Top-N / Bottom-N: keep the N highest or lowest by the measure.
+export const VISUAL_LIMIT_MODE_OPTIONS = [
+  { label: 'ANALYSES.VISUAL.LIMIT_MODE.NONE', value: 'none' },
+  { label: 'ANALYSES.VISUAL.LIMIT_MODE.TOP', value: 'top' },
+  { label: 'ANALYSES.VISUAL.LIMIT_MODE.BOTTOM', value: 'bottom' },
+];
+
+// Stacking mode (bar + area). Overrides the chart-type variant so any
+// bar/area/combo can be stacked/100%-stacked from the Properties pane.
+export const VISUAL_STACKING_OPTIONS = [
+  { label: 'ANALYSES.VISUAL.STACKING.NONE', value: 'none' },
+  { label: 'ANALYSES.VISUAL.STACKING.STACKED', value: 'stacked' },
+  { label: 'ANALYSES.VISUAL.STACKING.PERCENT', value: 'percent' },
+];
+
+// Data-label content: raw value vs percent-of-total.
+export const VISUAL_LABEL_CONTENT_OPTIONS = [
+  { label: 'ANALYSES.VISUAL.LABEL_CONTENT.VALUE', value: 'value' },
+  { label: 'ANALYSES.VISUAL.LABEL_CONTENT.PERCENT', value: 'percent' },
+];
+
+// Null handling on cartesian value series.
+export const VISUAL_NULL_HANDLING_OPTIONS = [
+  { label: 'ANALYSES.VISUAL.NULL_HANDLING.GAP', value: 'gap' },
+  { label: 'ANALYSES.VISUAL.NULL_HANDLING.ZERO', value: 'zero' },
+  { label: 'ANALYSES.VISUAL.NULL_HANDLING.HIDE', value: 'hide' },
+];
+
+// Value-axis scale type.
+export const VISUAL_AXIS_SCALE_OPTIONS = [
+  { label: 'ANALYSES.VISUAL.AXIS_SCALE.LINEAR', value: 'linear' },
+  { label: 'ANALYSES.VISUAL.AXIS_SCALE.LOG', value: 'log' },
+];
+
+// Per-field number/date format kind (reuses the dataset formatHint shape).
+export const VISUAL_FORMAT_KIND_OPTIONS = [
+  { label: 'ANALYSES.VISUAL.FORMAT_KIND.AUTO', value: 'auto' },
+  { label: 'ANALYSES.VISUAL.FORMAT_KIND.NUMBER', value: 'number' },
+  { label: 'ANALYSES.VISUAL.FORMAT_KIND.CURRENCY', value: 'currency' },
+  { label: 'ANALYSES.VISUAL.FORMAT_KIND.PERCENT', value: 'percent' },
+  { label: 'ANALYSES.VISUAL.FORMAT_KIND.DATE', value: 'date' },
+];
+
+// Which target the per-field format applies to (default: the value/measure axis).
+export const VISUAL_FORMAT_TARGET_OPTIONS = [
+  { label: 'ANALYSES.VISUAL.FORMAT_TARGET.VALUE', value: 'value' },
+  { label: 'ANALYSES.VISUAL.FORMAT_TARGET.CATEGORY', value: 'category' },
+];
+
 // Funnel orientation options
 export const FUNNEL_ORIENT_OPTIONS = [
   { label: 'CHART_OPTIONS.FUNNEL_ORIENT.VERTICAL', value: 'vertical' },
@@ -1085,6 +1167,28 @@ export const DEFAULT_CHART_CONFIG = {
   polygons3DBorderWidth: 1, // series.itemStyle.borderWidth
   polygons3DBorderColor: '#ffffff', // series.itemStyle.borderColor
   polygons3DOpacity: 0.8, // series.itemStyle.opacity
+
+  // === Per-visual controls (Slice C — sort / limit / stacking / axis / format) ===
+  // All default to the "off" / passthrough value so existing visuals render
+  // byte-identically until the author opts in.
+  sortBy: 'none', // 'none' | 'axis' | 'measure' — reorder categories
+  sortDir: 'desc', // 'asc' | 'desc'
+  limitMode: 'none', // 'none' | 'top' | 'bottom' — Top-N / Bottom-N
+  limitN: 10, // count kept when limitMode !== 'none'
+  stacking: 'none', // 'none' | 'stacked' | 'percent' — overrides chart-type variant
+  labelContent: 'value', // 'value' | 'percent' — data-label content
+  nullHandling: 'gap', // 'gap' | 'zero' | 'hide' — null value treatment
+  yAxisScaleType: 'linear', // 'linear' | 'log' — value-axis scale
+  yScaleMin: undefined, // yAxis.min (undefined = auto)
+  yScaleMax: undefined, // yAxis.max (undefined = auto)
+  // Per-field format hint, reusing the dataset formatHint shape:
+  // { kind, decimals, currencyCode, dateFormat, thousands }. `target`
+  // selects which axis it decorates ('value' = measure axis, 'category').
+  valueFormat: null, // { kind, decimals, currencyCode, dateFormat, thousands } | null
+
+  // === Histogram (client-side auto-binned bars) ===
+  histogramBins: 10, // number of bins (0/auto → Sturges' rule)
+  histogramShowCounts: true, // show frequency count labels on bars
 
   // === Table Visual ===
   // Density: compact = 32px rows + smaller font; comfortable (default) = 44px.
@@ -1900,6 +2004,9 @@ export const DUMMY_CHART_DATA: { [chartType: string]: any } = {
   'bar-vertical-normalized': MULTI_SERIES_DATA,
   'bar-horizontal-normalized': MULTI_SERIES_DATA,
 
+  // --- Combo (bars + line, dual-axis) ---
+  combo: MULTI_SERIES_DATA,
+
   // --- Line charts (multi-series) ---
   line: MULTI_SERIES_DATA,
   'line-stacked': MULTI_SERIES_DATA,
@@ -1941,6 +2048,9 @@ export const DUMMY_CHART_DATA: { [chartType: string]: any } = {
 
   // --- Statistical ---
   'box-chart': BOX_CHART_DATA,
+  // Histogram bins its X column client-side, so a single-series category set
+  // is a representative preview.
+  histogram: SINGLE_SERIES_DATA,
 
   // --- Funnel ---
   funnel: FUNNEL_DATA,
@@ -2015,6 +2125,13 @@ const BAR_CHART_TYPES = [
 const LINE_CHART_TYPES = ['line', 'line-stacked', 'line-step'];
 
 const AREA_CHART_TYPES = ['area', 'area-stacked', 'area-normalized'];
+
+// Combo (bars + line on independent axes) and histogram (auto-binned bars) are
+// cartesian bar-family variants — they route through the bar option builder
+// and honour the same axis / grid / zoom / stacking machinery.
+const COMBO_CHART_TYPES = ['combo'];
+
+const HISTOGRAM_CHART_TYPES = ['histogram'];
 
 const PIE_CHART_TYPES = [
   'pie',
@@ -2140,6 +2257,12 @@ export const CHART_ROLES: Record<string, ChartRolesSpec> = {
     optional: ['valueColumns'],
   },
 
+  // ── Combo / dual-axis ──
+  // x = category, yAxis = the first (primary-axis) measure, valueColumns = the
+  // additional measures. Which series goes to the secondary axis / renders as a
+  // line is chosen per-series in the Analytics → Dual-axis editor (config.dualAxis).
+  combo: { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
+
   // ── Line / area ──
   // Single-series by default; valueColumns is optional to enable multi-line / multi-area.
   line: { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
@@ -2178,6 +2301,10 @@ export const CHART_ROLES: Record<string, ChartRolesSpec> = {
 
   // ── Boxplot — needs a raw-samples column, not min/max etc. ──
   'box-chart': { required: ['xAxis', 'sample'], optional: [] },
+
+  // ── Histogram — one numeric column, auto-binned client-side. The measure
+  // lives on the X role (the column to bin); Y is the computed frequency. ──
+  histogram: { required: ['xAxis'], optional: [] },
 
   // ── Candlestick — OHLC ──
   candlestick: {
@@ -2364,6 +2491,16 @@ export function isBubbleChartType(chartType: string | null): boolean {
 export function isBoxChartType(chartType: string | null): boolean {
   if (!chartType) return false;
   return chartType === 'box-chart';
+}
+
+export function isComboChartType(chartType: string | null): boolean {
+  if (!chartType) return false;
+  return COMBO_CHART_TYPES.includes(chartType);
+}
+
+export function isHistogramChartType(chartType: string | null): boolean {
+  if (!chartType) return false;
+  return HISTOGRAM_CHART_TYPES.includes(chartType);
 }
 
 export function isPolarChartType(chartType: string | null): boolean {
@@ -2564,6 +2701,8 @@ export function supportsDataZoom(chartType: string | null): boolean {
     ...BAR_CHART_TYPES,
     ...LINE_CHART_TYPES,
     ...AREA_CHART_TYPES,
+    ...COMBO_CHART_TYPES,
+    ...HISTOGRAM_CHART_TYPES,
     'scatter',
     'effect-scatter',
     'waterfall',
@@ -2581,6 +2720,8 @@ export function supportsDataLabel(chartType: string | null): boolean {
     ...BAR_CHART_TYPES,
     ...LINE_CHART_TYPES,
     ...AREA_CHART_TYPES,
+    ...COMBO_CHART_TYPES,
+    ...HISTOGRAM_CHART_TYPES,
     'scatter',
     'effect-scatter',
     'bubble',
@@ -2665,6 +2806,8 @@ export function supportsToolbox(chartType: string | null): boolean {
     ...LINE_CHART_TYPES,
     ...AREA_CHART_TYPES,
     ...PIE_CHART_TYPES,
+    ...COMBO_CHART_TYPES,
+    ...HISTOGRAM_CHART_TYPES,
     'scatter',
     'effect-scatter',
     'waterfall',

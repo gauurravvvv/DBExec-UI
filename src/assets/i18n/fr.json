@@ -1629,7 +1629,10 @@
       "FORECAST_PERIODS": "Périodes de prévision",
       "SMALL_MULTIPLES": "Petits multiples",
       "FACET_COLUMN": "Colonne de facette",
-      "MAX_COLS": "Colonnes max."
+      "MAX_COLS": "Colonnes max.",
+      "TREND_LOG": "Logarithmique",
+      "TREND_POLY": "Polynomiale",
+      "POLY_DEGREE": "Degré du polynôme"
     },
     "INTERACTION": {
       "SECTION": "Interaction",
@@ -1680,6 +1683,71 @@
       "MODE": "Mode de filtre",
       "MODE_LIVE": "En direct",
       "MODE_APPLY": "Appliquer"
+    },
+    "VISUAL": {
+      "DATA_FORMAT_SECTION": "Données et format",
+      "SORT": "Tri",
+      "SORT_DIRECTION": "Sens du tri",
+      "SORT_BY": {
+        "NONE": "Aucun",
+        "AXIS": "Par axe",
+        "MEASURE": "Par mesure"
+      },
+      "SORT_DIR": {
+        "ASC": "Croissant",
+        "DESC": "Décroissant"
+      },
+      "LIMIT": "Limite",
+      "LIMIT_COUNT": "Nombre",
+      "LIMIT_MODE": {
+        "NONE": "Aucun",
+        "TOP": "N premiers",
+        "BOTTOM": "N derniers"
+      },
+      "STACKING_TITLE": "Empilement",
+      "STACKING": {
+        "NONE": "Aucun",
+        "STACKED": "Empilé",
+        "PERCENT": "Empilé à 100 %"
+      },
+      "LABEL_CONTENT_TITLE": "Contenu de l'étiquette",
+      "LABEL_CONTENT": {
+        "VALUE": "Valeur",
+        "PERCENT": "Pourcentage du total"
+      },
+      "NULL_HANDLING_TITLE": "Gestion des valeurs nulles",
+      "NULL_HANDLING": {
+        "GAP": "Afficher comme vide",
+        "ZERO": "Traiter comme zéro",
+        "HIDE": "Masquer"
+      },
+      "AXIS_SCALE_TYPE": "Échelle de l'axe",
+      "AXIS_SCALE": {
+        "LINEAR": "Linéaire",
+        "LOG": "Logarithmique"
+      },
+      "AXIS_MIN": "Minimum de l'axe",
+      "AXIS_MAX": "Maximum de l'axe",
+      "FORMAT_TITLE": "Format nombre/date",
+      "FORMAT_KIND": {
+        "AUTO": "Automatique",
+        "NUMBER": "Nombre",
+        "CURRENCY": "Devise",
+        "PERCENT": "Pourcentage",
+        "DATE": "Date"
+      },
+      "FORMAT_TARGET_TITLE": "Appliquer à",
+      "FORMAT_TARGET": {
+        "VALUE": "Axe des valeurs",
+        "CATEGORY": "Axe des catégories"
+      },
+      "FORMAT_DECIMALS": "Décimales",
+      "FORMAT_CURRENCY": "Code devise",
+      "FORMAT_DATE": "Format de date",
+      "FORMAT_THOUSANDS": "Séparateur de milliers",
+      "HISTOGRAM_SECTION": "Histogramme",
+      "HISTOGRAM_BINS": "Nombre de classes",
+      "HISTOGRAM_SHOW_COUNTS": "Afficher les effectifs"
     }
   },
   "DASHBOARD": {
@@ -2946,7 +3014,8 @@
       "FLOW": "Flux",
       "SPECIAL": "Spécial",
       "FINANCIAL": "Finance",
-      "3D_CHARTS": "Graphiques 3D"
+      "3D_CHARTS": "Graphiques 3D",
+      "COMBO": "Graphiques combinés"
     },
     "BAR_VERTICAL": {
       "NAME": "Graphique à barres",
@@ -3179,6 +3248,14 @@
     "POLYGONS3D": {
       "NAME": "Polygons 3D",
       "DESCRIPTION": "Extruded 3D polygon regions rendered on a globe, grouped by name with longitude/latitude vertices"
+    },
+    "COMBO": {
+      "NAME": "Combiné (double axe)",
+      "DESCRIPTION": "Barres et une ligne sur des axes de valeurs gauche/droite indépendants"
+    },
+    "HISTOGRAM": {
+      "NAME": "Histogramme",
+      "DESCRIPTION": "Répartition d'une colonne numérique en classes calculées automatiquement"
     }
   },
   "ROLE_LABELS": {
