@@ -61,6 +61,33 @@ export const FILTER_NULL_OPTION_VALUES = [
 export const FILTER_SCOPE_VALUES = ['dashboard', 'tab', 'visual'] as const;
 export type FilterScope = (typeof FILTER_SCOPE_VALUES)[number];
 
+/**
+ * Relative-date presets for a time filter (Slice D). The preset name is
+ * persisted in the filter's `config.relativePreset`; the BE resolves it
+ * to concrete dates at query time (see relativeDateRange.ts). 'custom'
+ * means "use the explicit start/end the user picked" — no resolution.
+ * Kept in lock-step with `RelativeDatePreset` in
+ * shared/utility/relativeDateRange.ts.
+ */
+export const RELATIVE_DATE_PRESET_VALUES = [
+  'today',
+  'yesterday',
+  'last_7_days',
+  'last_30_days',
+  'last_90_days',
+  'wtd',
+  'mtd',
+  'qtd',
+  'ytd',
+  'previous_week',
+  'previous_month',
+  'previous_quarter',
+  'previous_year',
+  'custom',
+] as const;
+export type RelativeDatePresetValue =
+  (typeof RELATIVE_DATE_PRESET_VALUES)[number];
+
 /** RLS rule subject scope. */
 export const RLS_SCOPE_VALUES = ['user', 'group'] as const;
 export type RlsScope = (typeof RLS_SCOPE_VALUES)[number];
@@ -244,6 +271,42 @@ const refineFilterScope = (
   }
 };
 
+/**
+ * Filter UI config (JSONB). Historically free-form; Slice D introduces
+ * three fields the BE now reads, so those are validated while every
+ * other key still passes through untouched (the visual layer owns the
+ * rest of the shape). `.passthrough()` keeps unknown keys; only the
+ * typed fields are constrained:
+ *
+ *   categoryValues     — curated allow-list for a category filter. When
+ *                        set, the applied selection is intersected with
+ *                        it at run time (out-of-list values are denied).
+ *                        Accepts string | number entries.
+ *   relativePreset     — a time filter's relative-date preset. The BE
+ *                        resolves it server-side at query time.
+ *   dependsOnFilterId  — parent filter id for a cascading (linked)
+ *                        filter. The child's option list is narrowed by
+ *                        the parent's selection.
+ */
+const filterConfigSchema = z
+  .object({
+    categoryValues: z
+      .array(z.union([z.string(), z.number()]), {
+        message: 'validation.analyses.filter.categoryValues.invalid',
+      })
+      .optional(),
+    relativePreset: z
+      .enum(RELATIVE_DATE_PRESET_VALUES, {
+        message: 'validation.analyses.filter.relativePreset.invalid',
+      })
+      .optional(),
+    dependsOnFilterId: z
+      .string({ message: 'validation.analyses.filter.dependsOnFilterId.invalid' })
+      .uuid({ message: 'validation.analyses.filter.dependsOnFilterId.invalid' })
+      .optional(),
+  })
+  .passthrough();
+
 const filterShape = z
   .object({
     name: filterNameSchema,
@@ -260,8 +323,8 @@ const filterShape = z
         message: 'validation.analyses.filter.control.invalid',
       }),
     ),
-    // Free-form filter UI config; shape is owned by the visual layer.
-    config: z.record(z.string(), z.any()).optional().default({}),
+    // Filter UI config — Slice-D fields validated, rest passes through.
+    config: filterConfigSchema.optional().default({}),
     nullOption: z
       .preprocess(
         blankToUndefined,
@@ -314,7 +377,7 @@ export const updateAnalysisFilterSchema = z
         }),
       )
       .optional(),
-    config: z.record(z.string(), z.any()).optional(),
+    config: filterConfigSchema.optional(),
     nullOption: z
       .preprocess(
         blankToUndefined,
@@ -371,6 +434,27 @@ export const updateAnalysisSchema = z.object({
 });
 export type UpdateAnalysisInput = z.infer<typeof updateAnalysisSchema>;
 
+/**
+ * Deep-duplicate an analysis. The source id arrives on the URL path
+ * (POST /:analysisId/duplicate → idFromParam copies it into body.id),
+ * so `id` is required here. `folderId` is optional — when supplied the
+ * copy is filed into that folder; null / omitted keeps the source's
+ * folder. No name field: the controller derives `<name> (copy)`.
+ */
+export const duplicateAnalysisSchema = z.object({
+  id: analysisIdSchema,
+  folderId: z
+    .preprocess(
+      blankToUndefined,
+      z
+        .string()
+        .uuid({ message: 'validation.analyses.folderId.invalid' }),
+    )
+    .nullable()
+    .optional(),
+});
+export type DuplicateAnalysisInput = z.infer<typeof duplicateAnalysisSchema>;
+
 // ── Run-query (filter payload) schemas ─────────────────────────────
 
 /**
@@ -406,6 +490,12 @@ export const appliedFilterSchema = z.object({
   dateRangeStart: z.string().optional(),
   dateRangeEnd: z.string().optional(),
   nullOption: z.string().optional(),
+  // Slice D: the run-time payload may carry the same config fields the
+  // saved filter does — `relativePreset` (resolved server-side to
+  // concrete dates) and `categoryValues` (curated allow-list enforced
+  // defensively at run time). Reuses filterConfigSchema so the run path
+  // and the save path validate the config identically.
+  config: filterConfigSchema.optional(),
 });
 export type AppliedFilterInput = z.infer<typeof appliedFilterSchema>;
 
@@ -839,3 +929,22 @@ export const publishDashboardSchema = z.discriminatedUnion('mode', [
   publishExistingSchema,
 ]);
 export type PublishDashboardInput = z.infer<typeof publishDashboardSchema>;
+
+/**
+ * Deep-duplicate a dashboard. The source id arrives on the URL path
+ * (POST /:dashboardId/duplicate → idFromParam copies it into body.id),
+ * so `id` is required here. `folderId` is optional — when supplied the
+ * copy is filed into that folder; null / omitted keeps the source's
+ * folder. No name field: the controller derives `<name> (copy)`.
+ */
+export const duplicateDashboardSchema = z.object({
+  id: idSchema('validation.analyses.dashboard.id.required'),
+  folderId: z
+    .preprocess(
+      blankToUndefined,
+      z.string().uuid({ message: 'validation.analyses.folderId.invalid' }),
+    )
+    .nullable()
+    .optional(),
+});
+export type DuplicateDashboardInput = z.infer<typeof duplicateDashboardSchema>;
