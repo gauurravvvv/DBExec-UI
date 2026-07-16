@@ -996,6 +996,7 @@
     }
   },
   "ANALYSES": {
+    "CREATE_MISSING_DATASET": "Não é possível criar a análise: o conjunto de dados de origem está ausente. Tente novamente a partir de um dataset.",
     "TITLE": "Análises",
     "SUBTITLE": "Gerencie suas análises",
     "ACTIVE_OPACITY": "Opacidade ativa",

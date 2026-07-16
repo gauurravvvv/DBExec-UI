@@ -1000,6 +1000,7 @@
     }
   },
   "ANALYSES": {
+    "CREATE_MISSING_DATASET": "Cannot create analysis: the source dataset is missing. Please retry from a dataset.",
     "TITLE": "Analyses",
     "SUBTITLE": "Manage your analyses",
     "ACTIVE_OPACITY": "Active Opacity",

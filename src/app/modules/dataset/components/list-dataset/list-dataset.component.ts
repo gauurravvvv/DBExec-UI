@@ -469,6 +469,18 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   }
 
   onCreateAnalysisDialogClose(result: AnalysisFormData | null) {
+    if (result && !this.analysisDatasetId) {
+      // Guard: the create-analysis dialog can only have been opened from a
+      // dataset row, so analysisDatasetId must be set. If it is somehow
+      // empty, surface it loudly rather than POSTing an analysis with no
+      // datasetId (which the BE rejects) — a silent no-op here was the old
+      // "nothing happens on create" symptom.
+      this.globalService.handleErrorService(
+        this.translate.instant('ANALYSES.CREATE_MISSING_DATASET'),
+      );
+      this.showCreateAnalysisDialog = false;
+      return;
+    }
     if (result && this.analysisDatasetId) {
       this.analysesService
         .addAnalyses({

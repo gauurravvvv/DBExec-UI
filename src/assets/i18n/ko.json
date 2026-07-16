@@ -996,6 +996,7 @@
     }
   },
   "ANALYSES": {
+    "CREATE_MISSING_DATASET": "분석을 만들 수 없습니다: 원본 데이터셋이 없습니다. 데이터셋에서 다시 시도하세요.",
     "TITLE": "분석",
     "SUBTITLE": "분석을 관리합니다",
     "ACTIVE_OPACITY": "활성 불투명도",

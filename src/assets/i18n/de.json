@@ -996,6 +996,7 @@
     }
   },
   "ANALYSES": {
+    "CREATE_MISSING_DATASET": "Analyse kann nicht erstellt werden: Der Quelldatensatz fehlt. Bitte erneut über ein Dataset versuchen.",
     "TITLE": "Analysen",
     "SUBTITLE": "Analysen verwalten",
     "ACTIVE_OPACITY": "Aktive Deckkraft",

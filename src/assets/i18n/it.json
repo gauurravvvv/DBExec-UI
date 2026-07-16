@@ -996,6 +996,7 @@
     }
   },
   "ANALYSES": {
+    "CREATE_MISSING_DATASET": "Impossibile creare l'analisi: il set di dati di origine è mancante. Riprova da un dataset.",
     "TITLE": "Analisi",
     "SUBTITLE": "Gestisci le tue analisi",
     "ACTIVE_OPACITY": "Opacità attiva",

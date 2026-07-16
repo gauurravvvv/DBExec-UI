@@ -996,6 +996,7 @@
     }
   },
   "ANALYSES": {
+    "CREATE_MISSING_DATASET": "Kan analyse niet maken: de brondataset ontbreekt. Probeer het opnieuw vanuit een dataset.",
     "TITLE": "Analyses",
     "SUBTITLE": "Beheer uw analyses",
     "ACTIVE_OPACITY": "Actieve dekking",

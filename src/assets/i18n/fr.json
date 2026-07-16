@@ -996,6 +996,7 @@
     }
   },
   "ANALYSES": {
+    "CREATE_MISSING_DATASET": "Impossible de créer l'analyse : le jeu de données source est manquant. Réessayez à partir d'un dataset.",
     "TITLE": "Analyses",
     "SUBTITLE": "Gérer vos analyses",
     "ACTIVE_OPACITY": "Opacité active",

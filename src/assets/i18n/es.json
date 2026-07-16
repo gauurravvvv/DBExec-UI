@@ -996,6 +996,7 @@
     }
   },
   "ANALYSES": {
+    "CREATE_MISSING_DATASET": "No se puede crear el análisis: falta el conjunto de datos de origen. Inténtelo de nuevo desde un dataset.",
     "TITLE": "Análisis",
     "SUBTITLE": "Gestionar sus análisis",
     "ACTIVE_OPACITY": "Opacidad activa",
