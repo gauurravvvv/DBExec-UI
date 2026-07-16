@@ -262,6 +262,15 @@ export class DatasetService {
       customLogic,
       used_field_ids,
       dataType,
+      // Per-field analytical metadata (column-metadata editor, slice 1).
+      // Each is optional on the wire — only forwarded when the caller
+      // actually set it, so an untouched key is left as-is server-side.
+      description,
+      role,
+      defaultAggregation,
+      formatHint,
+      isVisible,
+      typeOverride,
     } = payload;
 
     const requestBody: any = {
@@ -276,6 +285,24 @@ export class DatasetService {
     }
     if (dataType !== undefined) {
       requestBody.dataType = dataType;
+    }
+    if (description !== undefined) {
+      requestBody.description = description;
+    }
+    if (role !== undefined) {
+      requestBody.role = role;
+    }
+    if (defaultAggregation !== undefined) {
+      requestBody.defaultAggregation = defaultAggregation;
+    }
+    if (formatHint !== undefined) {
+      requestBody.formatHint = formatHint;
+    }
+    if (isVisible !== undefined) {
+      requestBody.isVisible = isVisible;
+    }
+    if (typeOverride !== undefined) {
+      requestBody.typeOverride = typeOverride;
     }
 
     this._saving.set(true);

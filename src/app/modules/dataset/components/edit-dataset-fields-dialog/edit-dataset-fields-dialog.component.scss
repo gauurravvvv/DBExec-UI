@@ -59,6 +59,7 @@
       display: flex;
       flex-direction: column;
       flex: 1;
+      min-height: 0;
       // `overflow: hidden` was removed because it clipped the
       // inline Data Type dropdown panel. Mirrors the
       // dataset-picker-dialog pattern: let the panel extend
@@ -83,12 +84,50 @@
         margin-bottom: 16px;
         display: flex;
         flex-direction: column;
-        gap: var(--space-6);
+        gap: var(--space-5);
+        // Dense metadata editor: the field can carry a dozen controls, so
+        // let the body scroll inside the fixed-height dialog while the
+        // header + action bar stay pinned.
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: visible;
+        // Breathing room so a dropdown panel opening near the right edge
+        // isn't flush against the scrollbar.
+        padding-right: var(--space-3);
+
+        // Two-column dense rows (data type / type override, role / agg,
+        // decimals / currency / thousands). Collapses to one column on
+        // narrow viewports.
+        .field-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: var(--space-5);
+          align-items: start;
+
+          @media (max-width: 520px) {
+            grid-template-columns: 1fr;
+          }
+        }
 
         .input-group {
           display: flex;
           flex-direction: column;
           gap: var(--space-3);
+
+          // Inline label + switch for the boolean metadata (Visible,
+          // Thousands). Keeps these compact instead of stacking a full
+          // form-field height each.
+          &.toggle-group {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-5);
+
+            ::ng-deep .form-field {
+              margin-bottom: 0;
+            }
+          }
 
           label {
             color: var(--text-color);

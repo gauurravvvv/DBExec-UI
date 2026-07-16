@@ -10,8 +10,10 @@
       <h3>{{ dialogTitle }}</h3>
     </div>
     <div class="fields-form">
-      <!-- Form Content -->
+      <!-- Form Content — scrolls when the metadata grid exceeds the
+           dialog height. -->
       <div class="form-field" *ngIf="editableField">
+        <!-- Identity: source column (read-only) + display name -->
         <div class="input-group">
           <app-custom-input [(ngModel)]="editableField.columnToUse" [label]="'DATASET.FIELD_NAME_TO_USE' | translate"
             [placeholder]="'DATASET.COLUMN_NAME' | translate" [inputDisabled]="true" icon="pi-id-card">
@@ -26,15 +28,102 @@
             {{ editableField.columnToView?.length || 0 }}/{{ MAX_NAME_LENGTH }}
           </small>
         </div>
+
+        <!-- Description -->
         <div class="input-group">
-          <app-custom-dropdown [options]="analyticalTypes" [ngModel]="editableField.dataType"
-            (ngModelChange)="onDataTypeChange($event)" [label]="'DATASET.DATA_TYPE' | translate" optionLabel="label"
-            optionValue="value" [placeholder]="'DATASET.SELECT_DATA_TYPE' | translate" [filter]="true"
-            [autoDisplayFirst]="false" [disabled]="isSubmitting" icon="pi-th-large">
+          <app-custom-input [(ngModel)]="editableField.description" [label]="'DATASET.FIELD.DESCRIPTION' | translate"
+            [placeholder]="'DATASET.FIELD.DESCRIPTION_PLACEHOLDER' | translate" inputMode="textarea" [rows]="2"
+            [autoResize]="true" [maxLength]="MAX_DESCRIPTION_LENGTH" (ngModelChange)="onFieldChange()"
+            [inputDisabled]="isSubmitting" icon="pi-align-left">
+          </app-custom-input>
+        </div>
+
+        <!-- Data type + type override (two columns) -->
+        <div class="field-row">
+          <div class="input-group">
+            <app-custom-dropdown [options]="analyticalTypes" [ngModel]="editableField.dataType"
+              (ngModelChange)="onDataTypeChange($event)" [label]="'DATASET.DATA_TYPE' | translate" optionLabel="label"
+              optionValue="value" [placeholder]="'DATASET.SELECT_DATA_TYPE' | translate" [filter]="true"
+              [autoDisplayFirst]="false" [disabled]="isSubmitting" icon="pi-th-large">
+            </app-custom-dropdown>
+          </div>
+          <div class="input-group">
+            <app-custom-dropdown [options]="analyticalTypes" [ngModel]="editableField.typeOverride"
+              (ngModelChange)="onTypeOverrideChange($event)" [label]="'DATASET.FIELD.TYPE_OVERRIDE' | translate"
+              optionLabel="label" optionValue="value" [placeholder]="'DATASET.FIELD.TYPE_OVERRIDE_PLACEHOLDER' | translate"
+              [filter]="true" [showClear]="true" [autoDisplayFirst]="false" [disabled]="isSubmitting" icon="pi-th-large">
+            </app-custom-dropdown>
+          </div>
+        </div>
+
+        <!-- Role + default aggregation (agg enabled only for measures) -->
+        <div class="field-row">
+          <div class="input-group">
+            <app-custom-dropdown [options]="roleOptionsResolved" [ngModel]="editableField.role"
+              (ngModelChange)="onRoleChange($event)" [label]="'DATASET.FIELD.ROLE' | translate" optionLabel="label"
+              optionValue="value" [filter]="false" [autoDisplayFirst]="false" [disabled]="isSubmitting"
+              icon="pi-tag">
+            </app-custom-dropdown>
+          </div>
+          <div class="input-group">
+            <app-custom-dropdown [options]="aggregationOptionsResolved" [ngModel]="editableField.defaultAggregation"
+              (ngModelChange)="onAggregationChange($event)" [label]="'DATASET.FIELD.DEFAULT_AGGREGATION' | translate"
+              optionLabel="label" optionValue="value" [filter]="false" [autoDisplayFirst]="false"
+              [disabled]="isSubmitting || !isMeasure" icon="pi-calculator">
+            </app-custom-dropdown>
+            <small class="type-hint" *ngIf="!isMeasure">
+              {{ 'DATASET.FIELD.AGGREGATION_MEASURE_HINT' | translate }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Format hint -->
+        <div class="input-group">
+          <app-custom-dropdown [options]="formatKindOptionsResolved" [ngModel]="editableField.formatHint.kind"
+            (ngModelChange)="onFormatKindChange($event)" [label]="'DATASET.FIELD.FORMAT' | translate" optionLabel="label"
+            optionValue="value" [filter]="false" [autoDisplayFirst]="false" [disabled]="isSubmitting" icon="pi-percentage">
           </app-custom-dropdown>
-          <small class="type-hint">
-            {{ 'DATASET.DATA_TYPE_HINT' | translate }}
-          </small>
+        </div>
+
+        <!-- number / currency / percent → decimals + thousands (+ currency code) -->
+        <div class="field-row" *ngIf="isNumericFormat">
+          <div class="input-group">
+            <app-custom-number [ngModel]="editableField.formatHint.decimals"
+              (ngModelChange)="onDecimalsChange($event)" [label]="'DATASET.FIELD.DECIMALS' | translate" [min]="0"
+              [max]="MAX_DECIMALS" [step]="1" [numberDisabled]="isSubmitting"
+              [placeholder]="'DATASET.FIELD.DECIMALS_PLACEHOLDER' | translate">
+            </app-custom-number>
+          </div>
+          <div class="input-group" *ngIf="isCurrencyFormat">
+            <app-custom-input [(ngModel)]="editableField.formatHint.currencyCode"
+              [label]="'DATASET.FIELD.CURRENCY' | translate"
+              [placeholder]="'DATASET.FIELD.CURRENCY_PLACEHOLDER' | translate" [maxLength]="8"
+              (ngModelChange)="onFieldChange()" [inputDisabled]="isSubmitting" icon="pi-dollar">
+            </app-custom-input>
+          </div>
+          <div class="input-group toggle-group">
+            <label>{{ 'DATASET.FIELD.THOUSANDS' | translate }}</label>
+            <app-custom-toggle [ngModel]="editableField.formatHint.thousands"
+              (onChange)="onThousandsChange($event.checked)" [showStatusLabel]="false" [disabled]="isSubmitting">
+            </app-custom-toggle>
+          </div>
+        </div>
+
+        <!-- date / datetime → date format string -->
+        <div class="input-group" *ngIf="isDateFormat">
+          <app-custom-input [(ngModel)]="editableField.formatHint.dateFormat"
+            [label]="'DATASET.FIELD.DATE_FORMAT' | translate"
+            [placeholder]="'DATASET.FIELD.DATE_FORMAT_PLACEHOLDER' | translate" [maxLength]="64"
+            (ngModelChange)="onFieldChange()" [inputDisabled]="isSubmitting" icon="pi-calendar">
+          </app-custom-input>
+        </div>
+
+        <!-- Visibility -->
+        <div class="input-group toggle-group">
+          <label>{{ 'DATASET.FIELD.VISIBLE' | translate }}</label>
+          <app-custom-toggle [ngModel]="editableField.isVisible" (onChange)="onVisibleChange($event.checked)"
+            [showStatusLabel]="false" [disabled]="isSubmitting">
+          </app-custom-toggle>
         </div>
       </div>
 
