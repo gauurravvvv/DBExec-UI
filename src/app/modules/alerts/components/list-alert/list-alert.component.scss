@@ -56,26 +56,6 @@
   }
 }
 
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 0.6rem 1.1rem;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: var(--primary-color);
-  color: var(--primary-color-text, #fff);
-  font-size: var(--fs-body);
-  font-weight: var(--fw-semibold);
-  cursor: pointer;
-  transition: all var(--motion-base) ease;
-
-  &:hover {
-    opacity: 0.92;
-    transform: translateY(-1px);
-  }
-}
-
 .content-card {
   background: transparent;
   border: none;
@@ -138,33 +118,12 @@ app-chip + app-chip {
   justify-content: flex-end;
   gap: var(--space-1);
 
-  .icon-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    border: none;
-    background: transparent;
-    color: var(--text-color-secondary);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: all var(--motion-base) ease;
-
-    &:hover:not(:disabled) {
-      background: var(--hover-background);
-      color: var(--text-color);
-    }
-    &.edit-btn:hover:not(:disabled) {
-      color: var(--primary-color);
-    }
-    &.delete-btn:hover:not(:disabled) {
-      color: var(--error-color, #dc2626);
-    }
-    &:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
+  /* Per-row hover accents for the shared icon buttons. */
+  .edit-btn:hover ::ng-deep .app-btn:not(:disabled) {
+    color: var(--primary-color);
+  }
+  .delete-btn:hover ::ng-deep .app-btn:not(:disabled) {
+    color: var(--error-color, #dc2626);
   }
 }
 
@@ -179,12 +138,37 @@ app-chip + app-chip {
   color: var(--text-muted, var(--text-color-secondary));
   text-align: center;
 
-  i {
-    font-size: 1.6rem;
-    opacity: 0.6;
+  .empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--hover-background);
+    margin-bottom: var(--space-2);
+
+    i {
+      font-size: 1.9rem;
+      color: var(--primary-color);
+      opacity: 0.8;
+    }
   }
-  span {
-    font-size: var(--fs-body);
+
+  .empty-title {
+    font-size: var(--fs-h3);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+  }
+
+  .empty-hint {
+    font-size: var(--fs-caption);
+    max-width: 420px;
+    line-height: var(--lh-relaxed, 1.5);
+  }
+
+  app-button {
+    margin-top: var(--space-3);
   }
 }
 
@@ -368,48 +352,6 @@ app-chip + app-chip {
       display: flex;
       gap: var(--space-5);
       justify-content: flex-end;
-
-      button {
-        display: flex;
-        align-items: center;
-        gap: var(--space-4);
-        padding: 0.65rem 1.25rem;
-        border-radius: var(--radius-sm);
-        font-weight: var(--fw-semibold);
-        font-size: var(--fs-body);
-        cursor: pointer;
-        transition: all var(--motion-base);
-        border: 1px solid transparent;
-
-        &.btn-cancel {
-          background: var(--card-background);
-          border-color: var(--border-color);
-          color: var(--text-color);
-
-          &:hover {
-            background: var(--hover-background);
-            border-color: var(--secondary-color);
-          }
-        }
-
-        &.btn-confirm {
-          background: var(--error-color);
-          color: var(--primary-text, #fff);
-
-          &.info {
-            background: var(--primary-color);
-          }
-
-          &:hover:not(:disabled) {
-            transform: translateY(-1px);
-          }
-          &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-          }
-        }
-      }
     }
   }
 }

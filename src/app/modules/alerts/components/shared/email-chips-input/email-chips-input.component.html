@@ -1,0 +1,28 @@
+<!-- Tokenised string[] editor: applied entries render as removable app-chips,
+     a trailing text input adds new ones on Enter / , / ; / blur. -->
+<div
+  class="email-chips"
+  [class.is-invalid]="invalid"
+  [class.is-disabled]="disabled"
+>
+  <app-chip
+    *ngFor="let chip of chips; trackBy: trackByChip"
+    variant="tag"
+    size="sm"
+    [removable]="!disabled"
+    (removed)="removeChip(chip)"
+  >
+    {{ chip }}
+  </app-chip>
+
+  <input
+    type="text"
+    class="email-chips-input"
+    [value]="draft"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    (input)="onInput($event)"
+    (keydown)="onKeydown($event)"
+    (blur)="onBlur()"
+  />
+</div>

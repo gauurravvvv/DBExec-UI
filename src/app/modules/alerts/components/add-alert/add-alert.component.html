@@ -2,40 +2,39 @@
   <div class="add-admin-container">
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text back-button" routerLink="/app/alerts">
-          <i class="pi pi-arrow-left"></i>
-        </button>
+        <app-button
+          variant="icon"
+          icon="pi pi-arrow-left"
+          class="back-button"
+          routerLink="/app/alerts"
+          [title]="'COMMON.BACK' | translate"
+        ></app-button>
         <h2>{{ 'ALERTS.ADD_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
-        <button
-          pButton
-          type="button"
-          class="p-button-outlined btn-test"
-          [label]="'ALERTS.TEST_NOW' | translate"
+        <app-button
+          variant="secondary"
+          icon="pi pi-bolt"
+          [loading]="testing()"
           [disabled]="!canSave || testing()"
-          (click)="onTestNow()"
+          (clicked)="onTestNow()"
         >
-          <i class="pi pi-bolt mr-2"></i>
-        </button>
-        <button
-          pButton
-          type="button"
-          [label]="'COMMON.CANCEL' | translate"
-          class="p-button-outlined btn-cancel"
-          (click)="onCancel()"
-        ></button>
-        <button
+          {{ 'ALERTS.TEST_NOW' | translate }}
+        </app-button>
+        <app-button variant="secondary" (clicked)="onCancel()">
+          {{ 'COMMON.CANCEL' | translate }}
+        </app-button>
+        <app-button
           *hasPermission="'alertManagement'; level: 'write'"
-          pButton
-          class="p-button-primary btn-save"
+          variant="primary"
           type="submit"
-          [label]="'COMMON.SAVE' | translate"
+          icon="pi pi-save"
+          [loading]="saving()"
           [disabled]="!canSave || saving()"
-          (click)="onSubmit()"
+          (clicked)="onSubmit()"
         >
-          <i class="pi pi-save mr-2"></i>
-        </button>
+          {{ 'COMMON.SAVE' | translate }}
+        </app-button>
       </div>
     </div>
 
@@ -236,15 +235,11 @@
             <label class="chips-label">
               {{ 'ALERTS.RECIPIENT_EMAILS' | translate }}
             </label>
-            <p-chips
+            <app-email-chips-input
               formControlName="recipientEmails"
-              [addOnBlur]="true"
-              [addOnTab]="true"
-              [allowDuplicate]="false"
-              [separator]="emailSeparator"
+              mode="email"
               [placeholder]="'ALERTS.ADD_EMAIL' | translate"
-              styleClass="alerts-email-chips"
-            ></p-chips>
+            ></app-email-chips-input>
           </div>
 
           <!-- Organization tags (Track F) -->
@@ -252,15 +247,11 @@
             <label class="chips-label">
               <i class="pi pi-tags"></i> {{ 'COMMON.TAGS' | translate }}
             </label>
-            <p-chips
+            <app-email-chips-input
               formControlName="tags"
-              [addOnBlur]="true"
-              [addOnTab]="true"
-              [allowDuplicate]="false"
-              separator=","
+              mode="tag"
               [placeholder]="'COMMON.TAGS_PLACEHOLDER' | translate"
-              styleClass="alerts-email-chips"
-            ></p-chips>
+            ></app-email-chips-input>
           </div>
         </div>
       </section>

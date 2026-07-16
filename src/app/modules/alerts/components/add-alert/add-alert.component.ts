@@ -68,9 +68,6 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
   timezoneOptions = TIMEZONE_OPTIONS;
   cronPresets = CRON_PRESETS;
 
-  /** Chips separator for the email entry. */
-  emailSeparator = /,|;| /;
-
   /* datasource + source dropdowns */
   selectedDatasource = '';
   preloadedDatasources: any[] | null = null;

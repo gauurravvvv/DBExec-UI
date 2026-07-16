@@ -24,25 +24,8 @@
         align-items: center;
         gap: var(--space-6);
 
-        .back-button {
-          padding: 0 !important;
-          width: 36px;
-          height: 36px;
-          border-radius: 50% !important;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: transparent !important;
-          color: var(--text-color) !important;
-          min-width: 0;
-          border: none !important;
-
-          &:hover {
-            background: var(--hover-background) !important;
-          }
-          i {
-            font-size: var(--fs-h2);
-          }
+        .back-button ::ng-deep .app-btn {
+          border-radius: 50%;
         }
 
         h2 {
@@ -142,7 +125,11 @@
 .channel-toggles {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-8);
+  gap: var(--space-5);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 }
 
 .chips-field {
@@ -154,16 +141,6 @@
     font-size: var(--fs-control);
     font-weight: var(--fw-medium);
     color: var(--text-color);
-  }
-
-  ::ng-deep .p-chips,
-  ::ng-deep .p-chips .p-inputtext {
-    width: 100%;
-  }
-  ::ng-deep .p-chips .p-chips-multiple-container {
-    width: 100%;
-    border-radius: var(--radius-sm);
-    border-color: var(--border-color);
   }
 }
 
@@ -222,10 +199,6 @@
       color: var(--error-color, #dc2626);
     }
   }
-}
-
-.mr-2 {
-  margin-right: var(--space-2);
 }
 
 /* ── save-confirm popup ────────────────────────────────────────── */
@@ -347,44 +320,6 @@
       display: flex;
       gap: var(--space-5);
       justify-content: flex-end;
-
-      button {
-        display: flex;
-        align-items: center;
-        gap: var(--space-4);
-        padding: 0.65rem 1.25rem;
-        border-radius: var(--radius-sm);
-        font-weight: var(--fw-semibold);
-        font-size: var(--fs-body);
-        cursor: pointer;
-        transition: all var(--motion-base);
-        border: 1px solid transparent;
-
-        &.btn-cancel {
-          background: var(--card-background);
-          border-color: var(--border-color);
-          color: var(--text-color);
-
-          &:hover {
-            background: var(--hover-background);
-            border-color: var(--secondary-color);
-          }
-        }
-
-        &.btn-confirm.info {
-          background: var(--primary-color);
-          color: var(--primary-color-text, #fff);
-
-          &:hover:not(:disabled) {
-            transform: translateY(-1px);
-          }
-          &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-          }
-        }
-      }
     }
   }
 }
