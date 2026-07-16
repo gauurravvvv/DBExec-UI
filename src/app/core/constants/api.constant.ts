@@ -172,6 +172,9 @@ export const DATASET = {
   // GET /datasets/:datasetId/usage — 30-day stats for the usage tab
   USAGE_PREFIX: '/datasets/',
   USAGE_SUFFIX: '/usage',
+  // GET /datasets/:datasetId/freshness — last-run timestamp/by/rows
+  FRESHNESS_PREFIX: '/datasets/',
+  FRESHNESS_SUFFIX: '/freshness',
 };
 
 export const TAB = {

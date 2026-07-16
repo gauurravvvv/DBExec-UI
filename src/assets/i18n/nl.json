@@ -934,6 +934,21 @@
       "TTL_PLACEHOLDER": "e.g. 300",
       "SECONDS": "seconden",
       "TTL_HINT": "Hoe lang gecachte resultaten geldig blijven voordat de query opnieuw wordt uitgevoerd."
+    },
+    "TRUST": {
+      "LAST_RUN": "Laatst uitgevoerd",
+      "NEVER_RUN": "Nooit uitgevoerd",
+      "ROWS": "rijen",
+      "BY": "door",
+      "DEPENDS_ON": "Afhankelijk van:",
+      "HIDDEN": "Verborgen",
+      "DIMENSION": "Dimensie",
+      "MEASURE": "Meetwaarde",
+      "OK": "Actueel",
+      "LAST_RUN_FAILED": "Laatste uitvoering mislukt",
+      "CHECKING_DEPENDENCIES": "Afhankelijkheden controleren…",
+      "DELETE_GUARD_MESSAGE": "Gebruikt door {{analyses}} analyses, {{dashboards}} dashboards, {{rls}} RLS-regels — verwijderen kan ze breken.",
+      "DELETE_GUARD_ACK": "Ik begrijp dat het verwijderen van deze dataset afhankelijke items kan breken."
     }
   },
   "ANALYSES": {

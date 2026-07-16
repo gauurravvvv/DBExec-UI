@@ -934,6 +934,21 @@
       "TTL_PLACEHOLDER": "e.g. 300",
       "SECONDS": "Sekunden",
       "TTL_HINT": "Wie lange zwischengespeicherte Ergebnisse gültig bleiben, bevor die Abfrage erneut ausgeführt wird."
+    },
+    "TRUST": {
+      "LAST_RUN": "Zuletzt ausgeführt",
+      "NEVER_RUN": "Nie ausgeführt",
+      "ROWS": "Zeilen",
+      "BY": "von",
+      "DEPENDS_ON": "Hängt ab von:",
+      "HIDDEN": "Ausgeblendet",
+      "DIMENSION": "Dimension",
+      "MEASURE": "Kennzahl",
+      "OK": "Aktuell",
+      "LAST_RUN_FAILED": "Letzte Ausführung fehlgeschlagen",
+      "CHECKING_DEPENDENCIES": "Abhängigkeiten werden geprüft…",
+      "DELETE_GUARD_MESSAGE": "Verwendet von {{analyses}} Analysen, {{dashboards}} Dashboards, {{rls}} RLS-Regeln — Löschen kann sie beschädigen.",
+      "DELETE_GUARD_ACK": "Ich verstehe, dass das Löschen dieses Datensatzes abhängige Elemente beschädigen kann."
     }
   },
   "ANALYSES": {

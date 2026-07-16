@@ -938,6 +938,21 @@
       "TTL_PLACEHOLDER": "e.g. 300",
       "SECONDS": "seconds",
       "TTL_HINT": "How long cached results stay fresh before the query re-runs."
+    },
+    "TRUST": {
+      "LAST_RUN": "Last run",
+      "NEVER_RUN": "Never run",
+      "ROWS": "rows",
+      "BY": "by",
+      "DEPENDS_ON": "Depends on:",
+      "HIDDEN": "Hidden",
+      "DIMENSION": "Dimension",
+      "MEASURE": "Measure",
+      "OK": "Fresh",
+      "LAST_RUN_FAILED": "Last run failed",
+      "CHECKING_DEPENDENCIES": "Checking dependencies…",
+      "DELETE_GUARD_MESSAGE": "Used by {{analyses}} analyses, {{dashboards}} dashboards, {{rls}} RLS rules — deleting may break them.",
+      "DELETE_GUARD_ACK": "I understand deleting this dataset may break dependent items."
     }
   },
   "ANALYSES": {

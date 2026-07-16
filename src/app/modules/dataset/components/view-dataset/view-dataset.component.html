@@ -10,18 +10,6 @@
       </div>
       <div class="header-actions" *ngIf="datasetData">
         <button
-          type="button"
-          class="btn-ghost fav-toggle"
-          [class.on]="isFavourite()"
-          (click)="toggleFavourite()"
-          [pTooltip]="
-            (isFavourite() ? 'FAVOURITE.REMOVE' : 'FAVOURITE.ADD') | translate
-          "
-          tooltipPosition="bottom"
-        >
-          <i class="pi" [ngClass]="isFavourite() ? 'pi-star-fill' : 'pi-star'"></i>
-        </button>
-        <button
           *hasPermission="'datasetManager'; level: 'write'"
           class="btn-primary"
           (click)="onEdit()"
@@ -52,6 +40,54 @@
 
     <!-- Content Section -->
     <div class="content-section" *ngIf="datasetData">
+      <!-- Freshness / trust header (slice 5) -->
+      <div class="freshness-bar" *ngIf="freshnessLoaded">
+        <ng-container *ngIf="hasEverRun; else neverRun">
+          <span
+            class="trust-chip"
+            [class.danger]="freshness?.hadError"
+            [class.success]="!freshness?.hadError"
+          >
+            <i
+              class="pi"
+              [ngClass]="
+                freshness?.hadError ? 'pi-exclamation-triangle' : 'pi-check-circle'
+              "
+            ></i>
+            {{
+              freshness?.hadError
+                ? ('DATASET.TRUST.LAST_RUN_FAILED' | translate)
+                : ('DATASET.TRUST.OK' | translate)
+            }}
+          </span>
+          <span class="freshness-text">
+            {{ 'DATASET.TRUST.LAST_RUN' | translate }}
+            {{ freshness?.lastRunAt | relativeTime }}
+            <ng-container *ngIf="freshness?.lastRunBy">
+              {{ 'DATASET.TRUST.BY' | translate }} {{ freshness?.lastRunBy }}
+            </ng-container>
+          </span>
+          <span class="freshness-sep" *ngIf="freshness?.rowsReturned != null">·</span>
+          <span class="freshness-rows" *ngIf="freshness?.rowsReturned != null">
+            {{ freshness?.rowsReturned }} {{ 'DATASET.TRUST.ROWS' | translate }}
+          </span>
+          <span
+            class="freshness-source"
+            *ngIf="freshness?.source"
+            [pTooltip]="'DATASET.SOURCE' | translate"
+            tooltipPosition="top"
+          >
+            <i class="pi pi-database"></i> {{ freshness?.source }}
+          </span>
+        </ng-container>
+        <ng-template #neverRun>
+          <span class="trust-chip neutral">
+            <i class="pi pi-clock"></i>
+            {{ 'DATASET.TRUST.NEVER_RUN' | translate }}
+          </span>
+        </ng-template>
+      </div>
+
       <div class="details-grid">
         <!-- Basic Information -->
         <div class="info-section">
@@ -85,21 +121,18 @@
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.STATUS' | translate }}</label>
-              <app-chip
-                variant="status"
-                [tone]="datasetData.status === 1 ? 'success' : 'error'"
-                [icon]="
-                  datasetData.status === 1
-                    ? 'pi pi-check-circle'
-                    : 'pi pi-times-circle'
-                "
-              >
+              <span class="status-badge" [class.active]="datasetData.status === 1">
+                <i class="pi" [ngClass]="
+                    datasetData.status === 1
+                      ? 'pi-check-circle'
+                      : 'pi-times-circle'
+                  "></i>
                 {{
                 datasetData.status === 1
                 ? ('COMMON.ACTIVE' | translate)
                 : ('COMMON.INACTIVE' | translate)
                 }}
-              </app-chip>
+              </span>
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.ORGANISATION' | translate }}</label>
@@ -225,11 +258,9 @@
             <h3>
               <i class="pi pi-list mr-2"></i>
               {{ 'DATASET.FIELDS' | translate }}
-              <app-chip
-                variant="count"
-                size="sm"
-                [count]="datasetData.datasetFields?.length || 0"
-              ></app-chip>
+              <span class="count-badge">{{
+                datasetData.datasetFields?.length || 0
+                }}</span>
             </h3>
             <button
               *hasPermission="'datasetManager'; level: 'write'"
@@ -254,8 +285,63 @@
                   " [class.custom-field]="entity.type === 2">
                   <span class="field-number">{{ i + 1 }}</span>
                   <div class="field-content">
-                    <span class="column-view">{{ entity.columnToView }}</span>
+                    <span class="field-title-row">
+                      <span class="column-view">{{ entity.columnToView }}</span>
+                      <!-- Role chip: dimension / measure (slice 5) -->
+                      <span
+                        class="trust-chip role"
+                        *ngIf="entity.role"
+                        [class.measure]="entity.role === 'measure'"
+                        [class.dimension]="entity.role === 'dimension'"
+                      >
+                        {{
+                          entity.role === 'measure'
+                            ? ('DATASET.TRUST.MEASURE' | translate)
+                            : entity.role === 'dimension'
+                              ? ('DATASET.TRUST.DIMENSION' | translate)
+                              : entity.role
+                        }}
+                      </span>
+                      <!-- Hidden chip when the field is not visible -->
+                      <span class="trust-chip neutral" *ngIf="entity.isVisible === false">
+                        <i class="pi pi-eye-slash"></i>
+                        {{ 'DATASET.TRUST.HIDDEN' | translate }}
+                      </span>
+                    </span>
                     <span class="column-use">{{ entity.columnToUse }}</span>
+                    <!-- New read-only metadata (slice 5) -->
+                    <span class="field-description" *ngIf="entity.description">
+                      {{ entity.description }}
+                    </span>
+                    <div
+                      class="field-meta"
+                      *ngIf="
+                        entity.defaultAggregation ||
+                        formatHintLabel(entity.formatHint) ||
+                        entity.typeOverride
+                      "
+                    >
+                      <span class="meta-tag" *ngIf="entity.defaultAggregation">
+                        <i class="pi pi-calculator"></i>
+                        {{ entity.defaultAggregation }}
+                      </span>
+                      <span class="meta-tag" *ngIf="formatHintLabel(entity.formatHint)">
+                        <i class="pi pi-percentage"></i>
+                        {{ formatHintLabel(entity.formatHint) }}
+                      </span>
+                      <span class="meta-tag" *ngIf="entity.typeOverride">
+                        <i class="pi pi-arrow-right-arrow-left"></i>
+                        {{ entity.typeOverride }}
+                      </span>
+                    </div>
+                    <!-- Dependency line for custom fields, when payload carries it -->
+                    <span
+                      class="field-depends"
+                      *ngIf="dependencyNames(entity).length"
+                    >
+                      {{ 'DATASET.TRUST.DEPENDS_ON' | translate }}
+                      {{ dependencyNames(entity).join(', ') }}
+                    </span>
                   </div>
                   <span class="field-datatype" *ngIf="entity.dataType" [pTooltip]="
                       ('DATASET.SOURCE' | translate) + ': ' + entity.dataType
@@ -305,11 +391,9 @@
           <h3>
             <i class="pi pi-chart-bar mr-2"></i>
             {{ 'DATASET.ANALYSES' | translate }}
-            <app-chip
-              variant="count"
-              size="sm"
-              [count]="datasetData.analyses?.length || 0"
-            ></app-chip>
+            <span class="count-badge">{{
+              datasetData.analyses?.length || 0
+              }}</span>
           </h3>
           <div class="fields-list">
             <div class="field-item" *ngFor="
@@ -325,121 +409,6 @@
               {{ 'DATASET.NO_ANALYSES_FOUND' | translate }}
             </div>
           </div>
-        </div>
-
-        <!-- Lineage — what depends on this dataset.
-             Shows dashboards + RLS rules that aren't already covered
-             by the Analyses section above. Hides while the BE call
-             is in flight so a flash-of-no-data doesn't read as
-             "nothing depends on this." -->
-        <div class="info-section full-width" *ngIf="lineage || isLoadingLineage">
-          <h3>
-            <i class="pi pi-sitemap mr-2"></i>
-            {{ 'DATASET.LINEAGE' | translate }}
-            <app-chip
-              variant="count"
-              size="sm"
-              *ngIf="lineage"
-              [count]="lineage.totalConsumers"
-            ></app-chip>
-          </h3>
-
-          <div class="lineage-loading" *ngIf="isLoadingLineage && !lineage">
-            <i class="pi pi-spin pi-spinner"></i>
-          </div>
-
-          <ng-container *ngIf="lineage && !isLoadingLineage">
-            <div class="lineage-empty" *ngIf="lineage.totalConsumers === 0">
-              <i class="pi pi-info-circle"></i>
-              {{ 'DATASET.LINEAGE_EMPTY' | translate }}
-            </div>
-
-            <div class="lineage-groups" *ngIf="lineage.totalConsumers > 0">
-              <div class="lineage-group" *ngIf="lineage.dashboards.length > 0">
-                <h4>
-                  <i class="pi pi-gauge"></i>
-                  {{ 'DATASET.LINEAGE_DASHBOARDS' | translate }}
-                  <app-chip variant="count" size="sm" [count]="lineage.dashboards.length"></app-chip>
-                </h4>
-                <ul class="lineage-list">
-                  <li *ngFor="let d of lineage.dashboards">
-                    <i class="pi pi-chart-pie"></i>
-                    {{ d.name }}
-                  </li>
-                </ul>
-              </div>
-
-              <div class="lineage-group" *ngIf="lineage.rlsRules.length > 0">
-                <h4>
-                  <i class="pi pi-filter"></i>
-                  {{ 'DATASET.LINEAGE_RLS_RULES' | translate }}
-                  <app-chip variant="count" size="sm" [count]="lineage.rlsRules.length"></app-chip>
-                </h4>
-                <ul class="lineage-list">
-                  <li *ngFor="let r of lineage.rlsRules">
-                    <i class="pi pi-shield"></i>
-                    {{ r.name }}
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </ng-container>
-        </div>
-
-        <!-- Usage — 30-day stats. Headline KPI strip + daily roll-up.
-             A flat sparkline-ish bar list keeps the section dependency-
-             free; no ngx-echarts needed for a 30-bar strip. -->
-        <div class="info-section full-width" *ngIf="usage || isLoadingUsage">
-          <h3>
-            <i class="pi pi-chart-line mr-2"></i>
-            {{ 'DATASET.USAGE' | translate }}
-            <span class="usage-window" *ngIf="usage">
-              ({{ 'DATASET.LAST_N_DAYS' | translate: { days: usage.windowDays } }})
-            </span>
-          </h3>
-
-          <div class="usage-loading" *ngIf="isLoadingUsage && !usage">
-            <i class="pi pi-spin pi-spinner"></i>
-          </div>
-
-          <ng-container *ngIf="usage && !isLoadingUsage">
-            <div class="usage-kpis">
-              <div class="usage-kpi">
-                <div class="kpi-value">{{ usage.summary.runs }}</div>
-                <div class="kpi-label">{{ 'DATASET.USAGE_RUNS' | translate }}</div>
-              </div>
-              <div class="usage-kpi" [class.has-errors]="usage.summary.errors > 0">
-                <div class="kpi-value">{{ usage.summary.errors }}</div>
-                <div class="kpi-label">{{ 'DATASET.USAGE_ERRORS' | translate }}</div>
-              </div>
-              <div class="usage-kpi">
-                <div class="kpi-value">{{ usage.summary.p50 }}<small>ms</small></div>
-                <div class="kpi-label">{{ 'DATASET.USAGE_P50' | translate }}</div>
-              </div>
-              <div class="usage-kpi">
-                <div class="kpi-value">{{ usage.summary.p95 }}<small>ms</small></div>
-                <div class="kpi-label">{{ 'DATASET.USAGE_P95' | translate }}</div>
-              </div>
-            </div>
-
-            <div class="usage-empty" *ngIf="usage.summary.runs === 0">
-              <i class="pi pi-info-circle"></i>
-              {{ 'DATASET.USAGE_EMPTY' | translate }}
-            </div>
-
-            <!-- Inline bar strip — no chart lib needed for 30 bars.
-                 Heights are CSS-normalised against the day with the
-                 most runs in the window, so a quiet dataset still
-                 shows a readable shape. -->
-            <div class="usage-sparkline" *ngIf="usage.daily.length > 0">
-              <div
-                class="bar"
-                *ngFor="let row of usage.daily"
-                [style.height.%]="(row.runs / (usage.summary.runs || 1)) * 100 || 4"
-                [title]="row.day + ': ' + row.runs + ' runs'"
-              ></div>
-            </div>
-          </ng-container>
         </div>
       </div>
     </div>
@@ -479,6 +448,30 @@
         {{ 'DATASET.CONFIRM_DELETE_SINGLE' | translate }}
       </p>
 
+      <!-- Dependency guard: warn about downstream consumers (slice 5) -->
+      <div class="dependency-warning" *ngIf="checkingLineage">
+        <i class="pi pi-spin pi-spinner"></i>
+        {{ 'DATASET.TRUST.CHECKING_DEPENDENCIES' | translate }}
+      </div>
+      <div class="dependency-warning danger" *ngIf="!checkingLineage && hasConsumers">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>
+          {{
+            'DATASET.TRUST.DELETE_GUARD_MESSAGE'
+              | translate
+                : {
+                    analyses: lineage?.analyses?.length || 0,
+                    dashboards: lineage?.dashboards?.length || 0,
+                    rls: lineage?.rlsRules?.length || 0
+                  }
+          }}
+        </span>
+      </div>
+      <label class="dependency-ack" *ngIf="!checkingLineage && hasConsumers">
+        <input type="checkbox" [(ngModel)]="acknowledgeConsumers" />
+        <span>{{ 'DATASET.TRUST.DELETE_GUARD_ACK' | translate }}</span>
+      </label>
+
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
@@ -514,6 +507,8 @@
         (click)="proceedDelete()"
         [disabled]="
           !deleteJustification.trim() ||
+          checkingLineage ||
+          (hasConsumers && !acknowledgeConsumers) ||
           (datasetData && isDeleting(datasetData.id))
         "
       >

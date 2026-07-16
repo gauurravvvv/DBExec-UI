@@ -8,8 +8,6 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { DATASET, QUERY_BUILDER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { FavouritesService } from 'src/app/shared/services/favourites.service';
-import type { FolderObjectType } from 'src/app/shared/validators/folders';
 import { DatasetService } from '../../services/dataset.service';
 
 @Component({
@@ -36,40 +34,37 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
   fieldToDelete: any = null;
   isLoadingField = false;
 
-  /**
-   * Lineage payload — `{ analyses, dashboards, rlsRules, totalConsumers }`.
-   * Independent of `datasetData.analyses` (which is just a denormalised
-   * list) — this is the BE's authoritative view of dependents and is
-   * also what powers the "what breaks if I delete" guard in the
-   * delete-confirmation modal.
-   */
+  // ── Trust surface (slice 5) ────────────────────────────────────────
+  // Freshness header stats. `null` until the GET resolves; `hasFreshness`
+  // stays false when the dataset has never run (all fields null).
+  freshness: {
+    lastRunAt: string | null;
+    lastRunBy: string | null;
+    rowsReturned: number | null;
+    source: string | null;
+    hadError: boolean | null;
+  } | null = null;
+  freshnessLoading = false;
+  freshnessLoaded = false;
+
+  // Delete dependency guard. Populated from the lineage endpoint before
+  // the justification step is shown; when totalConsumers > 0 the confirm
+  // dialog surfaces the counts and requires an explicit acknowledgement.
   lineage: {
-    analyses: { id: string; name: string }[];
-    dashboards: { id: string; name: string }[];
-    rlsRules: { id: string; name: string }[];
+    analyses: any[];
+    dashboards: any[];
+    rlsRules: any[];
     totalConsumers: number;
   } | null = null;
-  isLoadingLineage = false;
-
-  /**
-   * Usage payload — last 30 days. `summary` carries the headline KPIs;
-   * `daily` is the sparkline data. Shapes match the BE's
-   * /datasets/:id/usage response.
-   */
-  usage: {
-    windowDays: number;
-    summary: { runs: number; errors: number; p50: number; p95: number };
-    daily: { day: string; runs: number }[];
-  } | null = null;
-  isLoadingUsage = false;
+  checkingLineage = false;
+  // Explicit acknowledgement the user ticks when the dataset has
+  // downstream consumers — gates the delete button in that case.
+  acknowledgeConsumers = false;
 
   saving = this.datasetService.saving;
   // Drives the skeleton card on initial GET + per-id delete spinner.
   loading = this.datasetService.loading;
   isDeleting = (id: string): boolean => this.datasetService.isDeleting(id);
-
-  /* ── favourite star (Track F) ───────────────────────────────────── */
-  readonly objectType: FolderObjectType = 'dataset';
 
   constructor(
     private route: ActivatedRoute,
@@ -77,22 +72,7 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
     private datasetService: DatasetService,
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
-    private favouritesService: FavouritesService,
   ) {}
-
-  isFavourite(): boolean {
-    const id = this.datasetData?.id;
-    return !!id && this.favouritesService.isFavourite(this.objectType, id);
-  }
-
-  toggleFavourite(): void {
-    const id = this.datasetData?.id;
-    if (!id) return;
-    this.favouritesService.toggle(this.objectType, id).then((res: any) => {
-      this.globalService.handleSuccessService(res, false);
-      this.cdr.markForCheck();
-    });
-  }
 
   isArray = Array.isArray;
 
@@ -223,9 +203,6 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadDatasetData();
-    this.favouritesService
-      .refresh(this.objectType)
-      .then(() => this.cdr.markForCheck());
   }
 
   async loadDatasetData() {
@@ -235,55 +212,103 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
     const response: any = await this.datasetService.loadOne(datasetId);
     if (this.globalService.handleSuccessService(response, false)) {
       this.datasetData = this.datasetService.current();
-      // Fan out the secondary fetches in parallel. They power the
-      // Lineage and Usage sections of the detail page; both are
-      // additive — a failure on either one just hides its section
-      // rather than blocking the rest of the page.
-      this.loadLineage(datasetId);
-      this.loadUsage(datasetId);
+      // Kick off the freshness fetch once we know the dataset exists.
+      // Fire-and-forget: the header renders "loading" then fills in.
+      this.loadFreshness(datasetId);
     }
     this.cdr.markForCheck();
   }
 
-  private async loadLineage(datasetId: string): Promise<void> {
-    this.isLoadingLineage = true;
-    this.cdr.markForCheck();
+  /**
+   * Fetch point-in-time freshness stats for the header. Failures are
+   * swallowed silently — the header simply won't show the trust chip
+   * rather than blocking the whole detail view. `freshnessLoaded`
+   * flips regardless so the template can stop showing the spinner.
+   */
+  private async loadFreshness(datasetId: string) {
+    this.freshnessLoading = true;
+    this.freshnessLoaded = false;
     try {
-      const res: any = await this.datasetService.getLineage(datasetId);
+      const res: any = await this.datasetService.getFreshness(datasetId);
       if (res?.status && res.data) {
-        this.lineage = res.data;
+        this.freshness = res.data;
+      } else {
+        this.freshness = null;
       }
-    } catch (_err) {
-      // Silent — the section just doesn't render. The page still
-      // works for everything else.
+    } catch {
+      this.freshness = null;
     } finally {
-      this.isLoadingLineage = false;
-      this.cdr.markForCheck();
-    }
-  }
-
-  private async loadUsage(datasetId: string): Promise<void> {
-    this.isLoadingUsage = true;
-    this.cdr.markForCheck();
-    try {
-      const res: any = await this.datasetService.getUsage(datasetId);
-      if (res?.status && res.data) {
-        this.usage = res.data;
-      }
-    } catch (_err) {
-      // Same posture as lineage — additive, not load-bearing.
-    } finally {
-      this.isLoadingUsage = false;
+      this.freshnessLoading = false;
+      this.freshnessLoaded = true;
       this.cdr.markForCheck();
     }
   }
 
   /**
-   * Total downstream consumers — used by the delete confirmation
-   * modal to warn the user before they break things.
+   * Whether the dataset has ever been run. The BE returns all-null
+   * fields when it hasn't; we treat a present lastRunAt as the signal.
    */
-  get hasDownstreamConsumers(): boolean {
-    return (this.lineage?.totalConsumers ?? 0) > 0;
+  get hasEverRun(): boolean {
+    return !!this.freshness && this.freshness.lastRunAt != null;
+  }
+
+  /**
+   * Render a field's formatHint human-readably, e.g.
+   *   { kind: 'currency', currency: 'USD', decimals: 2 }
+   *     -> "Currency · USD · 2dp"
+   * Accepts either a structured object or a pre-formatted string.
+   * Returns '' when there's nothing to show.
+   */
+  formatHintLabel(hint: any): string {
+    if (hint == null) return '';
+    if (typeof hint === 'string') return hint;
+    if (typeof hint !== 'object') return String(hint);
+
+    const parts: string[] = [];
+    const kind = hint.kind ?? hint.type ?? hint.format;
+    if (kind) {
+      const k = String(kind);
+      parts.push(k.charAt(0).toUpperCase() + k.slice(1));
+    }
+    const currency = hint.currency ?? hint.currencyCode;
+    if (currency) parts.push(String(currency));
+    const decimals = hint.decimals ?? hint.decimalPlaces ?? hint.precision;
+    if (decimals != null) parts.push(`${decimals}dp`);
+    if (hint.percent === true || kind === 'percent') {
+      if (!parts.length) parts.push('Percent');
+    }
+
+    return parts.join(' · ');
+  }
+
+  /**
+   * Resolve a custom field's `used_field_ids` (numeric ids of sibling
+   * fields it references) into human-readable column names for a
+   * "Depends on: colA, colB" line. Returns [] when the payload carries
+   * no dependency info so the template can skip the line gracefully.
+   */
+  dependencyNames(field: any): string[] {
+    if (!field) return [];
+    // Prefer explicit referenced source columns if the BE surfaced them.
+    const explicit =
+      field.referencedColumns ?? field.usedFieldColumns ?? field.dependsOn;
+    if (Array.isArray(explicit) && explicit.length) {
+      return explicit.map((c: any) =>
+        typeof c === 'string' ? c : c?.columnToView ?? c?.name ?? String(c),
+      );
+    }
+
+    const ids = field.used_field_ids ?? field.usedFieldIds;
+    if (!Array.isArray(ids) || !ids.length) return [];
+    const all = this.datasetData?.datasetFields ?? [];
+    const names: string[] = [];
+    for (const id of ids) {
+      const match = all.find((f: any) => f.id === id);
+      if (match) {
+        names.push(match.columnToView || match.columnToUse || String(id));
+      }
+    }
+    return names;
   }
 
   goBack() {
@@ -313,13 +338,50 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
     }
   }
 
-  confirmDelete() {
+  async confirmDelete() {
+    // Dependency guard: consult lineage before opening the delete
+    // dialog so we can warn about downstream consumers. A failed
+    // lineage lookup must not block deletion — fall through with no
+    // guard rather than trapping the user.
+    this.lineage = null;
+    this.acknowledgeConsumers = false;
+    this.checkingLineage = true;
     this.showDeleteConfirm = true;
+    try {
+      const res: any = await this.datasetService.getLineage(
+        this.datasetData.id,
+      );
+      if (res?.status && res.data) {
+        this.lineage = {
+          analyses: res.data.analyses ?? [],
+          dashboards: res.data.dashboards ?? [],
+          rlsRules: res.data.rlsRules ?? [],
+          totalConsumers:
+            res.data.totalConsumers ??
+            (res.data.analyses?.length ?? 0) +
+              (res.data.dashboards?.length ?? 0) +
+              (res.data.rlsRules?.length ?? 0),
+        };
+      }
+    } catch {
+      this.lineage = null;
+    } finally {
+      this.checkingLineage = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  /** True when lineage reported at least one downstream consumer. */
+  get hasConsumers(): boolean {
+    return !!this.lineage && this.lineage.totalConsumers > 0;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.deleteJustification = '';
+    this.lineage = null;
+    this.checkingLineage = false;
+    this.acknowledgeConsumers = false;
   }
 
   proceedDelete() {
@@ -329,6 +391,8 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.deleteJustification = '';
+            this.lineage = null;
+            this.acknowledgeConsumers = false;
             this.router.navigate([DATASET.LIST]);
           }
           this.cdr.markForCheck();

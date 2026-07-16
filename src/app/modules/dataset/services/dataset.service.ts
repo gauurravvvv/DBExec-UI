@@ -564,6 +564,21 @@ export class DatasetService {
   }
 
   /**
+   * Freshness — `{ lastRunAt, lastRunBy, rowsReturned, source, hadError }`
+   * (all null when the dataset has never run). Powers the view-dataset
+   * trust header.
+   */
+  async getFreshness(datasetId: string): Promise<any> {
+    return await lastValueFrom(
+      this.http
+        .apiGet(DATASET.FRESHNESS_PREFIX + datasetId + DATASET.FRESHNESS_SUFFIX, {
+          skipLoader: true,
+        })
+        .pipe(takeUntil(this._cancelReads$)),
+    );
+  }
+
+  /**
    * Downstream consumers — `{ analyses, dashboards, rlsRules, totalConsumers }`.
    * Used by the Lineage tab and the delete-confirmation modal so the
    * user knows what they'd break before they hit confirm.

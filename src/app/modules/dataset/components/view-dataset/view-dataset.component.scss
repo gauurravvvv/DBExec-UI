@@ -234,6 +234,16 @@
               color: var(--text-color);
               opacity: 0.7;
             }
+
+            .count-badge {
+              margin-left: 8px;
+              background: var(--hover-background);
+              padding: 2px 8px;
+              border-radius: var(--radius-lg);
+              font-size: var(--fs-label);
+              color: var(--text-color);
+              opacity: 0.7;
+            }
           }
 
           .info-grid {
@@ -753,6 +763,203 @@
   }
 }
 
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 4px 12px;
+  border-radius: var(--radius-lg);
+  font-size: var(--fs-control);
+  font-weight: var(--fw-medium);
+  background: var(--error-color-transparent);
+  color: var(--error-color);
+
+  &.active {
+    background: var(--success-color-transparent);
+    color: var(--success-color);
+  }
+
+  i {
+    font-size: var(--fs-body);
+  }
+}
+
+// ── Trust surface (slice 5) ───────────────────────────────────────
+// Generic pill used for freshness status, field role, hidden marker.
+.trust-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 3px 10px;
+  border-radius: var(--radius-lg);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  line-height: 1.4;
+  white-space: nowrap;
+  background: var(--hover-background);
+  color: var(--text-color);
+
+  i {
+    font-size: var(--fs-micro);
+  }
+
+  &.success {
+    background: var(--success-color-transparent);
+    color: var(--success-color);
+  }
+
+  &.danger {
+    background: var(--error-color-transparent);
+    color: var(--error-color);
+  }
+
+  &.neutral {
+    background: var(--hover-background);
+    color: var(--text-color);
+    opacity: 0.85;
+  }
+
+  // Field role variants
+  &.role.dimension {
+    background: var(--primary-color-transparent);
+    color: var(--primary-color);
+  }
+
+  &.role.measure {
+    background: var(--success-color-transparent);
+    color: var(--success-color);
+  }
+}
+
+.freshness-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-7);
+  background: var(--hover-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-control);
+  color: var(--text-color);
+
+  .freshness-text {
+    color: var(--text-color);
+  }
+
+  .freshness-sep {
+    color: var(--text-color);
+    opacity: 0.4;
+  }
+
+  .freshness-rows {
+    color: var(--text-color);
+    opacity: 0.8;
+    font-weight: var(--fw-medium);
+  }
+
+  .freshness-source {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-color);
+    opacity: 0.7;
+
+    i {
+      font-size: var(--fs-micro);
+    }
+  }
+}
+
+// Field metadata block inside each mapping-item (slice 5)
+.field-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.field-description {
+  font-size: var(--fs-micro);
+  color: var(--text-color);
+  opacity: 0.75;
+  line-height: 1.4;
+  white-space: normal;
+}
+
+.field-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: 2px;
+
+  .meta-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--fs-micro);
+    color: var(--text-color);
+    opacity: 0.8;
+
+    i {
+      font-size: var(--fs-micro);
+      opacity: 0.7;
+    }
+  }
+}
+
+.field-depends {
+  font-size: var(--fs-micro);
+  color: var(--primary-color);
+  opacity: 0.9;
+  white-space: normal;
+}
+
+// Delete dependency guard (slice 5)
+.dependency-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: 1rem;
+  border-radius: var(--radius-md);
+  font-size: var(--fs-body);
+  background: var(--hover-background);
+  color: var(--text-color);
+
+  i {
+    margin-top: 2px;
+    font-size: var(--fs-h3);
+  }
+
+  &.danger {
+    background: var(--error-color-transparent);
+    color: var(--error-color);
+
+    i {
+      color: var(--error-color);
+    }
+  }
+}
+
+.dependency-ack {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: 1rem;
+  font-size: var(--fs-control);
+  color: var(--text-color);
+  cursor: pointer;
+
+  input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--error-color);
+  }
+}
+
 // 5. Popups & Modals
 .confirmation-popup {
   position: fixed;
@@ -955,200 +1162,5 @@
         }
       }
     }
-  }
-}
-
-// ─── Lineage section ─────────────────────────────────────────────
-// "What depends on this dataset" — listed by entity kind so the
-// admin can see at a glance which dashboards / RLS rules will break
-// if they delete or radically change the SQL.
-.lineage-loading,
-.usage-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-6);
-  color: var(--secondary-color);
-
-  i { font-size: var(--fs-h3); }
-}
-
-.lineage-empty,
-.usage-empty {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-4) var(--space-5);
-  background: var(--hover-background);
-  border-radius: var(--radius-md);
-  color: var(--secondary-color);
-  font-size: var(--fs-control);
-
-  i { color: var(--primary-color); }
-}
-
-.lineage-groups {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-}
-
-.lineage-group {
-  h4 {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-3);
-    margin: 0 0 var(--space-3);
-    font-size: var(--fs-control);
-    font-weight: var(--fw-semibold);
-    color: var(--text-color);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-
-    i { color: var(--primary-color); }
-  }
-
-  .lineage-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: var(--space-3);
-
-    li {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      padding: var(--space-3) var(--space-4);
-      background: var(--card-background);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      font-size: var(--fs-control);
-      color: var(--text-color);
-      transition:
-        border-color var(--motion-fast) ease,
-        background var(--motion-fast) ease;
-
-      &:hover {
-        border-color: var(--primary-color);
-        background: var(--hover-background);
-      }
-
-      i {
-        color: var(--secondary-color);
-        font-size: var(--fs-control);
-        flex-shrink: 0;
-      }
-    }
-  }
-}
-
-// ─── Usage section ───────────────────────────────────────────────
-.usage-window {
-  font-size: var(--fs-label);
-  font-weight: var(--fw-regular);
-  color: var(--secondary-color);
-  margin-left: var(--space-3);
-}
-
-.usage-kpis {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: var(--space-4);
-  margin-bottom: var(--space-5);
-}
-
-.usage-kpi {
-  padding: var(--space-4) var(--space-5);
-  background: var(--card-background);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-
-  .kpi-value {
-    font-size: var(--fs-h2);
-    font-weight: var(--fw-semibold);
-    color: var(--text-color);
-    line-height: 1.1;
-
-    small {
-      font-size: var(--fs-control);
-      font-weight: var(--fw-regular);
-      color: var(--secondary-color);
-      margin-left: 2px;
-    }
-  }
-
-  .kpi-label {
-    margin-top: 4px;
-    font-size: var(--fs-micro);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--secondary-color);
-    font-weight: var(--fw-medium);
-  }
-
-  // Tint the errors KPI red whenever it isn't zero — gives the
-  // section a quick scan-readable shape.
-  &.has-errors .kpi-value {
-    color: var(--error-color);
-  }
-}
-
-// Lightweight 30-bar strip — no chart library needed for a window
-// this short. Bars normalise their height against the total runs
-// in the window so a sparse dataset still shows a readable shape.
-.usage-sparkline {
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 56px;
-  padding: var(--space-3);
-  background: var(--hover-background);
-  border-radius: var(--radius-md);
-
-  .bar {
-    flex: 1;
-    min-width: 4px;
-    background: var(--primary-color);
-    border-radius: 2px;
-    opacity: 0.75;
-    transition: opacity var(--motion-fast) ease;
-
-    &:hover {
-      opacity: 1;
-    }
-  }
-}
-
-/* ── Track F: favourite star toggle in the view header ─────────────── */
-.fav-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--surface-border, #ced4da);
-  background: var(--surface-card, #ffffff);
-  border-radius: 8px;
-  cursor: pointer;
-  transition:
-    background 0.15s ease,
-    border-color 0.15s ease;
-
-  i {
-    color: #9aa7b4;
-    transition: color 0.15s ease;
-  }
-
-  &:hover {
-    border-color: #f1c21b;
-    i {
-      color: #f1c21b;
-    }
-  }
-
-  &.on i {
-    color: #f1c21b;
   }
 }

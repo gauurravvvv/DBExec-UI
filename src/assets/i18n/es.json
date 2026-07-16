@@ -934,6 +934,21 @@
       "TTL_PLACEHOLDER": "e.g. 300",
       "SECONDS": "segundos",
       "TTL_HINT": "Tiempo que los resultados en caché permanecen válidos antes de que la consulta se vuelva a ejecutar."
+    },
+    "TRUST": {
+      "LAST_RUN": "Última ejecución",
+      "NEVER_RUN": "Nunca ejecutado",
+      "ROWS": "filas",
+      "BY": "por",
+      "DEPENDS_ON": "Depende de:",
+      "HIDDEN": "Oculto",
+      "DIMENSION": "Dimensión",
+      "MEASURE": "Medida",
+      "OK": "Actualizado",
+      "LAST_RUN_FAILED": "La última ejecución falló",
+      "CHECKING_DEPENDENCIES": "Comprobando dependencias…",
+      "DELETE_GUARD_MESSAGE": "Utilizado por {{analyses}} análisis, {{dashboards}} paneles, {{rls}} reglas RLS — eliminarlo puede romperlos.",
+      "DELETE_GUARD_ACK": "Entiendo que eliminar este conjunto de datos puede romper los elementos dependientes."
     }
   },
   "ANALYSES": {
