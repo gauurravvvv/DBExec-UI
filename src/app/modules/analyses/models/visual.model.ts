@@ -20,7 +20,11 @@ export type AggregateFn =
   | 'count'
   | 'min'
   | 'max'
-  | 'count_distinct';
+  | 'count_distinct'
+  | 'median'
+  | 'percentile'
+  | 'stddev'
+  | 'variance';
 
 /**
  * One extra combo measure for multi-measure charts. Persisted in

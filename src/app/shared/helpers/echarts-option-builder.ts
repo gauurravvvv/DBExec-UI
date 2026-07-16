@@ -452,7 +452,7 @@ function buildPerfFlags(config: any): any {
 
 function buildDataLabel(config: any, defaultPosition?: string): any {
   if (!config.showDataLabel) return undefined;
-  return {
+  const label: any = {
     show: true,
     position: config.labelPosition || defaultPosition || 'top',
     fontFamily: CHART_TYPOGRAPHY.fontFamily,
@@ -460,6 +460,33 @@ function buildDataLabel(config: any, defaultPosition?: string): any {
     color: CHART_TYPOGRAPHY.dataLabel.color,
     fontWeight: CHART_TYPOGRAPHY.dataLabel.fontWeight,
   };
+  // Honour the per-field format hint on the ON-CHART value labels, using the
+  // SAME hint object (config.valueFormat) that tooltips + axis labels consume
+  // via applyPerFieldFormat. Previously the hint reached tooltips + axis labels
+  // but never the data labels, so a currency/percent/decimal/date field showed
+  // raw numbers on-chart. Set here so EVERY builder that calls buildDataLabel
+  // (including the non-cartesian pie/funnel/treemap/… families that never run
+  // through applyPerFieldFormat) formats its labels consistently. For the
+  // cartesian family applyPerFieldFormat re-stamps the same formatter later
+  // with the identical hint, so the two paths agree.
+  const hint = config?.valueFormat;
+  if (hint && hint.kind && hint.kind !== 'auto') {
+    label.formatter = (params: any) => {
+      // ECharts passes a params object; extract the datum's numeric value
+      // (object-valued datums carry it under .value). Non-numeric names pass
+      // through formatValueByHint untouched.
+      const raw =
+        params && typeof params === 'object' && 'value' in params
+          ? (params as any).value
+          : params;
+      const v =
+        raw && typeof raw === 'object' && 'value' in raw
+          ? (raw as any).value
+          : raw;
+      return formatValueByHint(v, hint);
+    };
+  }
+  return label;
 }
 
 // ========= Reference lines / bands / annotations =========

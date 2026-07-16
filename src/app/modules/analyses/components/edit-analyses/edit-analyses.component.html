@@ -291,6 +291,15 @@
                 tooltipPosition="right"
               ></button>
             </div>
+
+            <!-- Show-hidden toggle — only when the dataset has hidden fields. -->
+            <div class="show-hidden-action" *ngIf="hasHiddenFields">
+              <app-custom-toggle
+                [(ngModel)]="showHiddenFields"
+                [label]="'ANALYSES.SHOW_HIDDEN_FIELDS' | translate"
+                [showStatusLabel]="false"
+              ></app-custom-toggle>
+            </div>
           </div>
 
           <!-- Scrollable fields area -->

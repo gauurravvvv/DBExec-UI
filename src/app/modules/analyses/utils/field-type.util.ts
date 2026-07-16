@@ -97,6 +97,33 @@ export function toFieldKind(dataType: string | null | undefined): FieldKind {
 }
 
 /**
+ * Measure vs dimension for a DatasetField, honouring the BE-supplied field
+ * metadata when present. The BE now stamps an explicit `role` ('measure' |
+ * 'dimension') on curated fields; when set it wins over the raw-type
+ * heuristic so an author's semantic choice (e.g. a numeric ID marked as a
+ * dimension) routes correctly. Falls back to `effectiveDataType` (the BE's
+ * type after any override) then the raw `dataType`, so fields WITHOUT
+ * metadata behave exactly as before — additive, never breaking.
+ */
+export function fieldKindFromMeta(field: any): FieldKind {
+  const role = typeof field?.role === 'string' ? field.role.toLowerCase() : '';
+  if (role === 'measure' || role === 'dimension') return role;
+  const type = field?.effectiveDataType ?? field?.dataType;
+  return toFieldKind(type);
+}
+
+/**
+ * The field's default aggregate, if the BE metadata declares one. Read when a
+ * measure is dropped so the aggregate dropdown pre-selects the author's
+ * intended default instead of blank. Returns null when absent so the caller
+ * leaves the existing selection untouched.
+ */
+export function defaultAggregationOf(field: any): string | null {
+  const agg = field?.defaultAggregation;
+  return typeof agg === 'string' && agg.trim() ? agg.trim() : null;
+}
+
+/**
  * Suggested analysis-filter `filterType` for a field, derived from its
  * dataType. Used by the filter-dialog to pre-select a sensible type the
  * moment the user picks a column (they can still override).
@@ -163,4 +190,17 @@ export function fieldFitsRole(
   const expected = ROLE_EXPECTED_KIND[role];
   if (!expected) return true;
   return toFieldKind(dataType) === expected;
+}
+
+/**
+ * Metadata-aware variant of {@link fieldFitsRole}. Uses the field's explicit
+ * `role` metadata (via {@link fieldKindFromMeta}) so a field the BE marked as a
+ * measure/dimension is judged by that intent rather than its raw SQL type.
+ * Fields without metadata degrade to the same dataType heuristic, so behaviour
+ * is unchanged for legacy fields.
+ */
+export function fieldFitsRoleMeta(role: string, field: any): boolean {
+  const expected = ROLE_EXPECTED_KIND[role];
+  if (!expected) return true;
+  return fieldKindFromMeta(field) === expected;
 }
