@@ -22,17 +22,24 @@
           <div class="hero-meta">
             <h1 class="hero-name">{{ role.name }}</h1>
             <div class="hero-sub">
-              <span class="type-badge" [class.login]="isLogin" [class.group]="!isLogin">
-                <i class="pi" [ngClass]="isLogin ? 'pi-user' : 'pi-users'"></i>
+              <app-chip
+                variant="badge"
+                [tone]="isLogin ? 'primary' : 'neutral'"
+                [icon]="isLogin ? 'pi pi-user' : 'pi pi-users'"
+              >
                 {{ (isLogin ? 'DB_ACCESS.TYPE_LOGIN' : 'DB_ACCESS.TYPE_GROUP') | translate }}
-              </span>
+              </app-chip>
               <span class="dot">·</span>
-              <span class="status-pill" *ngIf="isLogin" [ngClass]="status()">
-                <span class="dot"></span>
+              <app-chip
+                variant="status"
+                *ngIf="isLogin"
+                [tone]="statusTone()"
+                [dot]="'currentColor'"
+              >
                 {{ 'DB_ACCESS.STATUS_' + (status() | uppercase) | translate }}
-              </span>
+              </app-chip>
               <span class="dot" *ngIf="isLogin">·</span>
-              <span class="count-pill"><i class="pi pi-users"></i> {{ memberCount }}</span>
+              <app-chip variant="count" icon="pi pi-users">{{ memberCount }}</app-chip>
             </div>
           </div>
         </div>
@@ -78,10 +85,13 @@
           <div class="config-item">
             <label>{{ 'COMMON.STATUS' | translate }}</label>
             <p>
-              <span class="status-pill" [ngClass]="status()">
-                <span class="dot"></span>
+              <app-chip
+                variant="status"
+                [tone]="statusTone()"
+                [dot]="'currentColor'"
+              >
                 {{ 'DB_ACCESS.STATUS_' + (status() | uppercase) | translate }}
-              </span>
+              </app-chip>
             </p>
           </div>
           <div class="config-item">
@@ -102,7 +112,7 @@
           <h3><i class="pi pi-sliders-h"></i>{{ 'DB_ACCESS.ATTRIBUTES' | translate }}</h3>
         </div>
         <div class="chip-row">
-          <span *ngFor="let f of flags()" class="flag-chip">{{ f }}</span>
+          <app-chip variant="tag" tone="primary" *ngFor="let f of flags()">{{ f }}</app-chip>
           <span class="empty-inline" *ngIf="!flags().length">—</span>
         </div>
       </div>
@@ -113,7 +123,7 @@
           <h3><i class="pi pi-sitemap"></i>{{ 'DB_ACCESS.MEMBER_OF' | translate }}</h3>
         </div>
         <div class="chip-row">
-          <span *ngFor="let m of (role.memberOf ?? [])" class="count-pill">{{ m }}</span>
+          <app-chip variant="tag" *ngFor="let m of (role.memberOf ?? [])">{{ m }}</app-chip>
           <span class="empty-inline" *ngIf="!(role.memberOf ?? []).length">—</span>
         </div>
       </div>
@@ -139,8 +149,8 @@
             <ng-template pTemplate="body" let-row>
               <tr>
                 <td>{{ row.object || row.objectName || '—' }}</td>
-                <td><span class="count-pill">{{ row.objectType || '—' }}</span></td>
-                <td><span class="flag-chip">{{ row.privilege }}</span></td>
+                <td><app-chip variant="tag" size="sm">{{ row.objectType || '—' }}</app-chip></td>
+                <td><app-chip variant="tag" tone="primary" size="sm">{{ row.privilege }}</app-chip></td>
                 <td><span class="description-text">{{ row.via || ('DB_ACCESS.DIRECT' | translate) }}</span></td>
               </tr>
             </ng-template>

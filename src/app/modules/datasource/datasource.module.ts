@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MenuModule } from 'primeng/menu';
+import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
 import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { CustomTableComponent } from 'src/app/shared/components/custom-table/custom-table.component';
 import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-table/custom-table-empty.directive';
@@ -33,6 +34,7 @@ import { DatasourceRoutingModule } from './datasource-routing.module';
     UsGridCellDirective,
     CustomTableComponent,
     CustomTableEmptyDirective,
+    ChipComponent,
   ],
 })
 export class DatasourceModule {}

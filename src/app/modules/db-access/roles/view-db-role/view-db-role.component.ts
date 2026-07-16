@@ -107,6 +107,18 @@ export class ViewDbRoleComponent implements OnInit {
     return 'active';
   }
 
+  /** Map the lifecycle status to an app-chip semantic tone. */
+  statusTone(): 'success' | 'error' | 'neutral' {
+    switch (this.status()) {
+      case 'active':
+        return 'success';
+      case 'expired':
+        return 'error';
+      default:
+        return 'neutral';
+    }
+  }
+
   get validUntil(): string | null {
     return this.attrs.validUntil ?? null;
   }

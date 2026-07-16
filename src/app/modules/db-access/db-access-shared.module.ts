@@ -8,6 +8,7 @@ import { UsDataGridComponent } from 'src/app/shared/components/us-data-grid/us-d
 import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { CustomTableComponent } from 'src/app/shared/components/custom-table/custom-table.component';
 import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-table/custom-table-empty.directive';
+import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
 import { ChangeSummaryDialogComponent } from './components/change-summary-dialog/change-summary-dialog.component';
 import { DatasourcePickerComponent } from './shared/datasource-picker/datasource-picker.component';
 
@@ -35,6 +36,7 @@ import { DatasourcePickerComponent } from './shared/datasource-picker/datasource
     UsDataGridComponent,
     UsGridCellDirective,
     CustomTableComponent,
+    ChipComponent,
   ],
   exports: [
     CommonModule,
@@ -48,6 +50,7 @@ import { DatasourcePickerComponent } from './shared/datasource-picker/datasource
     UsDataGridComponent,
     UsGridCellDirective,
     CustomTableComponent,
+    ChipComponent,
   ],
 })
 export class DbAccessSharedModule {}

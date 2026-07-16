@@ -60,26 +60,24 @@
           </ng-template>
 
           <ng-template usGridCell="type" let-db>
-            <span class="pill">{{ db.config?.dbType || db.type || '—' }}</span>
+            <app-chip variant="tag" size="sm">{{
+              db.config?.dbType || db.type || '—'
+            }}</app-chip>
           </ng-template>
 
           <ng-template usGridCell="status" let-db>
-            <span
-              class="status-pill"
-              [ngClass]="{
-                active: db.status === 1,
-                inactive: db.status !== 1,
-              }"
+            <app-chip
+              variant="status"
+              size="sm"
+              [tone]="db.status === 1 ? 'success' : 'neutral'"
+              [dot]="'currentColor'"
             >
-              <span class="dot"></span>
-              <span class="label">
-                {{
-                  db.status === 1
-                    ? ('COMMON.ACTIVE' | translate)
-                    : ('COMMON.INACTIVE' | translate)
-                }}
-              </span>
-            </span>
+              {{
+                db.status === 1
+                  ? ('COMMON.ACTIVE' | translate)
+                  : ('COMMON.INACTIVE' | translate)
+              }}
+            </app-chip>
           </ng-template>
 
           <ng-template usGridCell="createdOn" let-db>

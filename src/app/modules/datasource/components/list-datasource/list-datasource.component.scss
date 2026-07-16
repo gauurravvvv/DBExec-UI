@@ -176,21 +176,6 @@
     min-width: 0;
     width: 100%;
     overflow: hidden;
-
-    ::ng-deep .modern-table {
-      .pill {
-        background-color: var(--hover-background);
-        color: var(--secondary-color);
-        padding: 2px 8px;
-        border-radius: var(--radius-pill);
-        font-size: var(--fs-control);
-        display: inline-block;
-        max-width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-    }
   }
 }
 

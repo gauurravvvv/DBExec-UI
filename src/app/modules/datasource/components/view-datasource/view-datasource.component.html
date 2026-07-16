@@ -22,25 +22,41 @@
           <div class="hero-meta">
             <h1 class="hero-name">{{ dbData.name }}</h1>
             <div class="hero-sub">
-              <span class="engine-tag">{{ dbData.config?.dbType }}</span>
+              <app-chip variant="tag">{{ dbData.config?.dbType }}</app-chip>
               <span class="dot">·</span>
               <ng-container [ngSwitch]="health()">
-                <span class="health-pill" *ngSwitchCase="'ok'">
-                  <i class="pi pi-check-circle"></i>
+                <app-chip
+                  variant="status"
+                  tone="success"
+                  icon="pi pi-check-circle"
+                  *ngSwitchCase="'ok'"
+                >
                   {{ 'DATASOURCE.HEALTH_CONNECTED' | translate }}
-                </span>
-                <span class="health-pill failed" *ngSwitchCase="'failed'">
-                  <i class="pi pi-times-circle"></i>
+                </app-chip>
+                <app-chip
+                  variant="status"
+                  tone="error"
+                  icon="pi pi-times-circle"
+                  *ngSwitchCase="'failed'"
+                >
                   {{ 'DATASOURCE.HEALTH_FAILED' | translate }}
-                </span>
-                <span class="health-pill testing" *ngSwitchCase="'testing'">
-                  <i class="pi pi-spin pi-spinner"></i>
+                </app-chip>
+                <app-chip
+                  variant="status"
+                  tone="neutral"
+                  icon="pi pi-spin pi-spinner"
+                  *ngSwitchCase="'testing'"
+                >
                   {{ 'DATASOURCE.HEALTH_TESTING' | translate }}
-                </span>
-                <span class="health-pill unknown" *ngSwitchDefault>
-                  <i class="pi pi-circle"></i>
+                </app-chip>
+                <app-chip
+                  variant="status"
+                  tone="neutral"
+                  icon="pi pi-circle"
+                  *ngSwitchDefault
+                >
                   {{ 'DATASOURCE.HEALTH_NEVER_TESTED' | translate }}
-                </span>
+                </app-chip>
               </ng-container>
               <ng-container *ngIf="lastTestedAt() as t">
                 <span class="dot">·</span>
@@ -101,13 +117,16 @@
             <div class="config-item">
               <label>{{ 'DATASOURCE.CONNECTION_STATUS' | translate }}</label>
               <p>
-                <span class="status-badge" [class.active]="dbData.status === 1">
+                <app-chip
+                  variant="status"
+                  [tone]="dbData.status === 1 ? 'success' : 'neutral'"
+                >
                   {{
                     dbData.status === 1
                       ? ('COMMON.ACTIVE' | translate)
                       : ('COMMON.INACTIVE' | translate)
                   }}
-                </span>
+                </app-chip>
               </p>
             </div>
 

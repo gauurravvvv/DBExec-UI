@@ -24,14 +24,18 @@
           (click)="applyChanges()"
           class="p-button-raised p-button-primary modern-button"
         ></button>
-        <span class="cap-badge full" *ngIf="datasourceId && capability() && canManage && !unsupported()">
-          <i class="pi pi-check-circle"></i>
-          {{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}
-        </span>
-        <span class="cap-badge readonly" *ngIf="datasourceId && capability() && !canManage && !unsupported()">
-          <i class="pi pi-lock"></i>
-          {{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}
-        </span>
+        <app-chip
+          variant="badge"
+          tone="success"
+          icon="pi pi-check-circle"
+          *ngIf="datasourceId && capability() && canManage && !unsupported()"
+        >{{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}</app-chip>
+        <app-chip
+          variant="badge"
+          tone="neutral"
+          icon="pi pi-lock"
+          *ngIf="datasourceId && capability() && !canManage && !unsupported()"
+        >{{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}</app-chip>
       </div>
     </div>
 
@@ -107,10 +111,12 @@
                 <div class="rule-card-head">
                   <span class="rule-index">
                     {{ 'DB_ACCESS.RULE_N' | translate: { n: i + 1 } }}
-                    <span class="rule-incomplete-chip" *ngIf="!ruleValid(rule)">
-                      <i class="pi pi-exclamation-circle"></i>
-                      {{ 'DB_ACCESS.RULE_INCOMPLETE' | translate }}
-                    </span>
+                    <app-chip
+                      variant="badge"
+                      tone="warning"
+                      icon="pi pi-exclamation-circle"
+                      *ngIf="!ruleValid(rule)"
+                    >{{ 'DB_ACCESS.RULE_INCOMPLETE' | translate }}</app-chip>
                   </span>
                   <button
                     class="icon-btn delete-btn"
@@ -329,17 +335,18 @@
                     <div class="eff-group-head">
                       <span class="eff-obj" [title]="g.key">{{ g.key }}</span>
                       <span class="eff-sources">
-                        <span
-                          class="eff-source"
+                        <app-chip
+                          variant="tag"
+                          size="sm"
                           *ngFor="let s of g.sources"
-                          [class.direct]="s === 'Direct'"
+                          [tone]="s === 'Direct' ? 'primary' : 'neutral'"
                           [title]="s === 'Direct' ? '' : ('DB_ACCESS.VIA_ROLE' | translate: { role: s })"
-                        >{{ s === 'Direct' ? ('DB_ACCESS.DIRECT' | translate) : s }}</span>
+                        >{{ s === 'Direct' ? ('DB_ACCESS.DIRECT' | translate) : s }}</app-chip>
                       </span>
                     </div>
                     <div class="eff-privs" [title]="g.privileges.join(', ')">
-                      <span class="flag-chip" *ngFor="let p of g.shown">{{ p }}</span>
-                      <span class="flag-chip more" *ngIf="g.extra">+{{ g.extra }}</span>
+                      <app-chip variant="tag" tone="primary" size="sm" *ngFor="let p of g.shown">{{ p }}</app-chip>
+                      <app-chip variant="tag" size="sm" *ngIf="g.extra">+{{ g.extra }}</app-chip>
                     </div>
                   </div>
                 </cdk-virtual-scroll-viewport>

@@ -17,24 +17,17 @@
   margin: 0;
 }
 
-// Sessions-specific cell styling — the shared table covers pills, row-actions,
-// date-text and count-pill; these are the extras used by the cell templates.
+// Sessions-specific cell styling — status / self-tag / backend-type now render
+// through the shared <app-chip>; these are the remaining text-cell extras.
 .pid-text {
   font-family: var(--font-mono, monospace);
   font-weight: var(--fw-medium);
   color: var(--text-color);
-}
 
-.self-tag {
-  display: inline-block;
-  margin-left: var(--space-3);
-  padding: 1px 8px;
-  border-radius: var(--radius-pill);
-  background: var(--primary-color-transparent);
-  color: var(--primary-color);
-  font-size: var(--fs-label);
-  font-weight: var(--fw-medium);
-  white-space: nowrap;
+  // Space the "this session" chip that follows the pid in the same cell.
+  + app-chip {
+    margin-left: var(--space-3);
+  }
 }
 
 .query-text {
