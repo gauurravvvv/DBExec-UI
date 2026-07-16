@@ -1,0 +1,47 @@
+<!-- Button host when clickable/filter; static span otherwise. One template,
+     class list drives the look. -->
+<button
+  *ngIf="isButton; else staticChip"
+  type="button"
+  class="app-chip"
+  [ngClass]="[
+    'v-' + variant,
+    't-' + tone,
+    'sz-' + size,
+    active ? 'is-active' : '',
+    removable ? 'has-remove' : ''
+  ]"
+  [title]="title"
+  (click)="onClick($event)"
+>
+  <ng-container [ngTemplateOutlet]="body"></ng-container>
+</button>
+
+<ng-template #staticChip>
+  <span
+    class="app-chip"
+    [ngClass]="[
+      'v-' + variant,
+      't-' + tone,
+      'sz-' + size,
+      removable ? 'has-remove' : ''
+    ]"
+    [title]="title"
+  >
+    <ng-container [ngTemplateOutlet]="body"></ng-container>
+  </span>
+</ng-template>
+
+<!-- Shared inner content: dot / icon / label / count / remove -->
+<ng-template #body>
+  <span class="chip-dot" *ngIf="dot" [style.background]="dot"></span>
+  <i class="chip-icon" *ngIf="icon" [ngClass]="icon"></i>
+  <span class="chip-label"><ng-content></ng-content></span>
+  <span class="chip-count" *ngIf="showCount">{{ count }}</span>
+  <i
+    *ngIf="removable"
+    class="chip-remove pi pi-times"
+    role="button"
+    (click)="onRemove($event)"
+  ></i>
+</ng-template>

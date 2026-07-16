@@ -1,0 +1,180 @@
+/* app-chip — single tokenised chip/tag/status/badge/count element.
+   All colours/radii/sizes come from _theme-variables.scss custom properties,
+   so it tracks the theme (incl. dark) with no per-instance overrides. */
+
+:host {
+  display: inline-flex;
+  vertical-align: middle;
+  max-width: 100%;
+}
+
+.app-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  padding: 3px 10px;
+  font-family: var(--font-ui);
+  font-size: var(--fs-control);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-snug);
+  white-space: nowrap;
+  max-width: 100%;
+  /* neutral defaults; tone/variant classes override */
+  background: var(--chip-bg);
+  color: var(--chip-text);
+
+  .chip-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chip-icon {
+    font-size: 0.85em;
+  }
+
+  .chip-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex: 0 0 auto;
+  }
+
+  .chip-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-semibold);
+    background: rgba(0, 0, 0, 0.08);
+    color: inherit;
+  }
+
+  .chip-remove {
+    font-size: 0.75em;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity var(--motion-fast) var(--ease-out);
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+/* ── sizes ─────────────────────────────────────────────── */
+.app-chip.sz-sm {
+  padding: 1px 8px;
+  font-size: var(--fs-micro);
+  gap: 4px;
+
+  .chip-count {
+    min-width: 15px;
+    height: 15px;
+  }
+}
+
+/* ── button host (filter / clickable) ──────────────────── */
+button.app-chip {
+  cursor: pointer;
+  transition:
+    background var(--motion-fast) var(--ease-out),
+    border-color var(--motion-fast) var(--ease-out),
+    color var(--motion-fast) var(--ease-out);
+
+  &:hover {
+    border-color: var(--primary-color);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 1px;
+  }
+}
+
+/* ── tones (semantic colour) ───────────────────────────── */
+.app-chip.t-neutral {
+  background: rgba(107, 114, 128, 0.12);
+  color: var(--text-muted);
+}
+.app-chip.t-primary {
+  background: var(--chip-bg);
+  color: var(--chip-text);
+}
+.app-chip.t-success {
+  background: var(--status-active-bg);
+  color: var(--status-active-text);
+}
+.app-chip.t-warning {
+  background: var(--warning-bg);
+  color: var(--warning-color);
+}
+.app-chip.t-error {
+  background: var(--status-inactive-bg);
+  color: var(--status-inactive-text);
+}
+.app-chip.t-info {
+  background: var(--info-bg);
+  color: var(--info-color);
+}
+
+/* ── variant tweaks ────────────────────────────────────── */
+
+/* tag: neutral, slightly squarer, subtle border for definition */
+.app-chip.v-tag {
+  border-radius: var(--radius-sm);
+  border-color: var(--border-color);
+  background: transparent;
+  color: var(--text-color);
+  font-weight: var(--fw-regular);
+}
+
+/* badge: square-ish emphasis label */
+.app-chip.v-badge {
+  border-radius: var(--radius-xs);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 2px 7px;
+}
+
+/* count: tight numeric */
+.app-chip.v-count {
+  min-width: 22px;
+  justify-content: center;
+  padding: 2px 8px;
+  font-weight: var(--fw-semibold);
+}
+
+/* filter: clickable facet; active = filled primary */
+.app-chip.v-filter {
+  background: transparent;
+  border-color: var(--border-color);
+  color: var(--text-color);
+  font-weight: var(--fw-medium);
+
+  &.is-active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--primary-text);
+
+    .chip-count {
+      background: rgba(255, 255, 255, 0.25);
+    }
+  }
+}
+
+/* status pills keep the pill radius (default) and rely on tone colour. */
+
+@media (prefers-reduced-motion: reduce) {
+  button.app-chip,
+  .chip-remove {
+    transition: none;
+  }
+}
