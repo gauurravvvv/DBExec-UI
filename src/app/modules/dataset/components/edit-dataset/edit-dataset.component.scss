@@ -2924,3 +2924,276 @@ td.empty-message-cell {
     background: var(--hover-background);
   }
 }
+
+/* ── Save & Run: play glyph tucked beside the save glyph ──────────── */
+.save-run-play {
+  font-size: 9px !important;
+  margin-left: 2px;
+  vertical-align: super;
+  opacity: 0.85;
+}
+
+/* ── Column-profiling strip (Slice 4) ────────────────────────────── */
+.column-profile-strip {
+  padding: var(--space-2, 8px) var(--space-3, 12px);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--card-background);
+
+  .profile-caption {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1, 4px);
+    font-size: var(--fs-label, 12px);
+    color: var(--text-secondary-color);
+    margin-bottom: var(--space-2, 8px);
+
+    i {
+      font-size: 12px;
+    }
+  }
+
+  .profile-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2, 8px);
+  }
+
+  .profile-card {
+    flex: 0 0 auto;
+    min-width: 150px;
+    max-width: 220px;
+    padding: var(--space-2, 8px);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm, 6px);
+    background: var(--background-color);
+  }
+
+  .profile-col-name {
+    font-weight: var(--fw-semibold, 600);
+    font-size: var(--fs-label, 12px);
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: var(--space-2, 8px);
+  }
+
+  .profile-null-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1, 4px);
+    margin-bottom: var(--space-1, 4px);
+  }
+
+  .profile-null-label,
+  .profile-stat-label {
+    font-size: 11px;
+    color: var(--text-secondary-color);
+    min-width: 44px;
+  }
+
+  .profile-null-bar {
+    position: relative;
+    flex: 1;
+    height: 6px;
+    border-radius: var(--radius-pill, 999px);
+    background: var(--surface-hover, rgba(0, 0, 0, 0.06));
+    overflow: hidden;
+  }
+
+  .profile-null-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    height: 100%;
+    border-radius: var(--radius-pill, 999px);
+
+    &.sev-good {
+      background: var(--success-color, #22c55e);
+    }
+    &.sev-warn {
+      background: var(--warning-color, #f59e0b);
+    }
+    &.sev-bad {
+      background: var(--danger-color, #ef4444);
+    }
+  }
+
+  .profile-null-pct {
+    font-size: 11px;
+    color: var(--text-color);
+    min-width: 34px;
+    text-align: right;
+  }
+
+  .profile-stat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2, 8px);
+    font-size: 11px;
+
+    .profile-stat-val {
+      font-family: var(--font-mono, monospace);
+      color: var(--text-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+/* ── Diff-before-save dialog (Slice 3) ───────────────────────────── */
+.dataset-diff-dialog {
+  .diff-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4, 16px);
+  }
+
+  .diff-section-title {
+    margin: 0 0 var(--space-2, 8px);
+    font-size: var(--fs-label, 12px);
+    font-weight: var(--fw-semibold, 600);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary-color);
+  }
+
+  .diff-loading,
+  .diff-no-column-info,
+  .diff-no-changes {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 8px);
+    font-size: var(--fs-body, 14px);
+    color: var(--text-secondary-color);
+  }
+
+  .diff-downstream-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2, 8px);
+    padding: var(--space-2, 8px) var(--space-3, 12px);
+    margin-bottom: var(--space-3, 12px);
+    border-radius: var(--radius-sm, 6px);
+    background: var(--warning-bg, rgba(245, 158, 11, 0.12));
+    color: var(--warning-color, #b45309);
+    font-size: var(--fs-body, 14px);
+
+    i {
+      margin-top: 2px;
+    }
+  }
+
+  .diff-col-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1, 4px);
+    margin-bottom: var(--space-2, 8px);
+  }
+
+  .diff-col-tag {
+    font-size: 11px;
+    font-weight: var(--fw-semibold, 600);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-right: var(--space-1, 4px);
+
+    &.added {
+      color: var(--success-color, #16a34a);
+    }
+    &.removed {
+      color: var(--danger-color, #dc2626);
+    }
+    &.renamed,
+    &.type-changed {
+      color: var(--warning-color, #b45309);
+    }
+  }
+
+  .diff-col-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px var(--space-2, 8px);
+    border-radius: var(--radius-pill, 999px);
+    font-size: 11px;
+    font-family: var(--font-mono, monospace);
+    border: 1px solid var(--border-color);
+    background: var(--background-color);
+    color: var(--text-color);
+
+    em {
+      font-style: normal;
+      color: var(--text-secondary-color);
+    }
+
+    &.added {
+      border-color: var(--success-color, #16a34a);
+    }
+    &.removed {
+      border-color: var(--danger-color, #dc2626);
+    }
+    &.renamed,
+    &.type-changed {
+      border-color: var(--warning-color, #b45309);
+    }
+  }
+
+  .diff-sql-heads {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2, 8px);
+    font-size: 11px;
+    font-weight: var(--fw-semibold, 600);
+    color: var(--text-secondary-color);
+    margin-bottom: var(--space-1, 4px);
+  }
+
+  .diff-sql-panes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2, 8px);
+  }
+
+  .diff-sql-lines {
+    max-height: 260px;
+    overflow: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm, 6px);
+    background: var(--code-editor-bg, var(--background-color));
+    padding: var(--space-1, 4px) 0;
+  }
+
+  .diff-line {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-1, 4px);
+    padding: 0 var(--space-2, 8px);
+    font-family: var(--font-mono, monospace);
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+
+    code {
+      flex: 1;
+      background: transparent;
+    }
+
+    .diff-gutter {
+      width: 10px;
+      flex: 0 0 10px;
+      text-align: center;
+      opacity: 0.6;
+      user-select: none;
+    }
+
+    &.diff-line-added {
+      background: var(--success-bg, rgba(34, 197, 94, 0.12));
+    }
+    &.diff-line-removed {
+      background: var(--error-bg, rgba(239, 68, 68, 0.12));
+    }
+  }
+}

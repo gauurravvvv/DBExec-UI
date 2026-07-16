@@ -964,6 +964,35 @@
       "LABEL_COLUMN": "Colonne de libellé",
       "RUN_WITH_PARAMS": "Exécuter avec les paramètres",
       "REQUIRED_ERROR": "Le paramètre {{name}} est obligatoire"
+    },
+    "DIFF": {
+      "TITLE": "Vérifier les modifications avant d'enregistrer",
+      "COLUMN_CHANGES": "Modifications de colonnes",
+      "SQL_CHANGES": "Modifications SQL",
+      "OLD_SQL": "Ancien SQL",
+      "NEW_SQL": "Nouveau SQL",
+      "ADDED": "Ajoutées",
+      "REMOVED": "Supprimées",
+      "RENAMED": "Renommées",
+      "TYPE_CHANGED": "Type modifié",
+      "COMPUTING": "Analyse des modifications de colonnes…",
+      "NO_COLUMN_INFO": "Impossible de déterminer les modifications de colonnes pour ce SQL.",
+      "NO_COLUMN_CHANGES": "Aucune modification de colonne.",
+      "DOWNSTREAM_WARNING": "{{analyses}} analyses / {{dashboards}} tableaux de bord utilisent des colonnes que vous supprimez.",
+      "CONFIRM_SAVE": "Enregistrer les modifications"
+    },
+    "RESULT": {
+      "SAVE_AND_RUN": "Enregistrer et exécuter",
+      "EXPORT_CSV": "Exporter en CSV (lignes d'aperçu)",
+      "EXPORT_JSON": "Exporter en JSON (lignes d'aperçu)",
+      "COPY_SQL": "Copier le SQL",
+      "PROFILE_COLUMNS": "Profiler les colonnes",
+      "NULLS": "Valeurs nulles",
+      "DISTINCT": "Distinctes",
+      "MIN": "Min",
+      "MAX": "Max",
+      "AVG": "Moy",
+      "BASED_ON_PREVIEW": "D'après les lignes d'aperçu"
     }
   },
   "ANALYSES": {

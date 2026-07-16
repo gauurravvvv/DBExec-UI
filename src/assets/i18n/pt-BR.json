@@ -964,6 +964,35 @@
       "LABEL_COLUMN": "Coluna de rótulo",
       "RUN_WITH_PARAMS": "Executar com parâmetros",
       "REQUIRED_ERROR": "O parâmetro {{name}} é obrigatório"
+    },
+    "DIFF": {
+      "TITLE": "Revisar alterações antes de salvar",
+      "COLUMN_CHANGES": "Alterações de colunas",
+      "SQL_CHANGES": "Alterações de SQL",
+      "OLD_SQL": "SQL anterior",
+      "NEW_SQL": "Novo SQL",
+      "ADDED": "Adicionadas",
+      "REMOVED": "Removidas",
+      "RENAMED": "Renomeadas",
+      "TYPE_CHANGED": "Tipo alterado",
+      "COMPUTING": "Analisando alterações de colunas…",
+      "NO_COLUMN_INFO": "Não foi possível determinar as alterações de colunas para este SQL.",
+      "NO_COLUMN_CHANGES": "Sem alterações de colunas.",
+      "DOWNSTREAM_WARNING": "{{analyses}} análises / {{dashboards}} painéis usam colunas que você está removendo.",
+      "CONFIRM_SAVE": "Salvar alterações"
+    },
+    "RESULT": {
+      "SAVE_AND_RUN": "Salvar e executar",
+      "EXPORT_CSV": "Exportar CSV (linhas de prévia)",
+      "EXPORT_JSON": "Exportar JSON (linhas de prévia)",
+      "COPY_SQL": "Copiar SQL",
+      "PROFILE_COLUMNS": "Perfilar colunas",
+      "NULLS": "Nulos",
+      "DISTINCT": "Distintos",
+      "MIN": "Mín",
+      "MAX": "Máx",
+      "AVG": "Méd",
+      "BASED_ON_PREVIEW": "Com base nas linhas de prévia"
     }
   },
   "ANALYSES": {

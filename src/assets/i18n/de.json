@@ -964,6 +964,35 @@
       "LABEL_COLUMN": "Bezeichnungsspalte",
       "RUN_WITH_PARAMS": "Mit Parametern ausführen",
       "REQUIRED_ERROR": "Parameter {{name}} ist erforderlich"
+    },
+    "DIFF": {
+      "TITLE": "Änderungen vor dem Speichern prüfen",
+      "COLUMN_CHANGES": "Spaltenänderungen",
+      "SQL_CHANGES": "SQL-Änderungen",
+      "OLD_SQL": "Altes SQL",
+      "NEW_SQL": "Neues SQL",
+      "ADDED": "Hinzugefügt",
+      "REMOVED": "Entfernt",
+      "RENAMED": "Umbenannt",
+      "TYPE_CHANGED": "Typ geändert",
+      "COMPUTING": "Spaltenänderungen werden analysiert…",
+      "NO_COLUMN_INFO": "Spaltenänderungen konnten für dieses SQL nicht ermittelt werden.",
+      "NO_COLUMN_CHANGES": "Keine Spaltenänderungen.",
+      "DOWNSTREAM_WARNING": "{{analyses}} Analysen / {{dashboards}} Dashboards verwenden Spalten, die Sie entfernen.",
+      "CONFIRM_SAVE": "Änderungen speichern"
+    },
+    "RESULT": {
+      "SAVE_AND_RUN": "Speichern und ausführen",
+      "EXPORT_CSV": "CSV exportieren (Vorschauzeilen)",
+      "EXPORT_JSON": "JSON exportieren (Vorschauzeilen)",
+      "COPY_SQL": "SQL kopieren",
+      "PROFILE_COLUMNS": "Spalten profilieren",
+      "NULLS": "Nullwerte",
+      "DISTINCT": "Eindeutig",
+      "MIN": "Min",
+      "MAX": "Max",
+      "AVG": "Durchschn.",
+      "BASED_ON_PREVIEW": "Basierend auf Vorschauzeilen"
     }
   },
   "ANALYSES": {

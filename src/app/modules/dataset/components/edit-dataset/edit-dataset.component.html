@@ -68,6 +68,40 @@
       >
         <i class="pi pi-save" aria-hidden="true"></i>
       </button>
+      <!-- Save & Run — commits then re-runs the preview inline (stays
+           on the page). Shares the save dialog + diff-before-save flow. -->
+      <button
+        *hasPermission="'datasetManager'; level: 'write'"
+        pButton
+        class="p-button-text btn-dataset"
+        (click)="saveAndRun()"
+        [disabled]="
+          isLoadingEditor ||
+          !selectedDatasourceObj ||
+          !editor ||
+          isQueryEmpty ||
+          !hasQueryChanged
+        "
+        [title]="'DATASET.RESULT.SAVE_AND_RUN' | translate"
+        [attr.aria-label]="'DATASET.RESULT.SAVE_AND_RUN' | translate"
+      >
+        <i class="pi pi-save" aria-hidden="true"></i>
+        <i
+          class="pi pi-play save-run-play"
+          aria-hidden="true"
+        ></i>
+      </button>
+      <!-- Copy SQL — copies the editor content to the clipboard. -->
+      <button
+        pButton
+        class="p-button-text btn-export"
+        (click)="copySql()"
+        [disabled]="isLoadingEditor || !editor || isQueryEmpty"
+        [title]="'DATASET.RESULT.COPY_SQL' | translate"
+        [attr.aria-label]="'DATASET.RESULT.COPY_SQL' | translate"
+      >
+        <i class="pi pi-copy" aria-hidden="true"></i>
+      </button>
       <button
         pButton
         class="p-button-text btn-export"
@@ -539,6 +573,49 @@
                 [pTooltip]="'DATASET.EXPORT_CSV' | translate"
                 tooltipPosition="bottom"
               ></button>
+              <!-- Client-side CSV export of the loaded preview rows. -->
+              <button
+                pButton
+                icon="pi pi-file"
+                class="p-button-text p-button-rounded p-button-sm export-csv-btn"
+                (click)="exportResultsCsvClient()"
+                *ngIf="
+                  !queryResult.error &&
+                  queryResult.columns.length > 0 &&
+                  !isResultSheetCollapsed
+                "
+                [pTooltip]="'DATASET.RESULT.EXPORT_CSV' | translate"
+                tooltipPosition="bottom"
+              ></button>
+              <!-- Client-side JSON export of the loaded preview rows. -->
+              <button
+                pButton
+                icon="pi pi-file-export"
+                class="p-button-text p-button-rounded p-button-sm export-csv-btn"
+                (click)="exportResultsJsonClient()"
+                *ngIf="
+                  !queryResult.error &&
+                  queryResult.columns.length > 0 &&
+                  !isResultSheetCollapsed
+                "
+                [pTooltip]="'DATASET.RESULT.EXPORT_JSON' | translate"
+                tooltipPosition="bottom"
+              ></button>
+              <!-- Column-profiling toggle (client-side, preview rows). -->
+              <button
+                pButton
+                icon="pi pi-chart-bar"
+                class="p-button-text p-button-rounded p-button-sm clear-filters-btn"
+                [class.p-button-outlined]="showColumnProfile"
+                (click)="toggleColumnProfile()"
+                *ngIf="
+                  !queryResult.error &&
+                  queryResult.columns.length > 0 &&
+                  !isResultSheetCollapsed
+                "
+                [pTooltip]="'DATASET.RESULT.PROFILE_COLUMNS' | translate"
+                tooltipPosition="bottom"
+              ></button>
               <button
                 pButton
                 icon="pi pi-filter-slash"
@@ -648,6 +725,77 @@
               <p>{{ 'DATASET.QUERY_RETURNED_ZERO' | translate }}</p>
             </div>
 
+            <!--
+              Column-profiling strip. Client-side over the loaded
+              preview rows only — null %, distinct count, and numeric
+              min/max/avg. No BE call; the "based on preview rows"
+              caption makes the sampling explicit.
+            -->
+            <div
+              class="column-profile-strip"
+              *ngIf="
+                showColumnProfile &&
+                !queryResult.error &&
+                queryResult.columns.length > 0
+              "
+            >
+              <div class="profile-caption">
+                <i class="pi pi-info-circle" aria-hidden="true"></i>
+                {{ 'DATASET.RESULT.BASED_ON_PREVIEW' | translate }}
+              </div>
+              <div class="profile-cards">
+                <div
+                  class="profile-card"
+                  *ngFor="let p of columnProfiles; trackBy: trackByIndex"
+                >
+                  <div class="profile-col-name" [title]="p.column">
+                    {{ p.column }}
+                  </div>
+                  <div class="profile-null-row">
+                    <span class="profile-null-label">{{
+                      'DATASET.RESULT.NULLS' | translate
+                    }}</span>
+                    <span class="profile-null-bar">
+                      <span
+                        class="profile-null-fill"
+                        [ngClass]="'sev-' + nullSeverity(p.nullPct)"
+                        [style.width.%]="p.nullPct"
+                      ></span>
+                    </span>
+                    <span class="profile-null-pct">{{ p.nullPct }}%</span>
+                  </div>
+                  <div class="profile-stat">
+                    <span class="profile-stat-label">{{
+                      'DATASET.RESULT.DISTINCT' | translate
+                    }}</span>
+                    <span class="profile-stat-val">{{ p.distinct }}</span>
+                  </div>
+                  <ng-container *ngIf="p.isNumeric">
+                    <div class="profile-stat">
+                      <span class="profile-stat-label">{{
+                        'DATASET.RESULT.MIN' | translate
+                      }}</span>
+                      <span class="profile-stat-val">{{ p.min }}</span>
+                    </div>
+                    <div class="profile-stat">
+                      <span class="profile-stat-label">{{
+                        'DATASET.RESULT.MAX' | translate
+                      }}</span>
+                      <span class="profile-stat-val">{{ p.max }}</span>
+                    </div>
+                    <div class="profile-stat">
+                      <span class="profile-stat-label">{{
+                        'DATASET.RESULT.AVG' | translate
+                      }}</span>
+                      <span class="profile-stat-val">{{
+                        p.avg | number: '1.0-2'
+                      }}</span>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+
             <!-- Results Table with PrimeNG -->
             <div
               class="results-table-container"
@@ -660,6 +808,7 @@
                 [paginator]="isPaginationEnabled"
                 [lazy]="isPaginationEnabled"
                 (onLazyLoad)="onResultsLazyLoad($event)"
+                (onColResize)="onResultColResize($event)"
                 [totalRecords]="queryResult.rowCount"
                 [rowHover]="true"
                 currentPageReportTemplate="{first} - {last} of {totalRecords}"
@@ -908,6 +1057,180 @@
   (close)="onDatasetDialogClose($event)"
 >
 </app-save-dataset-dialog>
+
+<!--
+  Diff-before-save review (Slice 3). Opens when the SQL changed vs the
+  loaded original: shows the old→new line diff, the column delta from
+  preview-columns, and a downstream-consumer warning when a removed /
+  renamed column is used by analyses or dashboards. Confirm proceeds
+  with the save; cancel stays on the page.
+-->
+<p-dialog
+  [visible]="showDiffDialog"
+  (visibleChange)="!$event && cancelDiffSave()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  [style]="{ width: '860px', maxWidth: '95vw' }"
+  styleClass="dataset-diff-dialog"
+  [header]="'DATASET.DIFF.TITLE' | translate"
+>
+  <div class="diff-body">
+    <!-- Column delta -->
+    <div class="diff-section">
+      <h5 class="diff-section-title">
+        {{ 'DATASET.DIFF.COLUMN_CHANGES' | translate }}
+      </h5>
+
+      <div class="diff-loading" *ngIf="isComputingDiff">
+        <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+        {{ 'DATASET.DIFF.COMPUTING' | translate }}
+      </div>
+
+      <ng-container *ngIf="!isComputingDiff">
+        <div
+          class="diff-no-column-info"
+          *ngIf="!columnDelta"
+        >
+          {{ 'DATASET.DIFF.NO_COLUMN_INFO' | translate }}
+        </div>
+
+        <div class="diff-no-changes" *ngIf="columnDelta?.unchanged">
+          {{ 'DATASET.DIFF.NO_COLUMN_CHANGES' | translate }}
+        </div>
+
+        <ng-container *ngIf="columnDelta && !columnDelta.unchanged">
+          <!-- Downstream-consumer warning -->
+          <div
+            class="diff-downstream-warning"
+            *ngIf="
+              diffLineage &&
+              (diffLineage.analyses > 0 || diffLineage.dashboards > 0)
+            "
+          >
+            <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+            <span>
+              {{
+                'DATASET.DIFF.DOWNSTREAM_WARNING'
+                  | translate
+                    : {
+                        analyses: diffLineage.analyses,
+                        dashboards: diffLineage.dashboards
+                      }
+              }}
+            </span>
+          </div>
+
+          <div class="diff-col-group" *ngIf="columnDelta.added.length">
+            <span class="diff-col-tag added"
+              >{{ 'DATASET.DIFF.ADDED' | translate }} ({{
+                columnDelta.added.length
+              }})</span
+            >
+            <span
+              class="diff-col-chip added"
+              *ngFor="let c of columnDelta.added"
+              >{{ c.name }}<em *ngIf="c.dataType"> · {{ c.dataType }}</em></span
+            >
+          </div>
+
+          <div class="diff-col-group" *ngIf="columnDelta.removed.length">
+            <span class="diff-col-tag removed"
+              >{{ 'DATASET.DIFF.REMOVED' | translate }} ({{
+                columnDelta.removed.length
+              }})</span
+            >
+            <span
+              class="diff-col-chip removed"
+              *ngFor="let c of columnDelta.removed"
+              >{{ c.name }}<em *ngIf="c.dataType"> · {{ c.dataType }}</em></span
+            >
+          </div>
+
+          <div class="diff-col-group" *ngIf="columnDelta.renamed.length">
+            <span class="diff-col-tag renamed"
+              >{{ 'DATASET.DIFF.RENAMED' | translate }} ({{
+                columnDelta.renamed.length
+              }})</span
+            >
+            <span
+              class="diff-col-chip renamed"
+              *ngFor="let r of columnDelta.renamed"
+              >{{ r.from }} → {{ r.to }}</span
+            >
+          </div>
+
+          <div class="diff-col-group" *ngIf="columnDelta.typeChanged.length">
+            <span class="diff-col-tag type-changed"
+              >{{ 'DATASET.DIFF.TYPE_CHANGED' | translate }} ({{
+                columnDelta.typeChanged.length
+              }})</span
+            >
+            <span
+              class="diff-col-chip type-changed"
+              *ngFor="let t of columnDelta.typeChanged"
+              >{{ t.name }}: {{ t.from }} → {{ t.to }}</span
+            >
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+
+    <!-- SQL side-by-side / line diff -->
+    <div class="diff-section">
+      <h5 class="diff-section-title">
+        {{ 'DATASET.DIFF.SQL_CHANGES' | translate }}
+      </h5>
+      <div class="diff-sql-heads">
+        <span>{{ 'DATASET.DIFF.OLD_SQL' | translate }}</span>
+        <span>{{ 'DATASET.DIFF.NEW_SQL' | translate }}</span>
+      </div>
+      <div class="diff-sql-panes">
+        <div class="diff-sql-lines">
+          <div
+            *ngFor="let line of diffLines; trackBy: trackByIndex"
+            class="diff-line"
+            [ngClass]="'diff-line-' + line.kind"
+          >
+            <span class="diff-gutter">{{
+              line.kind === 'added' ? '' : (line.oldLine === null ? '' : '-')
+            }}</span>
+            <code>{{ line.oldLine }}</code>
+          </div>
+        </div>
+        <div class="diff-sql-lines">
+          <div
+            *ngFor="let line of diffLines; trackBy: trackByIndex"
+            class="diff-line"
+            [ngClass]="'diff-line-' + line.kind"
+          >
+            <span class="diff-gutter">{{
+              line.kind === 'removed' ? '' : (line.newLine === null ? '' : '+')
+            }}</span>
+            <code>{{ line.newLine }}</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      class="p-button-text"
+      (click)="cancelDiffSave()"
+      [label]="'COMMON.CANCEL' | translate"
+    ></button>
+    <button
+      pButton
+      class="p-button-primary"
+      (click)="confirmDiffSave()"
+      [disabled]="isComputingDiff"
+      [label]="'DATASET.DIFF.CONFIRM_SAVE' | translate"
+    ></button>
+  </ng-template>
+</p-dialog>
 
 <!-- Hidden File Input for SQL Import -->
 <input type="file" #fileInput hidden (change)="onFileSelected($event)" />

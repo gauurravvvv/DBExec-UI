@@ -964,6 +964,35 @@
       "LABEL_COLUMN": "标签列",
       "RUN_WITH_PARAMS": "使用参数运行",
       "REQUIRED_ERROR": "参数 {{name}} 为必填项"
+    },
+    "DIFF": {
+      "TITLE": "保存前查看更改",
+      "COLUMN_CHANGES": "列更改",
+      "SQL_CHANGES": "SQL 更改",
+      "OLD_SQL": "旧 SQL",
+      "NEW_SQL": "新 SQL",
+      "ADDED": "新增",
+      "REMOVED": "移除",
+      "RENAMED": "重命名",
+      "TYPE_CHANGED": "类型更改",
+      "COMPUTING": "正在分析列更改…",
+      "NO_COLUMN_INFO": "无法确定此 SQL 的列更改。",
+      "NO_COLUMN_CHANGES": "没有列更改。",
+      "DOWNSTREAM_WARNING": "{{analyses}} 个分析 / {{dashboards}} 个仪表板使用了你正在移除的列。",
+      "CONFIRM_SAVE": "保存更改"
+    },
+    "RESULT": {
+      "SAVE_AND_RUN": "保存并运行",
+      "EXPORT_CSV": "导出 CSV（预览行）",
+      "EXPORT_JSON": "导出 JSON（预览行）",
+      "COPY_SQL": "复制 SQL",
+      "PROFILE_COLUMNS": "列分析",
+      "NULLS": "空值",
+      "DISTINCT": "去重",
+      "MIN": "最小值",
+      "MAX": "最大值",
+      "AVG": "平均值",
+      "BASED_ON_PREVIEW": "基于预览行"
     }
   },
   "ANALYSES": {

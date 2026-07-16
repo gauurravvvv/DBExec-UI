@@ -964,6 +964,35 @@
       "LABEL_COLUMN": "Columna de etiqueta",
       "RUN_WITH_PARAMS": "Ejecutar con parámetros",
       "REQUIRED_ERROR": "El parámetro {{name}} es obligatorio"
+    },
+    "DIFF": {
+      "TITLE": "Revisar cambios antes de guardar",
+      "COLUMN_CHANGES": "Cambios de columnas",
+      "SQL_CHANGES": "Cambios de SQL",
+      "OLD_SQL": "SQL anterior",
+      "NEW_SQL": "SQL nuevo",
+      "ADDED": "Añadidas",
+      "REMOVED": "Eliminadas",
+      "RENAMED": "Renombradas",
+      "TYPE_CHANGED": "Tipo cambiado",
+      "COMPUTING": "Analizando cambios de columnas…",
+      "NO_COLUMN_INFO": "No se pudieron determinar los cambios de columnas para este SQL.",
+      "NO_COLUMN_CHANGES": "Sin cambios de columnas.",
+      "DOWNSTREAM_WARNING": "{{analyses}} análisis / {{dashboards}} paneles usan columnas que vas a eliminar.",
+      "CONFIRM_SAVE": "Guardar cambios"
+    },
+    "RESULT": {
+      "SAVE_AND_RUN": "Guardar y ejecutar",
+      "EXPORT_CSV": "Exportar CSV (filas de vista previa)",
+      "EXPORT_JSON": "Exportar JSON (filas de vista previa)",
+      "COPY_SQL": "Copiar SQL",
+      "PROFILE_COLUMNS": "Perfilar columnas",
+      "NULLS": "Nulos",
+      "DISTINCT": "Distintos",
+      "MIN": "Mín",
+      "MAX": "Máx",
+      "AVG": "Prom",
+      "BASED_ON_PREVIEW": "Según las filas de vista previa"
     }
   },
   "ANALYSES": {

@@ -602,6 +602,27 @@ export class DatasetService {
     );
   }
 
+  /**
+   * Introspect an arbitrary SQL string WITHOUT saving the dataset.
+   * POST /datasets/:datasetId/preview-columns body `{ sql }` →
+   * `{ columns: [{ name, dataType }] }`. Used by the diff-before-save
+   * flow to compute the column delta between the loaded SQL and the
+   * edited SQL before committing. `skipLoader` so it doesn't trip the
+   * global blocker while a dialog is open.
+   */
+  previewColumns(datasetId: string, sql: string) {
+    // POST /datasets/:datasetId/preview-columns
+    return lastValueFrom(
+      this.http.apiPost(
+        DATASET.PREVIEW_COLUMNS_PREFIX +
+          datasetId +
+          DATASET.PREVIEW_COLUMNS_SUFFIX,
+        { sql },
+        { skipLoader: true },
+      ),
+    );
+  }
+
   async deleteDatasetField(datasetId: string, fieldId: string) {
     this._saving.set(true);
     try {

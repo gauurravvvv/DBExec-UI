@@ -964,6 +964,35 @@
       "LABEL_COLUMN": "레이블 열",
       "RUN_WITH_PARAMS": "매개변수로 실행",
       "REQUIRED_ERROR": "매개변수 {{name}}은(는) 필수입니다"
+    },
+    "DIFF": {
+      "TITLE": "저장하기 전에 변경 사항 검토",
+      "COLUMN_CHANGES": "열 변경",
+      "SQL_CHANGES": "SQL 변경",
+      "OLD_SQL": "이전 SQL",
+      "NEW_SQL": "새 SQL",
+      "ADDED": "추가됨",
+      "REMOVED": "제거됨",
+      "RENAMED": "이름 변경됨",
+      "TYPE_CHANGED": "유형 변경됨",
+      "COMPUTING": "열 변경 사항 분석 중…",
+      "NO_COLUMN_INFO": "이 SQL에 대한 열 변경 사항을 확인할 수 없습니다.",
+      "NO_COLUMN_CHANGES": "열 변경 사항이 없습니다.",
+      "DOWNSTREAM_WARNING": "분석 {{analyses}}개 / 대시보드 {{dashboards}}개가 제거하려는 열을 사용합니다.",
+      "CONFIRM_SAVE": "변경 사항 저장"
+    },
+    "RESULT": {
+      "SAVE_AND_RUN": "저장 후 실행",
+      "EXPORT_CSV": "CSV 내보내기(미리보기 행)",
+      "EXPORT_JSON": "JSON 내보내기(미리보기 행)",
+      "COPY_SQL": "SQL 복사",
+      "PROFILE_COLUMNS": "열 프로파일링",
+      "NULLS": "널",
+      "DISTINCT": "고유",
+      "MIN": "최소",
+      "MAX": "최대",
+      "AVG": "평균",
+      "BASED_ON_PREVIEW": "미리보기 행 기준"
     }
   },
   "ANALYSES": {

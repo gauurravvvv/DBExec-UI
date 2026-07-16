@@ -160,6 +160,10 @@ export const DATASET = {
   // POST /datasets/:datasetId/distinct-values
   DISTINCT_VALUES_PREFIX: '/datasets/',
   DISTINCT_VALUES_SUFFIX: '/distinct-values',
+  // POST /datasets/:datasetId/preview-columns — introspect arbitrary SQL
+  // (body { sql }) → { columns: [{ name, dataType }] } without saving
+  PREVIEW_COLUMNS_PREFIX: '/datasets/',
+  PREVIEW_COLUMNS_SUFFIX: '/preview-columns',
   // POST /datasets/:datasetId/param-options — options for query-based
   // dropdown params (runs the SOURCE dataset, projects value/label cols)
   PARAM_OPTIONS_PREFIX: '/datasets/',

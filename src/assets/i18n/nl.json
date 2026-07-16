@@ -964,6 +964,35 @@
       "LABEL_COLUMN": "Labelkolom",
       "RUN_WITH_PARAMS": "Uitvoeren met parameters",
       "REQUIRED_ERROR": "Parameter {{name}} is verplicht"
+    },
+    "DIFF": {
+      "TITLE": "Wijzigingen controleren voor opslaan",
+      "COLUMN_CHANGES": "Kolomwijzigingen",
+      "SQL_CHANGES": "SQL-wijzigingen",
+      "OLD_SQL": "Oude SQL",
+      "NEW_SQL": "Nieuwe SQL",
+      "ADDED": "Toegevoegd",
+      "REMOVED": "Verwijderd",
+      "RENAMED": "Hernoemd",
+      "TYPE_CHANGED": "Type gewijzigd",
+      "COMPUTING": "Kolomwijzigingen analyseren…",
+      "NO_COLUMN_INFO": "Kolomwijzigingen konden niet worden bepaald voor deze SQL.",
+      "NO_COLUMN_CHANGES": "Geen kolomwijzigingen.",
+      "DOWNSTREAM_WARNING": "{{analyses}} analyses / {{dashboards}} dashboards gebruiken kolommen die je verwijdert.",
+      "CONFIRM_SAVE": "Wijzigingen opslaan"
+    },
+    "RESULT": {
+      "SAVE_AND_RUN": "Opslaan en uitvoeren",
+      "EXPORT_CSV": "CSV exporteren (voorbeeldrijen)",
+      "EXPORT_JSON": "JSON exporteren (voorbeeldrijen)",
+      "COPY_SQL": "SQL kopiëren",
+      "PROFILE_COLUMNS": "Kolommen profileren",
+      "NULLS": "Null-waarden",
+      "DISTINCT": "Uniek",
+      "MIN": "Min",
+      "MAX": "Max",
+      "AVG": "Gem.",
+      "BASED_ON_PREVIEW": "Gebaseerd op voorbeeldrijen"
     }
   },
   "ANALYSES": {

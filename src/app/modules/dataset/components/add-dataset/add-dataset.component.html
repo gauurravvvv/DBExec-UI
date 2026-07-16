@@ -112,6 +112,17 @@
       >
         <i class="pi pi-download" aria-hidden="true"></i>
       </button>
+      <!-- Copy SQL — copies the editor content to the clipboard. -->
+      <button
+        pButton
+        class="p-button-text btn-export"
+        (click)="copySql()"
+        [disabled]="isLoadingEditor || !editor || isQueryEmpty"
+        [title]="'DATASET.RESULT.COPY_SQL' | translate"
+        [attr.aria-label]="'DATASET.RESULT.COPY_SQL' | translate"
+      >
+        <i class="pi pi-copy" aria-hidden="true"></i>
+      </button>
       <button
         pButton
         class="p-button-text btn-danger"
@@ -612,6 +623,49 @@
                 [pTooltip]="'DATASET.EXPORT_CSV' | translate"
                 tooltipPosition="bottom"
               ></button>
+              <!-- Client-side CSV export of the loaded preview rows. -->
+              <button
+                pButton
+                icon="pi pi-file"
+                class="p-button-text p-button-rounded p-button-sm export-csv-btn"
+                (click)="exportResultsCsvClient()"
+                *ngIf="
+                  !queryResult.error &&
+                  queryResult.columns.length > 0 &&
+                  !isResultSheetCollapsed
+                "
+                [pTooltip]="'DATASET.RESULT.EXPORT_CSV' | translate"
+                tooltipPosition="bottom"
+              ></button>
+              <!-- Client-side JSON export of the loaded preview rows. -->
+              <button
+                pButton
+                icon="pi pi-file-export"
+                class="p-button-text p-button-rounded p-button-sm export-csv-btn"
+                (click)="exportResultsJsonClient()"
+                *ngIf="
+                  !queryResult.error &&
+                  queryResult.columns.length > 0 &&
+                  !isResultSheetCollapsed
+                "
+                [pTooltip]="'DATASET.RESULT.EXPORT_JSON' | translate"
+                tooltipPosition="bottom"
+              ></button>
+              <!-- Column-profiling toggle (client-side, preview rows). -->
+              <button
+                pButton
+                icon="pi pi-chart-bar"
+                class="p-button-text p-button-rounded p-button-sm clear-filters-btn"
+                [class.p-button-outlined]="showColumnProfile"
+                (click)="toggleColumnProfile()"
+                *ngIf="
+                  !queryResult.error &&
+                  queryResult.columns.length > 0 &&
+                  !isResultSheetCollapsed
+                "
+                [pTooltip]="'DATASET.RESULT.PROFILE_COLUMNS' | translate"
+                tooltipPosition="bottom"
+              ></button>
               <button
                 pButton
                 icon="pi pi-filter-slash"
@@ -727,6 +781,77 @@
               </div>
               <h4>{{ 'DATASET.NO_RESULTS_FOUND' | translate }}</h4>
               <p>{{ 'DATASET.QUERY_RETURNED_ZERO' | translate }}</p>
+            </div>
+
+            <!--
+              Column-profiling strip. Client-side over the loaded
+              preview rows only — null %, distinct count, and numeric
+              min/max/avg. No BE call; the "based on preview rows"
+              caption makes the sampling explicit.
+            -->
+            <div
+              class="column-profile-strip"
+              *ngIf="
+                showColumnProfile &&
+                !queryResult.error &&
+                queryResult.columns.length > 0
+              "
+            >
+              <div class="profile-caption">
+                <i class="pi pi-info-circle" aria-hidden="true"></i>
+                {{ 'DATASET.RESULT.BASED_ON_PREVIEW' | translate }}
+              </div>
+              <div class="profile-cards">
+                <div
+                  class="profile-card"
+                  *ngFor="let p of columnProfiles; trackBy: trackByIndex"
+                >
+                  <div class="profile-col-name" [title]="p.column">
+                    {{ p.column }}
+                  </div>
+                  <div class="profile-null-row">
+                    <span class="profile-null-label">{{
+                      'DATASET.RESULT.NULLS' | translate
+                    }}</span>
+                    <span class="profile-null-bar">
+                      <span
+                        class="profile-null-fill"
+                        [ngClass]="'sev-' + nullSeverity(p.nullPct)"
+                        [style.width.%]="p.nullPct"
+                      ></span>
+                    </span>
+                    <span class="profile-null-pct">{{ p.nullPct }}%</span>
+                  </div>
+                  <div class="profile-stat">
+                    <span class="profile-stat-label">{{
+                      'DATASET.RESULT.DISTINCT' | translate
+                    }}</span>
+                    <span class="profile-stat-val">{{ p.distinct }}</span>
+                  </div>
+                  <ng-container *ngIf="p.isNumeric">
+                    <div class="profile-stat">
+                      <span class="profile-stat-label">{{
+                        'DATASET.RESULT.MIN' | translate
+                      }}</span>
+                      <span class="profile-stat-val">{{ p.min }}</span>
+                    </div>
+                    <div class="profile-stat">
+                      <span class="profile-stat-label">{{
+                        'DATASET.RESULT.MAX' | translate
+                      }}</span>
+                      <span class="profile-stat-val">{{ p.max }}</span>
+                    </div>
+                    <div class="profile-stat">
+                      <span class="profile-stat-label">{{
+                        'DATASET.RESULT.AVG' | translate
+                      }}</span>
+                      <span class="profile-stat-val">{{
+                        p.avg | number: '1.0-2'
+                      }}</span>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
             </div>
 
             <!-- Results Table with PrimeNG -->

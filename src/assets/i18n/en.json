@@ -968,6 +968,35 @@
       "LABEL_COLUMN": "Label column",
       "RUN_WITH_PARAMS": "Run with parameters",
       "REQUIRED_ERROR": "Parameter {{name}} is required"
+    },
+    "DIFF": {
+      "TITLE": "Review changes before saving",
+      "COLUMN_CHANGES": "Column changes",
+      "SQL_CHANGES": "SQL changes",
+      "OLD_SQL": "Old SQL",
+      "NEW_SQL": "New SQL",
+      "ADDED": "Added",
+      "REMOVED": "Removed",
+      "RENAMED": "Renamed",
+      "TYPE_CHANGED": "Type changed",
+      "COMPUTING": "Analysing column changes…",
+      "NO_COLUMN_INFO": "Column changes could not be determined for this SQL.",
+      "NO_COLUMN_CHANGES": "No column changes.",
+      "DOWNSTREAM_WARNING": "{{analyses}} analyses / {{dashboards}} dashboards use columns you're removing.",
+      "CONFIRM_SAVE": "Save changes"
+    },
+    "RESULT": {
+      "SAVE_AND_RUN": "Save and run",
+      "EXPORT_CSV": "Export CSV (preview rows)",
+      "EXPORT_JSON": "Export JSON (preview rows)",
+      "COPY_SQL": "Copy SQL",
+      "PROFILE_COLUMNS": "Profile columns",
+      "NULLS": "Nulls",
+      "DISTINCT": "Distinct",
+      "MIN": "Min",
+      "MAX": "Max",
+      "AVG": "Avg",
+      "BASED_ON_PREVIEW": "Based on preview rows"
     }
   },
   "ANALYSES": {

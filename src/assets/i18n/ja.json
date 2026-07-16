@@ -964,6 +964,35 @@
       "LABEL_COLUMN": "ラベルの列",
       "RUN_WITH_PARAMS": "パラメーターを指定して実行",
       "REQUIRED_ERROR": "パラメーター {{name}} は必須です"
+    },
+    "DIFF": {
+      "TITLE": "保存前に変更を確認",
+      "COLUMN_CHANGES": "列の変更",
+      "SQL_CHANGES": "SQL の変更",
+      "OLD_SQL": "以前の SQL",
+      "NEW_SQL": "新しい SQL",
+      "ADDED": "追加",
+      "REMOVED": "削除",
+      "RENAMED": "名前変更",
+      "TYPE_CHANGED": "型変更",
+      "COMPUTING": "列の変更を分析中…",
+      "NO_COLUMN_INFO": "この SQL の列の変更を特定できませんでした。",
+      "NO_COLUMN_CHANGES": "列の変更はありません。",
+      "DOWNSTREAM_WARNING": "{{analyses}} 件の分析 / {{dashboards}} 件のダッシュボードが、削除しようとしている列を使用しています。",
+      "CONFIRM_SAVE": "変更を保存"
+    },
+    "RESULT": {
+      "SAVE_AND_RUN": "保存して実行",
+      "EXPORT_CSV": "CSV をエクスポート（プレビュー行）",
+      "EXPORT_JSON": "JSON をエクスポート（プレビュー行）",
+      "COPY_SQL": "SQL をコピー",
+      "PROFILE_COLUMNS": "列をプロファイル",
+      "NULLS": "NULL",
+      "DISTINCT": "一意",
+      "MIN": "最小",
+      "MAX": "最大",
+      "AVG": "平均",
+      "BASED_ON_PREVIEW": "プレビュー行に基づく"
     }
   },
   "ANALYSES": {

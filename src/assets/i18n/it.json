@@ -964,6 +964,35 @@
       "LABEL_COLUMN": "Colonna etichetta",
       "RUN_WITH_PARAMS": "Esegui con i parametri",
       "REQUIRED_ERROR": "Il parametro {{name}} è obbligatorio"
+    },
+    "DIFF": {
+      "TITLE": "Rivedi le modifiche prima di salvare",
+      "COLUMN_CHANGES": "Modifiche alle colonne",
+      "SQL_CHANGES": "Modifiche SQL",
+      "OLD_SQL": "SQL precedente",
+      "NEW_SQL": "Nuovo SQL",
+      "ADDED": "Aggiunte",
+      "REMOVED": "Rimosse",
+      "RENAMED": "Rinominate",
+      "TYPE_CHANGED": "Tipo modificato",
+      "COMPUTING": "Analisi delle modifiche alle colonne…",
+      "NO_COLUMN_INFO": "Non è stato possibile determinare le modifiche alle colonne per questo SQL.",
+      "NO_COLUMN_CHANGES": "Nessuna modifica alle colonne.",
+      "DOWNSTREAM_WARNING": "{{analyses}} analisi / {{dashboards}} dashboard usano colonne che stai rimuovendo.",
+      "CONFIRM_SAVE": "Salva modifiche"
+    },
+    "RESULT": {
+      "SAVE_AND_RUN": "Salva ed esegui",
+      "EXPORT_CSV": "Esporta CSV (righe di anteprima)",
+      "EXPORT_JSON": "Esporta JSON (righe di anteprima)",
+      "COPY_SQL": "Copia SQL",
+      "PROFILE_COLUMNS": "Profila colonne",
+      "NULLS": "Valori nulli",
+      "DISTINCT": "Distinti",
+      "MIN": "Min",
+      "MAX": "Max",
+      "AVG": "Media",
+      "BASED_ON_PREVIEW": "In base alle righe di anteprima"
     }
   },
   "ANALYSES": {

@@ -2446,3 +2446,112 @@ td.empty-message-cell {
     background: var(--hover-background);
   }
 }
+
+/* ── Column-profiling strip (Slice 4) ────────────────────────────── */
+.column-profile-strip {
+  padding: var(--space-2, 8px) var(--space-3, 12px);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--card-background);
+
+  .profile-caption {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1, 4px);
+    font-size: var(--fs-label, 12px);
+    color: var(--text-secondary-color);
+    margin-bottom: var(--space-2, 8px);
+
+    i {
+      font-size: 12px;
+    }
+  }
+
+  .profile-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2, 8px);
+  }
+
+  .profile-card {
+    flex: 0 0 auto;
+    min-width: 150px;
+    max-width: 220px;
+    padding: var(--space-2, 8px);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm, 6px);
+    background: var(--background-color);
+  }
+
+  .profile-col-name {
+    font-weight: var(--fw-semibold, 600);
+    font-size: var(--fs-label, 12px);
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: var(--space-2, 8px);
+  }
+
+  .profile-null-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1, 4px);
+    margin-bottom: var(--space-1, 4px);
+  }
+
+  .profile-null-label,
+  .profile-stat-label {
+    font-size: 11px;
+    color: var(--text-secondary-color);
+    min-width: 44px;
+  }
+
+  .profile-null-bar {
+    position: relative;
+    flex: 1;
+    height: 6px;
+    border-radius: var(--radius-pill, 999px);
+    background: var(--surface-hover, rgba(0, 0, 0, 0.06));
+    overflow: hidden;
+  }
+
+  .profile-null-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    height: 100%;
+    border-radius: var(--radius-pill, 999px);
+
+    &.sev-good {
+      background: var(--success-color, #22c55e);
+    }
+    &.sev-warn {
+      background: var(--warning-color, #f59e0b);
+    }
+    &.sev-bad {
+      background: var(--danger-color, #ef4444);
+    }
+  }
+
+  .profile-null-pct {
+    font-size: 11px;
+    color: var(--text-color);
+    min-width: 34px;
+    text-align: right;
+  }
+
+  .profile-stat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2, 8px);
+    font-size: 11px;
+
+    .profile-stat-val {
+      font-family: var(--font-mono, monospace);
+      color: var(--text-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}

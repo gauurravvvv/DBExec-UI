@@ -63,6 +63,19 @@ import {
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 import { DatasetParamConfig } from '../../helpers/param-tokens.helper';
 import { DatasetParamRunError } from '../dataset-params-panel/dataset-params-panel.component';
+import {
+  ColumnDelta,
+  ColumnProfile,
+  SimpleColumn,
+  SqlDiffLine,
+  diffColumns,
+  diffSqlLines,
+  downloadTextFile,
+  nullPctSeverity,
+  profileColumns,
+  rowsToCsv,
+  rowsToJson,
+} from '../add-dataset/dataset-result-tools.helper';
 
 // Declare Monaco and window for TypeScript
 declare const monaco: any;
@@ -138,6 +151,34 @@ export class EditDatasetComponent
 
   // Save as Dataset Dialog
   showDatasetDialog = false;
+
+  // ── Diff-before-save (Slice 3) ────────────────────────────────────
+  /** Saved dataset columns (columnToUse + dataType), captured on load,
+   *  used as the baseline for the column delta. */
+  private originalFields: SimpleColumn[] = [];
+  /** True while the diff dialog is open awaiting confirm/cancel. */
+  showDiffDialog = false;
+  /** Computed line diff for the SQL side-by-side pane. */
+  diffLines: SqlDiffLine[] = [];
+  /** Old / new SQL captured when the diff opened. */
+  diffOldSql = '';
+  diffNewSql = '';
+  /** Column delta (added/removed/renamed/type-changed). */
+  columnDelta: ColumnDelta | null = null;
+  /** True while previewColumns is in flight for the diff. */
+  isComputingDiff = false;
+  /** Downstream consumer counts when a removed/renamed column is used. */
+  diffLineage: { analyses: number; dashboards: number } | null = null;
+  /** The form payload captured at diff-open, committed on confirm. */
+  private pendingSaveForm: DatasetFormData | null = null;
+  /** When true, run the preview immediately after the pending save. */
+  private pendingSaveAndRun = false;
+
+  // ── Result export + profiling (Slice 4) ───────────────────────────
+  /** Toggle for the client-side column-profiling strip. */
+  showColumnProfile = false;
+  /** Cached profiles for the current preview rows. */
+  columnProfiles: ColumnProfile[] = [];
 
   // Results Popup
   showResultsPopup = false;
@@ -1310,6 +1351,12 @@ export class EditDatasetComponent
             this.queryResult.rows,
             this.queryResult.columnTypes,
           );
+          // Overlay any user-remembered widths for this dataset.
+          this.restoreColumnState();
+
+          // Refresh the profiling strip against the new rows (only when
+          // it's currently visible — otherwise it recomputes on open).
+          if (this.showColumnProfile) this.recomputeColumnProfiles();
 
           if (this.queryResult.columns.length > 0) {
             this.surfaceResultSheet();
@@ -1559,6 +1606,142 @@ export class EditDatasetComponent
     }
   }
 
+  // ── Client-side result export + profiling (Slice 4) ───────────────
+
+  /** Base file name for exports — derived from the dataset/datasource. */
+  private exportBaseName(): string {
+    return (
+      this.datasetName ||
+      this.selectedDatasourceName ||
+      this.selectedDatasourceObj?.name ||
+      'dataset'
+    ).replace(/[^\w.-]+/g, '_');
+  }
+
+  /**
+   * Export the CURRENT in-memory preview rows to CSV, client-side. No
+   * BE call — mirrors exactly what the grid shows (visible columns,
+   * current order). Distinct from `exportResultsAsCsv`, which streams
+   * the full server-side result set.
+   */
+  exportResultsCsvClient(): void {
+    if (!this.queryResult?.columns?.length) return;
+    const csv = rowsToCsv(this.queryResult.columns, this.queryResult.rows);
+    downloadTextFile(
+      csv,
+      `${this.exportBaseName()}_preview.csv`,
+      'text/csv;charset=utf-8;',
+    );
+  }
+
+  /** Export the current in-memory preview rows to JSON, client-side. */
+  exportResultsJsonClient(): void {
+    if (!this.queryResult?.columns?.length) return;
+    const json = rowsToJson(this.queryResult.columns, this.queryResult.rows);
+    downloadTextFile(
+      json,
+      `${this.exportBaseName()}_preview.json`,
+      'application/json;charset=utf-8;',
+    );
+  }
+
+  /** Copy the current SQL editor content to the clipboard. */
+  async copySql(): Promise<void> {
+    const sql = this.editor?.getValue() || this.currentQuery || '';
+    await this.writeToClipboard(sql);
+  }
+
+  /** Toggle the column-profiling strip; (re)compute on show. */
+  toggleColumnProfile(): void {
+    this.showColumnProfile = !this.showColumnProfile;
+    if (this.showColumnProfile) this.recomputeColumnProfiles();
+    this.cdr.markForCheck();
+  }
+
+  /** Recompute per-column profiles over the loaded preview rows. */
+  private recomputeColumnProfiles(): void {
+    if (!this.queryResult?.columns?.length) {
+      this.columnProfiles = [];
+      return;
+    }
+    this.columnProfiles = profileColumns(
+      this.queryResult.columns,
+      this.queryResult.rows,
+    );
+  }
+
+  /** Template helper — traffic-light class for a null-% bar. */
+  nullSeverity(pct: number): 'good' | 'warn' | 'bad' {
+    return nullPctSeverity(pct);
+  }
+
+  // ── Result-grid column-state persistence (Slice 4) ────────────────
+  private columnStateStorageKey(): string | null {
+    if (!this.datasetId) return null;
+    return `dbexec.dataset.${this.datasetId}.gridColumnState`;
+  }
+
+  /**
+   * Persist the result grid's column widths (the one bit of state the
+   * <colgroup>-driven grid exposes) keyed by dataset id. Sort/filter
+   * are lazy-loaded server-side here, so only widths round-trip.
+   * Fails silently when localStorage is unavailable.
+   */
+  private persistColumnState(): void {
+    const key = this.columnStateStorageKey();
+    if (!key) return;
+    try {
+      localStorage.setItem(
+        key,
+        JSON.stringify({ widths: this.columnWidths }),
+      );
+    } catch (_) {
+      /* localStorage may be unavailable */
+    }
+  }
+
+  /**
+   * PrimeNG `(onColResize)` — the user drag-resized a header. Map the
+   * delta onto our <colgroup> width record and persist so the width
+   * survives reloads. Guarded: only the data columns (index ≥ 1; the
+   * leading # column is fixed) are tracked.
+   */
+  onResultColResize(event: { element?: HTMLElement; delta?: number }): void {
+    if (!this.queryResult?.columns?.length) return;
+    const th = event?.element as HTMLElement | undefined;
+    const delta = event?.delta ?? 0;
+    if (!th) return;
+    // The header cell text is the column name (see the th-content
+    // template). Fall back to width-only when it can't be resolved.
+    const label = (th.textContent || '').trim();
+    const col = this.queryResult.columns.find(c => label.startsWith(c));
+    if (!col) return;
+    const current = this.columnWidths[col] ?? th.offsetWidth ?? 160;
+    this.columnWidths = {
+      ...this.columnWidths,
+      [col]: Math.max(60, current + delta),
+    };
+    this.persistColumnState();
+  }
+
+  /** Restore persisted column widths for this dataset, if any. */
+  private restoreColumnState(): void {
+    const key = this.columnStateStorageKey();
+    if (!key) return;
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (parsed?.widths && typeof parsed.widths === 'object') {
+        // Merge over the measured widths so a newly-added column still
+        // gets an auto width while remembered ones win.
+        this.columnWidths = { ...this.columnWidths, ...parsed.widths };
+      }
+    } catch (_) {
+      /* corrupt / unavailable — ignore */
+    }
+  }
+
   // ── Pane-resize column re-flow ────────────────────────────────
   private installResultPaneResizeObserver(): void {
     if (typeof ResizeObserver === 'undefined') return;
@@ -1595,36 +1778,173 @@ export class EditDatasetComponent
   onDatasetDialogClose(formData: DatasetFormData | null): void {
     this.showDatasetDialog = false;
 
-    if (formData) {
-      if (!this.selectedDatasourceObj || !this.datasetId) return;
+    // Whether this save should re-run inline afterwards (Save & Run).
+    // Captured + reset here so a cancelled dialog doesn't leave the
+    // flag armed for the next plain Save.
+    const andRun = this.pendingSaveAndRun;
+    this.pendingSaveAndRun = false;
 
-      // Get the SQL query
-      const sql = this.editor?.getValue() || this.currentQuery;
+    if (!formData) return;
+    if (!this.selectedDatasourceObj || !this.datasetId) return;
 
-      const saveData = {
-        id: this.datasetId,
-        name: formData.name,
-        description: formData.description,
-        datasource: this.selectedDatasourceObj.id,
-        sql,
-        // Always send the current config (even []) so removing every
-        // {{token}} clears a previously-saved paramsConfig on the BE.
-        paramsConfig: this.paramsConfig,
-      };
+    const sql = this.editor?.getValue() || this.currentQuery;
+    const sqlChanged = sql.trim() !== this.originalQuery.trim();
 
-      this.datasetService
-        .updateDataset(saveData, (formData.justification || '').trim())
-        .then(response => {
-          if (this.globalService.handleSuccessService(response, true)) {
-            this.originalQuery = this.editor?.getValue() || this.currentQuery;
+    // SQL unchanged (e.g. a rename/description-only edit) → commit
+    // straight through, no diff review needed.
+    if (!sqlChanged) {
+      this.commitSave(formData, andRun);
+      return;
+    }
+
+    // SQL changed → open the diff-before-save review. Capture the form
+    // + the run intent so the commit can proceed once the user confirms.
+    this.pendingSaveForm = formData;
+    this.pendingSaveAndRun = andRun;
+    this.openDiffDialog(sql);
+  }
+
+  /**
+   * Build the diff-before-save review: line diff of old vs new SQL,
+   * the column delta (via preview-columns on the NEW SQL), and — when
+   * a column is removed or renamed — a downstream-consumer warning
+   * from getLineage. Opens the dialog; the actual save waits for
+   * `confirmDiffSave()`.
+   */
+  private openDiffDialog(newSql: string): void {
+    this.diffOldSql = this.originalQuery;
+    this.diffNewSql = newSql;
+    this.diffLines = diffSqlLines(this.originalQuery, newSql);
+    this.columnDelta = null;
+    this.diffLineage = null;
+    this.isComputingDiff = true;
+    this.showDiffDialog = true;
+    this.cdr.markForCheck();
+
+    if (!this.datasetId) {
+      this.isComputingDiff = false;
+      return;
+    }
+
+    this.datasetService
+      .previewColumns(this.datasetId, newSql)
+      .then((response: any) => {
+        // Accept both an envelope ({ data: { columns } }) and a bare
+        // ({ columns }) shape so we don't depend on the wrapper.
+        const cols =
+          response?.data?.columns ?? response?.columns ?? [];
+        const next: SimpleColumn[] = (Array.isArray(cols) ? cols : []).map(
+          (c: any) => ({
+            name: (c?.name ?? '').toString(),
+            dataType: (c?.dataType ?? '').toString(),
+          }),
+        );
+        this.columnDelta = diffColumns(this.originalFields, next);
+
+        // Only bother the lineage endpoint when something is being
+        // removed or renamed — those are the changes that break
+        // downstream consumers.
+        const breaking =
+          this.columnDelta.removed.length > 0 ||
+          this.columnDelta.renamed.length > 0;
+        if (breaking && this.datasetId) {
+          this.datasetService
+            .getLineage(this.datasetId)
+            .then((lin: any) => {
+              const d = lin?.data ?? lin ?? {};
+              this.diffLineage = {
+                analyses: Array.isArray(d.analyses) ? d.analyses.length : 0,
+                dashboards: Array.isArray(d.dashboards)
+                  ? d.dashboards.length
+                  : 0,
+              };
+              this.cdr.markForCheck();
+            })
+            .catch(() => {
+              /* lineage is advisory — swallow */
+            });
+        }
+      })
+      .catch(() => {
+        // preview-columns failed (e.g. invalid SQL). Leave the delta
+        // null; the dialog still shows the SQL diff and lets the user
+        // proceed at their own risk.
+        this.columnDelta = null;
+      })
+      .finally(() => {
+        this.isComputingDiff = false;
+        this.cdr.markForCheck();
+      });
+  }
+
+  /** User confirmed the diff review → run the deferred save. */
+  confirmDiffSave(): void {
+    this.showDiffDialog = false;
+    const form = this.pendingSaveForm;
+    const andRun = this.pendingSaveAndRun;
+    this.pendingSaveForm = null;
+    this.pendingSaveAndRun = false;
+    if (form) this.commitSave(form, andRun);
+  }
+
+  /** User cancelled the diff review → stay on the page, discard nothing. */
+  cancelDiffSave(): void {
+    this.showDiffDialog = false;
+    this.pendingSaveForm = null;
+    this.pendingSaveAndRun = false;
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Commit the update. When `andRun` is true, stay on the page and
+   * immediately re-run the preview (Save & Run); otherwise keep the
+   * existing behaviour of navigating back to the list.
+   */
+  private commitSave(formData: DatasetFormData, andRun: boolean): void {
+    if (!this.selectedDatasourceObj || !this.datasetId) return;
+
+    const sql = this.editor?.getValue() || this.currentQuery;
+    const saveData = {
+      id: this.datasetId,
+      name: formData.name,
+      description: formData.description,
+      datasource: this.selectedDatasourceObj.id,
+      sql,
+      // Always send the current config (even []) so removing every
+      // {{token}} clears a previously-saved paramsConfig on the BE.
+      paramsConfig: this.paramsConfig,
+    };
+
+    this.datasetService
+      .updateDataset(saveData, (formData.justification || '').trim())
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, true)) {
+          this.originalQuery = this.editor?.getValue() || this.currentQuery;
+          if (andRun) {
+            // Save & Run: keep the editor open and preview the fresh SQL
+            // in place rather than bouncing to the list.
+            this.executeCompleteQuery();
+          } else {
             this.router.navigate([DATASET.LIST]);
           }
-          this.cdr.markForCheck();
-        })
-        .catch(() => {
-          this.cdr.markForCheck();
-        });
-    }
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
+  }
+
+  /**
+   * Save & Run — opens the save dialog (name/description/justification
+   * flow is reused) but flags the follow-up so that once the save
+   * commits we re-run the preview inline instead of navigating away.
+   * If the SQL changed, the diff review still runs first.
+   */
+  saveAndRun(): void {
+    if (!this.selectedDatasourceObj || !this.datasetId) return;
+    this.pendingSaveAndRun = true;
+    this.showDatasetDialog = true;
   }
 
   /** Params panel emitted an updated config; keep it for the next save. */
@@ -1694,6 +2014,8 @@ export class EditDatasetComponent
           this.queryResult.rows,
           this.queryResult.columnTypes,
         );
+        this.restoreColumnState();
+        if (this.showColumnProfile) this.recomputeColumnProfiles();
         if (columns.length > 0) {
           this.surfaceResultSheet();
         }
@@ -2149,6 +2471,21 @@ export class EditDatasetComponent
           this.paramsConfig = Array.isArray(dataset.paramsConfig)
             ? dataset.paramsConfig
             : [];
+
+          // Capture the current column set as the diff baseline. Fields
+          // carry `columnToUse` (the raw SQL column, matching what
+          // preview-columns returns as `name`) + `dataType`.
+          const fields = Array.isArray(dataset.datasetFields)
+            ? dataset.datasetFields
+            : Array.isArray(dataset.fields)
+              ? dataset.fields
+              : [];
+          this.originalFields = fields
+            .map((f: any) => ({
+              name: (f?.columnToUse ?? f?.name ?? '').toString(),
+              dataType: (f?.dataType ?? '').toString(),
+            }))
+            .filter((c: SimpleColumn) => !!c.name);
 
           // Set database from API response. Spread the full
           // datasource payload (rather than just {id, name}) so the

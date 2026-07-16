@@ -67,6 +67,14 @@ import {
 } from '../../store';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 import { DatasetParamConfig } from '../../helpers/param-tokens.helper';
+import {
+  ColumnProfile,
+  downloadTextFile,
+  nullPctSeverity,
+  profileColumns,
+  rowsToCsv,
+  rowsToJson,
+} from './dataset-result-tools.helper';
 
 // Declare Monaco and window for TypeScript
 declare const monaco: any;
@@ -286,6 +294,12 @@ export class AddDatasetComponent
 
   // Save as Dataset Dialog
   showDatasetDialog = false;
+
+  // ── Result export + profiling (Slice 4) ───────────────────────────
+  /** Toggle for the client-side column-profiling strip. */
+  showColumnProfile = false;
+  /** Cached profiles for the current preview rows. */
+  columnProfiles: ColumnProfile[] = [];
 
   // Results bottom sheet
   showResultsPopup = false;
@@ -2010,6 +2024,10 @@ export class AddDatasetComponent
             this.queryResult.columnTypes,
           );
 
+          // Refresh the profiling strip against the new rows (only when
+          // it's currently visible — otherwise it recomputes on open).
+          if (this.showColumnProfile) this.recomputeColumnProfiles();
+
           if (this.queryResult.columns.length > 0) {
             this.surfaceResultSheet();
           }
@@ -2709,6 +2727,72 @@ export class AddDatasetComponent
         this.translate.instant('DATASET.COPY_FAILED'),
       );
     }
+  }
+
+  // ── Client-side result export + profiling (Slice 4) ───────────────
+
+  /** Base file name for exports — derived from the datasource. */
+  private exportBaseName(): string {
+    return (this.selectedDatasourceObj?.name || 'dataset').replace(
+      /[^\w.-]+/g,
+      '_',
+    );
+  }
+
+  /**
+   * Export the CURRENT in-memory preview rows to CSV, client-side. No
+   * BE call — mirrors what the grid shows. Distinct from
+   * `exportResultsAsCsv`, which streams the full server-side result.
+   */
+  exportResultsCsvClient(): void {
+    if (!this.queryResult?.columns?.length) return;
+    const csv = rowsToCsv(this.queryResult.columns, this.queryResult.rows);
+    downloadTextFile(
+      csv,
+      `${this.exportBaseName()}_preview.csv`,
+      'text/csv;charset=utf-8;',
+    );
+  }
+
+  /** Export the current in-memory preview rows to JSON, client-side. */
+  exportResultsJsonClient(): void {
+    if (!this.queryResult?.columns?.length) return;
+    const json = rowsToJson(this.queryResult.columns, this.queryResult.rows);
+    downloadTextFile(
+      json,
+      `${this.exportBaseName()}_preview.json`,
+      'application/json;charset=utf-8;',
+    );
+  }
+
+  /** Copy the current SQL editor content to the clipboard. */
+  async copySql(): Promise<void> {
+    const sql = this.editor?.getValue() || this.currentQuery || '';
+    await this.writeToClipboard(sql);
+  }
+
+  /** Toggle the column-profiling strip; (re)compute on show. */
+  toggleColumnProfile(): void {
+    this.showColumnProfile = !this.showColumnProfile;
+    if (this.showColumnProfile) this.recomputeColumnProfiles();
+    this.cdr.markForCheck();
+  }
+
+  /** Recompute per-column profiles over the loaded preview rows. */
+  private recomputeColumnProfiles(): void {
+    if (!this.queryResult?.columns?.length) {
+      this.columnProfiles = [];
+      return;
+    }
+    this.columnProfiles = profileColumns(
+      this.queryResult.columns,
+      this.queryResult.rows,
+    );
+  }
+
+  /** Template helper — traffic-light class for a null-% bar. */
+  nullSeverity(pct: number): 'good' | 'warn' | 'bad' {
+    return nullPctSeverity(pct);
   }
 
   refreshDatasourceFromContext(): void {
