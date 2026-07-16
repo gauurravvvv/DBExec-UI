@@ -44,11 +44,11 @@ export class ViewAlertComponent implements OnInit, OnDestroy {
   showSnoozeDialog = false;
   snoozeMinutes = 60;
   snoozePresets = [
-    { label: '30m', value: 30 },
-    { label: '1h', value: 60 },
-    { label: '3h', value: 180 },
-    { label: '12h', value: 720 },
-    { label: '1d', value: 1440 },
+    { label: 'ALERTS.SNOOZE_30M', value: 30 },
+    { label: 'ALERTS.SNOOZE_1H', value: 60 },
+    { label: 'ALERTS.SNOOZE_3H', value: 180 },
+    { label: 'ALERTS.SNOOZE_12H', value: 720 },
+    { label: 'ALERTS.SNOOZE_1D', value: 1440 },
   ];
 
   testResult: { breached?: boolean; observedValue?: any; error?: string } | null = null;

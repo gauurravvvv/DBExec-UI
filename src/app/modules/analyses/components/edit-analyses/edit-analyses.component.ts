@@ -3591,8 +3591,6 @@ export class EditAnalysesComponent
         dashboardId: payload.dashboardId,
         name: payload.name,
         description: payload.description,
-        // Track F: organizational tags for the published dashboard.
-        tags: payload.tags,
       })
       .then(response => {
         if (this.globalService.handleSuccessService(response, true)) {

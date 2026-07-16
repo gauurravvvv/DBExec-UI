@@ -150,8 +150,6 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
       consecutiveBreachesRequired: [1, [Validators.min(1), Validators.max(100)]],
       enabled: [true],
       filterState: [null],
-      // organization (Track F): free-form tags
-      tags: [[]],
     });
 
     this.alertForm.valueChanges
@@ -189,7 +187,6 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
             consecutiveBreachesRequired: rule.consecutiveBreachesRequired ?? 1,
             enabled: rule.enabled ?? true,
             filterState: rule.filterState ?? null,
-            tags: rule.tags ?? [],
           },
           { emitEvent: false },
         );
