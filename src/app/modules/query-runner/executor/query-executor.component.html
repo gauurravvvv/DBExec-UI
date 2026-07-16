@@ -33,7 +33,7 @@
 
       <span class="qx-sep"></span>
 
-      <!-- Edit: Format / Wrap / Explain / Minimap -->
+      <!-- Edit: Format / Wrap / Explain -->
       <div class="qx-btn-group">
         <button pButton class="p-button-outlined modern-button qx-labeled-btn" (click)="format()"
           [disabled]="!editorReady"
@@ -55,7 +55,8 @@
 
       <span class="qx-sep"></span>
 
-      <!-- Right: row limit, read/write toggle, palette, shortcuts, overflow -->
+      <!-- Right: row limit, read/write toggle, overflow (palette + shortcuts
+           live inside the overflow menu / keyboard shortcuts) -->
       <label class="qx-limit" [pTooltip]="'QUERY_RUNNER.LIMIT_HINT' | translate" tooltipPosition="bottom">
         <span class="qx-limit-label">{{ 'QUERY_RUNNER.LIMIT_LABEL' | translate }}</span>
         <input type="number" min="1" [max]="50000" step="50"
@@ -256,10 +257,13 @@
             <input class="qx-quickfilter" type="text" *ngIf="!serverMode"
               [(ngModel)]="quickFilter" (ngModelChange)="onQuickFilter()"
               [placeholder]="'QUERY_RUNNER.FILTER_RESULTS' | translate" />
+            <!-- View group: column filters -->
             <button class="qx-icon" (click)="toggleFilters()" [class.qx-active]="showFilters"
               [pTooltip]="'QUERY_RUNNER.COLUMN_FILTERS' | translate" tooltipPosition="bottom">
               <i class="pi pi-filter"></i>
             </button>
+            <span class="qx-sep"></span>
+            <!-- Export group: CSV / JSON -->
             <button class="qx-icon" (click)="exportCsv()"
               [pTooltip]="'QUERY_RUNNER.EXPORT_CSV' | translate" tooltipPosition="bottom">
               <i class="pi pi-file"></i>

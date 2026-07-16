@@ -33,8 +33,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 0.5rem 1rem;
+  gap: var(--space-6);
+  padding: var(--space-4) var(--space-6);
   background: var(--qx-elev);
   border-bottom: 1px solid var(--qx-border);
   flex-shrink: 0;
@@ -42,7 +42,7 @@
 .qx-brand {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: var(--space-4);
   min-width: 0;
 
   > i {
@@ -50,7 +50,7 @@
     height: 30px;
     display: grid;
     place-items: center;
-    border-radius: 7px;
+    border-radius: var(--radius-sm);
     background: var(--qx-accent);
     color: var(--qx-accent-text);
     flex-shrink: 0;
@@ -62,8 +62,8 @@
   line-height: 1.2;
   min-width: 0;
   .qx-ds {
-    font-weight: 600;
-    font-size: 0.9rem;
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-card-title);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -798,24 +798,30 @@ $qx-btn-h: 34px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.3rem 0.5rem;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--qx-border);
   min-height: 38px;
+  background: var(--qx-elev);
 }
 .qx-result-tabs {
   display: flex;
-  gap: 2px;
+  gap: var(--space-1);
   overflow-x: auto;
   button {
     border: 1px solid transparent;
     background: transparent;
     color: var(--qx-muted);
-    padding: 0.3rem 0.7rem;
+    padding: var(--space-3) var(--space-5);
     font-size: var(--fs-control);
     cursor: pointer;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     white-space: nowrap;
+    transition: all var(--motion-base) ease;
+    &:hover:not(.active) {
+      color: var(--qx-text);
+      background: var(--hover-background);
+    }
     &.active {
       background: var(--qx-bg);
       color: var(--qx-text);
@@ -826,7 +832,7 @@ $qx-btn-h: 34px;
 .qx-result-actions {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: var(--space-3);
   margin-left: auto;
 
   .qx-quickfilter {
@@ -846,9 +852,23 @@ $qx-btn-h: 34px;
       box-shadow: 0 0 0 3px var(--primary-color-transparent);
     }
   }
+
+  // Group divider — mirrors the top toolbar's .qx-sep so the two toolbars
+  // read as one system (view group | export group).
+  .qx-sep {
+    width: 1px;
+    height: 18px;
+    background: var(--qx-border);
+    margin: 0 var(--space-2);
+    flex-shrink: 0;
+  }
+
+  // Flat/ghost icon buttons — same language as the top toolbar's .qx-icon-btn
+  // (borderless, muted, primary tint on hover/active) so the result toolbar
+  // visually matches the toolbar above the editor.
   .qx-icon {
-    border: 1px solid var(--border-color);
-    background: var(--card-background);
+    border: 1px solid transparent;
+    background: transparent;
     color: var(--text-muted);
     border-radius: var(--radius-sm);
     width: 30px;
@@ -858,8 +878,15 @@ $qx-btn-h: 34px;
     justify-content: center;
     cursor: pointer;
     transition: all var(--motion-base) ease;
-    &:hover { color: var(--primary-color); border-color: var(--primary-color); background: var(--primary-color-transparent); }
-    &.qx-active { color: var(--primary-color); border-color: var(--primary-color); background: var(--primary-color-transparent); }
+    .pi { font-size: var(--icon-sm); }
+    &:hover {
+      color: var(--primary-color);
+      background: var(--hover-background);
+    }
+    &.qx-active {
+      color: var(--primary-color);
+      background: var(--primary-color-transparent);
+    }
   }
 }
 .qx-result-body {
@@ -969,7 +996,7 @@ $qx-btn-h: 34px;
   gap: var(--space-5);
   color: var(--text-muted);
   font-size: var(--fs-control);
-  i { font-size: 1.6rem; opacity: 0.55; }
+  i { font-size: var(--icon-xl); opacity: 0.55; }
 }
 // Running state — same calm centred layout; spinner uses the accent.
 .qx-result-loading i { color: var(--primary-color); opacity: 1; }
