@@ -4146,7 +4146,9 @@
     "OPEN_IN_EXECUTOR": "Open in Executor",
     "SAVE_QUERY": "Save query",
     "SAVE_UPDATE": "Save",
-    "SAVE_AS_NEW": "Save as new"
+    "SAVE_AS_NEW": "Save as new",
+    "ROW_LIMIT": "Limite de linhas",
+    "LAST_RUN": "Última execução"
   },
   "DB_ACCESS": {
     "TITLE": "Gerenciamento de acesso ao banco de dados",

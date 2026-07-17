@@ -4146,7 +4146,9 @@
     "OPEN_IN_EXECUTOR": "Open in Executor",
     "SAVE_QUERY": "Save query",
     "SAVE_UPDATE": "Save",
-    "SAVE_AS_NEW": "Save as new"
+    "SAVE_AS_NEW": "Save as new",
+    "ROW_LIMIT": "行数限制",
+    "LAST_RUN": "最近运行"
   },
   "DB_ACCESS": {
     "TITLE": "数据库访问管理",

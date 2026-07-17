@@ -18,7 +18,7 @@
     "connectionManager": "接続",
     "queryRunner": "SQL ワークスペース",
     "accessManagement": "アクセス管理",
-    "dbExecStudio": "DBExec Studio",
+    "dbExecStudio": "DBExec スタジオ",
     "queryBuilderTab": "タブ",
     "queryBuilderSection": "セクション",
     "queryBuilderPrompt": "プロンプト",
@@ -4146,7 +4146,9 @@
     "OPEN_IN_EXECUTOR": "Open in Executor",
     "SAVE_QUERY": "Save query",
     "SAVE_UPDATE": "Save",
-    "SAVE_AS_NEW": "Save as new"
+    "SAVE_AS_NEW": "Save as new",
+    "ROW_LIMIT": "行数制限",
+    "LAST_RUN": "最終実行"
   },
   "DB_ACCESS": {
     "TITLE": "データベースアクセス管理",

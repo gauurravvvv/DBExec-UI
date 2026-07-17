@@ -4146,7 +4146,9 @@
     "OPEN_IN_EXECUTOR": "Open in Executor",
     "SAVE_QUERY": "Save query",
     "SAVE_UPDATE": "Save",
-    "SAVE_AS_NEW": "Save as new"
+    "SAVE_AS_NEW": "Save as new",
+    "ROW_LIMIT": "행 제한",
+    "LAST_RUN": "마지막 실행"
   },
   "DB_ACCESS": {
     "TITLE": "데이터베이스 접근 관리",

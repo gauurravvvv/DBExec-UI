@@ -31,11 +31,37 @@
           </div>
 
           <ng-template usGridCell="name" let-q>
-            <span class="dataset-name-link" (click)="onOpen(q)">{{ q.name }}</span>
+            <span class="dataset-name-link" (click)="onView(q)">{{ q.name }}</span>
+          </ng-template>
+
+          <ng-template usGridCell="description" let-q>
+            <span class="desc-text" [pTooltip]="q.description || ''" tooltipPosition="top">
+              {{ q.description || '—' }}
+            </span>
           </ng-template>
 
           <ng-template usGridCell="datasource" let-q>
             {{ q.datasourceName || '—' }}
+          </ng-template>
+
+          <ng-template usGridCell="connection" let-q>
+            {{ q.connectionName || '—' }}
+          </ng-template>
+
+          <ng-template usGridCell="rowLimit" let-q>
+            {{ q.rowLimit != null ? q.rowLimit : '—' }}
+          </ng-template>
+
+          <ng-template usGridCell="lastRun" let-q>
+            <span
+              class="date-text"
+              *ngIf="q.lastRunAt; else neverRun"
+              [pTooltip]="(q.lastRunAt | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              tooltipPosition="top"
+            >
+              {{ q.lastRunAt | relativeTime }}
+            </span>
+            <ng-template #neverRun><span class="muted">—</span></ng-template>
           </ng-template>
 
           <ng-template usGridCell="updated" let-q>
@@ -50,19 +76,9 @@
 
           <ng-template usGridCell="actions" let-q>
             <div class="row-actions">
-              <button class="icon-btn view-btn"
-                (click)="onOpen(q)"
-                [pTooltip]="'QUERY_RUNNER.OPEN' | translate" tooltipPosition="bottom">
-                <i class="pi pi-external-link"></i>
-              </button>
-              <button class="icon-btn"
-                (click)="onView(q)"
-                [pTooltip]="'COMMON.VIEW' | translate" tooltipPosition="bottom">
-                <i class="pi pi-eye"></i>
-              </button>
               <button class="icon-btn edit-btn"
                 (click)="onEdit(q)"
-                [pTooltip]="'COMMON.EDIT' | translate" tooltipPosition="bottom">
+                [pTooltip]="'QUERY_RUNNER.OPEN_EXECUTOR' | translate" tooltipPosition="bottom">
                 <i class="pi pi-pencil"></i>
               </button>
               <button class="icon-btn delete-btn"
@@ -84,21 +100,50 @@
   (closed)="closeNewQuery()"
 ></app-new-query-dialog>
 
-<!-- Delete confirm -->
+<!-- Delete confirm — canonical delete popup with required justification
+     (matches list-user: standard-delete-section + justification-section). -->
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
-  <div class="popup-content">
+  <div class="popup-content" role="dialog" aria-modal="true">
     <div class="popup-header">
-      <div class="popup-icon danger"><i class="pi pi-exclamation-triangle"></i></div>
+      <div class="popup-icon"><i class="pi pi-trash"></i></div>
       <h3>{{ 'QUERY_RUNNER.DELETE_SAVED_QUERY' | translate }}</h3>
     </div>
-    <div class="popup-body">
-      <p>{{ 'QUERY_RUNNER.DELETE_SAVED_QUERY_CONFIRM' | translate: { name: toDelete?.name } }}</p>
+
+    <div class="standard-delete-section">
+      <p class="delete-intro">
+        {{ 'QUERY_RUNNER.DELETE_SAVED_QUERY_CONFIRM' | translate: { name: toDelete?.name } }}
+      </p>
+
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
+        </li>
+      </ul>
+
+      <div class="justification-section">
+        <label for="sqDeleteJustification"
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
+        >
+        <textarea
+          id="sqDeleteJustification"
+          [(ngModel)]="deleteJustification"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
+          rows="3"
+          maxlength="500"
+          autocomplete="off"
+        ></textarea>
+        <small class="char-count">{{ deleteJustification.length }}/500</small>
+      </div>
     </div>
+
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelDelete()">
         <i class="pi pi-times"></i>{{ 'COMMON.CANCEL' | translate }}
       </button>
-      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="deleting">
+      <button class="btn-confirm" (click)="proceedDelete()"
+        [disabled]="deleting || !deleteJustification.trim()">
         <i class="pi" [ngClass]="deleting ? 'pi-spin pi-spinner' : 'pi-trash'"></i>
         {{ 'COMMON.DELETE' | translate }}
       </button>

@@ -66,6 +66,7 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
   showDeleteConfirm = false;
   toDelete: SavedQuery | null = null;
   deleting = false;
+  deleteJustification = '';
 
   constructor(
     private service: SavedQueriesService,
@@ -93,10 +94,14 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
   private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
-      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '260px', frozen: true, filter: 'text' },
-      { colId: 'datasource', field: 'datasourceName', header: t('COMMON.DATASOURCE'), width: '200px' },
-      { colId: 'updated', field: 'updatedOn', header: t('QUERY_RUNNER.UPDATED'), width: '176px' },
-      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '160px', sortable: false },
+      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '220px', frozen: true, filter: 'text' },
+      { colId: 'description', field: 'description', header: t('COMMON.DESCRIPTION'), width: '260px', sortable: false },
+      { colId: 'datasource', field: 'datasourceName', header: t('COMMON.DATASOURCE'), width: '170px' },
+      { colId: 'connection', field: 'connectionName', header: t('QUERY_RUNNER.STEP_CONNECTION'), width: '170px', sortable: false },
+      { colId: 'rowLimit', field: 'rowLimit', header: t('QUERY_RUNNER.ROW_LIMIT'), width: '110px', sortable: false },
+      { colId: 'lastRun', field: 'lastRunAt', header: t('QUERY_RUNNER.LAST_RUN'), width: '150px' },
+      { colId: 'updated', field: 'updatedOn', header: t('QUERY_RUNNER.UPDATED'), width: '150px' },
+      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '110px', sortable: false },
     ];
   }
 
@@ -157,22 +162,26 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
 
   // ── row actions ─────────────────────────────────────────────────────
 
-  /** Open a saved query in the standalone executor tab (SQL preloaded). */
-  onOpen(q: SavedQuery): void {
-    const url = QUERY_RUNNER.EXEC_SAVED(q.connectionId, q.id);
-    window.open(url, '_blank');
-  }
-
+  /**
+   * Name click → the read-only View page.
+   */
   onView(q: SavedQuery): void {
     this.router.navigate([QUERY_RUNNER.savedQueryView(q.id)]);
   }
 
+  /**
+   * Edit (✏) → open the query in the standalone SQL editor / executor tab
+   * (SQL + rowLimit preloaded). This is where a saved query is actually
+   * edited — the executor, not a metadata form.
+   */
   onEdit(q: SavedQuery): void {
-    this.router.navigate([QUERY_RUNNER.savedQueryEdit(q.id)]);
+    const url = QUERY_RUNNER.EXEC_SAVED(q.connectionId, q.id);
+    window.open(url, '_blank');
   }
 
   confirmDelete(q: SavedQuery): void {
     this.toDelete = q;
+    this.deleteJustification = '';
     this.showDeleteConfirm = true;
     this.cdr.markForCheck();
   }
@@ -180,16 +189,17 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
   cancelDelete(): void {
     this.showDeleteConfirm = false;
     this.toDelete = null;
+    this.deleteJustification = '';
     this.cdr.markForCheck();
   }
 
   proceedDelete(): void {
-    if (!this.toDelete) return;
+    if (!this.toDelete || !this.deleteJustification.trim()) return;
     this.deleting = true;
     this.cdr.markForCheck();
     const id = this.toDelete.id;
     this.service
-      .deleteSavedQuery(id)
+      .deleteSavedQuery(id, this.deleteJustification.trim())
       .then(res => {
         if (this.globalService.handleSuccessService(res)) {
           this.adapter?.reload();

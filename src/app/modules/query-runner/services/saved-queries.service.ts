@@ -92,9 +92,12 @@ export class SavedQueriesService {
     );
   }
 
-  deleteSavedQuery(id: string): Promise<any> {
+  deleteSavedQuery(id: string, justification?: string): Promise<any> {
     return lastValueFrom(
-      this.http.apiDelete(this.base(id), { skipLoader: true }),
+      this.http.apiDelete(this.base(id), {
+        body: { justification },
+        skipLoader: true,
+      }),
     );
   }
 }
