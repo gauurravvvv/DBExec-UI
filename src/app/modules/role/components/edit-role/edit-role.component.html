@@ -3,7 +3,12 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text" routerLink="/app/roles">
+        <button
+          pButton
+          class="p-button-text"
+          routerLink="/app/roles"
+          [attr.aria-label]="'COMMON.BACK' | translate"
+        >
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>{{ 'ROLE.EDIT_TITLE' | translate }}</h2>
@@ -176,12 +181,17 @@
 </div>
 
 <div class="confirmation-popup" *ngIf="showSaveConfirm">
-  <div class="popup-content">
+  <div
+    class="popup-content"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="editRoleSaveTitle"
+  >
     <div class="popup-header">
       <div class="popup-icon">
         <i class="pi pi-save"></i>
       </div>
-      <h3>{{ 'COMMON.CONFIRM_UPDATE' | translate }}</h3>
+      <h3 id="editRoleSaveTitle">{{ 'COMMON.CONFIRM_UPDATE' | translate }}</h3>
     </div>
     <div class="standard-delete-section">
       <p class="delete-intro">{{ 'ROLE.UPDATE_CONFIRM' | translate }}</p>

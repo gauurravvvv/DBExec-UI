@@ -132,8 +132,15 @@
             display="chip"
             [filter]="true"
             icon="pi-users"
+            [attr.aria-describedby]="
+              userForm.get('groupIds')?.touched &&
+              userForm.get('groupIds')?.errors?.['minCount']
+                ? 'addUserGroupsError'
+                : null
+            "
           ></app-custom-multiselect>
           <small
+            id="addUserGroupsError"
             class="error-message"
             *ngIf="
               userForm.get('groupIds')?.touched &&

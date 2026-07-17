@@ -3,7 +3,12 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text back-button" (click)="goBack()">
+        <button
+          pButton
+          class="p-button-text back-button"
+          (click)="goBack()"
+          [attr.aria-label]="'COMMON.BACK' | translate"
+        >
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>{{ 'GROUP.VIEW_TITLE' | translate }}</h2>
@@ -134,13 +139,18 @@
 </div>
 
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
-  <div class="popup-content">
+  <div
+    class="popup-content"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="viewGroupDeleteTitle"
+  >
     <!-- Header -->
     <div class="popup-header">
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3>{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
+      <h3 id="viewGroupDeleteTitle">{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
     </div>
 
     <!-- Delete Info Section -->

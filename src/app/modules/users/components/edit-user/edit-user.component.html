@@ -7,6 +7,7 @@
           pButton
           class="p-button-text back-button"
           routerLink="/app/users"
+          [attr.aria-label]="'COMMON.BACK' | translate"
         >
           <i class="pi pi-arrow-left"></i>
         </button>
@@ -134,8 +135,15 @@
             display="chip"
             [filter]="true"
             icon="pi-users"
+            [attr.aria-describedby]="
+              userForm.get('groupIds')?.touched &&
+              userForm.get('groupIds')?.errors?.['minCount']
+                ? 'editUserGroupsError'
+                : null
+            "
           ></app-custom-multiselect>
           <small
+            id="editUserGroupsError"
             class="error-message"
             *ngIf="
               userForm.get('groupIds')?.touched &&
@@ -168,12 +176,17 @@
 </div>
 
 <div class="confirmation-popup" *ngIf="showSaveConfirm">
-  <div class="popup-content">
+  <div
+    class="popup-content"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="editUserSaveTitle"
+  >
     <div class="popup-header">
       <div class="popup-icon">
         <i class="pi pi-save"></i>
       </div>
-      <h3>{{ 'COMMON.CONFIRM_UPDATE' | translate }}</h3>
+      <h3 id="editUserSaveTitle">{{ 'COMMON.CONFIRM_UPDATE' | translate }}</h3>
     </div>
     <div class="standard-delete-section">
       <p class="delete-intro">

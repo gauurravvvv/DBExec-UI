@@ -179,6 +179,7 @@
                 class="icon-btn unlock-btn"
                 (click)="onUnlock(user.id)"
                 [disabled]="!user.canUnlock || isUnlocking(user.id)"
+                [attr.aria-label]="'COMMON.UNLOCK_ACCOUNT' | translate"
                 [pTooltip]="
                   !user.canUnlock
                     ? (user.isDefault === 1
@@ -205,6 +206,7 @@
                 class="icon-btn edit-btn"
                 (click)="onEdit(user.id)"
                 [disabled]="!user.canEdit"
+                [attr.aria-label]="'COMMON.EDIT' | translate"
                 [pTooltip]="
                   !user.canEdit
                     ? (user.isDefault === 1
@@ -220,6 +222,7 @@
                 *hasPermission="'userManagement'; level: 'delete'"
                 class="icon-btn delete-btn"
                 (click)="confirmDelete(user.id)"
+                [attr.aria-label]="'COMMON.DELETE' | translate"
                 [pTooltip]="
                   !user.canDelete
                     ? (user.isDefault === 1
@@ -246,13 +249,18 @@
 </div>
 
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
-  <div class="popup-content">
+  <div
+    class="popup-content"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="listUserDeleteTitle"
+  >
     <!-- Header -->
     <div class="popup-header">
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3>{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
+      <h3 id="listUserDeleteTitle">{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
     </div>
 
     <!-- Delete Info Section -->

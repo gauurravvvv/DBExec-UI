@@ -3,7 +3,12 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text" routerLink="/app/roles">
+        <button
+          pButton
+          class="p-button-text"
+          routerLink="/app/roles"
+          [attr.aria-label]="'COMMON.BACK' | translate"
+        >
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>{{ 'ROLE.ADD_TITLE' | translate }}</h2>

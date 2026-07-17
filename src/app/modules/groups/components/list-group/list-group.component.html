@@ -128,6 +128,11 @@
                 *hasPermission="'groupManagement'; level: 'write'"
                 class="icon-btn edit-btn"
                 (click)="onEdit(group.id)"
+                [attr.aria-label]="
+                  group.isDefault === 1
+                    ? ('GROUP.MANAGE_USERS' | translate)
+                    : ('COMMON.EDIT' | translate)
+                "
                 [pTooltip]="
                   group.isDefault === 1
                     ? ('GROUP.MANAGE_USERS' | translate)
@@ -141,6 +146,7 @@
                 *hasPermission="'groupManagement'; level: 'delete'"
                 class="icon-btn delete-btn"
                 (click)="confirmDelete(group.id)"
+                [attr.aria-label]="'COMMON.DELETE' | translate"
                 [pTooltip]="
                   group.isDefault === 1
                     ? ('GROUP.CANNOT_DELETE_DEFAULT' | translate)
@@ -165,13 +171,18 @@
 </div>
 
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
-  <div class="popup-content">
+  <div
+    class="popup-content"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="listGroupDeleteTitle"
+  >
     <!-- Header -->
     <div class="popup-header">
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3>{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
+      <h3 id="listGroupDeleteTitle">{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
     </div>
 
     <!-- Delete Info Section -->

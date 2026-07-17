@@ -7,6 +7,7 @@
           pButton
           class="p-button-text back-button"
           routerLink="/app/users"
+          [attr.aria-label]="'COMMON.BACK' | translate"
         >
           <i class="pi pi-arrow-left"></i>
         </button>
@@ -199,13 +200,18 @@
 </div>
 
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
-  <div class="popup-content">
+  <div
+    class="popup-content"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="viewUserDeleteTitle"
+  >
     <!-- Header -->
     <div class="popup-header">
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3>{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
+      <h3 id="viewUserDeleteTitle">{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
     </div>
 
     <!-- Delete Info Section -->
