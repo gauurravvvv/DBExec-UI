@@ -74,9 +74,18 @@ export const selectIsDatasetLoading = (datasetId: string) =>
     status => status === 'loading',
   );
 
-// Factory selector: Check if dataset is loaded
+// Factory selector: Check if the dataset is AUTHORABLE — i.e. the user can add
+// visuals against it. This must NOT gate on the exact terminal `'loaded'`
+// status: a dataset that is still `loading`, or `stale`-but-cached, is perfectly
+// authorable, and gating on `=== 'loaded'` left the "Add visual" button dead
+// (the reported "I cannot add a visual" bug). Enable while a fetch is in flight
+// (loading) or once we hold rows (loaded / stale-with-data).
 export const selectIsDatasetLoaded = (datasetId: string) =>
-  createSelector(selectDatasetStatus(datasetId), status => status === 'loaded');
+  createSelector(selectDatasetByKey(datasetId), entry => {
+    if (!entry) return false;
+    if (entry.status === 'loading' || entry.status === 'loaded') return true;
+    return Array.isArray(entry.data); // stale-but-cached rows: still authorable
+  });
 
 // Factory selector: Get dataset error
 export const selectDatasetError = (datasetId: string) =>
