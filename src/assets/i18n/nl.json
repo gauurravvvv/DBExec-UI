@@ -3697,6 +3697,9 @@
         "name": {
           "required": "Veldnaam is verplicht",
           "tooLong": "De veldnaam mag niet langer zijn dan 128 tekens"
+        },
+        "customLogic": {
+          "tooLong": "Formule mag niet langer zijn dan 4000 tekens"
         }
       },
       "prompt": {

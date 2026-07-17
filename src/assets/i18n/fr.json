@@ -3697,6 +3697,9 @@
         "name": {
           "required": "Le nom du champ est obligatoire",
           "tooLong": "Le nom du champ ne doit pas dépasser 128 caractères"
+        },
+        "customLogic": {
+          "tooLong": "La formule ne doit pas dépasser 4000 caractères"
         }
       },
       "prompt": {

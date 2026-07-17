@@ -3697,6 +3697,9 @@
         "name": {
           "required": "Der Feldname ist erforderlich",
           "tooLong": "Der Feldname darf 128 Zeichen nicht überschreiten"
+        },
+        "customLogic": {
+          "tooLong": "Formel darf 4000 Zeichen nicht überschreiten"
         }
       },
       "prompt": {

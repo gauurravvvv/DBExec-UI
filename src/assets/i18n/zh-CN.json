@@ -3697,6 +3697,9 @@
         "name": {
           "required": "字段名称为必填项",
           "tooLong": "字段名称不得超过 128 个字符"
+        },
+        "customLogic": {
+          "tooLong": "公式不得超过4000个字符"
         }
       },
       "prompt": {

@@ -3697,6 +3697,9 @@
         "name": {
           "required": "필드 이름이 필요합니다",
           "tooLong": "필드 이름은 128자를 초과할 수 없습니다"
+        },
+        "customLogic": {
+          "tooLong": "수식은 4000자를 초과할 수 없습니다"
         }
       },
       "prompt": {

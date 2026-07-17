@@ -440,6 +440,13 @@ export const updateAnalysisSchema = z.object({
   // ({ id, justification }). The tabs array above is authoritative (an absent
   // tab is deleted); tabDeletes only carries the deletion reason for the audit.
   tabDeletes: z.array(z.record(z.string(), z.any())).optional(),
+  // Advanced-analytics specs (Wave 1) persisted on the analysis: table
+  // calculations, time-intelligence transforms and the date-spine config.
+  // Their shapes are validated downstream by the analytics engine; here we
+  // only ensure they're arrays of objects so the controller can persist them.
+  tableCalcs: z.array(z.record(z.string(), z.any())).optional(),
+  timeIntel: z.array(z.record(z.string(), z.any())).optional(),
+  dateSpine: z.array(z.record(z.string(), z.any())).optional(),
   justification: analysisJustificationSchema,
 });
 export type UpdateAnalysisInput = z.infer<typeof updateAnalysisSchema>;
@@ -580,6 +587,13 @@ export const runAnalysisQuerySchema = z.object({
   // Feature B: optional pivot totals / subtotals config a table / pivot visual
   // attaches so the run appends grand-total + per-group subtotal rows.
   pivotTotals: pivotTotalsConfigSchema.optional(),
+  // Advanced-analytics run specs (Wave 1): table calculations, time-
+  // intelligence transforms and the date-spine config applied to this run.
+  // Free-form arrays of objects here; the analytics engine validates their
+  // shapes when it compiles the SQL.
+  tableCalcs: z.array(z.record(z.string(), z.any())).optional(),
+  timeIntel: z.array(z.record(z.string(), z.any())).optional(),
+  dateSpine: z.array(z.record(z.string(), z.any())).optional(),
   limit: z
     .union([z.number().int(), z.string().regex(/^-?\d+$/)])
     .optional()
