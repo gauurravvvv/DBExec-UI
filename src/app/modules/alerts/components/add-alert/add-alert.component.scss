@@ -78,21 +78,31 @@
   }
 }
 
+/* Vertical single-column form: one control per row, mirroring the
+   Add Organisation form. The .two-col / .three-col modifiers are kept as
+   no-ops so the template needs no change — everything stacks. Controls are
+   constrained to 50% width on desktop (full width on narrow screens) to
+   match the Add Org rhythm. */
 .form-grid {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: var(--space-5);
 
-  &.two-col {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  &.two-col,
   &.three-col {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: none;
   }
 
-  @media (max-width: 900px) {
-    &.two-col,
-    &.three-col {
-      grid-template-columns: 1fr;
+  app-custom-input,
+  app-custom-dropdown,
+  app-custom-multiselect,
+  app-custom-toggle,
+  app-custom-number,
+  app-custom-textarea {
+    width: 50%;
+
+    @media (max-width: 768px) {
+      width: 100%;
     }
   }
 }
