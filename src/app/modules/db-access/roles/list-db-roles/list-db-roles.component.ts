@@ -61,7 +61,6 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   /* ── custom-table wiring (unified simple table; server-driven) ──────── */
   cols: CustomTableColumn[] = [];
   tableConfig: CustomTableConfig = {
-    mode: 'scroll', // plain infinite scroll — no page controls
     pageSize: 50, // rows fetched per scroll page
     globalSearch: true, // search box matches role name
     globalSearchKey: 'name', // roles BE matches the `name` filter key

@@ -93,3 +93,12 @@ export const SET_PASSWORD_PAGE_OPTIONS = [
 
 export const MAX_LIMIT = 10000000;
 export const DEFAULT_PAGE = 1;
+
+/**
+ * Single source of truth for list page sizes. Used by the shared
+ * app-custom-table (+ its UsServerListAdapter) and the server-paged
+ * app-custom-dropdown / app-custom-multiselect option fetch so every
+ * list surface fetches 50 rows per page by default.
+ */
+export const DEFAULT_PAGE_SIZE = 50;
+export const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];

@@ -28,6 +28,8 @@ import {
   type AlertOperator,
   type AlertValueType,
 } from 'src/app/shared/validators/alerts';
+import { ReferenceDataService } from 'src/app/core/services/reference-data.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /** A source field / formula the builder can reference on the LHS. */
 export interface AlertFieldOption {
@@ -92,6 +94,7 @@ export class AlertConditionBuilderComponent implements OnChanges {
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
   private translate = inject(TranslateService);
+  private referenceData = inject(ReferenceDataService);
 
   /** Fields / formulas selectable on the LHS. */
   @Input() fields: AlertFieldOption[] = [];
@@ -126,15 +129,23 @@ export class AlertConditionBuilderComponent implements OnChanges {
     label: this.translate.instant('ALERTS.AGGREGATE.' + a.toUpperCase()),
   }));
 
-  operatorOptions = ALERT_OPERATORS.map(o => ({
-    value: o,
-    label: this.translate.instant('ALERTS.OPERATOR.' + o.toUpperCase()),
-  }));
+  // Operators + value types are DB-driven (families: alert_operator,
+  // value_type). Seeded from the mirrored-validator enums (translated) so
+  // the dropdown is never empty on first paint / a failed fetch, then
+  // overwritten with the DB rows (label + order) once they resolve.
+  operatorOptions: { value: string; label: string }[] = ALERT_OPERATORS.map(
+    o => ({
+      value: o,
+      label: this.translate.instant('ALERTS.OPERATOR.' + o.toUpperCase()),
+    }),
+  );
 
-  valueTypeOptions = ALERT_VALUE_TYPES.map(v => ({
-    value: v,
-    label: this.translate.instant('ALERTS.VALUE_TYPE.' + v.toUpperCase()),
-  }));
+  valueTypeOptions: { value: string; label: string }[] = ALERT_VALUE_TYPES.map(
+    v => ({
+      value: v,
+      label: this.translate.instant('ALERTS.VALUE_TYPE.' + v.toUpperCase()),
+    }),
+  );
 
   joinOptions = ALERT_JOINS.map(j => ({ value: j, label: j }));
 
@@ -142,6 +153,39 @@ export class AlertConditionBuilderComponent implements OnChanges {
 
   constructor() {
     this.conditionForm.valueChanges.subscribe(() => this.emit());
+    this.loadReferenceOptions();
+  }
+
+  /**
+   * Pull the operator + value-type option lists from the DB-driven
+   * reference-data service. On empty (family absent / fetch failed) we
+   * keep the validator-seeded fallback so the builder still renders.
+   */
+  private loadReferenceOptions(): void {
+    this.referenceData
+      .getFamily('alert_operator')
+      .pipe(takeUntilDestroyed())
+      .subscribe(rows => {
+        if (rows.length) {
+          this.operatorOptions = rows.map(r => ({
+            value: r.code,
+            label: r.label,
+          }));
+          this.cdr.markForCheck();
+        }
+      });
+    this.referenceData
+      .getFamily('value_type')
+      .pipe(takeUntilDestroyed())
+      .subscribe(rows => {
+        if (rows.length) {
+          this.valueTypeOptions = rows.map(r => ({
+            value: r.code,
+            label: r.label,
+          }));
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   ngOnChanges(changes: SimpleChanges): void {

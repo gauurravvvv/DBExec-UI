@@ -26,7 +26,9 @@ import {
   loadRecipientUsersPage,
 } from 'src/app/modules/alerts/components/shared/alert-form.helpers';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { ReferenceDataService } from 'src/app/core/services/reference-data.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   DashboardSubscriptionService,
   DashboardDeliveryFormat,
@@ -67,15 +69,17 @@ export class ScheduleDeliveryDialogComponent implements OnChanges {
   private globalService = inject(GlobalService);
   private userService = inject(UserService);
   private translate = inject(TranslateService);
+  private referenceData = inject(ReferenceDataService);
 
   @Input() visible = false;
   @Input() dashboardId = '';
   @Input() dashboardName = '';
   @Output() closed = new EventEmitter<void>();
 
-  // Option labels are i18n keys; the custom-dropdown shows the raw label,
-  // so pre-translate them here (mirrors add-alert's dropdown handling).
-  readonly cronPresets = CRON_PRESETS.map(o => ({
+  // Cron presets are DB-driven (family: cron_preset). Seeded from the shared
+  // helper constant (translated) so the picker renders immediately, then
+  // overwritten with DB rows once the reference-data service resolves.
+  cronPresets: { label: string; value: string }[] = CRON_PRESETS.map(o => ({
     value: o.value,
     label: this.translate.instant(o.label),
   }));
@@ -102,6 +106,23 @@ export class ScheduleDeliveryDialogComponent implements OnChanges {
     () => ({ globalService: this.globalService }),
     (params: any) => this.userService.listUser(params),
   );
+
+  constructor() {
+    // DB-driven cron presets (family: cron_preset). Falls back to the
+    // helper constant seeded above when the family is absent / fetch failed.
+    this.referenceData
+      .getFamily('cron_preset')
+      .pipe(takeUntilDestroyed())
+      .subscribe(rows => {
+        if (rows.length) {
+          this.cronPresets = rows.map(r => ({
+            label: r.label,
+            value: r.meta?.cron ?? r.code,
+          }));
+          this.cdr.markForCheck();
+        }
+      });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible && this.dashboardId) {

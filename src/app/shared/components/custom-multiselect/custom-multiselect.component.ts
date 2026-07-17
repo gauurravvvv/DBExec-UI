@@ -13,6 +13,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+import { DEFAULT_PAGE_SIZE } from 'src/app/core/constants/global.constant';
 
 /**
  * Server-driven fetcher contract for the multi-select. Identical to the
@@ -94,7 +95,7 @@ export class CustomMultiselectComponent
   // chips visible at the top of the panel.
   @Input() serverMode = false;
   @Input() fetcher: MultiselectFetcher | null = null;
-  @Input() pageSize = 10;
+  @Input() pageSize = DEFAULT_PAGE_SIZE;
   @Input() searchDebounceMs = 300;
   @Input() preloadedItems: any[] | null = null;
   @Input() preloadedTotal: number | null = null;

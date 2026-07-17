@@ -67,7 +67,6 @@ export class ListAlertComponent implements OnInit, OnDestroy {
   cols: CustomTableColumn[] = [];
 
   tableConfig: CustomTableConfig = {
-    mode: 'scroll',
     pageSize: 50,
     globalSearch: true,
     globalSearchKey: 'search',

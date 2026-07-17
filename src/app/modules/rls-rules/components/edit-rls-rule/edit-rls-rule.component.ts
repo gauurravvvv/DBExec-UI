@@ -26,6 +26,7 @@ import {
 import { zodValidator } from 'src/app/shared/validators/zod-validator';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { ReferenceDataService } from 'src/app/core/services/reference-data.service';
 import { DatasetService } from 'src/app/modules/dataset/services/dataset.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
@@ -64,7 +65,10 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
   } = {};
   isLoadingColumnValues: { [columnName: string]: boolean } = {};
 
-  operatorOptions = [
+  // RLS condition operators are DB-driven (family: rls_operator). Seeded
+  // with the known codes as a fallback so the dropdown is never empty on a
+  // failed fetch; overwritten with DB rows (label + order) in ngOnInit.
+  operatorOptions: { label: string; value: string }[] = [
     { label: 'IN', value: 'IN' },
     { label: 'NOT IN', value: 'NOT_IN' },
     { label: 'EQUALS', value: 'EQUALS' },
@@ -120,6 +124,7 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
     private userService: UserService,
     private groupService: GroupService,
     private translate: TranslateService,
+    private referenceData: ReferenceDataService,
   ) {}
 
   hasUnsavedChanges(): boolean {
@@ -127,12 +132,32 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
+    this.loadOperatorOptions();
     this.initForm();
     this.ruleId = this.route.snapshot.params['id'];
     if (this.ruleId) {
       this.rlsRulesService.resetCurrent();
       this.loadRuleData();
     }
+  }
+
+  /**
+   * DB-driven RLS operator options (family: rls_operator). Falls back to
+   * the hardcoded seed above when the family is absent / the fetch failed.
+   */
+  private loadOperatorOptions(): void {
+    this.referenceData
+      .getFamily('rls_operator')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(rows => {
+        if (rows.length) {
+          this.operatorOptions = rows.map(r => ({
+            label: r.label,
+            value: r.code,
+          }));
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   initForm(): void {

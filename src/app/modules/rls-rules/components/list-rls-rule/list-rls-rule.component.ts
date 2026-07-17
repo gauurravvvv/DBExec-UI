@@ -69,7 +69,6 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
   cols: CustomTableColumn[] = [];
 
   tableConfig: CustomTableConfig = {
-    mode: 'scroll', // infinite scroll — no page controls
     pageSize: 50, // rows fetched per scroll page
     globalSearch: true,
     globalSearchKey: 'search', // BE rules list matches a `search` filter key

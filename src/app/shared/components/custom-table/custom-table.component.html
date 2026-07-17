@@ -168,8 +168,10 @@
   </p-table>
 
   <!-- ── Footer ── -->
-  <!-- Scroll mode: no page controls — just a quiet count / loading line. -->
-  <div class="ct-scroll-footer" *ngIf="serverAdapter && isScroll">
+  <!-- Infinite-scroll only: no page controls — just a quiet count / loading
+       line. The scroll body fetches the next 50-row batch as it nears the
+       bottom (see ngAfterViewInit → attachScroll). -->
+  <div class="ct-scroll-footer" *ngIf="serverAdapter">
     <span class="ct-count" *ngIf="!loadingMore">
       {{ 'COMMON.SHOWING_OF' | translate: { shown: rows.length, total: total } }}
     </span>
@@ -177,15 +179,4 @@
       <i class="pi pi-spin pi-spinner"></i> {{ 'COMMON.LOADING' | translate }}
     </span>
   </div>
-
-  <!-- Paginate mode: classic shared paginator. -->
-  <us-paginator
-    *ngIf="serverAdapter && !isScroll"
-    [page]="page"
-    [limit]="limit"
-    [total]="total"
-    [pageSizeOptions]="cfg.pageSizeOptions"
-    (pageChange)="onPageChange($event)"
-    (limitChange)="onLimitChange($event)"
-  ></us-paginator>
 </div>

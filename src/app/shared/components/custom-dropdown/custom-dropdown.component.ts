@@ -17,6 +17,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+import { DEFAULT_PAGE_SIZE } from 'src/app/core/constants/global.constant';
 
 /**
  * Server-driven fetcher contract. Each call returns one page of items and the
@@ -142,7 +143,7 @@ export class CustomDropdownComponent
   // don't set serverMode.
   @Input() serverMode = false;
   @Input() fetcher: DropdownFetcher | null = null;
-  @Input() pageSize = 10;
+  @Input() pageSize = DEFAULT_PAGE_SIZE;
   @Input() searchDebounceMs = 300;
 
   /**

@@ -3,6 +3,7 @@
  * (PrimeNG p-table under the hood). Grid-agnostic: consumers describe columns
  * with `CustomTableColumn` and never import a table library type.
  */
+import { DEFAULT_PAGE_SIZE } from 'src/app/core/constants/global.constant';
 
 /** One column. `colId` matches the cell-template key AND the server adapter's
  *  sortFieldMap/filter key. */
@@ -46,21 +47,13 @@ export interface CustomTableConfig {
   /** Optional caption/title on the toolbar's left. */
   title?: string;
 
-  /**
-   * How rows are consumed:
-   *  - 'scroll' (default): infinite virtual scroll — rows accumulate as the
-   *    user scrolls; no page controls (cleanest, least chrome).
-   *  - 'paginate': classic page + page-size selector footer.
-   */
-  mode?: 'scroll' | 'paginate';
-
-  /** Rows fetched per server request (both modes). Default 50 for scroll,
-   *  10 for paginate if unset. */
+  /** Rows fetched per infinite-scroll batch (server request). Default 50
+   *  (DEFAULT_PAGE_SIZE). The table is always infinite-scroll — there is no
+   *  page-number paginator. */
   pageSize?: number;
-  /** Page-size choices (paginate mode only). Default [10, 25, 50, 100]. */
-  pageSizeOptions?: number[];
 
-  /** Fixed row height (px) for the virtual scroller (scroll mode). Default 44. */
+  /** Fixed row height (px) used by the infinite-scroll near-bottom trigger.
+   *  Default 44. */
   rowHeight?: number;
 
   /** Global search box (the one always-on search). Default true. */
@@ -103,9 +96,7 @@ export const CUSTOM_TABLE_DEFAULTS: Required<
     'title' | 'globalSearchPlaceholder' | 'gridKey' | 'emptyMessage'
   >
 > = {
-  mode: 'scroll',
-  pageSize: 50,
-  pageSizeOptions: [10, 25, 50, 100],
+  pageSize: DEFAULT_PAGE_SIZE,
   rowHeight: 44,
   globalSearch: true,
   globalSearchKey: 'search',

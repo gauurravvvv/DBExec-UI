@@ -31,7 +31,6 @@ import { MenuItem } from 'primeng/api';
 import { SharedModule } from '../../shared.module';
 import { UsGridCellDirective } from '../us-data-grid/us-grid-cell.directive';
 import { UsServerListAdapter } from '../us-data-grid/us-server-list-adapter';
-import { UsPaginatorComponent } from '../us-paginator/us-paginator.component';
 import { CustomTableEmptyDirective } from './custom-table-empty.directive';
 import {
   CustomTableColumn,
@@ -45,7 +44,9 @@ import {
  * A thin, opinionated PrimeNG p-table wrapper that deliberately shows a CLEAN
  * default surface: a single toolbar row (global search + a compact cluster of
  * ONLY the enabled secondary actions), a sticky-header table with single-column
- * sort, and the shared server paginator below. No always-on floating-filter
+ * sort, and a quiet row-count footer below. The table is ALWAYS
+ * infinite-scroll (lazy-loading the next 50-row batch as the body nears the
+ * bottom) — there is no page-number paginator. No always-on floating-filter
  * row, no chip rows, no Views — the noise the old AG-Grid wrapper carried.
  *
  * Mirrors the `us-data-grid` call-site API so migration is minimal:
@@ -75,7 +76,6 @@ import {
     // Shared form controls (app-custom-input / -dropdown) for the search box
     // and per-column filters, so the table's inputs match the app everywhere.
     SharedModule,
-    UsPaginatorComponent,
     CustomTableEmptyDirective,
   ],
   templateUrl: './custom-table.component.html',
@@ -131,8 +131,7 @@ export class CustomTableComponent
   exportMenuItems: MenuItem[] = [];
   columnFilters: Record<string, unknown> = {};
 
-  /** Accumulated rows across pages (scroll mode). In paginate mode we read
-   *  the adapter's single page directly. */
+  /** Accumulated rows across scroll pages (append as each batch arrives). */
   private accumulated: Record<string, unknown>[] = [];
   private loadedSub?: Subscription;
 
@@ -140,18 +139,16 @@ export class CustomTableComponent
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['config']) {
-      const prevMode = this.cfg?.mode;
       this.cfg = {
         ...CUSTOM_TABLE_DEFAULTS,
         ...this.config,
       } as Required<CustomTableConfig>;
       this.restorePrefs();
       // Keep the adapter's page size in sync with the table's fetch size so
-      // scroll pages / paginator pages match what the BE returns.
+      // each scroll batch matches what the BE returns.
       if (this.serverAdapter && this.serverAdapter.limit() !== this.cfg.pageSize) {
         this.serverAdapter.setLimit(this.cfg.pageSize);
       }
-      if (prevMode !== this.cfg.mode) this.resetAccumulated();
     }
     if (changes['serverAdapter']) this.bindAdapter();
     if (changes['columns']) this.buildColumnMenu();
@@ -170,7 +167,6 @@ export class CustomTableComponent
     this.loadedSub?.unsubscribe();
     if (!this.serverAdapter) return;
     this.loadedSub = this.serverAdapter.loaded$.subscribe(res => {
-      if (this.cfg.mode !== 'scroll') return;
       const rows = (res?.rows ?? []) as Record<string, unknown>[];
       if (this.serverAdapter!.page() <= 1) this.accumulated = [...rows];
       else this.accumulated = [...this.accumulated, ...rows];
@@ -184,11 +180,6 @@ export class CustomTableComponent
     if (!this.serverAdapter.loading() && this.serverAdapter.total() === 0) {
       this.serverAdapter.reload();
     }
-  }
-
-  private resetAccumulated(): void {
-    this.accumulated = [];
-    this.loadingMore = false;
   }
 
   ngAfterContentInit(): void {
@@ -207,7 +198,6 @@ export class CustomTableComponent
    *  outside Angular's zone (scroll fires constantly); loadMore() re-enters
    *  the zone only when it actually fetches. */
   ngAfterViewInit(): void {
-    if (!this.isScroll) return;
     // PrimeNG creates the scroll container asynchronously; grab it next tick.
     setTimeout(() => this.attachScroll(), 0);
   }
@@ -254,11 +244,9 @@ export class CustomTableComponent
     return this.cellTemplates.get(colId) ?? null;
   }
 
-  /** Rows to render — accumulated across pages in scroll mode, the current
-   *  page in paginate mode. */
+  /** Rows to render — accumulated across scroll batches. */
   get rows(): Record<string, unknown>[] {
-    if (this.cfg.mode === 'scroll') return this.accumulated;
-    return this.serverAdapter?.rows() ?? [];
+    return this.accumulated;
   }
   get total(): number {
     return this.serverAdapter?.total() ?? 0;
@@ -266,12 +254,9 @@ export class CustomTableComponent
   get loading(): boolean {
     return this.serverAdapter?.loading() ?? false;
   }
-  /** In scroll mode, are there more server rows beyond what's loaded? */
+  /** Are there more server rows beyond what's loaded so far? */
   get hasMore(): boolean {
-    return this.cfg.mode === 'scroll' && this.accumulated.length < this.total;
-  }
-  get isScroll(): boolean {
-    return this.cfg.mode === 'scroll';
+    return this.accumulated.length < this.total;
   }
 
   /** Show the column header (and filter row) when there's data, while a fetch
@@ -301,12 +286,6 @@ export class CustomTableComponent
    *  parent, adapting to any screen size; otherwise a fixed CSS length. */
   get scrollHeight(): string {
     return this.cfg.height === 'flex' ? 'flex' : this.cfg.height;
-  }
-  get page(): number {
-    return this.serverAdapter?.page() ?? 1;
-  }
-  get limit(): number {
-    return this.serverAdapter?.limit() ?? this.cfg.pageSize;
   }
 
   colStyle(c: CustomTableColumn): Record<string, string> {
@@ -363,14 +342,7 @@ export class CustomTableComponent
     this.serverAdapter.setFilter(f);
   }
 
-  onPageChange(page: number): void {
-    this.serverAdapter?.setPage(page);
-  }
-  onLimitChange(limit: number): void {
-    this.serverAdapter?.setLimit(limit);
-  }
-
-  /** Fetch the next page (scroll mode). The loaded$ subscription appends it. */
+  /** Fetch the next page (scroll batch). The loaded$ subscription appends it. */
   loadMore(): void {
     if (!this.serverAdapter || this.loadingMore || !this.hasMore) return;
     this.loadingMore = true;

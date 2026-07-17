@@ -7,6 +7,7 @@ import {
   isObservable,
 } from 'rxjs';
 import { signal } from '@angular/core';
+import { DEFAULT_PAGE_SIZE } from 'src/app/core/constants/global.constant';
 
 /**
  * UsServerListAdapter — bridge between AG Grid Community (which only
@@ -122,7 +123,7 @@ export class UsServerListAdapter<TRow = unknown> {
   readonly total = signal<number>(0);
   readonly loading = signal<boolean>(false);
   readonly page = signal<number>(1);
-  readonly limit = signal<number>(25);
+  readonly limit = signal<number>(DEFAULT_PAGE_SIZE);
   readonly sortModel = signal<Array<{ colId: string; sort: 'asc' | 'desc' }>>(
     [],
   );

@@ -68,7 +68,6 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
   cols: CustomTableColumn[] = [];
 
   tableConfig: CustomTableConfig = {
-    mode: 'scroll', // infinite scroll — no page controls
     pageSize: 50, // rows fetched per scroll page
     globalSearch: true,
     globalSearchKey: 'search', // BE announcements list matches a `search` filter key

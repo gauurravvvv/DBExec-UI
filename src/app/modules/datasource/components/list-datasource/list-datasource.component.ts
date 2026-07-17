@@ -61,7 +61,6 @@ export class ListDatasourceComponent implements OnInit, OnDestroy {
   cols: CustomTableColumn[] = [];
 
   tableConfig: CustomTableConfig = {
-    mode: 'scroll', // infinite scroll — no page controls
     pageSize: 50, // rows fetched per scroll page
     globalSearch: true,
     globalSearchKey: 'search', // BE datasources list matches a `search` filter key

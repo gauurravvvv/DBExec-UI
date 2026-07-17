@@ -16,6 +16,7 @@ import { ALERT } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
+import { ReferenceDataService } from 'src/app/core/services/reference-data.service';
 import { DatasetService } from 'src/app/modules/dataset/services/dataset.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
@@ -72,10 +73,15 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
 
   /* option lists - labels pre-translated in ngOnInit (dropdown renders the
    *  optionLabel verbatim, so keys must be resolved up front). */
-  sourceTypeOptions = SOURCE_TYPE_OPTIONS.map(o => ({ ...o }));
-  severityOptions = SEVERITY_OPTIONS.map(o => ({ ...o }));
+  // Widened to plain string values so DB-driven rows (family codes) can be
+  // assigned; the mirrored validator remains the save-time type contract.
+  sourceTypeOptions: { label: string; value: string }[] =
+    SOURCE_TYPE_OPTIONS.map(o => ({ ...o }));
+  severityOptions: { label: string; value: string }[] = SEVERITY_OPTIONS.map(
+    o => ({ ...o }),
+  );
   timezoneOptions = TIMEZONE_OPTIONS;
-  cronPresets = CRON_PRESETS;
+  cronPresets: { label: string; value: string }[] = CRON_PRESETS;
 
   /* datasource + source dropdowns */
   selectedDatasource = '';
@@ -112,6 +118,7 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
     private userService: UserService,
     private alertService: AlertService,
     private translate: TranslateService,
+    private referenceData: ReferenceDataService,
   ) {
     this.initForm();
   }
@@ -124,7 +131,10 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    // Resolve translation keys to labels for the static dropdowns.
+    // Fallback: resolve translation keys to labels for the static dropdowns
+    // so they render immediately. Overwritten below by DB-driven rows once
+    // the reference-data service resolves (families: alert_source_type,
+    // alert_severity, cron_preset).
     this.sourceTypeOptions = SOURCE_TYPE_OPTIONS.map(o => ({
       ...o,
       label: this.translate.instant(o.label),
@@ -133,7 +143,53 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
       ...o,
       label: this.translate.instant(o.label),
     }));
+    this.loadReferenceOptions();
     this.loadDatasources();
+  }
+
+  /**
+   * DB-driven option lists for the alert form (source type, severity, cron
+   * presets). Each falls back to the helper constant already seeded above
+   * when its family is absent / the fetch failed.
+   */
+  private loadReferenceOptions(): void {
+    this.referenceData
+      .getFamily('alert_source_type')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(rows => {
+        if (rows.length) {
+          this.sourceTypeOptions = rows.map(r => ({
+            value: r.code,
+            label: r.label,
+          }));
+          this.cdr.markForCheck();
+        }
+      });
+    this.referenceData
+      .getFamily('alert_severity')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(rows => {
+        if (rows.length) {
+          this.severityOptions = rows.map(r => ({
+            value: r.code,
+            label: r.label,
+          }));
+          this.cdr.markForCheck();
+        }
+      });
+    this.referenceData
+      .getFamily('cron_preset')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(rows => {
+        if (rows.length) {
+          // meta.cron carries the 5-field expression; label is the display.
+          this.cronPresets = rows.map(r => ({
+            label: r.label,
+            value: r.meta?.cron ?? r.code,
+          }));
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   private initForm(): void {

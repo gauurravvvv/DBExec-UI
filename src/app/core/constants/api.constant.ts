@@ -501,6 +501,18 @@ export const ALERT = {
   EVENTS_SUFFIX: '/events',
 };
 
+/**
+ * Reference data (DB-driven enums) — the operator / value-type / severity /
+ * filter-type / cron-preset option lists the forms render. Loaded once and
+ * cached by ReferenceDataService.
+ *   GET /reference-data          → { …, data: { [family]: Row[] } }
+ *   GET /reference-data/:family  → { …, data: Row[] }
+ */
+export const REFERENCE_DATA = {
+  LIST: '/reference-data', // GET /reference-data (all families)
+  FAMILY: '/reference-data/', // GET /reference-data/:family
+};
+
 export const ORG_POLICY = {
   GET: '/api/v1/org-policy',
   UPDATE_SECURITY: '/api/v1/org-policy/security',

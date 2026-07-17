@@ -43,7 +43,6 @@ export class AlertHistoryComponent implements OnInit, OnChanges, OnDestroy {
   cols: CustomTableColumn[] = [];
 
   tableConfig: CustomTableConfig = {
-    mode: 'scroll',
     pageSize: 25,
     globalSearch: false,
     showColumnFilters: false,

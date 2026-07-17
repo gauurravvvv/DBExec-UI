@@ -136,6 +136,7 @@ import {
   PivotAggregation,
   PIVOT_AGGREGATION_OPTIONS,
 } from 'src/app/shared/helpers/pivot.helper';
+import { ReferenceDataService } from 'src/app/core/services/reference-data.service';
 
 @Component({
   selector: 'app-visual-config-sidebar',
@@ -301,6 +302,7 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     private ngZone: NgZone,
     private translate: TranslateService,
     private cdr: ChangeDetectorRef,
+    private referenceData: ReferenceDataService,
   ) {}
 
   // ══════════════════════════════════════════════════════════════════
@@ -313,7 +315,12 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
    * template via | translate on optionLabel through the localize pass
    * below (kept as raw keys; we translate inline in the getters).
    */
-  readonly aggregateOptions: { label: string; value: AggregateFn | '' }[] = [
+  // Aggregate function options are DB-driven (family: aggregate_fn). Seeded
+  // with the i18n-keyed fallback so the dropdown renders immediately, then
+  // overwritten with DB rows (label + order) once the reference-data service
+  // resolves. The leading NONE (value '') is a UI-only "no aggregate" entry
+  // that is NOT part of the DB family, so it's re-prepended after a DB load.
+  aggregateOptions: { label: string; value: AggregateFn | '' }[] = [
     { label: 'ANALYSES.AGG.NONE', value: '' },
     { label: 'ANALYSES.AGG.SUM', value: 'sum' },
     { label: 'ANALYSES.AGG.AVG', value: 'avg' },
@@ -329,7 +336,7 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
   ];
 
   /** Aggregate options WITHOUT the "none" entry — for combo extra measures. */
-  readonly comboAggregateOptions: { label: string; value: AggregateFn }[] = [
+  comboAggregateOptions: { label: string; value: AggregateFn }[] = [
     { label: 'ANALYSES.AGG.SUM', value: 'sum' },
     { label: 'ANALYSES.AGG.AVG', value: 'avg' },
     { label: 'ANALYSES.AGG.COUNT', value: 'count' },
@@ -989,6 +996,30 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
       // upstream of OnPush change detection. Without this, the
       // dropdowns keep showing the previous language's labels until
       // the next user interaction.
+      this.cdr.markForCheck();
+    });
+    this.loadAggregateOptions();
+  }
+
+  /**
+   * DB-driven aggregate-function options (family: aggregate_fn). Overwrites
+   * the i18n-keyed fallback with DB rows (label + order). The combo variant
+   * is the raw DB list; the primary variant re-prepends the UI-only NONE
+   * entry (value '') which isn't part of the family. No-op on empty (family
+   * absent / fetch failed) so the fallback list stays.
+   */
+  private loadAggregateOptions(): void {
+    this.referenceData.getFamily('aggregate_fn').subscribe(rows => {
+      if (!rows.length) return;
+      const dbOptions = rows.map(r => ({
+        label: r.label,
+        value: r.code as AggregateFn,
+      }));
+      this.comboAggregateOptions = dbOptions;
+      this.aggregateOptions = [
+        { label: this.translate.instant('ANALYSES.AGG.NONE'), value: '' },
+        ...dbOptions,
+      ];
       this.cdr.markForCheck();
     });
   }

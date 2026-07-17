@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { ReferenceDataService } from 'src/app/core/services/reference-data.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import { AnalysesService } from '../../services/analyses.service';
 import { suggestFilterType, toValueType } from '../../utils/field-type.util';
@@ -221,11 +222,27 @@ export class FilterDialogComponent implements OnChanges {
     [columnName: string]: { label: string; value: string }[];
   } = {};
 
+  // ── DB-driven option caches (reference-data families) ───────────────
+  // Populated in the constructor from the reference-data service. Each
+  // falls back to the hardcoded constant in this file when its family is
+  // absent / the fetch failed, so the dialog always renders.
+  //   filter_operator  → operators, keyed by filter_type via row.meta.filterType
+  //   filter_null_option, filter_type, filter_control, relative_date_preset
+  private dbFilterOperators: Record<
+    string,
+    { label: string; value: string }[]
+  > | null = null;
+  private dbControlOptions: Record<
+    string,
+    { label: string; value: string }[]
+  > | null = null;
+
   constructor(
     private globalService: GlobalService,
     private analysesService: AnalysesService,
     private datasetService: DatasetService,
     private translate: TranslateService,
+    private referenceData: ReferenceDataService,
   ) {
     this.filterTypeOptions = [
       {
@@ -271,10 +288,69 @@ export class FilterDialogComponent implements OnChanges {
       label: this.translate.instant(p.labelKey),
       value: p.value,
     }));
+    this.loadReferenceOptions();
   }
 
   /** Scope dropdown options (dashboard / tab / visual). */
   scopeOptions: { label: string; value: FilterScope }[] = [];
+
+  /**
+   * DB-driven option lists for the filter dialog. Each subscription
+   * overwrites the corresponding fallback (the hardcoded constants /
+   * translate-seeded arrays in this file) with DB rows once they resolve.
+   * Families:
+   *   filter_type          → filterTypeOptions
+   *   filter_operator      → operators, grouped by meta.filterType
+   *   filter_control       → control options, grouped by meta.filterType
+   *   filter_null_option   → nullOptions
+   *   relative_date_preset → relativePresetOptions
+   */
+  private loadReferenceOptions(): void {
+    this.referenceData.getFamily('filter_type').subscribe(rows => {
+      if (rows.length) {
+        this.filterTypeOptions = rows.map(r => ({
+          label: r.label,
+          value: r.code,
+        }));
+      }
+    });
+    this.referenceData.getFamily('filter_operator').subscribe(rows => {
+      if (rows.length) {
+        const grouped: Record<string, { label: string; value: string }[]> = {};
+        for (const r of rows) {
+          const key = r.meta?.filterType ?? '';
+          (grouped[key] ??= []).push({ label: r.label, value: r.code });
+        }
+        this.dbFilterOperators = grouped;
+        // Re-derive the currently-shown operator list if a type is picked.
+        if (this.filterDialogType) this.updateOperatorOptions();
+      }
+    });
+    this.referenceData.getFamily('filter_control').subscribe(rows => {
+      if (rows.length) {
+        const grouped: Record<string, { label: string; value: string }[]> = {};
+        for (const r of rows) {
+          const key = r.meta?.filterType ?? '';
+          (grouped[key] ??= []).push({ label: r.label, value: r.code });
+        }
+        this.dbControlOptions = grouped;
+        if (this.filterDialogType) this.updateControlTypeOptions();
+      }
+    });
+    this.referenceData.getFamily('filter_null_option').subscribe(rows => {
+      if (rows.length) {
+        this.nullOptions = rows.map(r => ({ label: r.label, value: r.code }));
+      }
+    });
+    this.referenceData.getFamily('relative_date_preset').subscribe(rows => {
+      if (rows.length) {
+        this.relativePresetOptions = rows.map(r => ({
+          label: r.label,
+          value: r.code as RelativeDatePreset,
+        }));
+      }
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible) {
@@ -918,6 +994,13 @@ export class FilterDialogComponent implements OnChanges {
   }
 
   private updateControlTypeOptions(): void {
+    // DB-driven (filter_control, grouped by meta.filterType) when available;
+    // otherwise the per-type hardcoded switch below.
+    const dbControls = this.dbControlOptions?.[this.filterDialogType];
+    if (dbControls && dbControls.length) {
+      this.controlTypeOptions = dbControls.map(o => ({ ...o }));
+      return;
+    }
     switch (this.filterDialogType) {
       case 'category':
         this.controlTypeOptions = [
@@ -970,6 +1053,13 @@ export class FilterDialogComponent implements OnChanges {
   }
 
   private updateOperatorOptions(): void {
+    // DB-driven (filter_operator, grouped by meta.filterType) when available;
+    // otherwise the mirrored hardcoded FILTER_OPERATOR_KEYS map.
+    const dbOps = this.dbFilterOperators?.[this.filterDialogType];
+    if (dbOps && dbOps.length) {
+      this.operatorOptions = dbOps.map(o => ({ ...o }));
+      return;
+    }
     const keys = FILTER_OPERATOR_KEYS[this.filterDialogType] || [];
     this.operatorOptions = keys.map(o => ({
       label: this.translate.instant(o.labelKey),
