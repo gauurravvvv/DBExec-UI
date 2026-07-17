@@ -28,6 +28,11 @@ export const DATASET_LIMITS = {
   DESCRIPTION_MAX: 500,
   JUSTIFICATION_MAX: 500,
   SQL_MAX: 10000,
+  // Custom-field formula cap. Bounds the JS formula engine so a
+  // pathologically deep/long expression cannot hang the enrichment
+  // pass (which evaluates the formula once per row). Matches the SQL
+  // calculated-field compiler's MAX_EXPRESSION_LENGTH.
+  CUSTOM_LOGIC_MAX: 4000,
 } as const;
 
 /**
@@ -423,13 +428,27 @@ export const updateDatasetViaBuilderSchema = z.object({
   justification: datasetJustificationSchema,
 });
 
+/**
+ * Custom-field formula. Allowed empty on the wire — the controller
+ * treats null as "no expression yet" (the formula UI saves drafts).
+ * Capped at CUSTOM_LOGIC_MAX so a pathologically long/deep formula
+ * cannot hang the per-row JS enrichment engine.
+ */
+export const customLogicSchema = z.preprocess(
+  blankToUndefined,
+  z
+    .string()
+    .max(DATASET_LIMITS.CUSTOM_LOGIC_MAX, {
+      message: 'validation.datasets.field.customLogic.tooLong',
+    })
+    .optional(),
+);
+
 /** Add custom calculated field. */
 export const addDatasetFieldSchema = z.object({
   datasetId: datasetIdSchema,
   name: datasetFieldNameSchema,
-  // customLogic is allowed empty on the wire — controller treats null
-  // as "no expression yet" (the formula UI saves drafts).
-  customLogic: z.preprocess(blankToUndefined, z.string().optional()),
+  customLogic: customLogicSchema,
   dataType: z.preprocess(blankToUndefined, z.string().optional()),
   analysisId: z.preprocess(blankToUndefined, z.string().optional()),
   used_field_ids: z.array(z.string()).optional(),
@@ -448,7 +467,7 @@ export const updateDatasetFieldSchema = z.object({
   datasetId: datasetIdSchema,
   columnNameToView: datasetFieldNameSchema,
   used_field_ids: z.array(z.string()).optional(),
-  customLogic: z.preprocess(blankToUndefined, z.string().optional()),
+  customLogic: customLogicSchema,
   dataType: z.preprocess(blankToUndefined, z.string().optional()),
   justification: datasetJustificationSchema,
   // Rich column metadata (slice 1) — all optional + additive.

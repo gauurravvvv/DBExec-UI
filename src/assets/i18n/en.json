@@ -3694,6 +3694,9 @@
         "name": {
           "required": "Field name is required",
           "tooLong": "Field name must not exceed 128 characters"
+        },
+        "customLogic": {
+          "tooLong": "Formula must not exceed 4000 characters"
         }
       },
       "prompt": {
