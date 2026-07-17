@@ -218,6 +218,10 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   // Save prompt can update it (vs. "Save as new"). SQL + rowLimit are
   // preloaded once the editor is ready.
   savedQueryId: string | null = null;
+  /** True when this tab was opened via ?query= — its SQL comes from the
+   *  saved query, never the per-connection autosave draft (which could be
+   *  leftover from a DIFFERENT saved query on the same connection). */
+  private openedFromSavedQuery = false;
   savedQueryName = '';
   savedQueryDescription = '';
   private pendingSavedSql: string | null = null; // applied after editor init
@@ -368,7 +372,10 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     this.loadSchemas();
     // If opened FROM a saved query, preload its SQL + rowLimit.
     const queryId = this.route.snapshot.queryParamMap.get('query');
-    if (queryId) this.loadSavedQuery(queryId);
+    if (queryId) {
+      this.openedFromSavedQuery = true;
+      this.loadSavedQuery(queryId);
+    }
   }
 
   /**
@@ -696,9 +703,15 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private initEditor(): void {
-    // A saved query opened via ?query= takes precedence over any autosaved
-    // draft; otherwise fall back to the per-connection draft.
-    const initialDoc = this.pendingSavedSql ?? this.loadDraft() ?? '';
+    // A saved query opened via ?query= owns the initial doc: use its SQL if
+    // already fetched, else start EMPTY and let loadSavedQuery's replaceAll
+    // fill it in. Never fall back to the per-connection autosave draft in
+    // that case — it could be leftover SQL from a different saved query on
+    // the same connection (the draft key is per-connection, not per-query).
+    // Only a plain tab (no ?query=) uses the draft.
+    const initialDoc = this.openedFromSavedQuery
+      ? (this.pendingSavedSql ?? '')
+      : (this.pendingSavedSql ?? this.loadDraft() ?? '');
     this.pendingSavedSql = null;
     this.zone.runOutsideAngular(() => {
       this.view = new EditorView({
@@ -1310,7 +1323,9 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   cancel(): void {
-    if (!this.running || !this.executionId) return;
+    // Cancel applies to a normal run (running) OR a derived server-page
+    // re-run (serverLoading) — both now carry an executionId.
+    if ((!this.running && !this.serverLoading) || !this.executionId) return;
     this.service.cancel(this.connectionId, this.executionId).catch(() => {});
   }
 
@@ -1592,6 +1607,10 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   private fetchServerPage(): void {
     if (!this.serverMode || !this.baseSql) return;
     this.serverLoading = true;
+    // Give the derived re-run its own executionId (was null) so the backend
+    // registers a RUNNING key and Cancel can reach it — a slow sort/filter
+    // over a big table was previously uncancelable.
+    this.executionId = this.genId();
     this.cdr.markForCheck();
     const derived = {
       ...(this.sortModel.length ? { orderBy: this.sortModel } : {}),
@@ -1600,7 +1619,7 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       limit: this.serverPageSize,
     };
     this.service
-      .execute(this.connectionId, this.baseSql, this.autoCommit, null, {
+      .execute(this.connectionId, this.baseSql, this.autoCommit, this.executionId, {
         maxRows: this.rowLimit,
         derived,
       })
@@ -1618,6 +1637,7 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       })
       .finally(() => {
         this.serverLoading = false;
+        this.executionId = null;
         this.cdr.markForCheck();
       });
   }

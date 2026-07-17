@@ -17,7 +17,12 @@ export interface TblInfo {
 }
 
 export class SchemaCatalog {
-  private byTable = new Map<string, ColInfo[]>(); // `${schema}.${table}` + bare `table`
+  // Keyed ONLY by `${schema}.${table}`. No bare-`table` bucket: that was a
+  // last-wins-across-schemas shortcut that let a lookup for one schema's
+  // table return a DIFFERENT schema's columns (e.g. sales.orders getting
+  // archive.orders' columns). Unqualified lookups resolve the schema first
+  // (see resolveSchema).
+  private byTable = new Map<string, ColInfo[]>();
   private tablesBySchema = new Map<string, TblInfo[]>();
   schemas: string[] = [];
   readonly defaultSchema = 'public';
@@ -41,23 +46,32 @@ export class SchemaCatalog {
   /** Merge the columns of one table (from a lazy fetch). */
   setColumns(schema: string, table: string, cols: ColInfo[]): void {
     this.byTable.set(`${schema}.${table}`.toLowerCase(), cols);
-    // Bare-name fallback (last-wins across schemas; fine for completion).
-    this.byTable.set(table.toLowerCase(), cols);
+  }
+
+  /**
+   * Resolve the schema for an unqualified table name to a CONCRETE schema
+   * whose columns we hold: prefer defaultSchema if it has the table, else
+   * the first loaded schema that has cached columns for it, else
+   * defaultSchema. This replaces the old bare-key blob so an unqualified
+   * `orders` never silently returns a different schema's `orders`.
+   */
+  private resolveSchema(table: string): string {
+    const t = table.toLowerCase();
+    if (this.byTable.has(`${this.defaultSchema}.${t}`)) return this.defaultSchema;
+    for (const key of this.byTable.keys()) {
+      if (key.endsWith(`.${t}`)) return key.slice(0, key.length - t.length - 1);
+    }
+    return this.defaultSchema;
   }
 
   hasColumns(schema: string | undefined, table: string): boolean {
-    return (
-      this.byTable.has(`${schema ?? this.defaultSchema}.${table}`.toLowerCase()) ||
-      this.byTable.has(table.toLowerCase())
-    );
+    const sch = schema ?? this.resolveSchema(table);
+    return this.byTable.has(`${sch}.${table}`.toLowerCase());
   }
 
   columns(schema: string | undefined, table: string): ColInfo[] {
-    return (
-      this.byTable.get(`${schema ?? this.defaultSchema}.${table}`.toLowerCase()) ??
-      this.byTable.get(table.toLowerCase()) ??
-      []
-    );
+    const sch = schema ?? this.resolveSchema(table);
+    return this.byTable.get(`${sch}.${table}`.toLowerCase()) ?? [];
   }
 
   tablesInSchema(schema: string): TblInfo[] {
