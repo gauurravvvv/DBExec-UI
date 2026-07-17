@@ -26,6 +26,7 @@ import {
 import { zodValidator } from 'src/app/shared/validators/zod-validator';
 import { AlertConditionBuilderComponent } from '../alert-condition-builder/alert-condition-builder.component';
 import {
+  ALERT_WIZARD_STEPS,
   buildAlertPayload,
   buildSourceFieldOptions,
   CRON_PRESETS,
@@ -38,10 +39,13 @@ import {
 import { AlertService } from '../../services/alert.service';
 
 /**
- * Add Alert — source picker → typed condition builder → schedule → recipients →
- * severity + state-machine gates. Field-level name/description validation is
- * sourced from the SHARED alerts Zod schema; the full cross-field contract is
- * re-checked by the BE zodValidate middleware against the same schema on save.
+ * Add Alert — a multi-step wizard (Source -> Condition -> Schedule -> Delivery ->
+ * Review & gating) mirroring the Add Organisation stepper idiom (custom
+ * `currentStep` index + per-step validity gates on Next). The SAME reactive
+ * form, validators and submit payload as the old single page are reused
+ * verbatim; only navigation is chunked by step. Field-level name/description
+ * validation is sourced from the SHARED alerts Zod schema; the full cross-field
+ * contract is re-checked by the BE zodValidate middleware on save.
  */
 @Component({
   selector: 'app-add-alert',
@@ -61,7 +65,12 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
 
   alertForm!: FormGroup;
 
-  /* option lists — labels pre-translated in ngOnInit (dropdown renders the
+  /* wizard state - custom step index, mirroring add-organisation. */
+  readonly steps = ALERT_WIZARD_STEPS;
+  readonly lastStep = ALERT_WIZARD_STEPS.length - 1;
+  currentStep = 0;
+
+  /* option lists - labels pre-translated in ngOnInit (dropdown renders the
    *  optionLabel verbatim, so keys must be resolved up front). */
   sourceTypeOptions = SOURCE_TYPE_OPTIONS.map(o => ({ ...o }));
   severityOptions = SEVERITY_OPTIONS.map(o => ({ ...o }));
@@ -86,7 +95,7 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
     conditionExpression: string | null;
   } = { valid: false, mode: 'builder', conditionBuilder: null, conditionExpression: null };
 
-  /* recipients — user multiselect */
+  /* recipients - user multiselect */
   preloadedUsers: any[] | null = null;
   preloadedUsersTotal: number | null = null;
 
@@ -163,7 +172,64 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
       });
   }
 
-  /* ── datasource picker ──────────────────────────────────────────── */
+  /* -- wizard navigation ------------------------------------------- */
+
+  /**
+   * Per-step validity gate. Only the controls owned by `step` are checked so
+   * Next unlocks progressively. The underlying reactive form + validators are
+   * unchanged - this just decides when navigation is allowed.
+   */
+  isStepValid(step: number): boolean {
+    switch (step) {
+      case 0:
+        return (
+          !!this.alertForm.get('name')?.valid &&
+          !!this.alertForm.get('sourceType')?.valid &&
+          !!this.selectedDatasource &&
+          !!this.alertForm.get('sourceId')?.valid
+        );
+      case 1:
+        return this.conditionState.valid;
+      case 2:
+        return (
+          !!this.alertForm.get('cronExpression')?.valid &&
+          !!this.alertForm.get('timezone')?.valid
+        );
+      case 3:
+        return !!this.alertForm.get('severity')?.valid;
+      case 4:
+        return this.canSave;
+      default:
+        return false;
+    }
+  }
+
+  nextStep(): void {
+    if (this.currentStep < this.lastStep && this.isStepValid(this.currentStep)) {
+      this.currentStep++;
+    }
+  }
+
+  previousStep(): void {
+    if (this.currentStep > 0) this.currentStep--;
+  }
+
+  /**
+   * Allow jumping backward freely; jumping forward only when every step up to
+   * the target is valid (same guard the sequential Next enforces).
+   */
+  onStepClick(step: number): void {
+    if (step <= this.currentStep) {
+      this.currentStep = step;
+      return;
+    }
+    for (let i = this.currentStep; i < step; i++) {
+      if (!this.isStepValid(i)) return;
+    }
+    this.currentStep = step;
+  }
+
+  /* -- datasource picker ------------------------------------------- */
 
   loadDatasourcesPage = async ({ search, page, limit }: any) => {
     const params: any = { page, limit };
@@ -207,7 +273,7 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
     this.cdr.markForCheck();
   }
 
-  /* ── source picker (dataset | analysis, datasource-scoped) ───────── */
+  /* -- source picker (dataset | analysis, datasource-scoped) ------- */
 
   loadSourcesPage = async ({ search, page, limit }: any) => {
     if (!this.selectedDatasource) return { items: [], total: 0 };
@@ -247,28 +313,48 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
       .catch(() => this.cdr.markForCheck());
   }
 
-  /* ── condition builder bridge ───────────────────────────────────── */
+  /* -- condition builder bridge ------------------------------------ */
 
   onConditionChange(state: typeof this.conditionState): void {
     this.conditionState = state;
     this.alertForm.markAsDirty();
   }
 
-  /* ── cron presets ───────────────────────────────────────────────── */
+  /* -- cron presets ------------------------------------------------ */
 
   applyCronPreset(expr: string): void {
     this.alertForm.patchValue({ cronExpression: expr });
     this.alertForm.markAsDirty();
   }
 
-  /* ── recipients ─────────────────────────────────────────────────── */
+  /* -- recipients -------------------------------------------------- */
 
   loadUsersPage = loadRecipientUsersPage(
     () => ({ globalService: this.globalService }),
     (params: any) => this.userService.listUser(params),
   );
 
-  /* ── build payload ──────────────────────────────────────────────── */
+  /* -- review-summary helpers -------------------------------------- */
+
+  get sourceTypeLabel(): string {
+    const v = this.alertForm.get('sourceType')?.value;
+    return this.sourceTypeOptions.find(o => o.value === v)?.label ?? v ?? '';
+  }
+
+  get severityLabel(): string {
+    const v = this.alertForm.get('severity')?.value;
+    return this.severityOptions.find(o => o.value === v)?.label ?? v ?? '';
+  }
+
+  get recipientEmailsCount(): number {
+    return (this.alertForm.get('recipientEmails')?.value ?? []).length;
+  }
+
+  get recipientUsersCount(): number {
+    return (this.alertForm.get('recipientUserIds')?.value ?? []).length;
+  }
+
+  /* -- build payload ----------------------------------------------- */
 
   private compose(): any | null {
     if (!this.conditionBuilder) return null;
@@ -280,7 +366,7 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
     return this.alertForm.valid && this.conditionState.valid && !!this.selectedDatasource;
   }
 
-  /* ── test now (preview, no persist) ─────────────────────────────── */
+  /* -- test now (preview, no persist) ------------------------------ */
 
   onTestNow(): void {
     const payload = this.compose();
@@ -305,7 +391,7 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
       });
   }
 
-  /* ── submit ─────────────────────────────────────────────────────── */
+  /* -- submit ------------------------------------------------------ */
 
   onSubmit(): void {
     this.alertForm.markAllAsTouched();

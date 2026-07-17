@@ -4524,6 +4524,15 @@
       "NUMBER": "Zahl",
       "DATE": "Datum",
       "BOOLEAN": "Boolescher Wert"
-    }
+    },
+    "STEP_SOURCE": "Quelle",
+    "STEP_CONDITION": "Bedingung",
+    "STEP_SCHEDULE": "Zeitplan",
+    "STEP_DELIVERY": "Zustellung",
+    "STEP_REVIEW": "Prüfen",
+    "WIZARD_BACK": "Zurück",
+    "WIZARD_NEXT": "Weiter",
+    "REVIEW_SUMMARY": "Prüfen & bestätigen",
+    "SUMMARY_RECIPIENTS": "{{users}} Benutzer, {{emails}} E-Mail(s)"
   }
 }
