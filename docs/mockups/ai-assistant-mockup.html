@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DBExec · AI Assistant — Interactive Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+<style>
+/* ===================================================================
+   DBExec AI Assistant — standalone interactive mockup
+   Theme tokens mirror the running app (src/assets/sass/variables/
+   _theme-variables.scss + src/variables.scss): Inter type, #2196f3 /
+   #0078d3 primary blue, DBExec blue→orange accent, white cards, the
+   app's 4/6/8/12/16px radii and soft shadows. Self-contained: no
+   framework, charts drawn on <canvas>. Purely a prototype.
+   =================================================================== */
+:root{
+  --primary:#2196f3;
+  --primary-strong:#0078d3;
+  --primary-hover:#1976d2;
+  --primary-light:#42a5f5;
+  --primary-transparent:rgba(33,150,243,.12);
+  --accent:#ff8a3d;            /* DBExec orange accent */
+  --accent-strong:#f4701f;
+  --bg:#eef3fb;
+  --card:#ffffff;
+  --surface:#f7f9fc;
+  --hover:#f2f5fa;
+  --text:#1f2733;
+  --text-muted:#6b7280;
+  --border:#e3e8ef;
+  --border-strong:#d3dae4;
+  --success:#22a565;
+  --warning:#ff9800;
+  --error:#f44336;
+  --radius-xs:4px;--radius-sm:6px;--radius-md:8px;--radius-lg:12px;--radius-xl:16px;--radius-2xl:20px;--pill:999px;
+  --shadow-sm:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+  --shadow-md:0 4px 12px rgba(16,24,40,.10);
+  --shadow-lg:0 18px 45px rgba(16,24,40,.22);
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+
+/* ---------- faux app shell behind the assistant ---------- */
+.app{display:flex;height:100vh;filter:saturate(1);}
+.sidebar-nav{
+  width:230px;flex-shrink:0;background:linear-gradient(180deg,#0b2a4a,#0a213b);
+  color:#cdd9e8;display:flex;flex-direction:column;padding:18px 12px;gap:4px;
+}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 10px 18px;}
+.brand .logo{
+  width:34px;height:34px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--primary-strong),var(--accent));
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;
+  box-shadow:0 4px 10px rgba(0,120,211,.4);font-family:var(--font);
+}
+.brand .name{font-family:var(--font);font-weight:700;font-size:17px;color:#fff;letter-spacing:.2px}
+.brand .name span{background:linear-gradient(90deg,#7dc4ff,var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.nav-group-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.14em;color:#617a97;padding:14px 12px 6px;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;font-size:13.5px;color:#b9c8db;cursor:pointer;transition:.15s;font-weight:500}
+.nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav-item.active{background:rgba(33,150,243,.22);color:#fff}
+.nav-item .ic{width:17px;height:17px;opacity:.9;flex-shrink:0}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{
+  height:60px;background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;
+}
+.topbar .crumbs{font-size:14px;color:var(--text-muted);font-weight:500}
+.topbar .crumbs b{color:var(--text);font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:14px}
+.avatar-pill{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#2196f3,#0078d3);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px}
+.content{flex:1;overflow:auto;padding:24px;position:relative}
+.page-title{font-size:22px;font-weight:700;margin-bottom:4px}
+.page-sub{color:var(--text-muted);font-size:13.5px;margin-bottom:22px}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow-sm)}
+.kpi .k-label{font-size:12px;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.kpi .k-value{font-size:26px;font-weight:700;margin-top:6px}
+.kpi .k-delta{font-size:12px;font-weight:600;margin-top:4px}
+.kpi .k-delta.up{color:var(--success)}.kpi .k-delta.down{color:var(--error)}
+.panel-row{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;box-shadow:var(--shadow-sm)}
+.panel h3{font-size:14.5px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.panel h3 .tag{font-size:11px;color:var(--text-muted);font-weight:500}
+.skeleton-bars{display:flex;align-items:flex-end;gap:10px;height:150px;padding-top:8px}
+.skeleton-bars .b{flex:1;background:linear-gradient(180deg,var(--primary-light),var(--primary));border-radius:6px 6px 0 0;opacity:.9}
+.list-line{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.list-line:last-child{border-bottom:none}
+.list-line .dot{width:8px;height:8px;border-radius:50%;background:var(--primary);margin-right:8px}
+.badge{font-size:11px;font-weight:600;padding:2px 9px;border-radius:var(--pill)}
+.badge.warn{background:rgba(255,152,0,.14);color:#b45f00}
+.badge.ok{background:rgba(34,165,101,.14);color:var(--success)}
+.badge.crit{background:rgba(244,67,54,.14);color:var(--error)}
+
+/* ======================= ASSISTANT ======================= */
+
+/* mode switcher (demo control) */
+.mode-switch{
+  position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:60;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--pill);
+  padding:5px;display:flex;gap:4px;box-shadow:var(--shadow-md);
+}
+.mode-switch button{
+  border:none;background:transparent;font-family:var(--font);font-size:12.5px;font-weight:600;
+  color:var(--text-muted);padding:7px 15px;border-radius:var(--pill);cursor:pointer;display:flex;align-items:center;gap:7px;transition:.15s;
+}
+.mode-switch button:hover{color:var(--text)}
+.mode-switch button.active{background:var(--primary);color:#fff;box-shadow:0 3px 8px rgba(33,150,243,.35)}
+.mode-switch .ic{width:15px;height:15px}
+.mode-hint{position:fixed;top:58px;left:50%;transform:translateX(-50%);z-index:60;font-size:11px;color:var(--text-muted);background:rgba(255,255,255,.7);padding:3px 10px;border-radius:var(--pill)}
+
+/* floating launcher (bubble mode) */
+.launcher{
+  position:fixed;right:26px;bottom:26px;z-index:50;width:60px;height:60px;border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),var(--primary-strong));
+  box-shadow:0 10px 26px rgba(0,120,211,.45);cursor:pointer;border:none;
+  display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;
+}
+.launcher:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 14px 32px rgba(0,120,211,.55)}
+.launcher .spark{width:26px;height:26px;color:#fff}
+.launcher .ping{position:absolute;top:-2px;right:-2px;width:16px;height:16px;background:var(--accent);border:2px solid #fff;border-radius:50%}
+
+/* assistant surface — shared skin, positioned per mode */
+.assistant{
+  position:fixed;z-index:55;background:var(--card);display:flex;flex-direction:column;
+  border:1px solid var(--border);overflow:hidden;opacity:0;pointer-events:none;
+  transform:translateY(14px) scale(.98);transition:opacity .22s ease,transform .22s ease;
+}
+.assistant.open{opacity:1;pointer-events:auto;transform:none}
+
+/* --- bubble --- */
+body[data-mode="bubble"] .assistant{
+  right:26px;bottom:26px;width:400px;height:600px;max-height:calc(100vh - 52px);
+  border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);
+}
+body[data-mode="bubble"] .a-history{display:none}
+body[data-mode="bubble"] .launcher{display:flex}
+
+/* --- sidebar --- */
+body[data-mode="sidebar"] .assistant{
+  right:0;top:0;bottom:0;width:440px;max-width:92vw;height:100vh;
+  border-radius:0;border-right:none;box-shadow:-18px 0 45px rgba(16,24,40,.16);
+}
+body[data-mode="sidebar"] .a-history{display:none}
+body[data-mode="sidebar"] .launcher{display:flex}
+body[data-mode="sidebar"] .scrim{display:block}
+
+/* --- fullscreen --- */
+body[data-mode="full"] .assistant{
+  inset:0;width:100vw;height:100vh;border-radius:0;border:none;
+}
+body[data-mode="full"] .a-history{display:flex}
+body[data-mode="full"] .launcher{display:none}
+body[data-mode="full"] .assistant{transform:none}
+
+.scrim{display:none;position:fixed;inset:0;background:rgba(15,23,42,.28);z-index:54;opacity:0;pointer-events:none;transition:opacity .22s}
+.scrim.show{opacity:1;pointer-events:auto}
+
+/* assistant inner layout */
+.assistant .a-body{flex:1;display:flex;min-height:0}
+.a-history{
+  width:270px;flex-shrink:0;border-right:1px solid var(--border);background:var(--surface);
+  flex-direction:column;
+}
+.a-history .h-head{padding:16px 16px 10px;display:flex;flex-direction:column;gap:10px}
+.a-history .new-chat{
+  display:flex;align-items:center;gap:9px;justify-content:center;background:var(--primary);
+  color:#fff;border:none;font-family:var(--font);font-weight:600;font-size:13px;padding:10px;border-radius:var(--radius-md);cursor:pointer;transition:.15s
+}
+.a-history .new-chat:hover{background:var(--primary-hover)}
+.a-history .h-search{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-md);padding:8px 11px;font-size:12.5px;color:var(--text);font-family:var(--font)}
+.a-history .h-label{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);padding:12px 16px 6px}
+.h-list{overflow:auto;padding:0 10px 12px;display:flex;flex-direction:column;gap:2px}
+.h-item{padding:9px 11px;border-radius:var(--radius-md);cursor:pointer;transition:.12s}
+.h-item:hover{background:var(--hover)}
+.h-item.active{background:var(--primary-transparent)}
+.h-item .h-title{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.h-item .h-meta{font-size:11px;color:var(--text-muted);margin-top:2px}
+
+/* conversation column */
+.a-conv{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
+.a-head{
+  display:flex;align-items:center;justify-content:space-between;padding:14px 16px;
+  border-bottom:1px solid var(--border);flex-shrink:0;
+  background:linear-gradient(180deg,var(--card),var(--surface));
+}
+.a-head .h-id{display:flex;align-items:center;gap:11px}
+.a-head .ai-orb{
+  width:36px;height:36px;border-radius:11px;flex-shrink:0;position:relative;
+  background:linear-gradient(135deg,var(--primary),var(--primary-strong));
+  display:flex;align-items:center;justify-content:center;color:#fff;
+  box-shadow:0 4px 10px rgba(0,120,211,.35);
+}
+.a-head .ai-orb .spark{width:19px;height:19px}
+.a-head .status{color:var(--success);font-size:11.5px;font-weight:500;display:flex;align-items:center;gap:5px;margin-top:2px}
+.a-head .status .live{width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 0 3px rgba(34,165,101,.18)}
+.a-head .h-title{font-size:14.5px;font-weight:700}
+.a-head .h-actions{display:flex;gap:6px}
+.icon-btn{width:32px;height:32px;border-radius:8px;border:1px solid transparent;background:transparent;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;justify-content:center;transition:.15s}
+.icon-btn:hover{background:var(--hover);color:var(--text)}
+.icon-btn .ic{width:17px;height:17px}
+
+.a-scroll{flex:1;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:16px;background:var(--surface)}
+body[data-mode="full"] .a-scroll{padding:26px 18%;}
+
+/* welcome / quick chat */
+.welcome{text-align:center;padding:20px 8px 4px;animation:fade .4s}
+.welcome .w-orb{width:56px;height:56px;border-radius:16px;margin:0 auto 14px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 8px 20px rgba(0,120,211,.35)}
+.welcome .w-orb .spark{width:28px;height:28px}
+.welcome h2{font-size:19px;font-weight:700;margin-bottom:5px}
+.welcome p{font-size:13px;color:var(--text-muted);max-width:360px;margin:0 auto}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+body[data-mode="bubble"] .quick-grid{grid-template-columns:1fr}
+.quick-card{
+  text-align:left;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:13px 14px;cursor:pointer;transition:.15s;display:flex;gap:11px;align-items:flex-start;
+}
+.quick-card:hover{border-color:var(--primary);box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.quick-card .q-ic{width:32px;height:32px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff}
+.quick-card .q-ic.c1{background:linear-gradient(135deg,#2196f3,#0078d3)}
+.quick-card .q-ic.c2{background:linear-gradient(135deg,#7c4dff,#5b2ee0)}
+.quick-card .q-ic.c3{background:linear-gradient(135deg,#22a565,#0f8a4f)}
+.quick-card .q-ic.c4{background:linear-gradient(135deg,#ff8a3d,#f4701f)}
+.quick-card .q-ic .ic{width:17px;height:17px}
+.quick-card .q-t{font-size:13px;font-weight:600;line-height:1.35}
+.quick-card .q-d{font-size:11.5px;color:var(--text-muted);margin-top:2px}
+
+/* message bubbles */
+.msg{display:flex;gap:11px;max-width:100%;animation:rise .3s ease}
+.msg .m-av{width:30px;height:30px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff}
+.msg.assistant .m-av{background:linear-gradient(135deg,var(--primary),var(--primary-strong))}
+.msg.user{flex-direction:row-reverse}
+.msg.user .m-av{background:linear-gradient(135deg,#334155,#1e293b)}
+.m-wrap{display:flex;flex-direction:column;gap:5px;max-width:82%}
+.msg.user .m-wrap{align-items:flex-end}
+.bubble{padding:11px 14px;border-radius:14px;font-size:13.5px;line-height:1.55;box-shadow:var(--shadow-sm)}
+.msg.assistant .bubble{background:var(--card);border:1px solid var(--border);border-top-left-radius:4px;color:var(--text)}
+.msg.user .bubble{background:linear-gradient(135deg,var(--primary),var(--primary-strong));color:#fff;border-top-right-radius:4px}
+.m-time{font-size:10.5px;color:var(--text-muted);padding:0 4px}
+
+/* artifact cards inside a message */
+.artifact{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);width:100%;max-width:100%}
+.artifact .a-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-bottom:1px solid var(--border);background:var(--surface)}
+.artifact .a-bar .a-name{font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:8px}
+.artifact .a-bar .a-name .ic{width:15px;height:15px;color:var(--primary)}
+.artifact .a-bar .a-kind{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);font-weight:600}
+.artifact .a-inner{padding:14px}
+.artifact canvas{width:100%;display:block}
+.sql-code{font-family:var(--mono);font-size:12px;line-height:1.7;background:#0d1b2a;color:#e6edf3;padding:14px;border-radius:var(--radius-md);overflow:auto;white-space:pre}
+.sql-code .kw{color:#79c0ff;font-weight:600}
+.sql-code .fn{color:#ffa657}
+.sql-code .str{color:#7ee787}
+.sql-code .num{color:#f0883e}
+.sql-code .cm{color:#8b949e;font-style:italic}
+.mini-table{width:100%;border-collapse:collapse;font-size:12px}
+.mini-table th{text-align:left;padding:7px 10px;background:var(--surface);color:var(--text-muted);font-weight:600;border-bottom:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.mini-table td{padding:7px 10px;border-bottom:1px solid var(--border)}
+.mini-table tr:last-child td{border-bottom:none}
+.a-actions{display:flex;flex-wrap:wrap;gap:8px;padding:0 13px 13px}
+.chip-btn{
+  display:inline-flex;align-items:center;gap:6px;font-family:var(--font);font-size:12px;font-weight:600;
+  border:1px solid var(--border);background:var(--card);color:var(--text);padding:7px 12px;border-radius:var(--pill);cursor:pointer;transition:.15s
+}
+.chip-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-transparent)}
+.chip-btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.chip-btn.primary:hover{background:var(--primary-hover);color:#fff}
+.chip-btn .ic{width:14px;height:14px}
+
+/* typing indicator */
+.typing{display:flex;gap:11px;animation:rise .25s}
+.typing .m-av{width:30px;height:30px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),var(--primary-strong));display:flex;align-items:center;justify-content:center;color:#fff}
+.typing .dots{background:var(--card);border:1px solid var(--border);border-radius:14px;border-top-left-radius:4px;padding:14px 16px;display:flex;gap:5px;align-items:center}
+.typing .dots span{width:7px;height:7px;border-radius:50%;background:var(--primary);opacity:.4;animation:blink 1.2s infinite}
+.typing .dots span:nth-child(2){animation-delay:.2s}
+.typing .dots span:nth-child(3){animation-delay:.4s}
+
+/* composer */
+.a-composer{border-top:1px solid var(--border);padding:12px 14px;background:var(--card);flex-shrink:0}
+.suggest-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:9px}
+.sg{font-size:11.5px;font-weight:500;color:var(--primary-strong);background:var(--primary-transparent);border:1px solid transparent;padding:5px 11px;border-radius:var(--pill);cursor:pointer;transition:.15s}
+.sg:hover{background:var(--primary);color:#fff}
+.composer-box{display:flex;align-items:flex-end;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:8px 8px 8px 14px;transition:.15s}
+.composer-box:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-transparent)}
+.composer-box textarea{flex:1;border:none;background:transparent;resize:none;font-family:var(--font);font-size:13.5px;color:var(--text);line-height:1.5;max-height:120px;outline:none}
+.composer-box .attach{color:var(--text-muted);align-self:center}
+.send-btn{width:38px;height:38px;border-radius:10px;border:none;flex-shrink:0;background:linear-gradient(135deg,var(--primary),var(--primary-strong));color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+.send-btn:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(0,120,211,.4)}
+.send-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.send-btn .ic{width:18px;height:18px}
+.composer-foot{font-size:10.5px;color:var(--text-muted);text-align:center;margin-top:8px}
+
+/* toast */
+.toast-wrap{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:80;display:flex;flex-direction:column;gap:9px;align-items:center}
+.toast{
+  display:flex;align-items:center;gap:11px;background:#0f2740;color:#fff;padding:12px 17px;border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-lg);font-size:13px;font-weight:500;animation:toastin .3s ease;max-width:440px
+}
+.toast .t-ic{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--success),#0f8a4f);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.toast .t-ic .ic{width:17px;height:17px}
+.toast b{font-weight:700}
+.toast .t-link{color:#7dc4ff;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes blink{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+@keyframes toastin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+@media(max-width:1100px){.kpi-row{grid-template-columns:repeat(2,1fr)}.panel-row{grid-template-columns:1fr}}
+@media(max-width:760px){
+  .sidebar-nav{display:none}
+  body[data-mode="bubble"] .assistant{width:calc(100vw - 24px);right:12px;left:12px;height:78vh}
+  .mode-switch button span.lbl{display:none}
+}
+</style>
+</head>
+<body data-mode="bubble">
+
+<!-- ===== mode switcher (demo control) ===== -->
+<div class="mode-switch" role="tablist" aria-label="Assistant presentation mode">
+  <button data-set="bubble" class="active" title="Bottom-right chat bubble">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.9-.9L3 21l1.9-5.6A8.5 8.5 0 1 1 21 11.5z"/></svg>
+    <span class="lbl">Bubble</span>
+  </button>
+  <button data-set="sidebar" title="Right sidebar overlay">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+    <span class="lbl">Sidebar</span>
+  </button>
+  <button data-set="full" title="Full-screen workspace">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+    <span class="lbl">Full screen</span>
+  </button>
+</div>
+<div class="mode-hint" id="modeHint">Bubble mode — click the glowing button, bottom-right</div>
+
+<!-- ===== faux app shell ===== -->
+<div class="app" aria-hidden="true">
+  <aside class="sidebar-nav">
+    <div class="brand">
+      <div class="logo">DB</div>
+      <div class="name">DB<span>Exec</span></div>
+    </div>
+    <div class="nav-group-label">Analyze</div>
+    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="17" y="3" width="4" height="17"/></svg>Dashboards</div>
+    <div class="nav-item active"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg>Analyses</div>
+    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/></svg>Datasets</div>
+    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Query Runner</div>
+    <div class="nav-group-label">Monitor</div>
+    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>Alerts</div>
+    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Audit Logs</div>
+    <div class="nav-group-label">Admin</div>
+    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Users</div>
+    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.82 1.17V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15z"/></svg>Settings</div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="crumbs">Analyses <b>/ Revenue performance</b></div>
+      <div class="topbar-right">
+        <span style="font-size:13px;color:var(--text-muted)">Acme Corp</span>
+        <div class="avatar-pill">SG</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-title">Revenue performance</div>
+      <div class="page-sub">Live overview · last refreshed 4 minutes ago</div>
+      <div class="kpi-row">
+        <div class="kpi"><div class="k-label">Total revenue</div><div class="k-value">$4.82M</div><div class="k-delta up">▲ 12.4% vs last month</div></div>
+        <div class="kpi"><div class="k-label">Active customers</div><div class="k-value">3,914</div><div class="k-delta up">▲ 3.1%</div></div>
+        <div class="kpi"><div class="k-label">Avg order value</div><div class="k-value">$1,231</div><div class="k-delta down">▼ 1.8%</div></div>
+        <div class="kpi"><div class="k-label">Open alerts</div><div class="k-value">7</div><div class="k-delta down">▲ 2 new</div></div>
+      </div>
+      <div class="panel-row">
+        <div class="panel">
+          <h3>Revenue by region <span class="tag">bar · monthly</span></h3>
+          <div class="skeleton-bars">
+            <div class="b" style="height:62%"></div><div class="b" style="height:88%"></div>
+            <div class="b" style="height:47%"></div><div class="b" style="height:73%"></div>
+            <div class="b" style="height:95%"></div><div class="b" style="height:58%"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Recent alerts <span class="tag">7 open</span></h3>
+          <div class="list-line"><span><span class="dot"></span>Revenue dropped below $1M</span><span class="badge crit">Critical</span></div>
+          <div class="list-line"><span><span class="dot"></span>Churn rate &gt; 5%</span><span class="badge warn">Warning</span></div>
+          <div class="list-line"><span><span class="dot"></span>New signups spike</span><span class="badge ok">Info</span></div>
+          <div class="list-line"><span><span class="dot"></span>Refund volume elevated</span><span class="badge warn">Warning</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== launcher (bubble/sidebar) ===== -->
+<button class="launcher" id="launcher" title="Ask DBExec AI">
+  <span class="ping"></span>
+  <svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.1L19 9l-5.1 1.9L12 16l-1.9-5.1L5 9l5.1-1.9L12 2zm7 11l.95 2.55L22.5 16.5l-2.55.95L19 20l-.95-2.55L15.5 16.5l2.55-.95L19 13zM5 14l.7 1.8L7.5 16.5l-1.8.7L5 19l-.7-1.8L2.5 16.5l1.8-.7L5 14z"/></svg>
+</button>
+
+<div class="scrim" id="scrim"></div>
+
+<!-- ===== assistant surface ===== -->
+<section class="assistant" id="assistant" aria-label="DBExec AI assistant">
+  <div class="a-body">
+    <!-- history rail (fullscreen only) -->
+    <div class="a-history">
+      <div class="h-head">
+        <button class="new-chat" onclick="AI.newChat()">
+          <svg class="ic" style="width:15px;height:15px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New chat
+        </button>
+        <input class="h-search" placeholder="Search conversations…" />
+      </div>
+      <div class="h-label">Today</div>
+      <div class="h-list" id="hList">
+        <div class="h-item active"><div class="h-title">Revenue by region chart</div><div class="h-meta">Just now · Analyses</div></div>
+        <div class="h-item"><div class="h-title">Top 10 customers query</div><div class="h-meta">18m ago · Query Runner</div></div>
+        <div class="h-item"><div class="h-title">Churn alert threshold</div><div class="h-meta">1h ago · Alerts</div></div>
+        <div class="h-label" style="padding-left:6px">Yesterday</div>
+        <div class="h-item"><div class="h-title">Monthly signups trend</div><div class="h-meta">Dashboard export</div></div>
+        <div class="h-item"><div class="h-title">Refund anomaly summary</div><div class="h-meta">Shared with team</div></div>
+      </div>
+    </div>
+
+    <!-- conversation -->
+    <div class="a-conv">
+      <div class="a-head">
+        <div class="h-id">
+          <div class="ai-orb">
+            <svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.1L19 9l-5.1 1.9L12 16l-1.9-5.1L5 9l5.1-1.9L12 2z"/></svg>
+          </div>
+          <div>
+            <div class="h-title">DBExec Assistant</div>
+            <div class="status"><span class="live"></span>Online · connected to Acme Corp</div>
+          </div>
+        </div>
+        <div class="h-actions">
+          <button class="icon-btn" title="New chat" onclick="AI.newChat()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          <button class="icon-btn" title="Close" onclick="AI.close()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
+      </div>
+
+      <div class="a-scroll" id="scroll"></div>
+
+      <div class="a-composer">
+        <div class="suggest-row" id="suggestRow"></div>
+        <div class="composer-box">
+          <textarea id="input" rows="1" placeholder="Ask anything, or describe a chart, query, or alert…"></textarea>
+          <button class="send-btn" id="send" title="Send" disabled>
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+        <div class="composer-foot">DBExec AI can generate charts, SQL and alerts from your connected data. Always review before saving.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* ============================================================
+   DBExec AI Assistant — mockup logic (vanilla JS, dummy data)
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const scroll = $('#scroll');
+const input = $('#input');
+const sendBtn = $('#send');
+
+/* ---- quick-chat cards + inline suggestions ---- */
+const QUICK = [
+  {ic:'c1', kind:'chart',  svg:'<path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/>', t:'Chart: revenue by region', d:'Bar chart, last 6 months', prompt:'Create a bar chart of revenue by region for the last 6 months'},
+  {ic:'c2', kind:'sql',    svg:'<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>', t:'SQL: top 10 customers', d:'By lifetime spend', prompt:'Write a SQL query for the top 10 customers by lifetime spend'},
+  {ic:'c3', kind:'table',  svg:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/>', t:'Table: monthly signups', d:'Trend + growth %', prompt:'Show me a table of monthly signups with growth percentage'},
+  {ic:'c4', kind:'alert',  svg:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>', t:'Alert: churn > 5%', d:'Draft a monitoring rule', prompt:'Set up an alert when monthly churn rate goes above 5%'},
+];
+const SUGGESTIONS = [
+  'Create a bar chart of revenue by region',
+  'Top 10 customers by spend',
+  'Monthly signups table',
+  'Alert when churn > 5%',
+];
+
+function welcomeHTML(){
+  return `<div class="welcome">
+    <div class="w-orb"><svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.1L19 9l-5.1 1.9L12 16l-1.9-5.1L5 9l5.1-1.9L12 2z"/></svg></div>
+    <h2>How can I help with your data?</h2>
+    <p>Ask in plain English — I can build charts, write SQL, summarise data and draft alerts, then drop them straight into a module.</p>
+    <div class="quick-grid">
+      ${QUICK.map((q,i)=>`
+        <button class="quick-card" onclick="AI.quick(${i})">
+          <span class="q-ic ${q.ic}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${q.svg}</svg></span>
+          <span><span class="q-t">${q.t}</span><span class="q-d">${q.d}</span></span>
+        </button>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderSuggestions(){
+  $('#suggestRow').innerHTML = SUGGESTIONS.map(s=>`<button class="sg" onclick="AI.suggest('${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
+}
+
+function now(){
+  return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+}
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* ---- message rendering ---- */
+function addUser(text){
+  const el = document.createElement('div');
+  el.className = 'msg user';
+  el.innerHTML = `<div class="m-av">SG</div>
+    <div class="m-wrap"><div class="bubble">${esc(text)}</div><div class="m-time">${now()}</div></div>`;
+  scroll.appendChild(el);
+  scrollDown();
+}
+function addAssistant(innerHTML){
+  const el = document.createElement('div');
+  el.className = 'msg assistant';
+  el.innerHTML = `<div class="m-av"><svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.1L19 9l-5.1 1.9L12 16l-1.9-5.1L5 9l5.1-1.9L12 2z"/></svg></div>
+    <div class="m-wrap"><div class="bubble">${innerHTML}</div><div class="m-time">${now()}</div></div>`;
+  scroll.appendChild(el);
+  scrollDown();
+  return el;
+}
+function typing(){
+  const el = document.createElement('div');
+  el.className='typing';el.id='typingEl';
+  el.innerHTML=`<div class="m-av"><svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.1L19 9l-5.1 1.9L12 16l-1.9-5.1L5 9l5.1-1.9L12 2z"/></svg></div>
+    <div class="dots"><span></span><span></span><span></span></div>`;
+  scroll.appendChild(el);scrollDown();
+}
+function stopTyping(){const t=$('#typingEl');if(t)t.remove();}
+function scrollDown(){requestAnimationFrame(()=>{scroll.scrollTop=scroll.scrollHeight;});}
+
+/* ---- artifact builders ---- */
+let artifactSeq = 0;
+
+function artifactChart(){
+  const id='chart'+(++artifactSeq);
+  const html = `
+  <p style="margin-bottom:10px">Here's a <b>bar chart of revenue by region</b> over the last 6 months, built from your <code>sales_fact</code> dataset:</p>
+  <div class="artifact">
+    <div class="a-bar">
+      <span class="a-name"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg>Revenue by region</span>
+      <span class="a-kind">Bar chart</span>
+    </div>
+    <div class="a-inner"><canvas id="${id}" height="190"></canvas></div>
+    <div class="a-actions">
+      <button class="chip-btn primary" onclick="AI.addTo('Dashboard','Revenue by region chart')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>Add to Dashboard</button>
+      <button class="chip-btn" onclick="AI.addTo('Analysis','Revenue by region chart')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg>Add to Analysis</button>
+      <button class="chip-btn" onclick="AI.toast('Chart exported as PNG')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+    </div>
+  </div>`;
+  const el = addAssistant(html);
+  drawBarChart(el.querySelector('#'+id));
+}
+
+function artifactSql(){
+  const sql =
+`<span class="cm">-- Top 10 customers by lifetime spend</span>
+<span class="kw">SELECT</span> c.customer_name,
+       <span class="fn">SUM</span>(o.total_amount) <span class="kw">AS</span> lifetime_spend,
+       <span class="fn">COUNT</span>(o.order_id)   <span class="kw">AS</span> orders
+<span class="kw">FROM</span>   orders o
+<span class="kw">JOIN</span>   customers c <span class="kw">ON</span> c.customer_id = o.customer_id
+<span class="kw">WHERE</span>  o.status = <span class="str">'completed'</span>
+<span class="kw">GROUP BY</span> c.customer_name
+<span class="kw">ORDER BY</span> lifetime_spend <span class="kw">DESC</span>
+<span class="kw">LIMIT</span>  <span class="num">10</span>;`;
+  const html = `
+  <p style="margin-bottom:10px">This query returns your <b>top 10 customers by lifetime spend</b>. I validated it against the <code>orders</code> and <code>customers</code> tables:</p>
+  <div class="artifact">
+    <div class="a-bar">
+      <span class="a-name"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>top_customers.sql</span>
+      <span class="a-kind">SQL</span>
+    </div>
+    <div class="a-inner"><pre class="sql-code">${sql}</pre></div>
+    <div class="a-actions">
+      <button class="chip-btn primary" onclick="AI.addTo('Query Runner','top_customers.sql')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>Open in Query Runner</button>
+      <button class="chip-btn" onclick="AI.addTo('Analysis','Top 10 customers')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg>Save as Analysis</button>
+      <button class="chip-btn" onclick="AI.toast('SQL copied to clipboard')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button>
+    </div>
+  </div>`;
+  addAssistant(html);
+}
+
+function artifactTable(){
+  const rows = [
+    ['Jan','2,140','—'],['Feb','2,405','+12.4%'],['Mar','2,610','+8.5%'],
+    ['Apr','2,880','+10.3%'],['May','3,150','+9.4%'],['Jun','3,914','+24.3%'],
+  ];
+  const html = `
+  <p style="margin-bottom:10px">Here's your <b>monthly signups with growth %</b>, aggregated from <code>user_events</code>:</p>
+  <div class="artifact">
+    <div class="a-bar">
+      <span class="a-name"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>Monthly signups</span>
+      <span class="a-kind">Table</span>
+    </div>
+    <div class="a-inner">
+      <table class="mini-table">
+        <thead><tr><th>Month</th><th>Signups</th><th>Growth</th></tr></thead>
+        <tbody>${rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td style="color:${r[2].startsWith('+')?'var(--success)':'var(--text-muted)'};font-weight:600">${r[2]}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>
+    <div class="a-actions">
+      <button class="chip-btn primary" onclick="AI.addTo('Dashboard','Monthly signups table')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>Add to Dashboard</button>
+      <button class="chip-btn" onclick="AI.addTo('Dataset','signups_monthly')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/></svg>Save as Dataset</button>
+      <button class="chip-btn" onclick="AI.toast('Exported to CSV')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+    </div>
+  </div>`;
+  addAssistant(html);
+}
+
+function artifactAlert(){
+  const html = `
+  <p style="margin-bottom:10px">I've drafted an alert rule to fire when <b>monthly churn exceeds 5%</b>. Review and open it in the Alerts wizard to finish:</p>
+  <div class="artifact">
+    <div class="a-bar">
+      <span class="a-name"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>High churn rate</span>
+      <span class="a-kind">Alert rule</span>
+    </div>
+    <div class="a-inner" style="display:flex;flex-direction:column;gap:9px;font-size:12.5px">
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Source</span><b>Dataset · customer_metrics</b></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Condition</span><b>churn_rate &gt; 5%</b></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Schedule</span><b>Daily at 9:00 · UTC</b></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Severity</span><span class="badge warn">Warning</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Notify</span><b>In-app + email</b></div>
+    </div>
+    <div class="a-actions">
+      <button class="chip-btn primary" onclick="AI.addTo('Alerts','High churn rate')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/></svg>Create in Alerts</button>
+      <button class="chip-btn" onclick="AI.toast('Test run: would fire (churn 6.2%)')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Test now</button>
+    </div>
+  </div>`;
+  addAssistant(html);
+}
+
+/* ---- canvas bar chart (no deps) ---- */
+function drawBarChart(canvas){
+  const dpr = window.devicePixelRatio||1;
+  const cssW = canvas.clientWidth||520, cssH = 190;
+  canvas.width = cssW*dpr; canvas.height = cssH*dpr;
+  const ctx = canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const data = [
+    {l:'North',v:820},{l:'South',v:1180},{l:'East',v:640},
+    {l:'West',v:970},{l:'EU',v:1290},{l:'APAC',v:760},
+  ];
+  const pad = {l:34,r:10,t:14,b:26};
+  const w = cssW-pad.l-pad.r, h = cssH-pad.t-pad.b;
+  const max = 1400;
+  ctx.clearRect(0,0,cssW,cssH);
+  // gridlines
+  ctx.strokeStyle='#eef2f7'; ctx.fillStyle='#9aa7b4'; ctx.font='10px Inter'; ctx.textAlign='right';
+  for(let i=0;i<=4;i++){
+    const y = pad.t + h - (h*i/4);
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+w,y);ctx.stroke();
+    ctx.fillText('$'+((max*i/4)/1000).toFixed(1)+'k', pad.l-6, y+3);
+  }
+  const bw = w/data.length*0.56, gap = w/data.length;
+  data.forEach((d,i)=>{
+    const bh = h*(d.v/max);
+    const x = pad.l + i*gap + (gap-bw)/2;
+    const y = pad.t + h - bh;
+    const g = ctx.createLinearGradient(0,y,0,pad.t+h);
+    g.addColorStop(0,'#42a5f5'); g.addColorStop(1,'#0078d3');
+    ctx.fillStyle=g;
+    const r=5;
+    ctx.beginPath();
+    ctx.moveTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.lineTo(x+bw-r,y);ctx.arcTo(x+bw,y,x+bw,y+r,r);
+    ctx.lineTo(x+bw,pad.t+h);ctx.lineTo(x,pad.t+h);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#6b7280';ctx.textAlign='center';ctx.font='10px Inter';
+    ctx.fillText(d.l, x+bw/2, cssH-8);
+  });
+}
+
+/* ---- intent routing (dummy NLU) ---- */
+function respond(text){
+  const t = text.toLowerCase();
+  typing();
+  setTimeout(()=>{
+    stopTyping();
+    if(/(chart|graph|plot|bar|trend|visuali[sz]e|revenue by)/.test(t)) artifactChart();
+    else if(/(sql|query|select|top \d|customers|join)/.test(t)) artifactSql();
+    else if(/(table|signups|list|rows|breakdown)/.test(t)) artifactTable();
+    else if(/(alert|churn|threshold|notify|monitor|fire)/.test(t)) artifactAlert();
+    else addAssistant(`I can help with that. Here are a few things I can build from your connected data — just tap one:
+      <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:9px">
+        <button class="sg" onclick="AI.suggest('Create a bar chart of revenue by region')">📊 A chart</button>
+        <button class="sg" onclick="AI.suggest('Top 10 customers by spend')">🧮 A SQL query</button>
+        <button class="sg" onclick="AI.suggest('Monthly signups table')">📋 A table</button>
+        <button class="sg" onclick="AI.suggest('Alert when churn > 5%')">🔔 An alert</button>
+      </div>`);
+  }, 850 + Math.random()*500);
+}
+
+/* ---- controller ---- */
+const AI = {
+  open(){
+    $('#assistant').classList.add('open');
+    if(document.body.dataset.mode==='sidebar') $('#scrim').classList.add('show');
+    if(!scroll.dataset.seeded){ this.newChat(); scroll.dataset.seeded='1'; }
+    setTimeout(()=>input.focus(),250);
+  },
+  close(){ $('#assistant').classList.remove('open'); $('#scrim').classList.remove('show'); },
+  newChat(){ scroll.innerHTML = welcomeHTML(); scrollDown(); },
+  send(){
+    const v = input.value.trim(); if(!v) return;
+    // clear welcome on first real message
+    if(scroll.querySelector('.welcome')) scroll.innerHTML='';
+    addUser(v); input.value=''; autosize(); sendBtn.disabled=true;
+    respond(v);
+  },
+  suggest(text){ input.value=text; autosize(); this.send(); },
+  quick(i){ this.suggest(QUICK[i].prompt); },
+  addTo(module, name){ this.toast(`<b>${esc(name)}</b> added to <b>${module}</b>`, module); },
+  toast(msg, module){
+    const w = $('#toastWrap');
+    const el = document.createElement('div');
+    el.className='toast';
+    const link = module ? ` <span class="t-link" onclick="AI.toast('Opening ${module}…')">Open ${module} →</span>` : '';
+    el.innerHTML = `<div class="t-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div><div>${msg}${link}</div>`;
+    w.appendChild(el);
+    setTimeout(()=>{el.style.transition='opacity .3s,transform .3s';el.style.opacity='0';el.style.transform='translateY(10px)';setTimeout(()=>el.remove(),320);}, 3200);
+  },
+};
+window.AI = AI;
+
+/* ---- composer wiring ---- */
+function autosize(){ input.style.height='auto'; input.style.height=Math.min(input.scrollHeight,120)+'px'; }
+input.addEventListener('input',()=>{ autosize(); sendBtn.disabled = !input.value.trim(); });
+input.addEventListener('keydown',e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); AI.send(); }});
+sendBtn.addEventListener('click',()=>AI.send());
+$('#launcher').addEventListener('click',()=>AI.open());
+$('#scrim').addEventListener('click',()=>AI.close());
+
+/* ---- mode switching ---- */
+const HINTS = {
+  bubble:'Bubble mode — click the glowing button, bottom-right',
+  sidebar:'Sidebar mode — click the launcher; opens as a right-side overlay',
+  full:'Full-screen mode — immersive workspace with recent chats',
+};
+document.querySelectorAll('.mode-switch button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.mode-switch button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    const m = b.dataset.set;
+    document.body.dataset.mode = m;
+    $('#modeHint').textContent = HINTS[m];
+    if(m==='full'){ AI.open(); }
+    else { AI.close(); }
+  });
+});
+
+/* ---- init ---- */
+renderSuggestions();
+scroll.innerHTML = welcomeHTML();
+scroll.dataset.seeded='1';
+// Redraw any visible charts on resize (keeps canvas crisp across modes)
+let rt; window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{document.querySelectorAll('.artifact canvas').forEach(drawBarChart);},180);});
+</script>
+</body>
+</html>
