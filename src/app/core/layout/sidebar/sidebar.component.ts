@@ -37,6 +37,13 @@ interface MenuItem {
   isExpanded?: boolean;
   subPermissions?: MenuItem[];
   route?: string;
+  /**
+   * When true, routerLinkActive matches ONLY the exact URL (not as a prefix).
+   * Set for nav routes that are a prefix of a sibling's route (e.g.
+   * '/app/query-runner' vs '/app/query-runner/connections') so the parent
+   * doesn't also highlight when a child route is active.
+   */
+  exact?: boolean;
 }
 
 /**
@@ -206,6 +213,7 @@ export class SidebarComponent implements OnInit {
         subPermissions:
           processedChildren.length > 0 ? processedChildren : undefined,
         route: this.appendRouteToMenu(node),
+        exact: this.exactRouteMatch(node),
       });
     }
     return result;
@@ -216,6 +224,13 @@ export class SidebarComponent implements OnInit {
       ir => ir.value === node.value,
     )?.route;
     return route || '';
+  }
+
+  /** Whether this nav entry should match its route exactly (see MenuItem.exact). */
+  exactRouteMatch(node: PermissionNode | MenuItem): boolean {
+    return (
+      SIDEBAR_ITEMS_ROUTES.find(ir => ir.value === node.value)?.exact === true
+    );
   }
 
   private expandMenuForCurrentRoute() {

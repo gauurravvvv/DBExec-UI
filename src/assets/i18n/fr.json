@@ -16,7 +16,7 @@
     "dbPrivileges": "Privilèges et accès",
     "dbConnections": "Connexions",
     "connectionManager": "Connexions",
-    "queryRunner": "Exécuteur de requêtes",
+    "queryRunner": "Espace de travail SQL",
     "accessManagement": "Gestionnaire d'accès",
     "dbExecStudio": "DBExec Studio",
     "queryBuilderTab": "Onglet",
@@ -2009,7 +2009,7 @@
     "DB_USERS": "Utilisateurs de la base de données",
     "DB_ROLES": "Utilisateurs et rôles de la base de données",
     "DB_PRIVILEGES": "Privilèges et accès",
-    "QUERY_RUNNER": "Exécuteur de requêtes",
+    "QUERY_RUNNER": "Espace de travail SQL",
     "EMBED_DASHBOARD": "Tableau de bord"
   },
   "AUTH": {
@@ -3915,7 +3915,7 @@
     }
   },
   "QUERY_RUNNER": {
-    "TITLE": "Exécuteur de requêtes",
+    "TITLE": "Espace de travail SQL",
     "CONNECTIONS_TITLE": "Connexions",
     "MANAGE_CONNECTIONS": "Gérer les connexions",
     "NEW_CONNECTION": "Nouvelle connexion",
@@ -3946,7 +3946,7 @@
     "DEFAULT_BADGE": "Connexion par défaut pour cette source de données",
     "ALL_DISABLED_FOR_DS": "Toutes les connexions de cette source de données sont désactivées. Activez-en une pour exécuter des requêtes.",
     "TEST": "Vérifier la connexion",
-    "OPEN": "Ouvrir l'exécuteur de requêtes",
+    "OPEN": "Ouvrir l'éditeur SQL",
     "LAUNCH_TITLE": "Ouvrir une session de requête",
     "LAUNCH_SUBTITLE": "Choisissez une source de données et l'une de vos connexions, puis ouvrez l'éditeur dans un nouvel onglet.",
     "STEP_DATASOURCE": "Source de données",
@@ -3956,7 +3956,7 @@
     "SELECT_CONNECTION": "Choisir une connexion",
     "NO_CONNECTIONS_FOR_DS": "Vous n'avez encore aucune connexion pour cette source de données.",
     "NO_CONNECTIONS_HINT": "Vous n'avez encore aucune connexion. Créez-en une pour commencer.",
-    "OPEN_EXECUTOR": "Ouvrir l'exécuteur de requêtes",
+    "OPEN_EXECUTOR": "Ouvrir l'éditeur SQL",
     "VERIFYING": "Vérification…",
     "RUN": "Exécuter",
     "RUNNING": "Exécution…",

@@ -16,7 +16,7 @@
     "dbPrivileges": "Privilegi e accesso",
     "dbConnections": "Connessioni",
     "connectionManager": "Connessioni",
-    "queryRunner": "Esecutore query",
+    "queryRunner": "Area di lavoro SQL",
     "accessManagement": "Gestore accessi",
     "dbExecStudio": "DBExec Studio",
     "queryBuilderTab": "Tab",
@@ -2009,7 +2009,7 @@
     "DB_USERS": "Utenti del database",
     "DB_ROLES": "Utenti e ruoli del database",
     "DB_PRIVILEGES": "Privilegi e accesso",
-    "QUERY_RUNNER": "Esecutore di query",
+    "QUERY_RUNNER": "Area di lavoro SQL",
     "EMBED_DASHBOARD": "Dashboard"
   },
   "AUTH": {
@@ -3915,7 +3915,7 @@
     }
   },
   "QUERY_RUNNER": {
-    "TITLE": "Query Runner",
+    "TITLE": "Area di lavoro SQL",
     "CONNECTIONS_TITLE": "Connessioni",
     "MANAGE_CONNECTIONS": "Gestisci connessioni",
     "NEW_CONNECTION": "Nuova connessione",
@@ -3946,7 +3946,7 @@
     "DEFAULT_BADGE": "Connessione predefinita per questa origine dati",
     "ALL_DISABLED_FOR_DS": "Tutte le connessioni per questa origine dati sono disabilitate. Abilitane una per eseguire query.",
     "TEST": "Verifica connessione",
-    "OPEN": "Apri Query Runner",
+    "OPEN": "Apri editor SQL",
     "LAUNCH_TITLE": "Apri una sessione di query",
     "LAUNCH_SUBTITLE": "Scegli un'origine dati e una delle tue connessioni, quindi apri l'editor in una nuova scheda.",
     "STEP_DATASOURCE": "Origine dati",
@@ -3956,7 +3956,7 @@
     "SELECT_CONNECTION": "Scegli una connessione",
     "NO_CONNECTIONS_FOR_DS": "Non hai ancora connessioni per questa origine dati.",
     "NO_CONNECTIONS_HINT": "Non hai ancora alcuna connessione. Creane una per iniziare.",
-    "OPEN_EXECUTOR": "Apri Query Runner",
+    "OPEN_EXECUTOR": "Apri editor SQL",
     "VERIFYING": "Verifica in corso…",
     "RUN": "Esegui",
     "RUNNING": "Esecuzione in corso…",

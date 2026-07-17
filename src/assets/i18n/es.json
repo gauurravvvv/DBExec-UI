@@ -16,7 +16,7 @@
     "dbPrivileges": "Privilegios y acceso",
     "dbConnections": "Conexiones",
     "connectionManager": "Conexiones",
-    "queryRunner": "Ejecutor de consultas",
+    "queryRunner": "Espacio de trabajo SQL",
     "accessManagement": "Gestor de acceso",
     "dbExecStudio": "DBExec Studio",
     "queryBuilderTab": "Pestaña",
@@ -2009,7 +2009,7 @@
     "DB_USERS": "Usuarios de la base de datos",
     "DB_ROLES": "Usuarios y roles de la base de datos",
     "DB_PRIVILEGES": "Privilegios y acceso",
-    "QUERY_RUNNER": "Ejecutor de consultas",
+    "QUERY_RUNNER": "Espacio de trabajo SQL",
     "EMBED_DASHBOARD": "Dashboard"
   },
   "AUTH": {
@@ -3915,7 +3915,7 @@
     }
   },
   "QUERY_RUNNER": {
-    "TITLE": "Ejecutor de consultas",
+    "TITLE": "Espacio de trabajo SQL",
     "CONNECTIONS_TITLE": "Conexiones",
     "MANAGE_CONNECTIONS": "Gestionar conexiones",
     "NEW_CONNECTION": "Nueva conexión",
@@ -3946,7 +3946,7 @@
     "DEFAULT_BADGE": "Conexión predeterminada para este origen de datos",
     "ALL_DISABLED_FOR_DS": "Todas las conexiones de este origen de datos están deshabilitadas. Habilite una para ejecutar consultas.",
     "TEST": "Verificar conexión",
-    "OPEN": "Abrir ejecutor de consultas",
+    "OPEN": "Abrir editor SQL",
     "LAUNCH_TITLE": "Abrir una sesión de consulta",
     "LAUNCH_SUBTITLE": "Elija un origen de datos y una de sus conexiones, luego abra el editor en una nueva pestaña.",
     "STEP_DATASOURCE": "Origen de datos",
@@ -3956,7 +3956,7 @@
     "SELECT_CONNECTION": "Elija una conexión",
     "NO_CONNECTIONS_FOR_DS": "Aún no tiene conexiones para este origen de datos.",
     "NO_CONNECTIONS_HINT": "Aún no tiene ninguna conexión. Cree una para empezar.",
-    "OPEN_EXECUTOR": "Abrir ejecutor de consultas",
+    "OPEN_EXECUTOR": "Abrir editor SQL",
     "VERIFYING": "Verificando…",
     "RUN": "Ejecutar",
     "RUNNING": "Ejecutando…",

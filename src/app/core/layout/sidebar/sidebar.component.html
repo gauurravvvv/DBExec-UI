@@ -91,6 +91,7 @@
             *ngIf="!item.subPermissions?.length"
             [routerLink]="item.route"
             routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
             #rla="routerLinkActive"
             [attr.aria-current]="rla.isActive ? 'page' : null"
             class="nav-link"
@@ -125,6 +126,7 @@
                 *ngIf="!subItem.subPermissions?.length"
                 [routerLink]="subItem.route"
                 routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: subItem.exact ?? false }"
                 #rlaSub="routerLinkActive"
                 [attr.aria-current]="rlaSub.isActive ? 'page' : null"
               >
@@ -255,6 +257,7 @@
         *ngIf="!nestedItem.subPermissions?.length"
         [routerLink]="nestedItem.route"
         routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: nestedItem.exact ?? false }"
         #rlaNested="routerLinkActive"
         [attr.aria-current]="rlaNested.isActive ? 'page' : null"
       >

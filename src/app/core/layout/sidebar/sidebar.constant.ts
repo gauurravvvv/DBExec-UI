@@ -21,13 +21,18 @@ export const SIDEBAR_ITEMS_ROUTES = [
   { value: 'datasetManager', route: '/app/datasets' },
   { value: 'analyses', route: '/app/analyses' },
   { value: 'connectionManager', route: '/app/query-runner/connections' },
-  { value: 'queryRunner', route: '/app/query-runner' },
+  // exact: this route ('/app/query-runner') is a PREFIX of connectionManager's
+  // and of the saved-query subpaths, so without exact matching it lights up
+  // whenever any query-runner child route is active. Match only the exact URL.
+  { value: 'queryRunner', route: '/app/query-runner', exact: true },
   { value: 'queryBuilderTab', route: '/app/tabs' },
   { value: 'queryBuilderSection', route: '/app/sections' },
   { value: 'queryBuilderPrompt', route: '/app/prompts' },
   { value: 'queryBuilderScreen', route: '/app/query-builders' },
   { value: 'myProfile', route: '/app/profile' },
-  { value: 'auditLogs', route: '/app/audit' },
+  // exact: '/app/audit' is a prefix of loginActivity's '/app/audit/logins',
+  // so it would also highlight on the Login Activity screen without exact match.
+  { value: 'auditLogs', route: '/app/audit', exact: true },
   { value: 'loginActivity', route: '/app/audit/logins' },
   { value: 'dashboard', route: '/app/dashboards' },
   { value: 'rlsRules', route: '/app/rls-rules' },

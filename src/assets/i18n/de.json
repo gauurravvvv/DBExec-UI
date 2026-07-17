@@ -16,7 +16,7 @@
     "dbPrivileges": "Berechtigungen & Zugriff",
     "dbConnections": "Verbindungen",
     "connectionManager": "Verbindungen",
-    "queryRunner": "Query-Runner",
+    "queryRunner": "SQL-Arbeitsbereich",
     "accessManagement": "Zugriffsverwaltung",
     "dbExecStudio": "DBExec Studio",
     "queryBuilderTab": "Tab",
@@ -2009,7 +2009,7 @@
     "DB_USERS": "Datenbankbenutzer",
     "DB_ROLES": "Datenbankbenutzer & Rollen",
     "DB_PRIVILEGES": "Rechte & Zugriff",
-    "QUERY_RUNNER": "Abfrage-Runner",
+    "QUERY_RUNNER": "SQL-Arbeitsbereich",
     "EMBED_DASHBOARD": "Dashboard"
   },
   "AUTH": {
@@ -3915,7 +3915,7 @@
     }
   },
   "QUERY_RUNNER": {
-    "TITLE": "Query-Runner",
+    "TITLE": "SQL-Arbeitsbereich",
     "CONNECTIONS_TITLE": "Verbindungen",
     "MANAGE_CONNECTIONS": "Verbindungen verwalten",
     "NEW_CONNECTION": "Neue Verbindung",
@@ -3946,7 +3946,7 @@
     "DEFAULT_BADGE": "Standardverbindung für diese Datenquelle",
     "ALL_DISABLED_FOR_DS": "Alle Verbindungen für diese Datenquelle sind deaktiviert. Aktivieren Sie eine, um Abfragen auszuführen.",
     "TEST": "Verbindung überprüfen",
-    "OPEN": "Query-Runner öffnen",
+    "OPEN": "SQL-Editor öffnen",
     "LAUNCH_TITLE": "Abfragesitzung öffnen",
     "LAUNCH_SUBTITLE": "Wählen Sie eine Datenquelle und eine Ihrer Verbindungen aus und öffnen Sie dann den Editor in einem neuen Tab.",
     "STEP_DATASOURCE": "Datenquelle",
@@ -3956,7 +3956,7 @@
     "SELECT_CONNECTION": "Verbindung auswählen",
     "NO_CONNECTIONS_FOR_DS": "Sie haben noch keine Verbindungen für diese Datenquelle.",
     "NO_CONNECTIONS_HINT": "Sie haben noch keine Verbindungen. Erstellen Sie eine, um zu beginnen.",
-    "OPEN_EXECUTOR": "Query-Runner öffnen",
+    "OPEN_EXECUTOR": "SQL-Editor öffnen",
     "VERIFYING": "Wird überprüft…",
     "RUN": "Ausführen",
     "RUNNING": "Wird ausgeführt…",

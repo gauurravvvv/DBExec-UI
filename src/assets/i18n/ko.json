@@ -16,7 +16,7 @@
     "dbPrivileges": "권한 및 액세스",
     "dbConnections": "연결",
     "connectionManager": "연결",
-    "queryRunner": "쿼리 러너",
+    "queryRunner": "SQL 작업 공간",
     "accessManagement": "액세스 관리자",
     "dbExecStudio": "DBExec Studio",
     "queryBuilderTab": "탭",
@@ -2009,7 +2009,7 @@
     "DB_USERS": "데이터베이스 사용자",
     "DB_ROLES": "데이터베이스 사용자 및 역할",
     "DB_PRIVILEGES": "권한 및 접근",
-    "QUERY_RUNNER": "쿼리 러너",
+    "QUERY_RUNNER": "SQL 작업 공간",
     "EMBED_DASHBOARD": "대시보드"
   },
   "AUTH": {
@@ -3915,7 +3915,7 @@
     }
   },
   "QUERY_RUNNER": {
-    "TITLE": "쿼리 실행기",
+    "TITLE": "SQL 작업 공간",
     "CONNECTIONS_TITLE": "연결",
     "MANAGE_CONNECTIONS": "연결 관리",
     "NEW_CONNECTION": "새 연결",
@@ -3946,7 +3946,7 @@
     "DEFAULT_BADGE": "이 데이터 소스의 기본 연결",
     "ALL_DISABLED_FOR_DS": "이 데이터 소스의 모든 연결이 비활성화되어 있습니다. 쿼리를 실행하려면 하나를 활성화하세요.",
     "TEST": "연결 확인",
-    "OPEN": "쿼리 실행기 열기",
+    "OPEN": "SQL 편집기 열기",
     "LAUNCH_TITLE": "쿼리 세션 열기",
     "LAUNCH_SUBTITLE": "데이터 소스와 연결 중 하나를 선택한 다음 새 탭에서 편집기를 여세요.",
     "STEP_DATASOURCE": "데이터 소스",
@@ -3956,7 +3956,7 @@
     "SELECT_CONNECTION": "연결 선택",
     "NO_CONNECTIONS_FOR_DS": "아직 이 데이터 소스에 대한 연결이 없습니다.",
     "NO_CONNECTIONS_HINT": "아직 연결이 없습니다. 시작하려면 하나를 생성하세요.",
-    "OPEN_EXECUTOR": "쿼리 실행기 열기",
+    "OPEN_EXECUTOR": "SQL 편집기 열기",
     "VERIFYING": "확인 중…",
     "RUN": "실행",
     "RUNNING": "실행 중…",

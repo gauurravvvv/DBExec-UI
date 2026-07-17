@@ -16,7 +16,7 @@
     "dbPrivileges": "Rechten en toegang",
     "dbConnections": "Verbindingen",
     "connectionManager": "Verbindingen",
-    "queryRunner": "Query-runner",
+    "queryRunner": "SQL-werkruimte",
     "accessManagement": "Toegangsbeheer",
     "dbExecStudio": "DBExec Studio",
     "queryBuilderTab": "Tab",
@@ -2009,7 +2009,7 @@
     "DB_USERS": "Databasegebruikers",
     "DB_ROLES": "Databasegebruikers & rollen",
     "DB_PRIVILEGES": "Rechten & toegang",
-    "QUERY_RUNNER": "Query-uitvoerder",
+    "QUERY_RUNNER": "SQL-werkruimte",
     "EMBED_DASHBOARD": "Dashboard"
   },
   "AUTH": {
@@ -3915,7 +3915,7 @@
     }
   },
   "QUERY_RUNNER": {
-    "TITLE": "Query Runner",
+    "TITLE": "SQL-werkruimte",
     "CONNECTIONS_TITLE": "Verbindingen",
     "MANAGE_CONNECTIONS": "Verbindingen beheren",
     "NEW_CONNECTION": "Nieuwe verbinding",
@@ -3946,7 +3946,7 @@
     "DEFAULT_BADGE": "Standaardverbinding voor deze gegevensbron",
     "ALL_DISABLED_FOR_DS": "Alle verbindingen voor deze gegevensbron zijn uitgeschakeld. Schakel er een in om query's uit te voeren.",
     "TEST": "Verbinding verifiëren",
-    "OPEN": "Query Runner openen",
+    "OPEN": "SQL-editor openen",
     "LAUNCH_TITLE": "Een querysessie openen",
     "LAUNCH_SUBTITLE": "Kies een gegevensbron en een van uw verbindingen, en open vervolgens de editor in een nieuw tabblad.",
     "STEP_DATASOURCE": "Gegevensbron",
@@ -3956,7 +3956,7 @@
     "SELECT_CONNECTION": "Kies een verbinding",
     "NO_CONNECTIONS_FOR_DS": "U hebt nog geen verbindingen voor deze gegevensbron.",
     "NO_CONNECTIONS_HINT": "U hebt nog geen verbindingen. Maak er een om te beginnen.",
-    "OPEN_EXECUTOR": "Query Runner openen",
+    "OPEN_EXECUTOR": "SQL-editor openen",
     "VERIFYING": "Bezig met verifiëren…",
     "RUN": "Uitvoeren",
     "RUNNING": "Bezig met uitvoeren…",

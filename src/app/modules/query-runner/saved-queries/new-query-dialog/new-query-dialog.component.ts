@@ -189,6 +189,17 @@ export class NewQueryDialogComponent implements OnInit {
     this.router.navigateByUrl(QUERY_RUNNER.CONNECTIONS_LIST);
   }
 
+  /**
+   * Close the popup ONLY when the backdrop itself is the click target — not
+   * when the click originated inside the popup content (or in a dropdown
+   * overlay that bubbles up). Using this instead of stopPropagation on the
+   * content lets PrimeNG's appendTo="body" dropdown receive the document-level
+   * outside click it needs to close itself.
+   */
+  onBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) this.close();
+  }
+
   close(): void {
     this.closed.emit();
   }

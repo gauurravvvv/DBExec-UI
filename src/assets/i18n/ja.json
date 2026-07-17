@@ -16,7 +16,7 @@
     "dbPrivileges": "権限とアクセス",
     "dbConnections": "接続",
     "connectionManager": "接続",
-    "queryRunner": "クエリランナー",
+    "queryRunner": "SQL ワークスペース",
     "accessManagement": "アクセス管理",
     "dbExecStudio": "DBExec Studio",
     "queryBuilderTab": "タブ",
@@ -2009,7 +2009,7 @@
     "DB_USERS": "データベースユーザー",
     "DB_ROLES": "データベースユーザーとロール",
     "DB_PRIVILEGES": "権限とアクセス",
-    "QUERY_RUNNER": "クエリランナー",
+    "QUERY_RUNNER": "SQL ワークスペース",
     "EMBED_DASHBOARD": "ダッシュボード"
   },
   "AUTH": {
@@ -3915,7 +3915,7 @@
     }
   },
   "QUERY_RUNNER": {
-    "TITLE": "クエリランナー",
+    "TITLE": "SQL ワークスペース",
     "CONNECTIONS_TITLE": "接続",
     "MANAGE_CONNECTIONS": "接続を管理",
     "NEW_CONNECTION": "新しい接続",
@@ -3946,7 +3946,7 @@
     "DEFAULT_BADGE": "このデータソースのデフォルト接続",
     "ALL_DISABLED_FOR_DS": "このデータソースの接続はすべて無効です。クエリを実行するには接続を有効にしてください。",
     "TEST": "接続を検証",
-    "OPEN": "クエリランナーを開く",
+    "OPEN": "SQL エディターを開く",
     "LAUNCH_TITLE": "クエリセッションを開く",
     "LAUNCH_SUBTITLE": "データソースと接続を1つ選択し、エディターを新しいタブで開いてください。",
     "STEP_DATASOURCE": "データソース",
@@ -3956,7 +3956,7 @@
     "SELECT_CONNECTION": "接続を選択",
     "NO_CONNECTIONS_FOR_DS": "このデータソースの接続はまだありません。",
     "NO_CONNECTIONS_HINT": "接続がまだありません。開始するには接続を作成してください。",
-    "OPEN_EXECUTOR": "クエリランナーを開く",
+    "OPEN_EXECUTOR": "SQL エディターを開く",
     "VERIFYING": "検証中…",
     "RUN": "実行",
     "RUNNING": "実行中…",

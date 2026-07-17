@@ -1,8 +1,15 @@
 <!-- New-Query popup — `.confirmation-popup` overlay (app dialog pattern),
      NOT a p-dialog. Datasource → connection selection reused from the
      retired launcher; "Open Executor" opens a blank executor tab. -->
-<div class="confirmation-popup" (click)="close()">
-  <div class="popup-content nq-content" (click)="$event.stopPropagation()">
+<!-- Close ONLY when the backdrop itself is clicked (target === currentTarget).
+     We must NOT stopPropagation on .popup-content: PrimeNG dropdowns use an
+     appendTo="body" overlay that closes on a document-level outside click, and
+     swallowing the bubbling click here kept the dropdown open on an in-popup
+     click and made a backdrop click close both at once. Letting clicks bubble
+     lets the dropdown's own outside-click close it; the target check keeps
+     in-content clicks from closing the popup. -->
+<div class="confirmation-popup" (click)="onBackdropClick($event)">
+  <div class="popup-content nq-content">
     <div class="popup-header">
       <div class="popup-icon"><i class="pi pi-play"></i></div>
       <h3>{{ 'QUERY_RUNNER.NEW_QUERY' | translate }}</h3>

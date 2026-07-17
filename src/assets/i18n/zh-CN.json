@@ -16,7 +16,7 @@
     "dbPrivileges": "权限与访问",
     "dbConnections": "连接",
     "connectionManager": "连接",
-    "queryRunner": "查询运行器",
+    "queryRunner": "SQL 工作区",
     "accessManagement": "访问管理",
     "dbExecStudio": "DBExec Studio",
     "queryBuilderTab": "标签页",
@@ -2009,7 +2009,7 @@
     "DB_USERS": "数据库用户",
     "DB_ROLES": "数据库用户与角色",
     "DB_PRIVILEGES": "权限与访问",
-    "QUERY_RUNNER": "查询运行器",
+    "QUERY_RUNNER": "SQL 工作区",
     "EMBED_DASHBOARD": "仪表板"
   },
   "AUTH": {
@@ -3915,7 +3915,7 @@
     }
   },
   "QUERY_RUNNER": {
-    "TITLE": "查询运行器",
+    "TITLE": "SQL 工作区",
     "CONNECTIONS_TITLE": "连接",
     "MANAGE_CONNECTIONS": "管理连接",
     "NEW_CONNECTION": "新建连接",
@@ -3946,7 +3946,7 @@
     "DEFAULT_BADGE": "此数据源的默认连接",
     "ALL_DISABLED_FOR_DS": "该数据源的所有连接均已禁用。请启用其中一个以运行查询。",
     "TEST": "验证连接",
-    "OPEN": "打开查询运行器",
+    "OPEN": "打开 SQL 编辑器",
     "LAUNCH_TITLE": "打开查询会话",
     "LAUNCH_SUBTITLE": "选择一个数据源和你的一个连接，然后在新标签页中打开编辑器。",
     "STEP_DATASOURCE": "数据源",
@@ -3956,7 +3956,7 @@
     "SELECT_CONNECTION": "选择连接",
     "NO_CONNECTIONS_FOR_DS": "你还没有此数据源的连接。",
     "NO_CONNECTIONS_HINT": "你还没有任何连接。请新建一个以开始使用。",
-    "OPEN_EXECUTOR": "打开查询运行器",
+    "OPEN_EXECUTOR": "打开 SQL 编辑器",
     "VERIFYING": "验证中…",
     "RUN": "运行",
     "RUNNING": "运行中…",
