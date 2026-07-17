@@ -36,6 +36,11 @@
     cursor: not-allowed;
   }
 
+  /* Resting chip: hint that it's editable on click. */
+  .email-chip:not(.is-disabled) {
+    cursor: pointer;
+  }
+
   .email-chips-input {
     flex: 1 1 120px;
     min-width: 120px;
@@ -54,5 +59,24 @@
     &:disabled {
       cursor: not-allowed;
     }
+  }
+
+  /* Inline-edit input replacing a chip in place — inherits the sz-sm chip's
+     footprint (padding / font-size / pill radius) so there is no layout jump
+     when switching in and out of edit mode. */
+  .email-chips-edit {
+    flex: 0 1 auto;
+    min-width: 8ch;
+    width: auto;
+    border: 1px solid var(--primary-color);
+    outline: none;
+    background: var(--card-background);
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: var(--fs-micro);
+    line-height: var(--lh-snug);
+    padding: 1px 8px;
+    border-radius: var(--radius-pill);
+    box-shadow: 0 0 0 2px var(--primary-color-transparent);
   }
 }

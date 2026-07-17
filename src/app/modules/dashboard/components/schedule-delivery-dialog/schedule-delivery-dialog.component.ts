@@ -19,6 +19,7 @@ import {
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { EmailChipsInputComponent } from 'src/app/shared/components/email-chips-input/email-chips-input.component';
 import {
   CRON_PRESETS,
   TIMEZONE_OPTIONS,
@@ -53,6 +54,7 @@ import {
     TranslateModule,
     AppPrimeNGModule,
     SharedModule,
+    EmailChipsInputComponent,
   ],
   templateUrl: './schedule-delivery-dialog.component.html',
   styleUrls: ['./schedule-delivery-dialog.component.scss'],
@@ -82,9 +84,6 @@ export class ScheduleDeliveryDialogComponent implements OnChanges {
     { label: this.translate.instant('DASHBOARD.SCHEDULE.FORMAT_PDF'), value: 'pdf' },
     { label: this.translate.instant('DASHBOARD.SCHEDULE.FORMAT_PNG'), value: 'png' },
   ];
-
-  /** Comma / semicolon / space separated emails in the chips control. */
-  readonly emailSeparator = /,|;| /;
 
   form: FormGroup = this.fb.group({
     cronExpression: ['0 9 * * 1', Validators.required],
