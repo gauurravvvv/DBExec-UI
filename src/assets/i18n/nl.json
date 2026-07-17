@@ -1819,6 +1819,151 @@
       "HISTOGRAM_SECTION": "Histogram",
       "HISTOGRAM_BINS": "Aantal klassen",
       "HISTOGRAM_SHOW_COUNTS": "Aantallen weergeven"
+    },
+    "V2": {
+      "TAB_DATA": "Gegevens",
+      "TAB_FORMAT": "Opmaak",
+      "WELL": {
+        "AXIS": "As",
+        "MEASURES": "Metingen",
+        "COLOR": "Kleur",
+        "SIZE": "Grootte",
+        "SHAPE": "Vorm",
+        "DETAIL": "Detail",
+        "TOOLTIP": "Tooltip",
+        "ROWS": "Rijen",
+        "COLUMNS": "Kolommen"
+      },
+      "AXIS": {
+        "MIN": "Minimum",
+        "MAX": "Maximum",
+        "SCALE": "Schaal",
+        "SCALE_LINEAR": "Lineair",
+        "SCALE_LOG": "Logaritmisch",
+        "SCALE_SYMLOG": "Symmetrisch logaritmisch",
+        "REVERSED": "As omkeren",
+        "TICK_FORMAT": "Opmaak van streepjes",
+        "ROTATION": "Labelrotatie",
+        "GRIDLINES": "Rasterlijnen",
+        "DUAL_AXIS": "Dubbele as",
+        "DUAL_SYNC": "Asschalen synchroniseren"
+      },
+      "COLOR": {
+        "PALETTE": "Palet",
+        "COLORBLIND_SAFE": "Kleurenblindvriendelijk palet",
+        "PER_VALUE": "Kleur per waarde",
+        "DIVERGING": "Divergerende schaal",
+        "MIDPOINT": "Middelpunt",
+        "OPACITY": "Dekking"
+      },
+      "DATA_LABELS": {
+        "SHOW": "Gegevenslabels tonen",
+        "POSITION": "Positie",
+        "CONTENT": "Labelinhoud",
+        "ONLY_MIN_MAX": "Alleen minimum en maximum"
+      },
+      "LEGEND": {
+        "POSITION": "Legendapositie",
+        "TYPE": "Legendatype"
+      },
+      "REFLINE": {
+        "CONSTANT": "Constante",
+        "AVERAGE": "Gemiddelde",
+        "MEDIAN": "Mediaan",
+        "MIN": "Minimum",
+        "MAX": "Maximum",
+        "PERCENTILE": "Percentiel",
+        "BAND": "Band"
+      },
+      "SORT": {
+        "BY_DIMENSION": "Op dimensie",
+        "BY_MEASURE": "Op meting",
+        "BY_VALUE": "Op waarde",
+        "DIRECTION": "Richting"
+      },
+      "TOPN": {
+        "TOP": "Bovenste",
+        "BOTTOM": "Onderste",
+        "COUNT": "Aantal",
+        "OTHER_BUCKET": "Rest groeperen als \"Overige\""
+      },
+      "FORMAT": {
+        "NUMBER": "Getal",
+        "CURRENCY": "Valuta",
+        "PERCENT": "Percentage",
+        "SCIENTIFIC": "Wetenschappelijk",
+        "DATE": "Datum",
+        "DECIMALS": "Decimalen",
+        "PREFIX": "Voorvoegsel",
+        "SUFFIX": "Achtervoegsel",
+        "DISPLAY_UNIT": "Weergave-eenheid",
+        "THOUSANDS": "Scheidingsteken voor duizendtallen"
+      },
+      "STACKING": {
+        "NONE": "Geen",
+        "TOTAL": "Gestapeld",
+        "PERCENT": "100% gestapeld"
+      },
+      "NULL_HANDLING": {
+        "GAP": "Als gat weergeven",
+        "CONNECT": "Doorverbinden",
+        "ZERO": "Als nul behandelen"
+      },
+      "SMALL_MULTIPLES": {
+        "FACET": "Opsplitsen op",
+        "MAX_COLS": "Max. kolommen"
+      },
+      "AGG": {
+        "SUM": "Som",
+        "AVERAGE": "Gemiddelde",
+        "COUNT": "Aantal",
+        "COUNT_DISTINCT": "Aantal unieke waarden",
+        "MIN": "Minimum",
+        "MAX": "Maximum",
+        "MEDIAN": "Mediaan",
+        "PERCENTILE": "Percentiel",
+        "STDDEV": "Standaarddeviatie",
+        "VARIANCE": "Variantie"
+      },
+      "TABLE_CALC": {
+        "RUNNING_TOTAL": "Lopend totaal",
+        "MOVING_AVERAGE": "Voortschrijdend gemiddelde",
+        "RANK": "Rang",
+        "DENSE_RANK": "Dichte rang",
+        "ROW_NUMBER": "Rijnummer",
+        "DIFFERENCE": "Verschil",
+        "PERCENT_DIFFERENCE": "Procentueel verschil",
+        "LAG": "Vorige waarde",
+        "LEAD": "Volgende waarde",
+        "PERCENT_OF_TOTAL": "Percentage van totaal"
+      },
+      "TIME_INTEL": {
+        "YTD": "Jaar tot heden",
+        "QTD": "Kwartaal tot heden",
+        "MTD": "Maand tot heden",
+        "SPLY": "Zelfde periode vorig jaar",
+        "YOY": "Jaar op jaar",
+        "MOM": "Maand op maand",
+        "QOQ": "Kwartaal op kwartaal",
+        "ROLLING": "Voortschrijdend"
+      },
+      "INTERACTION": {
+        "CROSS_FILTER": "Kruisfilter",
+        "DRILL_DOWN": "Inzoomen",
+        "DRILL_UP": "Uitzoomen",
+        "DRILL_TO_DETAIL": "Naar detail gaan",
+        "CLEAR_FILTERS": "Filters wissen",
+        "HIGHLIGHT": "Markeren"
+      },
+      "ERROR": {
+        "TRUNCATION_BANNER": "Bovenste {{n}} van {{total}} worden getoond",
+        "HIGH_CARDINALITY": "{{n}} unieke waarden — bovenste {{limit}} worden getoond",
+        "ALL_NULL_MEASURE": "Deze meting is leeg — alle waarden zijn null.",
+        "NO_DATA": "Geen gegevens om weer te geven.",
+        "DB_SYNTAX": "De query kon niet worden uitgevoerd vanwege een syntaxisfout.",
+        "DB_PERMISSION": "Je hebt geen toestemming om deze query uit te voeren.",
+        "DB_TIMEOUT": "De query is verlopen voordat deze kon worden voltooid."
+      }
     }
   },
   "DASHBOARD": {
@@ -3327,6 +3472,114 @@
     "HISTOGRAM": {
       "NAME": "Histogram",
       "DESCRIPTION": "Verdeling van een numerieke kolom in automatisch berekende klassen"
+    },
+    "BULLET": {
+      "NAME": "Bulletdiagram",
+      "DESCRIPTION": "Vergelijkt een meetwaarde met een doel en kwalitatieve bereiken"
+    },
+    "CHOROPLETH": {
+      "NAME": "Choroplethenkaart",
+      "DESCRIPTION": "Kleurt geografische regio's op basis van een waarde om ruimtelijke patronen te tonen"
+    },
+    "POINT_MAP": {
+      "NAME": "Puntenkaart",
+      "DESCRIPTION": "Zet afzonderlijke locaties als punten op een kaart"
+    },
+    "BUBBLE_MAP": {
+      "NAME": "Bellenkaart",
+      "DESCRIPTION": "Schaalt punten op een kaart op basis van een meetwaarde"
+    },
+    "VIOLIN": {
+      "NAME": "Vioolplot",
+      "DESCRIPTION": "Toont de verdelingsvorm van een numerieke kolom per categorie"
+    },
+    "DENSITY": {
+      "NAME": "Dichtheidsplot",
+      "DESCRIPTION": "Schat de kansdichtheid van een numerieke kolom"
+    },
+    "RIDGELINE": {
+      "NAME": "Ridgeline-plot",
+      "DESCRIPTION": "Stapelt dichtheidscurves per categorie om verdelingen te vergelijken"
+    },
+    "STREAMGRAPH": {
+      "NAME": "Streamgraph",
+      "DESCRIPTION": "Een vloeiend gestapeld vlakdiagram voor veranderende samenstelling in de tijd"
+    },
+    "MARIMEKKO": {
+      "NAME": "Marimekko-diagram",
+      "DESCRIPTION": "Een gestapeld staafdiagram met kolommen van variabele breedte die twee verhoudingen toont"
+    },
+    "CALENDAR_HEATMAP": {
+      "NAME": "Kalender-heatmap",
+      "DESCRIPTION": "Kleurt kalenderdagen op basis van een waarde om dagelijkse patronen te tonen"
+    },
+    "LOLLIPOP": {
+      "NAME": "Lollipopdiagram",
+      "DESCRIPTION": "Een staafdiagram getekend als lijn met punt om drukte te verminderen"
+    },
+    "CLEVELAND_DOT": {
+      "NAME": "Cleveland-puntdiagram",
+      "DESCRIPTION": "Rangschikt categorieën op één waarde met punten op een gemeenschappelijke as"
+    },
+    "DUMBBELL": {
+      "NAME": "Halterdiagram",
+      "DESCRIPTION": "Verbindt twee waarden per categorie om het verschil te tonen"
+    },
+    "SLOPE": {
+      "NAME": "Hellingsdiagram",
+      "DESCRIPTION": "Verbindt twee tijdstippen met lijnen om verandering in rang of waarde te tonen"
+    },
+    "BUMP": {
+      "NAME": "Bumpdiagram",
+      "DESCRIPTION": "Volgt hoe ranglijsten in de loop van de tijd veranderen"
+    },
+    "PARETO": {
+      "NAME": "Paretodiagram",
+      "DESCRIPTION": "Aflopend gesorteerde staven met een cumulatieve percentagelijn"
+    },
+    "ARC": {
+      "NAME": "Boogdiagram",
+      "DESCRIPTION": "Toont verbindingen tussen knopen die langs één as zijn geplaatst"
+    },
+    "CHORD": {
+      "NAME": "Akkoorddiagram",
+      "DESCRIPTION": "Toont stromen tussen entiteiten die in een cirkel zijn gerangschikt"
+    },
+    "NETWORK": {
+      "NAME": "Netwerkgrafiek",
+      "DESCRIPTION": "Toont knopen en de verbindingen daartussen"
+    },
+    "CYCLE_PLOT": {
+      "NAME": "Cyclusplot",
+      "DESCRIPTION": "Onthult seizoenspatronen door een trend binnen elke cyclus te groeperen"
+    },
+    "WIND_ROSE": {
+      "NAME": "Windroos",
+      "DESCRIPTION": "Een poolgrafiek die grootte en frequentie per richting toont"
+    },
+    "RADIAL_BAR": {
+      "NAME": "Radiaal staafdiagram",
+      "DESCRIPTION": "Staven rond een cirkel geplaatst in plaats van langs een rechte as"
+    },
+    "SOLID_GAUGE": {
+      "NAME": "Massieve meter",
+      "DESCRIPTION": "Een gevulde cirkelvormige meter die de voortgang naar een waarde toont"
+    },
+    "KPI_DELTA": {
+      "NAME": "KPI met delta",
+      "DESCRIPTION": "Eén metriek met de verandering ten opzichte van een vergelijkingsperiode"
+    },
+    "HEXBIN": {
+      "NAME": "Hexbin-plot",
+      "DESCRIPTION": "Groepeert dichte spreidingspunten in zeshoeken gekleurd op aantal"
+    },
+    "QQ_PLOT": {
+      "NAME": "Q-Q-plot",
+      "DESCRIPTION": "Vergelijkt een verdeling met een theoretische via kwantielen"
+    },
+    "ECDF": {
+      "NAME": "ECDF-plot",
+      "DESCRIPTION": "Tekent de empirische cumulatieve verdeling van een numerieke kolom"
     }
   },
   "ROLE_LABELS": {

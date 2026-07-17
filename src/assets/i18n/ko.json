@@ -1819,6 +1819,151 @@
       "HISTOGRAM_SECTION": "히스토그램",
       "HISTOGRAM_BINS": "구간 수",
       "HISTOGRAM_SHOW_COUNTS": "개수 표시"
+    },
+    "V2": {
+      "TAB_DATA": "데이터",
+      "TAB_FORMAT": "서식",
+      "WELL": {
+        "AXIS": "축",
+        "MEASURES": "측정값",
+        "COLOR": "색상",
+        "SIZE": "크기",
+        "SHAPE": "모양",
+        "DETAIL": "세부 정보",
+        "TOOLTIP": "툴팁",
+        "ROWS": "행",
+        "COLUMNS": "열"
+      },
+      "AXIS": {
+        "MIN": "최솟값",
+        "MAX": "최댓값",
+        "SCALE": "척도",
+        "SCALE_LINEAR": "선형",
+        "SCALE_LOG": "로그",
+        "SCALE_SYMLOG": "대칭 로그",
+        "REVERSED": "축 반전",
+        "TICK_FORMAT": "눈금 서식",
+        "ROTATION": "레이블 회전",
+        "GRIDLINES": "눈금선",
+        "DUAL_AXIS": "이중 축",
+        "DUAL_SYNC": "축 척도 동기화"
+      },
+      "COLOR": {
+        "PALETTE": "팔레트",
+        "COLORBLIND_SAFE": "색각 이상 대응 팔레트",
+        "PER_VALUE": "값별 색상",
+        "DIVERGING": "발산형 척도",
+        "MIDPOINT": "중간점",
+        "OPACITY": "불투명도"
+      },
+      "DATA_LABELS": {
+        "SHOW": "데이터 레이블 표시",
+        "POSITION": "위치",
+        "CONTENT": "레이블 내용",
+        "ONLY_MIN_MAX": "최솟값과 최댓값만"
+      },
+      "LEGEND": {
+        "POSITION": "범례 위치",
+        "TYPE": "범례 유형"
+      },
+      "REFLINE": {
+        "CONSTANT": "상수",
+        "AVERAGE": "평균",
+        "MEDIAN": "중앙값",
+        "MIN": "최솟값",
+        "MAX": "최댓값",
+        "PERCENTILE": "백분위수",
+        "BAND": "밴드"
+      },
+      "SORT": {
+        "BY_DIMENSION": "차원 기준",
+        "BY_MEASURE": "측정값 기준",
+        "BY_VALUE": "값 기준",
+        "DIRECTION": "방향"
+      },
+      "TOPN": {
+        "TOP": "상위",
+        "BOTTOM": "하위",
+        "COUNT": "개수",
+        "OTHER_BUCKET": "나머지를 \"기타\"로 묶기"
+      },
+      "FORMAT": {
+        "NUMBER": "숫자",
+        "CURRENCY": "통화",
+        "PERCENT": "백분율",
+        "SCIENTIFIC": "지수",
+        "DATE": "날짜",
+        "DECIMALS": "소수 자릿수",
+        "PREFIX": "접두사",
+        "SUFFIX": "접미사",
+        "DISPLAY_UNIT": "표시 단위",
+        "THOUSANDS": "천 단위 구분 기호"
+      },
+      "STACKING": {
+        "NONE": "없음",
+        "TOTAL": "누적",
+        "PERCENT": "100% 누적"
+      },
+      "NULL_HANDLING": {
+        "GAP": "공백으로 표시",
+        "CONNECT": "이어서 연결",
+        "ZERO": "0으로 처리"
+      },
+      "SMALL_MULTIPLES": {
+        "FACET": "분할 기준",
+        "MAX_COLS": "최대 열 수"
+      },
+      "AGG": {
+        "SUM": "합계",
+        "AVERAGE": "평균",
+        "COUNT": "개수",
+        "COUNT_DISTINCT": "고유 개수",
+        "MIN": "최솟값",
+        "MAX": "최댓값",
+        "MEDIAN": "중앙값",
+        "PERCENTILE": "백분위수",
+        "STDDEV": "표준편차",
+        "VARIANCE": "분산"
+      },
+      "TABLE_CALC": {
+        "RUNNING_TOTAL": "누적 합계",
+        "MOVING_AVERAGE": "이동 평균",
+        "RANK": "순위",
+        "DENSE_RANK": "조밀 순위",
+        "ROW_NUMBER": "행 번호",
+        "DIFFERENCE": "차이",
+        "PERCENT_DIFFERENCE": "백분율 차이",
+        "LAG": "이전 값",
+        "LEAD": "다음 값",
+        "PERCENT_OF_TOTAL": "전체 대비 비율"
+      },
+      "TIME_INTEL": {
+        "YTD": "연초 누계",
+        "QTD": "분기 초 누계",
+        "MTD": "월초 누계",
+        "SPLY": "전년 동기",
+        "YOY": "전년 대비",
+        "MOM": "전월 대비",
+        "QOQ": "전분기 대비",
+        "ROLLING": "롤링"
+      },
+      "INTERACTION": {
+        "CROSS_FILTER": "교차 필터",
+        "DRILL_DOWN": "드릴다운",
+        "DRILL_UP": "드릴업",
+        "DRILL_TO_DETAIL": "세부 정보로 드릴",
+        "CLEAR_FILTERS": "필터 지우기",
+        "HIGHLIGHT": "강조 표시"
+      },
+      "ERROR": {
+        "TRUNCATION_BANNER": "{{total}}개 중 상위 {{n}}개 표시 중",
+        "HIGH_CARDINALITY": "고유 값 {{n}}개 — 상위 {{limit}}개 표시 중",
+        "ALL_NULL_MEASURE": "이 측정값은 비어 있습니다. 모든 값이 null입니다.",
+        "NO_DATA": "표시할 데이터가 없습니다.",
+        "DB_SYNTAX": "구문 오류로 인해 쿼리를 실행할 수 없습니다.",
+        "DB_PERMISSION": "이 쿼리를 실행할 권한이 없습니다.",
+        "DB_TIMEOUT": "쿼리가 완료되기 전에 시간이 초과되었습니다."
+      }
     }
   },
   "DASHBOARD": {
@@ -3327,6 +3472,114 @@
     "HISTOGRAM": {
       "NAME": "히스토그램",
       "DESCRIPTION": "숫자 열을 자동 계산된 구간으로 분포"
+    },
+    "BULLET": {
+      "NAME": "불릿 차트",
+      "DESCRIPTION": "측정값을 목표 및 정성적 범위와 비교합니다"
+    },
+    "CHOROPLETH": {
+      "NAME": "단계 구분도",
+      "DESCRIPTION": "값에 따라 지리적 영역을 음영 처리하여 공간 패턴을 보여줍니다"
+    },
+    "POINT_MAP": {
+      "NAME": "포인트 지도",
+      "DESCRIPTION": "개별 위치를 지도에 점으로 표시합니다"
+    },
+    "BUBBLE_MAP": {
+      "NAME": "버블 지도",
+      "DESCRIPTION": "측정값에 따라 지도의 점 크기를 조정합니다"
+    },
+    "VIOLIN": {
+      "NAME": "바이올린 플롯",
+      "DESCRIPTION": "범주별 숫자 열의 분포 형태를 보여줍니다"
+    },
+    "DENSITY": {
+      "NAME": "밀도 플롯",
+      "DESCRIPTION": "숫자 열의 확률 밀도를 추정합니다"
+    },
+    "RIDGELINE": {
+      "NAME": "리지라인 플롯",
+      "DESCRIPTION": "범주별 밀도 곡선을 쌓아 분포를 비교합니다"
+    },
+    "STREAMGRAPH": {
+      "NAME": "스트림그래프",
+      "DESCRIPTION": "시간에 따라 변하는 구성을 나타내는 흐르는 누적 영역 차트"
+    },
+    "MARIMEKKO": {
+      "NAME": "마리메꼬 차트",
+      "DESCRIPTION": "너비가 가변적인 누적 막대 차트로 두 가지 비율을 보여줍니다"
+    },
+    "CALENDAR_HEATMAP": {
+      "NAME": "캘린더 히트맵",
+      "DESCRIPTION": "값에 따라 달력 날짜를 음영 처리하여 일별 패턴을 보여줍니다"
+    },
+    "LOLLIPOP": {
+      "NAME": "롤리팝 차트",
+      "DESCRIPTION": "선과 점으로 그린 막대 차트로 복잡함을 줄입니다"
+    },
+    "CLEVELAND_DOT": {
+      "NAME": "클리블랜드 도트 플롯",
+      "DESCRIPTION": "공통 축의 점을 사용해 단일 값으로 범주를 순위화합니다"
+    },
+    "DUMBBELL": {
+      "NAME": "덤벨 차트",
+      "DESCRIPTION": "범주별 두 값을 연결하여 그 격차를 보여줍니다"
+    },
+    "SLOPE": {
+      "NAME": "기울기 차트",
+      "DESCRIPTION": "두 시점을 선으로 연결하여 순위나 값의 변화를 보여줍니다"
+    },
+    "BUMP": {
+      "NAME": "범프 차트",
+      "DESCRIPTION": "순위가 시간에 따라 어떻게 변하는지 추적합니다"
+    },
+    "PARETO": {
+      "NAME": "파레토 차트",
+      "DESCRIPTION": "내림차순으로 정렬된 막대와 누적 백분율 선을 함께 표시합니다"
+    },
+    "ARC": {
+      "NAME": "호 다이어그램",
+      "DESCRIPTION": "단일 축을 따라 배치된 노드 간의 연결을 보여줍니다"
+    },
+    "CHORD": {
+      "NAME": "코드 다이어그램",
+      "DESCRIPTION": "원형으로 배치된 개체 간의 흐름을 보여줍니다"
+    },
+    "NETWORK": {
+      "NAME": "네트워크 그래프",
+      "DESCRIPTION": "노드와 그 사이의 연결을 표시합니다"
+    },
+    "CYCLE_PLOT": {
+      "NAME": "주기 플롯",
+      "DESCRIPTION": "각 주기 내에서 추세를 묶어 계절적 패턴을 드러냅니다"
+    },
+    "WIND_ROSE": {
+      "NAME": "바람 장미",
+      "DESCRIPTION": "방향별 크기와 빈도를 보여주는 극좌표 차트"
+    },
+    "RADIAL_BAR": {
+      "NAME": "방사형 막대 차트",
+      "DESCRIPTION": "직선 축 대신 원을 따라 배치한 막대 차트"
+    },
+    "SOLID_GAUGE": {
+      "NAME": "솔리드 게이지",
+      "DESCRIPTION": "값을 향한 진행 상황을 보여주는 채워진 원형 게이지"
+    },
+    "KPI_DELTA": {
+      "NAME": "델타 포함 KPI",
+      "DESCRIPTION": "비교 기간 대비 변화량을 함께 보여주는 단일 지표"
+    },
+    "HEXBIN": {
+      "NAME": "헥스빈 플롯",
+      "DESCRIPTION": "밀집된 산점을 개수로 색을 입힌 육각형으로 묶습니다"
+    },
+    "QQ_PLOT": {
+      "NAME": "Q-Q 플롯",
+      "DESCRIPTION": "분위수를 통해 분포를 이론 분포와 비교합니다"
+    },
+    "ECDF": {
+      "NAME": "ECDF 플롯",
+      "DESCRIPTION": "숫자 열의 경험적 누적 분포를 그립니다"
     }
   },
   "ROLE_LABELS": {

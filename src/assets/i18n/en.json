@@ -1822,6 +1822,151 @@
       "HISTOGRAM_SECTION": "Histogram",
       "HISTOGRAM_BINS": "Number of Bins",
       "HISTOGRAM_SHOW_COUNTS": "Show Counts"
+    },
+    "V2": {
+      "TAB_DATA": "Data",
+      "TAB_FORMAT": "Format",
+      "WELL": {
+        "AXIS": "Axis",
+        "MEASURES": "Measures",
+        "COLOR": "Color",
+        "SIZE": "Size",
+        "SHAPE": "Shape",
+        "DETAIL": "Detail",
+        "TOOLTIP": "Tooltip",
+        "ROWS": "Rows",
+        "COLUMNS": "Columns"
+      },
+      "AXIS": {
+        "MIN": "Minimum",
+        "MAX": "Maximum",
+        "SCALE": "Scale",
+        "SCALE_LINEAR": "Linear",
+        "SCALE_LOG": "Logarithmic",
+        "SCALE_SYMLOG": "Symmetric log",
+        "REVERSED": "Reverse axis",
+        "TICK_FORMAT": "Tick format",
+        "ROTATION": "Label rotation",
+        "GRIDLINES": "Gridlines",
+        "DUAL_AXIS": "Dual axis",
+        "DUAL_SYNC": "Sync axis scales"
+      },
+      "COLOR": {
+        "PALETTE": "Palette",
+        "COLORBLIND_SAFE": "Colorblind-safe palette",
+        "PER_VALUE": "Color per value",
+        "DIVERGING": "Diverging scale",
+        "MIDPOINT": "Midpoint",
+        "OPACITY": "Opacity"
+      },
+      "DATA_LABELS": {
+        "SHOW": "Show data labels",
+        "POSITION": "Position",
+        "CONTENT": "Label content",
+        "ONLY_MIN_MAX": "Only min and max"
+      },
+      "LEGEND": {
+        "POSITION": "Legend position",
+        "TYPE": "Legend type"
+      },
+      "REFLINE": {
+        "CONSTANT": "Constant",
+        "AVERAGE": "Average",
+        "MEDIAN": "Median",
+        "MIN": "Minimum",
+        "MAX": "Maximum",
+        "PERCENTILE": "Percentile",
+        "BAND": "Band"
+      },
+      "SORT": {
+        "BY_DIMENSION": "By dimension",
+        "BY_MEASURE": "By measure",
+        "BY_VALUE": "By value",
+        "DIRECTION": "Direction"
+      },
+      "TOPN": {
+        "TOP": "Top",
+        "BOTTOM": "Bottom",
+        "COUNT": "Count",
+        "OTHER_BUCKET": "Group the rest into \"Other\""
+      },
+      "FORMAT": {
+        "NUMBER": "Number",
+        "CURRENCY": "Currency",
+        "PERCENT": "Percent",
+        "SCIENTIFIC": "Scientific",
+        "DATE": "Date",
+        "DECIMALS": "Decimal places",
+        "PREFIX": "Prefix",
+        "SUFFIX": "Suffix",
+        "DISPLAY_UNIT": "Display unit",
+        "THOUSANDS": "Thousands separator"
+      },
+      "STACKING": {
+        "NONE": "None",
+        "TOTAL": "Stacked",
+        "PERCENT": "100% stacked"
+      },
+      "NULL_HANDLING": {
+        "GAP": "Show as gap",
+        "CONNECT": "Connect across",
+        "ZERO": "Treat as zero"
+      },
+      "SMALL_MULTIPLES": {
+        "FACET": "Facet by",
+        "MAX_COLS": "Max columns"
+      },
+      "AGG": {
+        "SUM": "Sum",
+        "AVERAGE": "Average",
+        "COUNT": "Count",
+        "COUNT_DISTINCT": "Count distinct",
+        "MIN": "Minimum",
+        "MAX": "Maximum",
+        "MEDIAN": "Median",
+        "PERCENTILE": "Percentile",
+        "STDDEV": "Standard deviation",
+        "VARIANCE": "Variance"
+      },
+      "TABLE_CALC": {
+        "RUNNING_TOTAL": "Running total",
+        "MOVING_AVERAGE": "Moving average",
+        "RANK": "Rank",
+        "DENSE_RANK": "Dense rank",
+        "ROW_NUMBER": "Row number",
+        "DIFFERENCE": "Difference",
+        "PERCENT_DIFFERENCE": "Percent difference",
+        "LAG": "Lag",
+        "LEAD": "Lead",
+        "PERCENT_OF_TOTAL": "Percent of total"
+      },
+      "TIME_INTEL": {
+        "YTD": "Year to date",
+        "QTD": "Quarter to date",
+        "MTD": "Month to date",
+        "SPLY": "Same period last year",
+        "YOY": "Year over year",
+        "MOM": "Month over month",
+        "QOQ": "Quarter over quarter",
+        "ROLLING": "Rolling"
+      },
+      "INTERACTION": {
+        "CROSS_FILTER": "Cross-filter",
+        "DRILL_DOWN": "Drill down",
+        "DRILL_UP": "Drill up",
+        "DRILL_TO_DETAIL": "Drill to detail",
+        "CLEAR_FILTERS": "Clear filters",
+        "HIGHLIGHT": "Highlight"
+      },
+      "ERROR": {
+        "TRUNCATION_BANNER": "Showing top {{n}} of {{total}}",
+        "HIGH_CARDINALITY": "{{n}} distinct values — showing top {{limit}}",
+        "ALL_NULL_MEASURE": "This measure is empty — every value is null.",
+        "NO_DATA": "No data to display.",
+        "DB_SYNTAX": "The query could not be run because of a syntax error.",
+        "DB_PERMISSION": "You do not have permission to run this query.",
+        "DB_TIMEOUT": "The query timed out before it could finish."
+      }
     }
   },
   "DASHBOARD": {
@@ -3330,6 +3475,114 @@
     "HISTOGRAM": {
       "NAME": "Histogram",
       "DESCRIPTION": "Distribution of a numeric column into auto-computed bins"
+    },
+    "BULLET": {
+      "NAME": "Bullet Chart",
+      "DESCRIPTION": "Compares a measure against a target and qualitative ranges"
+    },
+    "CHOROPLETH": {
+      "NAME": "Choropleth Map",
+      "DESCRIPTION": "Shades geographic regions by a value to reveal spatial patterns"
+    },
+    "POINT_MAP": {
+      "NAME": "Point Map",
+      "DESCRIPTION": "Plots individual locations as points on a map"
+    },
+    "BUBBLE_MAP": {
+      "NAME": "Bubble Map",
+      "DESCRIPTION": "Sizes points on a map by a measure"
+    },
+    "VIOLIN": {
+      "NAME": "Violin Plot",
+      "DESCRIPTION": "Shows the distribution shape of a numeric column across categories"
+    },
+    "DENSITY": {
+      "NAME": "Density Plot",
+      "DESCRIPTION": "Estimates the probability density of a numeric column"
+    },
+    "RIDGELINE": {
+      "NAME": "Ridgeline Plot",
+      "DESCRIPTION": "Stacks density curves per category to compare distributions"
+    },
+    "STREAMGRAPH": {
+      "NAME": "Streamgraph",
+      "DESCRIPTION": "A flowing stacked-area chart for changing composition over time"
+    },
+    "MARIMEKKO": {
+      "NAME": "Marimekko Chart",
+      "DESCRIPTION": "A stacked bar chart with variable-width columns showing two proportions"
+    },
+    "CALENDAR_HEATMAP": {
+      "NAME": "Calendar Heatmap",
+      "DESCRIPTION": "Shades calendar days by a value to reveal daily patterns"
+    },
+    "LOLLIPOP": {
+      "NAME": "Lollipop Chart",
+      "DESCRIPTION": "A bar chart drawn as a line and dot to reduce clutter"
+    },
+    "CLEVELAND_DOT": {
+      "NAME": "Cleveland Dot Plot",
+      "DESCRIPTION": "Ranks categories by a single value using dots on a common axis"
+    },
+    "DUMBBELL": {
+      "NAME": "Dumbbell Chart",
+      "DESCRIPTION": "Connects two values per category to show the gap between them"
+    },
+    "SLOPE": {
+      "NAME": "Slope Chart",
+      "DESCRIPTION": "Connects two time points with lines to show change in rank or value"
+    },
+    "BUMP": {
+      "NAME": "Bump Chart",
+      "DESCRIPTION": "Tracks how rankings change across time"
+    },
+    "PARETO": {
+      "NAME": "Pareto Chart",
+      "DESCRIPTION": "Bars sorted descending with a cumulative-percentage line"
+    },
+    "ARC": {
+      "NAME": "Arc Diagram",
+      "DESCRIPTION": "Shows connections between nodes laid out along a single axis"
+    },
+    "CHORD": {
+      "NAME": "Chord Diagram",
+      "DESCRIPTION": "Shows flows between entities arranged around a circle"
+    },
+    "NETWORK": {
+      "NAME": "Network Graph",
+      "DESCRIPTION": "Displays nodes and the links between them"
+    },
+    "CYCLE_PLOT": {
+      "NAME": "Cycle Plot",
+      "DESCRIPTION": "Reveals seasonal patterns by grouping a trend within each cycle"
+    },
+    "WIND_ROSE": {
+      "NAME": "Wind Rose",
+      "DESCRIPTION": "A polar chart showing magnitude and frequency by direction"
+    },
+    "RADIAL_BAR": {
+      "NAME": "Radial Bar Chart",
+      "DESCRIPTION": "Bars wrapped around a circle instead of along a straight axis"
+    },
+    "SOLID_GAUGE": {
+      "NAME": "Solid Gauge",
+      "DESCRIPTION": "A filled circular gauge showing progress toward a value"
+    },
+    "KPI_DELTA": {
+      "NAME": "KPI with Delta",
+      "DESCRIPTION": "A single metric with its change versus a comparison period"
+    },
+    "HEXBIN": {
+      "NAME": "Hexbin Plot",
+      "DESCRIPTION": "Bins dense scatter points into hexagons colored by count"
+    },
+    "QQ_PLOT": {
+      "NAME": "Q-Q Plot",
+      "DESCRIPTION": "Compares a distribution against a theoretical one via quantiles"
+    },
+    "ECDF": {
+      "NAME": "ECDF Plot",
+      "DESCRIPTION": "Plots the empirical cumulative distribution of a numeric column"
     }
   },
   "ROLE_LABELS": {

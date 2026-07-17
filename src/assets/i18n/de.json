@@ -1819,6 +1819,151 @@
       "HISTOGRAM_SECTION": "Histogramm",
       "HISTOGRAM_BINS": "Anzahl der Klassen",
       "HISTOGRAM_SHOW_COUNTS": "Anzahl anzeigen"
+    },
+    "V2": {
+      "TAB_DATA": "Daten",
+      "TAB_FORMAT": "Format",
+      "WELL": {
+        "AXIS": "Achse",
+        "MEASURES": "Messwerte",
+        "COLOR": "Farbe",
+        "SIZE": "Größe",
+        "SHAPE": "Form",
+        "DETAIL": "Detail",
+        "TOOLTIP": "Tooltip",
+        "ROWS": "Zeilen",
+        "COLUMNS": "Spalten"
+      },
+      "AXIS": {
+        "MIN": "Minimum",
+        "MAX": "Maximum",
+        "SCALE": "Skala",
+        "SCALE_LINEAR": "Linear",
+        "SCALE_LOG": "Logarithmisch",
+        "SCALE_SYMLOG": "Symmetrisch logarithmisch",
+        "REVERSED": "Achse umkehren",
+        "TICK_FORMAT": "Achsenbeschriftungsformat",
+        "ROTATION": "Beschriftungsdrehung",
+        "GRIDLINES": "Gitternetzlinien",
+        "DUAL_AXIS": "Doppelachse",
+        "DUAL_SYNC": "Achsenskalen synchronisieren"
+      },
+      "COLOR": {
+        "PALETTE": "Palette",
+        "COLORBLIND_SAFE": "Farbenblindsichere Palette",
+        "PER_VALUE": "Farbe je Wert",
+        "DIVERGING": "Divergierende Skala",
+        "MIDPOINT": "Mittelpunkt",
+        "OPACITY": "Deckkraft"
+      },
+      "DATA_LABELS": {
+        "SHOW": "Datenbeschriftungen anzeigen",
+        "POSITION": "Position",
+        "CONTENT": "Beschriftungsinhalt",
+        "ONLY_MIN_MAX": "Nur Minimum und Maximum"
+      },
+      "LEGEND": {
+        "POSITION": "Legendenposition",
+        "TYPE": "Legendentyp"
+      },
+      "REFLINE": {
+        "CONSTANT": "Konstante",
+        "AVERAGE": "Durchschnitt",
+        "MEDIAN": "Median",
+        "MIN": "Minimum",
+        "MAX": "Maximum",
+        "PERCENTILE": "Perzentil",
+        "BAND": "Band"
+      },
+      "SORT": {
+        "BY_DIMENSION": "Nach Dimension",
+        "BY_MEASURE": "Nach Messwert",
+        "BY_VALUE": "Nach Wert",
+        "DIRECTION": "Richtung"
+      },
+      "TOPN": {
+        "TOP": "Oberste",
+        "BOTTOM": "Unterste",
+        "COUNT": "Anzahl",
+        "OTHER_BUCKET": "Rest unter „Sonstige“ zusammenfassen"
+      },
+      "FORMAT": {
+        "NUMBER": "Zahl",
+        "CURRENCY": "Währung",
+        "PERCENT": "Prozent",
+        "SCIENTIFIC": "Wissenschaftlich",
+        "DATE": "Datum",
+        "DECIMALS": "Dezimalstellen",
+        "PREFIX": "Präfix",
+        "SUFFIX": "Suffix",
+        "DISPLAY_UNIT": "Anzeigeeinheit",
+        "THOUSANDS": "Tausendertrennzeichen"
+      },
+      "STACKING": {
+        "NONE": "Keine",
+        "TOTAL": "Gestapelt",
+        "PERCENT": "100 % gestapelt"
+      },
+      "NULL_HANDLING": {
+        "GAP": "Als Lücke anzeigen",
+        "CONNECT": "Durchverbinden",
+        "ZERO": "Als Null behandeln"
+      },
+      "SMALL_MULTIPLES": {
+        "FACET": "Aufteilen nach",
+        "MAX_COLS": "Max. Spalten"
+      },
+      "AGG": {
+        "SUM": "Summe",
+        "AVERAGE": "Durchschnitt",
+        "COUNT": "Anzahl",
+        "COUNT_DISTINCT": "Anzahl eindeutiger Werte",
+        "MIN": "Minimum",
+        "MAX": "Maximum",
+        "MEDIAN": "Median",
+        "PERCENTILE": "Perzentil",
+        "STDDEV": "Standardabweichung",
+        "VARIANCE": "Varianz"
+      },
+      "TABLE_CALC": {
+        "RUNNING_TOTAL": "Laufende Summe",
+        "MOVING_AVERAGE": "Gleitender Durchschnitt",
+        "RANK": "Rang",
+        "DENSE_RANK": "Dichter Rang",
+        "ROW_NUMBER": "Zeilennummer",
+        "DIFFERENCE": "Differenz",
+        "PERCENT_DIFFERENCE": "Prozentuale Differenz",
+        "LAG": "Vorheriger Wert",
+        "LEAD": "Nächster Wert",
+        "PERCENT_OF_TOTAL": "Prozent der Gesamtsumme"
+      },
+      "TIME_INTEL": {
+        "YTD": "Seit Jahresbeginn",
+        "QTD": "Seit Quartalsbeginn",
+        "MTD": "Seit Monatsbeginn",
+        "SPLY": "Gleicher Zeitraum im Vorjahr",
+        "YOY": "Im Jahresvergleich",
+        "MOM": "Im Monatsvergleich",
+        "QOQ": "Im Quartalsvergleich",
+        "ROLLING": "Gleitend"
+      },
+      "INTERACTION": {
+        "CROSS_FILTER": "Kreuzfilter",
+        "DRILL_DOWN": "Detailebene aufrufen",
+        "DRILL_UP": "Ebene nach oben",
+        "DRILL_TO_DETAIL": "Zu Details wechseln",
+        "CLEAR_FILTERS": "Filter zurücksetzen",
+        "HIGHLIGHT": "Hervorheben"
+      },
+      "ERROR": {
+        "TRUNCATION_BANNER": "Oberste {{n}} von {{total}} werden angezeigt",
+        "HIGH_CARDINALITY": "{{n}} eindeutige Werte – oberste {{limit}} werden angezeigt",
+        "ALL_NULL_MEASURE": "Dieser Messwert ist leer – alle Werte sind null.",
+        "NO_DATA": "Keine Daten zum Anzeigen.",
+        "DB_SYNTAX": "Die Abfrage konnte wegen eines Syntaxfehlers nicht ausgeführt werden.",
+        "DB_PERMISSION": "Sie haben keine Berechtigung, diese Abfrage auszuführen.",
+        "DB_TIMEOUT": "Die Abfrage hat das Zeitlimit überschritten, bevor sie abgeschlossen werden konnte."
+      }
     }
   },
   "DASHBOARD": {
@@ -3327,6 +3472,114 @@
     "HISTOGRAM": {
       "NAME": "Histogramm",
       "DESCRIPTION": "Verteilung einer numerischen Spalte in automatisch berechnete Klassen"
+    },
+    "BULLET": {
+      "NAME": "Bullet-Diagramm",
+      "DESCRIPTION": "Vergleicht einen Messwert mit einem Zielwert und qualitativen Bereichen"
+    },
+    "CHOROPLETH": {
+      "NAME": "Choroplethenkarte",
+      "DESCRIPTION": "Färbt geografische Regionen nach einem Wert und zeigt räumliche Muster"
+    },
+    "POINT_MAP": {
+      "NAME": "Punktkarte",
+      "DESCRIPTION": "Stellt einzelne Standorte als Punkte auf einer Karte dar"
+    },
+    "BUBBLE_MAP": {
+      "NAME": "Blasenkarte",
+      "DESCRIPTION": "Skaliert Punkte auf einer Karte nach einem Messwert"
+    },
+    "VIOLIN": {
+      "NAME": "Violinplot",
+      "DESCRIPTION": "Zeigt die Verteilungsform einer numerischen Spalte über Kategorien hinweg"
+    },
+    "DENSITY": {
+      "NAME": "Dichtediagramm",
+      "DESCRIPTION": "Schätzt die Wahrscheinlichkeitsdichte einer numerischen Spalte"
+    },
+    "RIDGELINE": {
+      "NAME": "Ridgeline-Diagramm",
+      "DESCRIPTION": "Stapelt Dichtekurven je Kategorie zum Verteilungsvergleich"
+    },
+    "STREAMGRAPH": {
+      "NAME": "Streamgraph",
+      "DESCRIPTION": "Ein fließendes gestapeltes Flächendiagramm für sich ändernde Zusammensetzung über die Zeit"
+    },
+    "MARIMEKKO": {
+      "NAME": "Marimekko-Diagramm",
+      "DESCRIPTION": "Ein gestapeltes Balkendiagramm mit variabler Spaltenbreite für zwei Anteile"
+    },
+    "CALENDAR_HEATMAP": {
+      "NAME": "Kalender-Heatmap",
+      "DESCRIPTION": "Färbt Kalendertage nach einem Wert und zeigt tägliche Muster"
+    },
+    "LOLLIPOP": {
+      "NAME": "Lollipop-Diagramm",
+      "DESCRIPTION": "Ein Balkendiagramm als Linie mit Punkt für weniger visuelle Unruhe"
+    },
+    "CLEVELAND_DOT": {
+      "NAME": "Cleveland-Punktdiagramm",
+      "DESCRIPTION": "Ordnet Kategorien nach einem Wert mit Punkten auf einer gemeinsamen Achse"
+    },
+    "DUMBBELL": {
+      "NAME": "Hantel-Diagramm",
+      "DESCRIPTION": "Verbindet zwei Werte je Kategorie, um deren Abstand zu zeigen"
+    },
+    "SLOPE": {
+      "NAME": "Steigungsdiagramm",
+      "DESCRIPTION": "Verbindet zwei Zeitpunkte mit Linien, um Änderungen in Rang oder Wert zu zeigen"
+    },
+    "BUMP": {
+      "NAME": "Bump-Diagramm",
+      "DESCRIPTION": "Verfolgt, wie sich Ranglisten im Zeitverlauf ändern"
+    },
+    "PARETO": {
+      "NAME": "Pareto-Diagramm",
+      "DESCRIPTION": "Absteigend sortierte Balken mit einer kumulativen Prozentlinie"
+    },
+    "ARC": {
+      "NAME": "Bogendiagramm",
+      "DESCRIPTION": "Zeigt Verbindungen zwischen Knoten entlang einer einzelnen Achse"
+    },
+    "CHORD": {
+      "NAME": "Chord-Diagramm",
+      "DESCRIPTION": "Zeigt Flüsse zwischen um einen Kreis angeordneten Entitäten"
+    },
+    "NETWORK": {
+      "NAME": "Netzwerkgraph",
+      "DESCRIPTION": "Stellt Knoten und die Verbindungen zwischen ihnen dar"
+    },
+    "CYCLE_PLOT": {
+      "NAME": "Zyklusdiagramm",
+      "DESCRIPTION": "Zeigt saisonale Muster, indem ein Trend innerhalb jedes Zyklus gruppiert wird"
+    },
+    "WIND_ROSE": {
+      "NAME": "Windrose",
+      "DESCRIPTION": "Ein Polardiagramm, das Betrag und Häufigkeit nach Richtung zeigt"
+    },
+    "RADIAL_BAR": {
+      "NAME": "Radiales Balkendiagramm",
+      "DESCRIPTION": "Balken um einen Kreis gewickelt statt entlang einer geraden Achse"
+    },
+    "SOLID_GAUGE": {
+      "NAME": "Vollmesser",
+      "DESCRIPTION": "Eine gefüllte kreisförmige Anzeige, die den Fortschritt zu einem Wert zeigt"
+    },
+    "KPI_DELTA": {
+      "NAME": "KPI mit Delta",
+      "DESCRIPTION": "Eine einzelne Kennzahl mit ihrer Veränderung gegenüber einem Vergleichszeitraum"
+    },
+    "HEXBIN": {
+      "NAME": "Hexbin-Diagramm",
+      "DESCRIPTION": "Fasst dichte Streupunkte in nach Anzahl gefärbte Sechsecke zusammen"
+    },
+    "QQ_PLOT": {
+      "NAME": "Q-Q-Diagramm",
+      "DESCRIPTION": "Vergleicht eine Verteilung anhand von Quantilen mit einer theoretischen"
+    },
+    "ECDF": {
+      "NAME": "ECDF-Diagramm",
+      "DESCRIPTION": "Stellt die empirische kumulative Verteilung einer numerischen Spalte dar"
     }
   },
   "ROLE_LABELS": {

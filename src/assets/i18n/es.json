@@ -1819,6 +1819,151 @@
       "HISTOGRAM_SECTION": "Histograma",
       "HISTOGRAM_BINS": "Número de intervalos",
       "HISTOGRAM_SHOW_COUNTS": "Mostrar recuentos"
+    },
+    "V2": {
+      "TAB_DATA": "Datos",
+      "TAB_FORMAT": "Formato",
+      "WELL": {
+        "AXIS": "Eje",
+        "MEASURES": "Medidas",
+        "COLOR": "Color",
+        "SIZE": "Tamaño",
+        "SHAPE": "Forma",
+        "DETAIL": "Detalle",
+        "TOOLTIP": "Información sobre herramientas",
+        "ROWS": "Filas",
+        "COLUMNS": "Columnas"
+      },
+      "AXIS": {
+        "MIN": "Mínimo",
+        "MAX": "Máximo",
+        "SCALE": "Escala",
+        "SCALE_LINEAR": "Lineal",
+        "SCALE_LOG": "Logarítmica",
+        "SCALE_SYMLOG": "Logarítmica simétrica",
+        "REVERSED": "Invertir eje",
+        "TICK_FORMAT": "Formato de marcas",
+        "ROTATION": "Rotación de etiquetas",
+        "GRIDLINES": "Líneas de cuadrícula",
+        "DUAL_AXIS": "Eje doble",
+        "DUAL_SYNC": "Sincronizar escalas de ejes"
+      },
+      "COLOR": {
+        "PALETTE": "Paleta",
+        "COLORBLIND_SAFE": "Paleta apta para daltonismo",
+        "PER_VALUE": "Color por valor",
+        "DIVERGING": "Escala divergente",
+        "MIDPOINT": "Punto medio",
+        "OPACITY": "Opacidad"
+      },
+      "DATA_LABELS": {
+        "SHOW": "Mostrar etiquetas de datos",
+        "POSITION": "Posición",
+        "CONTENT": "Contenido de la etiqueta",
+        "ONLY_MIN_MAX": "Solo mínimo y máximo"
+      },
+      "LEGEND": {
+        "POSITION": "Posición de la leyenda",
+        "TYPE": "Tipo de leyenda"
+      },
+      "REFLINE": {
+        "CONSTANT": "Constante",
+        "AVERAGE": "Promedio",
+        "MEDIAN": "Mediana",
+        "MIN": "Mínimo",
+        "MAX": "Máximo",
+        "PERCENTILE": "Percentil",
+        "BAND": "Banda"
+      },
+      "SORT": {
+        "BY_DIMENSION": "Por dimensión",
+        "BY_MEASURE": "Por medida",
+        "BY_VALUE": "Por valor",
+        "DIRECTION": "Dirección"
+      },
+      "TOPN": {
+        "TOP": "Superiores",
+        "BOTTOM": "Inferiores",
+        "COUNT": "Cantidad",
+        "OTHER_BUCKET": "Agrupar el resto en «Otros»"
+      },
+      "FORMAT": {
+        "NUMBER": "Número",
+        "CURRENCY": "Moneda",
+        "PERCENT": "Porcentaje",
+        "SCIENTIFIC": "Científico",
+        "DATE": "Fecha",
+        "DECIMALS": "Decimales",
+        "PREFIX": "Prefijo",
+        "SUFFIX": "Sufijo",
+        "DISPLAY_UNIT": "Unidad de visualización",
+        "THOUSANDS": "Separador de miles"
+      },
+      "STACKING": {
+        "NONE": "Ninguno",
+        "TOTAL": "Apilado",
+        "PERCENT": "Apilado al 100 %"
+      },
+      "NULL_HANDLING": {
+        "GAP": "Mostrar como hueco",
+        "CONNECT": "Conectar a través",
+        "ZERO": "Tratar como cero"
+      },
+      "SMALL_MULTIPLES": {
+        "FACET": "Segmentar por",
+        "MAX_COLS": "Columnas máximas"
+      },
+      "AGG": {
+        "SUM": "Suma",
+        "AVERAGE": "Promedio",
+        "COUNT": "Recuento",
+        "COUNT_DISTINCT": "Recuento distinto",
+        "MIN": "Mínimo",
+        "MAX": "Máximo",
+        "MEDIAN": "Mediana",
+        "PERCENTILE": "Percentil",
+        "STDDEV": "Desviación estándar",
+        "VARIANCE": "Varianza"
+      },
+      "TABLE_CALC": {
+        "RUNNING_TOTAL": "Total acumulado",
+        "MOVING_AVERAGE": "Media móvil",
+        "RANK": "Rango",
+        "DENSE_RANK": "Rango denso",
+        "ROW_NUMBER": "Número de fila",
+        "DIFFERENCE": "Diferencia",
+        "PERCENT_DIFFERENCE": "Diferencia porcentual",
+        "LAG": "Valor anterior",
+        "LEAD": "Valor siguiente",
+        "PERCENT_OF_TOTAL": "Porcentaje del total"
+      },
+      "TIME_INTEL": {
+        "YTD": "Año hasta la fecha",
+        "QTD": "Trimestre hasta la fecha",
+        "MTD": "Mes hasta la fecha",
+        "SPLY": "Mismo período del año anterior",
+        "YOY": "Interanual",
+        "MOM": "Intermensual",
+        "QOQ": "Intertrimestral",
+        "ROLLING": "Móvil"
+      },
+      "INTERACTION": {
+        "CROSS_FILTER": "Filtro cruzado",
+        "DRILL_DOWN": "Desglosar",
+        "DRILL_UP": "Contraer",
+        "DRILL_TO_DETAIL": "Ir al detalle",
+        "CLEAR_FILTERS": "Borrar filtros",
+        "HIGHLIGHT": "Resaltar"
+      },
+      "ERROR": {
+        "TRUNCATION_BANNER": "Mostrando los {{n}} principales de {{total}}",
+        "HIGH_CARDINALITY": "{{n}} valores distintos: mostrando los {{limit}} principales",
+        "ALL_NULL_MEASURE": "Esta medida está vacía: todos los valores son nulos.",
+        "NO_DATA": "No hay datos para mostrar.",
+        "DB_SYNTAX": "No se pudo ejecutar la consulta debido a un error de sintaxis.",
+        "DB_PERMISSION": "No tienes permiso para ejecutar esta consulta.",
+        "DB_TIMEOUT": "La consulta superó el tiempo de espera antes de finalizar."
+      }
     }
   },
   "DASHBOARD": {
@@ -3327,6 +3472,114 @@
     "HISTOGRAM": {
       "NAME": "Histograma",
       "DESCRIPTION": "Distribución de una columna numérica en intervalos calculados automáticamente"
+    },
+    "BULLET": {
+      "NAME": "Gráfico de bala",
+      "DESCRIPTION": "Compara una medida con un objetivo y rangos cualitativos"
+    },
+    "CHOROPLETH": {
+      "NAME": "Mapa coroplético",
+      "DESCRIPTION": "Colorea regiones geográficas según un valor para revelar patrones espaciales"
+    },
+    "POINT_MAP": {
+      "NAME": "Mapa de puntos",
+      "DESCRIPTION": "Traza ubicaciones individuales como puntos en un mapa"
+    },
+    "BUBBLE_MAP": {
+      "NAME": "Mapa de burbujas",
+      "DESCRIPTION": "Dimensiona los puntos de un mapa según una medida"
+    },
+    "VIOLIN": {
+      "NAME": "Diagrama de violín",
+      "DESCRIPTION": "Muestra la forma de distribución de una columna numérica por categorías"
+    },
+    "DENSITY": {
+      "NAME": "Gráfico de densidad",
+      "DESCRIPTION": "Estima la densidad de probabilidad de una columna numérica"
+    },
+    "RIDGELINE": {
+      "NAME": "Gráfico de crestas",
+      "DESCRIPTION": "Apila curvas de densidad por categoría para comparar distribuciones"
+    },
+    "STREAMGRAPH": {
+      "NAME": "Gráfico de flujo",
+      "DESCRIPTION": "Un gráfico de áreas apiladas fluido para la composición cambiante en el tiempo"
+    },
+    "MARIMEKKO": {
+      "NAME": "Gráfico Marimekko",
+      "DESCRIPTION": "Un gráfico de barras apiladas con columnas de ancho variable que muestra dos proporciones"
+    },
+    "CALENDAR_HEATMAP": {
+      "NAME": "Mapa de calor de calendario",
+      "DESCRIPTION": "Colorea los días del calendario según un valor para revelar patrones diarios"
+    },
+    "LOLLIPOP": {
+      "NAME": "Gráfico de piruleta",
+      "DESCRIPTION": "Un gráfico de barras dibujado como línea y punto para reducir la saturación"
+    },
+    "CLEVELAND_DOT": {
+      "NAME": "Gráfico de puntos de Cleveland",
+      "DESCRIPTION": "Clasifica categorías por un único valor con puntos en un eje común"
+    },
+    "DUMBBELL": {
+      "NAME": "Gráfico de mancuerna",
+      "DESCRIPTION": "Conecta dos valores por categoría para mostrar la diferencia entre ellos"
+    },
+    "SLOPE": {
+      "NAME": "Gráfico de pendiente",
+      "DESCRIPTION": "Conecta dos momentos con líneas para mostrar el cambio de rango o valor"
+    },
+    "BUMP": {
+      "NAME": "Gráfico de bump",
+      "DESCRIPTION": "Sigue cómo cambian las clasificaciones a lo largo del tiempo"
+    },
+    "PARETO": {
+      "NAME": "Gráfico de Pareto",
+      "DESCRIPTION": "Barras ordenadas de mayor a menor con una línea de porcentaje acumulado"
+    },
+    "ARC": {
+      "NAME": "Diagrama de arco",
+      "DESCRIPTION": "Muestra conexiones entre nodos dispuestos a lo largo de un único eje"
+    },
+    "CHORD": {
+      "NAME": "Diagrama de cuerdas",
+      "DESCRIPTION": "Muestra flujos entre entidades dispuestas en un círculo"
+    },
+    "NETWORK": {
+      "NAME": "Gráfico de red",
+      "DESCRIPTION": "Muestra nodos y los enlaces entre ellos"
+    },
+    "CYCLE_PLOT": {
+      "NAME": "Gráfico de ciclos",
+      "DESCRIPTION": "Revela patrones estacionales agrupando una tendencia dentro de cada ciclo"
+    },
+    "WIND_ROSE": {
+      "NAME": "Rosa de los vientos",
+      "DESCRIPTION": "Un gráfico polar que muestra magnitud y frecuencia por dirección"
+    },
+    "RADIAL_BAR": {
+      "NAME": "Gráfico de barras radiales",
+      "DESCRIPTION": "Barras dispuestas alrededor de un círculo en lugar de un eje recto"
+    },
+    "SOLID_GAUGE": {
+      "NAME": "Indicador sólido",
+      "DESCRIPTION": "Un medidor circular relleno que muestra el progreso hacia un valor"
+    },
+    "KPI_DELTA": {
+      "NAME": "KPI con delta",
+      "DESCRIPTION": "Una única métrica con su variación frente a un período de comparación"
+    },
+    "HEXBIN": {
+      "NAME": "Gráfico hexbin",
+      "DESCRIPTION": "Agrupa puntos de dispersión densos en hexágonos coloreados por recuento"
+    },
+    "QQ_PLOT": {
+      "NAME": "Gráfico Q-Q",
+      "DESCRIPTION": "Compara una distribución con una teórica mediante cuantiles"
+    },
+    "ECDF": {
+      "NAME": "Gráfico ECDF",
+      "DESCRIPTION": "Traza la distribución acumulada empírica de una columna numérica"
     }
   },
   "ROLE_LABELS": {

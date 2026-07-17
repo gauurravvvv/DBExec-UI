@@ -1819,6 +1819,151 @@
       "HISTOGRAM_SECTION": "ヒストグラム",
       "HISTOGRAM_BINS": "ビンの数",
       "HISTOGRAM_SHOW_COUNTS": "件数を表示"
+    },
+    "V2": {
+      "TAB_DATA": "データ",
+      "TAB_FORMAT": "書式",
+      "WELL": {
+        "AXIS": "軸",
+        "MEASURES": "指標",
+        "COLOR": "色",
+        "SIZE": "サイズ",
+        "SHAPE": "形状",
+        "DETAIL": "詳細",
+        "TOOLTIP": "ツールチップ",
+        "ROWS": "行",
+        "COLUMNS": "列"
+      },
+      "AXIS": {
+        "MIN": "最小値",
+        "MAX": "最大値",
+        "SCALE": "スケール",
+        "SCALE_LINEAR": "線形",
+        "SCALE_LOG": "対数",
+        "SCALE_SYMLOG": "対称対数",
+        "REVERSED": "軸を反転",
+        "TICK_FORMAT": "目盛りの書式",
+        "ROTATION": "ラベルの回転",
+        "GRIDLINES": "グリッド線",
+        "DUAL_AXIS": "2軸",
+        "DUAL_SYNC": "軸のスケールを同期"
+      },
+      "COLOR": {
+        "PALETTE": "パレット",
+        "COLORBLIND_SAFE": "色覚に配慮したパレット",
+        "PER_VALUE": "値ごとの色",
+        "DIVERGING": "発散スケール",
+        "MIDPOINT": "中間点",
+        "OPACITY": "不透明度"
+      },
+      "DATA_LABELS": {
+        "SHOW": "データラベルを表示",
+        "POSITION": "位置",
+        "CONTENT": "ラベルの内容",
+        "ONLY_MIN_MAX": "最小値と最大値のみ"
+      },
+      "LEGEND": {
+        "POSITION": "凡例の位置",
+        "TYPE": "凡例の種類"
+      },
+      "REFLINE": {
+        "CONSTANT": "定数",
+        "AVERAGE": "平均",
+        "MEDIAN": "中央値",
+        "MIN": "最小値",
+        "MAX": "最大値",
+        "PERCENTILE": "パーセンタイル",
+        "BAND": "帯"
+      },
+      "SORT": {
+        "BY_DIMENSION": "ディメンション順",
+        "BY_MEASURE": "指標順",
+        "BY_VALUE": "値順",
+        "DIRECTION": "方向"
+      },
+      "TOPN": {
+        "TOP": "上位",
+        "BOTTOM": "下位",
+        "COUNT": "件数",
+        "OTHER_BUCKET": "残りを「その他」にまとめる"
+      },
+      "FORMAT": {
+        "NUMBER": "数値",
+        "CURRENCY": "通貨",
+        "PERCENT": "パーセント",
+        "SCIENTIFIC": "指数",
+        "DATE": "日付",
+        "DECIMALS": "小数点以下の桁数",
+        "PREFIX": "接頭辞",
+        "SUFFIX": "接尾辞",
+        "DISPLAY_UNIT": "表示単位",
+        "THOUSANDS": "桁区切り"
+      },
+      "STACKING": {
+        "NONE": "なし",
+        "TOTAL": "積み上げ",
+        "PERCENT": "100% 積み上げ"
+      },
+      "NULL_HANDLING": {
+        "GAP": "空白として表示",
+        "CONNECT": "つないで表示",
+        "ZERO": "ゼロとして扱う"
+      },
+      "SMALL_MULTIPLES": {
+        "FACET": "分割の基準",
+        "MAX_COLS": "最大列数"
+      },
+      "AGG": {
+        "SUM": "合計",
+        "AVERAGE": "平均",
+        "COUNT": "カウント",
+        "COUNT_DISTINCT": "一意の値のカウント",
+        "MIN": "最小値",
+        "MAX": "最大値",
+        "MEDIAN": "中央値",
+        "PERCENTILE": "パーセンタイル",
+        "STDDEV": "標準偏差",
+        "VARIANCE": "分散"
+      },
+      "TABLE_CALC": {
+        "RUNNING_TOTAL": "累計",
+        "MOVING_AVERAGE": "移動平均",
+        "RANK": "順位",
+        "DENSE_RANK": "密順位",
+        "ROW_NUMBER": "行番号",
+        "DIFFERENCE": "差分",
+        "PERCENT_DIFFERENCE": "差分（％）",
+        "LAG": "前の値",
+        "LEAD": "次の値",
+        "PERCENT_OF_TOTAL": "全体に対する割合"
+      },
+      "TIME_INTEL": {
+        "YTD": "年初来",
+        "QTD": "四半期初来",
+        "MTD": "月初来",
+        "SPLY": "前年同期",
+        "YOY": "前年比",
+        "MOM": "前月比",
+        "QOQ": "前四半期比",
+        "ROLLING": "ローリング"
+      },
+      "INTERACTION": {
+        "CROSS_FILTER": "クロスフィルター",
+        "DRILL_DOWN": "ドリルダウン",
+        "DRILL_UP": "ドリルアップ",
+        "DRILL_TO_DETAIL": "詳細にドリル",
+        "CLEAR_FILTERS": "フィルターをクリア",
+        "HIGHLIGHT": "ハイライト"
+      },
+      "ERROR": {
+        "TRUNCATION_BANNER": "{{total}} 件中、上位 {{n}} 件を表示しています",
+        "HIGH_CARDINALITY": "{{n}} 件の一意の値 — 上位 {{limit}} 件を表示しています",
+        "ALL_NULL_MEASURE": "この指標は空です。すべての値が null です。",
+        "NO_DATA": "表示するデータがありません。",
+        "DB_SYNTAX": "構文エラーのため、クエリを実行できませんでした。",
+        "DB_PERMISSION": "このクエリを実行する権限がありません。",
+        "DB_TIMEOUT": "クエリが完了する前にタイムアウトしました。"
+      }
     }
   },
   "DASHBOARD": {
@@ -3327,6 +3472,114 @@
     "HISTOGRAM": {
       "NAME": "ヒストグラム",
       "DESCRIPTION": "数値列を自動計算したビンに分布"
+    },
+    "BULLET": {
+      "NAME": "弾丸チャート",
+      "DESCRIPTION": "指標を目標値と定性的な範囲と比較します"
+    },
+    "CHOROPLETH": {
+      "NAME": "コロプレスマップ",
+      "DESCRIPTION": "地理的な地域を値で色分けし、空間的な傾向を示します"
+    },
+    "POINT_MAP": {
+      "NAME": "ポイントマップ",
+      "DESCRIPTION": "個々の地点を地図上に点として表示します"
+    },
+    "BUBBLE_MAP": {
+      "NAME": "バブルマップ",
+      "DESCRIPTION": "地図上の点を指標に応じたサイズで表示します"
+    },
+    "VIOLIN": {
+      "NAME": "バイオリン図",
+      "DESCRIPTION": "カテゴリごとの数値列の分布形状を示します"
+    },
+    "DENSITY": {
+      "NAME": "密度プロット",
+      "DESCRIPTION": "数値列の確率密度を推定します"
+    },
+    "RIDGELINE": {
+      "NAME": "リッジラインプロット",
+      "DESCRIPTION": "カテゴリごとの密度曲線を重ねて分布を比較します"
+    },
+    "STREAMGRAPH": {
+      "NAME": "ストリームグラフ",
+      "DESCRIPTION": "時間とともに変化する構成を表す流れるような積み上げ面グラフ"
+    },
+    "MARIMEKKO": {
+      "NAME": "マリメッコチャート",
+      "DESCRIPTION": "幅が可変の積み上げ棒グラフで2つの比率を示します"
+    },
+    "CALENDAR_HEATMAP": {
+      "NAME": "カレンダーヒートマップ",
+      "DESCRIPTION": "カレンダーの日付を値で色分けし、日々の傾向を示します"
+    },
+    "LOLLIPOP": {
+      "NAME": "ロリポップチャート",
+      "DESCRIPTION": "線と点で描く棒グラフで、ごちゃつきを抑えます"
+    },
+    "CLEVELAND_DOT": {
+      "NAME": "クリーブランドドットプロット",
+      "DESCRIPTION": "共通軸上のドットで単一の値によりカテゴリを並べます"
+    },
+    "DUMBBELL": {
+      "NAME": "ダンベルチャート",
+      "DESCRIPTION": "カテゴリごとに2つの値をつなぎ、その差を示します"
+    },
+    "SLOPE": {
+      "NAME": "スロープチャート",
+      "DESCRIPTION": "2つの時点を線で結び、順位や値の変化を示します"
+    },
+    "BUMP": {
+      "NAME": "バンプチャート",
+      "DESCRIPTION": "順位が時間とともにどう変化するかを追跡します"
+    },
+    "PARETO": {
+      "NAME": "パレート図",
+      "DESCRIPTION": "降順に並べた棒と累積百分率の折れ線を組み合わせます"
+    },
+    "ARC": {
+      "NAME": "アーク図",
+      "DESCRIPTION": "1本の軸に沿って配置したノード間のつながりを示します"
+    },
+    "CHORD": {
+      "NAME": "コード図",
+      "DESCRIPTION": "円状に配置したエンティティ間の流れを示します"
+    },
+    "NETWORK": {
+      "NAME": "ネットワークグラフ",
+      "DESCRIPTION": "ノードとその間のリンクを表示します"
+    },
+    "CYCLE_PLOT": {
+      "NAME": "サイクルプロット",
+      "DESCRIPTION": "各周期内で傾向をまとめ、季節的なパターンを明らかにします"
+    },
+    "WIND_ROSE": {
+      "NAME": "風配図",
+      "DESCRIPTION": "方向ごとの大きさと頻度を示す極座標チャート"
+    },
+    "RADIAL_BAR": {
+      "NAME": "放射状棒グラフ",
+      "DESCRIPTION": "直線軸ではなく円状に配置した棒グラフ"
+    },
+    "SOLID_GAUGE": {
+      "NAME": "ソリッドゲージ",
+      "DESCRIPTION": "値に対する進捗を示す塗りつぶし円形ゲージ"
+    },
+    "KPI_DELTA": {
+      "NAME": "デルタ付きKPI",
+      "DESCRIPTION": "比較期間に対する変化を伴う単一の指標"
+    },
+    "HEXBIN": {
+      "NAME": "ヘックスビンプロット",
+      "DESCRIPTION": "密集した散布点を件数で色分けした六角形にまとめます"
+    },
+    "QQ_PLOT": {
+      "NAME": "Q-Qプロット",
+      "DESCRIPTION": "分位数を用いて分布を理論分布と比較します"
+    },
+    "ECDF": {
+      "NAME": "ECDFプロット",
+      "DESCRIPTION": "数値列の経験的累積分布を描画します"
     }
   },
   "ROLE_LABELS": {

@@ -1819,6 +1819,151 @@
       "HISTOGRAM_SECTION": "直方图",
       "HISTOGRAM_BINS": "区间数",
       "HISTOGRAM_SHOW_COUNTS": "显示计数"
+    },
+    "V2": {
+      "TAB_DATA": "数据",
+      "TAB_FORMAT": "格式",
+      "WELL": {
+        "AXIS": "轴",
+        "MEASURES": "度量",
+        "COLOR": "颜色",
+        "SIZE": "大小",
+        "SHAPE": "形状",
+        "DETAIL": "明细",
+        "TOOLTIP": "工具提示",
+        "ROWS": "行",
+        "COLUMNS": "列"
+      },
+      "AXIS": {
+        "MIN": "最小值",
+        "MAX": "最大值",
+        "SCALE": "刻度",
+        "SCALE_LINEAR": "线性",
+        "SCALE_LOG": "对数",
+        "SCALE_SYMLOG": "对称对数",
+        "REVERSED": "反转坐标轴",
+        "TICK_FORMAT": "刻度格式",
+        "ROTATION": "标签旋转",
+        "GRIDLINES": "网格线",
+        "DUAL_AXIS": "双轴",
+        "DUAL_SYNC": "同步坐标轴刻度"
+      },
+      "COLOR": {
+        "PALETTE": "调色板",
+        "COLORBLIND_SAFE": "色盲友好调色板",
+        "PER_VALUE": "按值着色",
+        "DIVERGING": "发散刻度",
+        "MIDPOINT": "中点",
+        "OPACITY": "不透明度"
+      },
+      "DATA_LABELS": {
+        "SHOW": "显示数据标签",
+        "POSITION": "位置",
+        "CONTENT": "标签内容",
+        "ONLY_MIN_MAX": "仅最小值和最大值"
+      },
+      "LEGEND": {
+        "POSITION": "图例位置",
+        "TYPE": "图例类型"
+      },
+      "REFLINE": {
+        "CONSTANT": "常量",
+        "AVERAGE": "平均值",
+        "MEDIAN": "中位数",
+        "MIN": "最小值",
+        "MAX": "最大值",
+        "PERCENTILE": "百分位数",
+        "BAND": "区间"
+      },
+      "SORT": {
+        "BY_DIMENSION": "按维度",
+        "BY_MEASURE": "按度量",
+        "BY_VALUE": "按值",
+        "DIRECTION": "方向"
+      },
+      "TOPN": {
+        "TOP": "前",
+        "BOTTOM": "后",
+        "COUNT": "数量",
+        "OTHER_BUCKET": "将其余归入“其他”"
+      },
+      "FORMAT": {
+        "NUMBER": "数字",
+        "CURRENCY": "货币",
+        "PERCENT": "百分比",
+        "SCIENTIFIC": "科学计数法",
+        "DATE": "日期",
+        "DECIMALS": "小数位数",
+        "PREFIX": "前缀",
+        "SUFFIX": "后缀",
+        "DISPLAY_UNIT": "显示单位",
+        "THOUSANDS": "千位分隔符"
+      },
+      "STACKING": {
+        "NONE": "无",
+        "TOTAL": "堆叠",
+        "PERCENT": "百分比堆叠"
+      },
+      "NULL_HANDLING": {
+        "GAP": "显示为间断",
+        "CONNECT": "跨空值连接",
+        "ZERO": "视为零"
+      },
+      "SMALL_MULTIPLES": {
+        "FACET": "分面依据",
+        "MAX_COLS": "最大列数"
+      },
+      "AGG": {
+        "SUM": "求和",
+        "AVERAGE": "平均值",
+        "COUNT": "计数",
+        "COUNT_DISTINCT": "去重计数",
+        "MIN": "最小值",
+        "MAX": "最大值",
+        "MEDIAN": "中位数",
+        "PERCENTILE": "百分位数",
+        "STDDEV": "标准差",
+        "VARIANCE": "方差"
+      },
+      "TABLE_CALC": {
+        "RUNNING_TOTAL": "累计总和",
+        "MOVING_AVERAGE": "移动平均",
+        "RANK": "排名",
+        "DENSE_RANK": "密集排名",
+        "ROW_NUMBER": "行号",
+        "DIFFERENCE": "差值",
+        "PERCENT_DIFFERENCE": "百分比差值",
+        "LAG": "前一个值",
+        "LEAD": "后一个值",
+        "PERCENT_OF_TOTAL": "占总计的百分比"
+      },
+      "TIME_INTEL": {
+        "YTD": "年初至今",
+        "QTD": "季度初至今",
+        "MTD": "月初至今",
+        "SPLY": "去年同期",
+        "YOY": "同比",
+        "MOM": "环比",
+        "QOQ": "季度环比",
+        "ROLLING": "滚动"
+      },
+      "INTERACTION": {
+        "CROSS_FILTER": "交叉筛选",
+        "DRILL_DOWN": "向下钻取",
+        "DRILL_UP": "向上钻取",
+        "DRILL_TO_DETAIL": "钻取到明细",
+        "CLEAR_FILTERS": "清除筛选",
+        "HIGHLIGHT": "高亮"
+      },
+      "ERROR": {
+        "TRUNCATION_BANNER": "正在显示 {{total}} 项中的前 {{n}} 项",
+        "HIGH_CARDINALITY": "{{n}} 个不同的值 — 正在显示前 {{limit}} 项",
+        "ALL_NULL_MEASURE": "此度量为空 — 所有值均为 null。",
+        "NO_DATA": "没有可显示的数据。",
+        "DB_SYNTAX": "由于语法错误，无法运行该查询。",
+        "DB_PERMISSION": "您没有运行此查询的权限。",
+        "DB_TIMEOUT": "查询在完成之前已超时。"
+      }
     }
   },
   "DASHBOARD": {
@@ -3327,6 +3472,114 @@
     "HISTOGRAM": {
       "NAME": "直方图",
       "DESCRIPTION": "将数值列分布到自动计算的区间中"
+    },
+    "BULLET": {
+      "NAME": "子弹图",
+      "DESCRIPTION": "将度量值与目标值和定性范围进行比较"
+    },
+    "CHOROPLETH": {
+      "NAME": "分级统计图",
+      "DESCRIPTION": "按数值为地理区域着色，揭示空间分布规律"
+    },
+    "POINT_MAP": {
+      "NAME": "点地图",
+      "DESCRIPTION": "将各个位置以点的形式绘制在地图上"
+    },
+    "BUBBLE_MAP": {
+      "NAME": "气泡地图",
+      "DESCRIPTION": "按度量值调整地图上点的大小"
+    },
+    "VIOLIN": {
+      "NAME": "小提琴图",
+      "DESCRIPTION": "显示数值列在各类别中的分布形状"
+    },
+    "DENSITY": {
+      "NAME": "密度图",
+      "DESCRIPTION": "估计数值列的概率密度"
+    },
+    "RIDGELINE": {
+      "NAME": "山脊线图",
+      "DESCRIPTION": "按类别堆叠密度曲线以比较分布"
+    },
+    "STREAMGRAPH": {
+      "NAME": "流图",
+      "DESCRIPTION": "用流动的堆叠面积图展示随时间变化的构成"
+    },
+    "MARIMEKKO": {
+      "NAME": "Marimekko 图",
+      "DESCRIPTION": "列宽可变的堆叠柱状图，展示两个维度的占比"
+    },
+    "CALENDAR_HEATMAP": {
+      "NAME": "日历热力图",
+      "DESCRIPTION": "按数值为日历中的每天着色，揭示每日规律"
+    },
+    "LOLLIPOP": {
+      "NAME": "棒棒糖图",
+      "DESCRIPTION": "用线条加圆点绘制的柱状图，减少视觉杂乱"
+    },
+    "CLEVELAND_DOT": {
+      "NAME": "克利夫兰点图",
+      "DESCRIPTION": "用共用坐标轴上的圆点按单一数值对类别排序"
+    },
+    "DUMBBELL": {
+      "NAME": "哑铃图",
+      "DESCRIPTION": "连接每个类别的两个数值以显示其差距"
+    },
+    "SLOPE": {
+      "NAME": "斜率图",
+      "DESCRIPTION": "用线条连接两个时间点，显示排名或数值的变化"
+    },
+    "BUMP": {
+      "NAME": "排名变化图",
+      "DESCRIPTION": "追踪排名随时间的变化"
+    },
+    "PARETO": {
+      "NAME": "帕累托图",
+      "DESCRIPTION": "按降序排列的柱状图并叠加累计百分比曲线"
+    },
+    "ARC": {
+      "NAME": "弧线图",
+      "DESCRIPTION": "展示沿单一轴排列的节点之间的连接"
+    },
+    "CHORD": {
+      "NAME": "弦图",
+      "DESCRIPTION": "展示围绕圆环排列的实体之间的流量"
+    },
+    "NETWORK": {
+      "NAME": "网络图",
+      "DESCRIPTION": "显示节点及其之间的连接"
+    },
+    "CYCLE_PLOT": {
+      "NAME": "周期图",
+      "DESCRIPTION": "通过在每个周期内分组趋势来揭示季节性规律"
+    },
+    "WIND_ROSE": {
+      "NAME": "风玫瑰图",
+      "DESCRIPTION": "按方向显示强度和频率的极坐标图"
+    },
+    "RADIAL_BAR": {
+      "NAME": "径向柱状图",
+      "DESCRIPTION": "将柱条环绕圆形排列，而非沿直线坐标轴"
+    },
+    "SOLID_GAUGE": {
+      "NAME": "实心仪表盘",
+      "DESCRIPTION": "用填充式圆形仪表显示达成某数值的进度"
+    },
+    "KPI_DELTA": {
+      "NAME": "带变化量的 KPI",
+      "DESCRIPTION": "显示单一指标及其相对于对比期的变化"
+    },
+    "HEXBIN": {
+      "NAME": "六边形分箱图",
+      "DESCRIPTION": "将密集的散点归入按数量着色的六边形"
+    },
+    "QQ_PLOT": {
+      "NAME": "Q-Q 图",
+      "DESCRIPTION": "通过分位数将某分布与理论分布进行比较"
+    },
+    "ECDF": {
+      "NAME": "ECDF 图",
+      "DESCRIPTION": "绘制数值列的经验累积分布"
     }
   },
   "ROLE_LABELS": {
