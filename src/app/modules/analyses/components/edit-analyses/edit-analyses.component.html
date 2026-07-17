@@ -176,17 +176,20 @@
       <div class="sidebar-content">
         <div class="sidebar-header-info">
           <div class="dataset-label">{{ 'ANALYSES.LAYERS' | translate }}</div>
+          <!-- Count reflects the ACTIVE tab, not all tabs — the list rows,
+               canvas, empty-state + this badge all scope to visualsInActiveTab
+               so switching tabs shows a per-tab view. -->
           <app-chip
             variant="count"
             size="sm"
-            *ngIf="visuals.length > 0"
-            [count]="visuals.length"
+            *ngIf="visualsInActiveTab.length > 0"
+            [count]="visualsInActiveTab.length"
           ></app-chip>
         </div>
         <div class="sidebar-divider"></div>
         <div class="sidebar-content-inner">
           <!-- Search Input -->
-          <div class="search-wrapper" *ngIf="visuals.length > 0">
+          <div class="search-wrapper" *ngIf="visualsInActiveTab.length > 0">
             <app-custom-input
               [(ngModel)]="visualListSearchQuery"
               [placeholder]="'ANALYSES.SEARCH_VISUALS' | translate"
@@ -194,14 +197,15 @@
             ></app-custom-input>
           </div>
 
-          <!-- Empty State — quieter -->
-          <div class="visual-list-empty" *ngIf="visuals.length === 0">
+          <!-- Empty State — quieter. Shown when the ACTIVE tab has no visuals
+               (an empty tab reads as empty even if other tabs have visuals). -->
+          <div class="visual-list-empty" *ngIf="visualsInActiveTab.length === 0">
             <i class="ci ci-visualization" aria-hidden="true"></i>
             <p>{{ 'ANALYSES.NO_VISUALS_YET' | translate }}</p>
           </div>
 
           <!-- Visual List Items -->
-          <div class="visual-list-items" *ngIf="visuals.length > 0">
+          <div class="visual-list-items" *ngIf="visualsInActiveTab.length > 0">
             <div
               class="visual-list-item"
               *ngFor="
