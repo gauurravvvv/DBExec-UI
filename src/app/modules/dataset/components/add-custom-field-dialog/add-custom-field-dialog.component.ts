@@ -279,6 +279,20 @@ export class AddCustomFieldDialogComponent
   private registerFormulaLanguage(): void {
     if (this.languageRegistered) return;
 
+    // Monaco's language registry is GLOBAL, but the old guard was a
+    // per-instance flag — so every new dialog instance re-registered
+    // `formulaLang` (and view-analyses mounts the dialog via *ngIf, i.e.
+    // a fresh instance on every open), accumulating orphaned config/token
+    // providers in Monaco for the app's lifetime. Guard on the global
+    // registry so registration happens exactly once per page load.
+    const alreadyRegistered = monaco.languages
+      .getLanguages()
+      .some((lang: any) => lang.id === 'formulaLang');
+    if (alreadyRegistered) {
+      this.languageRegistered = true;
+      return;
+    }
+
     // Register custom language
     monaco.languages.register({ id: 'formulaLang' });
 
@@ -429,6 +443,13 @@ export class AddCustomFieldDialogComponent
     if (this.editor) {
       this.editor.dispose();
       this.editor = null;
+    }
+    // Disconnect the body-class theme observer on close too, not only on
+    // destroy — a persistent ([visible]) mount would otherwise keep an idle
+    // MutationObserver firing on every theme toggle while the dialog is shut.
+    if (this.themeObserver) {
+      this.themeObserver.disconnect();
+      this.themeObserver = null;
     }
     this.isLoadingEditor = false;
     this.monacoLoadFailed = false;
@@ -748,14 +769,30 @@ export class AddCustomFieldDialogComponent
     this.validationResult = null;
     this.isValidated = false;
 
+    // Capture the exact formula being validated. If the user keeps typing
+    // while this request is in flight, the response is stale and must NOT
+    // flip the UI back to "validated" for a formula that has since changed
+    // (that would show a green checkmark on an unvalidated formula and
+    // re-enable Save). Both the success and failure branches bail out when
+    // the current formula no longer matches what was sent.
+    const validatedFormula = this.customField.columnToUse;
+
     const payload = {
       datasetId: this.editMode ? this.editFieldData?.datasetId : this.datasetId,
-      customLogic: this.customField.columnToUse,
+      customLogic: validatedFormula,
     };
 
     this.datasetService
       .validateCustomField(payload)
       .then((response: any) => {
+        // Stale response — the formula changed since this validate started.
+        // Clear the in-flight flag (onFormulaChange doesn't) so the user can
+        // re-validate the new formula, but do NOT mark it validated.
+        if (this.customField.columnToUse !== validatedFormula) {
+          this.isValidating = false;
+          this.cdr.markForCheck();
+          return;
+        }
         if (this.globalService.handleSuccessService(response, false, false)) {
           this.isValidating = false;
           this.isValidated = true;
@@ -765,8 +802,12 @@ export class AddCustomFieldDialogComponent
               response.message ||
               this.translate.instant('DATASET.FORMULA_VALIDATED'),
           };
-          // Update save button state - we just set isValidated to true above
+          // Enable Save only when name + formula are present AND there is no
+          // outstanding inline name error (e.g. a reserved function name).
+          // Without the !fieldNameError guard, validating re-enabled Save
+          // even while the inline name error was still shown.
           this.isSaveEnabled =
+            !this.fieldNameError &&
             this.customField.columnToView?.trim() !== '' &&
             this.customField.columnToUse?.trim() !== '';
         } else {
@@ -782,6 +823,8 @@ export class AddCustomFieldDialogComponent
         this.cdr.markForCheck();
       })
       .catch((error: any) => {
+        // Stale response — the formula changed since this validate started.
+        if (this.customField.columnToUse !== validatedFormula) return;
         this.isValidating = false;
         this.isValidated = false;
         this.validationResult = {
