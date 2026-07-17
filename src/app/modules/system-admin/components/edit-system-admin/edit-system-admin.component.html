@@ -45,7 +45,7 @@
     <app-content-loader *ngIf="loading() && !adminData"></app-content-loader>
 
     <!-- Form Section -->
-    <form *ngIf="adminData" [formGroup]="adminForm" class="admin-form">
+    <form autocomplete="off" *ngIf="adminData" [formGroup]="adminForm" class="admin-form">
       <div class="form-grid">
         <!-- First Name -->
         <app-custom-input

@@ -1,7 +1,7 @@
 <div class="save-analysis-popup" *ngIf="visible">
   <div class="popup-content">
     <h3>{{ dialogTitle }}</h3>
-    <form [formGroup]="analysisForm" class="analysis-form">
+    <form autocomplete="off" [formGroup]="analysisForm" class="analysis-form">
       <!-- Analysis Name -->
       <div class="form-field">
         <app-custom-input

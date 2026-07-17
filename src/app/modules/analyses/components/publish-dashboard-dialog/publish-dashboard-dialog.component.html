@@ -39,7 +39,7 @@
       </button>
     </div>
 
-    <form [formGroup]="form" class="publish-form">
+    <form autocomplete="off" [formGroup]="form" class="publish-form">
       <!-- ── NEW MODE ────────────────────────────────────────────── -->
       <ng-container *ngIf="mode === 'new'">
         <div class="form-field">

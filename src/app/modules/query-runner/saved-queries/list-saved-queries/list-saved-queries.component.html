@@ -1,0 +1,107 @@
+<div class="dataset-page-wrapper">
+  <div class="dataset-content-container">
+    <div class="page-header-section">
+      <div class="header-content">
+        <h2>{{ 'QUERY_RUNNER.SAVED_QUERIES_TITLE' | translate }}</h2>
+      </div>
+      <div class="header-actions">
+        <button
+          pButton
+          [label]="'QUERY_RUNNER.NEW_QUERY' | translate"
+          icon="pi pi-plus"
+          (click)="openNewQuery()"
+          class="p-button-raised p-button-primary modern-button"
+        ></button>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <div class="table-wrapper" *ngIf="adapter">
+        <app-custom-table
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="tableConfig"
+          [hasProjectedEmpty]="true"
+          (refresh)="refreshList()"
+        >
+          <!-- Empty body — always projected so only one empty state shows. -->
+          <div tableEmpty class="ct-empty-body">
+            <i class="pi pi-inbox"></i>
+            <span>{{ 'QUERY_RUNNER.NO_SAVED_QUERIES' | translate }}</span>
+          </div>
+
+          <ng-template usGridCell="name" let-q>
+            <span class="dataset-name-link" (click)="onOpen(q)">{{ q.name }}</span>
+          </ng-template>
+
+          <ng-template usGridCell="datasource" let-q>
+            {{ q.datasourceName || '—' }}
+          </ng-template>
+
+          <ng-template usGridCell="updated" let-q>
+            <span
+              class="date-text"
+              [pTooltip]="((q.updatedOn || q.createdOn) | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              tooltipPosition="top"
+            >
+              {{ (q.updatedOn || q.createdOn) | relativeTime }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="actions" let-q>
+            <div class="row-actions">
+              <button class="icon-btn view-btn"
+                (click)="onOpen(q)"
+                [pTooltip]="'QUERY_RUNNER.OPEN' | translate" tooltipPosition="bottom">
+                <i class="pi pi-external-link"></i>
+              </button>
+              <button class="icon-btn"
+                (click)="onView(q)"
+                [pTooltip]="'COMMON.VIEW' | translate" tooltipPosition="bottom">
+                <i class="pi pi-eye"></i>
+              </button>
+              <button class="icon-btn edit-btn"
+                (click)="onEdit(q)"
+                [pTooltip]="'COMMON.EDIT' | translate" tooltipPosition="bottom">
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button class="icon-btn delete-btn"
+                (click)="confirmDelete(q)"
+                [pTooltip]="'COMMON.DELETE' | translate" tooltipPosition="bottom">
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </ng-template>
+        </app-custom-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- New-Query popup (datasource → connection → open blank executor) -->
+<app-new-query-dialog
+  *ngIf="showNewQuery"
+  (closed)="closeNewQuery()"
+></app-new-query-dialog>
+
+<!-- Delete confirm -->
+<div class="confirmation-popup" *ngIf="showDeleteConfirm">
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-icon danger"><i class="pi pi-exclamation-triangle"></i></div>
+      <h3>{{ 'QUERY_RUNNER.DELETE_SAVED_QUERY' | translate }}</h3>
+    </div>
+    <div class="popup-body">
+      <p>{{ 'QUERY_RUNNER.DELETE_SAVED_QUERY_CONFIRM' | translate: { name: toDelete?.name } }}</p>
+    </div>
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">
+        <i class="pi pi-times"></i>{{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="deleting">
+        <i class="pi" [ngClass]="deleting ? 'pi-spin pi-spinner' : 'pi-trash'"></i>
+        {{ 'COMMON.DELETE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

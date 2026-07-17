@@ -81,6 +81,11 @@ import { MenuItem } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 
 import { QueryRunnerService } from '../services/query-runner.service';
+import {
+  SavedQueriesService,
+  SavedQueryPayload,
+} from '../services/saved-queries.service';
+import { GlobalService } from 'src/app/core/services/global.service';
 import { SchemaCatalog } from './schema-catalog';
 import { dbexecCompletionSource } from './completion';
 import { TypedCellComponent } from './typed-cell.component';
@@ -204,8 +209,23 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
 
   connectionId = '';
   connectionName = '';
+  datasourceId = '';
   datasourceName = '';
   engine = '';
+
+  // ── Saved queries ───────────────────────────────────────────────────
+  // When opened FROM a saved query (?query=<id>), we remember it so the
+  // Save prompt can update it (vs. "Save as new"). SQL + rowLimit are
+  // preloaded once the editor is ready.
+  savedQueryId: string | null = null;
+  savedQueryName = '';
+  savedQueryDescription = '';
+  private pendingSavedSql: string | null = null; // applied after editor init
+  savePromptOpen = false;
+  saving = false;
+  saveMode: 'new' | 'update' = 'new';
+  savePromptName = '';
+  savePromptDescription = '';
 
   // Editor
   private view!: EditorView;
@@ -318,6 +338,8 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   constructor(
     private route: ActivatedRoute,
     private service: QueryRunnerService,
+    private savedQueries: SavedQueriesService,
+    private globalService: GlobalService,
     private title: Title,
   ) {}
 
@@ -344,6 +366,40 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     this.buildOverflowMenu();
     this.loadConnectionMeta();
     this.loadSchemas();
+    // If opened FROM a saved query, preload its SQL + rowLimit.
+    const queryId = this.route.snapshot.queryParamMap.get('query');
+    if (queryId) this.loadSavedQuery(queryId);
+  }
+
+  /**
+   * Load a saved query's SQL + rowLimit. The executor is standalone but
+   * already makes authed calls (SavedQueriesService rides the same
+   * x-auth-token interceptor). If the editor is already up we apply the
+   * SQL immediately; otherwise initEditor() picks up `pendingSavedSql`.
+   */
+  private loadSavedQuery(id: string): void {
+    this.savedQueries
+      .getSavedQuery(id)
+      .then(res => {
+        if (res?.status && res.data) {
+          const d = res.data;
+          this.savedQueryId = d.id;
+          this.savedQueryName = d.name ?? '';
+          this.savedQueryDescription = d.description ?? '';
+          if (d.rowLimit != null) this.rowLimit = this.clampLimit(d.rowLimit);
+          const sql = d.sql ?? '';
+          if (this.view) {
+            this.replaceAll(sql);
+          } else {
+            this.pendingSavedSql = sql;
+          }
+          this.title.setTitle(
+            d.name ? `${d.name} — Query Runner` : 'Query Runner',
+          );
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {});
   }
 
   ngAfterViewInit(): void {
@@ -362,13 +418,17 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       .then(res => {
         if (res?.status && res.data) {
           this.connectionName = res.data.name;
+          this.datasourceId = res.data.datasourceId ?? '';
           this.datasourceName = res.data.datasourceName ?? '';
           this.engine = res.data.engine ?? '';
-          this.title.setTitle(
-            this.datasourceName
-              ? `${this.datasourceName} — Query Runner`
-              : 'Query Runner',
-          );
+          // Don't clobber a saved-query title (set in loadSavedQuery).
+          if (!this.savedQueryId) {
+            this.title.setTitle(
+              this.datasourceName
+                ? `${this.datasourceName} — Query Runner`
+                : 'Query Runner',
+            );
+          }
         }
         this.cdr.markForCheck();
       })
@@ -636,12 +696,15 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private initEditor(): void {
-    const saved = this.loadDraft();
+    // A saved query opened via ?query= takes precedence over any autosaved
+    // draft; otherwise fall back to the per-connection draft.
+    const initialDoc = this.pendingSavedSql ?? this.loadDraft() ?? '';
+    this.pendingSavedSql = null;
     this.zone.runOutsideAngular(() => {
       this.view = new EditorView({
         parent: this.editorHost.nativeElement,
         state: EditorState.create({
-          doc: saved ?? '',
+          doc: initialDoc,
           extensions: [
             lineNumbers(),
             highlightActiveLine(),
@@ -1249,6 +1312,88 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   cancel(): void {
     if (!this.running || !this.executionId) return;
     this.service.cancel(this.connectionId, this.executionId).catch(() => {});
+  }
+
+  // ── save query ──────────────────────────────────────────────────────
+
+  /**
+   * Open the inline Save prompt. When opened from a saved query, default
+   * to "Save" (update it); "Save as new" flips the mode. A brand-new tab
+   * only offers "Save" (as new).
+   */
+  openSavePrompt(mode: 'new' | 'update' = this.savedQueryId ? 'update' : 'new'): void {
+    this.saveMode = mode;
+    if (mode === 'update') {
+      this.savePromptName = this.savedQueryName;
+      this.savePromptDescription = this.savedQueryDescription;
+    } else {
+      // Prefill the name from the current saved query (if any) as a base.
+      this.savePromptName = this.savedQueryId ? '' : this.savedQueryName;
+      this.savePromptDescription = this.savedQueryId
+        ? ''
+        : this.savedQueryDescription;
+    }
+    this.savePromptOpen = true;
+    this.cdr.markForCheck();
+  }
+
+  closeSavePrompt(): void {
+    this.savePromptOpen = false;
+    this.cdr.markForCheck();
+    this.view?.focus();
+  }
+
+  /** True once a name is entered and we're not mid-save. */
+  get canSave(): boolean {
+    return !this.saving && this.savePromptName.trim().length >= 2;
+  }
+
+  /** POST (new) or PUT (update) the current editor SQL as a saved query. */
+  confirmSave(): void {
+    if (!this.canSave) return;
+    const sql = this.getAll().trim();
+    if (!sql || !this.connectionId || !this.datasourceId) {
+      this.statusText = 'Cannot save: missing SQL or connection metadata';
+      this.cdr.markForCheck();
+      return;
+    }
+    this.saving = true;
+    this.cdr.markForCheck();
+
+    const payload: SavedQueryPayload = {
+      name: this.savePromptName.trim(),
+      sql,
+      datasourceId: this.datasourceId,
+      connectionId: this.connectionId,
+      rowLimit: this.rowLimit,
+    };
+    const desc = this.savePromptDescription.trim();
+    if (desc) payload.description = desc;
+
+    const isUpdate = this.saveMode === 'update' && !!this.savedQueryId;
+    const req = isUpdate
+      ? this.savedQueries.updateSavedQuery(this.savedQueryId!, payload)
+      : this.savedQueries.addSavedQuery(payload);
+
+    req
+      .then(res => {
+        if (this.globalService.handleSuccessService(res)) {
+          const data = res?.data;
+          // Track the (new or existing) id so subsequent saves can update
+          // it in place; reflect the new name/description in tab state.
+          this.savedQueryId = data?.id ?? this.savedQueryId;
+          this.savedQueryName = payload.name;
+          this.savedQueryDescription = payload.description ?? '';
+          this.title.setTitle(`${payload.name} — Query Runner`);
+          this.savePromptOpen = false;
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        this.saving = false;
+        this.cdr.markForCheck();
+        this.view?.focus();
+      });
   }
 
   format(): void {

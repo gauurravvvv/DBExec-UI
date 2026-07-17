@@ -28,7 +28,7 @@
       *ngIf="loading() && !brandingForm.value.watermarkText"
     ></app-content-loader>
 
-    <form
+    <form autocomplete="off"
       *ngIf="!loading() || brandingForm.value.watermarkText"
       [formGroup]="brandingForm"
       class="admin-form"

@@ -46,7 +46,7 @@
     <app-content-loader *ngIf="loadingMeta && !roleData"></app-content-loader>
 
     <!-- Form Section -->
-    <form *ngIf="roleData" [formGroup]="roleForm" class="admin-form">
+    <form autocomplete="off" *ngIf="roleData" [formGroup]="roleForm" class="admin-form">
       <div class="basic-info-section">
         <!-- Role Name (always locked — BE doesn't support rename) -->
         <app-custom-input

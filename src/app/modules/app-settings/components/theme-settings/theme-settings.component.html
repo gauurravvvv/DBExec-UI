@@ -52,7 +52,7 @@
     ></app-content-loader>
 
     <!-- Form -->
-    <form
+    <form autocomplete="off"
       *ngIf="!loading() || themeForm.value.primary"
       [formGroup]="themeForm"
       class="admin-form"

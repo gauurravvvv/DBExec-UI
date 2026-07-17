@@ -48,7 +48,7 @@
     <app-content-loader *ngIf="loading() && !groupLoaded"></app-content-loader>
 
     <!-- Form Section -->
-    <form
+    <form autocomplete="off"
       [formGroup]="groupForm"
       class="admin-form"
       *ngIf="groupForm && groupLoaded"

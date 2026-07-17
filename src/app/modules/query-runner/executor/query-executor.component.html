@@ -29,6 +29,12 @@
           [pTooltip]="'QUERY_RUNNER.STOP' | translate" tooltipPosition="bottom">
           <i class="pi pi-stop-circle"></i>
         </button>
+        <button pButton class="p-button-outlined modern-button qx-labeled-btn qx-save-btn" (click)="openSavePrompt()"
+          [disabled]="!editorReady"
+          [pTooltip]="'QUERY_RUNNER.SAVE_QUERY' | translate" tooltipPosition="bottom">
+          <i class="pi pi-save"></i>
+          <span>{{ 'QUERY_RUNNER.SAVE_QUERY' | translate }}</span>
+        </button>
       </div>
 
       <span class="qx-sep"></span>
@@ -470,6 +476,40 @@
       <button class="qx-btn-ghost" (click)="cancelLoadChoice()">{{ 'COMMON.CANCEL' | translate }}</button>
       <button class="qx-btn-ghost" (click)="applyLoadedFile('append')">{{ 'QUERY_RUNNER.APPEND' | translate }}</button>
       <button class="qx-btn-primary" (click)="applyLoadedFile('replace')">{{ 'QUERY_RUNNER.REPLACE' | translate }}</button>
+    </div>
+  </div>
+</div>
+
+<!-- Save query — name + description prompt (POST new / PUT update) -->
+<div class="qx-overlay" *ngIf="savePromptOpen" (click)="closeSavePrompt()">
+  <div class="qx-goto-box qx-save-box" (click)="$event.stopPropagation()">
+    <label>{{ 'QUERY_RUNNER.SAVE_QUERY' | translate }}</label>
+
+    <!-- When opened from a saved query, offer update vs. save-as-new. -->
+    <div class="qx-save-modes" *ngIf="savedQueryId">
+      <button type="button" class="qx-btn-ghost" [class.qx-active]="saveMode === 'update'"
+        (click)="openSavePrompt('update')">
+        {{ 'QUERY_RUNNER.SAVE_UPDATE' | translate }}
+      </button>
+      <button type="button" class="qx-btn-ghost" [class.qx-active]="saveMode === 'new'"
+        (click)="openSavePrompt('new')">
+        {{ 'QUERY_RUNNER.SAVE_AS_NEW' | translate }}
+      </button>
+    </div>
+
+    <input type="text" [(ngModel)]="savePromptName" maxlength="150"
+      [placeholder]="'QUERY_RUNNER.SAVED_QUERY_NAME_PLACEHOLDER' | translate"
+      (keydown.enter)="confirmSave()" (keydown.escape)="closeSavePrompt()" autocomplete="off" />
+    <textarea rows="2" [(ngModel)]="savePromptDescription" maxlength="500"
+      [placeholder]="'QUERY_RUNNER.SAVED_QUERY_DESCRIPTION_PLACEHOLDER' | translate"
+      (keydown.escape)="closeSavePrompt()"></textarea>
+
+    <div class="qx-goto-actions">
+      <button class="qx-btn-ghost" (click)="closeSavePrompt()">{{ 'COMMON.CANCEL' | translate }}</button>
+      <button class="qx-btn-primary" (click)="confirmSave()" [disabled]="!canSave">
+        <i class="pi mr-2" [ngClass]="saving ? 'pi-spin pi-spinner' : 'pi-save'"></i>
+        {{ 'COMMON.SAVE' | translate }}
+      </button>
     </div>
   </div>
 </div>

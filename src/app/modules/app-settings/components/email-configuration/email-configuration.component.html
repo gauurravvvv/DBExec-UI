@@ -30,7 +30,7 @@
       *ngIf="loading() && emailForm.pristine"
     ></app-content-loader>
 
-    <form [formGroup]="emailForm" class="admin-form mt-4">
+    <form autocomplete="off" [formGroup]="emailForm" class="admin-form mt-4">
       <div class="form-group-section">
         <div class="group-header">
           <i class="pi pi-envelope"></i>

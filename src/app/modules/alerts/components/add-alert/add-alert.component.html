@@ -77,7 +77,7 @@
       </ng-container>
     </div>
 
-    <form [formGroup]="alertForm" class="admin-form">
+    <form autocomplete="off" [formGroup]="alertForm" class="admin-form">
       <!-- Step 1: Source -->
       <section class="form-section" *ngIf="currentStep === 0">
         <h3 class="section-title">

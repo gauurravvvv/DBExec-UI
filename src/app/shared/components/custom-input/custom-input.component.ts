@@ -40,9 +40,25 @@ export class CustomInputComponent implements ControlValueAccessor {
   @Input() styleClass = '';
   @Input() hint = '';
   @Input() tooltip = '';
-  // Native attributes forwarded to the underlying <input>. Default '' so
-  // existing call sites are unaffected.
+  // Native autocomplete attribute forwarded to the underlying <input>.
+  // Empty by default so the component picks a sensible default (see
+  // `effectiveAutocomplete`): 'off' for normal fields, 'new-password' for
+  // password fields (browsers ignore 'off' on password inputs but honour
+  // 'new-password' to suppress the save/autofill prompt). A caller can
+  // still override by passing an explicit value.
   @Input() autocomplete = '';
+
+  /**
+   * The autocomplete value actually rendered. Caller-supplied value wins;
+   * otherwise disable browser autofill by default — 'new-password' for
+   * password inputs, 'off' for everything else.
+   */
+  get effectiveAutocomplete(): string {
+    if (this.autocomplete) return this.autocomplete;
+    return this.type === 'password' || this.showPasswordToggle
+      ? 'new-password'
+      : 'off';
+  }
   @Input() inputId = '';
   @Input() ariaLabel = '';
 

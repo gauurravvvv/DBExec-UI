@@ -753,7 +753,7 @@
           : ('QUERY_BUILDER_MODULE.SAVE_AS_DATASET' | translate)
       }}
     </h3>
-    <form [formGroup]="saveForm" class="save-form">
+    <form autocomplete="off" [formGroup]="saveForm" class="save-form">
       <div class="form-field">
         <app-custom-input
           formControlName="name"

@@ -1,0 +1,73 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text back-button" (click)="goBack()">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>{{ query?.name || ('QUERY_RUNNER.SAVED_QUERY_TITLE' | translate) }}</h2>
+      </div>
+      <div class="action-buttons" *ngIf="query">
+        <button
+          pButton
+          type="button"
+          [label]="'QUERY_RUNNER.OPEN_IN_EXECUTOR' | translate"
+          icon="pi pi-external-link"
+          class="p-button-outlined btn-cancel"
+          (click)="openInExecutor()"
+        ></button>
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="button"
+          [label]="'COMMON.EDIT' | translate"
+          icon="pi pi-pencil"
+          (click)="onEdit()"
+        ></button>
+      </div>
+    </div>
+
+    <div class="admin-form" *ngIf="query">
+      <div class="left-section">
+        <div class="form-grid sq-view-grid">
+          <div class="sq-field">
+            <span class="sq-label">{{ 'QUERY_RUNNER.SAVED_QUERY_NAME' | translate }}</span>
+            <span class="sq-value">{{ query.name }}</span>
+          </div>
+
+          <div class="sq-field">
+            <span class="sq-label">{{ 'QUERY_RUNNER.SAVED_QUERY_DESCRIPTION' | translate }}</span>
+            <span class="sq-value">{{ query.description || '—' }}</span>
+          </div>
+
+          <div class="sq-field">
+            <span class="sq-label">{{ 'COMMON.DATASOURCE' | translate }}</span>
+            <span class="sq-value">{{ query.datasourceName || query.datasourceId }}</span>
+          </div>
+
+          <div class="sq-field">
+            <span class="sq-label">{{ 'QUERY_RUNNER.STEP_CONNECTION' | translate }}</span>
+            <span class="sq-value">{{ query.connectionName || query.connectionId }}</span>
+          </div>
+
+          <div class="sq-field">
+            <span class="sq-label">{{ 'QUERY_RUNNER.SAVED_QUERY_ROW_LIMIT' | translate }}</span>
+            <span class="sq-value">{{ query.rowLimit != null ? query.rowLimit : '—' }}</span>
+          </div>
+
+          <div class="sq-field">
+            <span class="sq-label">{{ 'QUERY_RUNNER.SAVED_QUERY_SQL' | translate }}</span>
+            <pre class="sq-sql">{{ query.sql }}</pre>
+          </div>
+
+          <div class="sq-field" *ngIf="query.updatedOn || query.createdOn">
+            <span class="sq-label">{{ 'QUERY_RUNNER.UPDATED' | translate }}</span>
+            <span class="sq-value">
+              {{ (query.updatedOn || query.createdOn) | date: 'dd MMM yyyy, HH:mm:ss' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

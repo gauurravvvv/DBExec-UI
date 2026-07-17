@@ -1,0 +1,56 @@
+@use '../../../db-access/styles/db-access-shared' as db;
+
+// Reuse the canonical confirmation-popup chrome (backdrop, card, header,
+// body, footer) so this popup matches every other app dialog.
+@include db.db-access-dialog;
+
+.confirmation-popup {
+  // The two dropdowns need a touch more room than a plain confirm.
+  .nq-content {
+    max-width: 480px;
+  }
+
+  // Form controls read left-aligned (a centered form looks broken), with
+  // comfortable spacing between the datasource + connection fields.
+  .popup-body {
+    text-align: left;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .nq-subtitle {
+    margin: 0;
+    color: var(--secondary-color);
+    font-size: var(--fs-body);
+    text-align: center;
+  }
+
+  .form-hint {
+    display: block;
+    margin-top: var(--space-3);
+    font-size: var(--fs-control);
+    color: var(--secondary-color);
+    &.warn { color: var(--warning-color); }
+  }
+
+  .nq-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-5) 0;
+    text-align: center;
+
+    i {
+      font-size: 2rem;
+      color: var(--secondary-color);
+    }
+    p {
+      margin: 0;
+      color: var(--secondary-color);
+      font-size: var(--fs-body);
+    }
+  }
+}

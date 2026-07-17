@@ -3886,6 +3886,32 @@
         "required": "최소 하나의 측정값이 필요합니다",
         "tooMany": "측정값이 너무 많습니다"
       }
+    },
+    "savedQueries": {
+      "name": {
+        "required": "Query name is required",
+        "tooShort": "Query name must be at least 2 characters",
+        "tooLong": "Query name must not exceed 150 characters",
+        "invalid": "Query name must start with a letter or digit and contain only letters, digits, spaces, dots, underscores, or hyphens"
+      },
+      "description": {
+        "tooLong": "Description must not exceed 500 characters"
+      },
+      "sql": {
+        "required": "SQL is required",
+        "tooLong": "SQL must not exceed 50000 characters"
+      },
+      "datasourceId": {
+        "required": "A datasource must be selected",
+        "invalid": "Selected datasource is invalid"
+      },
+      "connectionId": {
+        "required": "A connection must be selected",
+        "invalid": "Selected connection is invalid"
+      },
+      "rowLimit": {
+        "invalid": "Row limit must be a positive whole number"
+      }
     }
   },
   "QUERY_RUNNER": {
@@ -4096,7 +4122,31 @@
     "SERVER_MODE_HINT": "이 쿼리는 정렬, 필터링, 페이징이 데이터베이스에서 실행됩니다.",
     "PREV_PAGE": "이전 페이지",
     "NEXT_PAGE": "다음 페이지",
-    "CONNECTIONS_SEARCH_PLACEHOLDER": "이름으로 연결 검색"
+    "CONNECTIONS_SEARCH_PLACEHOLDER": "이름으로 연결 검색",
+    "SAVED_QUERIES_TITLE": "Saved queries",
+    "SAVED_QUERY_TITLE": "Saved query",
+    "SAVED_QUERIES_SEARCH_PLACEHOLDER": "Search saved queries by name",
+    "NO_SAVED_QUERIES": "No saved queries yet. Create one to get started.",
+    "NEW_QUERY": "New query",
+    "NEW_QUERY_SUBTITLE": "Pick a datasource and one of your connections, then open the editor in a new tab.",
+    "NEW_SAVED_QUERY": "New saved query",
+    "EDIT_SAVED_QUERY": "Edit saved query",
+    "DELETE_SAVED_QUERY": "Delete saved query",
+    "DELETE_SAVED_QUERY_CONFIRM": "Delete the saved query \"{{name}}\"? This removes the saved SQL only — nothing on the database is changed.",
+    "SAVED_QUERY_HINT": "A saved query stores your SQL against a datasource + connection so you can reopen and run it later.",
+    "SAVED_QUERY_NAME": "Query name",
+    "SAVED_QUERY_NAME_PLACEHOLDER": "e.g. Monthly active users",
+    "SAVED_QUERY_DESCRIPTION": "Description",
+    "SAVED_QUERY_DESCRIPTION_PLACEHOLDER": "Optional notes about what this query does",
+    "SAVED_QUERY_SQL": "SQL",
+    "SAVED_QUERY_SQL_PLACEHOLDER": "SELECT ...",
+    "SAVED_QUERY_ROW_LIMIT": "Row limit",
+    "SAVED_QUERY_ROW_LIMIT_PLACEHOLDER": "Optional (e.g. 200)",
+    "UPDATED": "Updated",
+    "OPEN_IN_EXECUTOR": "Open in Executor",
+    "SAVE_QUERY": "Save query",
+    "SAVE_UPDATE": "Save",
+    "SAVE_AS_NEW": "Save as new"
   },
   "DB_ACCESS": {
     "TITLE": "데이터베이스 접근 관리",

@@ -388,6 +388,43 @@ $qx-btn-h: 34px;
   .qx-goto-actions { flex-wrap: wrap; }
 }
 
+// Save-query prompt reuses the goto-box shell; adds a name+description form,
+// a save-mode switch (update / save-as-new), and a disabled primary state.
+.qx-save-box {
+  width: min(440px, 92vw);
+
+  .qx-save-modes {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+
+    .qx-btn-ghost.qx-active {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+  }
+
+  input { margin-bottom: 0.75rem; }
+
+  textarea {
+    width: 100%;
+    min-height: 56px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.6rem;
+    font-size: var(--fs-body);
+    color: var(--text-color);
+    background: var(--card-background);
+    resize: vertical;
+    &:focus { outline: none; border-color: var(--primary-color); }
+  }
+
+  .qx-btn-primary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
 .qx-goto-box {
   label {
     display: block;

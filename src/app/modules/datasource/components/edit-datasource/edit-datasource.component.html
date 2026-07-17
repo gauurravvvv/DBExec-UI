@@ -78,7 +78,7 @@
     <app-content-loader *ngIf="loading() && !datasourceLoaded"></app-content-loader>
 
     <!-- Form Section -->
-    <form
+    <form autocomplete="off"
       *ngIf="datasourceLoaded"
       [formGroup]="datasourceForm"
       class="admin-form"

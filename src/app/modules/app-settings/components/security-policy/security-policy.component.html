@@ -30,7 +30,7 @@
       *ngIf="loading() && securityForm.pristine"
     ></app-content-loader>
 
-    <form [formGroup]="securityForm" class="admin-form mt-4">
+    <form autocomplete="off" [formGroup]="securityForm" class="admin-form mt-4">
       <div class="form-grid">
         <app-custom-input
           formControlName="maxLoginAttempts"

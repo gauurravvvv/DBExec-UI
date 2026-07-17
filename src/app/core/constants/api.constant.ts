@@ -130,6 +130,11 @@ export const QUERY_RUNNER = {
   EXECUTE_SUFFIX: '/execute',
   // POST /query-runner/connections/:id/cancel   → cancel a running run
   CANCEL_SUFFIX: '/cancel',
+  // Saved queries (owner-scoped CRUD)
+  // GET/POST /query-runner/saved-queries
+  SAVED_QUERIES: '/query-runner/saved-queries',
+  // GET/PUT/DELETE /query-runner/saved-queries/:id
+  SAVED_QUERY: '/query-runner/saved-queries/', // + :id
 };
 
 export const GROUP = {

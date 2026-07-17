@@ -14,22 +14,49 @@ import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-tabl
 import { AddConnectionComponent } from './connections/add-connection/add-connection.component';
 import { ListConnectionsComponent } from './connections/list-connections/list-connections.component';
 import { LauncherComponent } from './launcher/launcher.component';
+import { ListSavedQueriesComponent } from './saved-queries/list-saved-queries/list-saved-queries.component';
+import { NewQueryDialogComponent } from './saved-queries/new-query-dialog/new-query-dialog.component';
+import { AddSavedQueryComponent } from './saved-queries/add-saved-query/add-saved-query.component';
+import { EditSavedQueryComponent } from './saved-queries/edit-saved-query/edit-saved-query.component';
+import { ViewSavedQueryComponent } from './saved-queries/view-saved-query/view-saved-query.component';
 
 /**
- * QueryRunnerModule — the in-shell part of Query Runner: the launcher
- * (datasource → connection → open) at the module root and the private
- * connection profiles CRUD under /connections. The standalone executor
- * lives in its own lazy module (query-executor.module) mounted OUTSIDE
- * the app shell, so a browser tab opens as a focused full-screen tool.
+ * QueryRunnerModule — the in-shell part of Query Runner. The module root
+ * now lands on the SAVED QUERIES list (the new Query Executor home; the
+ * old launcher page is retired as the landing — its datasource→connection
+ * logic lives in the New-Query popup). Below the root: saved-query CRUD
+ * and the private connection profiles CRUD under /connections. The
+ * standalone executor lives in its own lazy module (query-executor.module)
+ * mounted OUTSIDE the app shell.
  */
-// Each route guards on ITS OWN permission: the launcher needs
+// Each route guards on ITS OWN permission: the saved-queries screens need
 // queryRunner, the connection screens need connectionManager. A user
 // granted only one of the two still reaches the screens they can use.
 const routes: Routes = [
   {
     path: '',
-    component: LauncherComponent,
+    component: ListSavedQueriesComponent,
     canActivate: [roleGuard],
+    data: { permission: PERMISSIONS.QUERY_RUNNER },
+  },
+  {
+    path: 'saved-queries/new',
+    component: AddSavedQueryComponent,
+    canActivate: [roleGuard],
+    canDeactivate: [unsavedChangesGuard],
+    data: { permission: PERMISSIONS.QUERY_RUNNER },
+  },
+  {
+    path: 'saved-queries/:id',
+    component: ViewSavedQueryComponent,
+    canActivate: [roleGuard],
+    data: { permission: PERMISSIONS.QUERY_RUNNER },
+  },
+  {
+    path: 'saved-queries/:id/edit',
+    component: EditSavedQueryComponent,
+    canActivate: [roleGuard],
+    canDeactivate: [unsavedChangesGuard],
     data: { permission: PERMISSIONS.QUERY_RUNNER },
   },
   {
@@ -59,6 +86,11 @@ const routes: Routes = [
     LauncherComponent,
     ListConnectionsComponent,
     AddConnectionComponent,
+    ListSavedQueriesComponent,
+    NewQueryDialogComponent,
+    AddSavedQueryComponent,
+    EditSavedQueryComponent,
+    ViewSavedQueryComponent,
   ],
   imports: [
     CommonModule,

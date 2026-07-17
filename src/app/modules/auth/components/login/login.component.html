@@ -2,7 +2,7 @@
   cardTitle="Log in"
   cardSubtitle="Sign in to your DBExec account"
 >
-  <form
+  <form autocomplete="off"
     id="auth-form"
     [formGroup]="loginForm"
     (ngSubmit)="onSubmit()"

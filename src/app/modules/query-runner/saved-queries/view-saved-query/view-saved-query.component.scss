@@ -1,0 +1,45 @@
+@use '../../../db-access/styles/db-access-shared' as db;
+
+// Same back-header form chrome as the add/edit screens.
+@include db.db-access-form;
+
+// Read-only field rows — label above value, mirroring the form's vertical
+// rhythm without editable controls.
+.sq-view-grid {
+  gap: var(--space-6);
+}
+
+.sq-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sq-label {
+  font-size: var(--fs-control);
+  font-weight: var(--fw-semibold);
+  color: var(--secondary-color);
+}
+
+.sq-value {
+  font-size: var(--fs-body);
+  color: var(--text-color);
+  word-break: break-word;
+}
+
+// SQL block reads as code — monospace, subtle surface, scrolls if long.
+.sq-sql {
+  margin: 0;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--surface-hover, var(--card-background));
+  font-family: var(--font-mono);
+  font-size: var(--fs-control);
+  line-height: 1.5;
+  color: var(--text-color);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 360px;
+  overflow: auto;
+}

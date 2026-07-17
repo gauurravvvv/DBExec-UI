@@ -10,7 +10,7 @@
   appendTo="body"
   styleClass="schedule-delivery-dialog"
 >
-  <form [formGroup]="form" class="schedule-form">
+  <form autocomplete="off" [formGroup]="form" class="schedule-form">
     <p class="schedule-hint">
       {{ 'DASHBOARD.SCHEDULE.HINT' | translate: { name: dashboardName } }}
     </p>

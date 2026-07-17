@@ -84,14 +84,23 @@ export const DB_ACCESS = {
 };
 
 export const QUERY_RUNNER = {
-  // Launcher (datasource → connection → open)
+  // Launcher (datasource → connection → open) — retired as the landing;
+  // the module root now lands on the saved-queries list. Kept for callers.
   LAUNCHER: '/app/query-runner',
+  // Saved queries (owner-scoped CRUD) — the new Query Executor home.
+  SAVED_QUERIES_LIST: '/app/query-runner',
+  savedQueryNew: () => '/app/query-runner/saved-queries/new',
+  savedQueryView: (id: string) => `/app/query-runner/saved-queries/${id}`,
+  savedQueryEdit: (id: string) => `/app/query-runner/saved-queries/${id}/edit`,
   // Connection profiles (owner-scoped CRUD)
   CONNECTIONS_LIST: '/app/query-runner/connections',
   connectionNew: () => '/app/query-runner/connections/new',
   connectionEdit: (id: string) => `/app/query-runner/connections/${id}/edit`,
   // Standalone executor tab (outside the app shell)
   EXEC: '/query-runner/exec',
+  // Executor opened FROM a saved query — SQL + rowLimit preloaded via ?query=.
+  EXEC_SAVED: (connId: string, queryId: string) =>
+    `/query-runner/exec?conn=${encodeURIComponent(connId)}&query=${encodeURIComponent(queryId)}`,
 };
 export const DATASET = feature('/app/datasets');
 export const TAB = feature('/app/tabs');

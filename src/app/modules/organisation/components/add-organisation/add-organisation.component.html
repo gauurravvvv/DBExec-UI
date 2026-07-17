@@ -85,7 +85,7 @@
       </div>
     </div>
 
-    <form [formGroup]="orgForm" class="admin-form mt-4">
+    <form autocomplete="off" [formGroup]="orgForm" class="admin-form mt-4">
       <!-- Step 1: Organisation Details (single vertical stack, 50% width) -->
       <div *ngIf="currentStep === 0" class="step-1-layout">
         <div class="step-1-left">

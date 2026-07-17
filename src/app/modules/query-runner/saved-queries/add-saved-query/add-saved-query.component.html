@@ -1,0 +1,121 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text back-button" (click)="goBack()">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>
+          {{ (isEdit ? 'QUERY_RUNNER.EDIT_SAVED_QUERY' : 'QUERY_RUNNER.NEW_SAVED_QUERY') | translate }}
+        </h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          [label]="'COMMON.CANCEL' | translate"
+          class="p-button-outlined btn-cancel"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="button"
+          [label]="(isEdit ? 'COMMON.SAVE' : 'COMMON.CREATE') | translate"
+          (click)="onSubmit()"
+          [disabled]="saving"
+        >
+          <i class="pi mr-2" [ngClass]="saving ? 'pi-spin pi-spinner' : 'pi-save'"></i>
+        </button>
+      </div>
+    </div>
+
+    <form autocomplete="off" [formGroup]="form" class="admin-form">
+      <div class="left-section">
+        <div class="form-grid">
+          <p class="form-hint">
+            <i class="pi pi-info-circle"></i>
+            {{ 'QUERY_RUNNER.SAVED_QUERY_HINT' | translate }}
+          </p>
+
+          <app-custom-input
+            formControlName="name"
+            [label]="'QUERY_RUNNER.SAVED_QUERY_NAME' | translate"
+            [placeholder]="'QUERY_RUNNER.SAVED_QUERY_NAME_PLACEHOLDER' | translate"
+            icon="pi-bookmark"
+            [required]="true"
+            [showError]="!!errors['name']"
+            [errorMessage]="errors['name'] || ''"
+          ></app-custom-input>
+
+          <app-custom-textarea
+            formControlName="description"
+            [label]="'QUERY_RUNNER.SAVED_QUERY_DESCRIPTION' | translate"
+            [placeholder]="'QUERY_RUNNER.SAVED_QUERY_DESCRIPTION_PLACEHOLDER' | translate"
+            [rows]="3"
+            [showError]="!!errors['description']"
+            [errorMessage]="errors['description'] || ''"
+          ></app-custom-textarea>
+
+          <app-custom-dropdown
+            formControlName="datasourceId"
+            (onChangeEvent)="onDatasourceChange($event)"
+            [label]="'COMMON.DATASOURCE' | translate"
+            [serverMode]="true"
+            [fetcher]="loadDatasourcesPage"
+            [pageSize]="10"
+            [resolveSelected]="resolveDatasource"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            filterBy="name"
+            appendTo="body"
+            icon="pi-database"
+            [required]="true"
+            [showError]="!!errors['datasourceId']"
+            [errorMessage]="errors['datasourceId'] || ''"
+          ></app-custom-dropdown>
+
+          <app-custom-dropdown
+            formControlName="connectionId"
+            [label]="'QUERY_RUNNER.STEP_CONNECTION' | translate"
+            [options]="connectionOptions"
+            optionLabel="label"
+            optionValue="value"
+            [filter]="true"
+            filterBy="label"
+            appendTo="body"
+            icon="pi-link"
+            [required]="true"
+            [disabled]="!form.get('datasourceId')?.value"
+            [placeholder]="(form.get('datasourceId')?.value ? 'QUERY_RUNNER.SELECT_CONNECTION' : 'QUERY_RUNNER.SELECT_DATASOURCE_FIRST') | translate"
+            [showError]="!!errors['connectionId']"
+            [errorMessage]="errors['connectionId'] || ''"
+          ></app-custom-dropdown>
+
+          <div class="sq-mono">
+            <app-custom-textarea
+              formControlName="sql"
+              [label]="'QUERY_RUNNER.SAVED_QUERY_SQL' | translate"
+              [placeholder]="'QUERY_RUNNER.SAVED_QUERY_SQL_PLACEHOLDER' | translate"
+              [rows]="8"
+              [required]="true"
+              [showError]="!!errors['sql']"
+              [errorMessage]="errors['sql'] || ''"
+            ></app-custom-textarea>
+          </div>
+
+          <app-custom-number
+            formControlName="rowLimit"
+            [label]="'QUERY_RUNNER.SAVED_QUERY_ROW_LIMIT' | translate"
+            [placeholder]="'QUERY_RUNNER.SAVED_QUERY_ROW_LIMIT_PLACEHOLDER' | translate"
+            [min]="1"
+            [max]="50000"
+            [showError]="!!errors['rowLimit']"
+            [errorMessage]="errors['rowLimit'] || ''"
+          ></app-custom-number>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
