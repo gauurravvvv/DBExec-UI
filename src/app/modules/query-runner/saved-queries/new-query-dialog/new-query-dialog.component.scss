@@ -43,7 +43,10 @@
     padding: var(--space-5) 0;
     text-align: center;
 
-    i {
+    // ONLY the leading empty-state glyph is large. Scope to the direct child
+    // so the icon inside the "New connection" button below isn't blown up to
+    // 2rem (the old unscoped `i` selector did exactly that).
+    > i {
       font-size: 2rem;
       color: var(--secondary-color);
     }
@@ -53,13 +56,38 @@
       font-size: var(--fs-body);
     }
 
-    // Way-forward actions: a primary "Create connection" button + a quieter
+    // Way-forward actions: a primary "New connection" button + a quieter
     // "Manage connections" text link beneath it.
     .nq-empty-actions {
       display: flex;
       flex-direction: column;
       align-items: center;
+      gap: var(--space-4);
+    }
+
+    // Give the in-body confirm button the SAME treatment the footer's
+    // .popup-actions button gets (it lives outside .popup-actions, so it
+    // wouldn't otherwise inherit the icon sizing / flex / padding).
+    .btn-confirm {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       gap: var(--space-3);
+      padding: 0.65rem 1.25rem;
+      border-radius: var(--radius-md);
+      border: none;
+      font-weight: var(--fw-semibold);
+      font-size: var(--fs-body);
+      cursor: pointer;
+      color: var(--primary-text);
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+      box-shadow: 0 4px 14px var(--primary-color-transparent);
+      transition: all var(--motion-base, 0.15s) ease;
+
+      i { font-size: var(--fs-control); } // normal-sized plus, aligned with text
+
+      &:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+      &:active { transform: translateY(0); }
     }
 
     .nq-link {
@@ -71,7 +99,7 @@
       font-size: var(--fs-control);
       text-decoration: underline;
 
-      &:hover { color: var(--primary-color-hover, var(--primary-color)); }
+      &:hover { color: var(--primary-hover); }
     }
   }
 }
