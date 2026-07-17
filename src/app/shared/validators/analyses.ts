@@ -426,11 +426,16 @@ export const updateAnalysisSchema = z.object({
   datasource: analysisDatasourceSchema,
   datasetId: analysisDatasetSchema,
   status: statusSchema,
-  // Visuals and filters are domain objects owned by the analysis
-  // builder. Their shapes are validated downstream by the visual /
-  // filter modules; here we only ensure they're arrays of objects.
+  // Visuals, filters, tabs and parameters are domain objects owned by
+  // the analysis builder. Their shapes are validated downstream by the
+  // visual / filter / tab / parameter modules; here we only ensure
+  // they're arrays of objects so the controller can reconcile them.
+  // tabs / parameters carry client-side temp ids (prefixed tmp_) until
+  // this save persists them; the controller maps temp -> real ids.
   visuals: z.array(z.record(z.string(), z.any())).optional(),
   filters: z.array(z.record(z.string(), z.any())).optional(),
+  tabs: z.array(z.record(z.string(), z.any())).optional(),
+  parameters: z.array(z.record(z.string(), z.any())).optional(),
   justification: analysisJustificationSchema,
 });
 export type UpdateAnalysisInput = z.infer<typeof updateAnalysisSchema>;
