@@ -52,5 +52,26 @@
       color: var(--secondary-color);
       font-size: var(--fs-body);
     }
+
+    // Way-forward actions: a primary "Create connection" button + a quieter
+    // "Manage connections" text link beneath it.
+    .nq-empty-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .nq-link {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      color: var(--primary-color);
+      font-size: var(--fs-control);
+      text-decoration: underline;
+
+      &:hover { color: var(--primary-color-hover, var(--primary-color)); }
+    }
   }
 }

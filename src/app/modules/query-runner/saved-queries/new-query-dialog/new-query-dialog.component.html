@@ -11,57 +11,69 @@
     <div class="popup-body">
       <p class="nq-subtitle">{{ 'QUERY_RUNNER.NEW_QUERY_SUBTITLE' | translate }}</p>
 
-      <!-- Empty state: no connections yet -->
+      <!-- Datasource — ALWAYS shown. A datasource is pickable even before any
+           connection exists, so this must not hide behind the no-connections
+           guard (the old markup trapped it there, leaving the popup with no
+           control at all on a fresh org). -->
+      <app-custom-dropdown
+        [ngModel]="selectedDatasourceId"
+        [ngModelOptions]="{ standalone: true }"
+        (onChangeEvent)="onDatasourceChange($event)"
+        [label]="'QUERY_RUNNER.STEP_DATASOURCE' | translate"
+        [serverMode]="true"
+        [fetcher]="loadDatasourcesPage"
+        [pageSize]="10"
+        optionLabel="name"
+        optionValue="id"
+        [filter]="true"
+        filterBy="name"
+        [showClear]="true"
+        appendTo="body"
+        icon="pi-database"
+        [placeholder]="'QUERY_RUNNER.SELECT_DATASOURCE' | translate"
+      ></app-custom-dropdown>
+
+      <!-- Empty state: org has no connections at all. Give a way forward
+           instead of a dead-end hint — a primary "Create connection" action
+           plus a "Manage connections" link. -->
       <div class="nq-empty" *ngIf="!connectionsLoading && hasNoConnections">
         <i class="pi pi-link"></i>
         <p>{{ 'QUERY_RUNNER.NO_CONNECTIONS_HINT' | translate }}</p>
+        <div class="nq-empty-actions">
+          <button type="button" class="btn-confirm" (click)="goCreateConnection()">
+            <i class="pi pi-plus mr-2"></i>{{ 'QUERY_RUNNER.NEW_CONNECTION' | translate }}
+          </button>
+          <button type="button" class="nq-link" (click)="goManageConnections()">
+            {{ 'QUERY_RUNNER.MANAGE_CONNECTIONS' | translate }}
+          </button>
+        </div>
       </div>
 
-      <ng-container *ngIf="!hasNoConnections">
-        <!-- Datasource -->
+      <!-- Connection (enabled once a datasource is chosen). Shown only when the
+           org has at least one connection. -->
+      <div *ngIf="!hasNoConnections">
         <app-custom-dropdown
-          [ngModel]="selectedDatasourceId"
+          [(ngModel)]="selectedConnectionId"
           [ngModelOptions]="{ standalone: true }"
-          (onChangeEvent)="onDatasourceChange($event)"
-          [label]="'QUERY_RUNNER.STEP_DATASOURCE' | translate"
-          [serverMode]="true"
-          [fetcher]="loadDatasourcesPage"
-          [pageSize]="10"
-          optionLabel="name"
-          optionValue="id"
+          [label]="'QUERY_RUNNER.STEP_CONNECTION' | translate"
+          [options]="connectionOptions"
+          optionLabel="label"
+          optionValue="value"
           [filter]="true"
-          filterBy="name"
+          filterBy="label"
           [showClear]="true"
           appendTo="body"
-          icon="pi-database"
-          [placeholder]="'QUERY_RUNNER.SELECT_DATASOURCE' | translate"
+          icon="pi-link"
+          [disabled]="!selectedDatasourceId"
+          [placeholder]="(selectedDatasourceId ? 'QUERY_RUNNER.SELECT_CONNECTION' : 'QUERY_RUNNER.SELECT_DATASOURCE_FIRST') | translate"
         ></app-custom-dropdown>
-
-        <!-- Connection (enabled once a datasource is chosen) -->
-        <div>
-          <app-custom-dropdown
-            [(ngModel)]="selectedConnectionId"
-            [ngModelOptions]="{ standalone: true }"
-            [label]="'QUERY_RUNNER.STEP_CONNECTION' | translate"
-            [options]="connectionOptions"
-            optionLabel="label"
-            optionValue="value"
-            [filter]="true"
-            filterBy="label"
-            [showClear]="true"
-            appendTo="body"
-            icon="pi-link"
-            [disabled]="!selectedDatasourceId"
-            [placeholder]="(selectedDatasourceId ? 'QUERY_RUNNER.SELECT_CONNECTION' : 'QUERY_RUNNER.SELECT_DATASOURCE_FIRST') | translate"
-          ></app-custom-dropdown>
-          <small class="form-hint warn" *ngIf="selectedDatasourceId && connectionOptions.length === 0 && !allDisabledForDs">
-            {{ 'QUERY_RUNNER.NO_CONNECTIONS_FOR_DS' | translate }}
-          </small>
-          <small class="form-hint warn" *ngIf="allDisabledForDs">
-            {{ 'QUERY_RUNNER.ALL_DISABLED_FOR_DS' | translate }}
-          </small>
-        </div>
-      </ng-container>
+        <small class="form-hint warn" *ngIf="selectedDatasourceId && connectionOptions.length === 0 && !allDisabledForDs">
+          {{ 'QUERY_RUNNER.NO_CONNECTIONS_FOR_DS' | translate }}
+        </small>
+        <small class="form-hint warn" *ngIf="allDisabledForDs">
+          {{ 'QUERY_RUNNER.ALL_DISABLED_FOR_DS' | translate }}
+        </small>
+      </div>
     </div>
 
     <div class="popup-actions">

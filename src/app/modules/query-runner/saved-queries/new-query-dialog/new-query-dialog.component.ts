@@ -7,6 +7,7 @@ import {
   Output,
   inject,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { QUERY_RUNNER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
@@ -53,6 +54,7 @@ export class NewQueryDialogComponent implements OnInit {
     private service: QueryRunnerService,
     private datasourceService: DatasourceService,
     private globalService: GlobalService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -169,6 +171,22 @@ export class NewQueryDialogComponent implements OnInit {
         this.verifying = false;
         this.cdr.markForCheck();
       });
+  }
+
+  /**
+   * Empty-state escape hatch: go create a connection. Closes the popup first
+   * (it's an overlay on the saved-queries list) then routes to the new-connection
+   * form so the user isn't stranded when the org has no connections yet.
+   */
+  goCreateConnection(): void {
+    this.close();
+    this.router.navigateByUrl(QUERY_RUNNER.connectionNew());
+  }
+
+  /** Open the connections list (manage existing connections). */
+  goManageConnections(): void {
+    this.close();
+    this.router.navigateByUrl(QUERY_RUNNER.CONNECTIONS_LIST);
   }
 
   close(): void {
