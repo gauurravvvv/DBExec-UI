@@ -4524,6 +4524,15 @@
       "NUMBER": "Nombre",
       "DATE": "Date",
       "BOOLEAN": "Booléen"
-    }
+    },
+    "STEP_SOURCE": "Source",
+    "STEP_CONDITION": "Condition",
+    "STEP_SCHEDULE": "Planification",
+    "STEP_DELIVERY": "Diffusion",
+    "STEP_REVIEW": "Vérifier",
+    "WIZARD_BACK": "Retour",
+    "WIZARD_NEXT": "Suivant",
+    "REVIEW_SUMMARY": "Vérifier et confirmer",
+    "SUMMARY_RECIPIENTS": "{{users}} utilisateur(s), {{emails}} e-mail(s)"
   }
 }

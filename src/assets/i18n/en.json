@@ -4521,6 +4521,15 @@
       "NUMBER": "Number",
       "DATE": "Date",
       "BOOLEAN": "Boolean"
-    }
+    },
+    "STEP_SOURCE": "Source",
+    "STEP_CONDITION": "Condition",
+    "STEP_SCHEDULE": "Schedule",
+    "STEP_DELIVERY": "Delivery",
+    "STEP_REVIEW": "Review",
+    "WIZARD_BACK": "Back",
+    "WIZARD_NEXT": "Next",
+    "REVIEW_SUMMARY": "Review & confirm",
+    "SUMMARY_RECIPIENTS": "{{users}} user(s), {{emails}} email(s)"
   }
 }

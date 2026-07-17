@@ -4524,6 +4524,15 @@
       "NUMBER": "숫자",
       "DATE": "날짜",
       "BOOLEAN": "부울"
-    }
+    },
+    "STEP_SOURCE": "소스",
+    "STEP_CONDITION": "조건",
+    "STEP_SCHEDULE": "일정",
+    "STEP_DELIVERY": "전달",
+    "STEP_REVIEW": "검토",
+    "WIZARD_BACK": "뒤로",
+    "WIZARD_NEXT": "다음",
+    "REVIEW_SUMMARY": "검토 및 확인",
+    "SUMMARY_RECIPIENTS": "사용자 {{users}}명, 이메일 {{emails}}개"
   }
 }

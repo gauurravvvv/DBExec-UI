@@ -4524,6 +4524,15 @@
       "NUMBER": "数字",
       "DATE": "日期",
       "BOOLEAN": "布尔值"
-    }
+    },
+    "STEP_SOURCE": "数据源",
+    "STEP_CONDITION": "条件",
+    "STEP_SCHEDULE": "计划",
+    "STEP_DELIVERY": "投递",
+    "STEP_REVIEW": "审核",
+    "WIZARD_BACK": "上一步",
+    "WIZARD_NEXT": "下一步",
+    "REVIEW_SUMMARY": "审核并确认",
+    "SUMMARY_RECIPIENTS": "{{users}} 位用户，{{emails}} 个邮箱"
   }
 }

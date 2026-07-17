@@ -60,6 +60,22 @@ export const TIMEZONE_OPTIONS: { label: string; value: string }[] = [
   'Australia/Sydney',
 ].map(tz => ({ label: tz, value: tz }));
 
+/* -- wizard steps -------------------------------------------------- */
+
+/**
+ * Ordered wizard steps shared by the Add + Edit alert screens so both render
+ * an identical stepper. `titleKey` -> ngx-translate label, `icon` -> PrimeIcon
+ * shown on the step dot's active/label context. Purely presentational: the
+ * step boundaries do not change the reactive form or the submit payload.
+ */
+export const ALERT_WIZARD_STEPS: { key: string; titleKey: string; icon: string }[] = [
+  { key: 'source', titleKey: 'ALERTS.STEP_SOURCE', icon: 'pi-database' },
+  { key: 'condition', titleKey: 'ALERTS.STEP_CONDITION', icon: 'pi-filter' },
+  { key: 'schedule', titleKey: 'ALERTS.STEP_SCHEDULE', icon: 'pi-clock' },
+  { key: 'delivery', titleKey: 'ALERTS.STEP_DELIVERY', icon: 'pi-send' },
+  { key: 'review', titleKey: 'ALERTS.STEP_REVIEW', icon: 'pi-check-circle' },
+];
+
 /* ── field option builder ─────────────────────────────────────────── */
 
 /**

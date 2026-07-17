@@ -4524,6 +4524,15 @@
       "NUMBER": "数値",
       "DATE": "日付",
       "BOOLEAN": "ブール値"
-    }
+    },
+    "STEP_SOURCE": "ソース",
+    "STEP_CONDITION": "条件",
+    "STEP_SCHEDULE": "スケジュール",
+    "STEP_DELIVERY": "配信",
+    "STEP_REVIEW": "確認",
+    "WIZARD_BACK": "戻る",
+    "WIZARD_NEXT": "次へ",
+    "REVIEW_SUMMARY": "確認して保存",
+    "SUMMARY_RECIPIENTS": "ユーザー {{users}} 人、メール {{emails}} 件"
   }
 }

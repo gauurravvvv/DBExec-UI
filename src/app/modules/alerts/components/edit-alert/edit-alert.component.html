@@ -12,7 +12,28 @@
         <h2>{{ 'ALERTS.EDIT_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
+        <app-button variant="secondary" (clicked)="onCancel()">
+          {{ 'COMMON.CANCEL' | translate }}
+        </app-button>
         <app-button
+          *ngIf="currentStep > 0"
+          variant="secondary"
+          icon="pi pi-arrow-left"
+          (clicked)="previousStep()"
+        >
+          {{ 'ALERTS.WIZARD_BACK' | translate }}
+        </app-button>
+        <app-button
+          *ngIf="currentStep < lastStep"
+          variant="primary"
+          trailingIcon="pi pi-arrow-right"
+          [disabled]="!isStepValid(currentStep)"
+          (clicked)="nextStep()"
+        >
+          {{ 'ALERTS.WIZARD_NEXT' | translate }}
+        </app-button>
+        <app-button
+          *ngIf="currentStep === lastStep"
           variant="secondary"
           icon="pi pi-bolt"
           [loading]="testing()"
@@ -21,26 +42,44 @@
         >
           {{ 'ALERTS.TEST_NOW' | translate }}
         </app-button>
-        <app-button variant="secondary" (clicked)="onCancel()">
-          {{ 'COMMON.CANCEL' | translate }}
-        </app-button>
-        <app-button
-          *hasPermission="'alertManagement'; level: 'write'"
-          variant="primary"
-          type="submit"
-          icon="pi pi-save"
-          [loading]="saving()"
-          [disabled]="!canSave || !isFormDirty || saving()"
-          (clicked)="onSubmit()"
-        >
-          {{ 'COMMON.SAVE' | translate }}
-        </app-button>
+        <ng-container *hasPermission="'alertManagement'; level: 'write'">
+          <app-button
+            *ngIf="currentStep === lastStep"
+            variant="primary"
+            type="submit"
+            icon="pi pi-save"
+            [loading]="saving()"
+            [disabled]="!canSave || !isFormDirty || saving()"
+            (clicked)="onSubmit()"
+          >
+            {{ 'COMMON.SAVE' | translate }}
+          </app-button>
+        </ng-container>
       </div>
     </div>
 
+    <!-- Stepper progress (custom index, mirroring add-organisation) -->
+    <div class="steps-container" [ngClass]="'step-' + (currentStep + 1)" *ngIf="!loading()">
+      <ng-container *ngFor="let step of steps; let i = index; trackBy: trackByIndex">
+        <div
+          class="step"
+          [class.active]="currentStep === i"
+          [class.completed]="currentStep > i"
+          (click)="onStepClick(i)"
+        >
+          <div class="step-dot">
+            <i class="pi pi-check" *ngIf="currentStep > i"></i>
+            <span *ngIf="currentStep <= i">{{ i + 1 }}</span>
+          </div>
+          <span class="step-label">{{ step.titleKey | translate }}</span>
+        </div>
+        <div class="step-line" *ngIf="i < lastStep"></div>
+      </ng-container>
+    </div>
+
     <form [formGroup]="alertForm" class="admin-form" *ngIf="!loading()">
-      <!-- basics -->
-      <section class="form-section">
+      <!-- Step 1: Source -->
+      <section class="form-section" *ngIf="currentStep === 0">
         <h3 class="section-title">
           <i class="pi pi-info-circle"></i>
           {{ 'COMMON.BASIC_INFORMATION' | translate }}
@@ -64,11 +103,8 @@
             icon="pi-align-left"
           ></app-custom-input>
         </div>
-      </section>
 
-      <!-- source -->
-      <section class="form-section">
-        <h3 class="section-title">
+        <h3 class="section-title section-title--divider">
           <i class="pi pi-database"></i> {{ 'ALERTS.SOURCE' | translate }}
         </h3>
         <div class="form-grid three-col">
@@ -127,8 +163,8 @@
         </div>
       </section>
 
-      <!-- condition -->
-      <section class="form-section">
+      <!-- Step 2: Condition -->
+      <section class="form-section" *ngIf="currentStep === 1">
         <h3 class="section-title">
           <i class="pi pi-filter"></i> {{ 'ALERTS.CONDITION' | translate }}
         </h3>
@@ -139,8 +175,8 @@
         ></app-alert-condition-builder>
       </section>
 
-      <!-- schedule -->
-      <section class="form-section">
+      <!-- Step 3: Schedule -->
+      <section class="form-section" *ngIf="currentStep === 2">
         <h3 class="section-title">
           <i class="pi pi-clock"></i> {{ 'ALERTS.SCHEDULE' | translate }}
         </h3>
@@ -179,8 +215,8 @@
         </div>
       </section>
 
-      <!-- delivery -->
-      <section class="form-section">
+      <!-- Step 4: Delivery -->
+      <section class="form-section" *ngIf="currentStep === 3">
         <h3 class="section-title">
           <i class="pi pi-send"></i> {{ 'ALERTS.DELIVERY' | translate }}
         </h3>
@@ -245,8 +281,8 @@
         </div>
       </section>
 
-      <!-- gating -->
-      <section class="form-section">
+      <!-- Step 5: Review & gating -->
+      <section class="form-section" *ngIf="currentStep === lastStep">
         <h3 class="section-title">
           <i class="pi pi-shield"></i> {{ 'ALERTS.GATING' | translate }}
         </h3>
@@ -273,8 +309,56 @@
         ></app-custom-toggle>
       </section>
 
+      <!-- Review summary (read-only) -->
+      <section class="form-section review-summary" *ngIf="currentStep === lastStep">
+        <h3 class="section-title">
+          <i class="pi pi-list"></i> {{ 'ALERTS.REVIEW_SUMMARY' | translate }}
+        </h3>
+        <div class="summary-grid">
+          <div class="summary-row">
+            <span class="summary-label">{{ 'ALERTS.ALERT_NAME' | translate }}</span>
+            <span class="summary-value">{{ alertForm.get('name')?.value || '—' }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">{{ 'ALERTS.SOURCE' | translate }}</span>
+            <span class="summary-value">{{ sourceTypeLabel }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">{{ 'ALERTS.SCHEDULE' | translate }}</span>
+            <span class="summary-value">
+              {{ alertForm.get('cronExpression')?.value }} · {{ alertForm.get('timezone')?.value }}
+            </span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">{{ 'ALERTS.SEVERITY' | translate }}</span>
+            <span class="summary-value">{{ severityLabel }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">{{ 'ALERTS.RECIPIENTS' | translate }}</span>
+            <span class="summary-value">
+              {{ 'ALERTS.SUMMARY_RECIPIENTS'
+                | translate: { users: recipientUsersCount, emails: recipientEmailsCount } }}
+            </span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">{{ 'ALERTS.CHANNELS' | translate }}</span>
+            <span class="summary-value">
+              <span *ngIf="alertForm.get('notifyInApp')?.value" class="channel-chip">
+                {{ 'ALERTS.NOTIFY_IN_APP' | translate }}
+              </span>
+              <span *ngIf="alertForm.get('notifyEmail')?.value" class="channel-chip">
+                {{ 'ALERTS.NOTIFY_EMAIL' | translate }}
+              </span>
+              <span
+                *ngIf="!alertForm.get('notifyInApp')?.value && !alertForm.get('notifyEmail')?.value"
+              >—</span>
+            </span>
+          </div>
+        </div>
+      </section>
+
       <!-- test-now result -->
-      <section class="form-section test-result" *ngIf="testResult">
+      <section class="form-section test-result" *ngIf="currentStep === lastStep && testResult">
         <div
           class="test-banner"
           [ngClass]="{

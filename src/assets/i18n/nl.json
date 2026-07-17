@@ -4524,6 +4524,15 @@
       "NUMBER": "Getal",
       "DATE": "Datum",
       "BOOLEAN": "Booleaans"
-    }
+    },
+    "STEP_SOURCE": "Bron",
+    "STEP_CONDITION": "Voorwaarde",
+    "STEP_SCHEDULE": "Planning",
+    "STEP_DELIVERY": "Bezorging",
+    "STEP_REVIEW": "Controleren",
+    "WIZARD_BACK": "Terug",
+    "WIZARD_NEXT": "Volgende",
+    "REVIEW_SUMMARY": "Controleren en bevestigen",
+    "SUMMARY_RECIPIENTS": "{{users}} gebruiker(s), {{emails}} e-mail(s)"
   }
 }
