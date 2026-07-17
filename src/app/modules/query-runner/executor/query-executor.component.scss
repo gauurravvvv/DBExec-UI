@@ -1,3 +1,10 @@
+@use '../../db-access/styles/db-access-shared' as db;
+
+/* Canonical confirmation-popup chrome (backdrop, card, header, body, actions)
+   for the Save Query prompt — same dialog pattern as the New Query popup and
+   every other app dialog, instead of the executor's bespoke go-to-line box. */
+@include db.db-access-dialog;
+
 /* Standalone Query Runner workspace — full-viewport, DBeaver-style
    layout, but styled entirely with the app design tokens so it reads
    as part of the application (no bespoke teal palette). The --qx-*
@@ -390,38 +397,80 @@ $qx-btn-h: 34px;
 
 // Save-query prompt reuses the goto-box shell; adds a name+description form,
 // a save-mode switch (update / save-as-new), and a disabled primary state.
-.qx-save-box {
-  width: min(440px, 92vw);
+// Save Query prompt — rides the canonical .confirmation-popup chrome (above,
+// from the db-access-dialog mixin). Only the body's fields + the update/
+// save-as-new toggle need local styling.
+.confirmation-popup .nq-save-content {
+  max-width: 460px;
 
-  .qx-save-modes {
+  .popup-body {
+    text-align: left;
     display: flex;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
 
-    .qx-btn-ghost.qx-active {
-      border-color: var(--primary-color);
-      color: var(--primary-color);
+  // Update vs. Save-as-new segmented toggle (shown only when editing a
+  // previously-saved query).
+  .nq-save-modes {
+    display: inline-flex;
+    gap: var(--space-2);
+    background: var(--secondary-background);
+    padding: var(--space-1);
+    border-radius: var(--radius-sm);
+
+    .nq-mode-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: var(--space-3) var(--space-5);
+      border-radius: var(--radius-xs);
+      font-size: var(--fs-control);
+      font-weight: var(--fw-medium);
+      color: var(--secondary-color);
+      cursor: pointer;
+      transition: all var(--motion-base, 0.15s) ease;
+
+      &.active {
+        background: var(--card-background);
+        color: var(--primary-color);
+        box-shadow: var(--shadow-sm);
+      }
+      &:hover:not(.active) { color: var(--text-color); }
     }
   }
 
-  input { margin-bottom: 0.75rem; }
+  // Labelled name + description fields, styled to read like the app's form
+  // controls (the executor is standalone and doesn't pull in SharedModule).
+  .nq-save-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
 
-  textarea {
-    width: 100%;
-    min-height: 56px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    padding: 0.5rem 0.6rem;
-    font-size: var(--fs-body);
-    color: var(--text-color);
-    background: var(--card-background);
-    resize: vertical;
-    &:focus { outline: none; border-color: var(--primary-color); }
-  }
+    label {
+      font-size: var(--fs-label);
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
+    }
 
-  .qx-btn-primary:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4) var(--space-5);
+      font-size: var(--fs-body);
+      font-family: var(--font-ui);
+      color: var(--text-color);
+      background: var(--card-background);
+      &::placeholder { color: var(--text-subtle); }
+      &:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px var(--primary-color-transparent);
+      }
+    }
+    textarea { resize: vertical; min-height: 64px; }
   }
 }
 

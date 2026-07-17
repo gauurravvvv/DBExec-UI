@@ -1358,6 +1358,15 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     this.view?.focus();
   }
 
+  /**
+   * Close the Save prompt only when the backdrop itself is clicked — matches
+   * the canonical .confirmation-popup pattern (target===currentTarget) so a
+   * click inside the card doesn't dismiss it.
+   */
+  onSaveBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) this.closeSavePrompt();
+  }
+
   /** True once a name is entered and we're not mid-save. */
   get canSave(): boolean {
     return !this.saving && this.savePromptName.trim().length >= 2;

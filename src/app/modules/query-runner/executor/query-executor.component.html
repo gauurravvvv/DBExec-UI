@@ -480,34 +480,55 @@
   </div>
 </div>
 
-<!-- Save query — name + description prompt (POST new / PUT update) -->
-<div class="qx-overlay" *ngIf="savePromptOpen" (click)="closeSavePrompt()">
-  <div class="qx-goto-box qx-save-box" (click)="$event.stopPropagation()">
-    <label>{{ 'QUERY_RUNNER.SAVE_QUERY' | translate }}</label>
-
-    <!-- When opened from a saved query, offer update vs. save-as-new. -->
-    <div class="qx-save-modes" *ngIf="savedQueryId">
-      <button type="button" class="qx-btn-ghost" [class.qx-active]="saveMode === 'update'"
-        (click)="openSavePrompt('update')">
-        {{ 'QUERY_RUNNER.SAVE_UPDATE' | translate }}
-      </button>
-      <button type="button" class="qx-btn-ghost" [class.qx-active]="saveMode === 'new'"
-        (click)="openSavePrompt('new')">
-        {{ 'QUERY_RUNNER.SAVE_AS_NEW' | translate }}
-      </button>
+<!-- Save query — name + description prompt (POST new / PUT update).
+     Canonical `.confirmation-popup` chrome (matches the New Query popup + every
+     other app dialog) via the db-access-dialog mixin, NOT the executor's
+     bespoke qx-goto-box. Close only on a backdrop click (target===currentTarget)
+     so clicks inside the card don't dismiss it. -->
+<div class="confirmation-popup" *ngIf="savePromptOpen" (click)="onSaveBackdropClick($event)">
+  <div class="popup-content nq-save-content">
+    <div class="popup-header">
+      <div class="popup-icon"><i class="pi pi-save"></i></div>
+      <h3>{{ 'QUERY_RUNNER.SAVE_QUERY' | translate }}</h3>
     </div>
 
-    <input type="text" [(ngModel)]="savePromptName" maxlength="150"
-      [placeholder]="'QUERY_RUNNER.SAVED_QUERY_NAME_PLACEHOLDER' | translate"
-      (keydown.enter)="confirmSave()" (keydown.escape)="closeSavePrompt()" autocomplete="off" />
-    <textarea rows="2" [(ngModel)]="savePromptDescription" maxlength="500"
-      [placeholder]="'QUERY_RUNNER.SAVED_QUERY_DESCRIPTION_PLACEHOLDER' | translate"
-      (keydown.escape)="closeSavePrompt()"></textarea>
+    <div class="popup-body">
+      <!-- When opened from a saved query, offer update vs. save-as-new. -->
+      <div class="nq-save-modes" *ngIf="savedQueryId">
+        <button type="button" class="nq-mode-btn" [class.active]="saveMode === 'update'"
+          (click)="openSavePrompt('update')">
+          {{ 'QUERY_RUNNER.SAVE_UPDATE' | translate }}
+        </button>
+        <button type="button" class="nq-mode-btn" [class.active]="saveMode === 'new'"
+          (click)="openSavePrompt('new')">
+          {{ 'QUERY_RUNNER.SAVE_AS_NEW' | translate }}
+        </button>
+      </div>
 
-    <div class="qx-goto-actions">
-      <button class="qx-btn-ghost" (click)="closeSavePrompt()">{{ 'COMMON.CANCEL' | translate }}</button>
-      <button class="qx-btn-primary" (click)="confirmSave()" [disabled]="!canSave">
-        <i class="pi mr-2" [ngClass]="saving ? 'pi-spin pi-spinner' : 'pi-save'"></i>
+      <!-- Plain inputs (the executor is a lean standalone component that does
+           not pull in SharedModule); styled via .nq-save-field to read like the
+           app's form controls. -->
+      <div class="nq-save-field">
+        <label>{{ 'QUERY_RUNNER.SAVED_QUERY_NAME' | translate }}</label>
+        <input type="text" [(ngModel)]="savePromptName" maxlength="150"
+          [placeholder]="'QUERY_RUNNER.SAVED_QUERY_NAME_PLACEHOLDER' | translate"
+          (keydown.enter)="confirmSave()" (keydown.escape)="closeSavePrompt()" autocomplete="off" />
+      </div>
+
+      <div class="nq-save-field">
+        <label>{{ 'QUERY_RUNNER.SAVED_QUERY_DESCRIPTION' | translate }}</label>
+        <textarea rows="3" [(ngModel)]="savePromptDescription" maxlength="500"
+          [placeholder]="'QUERY_RUNNER.SAVED_QUERY_DESCRIPTION_PLACEHOLDER' | translate"
+          (keydown.escape)="closeSavePrompt()"></textarea>
+      </div>
+    </div>
+
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="closeSavePrompt()">
+        <i class="pi pi-times"></i>{{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button class="btn-confirm" (click)="confirmSave()" [disabled]="!canSave">
+        <i class="pi" [ngClass]="saving ? 'pi-spin pi-spinner' : 'pi-save'"></i>
         {{ 'COMMON.SAVE' | translate }}
       </button>
     </div>
