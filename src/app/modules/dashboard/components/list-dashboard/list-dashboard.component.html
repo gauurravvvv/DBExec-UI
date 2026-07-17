@@ -61,13 +61,6 @@
             </span>
           </ng-template>
 
-          <!-- Datasource badge (module-specific). -->
-          <ng-template usGridCell="datasourceName" let-dashboard>
-            <span class="description-text" [title]="dashboard.datasource?.name">
-              {{ dashboard.datasource?.name || '—' }}
-            </span>
-          </ng-template>
-
           <!-- Status pill (module-specific). -->
           <ng-template usGridCell="status" let-dashboard>
             <app-chip

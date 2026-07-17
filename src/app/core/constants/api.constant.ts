@@ -465,6 +465,8 @@ export const RLS_RULE = {
   GET: '/rls-rules/', // GET /rls-rules/:ruleId
   UPDATE: '/rls-rules/', // PUT /rls-rules/:ruleId
   DELETE: '/rls-rules/', // DELETE /rls-rules/:ruleId
+  // GET /rls-rules → all org rules, each enriched with datasetName + datasourceName
+  LIST_ALL: '/rls-rules',
   // GET /rls-rules/datasets/:datasetId
   LIST_FOR_DATASET_PREFIX: '/rls-rules/datasets/',
 };

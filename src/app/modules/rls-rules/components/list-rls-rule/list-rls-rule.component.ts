@@ -24,22 +24,20 @@ import { RlsRulesService } from '../../services/rls-rules.service';
 
 /**
  * RLS-rule listing — renders through the shared `<app-custom-table>` (the app's
- * unified list table) driven by a `UsServerListAdapter` on the legacy
- * `rlsRulesService.listRules` call. Infinite scroll (no page controls), a
- * single global search plus on-demand per-column filters (shared inputs), and
- * per-row actions. No bulk selection.
+ * unified list table) driven by a `UsServerListAdapter` on the
+ * `rlsRulesService.listAllRules` call (`GET /rls-rules`). Infinite scroll (no
+ * page controls), a single global search plus on-demand per-column filters
+ * (shared inputs), and per-row actions. No bulk selection.
  *
- * RLS is datasource-scoped: the adapter is built only once a datasource is
- * chosen (it needs the id in every request), so the datasource picker is
- * projected into the table's toolbar-left slot. The page header, delete-confirm
- * popup and assignments side panel retain their existing behaviour.
- *
- * PRE-EXISTING SEMANTIC MISMATCH (preserved): the BE list endpoint is
- * dataset-scoped, but this page exposes a datasource selector. Passing
- * `selectedDatasource` as the datasetId has always returned zero matches
- * because dataset ids and datasource ids don't overlap. This migration is a
- * like-for-like renderer swap — the broken BE wiring stays broken until the
- * page is redesigned.
+ * There is NO datasource gate — the adapter is built once in `ngOnInit` and
+ * browses ALL org rules. Each row is enriched by the BE with `datasetName` +
+ * `datasourceName`, so the list shows BOTH the dataset and the datasource
+ * context (RLS is the one module where both are meaningful: a rule targets a
+ * dataset within a datasource). A datasource picker is projected into the
+ * table's toolbar-left slot as an OPTIONAL filter (mirrors list-dataset): with
+ * none picked the list shows all rules; picking one re-queries scoped to that
+ * datasource. The page header, delete-confirm popup and assignments side panel
+ * retain their existing behaviour.
  */
 @Component({
   selector: 'app-list-rls-rule',
@@ -83,8 +81,9 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
     rowIdField: 'id',
   };
 
-  /** Server-side adapter — bound on first datasource selection so
-   *  the table doesn't fire a rules query before a datasource exists. */
+  /** Server-side adapter — built once in ngOnInit; NO datasource gate. The
+   *  list browses ALL org rules; the optional toolbar datasource filter narrows
+   *  it via a `?datasourceId=` query param. */
   adapter: UsServerListAdapter<any> | null = null;
 
   constructor(
@@ -102,6 +101,11 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
       ...this.tableConfig,
       globalSearchPlaceholder: this.translate.instant('RLS.SEARCH_PLACEHOLDER'),
     };
+    // Build the datasource-free adapter once — the list browses ALL org rules.
+    // The optional toolbar datasource filter narrows it via a `?datasourceId=`
+    // query param (no gate).
+    this.bindAdapter();
+    // Preload datasources purely to populate the optional filter dropdown.
     this.loadDatasources();
   }
 
@@ -116,7 +120,8 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
     const t = (k: string) => this.translate.instant(k);
     return [
       { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '240px', frozen: true, filter: 'text' },
-      { colId: 'datasetName', field: 'dataset.name', header: t('RLS.DATASET'), width: '200px', filter: 'text', sortable: false },
+      { colId: 'datasourceName', field: 'datasourceName', header: t('COMMON.DATASOURCE'), width: '192px', filter: 'text', sortable: false },
+      { colId: 'datasetName', field: 'datasetName', header: t('RLS.DATASET'), width: '200px', filter: 'text', sortable: false },
       { colId: 'conditions', field: 'conditions', header: t('RLS.CONDITIONS'), width: '360px', sortable: false },
       { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px' },
       { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
@@ -150,11 +155,17 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
     }
   };
 
-  onDatasourceChange(datasourceId: any) {
-    this.selectedDatasource = datasourceId;
+  /** Datasource filter changed — rebuild the adapter so the list re-queries
+   *  scoped to (or cleared of) the selected datasource. Mirrors list-dataset. */
+  onDatasourceChange(): void {
     this.bindAdapter();
   }
 
+  /**
+   * Preload the org's datasources purely to populate the OPTIONAL toolbar
+   * filter dropdown. No longer gates or binds the list adapter: the list shows
+   * all rules regardless of datasource.
+   */
   loadDatasources(): Promise<void> {
     return new Promise(resolve => {
       const params = { page: DEFAULT_PAGE, limit: 10 };
@@ -167,25 +178,14 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
             this.preloadedDatasourcesTotal =
               response?.data?.count ?? items.length;
             this.datasources = [...items];
-            if (this.datasources.length > 0) {
-              this.selectedDatasource = this.datasources[0].id;
-              this.bindAdapter();
-            } else {
-              this.selectedDatasource = null;
-              this.adapter = null;
-            }
           } else {
             this.datasources = [];
-            this.selectedDatasource = null;
-            this.adapter = null;
           }
           this.cdr.markForCheck();
           resolve();
         })
         .catch(() => {
           this.datasources = [];
-          this.selectedDatasource = null;
-          this.adapter = null;
           this.cdr.markForCheck();
           resolve();
         });
@@ -195,30 +195,29 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
   /* ── adapter wiring ─────────────────────────────────── */
 
   /**
-   * Build the server-side adapter once a datasource has been picked.
-   * The legacy BE call (`listRules(datasetId)`) ignores
-   * filter/sort/pagination — we pass only the id. The custom-table still
-   * drives search/scroll UI client-side over the returned rows.
-   *
-   * NOTE: `selectedDatasource` is passed as the datasetId on purpose;
-   * see the class-level comment about the pre-existing mismatch.
+   * Construct the server-side adapter. NO datasource gate — the list browses
+   * ALL org rules via `GET /rls-rules`. A `datasourceId` query param is sent
+   * only when the optional toolbar filter has one selected, narrowing the rows
+   * to that datasource server-side.
    */
   private bindAdapter() {
-    if (!this.selectedDatasource) {
-      this.adapter = null;
-      return;
-    }
     // Tear down any prior adapter so its in-flight call doesn't
     // race the new one's first load.
     this.adapter?.destroy();
-    const selectedDatasource = this.selectedDatasource;
     this.adapter = new UsServerListAdapter<any>({
-      load: (_params: UsListLoadParams) =>
-        this.rlsRulesService.listRules(selectedDatasource),
+      load: (params: UsListLoadParams) =>
+        this.rlsRulesService.listAllRules({
+          ...(this.selectedDatasource
+            ? { datasourceId: this.selectedDatasource }
+            : {}),
+          page: params.page,
+          limit: params.limit,
+          ...(params.sort ? { sort: params.sort } : {}),
+          ...(params.filter ? { filter: params.filter } : {}),
+        }),
       unwrap: (res: any) => {
         // BE may return `{ data: { rules: [...], count } }` or the
-        // bare array `{ data: [...] }`; mirror the legacy
-        // `load()` method's fallback chain.
+        // bare array `{ data: [...] }`; mirror the legacy fallback chain.
         const arr = Array.isArray(res?.data)
           ? res.data
           : (res?.data?.rules ?? []);

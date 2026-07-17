@@ -34,7 +34,7 @@
           [hasProjectedEmpty]="true"
           (refresh)="refreshList()"
         >
-          <!-- Toolbar-left slot: server-driven datasource picker. -->
+          <!-- Toolbar-left slot: server-driven datasource picker (optional). -->
           <div tableToolbarStart class="ds-toolbar-start">
             <app-custom-dropdown
               [(ngModel)]="selectedDatasource"
@@ -48,13 +48,11 @@
               [filter]="true"
               [floatingLabel]="true"
               [label]="'COMMON.DATASOURCE' | translate"
+              [showClear]="true"
               filterBy="name"
-              [autoDisplayFirst]="false"
-              [placeholder]="'COMMON.SELECT_DATASOURCE' | translate"
-              (onChangeEvent)="onDatasourceChange($event)"
+              (onChangeEvent)="onDatasourceChange()"
               icon="pi-database"
-            >
-            </app-custom-dropdown>
+            ></app-custom-dropdown>
           </div>
 
           <!-- Empty body — always projected so only one empty state shows. -->
@@ -72,9 +70,15 @@
             </a>
           </ng-template>
 
+          <ng-template usGridCell="datasourceName" let-rule>
+            <span class="description-text" [title]="rule.datasourceName">
+              {{ rule.datasourceName || '-' }}
+            </span>
+          </ng-template>
+
           <ng-template usGridCell="datasetName" let-rule>
-            <span class="description-text" [title]="rule.dataset?.name">
-              {{ rule.dataset?.name || '-' }}
+            <span class="description-text" [title]="rule.datasetName">
+              {{ rule.datasetName || '-' }}
             </span>
           </ng-template>
 
@@ -190,34 +194,6 @@
             </div>
           </ng-template>
         </app-custom-table>
-      </div>
-
-      <!-- Empty datasource state — no datasource picked yet (adapter null,
-           so the table + its toolbar picker aren't rendered). This inline
-           picker keeps the datasource selectable in that state. -->
-      <div class="empty-state-inline" *ngIf="!adapter">
-        <app-custom-dropdown
-          [(ngModel)]="selectedDatasource"
-          [serverMode]="true"
-          [fetcher]="loadDatasourcesPage"
-          [pageSize]="10"
-          [preloadedItems]="preloadedDatasources"
-          [preloadedTotal]="preloadedDatasourcesTotal"
-          optionLabel="name"
-          optionValue="id"
-          [filter]="true"
-          [floatingLabel]="true"
-          [label]="'COMMON.DATASOURCE' | translate"
-          filterBy="name"
-          [autoDisplayFirst]="false"
-          [placeholder]="'COMMON.SELECT_DATASOURCE' | translate"
-          (onChangeEvent)="onDatasourceChange($event)"
-          icon="pi-database"
-        ></app-custom-dropdown>
-        <i class="pi pi-database empty-state-icon"></i>
-        <span class="empty-state-text">
-          {{ 'RLS.SELECT_DATASOURCE_MSG' | translate }}
-        </span>
       </div>
     </div>
   </div>

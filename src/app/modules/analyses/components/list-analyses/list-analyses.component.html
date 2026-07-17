@@ -20,6 +20,27 @@
           [hasProjectedEmpty]="true"
           (refresh)="refreshList()"
         >
+          <!-- Toolbar-left slot: server-driven datasource picker (optional). -->
+          <div tableToolbarStart class="ds-toolbar-start">
+            <app-custom-dropdown
+              [(ngModel)]="selectedDatasource"
+              [serverMode]="true"
+              [fetcher]="loadDatasourcesPage"
+              [pageSize]="10"
+              [preloadedItems]="preloadedDatasources"
+              [preloadedTotal]="preloadedDatasourcesTotal"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              [floatingLabel]="true"
+              [label]="'COMMON.DATASOURCE' | translate"
+              [showClear]="true"
+              filterBy="name"
+              (onChangeEvent)="onDatasourceChange()"
+              icon="pi-database"
+            ></app-custom-dropdown>
+          </div>
+
           <!-- Empty body — always projected so only one empty state shows. -->
           <div tableEmpty class="ct-empty-body">
             <i class="pi pi-inbox"></i>

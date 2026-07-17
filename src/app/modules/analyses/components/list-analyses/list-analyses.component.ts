@@ -241,6 +241,12 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
     this.adapter?.reload();
   }
 
+  /** Datasource filter changed — rebuild the adapter so the list re-queries
+   *  scoped to (or cleared of) the selected datasource. Mirrors list-dataset. */
+  onDatasourceChange(): void {
+    this.bindAdapter();
+  }
+
   /**
    * Preload the org's datasources — kept for any create-from-dataset flow that
    * needs a datasource at creation. No longer gates or binds the list adapter:
