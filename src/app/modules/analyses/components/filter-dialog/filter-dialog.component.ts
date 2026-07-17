@@ -690,102 +690,43 @@ export class FilterDialogComponent implements OnChanges {
       config.dependsOnFilterId = this.filterDialogDependsOnFilterId;
     }
 
-    this.isSavingFilter = true;
+    // ── Draft-only save (full-draft Analyses editor model) ────────────
+    // No immediate server write. We build the filter row exactly as the
+    // old updateFilter/addFilters payload did, then emit it to the
+    // parent, which folds it into the analysis's atomic Save.
+    //
+    // - EDIT keeps the existing real id (this.editingFilter.tempId is
+    //   the persisted filter id in this dialog's model).
+    // - ADD gets a client-side temp id (`tmp_<uuid>`) so the parent and
+    //   the eventual atomic save can map temp → real. Sequence uses the
+    //   current configured-filter count, matching the old add payload.
+    //
+    // The emitted shape is a flat SavedFilter row (id, name, columnName,
+    // filterType, controlType, config, nullOption, isEnabled,
+    // isMandatory, sequence, scope, targetTabId, targetVisualIds) — the
+    // same shape the parent's (saved) handler already consumes. Adds are
+    // distinguishable by the `tmp_` id prefix; a `_mode` discriminator is
+    // also included for convenience.
+    const isEdit = !!this.editingFilter;
+    const builtFilter = {
+      id: isEdit ? this.editingFilter!.tempId : `tmp_${crypto.randomUUID()}`,
+      name,
+      columnName,
+      filterType: this.filterDialogType,
+      controlType: this.filterDialogControl,
+      config,
+      nullOption: this.filterDialogNullOption || 'ALL_VALUES',
+      isEnabled: this.filterDialogEnabled,
+      isMandatory: this.filterDialogMandatory,
+      sequence: isEdit
+        ? this.editingFilter!.sequence
+        : this.configuredFiltersCount,
+      ...this.buildScopePayload(),
+      _mode: isEdit ? 'edit' : 'add',
+    };
 
-    try {
-      let res: any;
-      if (this.editingFilter) {
-        res = await this.analysesService.updateFilter({
-          id: this.editingFilter.tempId,
-          name,
-          columnName,
-          filterType: this.filterDialogType,
-          controlType: this.filterDialogControl,
-          config,
-          nullOption: this.filterDialogNullOption || 'ALL_VALUES',
-          isEnabled: this.filterDialogEnabled,
-          isMandatory: this.filterDialogMandatory,
-          sequence: this.editingFilter.sequence,
-          ...this.buildScopePayload(),
-        });
-      } else {
-        res = await this.analysesService.addFilters({
-          analysisId: this.analysisId,
-          filters: [
-            {
-              name,
-              columnName,
-              filterType: this.filterDialogType,
-              controlType: this.filterDialogControl,
-              config,
-              nullOption: this.filterDialogNullOption || 'ALL_VALUES',
-              isEnabled: this.filterDialogEnabled,
-              isMandatory: this.filterDialogMandatory,
-              sequence: this.configuredFiltersCount,
-              ...this.buildScopePayload(),
-            },
-          ],
-        });
-      }
-
-      if (this.globalService.handleSuccessService(res, true)) {
-        const stale: any[] = res?.data?.staleDefaults ?? [];
-        if (Array.isArray(stale) && stale.length > 0) {
-          this.surfaceStaleDefaultsWarning(stale);
-        }
-        // The BE returns different shapes for add vs update:
-        //   add    → data.filters: SavedFilter[]
-        //   update → data.filter:  SavedFilter
-        // Normalise to a single saved row so the parent can dispatch
-        // filterSaved with it. We assume single-filter saves (which
-        // matches the current dialog flow).
-        const savedFilter =
-          res?.data?.filter ??
-          (Array.isArray(res?.data?.filters) ? res.data.filters[0] : null);
-        this.visibleChange.emit(false);
-        this.saved.emit(savedFilter);
-      }
-    } catch (err) {
-      this.globalService.handleErrorService(err);
-    } finally {
-      this.isSavingFilter = false;
-    }
-  }
-
-  /**
-   * Raise a non-blocking warn toast when the BE flagged saved defaults
-   * as already missing from the dataset. The save itself succeeded —
-   * this is advisory so the user can come back and fix the config
-   * before the next dashboard view.
-   *
-   * Routes through GlobalService.showWarn so toast styling and
-   * severity stay consistent with the rest of the app (the previous
-   * direct MessageService call was a small abstraction leak).
-   */
-  private surfaceStaleDefaultsWarning(stale: any[]): void {
-    const totalCount = stale.reduce(
-      (acc: number, r: any) => acc + (r?.values?.length ?? 0),
-      0,
-    );
-    const summary = this.translate.instant(
-      'ANALYSES.FILTER_SAVED_WITH_WARNING',
-    );
-    if (totalCount === 0) {
-      // Filter-level error (e.g. column_missing) with no specific
-      // values. Use the per-filter message verbatim.
-      const detail = stale
-        .map((r: any) => r?.message)
-        .filter(Boolean)
-        .join(' — ');
-      if (!detail) return;
-      this.globalService.showWarn(detail, summary);
-      return;
-    }
-    const detail = this.translate.instant(
-      'ANALYSES.FILTER_SAVED_WITH_STALE_DEFAULTS',
-      { count: totalCount },
-    );
-    this.globalService.showWarn(detail, summary);
+    this.visibleChange.emit(false);
+    this.saved.emit(builtFilter);
   }
 
   /**

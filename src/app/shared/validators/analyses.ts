@@ -436,6 +436,10 @@ export const updateAnalysisSchema = z.object({
   filters: z.array(z.record(z.string(), z.any())).optional(),
   tabs: z.array(z.record(z.string(), z.any())).optional(),
   parameters: z.array(z.record(z.string(), z.any())).optional(),
+  // Real tabs deleted during this draft, each with its audit justification
+  // ({ id, justification }). The tabs array above is authoritative (an absent
+  // tab is deleted); tabDeletes only carries the deletion reason for the audit.
+  tabDeletes: z.array(z.record(z.string(), z.any())).optional(),
   justification: analysisJustificationSchema,
 });
 export type UpdateAnalysisInput = z.infer<typeof updateAnalysisSchema>;

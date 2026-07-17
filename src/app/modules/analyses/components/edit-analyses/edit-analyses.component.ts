@@ -135,6 +135,26 @@ export class EditAnalysesComponent
     this._isDirty = true;
     this.chartConfigVersion++;
   }
+
+  /**
+   * Client-side temp id for draft-created tabs (and any draft entity) that
+   * haven't been persisted yet. The atomic save (updateAnalysis PUT) maps
+   * these tmp_ ids to real server ids via the response tabIdMap and rewrites
+   * every visual.tabId that referenced them. See the draft-save model:
+   * nothing hits the server until the user clicks Save.
+   */
+  private newTempId(): string {
+    const rnd =
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    return `tmp_${rnd}`;
+  }
+
+  /** A tab/visual id that only exists client-side (not yet persisted). */
+  isTempId(id: string | null | undefined): boolean {
+    return !!id && id.startsWith('tmp_');
+  }
   datasetId: string = '';
   analysisDetails: any = null;
   datasetDetails: any = null;
@@ -1942,35 +1962,25 @@ export class EditAnalysesComponent
   /** Create a new tab and switch to it. Optional name + icon (from quick-add);
    *  falls back to a generated "Tab N" name when none is supplied. */
   addTab(name?: string, icon?: string | null): void {
-    if (this.isTabBusy || !this.analysisId) return;
-    this.isTabBusy = true;
+    if (!this.analysisId) return;
     const tabName =
       name?.trim() ||
       this.translate.instant('ANALYSES.TABS.NEW_TAB_NAME', {
         n: this.tabs.length + 1,
       });
-    this.analysisTabsService
-      .add({
-        analysisId: this.analysisId,
-        name: tabName,
-        icon: icon ?? null,
-        sequence: this.tabs.length,
-      })
-      .then((response: any) => {
-        if (this.globalService.handleSuccessService(response, true)) {
-          const tab: AnalysisTab = response.data?.tab ?? response.data;
-          if (tab && tab.id) {
-            this.tabs = [...this.tabs, tab];
-            this.activeTabId = tab.id;
-          }
-        }
-        this.cdr.markForCheck();
-      })
-      .catch(() => this.cdr.markForCheck())
-      .finally(() => {
-        this.isTabBusy = false;
-        this.cdr.markForCheck();
-      });
+    // DRAFT: create the tab in-memory with a temp id. Nothing is persisted
+    // until the user clicks Save (atomic updateAnalysis PUT maps tmp_ → real).
+    const tab = {
+      id: this.newTempId(),
+      analysisId: this.analysisId,
+      name: tabName,
+      icon: icon ?? null,
+      sequence: this.tabs.length,
+    } as AnalysisTab;
+    this.tabs = [...this.tabs, tab];
+    this.activeTabId = tab.id;
+    this.markDirty();
+    this.cdr.markForCheck();
   }
 
   /** Begin inline rename of a tab header. */
@@ -1988,20 +1998,10 @@ export class EditAnalysesComponent
     if (!tabId) return;
     const tab = this.tabs.find(t => t.id === tabId);
     if (!tab || !name || name === tab.name) return;
-    const prev = tab.name;
-    tab.name = name; // optimistic
-    this.analysisTabsService
-      .update(tabId, { name })
-      .then((response: any) => {
-        if (!this.globalService.handleSuccessService(response, true)) {
-          tab.name = prev; // revert on failure
-        }
-        this.cdr.markForCheck();
-      })
-      .catch(() => {
-        tab.name = prev;
-        this.cdr.markForCheck();
-      });
+    // DRAFT: rename in-memory only; persisted by the atomic Save.
+    tab.name = name;
+    this.markDirty();
+    this.cdr.markForCheck();
   }
 
   onTabNameKeydown(event: KeyboardEvent): void {
@@ -2030,38 +2030,36 @@ export class EditAnalysesComponent
   proceedDeleteTab(): void {
     const tab = this.tabToDelete;
     const reason = this.tabDeleteJustification.trim();
-    if (!tab || this.isTabBusy) return;
-    this.isTabBusy = true;
-    this.analysisTabsService
-      .delete(tab.id, reason || undefined)
-      .then((response: any) => {
-        if (this.globalService.handleSuccessService(response, true)) {
-          this.tabs = this.tabs.filter(t => t.id !== tab.id);
-          // Reassign in-memory visuals off the deleted tab to the first
-          // remaining tab so the canvas matches the BE's reassignment.
-          const fallback = this.firstTabId;
-          this.visuals.forEach(v => {
-            if ((v.tabId ?? null) === tab.id) v.tabId = fallback;
-          });
-          if (this.activeTabId === tab.id) {
-            this.activeTabId = fallback;
-          }
-          this.placeVisualsOnGrid();
-          this.recalculateAllVisualDimensions();
-        }
-        this.cdr.markForCheck();
-      })
-      .catch(() => this.cdr.markForCheck())
-      .finally(() => {
-        this.isTabBusy = false;
-        this.cancelDeleteTab();
-        this.cdr.markForCheck();
-      });
+    if (!tab) return;
+    // DRAFT: remove the tab in-memory. Reassign its visuals to the first
+    // remaining tab, then drop it. The atomic Save re-inserts the surviving
+    // tabs authoritatively (so a deleted tab simply isn't in the payload).
+    // A tab that was only ever a draft (tmp_ id) never existed server-side;
+    // a real tab's deletion + justification is captured for the save's audit.
+    if (!this.isTempId(tab.id) && reason) {
+      this._pendingTabDeletes.push({ id: tab.id, justification: reason });
+    }
+    this.tabs = this.tabs.filter(t => t.id !== tab.id);
+    const fallback = this.firstTabId;
+    this.visuals.forEach(v => {
+      if ((v.tabId ?? null) === tab.id) v.tabId = fallback;
+    });
+    if (this.activeTabId === tab.id) {
+      this.activeTabId = fallback;
+    }
+    this.placeVisualsOnGrid();
+    this.recalculateAllVisualDimensions();
+    this.markDirty();
+    this.cancelDeleteTab();
+    this.cdr.markForCheck();
   }
+
+  /** Real (server-side) tabs deleted during this draft, with the audit reason.
+   *  Sent to the atomic Save so the BE can record the deletion justification. */
+  private _pendingTabDeletes: { id: string; justification: string }[] = [];
 
   /** Reorder: move a tab one slot left/right, persisting the new order. */
   moveTab(tab: AnalysisTab, direction: -1 | 1): void {
-    if (this.isTabBusy) return;
     const idx = this.tabs.findIndex(t => t.id === tab.id);
     const target = idx + direction;
     if (idx < 0 || target < 0 || target >= this.tabs.length) return;
@@ -2069,21 +2067,9 @@ export class EditAnalysesComponent
     [next[idx], next[target]] = [next[target], next[idx]];
     next.forEach((t, i) => (t.sequence = i));
     this.tabs = next;
-    this.isTabBusy = true;
-    this.analysisTabsService
-      .reorder(
-        this.analysisId,
-        next.map(t => t.id),
-      )
-      .then((response: any) => {
-        this.globalService.handleSuccessService(response, false);
-        this.cdr.markForCheck();
-      })
-      .catch(() => this.cdr.markForCheck())
-      .finally(() => {
-        this.isTabBusy = false;
-        this.cdr.markForCheck();
-      });
+    // DRAFT: reorder in-memory; the new sequence rides the atomic Save.
+    this.markDirty();
+    this.cdr.markForCheck();
   }
 
   /** Toggle the per-visual "move to tab" menu. */
@@ -2383,63 +2369,44 @@ export class EditAnalysesComponent
    * awaits so a failure surfaces on the offending visual rather than racing.
    * Switches to the new tab and reloads the canvas at the end.
    */
-  async duplicateTab(tab: AnalysisTab, event?: Event): Promise<void> {
+  duplicateTab(tab: AnalysisTab, event?: Event): void {
     if (event) event.stopPropagation();
-    if (this.duplicatingTab || this.isTabBusy || !this.analysisId) return;
-    this.duplicatingTab = true;
-    this.isTabBusy = true;
-    this.cdr.markForCheck();
+    if (!this.analysisId) return;
 
-    try {
-      // Snapshot the source tab's visuals BEFORE creating the new tab so a
-      // concurrent reload can't shift the set under us.
-      const sourceVisuals = this.visuals.filter(
-        v => (v.tabId ?? this.firstTabId) === tab.id,
-      );
+    // DRAFT: clone the tab + all its visuals fully in-memory with temp ids.
+    // Nothing is persisted until Save; the atomic PUT maps every tmp_ id and
+    // re-keys the cloned visuals' tabId to the new tab's real id.
+    const sourceVisuals = this.visuals.filter(
+      v => (v.tabId ?? this.firstTabId) === tab.id,
+    );
 
-      const tabRes: any = await this.analysisTabsService.add({
-        analysisId: this.analysisId,
-        name: this.copyTitle(tab.name),
-        icon: tab.icon ?? null,
-        sequence: this.tabs.length,
-      });
-      if (!this.globalService.handleSuccessService(tabRes, false)) {
-        return;
-      }
-      const newTab: AnalysisTab = tabRes.data?.tab ?? tabRes.data;
-      if (!newTab || !newTab.id) return;
+    const newTab = {
+      id: this.newTempId(),
+      analysisId: this.analysisId,
+      name: this.copyTitle(tab.name),
+      icon: tab.icon ?? null,
+      color: (tab as any).color ?? null,
+      sequence: this.tabs.length,
+    } as AnalysisTab;
+    this.tabs = [...this.tabs, newTab];
 
-      this.tabs = [...this.tabs, newTab];
-
-      // Create each source visual under the new tab. Sequential so errors
-      // are attributable and we don't hammer the BE with a burst.
-      for (const sv of sourceVisuals) {
-        const payload = this.buildVisualCreatePayload(sv, {
-          tabId: newTab.id,
-        });
-        const vRes: any = await this.analysesService.addVisual(
-          this.analysisId,
-          payload,
-        );
-        // Non-fatal per visual — surface but keep going so a single bad
-        // visual doesn't abandon the rest of the copied tab.
-        this.globalService.handleSuccessService(vRes, false);
-      }
-
-      this.globalService.showInfo(
-        this.translate.instant('ANALYSES.AUTHORING.TAB_DUPLICATED'),
-      );
-      this.activeTabId = newTab.id;
-      // Reload so the copied visuals hydrate with their real ids under the
-      // new tab, then re-place them on the grid for the now-active tab.
-      this.loadAllVisuals();
-    } catch (err) {
-      this.globalService.handleErrorService(err);
-    } finally {
-      this.duplicatingTab = false;
-      this.isTabBusy = false;
-      this.cdr.markForCheck();
+    for (const sv of sourceVisuals) {
+      const clone: any = {
+        ...sv,
+        id: this.newTempId(),
+        tabId: newTab.id,
+      };
+      this.visuals.push(clone);
     }
+
+    this.activeTabId = newTab.id;
+    this.placeVisualsOnGrid();
+    this.recalculateAllVisualDimensions();
+    this.markDirty();
+    this.globalService.showInfo(
+      this.translate.instant('ANALYSES.AUTHORING.TAB_DUPLICATED'),
+    );
+    this.cdr.markForCheck();
   }
 
   /**
@@ -3516,6 +3483,19 @@ export class EditAnalysesComponent
           : [],
       }));
 
+      // Draft tabs ride the atomic save. The BE reconciles them onto the new
+      // version (authoritative: what we send IS the tab set), returns a
+      // tabIdMap (payload/tmp id → real id) which we use to re-key in-memory
+      // tab + visual ids after save. Deleted real tabs (with their audit
+      // justification) go in tabDeletes.
+      const tabsPayload = this.tabs.map((t, i) => ({
+        id: t.id,
+        name: t.name,
+        sequence: i,
+        icon: t.icon ?? null,
+        color: (t as any).color ?? null,
+      }));
+
       const updatePayload = {
         id: this.analysisId,
         name: formData.name,
@@ -3523,6 +3503,8 @@ export class EditAnalysesComponent
         datasetId: this.datasetId,
         datasource: this.datasourceId,
         visuals: visualConfigurations,
+        tabs: tabsPayload,
+        tabDeletes: this._pendingTabDeletes,
       };
 
       this.analysesService
@@ -3530,6 +3512,24 @@ export class EditAnalysesComponent
         .then(response => {
           if (this.globalService.handleSuccessService(response, true)) {
             this._isDirty = false;
+            // Re-key in-memory tabs + visuals from the server's temp→real map
+            // so a subsequent Save/Publish addresses real rows, not tmp_ ids.
+            const tabIdMap: Record<string, string> =
+              response?.data?.tabIdMap ?? {};
+            if (Object.keys(tabIdMap).length) {
+              this.tabs.forEach(t => {
+                const real = tabIdMap[t.id];
+                if (real) t.id = real;
+              });
+              this.visuals.forEach(v => {
+                const real = v.tabId ? tabIdMap[v.tabId] : null;
+                if (real) v.tabId = real;
+              });
+              if (this.activeTabId && tabIdMap[this.activeTabId]) {
+                this.activeTabId = tabIdMap[this.activeTabId];
+              }
+            }
+            this._pendingTabDeletes = [];
             // The BE versioning model spawns a new Analyses row on
             // every save and leaves the old row immutable. The
             // response payload carries the new id under `data.id`
