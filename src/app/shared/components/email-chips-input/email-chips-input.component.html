@@ -1,0 +1,51 @@
+<!-- Tokenised string[] editor: applied entries render as app-chips. Clicking a
+     chip swaps it for an inline text input (Gmail-style) pre-filled with its
+     value; Enter/blur saves, Esc cancels. A trailing text input adds new
+     entries on Enter / , / ; / blur. -->
+<div
+  class="email-chips"
+  [class.is-invalid]="invalid"
+  [class.is-disabled]="disabled"
+>
+  <ng-container *ngFor="let chip of chips; let i = index; trackBy: trackByChip">
+    <!-- Inline edit input for the chip under edit -->
+    <input
+      *ngIf="editingIndex === i; else chipView"
+      #editInput
+      type="text"
+      class="email-chips-edit"
+      autofocus
+      [value]="editDraft"
+      [disabled]="disabled"
+      (input)="onEditInput($event)"
+      (keydown)="onEditKeydown($event)"
+      (blur)="onEditBlur()"
+    />
+
+    <!-- Resting chip; click to edit -->
+    <ng-template #chipView>
+      <app-chip
+        variant="tag"
+        size="sm"
+        class="email-chip"
+        [removable]="!disabled"
+        (clicked)="startEdit(i)"
+        [clickable]="!disabled"
+        (removed)="removeChip(chip)"
+      >
+        {{ chip }}
+      </app-chip>
+    </ng-template>
+  </ng-container>
+
+  <input
+    type="text"
+    class="email-chips-input"
+    [value]="draft"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    (input)="onInput($event)"
+    (keydown)="onKeydown($event)"
+    (blur)="onBlur()"
+  />
+</div>

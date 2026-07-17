@@ -70,15 +70,11 @@
         <label class="chips-label">
           {{ 'DASHBOARD.SCHEDULE.RECIPIENT_EMAILS' | translate }}
         </label>
-        <p-chips
+        <app-email-chips-input
           formControlName="recipientEmails"
-          [addOnBlur]="true"
-          [addOnTab]="true"
-          [allowDuplicate]="false"
-          [separator]="emailSeparator"
+          mode="email"
           [placeholder]="'DASHBOARD.SCHEDULE.ADD_EMAIL' | translate"
-          styleClass="schedule-email-chips"
-        ></p-chips>
+        ></app-email-chips-input>
       </div>
     </div>
 

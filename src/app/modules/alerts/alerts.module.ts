@@ -8,7 +8,7 @@ import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-tabl
 import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { EmailChipsInputComponent } from './components/shared/email-chips-input/email-chips-input.component';
+import { EmailChipsInputComponent } from 'src/app/shared/components/email-chips-input/email-chips-input.component';
 import { AddAlertComponent } from './components/add-alert/add-alert.component';
 import { AlertConditionBuilderComponent } from './components/alert-condition-builder/alert-condition-builder.component';
 import { AlertHistoryComponent } from './components/alert-history/alert-history.component';

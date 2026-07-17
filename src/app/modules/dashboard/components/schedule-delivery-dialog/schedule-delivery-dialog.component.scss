@@ -11,19 +11,28 @@
   color: var(--text-muted, #6b7280);
 }
 
+/* Canonical form rhythm (mirrors Add Organisation / Add Alert): one control
+   per row, stacked vertically. This is a narrow (~520px) dialog, so the dialog
+   itself plays the role of the 50% gutter — controls fill the dialog width
+   rather than shrinking to 50% of it. The previous two-column grid is dropped
+   in favour of the single-column stack. */
 .form-grid {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 14px;
 
-  &.two-col {
-    grid-template-columns: 1fr 1fr;
+  &.two-col,
+  &.three-col {
+    grid-template-columns: none;
   }
 
-  @media (max-width: 520px) {
-    &.two-col {
-      grid-template-columns: 1fr;
-    }
+  app-custom-input,
+  app-custom-dropdown,
+  app-custom-multiselect,
+  app-custom-toggle,
+  app-custom-number,
+  app-custom-textarea {
+    width: 100%;
   }
 }
 
@@ -31,19 +40,12 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: 100%;
 
   .chips-label {
     font-size: 13px;
     font-weight: 500;
     color: var(--text-color, #333);
-  }
-
-  ::ng-deep .schedule-email-chips {
-    width: 100%;
-    .p-chips,
-    .p-chips-multiple-container {
-      width: 100%;
-    }
   }
 }
 
