@@ -218,20 +218,19 @@
       <div class="sidebar-content">
         <div class="sidebar-header-info">
           <div class="dataset-label">{{ 'ANALYSES.LAYERS' | translate }}</div>
-          <!-- Count reflects the ACTIVE tab, not all tabs — the list rows,
-               canvas, empty-state + this badge all scope to visualsInActiveTab
-               so switching tabs shows a per-tab view. -->
+          <!-- Count reflects ALL tabs — the Layers panel now shows every tab
+               and its visuals, not just the active one. -->
           <app-chip
             variant="count"
             size="sm"
-            *ngIf="visualsInActiveTab.length > 0"
-            [count]="visualsInActiveTab.length"
+            *ngIf="visuals.length > 0"
+            [count]="visuals.length"
           ></app-chip>
         </div>
         <div class="sidebar-divider"></div>
         <div class="sidebar-content-inner">
           <!-- Search Input -->
-          <div class="search-wrapper" *ngIf="visualsInActiveTab.length > 0">
+          <div class="search-wrapper" *ngIf="visuals.length > 0">
             <app-custom-input
               [(ngModel)]="visualListSearchQuery"
               [placeholder]="'ANALYSES.SEARCH_VISUALS' | translate"
@@ -239,33 +238,55 @@
             ></app-custom-input>
           </div>
 
-          <!-- Empty State — quieter. Shown when the ACTIVE tab has no visuals
-               (an empty tab reads as empty even if other tabs have visuals). -->
-          <div class="visual-list-empty" *ngIf="visualsInActiveTab.length === 0">
+          <!-- Empty State — shown when the analysis has no visuals on ANY tab. -->
+          <div class="visual-list-empty" *ngIf="visuals.length === 0">
             <i class="ci ci-visualization" aria-hidden="true"></i>
             <p>{{ 'ANALYSES.NO_VISUALS_YET' | translate }}</p>
           </div>
 
-          <!-- Visual List Items -->
-          <div class="visual-list-items" *ngIf="visualsInActiveTab.length > 0">
+          <!-- Visual list grouped by tab — every tab + its visuals. Clicking a
+               visual switches to its tab and scrolls/focuses it. -->
+          <div class="visual-list-items" *ngIf="visuals.length > 0">
             <div
-              class="visual-list-item"
-              *ngFor="
-                let visual of filteredVisuals;
-                let i = index;
-                trackBy: trackById
-              "
-              [class.focused]="focusedVisualId === visual.id"
-              [class.unconfigured]="!visual.chartType"
-              (click)="scrollToVisual(visual, $event)"
+              class="layer-group"
+              *ngFor="let group of layerGroups; trackBy: trackByLayerGroup"
             >
-              <div class="visual-icon">
-                <i [class]="getVisualChartIcon(visual.chartType)"></i>
+              <!-- Tab header (only when the analysis actually has tabs). -->
+              <div
+                class="layer-group__header"
+                *ngIf="group.tab"
+                [class.active]="group.tab.id === activeTabId"
+                (click)="selectTab(group.tab.id)"
+              >
+                <span
+                  class="layer-group__dot"
+                  *ngIf="tabColor(group.tab)"
+                  [style.background]="tabColor(group.tab)"
+                  aria-hidden="true"
+                ></span>
+                <span class="layer-group__name">{{ group.tab.name }}</span>
+                <span class="layer-group__count">{{ group.visuals.length }}</span>
               </div>
-              <div class="visual-info">
-                <div class="visual-name">{{ visual.title }}</div>
-                <div class="visual-type-label">
-                  {{ getVisualChartLabel(visual.chartType) }}
+
+              <div class="layer-group__empty" *ngIf="group.visuals.length === 0">
+                {{ 'ANALYSES.NO_VISUALS_YET' | translate }}
+              </div>
+
+              <div
+                class="visual-list-item"
+                *ngFor="let visual of group.visuals; trackBy: trackById"
+                [class.focused]="focusedVisualId === visual.id"
+                [class.unconfigured]="!visual.chartType"
+                (click)="scrollToVisualInTab(visual, group.tab, $event)"
+              >
+                <div class="visual-icon">
+                  <i [class]="getVisualChartIcon(visual.chartType)"></i>
+                </div>
+                <div class="visual-info">
+                  <div class="visual-name">{{ visual.title }}</div>
+                  <div class="visual-type-label">
+                    {{ getVisualChartLabel(visual.chartType) }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -502,6 +523,7 @@
         [activeAxisSelection]="activeAxisSelection"
         [allFields]="allFields"
         (addVisualClicked)="addVisual()"
+        (addWidgetClicked)="openAddWidget()"
         (chartTypeSelected)="onChartTypeSelected()"
         (axisSelectionStarted)="onAxisSelectionStarted($event)"
         (axisFieldCleared)="onAxisFieldCleared()"
@@ -783,8 +805,11 @@
            least one named tab; an un-tabbed analysis renders as one implicit
            tab with no strip. -->
       <div class="analysis-tab-strip" *ngIf="tabs.length > 0">
-        <!-- CDK drag-drop reorder (Wave 7, feature 4). The move-left/right
-             icons remain as a keyboard/click fallback. Horizontal list. -->
+        <!-- Scrollable region: the tabs + the "+" add button. Overflows
+             horizontally when there are more tabs than fit; the "Add widget"
+             action stays pinned outside so it never scrolls off. -->
+        <div class="analysis-tabs-scroll">
+        <!-- CDK drag-drop reorder (Wave 7, feature 4). Horizontal list. -->
         <div
           class="analysis-tabs-track"
           cdkDropList
@@ -809,61 +834,27 @@
             aria-hidden="true"
           ></span>
           <ng-container *ngIf="editingTabId !== tab.id">
+            <!-- Clean tab: no inline action icons. Every tab action (rename,
+                 duplicate, set colour, delete) lives in the right-click menu.
+                 Double-click the name to rename quickly. -->
             <span
               class="analysis-tab__name"
               (dblclick)="startRenameTab(tab, $event)"
+              [pTooltip]="'ANALYSES.TABS.RIGHT_CLICK_HINT' | translate"
+              tooltipPosition="bottom"
               >{{ tab.name }}</span
             >
-            <span class="analysis-tab__actions">
-              <i
-                class="pi pi-angle-left tab-act"
-                *ngIf="ti > 0"
-                (click)="moveTab(tab, -1); $event.stopPropagation()"
-                [pTooltip]="'ANALYSES.TABS.MOVE_LEFT' | translate"
-                tooltipPosition="bottom"
-              ></i>
-              <i
-                class="pi pi-angle-right tab-act"
-                *ngIf="ti < tabs.length - 1"
-                (click)="moveTab(tab, 1); $event.stopPropagation()"
-                [pTooltip]="'ANALYSES.TABS.MOVE_RIGHT' | translate"
-                tooltipPosition="bottom"
-              ></i>
-              <i
-                class="pi pi-pencil tab-act"
-                (click)="startRenameTab(tab, $event)"
-                [pTooltip]="'ANALYSES.TABS.RENAME' | translate"
-                tooltipPosition="bottom"
-              ></i>
-              <!-- Duplicate tab (Slice F, item 2) — clones the tab + all its
-                   visuals into a new "… (copy)" tab. -->
-              <app-button
-                variant="icon"
-                size="sm"
-                icon="pi pi-clone"
-                class="tab-act-btn"
-                [loading]="duplicatingTab"
-                [disabled]="isTabBusy"
-                [title]="'ANALYSES.AUTHORING.DUPLICATE_TAB' | translate"
-                (clicked)="duplicateTab(tab, $event)"
-              ></app-button>
-              <i
-                class="pi pi-times tab-act tab-act--danger"
-                *ngIf="tabs.length > 1"
-                (click)="confirmDeleteTab(tab, $event)"
-                [pTooltip]="'ANALYSES.TABS.DELETE' | translate"
-                tooltipPosition="bottom"
-              ></i>
-            </span>
           </ng-container>
           <input
             *ngIf="editingTabId === tab.id"
+            #tabRenameInput
             class="analysis-tab__rename"
             [(ngModel)]="editingTabName"
+            [maxlength]="60"
             (blur)="finishRenameTab()"
             (keydown)="onTabNameKeydown($event)"
             (click)="$event.stopPropagation()"
-            autofocus
+            autocomplete="off"
           />
           <!-- CDK drag placeholder — a ghost slot while reordering. -->
           <div class="analysis-tab__drag-ph" *cdkDragPlaceholder></div>
@@ -896,24 +887,6 @@
             >
               <i class="pi pi-clone"></i>
               <span>{{ 'ANALYSES.TABS.DUPLICATE' | translate }}</span>
-            </button>
-            <button
-              type="button"
-              class="tab-ctx__item"
-              [disabled]="tabIndex(ctxTab) <= 0"
-              (click)="ctxMoveTab(-1, tabCtxOp)"
-            >
-              <i class="pi pi-angle-left"></i>
-              <span>{{ 'ANALYSES.TABS.MOVE_LEFT' | translate }}</span>
-            </button>
-            <button
-              type="button"
-              class="tab-ctx__item"
-              [disabled]="tabIndex(ctxTab) >= tabs.length - 1"
-              (click)="ctxMoveTab(1, tabCtxOp)"
-            >
-              <i class="pi pi-angle-right"></i>
-              <span>{{ 'ANALYSES.TABS.MOVE_RIGHT' | translate }}</span>
             </button>
 
             <div class="tab-ctx__divider"></div>
@@ -955,6 +928,10 @@
           </div>
         </p-overlayPanel>
 
+        <!-- Add-tab: the "+" opens a popover to pick a tab TYPE (Chart /
+             Table / KPI → icon) + name, then "Add tab". The popover is an
+             appendTo="body" overlay, so it anchors to the "+" correctly even
+             though the "+" lives inside the horizontally-scrolling region. -->
         <button
           type="button"
           class="analysis-tab-add"
@@ -1004,17 +981,9 @@
             </div>
           </div>
         </p-overlayPanel>
-        <span class="analysis-tab-spacer"></span>
-        <button
-          type="button"
-          class="analysis-tab-add analysis-tab-add--labelled"
-          (click)="openAddWidget()"
-          [pTooltip]="'DASHBOARD.WIDGET.ADD' | translate"
-          tooltipPosition="bottom"
-        >
-          <i class="pi pi-th-large"></i>
-          {{ 'DASHBOARD.WIDGET.ADD' | translate }}
-        </button>
+        </div>
+        <!-- /analysis-tabs-scroll — "Add widget" now lives in the Charts panel
+             (next to "Add Visual"), so the tab strip is just tabs + add-tab. -->
       </div>
 
       <!-- When there are NO tabs yet, still offer an "add tab" affordance so
@@ -1029,14 +998,7 @@
           <i class="pi pi-plus"></i>
           {{ 'ANALYSES.TABS.ADD' | translate }}
         </button>
-        <button
-          type="button"
-          class="analysis-tab-add analysis-tab-add--labelled"
-          (click)="openAddWidget()"
-        >
-          <i class="pi pi-th-large"></i>
-          {{ 'DASHBOARD.WIDGET.ADD' | translate }}
-        </button>
+        <!-- "Add widget" moved to the Charts panel (next to Add Visual). -->
       </div>
 
       <div
@@ -1833,6 +1795,9 @@
         </li>
       </ul>
 
+      <!-- Deleting a REAL tab captures a justification for the save's audit
+           trail (house pattern, like saved-queries / db-access deletes). The
+           reason flows into _pendingTabDeletes in proceedDeleteTab(). -->
       <div class="justification-section">
         <app-custom-input
           [(ngModel)]="tabDeleteJustification"

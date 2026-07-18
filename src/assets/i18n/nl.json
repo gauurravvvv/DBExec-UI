@@ -1633,7 +1633,8 @@
       "TYPE_KPI": "KPI",
       "DUPLICATE": "Dupliceren",
       "SET_COLOR": "Kleur instellen",
-      "CLEAR_COLOR": "Kleur wissen"
+      "CLEAR_COLOR": "Kleur wissen",
+      "RIGHT_CLICK_HINT": "Dubbelklik om te hernoemen · rechtsklik voor opties"
     },
     "AUTHORING": {
       "DUPLICATE": "Dupliceren",
@@ -2123,7 +2124,8 @@
       "FORMAT_PERCENT": "Percentage",
       "KPI_TARGET": "Doel",
       "KPI_COMPARE": "Vergelijkingsperiode",
-      "KPI_COMPARE_PH": "bijv. vorige maand"
+      "KPI_COMPARE_PH": "bijv. vorige maand",
+      "ADD_HINT": "Voeg een tekstnotitie of KPI-tegel toe aan het canvas"
     },
     "GATE": {
       "TITLE": "Invoer vereist",

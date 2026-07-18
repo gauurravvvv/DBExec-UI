@@ -1633,7 +1633,8 @@
       "TYPE_KPI": "KPI",
       "DUPLICATE": "Duplica",
       "SET_COLOR": "Imposta colore",
-      "CLEAR_COLOR": "Rimuovi colore"
+      "CLEAR_COLOR": "Rimuovi colore",
+      "RIGHT_CLICK_HINT": "Doppio clic per rinominare · clic destro per le opzioni"
     },
     "AUTHORING": {
       "DUPLICATE": "Duplica",
@@ -2123,7 +2124,8 @@
       "FORMAT_PERCENT": "Percentuale",
       "KPI_TARGET": "Obiettivo",
       "KPI_COMPARE": "Periodo di confronto",
-      "KPI_COMPARE_PH": "es. mese precedente"
+      "KPI_COMPARE_PH": "es. mese precedente",
+      "ADD_HINT": "Aggiungi una nota di testo o un riquadro KPI alla tela"
     },
     "GATE": {
       "TITLE": "Input richiesti",

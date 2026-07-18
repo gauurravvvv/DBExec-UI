@@ -4,9 +4,12 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnDestroy,
+  OnInit,
   Output,
   SimpleChanges,
 } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import {
@@ -30,7 +33,9 @@ import {
   styleUrls: ['./analysis-widget-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AnalysisWidgetEditorComponent implements OnChanges {
+export class AnalysisWidgetEditorComponent
+  implements OnChanges, OnInit, OnDestroy
+{
   @Input() visible = false;
   @Input() analysisId = '';
   /** Active tab id — new widgets default to it (null = default tab). */
@@ -63,12 +68,19 @@ export class AnalysisWidgetEditorComponent implements OnChanges {
   kpiCompareMode = '';
   isSaving = false;
 
-  readonly widgetTypeOptions: { label: string; value: WidgetType }[] = [
+  // Dropdown option sources hold i18n KEYS; the bound arrays below are the
+  // LOCALIZED copies (resolved in the constructor + on language change) so the
+  // Add-/Edit-widget dialog never shows raw keys like "DASHBOARD.WIDGET.TYPE_KPI".
+  private static readonly RAW_WIDGET_TYPE_OPTIONS: {
+    label: string;
+    value: WidgetType;
+  }[] = [
     { label: 'DASHBOARD.WIDGET.TYPE_TEXT', value: 'text' },
     { label: 'DASHBOARD.WIDGET.TYPE_KPI', value: 'kpi' },
   ];
+  widgetTypeOptions: { label: string; value: WidgetType }[] = [];
 
-  readonly aggregateOptions: {
+  private static readonly RAW_AGGREGATE_OPTIONS: {
     label: string;
     value: KpiWidgetConfig['aggregate'];
   }[] = [
@@ -79,15 +91,26 @@ export class AnalysisWidgetEditorComponent implements OnChanges {
     { label: 'ANALYSES.AGG.COUNT', value: 'count' },
     { label: 'ANALYSES.AGG.COUNT_DISTINCT', value: 'count_distinct' },
   ];
+  aggregateOptions: {
+    label: string;
+    value: KpiWidgetConfig['aggregate'];
+  }[] = [];
 
-  readonly formatOptions: { label: string; value: string }[] = [
+  private static readonly RAW_FORMAT_OPTIONS: {
+    label: string;
+    value: string;
+  }[] = [
     { label: 'DASHBOARD.WIDGET.FORMAT_NUMBER', value: 'number' },
     { label: 'DASHBOARD.WIDGET.FORMAT_CURRENCY', value: 'currency' },
     { label: 'DASHBOARD.WIDGET.FORMAT_PERCENT', value: 'percent' },
   ];
+  formatOptions: { label: string; value: string }[] = [];
 
   /** Period-over-period compare-mode options for the KPI (Slice B). */
-  readonly compareModeOptions: { label: string; value: string }[] = [
+  private static readonly RAW_COMPARE_MODE_OPTIONS: {
+    label: string;
+    value: string;
+  }[] = [
     { label: 'ANALYSES.KPI.COMPARE_NONE', value: '' },
     { label: 'ANALYSES.KPI.COMPARE_PREVIOUS_PERIOD', value: 'previous_period' },
     {
@@ -95,6 +118,7 @@ export class AnalysisWidgetEditorComponent implements OnChanges {
       value: 'same_period_last_year',
     },
   ];
+  compareModeOptions: { label: string; value: string }[] = [];
 
   /** Date-column options — dimensionOptions when set, else measureOptions. */
   get dateColumnOptions(): { label: string; value: string }[] {
@@ -103,11 +127,40 @@ export class AnalysisWidgetEditorComponent implements OnChanges {
       : this.measureOptions;
   }
 
+  private langSub?: Subscription;
+
   constructor(
     private widgetsService: AnalysisWidgetsService,
     private globalService: GlobalService,
     private translate: TranslateService,
   ) {}
+
+  ngOnInit(): void {
+    this.localizeOptions();
+    this.langSub = this.translate.onLangChange.subscribe(() =>
+      this.localizeOptions(),
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.langSub?.unsubscribe();
+  }
+
+  /** Resolve every option array's i18n KEY label against the active locale. */
+  private localizeOptions(): void {
+    const loc = <T extends { label: string; value: unknown }>(arr: T[]): T[] =>
+      arr.map(o => ({ ...o, label: this.translate.instant(o.label) }) as T);
+    this.widgetTypeOptions = loc(
+      AnalysisWidgetEditorComponent.RAW_WIDGET_TYPE_OPTIONS,
+    );
+    this.aggregateOptions = loc(
+      AnalysisWidgetEditorComponent.RAW_AGGREGATE_OPTIONS,
+    );
+    this.formatOptions = loc(AnalysisWidgetEditorComponent.RAW_FORMAT_OPTIONS);
+    this.compareModeOptions = loc(
+      AnalysisWidgetEditorComponent.RAW_COMPARE_MODE_OPTIONS,
+    );
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible) {

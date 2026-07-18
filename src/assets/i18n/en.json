@@ -1636,7 +1636,8 @@
       "TYPE_KPI": "KPI",
       "DUPLICATE": "Duplicate",
       "SET_COLOR": "Set color",
-      "CLEAR_COLOR": "Clear color"
+      "CLEAR_COLOR": "Clear color",
+      "RIGHT_CLICK_HINT": "Double-click to rename · right-click for options"
     },
     "AUTHORING": {
       "DUPLICATE": "Duplicate",
@@ -2126,7 +2127,8 @@
       "FORMAT_PERCENT": "Percent",
       "KPI_TARGET": "Target",
       "KPI_COMPARE": "Compare period",
-      "KPI_COMPARE_PH": "e.g. previous month"
+      "KPI_COMPARE_PH": "e.g. previous month",
+      "ADD_HINT": "Add a text note or KPI tile to the canvas"
     },
     "GATE": {
       "TITLE": "Inputs required",

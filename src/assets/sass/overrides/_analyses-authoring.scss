@@ -153,22 +153,33 @@
   border-top: 1px solid var(--border-color);
   margin: var(--space-1) 0;
 }
+// One clean row: every swatch (filled dots + the outlined clear ⊘) shares a
+// single centre line. align-items:center keeps them centred regardless of any
+// per-swatch box difference; the left padding matches the "SET COLOR" label
+// and the menu items above so the row lines up with them.
 .tab-ctx__swatches {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: var(--space-2);
   padding: var(--space-1) var(--space-3) var(--space-2);
 }
 .tab-ctx__swatch {
+  // box-sizing:border-box → the filled dots (2px border) and the clear swatch
+  // (1px border) render the SAME 22×22 outer box, so no circle sits higher or
+  // lower than the rest.
+  box-sizing: border-box;
   width: 22px;
   height: 22px;
   border-radius: 50%;
   border: 2px solid transparent;
   cursor: pointer;
   padding: 0;
+  flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
   &.is-active {
     border-color: var(--text-color);
     box-shadow: 0 0 0 2px var(--card-background);
@@ -179,6 +190,7 @@
     color: var(--text-muted);
     i {
       font-size: 0.75rem;
+      line-height: 1;
     }
   }
 }

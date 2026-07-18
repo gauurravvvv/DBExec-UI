@@ -1633,7 +1633,8 @@
       "TYPE_KPI": "KPI",
       "DUPLICATE": "Duplizieren",
       "SET_COLOR": "Farbe festlegen",
-      "CLEAR_COLOR": "Farbe entfernen"
+      "CLEAR_COLOR": "Farbe entfernen",
+      "RIGHT_CLICK_HINT": "Doppelklick zum Umbenennen · Rechtsklick für Optionen"
     },
     "AUTHORING": {
       "DUPLICATE": "Duplizieren",
@@ -2123,7 +2124,8 @@
       "FORMAT_PERCENT": "Prozent",
       "KPI_TARGET": "Ziel",
       "KPI_COMPARE": "Vergleichszeitraum",
-      "KPI_COMPARE_PH": "z. B. Vormonat"
+      "KPI_COMPARE_PH": "z. B. Vormonat",
+      "ADD_HINT": "Textnotiz oder KPI-Kachel zur Leinwand hinzufügen"
     },
     "GATE": {
       "TITLE": "Eingaben erforderlich",

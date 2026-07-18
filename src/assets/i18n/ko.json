@@ -1633,7 +1633,8 @@
       "TYPE_KPI": "KPI",
       "DUPLICATE": "복제",
       "SET_COLOR": "색상 설정",
-      "CLEAR_COLOR": "색상 지우기"
+      "CLEAR_COLOR": "색상 지우기",
+      "RIGHT_CLICK_HINT": "더블 클릭하여 이름 변경 · 마우스 오른쪽 버튼으로 옵션"
     },
     "AUTHORING": {
       "DUPLICATE": "복제",
@@ -2123,7 +2124,8 @@
       "FORMAT_PERCENT": "백분율",
       "KPI_TARGET": "목표",
       "KPI_COMPARE": "비교 기간",
-      "KPI_COMPARE_PH": "예: 이전 달"
+      "KPI_COMPARE_PH": "예: 이전 달",
+      "ADD_HINT": "텍스트 메모 또는 KPI 타일을 캔버스에 추가"
     },
     "GATE": {
       "TITLE": "입력 필요",

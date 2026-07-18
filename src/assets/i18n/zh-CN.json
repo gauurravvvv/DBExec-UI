@@ -1633,7 +1633,8 @@
       "TYPE_KPI": "KPI",
       "DUPLICATE": "复制",
       "SET_COLOR": "设置颜色",
-      "CLEAR_COLOR": "清除颜色"
+      "CLEAR_COLOR": "清除颜色",
+      "RIGHT_CLICK_HINT": "双击重命名 · 右键单击查看选项"
     },
     "AUTHORING": {
       "DUPLICATE": "复制",
@@ -2123,7 +2124,8 @@
       "FORMAT_PERCENT": "百分比",
       "KPI_TARGET": "目标",
       "KPI_COMPARE": "比较期间",
-      "KPI_COMPARE_PH": "例如：上个月"
+      "KPI_COMPARE_PH": "例如：上个月",
+      "ADD_HINT": "向画布添加文本注释或 KPI 磁贴"
     },
     "GATE": {
       "TITLE": "需要输入",

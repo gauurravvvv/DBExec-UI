@@ -1633,7 +1633,8 @@
       "TYPE_KPI": "KPI",
       "DUPLICATE": "Duplicar",
       "SET_COLOR": "Definir cor",
-      "CLEAR_COLOR": "Limpar cor"
+      "CLEAR_COLOR": "Limpar cor",
+      "RIGHT_CLICK_HINT": "Clique duas vezes para renomear · clique com o botão direito para opções"
     },
     "AUTHORING": {
       "DUPLICATE": "Duplicar",
@@ -2123,7 +2124,8 @@
       "FORMAT_PERCENT": "Porcentagem",
       "KPI_TARGET": "Meta",
       "KPI_COMPARE": "Período de comparação",
-      "KPI_COMPARE_PH": "ex.: mês anterior"
+      "KPI_COMPARE_PH": "ex.: mês anterior",
+      "ADD_HINT": "Adicionar uma nota de texto ou bloco de KPI ao canvas"
     },
     "GATE": {
       "TITLE": "Entradas obrigatórias",

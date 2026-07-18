@@ -1633,7 +1633,8 @@
       "TYPE_KPI": "KPI",
       "DUPLICATE": "Dupliquer",
       "SET_COLOR": "Définir la couleur",
-      "CLEAR_COLOR": "Effacer la couleur"
+      "CLEAR_COLOR": "Effacer la couleur",
+      "RIGHT_CLICK_HINT": "Double-clic pour renommer · clic droit pour les options"
     },
     "AUTHORING": {
       "DUPLICATE": "Dupliquer",
@@ -2123,7 +2124,8 @@
       "FORMAT_PERCENT": "Pourcentage",
       "KPI_TARGET": "Cible",
       "KPI_COMPARE": "Période de comparaison",
-      "KPI_COMPARE_PH": "p. ex. mois précédent"
+      "KPI_COMPARE_PH": "p. ex. mois précédent",
+      "ADD_HINT": "Ajouter une note de texte ou une tuile KPI au canevas"
     },
     "GATE": {
       "TITLE": "Saisies requises",

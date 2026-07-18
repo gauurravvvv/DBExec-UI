@@ -1633,7 +1633,8 @@
       "TYPE_KPI": "KPI",
       "DUPLICATE": "複製",
       "SET_COLOR": "色を設定",
-      "CLEAR_COLOR": "色をクリア"
+      "CLEAR_COLOR": "色をクリア",
+      "RIGHT_CLICK_HINT": "ダブルクリックで名前変更・右クリックでオプション"
     },
     "AUTHORING": {
       "DUPLICATE": "複製",
@@ -2123,7 +2124,8 @@
       "FORMAT_PERCENT": "パーセント",
       "KPI_TARGET": "目標",
       "KPI_COMPARE": "比較期間",
-      "KPI_COMPARE_PH": "例：前月"
+      "KPI_COMPARE_PH": "例：前月",
+      "ADD_HINT": "テキストメモまたはKPIタイルをキャンバスに追加"
     },
     "GATE": {
       "TITLE": "入力が必要です",

@@ -12,7 +12,8 @@
   </div>
   <div class="sidebar-divider"></div>
   <div class="sidebar-content-inner">
-    <!-- Add Visual Button (always visible) -->
+    <!-- Add Visual + Add Widget (always visible) — the two "add content to the
+         canvas" actions grouped together instead of stranded in the tab strip. -->
     <div class="add-visual-section">
       <button
         pButton
@@ -23,6 +24,15 @@
         [disabled]="!isDataLoaded"
         [pTooltip]="'ANALYSES.LOAD_DATA_FIRST_TO_ADD_VISUALS' | translate"
         [tooltipDisabled]="isDataLoaded"
+        tooltipPosition="top"
+      ></button>
+      <button
+        pButton
+        [label]="'DASHBOARD.WIDGET.ADD' | translate"
+        icon="pi pi-th-large"
+        class="p-button-text p-button-sm add-widget-button"
+        (click)="addWidgetClicked.emit()"
+        [pTooltip]="'DASHBOARD.WIDGET.ADD_HINT' | translate"
         tooltipPosition="top"
       ></button>
     </div>

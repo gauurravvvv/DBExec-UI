@@ -71,18 +71,37 @@
   scrollbar-color: var(--border-strong) transparent;
 }
 
-// ---- Add Visual button ----
+// ---- Add Visual + Add Widget buttons ----
 .add-visual-section {
   padding: var(--space-5);
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-2);
 }
 
 .add-visual-button {
   width: 100%;
   font-size: var(--fs-label);
   padding: 6px 8px;
+}
+
+// Secondary, quieter "Add widget" action sits under Add Visual — a text
+// button so it reads as the lesser of the two add actions.
+.add-widget-button {
+  width: 100%;
+  font-size: var(--fs-label);
+  padding: 5px 8px;
+
+  ::ng-deep .p-button-label,
+  &.p-button {
+    color: var(--text-muted);
+  }
+
+  &:hover {
+    ::ng-deep .p-button-label {
+      color: var(--primary-color);
+    }
+  }
 }
 
 // ---- Chart Type section (when picking a chart) ----

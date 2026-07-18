@@ -391,6 +391,40 @@ export class EditAnalysesComponent
     );
   }
 
+  /**
+   * Layers panel grouped by tab: EVERY tab with its visuals (search-filtered),
+   * so the author sees the whole analysis at a glance, not just the active
+   * tab. When there are no tabs (single implicit page) a single synthetic
+   * group holds all visuals. Groups with no matching visuals are dropped while
+   * a search is active so the list stays focused. Total layer count across all
+   * tabs is `visuals.length`.
+   */
+  get layerGroups(): { tab: AnalysisTab | null; visuals: Visual[] }[] {
+    const q = this.visualListSearchQuery
+      ? this.visualListSearchQuery.toLowerCase()
+      : '';
+    const match = (v: Visual) =>
+      !q || (v.title || '').toLowerCase().includes(q);
+
+    if (this.tabs.length === 0) {
+      const vis = this.visuals.filter(match);
+      return vis.length || !q ? [{ tab: null, visuals: vis }] : [];
+    }
+
+    const firstId = this.firstTabId;
+    return this.tabs
+      .map(tab => {
+        const vis = this.visuals.filter(v => {
+          const owning = v.tabId ?? firstId;
+          return owning === tab.id && match(v);
+        });
+        return { tab, visuals: vis };
+      })
+      // While searching, hide tabs with no hits; otherwise keep every tab
+      // (an empty tab still shows its header so the structure is visible).
+      .filter(g => (q ? g.visuals.length > 0 : true));
+  }
+
   getDataTypeIcon(dataType: string): string {
     if (!dataType) return 'pi-bars';
     const type = dataType.toLowerCase();
@@ -609,6 +643,14 @@ export class EditAnalysesComponent
    */
   @ViewChildren(ChartRendererComponent)
   chartRenderers!: QueryList<ChartRendererComponent>;
+
+  /**
+   * The inline tab-rename inputs (only one is ever present, since the *ngIf
+   * gates on the editing tab). Used to focus + select the field the moment
+   * rename starts — `autofocus` is unreliable for an *ngIf-created input.
+   */
+  @ViewChildren('tabRenameInput')
+  tabRenameInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   // ── Authoring QoL busy flags (Slice F) ───────────────────────────────
   /** Per-visual duplicate in flight, keyed by source visual id. */
@@ -2342,6 +2384,22 @@ export class EditAnalysesComponent
     event.stopPropagation();
     this.editingTabId = tab.id;
     this.editingTabName = tab.name;
+    this.focusRenameInput();
+  }
+
+  /**
+   * Focus + select-all the inline rename input once Angular has rendered it.
+   * `autofocus` doesn't fire for an *ngIf-created input, so do it explicitly
+   * after CD; select-all lets the author type straight over the old name.
+   */
+  private focusRenameInput(): void {
+    setTimeout(() => {
+      const el = this.tabRenameInputs?.first?.nativeElement;
+      if (el) {
+        el.focus();
+        el.select();
+      }
+    });
   }
 
   /** Commit an inline tab rename. Empty / unchanged names are dropped. */
@@ -2517,6 +2575,7 @@ export class EditAnalysesComponent
     this.editingTabId = tab.id;
     this.editingTabName = tab.name;
     this.cdr.markForCheck();
+    this.focusRenameInput();
   }
 
   /** Context-menu: duplicate the tab. */
@@ -4127,6 +4186,31 @@ export class EditAnalysesComponent
   /**
    * Scroll to a specific visual and highlight it
    */
+  /** trackBy for the tab-grouped Layers list. */
+  trackByLayerGroup(_: number, g: { tab: AnalysisTab | null }): string {
+    return g.tab?.id ?? '__no-tab__';
+  }
+
+  /**
+   * Layers-panel click when the panel shows ALL tabs: if the visual lives on a
+   * different tab, switch to that tab first, then scroll/highlight it once the
+   * canvas has re-rendered. Same-tab clicks behave like scrollToVisual.
+   */
+  scrollToVisualInTab(
+    visual: any,
+    tab: AnalysisTab | null,
+    event?: Event,
+  ): void {
+    if (event) event.stopPropagation();
+    if (tab && tab.id !== this.activeTabId) {
+      this.selectTab(tab.id);
+      // Let the canvas re-place the newly-visible visuals before scrolling.
+      setTimeout(() => this.scrollToVisual(visual), 120);
+      return;
+    }
+    this.scrollToVisual(visual);
+  }
+
   scrollToVisual(visual: any, event?: Event): void {
     if (event) {
       event.stopPropagation();
@@ -4141,11 +4225,16 @@ export class EditAnalysesComponent
       ) as HTMLElement;
       if (!container) return;
 
-      // Find the visual element by matching its visual ID
+      // Find the visual element by matching its visual ID. The canvas only
+      // renders the ACTIVE tab's visuals, so index against that list (not the
+      // full `visuals`) or a cross-tab layer click would scroll to the wrong
+      // card.
       const visualElements = container.querySelectorAll('.visual-box');
       const visualArray = Array.from(visualElements);
 
-      const targetIndex = this.visuals.findIndex(v => v.id === visual.id);
+      const targetIndex = this.visualsInActiveTab.findIndex(
+        v => v.id === visual.id,
+      );
       if (targetIndex >= 0 && targetIndex < visualArray.length) {
         const targetVisual = visualArray[targetIndex] as HTMLElement;
 

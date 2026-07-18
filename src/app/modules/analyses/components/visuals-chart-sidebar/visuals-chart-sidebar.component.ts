@@ -131,6 +131,8 @@ export class VisualsChartSidebarComponent implements OnInit, OnDestroy {
   @Input() allFields: any[] = [];
 
   @Output() addVisualClicked = new EventEmitter<void>();
+  /** Open the Add-widget dialog (moved here from the tab strip). */
+  @Output() addWidgetClicked = new EventEmitter<void>();
   @Output() chartTypeSelected = new EventEmitter<void>();
   @Output() axisSelectionStarted = new EventEmitter<RoleKey | null>();
   @Output() axisFieldCleared = new EventEmitter<void>();
