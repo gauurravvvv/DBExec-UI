@@ -152,6 +152,32 @@ export class ChartRendererComponent implements OnChanges {
   }
 
   /**
+   * Result-scale truncation banner (Wave 5, DATA-SCALE & PERF). True when the
+   * BE clipped this visual's result to a cap (raw-row LIMIT or aggregation
+   * group ceiling) and reported it back on `visual.truncation`. The parent
+   * populates that field per run from response.meta — exactly parallel to how
+   * `pivotTotalRows` is populated — so this renderer needs no extra @Input
+   * wiring; it just reflects the flag when present. Applies to every visual
+   * type (chart / table / card) because the banner sits above the visual body.
+   */
+  get isTruncated(): boolean {
+    return this.visual?.truncation?.truncated === true;
+  }
+
+  /**
+   * Interpolation params for ANALYSES.V2.ERROR.TRUNCATION_BANNER
+   * ("Showing top {{n}} of {{total}}"). `n` = rows shown after the cap;
+   * `total` = the cap that was applied. Locale-formatted so large counts read
+   * with thousands separators. Guarded to 0 when the flag is malformed.
+   */
+  get truncationParams(): { n: string; total: string } {
+    const t = this.visual?.truncation;
+    const shown = t && Number.isFinite(t.shown) ? t.shown : 0;
+    const cap = t && Number.isFinite(t.cap) ? t.cap : 0;
+    return { n: shown.toLocaleString(), total: cap.toLocaleString() };
+  }
+
+  /**
    * PNG data URL of the currently-rendered ECharts chart, or null when
    * this visual isn't ECharts-backed (table / card) or the chart hasn't
    * initialised. Delegates to the inner echart-visual's getPngDataUrl().

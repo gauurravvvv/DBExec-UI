@@ -72,6 +72,16 @@ export function columnsFromRows(rows: ExportRow[]): string[] {
  * Trigger a client-side download of `content` as a file. Uses a Blob +
  * object URL + synthetic <a> click, then revokes the URL. Guarded for
  * SSR / non-browser contexts.
+ *
+ * UTF-8 BOM (Excel unicode correctness): the product exports data from
+ * customer databases in ANY locale — column values may be Japanese, German
+ * (umlauts), Cyrillic, emoji, etc. Excel on Windows only decodes a CSV as
+ * UTF-8 when the file STARTS with the byte-order mark (U+FEFF); without it,
+ * non-ASCII text opens as mojibake. So for CSV downloads we prepend the BOM
+ * to the Blob bytes. It is added at the download boundary (not inside the CSV
+ * string) so `rowsToCsv`'s output stays byte-clean for any non-download
+ * consumer, and only for CSV mime types so other text downloads are
+ * untouched.
  */
 export function downloadTextFile(
   content: string,
@@ -79,7 +89,12 @@ export function downloadTextFile(
   mimeType: string,
 ): void {
   if (typeof document === 'undefined' || typeof URL === 'undefined') return;
-  const blob = new Blob([content], { type: mimeType });
+  const isCsv = /(^|[/;+])csv\b/i.test(mimeType);
+  // UTF-8 byte-order mark, built from its code point (0xFEFF) so no editor
+  // or lint pass can strip an invisible literal from source.
+  const BOM = String.fromCharCode(0xfeff);
+  const parts: BlobPart[] = isCsv ? [BOM, content] : [content];
+  const blob = new Blob(parts, { type: mimeType });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;

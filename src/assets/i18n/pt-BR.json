@@ -1589,7 +1589,19 @@
       "TO": "Até",
       "ANNO_X": "Posição X",
       "ANNO_X_PH": "Categoria ou valor X",
-      "ANNO_Y": "Valor Y"
+      "ANNO_Y": "Valor Y",
+      "TYPE": {
+        "CONSTANT": "Constante",
+        "AVERAGE": "Média",
+        "MEDIAN": "Mediana",
+        "MIN": "Mínimo",
+        "MAX": "Máximo",
+        "PERCENTILE": "Percentil"
+      },
+      "AXIS": {
+        "X": "Eixo X",
+        "Y": "Eixo Y"
+      }
     },
     "COLORSCALE": {
       "TITLE": "Escala de cores",
@@ -1964,6 +1976,9 @@
         "DB_PERMISSION": "Você não tem permissão para executar esta consulta.",
         "DB_TIMEOUT": "A consulta atingiu o tempo limite antes de ser concluída."
       }
+    },
+    "TOPN": {
+      "OTHER_LABEL": "Outros"
     }
   },
   "DASHBOARD": {

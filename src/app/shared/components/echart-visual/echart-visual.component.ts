@@ -13,6 +13,7 @@ import {
 } from '@angular/core';
 import * as echarts from 'echarts';
 import { requiresGl } from '../../../modules/analyses/constants/charts.constants';
+import { GeoRegistryService } from '../../../modules/analyses/services/geo-registry.service';
 import { buildChartOption } from '../../helpers/echarts-option-builder';
 import { loadEchartsGl } from '../../modules/shared-charts.module';
 
@@ -120,7 +121,10 @@ export class EchartVisualComponent
   private prevZoomCount = 0;
   private prevSeriesCount = 0;
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private geoRegistry: GeoRegistryService,
+  ) {}
 
   ngOnInit(): void {
     this.ensureGlLoaded();
@@ -189,10 +193,48 @@ export class EchartVisualComponent
   }
 
   /**
-   * For map/geo chart types, register the world GeoJSON before rendering.
+   * For map/geo chart types, register the GeoJSON map before rendering.
    * No-op for everything else. Mirrors the GL gate.
+   *
+   * Two distinct map families:
+   *  1. Data-bound maps (choropleth / point-map / bubble-map, and any future
+   *     region set) — resolved via GeoRegistryService: getRequiredMap() returns
+   *     the region-set name the chart's GeoConfig needs, and ensureMapRegistered
+   *     fetches that region set's GeoJSON from the backend once and registerMap()s
+   *     it under the region-set name. This is what makes the Wave-4 geo pipeline
+   *     actually bind data to geometry (region names / lat-lon) rather than
+   *     rendering an empty map. regionSet is open-ended — any slug the backend
+   *     has an asset for works.
+   *  2. GL / geo3D types (globe, map3d, polygons3d, …) — still use the bundled
+   *     world asset registered under `world` / `polygons3d_world`.
    */
   private ensureMapLoaded(): void {
+    // (1) Data-bound maps: non-null only for the geo chart types that read a
+    // region set from their config. Takes priority over the GL world asset.
+    const regionSet = this.geoRegistry.getRequiredMap(
+      this.chartType,
+      this.chartConfig || {},
+    );
+    if (regionSet) {
+      this.mapReady = false;
+      this.geoRegistry
+        .ensureMapRegistered(regionSet)
+        .then(() => {
+          this.mapReady = true;
+          // Rebuild now that the map exists so the series binds to real geometry.
+          this.updateChartOption();
+          this.cdr.markForCheck();
+        })
+        .catch(() => {
+          // Don't wedge rendering if the region set can't be fetched — fall
+          // through to an empty map rather than hang on the gate forever.
+          this.mapReady = true;
+          this.cdr.markForCheck();
+        });
+      return;
+    }
+
+    // (2) GL / geo3D world-asset maps.
     if (!MAP_CHART_TYPES.has(this.chartType)) {
       this.mapReady = true;
       return;

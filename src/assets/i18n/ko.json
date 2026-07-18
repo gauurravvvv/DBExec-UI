@@ -1589,7 +1589,19 @@
       "TO": "끝",
       "ANNO_X": "X 위치",
       "ANNO_X_PH": "카테고리 또는 X 값",
-      "ANNO_Y": "Y 값"
+      "ANNO_Y": "Y 값",
+      "TYPE": {
+        "CONSTANT": "상수",
+        "AVERAGE": "평균",
+        "MEDIAN": "중앙값",
+        "MIN": "최소",
+        "MAX": "최대",
+        "PERCENTILE": "백분위수"
+      },
+      "AXIS": {
+        "X": "X축",
+        "Y": "Y축"
+      }
     },
     "COLORSCALE": {
       "TITLE": "색상 척도",
@@ -1964,6 +1976,9 @@
         "DB_PERMISSION": "이 쿼리를 실행할 권한이 없습니다.",
         "DB_TIMEOUT": "쿼리가 완료되기 전에 시간이 초과되었습니다."
       }
+    },
+    "TOPN": {
+      "OTHER_LABEL": "기타"
     }
   },
   "DASHBOARD": {

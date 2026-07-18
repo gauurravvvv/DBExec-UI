@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { formatValue } from '../helpers/format-grammar';
+import { chronoSortKey, looksTemporal } from '../helpers/temporal';
 import {
   ChartData,
   ChartDataMapping,
@@ -11,6 +13,9 @@ import {
   Point,
   QuickCalc,
 } from './analysis-analytics.service';
+
+/** Default category label for a retained null dimension value (null-as-member). */
+const DEFAULT_NULL_MEMBER_LABEL = '(null)';
 
 /**
  * Chart type categories for determining data format
@@ -401,11 +406,16 @@ export class ChartDataTransformerService {
     // Detect if Y-axis column contains numeric values by sampling
     const isYAxisNumeric = this.isColumnNumeric(rawData, mapping.yAxisColumn);
     const aggregatedMap = new Map<string, number>();
+    // Remember one RAW x value per label so a temporal dimension can be
+    // ordered chronologically by the underlying date, not the label text.
+    const rawByLabel = new Map<string, unknown>();
 
     rawData.forEach(row => {
-      // Process X-axis value (category/name)
+      // Process X-axis value (category/name) — Wave 2 label formatting +
+      // null-as-member applied here.
       const rawName = row[mapping.xAxisColumn!];
-      const name = this.formatLabelValue(rawName);
+      const name = this.formatCategoryLabel(rawName, mapping);
+      if (!rawByLabel.has(name)) rawByLabel.set(name, rawName);
 
       // Process Y-axis value (value/count)
       let value: number;
@@ -420,10 +430,16 @@ export class ChartDataTransformerService {
       aggregatedMap.set(name, existing + value);
     });
 
-    return Array.from(aggregatedMap.entries())
+    const points = Array.from(aggregatedMap.entries())
       .filter(([_, value]) => value !== 0) // Filter out zero-value entries
-      .sort((a, b) => b[1] - a[1]) // Sort by value descending
       .map(([name, value]) => ({ name, value }));
+
+    // Temporal dimension → chronological order; otherwise keep the legacy
+    // value-descending order so non-time charts are unchanged.
+    if (looksTemporal(points.map(p => rawByLabel.get(p.name)))) {
+      return this.sortChronologicallyIfTemporal(points, rawByLabel);
+    }
+    return points.sort((a, b) => b.value - a.value);
   }
 
   /**
@@ -510,6 +526,55 @@ export class ChartDataTransformerService {
     }
 
     return stringValue || '(empty)';
+  }
+
+  /**
+   * Type-semantics (Wave 2) category-label formatter. Layers null-as-member
+   * and the author's label ValueFormat on top of the legacy formatLabelValue:
+   *
+   *   - null / undefined / '' →
+   *       • `nullLabel` (default '(null)') when `nullAsMember` is on;
+   *       • the legacy '(empty)' otherwise (unchanged behaviour).
+   *   - a configured `labelFormat` routes the value through the format grammar
+   *     (so a date dimension can render 'MMM yyyy', a code can carry a prefix,
+   *     etc.). When no labelFormat is set we fall back to formatLabelValue so
+   *     existing charts look identical.
+   *
+   * Returns the display label; callers still aggregate by this string.
+   */
+  private formatCategoryLabel(value: any, mapping: ChartDataMapping): string {
+    if (value === null || value === undefined || value === '') {
+      return mapping.nullAsMember
+        ? mapping.nullLabel || DEFAULT_NULL_MEMBER_LABEL
+        : '(empty)';
+    }
+    if (mapping.labelFormat) {
+      const formatted = formatValue(value, mapping.labelFormat);
+      // Guard: if the grammar produced an empty string for a non-null value,
+      // fall back so the category never silently disappears.
+      if (formatted !== '') return formatted;
+    }
+    return this.formatLabelValue(value);
+  }
+
+  /**
+   * Order a category series chronologically when its underlying dimension is
+   * temporal, otherwise leave the order untouched. `rawCategoryFor` maps a
+   * shaped point back to the RAW (pre-format) x value so the sort keys off the
+   * real date, not the formatted label — fixing the "Apr, Aug, Dec…"
+   * alphabetical bug. No-op (returns input) when the dimension isn't temporal.
+   */
+  private sortChronologicallyIfTemporal<T extends { name: string }>(
+    points: T[],
+    rawByLabel: Map<string, unknown>,
+  ): T[] {
+    const rawValues = points.map(p => rawByLabel.get(p.name));
+    if (!looksTemporal(rawValues)) return points;
+    return [...points].sort(
+      (a, b) =>
+        chronoSortKey(rawByLabel.get(a.name)) -
+        chronoSortKey(rawByLabel.get(b.name)),
+    );
   }
 
   /**
@@ -1031,21 +1096,30 @@ export class ChartDataTransformerService {
     }
     const valueCols = [mapping.yAxisColumn!, ...(mapping.valueColumns ?? [])];
 
+    // One shared raw-label map so every series orders on the same underlying
+    // x value (a temporal dimension sorts chronologically across all series).
+    const rawByLabel = new Map<string, unknown>();
+
     // Aggregate one numeric-or-count per (series, category)
     return valueCols.map(col => {
       const isNumeric = this.isColumnNumeric(rawData, col);
       const aggregated = new Map<string, number>();
       rawData.forEach(row => {
-        const name = this.formatLabelValue(row[mapping.xAxisColumn!]);
+        const rawName = row[mapping.xAxisColumn!];
+        const name = this.formatCategoryLabel(rawName, mapping);
+        if (!rawByLabel.has(name)) rawByLabel.set(name, rawName);
         const value = isNumeric ? this.toNumber(row[col]) : 1;
         aggregated.set(name, (aggregated.get(name) ?? 0) + value);
       });
+      const series = Array.from(aggregated.entries()).map(([name, value]) => ({
+        name,
+        value,
+      }));
       return {
         name: col,
-        series: Array.from(aggregated.entries()).map(([name, value]) => ({
-          name,
-          value,
-        })),
+        // Chronological order for a temporal x; insertion order otherwise
+        // (unchanged for non-time charts).
+        series: this.sortChronologicallyIfTemporal(series, rawByLabel),
       };
     });
   }
@@ -1418,6 +1492,29 @@ export class ChartDataTransformerService {
    * the call sites so they don't each have to know which role columns to
    * forward. New roles added to Visual only need to be added here.
    */
+  /**
+   * WAVE2-FORMAT-HOOK — public measure-value formatter for the ECharts option
+   * builder (owned by Waves 3/4). The transformer intentionally keeps `value`
+   * as a RAW number so downstream calcs (stacking, %-of-total, reference
+   * lines) stay numeric; the display string is produced only at the render
+   * edge — axis tick labels, data labels, tooltip value fields.
+   *
+   * The builder should call this at each of those sites, passing the visual's
+   * value ValueFormat (mapping.valueFormat / config.format.value):
+   *
+   *   formatter: (v) => transformer.formatMeasureValue(v, mapping.valueFormat)
+   *
+   * Kept here (not in the builder) so all value formatting funnels through the
+   * one pure grammar and the builder file stays owned by its wave. A no-format
+   * (undefined) input returns a plain grouped-number string.
+   */
+  formatMeasureValue(
+    value: number | string | null | undefined,
+    fmt?: import('../models/visual-config.model').ValueFormat,
+  ): string {
+    return formatValue(value, fmt);
+  }
+
   buildMapping(visual: any): ChartDataMapping {
     const mapping: ChartDataMapping = {
       xAxisColumn: visual.xAxisColumn ?? null,
@@ -1440,6 +1537,20 @@ export class ChartDataTransformerService {
       quickCalc: visual.config?.quickCalc ?? null,
       movingAverageWindow: Number(visual.config?.movingAverageWindow) || 3,
       compareMode: visual.config?.compare?.mode ?? null,
+
+      // ── Type-semantics (Wave 2) ──────────────────────────────────────
+      // Value / label format grammar + null handling from config.format /
+      // config.nullHandling / config.nullLabel (the AnalysisVisualConfig
+      // shape). Absent → no explicit format + legacy null handling.
+      valueFormat: visual.config?.format?.value ?? undefined,
+      labelFormat: visual.config?.format?.label ?? undefined,
+      nullHandling: visual.config?.nullHandling ?? undefined,
+      // Null-as-member: opt-in via config.nullAsMember, or implied when the
+      // author named a null category (config.nullLabel present).
+      nullAsMember:
+        visual.config?.nullAsMember === true ||
+        typeof visual.config?.nullLabel === 'string',
+      nullLabel: visual.config?.nullLabel ?? undefined,
     };
 
     // ── Server-side aggregation shape (Track D) ──────────────────────

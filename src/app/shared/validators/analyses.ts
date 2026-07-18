@@ -447,6 +447,10 @@ export const updateAnalysisSchema = z.object({
   tableCalcs: z.array(z.record(z.string(), z.any())).optional(),
   timeIntel: z.array(z.record(z.string(), z.any())).optional(),
   dateSpine: z.array(z.record(z.string(), z.any())).optional(),
+  // Ratio-of-sums measure spec (Wave 1): a single { numerator, denominator, ... }
+  // object. Shape validated by the analytics engine (applyRatioMeasure); here
+  // we only ensure it is an object so the controller can persist/forward it.
+  ratioMeasure: z.record(z.string(), z.any()).optional(),
   justification: analysisJustificationSchema,
 });
 export type UpdateAnalysisInput = z.infer<typeof updateAnalysisSchema>;
@@ -594,6 +598,9 @@ export const runAnalysisQuerySchema = z.object({
   tableCalcs: z.array(z.record(z.string(), z.any())).optional(),
   timeIntel: z.array(z.record(z.string(), z.any())).optional(),
   dateSpine: z.array(z.record(z.string(), z.any())).optional(),
+  // Ratio-of-sums measure spec (Wave 1): a single { numerator, denominator, ... }
+  // object applied to this run. Shape validated by applyRatioMeasure.
+  ratioMeasure: z.record(z.string(), z.any()).optional(),
   limit: z
     .union([z.number().int(), z.string().regex(/^-?\d+$/)])
     .optional()

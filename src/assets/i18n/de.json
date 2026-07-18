@@ -1589,7 +1589,19 @@
       "TO": "Bis",
       "ANNO_X": "X-Position",
       "ANNO_X_PH": "Kategorie oder X-Wert",
-      "ANNO_Y": "Y-Wert"
+      "ANNO_Y": "Y-Wert",
+      "TYPE": {
+        "CONSTANT": "Konstante",
+        "AVERAGE": "Durchschnitt",
+        "MEDIAN": "Median",
+        "MIN": "Minimum",
+        "MAX": "Maximum",
+        "PERCENTILE": "Perzentil"
+      },
+      "AXIS": {
+        "X": "X-Achse",
+        "Y": "Y-Achse"
+      }
     },
     "COLORSCALE": {
       "TITLE": "Farbskala",
@@ -1964,6 +1976,9 @@
         "DB_PERMISSION": "Sie haben keine Berechtigung, diese Abfrage auszuführen.",
         "DB_TIMEOUT": "Die Abfrage hat das Zeitlimit überschritten, bevor sie abgeschlossen werden konnte."
       }
+    },
+    "TOPN": {
+      "OTHER_LABEL": "Andere"
     }
   },
   "DASHBOARD": {

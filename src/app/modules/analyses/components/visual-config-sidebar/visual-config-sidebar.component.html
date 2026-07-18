@@ -168,8 +168,9 @@
           {{ 'ANALYSES.ANALYTICS.SECTION' | translate }}
         </div>
 
-        <!-- Dual-axis -->
-        <div class="config-row">
+        <!-- Dual-axis — gated by the active chart's `dualAxis` capability so a
+             second value axis is only offered where it makes sense (combo/line). -->
+        <div class="config-row" *ngIf="isCapable('dualAxis')">
           <label>{{ 'ANALYSES.ANALYTICS.DUAL_AXIS' | translate }}</label>
           <app-custom-toggle
             [ngModel]="dualAxisEnabled"
@@ -177,7 +178,7 @@
             [showStatusLabel]="false"
           ></app-custom-toggle>
         </div>
-        <div class="config-subsection" *ngIf="dualAxisEnabled">
+        <div class="config-subsection" *ngIf="isCapable('dualAxis') && dualAxisEnabled">
           <div class="config-group">
             <label>{{ 'ANALYSES.ANALYTICS.RIGHT_AXIS_NAME' | translate }}</label>
             <app-custom-input
@@ -330,8 +331,9 @@
           ></app-custom-dropdown>
         </div>
 
-        <!-- Small multiples -->
-        <div class="config-row">
+        <!-- Small multiples — gated by the active chart's `smallMultiples`
+             capability (facet grid only where the renderer supports it). -->
+        <div class="config-row" *ngIf="isCapable('smallMultiples')">
           <label>{{ 'ANALYSES.ANALYTICS.SMALL_MULTIPLES' | translate }}</label>
           <app-custom-toggle
             [ngModel]="smallMultiplesEnabled"
@@ -339,7 +341,7 @@
             [showStatusLabel]="false"
           ></app-custom-toggle>
         </div>
-        <div class="config-subsection" *ngIf="smallMultiplesEnabled">
+        <div class="config-subsection" *ngIf="isCapable('smallMultiples') && smallMultiplesEnabled">
           <div class="config-group">
             <label>{{ 'ANALYSES.ANALYTICS.FACET_COLUMN' | translate }}</label>
             <app-custom-dropdown
@@ -372,53 +374,65 @@
           {{ 'ANALYSES.VISUAL.DATA_FORMAT_SECTION' | translate }}
         </div>
 
-        <!-- Sort -->
-        <div class="config-group">
-          <label>{{ 'ANALYSES.VISUAL.SORT' | translate }}</label>
-          <app-custom-dropdown
-            [options]="sortByOptions"
-            [(ngModel)]="sortBy"
-            optionLabel="label"
-            optionValue="value"
-            appendTo="body"
-            icon="pi-sort-alt"
-          ></app-custom-dropdown>
-        </div>
-        <div class="config-group" *ngIf="sortBy !== 'none'">
-          <label>{{ 'ANALYSES.VISUAL.SORT_DIRECTION' | translate }}</label>
-          <app-custom-dropdown
-            [options]="sortDirOptions"
-            [(ngModel)]="sortDir"
-            optionLabel="label"
-            optionValue="value"
-            appendTo="body"
-          ></app-custom-dropdown>
-        </div>
+        <!-- Sort — gated by the active chart's `sort` capability -->
+        <ng-container *ngIf="isCapable('sort')">
+          <div class="config-group">
+            <label>{{ 'ANALYSES.VISUAL.SORT' | translate }}</label>
+            <app-custom-dropdown
+              [options]="sortByOptions"
+              [(ngModel)]="sortBy"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              icon="pi-sort-alt"
+            ></app-custom-dropdown>
+          </div>
+          <div class="config-group" *ngIf="sortBy !== 'none'">
+            <label>{{ 'ANALYSES.VISUAL.SORT_DIRECTION' | translate }}</label>
+            <app-custom-dropdown
+              [options]="sortDirOptions"
+              [(ngModel)]="sortDir"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+            ></app-custom-dropdown>
+          </div>
+        </ng-container>
 
-        <!-- Top-N / Bottom-N -->
-        <div class="config-group">
-          <label>{{ 'ANALYSES.VISUAL.LIMIT' | translate }}</label>
-          <app-custom-dropdown
-            [options]="limitModeOptions"
-            [(ngModel)]="limitMode"
-            optionLabel="label"
-            optionValue="value"
-            appendTo="body"
-            icon="pi-filter"
-          ></app-custom-dropdown>
-        </div>
-        <div class="config-group" *ngIf="limitMode !== 'none'">
-          <label>{{ 'ANALYSES.VISUAL.LIMIT_COUNT' | translate }}</label>
-          <app-custom-number
-            [(ngModel)]="limitN"
-            [min]="1"
-            [max]="1000"
-            [showButtons]="true"
-          ></app-custom-number>
-        </div>
+        <!-- Top-N / Bottom-N — gated by the active chart's `topN` capability -->
+        <ng-container *ngIf="isCapable('topN')">
+          <div class="config-group">
+            <label>{{ 'ANALYSES.VISUAL.LIMIT' | translate }}</label>
+            <app-custom-dropdown
+              [options]="limitModeOptions"
+              [(ngModel)]="limitMode"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              icon="pi-filter"
+            ></app-custom-dropdown>
+          </div>
+          <div class="config-group" *ngIf="limitMode !== 'none'">
+            <label>{{ 'ANALYSES.VISUAL.LIMIT_COUNT' | translate }}</label>
+            <app-custom-number
+              [(ngModel)]="limitN"
+              [min]="1"
+              [max]="1000"
+              [showButtons]="true"
+            ></app-custom-number>
+          </div>
+          <!-- Roll the trimmed rows into a single "Other" bucket -->
+          <div class="config-row" *ngIf="limitMode !== 'none'">
+            <label>{{ 'ANALYSES.V2.TOPN.OTHER_BUCKET' | translate }}</label>
+            <app-custom-toggle
+              [(ngModel)]="limitOther"
+              [showStatusLabel]="false"
+            ></app-custom-toggle>
+          </div>
+        </ng-container>
 
-        <!-- Stacking (bar / area / combo) -->
-        <div class="config-group">
+        <!-- Stacking (bar / area / combo) — gated by `stacking` capability -->
+        <div class="config-group" *ngIf="isCapable('stacking')">
           <label>{{ 'ANALYSES.VISUAL.STACKING_TITLE' | translate }}</label>
           <app-custom-dropdown
             [options]="stackingOptions"
@@ -3898,9 +3912,11 @@
       </div>
 
       <!-- ═══════════════ REFERENCE LINES & ANNOTATIONS ═══════════════ -->
+      <!-- Capability-gated: reference overlays render only on charts whose
+           `referenceLines` capability is true (every capable cartesian chart). -->
       <div
         class="config-section"
-        *ngIf="supportsReferenceLines(focusedVisual.chartType)"
+        *ngIf="isCapable('referenceLines')"
       >
         <div class="section-title">{{ 'ANALYSES.REFLINE.TITLE' | translate }}</div>
 
@@ -3950,6 +3966,19 @@
           <div class="config-group" *ngIf="line.type === 'constant'">
             <label>{{ 'ANALYSES.REFLINE.VALUE' | translate }}</label>
             <app-custom-number [(ngModel)]="line.value"></app-custom-number>
+          </div>
+          <!-- Percentile P (0–100): the line is computed client-side at that
+               percentile of the measure (median/avg/min/max compute with no
+               extra input). -->
+          <div class="config-group" *ngIf="line.type === 'percentile'">
+            <label>{{ 'ANALYSES.V2.REFLINE.PERCENTILE' | translate }}</label>
+            <app-custom-number
+              [(ngModel)]="line.value"
+              [min]="0"
+              [max]="100"
+              [showButtons]="true"
+              suffix="%"
+            ></app-custom-number>
           </div>
           <div class="config-group">
             <label>{{ 'ANALYSES.REFLINE.LABEL' | translate }}</label>
@@ -4108,9 +4137,12 @@
       </div>
 
       <!-- ═══════════════ VALUE COLOUR SCALE (visualMap) ═══════════════ -->
+      <!-- Capability-gated: the continuous colour scale is offered only on
+           charts whose `colorScale` capability is true (scatter, heat-map,
+           tree-map, calendar-heatmap, choropleth, …). -->
       <div
         class="config-section"
-        *ngIf="supportsVisualMap(focusedVisual.chartType)"
+        *ngIf="isCapable('colorScale')"
       >
         <div class="section-title">
           {{ 'ANALYSES.COLORSCALE.TITLE' | translate }}

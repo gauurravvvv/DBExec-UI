@@ -102,6 +102,25 @@ export interface ChartDataMapping {
   movingAverageWindow?: number;
   /** Period-over-period comparison mode. */
   compareMode?: 'previous_period' | 'same_period_last_year' | null;
+
+  // ── Type-semantics (Wave 2) ─────────────────────────────────────────
+  // Sourced from `config.format` / `config.nullHandling` / `config.nullLabel`
+  // by buildMapping. All optional — absent means "no explicit formatting /
+  // default null handling", so untouched charts keep their previous shape.
+  /** Format applied to category / axis LABELS (the x dimension). */
+  labelFormat?: import('./visual-config.model').ValueFormat;
+  /** Format applied to measure VALUES (used by the builder via WAVE2-FORMAT-HOOK). */
+  valueFormat?: import('./visual-config.model').ValueFormat;
+  /**
+   * How a null dimension value is handled. 'gap' | 'connect' | 'zero' keep the
+   * legacy drop/skip behaviour; when null-as-member is desired the caller
+   * sets `nullAsMember` and the null category is retained under `nullLabel`.
+   */
+  nullHandling?: import('./visual-config.model').NullHandling;
+  /** When true, a null dimension value is kept as its own category. */
+  nullAsMember?: boolean;
+  /** Label used for the retained null category (defaults to '(null)'). */
+  nullLabel?: string;
 }
 
 /**
@@ -332,6 +351,21 @@ export interface Visual {
    * distinct footer rows. Not persisted — derived per run.
    */
   pivotTotalRows?: any[];
+
+  /**
+   * Result-scale truncation flag (Wave 5, DATA-SCALE & PERF), populated at
+   * run time from response.meta when the BE clipped the result to a cap
+   * (raw-row LIMIT or the aggregation group ceiling). `shown` is the number
+   * of rows returned and `cap` the ceiling that was applied; the renderer
+   * shows the ANALYSES.V2.ERROR.TRUNCATION_BANNER ("Showing top {n} of
+   * {total}") when this is present and `truncated` is true. Not persisted —
+   * derived per run, parallel to pivotTotalRows.
+   */
+  truncation?: {
+    truncated: boolean;
+    shown: number;
+    cap: number;
+  } | null;
 }
 
 /**

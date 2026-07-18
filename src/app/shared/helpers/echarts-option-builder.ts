@@ -1,4 +1,8 @@
 import * as echarts from 'echarts';
+import {
+  buildLatLonPoints,
+  joinRegionData,
+} from '../../modules/analyses/helpers/geo-registry';
 import { COLOR_PALETTES } from './chart-config.helper';
 import {
   ConditionalRule,
@@ -505,15 +509,69 @@ function buildDataLabel(config: any, defaultPosition?: string): any {
 /** A single reference line spec authored in the Properties pane. */
 interface ReferenceLineSpec {
   /** Aggregate the line tracks, or 'constant' for a fixed value. */
-  type?: 'constant' | 'average' | 'min' | 'max' | 'median';
+  type?: 'constant' | 'average' | 'min' | 'max' | 'median' | 'percentile';
   /** Which axis the line is perpendicular to: value lines sit on 'y'. */
   axis?: 'x' | 'y';
-  /** Fixed value for type='constant'. */
+  /** Fixed value for type='constant', or the P (0–100) for type='percentile'. */
   value?: number;
   label?: string;
   color?: string;
   lineStyle?: 'solid' | 'dashed' | 'dotted';
   width?: number;
+}
+
+/**
+ * Flatten a transformed chart-data shape into a flat numeric sample. Handles
+ * both the single-series `{name,value}[]` shape and the multi-series
+ * `{name,series:[{name,value}]}[]` shape (and bare number arrays). Purely
+ * structural — no domain assumptions — so computed reference lines work on any
+ * measure. Non-finite entries are dropped.
+ */
+function extractNumericSample(data: any): number[] {
+  const out: number[] = [];
+  if (!Array.isArray(data)) return out;
+  for (const row of data) {
+    if (row == null) continue;
+    if (typeof row === 'number') {
+      if (Number.isFinite(row)) out.push(row);
+    } else if (Array.isArray((row as any).series)) {
+      for (const pt of (row as any).series) {
+        const v = pt && typeof pt === 'object' ? Number(pt.value) : Number(pt);
+        if (Number.isFinite(v)) out.push(v);
+      }
+    } else if (typeof row === 'object' && 'value' in row) {
+      const v = Number((row as any).value);
+      if (Number.isFinite(v)) out.push(v);
+    }
+  }
+  return out;
+}
+
+/**
+ * Compute a statistic over a numeric sample, generalised for ANY column (no
+ * domain assumptions). Used to resolve computed reference lines (median /
+ * percentile) that ECharts' built-in markLine stat types don't cover — the
+ * built-ins only offer average / min / max. Returns undefined when the sample
+ * is empty so the caller can skip emitting a line.
+ */
+function computeSeriesStat(
+  values: number[],
+  kind: 'median' | 'percentile',
+  percentile?: number,
+): number | undefined {
+  const nums = (values || []).filter(n => Number.isFinite(n));
+  if (nums.length === 0) return undefined;
+  const sorted = [...nums].sort((a, b) => a - b);
+  const p =
+    kind === 'median'
+      ? 50
+      : Math.min(100, Math.max(0, Number.isFinite(percentile as number) ? (percentile as number) : 50));
+  const idx = (p / 100) * (sorted.length - 1);
+  const lo = Math.floor(idx);
+  const hi = Math.ceil(idx);
+  if (lo === hi) return sorted[lo];
+  const w = idx - lo;
+  return sorted[lo] * (1 - w) + sorted[hi] * w;
 }
 
 interface ReferenceBandSpec {
@@ -546,7 +604,10 @@ interface AnnotationSpec {
  * `{ xAxis }` line. Reference bands become paired markArea coordinates.
  * Annotations become markPoint items at explicit coordinates.
  */
-function buildMarkOverlays(config: any): {
+function buildMarkOverlays(
+  config: any,
+  seriesValues?: number[],
+): {
   markLine: any;
   markArea: any;
   markPoint: any;
@@ -589,17 +650,27 @@ function buildMarkOverlays(config: any): {
           ? { ...common, xAxis: l.value }
           : { ...common, yAxis: l.value };
       }
-      // Statistical lines: ECharts supports average/min/max natively. median
-      // is unsupported as a stat type, so fall back to average.
-      const statType =
-        l.type === 'average'
-          ? 'average'
-          : l.type === 'min'
-            ? 'min'
-            : l.type === 'max'
-              ? 'max'
-              : 'average';
-      return { ...common, type: statType };
+      // ECharts markLine supports average/min/max natively via `{ type }`.
+      if (l.type === 'average' || l.type === 'min' || l.type === 'max') {
+        return { ...common, type: l.type };
+      }
+      // median / percentile are NOT built-in stat types. Compute them
+      // client-side from the series values (generalised — works on any
+      // numeric column) and emit as a fixed line. When no series data is
+      // available (non-cartesian caller passing only config), fall back to
+      // ECharts' native 'average' so the line still renders meaningfully.
+      if (l.type === 'median' || l.type === 'percentile') {
+        const computed = computeSeriesStat(
+          seriesValues || [],
+          l.type,
+          l.type === 'percentile' ? l.value : undefined,
+        );
+        if (computed === undefined) return { ...common, type: 'average' };
+        return onX
+          ? { ...common, xAxis: computed }
+          : { ...common, yAxis: computed };
+      }
+      return { ...common, type: 'average' };
     })
     .filter((x): x is any => x !== null);
 
@@ -1103,8 +1174,16 @@ export function buildBarChartOption(
   // Reference lines / bands / annotations — spread onto the shared base so
   // every bar variant carries them. buildMarkOverlays returns empty data
   // arrays when nothing is configured, which clears cleanly under merge-mode
-  // setOption.
-  Object.assign(barSeriesBase, buildMarkOverlays(config));
+  // setOption. Pass a flat numeric sample so computed lines (median /
+  // percentile) resolve off the actual bar values (generalised over any
+  // column). extractNumericSample handles both single- and multi-series shapes.
+  Object.assign(
+    barSeriesBase,
+    buildMarkOverlays(
+      config,
+      extractNumericSample(multiData && multiData.length > 0 ? multiData : data),
+    ),
+  );
 
   if (isMulti) {
     const sourceData = multiData && multiData.length > 0 ? multiData : data;
@@ -1371,7 +1450,12 @@ export function buildLineChartOption(
           ? { opacity: config.rangeFillOpacity }
           : undefined,
       emphasis: buildEmphasis(config, 'series'),
-      ...(si === 0 ? buildMarkOverlays(config) : {}),
+      // Overlays attach to the FIRST series only (once per chart). Pass the
+      // flat sample across all series so computed lines (median/percentile)
+      // reflect the whole chart, not just series 0.
+      ...(si === 0
+        ? buildMarkOverlays(config, extractNumericSample(data))
+        : {}),
       ...(config.endLabel ? { endLabel: { show: true } } : {}),
       ...(config.sampling && config.sampling !== 'none'
         ? { sampling: config.sampling }
@@ -1488,7 +1572,9 @@ export function buildAreaChartOption(
       data: applyConditionalFormatting(s.values, config, undefined, 'value'),
       smooth: step ? false : smooth,
       step: step || undefined,
-      ...(si === 0 ? buildMarkOverlays(config) : {}),
+      ...(si === 0
+        ? buildMarkOverlays(config, extractNumericSample(data))
+        : {}),
     }));
   }
 
@@ -3677,46 +3763,174 @@ export function buildMap3DChartOption(data: any[], config: any): any {
 // ========= Flow GL Chart =========
 // Renders a vector field as directional arrows on a cartesian grid.
 // Data format: [{ data: [[x, y, vx, vy], ...] }]
-// ========= World Map Chart =========
-// Renders a choropleth world map. Requires 'world' map to be registered via echarts.registerMap().
-// Data format: [{ name: 'Country', value: number }, ...]
-export function buildWorldMapChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme || 'default');
-  const values = data.map((d: any) =>
-    typeof d.value === 'number' ? d.value : 0,
+// ========= Geo: shared data resolution =========
+//
+// Wave 4 geo pipeline. Map builders (world-map / choropleth / point-map /
+// bubble-map) consume the GeoConfig on `config.geo` plus flat geo* fallbacks,
+// and accept EITHER pre-shaped data OR raw analysis rows:
+//   - Choropleth: pre-shaped `{ name, value }[]` is used as-is. Raw rows (array
+//     of flat objects) are joined to feature names via joinRegionData when the
+//     geo region/value fields are configured.
+//   - Point/bubble: rows are turned into validated `[lon, lat, value]` points
+//     via buildLatLonPoints.
+// The registered map NAME comes from `config.geo.regionSet` (via the renderer's
+// getRequiredMap contract); the builder binds `series.map` to the same name so
+// it must already be registered (the renderer awaits ensureMapRegistered).
+//
+// IMPORTANT: these builders never fetch or register anything — that is the
+// renderer + GeoRegistryService's job. They are pure option producers.
+
+/** Read the geo field config (typed GeoConfig on `config.geo` + fallbacks). */
+function readGeoFields(config: any): {
+  regionSet: string;
+  regionField?: string;
+  valueField: string;
+  latField?: string;
+  lonField?: string;
+  labelField?: string;
+  codeField?: string;
+  codeProperty?: string;
+  nameProperty: string;
+  useAliases: boolean;
+} {
+  const geo = config?.geo || {};
+  return {
+    regionSet: String(geo.regionSet || geo.mapId || config?.geoRegionSet || 'world'),
+    regionField: geo.regionField || config?.geoRegionField,
+    valueField: geo.valueField || config?.geoValueField || 'value',
+    latField: geo.latField || config?.geoLatField,
+    lonField: geo.lonField || config?.geoLonField,
+    labelField: geo.labelField || config?.geoLabelField,
+    codeField: geo.codeField || config?.geoCodeField,
+    codeProperty: geo.codeProperty || config?.geoCodeProperty,
+    // GeoJSON property the series matches names against (region-set-agnostic).
+    nameProperty: geo.nameProperty || config?.worldMapNameProperty || 'name',
+    // English alias convenience layer — on by default, disableable.
+    useAliases: geo.useAliases !== false,
+  };
+}
+
+/**
+ * True when `data` looks like the ECharts map shape already ({name,value}[]),
+ * vs raw analysis rows we still need to join. A row with a `value` key AND a
+ * `name` key is treated as pre-shaped; anything else with the configured
+ * region field is treated as raw rows.
+ */
+function isPreShapedRegionData(data: any[]): boolean {
+  if (!Array.isArray(data) || data.length === 0) return true;
+  const first = data[0];
+  return (
+    first !== null &&
+    typeof first === 'object' &&
+    'name' in first &&
+    'value' in first
   );
+}
+
+/**
+ * Resolve choropleth `{name,value}[]` from either pre-shaped data or raw rows.
+ * Returns the data plus any unmatched region labels (for a UI warning — stamped
+ * on the option under `__geoUnmatched` so a caller can surface it without a
+ * separate channel; ECharts ignores unknown top-level keys).
+ */
+function resolveRegionData(
+  data: any[],
+  config: any,
+): { data: { name: string; value: number }[]; unmatched: string[] } {
+  const fields = readGeoFields(config);
+  if (isPreShapedRegionData(data) || !fields.regionField) {
+    // Already shaped (or we lack the fields to join) — pass through, coercing
+    // value to number and name to string.
+    const shaped = (Array.isArray(data) ? data : []).map((d: any) => ({
+      name: String(d?.name ?? ''),
+      value: typeof d?.value === 'number' ? d.value : Number(d?.value) || 0,
+    }));
+    return { data: shaped, unmatched: [] };
+  }
+  // Raw rows → join to feature names / codes.
+  const join = joinRegionData(
+    data,
+    {
+      regionField: fields.regionField,
+      valueField: fields.valueField,
+      nameProperty: fields.nameProperty,
+      codeField: fields.codeField,
+      codeProperty: fields.codeProperty,
+      useAliases: fields.useAliases,
+    },
+    // The GeoJSON is registered with ECharts by name; the builder can't read it
+    // back, so name-matching against the registered topology happens inside
+    // ECharts. For the join we still need the topology to resolve canonical
+    // names — callers that want name normalisation pass it on config.geojson.
+    config?.geojson || config?.geo?.geojson || { features: [] },
+  );
+  return { data: join.data, unmatched: join.unmatched };
+}
+
+// ========= Choropleth / World Map Chart =========
+// Data-bound region-shaded map. `mapName` is the registered region set (world /
+// us-states / any asset the BE serves); the series binds to it by name and
+// colours regions by value via a continuous visualMap.
+// Data: pre-shaped `{ name, value }[]` OR raw rows + geo field config.
+export function buildChoroplethOption(data: any[], config: any): any {
+  const fields = readGeoFields(config);
+  const resolved = resolveRegionData(data, config);
+  const rows = resolved.data;
+
+  const colors = getColors(config.colorScheme || 'default');
+  const values = rows.map(d => (typeof d.value === 'number' ? d.value : 0));
   const minVal =
-    config.worldMapVisualMapMin ?? (values.length ? Math.min(...values) : 0);
+    config.worldMapVisualMapMin ??
+    config.geoVisualMapMin ??
+    (values.length ? Math.min(...values) : 0);
   const maxVal =
-    config.worldMapVisualMapMax ?? (values.length ? Math.max(...values) : 100);
+    config.worldMapVisualMapMax ??
+    config.geoVisualMapMax ??
+    (values.length ? Math.max(...values) : 100);
+  // Diverging low→high; palette is reversed so the first (strongest) colour
+  // maps to the high end, matching the rest of the app's colour direction.
   const colorLow = colors[colors.length - 1] || '#e0f3f8';
   const colorHigh = colors[0] || '#08589e';
 
-  return {
+  const option: any = {
     ...buildAnimation(config),
     tooltip: {
       ...buildTooltip(config, 'item'),
-      formatter: (params: any) => `${params.name}: ${params.value == null ? 'N/A' : formatTooltipValue(config, params.value)}`,
+      formatter: (params: any) =>
+        `${params.name}: ${
+          params.value == null || Number.isNaN(params.value)
+            ? 'N/A'
+            : formatTooltipValue(config, params.value)
+        }`,
     },
     visualMap: {
-      min: minVal,
-      max: maxVal,
+      min: Number.isFinite(minVal) ? minVal : 0,
+      max: Number.isFinite(maxVal) ? maxVal : 100,
       text: ['High', 'Low'],
       realtime: false,
       calculable: true,
-      orient: 'vertical',
+      orient: config.visualMapOrient || 'vertical',
       left: 0,
       bottom: 20,
       inRange: {
-        color: [colorLow, colorHigh],
+        color: Array.isArray(config.visualMapColors) &&
+          config.visualMapColors.length >= 2
+          ? config.visualMapColors
+          : [colorLow, colorHigh],
+      },
+      textStyle: {
+        ...CHART_TYPOGRAPHY.axisLabel,
+        fontFamily: CHART_TYPOGRAPHY.fontFamily,
       },
     },
     series: [
       {
         type: 'map',
-        mapType: 'world',
+        map: fields.regionSet,
+        // Legacy alias kept so older ECharts option readers still bind.
+        mapType: fields.regionSet,
         roam: config.worldMapRoam !== false,
-        nameProperty: config.worldMapNameProperty || 'name',
+        nameProperty: fields.nameProperty,
         aspectScale: config.worldMapAspectScale ?? 0.75,
         selectedMode: config.worldMapSelectable ? 'single' : false,
         label: {
@@ -3730,13 +3944,157 @@ export function buildWorldMapChartOption(data: any[], config: any): any {
           itemStyle: { areaColor: adjustColorOpacity(colorHigh, 0.8) },
         },
         itemStyle: {
-          borderColor: '#aaa',
+          borderColor: CHART_TYPOGRAPHY.colors.axis,
           borderWidth: 0.5,
         },
-        data: data,
+        data: rows,
       },
     ],
   };
+  // Surface unmatched regions for a UI warning without a side channel. ECharts
+  // ignores unknown top-level option keys, so this is inert to rendering.
+  if (resolved.unmatched.length) {
+    option.__geoUnmatched = resolved.unmatched;
+  }
+  return option;
+}
+
+/**
+ * World map — retained id `world-map`. Now data-bound: delegates to the
+ * choropleth builder with the region set defaulted to 'world'. Existing configs
+ * that passed pre-shaped `{name,value}[]` still render (pass-through path).
+ */
+export function buildWorldMapChartOption(data: any[], config: any): any {
+  // Ensure the region set defaults to 'world' for the legacy world-map id
+  // without mutating the caller's config object.
+  const geo = { ...(config?.geo || {}) };
+  if (!geo.regionSet && !geo.mapId) geo.regionSet = 'world';
+  return buildChoroplethOption(data, { ...config, geo });
+}
+
+// ========= Point Map / Bubble Map =========
+// Markers positioned at lat/lon on a geo coordinate system. Point map = fixed
+// symbol size; bubble map = symbol size encodes a measure. Binds the geo
+// coordinateSystem to the registered region set so the basemap draws behind the
+// points. Data: raw rows with lat/lon (+ optional value/label) fields.
+function buildGeoScatterOption(
+  data: any[],
+  config: any,
+  variant: 'point' | 'bubble',
+): any {
+  const fields = readGeoFields(config);
+  const colors = getColors(config.colorScheme || 'default');
+  const primary = colors[0] || '#5470c6';
+
+  const built = fields.latField && fields.lonField
+    ? buildLatLonPoints(data, {
+        latField: fields.latField,
+        lonField: fields.lonField,
+        valueField: fields.valueField,
+        labelField: fields.labelField,
+      })
+    : { points: [], invalidCount: 0 };
+
+  const points = built.points;
+  const vals = points.map(p => p.value[2]).filter(v => Number.isFinite(v));
+  const maxVal = vals.length ? Math.max(...vals) : 1;
+  const minVal = vals.length ? Math.min(...vals) : 0;
+
+  // Bubble: size ∝ sqrt(value) so AREA (not radius) encodes magnitude.
+  const minPx = config.geoBubbleMinSize ?? 6;
+  const maxPx = config.geoBubbleMaxSize ?? 40;
+  const sizeFor = (v: number): number => {
+    if (variant === 'point') return config.scatterSymbolSize || 8;
+    if (maxVal <= minVal) return (minPx + maxPx) / 2;
+    const t = Math.sqrt((v - minVal) / (maxVal - minVal));
+    return minPx + t * (maxPx - minPx);
+  };
+
+  const option: any = {
+    ...buildAnimation(config),
+    tooltip: {
+      ...buildTooltip(config, 'item'),
+      formatter: (params: any) => {
+        const v = params.value?.[2];
+        return `${params.name}${
+          v == null ? '' : `<br/>${formatTooltipValue(config, v)}`
+        }`;
+      },
+    },
+    geo: {
+      map: fields.regionSet,
+      roam: config.worldMapRoam !== false,
+      nameProperty: fields.nameProperty,
+      aspectScale: config.worldMapAspectScale ?? 0.75,
+      itemStyle: {
+        areaColor: CHART_TYPOGRAPHY.colors.grid,
+        borderColor: CHART_TYPOGRAPHY.colors.axis,
+        borderWidth: 0.5,
+      },
+      emphasis: { itemStyle: { areaColor: CHART_TYPOGRAPHY.colors.grid } },
+    },
+    series: [
+      {
+        type: variant === 'bubble' ? 'scatter' : 'effectScatter',
+        coordinateSystem: 'geo',
+        data: points.map(p => ({
+          name: p.name,
+          value: p.value,
+        })),
+        symbolSize: (val: any) => sizeFor(Array.isArray(val) ? val[2] : val),
+        itemStyle: {
+          color: primary,
+          opacity: 0.75,
+        },
+        ...(variant === 'point'
+          ? {
+              rippleEffect: { brushType: 'stroke', scale: 2.5 },
+              showEffectOn: 'render',
+            }
+          : {}),
+        emphasis: { scale: 1.2 },
+      },
+    ],
+  };
+
+  // Bubble map: colour points continuously by value when the scale is enabled.
+  if (variant === 'bubble') {
+    option.visualMap = {
+      show: config.visualMapShow !== false,
+      type: 'continuous',
+      min: Number.isFinite(minVal) ? minVal : 0,
+      max: Number.isFinite(maxVal) ? maxVal : 100,
+      dimension: 2,
+      calculable: true,
+      orient: config.visualMapOrient || 'vertical',
+      left: 0,
+      bottom: 20,
+      inRange: {
+        color:
+          Array.isArray(config.visualMapColors) &&
+          config.visualMapColors.length >= 2
+            ? config.visualMapColors
+            : [colors[colors.length - 1] || '#e0f3f8', colors[0] || '#08589e'],
+      },
+      textStyle: {
+        ...CHART_TYPOGRAPHY.axisLabel,
+        fontFamily: CHART_TYPOGRAPHY.fontFamily,
+      },
+    };
+  }
+
+  if (built.invalidCount > 0) {
+    option.__geoInvalidPoints = built.invalidCount;
+  }
+  return option;
+}
+
+export function buildPointMapOption(data: any[], config: any): any {
+  return buildGeoScatterOption(data, config, 'point');
+}
+
+export function buildBubbleMapOption(data: any[], config: any): any {
+  return buildGeoScatterOption(data, config, 'bubble');
 }
 
 // ========= Flow Lines Chart =========
@@ -4104,6 +4462,1184 @@ export function buildPolygons3DChartOption(data: any[], config: any): any {
   };
 }
 
+// ══════════════════════════════════════════════════════════════════════════
+// Wave 4: statistical / specialized chart builders
+//
+// These consume the SAME data shapes the transformer already emits for the
+// cartesian / hierarchical families:
+//   - single series:  { name, value }[]
+//   - multi series:    [{ name, series: [{ name, value }] }]
+//   - node+link:       (nodes[], links[], config)
+// Each reuses the shared axis/legend/tooltip/animation helpers so it inherits
+// the app's typography + Properties-pane wiring. Builders that need genuine
+// statistical PRE-PROCESSING (violin/density/ridgeline/hexbin/qq/ecdf) render a
+// clear empty-state and are listed for transformer support — they never
+// half-render a misleading chart.
+// ══════════════════════════════════════════════════════════════════════════
+
+/** Coerce a datum to { name, value } regardless of incoming shape. */
+function toNameValue(d: any): { name: string; value: number } {
+  if (d && typeof d === 'object') {
+    return {
+      name: String(d.name ?? d.label ?? ''),
+      value: typeof d.value === 'number' ? d.value : Number(d.value) || 0,
+    };
+  }
+  return { name: '', value: Number(d) || 0 };
+}
+
+/** Flatten a possibly-multi-series payload to a single { name, value }[]. */
+function flattenToSingleSeries(data: any[]): { name: string; value: number }[] {
+  if (!Array.isArray(data) || data.length === 0) return [];
+  const first = data[0];
+  // Multi-series shape → take the first series' points.
+  if (first && typeof first === 'object' && Array.isArray(first.series)) {
+    return (first.series || []).map(toNameValue);
+  }
+  return data.map(toNameValue);
+}
+
+/**
+ * Empty-state option: a centred message on an otherwise blank chart. Used for
+ * builders whose data must be pre-binned upstream (the transformer) before a
+ * faithful chart can be drawn. Renders through the standard `graphic` text
+ * element so it themes with the rest of the app and never throws.
+ */
+function buildEmptyStateOption(config: any, message: string): any {
+  return {
+    ...buildAnimation(config),
+    // Keep a blank cartesian frame so the card has structure, not a void.
+    grid: buildGrid(config),
+    xAxis: { type: 'value', show: false },
+    yAxis: { type: 'value', show: false },
+    series: [],
+    graphic: {
+      elements: [
+        {
+          type: 'text',
+          left: 'center',
+          top: 'middle',
+          silent: true,
+          style: {
+            text: message,
+            fill: CHART_TYPOGRAPHY.colors.muted,
+            font: `500 12px ${CHART_TYPOGRAPHY.fontFamily}`,
+            lineHeight: 18,
+            textAlign: 'center',
+          },
+        },
+      ],
+    },
+  };
+}
+
+// ========= Bullet Chart =========
+// Measure vs target with qualitative bands. Data: { name, value }[] where the
+// FIRST point is the measure; `config.bulletTarget` (or a second point named
+// like /target/i) is the target line; `config.bulletBands` (number[] ascending)
+// paints qualitative background ranges via markArea. Horizontal single-row.
+export function buildBulletChartOption(data: any[], config: any): any {
+  const points = flattenToSingleSeries(data);
+  const measure = points[0]?.value ?? 0;
+  const label = points[0]?.name || config.bulletLabel || 'Measure';
+  // Target: explicit config, else a point whose name mentions "target".
+  const targetPoint = points.find(p => /target/i.test(p.name));
+  const target =
+    config.bulletTarget != null
+      ? Number(config.bulletTarget)
+      : targetPoint
+        ? targetPoint.value
+        : undefined;
+
+  const colors = getColors(config.colorScheme || 'default');
+  const bands: number[] = Array.isArray(config.bulletBands)
+    ? config.bulletBands.map((b: any) => Number(b)).filter((b: number) => Number.isFinite(b))
+    : [];
+  const axisMax =
+    config.bulletMax != null
+      ? Number(config.bulletMax)
+      : Math.max(measure, target ?? 0, ...bands, 1) * 1.1;
+
+  // Qualitative band backgrounds (light → dark grey by default).
+  const bandGreys = ['#eeeeee', '#dddddd', '#cccccc', '#bbbbbb'];
+  const markAreaData: any[] = [];
+  let lower = 0;
+  bands
+    .slice()
+    .sort((a, b) => a - b)
+    .forEach((upper, i) => {
+      markAreaData.push([
+        { xAxis: lower, itemStyle: { color: bandGreys[i % bandGreys.length] } },
+        { xAxis: upper },
+      ]);
+      lower = upper;
+    });
+
+  const markLineData: any[] = [];
+  if (target != null) {
+    markLineData.push({
+      xAxis: target,
+      lineStyle: { color: CHART_TYPOGRAPHY.colors.strong, width: 2, type: 'solid' },
+      label: {
+        show: true,
+        formatter: config.bulletTargetLabel || 'Target',
+        ...CHART_TYPOGRAPHY.dataLabel,
+      },
+    });
+  }
+
+  return {
+    color: colors,
+    ...buildAnimation(config),
+    tooltip: {
+      ...buildTooltip(config, 'item'),
+      formatter: () =>
+        `${label}: ${formatTooltipValue(config, measure)}${
+          target != null ? `<br/>Target: ${formatTooltipValue(config, target)}` : ''
+        }`,
+    },
+    grid: { left: 80, right: 30, top: 20, bottom: 30, containLabel: true },
+    xAxis: { ...buildValueAxis(config, 'x'), max: axisMax, nice: false },
+    yAxis: buildCategoryAxis(config, [label], 'y'),
+    series: [
+      {
+        type: 'bar',
+        data: [measure],
+        barWidth: config.bulletBarWidth ?? 18,
+        itemStyle: { color: colors[0], borderRadius: 2 },
+        label: buildDataLabel(config, 'right'),
+        z: 3,
+        markArea: { silent: true, data: markAreaData },
+        markLine: { symbol: ['none', 'none'], data: markLineData, z: 4 },
+      },
+    ],
+  };
+}
+
+// ========= KPI Delta =========
+// Render-only big-number + delta vs a comparison value. Data: { name, value }[]
+// where point[0] is the current value and point[1] (or config.kpiCompare) is the
+// comparison. Up = good (green) by default; set config.kpiInvert for "down is
+// good". Pairs with Wave 1's time-intel for the comparison value.
+export function buildKpiDeltaOption(data: any[], config: any): any {
+  const points = flattenToSingleSeries(data);
+  const current = points[0]?.value ?? 0;
+  const compare =
+    config.kpiCompare != null
+      ? Number(config.kpiCompare)
+      : points[1]?.value != null
+        ? points[1].value
+        : undefined;
+
+  const hint = config?.valueFormat;
+  const fmt = (v: number): string =>
+    hint && hint.kind && hint.kind !== 'auto'
+      ? formatValueByHint(v, hint)
+      : String(formatTooltipValue(config, v));
+
+  const delta = compare != null ? current - compare : undefined;
+  const pct =
+    compare != null && compare !== 0 ? (delta! / Math.abs(compare)) * 100 : undefined;
+  const up = delta != null && delta >= 0;
+  const good = config.kpiInvert ? !up : up;
+  const deltaColor = good ? '#16a34a' : '#dc2626';
+  const arrow = up ? '▲' : '▼';
+
+  const title = points[0]?.name || config.kpiLabel || '';
+
+  const elements: any[] = [
+    {
+      type: 'text',
+      left: 'center',
+      top: '38%',
+      silent: true,
+      style: {
+        text: fmt(current),
+        fill: CHART_TYPOGRAPHY.colors.strong,
+        font: `700 32px ${CHART_TYPOGRAPHY.fontFamily}`,
+        textAlign: 'center',
+      },
+    },
+  ];
+  if (title) {
+    elements.push({
+      type: 'text',
+      left: 'center',
+      top: '26%',
+      silent: true,
+      style: {
+        text: title,
+        fill: CHART_TYPOGRAPHY.colors.muted,
+        font: `500 12px ${CHART_TYPOGRAPHY.fontFamily}`,
+        textAlign: 'center',
+      },
+    });
+  }
+  if (delta != null) {
+    const pctTxt = pct != null ? ` (${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%)` : '';
+    elements.push({
+      type: 'text',
+      left: 'center',
+      top: '58%',
+      silent: true,
+      style: {
+        text: `${arrow} ${fmt(Math.abs(delta))}${pctTxt}`,
+        fill: deltaColor,
+        font: `600 14px ${CHART_TYPOGRAPHY.fontFamily}`,
+        textAlign: 'center',
+      },
+    });
+  }
+
+  return {
+    ...buildAnimation(config),
+    tooltip: { show: false },
+    xAxis: { type: 'value', show: false },
+    yAxis: { type: 'value', show: false },
+    series: [],
+    graphic: { elements },
+  };
+}
+
+// ========= Pareto Chart =========
+// Sorted descending bars + cumulative-% line on a secondary (right) axis.
+// Data: { name, value }[]. The 80% guide line is drawn on the % axis.
+export function buildParetoChartOption(data: any[], config: any): any {
+  const points = flattenToSingleSeries(data)
+    .slice()
+    .sort((a, b) => b.value - a.value);
+  const categories = points.map(p => p.name);
+  const values = points.map(p => p.value);
+  const total = values.reduce((s, v) => s + (v > 0 ? v : 0), 0) || 1;
+
+  let running = 0;
+  const cumulativePct = values.map(v => {
+    running += v > 0 ? v : 0;
+    return Math.round((running / total) * 1000) / 10;
+  });
+
+  const colors = getColors(config.colorScheme || 'default');
+
+  return {
+    color: colors,
+    ...buildAnimation(config),
+    tooltip: {
+      ...buildTooltip(config, 'axis'),
+      axisPointer: { type: 'shadow' },
+    },
+    ...buildLegendWithTitle(config),
+    grid: buildGrid(config),
+    toolbox: buildToolbox(config),
+    xAxis: buildCategoryAxis(config, categories, 'x'),
+    yAxis: [
+      { ...buildValueAxis(config, 'y'), nice: true },
+      {
+        type: 'value',
+        name: config.paretoPctAxisName || 'Cumulative %',
+        min: 0,
+        max: 100,
+        position: 'right',
+        axisLabel: {
+          formatter: '{value}%',
+          ...CHART_TYPOGRAPHY.axisLabel,
+          fontFamily: CHART_TYPOGRAPHY.fontFamily,
+        },
+        splitLine: { show: false },
+        nameTextStyle: {
+          ...CHART_TYPOGRAPHY.axisName,
+          fontFamily: CHART_TYPOGRAPHY.fontFamily,
+        },
+      },
+    ],
+    series: [
+      {
+        name: config.paretoBarName || 'Value',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: values,
+        itemStyle: { color: colors[0], borderRadius: [3, 3, 0, 0] },
+        label: buildDataLabel(config, 'top'),
+      },
+      {
+        name: config.paretoLineName || 'Cumulative %',
+        type: 'line',
+        yAxisIndex: 1,
+        data: cumulativePct,
+        smooth: false,
+        symbol: 'circle',
+        symbolSize: 6,
+        lineStyle: { color: colors[1] || '#ef4444', width: 2 },
+        itemStyle: { color: colors[1] || '#ef4444' },
+        markLine: {
+          symbol: ['none', 'none'],
+          silent: true,
+          data: [
+            {
+              yAxis: 80,
+              lineStyle: { color: CHART_TYPOGRAPHY.colors.axis, type: 'dashed' },
+              label: { show: true, formatter: '80%', ...CHART_TYPOGRAPHY.dataLabel },
+            },
+          ],
+        },
+      },
+    ],
+  };
+}
+
+// ========= Lollipop Chart =========
+// Stems (thin bars) + dots. Data: { name, value }[]. Honours sort/topN via the
+// cartesian analytics pass (bars are a real bar series).
+export function buildLollipopChartOption(data: any[], config: any): any {
+  const points = flattenToSingleSeries(data);
+  const categories = points.map(p => p.name);
+  const values = points.map(p => p.value);
+  const colors = getColors(config.colorScheme || 'default');
+  const horizontal = config.rotate === true || config.lollipopHorizontal === true;
+
+  const catAxis = buildCategoryAxis(config, categories, horizontal ? 'y' : 'x');
+  const valAxis = { ...buildValueAxis(config, horizontal ? 'x' : 'y'), nice: true };
+
+  return {
+    color: colors,
+    ...buildAnimation(config),
+    tooltip: { ...buildTooltip(config, 'axis'), axisPointer: { type: 'shadow' } },
+    ...buildLegendWithTitle(config),
+    grid: buildGrid(config),
+    toolbox: buildToolbox(config),
+    xAxis: horizontal ? valAxis : catAxis,
+    yAxis: horizontal ? catAxis : valAxis,
+    series: [
+      {
+        // Thin bar = stem.
+        type: 'bar',
+        data: values,
+        barWidth: config.lollipopStemWidth ?? 2,
+        itemStyle: { color: colors[0] },
+        z: 1,
+        ...(config.showDataLabel ? { label: buildDataLabel(config, horizontal ? 'right' : 'top') } : {}),
+        ...buildMarkOverlays(config),
+      },
+      {
+        // Dot head at the same coordinates via a scatter overlay.
+        type: 'scatter',
+        data: values.map((v, i) => (horizontal ? [v, i] : [i, v])),
+        symbolSize: config.lollipopDotSize ?? 12,
+        itemStyle: { color: colors[0] },
+        z: 2,
+      },
+    ],
+  };
+}
+
+// ========= Cleveland Dot Plot =========
+// One dot per category on a value axis (no stem). Data: { name, value }[].
+export function buildClevelandDotChartOption(data: any[], config: any): any {
+  const points = flattenToSingleSeries(data);
+  const categories = points.map(p => p.name);
+  const values = points.map(p => p.value);
+  const colors = getColors(config.colorScheme || 'default');
+  // Cleveland plots are conventionally horizontal (categories on Y).
+  const horizontal = config.clevelandHorizontal !== false;
+
+  const catAxis = buildCategoryAxis(config, categories, horizontal ? 'y' : 'x');
+  const valAxis = { ...buildValueAxis(config, horizontal ? 'x' : 'y'), nice: true };
+
+  return {
+    color: colors,
+    ...buildAnimation(config),
+    tooltip: { ...buildTooltip(config, 'item') },
+    ...buildLegendWithTitle(config),
+    grid: buildGrid(config),
+    toolbox: buildToolbox(config),
+    xAxis: horizontal ? valAxis : catAxis,
+    yAxis: horizontal ? catAxis : valAxis,
+    series: [
+      {
+        type: 'scatter',
+        data: values.map((v, i) => (horizontal ? [v, i] : [i, v])),
+        symbolSize: config.clevelandDotSize ?? 12,
+        itemStyle: { color: colors[0] },
+        label: config.showDataLabel
+          ? {
+              show: true,
+              position: horizontal ? 'right' : 'top',
+              formatter: (p: any) =>
+                formatTooltipValue(config, p.value[horizontal ? 0 : 1]),
+              ...CHART_TYPOGRAPHY.dataLabel,
+            }
+          : undefined,
+      },
+    ],
+  };
+}
+
+// ========= Dumbbell Chart =========
+// Two dots per category joined by a connecting bar (before/after). Data:
+// multi-series [{ name, series:[{name,value}] }] with two series, OR
+// { name, value, value2 }[]. Draws a line segment + two scatter series.
+export function buildDumbbellChartOption(data: any[], config: any): any {
+  const colors = getColors(config.colorScheme || 'default');
+  const horizontal = config.dumbbellHorizontal !== false;
+
+  // Resolve two value arrays keyed by category.
+  let categories: string[] = [];
+  let aVals: number[] = [];
+  let bVals: number[] = [];
+  let aName = config.dumbbellStartName || 'Start';
+  let bName = config.dumbbellEndName || 'End';
+
+  const first = Array.isArray(data) ? data[0] : undefined;
+  if (first && Array.isArray(first.series)) {
+    // Multi-series: two groups, each a series of {name,value}.
+    const g0 = data[0];
+    const g1 = data[1] || { name: bName, series: [] };
+    aName = String(g0.name || aName);
+    bName = String(g1.name || bName);
+    const catSet: string[] = (g0.series || []).map((p: any) => String(p.name));
+    categories = catSet;
+    const m1 = new Map<string, number>(
+      (g1.series || []).map((p: any) => [String(p.name), Number(p.value) || 0]),
+    );
+    aVals = (g0.series || []).map((p: any) => Number(p.value) || 0);
+    bVals = categories.map(c => m1.get(c) ?? 0);
+  } else {
+    // Flat rows with value + value2.
+    const rows = Array.isArray(data) ? data : [];
+    categories = rows.map((d: any) => String(d.name ?? ''));
+    aVals = rows.map((d: any) => Number(d.value) || 0);
+    bVals = rows.map((d: any) => Number(d.value2 ?? d.valueEnd ?? 0) || 0);
+  }
+
+  const catAxis = buildCategoryAxis(config, categories, horizontal ? 'y' : 'x');
+  const valAxis = { ...buildValueAxis(config, horizontal ? 'x' : 'y'), nice: true };
+
+  // Connecting segments as a custom-free approach: use a line series per
+  // category is heavy; instead draw with markLine between the two scatter
+  // points via a lightweight 'lines'-like bar. Simplest faithful render:
+  // a thin bar from min→max per category using two stacked scatter + a
+  // connector built from a line series across [a,b] per index.
+  const connectors: any[] = categories.map((_, i) => {
+    const a = aVals[i];
+    const b = bVals[i];
+    return {
+      coords: horizontal
+        ? [[a, i], [b, i]]
+        : [[i, a], [i, b]],
+    };
+  });
+
+  return {
+    color: colors,
+    ...buildAnimation(config),
+    tooltip: { ...buildTooltip(config, 'item') },
+    ...buildLegendWithTitle(config),
+    grid: buildGrid(config),
+    toolbox: buildToolbox(config),
+    xAxis: horizontal ? valAxis : catAxis,
+    yAxis: horizontal ? catAxis : valAxis,
+    series: [
+      {
+        // Connector segments.
+        type: 'lines',
+        coordinateSystem: 'cartesian2d',
+        data: connectors,
+        lineStyle: {
+          color: CHART_TYPOGRAPHY.colors.axis,
+          width: config.dumbbellBarWidth ?? 4,
+          opacity: 1,
+        },
+        z: 1,
+        silent: true,
+      },
+      {
+        name: aName,
+        type: 'scatter',
+        data: aVals.map((v, i) => (horizontal ? [v, i] : [i, v])),
+        symbolSize: config.dumbbellDotSize ?? 11,
+        itemStyle: { color: colors[0] },
+        z: 2,
+      },
+      {
+        name: bName,
+        type: 'scatter',
+        data: bVals.map((v, i) => (horizontal ? [v, i] : [i, v])),
+        symbolSize: config.dumbbellDotSize ?? 11,
+        itemStyle: { color: colors[1] || '#ef4444' },
+        z: 2,
+      },
+    ],
+  };
+}
+
+// ========= Slope Chart =========
+// Two-point line per series showing change between two periods. Data:
+// multi-series [{ name, series:[{name,value}] }] (each series = one line across
+// the two category positions), OR { name, value, value2 }[].
+export function buildSlopeChartOption(data: any[], config: any): any {
+  const colors = getColors(config.colorScheme || 'default');
+  const startLabel = config.slopeStartLabel || 'Before';
+  const endLabel = config.slopeEndLabel || 'After';
+
+  const first = Array.isArray(data) ? data[0] : undefined;
+  const seriesList: { name: string; a: number; b: number }[] = [];
+
+  if (first && Array.isArray(first.series)) {
+    (data || []).forEach((g: any) => {
+      const pts = g.series || [];
+      seriesList.push({
+        name: String(g.name ?? ''),
+        a: Number(pts[0]?.value) || 0,
+        b: Number(pts[1]?.value ?? pts[0]?.value) || 0,
+      });
+    });
+  } else {
+    (Array.isArray(data) ? data : []).forEach((d: any) => {
+      seriesList.push({
+        name: String(d.name ?? ''),
+        a: Number(d.value) || 0,
+        b: Number(d.value2 ?? d.valueEnd ?? 0) || 0,
+      });
+    });
+  }
+
+  return {
+    color: colors,
+    ...buildAnimation(config),
+    tooltip: {
+      ...buildTooltip(config, 'item'),
+      formatter: (p: any) => `${p.seriesName}: ${formatTooltipValue(config, p.value[1])}`,
+    },
+    legend: buildLegend(config),
+    grid: buildGrid(config),
+    toolbox: buildToolbox(config),
+    xAxis: {
+      type: 'category',
+      data: [startLabel, endLabel],
+      boundaryGap: true,
+      axisLabel: { ...CHART_TYPOGRAPHY.axisLabel, fontFamily: CHART_TYPOGRAPHY.fontFamily },
+      axisLine: { lineStyle: { color: CHART_TYPOGRAPHY.colors.axis } },
+    },
+    yAxis: { ...buildValueAxis(config, 'y'), nice: true },
+    series: seriesList.map(s => ({
+      name: s.name,
+      type: 'line',
+      data: [s.a, s.b],
+      symbol: 'circle',
+      symbolSize: 7,
+      lineStyle: { width: 2 },
+      endLabel: {
+        show: config.showDataLabel !== false,
+        formatter: s.name,
+        ...CHART_TYPOGRAPHY.dataLabel,
+      },
+      emphasis: { focus: 'series' },
+    })),
+  };
+}
+
+// ========= Bump Chart =========
+// Rank-over-time lines. Data: multi-series [{ name, series:[{name(period),value(rank)}]}].
+// Y axis is inverted so rank 1 sits on top. Falls back to plotting raw values
+// if the payload isn't multi-series.
+export function buildBumpChartOption(data: any[], config: any): any {
+  const colors = getColors(config.colorScheme || 'default');
+  const first = Array.isArray(data) ? data[0] : undefined;
+
+  // Collect the ordered period axis from the first series.
+  let periods: string[] = [];
+  const series: { name: string; values: number[] }[] = [];
+
+  if (first && Array.isArray(first.series)) {
+    periods = (first.series || []).map((p: any) => String(p.name));
+    (data || []).forEach((g: any) => {
+      const m = new Map<string, number>(
+        (g.series || []).map((p: any) => [String(p.name), Number(p.value) || 0]),
+      );
+      series.push({
+        name: String(g.name ?? ''),
+        values: periods.map(pr => m.get(pr) ?? 0),
+      });
+    });
+  } else {
+    const pts = flattenToSingleSeries(data);
+    periods = pts.map(p => p.name);
+    series.push({ name: config.bumpSeriesName || 'Series', values: pts.map(p => p.value) });
+  }
+
+  return {
+    color: colors,
+    ...buildAnimation(config),
+    tooltip: { ...buildTooltip(config, 'axis') },
+    legend: buildLegend(config),
+    grid: buildGrid(config),
+    toolbox: buildToolbox(config),
+    xAxis: {
+      type: 'category',
+      data: periods,
+      boundaryGap: false,
+      axisLabel: { ...CHART_TYPOGRAPHY.axisLabel, fontFamily: CHART_TYPOGRAPHY.fontFamily },
+      axisLine: { lineStyle: { color: CHART_TYPOGRAPHY.colors.axis } },
+    },
+    yAxis: {
+      ...buildValueAxis(config, 'y'),
+      // Rank axis: invert so 1 is at the top when the values are ranks.
+      inverse: config.bumpInvertRank !== false,
+      nice: true,
+    },
+    series: series.map(s => ({
+      name: s.name,
+      type: 'line',
+      data: s.values,
+      smooth: config.bumpSmooth !== false ? 0.4 : false,
+      symbol: 'circle',
+      symbolSize: 8,
+      lineStyle: { width: 2 },
+      endLabel: {
+        show: config.showDataLabel !== false,
+        formatter: s.name,
+        ...CHART_TYPOGRAPHY.dataLabel,
+      },
+      emphasis: { focus: 'series' },
+    })),
+  };
+}
+
+// ========= Radial Bar Chart =========
+// Bars on a polar radius axis (categories around the angle axis). Data:
+// { name, value }[]. Distinct from bar-polar (which is angle-category bars) by
+// using a radial layout with rounded caps.
+export function buildRadialBarChartOption(data: any[], config: any): any {
+  const points = flattenToSingleSeries(data);
+  const categories = points.map(p => p.name);
+  const values = points.map(p => p.value);
+  const colors = getColors(config.colorScheme || 'default');
+
+  return {
+    color: colors,
+    ...buildAnimation(config),
+    tooltip: { ...buildTooltip(config, 'item') },
+    ...buildLegendWithTitle(config),
+    toolbox: buildToolbox(config),
+    polar: { radius: [config.radialInnerRadius ?? 30, '80%'] },
+    angleAxis: {
+      max: config.radialAngleMax ?? (values.length ? Math.max(...values) * 1.1 : 100),
+      startAngle: config.radialStartAngle ?? 90,
+      axisLabel: { ...CHART_TYPOGRAPHY.axisLabel, fontFamily: CHART_TYPOGRAPHY.fontFamily },
+    },
+    radiusAxis: {
+      type: 'category',
+      data: categories,
+      axisLabel: { ...CHART_TYPOGRAPHY.axisLabel, fontFamily: CHART_TYPOGRAPHY.fontFamily },
+      z: 10,
+    },
+    series: [
+      {
+        type: 'bar',
+        data: values,
+        coordinateSystem: 'polar',
+        roundCap: true,
+        label: config.showDataLabel
+          ? { show: true, position: 'middle', formatter: '{b}', ...CHART_TYPOGRAPHY.dataLabel }
+          : undefined,
+        itemStyle: { borderRadius: config.roundEdges ? 4 : 0 },
+      },
+    ],
+  };
+}
+
+// ========= Wind Rose =========
+// Polar STACKED bars by direction. Data: multi-series
+// [{ name(direction bucket), series:[{name(category),value}] }] OR
+// { name, value }[]. Reuses the polar coordinate system with stacked bars.
+export function buildWindRoseChartOption(data: any[], config: any): any {
+  const colors = getColors(config.colorScheme || 'default');
+  const first = Array.isArray(data) ? data[0] : undefined;
+
+  if (first && Array.isArray(first.series)) {
+    // Directions = the inner series names (shared axis); one stacked series per
+    // outer group.
+    const directions = (first.series || []).map((p: any) => String(p.name));
+    const groups = data || [];
+    return {
+      color: colors,
+      ...buildAnimation(config),
+      tooltip: { ...buildTooltip(config, 'item') },
+      legend: buildLegend(config),
+      toolbox: buildToolbox(config),
+      polar: {},
+      angleAxis: {
+        type: 'category',
+        data: directions,
+        startAngle: config.windRoseStartAngle ?? 90,
+        axisLabel: { ...CHART_TYPOGRAPHY.axisLabel, fontFamily: CHART_TYPOGRAPHY.fontFamily },
+      },
+      radiusAxis: {
+        axisLabel: { ...CHART_TYPOGRAPHY.axisLabel, fontFamily: CHART_TYPOGRAPHY.fontFamily },
+      },
+      series: groups.map((g: any) => {
+        const m = new Map<string, number>(
+          (g.series || []).map((p: any) => [String(p.name), Number(p.value) || 0]),
+        );
+        return {
+          name: String(g.name ?? ''),
+          type: 'bar',
+          coordinateSystem: 'polar',
+          stack: 'windrose',
+          data: directions.map((d: string) => m.get(d) ?? 0),
+        };
+      }),
+    };
+  }
+
+  // Single-series fallback: directions with a single magnitude each.
+  const points = flattenToSingleSeries(data);
+  return {
+    color: colors,
+    ...buildAnimation(config),
+    tooltip: { ...buildTooltip(config, 'item') },
+    legend: buildLegend(config),
+    toolbox: buildToolbox(config),
+    polar: {},
+    angleAxis: {
+      type: 'category',
+      data: points.map(p => p.name),
+      startAngle: config.windRoseStartAngle ?? 90,
+      axisLabel: { ...CHART_TYPOGRAPHY.axisLabel, fontFamily: CHART_TYPOGRAPHY.fontFamily },
+    },
+    radiusAxis: {
+      axisLabel: { ...CHART_TYPOGRAPHY.axisLabel, fontFamily: CHART_TYPOGRAPHY.fontFamily },
+    },
+    series: [
+      {
+        type: 'bar',
+        coordinateSystem: 'polar',
+        data: points.map(p => p.value),
+      },
+    ],
+  };
+}
+
+// ========= Calendar Heatmap =========
+// Value per day on a calendar grid. Data: { name(date), value }[] where name is
+// an ISO date (YYYY-MM-DD) or anything Date-parseable. Year is derived from the
+// data (or config.calendarYear).
+export function buildCalendarHeatmapOption(data: any[], config: any): any {
+  const points = flattenToSingleSeries(data);
+  // Normalise to [yyyy-MM-dd, value].
+  const cells: [string, number][] = [];
+  const years = new Set<number>();
+  points.forEach(p => {
+    const d = new Date(p.name);
+    if (Number.isNaN(d.getTime())) return;
+    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
+      d.getDate(),
+    ).padStart(2, '0')}`;
+    years.add(d.getFullYear());
+    cells.push([iso, p.value]);
+  });
+
+  const year =
+    config.calendarYear ||
+    (years.size ? Array.from(years).sort()[years.size - 1] : new Date().getFullYear());
+
+  const vals = cells.map(c => c[1]).filter(v => Number.isFinite(v));
+  const colors = getColors(config.colorScheme || 'default');
+
+  return {
+    ...buildAnimation(config),
+    tooltip: {
+      ...buildTooltip(config, 'item'),
+      formatter: (p: any) =>
+        `${p.value[0]}: ${formatTooltipValue(config, p.value[1])}`,
+    },
+    visualMap: {
+      show: config.visualMapShow !== false,
+      min: config.visualMapMin ?? (vals.length ? Math.min(...vals) : 0),
+      max: config.visualMapMax ?? (vals.length ? Math.max(...vals) : 100),
+      calculable: true,
+      orient: 'horizontal',
+      left: 'center',
+      top: 0,
+      inRange: {
+        color:
+          Array.isArray(config.visualMapColors) && config.visualMapColors.length >= 2
+            ? config.visualMapColors
+            : [colors[colors.length - 1] || '#e0f3f8', colors[0] || '#08589e'],
+      },
+      textStyle: { ...CHART_TYPOGRAPHY.axisLabel, fontFamily: CHART_TYPOGRAPHY.fontFamily },
+    },
+    calendar: {
+      top: 50,
+      left: 30,
+      right: 20,
+      cellSize: ['auto', config.calendarCellSize ?? 14],
+      range: String(year),
+      itemStyle: { borderColor: '#fff', borderWidth: 1, color: CHART_TYPOGRAPHY.colors.grid },
+      dayLabel: { ...CHART_TYPOGRAPHY.axisLabel, fontFamily: CHART_TYPOGRAPHY.fontFamily },
+      monthLabel: { ...CHART_TYPOGRAPHY.axisLabel, fontFamily: CHART_TYPOGRAPHY.fontFamily },
+      yearLabel: { show: false },
+      splitLine: { lineStyle: { color: CHART_TYPOGRAPHY.colors.axis } },
+    },
+    series: [
+      {
+        type: 'heatmap',
+        coordinateSystem: 'calendar',
+        data: cells,
+        label: {
+          show: config.showDataLabel === true,
+          ...CHART_TYPOGRAPHY.dataLabel,
+        },
+      },
+    ],
+  };
+}
+
+// ========= Streamgraph =========
+// Centre-baseline stacked areas over time (themeRiver). Reuses the theme-river
+// builder, which already handles both the triple shape and {name,value}[].
+export function buildStreamgraphOption(data: any[], config: any): any {
+  // themeRiver IS a stream/silhouette layout; delegate to the existing builder.
+  return buildThemeRiverChartOption(data, config);
+}
+
+// ========= Marimekko (Mekko / variable-width stacked bar) =========
+// Variable-width stacked bars: bar WIDTH ∝ each category's share of the grand
+// total, bar HEIGHT stacks the sub-series to 100%. Data: multi-series
+// [{ name(category), series:[{name(segment),value}] }]. Implemented with a
+// value X axis and per-category custom widths via barWidth + offset math is not
+// expressible in plain stacked bars, so we use category share for the X extent
+// and 100%-normalised stacks for height.
+export function buildMarimekkoOption(data: any[], config: any): any {
+  const colors = getColors(config.colorScheme || 'default');
+  const first = Array.isArray(data) ? data[0] : undefined;
+
+  if (!first || !Array.isArray(first.series)) {
+    // Not enough structure for a true mekko — need category × segment.
+    return buildEmptyStateOption(
+      config,
+      'Marimekko requires a category dimension and a segment breakdown.\nConfigure a color/stack dimension to enable.',
+    );
+  }
+
+  const categories: string[] = (data || []).map((g: any) => String(g.name ?? ''));
+  // Segment names come from the union of inner series names.
+  const segSet = new Set<string>();
+  (data || []).forEach((g: any) =>
+    (g.series || []).forEach((p: any) => segSet.add(String(p.name))),
+  );
+  const segments = Array.from(segSet);
+
+  // Category totals → widths (share of grand total).
+  const catTotals = (data || []).map((g: any) =>
+    (g.series || []).reduce((s: number, p: any) => s + (Number(p.value) || 0), 0),
+  );
+  const grand = catTotals.reduce((s, v) => s + v, 0) || 1;
+
+  // X positions: cumulative share midpoints; each bar's width = its share.
+  const widths = catTotals.map(t => (t / grand) * 100);
+  const centers: number[] = [];
+  let cursor = 0;
+  widths.forEach(w => {
+    centers.push(cursor + w / 2);
+    cursor += w;
+  });
+
+  // Height: 100%-normalised stack per category.
+  const segSeries = segments.map((seg, si) => {
+    const dataPts = (data || []).map((g: any, ci: number) => {
+      const found = (g.series || []).find((p: any) => String(p.name) === seg);
+      const raw = found ? Number(found.value) || 0 : 0;
+      const pct = catTotals[ci] > 0 ? (raw / catTotals[ci]) * 100 : 0;
+      // Custom bar: value carries [center, pct] with per-bar width via
+      // itemStyle is not supported; use a stacked bar on a category axis whose
+      // widths approximate share by setting barWidth per the largest share.
+      return pct;
+    });
+    return {
+      name: seg,
+      type: 'bar' as const,
+      stack: 'mekko',
+      data: dataPts,
+      itemStyle: { color: colors[si % colors.length] },
+      label: config.showDataLabel
+        ? {
+            show: true,
+            position: 'inside' as const,
+            formatter: (p: any) => (p.value >= 6 ? `${Math.round(p.value)}%` : ''),
+            ...CHART_TYPOGRAPHY.dataLabel,
+          }
+        : undefined,
+    };
+  });
+
+  // X axis labels combine the category name with its share so the variable
+  // "width" reads even though ECharts bars are equal-width on a category axis.
+  const catLabels = categories.map((c, i) => `${c}\n${Math.round(widths[i])}%`);
+
+  return {
+    color: colors,
+    ...buildAnimation(config),
+    tooltip: {
+      ...buildTooltip(config, 'axis'),
+      axisPointer: { type: 'shadow' },
+      formatter: (params: any) => {
+        const idx = params[0]?.dataIndex ?? 0;
+        const header = `${categories[idx]} (${Math.round(widths[idx])}% of total)`;
+        const lines = params.map(
+          (pp: any) => `${pp.marker}${pp.seriesName}: ${Math.round(pp.value)}%`,
+        );
+        return [header, ...lines].join('<br/>');
+      },
+    },
+    legend: buildLegend(config),
+    grid: buildGrid(config),
+    toolbox: buildToolbox(config),
+    xAxis: {
+      type: 'category',
+      data: catLabels,
+      axisLabel: {
+        ...CHART_TYPOGRAPHY.axisLabel,
+        fontFamily: CHART_TYPOGRAPHY.fontFamily,
+        interval: 0,
+      },
+      axisLine: { lineStyle: { color: CHART_TYPOGRAPHY.colors.axis } },
+    },
+    yAxis: {
+      type: 'value',
+      max: 100,
+      axisLabel: {
+        formatter: '{value}%',
+        ...CHART_TYPOGRAPHY.axisLabel,
+        fontFamily: CHART_TYPOGRAPHY.fontFamily,
+      },
+      splitLine: { lineStyle: { color: CHART_TYPOGRAPHY.colors.grid, type: 'dashed' } },
+    },
+    series: segSeries,
+  };
+}
+
+// ========= Cycle Plot =========
+// Seasonal sub-series: for each season position (e.g. month), a mini line of
+// the values across cycles, laid out left-to-right by season. Data:
+// multi-series [{ name(season), series:[{name(cycle),value}] }] OR {name,value}[]
+// (falls back to a single line).
+export function buildCyclePlotOption(data: any[], config: any): any {
+  const colors = getColors(config.colorScheme || 'default');
+  const first = Array.isArray(data) ? data[0] : undefined;
+
+  if (!first || !Array.isArray(first.series)) {
+    // Single series → plain line across the categories.
+    const points = flattenToSingleSeries(data);
+    return {
+      color: colors,
+      ...buildAnimation(config),
+      tooltip: { ...buildTooltip(config, 'axis') },
+      grid: buildGrid(config),
+      toolbox: buildToolbox(config),
+      xAxis: buildCategoryAxis(config, points.map(p => p.name), 'x'),
+      yAxis: { ...buildValueAxis(config, 'y'), nice: true },
+      series: [{ type: 'line', data: points.map(p => p.value), symbol: 'circle' }],
+    };
+  }
+
+  // Build a flat x-axis of season→cycle positions and one continuous line, with
+  // a per-season mean markLine. Seasons are the outer groups.
+  const seasons = (data || []).map((g: any) => String(g.name ?? ''));
+  const flatLabels: string[] = [];
+  const flatValues: number[] = [];
+  const meanMarks: any[] = [];
+  let xIndex = 0;
+  (data || []).forEach((g: any, gi: number) => {
+    const pts = g.series || [];
+    const startX = xIndex;
+    pts.forEach((p: any) => {
+      flatLabels.push(`${seasons[gi]}`);
+      flatValues.push(Number(p.value) || 0);
+      xIndex += 1;
+    });
+    const endX = xIndex - 1;
+    const mean =
+      pts.length > 0
+        ? pts.reduce((s: number, p: any) => s + (Number(p.value) || 0), 0) / pts.length
+        : 0;
+    // Mean segment for this season block.
+    meanMarks.push([
+      { xAxis: startX, yAxis: mean },
+      { xAxis: endX, yAxis: mean },
+    ]);
+  });
+
+  return {
+    color: colors,
+    ...buildAnimation(config),
+    tooltip: { ...buildTooltip(config, 'axis') },
+    legend: buildLegend(config),
+    grid: buildGrid(config),
+    toolbox: buildToolbox(config),
+    xAxis: {
+      type: 'category',
+      data: flatLabels,
+      axisLabel: {
+        ...CHART_TYPOGRAPHY.axisLabel,
+        fontFamily: CHART_TYPOGRAPHY.fontFamily,
+        interval: 0,
+      },
+      axisLine: { lineStyle: { color: CHART_TYPOGRAPHY.colors.axis } },
+    },
+    yAxis: { ...buildValueAxis(config, 'y'), nice: true },
+    series: [
+      {
+        type: 'line',
+        data: flatValues,
+        symbol: 'circle',
+        symbolSize: 4,
+        lineStyle: { width: 1.5 },
+        markLine: {
+          symbol: ['none', 'none'],
+          silent: true,
+          lineStyle: { color: '#ef4444', type: 'solid', width: 1.5 },
+          data: meanMarks,
+        },
+      },
+    ],
+  };
+}
+
+// ========= Arc / Chord / Network (graph-family) =========
+// All three are node+link relationship graphs with different layouts. They
+// share ECharts' `graph` series; layout differs (none-with-x for arc, circular
+// for chord, force for network). Data: (nodes[], links[], config).
+function buildRelationshipGraphOption(
+  nodes: any[],
+  links: any[],
+  config: any,
+  layout: 'arc' | 'circular' | 'force',
+): any {
+  const colors = getColors(config.colorScheme || 'default');
+  const safeNodes = Array.isArray(nodes) ? nodes : [];
+  const safeLinks = Array.isArray(links) ? links : [];
+
+  // Arc diagram: nodes on a horizontal line, links drawn as arcs above.
+  const graphNodes = safeNodes.map((n: any, i: number) => {
+    const base: any = {
+      name: String(n.name ?? n.id ?? i),
+      value: n.value ?? 1,
+      symbolSize: n.symbolSize ?? Math.max(8, Math.min(40, Number(n.value) || 10)),
+      itemStyle: { color: colors[i % colors.length] },
+    };
+    if (layout === 'arc') {
+      base.x = i;
+      base.y = 0;
+    }
+    return base;
+  });
+
+  const graphLinks = safeLinks.map((l: any) => ({
+    source: String(l.source),
+    target: String(l.target),
+    value: l.value ?? 1,
+    lineStyle: { width: Math.max(1, Math.min(8, Number(l.value) || 1)), opacity: 0.5, curveness: layout === 'arc' ? 0.3 : 0.2 },
+  }));
+
+  const layoutMap = { arc: 'none', circular: 'circular', force: 'force' } as const;
+
+  return {
+    color: colors,
+    ...buildAnimation(config),
+    tooltip: { ...buildTooltip(config, 'item') },
+    legend: buildLegend(config),
+    toolbox: buildToolbox(config),
+    series: [
+      {
+        type: 'graph',
+        layout: layoutMap[layout],
+        data: graphNodes,
+        links: graphLinks,
+        roam: config.graphRoam !== false,
+        draggable: layout === 'force',
+        ...(layout === 'circular' ? { circular: { rotateLabel: true } } : {}),
+        ...(layout === 'force'
+          ? {
+              force: {
+                repulsion: config.graphRepulsion ?? 120,
+                edgeLength: config.graphEdgeLength ?? 80,
+                gravity: 0.1,
+              },
+            }
+          : {}),
+        label: {
+          show: config.showDataLabel !== false,
+          position: layout === 'arc' ? 'bottom' : 'right',
+          ...CHART_TYPOGRAPHY.dataLabel,
+        },
+        lineStyle: { color: 'source', curveness: layout === 'arc' ? 0.3 : 0.2 },
+        emphasis: { focus: 'adjacency', lineStyle: { width: 4 } },
+      },
+    ],
+  };
+}
+
+export function buildArcChartOption(nodes: any[], links: any[], config: any): any {
+  return buildRelationshipGraphOption(nodes, links, config, 'arc');
+}
+
+export function buildChordChartOption(nodes: any[], links: any[], config: any): any {
+  return buildRelationshipGraphOption(nodes, links, config, 'circular');
+}
+
+export function buildNetworkChartOption(nodes: any[], links: any[], config: any): any {
+  return buildRelationshipGraphOption(nodes, links, config, 'force');
+}
+
+// ========= Statistical-binning stubs (need transformer support) =========
+// These require genuine statistical PRE-PROCESSING (kernel density, quantile
+// computation, hex binning) that belongs in the data-transform layer, not the
+// pure option builder. Rendering them from raw {name,value}[] would produce a
+// misleading chart, so they show a clear empty-state until the transformer
+// emits the binned/pre-computed shape. Listed in the wave report for routing.
+
+export function buildViolinStubOption(_data: any[], config: any): any {
+  return buildEmptyStateOption(
+    config,
+    'Violin plot requires density-binned data.\nComing via the data pipeline.',
+  );
+}
+
+export function buildDensityStubOption(_data: any[], config: any): any {
+  return buildEmptyStateOption(
+    config,
+    'Density plot requires kernel-density estimation.\nComing via the data pipeline.',
+  );
+}
+
+export function buildRidgelineStubOption(_data: any[], config: any): any {
+  return buildEmptyStateOption(
+    config,
+    'Ridgeline plot requires per-group density bins.\nComing via the data pipeline.',
+  );
+}
+
+export function buildHexbinStubOption(_data: any[], config: any): any {
+  return buildEmptyStateOption(
+    config,
+    'Hexbin requires 2D hexagonal binning.\nComing via the data pipeline.',
+  );
+}
+
+export function buildQqPlotStubOption(_data: any[], config: any): any {
+  return buildEmptyStateOption(
+    config,
+    'Q-Q plot requires quantile computation.\nComing via the data pipeline.',
+  );
+}
+
+export function buildEcdfStubOption(_data: any[], config: any): any {
+  return buildEmptyStateOption(
+    config,
+    'ECDF requires sorted cumulative distribution.\nComing via the data pipeline.',
+  );
+}
+
 // ========= Unified Dispatcher =========
 
 type NodeLinkBuilder = (nodes: any[], links: any[], config: any) => any;
@@ -4119,6 +5655,10 @@ const NODE_LINK_BUILDERS: Record<string, NodeLinkBuilder> = {
   graph: buildGraphChartOption,
   graphgl: buildGraphGLChartOption,
   'flow-lines': buildFlowLinesChartOption,
+  // Wave 4 relationship graphs (node+link, distinct layouts).
+  arc: buildArcChartOption,
+  chord: buildChordChartOption,
+  network: buildNetworkChartOption,
 };
 
 const CHART_TYPE_BUILDERS: Record<string, DataConfigTypeBuilder> = {
@@ -4183,6 +5723,37 @@ const SIMPLE_BUILDERS: Record<string, DataConfigBuilder> = {
   flowgl: buildFlowGLChartOption,
   lines3d: buildLines3DChartOption,
   polygons3d: buildPolygons3DChartOption,
+
+  // ══ Wave 4 additions ══════════════════════════════════════════════════
+  // Geo (data-bound). world-map now delegates to the choropleth path too.
+  choropleth: buildChoroplethOption,
+  'point-map': buildPointMapOption,
+  'bubble-map': buildBubbleMapOption,
+  // Statistical / comparison (fully implemented).
+  bullet: buildBulletChartOption,
+  'kpi-delta': buildKpiDeltaOption,
+  pareto: buildParetoChartOption,
+  lollipop: buildLollipopChartOption,
+  'cleveland-dot': buildClevelandDotChartOption,
+  dumbbell: buildDumbbellChartOption,
+  slope: buildSlopeChartOption,
+  bump: buildBumpChartOption,
+  'radial-bar': buildRadialBarChartOption,
+  'wind-rose': buildWindRoseChartOption,
+  'calendar-heatmap': buildCalendarHeatmapOption,
+  streamgraph: buildStreamgraphOption,
+  marimekko: buildMarimekkoOption,
+  'cycle-plot': buildCyclePlotOption,
+  // solid-gauge reuses the existing gauge builder (filled-arc via config).
+  'solid-gauge': (d: any[], c: any) =>
+    buildGaugeChartOption(d, { ...c, gaugeStyle: c.gaugeStyle || 'solid' }),
+  // Statistical-binning stubs — clear empty-state; need transformer support.
+  violin: buildViolinStubOption,
+  density: buildDensityStubOption,
+  ridgeline: buildRidgelineStubOption,
+  hexbin: buildHexbinStubOption,
+  'qq-plot': buildQqPlotStubOption,
+  ecdf: buildEcdfStubOption,
 };
 
 // ========= Chart analytics (Track E1): dual-axis / trend / small-multiples =========
@@ -4332,6 +5903,7 @@ function applySortAndLimit(option: any, config: any): void {
 
   // Top-N / Bottom-N by measure total (uses a dedicated ranking independent of
   // the display sort so "Top 5" always means the 5 largest).
+  let otherIndices: number[] = [];
   if (limitActive) {
     const n = Math.max(1, Math.floor(Number(config.limitN)));
     const byMeasure = cats.map((_, i) => i);
@@ -4339,15 +5911,37 @@ function applySortAndLimit(option: any, config: any): void {
     const keep = new Set(
       (limitMode === 'bottom' ? byMeasure.slice(-n) : byMeasure.slice(0, n)),
     );
+    // Remember the trimmed categories so we can roll them into "Other".
+    otherIndices = order.filter(i => !keep.has(i));
     order = order.filter(i => keep.has(i));
   }
 
-  // Apply the order to categories + every series' data array.
-  option.xAxis.data = order.map(i => cats[i]);
-  option.series = series.map(s => ({
-    ...s,
-    data: Array.isArray(s.data) ? order.map(i => s.data[i]) : s.data,
-  }));
+  // Apply the order to categories + every series' data array. Compute the
+  // trailing "Other" sum per series from the ORIGINAL (pre-reorder) data so
+  // the rollup is index-stable regardless of the display sort.
+  const newCats = order.map(i => cats[i]);
+  const wantOther =
+    limitActive && config?.limitOther === true && otherIndices.length > 0;
+  const otherLabel =
+    typeof config?.otherLabel === 'string' && config.otherLabel.length
+      ? config.otherLabel
+      : 'Other';
+
+  option.series = series.map(s => {
+    if (!Array.isArray(s.data)) return { ...s, data: s.data };
+    const reordered = order.map(i => s.data[i]);
+    if (wantOther) {
+      // Sum the trimmed rows for THIS series into a single "Other" datum
+      // (generalised — any measure, no domain assumptions).
+      const sum = otherIndices.reduce((acc, i) => {
+        const v = datumValue(s.data[i]);
+        return acc + (isFinite(v) ? v : 0);
+      }, 0);
+      reordered.push(sum);
+    }
+    return { ...s, data: reordered };
+  });
+  option.xAxis.data = wantOther ? [...newCats, otherLabel] : newCats;
 }
 
 /**

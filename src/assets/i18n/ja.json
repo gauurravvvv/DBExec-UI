@@ -1589,7 +1589,19 @@
       "TO": "終了",
       "ANNO_X": "X位置",
       "ANNO_X_PH": "カテゴリまたはX値",
-      "ANNO_Y": "Y値"
+      "ANNO_Y": "Y値",
+      "TYPE": {
+        "CONSTANT": "定数",
+        "AVERAGE": "平均",
+        "MEDIAN": "中央値",
+        "MIN": "最小",
+        "MAX": "最大",
+        "PERCENTILE": "パーセンタイル"
+      },
+      "AXIS": {
+        "X": "X軸",
+        "Y": "Y軸"
+      }
     },
     "COLORSCALE": {
       "TITLE": "カラースケール",
@@ -1964,6 +1976,9 @@
         "DB_PERMISSION": "このクエリを実行する権限がありません。",
         "DB_TIMEOUT": "クエリが完了する前にタイムアウトしました。"
       }
+    },
+    "TOPN": {
+      "OTHER_LABEL": "その他"
     }
   },
   "DASHBOARD": {

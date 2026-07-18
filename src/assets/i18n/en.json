@@ -1592,7 +1592,19 @@
       "TO": "To",
       "ANNO_X": "X position",
       "ANNO_X_PH": "Category or X value",
-      "ANNO_Y": "Y value"
+      "ANNO_Y": "Y value",
+      "TYPE": {
+        "CONSTANT": "Constant",
+        "AVERAGE": "Average",
+        "MEDIAN": "Median",
+        "MIN": "Minimum",
+        "MAX": "Maximum",
+        "PERCENTILE": "Percentile"
+      },
+      "AXIS": {
+        "X": "X axis",
+        "Y": "Y axis"
+      }
     },
     "COLORSCALE": {
       "TITLE": "Color scale",
@@ -1967,6 +1979,9 @@
         "DB_PERMISSION": "You do not have permission to run this query.",
         "DB_TIMEOUT": "The query timed out before it could finish."
       }
+    },
+    "TOPN": {
+      "OTHER_LABEL": "Other"
     }
   },
   "DASHBOARD": {

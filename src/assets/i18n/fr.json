@@ -1589,7 +1589,19 @@
       "TO": "À",
       "ANNO_X": "Position X",
       "ANNO_X_PH": "Catégorie ou valeur X",
-      "ANNO_Y": "Valeur Y"
+      "ANNO_Y": "Valeur Y",
+      "TYPE": {
+        "CONSTANT": "Constante",
+        "AVERAGE": "Moyenne",
+        "MEDIAN": "Médiane",
+        "MIN": "Minimum",
+        "MAX": "Maximum",
+        "PERCENTILE": "Centile"
+      },
+      "AXIS": {
+        "X": "Axe X",
+        "Y": "Axe Y"
+      }
     },
     "COLORSCALE": {
       "TITLE": "Échelle de couleurs",
@@ -1964,6 +1976,9 @@
         "DB_PERMISSION": "Vous n'avez pas l'autorisation d'exécuter cette requête.",
         "DB_TIMEOUT": "La requête a expiré avant de pouvoir se terminer."
       }
+    },
+    "TOPN": {
+      "OTHER_LABEL": "Autre"
     }
   },
   "DASHBOARD": {

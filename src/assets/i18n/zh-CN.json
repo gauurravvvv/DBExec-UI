@@ -1589,7 +1589,19 @@
       "TO": "至",
       "ANNO_X": "X 位置",
       "ANNO_X_PH": "类别或 X 值",
-      "ANNO_Y": "Y 值"
+      "ANNO_Y": "Y 值",
+      "TYPE": {
+        "CONSTANT": "常量",
+        "AVERAGE": "平均值",
+        "MEDIAN": "中位数",
+        "MIN": "最小值",
+        "MAX": "最大值",
+        "PERCENTILE": "百分位数"
+      },
+      "AXIS": {
+        "X": "X 轴",
+        "Y": "Y 轴"
+      }
     },
     "COLORSCALE": {
       "TITLE": "色阶",
@@ -1964,6 +1976,9 @@
         "DB_PERMISSION": "您没有运行此查询的权限。",
         "DB_TIMEOUT": "查询在完成之前已超时。"
       }
+    },
+    "TOPN": {
+      "OTHER_LABEL": "其他"
     }
   },
   "DASHBOARD": {

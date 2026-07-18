@@ -135,6 +135,20 @@ export const COLOR_PALETTES: { [key: string]: string[] } = {
     '#76bc9b',
     '#cce6da',
   ],
+  // Colorblind-safe (Okabe–Ito): a widely-used qualitative palette engineered
+  // to stay distinguishable under deuteranopia / protanopia / tritanopia. Kept
+  // neutral (no business-specific hues) so it is safe as a default a11y choice
+  // for any dataset. Referenced by the Color section's colorblind-safe option.
+  'colorblind-safe': [
+    '#0072b2', // blue
+    '#e69f00', // orange
+    '#009e73', // bluish green
+    '#cc79a7', // reddish purple
+    '#56b4e9', // sky blue
+    '#d55e00', // vermillion
+    '#f0e442', // yellow
+    '#000000', // black
+  ],
 };
 
 // Theme dropdown options for the UI
@@ -151,6 +165,10 @@ export const ECHARTS_THEME_OPTIONS = [
   { label: 'Sakura', value: 'sakura' },
   { label: 'Tech Blue', value: 'tech-blue' },
   { label: 'Dark Bold', value: 'dark-bold' },
+  // i18n-keyed so the a11y palette reads in the active locale; other entries
+  // are proper nouns (theme names) kept as-is. The label resolver in the
+  // sidebar (localizeDropdownOptions) translates keys that look like keys.
+  { label: 'ANALYSES.V2.COLOR.COLORBLIND_SAFE', value: 'colorblind-safe' },
 ];
 
 // ========= Dummy Data =========

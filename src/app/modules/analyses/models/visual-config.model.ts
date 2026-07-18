@@ -224,6 +224,12 @@ export interface ValueFormat {
   displayUnit?: DisplayUnit;
   /** Raw format string that overrides the structured fields when set. */
   formatString?: string;
+  /**
+   * Text rendered in place of a null / empty value by the format grammar
+   * (Wave 2). Defaults to '' when unset. Distinct from `AnalysisVisualConfig.
+   * nullLabel`, which names a null CATEGORY bucket; this formats a null VALUE.
+   */
+  nullText?: string;
 }
 
 /** Two format slots: one for measures/values, one for category labels. */

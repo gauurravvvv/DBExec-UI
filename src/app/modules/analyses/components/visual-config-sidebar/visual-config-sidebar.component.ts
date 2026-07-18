@@ -124,6 +124,10 @@ import {
   VISUAL_FORMAT_KIND_OPTIONS,
   VISUAL_FORMAT_TARGET_OPTIONS,
 } from '../../constants/charts.constants';
+import {
+  ChartCapabilities,
+  getChartCapabilities,
+} from '../../constants/chart-capabilities';
 import { Visual } from '../../models';
 import type { AggregateFn, AggregationMeasure } from '../../models/visual.model';
 import {
@@ -799,9 +803,39 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
       v === null || v === undefined ? undefined : v;
   }
 
+  // ── Top-N "Other" bucket (config.limitOther) ────────────────────────────
+  // When Top-/Bottom-N is active, roll the trimmed categories into a single
+  // "Other" bucket instead of dropping them (client-side, generalised — the
+  // shared applySortAndLimit does the rollup, summing the remaining rows).
+  get limitOther(): boolean {
+    return this.focusedVisual?.config?.limitOther === true;
+  }
+  set limitOther(v: boolean) {
+    if (!this.focusedVisual?.config) return;
+    this.focusedVisual.config.limitOther = v;
+    // Seed the localized "Other" label so the pure builder (applySortAndLimit)
+    // — which has no TranslateService — renders the trailing bucket in-locale.
+    if (v) {
+      this.focusedVisual.config.otherLabel =
+        this.translate.instant('ANALYSES.TOPN.OTHER_LABEL');
+    }
+  }
+
   // ── Per-field number/date format (config.valueFormat = formatHint) ──────
   // formatHint shape: { kind, decimals, currencyCode, dateFormat, thousands,
   // target }. `kind: 'auto'` (the default) means no override.
+  //
+  // FORMAT AUTHORITY (Wave 3, integration gap b): the ECharts option builder
+  // reads the FLAT `config.valueFormat` (applyPerFieldFormat + the Wave-4
+  // builders' own hint reads) to format axis ticks / data labels / tooltips.
+  // The transform layer instead reads the STRUCTURED `config.format.{value,
+  // label}` (see buildMapping / formatMeasureValue). Both must agree so a
+  // currency/percent/date choice renders identically everywhere. Every format
+  // setter below therefore mirrors the flat hint into the structured slot via
+  // syncFormatToStructured() — `target: 'category'` maps to config.format.label,
+  // otherwise config.format.value. The shapes are field-compatible (kind,
+  // decimals, currencyCode, dateFormat, thousands, prefix/suffix), so the
+  // mirror is a shallow copy minus the FE-only `target` discriminator.
 
   private ensureValueFormat(): any {
     if (!this.focusedVisual?.config) return null;
@@ -819,6 +853,36 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     return cfg.valueFormat;
   }
 
+  /**
+   * Mirror the flat `config.valueFormat` (builder contract) into the structured
+   * `config.format.{value|label}` (transformer contract) so both layers format
+   * the measure/label identically. A null/auto hint clears the structured slot.
+   * The `target` discriminator selects value vs label; the ValueFormat itself
+   * is copied field-for-field (target stripped — the structured shape has none).
+   */
+  private syncFormatToStructured(): void {
+    const cfg = this.focusedVisual?.config;
+    if (!cfg) return;
+    const hint = cfg.valueFormat;
+    const fmt = (cfg.format && typeof cfg.format === 'object') ? { ...cfg.format } : {};
+    if (!hint || !hint.kind || hint.kind === 'auto') {
+      // Cleared / passthrough — drop both structured slots we own.
+      delete fmt.value;
+      delete fmt.label;
+    } else {
+      const { target, ...rest } = hint;
+      if (target === 'category') {
+        fmt.label = { ...rest };
+        delete fmt.value;
+      } else {
+        fmt.value = { ...rest };
+        delete fmt.label;
+      }
+    }
+    // Re-assign the object reference so OnPush / snapshot-diff picks it up.
+    cfg.format = fmt;
+  }
+
   get formatKind(): string {
     return this.focusedVisual?.config?.valueFormat?.kind ?? 'auto';
   }
@@ -828,9 +892,11 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     if (v === 'auto') {
       // Reset to passthrough — drop the whole hint so the builder no-ops.
       this.focusedVisual.config.valueFormat = null;
+      this.syncFormatToStructured();
       return;
     }
     this.focusedVisual.config.valueFormat = { ...fmt, kind: v };
+    this.syncFormatToStructured();
   }
 
   get formatTarget(): string {
@@ -840,6 +906,7 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     const fmt = this.ensureValueFormat();
     if (!fmt) return;
     this.focusedVisual!.config.valueFormat = { ...fmt, target: v };
+    this.syncFormatToStructured();
   }
 
   get formatDecimals(): number {
@@ -849,6 +916,7 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     const fmt = this.ensureValueFormat();
     if (!fmt) return;
     this.focusedVisual!.config.valueFormat = { ...fmt, decimals: v };
+    this.syncFormatToStructured();
   }
 
   get formatCurrencyCode(): string {
@@ -858,6 +926,7 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     const fmt = this.ensureValueFormat();
     if (!fmt) return;
     this.focusedVisual!.config.valueFormat = { ...fmt, currencyCode: v };
+    this.syncFormatToStructured();
   }
 
   get formatDateFormat(): string {
@@ -867,6 +936,7 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     const fmt = this.ensureValueFormat();
     if (!fmt) return;
     this.focusedVisual!.config.valueFormat = { ...fmt, dateFormat: v };
+    this.syncFormatToStructured();
   }
 
   get formatThousands(): boolean {
@@ -876,6 +946,7 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     const fmt = this.ensureValueFormat();
     if (!fmt) return;
     this.focusedVisual!.config.valueFormat = { ...fmt, thousands: v };
+    this.syncFormatToStructured();
   }
 
   // ── Analytics section: small-multiples (config.smallMultiples) ───────
@@ -1115,6 +1186,10 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     this.axisScaleOptions = localize(VISUAL_AXIS_SCALE_OPTIONS);
     this.formatKindOptions = localize(VISUAL_FORMAT_KIND_OPTIONS);
     this.formatTargetOptions = localize(VISUAL_FORMAT_TARGET_OPTIONS);
+    // Palette names are proper nouns (safe passthrough through translate.instant
+    // — a non-key returns unchanged); only the colorblind-safe entry carries an
+    // i18n key, which resolves here so the a11y palette reads in-locale.
+    this.colorSchemes = localize(COLOR_SCHEMES);
     // Trend types include the new log/poly fits; localize the display copy.
     this.trendTypeOptions = localize(this.trendTypeOptionsRaw);
     // Slice B — quick calc + period-over-period.
@@ -1205,6 +1280,27 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
   isHistogramChartType = isHistogramChartType;
   hasAxisLabels = hasAxisLabels;
   is3DCoordinateChartType = is3DCoordinateChartType;
+
+  // ── Per-graph property validation (capability gating) ──────────────────
+  //
+  // The Format panel shows/enables a config control ONLY when the active
+  // chart type declares the matching capability (chart-capabilities.ts). This
+  // is domain-neutral — driven purely by the chart's structural capabilities,
+  // NOT by field values — so a control that would produce nonsense (an axis
+  // min on a pie, stacking on a scatter, a region field on a bar) is never
+  // offered. Templates call `isCapable('stacking')`, `isCapable('dualAxis')`,
+  // etc. Sections keep their legacy `supportsX(...)` guards where those exist;
+  // `isCapable` is the single, consistent gate for the Wave-3 config depth.
+
+  /** The active chart's capability flags (all-false for an unknown/absent id). */
+  get capabilities(): ChartCapabilities {
+    return getChartCapabilities(this.focusedVisual?.chartType ?? '');
+  }
+
+  /** True when the active chart supports the named capability. */
+  isCapable(prop: keyof ChartCapabilities): boolean {
+    return this.capabilities[prop] === true;
+  }
 
   // Feature support checkers
   supportsGradient = supportsGradient;
@@ -1300,8 +1396,10 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
   private static readonly RAW_REFLINE_TYPES = [
     { label: 'ANALYSES.REFLINE.TYPE.CONSTANT', value: 'constant' },
     { label: 'ANALYSES.REFLINE.TYPE.AVERAGE', value: 'average' },
+    { label: 'ANALYSES.REFLINE.TYPE.MEDIAN', value: 'median' },
     { label: 'ANALYSES.REFLINE.TYPE.MIN', value: 'min' },
     { label: 'ANALYSES.REFLINE.TYPE.MAX', value: 'max' },
+    { label: 'ANALYSES.REFLINE.TYPE.PERCENTILE', value: 'percentile' },
   ];
   private static readonly RAW_REF_AXIS = [
     { label: 'ANALYSES.REFLINE.AXIS.Y', value: 'y' },

@@ -1589,7 +1589,19 @@
       "TO": "A",
       "ANNO_X": "Posizione X",
       "ANNO_X_PH": "Categoria o valore X",
-      "ANNO_Y": "Valore Y"
+      "ANNO_Y": "Valore Y",
+      "TYPE": {
+        "CONSTANT": "Costante",
+        "AVERAGE": "Media",
+        "MEDIAN": "Mediana",
+        "MIN": "Minimo",
+        "MAX": "Massimo",
+        "PERCENTILE": "Percentile"
+      },
+      "AXIS": {
+        "X": "Asse X",
+        "Y": "Asse Y"
+      }
     },
     "COLORSCALE": {
       "TITLE": "Scala colori",
@@ -1964,6 +1976,9 @@
         "DB_PERMISSION": "Non disponi dell'autorizzazione per eseguire questa query.",
         "DB_TIMEOUT": "La query è scaduta prima di poter essere completata."
       }
+    },
+    "TOPN": {
+      "OTHER_LABEL": "Altro"
     }
   },
   "DASHBOARD": {

@@ -1,4 +1,17 @@
-export const CHART_TYPES = [
+import {
+  ChartCapabilities,
+  getChartCapabilities,
+} from './chart-capabilities';
+
+/**
+ * Raw chart-type definitions. Each entry gets a `capabilities` object stamped
+ * onto it below (from chart-capabilities.ts) so `CHART_TYPES` — the exported
+ * array the picker + config UI consume — carries per-graph property capabilities
+ * on every entry. The capabilities drive which config groups Wave 3's sidebar
+ * shows/hides for the selected chart. Edit capabilities in chart-capabilities.ts
+ * (the single source of truth); edit names/icons/categories here.
+ */
+const RAW_CHART_TYPES = [
   {
     id: 'bar-vertical',
     name: 'CHART_TYPES.BAR_VERTICAL.NAME',
@@ -458,7 +471,237 @@ export const CHART_TYPES = [
     category: 'CHART_TYPES.CATEGORIES.3D_CHARTS',
     description: 'CHART_TYPES.POLYGONS3D.DESCRIPTION',
   },
+
+  // ══ Wave 4 additions ═════════════════════════════════════════════════════
+  // i18n keys follow CHART_TYPES.<UPPER_SNAKE(id)>.{NAME,DESCRIPTION} (already
+  // committed to the locale files). Categories reuse existing groups.
+
+  // Statistical / comparison
+  {
+    id: 'bullet',
+    name: 'CHART_TYPES.BULLET.NAME',
+    icon: 'pi pi-chart-bar',
+    category: 'CHART_TYPES.CATEGORIES.STATISTICAL',
+    description: 'CHART_TYPES.BULLET.DESCRIPTION',
+    rotate: true,
+  },
+  {
+    id: 'lollipop',
+    name: 'CHART_TYPES.LOLLIPOP.NAME',
+    icon: 'pi pi-chart-bar',
+    category: 'CHART_TYPES.CATEGORIES.BAR_CHARTS',
+    description: 'CHART_TYPES.LOLLIPOP.DESCRIPTION',
+  },
+  {
+    id: 'cleveland-dot',
+    name: 'CHART_TYPES.CLEVELAND_DOT.NAME',
+    icon: 'pi pi-circle',
+    category: 'CHART_TYPES.CATEGORIES.STATISTICAL',
+    description: 'CHART_TYPES.CLEVELAND_DOT.DESCRIPTION',
+    rotate: true,
+  },
+  {
+    id: 'dumbbell',
+    name: 'CHART_TYPES.DUMBBELL.NAME',
+    icon: 'pi pi-arrows-h',
+    category: 'CHART_TYPES.CATEGORIES.STATISTICAL',
+    description: 'CHART_TYPES.DUMBBELL.DESCRIPTION',
+    rotate: true,
+  },
+  {
+    id: 'slope',
+    name: 'CHART_TYPES.SLOPE.NAME',
+    icon: 'pi pi-chart-line',
+    category: 'CHART_TYPES.CATEGORIES.LINE_CHARTS',
+    description: 'CHART_TYPES.SLOPE.DESCRIPTION',
+  },
+  {
+    id: 'bump',
+    name: 'CHART_TYPES.BUMP.NAME',
+    icon: 'pi pi-chart-line',
+    category: 'CHART_TYPES.CATEGORIES.LINE_CHARTS',
+    description: 'CHART_TYPES.BUMP.DESCRIPTION',
+  },
+  {
+    id: 'pareto',
+    name: 'CHART_TYPES.PARETO.NAME',
+    icon: 'pi pi-sort-amount-down',
+    category: 'CHART_TYPES.CATEGORIES.BAR_CHARTS',
+    description: 'CHART_TYPES.PARETO.DESCRIPTION',
+  },
+  {
+    id: 'cycle-plot',
+    name: 'CHART_TYPES.CYCLE_PLOT.NAME',
+    icon: 'pi pi-chart-line',
+    category: 'CHART_TYPES.CATEGORIES.LINE_CHARTS',
+    description: 'CHART_TYPES.CYCLE_PLOT.DESCRIPTION',
+  },
+
+  // Distribution (statistical binning — see builder stubs)
+  {
+    id: 'violin',
+    name: 'CHART_TYPES.VIOLIN.NAME',
+    icon: 'pi pi-chart-bar',
+    category: 'CHART_TYPES.CATEGORIES.STATISTICAL',
+    description: 'CHART_TYPES.VIOLIN.DESCRIPTION',
+  },
+  {
+    id: 'density',
+    name: 'CHART_TYPES.DENSITY.NAME',
+    icon: 'pi pi-chart-line',
+    category: 'CHART_TYPES.CATEGORIES.STATISTICAL',
+    description: 'CHART_TYPES.DENSITY.DESCRIPTION',
+  },
+  {
+    id: 'ridgeline',
+    name: 'CHART_TYPES.RIDGELINE.NAME',
+    icon: 'pi pi-align-justify',
+    category: 'CHART_TYPES.CATEGORIES.STATISTICAL',
+    description: 'CHART_TYPES.RIDGELINE.DESCRIPTION',
+  },
+  {
+    id: 'hexbin',
+    name: 'CHART_TYPES.HEXBIN.NAME',
+    icon: 'pi pi-th-large',
+    category: 'CHART_TYPES.CATEGORIES.STATISTICAL',
+    description: 'CHART_TYPES.HEXBIN.DESCRIPTION',
+  },
+  {
+    id: 'qq-plot',
+    name: 'CHART_TYPES.QQ_PLOT.NAME',
+    icon: 'pi pi-circle',
+    category: 'CHART_TYPES.CATEGORIES.STATISTICAL',
+    description: 'CHART_TYPES.QQ_PLOT.DESCRIPTION',
+  },
+  {
+    id: 'ecdf',
+    name: 'CHART_TYPES.ECDF.NAME',
+    icon: 'pi pi-chart-line',
+    category: 'CHART_TYPES.CATEGORIES.STATISTICAL',
+    description: 'CHART_TYPES.ECDF.DESCRIPTION',
+  },
+
+  // Flow / relationship
+  {
+    id: 'streamgraph',
+    name: 'CHART_TYPES.STREAMGRAPH.NAME',
+    icon: 'pi pi-bolt',
+    category: 'CHART_TYPES.CATEGORIES.SPECIAL',
+    description: 'CHART_TYPES.STREAMGRAPH.DESCRIPTION',
+  },
+  {
+    id: 'marimekko',
+    name: 'CHART_TYPES.MARIMEKKO.NAME',
+    icon: 'pi pi-th-large',
+    category: 'CHART_TYPES.CATEGORIES.BAR_CHARTS',
+    description: 'CHART_TYPES.MARIMEKKO.DESCRIPTION',
+  },
+  {
+    id: 'arc',
+    name: 'CHART_TYPES.ARC.NAME',
+    icon: 'pi pi-share-alt',
+    category: 'CHART_TYPES.CATEGORIES.FLOW',
+    description: 'CHART_TYPES.ARC.DESCRIPTION',
+  },
+  {
+    id: 'chord',
+    name: 'CHART_TYPES.CHORD.NAME',
+    icon: 'pi pi-share-alt',
+    category: 'CHART_TYPES.CATEGORIES.FLOW',
+    description: 'CHART_TYPES.CHORD.DESCRIPTION',
+  },
+  {
+    id: 'network',
+    name: 'CHART_TYPES.NETWORK.NAME',
+    icon: 'pi pi-share-alt',
+    category: 'CHART_TYPES.CATEGORIES.FLOW',
+    description: 'CHART_TYPES.NETWORK.DESCRIPTION',
+  },
+
+  // Calendar / polar / gauge
+  {
+    id: 'calendar-heatmap',
+    name: 'CHART_TYPES.CALENDAR_HEATMAP.NAME',
+    icon: 'pi pi-calendar',
+    category: 'CHART_TYPES.CATEGORIES.MAPS',
+    description: 'CHART_TYPES.CALENDAR_HEATMAP.DESCRIPTION',
+  },
+  {
+    id: 'wind-rose',
+    name: 'CHART_TYPES.WIND_ROSE.NAME',
+    icon: 'pi pi-compass',
+    category: 'CHART_TYPES.CATEGORIES.PIE_CHARTS',
+    description: 'CHART_TYPES.WIND_ROSE.DESCRIPTION',
+  },
+  {
+    id: 'radial-bar',
+    name: 'CHART_TYPES.RADIAL_BAR.NAME',
+    icon: 'pi pi-compass',
+    category: 'CHART_TYPES.CATEGORIES.BAR_CHARTS',
+    description: 'CHART_TYPES.RADIAL_BAR.DESCRIPTION',
+  },
+  {
+    id: 'solid-gauge',
+    name: 'CHART_TYPES.SOLID_GAUGE.NAME',
+    icon: 'pi pi-stopwatch',
+    category: 'CHART_TYPES.CATEGORIES.GAUGES',
+    description: 'CHART_TYPES.SOLID_GAUGE.DESCRIPTION',
+  },
+  {
+    id: 'kpi-delta',
+    name: 'CHART_TYPES.KPI_DELTA.NAME',
+    icon: 'pi pi-hashtag',
+    category: 'CHART_TYPES.CATEGORIES.CARDS',
+    description: 'CHART_TYPES.KPI_DELTA.DESCRIPTION',
+  },
+
+  // Geo (data-bound — Wave 4 pipeline)
+  {
+    id: 'choropleth',
+    name: 'CHART_TYPES.CHOROPLETH.NAME',
+    icon: 'pi pi-map',
+    category: 'CHART_TYPES.CATEGORIES.MAPS',
+    description: 'CHART_TYPES.CHOROPLETH.DESCRIPTION',
+  },
+  {
+    id: 'point-map',
+    name: 'CHART_TYPES.POINT_MAP.NAME',
+    icon: 'pi pi-map-marker',
+    category: 'CHART_TYPES.CATEGORIES.MAPS',
+    description: 'CHART_TYPES.POINT_MAP.DESCRIPTION',
+  },
+  {
+    id: 'bubble-map',
+    name: 'CHART_TYPES.BUBBLE_MAP.NAME',
+    icon: 'pi pi-map-marker',
+    category: 'CHART_TYPES.CATEGORIES.MAPS',
+    description: 'CHART_TYPES.BUBBLE_MAP.DESCRIPTION',
+  },
 ];
+
+/**
+ * A CHART_TYPES entry: the display metadata plus the `capabilities` object that
+ * gates config-UI property groups for that chart.
+ */
+export interface ChartTypeDef {
+  id: string;
+  name: string;
+  icon: string;
+  category: string;
+  description: string;
+  rotate?: boolean;
+  capabilities: ChartCapabilities;
+}
+
+/**
+ * The exported chart catalogue. Every entry carries a `capabilities` object
+ * (stamped from chart-capabilities.ts) so the picker and the config sidebar
+ * read per-graph property support off a single array.
+ */
+export const CHART_TYPES: ChartTypeDef[] = RAW_CHART_TYPES.map(def => ({
+  ...def,
+  capabilities: getChartCapabilities(def.id),
+}));
 
 export { ECHARTS_THEME_OPTIONS as COLOR_SCHEMES } from '../../../shared/helpers/chart-config.helper';
 
@@ -2356,6 +2599,56 @@ export const CHART_ROLES: Record<string, ChartRolesSpec> = {
   scattergl: { required: ['xAxis', 'yAxis'], optional: [] },
   linesgl: { required: ['lng', 'lat'], optional: [] },
   flowgl: { required: ['lng', 'lat'], optional: [] },
+
+  // ══ Wave 4 new chart types ══════════════════════════════════════════════
+  // Role keys reuse the EXISTING vocabulary (no new RoleKey values): geo
+  // choropleth follows the world-map convention (xAxis = region name, yAxis =
+  // value); lat/lon maps use the lng/lat roles; single-value KPIs/gauges need
+  // only the measure (yAxis). Each entry is the HONEST minimal set of columns
+  // the chart's Wave-4 builder actually consumes — so hasRequiredChartFields
+  // stops blocking maps/KPIs that were wrongly held to the default xAxis+yAxis.
+
+  // Statistical / comparison bars (category + measure).
+  bullet: { required: ['xAxis', 'yAxis'], optional: [] },
+  pareto: { required: ['xAxis', 'yAxis'], optional: [] },
+  lollipop: { required: ['xAxis', 'yAxis'], optional: [] },
+  'cleveland-dot': { required: ['xAxis', 'yAxis'], optional: [] },
+  dumbbell: { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
+  slope: { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
+  bump: { required: ['xAxis', 'yAxis'], optional: [] },
+  'cycle-plot': { required: ['xAxis', 'yAxis'], optional: [] },
+  'radial-bar': { required: ['xAxis', 'yAxis'], optional: [] },
+  'wind-rose': { required: ['xAxis', 'yAxis'], optional: [] },
+  streamgraph: { required: ['xAxis', 'yAxis'], optional: ['time'] },
+  'calendar-heatmap': { required: ['xAxis', 'yAxis'], optional: ['time'] },
+  // Marimekko needs a category + first measure; extra segment measures ride
+  // valueColumns (the builder errors gracefully without them).
+  marimekko: { required: ['xAxis', 'yAxis'], optional: ['valueColumns'] },
+
+  // Single-value displays — only the measure is required.
+  'kpi-delta': { required: ['yAxis'], optional: [] },
+  'solid-gauge': { required: ['yAxis'], optional: ['xAxis'] },
+
+  // Relationship graphs (node+link) — x = source, y = target, z = link weight.
+  arc: { required: ['xAxis', 'yAxis'], optional: ['zAxis'] },
+  chord: { required: ['xAxis', 'yAxis'], optional: ['zAxis'] },
+  network: { required: ['xAxis', 'yAxis'], optional: ['zAxis'] },
+
+  // Geo (data-bound). choropleth mirrors world-map (region name + value); the
+  // lat/lon maps require the geo lng/lat roles, value is optional.
+  choropleth: { required: ['xAxis', 'yAxis'], optional: [] },
+  'point-map': { required: ['lng', 'lat'], optional: ['yAxis'] },
+  'bubble-map': { required: ['lng', 'lat'], optional: ['yAxis'] },
+
+  // Distribution placeholders — the builders render an empty-state until the
+  // statistical binning pipeline lands, but a sane required set keeps the gate
+  // from hard-blocking and tells the sidebar which columns to ask for.
+  violin: { required: ['xAxis', 'sample'], optional: [] },
+  ridgeline: { required: ['xAxis', 'sample'], optional: [] },
+  density: { required: ['xAxis'], optional: [] },
+  ecdf: { required: ['xAxis'], optional: [] },
+  hexbin: { required: ['xAxis', 'yAxis'], optional: [] },
+  'qq-plot': { required: ['xAxis'], optional: [] },
 };
 
 /**

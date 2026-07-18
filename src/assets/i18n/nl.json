@@ -1589,7 +1589,19 @@
       "TO": "Tot",
       "ANNO_X": "X-positie",
       "ANNO_X_PH": "Categorie of X-waarde",
-      "ANNO_Y": "Y-waarde"
+      "ANNO_Y": "Y-waarde",
+      "TYPE": {
+        "CONSTANT": "Constante",
+        "AVERAGE": "Gemiddelde",
+        "MEDIAN": "Mediaan",
+        "MIN": "Minimum",
+        "MAX": "Maximum",
+        "PERCENTILE": "Percentiel"
+      },
+      "AXIS": {
+        "X": "X-as",
+        "Y": "Y-as"
+      }
     },
     "COLORSCALE": {
       "TITLE": "Kleurschaal",
@@ -1964,6 +1976,9 @@
         "DB_PERMISSION": "Je hebt geen toestemming om deze query uit te voeren.",
         "DB_TIMEOUT": "De query is verlopen voordat deze kon worden voltooid."
       }
+    },
+    "TOPN": {
+      "OTHER_LABEL": "Overige"
     }
   },
   "DASHBOARD": {
