@@ -1197,11 +1197,19 @@ export class EditAnalysesComponent
     // transforms from. Cross-filter / drill predicates are NO LONGER merged
     // here; they are applied SCOPED, per target/source visual (reRunCross-
     // FilterTargets / reRunDrillSource fetch their own scoped rows). A full
-    // base reload (initial load, field edit, refresh) therefore resets any
-    // active interaction so the canvas is consistent with the fresh base data
-    // rather than silently double-filtering. Only the user's applied filters +
+    // base reload (initial load, field edit) therefore resets any active
+    // interaction so the canvas is consistent with the fresh base data rather
+    // than silently double-filtering. Only the user's applied filters +
     // parameters scope the base run.
-    this.resetInteractionState();
+    //
+    // EXCEPTION (code-review CR-6): a plain Refresh must NOT throw the user out
+    // of an active drill / cross-filter. When refreshData() sets
+    // `_preserveInteractionOnReload`, we keep the interaction STATE, refresh the
+    // base rows underneath it, and re-apply the active scope once the base data
+    // lands (see the success handler below).
+    if (!this._preserveInteractionOnReload) {
+      this.resetInteractionState();
+    }
     const mergedFilters = [...this.appliedFilters];
 
     // Feature 5: if a table visual has server-side totals configured,
@@ -1231,6 +1239,12 @@ export class EditAnalysesComponent
               data: response.data,
             }),
           );
+          // CR-6: after a preserve-mode Refresh, re-apply the active drill /
+          // cross-filter scope on top of the freshly-loaded base rows so the
+          // user stays on the level they were examining.
+          if (this._preserveInteractionOnReload) {
+            this.reapplyActiveInteraction();
+          }
         } else {
           this.store.dispatch(
             AddAnalysesActions.loadDatasetDataFailure({
@@ -1252,6 +1266,11 @@ export class EditAnalysesComponent
               this.translate.instant('ANALYSES.ERROR_LOADING_GRAPH_DATA'),
           }),
         );
+      })
+      .finally(() => {
+        // One-shot flag — always clear so a later base change (dataset switch,
+        // field edit) resets interaction normally.
+        this._preserveInteractionOnReload = false;
       });
   }
 
@@ -1566,7 +1585,10 @@ export class EditAnalysesComponent
   }
 
   refreshData(): void {
-    // Simply call loadDatasetData again to refresh the data
+    // Refresh the base data but KEEP the user on their active drill /
+    // cross-filter level (code-review CR-6): preserve the interaction state,
+    // reload the base rows, then re-apply the scope once the data lands.
+    this._preserveInteractionOnReload = true;
     this.loadDatasetData();
   }
 
@@ -2288,6 +2310,11 @@ export class EditAnalysesComponent
   /** Real (server-side) tabs deleted during this draft, with the audit reason.
    *  Sent to the atomic Save so the BE can record the deletion justification. */
   private _pendingTabDeletes: { id: string; justification: string }[] = [];
+
+  // CR-6: one-shot flag set by refreshData() so a plain Refresh preserves the
+  // active drill / cross-filter scope across the base reload instead of
+  // resetInteractionState() clearing it. Cleared in loadDatasetData's finally.
+  private _preserveInteractionOnReload = false;
 
   /** Reorder: move a tab one slot left/right, persisting the new order. */
   moveTab(tab: AnalysisTab, direction: -1 | 1): void {
@@ -3251,8 +3278,14 @@ export class EditAnalysesComponent
    */
   onVisualChartSelect(visual: Visual, event: any): void {
     const columnName = visual.xAxisColumn;
-    const value = this.extractClickedValue(event);
-    if (value === null || value === undefined) return;
+    // The click payload carries the FORMATTED category label (ECharts' tick
+    // text). Cross-filter/drill must filter the RAW column, so resolve the
+    // label back to the underlying raw value before it becomes a filter value
+    // (code-review CR-1). Falls back to the label itself when no raw match is
+    // found (identity-formatted plain-string dimensions are unchanged).
+    const label = this.extractClickedValue(event);
+    if (label === null || label === undefined) return;
+    const value = this.resolveRawClickedValue(visual, label);
 
     // Drill precedence — a drillable click descends rather than cross-filtering.
     const dims = visual.drillDimensions || [];
@@ -3261,7 +3294,8 @@ export class EditAnalysesComponent
       // No-op once the stack is exhausted (nothing deeper to drill into) —
       // avoids a pointless re-fetch on the leaf level.
       if (depth + 1 < dims.length) {
-        this.interaction.drillDown(dims, value, String(value));
+        // Filter on the RAW value; display the clicked LABEL in the breadcrumb.
+        this.interaction.drillDown(dims, value, String(label));
         this.reRunDrillSource(visual);
         this.cdr.markForCheck();
       }
@@ -3302,6 +3336,47 @@ export class EditAnalysesComponent
       if (typeof v === 'string' || typeof v === 'number') return v;
     }
     return null;
+  }
+
+  /**
+   * Resolve a clicked category LABEL back to the RAW underlying value of the
+   * visual's category column, so cross-filter / drill filter the raw column
+   * with a raw value (code-review CR-1). The chart tick shows a FORMATTED
+   * label ('Apr 2024', '$1.5M', '(null)', '1,235') via the transformer's
+   * category formatting; binding that display string against the raw column
+   * matches zero rows. We scan the visual's source rows (its interaction-scoped
+   * rows if present, else the shared base rows) for the row whose category
+   * cell, formatted the same way, equals the clicked label, and return that
+   * cell's raw value.
+   *
+   * Generalised: works for any column/value; no domain assumptions. Falls back
+   * to the label itself when the column is unknown or no row matches (an
+   * identity-formatted plain-string dimension is therefore unaffected).
+   */
+  private resolveRawClickedValue(
+    visual: Visual,
+    label: string | number,
+  ): string | number {
+    const mapping = this.chartDataTransformer.buildMapping(visual);
+    // Drill re-points the category to the current drill column; match that.
+    const col =
+      (visual.__drillColumn as string) || mapping.xAxisColumn || visual.xAxisColumn;
+    if (!col) return label;
+    const rows: any[] = (visual.__interactionRows as any[]) ?? this.rawGraphData;
+    if (!Array.isArray(rows) || rows.length === 0) return label;
+    const target = String(label);
+    for (const row of rows) {
+      const raw = row?.[col];
+      if (this.chartDataTransformer.formatCategoryValue(raw, mapping) === target) {
+        // A genuine null-category (null-as-member) has no raw scalar to bind
+        // an EQUALS filter against, so keep the label — the downstream filter
+        // path treats it as the member value. Otherwise bind the raw scalar.
+        return raw === null || raw === undefined
+          ? label
+          : (raw as string | number);
+      }
+    }
+    return label;
   }
 
   /**
@@ -3461,6 +3536,25 @@ export class EditAnalysesComponent
       this.chartDataVersion++;
     } else {
       this.reRunDrillSource(source);
+    }
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * CR-6: re-apply the active drill / cross-filter scope after a preserve-mode
+   * base reload (Refresh). Reuses the exact same scoped re-run paths the live
+   * interactions use, so the user lands back on the drill level / cross-filter
+   * they had before pressing Refresh instead of being reset to the base view.
+   * Safe no-op when nothing is active.
+   */
+  private reapplyActiveInteraction(): void {
+    if (!this.interaction.hasActiveInteractions()) return;
+    if (this.interaction.drillPath().length > 0) {
+      const source = this.getDrillSourceVisual();
+      if (source) this.reRunDrillSource(source);
+    }
+    if (this.interaction.crossFilters().length > 0) {
+      this.reRunCrossFilterTargets();
     }
     this.cdr.markForCheck();
   }
@@ -4298,6 +4392,8 @@ export class EditAnalysesComponent
             // so a subsequent Save/Publish addresses real rows, not tmp_ ids.
             const tabIdMap: Record<string, string> =
               response?.data?.tabIdMap ?? {};
+            const visualIdMap: Record<string, string> =
+              response?.data?.visualIdMap ?? {};
             if (Object.keys(tabIdMap).length) {
               this.tabs.forEach(t => {
                 const real = tabIdMap[t.id];
@@ -4310,6 +4406,25 @@ export class EditAnalysesComponent
               if (this.activeTabId && tabIdMap[this.activeTabId]) {
                 this.activeTabId = tabIdMap[this.activeTabId];
               }
+            }
+            // Re-key each visual's OWN id AND any cross-filter target id lists
+            // through the server's temp→real visualIdMap (code-review CR-4).
+            // The versioned-save clone assigns new visual ids, so an authored
+            // cross-filter whose config.interaction.crossFilter.targets.visualIds
+            // still held tmp_ ids would silently target dead ids after Save —
+            // clicking the source would filter nothing and the wiring would be
+            // lost on reload. Remap the id first, then rewrite the target lists.
+            if (Object.keys(visualIdMap).length) {
+              this.visuals.forEach(v => {
+                const targets =
+                  v.config?.interaction?.crossFilter?.targets?.visualIds;
+                if (Array.isArray(targets)) {
+                  v.config.interaction.crossFilter.targets.visualIds =
+                    targets.map((id: string) => visualIdMap[id] ?? id);
+                }
+                const real = visualIdMap[v.id];
+                if (real) v.id = real;
+              });
             }
             this._pendingTabDeletes = [];
             // The BE versioning model spawns a new Analyses row on

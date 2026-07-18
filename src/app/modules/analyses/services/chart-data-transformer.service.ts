@@ -430,9 +430,16 @@ export class ChartDataTransformerService {
       aggregatedMap.set(name, existing + value);
     });
 
-    const points = Array.from(aggregatedMap.entries())
-      .filter(([_, value]) => value !== 0) // Filter out zero-value entries
-      .map(([name, value]) => ({ name, value }));
+    // Keep zero-sum buckets (code-review CR-2). A legitimate zero total — a
+    // month with no sales, a category that summed to 0 — is real data: the
+    // point must render as 0, not vanish (which would leave a misleading gap
+    // in a time series and connect neighbouring points across the hole). The
+    // multi-series path never filtered zeros, so keeping them here also makes
+    // single- and multi-series charts of the same data agree.
+    const points = Array.from(aggregatedMap.entries()).map(([name, value]) => ({
+      name,
+      value,
+    }));
 
     // Temporal dimension → chronological order; otherwise keep the legacy
     // value-descending order so non-time charts are unchanged.
@@ -542,6 +549,17 @@ export class ChartDataTransformerService {
    *
    * Returns the display label; callers still aggregate by this string.
    */
+  /**
+   * PUBLIC formatting authority (code-review CR-1). Formats a raw category
+   * value to its display label exactly as the chart does, so callers outside
+   * the transformer (e.g. the editor resolving a clicked tick label back to
+   * its raw value for cross-filter/drill) share ONE formatting definition and
+   * never drift. Thin delegate to the private formatCategoryLabel.
+   */
+  formatCategoryValue(value: any, mapping: ChartDataMapping): string {
+    return this.formatCategoryLabel(value, mapping);
+  }
+
   private formatCategoryLabel(value: any, mapping: ChartDataMapping): string {
     if (value === null || value === undefined || value === '') {
       return mapping.nullAsMember

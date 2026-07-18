@@ -109,32 +109,57 @@ export function chronoSortKey(raw: unknown): number {
 }
 
 /**
+ * A value that is unambiguously DATE-SHAPED — a real Date/timestamp, or a
+ * string carrying date structure (ISO `2024-04-01`, slashed `04/01/2024`,
+ * dotted `01.04.2024`, or an ISO time). This is deliberately STRICTER than
+ * "`new Date()` can parse it": a bare English month or weekday name
+ * ("March", "Friday") is NOT date-shaped, because a genuine CATEGORICAL
+ * dimension whose members happen to be month/day words must keep its
+ * value-ranked order rather than being silently reordered to calendar order
+ * (code-review CR-5). Bare month labels are still ORDERED correctly by
+ * chronoSortKey when the dimension is *already* known temporal — this gate
+ * only governs the auto-DETECTION of temporality.
+ */
+const DATE_SHAPED =
+  /(^\d{4}-\d{2})|(\d{1,2}[/.]\d{1,2}[/.]\d{2,4})|(\d{4}[/.]\d{1,2})|(\d{2}:\d{2})/;
+
+function isDateShaped(v: unknown): boolean {
+  if (v instanceof Date) return !Number.isNaN(v.getTime());
+  if (typeof v !== 'string') return false;
+  const s = v.trim();
+  if (!s) return false;
+  // Pure numbers ("2024", "42") are NOT date-shaped — a year-like integer is
+  // still a number and sorts fine numerically.
+  if (/^-?\d+(\.\d+)?$/.test(s)) return false;
+  return DATE_SHAPED.test(s);
+}
+
+/**
  * True when a set of raw category values looks temporal — a strong majority
- * parse to a finite chronoSortKey. Used by the transformer to decide whether
- * to apply chronological ordering to a dimension's categories. Sampling-based
- * and cheap; a mostly-numeric-string column (which also "parses" via Date on
- * some inputs) is excluded by requiring at least one non-pure-number sample.
+ * are unambiguously DATE-SHAPED (see isDateShaped). Used by the transformer
+ * to decide whether to apply chronological ordering to a dimension's
+ * categories. Sampling-based and cheap.
+ *
+ * NOTE (CR-5): detection intentionally requires date STRUCTURE, not mere
+ * `new Date()` parseability. This prevents a categorical dimension of bare
+ * month names ("May", "March") or weekday names — which `new Date()` happily
+ * parses — from being misclassified as a time axis and having its
+ * value-descending ranking silently overridden. A truly temporal dimension
+ * (date/timestamp column, ISO periods) still detects and orders correctly.
  */
 export function looksTemporal(values: unknown[]): boolean {
   if (!Array.isArray(values) || values.length === 0) return false;
   let dated = 0;
   let considered = 0;
-  let sawNonNumeric = false;
   const limit = Math.min(values.length, 20);
   for (let i = 0; i < values.length && considered < limit; i++) {
     const v = values[i];
     if (v === null || v === undefined || v === '') continue;
     considered++;
-    // A pure number / numeric string is NOT evidence of a date (years like
-    // 2024 aside — those still sort fine as numbers elsewhere).
-    const isPureNumber =
-      typeof v === 'number' ||
-      (typeof v === 'string' && /^-?\d+(\.\d+)?$/.test(v.trim()));
-    if (!isPureNumber) sawNonNumeric = true;
-    if (Number.isFinite(chronoSortKey(v))) dated++;
+    if (isDateShaped(v)) dated++;
   }
   if (considered === 0) return false;
-  return sawNonNumeric && dated / considered >= 0.8;
+  return dated / considered >= 0.8;
 }
 
 /* ────────────────────────────────────────────────────────────────────────
