@@ -1059,6 +1059,50 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
       .map(v => ({ label: v.title || v.id, value: v.id }));
   }
 
+  // ── Interaction section: drill-down (Wave 6) ────────────────────────
+  //
+  // Ordered dimension columns the author picks for hierarchy drill. Stored on
+  // the flat visual.drillDimensions (the column the editor's interaction bus
+  // reads) AND mirrored into config.interaction.drillDimensions so the whole
+  // interaction wiring lives under one config key. A visual needs >1 dimension
+  // for drill to do anything (root + at least one descent).
+
+  /** The authored drill dimension list (ordered). */
+  get drillDimensions(): string[] {
+    return this.focusedVisual?.drillDimensions ?? [];
+  }
+  set drillDimensions(cols: string[]) {
+    if (!this.focusedVisual) return;
+    const next = Array.isArray(cols) ? cols : [];
+    this.focusedVisual.drillDimensions = next;
+    if (!this.focusedVisual.config) this.focusedVisual.config = {};
+    this.focusedVisual.config.interaction = {
+      ...(this.focusedVisual.config.interaction || {}),
+      drillDimensions: next,
+    };
+  }
+
+  // ── Interaction section: drill-to-detail (Wave 6) ───────────────────
+  //
+  // Opt-in that surfaces a per-visual "detail" affordance in the editor which
+  // fetches the underlying raw rows for the visual's current scope. Stored
+  // under config.interaction.drillToDetail.enabled.
+
+  get drillToDetailEnabled(): boolean {
+    return !!this.focusedVisual?.config?.interaction?.drillToDetail?.enabled;
+  }
+  set drillToDetailEnabled(on: boolean) {
+    if (!this.focusedVisual?.config) return;
+    const cfg = this.focusedVisual.config;
+    cfg.interaction = {
+      ...(cfg.interaction || {}),
+      drillToDetail: {
+        ...(cfg.interaction?.drillToDetail || {}),
+        enabled: on,
+      },
+    };
+  }
+
   ngOnInit(): void {
     this.localizeDropdownOptions();
     this.langSubscription = this.translate.onLangChange.subscribe(() => {

@@ -590,6 +590,38 @@
             ></app-custom-multiselect>
           </div>
         </div>
+
+        <!-- Drill-down path (Wave 6) — ordered dimensions the click descends
+             through. Needs 2+ to do anything (root + at least one descent). -->
+        <div class="config-row">
+          <label>{{ 'ANALYSES.DRILL_DIMENSIONS' | translate }}</label>
+        </div>
+        <div class="config-subsection">
+          <div class="config-group">
+            <app-custom-multiselect
+              [options]="fieldOptions"
+              [(ngModel)]="drillDimensions"
+              optionLabel="label"
+              optionValue="value"
+              display="chip"
+              appendTo="body"
+              [placeholder]="'ANALYSES.DRILL_PICK_DIMENSIONS' | translate"
+            ></app-custom-multiselect>
+            <small class="config-hint">{{
+              'ANALYSES.DRILL_HINT' | translate
+            }}</small>
+          </div>
+        </div>
+
+        <!-- Drill-to-detail (Wave 6) — opt-in underlying-row inspector. -->
+        <div class="config-row">
+          <label>{{ 'ANALYSES.V2.INTERACTION.DRILL_TO_DETAIL' | translate }}</label>
+          <app-custom-toggle
+            [ngModel]="drillToDetailEnabled"
+            (ngModelChange)="drillToDetailEnabled = $event"
+            [showStatusLabel]="false"
+          ></app-custom-toggle>
+        </div>
       </div>
 
       <!-- ===== Table-specific options ===== -->

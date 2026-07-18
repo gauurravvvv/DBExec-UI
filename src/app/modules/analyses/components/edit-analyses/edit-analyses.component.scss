@@ -1974,6 +1974,10 @@
       color: var(--primary-color);
       background: rgba(var(--primary-color-rgb), 0.12);
     }
+    // Drill-to-detail toggle (Wave 6) — opens the underlying-row inspector.
+    .detail-icon:hover {
+      color: var(--primary-color);
+    }
   }
 }
 
@@ -2370,6 +2374,77 @@
   justify-content: center;
   overflow: hidden;
   background: var(--card-background);
+}
+
+// ── Drill-to-detail panel (Wave 6, §C) ──────────────────────────────
+.detail-panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--overlay-background);
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.detail-panel {
+  background: var(--card-background);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 40px -10px var(--overlay-background);
+  max-width: 92vw;
+  max-height: 82vh;
+  width: 1000px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: scaleIn 0.2s ease-out;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-6) var(--space-7);
+    border-bottom: 1px solid var(--border-color);
+    background: var(--secondary-background);
+  }
+
+  &__title {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+  }
+
+  &__subtitle {
+    font-size: var(--fs-label);
+    font-weight: var(--fw-regular);
+    color: var(--text-muted);
+  }
+
+  &__body {
+    flex: 1;
+    min-height: 200px;
+    max-height: 68vh;
+    padding: var(--space-6);
+    overflow: auto;
+    background: var(--card-background);
+  }
+
+  &__loading,
+  &__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+    color: var(--text-muted);
+    font-size: var(--fs-body);
+  }
 }
 
 // Filter Configuration Dialog — deep overrides for PrimeNG

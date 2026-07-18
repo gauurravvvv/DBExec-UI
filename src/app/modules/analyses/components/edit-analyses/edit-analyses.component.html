@@ -653,18 +653,17 @@
           </ng-container>
         </div>
 
+        <!-- Wave 6: the active SCOPED cross-filter (single, last-click-wins).
+             Renders the clicked column = value; a chip click clears it and
+             recovers the target visuals. -->
         <div
           class="crossfilter-chips"
-          *ngIf="interaction.crossFilters().length"
+          *ngIf="interaction.scopedCrossFilter() as cf"
         >
           <app-chip
             variant="tag"
             tone="primary"
             icon="pi pi-filter"
-            *ngFor="
-              let cf of interaction.crossFilters();
-              trackBy: trackByIndex
-            "
           >
             {{ cf.columnName }} = {{ cf.value }}
           </app-chip>
@@ -887,6 +886,20 @@
                     : 'ANALYSES.CROSSFILTER_OFF'
                   ) | translate
                 "
+                tooltipPosition="top"
+              ></i>
+              <!-- Drill-to-detail (Wave 6, §C). Opens the underlying rows for
+                   the visual's current scope in a panel. Gated by
+                   config.interaction.drillToDetail.enabled. -->
+              <i
+                *ngIf="
+                  visual.chartType &&
+                  hasRequiredChartFields(visual) &&
+                  isDrillToDetailEnabled(visual)
+                "
+                class="pi pi-table action-icon detail-icon"
+                (click)="openDrillToDetail(visual, null); $event.stopPropagation()"
+                [pTooltip]="'ANALYSES.V2.INTERACTION.DRILL_TO_DETAIL' | translate"
                 tooltipPosition="top"
               ></i>
               <i
@@ -1233,7 +1246,7 @@
       [allFields]="allFields"
       [siblingVisuals]="siblingVisualsForConfig"
       (close)="closeConfigSidebar()"
-      (configChanged)="markDirty()"
+      (configChanged)="onVisualInteractionChanged()"
     ></app-visual-config-sidebar>
   </div>
 </div>
@@ -1263,6 +1276,50 @@
         [configVersion]="chartConfigVersion"
         [dataVersion]="chartDataVersion"
       ></app-chart-renderer>
+    </div>
+  </div>
+</div>
+
+<!-- Drill-to-detail panel (Wave 6, §C) — the underlying rows for a clicked
+     mark / visual scope. Reuses app-table-visual (the module's in-memory row
+     table) so columns are derived from the raw rows. Generalised: shows
+     whatever columns the raw rows carry, no domain assumptions. -->
+<div
+  class="detail-panel-overlay"
+  *ngIf="detailPanelOpen"
+  (click)="closeDrillToDetail()"
+>
+  <div class="detail-panel" (click)="$event.stopPropagation()">
+    <div class="detail-panel__header">
+      <span class="detail-panel__title">
+        <i class="pi pi-table"></i>
+        {{ 'ANALYSES.V2.INTERACTION.DRILL_TO_DETAIL' | translate }}
+        <span class="detail-panel__subtitle">{{ detailPanelTitle }}</span>
+      </span>
+      <button
+        pButton
+        icon="pi pi-times"
+        class="p-button-text p-button-rounded"
+        (click)="closeDrillToDetail()"
+        [pTooltip]="'COMMON.CLOSE' | translate"
+        tooltipPosition="left"
+      ></button>
+    </div>
+    <div class="detail-panel__body">
+      <div class="detail-panel__loading" *ngIf="detailPanelLoading">
+        {{ 'COMMON.LOADING' | translate }}
+      </div>
+      <div
+        class="detail-panel__empty"
+        *ngIf="!detailPanelLoading && detailPanelRows.length === 0"
+      >
+        {{ 'COMMON.NO_DATA_AVAILABLE' | translate }}
+      </div>
+      <app-table-visual
+        *ngIf="!detailPanelLoading && detailPanelRows.length > 0"
+        [data]="detailPanelRows"
+        [chartConfig]="{}"
+      ></app-table-visual>
     </div>
   </div>
 </div>

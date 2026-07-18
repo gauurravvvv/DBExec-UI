@@ -366,6 +366,26 @@ export interface Visual {
     shown: number;
     cap: number;
   } | null;
+
+  /**
+   * Per-visual scoped rows for an active interaction (Wave 6). Populated at
+   * run time when this visual is a cross-filter TARGET (scoped rows fetched
+   * with the source click's predicate) or the SOURCE of an active drill
+   * (rows fetched scoped to the drilled-into value). null / undefined = no
+   * override, the visual transforms from the shared analysis dataset. Not
+   * persisted — transient interaction state, cleared when the interaction is
+   * cleared. Prefixed `__` to mark it as runtime-only and keep it out of the
+   * saved visual payload.
+   */
+  __interactionRows?: any[] | null;
+
+  /**
+   * The current drill dimension column for this visual (Wave 6) while a drill
+   * is active and this visual is the drill source. Re-points the category so
+   * the visual re-buckets by the drilled-into dimension. null / undefined =
+   * not drilling. Transient, not persisted.
+   */
+  __drillColumn?: string | null;
 }
 
 /**

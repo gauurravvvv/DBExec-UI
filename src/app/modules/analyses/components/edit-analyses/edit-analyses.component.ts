@@ -69,7 +69,6 @@ import {
   defaultAggregationOf,
 } from '../../utils/field-type.util';
 import type { AnalysisParameter } from '../../models/analysis-parameter.model';
-import type { CrossFilterEvent } from '../../models/interaction.model';
 import {
   AddAnalysesActions,
   AnalysesFilterActions,
@@ -993,11 +992,16 @@ export class EditAnalysesComponent
       }),
     );
 
-    // Merge the user's applied filters with any cross-filter / drill
-    // predicates derived from the interaction bus (spec §6). Parameters
-    // ride along so the BE can substitute {{param.<key>}} at compile time.
-    const interactionFilters = this.interaction.toRunQueryFilters();
-    const mergedFilters = [...this.appliedFilters, ...interactionFilters];
+    // Wave 6: this is the BASE analysis run — the shared dataset every visual
+    // transforms from. Cross-filter / drill predicates are NO LONGER merged
+    // here; they are applied SCOPED, per target/source visual (reRunCross-
+    // FilterTargets / reRunDrillSource fetch their own scoped rows). A full
+    // base reload (initial load, field edit, refresh) therefore resets any
+    // active interaction so the canvas is consistent with the fresh base data
+    // rather than silently double-filtering. Only the user's applied filters +
+    // parameters scope the base run.
+    this.resetInteractionState();
+    const mergedFilters = [...this.appliedFilters];
 
     // Feature 5: if a table visual has server-side totals configured,
     // attach the pivotTotals run-config so the BE appends grand/subtotal
@@ -1283,10 +1287,22 @@ export class EditAnalysesComponent
   }
 
   /**
-   * Transform chart data for a single visual
+   * Transform chart data for a single visual.
+   *
+   * Interaction overrides (Wave 6): a visual carries its own scoped rows in
+   * `__interactionRows` while it is a cross-filter TARGET or the SOURCE of an
+   * active drill (fetched once, scoped to what the user clicked). When present
+   * we transform from those rows instead of the shared `rawGraphData`, so only
+   * the affected visuals reflect the interaction — the rest of the canvas is
+   * untouched. `__drillColumn` re-points the category to the current drill
+   * dimension for the drilling visual. Both are transient (not persisted).
    */
   transformSingleVisualChartData(visual: any): void {
-    if (!this.rawGraphData || this.rawGraphData.length === 0) {
+    const rows = visual.__interactionRows ?? this.rawGraphData;
+    if (!rows || rows.length === 0) {
+      // A scoped fetch that returned no rows still clears the chart so the
+      // visual reflects the (empty) scope rather than stale data.
+      if (visual.__interactionRows) visual.chartData = [];
       return;
     }
 
@@ -1297,20 +1313,31 @@ export class EditAnalysesComponent
       if (!visual.config || visual.config.tableHiddenColumns === undefined) {
         this.seedTableHiddenColumns(visual);
       }
-      visual.chartData = this.rawGraphData;
+      visual.chartData = rows;
       return;
     }
 
     // Server-aggregated visuals encode their category/measure via
     // dimensionColumn/aggregate (buildMapping re-points x=dimension,
     // y="value"), so they don't need x/y axis columns set to transform.
-    const hasAxisPair = !!(visual.xAxisColumn && visual.yAxisColumn);
+    const drillColumn: string | null = visual.__drillColumn ?? null;
+    const hasAxisPair = !!(
+      (drillColumn || visual.xAxisColumn) &&
+      visual.yAxisColumn
+    );
     const isAggregated = !!(visual.aggregate && visual.dimensionColumn);
     if (visual.chartType && (hasAxisPair || isAggregated)) {
+      const mapping = this.chartDataTransformer.buildMapping(visual);
+      // Drill re-points the category (x-axis; buildMapping already folds an
+      // aggregated visual's dimensionColumn into xAxisColumn) to the current
+      // drill dimension so the visual re-buckets by the drilled-into column.
+      if (drillColumn) {
+        mapping.xAxisColumn = drillColumn;
+      }
       visual.chartData = this.chartDataTransformer.transformData(
         visual.chartType,
-        this.rawGraphData,
-        this.chartDataTransformer.buildMapping(visual),
+        rows,
+        mapping,
       );
     }
   }
@@ -2744,41 +2771,56 @@ export class EditAnalysesComponent
     this.isConfigSidebarOpen = false;
   }
 
-  // ─── Advanced interactions: cross-filter + drill-down (spec §6) ──────
+  // ─── Advanced interactions: SCOPED cross-filter + drill (Wave 6) ─────
+  //
+  // Unlike the legacy global bus (which re-ran the whole shared query and
+  // re-filtered EVERY visual), Wave 6 is SCOPED:
+  //   - cross-filter: a click on a cross-filter-enabled source re-runs ONLY
+  //     the author-configured TARGET visuals (config.interaction.crossFilter.
+  //     targets), each with the clicked predicate scoped into ITS own fetch;
+  //     non-target visuals are untouched.
+  //   - drill-down: a click on a visual with a drill stack re-runs ONLY that
+  //     SOURCE visual, scoped to the clicked value and re-bucketed by the next
+  //     dimension.
+  // Both compose with RLS + the analysis's applied filters on the BE, which
+  // prepends resolveRlsFilters and binds every filter value as a parameter.
 
   /**
    * A visual emitted a data-point click (chart-renderer forwards the
-   * echart-visual / table-visual `chartSelect`). We resolve the clicked
-   * category, then:
-   *   - if the visual declares a drill stack → descend one level;
-   *   - else if the visual has cross-filter enabled → apply a cross-filter
-   *     to the sibling visuals.
-   * Either way we re-run the query so the canvas reflects the new scope.
+   * echart-visual / table-visual `chartSelect`). Drill takes precedence when
+   * configured (matching "click a bar to go deeper"); otherwise a scoped
+   * cross-filter is applied to the configured target visuals.
    */
   onVisualChartSelect(visual: Visual, event: any): void {
     const columnName = visual.xAxisColumn;
     const value = this.extractClickedValue(event);
     if (value === null || value === undefined) return;
 
-    // Drill takes precedence when configured — a drillable click descends
-    // rather than cross-filtering, matching the user's mental model of
-    // "click a bar to go deeper".
+    // Drill precedence — a drillable click descends rather than cross-filtering.
     const dims = visual.drillDimensions || [];
     if (dims.length > 1) {
-      this.interaction.drillDown(dims, value, String(value));
-      this.loadDatasetData();
-      this.cdr.markForCheck();
+      const depth = this.interaction.drillPath().length;
+      // No-op once the stack is exhausted (nothing deeper to drill into) —
+      // avoids a pointless re-fetch on the leaf level.
+      if (depth + 1 < dims.length) {
+        this.interaction.drillDown(dims, value, String(value));
+        this.reRunDrillSource(visual);
+        this.cdr.markForCheck();
+      }
       return;
     }
 
-    if (visual.crossFilterEnabled && columnName) {
-      const evt: CrossFilterEvent = {
-        sourceVisualId: visual.id,
-        columnName,
-        value,
-      };
-      this.interaction.applyCrossFilter(evt);
-      this.loadDatasetData();
+    // Scoped cross-filter — apply against the source's clicked column, then
+    // re-run only the resolved target visuals. applyScopedCrossFilter returns
+    // false when the visual is not cross-filter-enabled OR when the same mark
+    // was clicked again (toggle-off): re-run targets either way so they either
+    // pick up the new scope or recover to the base dataset.
+    if (
+      columnName &&
+      AnalysisInteractionService.isCrossFilterEnabled(visual)
+    ) {
+      this.interaction.applyScopedCrossFilter(visual, columnName, value);
+      this.reRunCrossFilterTargets();
       this.cdr.markForCheck();
     }
   }
@@ -2805,17 +2847,130 @@ export class EditAnalysesComponent
   }
 
   /**
-   * Toggle cross-filtering on a visual. When turning it off we also drop
-   * any cross-filter this visual currently contributes, then re-run so the
-   * siblings recover. Marks dirty so the flag persists on next save.
+   * Fetch a SCOPED analysis run with `extraFilters` merged on top of the
+   * analysis's applied filters + parameters. Resolves to the raw rows (or [] on
+   * failure). Used by the scoped cross-filter / drill re-runs. NO aggregation
+   * block is sent (the editor aggregates client-side in the transformer), so
+   * `withRawRows` simply documents intent — the payload is identical either
+   * way. Every value in `extraFilters` rides as filter data → the BE binds it
+   * as a parameter and composes it after resolveRlsFilters (no bypass).
+   */
+  private fetchScopedRows(extraFilters: any[]): Promise<any[]> {
+    const mergedFilters = [...this.appliedFilters, ...extraFilters];
+    return this.analysesService
+      .runAnalysisQuery({
+        datasetId: this.datasetId,
+        analysisId: this.analysisId,
+        limit: this.DATA_ROW_LIMIT,
+        ...(mergedFilters.length > 0 ? { filters: mergedFilters } : {}),
+        ...(this.appliedParameters.length > 0
+          ? { parameters: this.appliedParameters }
+          : {}),
+      })
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          return Array.isArray(response?.data) ? response.data : [];
+        }
+        return [];
+      })
+      .catch(err => {
+        console.error('Scoped interaction query failed:', err);
+        return [];
+      });
+  }
+
+  /**
+   * Re-run ONLY the visuals that are targets of the active scoped cross-filter.
+   * Each target gets its own scoped rows (the base dataset filtered by the
+   * clicked predicate) stashed on `__interactionRows`; non-targets have their
+   * override cleared so they recover to the shared dataset. When no scoped
+   * filter is active (toggle-off / clear), every visual's override is dropped.
+   */
+  private reRunCrossFilterTargets(): void {
+    // firstTabId normalizes null tabIds so 'same-tab' resolution matches
+    // matchesActiveTab() (a null tabId belongs to the first/implicit tab).
+    const firstTab = this.firstTabId;
+    const targets = this.visualsInActiveTab.filter(v =>
+      this.interaction.isTargetOfCrossFilter(v, firstTab),
+    );
+
+    // Drop overrides on visuals that are no longer targets (recover to base).
+    this.visualsInActiveTab.forEach(v => {
+      if (!targets.includes(v)) this.clearVisualInteractionOverride(v);
+    });
+
+    if (targets.length === 0) {
+      this.chartDataVersion++;
+      return;
+    }
+
+    // All targets share the SAME scoped predicate, so one fetch feeds them all.
+    const sample = targets[0];
+    const filters = this.interaction.scopedFiltersFor(sample, firstTab);
+    this.fetchScopedRows(filters).then(rows => {
+      targets.forEach(v => {
+        v.__interactionRows = rows;
+        v.__drillColumn = null;
+        if (v.loaded) this.transformSingleVisualChartData(v);
+      });
+      this.chartDataVersion++;
+      this.cdr.markForCheck();
+    });
+  }
+
+  /**
+   * Re-run ONLY the drill SOURCE visual: fetch rows scoped to the active drill
+   * path (parent-dimension EQUALS predicates) and re-point its category to the
+   * current drill dimension so it re-buckets one level deeper. Other visuals
+   * are untouched.
+   */
+  private reRunDrillSource(visual: Visual): void {
+    const path = this.interaction.drillPath();
+    const drillColumn =
+      path.length > 0 ? path[path.length - 1].columnName : visual.xAxisColumn;
+    const filters = this.interaction.toRunQueryFilters();
+    this.fetchScopedRows(filters).then(rows => {
+      (visual as any).__interactionRows = rows;
+      (visual as any).__drillColumn = drillColumn;
+      if (visual.loaded) this.transformSingleVisualChartData(visual);
+      this.chartDataVersion++;
+      this.cdr.markForCheck();
+    });
+  }
+
+  /** Clear a single visual's transient interaction override + re-transform. */
+  private clearVisualInteractionOverride(visual: Visual): void {
+    if (visual.__interactionRows == null && visual.__drillColumn == null) return;
+    visual.__interactionRows = null;
+    visual.__drillColumn = null;
+    if (visual.loaded) this.transformSingleVisualChartData(visual);
+  }
+
+  /**
+   * Toggle cross-filtering on a visual. When turning it off we drop the active
+   * scoped filter (if this visual owned it) and recover the targets. Marks
+   * dirty so the flag persists on next save. Also mirrors into
+   * config.interaction so the sidebar + dashboard read a consistent shape.
    */
   toggleCrossFilter(visual: Visual, event?: Event): void {
     if (event) event.stopPropagation();
     visual.crossFilterEnabled = !visual.crossFilterEnabled;
+    if (!visual.config) visual.config = {};
+    visual.config.interaction = {
+      ...(visual.config.interaction || {}),
+      crossFilter: {
+        ...(visual.config.interaction?.crossFilter || {}),
+        enabled: visual.crossFilterEnabled,
+        targets: visual.config.interaction?.crossFilter?.targets ?? 'same-tab',
+      },
+    };
     this.markDirty();
     if (!visual.crossFilterEnabled) {
-      this.interaction.clearCrossFilterFrom(visual.id);
-      this.loadDatasetData();
+      const active = this.interaction.scopedCrossFilter();
+      if (active && active.sourceVisualId === visual.id) {
+        this.interaction.clearScopedCrossFilter();
+        this.reRunCrossFilterTargets();
+      }
     }
     this.cdr.markForCheck();
   }
@@ -2825,34 +2980,147 @@ export class EditAnalysesComponent
     return this.interaction.hasActiveInteractions();
   }
 
-  /** Breadcrumb click — ascend to a drill level (index -1 = root). */
+  /** The active drill path (for the breadcrumb). */
+  get drillBreadcrumb() {
+    return this.interaction.drillPath();
+  }
+
+  /**
+   * Breadcrumb click — ascend to a drill level (index -1 = root). Re-runs the
+   * drill source (the visual whose drill produced the path). At the root the
+   * source's override is cleared so it recovers to its authored view.
+   */
   drillTo(index: number): void {
     this.interaction.drillUpTo(index);
-    this.loadDatasetData();
+    const source = this.getDrillSourceVisual();
+    if (!source) {
+      this.cdr.markForCheck();
+      return;
+    }
+    if (this.interaction.drillPath().length === 0) {
+      this.clearVisualInteractionOverride(source);
+      this.chartDataVersion++;
+    } else {
+      this.reRunDrillSource(source);
+    }
     this.cdr.markForCheck();
   }
 
-  /** Clear every cross-filter + reset the drill path, then re-run. */
+  /**
+   * The visual currently driving the active drill (the one with a live
+   * `__drillColumn` override). Null when no drill is active.
+   */
+  private getDrillSourceVisual(): Visual | null {
+    return this.visuals.find(v => v.__drillColumn != null) || null;
+  }
+
+  /**
+   * Clear every scoped cross-filter + reset the drill path, dropping all
+   * per-visual overrides so the whole canvas recovers to the base dataset.
+   */
   clearInteractions(): void {
     this.interaction.reset();
-    this.loadDatasetData();
+    this.visuals.forEach(v => {
+      v.__interactionRows = null;
+      v.__drillColumn = null;
+    });
+    this.transformAllVisualsChartData();
     this.cdr.markForCheck();
   }
 
   /**
    * The chart sidebar changed a visual's interaction config (cross-filter
-   * opt-in / drill dimensions). Mark dirty so it persists on save. If the
-   * focused visual just lost cross-filtering, drop any cross-filter it was
-   * contributing so the siblings recover immediately.
+   * opt-in / targets / drill dimensions / drill-to-detail). Mark dirty so it
+   * persists on save. If the focused visual just lost cross-filtering and owned
+   * the active scoped filter, drop it and recover the targets.
    */
   onVisualInteractionChanged(): void {
     this.markDirty();
     const v = this.getFocusedVisual();
-    if (v && !v.crossFilterEnabled) {
-      this.interaction.clearCrossFilterFrom(v.id);
-      if (this.interaction.hasActiveInteractions()) this.loadDatasetData();
+    if (v && !AnalysisInteractionService.isCrossFilterEnabled(v)) {
+      const active = this.interaction.scopedCrossFilter();
+      if (active && active.sourceVisualId === v.id) {
+        this.interaction.clearScopedCrossFilter();
+        this.reRunCrossFilterTargets();
+      }
     }
     this.cdr.markForCheck();
+  }
+
+  // ─── Drill-to-detail (Wave 6, §C): underlying-row inspector ──────────
+
+  /** Whether the drill-to-detail panel is open. */
+  detailPanelOpen = false;
+  /** Title shown on the detail panel header. */
+  detailPanelTitle = '';
+  /** Loading state for the detail-row fetch. */
+  detailPanelLoading = false;
+  /** Raw underlying rows shown in the detail panel. */
+  detailPanelRows: any[] = [];
+  /** Column keys for the detail table (derived from the first row). */
+  detailPanelColumns: string[] = [];
+
+  /**
+   * True when a visual has drill-to-detail enabled (config.interaction.
+   * drillToDetail.enabled). Used to gate the per-visual "detail" affordance.
+   */
+  isDrillToDetailEnabled(visual: Visual | null | undefined): boolean {
+    return !!visual?.config?.interaction?.drillToDetail?.enabled;
+  }
+
+  /**
+   * Open the drill-to-detail panel for a visual: fetch the underlying rows
+   * scoped to the active drill path + the clicked mark (or the whole visual
+   * scope when opened from the header), with NO aggregation so the BE returns
+   * the raw rows. Generalised — no assumption about the columns/values.
+   */
+  openDrillToDetail(visual: Visual, event?: any): void {
+    if (event?.stopPropagation) event.stopPropagation();
+    if (!this.isDrillToDetailEnabled(visual)) return;
+    const clickedColumn = visual.__drillColumn ?? visual.xAxisColumn;
+    const clickedValue = event ? this.extractClickedValue(event) : null;
+    const filters = this.interaction.drillToDetailFilters(
+      clickedColumn,
+      clickedValue,
+    );
+    this.detailPanelTitle =
+      visual.title || this.translate.instant('ANALYSES.V2.INTERACTION.DRILL_TO_DETAIL');
+    this.detailPanelOpen = true;
+    this.detailPanelLoading = true;
+    this.detailPanelRows = [];
+    this.detailPanelColumns = [];
+    this.cdr.markForCheck();
+    this.fetchScopedRows(filters).then(rows => {
+      this.detailPanelRows = rows;
+      this.detailPanelColumns =
+        rows.length > 0 ? Object.keys(rows[0]) : [];
+      this.detailPanelLoading = false;
+      this.cdr.markForCheck();
+    });
+  }
+
+  /** Close the drill-to-detail panel. */
+  closeDrillToDetail(): void {
+    this.detailPanelOpen = false;
+    this.detailPanelRows = [];
+    this.detailPanelColumns = [];
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Drop all interaction state (service + per-visual overrides) WITHOUT
+   * re-fetching. Called at the start of a base reload so the fresh shared
+   * dataset is not double-filtered by a stale scoped interaction. Unlike
+   * clearInteractions() this does not itself trigger a query — the caller is
+   * already fetching the base data.
+   */
+  private resetInteractionState(): void {
+    if (!this.interaction.hasActiveInteractions()) return;
+    this.interaction.reset();
+    this.visuals.forEach(v => {
+      v.__interactionRows = null;
+      v.__drillColumn = null;
+    });
   }
 
   onChartTypeSelected(): void {
