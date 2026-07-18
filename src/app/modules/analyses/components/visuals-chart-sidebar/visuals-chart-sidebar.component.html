@@ -222,6 +222,20 @@
                 </div>
               </p-overlayPanel>
             </div>
+            <!-- Non-aggregatable measure hint (issue #2): a geographic
+                 coordinate / doNotAggregate field summed as a measure is
+                 almost never meaningful. Subtle inline warning note under the
+                 well — never a hard block; the author can still aggregate if
+                 intended. GENERALISED via field semanticType, not column names. -->
+            <div
+              class="axis-warn"
+              *ngIf="showNonAggregatableHint(slot.key)"
+              [pTooltip]="'ANALYSES.V2.WELL.GEO_MEASURE_HINT' | translate"
+              tooltipPosition="top"
+            >
+              <i class="pi pi-exclamation-triangle"></i>
+              <span>{{ 'ANALYSES.V2.WELL.GEO_MEASURE_CHIP' | translate }}</span>
+            </div>
             <div
               class="axis-placeholder"
               *ngIf="!asScalar(getRoleValue(slot.key))"

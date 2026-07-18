@@ -2189,63 +2189,10 @@
 }
 
 // Empty State
-.empty-state {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 40px;
-  text-align: center;
-  color: var(--secondary-color);
-
-  > i {
-    font-size: var(--fs-h1);
-    margin-bottom: 24px;
-    opacity: 0.3;
-    color: var(--primary-color);
-  }
-
-  h3 {
-    font-size: var(--fs-h1);
-    font-weight: var(--fw-semibold);
-    margin: 0 0 12px 0;
-    color: var(--text-color);
-  }
-
-  > p {
-    font-size: var(--fs-body);
-    margin: 0 0 32px 0;
-    max-width: 400px;
-  }
-}
-
-.empty-state-tips {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-  align-items: flex-start;
-  background-color: var(--hover-background);
-  padding: 20px 24px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
-
-  .tip-item {
-    display: flex;
-    align-items: center;
-    gap: var(--space-5);
-    font-size: var(--fs-control);
-
-    i {
-      color: var(--primary-color);
-      font-size: var(--fs-body);
-    }
-
-    span {
-      color: var(--text-color);
-    }
-  }
-}
+// NOTE: the first-pass `.empty-state` / `.empty-state-tips` rules that lived
+// here were dead — fully superseded by the `!important` `.empty-state` block
+// further down (numbered-steps + CTA redesign) and the `.empty-state-tips`
+// display:none guard. Removed to keep this component's style budget lean.
 
 // ===================================================================
 // Responsive Design
@@ -3001,15 +2948,41 @@
   }
 
   &--primary {
-    background: var(--primary-color);
+    position: relative;
+    // Gradient primary — the studio's headline action.
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--primary-hover)
+    );
     color: var(--primary-text);
+    box-shadow: 0 1px 2px rgba(var(--primary-color-rgb), 0.35);
 
     &:hover:not(:disabled) {
-      background: var(--primary-hover);
+      filter: brightness(1.06);
+      box-shadow: 0 2px 6px rgba(var(--primary-color-rgb), 0.4);
     }
     &:disabled {
-      opacity: 0.5;
+      background: var(--a-bg-sunken, var(--hover-background));
+      color: var(--text-subtle);
+      box-shadow: none;
+      opacity: 1;
       cursor: not-allowed;
+    }
+
+    // Unsaved "dirty" dot — a small amber pip on the Save button while
+    // there are pending edits, so the author sees work is unpersisted.
+    &.is-dirty::after {
+      content: '';
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--warning-color);
+      border: 2px solid var(--a-bg-surface, var(--card-background));
+      box-shadow: 0 0 0 1px var(--warning-color);
     }
   }
 
@@ -3024,12 +2997,17 @@
       var(--success-dark)
     );
     color: var(--primary-text);
+    box-shadow: 0 1px 2px rgba(76, 175, 80, 0.3);
 
     &:hover:not(:disabled) {
       filter: brightness(1.05);
+      box-shadow: 0 2px 6px rgba(76, 175, 80, 0.35);
     }
     &:disabled {
-      opacity: 0.5;
+      background: var(--a-bg-sunken, var(--hover-background));
+      color: var(--text-subtle);
+      box-shadow: none;
+      opacity: 1;
       cursor: not-allowed;
     }
   }
@@ -3088,7 +3066,11 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-3);
-  padding: 0 var(--space-3);
+  // subtle pill — a sunken chip that carries the row-count + status dot
+  padding: 3px var(--space-4);
+  border: 1px solid var(--a-border-faint, var(--border-color));
+  border-radius: var(--radius-pill);
+  background: var(--a-bg-sunken, var(--secondary-background));
   font-size: var(--fs-label);
   color: var(--text-muted);
   white-space: nowrap;
@@ -3818,8 +3800,17 @@
 // ----------------------------------------------------------------------------
 // CANVAS + VISUAL CARDS
 // ----------------------------------------------------------------------------
+// Center column carries the subtle grey "canvas" surface so the left/right
+// rails (white) visually separate from it AND the active folder tab (which
+// is filled with this same canvas colour) reads as fused to the content
+// panel below the strip. Applies to the empty state too (it's a sibling of
+// .canvas-area inside .editor-container).
+.editor-container {
+  background-color: var(--a-bg-canvas) !important;
+}
+
 .canvas-area {
-  background-color: var(--a-bg-canvas);
+  background-color: var(--a-bg-canvas) !important;
   background-image: none;
 }
 
@@ -4357,15 +4348,21 @@
   border: none !important;
   flex: 1;
 
-  // Custom SVG icon — muted, no tinted ring, no marketing chrome.
+  // Custom SVG icon — big + muted hero, sits inside a soft tinted disc so
+  // the empty canvas has an intentional focal point (prototype look).
   .ci,
   .empty-state__icon {
-    display: inline-block !important;
-    width: 36px !important;
-    height: 36px !important;
-    margin: 0 0 var(--space-5) !important;
-    opacity: 0.5 !important;
-    filter: grayscale(1) brightness(0.6) !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 64px !important;
+    height: 64px !important;
+    margin: 0 0 var(--space-6) !important;
+    padding: 14px;
+    border-radius: var(--radius-2xl);
+    background: var(--a-bg-sunken, var(--secondary-background)) !important;
+    opacity: 0.9 !important;
+    filter: grayscale(1) brightness(0.85) !important;
   }
 
   // Bare PrimeIcon fallback (in case any callsite still uses pi)
@@ -4395,34 +4392,76 @@
     line-height: 1.5;
   }
 
-  // Quiet bullet tips list. Each line: small muted dot + plain copy.
-  // Replaces the previous boxed/iconed .empty-state-tips block.
-  .empty-state__tips {
+  // Numbered "getting started" steps — a primary-tinted numeral chip +
+  // plain copy per row. Reads as a mini-checklist, not a bullet dump.
+  .empty-state__steps {
     list-style: none;
     padding: 0;
-    margin: 0;
+    margin: 0 0 var(--space-7);
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
+    gap: var(--space-4);
     text-align: left;
+  }
+
+  .empty-state__step {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
     color: var(--text-muted);
     font-size: var(--fs-label);
-    line-height: 1.45;
+    line-height: 1.4;
+  }
 
-    li {
-      position: relative;
-      padding-left: var(--space-5);
+  .empty-state__step-num {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--primary-color-transparent);
+    color: var(--primary-color);
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-bold);
+  }
 
-      &::before {
-        content: '';
-        position: absolute;
-        left: 4px;
-        top: 8px;
-        width: 4px;
-        height: 4px;
-        border-radius: 50%;
-        background: var(--text-subtle);
-      }
+  .empty-state__step-text {
+    color: var(--text-muted);
+  }
+
+  // Primary CTA — gradient Add-visual button, same language as the toolbar
+  // Save so the studio's primary action reads consistently.
+  .empty-state__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    height: 34px;
+    padding: 0 var(--space-6);
+    border: none;
+    border-radius: var(--a-radius-sm, var(--radius-sm));
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--primary-hover)
+    );
+    color: var(--primary-text);
+    font-size: var(--fs-label);
+    font-weight: var(--fw-semibold);
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(var(--primary-color-rgb), 0.35);
+    transition:
+      filter var(--motion-fast) ease,
+      box-shadow var(--motion-fast) ease;
+
+    i {
+      font-size: 12px;
+    }
+
+    &:hover {
+      filter: brightness(1.06);
+      box-shadow: 0 3px 8px rgba(var(--primary-color-rgb), 0.4);
     }
   }
 
@@ -4652,46 +4691,69 @@
   }
 }
 
-/* ─── Analysis tab strip (Track A4) ─────────────────────────────────── */
+/* ─── Analysis tab strip (Track A4) — CONNECTED FOLDER TABS ──────────────
+   The active tab shares the canvas background (--a-bg-canvas) and drops its
+   bottom border so it reads as a manila folder tab fused to the content
+   panel below. The strip carries the hairline that the active tab "cuts"
+   through (via margin-bottom:-1px). Token-driven + dark-mode-safe: surface
+   for the strip, canvas for the active fill, --border-color for the line,
+   --primary-color for the active accent. Prototype radius 7px maps to a
+   literal 7px (between --radius-sm 6px and --radius-md 8px). */
 .analysis-tab-strip {
   display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--border-color);
+  align-items: flex-end;
+  gap: 3px;
+  // top + sides breathing room, NO bottom pad so tabs sit on the hairline
+  padding: var(--space-3) var(--space-4) 0;
+  border-bottom: 1px solid var(--a-border-faint, var(--border-color));
+  background: var(--a-bg-surface, var(--card-background));
   overflow-x: auto;
+  overflow-y: hidden;
   flex: 0 0 auto;
+  // hide the thin horizontal scrollbar unless it's needed
+  scrollbar-width: thin;
 
   &--empty {
-    border-bottom: 1px dashed var(--border-color);
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
   }
 }
 
 .analysis-tab {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-1, 4px) var(--space-3);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-xs);
-  background: var(--card-background);
+  gap: var(--space-3);
+  padding: 7px var(--space-5);
+  // rounded TOP corners only — folder-tab silhouette
+  border-radius: 7px 7px 0 0;
+  border: 1px solid transparent;
+  border-bottom: none;
+  background: transparent;
   color: var(--text-muted);
   font-size: var(--fs-label);
-  font-weight: var(--fw-medium);
+  font-weight: var(--fw-semibold);
+  line-height: 1.3;
   cursor: pointer;
   white-space: nowrap;
-  transition: all var(--motion-fast) ease;
+  // sit ON the strip's bottom hairline so the active tab can erase it
+  margin-bottom: -1px;
+  transition:
+    color var(--motion-fast) ease,
+    background var(--motion-fast) ease,
+    border-color var(--motion-fast) ease;
 
-  &:hover {
-    background: var(--hover-background);
+  &:hover:not(.active) {
+    background: var(--a-bg-hover, var(--hover-background));
     color: var(--text-color);
   }
 
   &.active {
-    border-color: var(--primary-color);
+    // merges into the canvas below — the defining folder-tab move
+    background: var(--a-bg-canvas, var(--home-background-color));
     color: var(--primary-color);
-    background: var(--primary-color-transparent, rgba(var(--primary-color-rgb), 0.08));
-    font-weight: var(--fw-semibold);
+    // top + sides border, NO bottom → connects to the content panel
+    border-color: var(--a-border-faint, var(--border-color));
+    border-bottom: 1px solid var(--a-bg-canvas, var(--home-background-color));
   }
 
   &__name {
@@ -4703,7 +4765,8 @@
   &__actions {
     display: inline-flex;
     align-items: center;
-    gap: 2px;
+    gap: 1px;
+    margin-left: var(--space-1);
     opacity: 0;
     transition: opacity var(--motion-fast) ease;
   }
@@ -4716,24 +4779,39 @@
   &__rename {
     border: 1px solid var(--primary-color);
     border-radius: var(--radius-xs);
-    padding: 2px 6px;
+    padding: 1px 5px;
+    width: 96px;
+    max-width: 120px;
     font-size: var(--fs-label);
-    min-width: 120px;
+    font-weight: var(--fw-semibold);
+    background: var(--input-background, var(--card-background));
+    color: var(--text-color);
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--primary-color-transparent);
+    }
   }
 
   .tab-act {
     font-size: var(--fs-micro);
-    padding: 2px;
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
     border-radius: var(--radius-xs);
-    color: var(--text-muted);
+    color: var(--text-subtle);
 
     &:hover {
       color: var(--primary-color);
-      background: var(--hover-background);
+      background: var(--a-bg-hover, var(--hover-background));
     }
 
     &--danger:hover {
       color: var(--error-color);
+      background: var(--error-bg);
     }
   }
 
@@ -4743,12 +4821,12 @@
     display: inline-flex;
 
     ::ng-deep .app-btn.is-icon {
-      width: auto;
+      width: 18px;
       min-width: 0;
-      height: auto;
-      padding: 2px;
+      height: 18px;
+      padding: 0;
       border-radius: var(--radius-xs);
-      color: var(--text-muted);
+      color: var(--text-subtle);
       background: transparent;
 
       .app-btn-ico {
@@ -4757,7 +4835,7 @@
 
       &:hover:not(:disabled) {
         color: var(--primary-color);
-        background: var(--hover-background);
+        background: var(--a-bg-hover, var(--hover-background));
       }
 
       &:disabled {
@@ -4768,32 +4846,68 @@
   }
 }
 
+// The "+" add-tab affordance — dashed square that echoes the folder tabs
+// but stays quiet until hovered. Sits on the strip baseline like a tab.
 .analysis-tab-add {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-2);
-  padding: var(--space-1, 4px) var(--space-3);
-  border: 1px dashed var(--border-color);
-  border-radius: var(--radius-xs);
-  background: transparent;
+  width: 26px;
+  height: 26px;
+  margin-bottom: 3px;
+  padding: 0;
+  border: 1px dashed var(--a-border-faint, var(--border-color));
+  border-radius: 7px;
+  background: var(--a-bg-surface, var(--card-background));
   color: var(--text-muted);
   font-size: var(--fs-label);
+  font-weight: var(--fw-bold);
   cursor: pointer;
-  transition: all var(--motion-fast) ease;
+  flex: 0 0 auto;
+  transition:
+    color var(--motion-fast) ease,
+    border-color var(--motion-fast) ease,
+    background var(--motion-fast) ease;
+
+  i {
+    font-size: 11px;
+  }
 
   &:hover:not(:disabled) {
     border-color: var(--primary-color);
+    border-style: solid;
     color: var(--primary-color);
+    background: var(--primary-color-transparent);
   }
 
   &:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
   }
 
+  // The labelled variant ("+ Add widget" / empty-strip "+ Add tab") is a
+  // pill with text, not a square. Vertically centred against the tab row.
   &--labelled {
-    font-weight: var(--fw-medium);
+    width: auto;
+    height: 28px;
+    margin-bottom: var(--space-3);
+    padding: 0 var(--space-5);
+    border-style: solid;
+    font-size: var(--fs-label);
+    font-weight: var(--fw-semibold);
+    align-self: center;
+
+    i {
+      font-size: 12px;
+    }
   }
+}
+
+// The strip's trailing spacer + "Add widget" pill sit centred, not on the
+// folder-tab baseline.
+.analysis-tab-strip .analysis-tab-spacer {
+  align-self: stretch;
 }
 
 /* ─── Quick add-tab control (type chips + name) ─────────────────────── */
@@ -5000,11 +5114,15 @@
 .cdk-drag-preview { box-shadow: var(--shadow-lg); border-radius: var(--radius-md); opacity: .95; }
 .cdk-drag-placeholder { opacity: .35; }
 .cdk-drag-animating, .visual-cell.cdk-drop-list-dragging .visual-box:not(.cdk-drag-placeholder) { transition: transform 180ms cubic-bezier(0,0,.2,1); }
-.analysis-tabs-track { display: inline-flex; align-items: center; gap: var(--space-1); min-width: 0; }
+.analysis-tabs-track { display: inline-flex; align-items: flex-end; gap: 3px; min-width: 0; }
 .analysis-tab {
   position: relative;
-  &.has-color { border-bottom: 2px solid var(--tab-color); }
-  &__color-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: var(--space-2); flex: 0 0 auto; }
-  &__drag-ph { width: 40px; height: 24px; border: 1px dashed var(--border-color); border-radius: var(--radius-sm); background: var(--hover-background); }
-  &.cdk-drag-preview { box-shadow: var(--shadow-md); }
+  // Per-tab colour signal — a top accent bar on the folder-tab silhouette
+  // (was a bottom border, which fights the connected active tab). The 7px
+  // color-dot echoes the prototype spec.
+  &.has-color { box-shadow: inset 0 3px 0 0 var(--tab-color); }
+  &.has-color.active { box-shadow: inset 0 3px 0 0 var(--tab-color); }
+  &__color-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; flex: 0 0 auto; }
+  &__drag-ph { width: 40px; height: 26px; border: 1px dashed var(--primary-color); border-radius: 7px 7px 0 0; background: var(--primary-color-transparent); }
+  &.cdk-drag-preview { box-shadow: var(--shadow-md); border-radius: 7px 7px 0 0; }
 }

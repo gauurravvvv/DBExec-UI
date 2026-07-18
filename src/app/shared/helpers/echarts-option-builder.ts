@@ -330,14 +330,29 @@ function buildLegendWithTitle(config: any): any {
  * cheap insurance).
  */
 function formatTooltipValue(config: any, value: any): any {
-  if (typeof config.tooltipPrecision !== 'number') return value;
-  if (typeof value === 'number' && isFinite(value)) {
-    return value.toFixed(config.tooltipPrecision);
+  // Explicit precision wins — round to exactly N decimals.
+  if (typeof config.tooltipPrecision === 'number') {
+    if (typeof value === 'number' && isFinite(value)) {
+      return value.toFixed(config.tooltipPrecision);
+    }
+    if (typeof value === 'string' && value !== '') {
+      const n = Number(value);
+      if (isFinite(n)) return n.toFixed(config.tooltipPrecision);
+    }
+    return value;
   }
-  // numeric strings can sneak in from SQL numerics — round those too
-  if (typeof value === 'string' && value !== '') {
-    const n = Number(value);
-    if (isFinite(n)) return n.toFixed(config.tooltipPrecision);
+  // No explicit precision: market-grade default — group with thousands
+  // separators and cap runaway float decimals (SUM(longitude) gives
+  // "-34321.44097199956"; a tooltip should read "-34,321.44"). Integers stay
+  // integers. Non-numeric values (categories) pass through untouched.
+  const n =
+    typeof value === 'number'
+      ? value
+      : typeof value === 'string' && value !== ''
+        ? Number(value)
+        : NaN;
+  if (isFinite(n)) {
+    return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
   }
   return value;
 }
@@ -372,9 +387,13 @@ function buildTooltip(config: any, defaultTrigger: string = 'item'): any {
   // overrides (heatmap, scatter, bubble, treemap, candlestick, etc.)
   // bypass it entirely. Those callsites use `formatTooltipValue()`
   // (below) to honour the same precision.
-  if (typeof config.tooltipPrecision === 'number') {
-    tooltip.valueFormatter = (v: any) => formatTooltipValue(config, v);
-  }
+  // Always route default-renderer tooltip values through formatTooltipValue —
+  // it honours an explicit tooltipPrecision AND, absent one, applies the
+  // market-grade default (thousands grouping + max 2 decimals) so raw floats
+  // like "-34321.44097199956" never surface. Chart-specific tooltip.formatter
+  // overrides (heatmap/scatter/bubble/…) bypass this and call
+  // formatTooltipValue themselves, so both paths agree.
+  tooltip.valueFormatter = (v: any) => formatTooltipValue(config, v);
   if (config.axisPointerType && config.axisPointerType !== 'none') {
     tooltip.axisPointer = {
       type: config.axisPointerType,
@@ -864,7 +883,12 @@ function buildCategoryAxis(
   // horizontal bar (category on the Y axis) showed the value label "Value"
   // over the category axis and vice-versa (names were swapped).
   const showLabel = config.showXAxisLabel;
-  const label = config.xAxisLabel;
+  // Auto-derived axis name (field name / "<agg> of <field>") stamped by the
+  // editor onto config._xAxisFieldLabel. The author's explicit label always
+  // wins; the derived name is the fallback so a fresh chart reads "sex"
+  // instead of the literal placeholder "Category". Empty string when there is
+  // no field — never a hardcoded literal.
+  const label = config.xAxisLabel || config._xAxisFieldLabel || '';
 
   // nameGap positions the axis name relative to the axis line.
   // ECharts does NOT measure rotated label height into nameGap, so a
@@ -943,6 +967,34 @@ function buildCategoryAxis(
   return result;
 }
 
+/**
+ * Compact abbreviation for a value-axis tick when the author hasn't set an
+ * explicit number format. Large magnitudes read far better abbreviated
+ * (5,000,000 → "5M", 1,200 → "1.2K") than as long grouped integers — this is
+ * the market-grade default a real BI tool applies to measure axes. Small
+ * magnitudes (< 1000) and non-finite values fall back to locale grouping so
+ * they read naturally. GENERALISED: no unit/currency assumption — a user who
+ * wants "$1.2M" sets an explicit currency format, which applyPerFieldFormat
+ * layers on top (replacing this default formatter entirely).
+ */
+function compactAxisNumber(value: any): string {
+  const n = typeof value === 'number' ? value : Number(value);
+  if (!isFinite(n)) return value == null ? '' : String(value);
+  const abs = Math.abs(n);
+  const sign = n < 0 ? '-' : '';
+  // One decimal, trimmed of a trailing ".0" so "5.0M" reads as "5M".
+  const trim = (x: number) => {
+    const s = x.toFixed(1);
+    return s.endsWith('.0') ? s.slice(0, -2) : s;
+  };
+  if (abs >= 1e12) return `${sign}${trim(abs / 1e12)}T`;
+  if (abs >= 1e9) return `${sign}${trim(abs / 1e9)}B`;
+  if (abs >= 1e6) return `${sign}${trim(abs / 1e6)}M`;
+  if (abs >= 1e3) return `${sign}${trim(abs / 1e3)}K`;
+  // < 1000 — group naturally (handles small decimals + integers).
+  return n.toLocaleString();
+}
+
 function buildValueAxis(config: any, axis: 'x' | 'y'): any {
   const isX = axis === 'x';
   // `show` stays keyed to physical position; the NAME follows the data role.
@@ -951,7 +1003,12 @@ function buildValueAxis(config: any, axis: 'x' | 'y'): any {
   // value axis is drawn horizontally (horizontal bars) or vertically.
   const showAxis = isX ? config.xAxis !== false : config.yAxis !== false;
   const showLabel = config.showYAxisLabel;
-  const label = config.yAxisLabel;
+  // Auto-derived measure-axis name ("Sum of total_charge") stamped by the
+  // editor onto config._yAxisFieldLabel. Author's explicit label wins; the
+  // derived name is the fallback so the value axis names the measure +
+  // aggregate instead of the literal placeholder "Value". Empty string when
+  // there is no field — never a hardcoded literal.
+  const label = config.yAxisLabel || config._yAxisFieldLabel || '';
   const result: any = {
     type: 'value',
     show: showAxis,
@@ -975,6 +1032,14 @@ function buildValueAxis(config: any, axis: 'x' | 'y'): any {
     axisLabel: {
       ...CHART_TYPOGRAPHY.axisLabel,
       fontFamily: CHART_TYPOGRAPHY.fontFamily,
+      // Market-grade default: abbreviate large magnitudes (5,000,000 → "5M").
+      // Only when the author hasn't set an explicit number format — a real
+      // valueFormat (currency/percent/decimal) is layered on later by
+      // applyPerFieldFormat, which replaces this formatter entirely.
+      ...(config?.valueFormat && config.valueFormat.kind &&
+      config.valueFormat.kind !== 'auto'
+        ? {}
+        : { formatter: (v: any) => compactAxisNumber(v) }),
     },
     splitLine: {
       show: config.showGridLines !== false,
@@ -1338,7 +1403,10 @@ export function buildBarChartOption(
       option.series = [
         {
           ...barSeriesBase,
-          name: 'Value',
+          // Series name = the derived measure label (drives the tooltip series
+          // name + single-series legend). Falls back to the value-axis label
+          // then '' — never the literal placeholder "Value".
+          name: config._yAxisFieldLabel || config.yAxisLabel || '',
           type: 'bar',
           data: coloredValues,
           emphasis: buildEmphasis(config, 'series'),

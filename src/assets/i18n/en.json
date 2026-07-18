@@ -1686,7 +1686,8 @@
       "PERCENTILE_LABEL": "Percentile (P)",
       "EXTRA_MEASURES": "Extra measures",
       "ADD_MEASURE": "Add measure",
-      "ALIAS_PH": "Alias"
+      "ALIAS_PH": "Alias",
+      "AGGREGATE_PH": "Aggregate function"
     },
     "ANALYTICS": {
       "SECTION": "Analytics",
@@ -1865,7 +1866,9 @@
         "DETAIL": "Detail",
         "TOOLTIP": "Tooltip",
         "ROWS": "Rows",
-        "COLUMNS": "Columns"
+        "COLUMNS": "Columns",
+        "GEO_MEASURE_HINT": "This is a geographic field — aggregating it (sum/average) is usually not meaningful. It is charted as-is; pick an aggregate only if you intend to.",
+        "GEO_MEASURE_CHIP": "Geographic field — aggregation may not be meaningful"
       },
       "AXIS": {
         "MIN": "Minimum",
@@ -2010,7 +2013,9 @@
       "MENU_SORT_NONE": "No sort",
       "MENU_FORMAT": "Format…",
       "MENU_REMOVE": "Remove from well"
-    }
+    },
+    "AXIS_AGG_OF": "{{agg}} of {{field}}",
+    "AUTO_TITLE_BY": "{{measure}} by {{dimension}}"
   },
   "DASHBOARD": {
     "TITLE": "Dashboards",

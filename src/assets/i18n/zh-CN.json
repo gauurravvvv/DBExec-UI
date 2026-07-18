@@ -1683,7 +1683,8 @@
       "PERCENTILE_LABEL": "百分位数 (P)",
       "EXTRA_MEASURES": "额外度量",
       "ADD_MEASURE": "添加度量",
-      "ALIAS_PH": "别名"
+      "ALIAS_PH": "别名",
+      "AGGREGATE_PH": "聚合函数"
     },
     "ANALYTICS": {
       "SECTION": "分析",
@@ -1862,7 +1863,9 @@
         "DETAIL": "明细",
         "TOOLTIP": "工具提示",
         "ROWS": "行",
-        "COLUMNS": "列"
+        "COLUMNS": "列",
+        "GEO_MEASURE_HINT": "这是一个地理字段——对其进行聚合（求和/平均）通常没有意义。它按原样绘制；仅在确有需要时才选择聚合方式。",
+        "GEO_MEASURE_CHIP": "地理字段——聚合可能没有意义"
       },
       "AXIS": {
         "MIN": "最小值",
@@ -2007,7 +2010,9 @@
       "MENU_SORT_NONE": "不排序",
       "MENU_FORMAT": "格式…",
       "MENU_REMOVE": "从字段移除"
-    }
+    },
+    "AXIS_AGG_OF": "{{field}} 的{{agg}}",
+    "AUTO_TITLE_BY": "按{{dimension}}的{{measure}}"
   },
   "DASHBOARD": {
     "TITLE": "仪表盘",

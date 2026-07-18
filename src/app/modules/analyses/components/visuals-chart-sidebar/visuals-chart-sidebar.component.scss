@@ -353,14 +353,14 @@
   }
 }
 
-// Axis label: tiny muted caption — "X-Axis", "Y-Axis", "Row", "Source"...
-// Sentence-case (no uppercase), letter-spacing 0, micro size.
+// Axis label: small uppercase letterspaced well label — "X-AXIS", "Y-AXIS",
+// "ROW"… Matches the prototype's micro well labels.
 .axis-label {
   font-size: var(--fs-micro);
   font-weight: var(--fw-semibold);
-  text-transform: none;
-  letter-spacing: 0;
-  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-wider, 0.06em);
+  color: var(--text-subtle);
   margin: 0;
   line-height: 1.2;
 }
@@ -404,9 +404,11 @@
       color var(--motion-fast) ease,
       background var(--motion-fast) ease;
 
+    // Remove (✕) — turns red on hover to signal destructive removal
+    // (prototype .rm look).
     &:hover {
-      color: var(--card-background);
-      background: var(--primary-color);
+      color: var(--primary-text);
+      background: var(--error-color);
     }
   }
 }
@@ -428,6 +430,34 @@
     font-style: normal;
     font-weight: var(--fw-regular);
     color: var(--text-muted);
+    line-height: 1.3;
+  }
+}
+
+// Non-aggregatable measure warning (issue #2). A quiet amber note that sits
+// under the well when a geo coordinate / doNotAggregate field is used as a
+// measure — reads as a hint, not an error. Token-driven warning palette.
+.axis-warn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-color);
+  border-radius: var(--radius-sm);
+  cursor: help;
+
+  i {
+    color: var(--warning-color);
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  span {
+    color: var(--warning-hover);
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-medium);
     line-height: 1.3;
   }
 }
@@ -496,19 +526,29 @@
   cursor: pointer;
 
   .axis-value__label {
+    // Mono field name — reads as a data token (prototype .fp look).
+    font-family: var(--font-mono);
     color: var(--primary-color);
-    font-size: var(--fs-micro);
+    font-size: 10.5px;
     font-weight: var(--fw-medium);
+    letter-spacing: -0.01em;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     line-height: 1.2;
   }
 
+  // The aggregate ("· SUM") reads as a clickable primary link with a dotted
+  // underline — the whole pill is the click target, but the dotted underline
+  // signals the aggregate is what changes (prototype .ag look).
   .axis-value__agg {
+    font-family: var(--font-mono);
     color: var(--primary-color);
-    font-size: var(--fs-micro);
-    opacity: 0.8;
+    font-size: 10.5px;
+    font-weight: var(--fw-semibold);
+    text-decoration: underline dotted;
+    text-underline-offset: 2px;
+    opacity: 0.95;
     white-space: nowrap;
   }
 

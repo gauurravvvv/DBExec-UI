@@ -1683,7 +1683,8 @@
       "PERCENTILE_LABEL": "Percentil (P)",
       "EXTRA_MEASURES": "Medidas extras",
       "ADD_MEASURE": "Adicionar medida",
-      "ALIAS_PH": "Alias"
+      "ALIAS_PH": "Alias",
+      "AGGREGATE_PH": "Função de agregação"
     },
     "ANALYTICS": {
       "SECTION": "Análises",
@@ -1862,7 +1863,9 @@
         "DETAIL": "Detalhe",
         "TOOLTIP": "Dica de ferramenta",
         "ROWS": "Linhas",
-        "COLUMNS": "Colunas"
+        "COLUMNS": "Colunas",
+        "GEO_MEASURE_HINT": "Este é um campo geográfico — agregá-lo (soma/média) geralmente não faz sentido. Ele é exibido como está; escolha uma agregação apenas se for intencional.",
+        "GEO_MEASURE_CHIP": "Campo geográfico — a agregação pode não fazer sentido"
       },
       "AXIS": {
         "MIN": "Mínimo",
@@ -2007,7 +2010,9 @@
       "MENU_SORT_NONE": "Sem ordenação",
       "MENU_FORMAT": "Formatar…",
       "MENU_REMOVE": "Remover do campo"
-    }
+    },
+    "AXIS_AGG_OF": "{{agg}} de {{field}}",
+    "AUTO_TITLE_BY": "{{measure}} por {{dimension}}"
   },
   "DASHBOARD": {
     "TITLE": "Painéis",

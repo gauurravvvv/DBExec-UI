@@ -1683,7 +1683,8 @@
       "PERCENTILE_LABEL": "Percentile (P)",
       "EXTRA_MEASURES": "Misure aggiuntive",
       "ADD_MEASURE": "Aggiungi misura",
-      "ALIAS_PH": "Alias"
+      "ALIAS_PH": "Alias",
+      "AGGREGATE_PH": "Funzione di aggregazione"
     },
     "ANALYTICS": {
       "SECTION": "Analisi",
@@ -1862,7 +1863,9 @@
         "DETAIL": "Dettaglio",
         "TOOLTIP": "Descrizione comando",
         "ROWS": "Righe",
-        "COLUMNS": "Colonne"
+        "COLUMNS": "Colonne",
+        "GEO_MEASURE_HINT": "Questo è un campo geografico: aggregarlo (somma/media) di solito non è significativo. Viene rappresentato così com’è; scegli un’aggregazione solo se intenzionale.",
+        "GEO_MEASURE_CHIP": "Campo geografico: l’aggregazione potrebbe non essere significativa"
       },
       "AXIS": {
         "MIN": "Minimo",
@@ -2007,7 +2010,9 @@
       "MENU_SORT_NONE": "Nessun ordinamento",
       "MENU_FORMAT": "Formato…",
       "MENU_REMOVE": "Rimuovi dal campo"
-    }
+    },
+    "AXIS_AGG_OF": "{{agg}} di {{field}}",
+    "AUTO_TITLE_BY": "{{measure}} per {{dimension}}"
   },
   "DASHBOARD": {
     "TITLE": "Dashboard",

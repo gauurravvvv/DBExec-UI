@@ -1126,8 +1126,14 @@ export const DEFAULT_CHART_CONFIG = {
   gridLineStyle: 'dashed', // splitLine.lineStyle.type
   showXAxisLabel: true,
   showYAxisLabel: true,
-  xAxisLabel: 'Category',
-  yAxisLabel: 'Value',
+  // Empty by default = "auto". The editor stamps the real field-derived name
+  // ("sex" / "Sum of total_charge") onto config._xAxisFieldLabel /
+  // _yAxisFieldLabel, which the option builder uses as the axis-name fallback.
+  // An author who types an explicit label here overrides the derived name.
+  // (Previously hardcoded "Category" / "Value" — which read like an
+  // unfinished template on every chart.)
+  xAxisLabel: '',
+  yAxisLabel: '',
   xAxisLabelRotate: 0, // axisLabel.rotate (0-90)
   niceScale: false, // yAxis.nice (was roundDomains)
   // yAxis.scale — default OFF so value axes start at zero. With scale:true

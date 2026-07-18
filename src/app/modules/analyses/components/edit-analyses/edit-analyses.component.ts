@@ -84,6 +84,10 @@ import {
   ROLE_EXPECTED_KIND,
   defaultAggregationOf,
 } from '../../utils/field-type.util';
+import {
+  dimensionAxisName,
+  measureAxisName,
+} from '../../utils/axis-label.util';
 import type { AnalysisParameter } from '../../models/analysis-parameter.model';
 import {
   AddAnalysesActions,
@@ -705,9 +709,50 @@ export class EditAnalysesComponent
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         for (const v of this.visuals) {
-          if (v.titleKey) v.title = this.translate.instant(v.titleKey);
+          // Auto-named visuals (titleKey still set) re-derive their title in the
+          // new locale — either the descriptive "<measure> by <dimension>" name
+          // or the plain "Untitled Visual" fallback.
+          if (v.titleKey) v.title = this.deriveAutoVisualTitle(v);
         }
       });
+  }
+
+  /**
+   * Descriptive auto-title for a visual whose title the user hasn't customised
+   * (titleKey still set). Reads the SAME field-derived names the axes use:
+   * "Sum of total_charge by department", "total_charge over encounter_date",
+   * or just the measure/dimension when only one is set. Falls back to the
+   * translated titleKey ("Untitled Visual") when there is no usable mapping.
+   * GENERALISED — driven by field metadata + aggregate, no hardcoded columns.
+   */
+  private deriveAutoVisualTitle(visual: any): string {
+    const fallback = this.translate.instant(
+      visual.titleKey || 'ANALYSES.UNTITLED_VISUAL',
+    );
+    if (!visual?.chartType) return fallback;
+    const catCol =
+      (visual.aggregate ? visual.dimensionColumn : null) ||
+      visual.xAxisColumn ||
+      null;
+    const measCol =
+      (visual.aggregate ? visual.measureColumn : null) ||
+      visual.yAxisColumn ||
+      null;
+    const measure = measureAxisName(
+      measCol,
+      visual.aggregate,
+      this.allFields,
+      (k, p) => this.translate.instant(k, p as any),
+    );
+    const dimension = dimensionAxisName(catCol, this.allFields);
+    if (measure && dimension) {
+      return this.translate.instant('ANALYSES.AUTO_TITLE_BY', {
+        measure,
+        dimension,
+      });
+    }
+    // Only one side mapped — name the visual after whichever exists.
+    return measure || dimension || fallback;
   }
 
   ngAfterViewInit(): void {
@@ -1566,6 +1611,7 @@ export class EditAnalysesComponent
         rows,
         mapping,
       );
+      this.stampDerivedAxisLabels(visual);
     }
   }
 
@@ -1589,6 +1635,56 @@ export class EditAnalysesComponent
       this.rawGraphData,
       this.chartDataTransformer.buildMapping(visual),
     );
+    this.stampDerivedAxisLabels(visual);
+  }
+
+  /**
+   * Stamp market-grade auto-derived axis names onto the visual's config as the
+   * TRANSIENT render hints `_xAxisFieldLabel` / `_yAxisFieldLabel`. The ECharts
+   * option builder reads these as the axis-name fallback when the author has
+   * not typed an explicit `xAxisLabel` / `yAxisLabel`, so a fresh chart reads
+   * "sex" on X and "Sum of total_charge" on Y instead of the literal
+   * placeholders "Category" / "Value".
+   *
+   * GENERALISED: the category name is the dimension field's display name; the
+   * measure name is "<agg verb> of <field>" (i18n) driven by the visual's
+   * `aggregate`. Both resolve from field metadata, no hardcoded columns. Keys
+   * are prefixed `_` to mark them render-only (they ride on config but are
+   * recomputed every rebuild, never authoritative — an explicit user label in
+   * `xAxisLabel`/`yAxisLabel` always wins in the builder).
+   */
+  private stampDerivedAxisLabels(visual: any): void {
+    if (!visual?.config) return;
+    // Legacy cleanup: analyses authored before this change persisted the
+    // literal placeholders "Category" / "Value" as the axis labels. Treat those
+    // as unset so the derived field name takes over — an author's REAL explicit
+    // label (anything else) is preserved untouched.
+    if (visual.config.xAxisLabel === 'Category') visual.config.xAxisLabel = '';
+    if (visual.config.yAxisLabel === 'Value') visual.config.yAxisLabel = '';
+    // Category axis = the X dimension (or the aggregated dimensionColumn).
+    const catCol =
+      (visual.__drillColumn as string) ||
+      (visual.aggregate ? visual.dimensionColumn : null) ||
+      visual.xAxisColumn ||
+      null;
+    // Measure axis = the Y measure (or the aggregated measureColumn).
+    const measCol =
+      (visual.aggregate ? visual.measureColumn : null) ||
+      visual.yAxisColumn ||
+      null;
+    visual.config._xAxisFieldLabel = dimensionAxisName(catCol, this.allFields);
+    visual.config._yAxisFieldLabel = measureAxisName(
+      measCol,
+      visual.aggregate,
+      this.allFields,
+      (k, p) => this.translate.instant(k, p as any),
+    );
+    // Auto-title: when the user hasn't renamed the visual (titleKey still set),
+    // give it a descriptive name from the mapping instead of "Untitled Visual".
+    // A user-typed title (titleKey === null) is never touched.
+    if (visual.titleKey) {
+      visual.title = this.deriveAutoVisualTitle(visual);
+    }
   }
 
   refreshData(): void {
@@ -2976,7 +3072,11 @@ export class EditAnalysesComponent
 
   getVisualChartLabel(chartType: string | null | undefined): string {
     if (!chartType) return this.translate.instant('ANALYSES.NO_CHART_SELECTED');
-    return CHART_TYPES.find(c => c.id === chartType)?.name ?? chartType;
+    // CHART_TYPES[].name is an i18n KEY (e.g. CHART_TYPES.BAR_VERTICAL.NAME) —
+    // it must be resolved through translate or the raw key leaks into the
+    // Layers list. Falls back to the chartType id for an unmapped type.
+    const key = CHART_TYPES.find(c => c.id === chartType)?.name;
+    return key ? this.translate.instant(key) : chartType;
   }
 
   isHeatMapChartType(chartType: string | null | undefined): boolean {
@@ -3604,6 +3704,15 @@ export class EditAnalysesComponent
         this.reRunCrossFilterTargets();
       }
     }
+    // A Properties-panel change (e.g. the Aggregate dropdown) can alter the
+    // derived measure-axis name ("Sum of …" → "Average of …"). Re-transform so
+    // the chart data + the stamped axis-label render hints stay in sync, and
+    // bump the versions so the OnPush chart-renderer re-reads config + data.
+    if (v) {
+      this.updateVisualChartData(v);
+    }
+    this.chartConfigVersion++;
+    this.chartDataVersion++;
     this.cdr.markForCheck();
   }
 

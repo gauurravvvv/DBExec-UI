@@ -257,8 +257,11 @@ export const DEFAULT_AXIS_CONFIG: AxisConfig = {
   showGridLines: true,
   showXAxisLabel: true,
   showYAxisLabel: true,
-  xAxisLabel: 'Category',
-  yAxisLabel: 'Value',
+  // Empty = "auto"; the Analyses editor stamps a field-derived axis name onto
+  // config._xAxisFieldLabel / _yAxisFieldLabel that the option builder uses as
+  // the fallback. Was hardcoded 'Category' / 'Value' (looked like a template).
+  xAxisLabel: '',
+  yAxisLabel: '',
   roundDomains: false,
   trimXAxisTicks: true,
   trimYAxisTicks: true,

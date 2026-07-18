@@ -162,6 +162,7 @@
         *hasPermission="'analyses'; level: 'write'"
         type="button"
         class="a-btn a-btn--primary"
+        [class.is-dirty]="hasUnsavedChanges() && !saving()"
         (click)="saveAnalysis()"
         [disabled]="!canSave || saving()"
       >
@@ -1434,7 +1435,9 @@
         </div>
       </div>
 
-      <!-- Empty State — subtle, quieter copy + custom SVG icon -->
+      <!-- Empty State — big muted icon + numbered "getting started" steps
+           + a primary Add-visual button. Numbered steps guide the author
+           from picking a chart → dropping fields → the visual rendering. -->
       <div
         class="empty-state"
         *ngIf="visualsInActiveTab.length === 0 && widgetsInActiveTab.length === 0"
@@ -1446,11 +1449,29 @@
         <p class="empty-state__hint">
           {{ 'ANALYSES.ADD_VISUAL_HINT' | translate }}
         </p>
-        <ul class="empty-state__tips">
-          <li>{{ 'ANALYSES.TIP_CLICK_CHART' | translate }}</li>
-          <li>{{ 'ANALYSES.TIP_DRAG_RESIZE' | translate }}</li>
-          <li>{{ 'ANALYSES.TIP_RIGHT_CLICK' | translate }}</li>
-        </ul>
+        <ol class="empty-state__steps">
+          <li class="empty-state__step">
+            <span class="empty-state__step-num">1</span>
+            <span class="empty-state__step-text">{{ 'ANALYSES.TIP_CLICK_CHART' | translate }}</span>
+          </li>
+          <li class="empty-state__step">
+            <span class="empty-state__step-num">2</span>
+            <span class="empty-state__step-text">{{ 'ANALYSES.TIP_DRAG_RESIZE' | translate }}</span>
+          </li>
+          <li class="empty-state__step">
+            <span class="empty-state__step-num">3</span>
+            <span class="empty-state__step-text">{{ 'ANALYSES.TIP_RIGHT_CLICK' | translate }}</span>
+          </li>
+        </ol>
+        <button
+          *hasPermission="'analyses'; level: 'write'"
+          type="button"
+          class="empty-state__cta"
+          (click)="addVisual()"
+        >
+          <i class="pi pi-plus"></i>
+          <span>{{ 'ANALYSES.ADD_VISUAL' | translate }}</span>
+        </button>
       </div>
     </div>
 

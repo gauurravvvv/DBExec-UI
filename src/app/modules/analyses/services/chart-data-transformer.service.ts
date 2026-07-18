@@ -262,21 +262,41 @@ export class ChartDataTransformerService {
         const yCol = mapping.yAxisColumn;
         if (!yCol) return [];
         const yNumeric = this.isColumnNumeric(rawData, yCol);
+        const aggFn = mapping.aggregate ?? null;
+        // Pure count mode: explicit COUNT, or a non-numeric measure with no
+        // explicit aggregate (legacy). Otherwise reduce the numeric samples by
+        // the chosen function so a KPI's AVG/MIN/MAX/etc. is correct.
+        const countMode = aggFn === 'count' || (!yNumeric && !aggFn);
         if (mapping.xAxisColumn) {
-          const agg = new Map<string, number>();
+          const buckets = new Map<string, number[]>();
+          const counts = new Map<string, number>();
           rawData.forEach(row => {
             const name = this.formatLabelValue(row[mapping.xAxisColumn!]);
-            const val = yNumeric ? this.toNumber(row[yCol]) : 1;
-            agg.set(name, (agg.get(name) || 0) + val);
+            if (countMode) {
+              counts.set(name, (counts.get(name) || 0) + 1);
+            } else {
+              const b = buckets.get(name) ?? [];
+              b.push(this.toNumber(row[yCol]));
+              buckets.set(name, b);
+            }
           });
-          return Array.from(agg.entries()).map(([name, value]) => ({
-            name,
-            value,
-          }));
+          return countMode
+            ? Array.from(counts.entries()).map(([name, value]) => ({
+                name,
+                value,
+              }))
+            : Array.from(buckets.entries()).map(([name, samples]) => ({
+                name,
+                value: this.aggregateSamples(samples, aggFn, mapping.percentile),
+              }));
         }
-        const total = yNumeric
-          ? rawData.reduce((s, row) => s + this.toNumber(row[yCol]), 0)
-          : rawData.length;
+        const total = countMode
+          ? rawData.length
+          : this.aggregateSamples(
+              rawData.map(row => this.toNumber(row[yCol])),
+              aggFn,
+              mapping.percentile,
+            );
         return [{ name: yCol, value: total }];
       }
 
@@ -387,6 +407,69 @@ export class ChartDataTransformerService {
   }
 
   /**
+   * Reduce a bucket of numeric samples to a single value per the chosen
+   * aggregate function. Client-side twin of the BE aggregation wrap so the
+   * editor + dashboard (which never receive server-grouped rows) compute the
+   * SAME measure the author picked instead of blindly summing. Unknown / absent
+   * functions fall back to SUM (the legacy default). GENERALISED — no column or
+   * domain assumptions.
+   */
+  private aggregateSamples(
+    values: number[],
+    fn: string | null | undefined,
+    percentile?: number,
+  ): number {
+    if (!values.length) return 0;
+    switch (fn) {
+      case 'avg': {
+        return values.reduce((a, b) => a + b, 0) / values.length;
+      }
+      case 'min':
+        // reduce (not Math.min(...values)) so a very large bucket can't blow
+        // the argument-count stack limit.
+        return values.reduce((a, b) => (b < a ? b : a), values[0]);
+      case 'max':
+        return values.reduce((a, b) => (b > a ? b : a), values[0]);
+      case 'count':
+        return values.length;
+      case 'count_distinct':
+        return new Set(values).size;
+      case 'median':
+        return this.quantile(values, 0.5);
+      case 'percentile': {
+        const p =
+          typeof percentile === 'number' && percentile >= 0 && percentile <= 100
+            ? percentile / 100
+            : 0.9;
+        return this.quantile(values, p);
+      }
+      case 'stddev':
+      case 'variance': {
+        const mean = values.reduce((a, b) => a + b, 0) / values.length;
+        const variance =
+          values.reduce((a, b) => a + (b - mean) * (b - mean), 0) /
+          values.length;
+        return fn === 'variance' ? variance : Math.sqrt(variance);
+      }
+      case 'sum':
+      default:
+        return values.reduce((a, b) => a + b, 0);
+    }
+  }
+
+  /** Linear-interpolated quantile (q in [0,1]) over a numeric sample. */
+  private quantile(values: number[], q: number): number {
+    const sorted = [...values].sort((a, b) => a - b);
+    if (sorted.length === 1) return sorted[0];
+    const pos = (sorted.length - 1) * q;
+    const base = Math.floor(pos);
+    const rest = pos - base;
+    return sorted[base + 1] !== undefined
+      ? sorted[base] + rest * (sorted[base + 1] - sorted[base])
+      : sorted[base];
+  }
+
+  /**
    * Transform raw data to single-series format: [{name, value}]
    * Used for bar, pie, gauge, treemap, card charts
    *
@@ -405,7 +488,16 @@ export class ChartDataTransformerService {
 
     // Detect if Y-axis column contains numeric values by sampling
     const isYAxisNumeric = this.isColumnNumeric(rawData, mapping.yAxisColumn);
-    const aggregatedMap = new Map<string, number>();
+    // The explicit aggregate wins; 'count' works on any column (numeric or
+    // not). For a non-numeric measure with no explicit aggregate we still count
+    // occurrences (legacy). Otherwise gather the numeric samples per category
+    // and reduce them with the chosen function so AVG/MIN/MAX/etc. are correct
+    // — not silently summed.
+    const agg = mapping.aggregate ?? null;
+    const countMode = agg === 'count' || (!isYAxisNumeric && !agg);
+    // Samples per category (only used when not in pure count mode).
+    const samplesByLabel = new Map<string, number[]>();
+    const countByLabel = new Map<string, number>();
     // Remember one RAW x value per label so a temporal dimension can be
     // ordered chronologically by the underlying date, not the label text.
     const rawByLabel = new Map<string, unknown>();
@@ -417,29 +509,30 @@ export class ChartDataTransformerService {
       const name = this.formatCategoryLabel(rawName, mapping);
       if (!rawByLabel.has(name)) rawByLabel.set(name, rawName);
 
-      // Process Y-axis value (value/count)
-      let value: number;
-      if (isYAxisNumeric) {
-        value = this.toNumber(row[mapping.yAxisColumn!]);
-      } else {
-        // Count occurrences for non-numeric columns
-        value = 1;
+      if (countMode) {
+        countByLabel.set(name, (countByLabel.get(name) || 0) + 1);
+        return;
       }
-
-      const existing = aggregatedMap.get(name) || 0;
-      aggregatedMap.set(name, existing + value);
+      const bucket = samplesByLabel.get(name) ?? [];
+      bucket.push(this.toNumber(row[mapping.yAxisColumn!]));
+      samplesByLabel.set(name, bucket);
     });
 
-    // Keep zero-sum buckets (code-review CR-2). A legitimate zero total — a
+    // Keep zero buckets (code-review CR-2). A legitimate zero total — a
     // month with no sales, a category that summed to 0 — is real data: the
     // point must render as 0, not vanish (which would leave a misleading gap
     // in a time series and connect neighbouring points across the hole). The
     // multi-series path never filtered zeros, so keeping them here also makes
     // single- and multi-series charts of the same data agree.
-    const points = Array.from(aggregatedMap.entries()).map(([name, value]) => ({
-      name,
-      value,
-    }));
+    const points = countMode
+      ? Array.from(countByLabel.entries()).map(([name, value]) => ({
+          name,
+          value,
+        }))
+      : Array.from(samplesByLabel.entries()).map(([name, samples]) => ({
+          name,
+          value: this.aggregateSamples(samples, agg, mapping.percentile),
+        }));
 
     // Temporal dimension → chronological order; otherwise keep the legacy
     // value-descending order so non-time charts are unchanged.
@@ -1118,21 +1211,33 @@ export class ChartDataTransformerService {
     // x value (a temporal dimension sorts chronologically across all series).
     const rawByLabel = new Map<string, unknown>();
 
-    // Aggregate one numeric-or-count per (series, category)
+    // Aggregate one value per (series, category), honouring the chosen
+    // aggregate (SUM/AVG/MIN/MAX/COUNT/…) instead of blindly summing so combo /
+    // stacked / multi-line measures are correct client-side.
+    const aggFn = mapping.aggregate ?? null;
     return valueCols.map(col => {
       const isNumeric = this.isColumnNumeric(rawData, col);
-      const aggregated = new Map<string, number>();
+      const countMode = aggFn === 'count' || (!isNumeric && !aggFn);
+      const buckets = new Map<string, number[]>();
+      const counts = new Map<string, number>();
       rawData.forEach(row => {
         const rawName = row[mapping.xAxisColumn!];
         const name = this.formatCategoryLabel(rawName, mapping);
         if (!rawByLabel.has(name)) rawByLabel.set(name, rawName);
-        const value = isNumeric ? this.toNumber(row[col]) : 1;
-        aggregated.set(name, (aggregated.get(name) ?? 0) + value);
+        if (countMode) {
+          counts.set(name, (counts.get(name) ?? 0) + 1);
+        } else {
+          const b = buckets.get(name) ?? [];
+          b.push(this.toNumber(row[col]));
+          buckets.set(name, b);
+        }
       });
-      const series = Array.from(aggregated.entries()).map(([name, value]) => ({
-        name,
-        value,
-      }));
+      const series = countMode
+        ? Array.from(counts.entries()).map(([name, value]) => ({ name, value }))
+        : Array.from(buckets.entries()).map(([name, samples]) => ({
+            name,
+            value: this.aggregateSamples(samples, aggFn, mapping.percentile),
+          }));
       return {
         name: col,
         // Chronological order for a temporal x; insertion order otherwise
@@ -1571,28 +1676,36 @@ export class ChartDataTransformerService {
       nullLabel: visual.config?.nullLabel ?? undefined,
     };
 
-    // ── Server-side aggregation shape (Track D) ──────────────────────
-    // When the visual declares an `aggregate`, the BE has already
-    // grouped the rows: each row is { <dimensionColumn>: <cat>, value:
-    // <agg>, [alias]: <agg>, ... } (buildAggregationWrap aliases the
-    // primary measure AS "value" and each extra combo measure AS its
-    // alias). Re-point the mapping so the standard category+value
-    // transforms read the dimension for X and the "value" alias for Y —
-    // x = dimension, y = value. Extra combo aliases (config.aggregations)
-    // feed the multi-series value columns so combo charts pick them up.
-    // No-op when `aggregate` is absent (raw-row back-compat).
+    // ── Aggregation shape (Track D) ──────────────────────────────────
+    // When the visual declares an `aggregate`, group by the dimension over the
+    // measure. The Analyses editor + dashboard render CLIENT-SIDE: the shared
+    // query returns RAW rows (never a server-grouped `value` column), so the
+    // transformer must aggregate the REAL measure column with the chosen
+    // function itself. Point x = dimension, y = the real measure column, and
+    // carry the aggregate + percentile so the category transforms accumulate
+    // correctly (SUM/AVG/MIN/MAX/COUNT/COUNT_DISTINCT/MEDIAN/…) instead of the
+    // blind SUM that made every aggregate render as a row COUNT. Combo extra
+    // measures come from config.aggregations[].column. No-op when `aggregate`
+    // is absent (raw-row back-compat).
     if (visual.aggregate) {
       mapping.xAxisColumn = visual.dimensionColumn ?? visual.xAxisColumn ?? null;
-      mapping.yAxisColumn = 'value';
+      mapping.yAxisColumn =
+        visual.measureColumn ?? visual.yAxisColumn ?? null;
+      mapping.aggregate = visual.aggregate;
+      mapping.percentile =
+        typeof visual.config?.percentile === 'number'
+          ? visual.config.percentile
+          : undefined;
       const extras = Array.isArray(visual.config?.aggregations)
         ? visual.config.aggregations
-            .map((a: any) => a?.alias)
+            .map((a: any) => a?.column)
             .filter((v: any) => typeof v === 'string' && v.length > 0)
         : [];
       if (extras.length > 0) {
-        // Prepend "value" so the primary measure is the first series and
-        // the combo aliases follow, matching the aggregation column order.
-        mapping.valueColumns = ['value', ...extras];
+        // Primary measure first, then the combo measure columns.
+        mapping.valueColumns = [mapping.yAxisColumn, ...extras].filter(
+          (v): v is string => typeof v === 'string' && v.length > 0,
+        );
       }
     }
 

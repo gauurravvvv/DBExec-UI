@@ -319,12 +319,18 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
    * template via | translate on optionLabel through the localize pass
    * below (kept as raw keys; we translate inline in the getters).
    */
-  // Aggregate function options are DB-driven (family: aggregate_fn). Seeded
-  // with the i18n-keyed fallback so the dropdown renders immediately, then
-  // overwritten with DB rows (label + order) once the reference-data service
-  // resolves. The leading NONE (value '') is a UI-only "no aggregate" entry
-  // that is NOT part of the DB family, so it's re-prepended after a DB load.
-  aggregateOptions: { label: string; value: AggregateFn | '' }[] = [
+  // Aggregate function options are DB-driven (family: aggregate_fn). The RAW
+  // arrays hold the i18n KEYS; `aggregateOptions` / `comboAggregateOptions` are
+  // the LOCALIZED copies the template binds to. localizeDropdownOptions()
+  // resolves the keys on init + language change, so the labels are never shown
+  // raw even when the DB family is empty. loadAggregateOptions() OVERWRITES the
+  // localized copies with DB rows (label + order) when the family resolves. The
+  // leading NONE (value '') is a UI-only "no aggregate" entry that is NOT part
+  // of the DB family, so it's re-prepended after a DB load.
+  private static readonly RAW_AGGREGATE_OPTIONS: {
+    label: string;
+    value: AggregateFn | '';
+  }[] = [
     { label: 'ANALYSES.AGG.NONE', value: '' },
     { label: 'ANALYSES.AGG.SUM', value: 'sum' },
     { label: 'ANALYSES.AGG.AVG', value: 'avg' },
@@ -339,18 +345,22 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     { label: 'ANALYSES.AGG.VARIANCE', value: 'variance' },
   ];
 
-  /** Aggregate options WITHOUT the "none" entry — for combo extra measures. */
+  /** Localized copy bound by the template (see RAW_AGGREGATE_OPTIONS). */
+  aggregateOptions: { label: string; value: AggregateFn | '' }[] = [
+    ...VisualConfigSidebarComponent.RAW_AGGREGATE_OPTIONS,
+  ];
+
+  /** Aggregate KEYS WITHOUT the "none" entry — for combo extra measures. */
+  private static readonly RAW_COMBO_AGGREGATE_OPTIONS: {
+    label: string;
+    value: AggregateFn;
+  }[] = VisualConfigSidebarComponent.RAW_AGGREGATE_OPTIONS.filter(
+    (o): o is { label: string; value: AggregateFn } => o.value !== '',
+  );
+
+  /** Localized combo copy bound by the template. */
   comboAggregateOptions: { label: string; value: AggregateFn }[] = [
-    { label: 'ANALYSES.AGG.SUM', value: 'sum' },
-    { label: 'ANALYSES.AGG.AVG', value: 'avg' },
-    { label: 'ANALYSES.AGG.COUNT', value: 'count' },
-    { label: 'ANALYSES.AGG.MIN', value: 'min' },
-    { label: 'ANALYSES.AGG.MAX', value: 'max' },
-    { label: 'ANALYSES.AGG.COUNT_DISTINCT', value: 'count_distinct' },
-    { label: 'ANALYSES.AGG.MEDIAN', value: 'median' },
-    { label: 'ANALYSES.AGG.PERCENTILE', value: 'percentile' },
-    { label: 'ANALYSES.AGG.STDDEV', value: 'stddev' },
-    { label: 'ANALYSES.AGG.VARIANCE', value: 'variance' },
+    ...VisualConfigSidebarComponent.RAW_COMBO_AGGREGATE_OPTIONS,
   ];
 
   /**
@@ -370,15 +380,29 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
   trendTypeOptions: { label: string; value: string }[] = [];
 
   /** Per-series render types for the dual-axis editor. */
-  readonly dualAxisSeriesTypeOptions: { label: string; value: string }[] = [
+  // RAW keys + localized copies (bound by the template) so the dual-axis
+  // editor's dropdowns never render raw i18n keys.
+  private static readonly RAW_DUAL_AXIS_SERIES_TYPE_OPTIONS: {
+    label: string;
+    value: string;
+  }[] = [
     { label: 'ANALYSES.ANALYTICS.SERIES_BAR', value: 'bar' },
     { label: 'ANALYSES.ANALYTICS.SERIES_LINE', value: 'line' },
   ];
+  dualAxisSeriesTypeOptions: { label: string; value: string }[] = [
+    ...VisualConfigSidebarComponent.RAW_DUAL_AXIS_SERIES_TYPE_OPTIONS,
+  ];
 
   /** Left / right axis choices for the dual-axis editor. */
-  readonly dualAxisSideOptions: { label: string; value: number }[] = [
+  private static readonly RAW_DUAL_AXIS_SIDE_OPTIONS: {
+    label: string;
+    value: number;
+  }[] = [
     { label: 'ANALYSES.ANALYTICS.AXIS_LEFT', value: 0 },
     { label: 'ANALYSES.ANALYTICS.AXIS_RIGHT', value: 1 },
+  ];
+  dualAxisSideOptions: { label: string; value: number }[] = [
+    ...VisualConfigSidebarComponent.RAW_DUAL_AXIS_SIDE_OPTIONS,
   ];
 
   /**
@@ -405,11 +429,19 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
   ];
   compareModeOptions: { label: string; value: string }[] = [];
 
-  /** Cross-filter target-mode choices for the Interaction section (E2). */
-  readonly crossFilterTargetOptions: { label: string; value: string }[] = [
+  /** Cross-filter target-mode choices for the Interaction section (E2). RAW
+   * holds the i18n keys; the mutable copy is localized in
+   * localizeDropdownOptions so the selected label never renders as a raw key. */
+  private static readonly RAW_CROSS_FILTER_TARGET_OPTIONS: {
+    label: string;
+    value: string;
+  }[] = [
     { label: 'ANALYSES.INTERACTION.TARGET_SAME_TAB', value: 'same-tab' },
     { label: 'ANALYSES.INTERACTION.TARGET_DASHBOARD', value: 'dashboard' },
     { label: 'ANALYSES.INTERACTION.TARGET_SELECTED', value: 'visuals' },
+  ];
+  crossFilterTargetOptions: { label: string; value: string }[] = [
+    ...VisualConfigSidebarComponent.RAW_CROSS_FILTER_TARGET_OPTIONS,
   ];
 
   /** True for the cartesian families the analytics sections support. */
@@ -1219,6 +1251,26 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     );
     this.conditionalDataTypeOptions = localize(
       VisualConfigSidebarComponent.RAW_CF_DTYPES,
+    );
+    // Aggregate dropdowns — resolve the i18n KEYS so the labels never render
+    // raw when the DB reference-data family (aggregate_fn) is empty / not yet
+    // loaded. loadAggregateOptions() overwrites these with DB rows on init when
+    // the family resolves; on a later language change we re-derive from the RAW
+    // keys here (correct fallback, never raw keys).
+    this.aggregateOptions = localize(
+      VisualConfigSidebarComponent.RAW_AGGREGATE_OPTIONS,
+    );
+    this.comboAggregateOptions = localize(
+      VisualConfigSidebarComponent.RAW_COMBO_AGGREGATE_OPTIONS,
+    );
+    this.crossFilterTargetOptions = localize(
+      VisualConfigSidebarComponent.RAW_CROSS_FILTER_TARGET_OPTIONS,
+    );
+    this.dualAxisSeriesTypeOptions = localize(
+      VisualConfigSidebarComponent.RAW_DUAL_AXIS_SERIES_TYPE_OPTIONS,
+    );
+    this.dualAxisSideOptions = localize(
+      VisualConfigSidebarComponent.RAW_DUAL_AXIS_SIDE_OPTIONS,
     );
     // Per-visual controls (Slice C).
     this.sortByOptions = localize(VISUAL_SORT_BY_OPTIONS);

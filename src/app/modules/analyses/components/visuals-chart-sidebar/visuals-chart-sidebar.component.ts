@@ -27,6 +27,10 @@ import {
 } from '../../constants/charts.constants';
 import { RoleKey, Visual } from '../../models/visual.model';
 import { toFieldKind } from '../../utils/field-type.util';
+import {
+  findFieldByColumn,
+  isNonAggregatableMeasure,
+} from '../../utils/axis-label.util';
 
 /**
  * A single slot in the field-mapping panel. Driven by the chart's
@@ -570,6 +574,22 @@ export class VisualsChartSidebarComponent implements OnInit, OnDestroy {
   /** True when the pill's role is a measure (aggregation applies). */
   isMeasureRole(role: RoleKey): boolean {
     return VisualsChartSidebarComponent.MEASURE_ROLES.has(role);
+  }
+
+  /**
+   * Soft inline hint (issue #2): true when a MEASURE slot holds a field whose
+   * BE semanticType marks it non-aggregatable — a geographic coordinate
+   * (SUM(longitude) is nonsense), or a field flagged doNotAggregate. Drives a
+   * subtle warning chip in the well; it never blocks — the author can still
+   * aggregate if they mean to. GENERALISED via field metadata, not column
+   * names, so it holds for any dataset.
+   */
+  showNonAggregatableHint(role: RoleKey): boolean {
+    if (!this.isMeasureRole(role)) return false;
+    const col = this.asScalar(this.getRoleValue(role));
+    if (!col) return false;
+    const field = findFieldByColumn(col, this.allFields);
+    return isNonAggregatableMeasure(field);
   }
 
   /** Open the pill menu for a scalar role via the overlay panel. */

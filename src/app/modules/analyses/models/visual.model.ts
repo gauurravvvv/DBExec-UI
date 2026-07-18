@@ -121,6 +121,19 @@ export interface ChartDataMapping {
   nullAsMember?: boolean;
   /** Label used for the retained null category (defaults to '(null)'). */
   nullLabel?: string;
+
+  // ── Client-side aggregation (editor + dashboard render path) ─────────
+  /**
+   * Aggregate function to apply per category over the measure column. The
+   * Analyses editor + dashboard aggregate CLIENT-SIDE (the shared query returns
+   * raw rows, never a server-grouped `value` column), so the transformer must
+   * honour this instead of blindly summing. null / absent → SUM for numeric
+   * measures / COUNT for non-numeric (the legacy default), so untouched charts
+   * are unchanged.
+   */
+  aggregate?: import('./visual.model').AggregateFn | null;
+  /** Percentile rank P (1..99) when aggregate === 'percentile'. */
+  percentile?: number;
 }
 
 /**
