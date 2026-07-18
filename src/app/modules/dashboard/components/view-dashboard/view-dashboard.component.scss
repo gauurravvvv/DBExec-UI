@@ -291,68 +291,73 @@
 // the toolbar's filter-toggle button so the interaction reads
 // as a single coherent gesture.
 //
-// The inner analysis-filter-bar is forced to render vertically
-// via the ::ng-deep override block at the bottom of this file —
-// the bar is horizontal by default (intended for top-bar usage
-// from earlier iterations), but inside a 260px sidebar each chip
-// gets a full row.
-.filter-sidebar {
-  width: 260px;
-  min-width: 260px;
-  background: var(--card-background);
-  border-right: 1px solid var(--border-color);
-  display: flex;
-  flex-direction: column;
-  transition: all var(--motion-slow) ease;
-  overflow: hidden;
+// ── Persistent horizontal filter bar (pinned above the canvas) ─────────
+// Filters are always visible at the top of the dashboard so viewers reach
+// them immediately. The shared analysis-filter-bar renders its controls
+// horizontally (its native layout) inside .filter-bar-body; a compact head
+// row carries the title, applied-count badge, and a collapse chevron.
+.dashboard-filter-bar {
   flex-shrink: 0;
+  background: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
 
-  &.collapsed {
-    width: 0;
-    min-width: 0;
-    border-right: none;
-  }
-
-  .sidebar-content {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    overflow: hidden;
-    min-width: 260px; // hold inner content width during slide-out animation
-  }
-
-  .sidebar-header-info {
-    padding: 12px 16px;
-    background-color: var(--hover-background);
-    border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;
-    height: 48px;
+  .filter-bar-head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    padding: var(--space-2) var(--space-4);
+  }
 
-    .dataset-label {
-      font-size: var(--fs-body);
-      font-weight: var(--fw-semibold);
-      color: var(--secondary-color);
-      letter-spacing: 0.5px;
-      margin: 0;
+  .filter-bar-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    border: none;
+    background: transparent;
+    color: var(--text-color);
+    font: inherit;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: background var(--motion-fast) ease;
+
+    &:hover {
+      background: var(--hover-background);
     }
 
+    > .pi-filter {
+      color: var(--primary-color);
+      font-size: 0.9rem;
+    }
+
+    .filter-bar-title {
+      font-size: var(--fs-label);
+      font-weight: var(--fw-semibold);
+      letter-spacing: 0.02em;
+    }
+
+    .filter-bar-chevron {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-left: var(--space-1);
+    }
   }
 
-  .sidebar-divider {
-    height: 1px;
-    background-color: var(--border-color);
-    flex-shrink: 0;
+  // Body holds the shared bar; a top hairline separates it from the head.
+  .filter-bar-body {
+    padding: 0 var(--space-4) var(--space-3);
+    border-top: 1px solid var(--a-border-faint, var(--border-color));
+    animation: dash-filter-reveal var(--motion-fast) ease;
   }
 
-  .sidebar-content-inner {
-    flex: 1;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+  &.collapsed .filter-bar-head {
+    // when collapsed the head is the only row — no bottom rule needed
+    padding-bottom: var(--space-2);
   }
+}
+
+@keyframes dash-filter-reveal {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 // Canvas Container
@@ -609,74 +614,35 @@
 }
 
 // ===================================================================
-// Inner analysis-filter-bar overrides inside the dashboard sidebar
+// Inner analysis-filter-bar in the dashboard's horizontal top bar
 // ===================================================================
-// The shared bar renders chips horizontally with flex-wrap by default
-// (designed for a top-bar layout used in earlier iterations). Inside
-// our 260px sidebar each chip needs its own row, so we override the
-// bar's flex direction and reset its container padding. ::ng-deep
-// pierces the bar's emulated encapsulation; scoping to .filter-sidebar
-// keeps the override surgical — other consumers (Edit Analysis,
-// view-analyses) are unaffected.
-:host ::ng-deep .filter-sidebar {
+// The shared bar's native layout is already horizontal with wrap, which is
+// exactly what the top bar wants — so the overrides here are light: strip the
+// bar's own chrome (it sits inside our .filter-bar-body which owns padding /
+// borders) and give each control a comfortable min-width so many filters wrap
+// onto tidy rows instead of squashing. Scoped to .dashboard-filter-bar so
+// other consumers (Edit Analysis, view-analyses) are unaffected.
+:host ::ng-deep .dashboard-filter-bar {
   .filter-bar {
-    flex-direction: column;
-    align-items: stretch;
     padding: 0;
     border-bottom: none;
     background: transparent;
-    gap: 0;
-    height: 100%;
-    overflow: hidden;
   }
 
   .filter-controls {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-5);
-    padding: var(--space-5);
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-
-    &::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: var(--border-color);
-      border-radius: var(--radius-xs);
-
-      &:hover {
-        background: var(--secondary-color);
-      }
-    }
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--space-4);
+    padding: var(--space-3) 0 0;
   }
 
-  // Each filter chip takes the full sidebar width — no min/max
-  // cap that would create awkward dead space.
+  // Each filter control gets a sensible fixed-ish width so a row of filters
+  // reads as neat columns and wraps cleanly on narrow viewports.
   .filter-control {
-    min-width: 0;
-    max-width: none;
-    width: 100%;
-  }
-
-  // Filter actions (Clear button — Apply is hidden in autoApply
-  // mode) pinned to the bottom with a divider so they don't scroll
-  // away when the user has many filters.
-  .filter-actions {
-    flex-shrink: 0;
-    padding: var(--space-5);
-    border-top: 1px solid var(--border-color);
-    background: var(--card-background);
-
-    button {
-      flex: 1;
-    }
+    min-width: 220px;
+    max-width: 300px;
+    flex: 0 1 240px;
   }
 }
 

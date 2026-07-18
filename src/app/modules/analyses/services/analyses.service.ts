@@ -371,6 +371,10 @@ export class AnalysesService {
       tabs,
       tabDeletes,
       parameters,
+      // Filters are authored draft-only in the editor and folded into this
+      // atomic save (same as tabs/params). They MUST ride the same PUT or they
+      // never persist — the BE reconciles the provided array authoritatively.
+      filters,
     } = payload;
     this._saving.set(true);
     try {
@@ -390,6 +394,7 @@ export class AnalysesService {
             ...(tabs !== undefined ? { tabs } : {}),
             ...(tabDeletes !== undefined ? { tabDeletes } : {}),
             ...(parameters !== undefined ? { parameters } : {}),
+            ...(filters !== undefined ? { filters } : {}),
             justification,
           },
           { skipLoader: true },

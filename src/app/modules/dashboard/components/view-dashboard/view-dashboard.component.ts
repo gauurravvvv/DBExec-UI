@@ -203,14 +203,26 @@ export class ViewDashboardComponent
   isDataLoading = signal(false);
 
   /**
-   * Filter sidebar open state. Default CLOSED so the dashboard
-   * loads with the canvas at full width — viewers consuming a
-   * dashboard usually want chart real estate first; only the ones
-   * who want to drill down open the panel. The toolbar filter
-   * button toggles this. Mirrors the Edit Analysis sidebar pattern
-   * so navigation between modules feels the same.
+   * Filter-bar open state. Default OPEN so the dashboard's filters are
+   * visible and reachable the moment it loads — filters are a primary way
+   * viewers interact with a dashboard, so they should never be hidden behind
+   * a toggle. The bar can still be collapsed (chevron) by viewers who want
+   * maximum chart real estate.
    */
-  isFilterSidebarOpen = false;
+  isFilterSidebarOpen = true;
+
+  /** Count of filters that currently have an applied value (for the badge). */
+  get appliedFilterCount(): number {
+    const applied = this.appliedFilters || [];
+    return applied.filter(
+      f =>
+        f &&
+        f.value !== undefined &&
+        f.value !== null &&
+        f.value !== '' &&
+        !(Array.isArray(f.value) && f.value.length === 0),
+    ).length;
+  }
 
   toggleFilterSidebar(): void {
     this.isFilterSidebarOpen = !this.isFilterSidebarOpen;

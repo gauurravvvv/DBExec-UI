@@ -4520,6 +4520,28 @@ export class EditAnalysesComponent
         color: (t as any).color ?? null,
       }));
 
+      // Draft filters ride the atomic save too — the filter dialog is
+      // draft-only (emits into configuredFilters), so the authoritative
+      // filter set must be sent here or it never persists. The BE wipes the
+      // cloned copies and re-inserts from this array (same model as tabs).
+      const filtersPayload = this.configuredFilters.map((f, i) => ({
+        id: f.tempId,
+        name: f.name,
+        columnName: f.columnName,
+        filterType: f.filterType,
+        controlType: f.controlType,
+        config: f.config || {},
+        nullOption: f.nullOption || 'ALL_VALUES',
+        isEnabled: f.isEnabled !== false,
+        isMandatory: !!f.isMandatory,
+        sequence: typeof f.sequence === 'number' ? f.sequence : i,
+        scope: f.scope ?? 'dashboard',
+        targetTabId: f.targetTabId ?? null,
+        targetVisualIds: Array.isArray(f.targetVisualIds)
+          ? f.targetVisualIds
+          : [],
+      }));
+
       const updatePayload = {
         id: this.analysisId,
         name: formData.name,
@@ -4529,6 +4551,7 @@ export class EditAnalysesComponent
         visuals: visualConfigurations,
         tabs: tabsPayload,
         tabDeletes: this._pendingTabDeletes,
+        filters: filtersPayload,
       };
 
       this.analysesService

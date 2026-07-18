@@ -133,24 +133,9 @@
           <i class="pi pi-sliders-h"></i>
         </button>
 
-        <!--
-          Filter-panel toggle — icon-only, segmented-button feel.
-          Active state when the sidebar is open. Hidden when the
-          analysis has zero filters configured (nothing to show).
-        -->
-        <button
-          type="button"
-          class="header-icon-btn"
-          [class.is-active]="isFilterSidebarOpen"
-          (click)="toggleFilterSidebar()"
-          *ngIf="filters.length > 0 && !gateOpen"
-          [pTooltip]="'DASHBOARD.FILTERS' | translate"
-          tooltipPosition="bottom"
-          [attr.aria-label]="'DASHBOARD.FILTERS' | translate"
-          [attr.aria-expanded]="isFilterSidebarOpen"
-        >
-          <i class="pi pi-filter"></i>
-        </button>
+        <!-- Filters now live in a persistent, always-visible bar at the top
+             of the canvas (see .dashboard-filter-bar), so the header no
+             longer needs a filter-panel toggle. -->
         <button
           type="button"
           class="header-icon-btn"
@@ -289,48 +274,65 @@
       </div>
     </div>
 
-    <!-- Content Section — sidebar on the left, canvas filling the rest. -->
+    <!-- Content Section — a persistent horizontal filter bar pinned at the
+         top of the canvas column, then the tab strip + canvas below it. -->
     <div
       class="content-section"
       *ngIf="!loading() && !rendering() && dashboard && !gateOpen"
     >
-      <!--
-        Filter sidebar — mirrors the Edit Analysis chrome (260px panel,
-        sticky header with title + count badge, divider, scrollable
-        content). When collapsed, the sidebar slides out to zero-width
-        so the canvas takes the full row.
-
-        Inside, we render the shared analysis-filter-bar with
-        [autoApply]=true so any value change debounces and re-emits
-        filtersApplied automatically — no separate "Apply" button to
-        hunt for. The bar's chips render vertically (one per row)
-        because we override its native horizontal flex via ::ng-deep
-        in this component's SCSS (see .filter-sidebar override block).
-      -->
-      <div
-        class="filter-sidebar"
-        [class.collapsed]="!isFilterSidebarOpen"
-        *ngIf="filters.length > 0"
-      >
-        <div class="sidebar-content">
-          <div class="sidebar-header-info">
-            <div class="dataset-label">
-              {{ 'DASHBOARD.FILTERS' | translate }}
-            </div>
-            <app-chip
-              variant="count"
-              size="sm"
-              *ngIf="filters.length > 0"
-              [count]="filters.length"
-            ></app-chip>
+      <!-- Right column: filter bar + tab strip (multi-tab only) + canvas -->
+      <div class="canvas-column">
+        <!--
+          Persistent filter bar (Track: filter UX). Filters live in a
+          always-visible horizontal bar at the TOP of the dashboard — the
+          standard BI pattern — so viewers see and reach them immediately
+          instead of hunting for a hidden sidebar toggle. Collapsible via the
+          header chevron for viewers who want maximum canvas, but OPEN by
+          default. The shared analysis-filter-bar renders its controls
+          horizontally (its native layout) with [autoApply]=true so value
+          changes debounce and re-query automatically.
+        -->
+        <div
+          class="dashboard-filter-bar"
+          [class.collapsed]="!isFilterSidebarOpen"
+          *ngIf="filters.length > 0"
+        >
+          <div class="filter-bar-head">
+            <button
+              type="button"
+              class="filter-bar-toggle"
+              (click)="toggleFilterSidebar()"
+              [attr.aria-expanded]="isFilterSidebarOpen"
+              [pTooltip]="
+                (isFilterSidebarOpen ? 'COMMON.COLLAPSE' : 'COMMON.EXPAND')
+                  | translate
+              "
+              tooltipPosition="bottom"
+            >
+              <i class="pi pi-filter"></i>
+              <span class="filter-bar-title">{{
+                'DASHBOARD.FILTERS' | translate
+              }}</span>
+              <app-chip
+                variant="count"
+                size="sm"
+                *ngIf="appliedFilterCount > 0"
+                tone="primary"
+                [count]="appliedFilterCount"
+              ></app-chip>
+              <i
+                class="pi filter-bar-chevron"
+                [ngClass]="
+                  isFilterSidebarOpen ? 'pi-chevron-up' : 'pi-chevron-down'
+                "
+              ></i>
+            </button>
           </div>
-          <div class="sidebar-divider"></div>
-          <div class="sidebar-content-inner">
-            <!-- Hosted mode: we pass the snapshotted filters directly
-                 and a fetcher factory pointing at the dashboard
-                 distinct-values endpoint, so the bar never falls back
-                 to the live AnalysesService path. analysisId is
-                 intentionally blank — the dashboard owns its filters. -->
+
+          <!-- Hosted mode: snapshotted filters + a fetcher factory pointing at
+               the dashboard distinct-values endpoint (blank analysisId — the
+               dashboard owns its filters). Renders horizontally. -->
+          <div class="filter-bar-body" *ngIf="isFilterSidebarOpen">
             <app-analysis-filter-bar
               [analysisId]="''"
               [filters]="filters"
@@ -341,10 +343,7 @@
             ></app-analysis-filter-bar>
           </div>
         </div>
-      </div>
 
-      <!-- Right column: tab strip (multi-tab only) + canvas -->
-      <div class="canvas-column">
         <!--
           Tab strip (Track A4). Rendered only when the dashboard has >1
           tab; single/implicit-tab dashboards render exactly as before.
