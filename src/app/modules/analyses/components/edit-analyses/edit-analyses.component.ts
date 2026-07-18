@@ -1541,12 +1541,19 @@ export class EditAnalysesComponent
     // dimensionColumn/aggregate (buildMapping re-points x=dimension,
     // y="value"), so they don't need x/y axis columns set to transform.
     const drillColumn: string | null = visual.__drillColumn ?? null;
-    const hasAxisPair = !!(
-      (drillColumn || visual.xAxisColumn) &&
-      visual.yAxisColumn
-    );
+    // Role-spec driven readiness — the SAME check the render gate uses. A
+    // hard `xAxis && yAxis` pair wrongly excluded chart types whose CHART_ROLES
+    // spec needs only one axis (number-card = yAxis only, histogram = xAxis
+    // only). On reload those never got their chartData computed and showed
+    // "No data available" even though the render gate considered them
+    // configured. `hasRequiredChartFields` honours each chart's role spec so
+    // every configured visual transforms. A drilled-into visual is ready once
+    // it has a drill column + measure even if xAxis wasn't set.
+    const hasRequiredRoles =
+      this.hasRequiredChartFields(visual) ||
+      !!(drillColumn && visual.yAxisColumn);
     const isAggregated = !!(visual.aggregate && visual.dimensionColumn);
-    if (visual.chartType && (hasAxisPair || isAggregated)) {
+    if (visual.chartType && (hasRequiredRoles || isAggregated)) {
       const mapping = this.chartDataTransformer.buildMapping(visual);
       // Drill re-points the category (x-axis; buildMapping already folds an
       // aggregated visual's dimensionColumn into xAxisColumn) to the current

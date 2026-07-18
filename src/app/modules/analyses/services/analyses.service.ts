@@ -354,7 +354,24 @@ export class AnalysesService {
   }
 
   async updateAnalyses(payload: any, justification?: string) {
-    const { id, name, description, datasetId, datasource, visuals } = payload;
+    const {
+      id,
+      name,
+      description,
+      datasetId,
+      datasource,
+      visuals,
+      // Tabs / tab-deletes / parameters are authored alongside visuals in the
+      // editor's atomic save. They MUST ride the same PUT — dropping them here
+      // meant `tabsProvided` was false server-side, so a visual carrying a
+      // client-side `tmp_` tabId was inserted verbatim into the uuid tabId
+      // column → 500 "invalid input syntax for type uuid". Forward them so the
+      // controller can reconcile tabs and re-key visual.tabId through the
+      // temp→real map.
+      tabs,
+      tabDeletes,
+      parameters,
+    } = payload;
     this._saving.set(true);
     try {
       return await lastValueFrom(
@@ -368,6 +385,11 @@ export class AnalysesService {
             datasetId,
             datasource,
             visuals,
+            // Only include when the caller actually manages them, so callers
+            // that update just metadata don't accidentally wipe tabs/params.
+            ...(tabs !== undefined ? { tabs } : {}),
+            ...(tabDeletes !== undefined ? { tabDeletes } : {}),
+            ...(parameters !== undefined ? { parameters } : {}),
             justification,
           },
           { skipLoader: true },

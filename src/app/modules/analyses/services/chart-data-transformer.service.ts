@@ -951,7 +951,7 @@ export class ChartDataTransformerService {
           ? this.toNumber(row[mapping.zAxisColumn])
           : 0;
         if (!isFinite(z)) continue;
-        const key = `${x} ${y}`;
+        const key = JSON.stringify([x, y]);
         const prev = groups.get(key);
         if (prev) {
           prev[2] += z;
