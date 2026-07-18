@@ -15,6 +15,10 @@ import {
   ViewChildren,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {
+  CdkDragDrop,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
@@ -63,6 +67,18 @@ import {
   AnalysisWidget,
   AnalysisWidgetsService,
 } from '../../services/analysis-widgets.service';
+import {
+  AuthoringHistory,
+  AuthoringSnapshot,
+} from '../../helpers/authoring-history';
+import {
+  AlignEdge,
+  DistributeAxis,
+  GridGeom,
+  VisualSelection,
+  alignGeoms,
+  distributeGeoms,
+} from '../../helpers/visual-selection';
 import {
   fieldFitsRoleMeta,
   ROLE_EXPECTED_KIND,
@@ -133,6 +149,167 @@ export class EditAnalysesComponent
   markDirty(): void {
     this._isDirty = true;
     this.chartConfigVersion++;
+  }
+
+  // ─── Undo / Redo (Wave 7, feature 1) ────────────────────────────────
+  //
+  // A bounded history stack over the in-memory draft (tabs, visuals, config,
+  // encodings, layout, widgets, active tab, pending tab deletes). Snapshots
+  // EXCLUDE transient/derived per-visual fields (Wave-6 __interactionRows /
+  // __drillColumn, plus chartData / pivotTotalRows / truncation) — see
+  // AuthoringHistory. Each mutating action calls captureHistory() BEFORE it
+  // mutates; undo/redo apply a snapshot and re-render. A restore leaves the
+  // draft dirty (it IS a draft mutation), matching the spec.
+  private readonly history = new AuthoringHistory(50);
+
+  /** Build a snapshot of the current draft state. */
+  private currentSnapshot(): AuthoringSnapshot {
+    return AuthoringHistory.snapshot(
+      this.tabs,
+      this.visuals,
+      this.widgets,
+      this.activeTabId,
+      this._pendingTabDeletes,
+    );
+  }
+
+  /**
+   * Record the pre-mutation draft state so it can be undone. Call at the
+   * START of any action that changes tabs / visuals / config / layout /
+   * widgets. No-op while a restore is in flight (guarded in AuthoringHistory).
+   */
+  captureHistory(): void {
+    this.history.capture(this.currentSnapshot());
+  }
+
+  get canUndo(): boolean {
+    return this.history.canUndo;
+  }
+  get canRedo(): boolean {
+    return this.history.canRedo;
+  }
+
+  /**
+   * Apply a snapshot back onto the live draft: replace the arrays with fresh
+   * (already deep-cloned) copies, re-hydrate transient render fields to empty,
+   * re-place on the grid, and re-transform so charts repaint. Marks dirty —
+   * an undo/redo is itself a draft edit.
+   */
+  private applySnapshot(snap: AuthoringSnapshot): void {
+    // Any active interaction is dropped — the restored layout may not contain
+    // the visuals a scoped filter/drill referenced. Reset without a refetch.
+    this.resetInteractionState();
+
+    this.tabs = (snap.tabs ?? []).map(t => ({ ...t }));
+    this.visuals = (snap.visuals ?? []).map(v => ({
+      ...v,
+      // Transient/derived fields were stripped from the snapshot; seed them
+      // empty so the render path recomputes from rawGraphData.
+      chartData: [],
+      __interactionRows: null,
+      __drillColumn: null,
+    }));
+    this.widgets = (snap.widgets ?? []).map(w => ({ ...w }));
+    this._pendingTabDeletes = (snap.pendingTabDeletes ?? []).map(d => ({
+      ...d,
+    }));
+
+    // Keep the active tab valid against the restored tab set.
+    const restoredActive = snap.activeTabId ?? null;
+    const stillExists =
+      restoredActive && this.tabs.some(t => t.id === restoredActive);
+    this.activeTabId = stillExists
+      ? restoredActive
+      : this.tabs.length > 0
+        ? this.tabs[0].id
+        : null;
+
+    // Selection + focus may reference visuals that no longer exist.
+    this.pruneSelection();
+    if (
+      this.focusedVisualId &&
+      !this.visuals.some(v => v.id === this.focusedVisualId)
+    ) {
+      this.focusedVisualId = null;
+      this.isConfigSidebarOpen = false;
+    }
+
+    this.placeVisualsOnGrid();
+    this.recalculateAllVisualDimensions();
+    if (this.rawGraphData && this.rawGraphData.length > 0) {
+      this.visuals.forEach(v => {
+        if (v.loaded) this.transformSingleVisualChartData(v);
+      });
+    }
+    this.chartDataVersion++;
+    this.markDirty();
+    this.cdr.markForCheck();
+  }
+
+  /** Undo the last mutating action (Ctrl/Cmd+Z + toolbar). */
+  undo(): void {
+    const snap = this.history.undo(this.currentSnapshot());
+    if (!snap) return;
+    this.history.isRestoring = true;
+    try {
+      this.applySnapshot(snap);
+    } finally {
+      this.history.isRestoring = false;
+    }
+  }
+
+  /** Redo the last undone action (Ctrl/Cmd+Shift+Z + toolbar). */
+  redo(): void {
+    const snap = this.history.redo(this.currentSnapshot());
+    if (!snap) return;
+    this.history.isRestoring = true;
+    try {
+      this.applySnapshot(snap);
+    } finally {
+      this.history.isRestoring = false;
+    }
+  }
+
+  /**
+   * Global keyboard shortcuts for undo / redo. Cmd on Mac, Ctrl elsewhere.
+   * Ctrl/Cmd+Z = undo, Ctrl/Cmd+Shift+Z (or Ctrl/Cmd+Y) = redo. Ignored while
+   * the user is typing in an input / textarea / contenteditable so we never
+   * hijack native text undo.
+   */
+  @HostListener('document:keydown', ['$event'])
+  onDocumentKeydown(event: KeyboardEvent): void {
+    const mod = event.metaKey || event.ctrlKey;
+    if (!mod) return;
+    const key = event.key?.toLowerCase();
+    if (key !== 'z' && key !== 'y') return;
+    if (this.isTypingTarget(event.target)) return;
+
+    if (key === 'y' || (key === 'z' && event.shiftKey)) {
+      if (this.canRedo) {
+        event.preventDefault();
+        this.redo();
+      }
+      return;
+    }
+    if (key === 'z') {
+      if (this.canUndo) {
+        event.preventDefault();
+        this.undo();
+      }
+    }
+  }
+
+  /** True when the event target is an editable control (skip undo capture). */
+  private isTypingTarget(target: EventTarget | null): boolean {
+    const el = target as HTMLElement | null;
+    if (!el || !el.tagName) return false;
+    const tag = el.tagName.toLowerCase();
+    return (
+      tag === 'input' ||
+      tag === 'textarea' ||
+      tag === 'select' ||
+      el.isContentEditable === true
+    );
   }
 
   /**
@@ -354,6 +531,33 @@ export class EditAnalysesComponent
   }
   visualCounter: number = 0;
   focusedVisualId: string | null = null;
+
+  // ─── Multi-select (Wave 7, feature 2) ───────────────────────────────
+  // `focusedVisualId` stays the PRIMARY (last-clicked) visual the config
+  // panel binds to; `selection` tracks the full multi-select set so
+  // align/distribute can operate on ≥2 visuals. Shift/Ctrl-click extends.
+  private readonly selection = new VisualSelection();
+
+  /** Ids currently in the multi-selection (template reads this via isSelected). */
+  get selectedVisualIds(): string[] {
+    return this.selection.values();
+  }
+
+  /** Count of selected visuals — drives the align/distribute toolbar. */
+  get selectedCount(): number {
+    return this.selection.size;
+  }
+
+  /** True when a visual is part of the active multi-selection. */
+  isSelected(id: string): boolean {
+    return this.selection.has(id);
+  }
+
+  /** Drop selection ids that no longer map to a live visual. */
+  private pruneSelection(): void {
+    this.selection.prune(new Set(this.visuals.map(v => v.id)));
+  }
+
   resizingVisual: any = null;
   resizeStartX: number = 0;
   resizeStartY: number = 0;
@@ -382,9 +586,6 @@ export class EditAnalysesComponent
 
   // Maximized visual
   maximizedVisual: any = null;
-
-  // Dragging
-  draggingVisual: any = null;
 
   // Title editing
   editingTitleId: string | null = null;
@@ -1995,6 +2196,7 @@ export class EditAnalysesComponent
       this.translate.instant('ANALYSES.TABS.NEW_TAB_NAME', {
         n: this.tabs.length + 1,
       });
+    this.captureHistory();
     // DRAFT: create the tab in-memory with a temp id. Nothing is persisted
     // until the user clicks Save (atomic updateAnalysis PUT maps tmp_ → real).
     const tab = {
@@ -2025,6 +2227,7 @@ export class EditAnalysesComponent
     if (!tabId) return;
     const tab = this.tabs.find(t => t.id === tabId);
     if (!tab || !name || name === tab.name) return;
+    this.captureHistory();
     // DRAFT: rename in-memory only; persisted by the atomic Save.
     tab.name = name;
     this.markDirty();
@@ -2058,6 +2261,7 @@ export class EditAnalysesComponent
     const tab = this.tabToDelete;
     const reason = this.tabDeleteJustification.trim();
     if (!tab) return;
+    this.captureHistory();
     // DRAFT: remove the tab in-memory. Reassign its visuals to the first
     // remaining tab, then drop it. The atomic Save re-inserts the surviving
     // tabs authoritatively (so a deleted tab simply isn't in the payload).
@@ -2090,6 +2294,7 @@ export class EditAnalysesComponent
     const idx = this.tabs.findIndex(t => t.id === tab.id);
     const target = idx + direction;
     if (idx < 0 || target < 0 || target >= this.tabs.length) return;
+    this.captureHistory();
     const next = [...this.tabs];
     [next[idx], next[target]] = [next[target], next[idx]];
     next.forEach((t, i) => (t.sequence = i));
@@ -2097,6 +2302,112 @@ export class EditAnalysesComponent
     // DRAFT: reorder in-memory; the new sequence rides the atomic Save.
     this.markDirty();
     this.cdr.markForCheck();
+  }
+
+  /**
+   * CDK drag-drop reorder of the tab strip (Wave 7, feature 4). Moves the
+   * dragged tab to its dropped index and re-sequences. Draft-only — the new
+   * order rides the atomic Save (same as moveTab, which stays as a fallback).
+   */
+  onTabDrop(event: CdkDragDrop<AnalysisTab[]>): void {
+    if (event.previousIndex === event.currentIndex) return;
+    this.captureHistory();
+    const next = [...this.tabs];
+    moveItemInArray(next, event.previousIndex, event.currentIndex);
+    next.forEach((t, i) => (t.sequence = i));
+    this.tabs = next;
+    this.markDirty();
+    this.cdr.markForCheck();
+  }
+
+  // ─── Tab context menu + per-tab colour (Wave 7, feature 4) ──────────
+  //
+  // A right-click on a tab opens a token-styled popup (appendTo=body via the
+  // template overlay) with rename / duplicate / delete / set-colour / move.
+  // Colour writes the analysis_tab `color` column (already persisted by the
+  // atomic Save — see handleSaveDialogClose tabsPayload). All draft-only.
+
+  /** The tab whose context menu / colour popover is currently open. */
+  ctxTab: AnalysisTab | null = null;
+
+  /**
+   * Preset tab colour swatches for the context menu. Token-derived hues so
+   * they read consistently in light/dark; the stored value is the literal CSS
+   * colour (persisted on the tab's `color` column). Generalised — no meaning
+   * attached to any colour.
+   */
+  readonly tabColorSwatches: string[] = [
+    'var(--primary-color)',
+    'var(--secondary-color)',
+    'var(--success-color, #2e9e5b)',
+    'var(--warning-color, #d98a00)',
+    'var(--danger-color, #d64545)',
+    'var(--info-color, #3b82c4)',
+  ];
+
+  /** Open the tab context menu at the pointer via the overlay panel. */
+  openTabContextMenu(tab: AnalysisTab, event: MouseEvent, op: any): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.ctxTab = tab;
+    op.show(event);
+  }
+
+  /** Index of a tab in the strip (for move-left/right guards in the menu). */
+  tabIndex(tab: AnalysisTab | null): number {
+    if (!tab) return -1;
+    return this.tabs.findIndex(t => t.id === tab.id);
+  }
+
+  /** Per-tab colour (read helper for the template dot/strip). */
+  tabColor(tab: AnalysisTab): string | null {
+    return (tab as any)?.color ?? null;
+  }
+
+  /** Apply a colour to the context-menu tab (draft-only). */
+  setTabColor(color: string | null): void {
+    if (!this.ctxTab) return;
+    this.captureHistory();
+    (this.ctxTab as any).color = color || null;
+    this.markDirty();
+    this.cdr.markForCheck();
+  }
+
+  /** Clear the context-menu tab's colour. */
+  clearTabColor(op?: any): void {
+    this.setTabColor(null);
+    op?.hide();
+  }
+
+  /** Context-menu: rename the tab (reuses inline rename). */
+  ctxRenameTab(op?: any): void {
+    const tab = this.ctxTab;
+    op?.hide();
+    if (!tab) return;
+    this.editingTabId = tab.id;
+    this.editingTabName = tab.name;
+    this.cdr.markForCheck();
+  }
+
+  /** Context-menu: duplicate the tab. */
+  ctxDuplicateTab(op?: any): void {
+    const tab = this.ctxTab;
+    op?.hide();
+    if (tab) this.duplicateTab(tab);
+  }
+
+  /** Context-menu: delete the tab (opens the confirm popup). */
+  ctxDeleteTab(event: Event, op?: any): void {
+    const tab = this.ctxTab;
+    op?.hide();
+    if (tab && this.tabs.length > 1) this.confirmDeleteTab(tab, event);
+  }
+
+  /** Context-menu: move the tab left/right. */
+  ctxMoveTab(direction: -1 | 1, op?: any): void {
+    const tab = this.ctxTab;
+    op?.hide();
+    if (tab) this.moveTab(tab, direction);
   }
 
   /** Toggle the per-visual "move to tab" menu. */
@@ -2114,6 +2425,7 @@ export class EditAnalysesComponent
     if (event) event.stopPropagation();
     this.moveMenuVisualId = null;
     if ((visual.tabId ?? this.firstTabId) === tabId) return;
+    this.captureHistory();
     visual.tabId = tabId;
     this.markDirty();
     if (this.focusedVisualId === visual.id) {
@@ -2224,6 +2536,7 @@ export class EditAnalysesComponent
   }
 
   addVisual(): void {
+    this.captureHistory();
     this.markDirty();
     this.visualCounter++;
     const visual = createVisual(
@@ -2247,8 +2560,9 @@ export class EditAnalysesComponent
     this.placeVisualsOnGrid();
     this.recalculateAllVisualDimensions();
 
-    // Auto-focus the newly added visual
+    // Auto-focus the newly added visual (single-select it too).
     this.focusedVisualId = String(this.visualCounter);
+    this.selection.setSingle(this.focusedVisualId);
 
     // Scroll to the new visual (scoped to canvas container only)
     setTimeout(() => {
@@ -2400,6 +2714,7 @@ export class EditAnalysesComponent
     if (event) event.stopPropagation();
     if (!this.analysisId) return;
 
+    this.captureHistory();
     // DRAFT: clone the tab + all its visuals fully in-memory with temp ids.
     // Nothing is persisted until Save; the atomic PUT maps every tmp_ id and
     // re-keys the cloned visuals' tabId to the new tab's real id.
@@ -2513,13 +2828,71 @@ export class EditAnalysesComponent
     this.cdr.markForCheck();
   }
 
-  /** ESC closes the full-screen focus overlay when one is open. */
+  /**
+   * ESC closes overlays in priority order: full-screen focus, then present
+   * mode, then the tab context/colour popover (via the multi-select clear).
+   */
   @HostListener('document:keydown.escape')
   onEscapeKey(): void {
     if (this.maximizedVisual) {
       this.minimizeVisual();
       this.cdr.markForCheck();
+      return;
     }
+    if (this.presentMode) {
+      this.exitPresent();
+      return;
+    }
+    if (this.selectedCount > 0) {
+      this.clearSelection();
+    }
+  }
+
+  // ─── Present / fullscreen mode (Wave 7, feature 6) ──────────────────
+  //
+  // A read-only, full-viewport view of the analysis: no authoring chrome, all
+  // tabs switchable, visuals rendered at full size via the SAME render path
+  // (app-chart-renderer / app-table-visual / app-kpi-card). ESC exits. Purely
+  // presentational — it reads the in-memory draft, mutates nothing.
+  presentMode = false;
+  /** The tab shown in present mode (independent of the authoring activeTabId). */
+  presentTabId: string | null = null;
+
+  /** Enter present mode, seeding the shown tab from the active authoring tab. */
+  enterPresent(): void {
+    this.presentTabId = this.activeTabId ?? this.firstTabId;
+    this.presentMode = true;
+    this.cdr.markForCheck();
+  }
+
+  /** Exit present mode. */
+  exitPresent(): void {
+    this.presentMode = false;
+    this.cdr.markForCheck();
+  }
+
+  /** Switch the presented tab. */
+  selectPresentTab(tabId: string): void {
+    this.presentTabId = tabId;
+    this.cdr.markForCheck();
+  }
+
+  /** Visuals shown in present mode for the presented tab. */
+  get visualsInPresentTab(): Visual[] {
+    if (this.tabs.length === 0) return this.visuals;
+    const first = this.firstTabId;
+    return this.visuals.filter(
+      v => (v.tabId ?? first) === this.presentTabId,
+    );
+  }
+
+  /** Widgets shown in present mode for the presented tab. */
+  get widgetsInPresentTab(): AnalysisWidget[] {
+    if (this.tabs.length === 0) return this.widgets;
+    const first = this.firstTabId;
+    return this.widgets.filter(
+      w => (w.tabId ?? first) === this.presentTabId,
+    );
   }
 
   trackById(index: number, item: any): any {
@@ -2690,16 +3063,19 @@ export class EditAnalysesComponent
   }
 
   removeVisual(id: string): void {
+    this.captureHistory();
     this.markDirty();
     this.visuals = this.visuals.filter(v => v.id !== id);
     if (this.focusedVisualId === id) {
       this.focusedVisualId = null;
     }
+    this.pruneSelection();
     this.placeVisualsOnGrid();
     this.recalculateAllVisualDimensions();
   }
 
   clearChartType(visual?: Visual): void {
+    this.captureHistory();
     this.markDirty();
     const target = visual || this.getFocusedVisual();
     if (target) {
@@ -2717,6 +3093,7 @@ export class EditAnalysesComponent
   clearFocus(): void {
     this.focusedVisualId = null;
     this.isConfigSidebarOpen = false;
+    this.selection.clear();
   }
 
   startEditTitle(id: string, event: Event): void {
@@ -2725,6 +3102,7 @@ export class EditAnalysesComponent
   }
 
   finishEditTitle(): void {
+    this.captureHistory();
     this.markDirty();
     // User has typed their own title — clear `titleKey` so a later
     // language switch doesn't overwrite it back to the localized
@@ -2742,9 +3120,89 @@ export class EditAnalysesComponent
   }
 
   onVisualClick(event: MouseEvent, id: string): void {
-    if (this.isResizing) return;
+    if (this.isResizing || this.isCdkDragging) return;
     event.stopPropagation();
-    this.focusedVisualId = this.focusedVisualId === id ? null : id;
+
+    // Shift / Ctrl / Cmd click extends the multi-selection (align/distribute).
+    // The primary (focused) visual stays the last-clicked so the config panel
+    // keeps a single target.
+    if (event.shiftKey || event.ctrlKey || event.metaKey) {
+      this.selection.toggle(id);
+      // Keep focus on the primary so the config sidebar tracks it.
+      this.focusedVisualId = this.selection.primary;
+      this.cdr.markForCheck();
+      return;
+    }
+
+    // Plain click: toggle single focus + reset the multi-selection to it.
+    const next = this.focusedVisualId === id ? null : id;
+    this.focusedVisualId = next;
+    if (next) {
+      this.selection.setSingle(next);
+    } else {
+      this.selection.clear();
+    }
+    this.cdr.markForCheck();
+  }
+
+  // ─── Align / distribute (Wave 7, feature 2) ─────────────────────────
+  //
+  // Operate on the SELECTED visuals' grid coordinates (gridCol/gridRow/
+  // colSpan/rowSpan). The canvas is a 24-column non-overlapping bin-pack, so
+  // alignment nudges grid cells and we then re-place + re-derive pixel sizes.
+  // Generalised — no assumption about chart types or data.
+  //
+  // Z-ORDER: this layout never overlaps visuals, so bring-to-front /
+  // send-to-back is a no-op and is intentionally NOT provided (see Wave-7
+  // report). Marquee selection was also skipped (shift/ctrl-click covers the
+  // multi-select need without the drag-rectangle risk).
+
+  /** The live visuals currently in the multi-selection (active-tab scoped). */
+  private selectedVisualObjects(): Visual[] {
+    const ids = new Set(this.selection.values());
+    return this.visualsInActiveTab.filter(v => ids.has(v.id));
+  }
+
+  /** True when the align/distribute toolbar should be enabled (≥2 selected). */
+  get canAlign(): boolean {
+    return this.selectedVisualObjects().length >= 2;
+  }
+
+  /** True when distribute is meaningful (≥3 selected). */
+  get canDistribute(): boolean {
+    return this.selectedVisualObjects().length >= 3;
+  }
+
+  /** Align the selected visuals to a shared edge. */
+  alignSelected(edge: AlignEdge): void {
+    const targets = this.selectedVisualObjects();
+    if (targets.length < 2) return;
+    this.captureHistory();
+    const changed = alignGeoms(targets as unknown as GridGeom[], edge);
+    if (!changed) return;
+    this.markDirty();
+    this.placeVisualsOnGrid();
+    this.recalculateAllVisualDimensions();
+    this.cdr.markForCheck();
+  }
+
+  /** Distribute the selected visuals evenly along an axis. */
+  distributeSelected(axis: DistributeAxis): void {
+    const targets = this.selectedVisualObjects();
+    if (targets.length < 3) return;
+    this.captureHistory();
+    const changed = distributeGeoms(targets as unknown as GridGeom[], axis);
+    if (!changed) return;
+    this.markDirty();
+    this.placeVisualsOnGrid();
+    this.recalculateAllVisualDimensions();
+    this.cdr.markForCheck();
+  }
+
+  /** Clear the multi-selection (Escape / canvas click). */
+  clearSelection(): void {
+    this.selection.clear();
+    this.cdr.markForCheck();
   }
 
   /**
@@ -2954,6 +3412,7 @@ export class EditAnalysesComponent
    */
   toggleCrossFilter(visual: Visual, event?: Event): void {
     if (event) event.stopPropagation();
+    this.captureHistory();
     visual.crossFilterEnabled = !visual.crossFilterEnabled;
     if (!visual.config) visual.config = {};
     visual.config.interaction = {
@@ -3124,6 +3583,7 @@ export class EditAnalysesComponent
   }
 
   onChartTypeSelected(): void {
+    this.captureHistory();
     this.markDirty();
     const visual = this.getFocusedVisual();
     if (visual) {
@@ -3153,6 +3613,40 @@ export class EditAnalysesComponent
     visual.config.tableHiddenColumns = [...cols];
   }
 
+  /**
+   * On-pill encoding menu (Wave 7, feature 5) is ABOUT to change the focused
+   * visual — snapshot the pre-change state so the edit is undoable.
+   */
+  onEncodingWillChange(): void {
+    this.captureHistory();
+  }
+
+  /**
+   * On-pill encoding change committed (aggregation / sort / remove). Mark
+   * dirty + re-transform the focused visual so the chart reflects the new
+   * encoding immediately.
+   */
+  onEncodingChanged(): void {
+    this.markDirty();
+    const visual = this.getFocusedVisual();
+    if (visual) {
+      this.updateVisualChartData(visual);
+    }
+    this.chartDataVersion++;
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * The pill menu's "Format…" shortcut — open the format (config) sidebar for
+   * the focused visual so the author can edit its number/label formatting.
+   */
+  onFormatRequested(): void {
+    if (this.focusedVisualId) {
+      this.isConfigSidebarOpen = true;
+      this.cdr.markForCheck();
+    }
+  }
+
   onAxisSelectionStarted(role: RoleKey | null): void {
     this.activeAxisSelection = role;
     if (role && !this.isFieldsPanelOpen) {
@@ -3164,6 +3658,7 @@ export class EditAnalysesComponent
   }
 
   onAxisFieldCleared(): void {
+    this.captureHistory();
     this.markDirty();
     const visual = this.getFocusedVisual();
     if (visual) {
@@ -3232,6 +3727,7 @@ export class EditAnalysesComponent
     }
 
     if (this.activeAxisSelection && this.focusedVisualId) {
+      this.captureHistory();
       this.markDirty();
       const visual = this.getFocusedVisual();
       if (visual) {
@@ -3370,6 +3866,7 @@ export class EditAnalysesComponent
   private toggleTableColumn(visual: any, field: any): void {
     const col = field?.columnToUse || field?.columnToView;
     if (!col) return;
+    this.captureHistory();
     this.markDirty();
     if (!visual.config) visual.config = {};
     const cfg = visual.config;
@@ -3475,9 +3972,15 @@ export class EditAnalysesComponent
   }
 
   // Resize methods
+  /** Set once per resize gesture the first time a size actually changes, so
+   *  we snapshot the pre-resize layout exactly once (one undo per drag) and
+   *  never push a no-op snapshot for a click that didn't resize. */
+  private resizeCaptured = false;
+
   startResize(event: MouseEvent, visual: any, direction: string): void {
     event.preventDefault();
     event.stopPropagation();
+    this.resizeCaptured = false;
     this.isResizing = true;
     this.resizingVisual = visual;
     this.resizeDirection = direction;
@@ -3537,6 +4040,11 @@ export class EditAnalysesComponent
       newColSpan !== this.resizingVisual.colSpan ||
       newRowSpan !== this.resizingVisual.rowSpan
     ) {
+      // Snapshot the pre-resize layout on the first real change only.
+      if (!this.resizeCaptured) {
+        this.captureHistory();
+        this.resizeCaptured = true;
+      }
       this.resizingVisual.colSpan = newColSpan;
       this.resizingVisual.rowSpan = newRowSpan;
       this.placeVisualsOnGrid();
@@ -3563,64 +4071,66 @@ export class EditAnalysesComponent
     }, 100);
   }
 
-  // Drag methods
-  startDrag(event: DragEvent, visual: any): void {
-    this.draggingVisual = visual;
-    if (event.dataTransfer) {
-      event.dataTransfer.effectAllowed = 'move';
-      event.dataTransfer.setData('text/html', visual.id.toString());
-      const visualBox = (event.target as HTMLElement).closest('.visual-box');
-      if (visualBox) {
-        const rect = visualBox.getBoundingClientRect();
-        event.dataTransfer.setDragImage(
-          visualBox,
-          event.clientX - rect.left,
-          event.clientY - rect.top,
-        );
-      }
-    }
+  // (Wave 7) The legacy HTML5 drag-and-drop reorder (startDrag / onDragOver /
+  // onCanvasDragOver / onDrop / onDragEnd) was replaced by CDK drag-drop below
+  // (onVisualCdkDropped). The old handlers + `draggingVisual` are removed; the
+  // shared auto-scroll (autoScrollNearEdge/stopAutoScroll) is still used by the
+  // resize gesture (onResize).
+
+  // ─── CDK canvas drag reposition (Wave 7, feature 3) ─────────────────
+  //
+  // Each visual-box is a cdkDropList (id = visual id) holding one cdkDrag,
+  // wrapped in a cdkDropListGroup. Dropping visual A onto visual B SWAPS their
+  // grid slots (gridCol/gridRow/colSpan/rowSpan) — a robust grid-swap idiom
+  // that doesn't fight the CSS-grid bin-pack the way sort-based drop lists do.
+  // placeVisualsOnGrid stays the auto-layout fallback; the responsive
+  // ResizeObserver sizing is untouched (we only reorder + re-derive pixels).
+  //
+  // `isCdkDragging` suppresses the click-to-focus that would otherwise fire
+  // at drag end.
+  isCdkDragging = false;
+
+  onVisualCdkDragStarted(): void {
+    this.isCdkDragging = true;
   }
 
-  onDragOver(event: DragEvent, targetVisual: any): void {
-    event.preventDefault();
-    if (event.dataTransfer) {
-      event.dataTransfer.dropEffect = 'move';
+  /**
+   * Handle a CDK drop from one visual cell onto another: swap the two
+   * visuals' grid geometry so the dragged card takes the target's slot and
+   * vice-versa, then re-pack + re-derive sizes. Same-cell drops are a no-op.
+   */
+  onVisualCdkDropped(event: CdkDragDrop<Visual>): void {
+    // Defer clearing the drag flag so the trailing (click) is still swallowed.
+    setTimeout(() => (this.isCdkDragging = false), 0);
+    const dragged = event.item?.data as Visual | undefined;
+    const target = event.container?.data as Visual | undefined;
+    if (!dragged || !target || dragged === target || dragged.id === target.id) {
+      return;
     }
-    // Auto-scroll when dragging near canvas edge
-    this.autoScrollNearEdge(event.clientY);
-  }
-
-  /** Canvas-level dragover for auto-scroll in empty areas */
-  onCanvasDragOver(event: DragEvent): void {
-    event.preventDefault();
-    if (event.dataTransfer) {
-      event.dataTransfer.dropEffect = 'move';
+    this.captureHistory();
+    this.markDirty();
+    // Swap grid geometry between the two visuals.
+    const keys: (keyof GridGeom)[] = [
+      'gridCol',
+      'gridRow',
+      'colSpan',
+      'rowSpan',
+    ];
+    for (const k of keys) {
+      const tmp = (dragged as any)[k];
+      (dragged as any)[k] = (target as any)[k];
+      (target as any)[k] = tmp;
     }
-    this.autoScrollNearEdge(event.clientY);
-  }
-
-  onDrop(event: DragEvent, targetVisual: any): void {
-    event.preventDefault();
-    if (this.draggingVisual && this.draggingVisual !== targetVisual) {
-      this.markDirty();
-      const draggedIndex = this.visuals.indexOf(this.draggingVisual);
-      const targetIndex = this.visuals.indexOf(targetVisual);
-
-      // Reorder array
-      this.visuals.splice(draggedIndex, 1);
-      this.visuals.splice(targetIndex, 0, this.draggingVisual);
-
-      // Reflow grid after reorder
-      this.placeVisualsOnGrid();
-      this.recalculateAllVisualDimensions();
+    // Reorder the backing array so auto-placement is stable on next reflow.
+    const di = this.visuals.indexOf(dragged);
+    const ti = this.visuals.indexOf(target);
+    if (di > -1 && ti > -1) {
+      this.visuals.splice(di, 1);
+      this.visuals.splice(ti, 0, dragged);
     }
-    this.draggingVisual = null;
-    this.stopAutoScroll();
-  }
-
-  onDragEnd(event: DragEvent): void {
-    this.draggingVisual = null;
-    this.stopAutoScroll();
+    this.placeVisualsOnGrid();
+    this.recalculateAllVisualDimensions();
+    this.cdr.markForCheck();
   }
 
   private autoScrollNearEdge(clientY: number): void {
@@ -3780,6 +4290,10 @@ export class EditAnalysesComponent
         .then(response => {
           if (this.globalService.handleSuccessService(response, true)) {
             this._isDirty = false;
+            // Snapshots reference the pre-save (tmp_) ids; after the server
+            // re-keys tabs/visuals to real ids they'd no longer apply cleanly,
+            // so drop the undo history on a successful save.
+            this.history.clear();
             // Re-key in-memory tabs + visuals from the server's temp→real map
             // so a subsequent Save/Publish addresses real rows, not tmp_ ids.
             const tabIdMap: Record<string, string> =

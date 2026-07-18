@@ -1630,7 +1630,10 @@
       "ADD_TAB_TYPE": "Registerkarte hinzufügen",
       "TYPE_CHART": "Diagramm",
       "TYPE_TABLE": "Tabelle",
-      "TYPE_KPI": "KPI"
+      "TYPE_KPI": "KPI",
+      "DUPLICATE": "Duplizieren",
+      "SET_COLOR": "Farbe festlegen",
+      "CLEAR_COLOR": "Farbe entfernen"
     },
     "AUTHORING": {
       "DUPLICATE": "Duplizieren",
@@ -1643,7 +1646,22 @@
       "TAB_DUPLICATED": "Registerkarte dupliziert",
       "EXPORT_PNG_TABLE_SKIP": "Der PNG-Export ist für Tabellenvisualisierungen nicht verfügbar. Verwenden Sie stattdessen CSV.",
       "EXPORT_PNG_UNAVAILABLE": "Das Diagrammbild ist noch nicht bereit. Versuchen Sie es gleich erneut.",
-      "EXPORT_CSV_EMPTY": "Nichts zu exportieren – diese Visualisierung enthält noch keine Daten."
+      "EXPORT_CSV_EMPTY": "Nichts zu exportieren – diese Visualisierung enthält noch keine Daten.",
+      "UNDO": "Rückgängig",
+      "REDO": "Wiederholen",
+      "PRESENT": "Präsentieren",
+      "EXIT_PRESENT": "Beenden",
+      "ALIGN": "Ausrichten",
+      "DISTRIBUTE": "Verteilen",
+      "ALIGN_LEFT": "Links ausrichten",
+      "ALIGN_CENTER": "Zentriert ausrichten",
+      "ALIGN_RIGHT": "Rechts ausrichten",
+      "ALIGN_TOP": "Oben ausrichten",
+      "ALIGN_MIDDLE": "Mittig ausrichten",
+      "ALIGN_BOTTOM": "Unten ausrichten",
+      "DISTRIBUTE_H": "Horizontal verteilen",
+      "DISTRIBUTE_V": "Vertikal verteilen",
+      "SELECTED_COUNT": "{{count}} ausgewählt"
     },
     "AGG": {
       "DIMENSION": "Dimension",
@@ -1979,6 +1997,16 @@
     },
     "TOPN": {
       "OTHER_LABEL": "Andere"
+    },
+    "ENCODING": {
+      "MENU_TITLE": "Feldoptionen",
+      "MENU_AGG": "Aggregation",
+      "MENU_SORT": "Sortieren",
+      "MENU_SORT_ASC": "Aufsteigend sortieren",
+      "MENU_SORT_DESC": "Absteigend sortieren",
+      "MENU_SORT_NONE": "Keine Sortierung",
+      "MENU_FORMAT": "Formatieren…",
+      "MENU_REMOVE": "Aus Feld entfernen"
     }
   },
   "DASHBOARD": {

@@ -103,6 +103,47 @@
 
       <div class="a-toolbar__divider" aria-hidden="true"></div>
 
+      <!-- Undo / Redo (Wave 7, feature 1). Operate on the in-memory draft
+           history; keyboard Ctrl/Cmd+Z and Ctrl/Cmd+Shift+Z mirror these. -->
+      <button
+        type="button"
+        class="a-icon-btn"
+        (click)="undo()"
+        [disabled]="!canUndo"
+        [pTooltip]="'ANALYSES.AUTHORING.UNDO' | translate"
+        tooltipPosition="bottom"
+        [attr.aria-label]="'ANALYSES.AUTHORING.UNDO' | translate"
+      >
+        <i class="pi pi-undo"></i>
+      </button>
+      <button
+        type="button"
+        class="a-icon-btn"
+        (click)="redo()"
+        [disabled]="!canRedo"
+        [pTooltip]="'ANALYSES.AUTHORING.REDO' | translate"
+        tooltipPosition="bottom"
+        [attr.aria-label]="'ANALYSES.AUTHORING.REDO' | translate"
+      >
+        <i class="pi pi-refresh a-icon-flip"></i>
+      </button>
+
+      <div class="a-toolbar__divider" aria-hidden="true"></div>
+
+      <!-- Present / fullscreen (Wave 7, feature 6) — read-only full-viewport
+           view of the analysis. Disabled until there's something to show. -->
+      <button
+        type="button"
+        class="a-icon-btn"
+        (click)="enterPresent()"
+        [disabled]="!visuals.length && !widgets.length"
+        [pTooltip]="'ANALYSES.AUTHORING.PRESENT' | translate"
+        tooltipPosition="bottom"
+        [attr.aria-label]="'ANALYSES.AUTHORING.PRESENT' | translate"
+      >
+        <i class="pi pi-play"></i>
+      </button>
+
       <button
         type="button"
         class="a-icon-btn"
@@ -464,6 +505,9 @@
         (axisSelectionStarted)="onAxisSelectionStarted($event)"
         (axisFieldCleared)="onAxisFieldCleared()"
         (interactionChanged)="onVisualInteractionChanged()"
+        (encodingWillChange)="onEncodingWillChange()"
+        (encodingChanged)="onEncodingChanged()"
+        (formatRequested)="onFormatRequested()"
       ></app-visuals-chart-sidebar>
     </div>
 
@@ -681,16 +725,88 @@
         </button>
       </div>
 
+      <!-- Multi-select align / distribute toolbar (Wave 7, feature 2).
+           Appears once ≥2 visuals are selected (shift/ctrl-click). Operates on
+           grid coords; distribute needs ≥3. Z-order omitted — the grid never
+           overlaps visuals (see component note). -->
+      <div class="align-toolbar" *ngIf="selectedCount >= 2">
+        <span class="align-toolbar__count">
+          {{ 'ANALYSES.AUTHORING.SELECTED_COUNT' | translate: { count: selectedCount } }}
+        </span>
+        <div class="align-toolbar__group" role="group">
+          <span class="align-toolbar__glabel">{{ 'ANALYSES.AUTHORING.ALIGN' | translate }}</span>
+          <button type="button" class="align-btn" (click)="alignSelected('left')"
+            [pTooltip]="'ANALYSES.AUTHORING.ALIGN_LEFT' | translate" tooltipPosition="bottom">
+            <i class="pi pi-align-left"></i>
+          </button>
+          <button type="button" class="align-btn" (click)="alignSelected('center')"
+            [pTooltip]="'ANALYSES.AUTHORING.ALIGN_CENTER' | translate" tooltipPosition="bottom">
+            <i class="pi pi-align-center"></i>
+          </button>
+          <button type="button" class="align-btn" (click)="alignSelected('right')"
+            [pTooltip]="'ANALYSES.AUTHORING.ALIGN_RIGHT' | translate" tooltipPosition="bottom">
+            <i class="pi pi-align-right"></i>
+          </button>
+          <span class="align-toolbar__sep"></span>
+          <button type="button" class="align-btn" (click)="alignSelected('top')"
+            [pTooltip]="'ANALYSES.AUTHORING.ALIGN_TOP' | translate" tooltipPosition="bottom">
+            <i class="pi pi-arrow-up"></i>
+          </button>
+          <button type="button" class="align-btn" (click)="alignSelected('middle')"
+            [pTooltip]="'ANALYSES.AUTHORING.ALIGN_MIDDLE' | translate" tooltipPosition="bottom">
+            <i class="pi pi-arrows-v"></i>
+          </button>
+          <button type="button" class="align-btn" (click)="alignSelected('bottom')"
+            [pTooltip]="'ANALYSES.AUTHORING.ALIGN_BOTTOM' | translate" tooltipPosition="bottom">
+            <i class="pi pi-arrow-down"></i>
+          </button>
+        </div>
+        <div class="align-toolbar__group" role="group" *ngIf="canDistribute">
+          <span class="align-toolbar__glabel">{{ 'ANALYSES.AUTHORING.DISTRIBUTE' | translate }}</span>
+          <button type="button" class="align-btn" (click)="distributeSelected('horizontal')"
+            [pTooltip]="'ANALYSES.AUTHORING.DISTRIBUTE_H' | translate" tooltipPosition="bottom">
+            <i class="pi pi-arrows-h"></i>
+          </button>
+          <button type="button" class="align-btn" (click)="distributeSelected('vertical')"
+            [pTooltip]="'ANALYSES.AUTHORING.DISTRIBUTE_V' | translate" tooltipPosition="bottom">
+            <i class="pi pi-arrows-v"></i>
+          </button>
+        </div>
+        <button type="button" class="align-toolbar__clear" (click)="clearSelection()"
+          [pTooltip]="'COMMON.CLOSE' | translate" tooltipPosition="bottom">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
       <!-- Analysis tab strip (Track A4). Hidden until the analysis has at
            least one named tab; an un-tabbed analysis renders as one implicit
            tab with no strip. -->
       <div class="analysis-tab-strip" *ngIf="tabs.length > 0">
+        <!-- CDK drag-drop reorder (Wave 7, feature 4). The move-left/right
+             icons remain as a keyboard/click fallback. Horizontal list. -->
+        <div
+          class="analysis-tabs-track"
+          cdkDropList
+          cdkDropListOrientation="horizontal"
+          (cdkDropListDropped)="onTabDrop($event)"
+        >
         <div
           class="analysis-tab"
           *ngFor="let tab of tabs; let ti = index; trackBy: trackByTabId"
+          cdkDrag
+          [cdkDragData]="tab"
           [class.active]="tab.id === activeTabId"
+          [style.--tab-color]="tabColor(tab) || 'transparent'"
+          [class.has-color]="!!tabColor(tab)"
           (click)="selectTab(tab.id)"
+          (contextmenu)="openTabContextMenu(tab, $event, tabCtxOp)"
         >
+          <span
+            class="analysis-tab__color-dot"
+            *ngIf="tabColor(tab)"
+            [style.background]="tabColor(tab)"
+            aria-hidden="true"
+          ></span>
           <ng-container *ngIf="editingTabId !== tab.id">
             <span
               class="analysis-tab__name"
@@ -748,7 +864,96 @@
             (click)="$event.stopPropagation()"
             autofocus
           />
+          <!-- CDK drag placeholder — a ghost slot while reordering. -->
+          <div class="analysis-tab__drag-ph" *cdkDragPlaceholder></div>
         </div>
+        </div>
+        <!-- /analysis-tabs-track -->
+
+        <!-- Tab right-click context menu (Wave 7, feature 4) — token-styled
+             popover, appendTo body. Rename / duplicate / delete / set colour /
+             move. All draft-only (persisted on Save). -->
+        <p-overlayPanel
+          #tabCtxOp
+          appendTo="body"
+          styleClass="tab-ctx-panel"
+        >
+          <div class="tab-ctx" *ngIf="ctxTab">
+            <button
+              type="button"
+              class="tab-ctx__item"
+              (click)="ctxRenameTab(tabCtxOp)"
+            >
+              <i class="pi pi-pencil"></i>
+              <span>{{ 'ANALYSES.TABS.RENAME' | translate }}</span>
+            </button>
+            <button
+              type="button"
+              class="tab-ctx__item"
+              [disabled]="isTabBusy"
+              (click)="ctxDuplicateTab(tabCtxOp)"
+            >
+              <i class="pi pi-clone"></i>
+              <span>{{ 'ANALYSES.TABS.DUPLICATE' | translate }}</span>
+            </button>
+            <button
+              type="button"
+              class="tab-ctx__item"
+              [disabled]="tabIndex(ctxTab) <= 0"
+              (click)="ctxMoveTab(-1, tabCtxOp)"
+            >
+              <i class="pi pi-angle-left"></i>
+              <span>{{ 'ANALYSES.TABS.MOVE_LEFT' | translate }}</span>
+            </button>
+            <button
+              type="button"
+              class="tab-ctx__item"
+              [disabled]="tabIndex(ctxTab) >= tabs.length - 1"
+              (click)="ctxMoveTab(1, tabCtxOp)"
+            >
+              <i class="pi pi-angle-right"></i>
+              <span>{{ 'ANALYSES.TABS.MOVE_RIGHT' | translate }}</span>
+            </button>
+
+            <div class="tab-ctx__divider"></div>
+            <div class="tab-ctx__label">
+              {{ 'ANALYSES.TABS.SET_COLOR' | translate }}
+            </div>
+            <div class="tab-ctx__swatches">
+              <button
+                type="button"
+                class="tab-ctx__swatch"
+                *ngFor="let c of tabColorSwatches; trackBy: trackByIndex"
+                [style.background]="c"
+                [class.is-active]="tabColor(ctxTab) === c"
+                [attr.aria-label]="c"
+                (click)="setTabColor(c)"
+              ></button>
+              <button
+                type="button"
+                class="tab-ctx__swatch tab-ctx__swatch--clear"
+                [class.is-active]="!tabColor(ctxTab)"
+                [pTooltip]="'ANALYSES.TABS.CLEAR_COLOR' | translate"
+                tooltipPosition="top"
+                (click)="clearTabColor()"
+              >
+                <i class="pi pi-ban"></i>
+              </button>
+            </div>
+
+            <div class="tab-ctx__divider" *ngIf="tabs.length > 1"></div>
+            <button
+              type="button"
+              class="tab-ctx__item tab-ctx__item--danger"
+              *ngIf="tabs.length > 1"
+              (click)="ctxDeleteTab($event, tabCtxOp)"
+            >
+              <i class="pi pi-trash"></i>
+              <span>{{ 'ANALYSES.TABS.DELETE' | translate }}</span>
+            </button>
+          </div>
+        </p-overlayPanel>
+
         <button
           type="button"
           class="analysis-tab-add"
@@ -836,33 +1041,40 @@
       <div
         class="canvas-area"
         *ngIf="visualsInActiveTab.length > 0 || widgetsInActiveTab.length > 0"
+        cdkDropListGroup
         (click)="clearFocus()"
-        (dragover)="onCanvasDragOver($event)"
       >
+        <!-- Wave 7 (feature 3): each visual sits in a cdkDropList cell (which
+             owns the CSS-grid placement); the card inside is a cdkDrag. A drop
+             onto another cell SWAPS the two visuals' grid slots
+             (onVisualCdkDropped). The title-bar grip is the drag handle so
+             clicks / resize handles / config icons stay clickable. -->
         <div
-          class="visual-box"
+          class="visual-cell"
           *ngFor="let visual of visualsInActiveTab; trackBy: trackByVisualId"
-          [class.focused]="focusedVisualId === visual.id"
-          [class.disabled]="
-            focusedVisualId !== null && focusedVisualId !== visual.id
-          "
-          [class.dragging]="draggingVisual === visual"
-          [class.drop-target]="draggingVisual && draggingVisual !== visual"
-          [class.resizing]="resizingVisual?.id === visual.id"
+          cdkDropList
+          [cdkDropListData]="visual"
+          (cdkDropListDropped)="onVisualCdkDropped($event)"
           [style.grid-column]="visual.gridCol + 1 + ' / span ' + visual.colSpan"
           [style.grid-row]="visual.gridRow + 1 + ' / span ' + visual.rowSpan"
-          (dragover)="onDragOver($event, visual)"
-          (drop)="onDrop($event, visual)"
-          (dragend)="onDragEnd($event)"
+        >
+        <div
+          class="visual-box"
+          cdkDrag
+          [cdkDragData]="visual"
+          (cdkDragStarted)="onVisualCdkDragStarted()"
+          [class.focused]="focusedVisualId === visual.id"
+          [class.selected]="isSelected(visual.id)"
+          [class.disabled]="
+            focusedVisualId !== null && focusedVisualId !== visual.id && !isSelected(visual.id)
+          "
+          [class.resizing]="resizingVisual?.id === visual.id"
           (click)="onVisualClick($event, visual.id)"
           (contextmenu)="onVisualRightClick($event, visual.id)"
         >
-          <!-- Inline Title (drag handle for reordering) -->
-          <div
-            class="visual-inline-title"
-            draggable="true"
-            (dragstart)="startDrag($event, visual)"
-          >
+          <!-- Inline Title — CDK drag handle for reposition (grip). -->
+          <div class="visual-inline-title" cdkDragHandle>
+            <i class="pi pi-bars visual-drag-grip" aria-hidden="true"></i>
             <span class="inline-title-text">{{ visual.title }}</span>
             <!-- Action buttons (no chart-type switcher; users change
                  chart type via the Layers + Visuals sidebars only) -->
@@ -1181,6 +1393,9 @@
             (mousedown)="startResize($event, visual, 'bottom-right')"
           ></div>
         </div>
+        <!-- /visual-box (cdkDrag) -->
+        </div>
+        <!-- /visual-cell (cdkDropList) -->
       </div>
 
       <!-- Canvas widgets (Track E3) — text/markdown notes + KPI tiles.
@@ -1276,6 +1491,105 @@
         [configVersion]="chartConfigVersion"
         [dataVersion]="chartDataVersion"
       ></app-chart-renderer>
+    </div>
+  </div>
+</div>
+
+<!-- Present / fullscreen mode (Wave 7, feature 6) — read-only, full-viewport
+     view of the analysis. Tabs switchable, visuals render at full size via the
+     same chart-renderer / table / KPI path. ESC or the × exits. No authoring
+     chrome. Reads the in-memory draft; mutates nothing. -->
+<div class="present-overlay" *ngIf="presentMode">
+  <div class="present-topbar">
+    <div class="present-topbar__title">
+      <i class="pi pi-play-circle"></i>
+      <span>{{ analysisDetails?.name || ('ANALYSES.EDIT_ANALYSIS' | translate) }}</span>
+    </div>
+    <div class="present-tabs" *ngIf="tabs.length > 0">
+      <button
+        type="button"
+        class="present-tab"
+        *ngFor="let tab of tabs; trackBy: trackByTabId"
+        [class.active]="tab.id === presentTabId"
+        [style.--tab-color]="tabColor(tab) || 'transparent'"
+        [class.has-color]="!!tabColor(tab)"
+        (click)="selectPresentTab(tab.id)"
+      >
+        <span
+          class="present-tab__dot"
+          *ngIf="tabColor(tab)"
+          [style.background]="tabColor(tab)"
+        ></span>
+        {{ tab.name }}
+      </button>
+    </div>
+    <button
+      type="button"
+      class="present-exit"
+      (click)="exitPresent()"
+      [pTooltip]="'ANALYSES.AUTHORING.EXIT_PRESENT' | translate"
+      tooltipPosition="left"
+    >
+      <i class="pi pi-times"></i>
+      <span>{{ 'ANALYSES.AUTHORING.EXIT_PRESENT' | translate }}</span>
+    </button>
+  </div>
+
+  <div class="present-stage">
+    <div
+      class="present-grid"
+      *ngIf="visualsInPresentTab.length > 0 || widgetsInPresentTab.length > 0"
+    >
+      <div
+        class="present-visual"
+        *ngFor="let visual of visualsInPresentTab; trackBy: trackByVisualId"
+        [style.grid-column]="visual.gridCol + 1 + ' / span ' + visual.colSpan"
+        [style.grid-row]="visual.gridRow + 1 + ' / span ' + visual.rowSpan"
+      >
+        <div class="present-visual__title">{{ visual.title }}</div>
+        <div class="present-visual__body">
+          <ng-container
+            *ngIf="
+              visual.chartType &&
+              (hasRequiredChartFields(visual) ||
+                isLines3dChartType(visual.chartType) ||
+                isPolygons3dChartType(visual.chartType))
+            "
+          >
+            <app-chart-renderer
+              [visual]="visual"
+              [chartWidth]="visual.width"
+              [chartHeight]="visual.height - 30"
+              [configVersion]="chartConfigVersion"
+              [dataVersion]="chartDataVersion"
+            ></app-chart-renderer>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <!-- Present-mode widgets (text / KPI). -->
+    <div class="present-widget-strip" *ngIf="widgetsInPresentTab.length > 0">
+      <div
+        class="present-widget"
+        *ngFor="let w of widgetsInPresentTab; trackBy: trackByWidgetId"
+        [class.present-widget--kpi]="w.widgetType === 'kpi'"
+      >
+        <div class="present-widget__text" *ngIf="w.widgetType === 'text'">
+          {{ $any(w.config).markdown }}
+        </div>
+        <div class="present-widget__kpi" *ngIf="w.widgetType === 'kpi'">
+          <app-kpi-card [config]="kpiConfig(w)" [data]="rawGraphData"></app-kpi-card>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="present-empty"
+      *ngIf="visualsInPresentTab.length === 0 && widgetsInPresentTab.length === 0"
+    >
+      <i class="ci ci-visualization" aria-hidden="true"></i>
+      <p>{{ 'ANALYSES.NO_VISUALS_YET' | translate }}</p>
     </div>
   </div>
 </div>

@@ -1,0 +1,340 @@
+// ═══════════════════════════════════════════════════════════════════════
+// Analyses — Wave 7 authoring UX: body-level / overlay styles.
+//
+// These target DOM that renders OUTSIDE the edit-analyses component's own
+// subtree — PrimeNG overlay-panel content (tab context menu, on-pill encoding
+// menu) is appendTo="body", and the Present mode is a fixed full-viewport
+// layer. Keeping them global (a) lets the scoped styles reach the projected
+// overlay content reliably and (b) keeps the edit-analyses component style
+// budget under the anyComponentStyle threshold. Class names are Wave-7-unique
+// so there is no collision risk. Token-driven; tracks light/dark automatically.
+// ═══════════════════════════════════════════════════════════════════════
+
+/* Multi-select align / distribute toolbar (feature 2). */
+.align-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin: var(--space-2) 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+
+  &__count {
+    font-size: var(--fs-label);
+    font-weight: var(--fw-semibold);
+    color: var(--primary-color);
+    white-space: nowrap;
+  }
+  &__group {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding-left: var(--space-3);
+    border-left: 1px solid var(--border-color);
+  }
+  &__glabel {
+    font-size: var(--fs-micro);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-right: var(--space-1);
+  }
+  &__sep {
+    width: 1px;
+    height: 18px;
+    background: var(--border-color);
+    margin: 0 var(--space-1);
+  }
+  &__clear {
+    margin-left: auto;
+    width: 26px;
+    height: 26px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    &:hover {
+      background: var(--hover-background);
+      color: var(--text-color);
+    }
+  }
+  .align-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-color);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--motion-fast) ease;
+    i {
+      font-size: 0.85rem;
+    }
+    &:hover {
+      background: var(--primary-color-transparent);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+  }
+}
+
+/* Tab context menu + on-pill encoding menu content (appendTo=body). */
+.tab-ctx,
+.pill-menu {
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  padding: var(--space-1);
+}
+.tab-ctx__item,
+.pill-menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  background: transparent;
+  color: var(--text-color);
+  font-size: var(--fs-body);
+  font-family: inherit;
+  text-align: left;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--motion-fast) ease;
+  i {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    width: 16px;
+    text-align: center;
+  }
+  &:hover:not(:disabled) {
+    background: var(--hover-background);
+  }
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  &.is-active {
+    color: var(--primary-color);
+    font-weight: var(--fw-medium);
+    i {
+      color: var(--primary-color);
+    }
+  }
+  &--danger {
+    color: var(--danger-color, #d64545);
+    i {
+      color: var(--danger-color, #d64545);
+    }
+  }
+}
+.tab-ctx__label,
+.pill-menu__label {
+  font-size: var(--fs-micro);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: var(--space-2) var(--space-3) var(--space-1);
+}
+.tab-ctx__divider,
+.pill-menu__section + .pill-menu__section {
+  border-top: 1px solid var(--border-color);
+  margin: var(--space-1) 0;
+}
+.tab-ctx__swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3) var(--space-2);
+}
+.tab-ctx__swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  &.is-active {
+    border-color: var(--text-color);
+    box-shadow: 0 0 0 2px var(--card-background);
+  }
+  &--clear {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    i {
+      font-size: 0.75rem;
+    }
+  }
+}
+.pill-menu__check {
+  font-size: 0.75rem;
+}
+
+/* Present / fullscreen mode (feature 6) — fixed full-viewport layer. */
+.present-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  background: var(--body-background, var(--card-background));
+  display: flex;
+  flex-direction: column;
+}
+.present-topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--card-background);
+  flex: 0 0 auto;
+  &__title {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+    i {
+      color: var(--primary-color);
+    }
+  }
+}
+.present-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-left: auto;
+  overflow-x: auto;
+}
+.present-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--fs-body);
+  font-family: inherit;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  &:hover {
+    color: var(--text-color);
+    background: var(--hover-background);
+  }
+  &.active {
+    color: var(--primary-color);
+    background: var(--primary-color-transparent);
+    font-weight: var(--fw-medium);
+  }
+}
+.present-exit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-color);
+  background: var(--card-background);
+  color: var(--text-color);
+  font-size: var(--fs-control);
+  font-family: inherit;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  &:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+}
+.present-stage {
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: var(--space-5);
+}
+.present-grid {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  grid-auto-rows: minmax(60px, auto);
+  gap: var(--space-3);
+}
+.present-visual {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  &__title {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--fs-control);
+    font-weight: var(--fw-medium);
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  &__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+  }
+}
+.present-widget-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+.present-widget {
+  flex: 1 1 240px;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  &__text {
+    color: var(--text-color);
+    line-height: 1.5;
+  }
+  &--kpi {
+    text-align: center;
+  }
+}
+.present-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  height: 100%;
+  color: var(--text-muted);
+  i {
+    font-size: 2.5rem;
+    opacity: 0.5;
+  }
+}

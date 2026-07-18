@@ -1630,7 +1630,10 @@
       "ADD_TAB_TYPE": "Een tabblad toevoegen",
       "TYPE_CHART": "Grafiek",
       "TYPE_TABLE": "Tabel",
-      "TYPE_KPI": "KPI"
+      "TYPE_KPI": "KPI",
+      "DUPLICATE": "Dupliceren",
+      "SET_COLOR": "Kleur instellen",
+      "CLEAR_COLOR": "Kleur wissen"
     },
     "AUTHORING": {
       "DUPLICATE": "Dupliceren",
@@ -1643,7 +1646,22 @@
       "TAB_DUPLICATED": "Tabblad gedupliceerd",
       "EXPORT_PNG_TABLE_SKIP": "PNG-export is niet beschikbaar voor tabelvisuals. Gebruik in plaats daarvan CSV.",
       "EXPORT_PNG_UNAVAILABLE": "De grafiekafbeelding is nog niet klaar. Probeer het zo opnieuw.",
-      "EXPORT_CSV_EMPTY": "Niets om te exporteren — deze visual heeft nog geen gegevens."
+      "EXPORT_CSV_EMPTY": "Niets om te exporteren — deze visual heeft nog geen gegevens.",
+      "UNDO": "Ongedaan maken",
+      "REDO": "Opnieuw",
+      "PRESENT": "Presenteren",
+      "EXIT_PRESENT": "Afsluiten",
+      "ALIGN": "Uitlijnen",
+      "DISTRIBUTE": "Verdelen",
+      "ALIGN_LEFT": "Links uitlijnen",
+      "ALIGN_CENTER": "Gecentreerd uitlijnen",
+      "ALIGN_RIGHT": "Rechts uitlijnen",
+      "ALIGN_TOP": "Boven uitlijnen",
+      "ALIGN_MIDDLE": "Midden uitlijnen",
+      "ALIGN_BOTTOM": "Onder uitlijnen",
+      "DISTRIBUTE_H": "Horizontaal verdelen",
+      "DISTRIBUTE_V": "Verticaal verdelen",
+      "SELECTED_COUNT": "{{count}} geselecteerd"
     },
     "AGG": {
       "DIMENSION": "Dimensie",
@@ -1979,6 +1997,16 @@
     },
     "TOPN": {
       "OTHER_LABEL": "Overige"
+    },
+    "ENCODING": {
+      "MENU_TITLE": "Veldopties",
+      "MENU_AGG": "Aggregatie",
+      "MENU_SORT": "Sorteren",
+      "MENU_SORT_ASC": "Oplopend sorteren",
+      "MENU_SORT_DESC": "Aflopend sorteren",
+      "MENU_SORT_NONE": "Niet sorteren",
+      "MENU_FORMAT": "Opmaak…",
+      "MENU_REMOVE": "Uit veld verwijderen"
     }
   },
   "DASHBOARD": {

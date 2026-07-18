@@ -1630,7 +1630,10 @@
       "ADD_TAB_TYPE": "タブを追加",
       "TYPE_CHART": "グラフ",
       "TYPE_TABLE": "テーブル",
-      "TYPE_KPI": "KPI"
+      "TYPE_KPI": "KPI",
+      "DUPLICATE": "複製",
+      "SET_COLOR": "色を設定",
+      "CLEAR_COLOR": "色をクリア"
     },
     "AUTHORING": {
       "DUPLICATE": "複製",
@@ -1643,7 +1646,22 @@
       "TAB_DUPLICATED": "タブを複製しました",
       "EXPORT_PNG_TABLE_SKIP": "PNG エクスポートはテーブルビジュアルでは利用できません。代わりに CSV を使用してください。",
       "EXPORT_PNG_UNAVAILABLE": "チャート画像はまだ準備できていません。しばらくしてからもう一度お試しください。",
-      "EXPORT_CSV_EMPTY": "エクスポートするものがありません。このビジュアルにはまだデータがありません。"
+      "EXPORT_CSV_EMPTY": "エクスポートするものがありません。このビジュアルにはまだデータがありません。",
+      "UNDO": "元に戻す",
+      "REDO": "やり直す",
+      "PRESENT": "プレゼン",
+      "EXIT_PRESENT": "終了",
+      "ALIGN": "整列",
+      "DISTRIBUTE": "分布",
+      "ALIGN_LEFT": "左揃え",
+      "ALIGN_CENTER": "中央揃え",
+      "ALIGN_RIGHT": "右揃え",
+      "ALIGN_TOP": "上揃え",
+      "ALIGN_MIDDLE": "上下中央揃え",
+      "ALIGN_BOTTOM": "下揃え",
+      "DISTRIBUTE_H": "左右に分布",
+      "DISTRIBUTE_V": "上下に分布",
+      "SELECTED_COUNT": "{{count}} 件選択中"
     },
     "AGG": {
       "DIMENSION": "ディメンション",
@@ -1979,6 +1997,16 @@
     },
     "TOPN": {
       "OTHER_LABEL": "その他"
+    },
+    "ENCODING": {
+      "MENU_TITLE": "フィールドオプション",
+      "MENU_AGG": "集計",
+      "MENU_SORT": "並べ替え",
+      "MENU_SORT_ASC": "昇順で並べ替え",
+      "MENU_SORT_DESC": "降順で並べ替え",
+      "MENU_SORT_NONE": "並べ替えなし",
+      "MENU_FORMAT": "書式…",
+      "MENU_REMOVE": "フィールドから削除"
     }
   },
   "DASHBOARD": {

@@ -478,3 +478,51 @@
   line-height: 1.4;
   margin-bottom: var(--space-3);
 }
+
+/* ─── On-pill encoding menu trigger (Wave 7, feature 5) ───────────────── */
+/* The placed-field pill becomes a clickable button that opens the encoding
+   menu (aggregation / sort / format / remove). Keeps the existing pill look
+   but adds an aggregate tag, sort-direction glyph, and a caret. */
+.axis-value__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--primary-color);
+  font-family: inherit;
+  cursor: pointer;
+
+  .axis-value__label {
+    color: var(--primary-color);
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-medium);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+
+  .axis-value__agg {
+    color: var(--primary-color);
+    font-size: var(--fs-micro);
+    opacity: 0.8;
+    white-space: nowrap;
+  }
+
+  .axis-value__sortdir {
+    font-size: 9px;
+    opacity: 0.85;
+  }
+
+  .axis-value__caret {
+    font-size: 8px;
+    opacity: 0.7;
+  }
+
+  &:hover .axis-value__caret {
+    opacity: 1;
+  }
+}

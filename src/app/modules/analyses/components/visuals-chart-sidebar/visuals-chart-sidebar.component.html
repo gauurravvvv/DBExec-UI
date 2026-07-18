@@ -108,11 +108,119 @@
               class="axis-value"
               *ngIf="asScalar(getRoleValue(slot.key)) as col"
             >
-              <span>{{ getFieldDisplayName(col) }}</span>
+              <!-- On-pill encoding menu (Wave 7, feature 5): click the pill to
+                   open aggregation / sort / format / remove. -->
+              <button
+                type="button"
+                class="axis-value__pill"
+                (click)="openPillMenu(slot.key, $event, pillOp)"
+                [pTooltip]="'ANALYSES.ENCODING.MENU_TITLE' | translate"
+                tooltipPosition="top"
+              >
+                <span class="axis-value__label">{{
+                  getFieldDisplayName(col)
+                }}</span>
+                <span
+                  class="axis-value__agg"
+                  *ngIf="isMeasureRole(slot.key) && currentAggregate"
+                  >· {{ currentAggregate }}</span
+                >
+                <i
+                  class="pi axis-value__sortdir"
+                  *ngIf="currentSortDir(slot.key) !== 'none'"
+                  [class.pi-sort-amount-up]="currentSortDir(slot.key) === 'asc'"
+                  [class.pi-sort-amount-down]="
+                    currentSortDir(slot.key) === 'desc'
+                  "
+                ></i>
+                <i class="pi pi-chevron-down axis-value__caret"></i>
+              </button>
               <i
                 class="pi pi-times clear-btn"
                 (click)="clearAxisField(slot.key, $event)"
               ></i>
+
+              <!-- Pill menu overlay — appendTo body, token-styled. -->
+              <p-overlayPanel
+                #pillOp
+                appendTo="body"
+                styleClass="pill-menu-panel"
+              >
+                <div class="pill-menu" *ngIf="pillMenuRole === slot.key">
+                  <div class="pill-menu__section" *ngIf="isMeasureRole(slot.key)">
+                    <div class="pill-menu__label">
+                      {{ 'ANALYSES.ENCODING.MENU_AGG' | translate }}
+                    </div>
+                    <button
+                      type="button"
+                      class="pill-menu__item"
+                      *ngFor="let opt of aggregateOptions; trackBy: trackByIndex"
+                      [class.is-active]="currentAggregate === opt.value"
+                      (click)="setPillAggregate(opt.value, pillOp)"
+                    >
+                      <i
+                        class="pi pi-check pill-menu__check"
+                        [style.visibility]="
+                          currentAggregate === opt.value ? 'visible' : 'hidden'
+                        "
+                      ></i>
+                      <span>{{ opt.label }}</span>
+                    </button>
+                  </div>
+
+                  <div class="pill-menu__section">
+                    <div class="pill-menu__label">
+                      {{ 'ANALYSES.ENCODING.MENU_SORT' | translate }}
+                    </div>
+                    <button
+                      type="button"
+                      class="pill-menu__item"
+                      [class.is-active]="currentSortDir(slot.key) === 'asc'"
+                      (click)="setPillSort(slot.key, 'asc', pillOp)"
+                    >
+                      <i class="pi pi-sort-amount-up"></i>
+                      <span>{{ 'ANALYSES.ENCODING.MENU_SORT_ASC' | translate }}</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="pill-menu__item"
+                      [class.is-active]="currentSortDir(slot.key) === 'desc'"
+                      (click)="setPillSort(slot.key, 'desc', pillOp)"
+                    >
+                      <i class="pi pi-sort-amount-down"></i>
+                      <span>{{ 'ANALYSES.ENCODING.MENU_SORT_DESC' | translate }}</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="pill-menu__item"
+                      [class.is-active]="currentSortDir(slot.key) === 'none'"
+                      (click)="setPillSort(slot.key, 'none', pillOp)"
+                    >
+                      <i class="pi pi-ban"></i>
+                      <span>{{ 'ANALYSES.ENCODING.MENU_SORT_NONE' | translate }}</span>
+                    </button>
+                  </div>
+
+                  <div class="pill-menu__section pill-menu__section--actions">
+                    <button
+                      type="button"
+                      class="pill-menu__item"
+                      (click)="openPillFormat(slot.key, pillOp)"
+                    >
+                      <i class="pi pi-sliders-h"></i>
+                      <span>{{ 'ANALYSES.ENCODING.MENU_FORMAT' | translate }}</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="pill-menu__item pill-menu__item--danger"
+                      (click)="removePillField(slot.key, pillOp)"
+                    >
+                      <i class="pi pi-times"></i>
+                      <span>{{ 'ANALYSES.ENCODING.MENU_REMOVE' | translate }}</span>
+                    </button>
+                  </div>
+                </div>
+              </p-overlayPanel>
             </div>
             <div
               class="axis-placeholder"

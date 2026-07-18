@@ -1630,7 +1630,10 @@
       "ADD_TAB_TYPE": "Añadir una pestaña",
       "TYPE_CHART": "Gráfico",
       "TYPE_TABLE": "Tabla",
-      "TYPE_KPI": "KPI"
+      "TYPE_KPI": "KPI",
+      "DUPLICATE": "Duplicar",
+      "SET_COLOR": "Establecer color",
+      "CLEAR_COLOR": "Quitar color"
     },
     "AUTHORING": {
       "DUPLICATE": "Duplicar",
@@ -1643,7 +1646,22 @@
       "TAB_DUPLICATED": "Pestaña duplicada",
       "EXPORT_PNG_TABLE_SKIP": "La exportación PNG no está disponible para visualizaciones de tabla. Usa CSV en su lugar.",
       "EXPORT_PNG_UNAVAILABLE": "La imagen del gráfico aún no está lista. Inténtalo de nuevo en un momento.",
-      "EXPORT_CSV_EMPTY": "No hay nada que exportar: esta visualización todavía no tiene datos."
+      "EXPORT_CSV_EMPTY": "No hay nada que exportar: esta visualización todavía no tiene datos.",
+      "UNDO": "Deshacer",
+      "REDO": "Rehacer",
+      "PRESENT": "Presentar",
+      "EXIT_PRESENT": "Salir",
+      "ALIGN": "Alinear",
+      "DISTRIBUTE": "Distribuir",
+      "ALIGN_LEFT": "Alinear a la izquierda",
+      "ALIGN_CENTER": "Alinear al centro",
+      "ALIGN_RIGHT": "Alinear a la derecha",
+      "ALIGN_TOP": "Alinear arriba",
+      "ALIGN_MIDDLE": "Alinear al medio",
+      "ALIGN_BOTTOM": "Alinear abajo",
+      "DISTRIBUTE_H": "Distribuir horizontalmente",
+      "DISTRIBUTE_V": "Distribuir verticalmente",
+      "SELECTED_COUNT": "{{count}} seleccionados"
     },
     "AGG": {
       "DIMENSION": "Dimensión",
@@ -1979,6 +1997,16 @@
     },
     "TOPN": {
       "OTHER_LABEL": "Otros"
+    },
+    "ENCODING": {
+      "MENU_TITLE": "Opciones del campo",
+      "MENU_AGG": "Agregación",
+      "MENU_SORT": "Ordenar",
+      "MENU_SORT_ASC": "Orden ascendente",
+      "MENU_SORT_DESC": "Orden descendente",
+      "MENU_SORT_NONE": "Sin orden",
+      "MENU_FORMAT": "Formato…",
+      "MENU_REMOVE": "Quitar del campo"
     }
   },
   "DASHBOARD": {

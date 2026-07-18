@@ -10,6 +10,8 @@ import {
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
+import { ReferenceDataService } from 'src/app/core/services/reference-data.service';
+import { AggregateFn } from '../../models/visual.model';
 import {
   CHART_TYPES,
   getChartRoles,
@@ -93,6 +95,7 @@ export class VisualsChartSidebarComponent implements OnInit, OnDestroy {
   constructor(
     private translate: TranslateService,
     private cdr: ChangeDetectorRef,
+    private referenceData: ReferenceDataService,
   ) {}
 
   ngOnInit(): void {
@@ -101,8 +104,11 @@ export class VisualsChartSidebarComponent implements OnInit, OnDestroy {
       // key — a translation-key string, identical across locales — so
       // it doesn't need rebuilding. We just need a CD pass so the pipe
       // re-evaluates against the new language.
+      this.localizeAggregateOptions();
       this.cdr.markForCheck();
     });
+    this.localizeAggregateOptions();
+    this.loadAggregateOptions();
   }
 
   ngOnDestroy(): void {
@@ -130,6 +136,19 @@ export class VisualsChartSidebarComponent implements OnInit, OnDestroy {
    * re-run if a live drill/cross-filter is affected.
    */
   @Output() interactionChanged = new EventEmitter<void>();
+
+  /**
+   * Fired by the on-pill encoding menu (Wave 7, feature 5) the MOMENT the
+   * user picks a menu, BEFORE the mutation is applied, so the parent can push
+   * an undo snapshot of the pre-change state. Paired with encodingChanged.
+   */
+  @Output() encodingWillChange = new EventEmitter<void>();
+
+  /**
+   * Fired AFTER an on-pill encoding change (aggregation / sort / remove) is
+   * applied to the focused visual, so the parent marks dirty + re-transforms.
+   */
+  @Output() encodingChanged = new EventEmitter<void>();
 
   // Chart type checkers
   isHeatMapChartType = isHeatMapChartType;
@@ -479,6 +498,189 @@ export class VisualsChartSidebarComponent implements OnInit, OnDestroy {
     this.focusedVisual.drillDimensions = Array.isArray(cols) ? cols : [];
     this.interactionChanged.emit();
   }
+
+  // ─── On-pill encoding menu (Wave 7, feature 5) ──────────────────────
+  //
+  // A placed field "pill" in a scalar role slot is clickable → an overlay
+  // popover (appendTo=body) with: aggregation (the app's aggregate set),
+  // sort (asc / desc / none by this field), open-format shortcut, and
+  // remove-from-well. All writes land on the focused visual's encoding /
+  // config; the parent captures undo (encodingWillChange) then re-transforms
+  // (encodingChanged). Token-driven, i18n, OnPush-safe. Generalised — no
+  // assumption about the column's meaning.
+
+  /** The role whose pill menu is currently open (null = closed). */
+  pillMenuRole: RoleKey | null = null;
+
+  /**
+   * Aggregate-function options for the pill menu. DB-driven (family
+   * aggregate_fn) with an i18n-keyed fallback so it renders immediately,
+   * mirroring the config sidebar. Includes the UI-only NONE (value '').
+   */
+  aggregateOptions: { label: string; value: AggregateFn | '' }[] = [];
+  private readonly aggregateOptionsRaw: {
+    label: string;
+    value: AggregateFn | '';
+  }[] = [
+    { label: 'ANALYSES.AGG.NONE', value: '' },
+    { label: 'ANALYSES.AGG.SUM', value: 'sum' },
+    { label: 'ANALYSES.AGG.AVG', value: 'avg' },
+    { label: 'ANALYSES.AGG.COUNT', value: 'count' },
+    { label: 'ANALYSES.AGG.MIN', value: 'min' },
+    { label: 'ANALYSES.AGG.MAX', value: 'max' },
+    { label: 'ANALYSES.AGG.COUNT_DISTINCT', value: 'count_distinct' },
+    { label: 'ANALYSES.AGG.MEDIAN', value: 'median' },
+    { label: 'ANALYSES.AGG.PERCENTILE', value: 'percentile' },
+    { label: 'ANALYSES.AGG.STDDEV', value: 'stddev' },
+    { label: 'ANALYSES.AGG.VARIANCE', value: 'variance' },
+  ];
+
+  /** Resolve the aggregate option labels against the active locale. */
+  private localizeAggregateOptions(): void {
+    this.aggregateOptions = this.aggregateOptionsRaw.map(o => ({
+      value: o.value,
+      label: this.translate.instant(o.label),
+    }));
+  }
+
+  /** Overwrite the fallback aggregate list with DB rows once resolved. */
+  private loadAggregateOptions(): void {
+    this.referenceData.getFamily('aggregate_fn').subscribe(rows => {
+      if (!rows.length) return;
+      const dbOptions = rows.map(r => ({
+        label: r.label,
+        value: r.code as AggregateFn,
+      }));
+      this.aggregateOptions = [
+        { label: this.translate.instant('ANALYSES.AGG.NONE'), value: '' },
+        ...dbOptions,
+      ];
+      this.cdr.markForCheck();
+    });
+  }
+
+  /**
+   * Roles that carry a MEASURE (a quantity you aggregate). The aggregation
+   * section of the pill menu only applies to these; category/dimension pills
+   * show sort + format + remove only.
+   */
+  private static readonly MEASURE_ROLES: ReadonlySet<RoleKey> =
+    new Set<RoleKey>(['yAxis', 'zAxis', 'valueColumns', 'sample']);
+
+  /** True when the pill's role is a measure (aggregation applies). */
+  isMeasureRole(role: RoleKey): boolean {
+    return VisualsChartSidebarComponent.MEASURE_ROLES.has(role);
+  }
+
+  /** Open the pill menu for a scalar role via the overlay panel. */
+  openPillMenu(role: RoleKey, event: Event, op: any): void {
+    event.stopPropagation();
+    this.pillMenuRole = role;
+    op.toggle(event);
+  }
+
+  /** The aggregate currently set on the focused visual ('' = none). */
+  get currentAggregate(): AggregateFn | '' {
+    return (this.focusedVisual as any)?.aggregate ?? '';
+  }
+
+  /**
+   * Apply an aggregate to the focused visual from the pill menu. Writes
+   * `aggregate` + the dimension/measure columns the server-side aggregation
+   * encoding expects (dimension = xAxisColumn, measure = the pill's column),
+   * or clears them when NONE is picked. Fires will-change (undo) then changed.
+   */
+  setPillAggregate(agg: AggregateFn | '', op?: any): void {
+    const v = this.focusedVisual as any;
+    if (!v) return;
+    this.encodingWillChange.emit();
+    if (agg === '') {
+      v.aggregate = null;
+      v.dimensionColumn = null;
+      v.measureColumn = null;
+    } else {
+      v.aggregate = agg;
+      // Dimension = the category (x) axis; measure = the value (y) axis. This
+      // is the same encoding the config sidebar / transformer read.
+      v.dimensionColumn = v.xAxisColumn ?? v.dimensionColumn ?? null;
+      v.measureColumn = v.yAxisColumn ?? v.measureColumn ?? null;
+    }
+    op?.hide();
+    this.encodingChanged.emit();
+  }
+
+  /**
+   * The sort axis this pill's role maps to: a MEASURE pill sorts by the
+   * measure value ('measure'); a dimension/category pill sorts by the axis
+   * category ('axis'). Matches the config sidebar's VISUAL_SORT_BY_OPTIONS so
+   * both surfaces write the SAME config keys the shared applySortAndLimit
+   * builder already consumes (config.sortBy / config.sortDir).
+   */
+  private sortByForRole(role: RoleKey): 'axis' | 'measure' {
+    return this.isMeasureRole(role) ? 'measure' : 'axis';
+  }
+
+  /**
+   * The pill's current sort direction, or 'none' when the visual isn't sorted
+   * by THIS pill's axis. Reads config.sortBy / config.sortDir.
+   */
+  currentSortDir(role: RoleKey): 'asc' | 'desc' | 'none' {
+    const cfg = (this.focusedVisual as any)?.config;
+    if (!cfg) return 'none';
+    if ((cfg.sortBy ?? 'none') !== this.sortByForRole(role)) return 'none';
+    return cfg.sortDir === 'asc' ? 'asc' : 'desc';
+  }
+
+  /**
+   * Set the sort applied by a field's pill. Writes the shared config.sortBy
+   * ('axis' | 'measure' | 'none') + config.sortDir ('asc' | 'desc') that the
+   * transform pipeline's applySortAndLimit reads — no bespoke sort key.
+   * 'none' clears sorting. Generalised over any column.
+   */
+  setPillSort(role: RoleKey, direction: 'asc' | 'desc' | 'none', op?: any): void {
+    const v = this.focusedVisual as any;
+    if (!v) return;
+    this.encodingWillChange.emit();
+    if (!v.config) v.config = {};
+    if (direction === 'none') {
+      v.config = { ...v.config, sortBy: 'none' };
+    } else {
+      v.config = {
+        ...v.config,
+        sortBy: this.sortByForRole(role),
+        sortDir: direction,
+      };
+    }
+    op?.hide();
+    this.encodingChanged.emit();
+  }
+
+  /** Remove the field bound to a role from its well (pill menu action). */
+  removePillField(role: RoleKey, op?: any): void {
+    if (!this.focusedVisual) return;
+    this.encodingWillChange.emit();
+    this.clearRoleOnVisual(this.focusedVisual, role);
+    op?.hide();
+    // Reuse the existing cleared path so the parent re-transforms.
+    this.axisFieldCleared.emit();
+  }
+
+  /**
+   * Format shortcut — the pill menu's "Format…" opens the format editor for
+   * this field. The rich format controls live in the config sidebar (Wave 3),
+   * so we surface the field for the author and emit interactionChanged, which
+   * the parent already routes to open/refresh the config surface. Kept a
+   * light hook so the two panels stay decoupled.
+   */
+  openPillFormat(role: RoleKey, op?: any): void {
+    op?.hide();
+    // Signal the parent (which owns the config sidebar) that the author wants
+    // to format this visual; the parent opens the format panel. No mutation.
+    this.formatRequested.emit();
+  }
+
+  /** Asks the parent to open the format (config) sidebar for the focused visual. */
+  @Output() formatRequested = new EventEmitter<void>();
 
   trackByIndex(index: number): number {
     return index;

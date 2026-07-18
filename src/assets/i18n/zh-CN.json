@@ -1630,7 +1630,10 @@
       "ADD_TAB_TYPE": "添加选项卡",
       "TYPE_CHART": "图表",
       "TYPE_TABLE": "表格",
-      "TYPE_KPI": "KPI"
+      "TYPE_KPI": "KPI",
+      "DUPLICATE": "复制",
+      "SET_COLOR": "设置颜色",
+      "CLEAR_COLOR": "清除颜色"
     },
     "AUTHORING": {
       "DUPLICATE": "复制",
@@ -1643,7 +1646,22 @@
       "TAB_DUPLICATED": "标签页已复制",
       "EXPORT_PNG_TABLE_SKIP": "PNG 导出不适用于表格可视化。请改用 CSV。",
       "EXPORT_PNG_UNAVAILABLE": "图表图像尚未就绪。请稍后重试。",
-      "EXPORT_CSV_EMPTY": "没有可导出的内容——此可视化尚无数据。"
+      "EXPORT_CSV_EMPTY": "没有可导出的内容——此可视化尚无数据。",
+      "UNDO": "撤销",
+      "REDO": "重做",
+      "PRESENT": "演示",
+      "EXIT_PRESENT": "退出",
+      "ALIGN": "对齐",
+      "DISTRIBUTE": "分布",
+      "ALIGN_LEFT": "左对齐",
+      "ALIGN_CENTER": "居中对齐",
+      "ALIGN_RIGHT": "右对齐",
+      "ALIGN_TOP": "顶部对齐",
+      "ALIGN_MIDDLE": "垂直居中",
+      "ALIGN_BOTTOM": "底部对齐",
+      "DISTRIBUTE_H": "水平分布",
+      "DISTRIBUTE_V": "垂直分布",
+      "SELECTED_COUNT": "已选择 {{count}} 个"
     },
     "AGG": {
       "DIMENSION": "维度",
@@ -1979,6 +1997,16 @@
     },
     "TOPN": {
       "OTHER_LABEL": "其他"
+    },
+    "ENCODING": {
+      "MENU_TITLE": "字段选项",
+      "MENU_AGG": "聚合",
+      "MENU_SORT": "排序",
+      "MENU_SORT_ASC": "升序排序",
+      "MENU_SORT_DESC": "降序排序",
+      "MENU_SORT_NONE": "不排序",
+      "MENU_FORMAT": "格式…",
+      "MENU_REMOVE": "从字段移除"
     }
   },
   "DASHBOARD": {

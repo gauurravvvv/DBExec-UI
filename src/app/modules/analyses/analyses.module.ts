@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EffectsModule } from '@ngrx/effects';
@@ -64,6 +65,9 @@ import {
     SharedModule,
     SharedChartsModule,
     MenuModule,
+    // Wave 7 authoring UX: CDK drag-drop powers tab-strip reorder + canvas
+    // visual reposition. Installed dep (@angular/cdk), no new package.
+    DragDropModule,
     // Standalone — the shared unified list table + its projected-empty
     // directive. `UsGridCellDirective` stays: the table reuses it verbatim
     // for per-cell templates.

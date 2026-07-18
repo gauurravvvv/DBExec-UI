@@ -1630,7 +1630,10 @@
       "ADD_TAB_TYPE": "Ajouter un onglet",
       "TYPE_CHART": "Graphique",
       "TYPE_TABLE": "Tableau",
-      "TYPE_KPI": "KPI"
+      "TYPE_KPI": "KPI",
+      "DUPLICATE": "Dupliquer",
+      "SET_COLOR": "Définir la couleur",
+      "CLEAR_COLOR": "Effacer la couleur"
     },
     "AUTHORING": {
       "DUPLICATE": "Dupliquer",
@@ -1643,7 +1646,22 @@
       "TAB_DUPLICATED": "Onglet dupliqué",
       "EXPORT_PNG_TABLE_SKIP": "L'export PNG n'est pas disponible pour les visualisations de type tableau. Utilisez plutôt le CSV.",
       "EXPORT_PNG_UNAVAILABLE": "L'image du graphique n'est pas encore prête. Réessayez dans un instant.",
-      "EXPORT_CSV_EMPTY": "Rien à exporter : cette visualisation n'a pas encore de données."
+      "EXPORT_CSV_EMPTY": "Rien à exporter : cette visualisation n'a pas encore de données.",
+      "UNDO": "Annuler",
+      "REDO": "Rétablir",
+      "PRESENT": "Présenter",
+      "EXIT_PRESENT": "Quitter",
+      "ALIGN": "Aligner",
+      "DISTRIBUTE": "Répartir",
+      "ALIGN_LEFT": "Aligner à gauche",
+      "ALIGN_CENTER": "Aligner au centre",
+      "ALIGN_RIGHT": "Aligner à droite",
+      "ALIGN_TOP": "Aligner en haut",
+      "ALIGN_MIDDLE": "Aligner au milieu",
+      "ALIGN_BOTTOM": "Aligner en bas",
+      "DISTRIBUTE_H": "Répartir horizontalement",
+      "DISTRIBUTE_V": "Répartir verticalement",
+      "SELECTED_COUNT": "{{count}} sélectionné(s)"
     },
     "AGG": {
       "DIMENSION": "Dimension",
@@ -1979,6 +1997,16 @@
     },
     "TOPN": {
       "OTHER_LABEL": "Autre"
+    },
+    "ENCODING": {
+      "MENU_TITLE": "Options du champ",
+      "MENU_AGG": "Agrégation",
+      "MENU_SORT": "Trier",
+      "MENU_SORT_ASC": "Tri croissant",
+      "MENU_SORT_DESC": "Tri décroissant",
+      "MENU_SORT_NONE": "Aucun tri",
+      "MENU_FORMAT": "Format…",
+      "MENU_REMOVE": "Retirer du champ"
     }
   },
   "DASHBOARD": {
