@@ -2541,6 +2541,21 @@ export class EditAnalysesComponent
     op.show(event);
   }
 
+  /**
+   * The visual whose kebab (⋮) action menu is currently open. The card header
+   * shows a single kebab instead of a busy inline icon row; every per-visual
+   * action (focus, maximize, duplicate, cross-filter, drill, export, move,
+   * delete) lives in this menu. Mirrors the tab context-menu pattern.
+   */
+  menuVisual: Visual | null = null;
+
+  /** Open the per-visual kebab action menu, anchored to the kebab button. */
+  openVisualMenu(visual: Visual, event: Event, op: any): void {
+    event.stopPropagation();
+    this.menuVisual = visual;
+    op.toggle(event);
+  }
+
   /** Index of a tab in the strip (for move-left/right guards in the menu). */
   tabIndex(tab: AnalysisTab | null): number {
     if (!tab) return -1;
@@ -2597,12 +2612,6 @@ export class EditAnalysesComponent
     const tab = this.ctxTab;
     op?.hide();
     if (tab) this.moveTab(tab, direction);
-  }
-
-  /** Toggle the per-visual "move to tab" menu. */
-  toggleMoveMenu(visualId: string, event: Event): void {
-    event.stopPropagation();
-    this.moveMenuVisualId = this.moveMenuVisualId === visualId ? null : visualId;
   }
 
   /**

@@ -1039,143 +1039,192 @@
           <div class="visual-inline-title" cdkDragHandle>
             <i class="pi pi-bars visual-drag-grip" aria-hidden="true"></i>
             <span class="inline-title-text">{{ visual.title }}</span>
-            <!-- Action buttons (no chart-type switcher; users change
-                 chart type via the Layers + Visuals sidebars only) -->
+            <!-- Actions — consolidated into a single kebab (⋮) menu so the
+                 card header stays clean. Cross-filter keeps an inline toggle
+                 ONLY while active (so the author sees which visuals broadcast
+                 a filter at a glance); everything else lives in the menu. -->
             <div class="visual-action-buttons">
-              <!-- Cross-filter opt-in (spec §6). Only meaningful on
-                   charts with a category axis; clicking a point when
-                   enabled filters the sibling visuals. Highlighted when
-                   active so the author sees which visuals broadcast. -->
+              <!-- Active cross-filter indicator (inline, active-only). -->
               <i
                 *ngIf="
                   visual.chartType &&
                   !isTableChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                class="pi pi-filter action-icon crossfilter-icon"
-                [class.active]="visual.crossFilterEnabled"
-                (click)="toggleCrossFilter(visual, $event)"
-                [pTooltip]="
-                  (visual.crossFilterEnabled
-                    ? 'ANALYSES.CROSSFILTER_ON'
-                    : 'ANALYSES.CROSSFILTER_OFF'
-                  ) | translate
-                "
-                tooltipPosition="top"
-              ></i>
-              <!-- Drill-to-detail (Wave 6, §C). Opens the underlying rows for
-                   the visual's current scope in a panel. Gated by
-                   config.interaction.drillToDetail.enabled. -->
-              <i
-                *ngIf="
-                  visual.chartType &&
                   hasRequiredChartFields(visual) &&
-                  isDrillToDetailEnabled(visual)
+                  visual.crossFilterEnabled
                 "
-                class="pi pi-table action-icon detail-icon"
-                (click)="openDrillToDetail(visual, null); $event.stopPropagation()"
-                [pTooltip]="'ANALYSES.V2.INTERACTION.DRILL_TO_DETAIL' | translate"
-                tooltipPosition="top"
-              ></i>
-              <i
-                *ngIf="
-                  visual.chartType &&
-                  (hasRequiredChartFields(visual) ||
-                    isLines3dChartType(visual.chartType) ||
-                    isPolygons3dChartType(visual.chartType))
-                "
-                class="pi pi-window-maximize action-icon maximize-icon"
-                (click)="maximizeVisual(visual, $event)"
-                [pTooltip]="'ANALYSES.MAXIMIZE' | translate"
+                class="pi pi-filter action-icon crossfilter-icon active"
+                (click)="toggleCrossFilter(visual, $event)"
+                [pTooltip]="'ANALYSES.CROSSFILTER_ON' | translate"
                 tooltipPosition="top"
               ></i>
 
-              <!-- Full-screen focus (Slice F, item 5) — expands this visual
-                   into the maximized overlay (ESC / backdrop / × to close). -->
-              <app-button
-                *ngIf="
-                  visual.chartType &&
-                  (hasRequiredChartFields(visual) ||
-                    isLines3dChartType(visual.chartType) ||
-                    isPolygons3dChartType(visual.chartType))
-                "
-                variant="icon"
-                size="sm"
-                icon="pi pi-expand"
-                class="visual-action-btn"
-                [title]="'ANALYSES.AUTHORING.FOCUS' | translate"
-                (clicked)="focusVisual(visual, $event)"
-              ></app-button>
-
-              <!-- Duplicate visual (Slice F, item 1) — clones the visual +
-                   its config into the same tab as "… (copy)". -->
-              <app-button
-                variant="icon"
-                size="sm"
-                icon="pi pi-copy"
-                class="visual-action-btn"
-                [loading]="duplicatingVisualId === visual.id"
-                [disabled]="!!duplicatingVisualId"
-                [title]="'ANALYSES.AUTHORING.DUPLICATE' | translate"
-                (clicked)="duplicateVisual(visual, $event)"
-              ></app-button>
-
-              <!-- Export PNG (Slice F, item 3) — ECharts data-URL download.
-                   Skipped gracefully for table visuals (no chart instance). -->
-              <app-button
-                *ngIf="
-                  visual.chartType && !isTableChartType(visual.chartType)
-                "
-                variant="icon"
-                size="sm"
-                icon="pi pi-image"
-                class="visual-action-btn"
-                [title]="'ANALYSES.AUTHORING.EXPORT_PNG' | translate"
-                (clicked)="exportVisualPng(visual, $event)"
-              ></app-button>
-
-              <!-- Export CSV (Slice F, item 3) — current underlying rows.
-                   Always available, including for table visuals. -->
-              <app-button
-                *ngIf="visual.chartType"
-                variant="icon"
-                size="sm"
-                icon="pi pi-file-export"
-                class="visual-action-btn"
-                [title]="'ANALYSES.AUTHORING.EXPORT_CSV' | translate"
-                (clicked)="exportVisualCsv(visual, $event)"
-              ></app-button>
-              <i
-                *ngIf="tabs.length > 1"
-                class="pi pi-arrow-right-arrow-left action-icon move-tab-icon"
-                (click)="toggleMoveMenu(visual.id, $event)"
-                [pTooltip]="'ANALYSES.TABS.MOVE_VISUAL' | translate"
+              <!-- Kebab menu trigger. -->
+              <button
+                type="button"
+                class="action-icon visual-kebab-btn"
+                (click)="openVisualMenu(visual, $event, visualMenuOp)"
+                [pTooltip]="'COMMON.MORE' | translate"
                 tooltipPosition="top"
-              ></i>
-              <div
-                class="move-tab-menu"
-                *ngIf="moveMenuVisualId === visual.id"
-                (click)="$event.stopPropagation()"
+                [attr.aria-label]="'COMMON.MORE' | translate"
               >
-                <div class="move-tab-menu__label">
-                  {{ 'ANALYSES.TABS.MOVE_TO' | translate }}
+                <i class="pi pi-ellipsis-v"></i>
+              </button>
+
+              <!-- Kebab overlay — token-styled, appendTo body, reuses the
+                   tab-context-menu look for a consistent menu surface. -->
+              <p-overlayPanel
+                #visualMenuOp
+                appendTo="body"
+                styleClass="tab-ctx-panel"
+              >
+                <div class="tab-ctx" *ngIf="menuVisual as v">
+                  <!-- Focus (full-screen) -->
+                  <button
+                    type="button"
+                    class="tab-ctx__item"
+                    *ngIf="
+                      v.chartType &&
+                      (hasRequiredChartFields(v) ||
+                        isLines3dChartType(v.chartType) ||
+                        isPolygons3dChartType(v.chartType))
+                    "
+                    (click)="focusVisual(v, $event); visualMenuOp.hide()"
+                  >
+                    <i class="pi pi-expand"></i>
+                    <span>{{ 'ANALYSES.AUTHORING.FOCUS' | translate }}</span>
+                  </button>
+                  <!-- Maximize -->
+                  <button
+                    type="button"
+                    class="tab-ctx__item"
+                    *ngIf="
+                      v.chartType &&
+                      (hasRequiredChartFields(v) ||
+                        isLines3dChartType(v.chartType) ||
+                        isPolygons3dChartType(v.chartType))
+                    "
+                    (click)="maximizeVisual(v, $event); visualMenuOp.hide()"
+                  >
+                    <i class="pi pi-window-maximize"></i>
+                    <span>{{ 'ANALYSES.MAXIMIZE' | translate }}</span>
+                  </button>
+                  <!-- Duplicate -->
+                  <button
+                    type="button"
+                    class="tab-ctx__item"
+                    [disabled]="!!duplicatingVisualId"
+                    (click)="duplicateVisual(v, $event); visualMenuOp.hide()"
+                  >
+                    <i
+                      class="pi"
+                      [class.pi-copy]="duplicatingVisualId !== v.id"
+                      [class.pi-spin]="duplicatingVisualId === v.id"
+                      [class.pi-spinner]="duplicatingVisualId === v.id"
+                    ></i>
+                    <span>{{ 'ANALYSES.AUTHORING.DUPLICATE' | translate }}</span>
+                  </button>
+
+                  <div
+                    class="tab-ctx__divider"
+                    *ngIf="
+                      v.chartType &&
+                      !isTableChartType(v.chartType) &&
+                      hasRequiredChartFields(v)
+                    "
+                  ></div>
+
+                  <!-- Cross-filter toggle -->
+                  <button
+                    type="button"
+                    class="tab-ctx__item"
+                    [class.is-active]="v.crossFilterEnabled"
+                    *ngIf="
+                      v.chartType &&
+                      !isTableChartType(v.chartType) &&
+                      hasRequiredChartFields(v)
+                    "
+                    (click)="toggleCrossFilter(v, $event); visualMenuOp.hide()"
+                  >
+                    <i class="pi pi-filter"></i>
+                    <span>{{
+                      (v.crossFilterEnabled
+                        ? 'ANALYSES.CROSSFILTER_ON'
+                        : 'ANALYSES.CROSSFILTER_OFF'
+                      ) | translate
+                    }}</span>
+                  </button>
+                  <!-- Drill-to-detail -->
+                  <button
+                    type="button"
+                    class="tab-ctx__item"
+                    *ngIf="
+                      v.chartType &&
+                      hasRequiredChartFields(v) &&
+                      isDrillToDetailEnabled(v)
+                    "
+                    (click)="openDrillToDetail(v, null); visualMenuOp.hide()"
+                  >
+                    <i class="pi pi-table"></i>
+                    <span>{{
+                      'ANALYSES.V2.INTERACTION.DRILL_TO_DETAIL' | translate
+                    }}</span>
+                  </button>
+
+                  <div class="tab-ctx__divider" *ngIf="v.chartType"></div>
+
+                  <!-- Export PNG -->
+                  <button
+                    type="button"
+                    class="tab-ctx__item"
+                    *ngIf="v.chartType && !isTableChartType(v.chartType)"
+                    (click)="exportVisualPng(v, $event); visualMenuOp.hide()"
+                  >
+                    <i class="pi pi-image"></i>
+                    <span>{{ 'ANALYSES.AUTHORING.EXPORT_PNG' | translate }}</span>
+                  </button>
+                  <!-- Export CSV -->
+                  <button
+                    type="button"
+                    class="tab-ctx__item"
+                    *ngIf="v.chartType"
+                    (click)="exportVisualCsv(v, $event); visualMenuOp.hide()"
+                  >
+                    <i class="pi pi-file-export"></i>
+                    <span>{{ 'ANALYSES.AUTHORING.EXPORT_CSV' | translate }}</span>
+                  </button>
+
+                  <!-- Move to tab -->
+                  <ng-container *ngIf="tabs.length > 1">
+                    <div class="tab-ctx__divider"></div>
+                    <div class="tab-ctx__label">
+                      {{ 'ANALYSES.TABS.MOVE_TO' | translate }}
+                    </div>
+                    <button
+                      type="button"
+                      class="tab-ctx__item"
+                      *ngFor="let t of tabs; trackBy: trackByTabId"
+                      [disabled]="
+                        (v.tabId || (tabs.length ? tabs[0].id : null)) === t.id
+                      "
+                      (click)="moveVisualToTab(v, t.id, $event); visualMenuOp.hide()"
+                    >
+                      <i class="pi pi-arrow-right-arrow-left"></i>
+                      <span>{{ t.name }}</span>
+                    </button>
+                  </ng-container>
+
+                  <div class="tab-ctx__divider"></div>
+                  <!-- Delete (danger) -->
+                  <button
+                    type="button"
+                    class="tab-ctx__item tab-ctx__item--danger"
+                    (click)="removeVisual(v.id); visualMenuOp.hide()"
+                  >
+                    <i class="pi pi-trash"></i>
+                    <span>{{ 'ANALYSES.REMOVE' | translate }}</span>
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  class="move-tab-menu__item"
-                  *ngFor="let t of tabs; trackBy: trackByTabId"
-                  [disabled]="(visual.tabId || (tabs.length ? tabs[0].id : null)) === t.id"
-                  (click)="moveVisualToTab(visual, t.id, $event)"
-                >
-                  {{ t.name }}
-                </button>
-              </div>
-              <i
-                class="pi pi-times action-icon remove-icon"
-                (click)="removeVisual(visual.id); $event.stopPropagation()"
-                [pTooltip]="'ANALYSES.REMOVE' | translate"
-                tooltipPosition="top"
-              ></i>
+              </p-overlayPanel>
             </div>
           </div>
           <div class="visual-body">
