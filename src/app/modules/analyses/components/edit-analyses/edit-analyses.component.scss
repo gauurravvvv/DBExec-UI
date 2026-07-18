@@ -4830,12 +4830,13 @@
 }
 
 .analysis-tab {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: var(--space-3);
-  padding: 7px var(--space-5);
+  padding: 8px var(--space-5);
   // rounded TOP corners only — folder-tab silhouette
-  border-radius: 7px 7px 0 0;
+  border-radius: 8px 8px 0 0;
   border: 1px solid transparent;
   border-bottom: none;
   background: transparent;
@@ -4850,11 +4851,37 @@
   transition:
     color var(--motion-fast) ease,
     background var(--motion-fast) ease,
-    border-color var(--motion-fast) ease;
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease;
+
+  // Top accent bar — the premium analytics active-tab tell. Sits flush with
+  // the tab's top edge; collapses (scaleX 0) for inactive tabs so hovering an
+  // inactive tab previews a faint bar without shouting. Uses the per-tab
+  // colour when set (author-chosen), else the primary accent.
+  &::after {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 8px;
+    right: 8px;
+    height: 2px;
+    border-radius: var(--radius-pill);
+    background: var(--tab-color, var(--primary-color));
+    transform: scaleX(0);
+    transform-origin: center;
+    opacity: 0;
+    transition:
+      transform var(--motion-fast) ease,
+      opacity var(--motion-fast) ease;
+  }
 
   &:hover:not(.active) {
     background: var(--a-bg-hover, var(--hover-background));
     color: var(--text-color);
+    &::after {
+      transform: scaleX(0.6);
+      opacity: 0.4;
+    }
   }
 
   &.active {
@@ -4864,6 +4891,13 @@
     // top + sides border, NO bottom → connects to the content panel
     border-color: var(--a-border-faint, var(--border-color));
     border-bottom: 1px solid var(--a-bg-canvas, var(--home-background-color));
+    // subtle lift so the active page reads as "raised" above its siblings
+    box-shadow: 0 -1px 4px rgba(var(--primary-color-rgb), 0.06);
+
+    &::after {
+      transform: scaleX(1);
+      opacity: 1;
+    }
   }
 
   &__name {
@@ -4970,119 +5004,6 @@
 .analysis-tab-strip > .analysis-tab-add--labelled {
   flex: 0 0 auto;
   margin-bottom: 3px;
-}
-
-/* ─── Quick add-tab control (type chips + name) ─────────────────────── */
-.add-tab-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  min-width: 260px;
-  padding: var(--space-1);
-
-  .add-tab-label {
-    font-size: var(--fs-label);
-    font-weight: var(--fw-semibold, 600);
-    color: var(--text-color);
-  }
-
-  .add-tab-types {
-    display: flex;
-    gap: var(--space-2);
-  }
-
-  // (Wave 7) .add-tab-type-chip removed — the quick-add tab-type picker uses
-  // <app-chip variant="filter"> now, so this legacy chip block was dead.
-
-  .add-tab-name {
-    width: 100%;
-    height: 36px;
-    padding: 0 var(--space-3);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-xs);
-    background: var(--input-background, var(--card-background));
-    color: var(--text-color);
-    font-size: var(--fs-body, 0.9rem);
-    font-family: inherit;
-
-    &:focus {
-      outline: none;
-      border-color: var(--primary-color);
-    }
-  }
-
-  .add-tab-actions {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .add-tab-btn.primary {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-2) var(--space-4);
-    border: none;
-    border-radius: var(--radius-xs);
-    background: var(--primary-color);
-    color: #fff;
-    font-size: var(--fs-label);
-    font-weight: var(--fw-medium);
-    cursor: pointer;
-    transition: filter var(--motion-fast) ease;
-
-    &:hover:not(:disabled) {
-      filter: brightness(1.05);
-    }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-  }
-}
-
-/* ─── Move-visual-to-tab overlay menu ───────────────────────────────── */
-.move-tab-menu {
-  position: absolute;
-  top: 28px;
-  right: 6px;
-  z-index: 30;
-  min-width: 160px;
-  padding: var(--space-2);
-  background: var(--card-background);
-  border: 1px solid var(--border-color);
-  border-radius: var(--a-radius-sm, var(--radius-xs));
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-
-  &__label {
-    font-size: var(--fs-micro);
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    padding: 2px 6px 6px;
-  }
-
-  &__item {
-    display: block;
-    width: 100%;
-    text-align: left;
-    padding: var(--space-2) var(--space-3);
-    border: none;
-    background: transparent;
-    color: var(--text-color);
-    font-size: var(--fs-label);
-    border-radius: var(--radius-xs);
-    cursor: pointer;
-
-    &:hover:not(:disabled) {
-      background: var(--hover-background);
-    }
-
-    &:disabled {
-      opacity: 0.45;
-      cursor: default;
-    }
-  }
 }
 
 /* ─── Canvas widgets (Track E3) ─────────────────────────────────────── */

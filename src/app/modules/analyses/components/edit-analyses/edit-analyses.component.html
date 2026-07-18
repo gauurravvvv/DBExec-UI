@@ -928,59 +928,20 @@
           </div>
         </p-overlayPanel>
 
-        <!-- Add-tab: the "+" opens a popover to pick a tab TYPE (Chart /
-             Table / KPI → icon) + name, then "Add tab". The popover is an
-             appendTo="body" overlay, so it anchors to the "+" correctly even
-             though the "+" lives inside the horizontally-scrolling region. -->
+        <!-- Add-tab: a single click adds a new tab straightaway (named
+             "Tab N", switched to it) — no intermediate type/name popover.
+             Double-click the new tab to rename it. -->
         <button
           type="button"
           class="analysis-tab-add"
-          (click)="onOpenAddTab(); addTabOp.toggle($event)"
+          (click)="addTab()"
           [disabled]="isTabBusy"
           [pTooltip]="'ANALYSES.TABS.ADD' | translate"
           tooltipPosition="bottom"
+          [attr.aria-label]="'ANALYSES.TABS.ADD' | translate"
         >
           <i class="pi pi-plus"></i>
         </button>
-
-        <!-- Quick add-tab control: pick a type (→ icon) + name, chip-styled. -->
-        <p-overlayPanel #addTabOp appendTo="body" styleClass="add-tab-panel">
-          <div class="add-tab-form">
-            <div class="add-tab-label">
-              {{ 'ANALYSES.TABS.ADD_TAB_TYPE' | translate }}
-            </div>
-            <div class="add-tab-types">
-              <app-chip
-                variant="filter"
-                *ngFor="let preset of tabTypePresets"
-                [icon]="preset.icon"
-                [active]="newTabType === preset.type"
-                (clicked)="newTabType = preset.type"
-              >
-                {{ preset.labelKey | translate }}
-              </app-chip>
-            </div>
-            <input
-              type="text"
-              class="add-tab-name"
-              [(ngModel)]="newTabName"
-              (keydown.enter)="addTabTyped(addTabOp)"
-              [placeholder]="'ANALYSES.TABS.NEW_TAB_NAME' | translate: { n: tabs.length + 1 }"
-              autocomplete="off"
-            />
-            <div class="add-tab-actions">
-              <button
-                type="button"
-                class="add-tab-btn primary"
-                [disabled]="isTabBusy"
-                (click)="addTabTyped(addTabOp)"
-              >
-                <i class="pi pi-plus"></i>
-                {{ 'ANALYSES.TABS.ADD' | translate }}
-              </button>
-            </div>
-          </div>
-        </p-overlayPanel>
         </div>
         <!-- /analysis-tabs-scroll — "Add widget" now lives in the Charts panel
              (next to "Add Visual"), so the tab strip is just tabs + add-tab. -->
@@ -1192,26 +1153,6 @@
                     <i class="pi pi-file-export"></i>
                     <span>{{ 'ANALYSES.AUTHORING.EXPORT_CSV' | translate }}</span>
                   </button>
-
-                  <!-- Move to tab -->
-                  <ng-container *ngIf="tabs.length > 1">
-                    <div class="tab-ctx__divider"></div>
-                    <div class="tab-ctx__label">
-                      {{ 'ANALYSES.TABS.MOVE_TO' | translate }}
-                    </div>
-                    <button
-                      type="button"
-                      class="tab-ctx__item"
-                      *ngFor="let t of tabs; trackBy: trackByTabId"
-                      [disabled]="
-                        (v.tabId || (tabs.length ? tabs[0].id : null)) === t.id
-                      "
-                      (click)="moveVisualToTab(v, t.id, $event); visualMenuOp.hide()"
-                    >
-                      <i class="pi pi-arrow-right-arrow-left"></i>
-                      <span>{{ t.name }}</span>
-                    </button>
-                  </ng-container>
 
                   <div class="tab-ctx__divider"></div>
                   <!-- Delete (danger) -->

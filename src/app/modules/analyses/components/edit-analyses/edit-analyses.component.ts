@@ -2236,8 +2236,6 @@ export class EditAnalysesComponent
   showDeleteTabConfirm = false;
   tabToDelete: AnalysisTab | null = null;
   tabDeleteJustification = '';
-  /** Move-visual-to-tab menu state (which visual's menu is open). */
-  moveMenuVisualId: string | null = null;
 
   /**
    * Load the analysis's tabs. Seeds `activeTabId` to the first tab.
@@ -2315,46 +2313,7 @@ export class EditAnalysesComponent
    * column — icon carries the intent), so no schema change is needed. The FE
    * shows these as icon chips + an i18n label.
    */
-  readonly tabTypePresets: { type: string; icon: string; labelKey: string }[] =
-    [
-      { type: 'chart', icon: 'pi pi-chart-bar', labelKey: 'ANALYSES.TABS.TYPE_CHART' },
-      { type: 'table', icon: 'pi pi-table', labelKey: 'ANALYSES.TABS.TYPE_TABLE' },
-      { type: 'kpi', icon: 'pi pi-hashtag', labelKey: 'ANALYSES.TABS.TYPE_KPI' },
-    ];
-
-  /** Quick-add popover state. */
-  newTabType = 'chart';
-  newTabName = '';
-
-  /** Reset the quick-add form when its popover opens. */
-  onOpenAddTab(): void {
-    this.newTabType = 'chart';
-    this.newTabName = '';
-  }
-
-  /** Icon for the currently-selected quick-add type. */
-  private iconForType(type: string): string {
-    return (
-      this.tabTypePresets.find(p => p.type === type)?.icon ?? 'pi pi-chart-bar'
-    );
-  }
-
-  /**
-   * Add a tab from the quick-add control: a chosen type (→ icon) + an optional
-   * name (defaults to the "Tab N" name). Switches to the new tab.
-   */
-  addTabTyped(op?: { hide: () => void }): void {
-    if (this.isTabBusy || !this.analysisId) return;
-    const name =
-      this.newTabName.trim() ||
-      this.translate.instant('ANALYSES.TABS.NEW_TAB_NAME', {
-        n: this.tabs.length + 1,
-      });
-    this.addTab(name, this.iconForType(this.newTabType));
-    op?.hide();
-  }
-
-  /** Create a new tab and switch to it. Optional name + icon (from quick-add);
+  /** Create a new tab and switch to it. Optional name + icon;
    *  falls back to a generated "Tab N" name when none is supplied. */
   addTab(name?: string, icon?: string | null): void {
     if (!this.analysisId) return;
@@ -2612,27 +2571,6 @@ export class EditAnalysesComponent
     const tab = this.ctxTab;
     op?.hide();
     if (tab) this.moveTab(tab, direction);
-  }
-
-  /**
-   * Move a visual to a different tab. Optimistic local re-tag + a save-time
-   * persist (tabId rides the visual's config payload on the next save).
-   * Marks dirty so the change survives.
-   */
-  moveVisualToTab(visual: Visual, tabId: string, event?: Event): void {
-    if (event) event.stopPropagation();
-    this.moveMenuVisualId = null;
-    if ((visual.tabId ?? this.firstTabId) === tabId) return;
-    this.captureHistory();
-    visual.tabId = tabId;
-    this.markDirty();
-    if (this.focusedVisualId === visual.id) {
-      this.focusedVisualId = null;
-      this.isConfigSidebarOpen = false;
-    }
-    this.placeVisualsOnGrid();
-    this.recalculateAllVisualDimensions();
-    this.cdr.markForCheck();
   }
 
   trackByTabId(_: number, tab: AnalysisTab): string {
