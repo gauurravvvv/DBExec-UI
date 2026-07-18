@@ -104,9 +104,12 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
     const justificationValid =
       !this.showJustification || this.saveJustification.trim();
     if (this.analysisForm.valid && justificationValid) {
+      // Null-safe: a form control's value can be null (e.g. an analysis
+      // created without a description), so guard the trim() — reading
+      // `.trim()` off a null value threw and silently blocked the save.
       const formData: AnalysisFormData = {
-        name: this.analysisForm.get('name')?.value.trim(),
-        description: this.analysisForm.get('description')?.value.trim(),
+        name: (this.analysisForm.get('name')?.value ?? '').trim(),
+        description: (this.analysisForm.get('description')?.value ?? '').trim(),
       };
       if (this.showJustification) {
         formData.justification = this.saveJustification.trim();
