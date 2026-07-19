@@ -325,7 +325,9 @@
     "LIGHT_MODE": "Switch to Light Mode",
     "BLACK_MODE": "Switch to Black Mode",
     "LANGUAGE": "Taal",
-    "SEARCH": "Zoeken"
+    "SEARCH": "Zoeken",
+    "CLEAR": "Wissen",
+    "DELETE_NOTIFICATION": "Notificatie verwijderen"
   },
   "PROFILE": {
     "TITLE": "Mijn profiel",
@@ -3670,7 +3672,17 @@
     "GROUP_YESTERDAY": "Gisteren",
     "GROUP_THIS_WEEK": "Deze week",
     "GROUP_THIS_MONTH": "Deze maand",
-    "GROUP_OLDER": "Ouder"
+    "GROUP_OLDER": "Ouder",
+    "ASSET_SHARED_TITLE": "Met u gedeeld",
+    "ASSET_SHARED_BODY": "{{assetName}} is met u gedeeld.",
+    "ASSET_UNSHARED_TITLE": "Toegang verwijderd",
+    "ASSET_UNSHARED_BODY": "Uw toegang tot {{assetName}} is verwijderd.",
+    "ALERT_FIRED_TITLE": "Waarschuwing geactiveerd",
+    "ALERT_FIRED_BODY": "De waarschuwing {{alertName}} is geactiveerd.",
+    "DASHBOARD_DELIVERED_TITLE": "Dashboard bezorgd",
+    "DASHBOARD_DELIVERED_BODY": "{{dashboardName}} is in uw postvak bezorgd.",
+    "GENERIC_TITLE": "Notificatie",
+    "GENERIC_BODY": "U hebt een nieuwe notificatie."
   },
   "MENU": {
     "SECURITY_POLICY": "Beveiligingsbeleid",

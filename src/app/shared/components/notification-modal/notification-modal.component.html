@@ -7,6 +7,18 @@
   (closed)="close()"
 >
   <ng-container *ngIf="hasNotifications; else emptyState">
+    <!-- Actions toolbar — Clear removes all READ rows. -->
+    <div class="notification-toolbar" *ngIf="hasRead">
+      <button
+        type="button"
+        class="notification-clear"
+        (click)="onClear()"
+      >
+        <i class="pi pi-trash" aria-hidden="true"></i>
+        {{ 'HEADER.CLEAR' | translate }}
+      </button>
+    </div>
+
     <ng-container *ngFor="let group of groupedItems(); trackBy: trackByBucket">
       <div class="group-header">{{ group.label | translate }}</div>
       <ul class="notification-rows">
@@ -14,6 +26,8 @@
           *ngFor="let n of group.items; trackBy: trackById"
           class="notification-row"
           [class.unread]="!n.readAt"
+          [class.clickable]="hasRoute(n)"
+          (click)="onRowClick(n)"
         >
           <div class="notification-icon">
             <i class="pi" [ngClass]="iconFor(n.type)" aria-hidden="true"></i>
@@ -21,12 +35,20 @@
           <div class="notification-content">
             <div class="row-title">{{ titleKeyFor(n) | translate }}</div>
             <div class="row-message">
-              {{ bodyKeyFor(n) | translate: { groupName: n.meta?.groupName || '' } }}
+              {{ bodyKeyFor(n) | translate: bodyParams(n) }}
             </div>
           </div>
           <span class="row-time" [title]="n.createdOn | date: 'medium'">
             {{ n.createdOn | relativeTime }}
           </span>
+          <button
+            type="button"
+            class="row-delete"
+            [attr.aria-label]="'HEADER.DELETE_NOTIFICATION' | translate"
+            (click)="onDelete($event, n)"
+          >
+            <i class="pi pi-times" aria-hidden="true"></i>
+          </button>
         </li>
       </ul>
     </ng-container>

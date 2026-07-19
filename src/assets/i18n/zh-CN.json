@@ -325,7 +325,9 @@
     "LIGHT_MODE": "Switch to Light Mode",
     "BLACK_MODE": "Switch to Black Mode",
     "LANGUAGE": "语言",
-    "SEARCH": "搜索"
+    "SEARCH": "搜索",
+    "CLEAR": "清除",
+    "DELETE_NOTIFICATION": "删除通知"
   },
   "PROFILE": {
     "TITLE": "我的资料",
@@ -3670,7 +3672,17 @@
     "GROUP_YESTERDAY": "昨天",
     "GROUP_THIS_WEEK": "本周",
     "GROUP_THIS_MONTH": "本月",
-    "GROUP_OLDER": "更早"
+    "GROUP_OLDER": "更早",
+    "ASSET_SHARED_TITLE": "已与您共享",
+    "ASSET_SHARED_BODY": "{{assetName}} 已与您共享。",
+    "ASSET_UNSHARED_TITLE": "访问权限已移除",
+    "ASSET_UNSHARED_BODY": "您对 {{assetName}} 的访问权限已被移除。",
+    "ALERT_FIRED_TITLE": "警报已触发",
+    "ALERT_FIRED_BODY": "警报 {{alertName}} 已触发。",
+    "DASHBOARD_DELIVERED_TITLE": "仪表板已送达",
+    "DASHBOARD_DELIVERED_BODY": "{{dashboardName}} 已送达您的收件箱。",
+    "GENERIC_TITLE": "通知",
+    "GENERIC_BODY": "您有一条新通知。"
   },
   "MENU": {
     "SECURITY_POLICY": "安全策略",

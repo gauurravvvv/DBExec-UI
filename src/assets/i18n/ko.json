@@ -325,7 +325,9 @@
     "LIGHT_MODE": "Switch to Light Mode",
     "BLACK_MODE": "Switch to Black Mode",
     "LANGUAGE": "언어",
-    "SEARCH": "검색"
+    "SEARCH": "검색",
+    "CLEAR": "지우기",
+    "DELETE_NOTIFICATION": "알림 삭제"
   },
   "PROFILE": {
     "TITLE": "내 프로필",
@@ -3670,7 +3672,17 @@
     "GROUP_YESTERDAY": "어제",
     "GROUP_THIS_WEEK": "이번 주",
     "GROUP_THIS_MONTH": "이번 달",
-    "GROUP_OLDER": "이전"
+    "GROUP_OLDER": "이전",
+    "ASSET_SHARED_TITLE": "공유됨",
+    "ASSET_SHARED_BODY": "{{assetName}}이(가) 회원님과 공유되었습니다.",
+    "ASSET_UNSHARED_TITLE": "액세스 제거됨",
+    "ASSET_UNSHARED_BODY": "{{assetName}}에 대한 액세스가 제거되었습니다.",
+    "ALERT_FIRED_TITLE": "알림 발생",
+    "ALERT_FIRED_BODY": "{{alertName}} 알림이 발생했습니다.",
+    "DASHBOARD_DELIVERED_TITLE": "대시보드 전달됨",
+    "DASHBOARD_DELIVERED_BODY": "{{dashboardName}}이(가) 받은 편지함으로 전달되었습니다.",
+    "GENERIC_TITLE": "알림",
+    "GENERIC_BODY": "새 알림이 있습니다."
   },
   "MENU": {
     "SECURITY_POLICY": "보안 정책",

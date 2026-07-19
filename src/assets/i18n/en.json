@@ -325,7 +325,9 @@
     "LIGHT_MODE": "Switch to Light Mode",
     "BLACK_MODE": "Switch to Black Mode",
     "LANGUAGE": "Language",
-    "SEARCH": "Search"
+    "SEARCH": "Search",
+    "CLEAR": "Clear",
+    "DELETE_NOTIFICATION": "Delete notification"
   },
   "PROFILE": {
     "TITLE": "My Profile",
@@ -3673,7 +3675,17 @@
     "GROUP_YESTERDAY": "Yesterday",
     "GROUP_THIS_WEEK": "This week",
     "GROUP_THIS_MONTH": "This month",
-    "GROUP_OLDER": "Older"
+    "GROUP_OLDER": "Older",
+    "ASSET_SHARED_TITLE": "Shared with you",
+    "ASSET_SHARED_BODY": "{{assetName}} was shared with you.",
+    "ASSET_UNSHARED_TITLE": "Access removed",
+    "ASSET_UNSHARED_BODY": "Your access to {{assetName}} was removed.",
+    "ALERT_FIRED_TITLE": "Alert triggered",
+    "ALERT_FIRED_BODY": "The alert {{alertName}} was triggered.",
+    "DASHBOARD_DELIVERED_TITLE": "Dashboard delivered",
+    "DASHBOARD_DELIVERED_BODY": "{{dashboardName}} was delivered to your inbox.",
+    "GENERIC_TITLE": "Notification",
+    "GENERIC_BODY": "You have a new notification."
   },
   "MENU": {
     "SECURITY_POLICY": "Security Policy",

@@ -325,7 +325,9 @@
     "LIGHT_MODE": "Switch to Light Mode",
     "BLACK_MODE": "Switch to Black Mode",
     "LANGUAGE": "言語",
-    "SEARCH": "検索"
+    "SEARCH": "検索",
+    "CLEAR": "クリア",
+    "DELETE_NOTIFICATION": "通知を削除"
   },
   "PROFILE": {
     "TITLE": "マイプロフィール",
@@ -3670,7 +3672,17 @@
     "GROUP_YESTERDAY": "昨日",
     "GROUP_THIS_WEEK": "今週",
     "GROUP_THIS_MONTH": "今月",
-    "GROUP_OLDER": "それ以前"
+    "GROUP_OLDER": "それ以前",
+    "ASSET_SHARED_TITLE": "共有されました",
+    "ASSET_SHARED_BODY": "{{assetName}} が共有されました。",
+    "ASSET_UNSHARED_TITLE": "アクセスが削除されました",
+    "ASSET_UNSHARED_BODY": "{{assetName}} へのアクセスが削除されました。",
+    "ALERT_FIRED_TITLE": "アラートが発生しました",
+    "ALERT_FIRED_BODY": "アラート {{alertName}} が発生しました。",
+    "DASHBOARD_DELIVERED_TITLE": "ダッシュボードが配信されました",
+    "DASHBOARD_DELIVERED_BODY": "{{dashboardName}} が受信トレイに配信されました。",
+    "GENERIC_TITLE": "通知",
+    "GENERIC_BODY": "新しい通知があります。"
   },
   "MENU": {
     "SECURITY_POLICY": "セキュリティポリシー",
