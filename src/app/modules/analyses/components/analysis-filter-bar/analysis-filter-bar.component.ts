@@ -626,15 +626,22 @@ export class AnalysisFilterBarComponent
 
   onFilterChange(filter: any, value: any): void {
     this.appliedValues[filter.id] = value;
-    // Cascading (item 3): if any other filter declares this one as its
-    // parent, its option set is now stale — clear the child's selection
-    // and force a re-fetch constrained by the new parent value.
-    this.invalidateDependents(filter.id);
-    // In live mode a value change re-emits filters after a short
-    // debounce. We do NOT touch the existing Apply button flow —
-    // applyFilters() works the same regardless of mode; live mode just
-    // calls it for the user.
+    // Cascading (item 3) is a LIVE-mode-only behaviour: when a parent's
+    // value changes we clear dependent children's selections + cached
+    // options and re-fetch them constrained by the new parent value.
+    //
+    // In batched (non-live) mode we must NOT cascade here. ngModelChange
+    // now routes multiselect/slider edits through onFilterChange, so a
+    // parent edit would call invalidateDependents() and wipe the user's
+    // STAGED child selections before they ever press Apply. In batched
+    // mode the child options/selections are resolved at Apply time, so
+    // gate the invalidation (and the auto-apply) behind liveMode.
     if (this.liveMode) {
+      this.invalidateDependents(filter.id);
+      // In live mode a value change re-emits filters after a short
+      // debounce. We do NOT touch the existing Apply button flow —
+      // applyFilters() works the same regardless of mode; live mode just
+      // calls it for the user.
       this.scheduleAutoApply();
     }
   }
