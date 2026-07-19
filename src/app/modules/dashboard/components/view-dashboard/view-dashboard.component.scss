@@ -181,6 +181,11 @@
       // When the sidebar is collapsed (width: 0), the canvas takes
       // the full row.
       flex: 1;
+      // min-height:0 is REQUIRED so this flex child can shrink below its
+      // content height — without it the nested .canvas-area never gets a
+      // bounded height and its overflow-y:auto never engages, so lower
+      // visuals fall off-screen with no way to scroll to them.
+      min-height: 0;
       overflow: hidden;
       display: flex;
       flex-direction: row;
@@ -296,28 +301,34 @@
 // them immediately. The shared analysis-filter-bar renders its controls
 // horizontally (its native layout) inside .filter-bar-body; a compact head
 // row carries the title, applied-count badge, and a collapse chevron.
+// Filters render as a proper accordion pinned above the canvas: a full-width
+// clickable header row (filter icon · title · applied-count · chevron) that
+// expands a padded body of filter controls laid out on a clean grid. The whole
+// header is the toggle target (not just a small button), matching the
+// affordance users expect from an accordion.
 .dashboard-filter-bar {
   flex-shrink: 0;
   background: var(--card-background);
   border-bottom: 1px solid var(--border-color);
 
+  // Header row IS the accordion toggle — full width, comfortable hit area.
   .filter-bar-head {
     display: flex;
     align-items: center;
-    padding: var(--space-2) var(--space-4);
+    padding: 0;
   }
 
   .filter-bar-toggle {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-1) var(--space-2);
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-3) var(--space-6);
     border: none;
     background: transparent;
     color: var(--text-color);
     font: inherit;
     cursor: pointer;
-    border-radius: var(--radius-sm);
     transition: background var(--motion-fast) ease;
 
     &:hover {
@@ -326,32 +337,37 @@
 
     > .pi-filter {
       color: var(--primary-color);
-      font-size: 0.9rem;
+      font-size: var(--fs-body);
+      flex-shrink: 0;
     }
 
     .filter-bar-title {
-      font-size: var(--fs-label);
+      font-size: var(--fs-control);
       font-weight: var(--fw-semibold);
-      letter-spacing: 0.02em;
+      letter-spacing: 0.01em;
+      color: var(--text-color);
     }
 
+    // Push the chevron to the far right so the header reads as a real
+    // accordion row (title left, expander right).
     .filter-bar-chevron {
       font-size: 0.7rem;
-      color: var(--text-muted);
-      margin-left: var(--space-1);
+      color: var(--secondary-color);
+      margin-left: auto;
+      transition: transform var(--motion-base) ease;
     }
   }
 
   // Body holds the shared bar; a top hairline separates it from the head.
   .filter-bar-body {
-    padding: 0 var(--space-4) var(--space-3);
-    border-top: 1px solid var(--a-border-faint, var(--border-color));
-    animation: dash-filter-reveal var(--motion-fast) ease;
+    padding: var(--space-4) var(--space-6) var(--space-5);
+    border-top: 1px solid var(--border-color);
+    background: var(--hover-background);
+    animation: dash-filter-reveal var(--motion-base) ease;
   }
 
   &.collapsed .filter-bar-head {
-    // when collapsed the head is the only row — no bottom rule needed
-    padding-bottom: var(--space-2);
+    padding-bottom: 0;
   }
 }
 
@@ -363,8 +379,13 @@
 // Canvas Container
 .canvas-container {
   flex: 1;
+  // Same flexbox scroll-trap fix: allow shrink so the child .canvas-area
+  // (overflow-y:auto) is height-bounded and scrolls.
+  min-height: 0;
   overflow: hidden;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 // Canvas Area (CSS Grid) — matching edit-analyses
@@ -627,22 +648,85 @@
     padding: 0;
     border-bottom: none;
     background: transparent;
-  }
-
-  .filter-controls {
     display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
+    flex-direction: column;
+    align-items: stretch; // full-width children (grid + actions row)
     gap: var(--space-4);
-    padding: var(--space-3) 0 0;
   }
 
-  // Each filter control gets a sensible fixed-ish width so a row of filters
-  // reads as neat columns and wraps cleanly on narrow viewports.
+  // Controls sit on a clean responsive grid — auto-fit columns with a
+  // comfortable min so labels never collide with their inputs and every
+  // filter reads as an aligned column that wraps tidily on narrow widths.
+  // Max 4 filters per row. Fixed 4-column grid on wide viewports; the
+  // media queries below step it down (3 / 2 / 1) as width shrinks so
+  // controls never squash below a usable width.
+  .filter-controls {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: start;
+    gap: var(--space-4) var(--space-5);
+    padding: 0;
+  }
+
+  @media (max-width: 1280px) {
+    .filter-controls {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 900px) {
+    .filter-controls {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 600px) {
+    .filter-controls {
+      grid-template-columns: 1fr;
+    }
+  }
+
   .filter-control {
-    min-width: 220px;
-    max-width: 300px;
-    flex: 0 1 240px;
+    // The shared component hard-codes width:200px / max-width:240px on
+    // each control, which — inside a grid cell — clumps controls to one
+    // side and leaves a big empty gutter. Force full cell width so every
+    // filter fills its grid column edge-to-edge.
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+
+    // Each control's own label sits above its input on its own line.
+    label {
+      font-size: var(--fs-label);
+      font-weight: var(--fw-medium);
+      color: var(--secondary-color);
+    }
+
+    // Make the actual input controls stretch to the cell too.
+    .p-dropdown,
+    .p-multiselect,
+    .p-calendar,
+    app-custom-dropdown,
+    app-custom-multiselect,
+    app-custom-calendar,
+    app-custom-daterange,
+    app-custom-input,
+    app-custom-number,
+    input {
+      width: 100% !important;
+    }
+  }
+
+  // Actions row (Live/Apply toggle + Clear) drops below the grid, right
+  // aligned, separated by a hairline so it reads as the "commit" zone.
+  .filter-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-color);
   }
 }
 
@@ -653,6 +737,10 @@
 .canvas-column {
   flex: 1;
   min-width: 0;
+  // min-height:0 so the column can shrink and hand a bounded height to
+  // .canvas-container → .canvas-area, which is what makes the visuals
+  // scroll instead of overflowing off the bottom of the viewport.
+  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -749,5 +837,305 @@
 
   &.on i {
     color: #f1c21b;
+  }
+}
+
+// ===================================================================
+// USER-FRIENDLY POLISH LAYER (2026-07-19)
+// A cohesive visual upgrade of the dashboard viewer. All rules are
+// token-driven (colour / spacing / radius / type scale) so light and
+// dark themes both hold, and everything is :host-scoped to this
+// component. Appended last so it wins on source order without having
+// to touch the working structural rules above.
+// ===================================================================
+
+// ── Page shell: give the whole surface a soft, framed feel ─────────
+.view-category-wrapper {
+  padding: var(--space-4);
+  box-sizing: border-box;
+  background: var(--background-color);
+
+  .view-category-container {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+  }
+}
+
+// ── Header: taller, calmer, with a hairline gradient underline ─────
+.view-category-container .page-header {
+  padding: var(--space-5) var(--space-7);
+  background: linear-gradient(
+    180deg,
+    var(--card-background) 0%,
+    var(--card-background) 100%
+  );
+  // A whisper-thin brand rule under the header separates identity
+  // from content without a heavy border.
+  box-shadow: inset 0 -1px 0 var(--border-color);
+  border-bottom: none;
+
+  .left-section h2 {
+    font-size: var(--fs-h1);
+    letter-spacing: -0.01em;
+  }
+
+  // Group the operate-the-dashboard icons into one segmented cluster
+  // so the toolbar reads as a deliberate control group, not scattered
+  // buttons. A faint pill background unifies them.
+  .header-actions {
+    gap: var(--space-2);
+    padding: var(--space-1);
+    border-radius: var(--radius-md);
+  }
+
+  .header-icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(var(--primary-color-rgb), 0.18);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+  }
+}
+
+// ── Filter accordion: make it feel like a real control surface ─────
+.dashboard-filter-bar {
+  margin: var(--space-5) var(--space-6) 0;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--card-background);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+
+  .filter-bar-toggle {
+    padding: var(--space-4) var(--space-6);
+
+    > .pi-filter {
+      width: 26px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      background: rgba(var(--primary-color-rgb), 0.1);
+    }
+
+    .filter-bar-title {
+      font-size: var(--fs-body);
+    }
+  }
+
+  // Chevron rotates smoothly to signal expand/collapse.
+  &:not(.collapsed) .filter-bar-chevron {
+    transform: rotate(0deg);
+  }
+
+  .filter-bar-body {
+    background: var(--background-color);
+  }
+}
+
+// ── Tab strip: pill-style tabs on a subtle track ───────────────────
+.dashboard-tab-strip {
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-6) 0;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--card-background);
+
+  .dashboard-tab {
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    border-bottom: 2px solid transparent;
+    font-size: var(--fs-control);
+    position: relative;
+    top: 1px;
+
+    &:hover {
+      background: var(--hover-background);
+    }
+
+    &.active {
+      background: var(--background-color);
+      border-bottom-color: var(--primary-color);
+    }
+  }
+}
+
+// ── Canvas: a touch more breathing room + subtle inset ─────────────
+.canvas-area {
+  padding: var(--space-7);
+  gap: var(--space-6);
+}
+
+// ── Visual cards: the headline upgrade. Premium chrome with a
+//    colour-accent top edge that lights up on hover, a sticky header,
+//    and a gentle lift. This is what turns "raw box" into "polished
+//    tile". Single source of truth — supersedes the earlier duplicate
+//    .visual-box blocks above via source order.
+.visual-box {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--card-background);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 1px 3px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  transition:
+    border-color var(--motion-base) ease,
+    box-shadow var(--motion-base) ease,
+    transform var(--motion-base) ease;
+
+  // Thin accent strip along the top edge; invisible until hover so
+  // cards stay calm at rest but respond to attention.
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(
+      90deg,
+      var(--primary-color),
+      rgba(var(--primary-color-rgb), 0.5)
+    );
+    opacity: 0;
+    transition: opacity var(--motion-base) ease;
+    z-index: 1;
+  }
+
+  &:hover {
+    border-color: rgba(var(--primary-color-rgb), 0.45);
+    box-shadow:
+      0 6px 20px rgba(0, 0, 0, 0.08),
+      0 2px 6px rgba(0, 0, 0, 0.04);
+    transform: translateY(-2px);
+
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+// Card header: sticky within its tile, clearer type, quiet background.
+.visual-inline-title {
+  height: 40px;
+  padding: 0 var(--space-5);
+  background: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  .inline-title-text {
+    font-size: var(--fs-control);
+    font-weight: var(--fw-semibold);
+    letter-spacing: -0.005em;
+    padding: 0;
+  }
+}
+
+.visual-body {
+  padding: var(--space-2);
+}
+
+// Cross-filter source: make the click affordance obvious and give
+// active sources a persistent primary ring so the user always knows
+// which chart is driving the filter.
+.visual-box.cross-filter-source {
+  &::after {
+    content: '\e9c9'; // pi-filter glyph
+    font-family: 'primeicons';
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-4);
+    font-size: var(--fs-micro);
+    color: var(--primary-color);
+    opacity: 0;
+    transition: opacity var(--motion-base) ease;
+    z-index: 2;
+  }
+
+  &:hover::after {
+    opacity: 0.6;
+  }
+}
+
+// ── Empty state: branded, friendly, actionable-looking ─────────────
+.empty-state {
+  gap: var(--space-6);
+  padding: var(--space-9) var(--space-6);
+
+  i {
+    width: 88px;
+    height: 88px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(var(--primary-color-rgb), 0.08);
+    color: var(--primary-color);
+    font-size: 34px;
+    opacity: 1;
+  }
+
+  h3 {
+    font-size: var(--fs-h2);
+  }
+
+  p {
+    color: var(--secondary-color);
+    line-height: var(--lh-relaxed, 1.6);
+  }
+}
+
+// ── Missing-field banner: soften into a rounded, inset notice ──────
+.missing-field-banner {
+  margin: var(--space-5) var(--space-6) 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+// ── Widget tiles: match the visual-card chrome for consistency ─────
+.widget-box {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition:
+    box-shadow var(--motion-base) ease,
+    transform var(--motion-base) ease;
+
+  &:hover {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
+    transform: translateY(-1px);
+  }
+}
+
+// ── Snapshot breadcrumb: pill it so it reads as a metadata badge ───
+.snapshot-breadcrumb {
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  background: var(--hover-background);
+  width: fit-content;
+  margin-top: var(--space-1);
+}
+
+// ── Respect reduced-motion: kill the lifts/transitions for users who
+//    ask for it (accessibility). ──────────────────────────────────
+@media (prefers-reduced-motion: reduce) {
+  .visual-box,
+  .widget-box,
+  .header-icon-btn {
+    transition: none !important;
+    &:hover {
+      transform: none !important;
+    }
   }
 }
