@@ -160,6 +160,7 @@
           "
           [filter]="true"
           [(ngModel)]="appliedValues[filter.id]"
+          (ngModelChange)="onFilterChange(filter, $event)"
           display="comma"
           [maxSelectedLabels]="1"
           [selectedItemsLabel]="'ANALYSES.FILTER_N_SELECTED' | translate"
@@ -218,6 +219,7 @@
         <app-custom-rangeslider
           [label]="filter.name"
           [(ngModel)]="appliedValues[filter.id]"
+          (ngModelChange)="onFilterChange(filter, $event)"
           [min]="filter.config?.rangeMin ?? 0"
           [max]="filter.config?.rangeMax ?? 100"
         ></app-custom-rangeslider>
