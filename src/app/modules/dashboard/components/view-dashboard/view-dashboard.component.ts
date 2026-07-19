@@ -722,9 +722,16 @@ export class ViewDashboardComponent
 
   /** Transform + paint one visual from its own (possibly targeted) rows. */
   private paintVisual(visual: Visual, rows: any[]): void {
-    if (visual.chartType && visual.xAxisColumn && visual.yAxisColumn) {
+    // Paint whenever the template would RENDER this visual. Previously this
+    // gated on `xAxisColumn && yAxisColumn` (BOTH required), which is
+    // STRICTER than hasRequiredChartFields() — so KPI / number-card visuals
+    // (no axis labels; renderable with a single axis, or driven by
+    // dimension/measure) passed the render gate but were never painted,
+    // leaving chartData=[] → "No data available" even with rows present.
+    // Aligning the two gates is the fix: if it renders, it gets data.
+    if (this.hasRequiredChartFields(visual)) {
       visual.chartData = this.chartDataTransformer.transformData(
-        visual.chartType,
+        visual.chartType!,
         rows,
         this.chartDataTransformer.buildMapping(visual),
       ) as any[];
