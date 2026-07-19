@@ -456,6 +456,17 @@ export const ASSET_SHARE = {
   SHARE_BY_ID: '/asset-shares/shares/',
 };
 
+// Seamless asset migration — one-click export of datasets / analyses /
+// dashboards to a portable JSON bundle, and near-zero-click import into any
+// org / environment. Both paths under `/api/v1/migration`; the request
+// interceptor prepends the server base.
+//   POST /migration/export   → streams a `.dbexec.json` file download
+//   POST /migration/import   → applies a validated bundle (all-or-nothing)
+export const MIGRATION = {
+  EXPORT: '/migration/export',
+  IMPORT: '/migration/import',
+};
+
 // Public dashboard embed — UNAUTHENTICATED, token-guarded. Called only by
 // the standalone /embed viewer (no x-auth-token). Base is deliberately the
 // /public/dashboards mount that sits outside the auth middleware chain.
