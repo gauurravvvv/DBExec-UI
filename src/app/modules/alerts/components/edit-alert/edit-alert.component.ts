@@ -15,7 +15,6 @@ import { ALERT } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
-import { ReferenceDataService } from 'src/app/core/services/reference-data.service';
 import { DatasetService } from 'src/app/modules/dataset/services/dataset.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
@@ -26,7 +25,6 @@ import {
 import { zodValidator } from 'src/app/shared/validators/zod-validator';
 import { AlertConditionBuilderComponent } from '../alert-condition-builder/alert-condition-builder.component';
 import {
-  ALERT_WIZARD_STEPS,
   buildAlertPayload,
   buildSourceFieldOptions,
   CRON_PRESETS,
@@ -39,12 +37,10 @@ import {
 import { AlertService } from '../../services/alert.service';
 
 /**
- * Edit Alert - the same multi-step wizard as Add (Source -> Condition ->
- * Schedule -> Delivery -> Review & gating), hydrated from a saved rule. Because
- * a persisted rule is already valid, the user can jump between any step freely.
- * On save it opens a justification confirm (audit-logged CUD, mirroring
- * edit-rls-rule). Shares the alert-form helpers + AlertConditionBuilder child
- * with the add screen. The reactive form, validators and payload are unchanged.
+ * Edit Alert — hydrates the same source-picker → condition-builder → schedule →
+ * delivery → gating form from a saved rule, and on save opens a justification
+ * confirm (audit-logged CUD, mirroring edit-rls-rule). Shares the alert-form
+ * helpers + the AlertConditionBuilder child with the add screen.
  */
 @Component({
   selector: 'app-edit-alert',
@@ -71,23 +67,11 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
   showSaveConfirm = false;
   saveJustification = '';
 
-  /* wizard state - custom step index, mirroring add-organisation. */
-  readonly steps = ALERT_WIZARD_STEPS;
-  readonly lastStep = ALERT_WIZARD_STEPS.length - 1;
-  currentStep = 0;
-  /** True once a saved rule has hydrated the form, unlocking free jumping. */
-  hydrated = false;
-
   /* option lists */
-  // Widened to plain string values so DB-driven rows (family codes) can be
-  // assigned; the mirrored validator remains the save-time type contract.
-  sourceTypeOptions: { label: string; value: string }[] =
-    SOURCE_TYPE_OPTIONS.map(o => ({ ...o }));
-  severityOptions: { label: string; value: string }[] = SEVERITY_OPTIONS.map(
-    o => ({ ...o }),
-  );
+  sourceTypeOptions = SOURCE_TYPE_OPTIONS.map(o => ({ ...o }));
+  severityOptions = SEVERITY_OPTIONS.map(o => ({ ...o }));
   timezoneOptions = TIMEZONE_OPTIONS;
-  cronPresets: { label: string; value: string }[] = CRON_PRESETS;
+  cronPresets = CRON_PRESETS;
 
   /* datasource + source dropdowns */
   selectedDatasource = '';
@@ -124,7 +108,6 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
     private userService: UserService,
     private alertService: AlertService,
     private translate: TranslateService,
-    private referenceData: ReferenceDataService,
   ) {}
 
   hasUnsavedChanges(): boolean {
@@ -132,7 +115,6 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    // Fallback labels (rendered immediately), overwritten by DB-driven rows.
     this.sourceTypeOptions = SOURCE_TYPE_OPTIONS.map(o => ({
       ...o,
       label: this.translate.instant(o.label),
@@ -141,56 +123,12 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
       ...o,
       label: this.translate.instant(o.label),
     }));
-    this.loadReferenceOptions();
     this.initForm();
     this.alertId = this.route.snapshot.params['id'];
     if (this.alertId) {
       this.alertService.resetCurrent();
       this.loadAlert();
     }
-  }
-
-  /**
-   * DB-driven option lists (alert_source_type, alert_severity, cron_preset),
-   * each falling back to the helper constant seeded in ngOnInit.
-   */
-  private loadReferenceOptions(): void {
-    this.referenceData
-      .getFamily('alert_source_type')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(rows => {
-        if (rows.length) {
-          this.sourceTypeOptions = rows.map(r => ({
-            value: r.code,
-            label: r.label,
-          }));
-          this.cdr.markForCheck();
-        }
-      });
-    this.referenceData
-      .getFamily('alert_severity')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(rows => {
-        if (rows.length) {
-          this.severityOptions = rows.map(r => ({
-            value: r.code,
-            label: r.label,
-          }));
-          this.cdr.markForCheck();
-        }
-      });
-    this.referenceData
-      .getFamily('cron_preset')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(rows => {
-        if (rows.length) {
-          this.cronPresets = rows.map(r => ({
-            label: r.label,
-            value: r.meta?.cron ?? r.code,
-          }));
-          this.cdr.markForCheck();
-        }
-      });
   }
 
   private initForm(): void {
@@ -219,7 +157,7 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
       .subscribe(() => this.checkDirty());
   }
 
-  /* -- load + hydrate ---------------------------------------------- */
+  /* ── load + hydrate ─────────────────────────────────────────────── */
 
   private loadAlert(): void {
     this.loadDatasources();
@@ -258,7 +196,6 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
 
         this.originalFormValue = this.alertForm.value;
         this.isFormDirty = false;
-        this.hydrated = true;
         this.alertForm.markAsPristine();
         this.cdr.markForCheck();
       })
@@ -302,52 +239,7 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  /* -- wizard navigation ------------------------------------------- */
-
-  /** Same per-step gate as Add; on a hydrated rule every step is already valid. */
-  isStepValid(step: number): boolean {
-    switch (step) {
-      case 0:
-        return (
-          !!this.alertForm.get('name')?.valid &&
-          !!this.alertForm.get('sourceType')?.valid &&
-          !!this.selectedDatasource &&
-          !!this.alertForm.get('sourceId')?.valid
-        );
-      case 1:
-        return this.conditionState.valid;
-      case 2:
-        return (
-          !!this.alertForm.get('cronExpression')?.valid &&
-          !!this.alertForm.get('timezone')?.valid
-        );
-      case 3:
-        return !!this.alertForm.get('severity')?.valid;
-      case 4:
-        return this.canSave;
-      default:
-        return false;
-    }
-  }
-
-  nextStep(): void {
-    if (this.currentStep < this.lastStep && this.isStepValid(this.currentStep)) {
-      this.currentStep++;
-    }
-  }
-
-  previousStep(): void {
-    if (this.currentStep > 0) this.currentStep--;
-  }
-
-  /**
-   * Edit works on an already-valid rule, so any step can be visited freely.
-   */
-  onStepClick(step: number): void {
-    if (step >= 0 && step <= this.lastStep) this.currentStep = step;
-  }
-
-  /* -- datasource + source pickers --------------------------------- */
+  /* ── datasource + source pickers ────────────────────────────────── */
 
   loadDatasourcesPage = async ({ search, page, limit }: any) => {
     const params: any = { page, limit };
@@ -435,7 +327,7 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
       .catch(() => this.cdr.markForCheck());
   }
 
-  /* -- condition builder bridge ------------------------------------ */
+  /* ── condition builder bridge ───────────────────────────────────── */
 
   onConditionChange(state: typeof this.conditionState): void {
     this.conditionState = state;
@@ -457,26 +349,6 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
       JSON.stringify(this.originalFormValue) !== JSON.stringify(this.alertForm.value);
   }
 
-  /* -- review-summary helpers -------------------------------------- */
-
-  get sourceTypeLabel(): string {
-    const v = this.alertForm.get('sourceType')?.value;
-    return this.sourceTypeOptions.find(o => o.value === v)?.label ?? v ?? '';
-  }
-
-  get severityLabel(): string {
-    const v = this.alertForm.get('severity')?.value;
-    return this.severityOptions.find(o => o.value === v)?.label ?? v ?? '';
-  }
-
-  get recipientEmailsCount(): number {
-    return (this.alertForm.get('recipientEmails')?.value ?? []).length;
-  }
-
-  get recipientUsersCount(): number {
-    return (this.alertForm.get('recipientUserIds')?.value ?? []).length;
-  }
-
   private compose(): any | null {
     if (!this.conditionBuilder) return null;
     const cond = this.conditionBuilder.getPayload();
@@ -487,7 +359,7 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
     return this.alertForm.valid && this.conditionState.valid && !!this.selectedDatasource;
   }
 
-  /* -- test now ---------------------------------------------------- */
+  /* ── test now ───────────────────────────────────────────────────── */
 
   onTestNow(): void {
     const payload = this.compose();
@@ -512,7 +384,7 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
       });
   }
 
-  /* -- save (with justification confirm) --------------------------- */
+  /* ── save (with justification confirm) ──────────────────────────── */
 
   onSubmit(): void {
     this.alertForm.markAllAsTouched();
