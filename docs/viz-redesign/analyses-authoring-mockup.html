@@ -1,0 +1,384 @@
+<title>DBExec Analyses — Authoring Redesign</title>
+<style>
+  :root{
+    --primary:#2196f3; --primary-hover:#1976d2; --primary-tint:rgba(33,150,243,.10);
+    --ink:#1f2733; --muted:#64707f; --subtle:#97a1ae;
+    --line:#e2e6eb; --line-2:#eef2f7; --surface:#fff; --surface-2:#f6f8fb; --surface-3:#eff3f8;
+    --good:#21a366; --warn:#e08600; --bad:#e5484d;
+    --grid:#edf1f6;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,monospace;
+    --ui:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --r:9px; --r-sm:6px; --r-lg:14px;
+    --sh:0 1px 2px rgba(20,30,45,.05),0 8px 24px rgba(20,30,45,.07);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--ui);color:var(--ink);line-height:1.55;
+    background:radial-gradient(1100px 520px at 82% -8%,rgba(33,150,243,.06),transparent 60%),var(--surface-2);
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 24px 88px}
+  header.mast{max-width:1240px;margin:0 auto;padding:48px 24px 22px}
+  .eyebrow{font-size:12px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--primary);margin:0 0 10px}
+  h1{font-size:clamp(26px,3vw,38px);line-height:1.08;margin:0 0 12px;font-weight:800;letter-spacing:-.02em;text-wrap:balance;max-width:22ch}
+  .lede{font-size:16.5px;color:var(--muted);max-width:70ch;margin:0}
+  .lede b{color:var(--ink);font-weight:600}
+
+  nav.jump{position:sticky;top:0;z-index:20;background:rgba(246,248,251,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  nav.jump .in{max-width:1240px;margin:0 auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  nav.jump .brand{font-weight:800;letter-spacing:-.01em;margin-right:6px}
+  nav.jump .brand span{color:var(--primary)}
+  nav.jump a{font-size:12.5px;color:var(--muted);text-decoration:none;padding:5px 11px;border-radius:999px}
+  nav.jump a:hover{color:var(--primary);background:var(--primary-tint)}
+
+  section{margin-top:52px;scroll-margin-top:64px}
+  .sec-h{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+  .sec-h h2{font-size:21px;font-weight:750;letter-spacing:-.01em;margin:0}
+  .sec-h .tag{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--surface-3);border-radius:999px;padding:3px 10px}
+  .sec-sub{color:var(--muted);max-width:74ch;margin:2px 0 20px}
+
+  /* toggle */
+  .switch{display:inline-flex;background:var(--surface-3);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;margin-bottom:18px}
+  .switch button{border:none;background:transparent;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:6px 16px;border-radius:999px;cursor:pointer}
+  .switch button.on{background:var(--surface);color:var(--primary);box-shadow:var(--sh)}
+
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+  @media(max-width:1080px){.ba{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh);overflow:hidden}
+  .panel>.cap{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:10px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+  .before>.cap{color:var(--muted);background:var(--surface-2)}
+  .after>.cap{color:var(--primary);background:var(--primary-tint)}
+  .cap .verdict{font-weight:600;letter-spacing:0;text-transform:none;font-size:11px}
+  .before .verdict{color:var(--bad)} .after .verdict{color:var(--good)}
+
+  /* ---- app frame mock ---- */
+  .app{font-size:11px;background:var(--surface)}
+  .tbar{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--surface)}
+  .tbar .crumb{color:var(--muted);font-weight:600}
+  .tbar .crumb b{color:var(--ink)}
+  .tbar .sp{flex:1}
+  .pill{border:1px solid var(--line);border-radius:var(--r-sm);padding:3px 8px;color:var(--muted);background:var(--surface)}
+  .pill.dot::before{content:"●";color:var(--good);margin-right:4px}
+  .btn{border:none;border-radius:var(--r-sm);padding:4px 11px;font-weight:600;font-size:11px}
+  .btn.primary{background:linear-gradient(135deg,var(--primary),var(--primary-hover));color:#fff}
+  .btn.green{background:linear-gradient(135deg,#34b36b,#1e9e57);color:#fff}
+  .btn.ghost{background:var(--surface);border:1px solid var(--line);color:var(--ink)}
+  .kbd{font-family:var(--mono);font-size:9px;background:rgba(255,255,255,.25);border-radius:3px;padding:0 3px;margin-left:4px}
+
+  /* BEFORE: 4 rails cramped */
+  .before-body{display:grid;grid-template-columns:74px 66px 82px 70px 1fr;height:340px}
+  .rail{border-right:1px solid var(--line);padding:8px 6px;overflow:hidden;background:var(--surface)}
+  .rail.cramp{background:var(--surface-2)}
+  .rail .rh{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;white-space:nowrap}
+  .rail .item{height:9px;background:var(--line-2);border-radius:3px;margin-bottom:5px}
+  .rail .item.s{width:70%} .rail .item.m{width:88%}
+  .canvas-b{padding:10px;position:relative;background:repeating-linear-gradient(0deg,transparent,transparent 33px,var(--grid) 33px,var(--grid) 34px)}
+  .cardm{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);height:120px;margin-bottom:8px;display:flex;flex-direction:column}
+  .cardm .ch{display:flex;align-items:center;gap:4px;padding:5px 7px;border-bottom:1px solid var(--line);font-weight:600}
+  .cardm .ch .ico{color:var(--subtle)}
+  .cardm .cb{flex:1;display:flex;align-items:flex-end;gap:4px;padding:8px}
+  .cardm .cb i{flex:1;border-radius:2px 2px 0 0;background:#9db8cf}
+  .cfg-overlay{position:absolute;top:8px;right:8px;bottom:8px;width:90px;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-sm);box-shadow:-6px 0 16px rgba(20,30,45,.10);padding:7px 6px}
+  .cfg-overlay .rh{color:var(--warn)}
+
+  /* AFTER: 4-zone shell */
+  .after-body{display:grid;grid-template-columns:150px 1fr 168px;height:400px}
+  .a-left{border-right:1px solid var(--line);display:flex;flex-direction:column;background:var(--surface)}
+  .seg{display:flex;margin:8px;background:var(--surface-3);border-radius:var(--r-sm);padding:2px;gap:2px}
+  .seg span{flex:1;text-align:center;font-size:9.5px;font-weight:600;color:var(--muted);padding:4px 0;border-radius:4px}
+  .seg span.on{background:var(--surface);color:var(--primary);box-shadow:var(--sh)}
+  .a-left .srch{margin:0 8px 8px;border:1px solid var(--line);border-radius:var(--r-sm);padding:4px 7px;color:var(--subtle);font-size:10px}
+  .grp{padding:2px 10px;font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--subtle);margin-top:4px}
+  .fld{display:flex;align-items:center;gap:5px;padding:4px 10px;font-size:10px;color:var(--ink)}
+  .fld .t{margin-left:auto;font-family:var(--mono);font-size:8px;color:var(--subtle)}
+  .fld .g{width:6px;height:6px;border-radius:2px}
+  .a-center{display:flex;flex-direction:column;min-width:0;background:var(--surface-2)}
+  .tabstrip{display:flex;align-items:center;gap:3px;padding:6px 8px;border-bottom:1px solid var(--line);background:var(--surface)}
+  .tabx{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:4px 9px;border-radius:6px 6px 0 0;color:var(--muted);border:1px solid transparent}
+  .tabx.on{background:var(--surface-2);color:var(--primary);border-color:var(--line);border-bottom-color:var(--surface-2)}
+  .tabx .cdot{width:6px;height:6px;border-radius:50%}
+  .tabx .drag{color:var(--subtle);cursor:grab}
+  .addtab{border:1px dashed var(--line);border-radius:6px;color:var(--muted);width:20px;height:20px;display:grid;place-items:center;font-weight:700}
+  .canvas-a{flex:1;padding:10px;overflow:hidden;background:repeating-linear-gradient(0deg,transparent,transparent 33px,var(--grid) 33px,var(--grid) 34px)}
+  .carda{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);margin-bottom:8px;box-shadow:0 1px 2px rgba(20,30,45,.04)}
+  .carda .ch{display:flex;align-items:center;gap:5px;padding:6px 8px;border-bottom:1px solid var(--line);font-weight:600}
+  .carda .ch .drag{color:var(--subtle);cursor:grab}
+  .carda .ch .sp{flex:1}
+  .carda .ch .act{color:var(--subtle);font-size:10px}
+  .carda .cb{height:74px;display:flex;align-items:flex-end;gap:5px;padding:9px}
+  .carda .cb i{flex:1;border-radius:2px 2px 0 0;background:linear-gradient(180deg,#4aa3f0,var(--primary))}
+  .carda.line .cb{align-items:stretch}
+  .drawer{border-top:1px solid var(--line);background:var(--surface);padding:6px 10px;font-size:9.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .drawer .chev{color:var(--subtle)}
+  .a-right{border-left:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column}
+  .rtabs{display:flex;border-bottom:1px solid var(--line)}
+  .rtabs span{flex:1;text-align:center;font-size:10px;font-weight:600;color:var(--muted);padding:6px 0;cursor:pointer}
+  .rtabs span.on{color:var(--primary);box-shadow:inset 0 -2px 0 var(--primary)}
+  .rbody{padding:8px;display:flex;flex-direction:column;gap:7px;overflow:hidden}
+  .gal{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px}
+  .gal b{aspect-ratio:1;border:1px solid var(--line);border-radius:5px;display:grid;place-items:center;font-size:11px;color:var(--muted);background:var(--surface)}
+  .gal b.on{border-color:var(--primary);background:var(--primary-tint);color:var(--primary)}
+  .gal b.off{opacity:.4}
+  .well{border:1px dashed var(--line);border-radius:var(--r-sm);padding:5px 7px;font-size:9.5px;color:var(--muted);display:flex;align-items:center;gap:5px}
+  .well .fp{background:var(--surface-3);border:1px solid var(--line);border-radius:999px;padding:1px 7px;font-family:var(--mono);font-size:8.5px;color:var(--ink)}
+  .well .fp .ag{color:var(--primary);font-weight:600}
+  .well.ok{border-style:solid;border-color:rgba(33,163,102,.4)}
+  .well .warn{margin-left:auto;color:var(--warn)}
+
+  /* annotation callouts under each frame */
+  .notes{padding:14px 16px;border-top:1px solid var(--line);background:var(--surface-2)}
+  .notes h4{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .notes ul{margin:0;padding-left:18px;font-size:12.5px;color:var(--ink)}
+  .notes li{margin-bottom:5px}
+  .notes.bad li::marker{color:var(--bad)}
+  .notes.good li::marker{color:var(--good)}
+  .k{font-family:var(--mono);font-size:11px;background:var(--surface-3);border-radius:4px;padding:1px 5px}
+
+  /* feature inventory grid */
+  .feat{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+  .fcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:14px 16px}
+  .fcard h3{margin:0 0 4px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+  .fcard h3 .i{width:22px;height:22px;border-radius:6px;background:var(--primary-tint);color:var(--primary);display:grid;place-items:center;font-size:12px}
+  .fcard ul{margin:6px 0 0;padding-left:16px;font-size:12.5px;color:var(--muted)}
+  .fcard li{margin-bottom:3px}
+  .fcard li b{color:var(--ink);font-weight:600}
+  .badge{display:inline-block;font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:middle}
+  .badge.now{background:rgba(33,163,102,.12);color:#17663f}
+  .badge.build{background:rgba(224,134,0,.14);color:#8a5200}
+
+  .callout{background:var(--primary-tint);border:1px solid rgba(33,150,243,.25);border-radius:var(--r);padding:14px 18px;font-size:13.5px;margin-top:24px}
+  .callout b{color:var(--primary-hover)}
+  footer{max-width:1240px;margin:52px auto 0;padding:22px 24px;border-top:1px solid var(--line);color:var(--subtle);font-size:12.5px}
+</style>
+
+<nav class="jump"><div class="in">
+  <span class="brand">DB<span>Exec</span> · Analyses</span>
+  <a href="#top">Overview</a><a href="#shell">Before / After</a><a href="#tabs">Tabs</a>
+  <a href="#build">Build panel</a><a href="#feat">All functionality</a>
+</div></nav>
+
+<header class="mast" id="top">
+  <p class="eyebrow">Authoring redesign · the page users land on most</p>
+  <h1>From four cramped rails to a real four-zone analysis studio.</h1>
+  <p class="lede">The Analyses editor is where people spend their time. Today the canvas is starved by
+    <b>four stacked left rails</b>, the config panel <b>occludes the chart</b>, data-state changes are
+    <b>silent</b>, and building a first chart is <b>invisible</b>. This mockup shows the proposed layout
+    on DBExec's own tokens — every function visible — beside today's. <b>Draft-until-Save</b>,
+    <b>per-tab visuals</b>, and the <b>Add-visual fix</b> are already shipped; this is the shell + depth on top.</p>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ SHELL BEFORE/AFTER ============ -->
+  <section id="shell">
+    <div class="sec-h"><h2>The authoring shell</h2><span class="tag">edit-analyses</span></div>
+    <p class="sec-sub">Left: today — a 56px toolbar over four stacked rails (Filters · Data · Layers · Visuals) that
+      squeeze the canvas to a sliver, with the config panel floating over the chart. Right: proposed — one left rail
+      with a Data/Layers/Filters switcher, an <b>in-flow</b> right rail with Build/Format tabs (canvas reflows, chart
+      never covered), and a collapsible data drawer.</p>
+
+    <div class="ba">
+      <!-- BEFORE -->
+      <div class="panel before">
+        <div class="cap"><span>Today</span><span class="verdict">canvas ≈ 45% · chart occluded</span></div>
+        <div class="app">
+          <div class="tbar">
+            <span class="crumb">Edit Analysis / <b>Q3 Revenue</b></span><span class="sp"></span>
+            <span class="pill dot">1,204 rows</span><span class="btn primary">Save</span><span class="btn green">Publish</span>
+          </div>
+          <div class="before-body">
+            <div class="rail cramp"><div class="rh">Filters</div><div class="item m"></div><div class="item s"></div></div>
+            <div class="rail cramp"><div class="rh">Data</div><div class="item m"></div><div class="item m"></div><div class="item s"></div><div class="item s"></div></div>
+            <div class="rail cramp"><div class="rh">Layers</div><div class="item m"></div><div class="item s"></div></div>
+            <div class="rail cramp"><div class="rh">Visuals</div><div class="item m"></div><div class="item s"></div></div>
+            <div class="canvas-b">
+              <div class="cardm"><div class="ch"><span class="ico">⠿</span>Revenue by Region</div><div class="cb"><i style="height:40%"></i><i style="height:72%"></i><i style="height:55%"></i><i style="height:88%"></i></div></div>
+              <div class="cfg-overlay"><div class="rh">Config ✕</div><div class="item m" style="background:var(--line-2)"></div><div class="item s"></div><div class="item m"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="notes bad">
+          <h4>Why it drags</h4>
+          <ul>
+            <li>Four rails eat <b>~640px</b> of chrome before any chart shows.</li>
+            <li>Config panel <b>floats over</b> the visual you're editing.</li>
+            <li>Field scope is scattered — no "this page" vs "global".</li>
+            <li>No data drawer: you can't see the rows behind a chart.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- AFTER -->
+      <div class="panel after">
+        <div class="cap"><span>Proposed</span><span class="verdict">canvas ≈ 2× · chart never covered</span></div>
+        <div class="app">
+          <div class="tbar">
+            <span class="crumb">Edit Analysis / <b>Q3 Revenue</b></span>
+            <span class="pill">Focus<span class="kbd">⌘.</span></span><span class="sp"></span>
+            <span class="pill dot">1,204 rows</span>
+            <span class="btn primary">Run<span class="kbd">⌘↵</span></span>
+            <span class="btn ghost">Save</span><span class="btn green">Publish</span>
+          </div>
+          <div class="after-body">
+            <div class="a-left">
+              <div class="seg"><span class="on">Data</span><span>Layers</span><span>Filters</span></div>
+              <div class="srch">🔍 Search fields…</div>
+              <div class="grp">This page · Fields</div>
+              <div class="fld"><span class="g" style="background:#8a63d2"></span>region <span class="t">abc</span></div>
+              <div class="fld"><span class="g" style="background:var(--primary)"></span>revenue <span class="t">#</span></div>
+              <div class="fld"><span class="g" style="background:var(--good)"></span>order_dt <span class="t">📅</span></div>
+              <div class="grp">Global</div>
+              <div class="fld">Filters (2)</div><div class="fld">Parameters (1)</div>
+            </div>
+            <div class="a-center">
+              <div class="tabstrip">
+                <span class="tabx on"><span class="drag">⠿</span><span class="cdot" style="background:var(--primary)"></span>Sales</span>
+                <span class="tabx"><span class="cdot" style="background:var(--warn)"></span>Ops</span>
+                <span class="addtab">+</span>
+              </div>
+              <div class="canvas-a">
+                <div class="carda"><div class="ch"><span class="drag">⠿</span>Revenue by Region<span class="sp"></span><span class="act">⤢ ⧉ ⬇ ✕</span></div><div class="cb"><i style="height:40%"></i><i style="height:72%"></i><i style="height:55%"></i><i style="height:88%"></i><i style="height:33%"></i></div></div>
+                <div class="carda line"><div class="ch"><span class="drag">⠿</span>Orders Trend<span class="sp"></span><span class="act">⤢ ⧉ ⬇ ✕</span></div><div class="cb"><svg viewBox="0 0 200 60" width="100%" height="56" preserveAspectRatio="none"><polyline fill="rgba(33,150,243,.12)" stroke="none" points="0,50 40,30 80,38 120,16 160,24 200,8 200,60 0,60"/><polyline fill="none" stroke="#2196f3" stroke-width="2" points="0,50 40,30 80,38 120,16 160,24 200,8"/></svg></div></div>
+              </div>
+              <div class="drawer"><span class="chev">▾</span> DATA — rows behind selected chart · <span style="font-family:var(--mono)">app-custom-table</span></div>
+            </div>
+            <div class="a-right">
+              <div class="rtabs"><span class="on">Build</span><span>Format</span></div>
+              <div class="rbody">
+                <div class="grp" style="padding-left:0">Chart type</div>
+                <div class="gal">
+                  <b class="on">▊</b><b>◔</b><b>∿</b><b>⋯</b><b>▤</b><b class="off">🗺</b>
+                </div>
+                <div class="grp" style="padding-left:0">Encoding</div>
+                <div class="well ok">X <span class="fp">region</span> ✓</div>
+                <div class="well ok">Y <span class="fp"><span class="ag">SUM</span>(revenue)</span> ✓</div>
+                <div class="well">Color <span class="warn">optional</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="notes good">
+          <h4>What changes</h4>
+          <ul>
+            <li><b>4 rails → 1</b> with a Data · Layers · Filters switcher; canvas ~doubles.</li>
+            <li>Right rail is <b>in-flow</b> — Build (gallery + wells) / Format tabs; chart never occluded.</li>
+            <li>Fields split <b>This page</b> vs <b>Global</b>; interactive <b>pills</b> carry the aggregate (<span class="k">SUM(revenue)</span>).</li>
+            <li><b>Run ⌘↵</b> + <b>Focus ⌘.</b> in the toolbar; bottom <b>data drawer</b>.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TABS ============ -->
+  <section id="tabs">
+    <div class="sec-h"><h2>Tab strip — a real p-tab-class experience</h2><span class="tag">shipping now</span></div>
+    <p class="sec-sub">Right-click for the full menu, drag to reorder, inline-rename, per-tab color, and a <b>+</b> at the end.
+      Visuals scope to the active tab. Everything is a <b>draft</b> — nothing persists until Save.</p>
+    <div class="panel after" style="max-width:640px">
+      <div class="cap"><span>Tab interactions</span><span class="verdict">draft · saved on Save</span></div>
+      <div class="app" style="padding:14px 16px;background:var(--surface-2)">
+        <div class="tabstrip" style="border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface)">
+          <span class="tabx on"><span class="drag">⠿</span><span class="cdot" style="background:var(--primary)"></span>Sales <span class="t" style="color:var(--subtle);font-family:var(--mono);font-size:8px">•</span></span>
+          <span class="tabx"><span class="drag">⠿</span><span class="cdot" style="background:var(--warn)"></span>Ops</span>
+          <span class="tabx"><span class="drag">⠿</span><span class="cdot" style="background:var(--good)"></span>Finance</span>
+          <span class="addtab">+</span>
+        </div>
+        <div style="margin-top:10px;width:150px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);box-shadow:var(--sh);font-size:11px;overflow:hidden">
+          <div style="padding:5px 10px;border-bottom:1px solid var(--line-2)">✎ Rename</div>
+          <div style="padding:5px 10px;border-bottom:1px solid var(--line-2)">⧉ Duplicate</div>
+          <div style="padding:5px 10px;border-bottom:1px solid var(--line-2)">🎨 Set color ▸</div>
+          <div style="padding:5px 10px;color:var(--bad)">🗑 Delete</div>
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin:8px 0 0">Right-click a tab → menu · drag ⠿ to reorder · double-click to rename</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ALL FUNCTIONALITY ============ -->
+  <section id="feat">
+    <div class="sec-h"><h2>Everything the module will do</h2><span class="tag">production-ready target</span></div>
+    <p class="sec-sub">The full functional surface, grouped. <span class="badge now">shipped</span> = landed this pass ·
+      <span class="badge build">to build</span> = in the production plan. Chart types, data types, and aggregations are being
+      researched exhaustively across Tableau, Power BI, Looker, Metabase, Superset, Hex &amp; Sigma before build.</p>
+
+    <div class="feat">
+      <div class="fcard">
+        <h3><span class="i">▊</span>Chart types <span class="badge build">to build: gaps</span></h3>
+        <ul>
+          <li><b>Have (24):</b> bar/line/area/combo, pie/donut/funnel/treemap/sunburst, scatter/bubble/histogram/box, gauge/radar/heatmap, sankey/waterfall/candlestick, KPI/number, table/pivot.</li>
+          <li><b>Adding:</b> map/geo (choropleth, point, bubble, heat), bullet, lollipop, streamgraph, marimekko, calendar-heatmap, network, violin/ridgeline.</li>
+          <li>Field-aware picker — invalid types greyed for current fields.</li>
+        </ul>
+      </div>
+      <div class="fcard">
+        <h3><span class="i">#</span>Data types <span class="badge build">to build</span></h3>
+        <ul>
+          <li><b>Numeric</b> — int/float/decimal, currency, percent, scientific; locale format tokens.</li>
+          <li><b>Temporal</b> — date/datetime/time, timezone, relative &amp; fiscal periods, date-part hierarchy (Y/Q/M/W/D/H).</li>
+          <li><b>Categorical</b> — nominal/ordinal, high-cardinality + "other" bucketing.</li>
+          <li><b>Geo</b> (lat/long, country/region/postal, geojson), boolean, JSON/nested, robust null/NaN handling.</li>
+        </ul>
+      </div>
+      <div class="fcard">
+        <h3><span class="i">Σ</span>Aggregations <span class="badge build">to build: FE+BE</span></h3>
+        <ul>
+          <li><b>Basic</b> — sum/avg/min/max/count/count-distinct/median <span class="badge now">most shipped</span></li>
+          <li><b>Statistical</b> — stddev/variance, percentile/quantile, mode, geo/harmonic mean.</li>
+          <li><b>Table-calcs</b> — running total, moving avg, rank, % of total, difference, index, lag/lead.</li>
+          <li><b>Time-intelligence</b> — YoY/MoM/QoQ, YTD/MTD, same-period-last-year, rolling N.</li>
+          <li><b>LOD</b> — FIXED/INCLUDE/EXCLUDE-style; grand + subtotals for pivots. Dialect-aware SQL.</li>
+        </ul>
+      </div>
+      <div class="fcard">
+        <h3><span class="i">⚙</span>Config &amp; encoding <span class="badge build">to build</span></h3>
+        <ul>
+          <li>Channels: x/y, color, size, shape, detail, tooltip, label, row/col facets, dual axis.</li>
+          <li>Per-series color/type/axis, stacking modes, data labels, reference lines/bands, trend/forecast.</li>
+          <li>Palette swatches + per-value + conditional color; number/date format with <b>live preview</b>.</li>
+          <li>Sort + Top-N + "other"; small multiples; drill hierarchies.</li>
+        </ul>
+      </div>
+      <div class="fcard">
+        <h3><span class="i">⤢</span>Interaction <span class="badge build">to build</span></h3>
+        <ul>
+          <li>Unified <b>cross-filter</b> (source→target) + active-filter chips.</li>
+          <li>Drill-down (hierarchy) &amp; drill-through (to detail); tooltip hover-sync.</li>
+          <li>Brush/zoom/pan, legend toggle, click-to-filter.</li>
+          <li>Parameters (single/multi/range/date) + what-if + dynamic axis/measure swap.</li>
+        </ul>
+      </div>
+      <div class="fcard">
+        <h3><span class="i">🗂</span>Authoring UX <span class="badge now">core shipped</span></h3>
+        <ul>
+          <li><b>Draft-until-Save</b> — everything in-memory, one atomic Save <span class="badge now">done</span></li>
+          <li>Tabs: menu/drag/rename/color/overflow; per-tab visuals <span class="badge now">done</span></li>
+          <li>Add-visual works while data loads <span class="badge now">done</span></li>
+          <li><b>To build:</b> 4-zone shell, Build/Format rail, empty-state onboarding (①②③ + sample data), command palette, undo/redo, duplicate-analysis, comments.</li>
+        </ul>
+      </div>
+      <div class="fcard">
+        <h3><span class="i">⚡</span>Data scale &amp; correctness <span class="badge build">to build: BE</span></h3>
+        <ul>
+          <li>Server-side aggregation pushdown; transparent Top-N / row-limit banners.</li>
+          <li>Table virtual scroll; scatter/line downsampling (LTTB).</li>
+          <li>Timezone + fiscal-calendar correctness; approximate percentile/count-distinct at scale.</li>
+          <li>Framed empty / error / loading states; export CSV/Excel/PDF/PNG.</li>
+        </ul>
+      </div>
+      <div class="fcard">
+        <h3><span class="i">♿</span>A11y &amp; polish <span class="badge build">to build</span></h3>
+        <ul>
+          <li>Keyboard nav across tabs/canvas/panels; visible focus; ARIA roles.</li>
+          <li>Micro-interactions: drag affordances, eased transitions, save/dirty indicator.</li>
+          <li>Colorblind-safe palettes; token-driven contrast; consistent iconography.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout"><b>How to read this:</b> the shell + tab redesign above is the visual direction to approve.
+      The functionality grid is the production scope — being pinned down by exhaustive market research right now, then
+      fanned out and built across worktrees (FE + BE), compile-verified + code-reviewed, for you to drive live.</div>
+  </section>
+</div>
+
+<footer>DBExec Analyses authoring redesign · mockup on the app's own design tokens (blue #2196f3, Inter, cool-grey neutrals).
+Benchmarks: Tableau · Power BI · Looker · Metabase · Superset · Hex · Sigma. Detail in <span class="k">docs/viz-redesign/</span>.</footer>

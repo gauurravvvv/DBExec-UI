@@ -49,3 +49,6 @@ Thumbs.db
 # Playwright test artifacts
 /test-results
 /e2e/e2e-report.json
+
+# Claude Code agent worktrees (working dirs, not source)
+.claude/worktrees/
