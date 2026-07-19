@@ -144,13 +144,31 @@ export class HttpRequestInterceptor implements HttpInterceptor {
       evt.body instanceof Blob &&
       (evt.headers.get('content-type') || '').includes('application/json')
     ) {
-      // Server returned JSON for a blob request — parse it so error codes are detected
+      // A blob request can get a JSON body two ways:
+      //   1. a genuine file download the caller asked for as a Blob (e.g. the
+      //      migration export streams the bundle as application/json), OR
+      //   2. our standard envelope carrying an actionable code — most importantly
+      //      a 440 session-expiry — returned even though a Blob was requested.
+      // We must detect (2) so auth-refresh still fires, WITHOUT clobbering (1):
+      // if we parsed every JSON blob into an object, legitimate downloads would
+      // reach the caller as a plain object instead of a Blob and never download.
+      // So: parse, and ONLY swap the body to the parsed object when it's an
+      // actionable envelope (session/maintenance code). Otherwise pass the
+      // ORIGINAL Blob through untouched so the download path works.
       return from(evt.body.text()).pipe(
         switchMap(text => {
           let json: any;
           try {
             json = JSON.parse(text);
           } catch {
+            return of(evt as HttpEvent<any>);
+          }
+          const code = json?.code;
+          const actionable =
+            code === 440 || code === 501 || code === 503;
+          if (!actionable) {
+            // Genuine file download (or any non-actionable JSON blob) — leave
+            // the Blob intact for the caller to save.
             return of(evt as HttpEvent<any>);
           }
           // handleSuccess may throw (e.g., HttpErrorResponse for 440) — let it propagate
