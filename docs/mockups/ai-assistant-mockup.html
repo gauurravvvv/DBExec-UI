@@ -1,455 +1,773 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>DBExec — AI Assistant (concept)</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DBExec · AI Assistant — Interactive Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
 <style>
-  /* ─────────────────────────────────────────────────────────────
-     DBExec AI Assistant — design concept.
-     Tokens mirror the real app (src/assets/sass/variables/_theme-variables.scss):
-     primary #2196f3, Inter UI / JetBrains Mono for code, radii 6/8/12/16,
-     the app's shadow scale. Font CDNs are blocked in this preview, so the
-     families fall back to system stacks with matching metrics.
-     ───────────────────────────────────────────────────────────── */
-  :root {
-    --primary: #2196f3;
-    --primary-hover: #1976d2;
-    --primary-light: #42a5f5;
-    --primary-050: #e8f2fd;
-    --primary-rgb: 33, 150, 243;
+/* ===================================================================
+   DBExec AI Assistant — standalone interactive mockup
+   Theme tokens mirror the running app (src/assets/sass/variables/
+   _theme-variables.scss + src/variables.scss): Inter type, #2196f3 /
+   #0078d3 primary blue, DBExec blue→orange accent, white cards, the
+   app's 4/6/8/12/16px radii and soft shadows. Self-contained: no
+   framework, charts drawn on <canvas>. Purely a prototype.
+   =================================================================== */
+:root{
+  --primary:#2196f3;
+  --primary-strong:#0078d3;
+  --primary-hover:#1976d2;
+  --primary-light:#42a5f5;
+  --primary-transparent:rgba(33,150,243,.12);
+  --accent:#ff8a3d;            /* DBExec orange accent */
+  --accent-strong:#f4701f;
+  --bg:#eef3fb;
+  --card:#ffffff;
+  --surface:#f7f9fc;
+  --hover:#f2f5fa;
+  --text:#1f2733;
+  --text-muted:#6b7280;
+  --border:#e3e8ef;
+  --border-strong:#d3dae4;
+  --success:#22a565;
+  --warning:#ff9800;
+  --error:#f44336;
+  --radius-xs:4px;--radius-sm:6px;--radius-md:8px;--radius-lg:12px;--radius-xl:16px;--radius-2xl:20px;--pill:999px;
+  --shadow-sm:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+  --shadow-md:0 4px 12px rgba(16,24,40,.10);
+  --shadow-lg:0 18px 45px rgba(16,24,40,.22);
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
 
-    --ink: #1f2733;
-    --text: #333333;
-    --text-muted: #6b7280;
-    --text-subtle: #9ca3af;
+/* ---------- faux app shell behind the assistant ---------- */
+.app{display:flex;height:100vh;filter:saturate(1);}
+.sidebar-nav{
+  width:230px;flex-shrink:0;background:linear-gradient(180deg,#0b2a4a,#0a213b);
+  color:#cdd9e8;display:flex;flex-direction:column;padding:18px 12px;gap:4px;
+}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 10px 18px;}
+.brand .logo{
+  width:34px;height:34px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--primary-strong),var(--accent));
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;
+  box-shadow:0 4px 10px rgba(0,120,211,.4);font-family:var(--font);
+}
+.brand .name{font-family:var(--font);font-weight:700;font-size:17px;color:#fff;letter-spacing:.2px}
+.brand .name span{background:linear-gradient(90deg,#7dc4ff,var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.nav-group-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.14em;color:#617a97;padding:14px 12px 6px;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;font-size:13.5px;color:#b9c8db;cursor:pointer;transition:.15s;font-weight:500}
+.nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav-item.active{background:rgba(33,150,243,.22);color:#fff}
+.nav-item .ic{width:17px;height:17px;opacity:.9;flex-shrink:0}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{
+  height:60px;background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;
+}
+.topbar .crumbs{font-size:14px;color:var(--text-muted);font-weight:500}
+.topbar .crumbs b{color:var(--text);font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:14px}
+.avatar-pill{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#2196f3,#0078d3);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px}
+.content{flex:1;overflow:auto;padding:24px;position:relative}
+.page-title{font-size:22px;font-weight:700;margin-bottom:4px}
+.page-sub{color:var(--text-muted);font-size:13.5px;margin-bottom:22px}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow-sm)}
+.kpi .k-label{font-size:12px;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.kpi .k-value{font-size:26px;font-weight:700;margin-top:6px}
+.kpi .k-delta{font-size:12px;font-weight:600;margin-top:4px}
+.kpi .k-delta.up{color:var(--success)}.kpi .k-delta.down{color:var(--error)}
+.panel-row{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;box-shadow:var(--shadow-sm)}
+.panel h3{font-size:14.5px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.panel h3 .tag{font-size:11px;color:var(--text-muted);font-weight:500}
+.skeleton-bars{display:flex;align-items:flex-end;gap:10px;height:150px;padding-top:8px}
+.skeleton-bars .b{flex:1;background:linear-gradient(180deg,var(--primary-light),var(--primary));border-radius:6px 6px 0 0;opacity:.9}
+.list-line{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.list-line:last-child{border-bottom:none}
+.list-line .dot{width:8px;height:8px;border-radius:50%;background:var(--primary);margin-right:8px}
+.badge{font-size:11px;font-weight:600;padding:2px 9px;border-radius:var(--pill)}
+.badge.warn{background:rgba(255,152,0,.14);color:#b45f00}
+.badge.ok{background:rgba(34,165,101,.14);color:var(--success)}
+.badge.crit{background:rgba(244,67,54,.14);color:var(--error)}
 
-    --bg-app: #f5f6fa;
-    --card: #ffffff;
-    --surface: #f8fafc;
-    --hover: #f1f5f9;
-    --border: #e6e8ee;
-    --border-strong: #d4d8e0;
+/* ======================= ASSISTANT ======================= */
 
-    --success: #2e9e5b;
-    --success-bg: #e9f6ee;
-    --warning: #d97a06;
-    --warning-bg: #fbf1e0;
-    --danger: #e5484d;
+/* mode switcher (demo control) */
+.mode-switch{
+  position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:60;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--pill);
+  padding:5px;display:flex;gap:4px;box-shadow:var(--shadow-md);
+}
+.mode-switch button{
+  border:none;background:transparent;font-family:var(--font);font-size:12.5px;font-weight:600;
+  color:var(--text-muted);padding:7px 15px;border-radius:var(--pill);cursor:pointer;display:flex;align-items:center;gap:7px;transition:.15s;
+}
+.mode-switch button:hover{color:var(--text)}
+.mode-switch button.active{background:var(--primary);color:#fff;box-shadow:0 3px 8px rgba(33,150,243,.35)}
+.mode-switch .ic{width:15px;height:15px}
+.mode-hint{position:fixed;top:58px;left:50%;transform:translateX(-50%);z-index:60;font-size:11px;color:var(--text-muted);background:rgba(255,255,255,.7);padding:3px 10px;border-radius:var(--pill)}
 
-    --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.05);
-    --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08);
-    --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.12);
-    --shadow-xl: 0 24px 64px rgba(16, 24, 40, 0.18);
+/* floating launcher (bubble mode) */
+.launcher{
+  position:fixed;right:26px;bottom:26px;z-index:50;width:60px;height:60px;border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),var(--primary-strong));
+  box-shadow:0 10px 26px rgba(0,120,211,.45);cursor:pointer;border:none;
+  display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;
+}
+.launcher:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 14px 32px rgba(0,120,211,.55)}
+.launcher .spark{width:26px;height:26px;color:#fff}
+.launcher .ping{position:absolute;top:-2px;right:-2px;width:16px;height:16px;background:var(--accent);border:2px solid #fff;border-radius:50%}
 
-    --r-xs: 4px;
-    --r-sm: 6px;
-    --r-md: 8px;
-    --r-lg: 12px;
-    --r-xl: 16px;
-    --r-pill: 999px;
+/* assistant surface — shared skin, positioned per mode */
+.assistant{
+  position:fixed;z-index:55;background:var(--card);display:flex;flex-direction:column;
+  border:1px solid var(--border);overflow:hidden;opacity:0;pointer-events:none;
+  transform:translateY(14px) scale(.98);transition:opacity .22s ease,transform .22s ease;
+}
+.assistant.open{opacity:1;pointer-events:auto;transform:none}
 
-    --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --font-brand: "Poppins", var(--font);
-    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  }
+/* --- bubble --- */
+body[data-mode="bubble"] .assistant{
+  right:26px;bottom:26px;width:400px;height:600px;max-height:calc(100vh - 52px);
+  border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);
+}
+body[data-mode="bubble"] .a-history{display:none}
+body[data-mode="bubble"] .launcher{display:flex}
 
-  * { box-sizing: border-box; }
-  html, body { height: 100%; }
-  body {
-    margin: 0; font-family: var(--font); color: var(--text); background: var(--bg-app);
-    -webkit-font-smoothing: antialiased; overflow: hidden;
-  }
-  button { font-family: inherit; cursor: pointer; }
-  ::-webkit-scrollbar { width: 10px; height: 10px; }
-  ::-webkit-scrollbar-thumb { background: #d3d8e2; border-radius: var(--r-pill); border: 2px solid transparent; background-clip: content-box; }
-  ::-webkit-scrollbar-thumb:hover { background: #b9c0cd; background-clip: content-box; }
+/* --- sidebar --- */
+body[data-mode="sidebar"] .assistant{
+  right:0;top:0;bottom:0;width:440px;max-width:92vw;height:100vh;
+  border-radius:0;border-right:none;box-shadow:-18px 0 45px rgba(16,24,40,.16);
+}
+body[data-mode="sidebar"] .a-history{display:none}
+body[data-mode="sidebar"] .launcher{display:flex}
+body[data-mode="sidebar"] .scrim{display:block}
 
-  /* ── faux app shell behind the assistant ─────────────────────── */
-  .app-shell { display: flex; height: 100vh; }
-  .sidebar { width: 232px; flex: none; background: #101828; color: #c3cad6; display: flex; flex-direction: column; padding: 18px 12px; }
-  .brand { display: flex; align-items: center; gap: 10px; padding: 6px 10px 20px; }
-  .brand .logo { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, var(--primary), var(--primary-hover)); display: grid; place-items: center; color: #fff; font-weight: 700; font-family: var(--mono); font-size: 15px; box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.4); }
-  .brand .name { font-family: var(--font-brand); font-weight: 700; font-size: 17px; color: #fff; letter-spacing: -0.01em; }
-  .brand .name em { font-style: normal; color: var(--primary-light); }
-  .nav-group-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #5b6675; padding: 14px 12px 6px; }
-  .nav-item { display: flex; align-items: center; gap: 11px; padding: 9px 12px; border-radius: var(--r-sm); font-size: 13.5px; color: #c3cad6; margin-bottom: 1px; }
-  .nav-item .ic { width: 16px; height: 16px; opacity: 0.85; }
-  .nav-item.active { background: rgba(var(--primary-rgb), 0.16); color: #fff; }
+/* --- fullscreen --- */
+body[data-mode="full"] .assistant{
+  inset:0;width:100vw;height:100vh;border-radius:0;border:none;
+}
+body[data-mode="full"] .a-history{display:flex}
+body[data-mode="full"] .launcher{display:none}
+body[data-mode="full"] .assistant{transform:none}
 
-  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-  .topbar { height: 56px; flex: none; background: var(--card); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; padding: 0 24px; }
-  .topbar h1 { font-size: 17px; font-weight: 600; margin: 0; color: var(--ink); }
-  .topbar .crumb { color: var(--text-subtle); font-size: 13px; }
-  .topbar .spacer { flex: 1; }
-  .topbar .avatar { width: 32px; height: 32px; border-radius: var(--r-pill); background: var(--primary-050); color: var(--primary-hover); display: grid; place-items: center; font-weight: 600; font-size: 13px; }
-  .content { flex: 1; overflow: auto; padding: 24px; }
-  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
-  .kpi { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px 18px; box-shadow: var(--shadow-sm); }
-  .kpi .label { font-size: 12px; color: var(--text-muted); }
-  .kpi .value { font-size: 24px; font-weight: 700; color: var(--ink); margin-top: 6px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-  .kpi .delta { font-size: 12px; margin-top: 4px; font-weight: 600; }
-  .kpi .delta.up { color: var(--success); } .kpi .delta.down { color: var(--danger); }
-  .ghost-block { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); height: 260px; display: grid; place-items: center; color: var(--text-subtle); font-size: 13px; }
+.scrim{display:none;position:fixed;inset:0;background:rgba(15,23,42,.28);z-index:54;opacity:0;pointer-events:none;transition:opacity .22s}
+.scrim.show{opacity:1;pointer-events:auto}
 
-  /* ── presentation-mode switcher (concept control) ────────────── */
-  .mode-switch { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 60; background: var(--card); border: 1px solid var(--border); border-radius: var(--r-pill); padding: 4px; display: flex; gap: 2px; box-shadow: var(--shadow-md); }
-  .mode-switch .seg { border: none; background: transparent; color: var(--text-muted); font-size: 12.5px; font-weight: 600; padding: 7px 16px; border-radius: var(--r-pill); transition: all 0.18s ease; }
-  .mode-switch .seg.active { background: var(--primary); color: #fff; box-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.35); }
-  .mode-switch .seg:not(.active):hover { color: var(--ink); background: var(--hover); }
-  .mode-switch .tag { font-family: var(--mono); font-size: 10px; color: var(--text-subtle); align-self: center; padding: 0 10px 0 6px; }
+/* assistant inner layout */
+.assistant .a-body{flex:1;display:flex;min-height:0}
+.a-history{
+  width:270px;flex-shrink:0;border-right:1px solid var(--border);background:var(--surface);
+  flex-direction:column;
+}
+.a-history .h-head{padding:16px 16px 10px;display:flex;flex-direction:column;gap:10px}
+.a-history .new-chat{
+  display:flex;align-items:center;gap:9px;justify-content:center;background:var(--primary);
+  color:#fff;border:none;font-family:var(--font);font-weight:600;font-size:13px;padding:10px;border-radius:var(--radius-md);cursor:pointer;transition:.15s
+}
+.a-history .new-chat:hover{background:var(--primary-hover)}
+.a-history .h-search{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-md);padding:8px 11px;font-size:12.5px;color:var(--text);font-family:var(--font)}
+.a-history .h-label{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);padding:12px 16px 6px}
+.h-list{overflow:auto;padding:0 10px 12px;display:flex;flex-direction:column;gap:2px}
+.h-item{padding:9px 11px;border-radius:var(--radius-md);cursor:pointer;transition:.12s}
+.h-item:hover{background:var(--hover)}
+.h-item.active{background:var(--primary-transparent)}
+.h-item .h-title{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.h-item .h-meta{font-size:11px;color:var(--text-muted);margin-top:2px}
 
-  /* ── the assistant surface ───────────────────────────────────── */
-  .scrim { position: fixed; inset: 0; background: rgba(16, 24, 40, 0.28); backdrop-filter: blur(1.5px); z-index: 40; opacity: 0; pointer-events: none; transition: opacity 0.24s ease; }
-  .scrim.show { opacity: 1; pointer-events: auto; }
-  .assistant { position: fixed; z-index: 50; background: var(--card); display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow-xl); border: 1px solid var(--border); opacity: 0; pointer-events: none; transition: opacity 0.26s ease, transform 0.26s cubic-bezier(0.16, 1, 0.3, 1); }
-  .assistant.show { opacity: 1; pointer-events: auto; }
-  .assistant.bubble { right: 24px; bottom: 96px; width: 420px; height: min(640px, calc(100vh - 140px)); border-radius: var(--r-xl); transform: translateY(16px) scale(0.98); }
-  .assistant.bubble.show { transform: translateY(0) scale(1); }
-  .assistant.sidebar { right: 0; top: 0; bottom: 0; width: 460px; height: 100vh; border-radius: 0; border-top: none; border-bottom: none; border-right: none; transform: translateX(24px); }
-  .assistant.sidebar.show { transform: translateX(0); }
-  .assistant.full { inset: 40px; width: auto; height: auto; border-radius: var(--r-xl); transform: scale(0.985); display: grid; grid-template-columns: 260px 1fr; }
-  .assistant.full.show { transform: scale(1); }
+/* conversation column */
+.a-conv{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
+.a-head{
+  display:flex;align-items:center;justify-content:space-between;padding:14px 16px;
+  border-bottom:1px solid var(--border);flex-shrink:0;
+  background:linear-gradient(180deg,var(--card),var(--surface));
+}
+.a-head .h-id{display:flex;align-items:center;gap:11px}
+.a-head .ai-orb{
+  width:36px;height:36px;border-radius:11px;flex-shrink:0;position:relative;
+  background:linear-gradient(135deg,var(--primary),var(--primary-strong));
+  display:flex;align-items:center;justify-content:center;color:#fff;
+  box-shadow:0 4px 10px rgba(0,120,211,.35);
+}
+.a-head .ai-orb .spark{width:19px;height:19px}
+.a-head .status{color:var(--success);font-size:11.5px;font-weight:500;display:flex;align-items:center;gap:5px;margin-top:2px}
+.a-head .status .live{width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 0 3px rgba(34,165,101,.18)}
+.a-head .h-title{font-size:14.5px;font-weight:700}
+.a-head .h-actions{display:flex;gap:6px}
+.icon-btn{width:32px;height:32px;border-radius:8px;border:1px solid transparent;background:transparent;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;justify-content:center;transition:.15s}
+.icon-btn:hover{background:var(--hover);color:var(--text)}
+.icon-btn .ic{width:17px;height:17px}
 
-  .recents { display: none; }
-  .assistant.full .recents { display: flex; flex-direction: column; background: var(--surface); border-right: 1px solid var(--border); padding: 18px 14px; overflow: auto; }
-  .recents .rtitle { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-subtle); padding: 6px 10px 10px; }
-  .recents .ritem { padding: 10px 12px; border-radius: var(--r-sm); font-size: 13px; color: var(--text); display: flex; flex-direction: column; gap: 3px; }
-  .recents .ritem .rmeta { font-size: 11px; color: var(--text-subtle); }
-  .recents .ritem:hover { background: var(--hover); }
-  .recents .ritem.active { background: var(--primary-050); color: var(--primary-hover); }
-  .recents .ritem.active .rmeta { color: var(--primary); }
+.a-scroll{flex:1;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:16px;background:var(--surface)}
+body[data-mode="full"] .a-scroll{padding:26px 18%;}
 
-  .panel { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
-  .a-head { flex: none; display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--border); background: var(--card); }
-  .a-head .spark { width: 34px; height: 34px; border-radius: var(--r-md); flex: none; background: linear-gradient(135deg, var(--primary), #6f4bd8); display: grid; place-items: center; box-shadow: 0 3px 10px rgba(var(--primary-rgb), 0.35); }
-  .a-head .htext { min-width: 0; }
-  .a-head .htext .t { font-size: 14px; font-weight: 600; color: var(--ink); }
-  .a-head .htext .s { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; margin-top: 1px; }
-  .dot-live { width: 7px; height: 7px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px var(--success-bg); }
-  .a-head .hactions { margin-left: auto; display: flex; gap: 4px; }
-  .icon-btn { width: 30px; height: 30px; border: none; background: transparent; border-radius: var(--r-sm); color: var(--text-muted); display: grid; place-items: center; }
-  .icon-btn:hover { background: var(--hover); color: var(--ink); }
+/* welcome / quick chat */
+.welcome{text-align:center;padding:20px 8px 4px;animation:fade .4s}
+.welcome .w-orb{width:56px;height:56px;border-radius:16px;margin:0 auto 14px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 8px 20px rgba(0,120,211,.35)}
+.welcome .w-orb .spark{width:28px;height:28px}
+.welcome h2{font-size:19px;font-weight:700;margin-bottom:5px}
+.welcome p{font-size:13px;color:var(--text-muted);max-width:360px;margin:0 auto}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+body[data-mode="bubble"] .quick-grid{grid-template-columns:1fr}
+.quick-card{
+  text-align:left;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:13px 14px;cursor:pointer;transition:.15s;display:flex;gap:11px;align-items:flex-start;
+}
+.quick-card:hover{border-color:var(--primary);box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.quick-card .q-ic{width:32px;height:32px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff}
+.quick-card .q-ic.c1{background:linear-gradient(135deg,#2196f3,#0078d3)}
+.quick-card .q-ic.c2{background:linear-gradient(135deg,#7c4dff,#5b2ee0)}
+.quick-card .q-ic.c3{background:linear-gradient(135deg,#22a565,#0f8a4f)}
+.quick-card .q-ic.c4{background:linear-gradient(135deg,#ff8a3d,#f4701f)}
+.quick-card .q-ic .ic{width:17px;height:17px}
+.quick-card .q-t{font-size:13px;font-weight:600;line-height:1.35}
+.quick-card .q-d{font-size:11.5px;color:var(--text-muted);margin-top:2px}
 
-  .stream { flex: 1; overflow: auto; padding: 20px 18px; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
+/* message bubbles */
+.msg{display:flex;gap:11px;max-width:100%;animation:rise .3s ease}
+.msg .m-av{width:30px;height:30px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff}
+.msg.assistant .m-av{background:linear-gradient(135deg,var(--primary),var(--primary-strong))}
+.msg.user{flex-direction:row-reverse}
+.msg.user .m-av{background:linear-gradient(135deg,#334155,#1e293b)}
+.m-wrap{display:flex;flex-direction:column;gap:5px;max-width:82%}
+.msg.user .m-wrap{align-items:flex-end}
+.bubble{padding:11px 14px;border-radius:14px;font-size:13.5px;line-height:1.55;box-shadow:var(--shadow-sm)}
+.msg.assistant .bubble{background:var(--card);border:1px solid var(--border);border-top-left-radius:4px;color:var(--text)}
+.msg.user .bubble{background:linear-gradient(135deg,var(--primary),var(--primary-strong));color:#fff;border-top-right-radius:4px}
+.m-time{font-size:10.5px;color:var(--text-muted);padding:0 4px}
 
-  .greeting h2 { font-family: var(--font-brand); font-size: 20px; font-weight: 700; color: var(--ink); margin: 4px 0 6px; letter-spacing: -0.01em; }
-  .greeting p { font-size: 13.5px; color: var(--text-muted); margin: 0 0 16px; line-height: 1.5; max-width: 46ch; }
-  .quick-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .assistant.full .quick-cards { grid-template-columns: repeat(4, 1fr); }
-  .qcard { text-align: left; background: var(--card); border: 1px solid var(--border); border-radius: var(--r-md); padding: 14px; display: flex; flex-direction: column; gap: 8px; transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease; }
-  .qcard:hover { border-color: var(--primary-light); box-shadow: var(--shadow-md); transform: translateY(-1px); }
-  .qcard .qic { width: 30px; height: 30px; border-radius: var(--r-sm); display: grid; place-items: center; }
-  .qcard .qt { font-size: 13px; font-weight: 600; color: var(--ink); }
-  .qcard .qd { font-size: 11.5px; color: var(--text-muted); line-height: 1.45; }
-  .qic.blue { background: var(--primary-050); color: var(--primary-hover); }
-  .qic.violet { background: #efeafc; color: #6f4bd8; }
-  .qic.green { background: var(--success-bg); color: var(--success); }
-  .qic.amber { background: var(--warning-bg); color: var(--warning); }
+/* artifact cards inside a message */
+.artifact{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);width:100%;max-width:100%}
+.artifact .a-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-bottom:1px solid var(--border);background:var(--surface)}
+.artifact .a-bar .a-name{font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:8px}
+.artifact .a-bar .a-name .ic{width:15px;height:15px;color:var(--primary)}
+.artifact .a-bar .a-kind{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);font-weight:600}
+.artifact .a-inner{padding:14px}
+.artifact canvas{width:100%;display:block}
+.sql-code{font-family:var(--mono);font-size:12px;line-height:1.7;background:#0d1b2a;color:#e6edf3;padding:14px;border-radius:var(--radius-md);overflow:auto;white-space:pre}
+.sql-code .kw{color:#79c0ff;font-weight:600}
+.sql-code .fn{color:#ffa657}
+.sql-code .str{color:#7ee787}
+.sql-code .num{color:#f0883e}
+.sql-code .cm{color:#8b949e;font-style:italic}
+.mini-table{width:100%;border-collapse:collapse;font-size:12px}
+.mini-table th{text-align:left;padding:7px 10px;background:var(--surface);color:var(--text-muted);font-weight:600;border-bottom:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.mini-table td{padding:7px 10px;border-bottom:1px solid var(--border)}
+.mini-table tr:last-child td{border-bottom:none}
+.a-actions{display:flex;flex-wrap:wrap;gap:8px;padding:0 13px 13px}
+.chip-btn{
+  display:inline-flex;align-items:center;gap:6px;font-family:var(--font);font-size:12px;font-weight:600;
+  border:1px solid var(--border);background:var(--card);color:var(--text);padding:7px 12px;border-radius:var(--pill);cursor:pointer;transition:.15s
+}
+.chip-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-transparent)}
+.chip-btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.chip-btn.primary:hover{background:var(--primary-hover);color:#fff}
+.chip-btn .ic{width:14px;height:14px}
 
-  .msg { display: flex; gap: 10px; max-width: 100%; }
-  .msg .av { width: 28px; height: 28px; border-radius: var(--r-sm); flex: none; display: grid; place-items: center; font-size: 12px; font-weight: 600; }
-  .msg.user { flex-direction: row-reverse; }
-  .msg.user .av { background: var(--primary-050); color: var(--primary-hover); }
-  .msg.ai .av { background: linear-gradient(135deg, var(--primary), #6f4bd8); color: #fff; }
-  .bubblemsg { border-radius: var(--r-md); padding: 11px 14px; font-size: 13.5px; line-height: 1.55; }
-  .msg.user .bubblemsg { background: var(--primary); color: #fff; border-bottom-right-radius: 3px; }
-  .msg.ai .bubblemsg { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-bottom-left-radius: 3px; }
-  .bubblemsg code { font-family: var(--mono); font-size: 12px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary-hover); padding: 1px 5px; border-radius: var(--r-xs); }
-  .msg.user .bubblemsg code { background: rgba(255,255,255,0.22); color: #fff; }
-  .msg .ts { font-size: 10.5px; color: var(--text-subtle); margin-top: 5px; font-family: var(--mono); }
-  .msg.user .col { align-items: flex-end; }
-  .msg .col { display: flex; flex-direction: column; min-width: 0; max-width: 86%; }
+/* typing indicator */
+.typing{display:flex;gap:11px;animation:rise .25s}
+.typing .m-av{width:30px;height:30px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),var(--primary-strong));display:flex;align-items:center;justify-content:center;color:#fff}
+.typing .dots{background:var(--card);border:1px solid var(--border);border-radius:14px;border-top-left-radius:4px;padding:14px 16px;display:flex;gap:5px;align-items:center}
+.typing .dots span{width:7px;height:7px;border-radius:50%;background:var(--primary);opacity:.4;animation:blink 1.2s infinite}
+.typing .dots span:nth-child(2){animation-delay:.2s}
+.typing .dots span:nth-child(3){animation-delay:.4s}
 
-  .typing { display: inline-flex; gap: 4px; padding: 13px 15px; }
-  .typing span { width: 7px; height: 7px; border-radius: 50%; background: var(--text-subtle); animation: bounce 1.3s infinite ease-in-out; }
-  .typing span:nth-child(2) { animation-delay: 0.18s; } .typing span:nth-child(3) { animation-delay: 0.36s; }
-  @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); opacity: 0.5; } 30% { transform: translateY(-5px); opacity: 1; } }
+/* composer */
+.a-composer{border-top:1px solid var(--border);padding:12px 14px;background:var(--card);flex-shrink:0}
+.suggest-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:9px}
+.sg{font-size:11.5px;font-weight:500;color:var(--primary-strong);background:var(--primary-transparent);border:1px solid transparent;padding:5px 11px;border-radius:var(--pill);cursor:pointer;transition:.15s}
+.sg:hover{background:var(--primary);color:#fff}
+.composer-box{display:flex;align-items:flex-end;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:8px 8px 8px 14px;transition:.15s}
+.composer-box:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-transparent)}
+.composer-box textarea{flex:1;border:none;background:transparent;resize:none;font-family:var(--font);font-size:13.5px;color:var(--text);line-height:1.5;max-height:120px;outline:none}
+.composer-box .attach{color:var(--text-muted);align-self:center}
+.send-btn{width:38px;height:38px;border-radius:10px;border:none;flex-shrink:0;background:linear-gradient(135deg,var(--primary),var(--primary-strong));color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+.send-btn:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(0,120,211,.4)}
+.send-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.send-btn .ic{width:18px;height:18px}
+.composer-foot{font-size:10.5px;color:var(--text-muted);text-align:center;margin-top:8px}
 
-  .artifact { border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; margin-top: 10px; background: var(--card); box-shadow: var(--shadow-sm); }
-  .art-head { display: flex; align-items: center; gap: 8px; padding: 9px 12px; background: var(--surface); border-bottom: 1px solid var(--border); }
-  .art-head .k { font-size: 10px; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.08em; padding: 2px 7px; border-radius: var(--r-xs); }
-  .k.chart { background: var(--primary-050); color: var(--primary-hover); }
-  .k.sql { background: #efeafc; color: #6f4bd8; }
-  .k.table { background: var(--success-bg); color: var(--success); }
-  .k.alert { background: var(--warning-bg); color: var(--warning); }
-  .art-head .at { font-size: 12.5px; font-weight: 600; color: var(--ink); }
-  .art-body { padding: 12px; }
-  .art-body canvas { display: block; width: 100%; height: 150px; }
-  pre.code { margin: 0; font-family: var(--mono); font-size: 12px; line-height: 1.6; white-space: pre; overflow-x: auto; color: #d6deeb; }
-  .sqlwrap { background: #0f1626; border-radius: var(--r-sm); padding: 12px 14px; overflow-x: auto; }
-  .tok-kw { color: #7cc4ff; } .tok-fn { color: #c3a6ff; } .tok-num { color: #ffd479; } .tok-punc { color: #8a93a3; }
-  table.mini { width: 100%; border-collapse: collapse; font-size: 12px; }
-  table.mini th { text-align: left; font-weight: 600; color: var(--text-muted); padding: 6px 10px; border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
-  table.mini td { padding: 7px 10px; border-bottom: 1px solid var(--border); color: var(--text); font-variant-numeric: tabular-nums; }
-  table.mini tr:last-child td { border-bottom: none; }
-  .alert-preview { display: flex; flex-direction: column; gap: 8px; }
-  .alert-preview .row { display: flex; gap: 8px; font-size: 12.5px; }
-  .alert-preview .row .lbl { color: var(--text-muted); width: 78px; flex: none; }
-  .alert-preview .row .val { color: var(--ink); font-weight: 500; }
-  .sev { font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: var(--r-pill); }
-  .sev.warn { background: var(--warning-bg); color: var(--warning); }
-  .art-actions { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px; border-top: 1px solid var(--border); background: var(--surface); }
-  .add-btn { border: 1px solid var(--border-strong); background: var(--card); color: var(--text); font-size: 11.5px; font-weight: 600; padding: 5px 11px; border-radius: var(--r-sm); display: inline-flex; align-items: center; gap: 5px; transition: all 0.15s ease; }
-  .add-btn:hover { border-color: var(--primary); color: var(--primary-hover); background: var(--primary-050); }
-  .add-btn .plus { font-weight: 700; }
+/* toast */
+.toast-wrap{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:80;display:flex;flex-direction:column;gap:9px;align-items:center}
+.toast{
+  display:flex;align-items:center;gap:11px;background:#0f2740;color:#fff;padding:12px 17px;border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-lg);font-size:13px;font-weight:500;animation:toastin .3s ease;max-width:440px
+}
+.toast .t-ic{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--success),#0f8a4f);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.toast .t-ic .ic{width:17px;height:17px}
+.toast b{font-weight:700}
+.toast .t-link{color:#7dc4ff;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 
-  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
-  .chip { border: 1px solid var(--border); background: var(--card); color: var(--text-muted); font-size: 12px; padding: 6px 12px; border-radius: var(--r-pill); transition: all 0.15s ease; }
-  .chip:hover { border-color: var(--primary-light); color: var(--primary-hover); background: var(--primary-050); }
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes blink{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+@keyframes toastin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
-  .composer { flex: none; border-top: 1px solid var(--border); padding: 12px 14px 14px; background: var(--card); }
-  .composer .box { display: flex; align-items: flex-end; gap: 8px; border: 1px solid var(--border-strong); border-radius: var(--r-lg); padding: 8px 8px 8px 14px; transition: border-color 0.15s ease, box-shadow 0.15s ease; background: var(--card); }
-  .composer .box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.12); }
-  .composer textarea { flex: 1; border: none; outline: none; resize: none; font-family: inherit; font-size: 13.5px; color: var(--text); line-height: 1.5; max-height: 96px; background: transparent; padding: 4px 0; }
-  .composer textarea::placeholder { color: var(--text-subtle); }
-  .send { width: 34px; height: 34px; flex: none; border: none; border-radius: var(--r-md); background: var(--primary); color: #fff; display: grid; place-items: center; transition: background 0.15s ease, transform 0.1s ease; }
-  .send:hover { background: var(--primary-hover); }
-  .send:active { transform: scale(0.94); }
-  .composer .foot { font-size: 10.5px; color: var(--text-subtle); text-align: center; margin-top: 8px; font-family: var(--mono); }
-
-  .launcher { position: fixed; right: 24px; bottom: 24px; z-index: 55; width: 56px; height: 56px; border-radius: var(--r-pill); border: none; background: linear-gradient(135deg, var(--primary), #6f4bd8); display: grid; place-items: center; box-shadow: 0 8px 24px rgba(var(--primary-rgb), 0.42); transition: transform 0.18s ease, box-shadow 0.18s ease; }
-  .launcher:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 12px 30px rgba(var(--primary-rgb), 0.5); }
-  .launcher::after { content: ""; position: absolute; inset: -5px; border-radius: var(--r-pill); border: 2px solid rgba(var(--primary-rgb), 0.35); animation: pulse 2.4s infinite ease-out; }
-  @keyframes pulse { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(1.35); opacity: 0; } }
-  .launcher.hidden { display: none; }
-
-  .toast-wrap { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 80; display: flex; flex-direction: column; gap: 8px; align-items: center; }
-  .toast { background: var(--ink); color: #fff; border-radius: var(--r-md); padding: 11px 16px; font-size: 13px; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 12px; opacity: 0; transform: translateY(10px); transition: opacity 0.25s ease, transform 0.25s ease; }
-  .toast.show { opacity: 1; transform: translateY(0); }
-  .toast .check { width: 18px; height: 18px; border-radius: 50%; background: var(--success); display: grid; place-items: center; flex: none; }
-  .toast a { color: var(--primary-light); font-weight: 600; text-decoration: none; }
-  .toast a:hover { text-decoration: underline; }
-
-  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
-  @media (max-width: 720px) {
-    .sidebar { display: none; }
-    .assistant.bubble { right: 0; left: 0; bottom: 0; width: auto; height: 78vh; border-radius: var(--r-xl) var(--r-xl) 0 0; }
-    .assistant.sidebar { width: 100vw; }
-    .assistant.full { inset: 0; border-radius: 0; grid-template-columns: 1fr; }
-    .assistant.full .recents { display: none; }
-    .kpi-row { grid-template-columns: 1fr 1fr; }
-  }
+@media(max-width:1100px){.kpi-row{grid-template-columns:repeat(2,1fr)}.panel-row{grid-template-columns:1fr}}
+@media(max-width:760px){
+  .sidebar-nav{display:none}
+  body[data-mode="bubble"] .assistant{width:calc(100vw - 24px);right:12px;left:12px;height:78vh}
+  .mode-switch button span.lbl{display:none}
+}
 </style>
 </head>
-<body>
+<body data-mode="bubble">
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="i-spark" viewBox="0 0 24 24"><path fill="#fff" d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2zm6 12l.8 2.7L21.5 17l-2.7.8L18 20.5l-.8-2.7L14.5 17l2.7-.8L18 14z"/></symbol>
-  <symbol id="i-send" viewBox="0 0 24 24"><path fill="currentColor" d="M3.4 20.4l17.5-8.4c.8-.4.8-1.6 0-2L3.4 1.6C2.7 1.3 2 1.8 2 2.6l.9 6.3c.1.5.4.8.9.9l8.2 1.2-8.2 1.2c-.5.1-.8.4-.9.9L2 21.4c0 .8.7 1.3 1.4 1z"/></symbol>
-  <symbol id="i-new" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 5v14M5 12h14"/></symbol>
-  <symbol id="i-min" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M5 12h14"/></symbol>
-</svg>
-
-<div class="app-shell" aria-hidden="true">
-  <aside class="sidebar">
-    <div class="brand"><span class="logo">DB</span><span class="name">DB<em>Exec</em></span></div>
-    <div class="nav-group-label">Workspace</div>
-    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24"><path fill="currentColor" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Dashboards</div>
-    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24"><path fill="currentColor" d="M4 6h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"/></svg>Analyses</div>
-    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16v4H4zm0 6h16v4H4zm0 6h16v4H4z"/></svg>Datasets</div>
-    <div class="nav-group-label">Studio</div>
-    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5l-6 7 6 7 1.4-1.4L4.8 12l4.6-4.6zm8 0l-1.4 1.4 4.6 4.6-4.6 4.6L16 19l6-7z"/></svg>Query Runner</div>
-    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24"><path fill="currentColor" d="M4 6c0-1.1 3.6-2 8-2s8 .9 8 2-3.6 2-8 2-8-.9-8-2zm0 6V8c0 1.1 3.6 2 8 2s8-.9 8-2v4c0 1.1-3.6 2-8 2s-8-.9-8-2zm0 6v-4c0 1.1 3.6 2 8 2s8-.9 8-2v4c0 1.1-3.6 2-8 2s-8-.9-8-2z"/></svg>Connections</div>
-    <div class="nav-group-label">Data Mgmt</div>
-    <div class="nav-item active"><svg class="ic" viewBox="0 0 24 24"><path fill="currentColor" d="M4 6c0-1.1 3.6-2 8-2s8 .9 8 2-3.6 2-8 2-8-.9-8-2zm0 12V8c0 1.1 3.6 2 8 2s8-.9 8-2v10c0 1.1-3.6 2-8 2s-8-.9-8-2z"/></svg>Datasources</div>
-    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a4 4 0 100-8 4 4 0 000 8zm0 2c-4 0-8 2-8 5v1h16v-1c0-3-4-5-8-5z"/></svg>Roles &amp; Access</div>
-  </aside>
-  <main class="main">
-    <div class="topbar"><h1>Datasources</h1><span class="crumb">Data Management</span><span class="spacer"></span><div class="avatar">SG</div></div>
-    <div class="content">
-      <div class="kpi-row">
-        <div class="kpi"><div class="label">Connected sources</div><div class="value">14</div><div class="delta up">▲ 2 this week</div></div>
-        <div class="kpi"><div class="label">Queries today</div><div class="value">1,284</div><div class="delta up">▲ 11%</div></div>
-        <div class="kpi"><div class="label">Active alerts</div><div class="value">7</div><div class="delta down">▼ 1</div></div>
-        <div class="kpi"><div class="label">Avg. latency</div><div class="value">42<span style="font-size:14px;color:var(--text-muted)">ms</span></div><div class="delta up">▲ nominal</div></div>
-      </div>
-      <div class="ghost-block">Datasource list &amp; detail</div>
-    </div>
-  </main>
-</div>
-
+<!-- ===== mode switcher (demo control) ===== -->
 <div class="mode-switch" role="tablist" aria-label="Assistant presentation mode">
-  <button class="seg active" data-mode="bubble" role="tab">Bubble</button>
-  <button class="seg" data-mode="sidebar" role="tab">Sidebar</button>
-  <button class="seg" data-mode="full" role="tab">Full screen</button>
-  <span class="tag">concept</span>
+  <button data-set="bubble" class="active" title="Bottom-right chat bubble">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.9-.9L3 21l1.9-5.6A8.5 8.5 0 1 1 21 11.5z"/></svg>
+    <span class="lbl">Bubble</span>
+  </button>
+  <button data-set="sidebar" title="Right sidebar overlay">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+    <span class="lbl">Sidebar</span>
+  </button>
+  <button data-set="full" title="Full-screen workspace">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+    <span class="lbl">Full screen</span>
+  </button>
 </div>
+<div class="mode-hint" id="modeHint">Bubble mode — click the glowing button, bottom-right</div>
+
+<!-- ===== faux app shell ===== -->
+<div class="app" aria-hidden="true">
+  <aside class="sidebar-nav">
+    <div class="brand">
+      <div class="logo">DB</div>
+      <div class="name">DB<span>Exec</span></div>
+    </div>
+    <div class="nav-group-label">Analyze</div>
+    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="12" width="4" height="8"/><rect x="10" y="7" width="4" height="13"/><rect x="17" y="3" width="4" height="17"/></svg>Dashboards</div>
+    <div class="nav-item active"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg>Analyses</div>
+    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/></svg>Datasets</div>
+    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Query Runner</div>
+    <div class="nav-group-label">Monitor</div>
+    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>Alerts</div>
+    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Audit Logs</div>
+    <div class="nav-group-label">Admin</div>
+    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Users</div>
+    <div class="nav-item"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.82 1.17V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15z"/></svg>Settings</div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="crumbs">Analyses <b>/ Revenue performance</b></div>
+      <div class="topbar-right">
+        <span style="font-size:13px;color:var(--text-muted)">Acme Corp</span>
+        <div class="avatar-pill">SG</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-title">Revenue performance</div>
+      <div class="page-sub">Live overview · last refreshed 4 minutes ago</div>
+      <div class="kpi-row">
+        <div class="kpi"><div class="k-label">Total revenue</div><div class="k-value">$4.82M</div><div class="k-delta up">▲ 12.4% vs last month</div></div>
+        <div class="kpi"><div class="k-label">Active customers</div><div class="k-value">3,914</div><div class="k-delta up">▲ 3.1%</div></div>
+        <div class="kpi"><div class="k-label">Avg order value</div><div class="k-value">$1,231</div><div class="k-delta down">▼ 1.8%</div></div>
+        <div class="kpi"><div class="k-label">Open alerts</div><div class="k-value">7</div><div class="k-delta down">▲ 2 new</div></div>
+      </div>
+      <div class="panel-row">
+        <div class="panel">
+          <h3>Revenue by region <span class="tag">bar · monthly</span></h3>
+          <div class="skeleton-bars">
+            <div class="b" style="height:62%"></div><div class="b" style="height:88%"></div>
+            <div class="b" style="height:47%"></div><div class="b" style="height:73%"></div>
+            <div class="b" style="height:95%"></div><div class="b" style="height:58%"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Recent alerts <span class="tag">7 open</span></h3>
+          <div class="list-line"><span><span class="dot"></span>Revenue dropped below $1M</span><span class="badge crit">Critical</span></div>
+          <div class="list-line"><span><span class="dot"></span>Churn rate &gt; 5%</span><span class="badge warn">Warning</span></div>
+          <div class="list-line"><span><span class="dot"></span>New signups spike</span><span class="badge ok">Info</span></div>
+          <div class="list-line"><span><span class="dot"></span>Refund volume elevated</span><span class="badge warn">Warning</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== launcher (bubble/sidebar) ===== -->
+<button class="launcher" id="launcher" title="Ask DBExec AI">
+  <span class="ping"></span>
+  <svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.1L19 9l-5.1 1.9L12 16l-1.9-5.1L5 9l5.1-1.9L12 2zm7 11l.95 2.55L22.5 16.5l-2.55.95L19 20l-.95-2.55L15.5 16.5l2.55-.95L19 13zM5 14l.7 1.8L7.5 16.5l-1.8.7L5 19l-.7-1.8L2.5 16.5l1.8-.7L5 14z"/></svg>
+</button>
 
 <div class="scrim" id="scrim"></div>
-<button class="launcher hidden" id="launcher" aria-label="Open DBExec Assistant"><svg width="26" height="26"><use href="#i-spark"/></svg></button>
 
-<div class="assistant bubble show" id="assistant" role="dialog" aria-label="DBExec Assistant">
-  <div class="recents">
-    <div class="rtitle">Recent</div>
-    <div class="ritem active">Revenue by region<span class="rmeta">Chart · 2m ago</span></div>
-    <div class="ritem">Top 10 slow queries<span class="rmeta">SQL · 1h ago</span></div>
-    <div class="ritem">Churn cohort table<span class="rmeta">Table · Yesterday</span></div>
-    <div class="ritem">Failed-login alert<span class="rmeta">Alert · 2d ago</span></div>
-  </div>
-  <div class="panel">
-    <div class="a-head">
-      <div class="spark"><svg width="19" height="19"><use href="#i-spark"/></svg></div>
-      <div class="htext"><div class="t">DBExec Assistant</div><div class="s"><span class="dot-live"></span> Connected · orders_prod</div></div>
-      <div class="hactions">
-        <button class="icon-btn" id="newChat" title="New chat"><svg width="18" height="18"><use href="#i-new"/></svg></button>
-        <button class="icon-btn" id="closeA" title="Minimize"><svg width="18" height="18"><use href="#i-min"/></svg></button>
+<!-- ===== assistant surface ===== -->
+<section class="assistant" id="assistant" aria-label="DBExec AI assistant">
+  <div class="a-body">
+    <!-- history rail (fullscreen only) -->
+    <div class="a-history">
+      <div class="h-head">
+        <button class="new-chat" onclick="AI.newChat()">
+          <svg class="ic" style="width:15px;height:15px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New chat
+        </button>
+        <input class="h-search" placeholder="Search conversations…" />
+      </div>
+      <div class="h-label">Today</div>
+      <div class="h-list" id="hList">
+        <div class="h-item active"><div class="h-title">Revenue by region chart</div><div class="h-meta">Just now · Analyses</div></div>
+        <div class="h-item"><div class="h-title">Top 10 customers query</div><div class="h-meta">18m ago · Query Runner</div></div>
+        <div class="h-item"><div class="h-title">Churn alert threshold</div><div class="h-meta">1h ago · Alerts</div></div>
+        <div class="h-label" style="padding-left:6px">Yesterday</div>
+        <div class="h-item"><div class="h-title">Monthly signups trend</div><div class="h-meta">Dashboard export</div></div>
+        <div class="h-item"><div class="h-title">Refund anomaly summary</div><div class="h-meta">Shared with team</div></div>
       </div>
     </div>
-    <div class="stream" id="stream"></div>
-    <div class="composer">
-      <div class="box">
-        <textarea id="input" rows="1" placeholder="Ask about your data, write SQL, build a chart…"></textarea>
-        <button class="send" id="sendBtn" aria-label="Send"><svg width="17" height="17"><use href="#i-send"/></svg></button>
+
+    <!-- conversation -->
+    <div class="a-conv">
+      <div class="a-head">
+        <div class="h-id">
+          <div class="ai-orb">
+            <svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.1L19 9l-5.1 1.9L12 16l-1.9-5.1L5 9l5.1-1.9L12 2z"/></svg>
+          </div>
+          <div>
+            <div class="h-title">DBExec Assistant</div>
+            <div class="status"><span class="live"></span>Online · connected to Acme Corp</div>
+          </div>
+        </div>
+        <div class="h-actions">
+          <button class="icon-btn" title="New chat" onclick="AI.newChat()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          <button class="icon-btn" title="Close" onclick="AI.close()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
       </div>
-      <div class="foot">DBExec Assistant · answers grounded in your connected datasources</div>
+
+      <div class="a-scroll" id="scroll"></div>
+
+      <div class="a-composer">
+        <div class="suggest-row" id="suggestRow"></div>
+        <div class="composer-box">
+          <textarea id="input" rows="1" placeholder="Ask anything, or describe a chart, query, or alert…"></textarea>
+          <button class="send-btn" id="send" title="Send" disabled>
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+        <div class="composer-foot">DBExec AI can generate charts, SQL and alerts from your connected data. Always review before saving.</div>
+      </div>
     </div>
   </div>
-</div>
+</section>
 
 <div class="toast-wrap" id="toastWrap"></div>
 
 <script>
-(function () {
-  "use strict";
-  var assistant = document.getElementById("assistant");
-  var scrim = document.getElementById("scrim");
-  var launcher = document.getElementById("launcher");
-  var stream = document.getElementById("stream");
-  var input = document.getElementById("input");
-  var mode = "bubble";
+/* ============================================================
+   DBExec AI Assistant — mockup logic (vanilla JS, dummy data)
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const scroll = $('#scroll');
+const input = $('#input');
+const sendBtn = $('#send');
 
-  function setMode(m) {
-    mode = m;
-    assistant.className = "assistant " + m + " show";
-    scrim.classList.toggle("show", m !== "bubble");
-    launcher.classList.add("hidden");
-    document.querySelectorAll(".mode-switch .seg").forEach(function (s) { s.classList.toggle("active", s.dataset.mode === m); });
-  }
-  function openA() { assistant.classList.add("show"); launcher.classList.add("hidden"); if (mode !== "bubble") scrim.classList.add("show"); }
-  function closeA() { assistant.classList.remove("show"); scrim.classList.remove("show"); launcher.classList.toggle("hidden", mode !== "bubble"); }
-  document.querySelectorAll(".mode-switch .seg").forEach(function (s) { s.addEventListener("click", function () { setMode(s.dataset.mode); openA(); }); });
-  launcher.addEventListener("click", openA);
-  document.getElementById("closeA").addEventListener("click", closeA);
-  scrim.addEventListener("click", closeA);
+/* ---- quick-chat cards + inline suggestions ---- */
+const QUICK = [
+  {ic:'c1', kind:'chart',  svg:'<path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/>', t:'Chart: revenue by region', d:'Bar chart, last 6 months', prompt:'Create a bar chart of revenue by region for the last 6 months'},
+  {ic:'c2', kind:'sql',    svg:'<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>', t:'SQL: top 10 customers', d:'By lifetime spend', prompt:'Write a SQL query for the top 10 customers by lifetime spend'},
+  {ic:'c3', kind:'table',  svg:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/>', t:'Table: monthly signups', d:'Trend + growth %', prompt:'Show me a table of monthly signups with growth percentage'},
+  {ic:'c4', kind:'alert',  svg:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>', t:'Alert: churn > 5%', d:'Draft a monitoring rule', prompt:'Set up an alert when monthly churn rate goes above 5%'},
+];
+const SUGGESTIONS = [
+  'Create a bar chart of revenue by region',
+  'Top 10 customers by spend',
+  'Monthly signups table',
+  'Alert when churn > 5%',
+];
 
-  function now() { var d = new Date(); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); }
-  function el(html) { var t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; }
-  function scrollDown() { stream.scrollTop = stream.scrollHeight; }
-  function escapeHtml(s) { return s.replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+function welcomeHTML(){
+  return `<div class="welcome">
+    <div class="w-orb"><svg class="spark" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.1L19 9l-5.1 1.9L12 16l-1.9-5.1L5 9l5.1-1.9L12 2z"/></svg></div>
+    <h2>How can I help with your data?</h2>
+    <p>Ask in plain English — I can build charts, write SQL, summarise data and draft alerts, then drop them straight into a module.</p>
+    <div class="quick-grid">
+      ${QUICK.map((q,i)=>`
+        <button class="quick-card" onclick="AI.quick(${i})">
+          <span class="q-ic ${q.ic}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${q.svg}</svg></span>
+          <span><span class="q-t">${q.t}</span><span class="q-d">${q.d}</span></span>
+        </button>`).join('')}
+    </div>
+  </div>`;
+}
 
-  var QUICK = [
-    { ic: "blue", t: "Build a chart", d: "Revenue by region, last quarter", ex: "Chart revenue by region for last quarter" },
-    { ic: "violet", t: "Write SQL", d: "Top 10 slowest queries", ex: "Show me the 10 slowest queries this week" },
-    { ic: "green", t: "Explore data", d: "Preview the orders table", ex: "Show a sample of the orders table" },
-    { ic: "amber", t: "Create an alert", d: "When failed logins spike", ex: "Alert me when failed logins exceed 50 in an hour" }
+function renderSuggestions(){
+  $('#suggestRow').innerHTML = SUGGESTIONS.map(s=>`<button class="sg" onclick="AI.suggest('${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
+}
+
+function now(){
+  return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+}
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* ---- message rendering ---- */
+function addUser(text){
+  const el = document.createElement('div');
+  el.className = 'msg user';
+  el.innerHTML = `<div class="m-av">SG</div>
+    <div class="m-wrap"><div class="bubble">${esc(text)}</div><div class="m-time">${now()}</div></div>`;
+  scroll.appendChild(el);
+  scrollDown();
+}
+function addAssistant(innerHTML){
+  const el = document.createElement('div');
+  el.className = 'msg assistant';
+  el.innerHTML = `<div class="m-av"><svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.1L19 9l-5.1 1.9L12 16l-1.9-5.1L5 9l5.1-1.9L12 2z"/></svg></div>
+    <div class="m-wrap"><div class="bubble">${innerHTML}</div><div class="m-time">${now()}</div></div>`;
+  scroll.appendChild(el);
+  scrollDown();
+  return el;
+}
+function typing(){
+  const el = document.createElement('div');
+  el.className='typing';el.id='typingEl';
+  el.innerHTML=`<div class="m-av"><svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.1L19 9l-5.1 1.9L12 16l-1.9-5.1L5 9l5.1-1.9L12 2z"/></svg></div>
+    <div class="dots"><span></span><span></span><span></span></div>`;
+  scroll.appendChild(el);scrollDown();
+}
+function stopTyping(){const t=$('#typingEl');if(t)t.remove();}
+function scrollDown(){requestAnimationFrame(()=>{scroll.scrollTop=scroll.scrollHeight;});}
+
+/* ---- artifact builders ---- */
+let artifactSeq = 0;
+
+function artifactChart(){
+  const id='chart'+(++artifactSeq);
+  const html = `
+  <p style="margin-bottom:10px">Here's a <b>bar chart of revenue by region</b> over the last 6 months, built from your <code>sales_fact</code> dataset:</p>
+  <div class="artifact">
+    <div class="a-bar">
+      <span class="a-name"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg>Revenue by region</span>
+      <span class="a-kind">Bar chart</span>
+    </div>
+    <div class="a-inner"><canvas id="${id}" height="190"></canvas></div>
+    <div class="a-actions">
+      <button class="chip-btn primary" onclick="AI.addTo('Dashboard','Revenue by region chart')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>Add to Dashboard</button>
+      <button class="chip-btn" onclick="AI.addTo('Analysis','Revenue by region chart')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg>Add to Analysis</button>
+      <button class="chip-btn" onclick="AI.toast('Chart exported as PNG')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+    </div>
+  </div>`;
+  const el = addAssistant(html);
+  drawBarChart(el.querySelector('#'+id));
+}
+
+function artifactSql(){
+  const sql =
+`<span class="cm">-- Top 10 customers by lifetime spend</span>
+<span class="kw">SELECT</span> c.customer_name,
+       <span class="fn">SUM</span>(o.total_amount) <span class="kw">AS</span> lifetime_spend,
+       <span class="fn">COUNT</span>(o.order_id)   <span class="kw">AS</span> orders
+<span class="kw">FROM</span>   orders o
+<span class="kw">JOIN</span>   customers c <span class="kw">ON</span> c.customer_id = o.customer_id
+<span class="kw">WHERE</span>  o.status = <span class="str">'completed'</span>
+<span class="kw">GROUP BY</span> c.customer_name
+<span class="kw">ORDER BY</span> lifetime_spend <span class="kw">DESC</span>
+<span class="kw">LIMIT</span>  <span class="num">10</span>;`;
+  const html = `
+  <p style="margin-bottom:10px">This query returns your <b>top 10 customers by lifetime spend</b>. I validated it against the <code>orders</code> and <code>customers</code> tables:</p>
+  <div class="artifact">
+    <div class="a-bar">
+      <span class="a-name"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>top_customers.sql</span>
+      <span class="a-kind">SQL</span>
+    </div>
+    <div class="a-inner"><pre class="sql-code">${sql}</pre></div>
+    <div class="a-actions">
+      <button class="chip-btn primary" onclick="AI.addTo('Query Runner','top_customers.sql')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>Open in Query Runner</button>
+      <button class="chip-btn" onclick="AI.addTo('Analysis','Top 10 customers')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg>Save as Analysis</button>
+      <button class="chip-btn" onclick="AI.toast('SQL copied to clipboard')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button>
+    </div>
+  </div>`;
+  addAssistant(html);
+}
+
+function artifactTable(){
+  const rows = [
+    ['Jan','2,140','—'],['Feb','2,405','+12.4%'],['Mar','2,610','+8.5%'],
+    ['Apr','2,880','+10.3%'],['May','3,150','+9.4%'],['Jun','3,914','+24.3%'],
   ];
-  var ICON = {
-    blue: '<svg width="17" height="17" viewBox="0 0 24 24"><path fill="currentColor" d="M4 20V10h3v10H4zm6.5 0V4h3v16h-3zM17 20v-7h3v7h-3z"/></svg>',
-    violet: '<svg width="17" height="17" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5l-6 7 6 7 1.4-1.4L4.8 12l4.6-4.6L8 5zm8 0l-1.4 1.4 4.6 4.6-4.6 4.6L16 19l6-7-6-7z"/></svg>',
-    green: '<svg width="17" height="17" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16v3H4zm0 5h16v3H4zm0 5h10v3H4z"/></svg>',
-    amber: '<svg width="17" height="17" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a7 7 0 00-7 7c0 3-1 4-2 6h18c-1-2-2-3-2-6a7 7 0 00-7-7zm0 20a3 3 0 003-3H9a3 3 0 003 3z"/></svg>'
-  };
-  function renderGreeting() {
-    var cards = QUICK.map(function (q) {
-      return '<button class="qcard" data-ex="' + q.ex + '"><span class="qic ' + q.ic + '">' + ICON[q.ic] + '</span><span class="qt">' + q.t + '</span><span class="qd">' + q.d + '</span></button>';
-    }).join("");
-    stream.innerHTML = '<div class="greeting"><h2>How can I help with your data?</h2><p>Ask in plain language — I can query any connected datasource, draft SQL, build a chart, or set up an alert, then drop the result straight into a module.</p><div class="quick-cards">' + cards + '</div></div>';
-    stream.querySelectorAll(".qcard").forEach(function (c) { c.addEventListener("click", function () { submit(c.dataset.ex); }); });
-  }
+  const html = `
+  <p style="margin-bottom:10px">Here's your <b>monthly signups with growth %</b>, aggregated from <code>user_events</code>:</p>
+  <div class="artifact">
+    <div class="a-bar">
+      <span class="a-name"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>Monthly signups</span>
+      <span class="a-kind">Table</span>
+    </div>
+    <div class="a-inner">
+      <table class="mini-table">
+        <thead><tr><th>Month</th><th>Signups</th><th>Growth</th></tr></thead>
+        <tbody>${rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td style="color:${r[2].startsWith('+')?'var(--success)':'var(--text-muted)'};font-weight:600">${r[2]}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>
+    <div class="a-actions">
+      <button class="chip-btn primary" onclick="AI.addTo('Dashboard','Monthly signups table')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>Add to Dashboard</button>
+      <button class="chip-btn" onclick="AI.addTo('Dataset','signups_monthly')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/></svg>Save as Dataset</button>
+      <button class="chip-btn" onclick="AI.toast('Exported to CSV')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+    </div>
+  </div>`;
+  addAssistant(html);
+}
 
-  function addUser(text) {
-    stream.appendChild(el('<div class="msg user"><div class="av">SG</div><div class="col"><div class="bubblemsg">' + escapeHtml(text) + '</div><div class="ts">' + now() + '</div></div></div>'));
-    scrollDown();
-  }
-  function addTyping() {
-    var node = el('<div class="msg ai"><div class="av"><svg width="15" height="15"><use href="#i-spark"/></svg></div><div class="col"><div class="bubblemsg" style="padding:0"><div class="typing"><span></span><span></span><span></span></div></div></div></div>');
-    stream.appendChild(node); scrollDown(); return node;
-  }
-  function addAI(bodyHtml) {
-    stream.appendChild(el('<div class="msg ai"><div class="av"><svg width="15" height="15"><use href="#i-spark"/></svg></div><div class="col">' + bodyHtml + '<div class="ts">' + now() + '</div></div></div>'));
-    scrollDown(); wireAddButtons(); wireChips();
-  }
-  function addBtn(m) { return '<button class="add-btn" data-module="' + m + '"><span class="plus">+</span> Add to ' + m + '</button>'; }
-  function wireAddButtons() { stream.querySelectorAll(".add-btn:not([data-w])").forEach(function (b) { b.setAttribute("data-w", "1"); b.addEventListener("click", function () { toast(b.dataset.module); }); }); }
+function artifactAlert(){
+  const html = `
+  <p style="margin-bottom:10px">I've drafted an alert rule to fire when <b>monthly churn exceeds 5%</b>. Review and open it in the Alerts wizard to finish:</p>
+  <div class="artifact">
+    <div class="a-bar">
+      <span class="a-name"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>High churn rate</span>
+      <span class="a-kind">Alert rule</span>
+    </div>
+    <div class="a-inner" style="display:flex;flex-direction:column;gap:9px;font-size:12.5px">
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Source</span><b>Dataset · customer_metrics</b></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Condition</span><b>churn_rate &gt; 5%</b></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Schedule</span><b>Daily at 9:00 · UTC</b></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Severity</span><span class="badge warn">Warning</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Notify</span><b>In-app + email</b></div>
+    </div>
+    <div class="a-actions">
+      <button class="chip-btn primary" onclick="AI.addTo('Alerts','High churn rate')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/></svg>Create in Alerts</button>
+      <button class="chip-btn" onclick="AI.toast('Test run: would fire (churn 6.2%)')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Test now</button>
+    </div>
+  </div>`;
+  addAssistant(html);
+}
 
-  function chartArtifact() {
-    var id = "cv" + Math.floor(performance.now());
-    return { html: '<div class="bubblemsg">Here\'s revenue by region for last quarter — APAC leads at $412K.</div><div class="artifact"><div class="art-head"><span class="k chart">Chart</span><span class="at">Revenue by region · Q3</span></div><div class="art-body"><canvas id="' + id + '" width="360" height="150"></canvas></div><div class="art-actions">' + addBtn("Dashboard") + addBtn("Analysis") + '</div></div>', after: function () { drawBars(id); } };
+/* ---- canvas bar chart (no deps) ---- */
+function drawBarChart(canvas){
+  const dpr = window.devicePixelRatio||1;
+  const cssW = canvas.clientWidth||520, cssH = 190;
+  canvas.width = cssW*dpr; canvas.height = cssH*dpr;
+  const ctx = canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const data = [
+    {l:'North',v:820},{l:'South',v:1180},{l:'East',v:640},
+    {l:'West',v:970},{l:'EU',v:1290},{l:'APAC',v:760},
+  ];
+  const pad = {l:34,r:10,t:14,b:26};
+  const w = cssW-pad.l-pad.r, h = cssH-pad.t-pad.b;
+  const max = 1400;
+  ctx.clearRect(0,0,cssW,cssH);
+  // gridlines
+  ctx.strokeStyle='#eef2f7'; ctx.fillStyle='#9aa7b4'; ctx.font='10px Inter'; ctx.textAlign='right';
+  for(let i=0;i<=4;i++){
+    const y = pad.t + h - (h*i/4);
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+w,y);ctx.stroke();
+    ctx.fillText('$'+((max*i/4)/1000).toFixed(1)+'k', pad.l-6, y+3);
   }
-  function sqlArtifact() {
-    return { html: '<div class="bubblemsg">This ranks statements by mean execution time from <code>pg_stat_statements</code>:</div><div class="artifact"><div class="art-head"><span class="k sql">SQL</span><span class="at">top_slow_queries.sql</span></div><div class="art-body"><div class="sqlwrap"><pre class="code"><span class="tok-kw">SELECT</span> query, calls,\n       <span class="tok-fn">round</span>(mean_exec_time::<span class="tok-kw">numeric</span>, <span class="tok-num">2</span>) <span class="tok-kw">AS</span> avg_ms\n<span class="tok-kw">FROM</span>   pg_stat_statements\n<span class="tok-kw">ORDER BY</span> mean_exec_time <span class="tok-kw">DESC</span>\n<span class="tok-kw">LIMIT</span>  <span class="tok-num">10</span><span class="tok-punc">;</span></pre></div></div><div class="art-actions">' + addBtn("Query Runner") + addBtn("Dataset") + '</div></div>', after: null };
-  }
-  function tableArtifact() {
-    return { html: '<div class="bubblemsg">Sample of the <code>orders</code> table (5 of 48,210 rows):</div><div class="artifact"><div class="art-head"><span class="k table">Table</span><span class="at">orders · preview</span></div><div class="art-body" style="overflow-x:auto"><table class="mini"><thead><tr><th>id</th><th>customer</th><th>region</th><th>total</th><th>status</th></tr></thead><tbody><tr><td>10482</td><td>Acme Co</td><td>APAC</td><td>$1,240</td><td>paid</td></tr><tr><td>10483</td><td>Globex</td><td>EMEA</td><td>$860</td><td>paid</td></tr><tr><td>10484</td><td>Initech</td><td>NA</td><td>$2,110</td><td>pending</td></tr><tr><td>10485</td><td>Umbrella</td><td>APAC</td><td>$540</td><td>refunded</td></tr><tr><td>10486</td><td>Soylent</td><td>EMEA</td><td>$1,975</td><td>paid</td></tr></tbody></table></div><div class="art-actions">' + addBtn("Dataset") + addBtn("Analysis") + '</div></div>', after: null };
-  }
-  function alertArtifact() {
-    return { html: '<div class="bubblemsg">I\'ve drafted an alert rule — review and save it in the Alerts module:</div><div class="artifact"><div class="art-head"><span class="k alert">Alert</span><span class="at">Failed-login spike</span></div><div class="art-body"><div class="alert-preview"><div class="row"><span class="lbl">Source</span><span class="val">auth_events (dataset)</span></div><div class="row"><span class="lbl">Condition</span><span class="val">count(failed_login) &gt; 50 / hour</span></div><div class="row"><span class="lbl">Schedule</span><span class="val">Every 15 minutes</span></div><div class="row"><span class="lbl">Severity</span><span class="val"><span class="sev warn">Warning</span></span></div></div></div><div class="art-actions">' + addBtn("Alerts") + '</div></div>', after: null };
-  }
-  function textArtifact(t) { return { html: '<div class="bubblemsg">' + t + '</div>', after: null }; }
+  const bw = w/data.length*0.56, gap = w/data.length;
+  data.forEach((d,i)=>{
+    const bh = h*(d.v/max);
+    const x = pad.l + i*gap + (gap-bw)/2;
+    const y = pad.t + h - bh;
+    const g = ctx.createLinearGradient(0,y,0,pad.t+h);
+    g.addColorStop(0,'#42a5f5'); g.addColorStop(1,'#0078d3');
+    ctx.fillStyle=g;
+    const r=5;
+    ctx.beginPath();
+    ctx.moveTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.lineTo(x+bw-r,y);ctx.arcTo(x+bw,y,x+bw,y+r,r);
+    ctx.lineTo(x+bw,pad.t+h);ctx.lineTo(x,pad.t+h);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#6b7280';ctx.textAlign='center';ctx.font='10px Inter';
+    ctx.fillText(d.l, x+bw/2, cssH-8);
+  });
+}
 
-  function route(text) {
-    var t = text.toLowerCase();
-    if (/chart|revenue|region|graph|plot|visuali/.test(t)) return chartArtifact();
-    if (/sql|slow|quer|explain/.test(t)) return sqlArtifact();
-    if (/table|preview|sample|rows|orders|show/.test(t)) return tableArtifact();
-    if (/alert|notify|spike|threshold|failed login/.test(t)) return alertArtifact();
-    return textArtifact("I can pull that from your connected sources. Want it as a chart, a table, a SQL draft, or an alert? Try a suggestion below.");
-  }
+/* ---- intent routing (dummy NLU) ---- */
+function respond(text){
+  const t = text.toLowerCase();
+  typing();
+  setTimeout(()=>{
+    stopTyping();
+    if(/(chart|graph|plot|bar|trend|visuali[sz]e|revenue by)/.test(t)) artifactChart();
+    else if(/(sql|query|select|top \d|customers|join)/.test(t)) artifactSql();
+    else if(/(table|signups|list|rows|breakdown)/.test(t)) artifactTable();
+    else if(/(alert|churn|threshold|notify|monitor|fire)/.test(t)) artifactAlert();
+    else addAssistant(`I can help with that. Here are a few things I can build from your connected data — just tap one:
+      <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:9px">
+        <button class="sg" onclick="AI.suggest('Create a bar chart of revenue by region')">📊 A chart</button>
+        <button class="sg" onclick="AI.suggest('Top 10 customers by spend')">🧮 A SQL query</button>
+        <button class="sg" onclick="AI.suggest('Monthly signups table')">📋 A table</button>
+        <button class="sg" onclick="AI.suggest('Alert when churn > 5%')">🔔 An alert</button>
+      </div>`);
+  }, 850 + Math.random()*500);
+}
 
-  var busy = false;
-  function submit(text) {
-    text = (text || input.value).trim(); if (!text || busy) return; busy = true;
-    if (stream.querySelector(".greeting")) stream.innerHTML = "";
-    addUser(text); input.value = ""; autoSize();
-    var typing = addTyping();
-    var art = route(text);
-    setTimeout(function () {
-      typing.remove();
-      addAI(art.html + suggestionChips());
-      if (art.after) art.after();
-      busy = false;
-    }, 850 + Math.random() * 450);
-  }
-  function suggestionChips() {
-    return '<div class="chips"><button class="chip" data-ex="Break that down by month">Break down by month</button><button class="chip" data-ex="Export this as CSV">Export as CSV</button><button class="chip" data-ex="Add a filter for paid orders">Filter: paid only</button></div>';
-  }
-  function wireChips() { stream.querySelectorAll(".chip:not([data-w])").forEach(function (c) { c.setAttribute("data-w", "1"); c.addEventListener("click", function () { submit(c.dataset.ex); }); }); }
+/* ---- controller ---- */
+const AI = {
+  open(){
+    $('#assistant').classList.add('open');
+    if(document.body.dataset.mode==='sidebar') $('#scrim').classList.add('show');
+    if(!scroll.dataset.seeded){ this.newChat(); scroll.dataset.seeded='1'; }
+    setTimeout(()=>input.focus(),250);
+  },
+  close(){ $('#assistant').classList.remove('open'); $('#scrim').classList.remove('show'); },
+  newChat(){ scroll.innerHTML = welcomeHTML(); scrollDown(); },
+  send(){
+    const v = input.value.trim(); if(!v) return;
+    // clear welcome on first real message
+    if(scroll.querySelector('.welcome')) scroll.innerHTML='';
+    addUser(v); input.value=''; autosize(); sendBtn.disabled=true;
+    respond(v);
+  },
+  suggest(text){ input.value=text; autosize(); this.send(); },
+  quick(i){ this.suggest(QUICK[i].prompt); },
+  addTo(module, name){ this.toast(`<b>${esc(name)}</b> added to <b>${module}</b>`, module); },
+  toast(msg, module){
+    const w = $('#toastWrap');
+    const el = document.createElement('div');
+    el.className='toast';
+    const link = module ? ` <span class="t-link" onclick="AI.toast('Opening ${module}…')">Open ${module} →</span>` : '';
+    el.innerHTML = `<div class="t-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div><div>${msg}${link}</div>`;
+    w.appendChild(el);
+    setTimeout(()=>{el.style.transition='opacity .3s,transform .3s';el.style.opacity='0';el.style.transform='translateY(10px)';setTimeout(()=>el.remove(),320);}, 3200);
+  },
+};
+window.AI = AI;
 
-  function drawBars(id) {
-    var cv = document.getElementById(id); if (!cv) return;
-    var ctx = cv.getContext("2d"), W = cv.width, H = cv.height;
-    var data = [["APAC", 412], ["EMEA", 318], ["NA", 286], ["LATAM", 154]], max = 440, pad = 24, gap = 22;
-    var bw = (W - pad * 2 - gap * (data.length - 1)) / data.length;
-    ctx.clearRect(0, 0, W, H);
-    ctx.strokeStyle = "#eef1f6"; ctx.lineWidth = 1;
-    for (var g = 0; g <= 4; g++) { var gy = pad + (H - pad * 1.6) * g / 4; ctx.beginPath(); ctx.moveTo(pad, gy); ctx.lineTo(W - pad, gy); ctx.stroke(); }
-    data.forEach(function (d, i) {
-      var h = (d[1] / max) * (H - pad * 1.9), x = pad + i * (bw + gap), y = H - pad * 1.3 - h;
-      var grad = ctx.createLinearGradient(0, y, 0, y + h); grad.addColorStop(0, "#42a5f5"); grad.addColorStop(1, "#1976d2");
-      ctx.fillStyle = grad; roundRect(ctx, x, y, bw, h, 4); ctx.fill();
-      ctx.fillStyle = "#6b7280"; ctx.font = "11px 'JetBrains Mono', monospace"; ctx.textAlign = "center"; ctx.fillText(d[0], x + bw / 2, H - 6);
-      ctx.fillStyle = "#1f2733"; ctx.font = "600 11px Inter, sans-serif"; ctx.fillText("$" + d[1] + "K", x + bw / 2, y - 6);
-    });
-  }
-  function roundRect(c, x, y, w, h, r) { r = Math.min(r, h); c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
+/* ---- composer wiring ---- */
+function autosize(){ input.style.height='auto'; input.style.height=Math.min(input.scrollHeight,120)+'px'; }
+input.addEventListener('input',()=>{ autosize(); sendBtn.disabled = !input.value.trim(); });
+input.addEventListener('keydown',e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); AI.send(); }});
+sendBtn.addEventListener('click',()=>AI.send());
+$('#launcher').addEventListener('click',()=>AI.open());
+$('#scrim').addEventListener('click',()=>AI.close());
 
-  function autoSize() { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 96) + "px"; }
-  input.addEventListener("input", autoSize);
-  input.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); submit(); } });
-  document.getElementById("sendBtn").addEventListener("click", function () { submit(); });
-  document.getElementById("newChat").addEventListener("click", renderGreeting);
+/* ---- mode switching ---- */
+const HINTS = {
+  bubble:'Bubble mode — click the glowing button, bottom-right',
+  sidebar:'Sidebar mode — click the launcher; opens as a right-side overlay',
+  full:'Full-screen mode — immersive workspace with recent chats',
+};
+document.querySelectorAll('.mode-switch button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.mode-switch button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    const m = b.dataset.set;
+    document.body.dataset.mode = m;
+    $('#modeHint').textContent = HINTS[m];
+    if(m==='full'){ AI.open(); }
+    else { AI.close(); }
+  });
+});
 
-  function toast(module) {
-    var wrap = document.getElementById("toastWrap");
-    var t = el('<div class="toast"><span class="check"><svg width="11" height="11" viewBox="0 0 24 24"><path fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M4 12l5 5L20 6"/></svg></span><span>Added to <b>' + module + '</b></span><a href="#">Open module →</a></div>');
-    wrap.appendChild(t);
-    requestAnimationFrame(function () { t.classList.add("show"); });
-    setTimeout(function () { t.classList.remove("show"); setTimeout(function () { t.remove(); }, 300); }, 2600);
-  }
-
-  renderGreeting();
-})();
+/* ---- init ---- */
+renderSuggestions();
+scroll.innerHTML = welcomeHTML();
+scroll.dataset.seeded='1';
+// Redraw any visible charts on resize (keeps canvas crisp across modes)
+let rt; window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{document.querySelectorAll('.artifact canvas').forEach(drawBarChart);},180);});
 </script>
 </body>
 </html>
