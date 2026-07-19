@@ -4227,6 +4227,25 @@
         "required": "At least one measure is required",
         "tooMany": "Too many measures"
       }
+    },
+    "assetShares": {
+      "assetType": {
+        "invalid": "Invalid asset type"
+      },
+      "granteeType": {
+        "invalid": "Recipient must be a user or a group"
+      },
+      "granteeId": {
+        "required": "Please select a recipient",
+        "invalid": "Invalid recipient"
+      },
+      "permission": {
+        "invalid": "Permission must be Edit or View"
+      },
+      "grants": {
+        "required": "Select at least one recipient",
+        "tooMany": "You can share with at most {{max}} recipients at once"
+      }
     }
   },
   "DB_ACCESS": {
@@ -4901,5 +4920,28 @@
     "WIZARD_NEXT": "Next",
     "REVIEW_SUMMARY": "Review & confirm",
     "SUMMARY_RECIPIENTS": "{{users}} user(s), {{emails}} email(s)"
+  },
+  "SHARE": {
+    "TITLE": "Share",
+    "ADD_USERS": "Add users",
+    "SELECT_USERS": "Select users",
+    "ADD_GROUPS": "Add groups",
+    "SELECT_GROUPS": "Select groups",
+    "PERMISSION": "Permission",
+    "PERMISSION_EDIT": "Can edit",
+    "PERMISSION_VIEW": "Can view",
+    "ADD": "Add",
+    "WHO_HAS_ACCESS": "Who has access",
+    "OWNER": "Owner",
+    "GROUP": "Group",
+    "NO_GRANTS": "Not shared with anyone yet",
+    "REVOKE": "Remove access",
+    "REVOKE_CONFIRM": "Remove?",
+    "GRANTED": "Access granted",
+    "GRANT_FAILED": "Failed to grant access",
+    "UPDATED": "Access level updated",
+    "UPDATE_FAILED": "Failed to update access",
+    "REVOKED": "Access removed",
+    "REVOKE_FAILED": "Failed to remove access"
   }
 }

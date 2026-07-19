@@ -4230,6 +4230,25 @@
       "rowLimit": {
         "invalid": "Row limit must be a positive whole number"
       }
+    },
+    "assetShares": {
+      "assetType": {
+        "invalid": "Ongeldig itemtype"
+      },
+      "granteeType": {
+        "invalid": "Ontvanger moet een gebruiker of een groep zijn"
+      },
+      "granteeId": {
+        "required": "Selecteer een ontvanger",
+        "invalid": "Ongeldige ontvanger"
+      },
+      "permission": {
+        "invalid": "Machtiging moet Bewerken of Bekijken zijn"
+      },
+      "grants": {
+        "required": "Selecteer ten minste één ontvanger",
+        "tooMany": "U kunt met maximaal {{max}} ontvangers tegelijk delen"
+      }
     }
   },
   "QUERY_RUNNER": {
@@ -4904,5 +4923,28 @@
     "WIZARD_NEXT": "Volgende",
     "REVIEW_SUMMARY": "Controleren en bevestigen",
     "SUMMARY_RECIPIENTS": "{{users}} gebruiker(s), {{emails}} e-mail(s)"
+  },
+  "SHARE": {
+    "TITLE": "Delen",
+    "ADD_USERS": "Gebruikers toevoegen",
+    "SELECT_USERS": "Gebruikers selecteren",
+    "ADD_GROUPS": "Groepen toevoegen",
+    "SELECT_GROUPS": "Groepen selecteren",
+    "PERMISSION": "Machtiging",
+    "PERMISSION_EDIT": "Kan bewerken",
+    "PERMISSION_VIEW": "Kan bekijken",
+    "ADD": "Toevoegen",
+    "WHO_HAS_ACCESS": "Wie heeft toegang",
+    "OWNER": "Eigenaar",
+    "GROUP": "Groep",
+    "NO_GRANTS": "Nog met niemand gedeeld",
+    "REVOKE": "Toegang verwijderen",
+    "REVOKE_CONFIRM": "Verwijderen?",
+    "GRANTED": "Toegang verleend",
+    "GRANT_FAILED": "Kan toegang niet verlenen",
+    "UPDATED": "Toegangsniveau bijgewerkt",
+    "UPDATE_FAILED": "Kan toegang niet bijwerken",
+    "REVOKED": "Toegang verwijderd",
+    "REVOKE_FAILED": "Kan toegang niet verwijderen"
   }
 }

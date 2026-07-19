@@ -4230,6 +4230,25 @@
       "rowLimit": {
         "invalid": "Row limit must be a positive whole number"
       }
+    },
+    "assetShares": {
+      "assetType": {
+        "invalid": "無効なアセットタイプです"
+      },
+      "granteeType": {
+        "invalid": "共有先はユーザーまたはグループである必要があります"
+      },
+      "granteeId": {
+        "required": "共有先を選択してください",
+        "invalid": "無効な共有先です"
+      },
+      "permission": {
+        "invalid": "権限は「編集」または「表示」である必要があります"
+      },
+      "grants": {
+        "required": "少なくとも1人の共有先を選択してください",
+        "tooMany": "一度に共有できる相手は最大{{max}}件です"
+      }
     }
   },
   "QUERY_RUNNER": {
@@ -4904,5 +4923,28 @@
     "WIZARD_NEXT": "次へ",
     "REVIEW_SUMMARY": "確認して保存",
     "SUMMARY_RECIPIENTS": "ユーザー {{users}} 人、メール {{emails}} 件"
+  },
+  "SHARE": {
+    "TITLE": "共有",
+    "ADD_USERS": "ユーザーを追加",
+    "SELECT_USERS": "ユーザーを選択",
+    "ADD_GROUPS": "グループを追加",
+    "SELECT_GROUPS": "グループを選択",
+    "PERMISSION": "権限",
+    "PERMISSION_EDIT": "編集可能",
+    "PERMISSION_VIEW": "閲覧可能",
+    "ADD": "追加",
+    "WHO_HAS_ACCESS": "アクセスできるユーザー",
+    "OWNER": "所有者",
+    "GROUP": "グループ",
+    "NO_GRANTS": "まだ誰とも共有されていません",
+    "REVOKE": "アクセスを削除",
+    "REVOKE_CONFIRM": "削除しますか？",
+    "GRANTED": "アクセスを許可しました",
+    "GRANT_FAILED": "アクセスの許可に失敗しました",
+    "UPDATED": "アクセスレベルを更新しました",
+    "UPDATE_FAILED": "アクセスの更新に失敗しました",
+    "REVOKED": "アクセスを削除しました",
+    "REVOKE_FAILED": "アクセスの削除に失敗しました"
   }
 }

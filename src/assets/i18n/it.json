@@ -4230,6 +4230,25 @@
       "rowLimit": {
         "invalid": "Row limit must be a positive whole number"
       }
+    },
+    "assetShares": {
+      "assetType": {
+        "invalid": "Tipo di risorsa non valido"
+      },
+      "granteeType": {
+        "invalid": "Il destinatario deve essere un utente o un gruppo"
+      },
+      "granteeId": {
+        "required": "Seleziona un destinatario",
+        "invalid": "Destinatario non valido"
+      },
+      "permission": {
+        "invalid": "L'autorizzazione deve essere Modifica o Visualizza"
+      },
+      "grants": {
+        "required": "Seleziona almeno un destinatario",
+        "tooMany": "Puoi condividere con un massimo di {{max}} destinatari alla volta"
+      }
     }
   },
   "QUERY_RUNNER": {
@@ -4904,5 +4923,28 @@
     "WIZARD_NEXT": "Avanti",
     "REVIEW_SUMMARY": "Rivedi e conferma",
     "SUMMARY_RECIPIENTS": "{{users}} utente/i, {{emails}} email"
+  },
+  "SHARE": {
+    "TITLE": "Condividi",
+    "ADD_USERS": "Aggiungi utenti",
+    "SELECT_USERS": "Seleziona utenti",
+    "ADD_GROUPS": "Aggiungi gruppi",
+    "SELECT_GROUPS": "Seleziona gruppi",
+    "PERMISSION": "Autorizzazione",
+    "PERMISSION_EDIT": "Può modificare",
+    "PERMISSION_VIEW": "Può visualizzare",
+    "ADD": "Aggiungi",
+    "WHO_HAS_ACCESS": "Chi ha accesso",
+    "OWNER": "Proprietario",
+    "GROUP": "Gruppo",
+    "NO_GRANTS": "Non ancora condiviso con nessuno",
+    "REVOKE": "Rimuovi accesso",
+    "REVOKE_CONFIRM": "Rimuovere?",
+    "GRANTED": "Accesso concesso",
+    "GRANT_FAILED": "Impossibile concedere l'accesso",
+    "UPDATED": "Livello di accesso aggiornato",
+    "UPDATE_FAILED": "Impossibile aggiornare l'accesso",
+    "REVOKED": "Accesso rimosso",
+    "REVOKE_FAILED": "Impossibile rimuovere l'accesso"
   }
 }

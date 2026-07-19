@@ -1,0 +1,207 @@
+// Asset share dialog — layered on the shared .confirmation-popup overlay
+// (defined globally). Only the share-specific layout lives here; colours,
+// spacing and type all come from the design tokens.
+
+.share-content {
+  width: 92%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  max-height: 88vh;
+}
+
+.share-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: left;
+
+  .popup-icon {
+    flex: 0 0 auto;
+  }
+
+  h3 {
+    margin: var(--space-0);
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-semibold);
+  }
+
+  .share-asset-name {
+    margin-left: auto;
+    font-size: var(--fs-label);
+    color: var(--text-color-secondary);
+    max-width: 45%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.share-body {
+  padding: var(--space-6);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  text-align: left;
+}
+
+.share-add {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  .share-add-pickers {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .share-add-row {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-4);
+
+    app-custom-dropdown {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .share-add-btn {
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+  }
+}
+
+.share-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  .share-list-head {
+    font-size: var(--fs-label);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-2);
+  }
+
+  .share-loading,
+  .share-empty {
+    padding: var(--space-5);
+    text-align: center;
+    color: var(--text-color-secondary);
+    font-size: var(--fs-control);
+  }
+}
+
+.share-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-2);
+  border-bottom: 1px solid var(--border-color);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.owner-row {
+    background: var(--hover-background);
+    border-radius: var(--radius-md, 8px);
+    border-bottom: none;
+    margin-bottom: var(--space-2);
+  }
+}
+
+.share-grantee {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+
+  i {
+    color: var(--text-color-secondary);
+  }
+
+  .share-grantee-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .share-grantee-name {
+    font-size: var(--fs-control);
+    font-weight: var(--fw-medium);
+    color: var(--text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .share-grantee-sub {
+    font-size: var(--fs-micro);
+    color: var(--text-color-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.share-owner-badge {
+  flex: 0 0 auto;
+  font-size: var(--fs-label);
+  color: var(--text-color-secondary);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-pill, 999px);
+}
+
+.share-row-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 0 0 auto;
+
+  app-custom-dropdown {
+    min-width: 130px;
+  }
+
+  .confirm-text {
+    font-size: var(--fs-label);
+    color: var(--text-color-secondary);
+  }
+
+  .btn-danger-text {
+    background: transparent;
+    border: none;
+    color: var(--warning-color);
+    cursor: pointer;
+    padding: var(--space-2);
+    border-radius: var(--radius-sm, 4px);
+
+    &:hover:not(:disabled) {
+      background: var(--warning-color-bg, var(--hover-background));
+    }
+    &:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+  }
+
+  .btn-plain-text {
+    background: transparent;
+    border: none;
+    color: var(--text-color-secondary);
+    cursor: pointer;
+    padding: var(--space-2);
+  }
+}
+
+.share-actions {
+  display: flex;
+  justify-content: flex-end;
+}

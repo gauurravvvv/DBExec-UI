@@ -440,6 +440,22 @@ export const DASHBOARD = {
   SHARE_TOKENS_SUFFIX: '/share-tokens',
 };
 
+// Asset sharing — grant a dataset / analysis / dashboard to users + groups at
+// edit or view. One generic surface for all three families.
+//   GET/POST  /asset-shares/:assetType/:assetId/shares            list / grant one
+//   POST      /asset-shares/:assetType/:assetId/shares/bulk       grant many
+//   PUT       /asset-shares/shares/:shareId                       change level
+//   DELETE    /asset-shares/shares/:shareId                       revoke
+export const ASSET_SHARE = {
+  // `/asset-shares/${assetType}/${assetId}/shares`
+  SHARES_PREFIX: '/asset-shares/',
+  SHARES_SUFFIX: '/shares',
+  // `/asset-shares/${assetType}/${assetId}/shares/bulk`
+  BULK_SUFFIX: '/shares/bulk',
+  // `/asset-shares/shares/${shareId}`
+  SHARE_BY_ID: '/asset-shares/shares/',
+};
+
 // Public dashboard embed — UNAUTHENTICATED, token-guarded. Called only by
 // the standalone /embed viewer (no x-auth-token). Base is deliberately the
 // /public/dashboards mount that sits outside the auth middleware chain.

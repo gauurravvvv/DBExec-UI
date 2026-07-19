@@ -7,6 +7,7 @@ import { SaveAnalysesDialogComponent } from '../modules/analyses/components/save
 import { AddCustomFieldDialogComponent } from '../modules/dataset/components/add-custom-field-dialog/add-custom-field-dialog.component';
 import { CalculatedFieldsDialogComponent } from '../modules/dataset/components/calculated-fields-dialog/calculated-fields-dialog.component';
 import { DatasetPickerDialogComponent } from '../modules/dataset/components/dataset-picker-dialog/dataset-picker-dialog.component';
+import { AssetShareDialogComponent } from './components/asset-share-dialog/asset-share-dialog.component';
 import { ButtonComponent } from './components/button/button.component';
 import { ChangePasswordDialogComponent } from './components/change-password-dialog/change-password-dialog.component';
 import { ConfirmLeaveDialogComponent } from './components/confirm-leave-dialog/confirm-leave-dialog.component';
@@ -41,6 +42,7 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
 
 @NgModule({
   declarations: [
+    AssetShareDialogComponent,
     ChangePasswordDialogComponent,
     ConfirmLeaveDialogComponent,
     CustomCalendarComponent,
@@ -84,6 +86,7 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     ButtonComponent,
   ],
   exports: [
+    AssetShareDialogComponent,
     ChangePasswordDialogComponent,
     ConfirmLeaveDialogComponent,
     CustomCalendarComponent,

@@ -4230,6 +4230,25 @@
       "rowLimit": {
         "invalid": "Row limit must be a positive whole number"
       }
+    },
+    "assetShares": {
+      "assetType": {
+        "invalid": "资产类型无效"
+      },
+      "granteeType": {
+        "invalid": "接收者必须是用户或群组"
+      },
+      "granteeId": {
+        "required": "请选择接收者",
+        "invalid": "接收者无效"
+      },
+      "permission": {
+        "invalid": "权限必须为“编辑”或“查看”"
+      },
+      "grants": {
+        "required": "请至少选择一个接收者",
+        "tooMany": "一次最多可与 {{max}} 个接收者共享"
+      }
     }
   },
   "QUERY_RUNNER": {
@@ -4904,5 +4923,28 @@
     "WIZARD_NEXT": "下一步",
     "REVIEW_SUMMARY": "审核并确认",
     "SUMMARY_RECIPIENTS": "{{users}} 位用户，{{emails}} 个邮箱"
+  },
+  "SHARE": {
+    "TITLE": "共享",
+    "ADD_USERS": "添加用户",
+    "SELECT_USERS": "选择用户",
+    "ADD_GROUPS": "添加群组",
+    "SELECT_GROUPS": "选择群组",
+    "PERMISSION": "权限",
+    "PERMISSION_EDIT": "可编辑",
+    "PERMISSION_VIEW": "可查看",
+    "ADD": "添加",
+    "WHO_HAS_ACCESS": "谁有访问权限",
+    "OWNER": "所有者",
+    "GROUP": "群组",
+    "NO_GRANTS": "尚未与任何人共享",
+    "REVOKE": "移除访问权限",
+    "REVOKE_CONFIRM": "移除？",
+    "GRANTED": "已授予访问权限",
+    "GRANT_FAILED": "授予访问权限失败",
+    "UPDATED": "已更新访问级别",
+    "UPDATE_FAILED": "更新访问权限失败",
+    "REVOKED": "已移除访问权限",
+    "REVOKE_FAILED": "移除访问权限失败"
   }
 }

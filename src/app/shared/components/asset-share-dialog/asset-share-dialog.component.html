@@ -1,0 +1,168 @@
+<!-- Asset share dialog — `.confirmation-popup` overlay (app dialog pattern),
+     NOT a p-dialog. Close only on a backdrop click (target === currentTarget);
+     clicks on content bubble so appendTo="body" dropdown overlays close via
+     their own outside-click. -->
+<div
+  class="confirmation-popup"
+  *ngIf="visible"
+  (click)="onBackdropClick($event)"
+>
+  <div class="popup-content share-content">
+    <div class="popup-header share-header">
+      <div class="popup-icon"><i class="pi pi-share-alt"></i></div>
+      <h3>{{ 'SHARE.TITLE' | translate }}</h3>
+      <span class="share-asset-name" *ngIf="assetName">{{ assetName }}</span>
+    </div>
+
+    <div class="popup-body share-body">
+      <!-- Add recipients -->
+      <div class="share-add">
+        <div class="share-add-pickers">
+          <app-custom-multiselect
+            [(ngModel)]="selectedUserIds"
+            [ngModelOptions]="{ standalone: true }"
+            [label]="'SHARE.ADD_USERS' | translate"
+            [placeholder]="'SHARE.SELECT_USERS' | translate"
+            [serverMode]="true"
+            [fetcher]="loadUsersPage"
+            [resolveSelected]="resolveSelectedUser"
+            [pageSize]="10"
+            optionLabel="username"
+            optionValue="id"
+            [filter]="true"
+            filterBy="username"
+            display="chip"
+            icon="pi-user"
+            appendTo="body"
+          ></app-custom-multiselect>
+
+          <app-custom-multiselect
+            [(ngModel)]="selectedGroupIds"
+            [ngModelOptions]="{ standalone: true }"
+            [label]="'SHARE.ADD_GROUPS' | translate"
+            [placeholder]="'SHARE.SELECT_GROUPS' | translate"
+            [serverMode]="true"
+            [fetcher]="loadGroupsPage"
+            [resolveSelected]="resolveSelectedGroup"
+            [pageSize]="10"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            filterBy="name"
+            display="chip"
+            icon="pi-users"
+            appendTo="body"
+          ></app-custom-multiselect>
+        </div>
+
+        <div class="share-add-row">
+          <app-custom-dropdown
+            [(ngModel)]="addPermission"
+            [ngModelOptions]="{ standalone: true }"
+            [label]="'SHARE.PERMISSION' | translate"
+            [options]="permissionOptions"
+            optionLabel="label"
+            optionValue="value"
+            [filter]="false"
+            appendTo="body"
+          ></app-custom-dropdown>
+
+          <button
+            type="button"
+            class="btn-confirm share-add-btn"
+            (click)="add()"
+            [disabled]="!canAdd"
+          >
+            <i class="pi" [ngClass]="adding ? 'pi-spin pi-spinner' : 'pi-plus'"></i>
+            {{ 'SHARE.ADD' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Who has access -->
+      <div class="share-list">
+        <div class="share-list-head">{{ 'SHARE.WHO_HAS_ACCESS' | translate }}</div>
+
+        <!-- Owner (pinned) -->
+        <div class="share-row owner-row" *ngIf="shareService.owner() as owner">
+          <div class="share-grantee">
+            <i class="pi pi-user"></i>
+            <div class="share-grantee-text">
+              <span class="share-grantee-name">{{ owner.name }}</span>
+              <span class="share-grantee-sub" *ngIf="owner.email">{{ owner.email }}</span>
+            </div>
+          </div>
+          <span class="share-owner-badge">{{ 'SHARE.OWNER' | translate }}</span>
+        </div>
+
+        <div class="share-loading" *ngIf="shareService.loading()">
+          <i class="pi pi-spin pi-spinner"></i>
+        </div>
+
+        <div
+          class="share-empty"
+          *ngIf="!shareService.loading() && shareService.shares().length === 0"
+        >
+          {{ 'SHARE.NO_GRANTS' | translate }}
+        </div>
+
+        <!-- Grants -->
+        <div class="share-row" *ngFor="let grant of shareService.shares()">
+          <div class="share-grantee">
+            <i class="pi" [ngClass]="grant.granteeType === 'group' ? 'pi-users' : 'pi-user'"></i>
+            <div class="share-grantee-text">
+              <span class="share-grantee-name">{{ grant.granteeName }}</span>
+              <span class="share-grantee-sub" *ngIf="grant.granteeEmail">{{ grant.granteeEmail }}</span>
+              <span class="share-grantee-sub" *ngIf="grant.granteeType === 'group'">
+                {{ 'SHARE.GROUP' | translate }}
+              </span>
+            </div>
+          </div>
+
+          <div class="share-row-actions">
+            <app-custom-dropdown
+              [ngModel]="grant.permission"
+              [ngModelOptions]="{ standalone: true }"
+              (onChangeEvent)="changeLevel(grant, $event)"
+              [options]="permissionOptions"
+              optionLabel="label"
+              optionValue="value"
+              [filter]="false"
+              appendTo="body"
+            ></app-custom-dropdown>
+
+            <ng-container *ngIf="!isRevokeArmed(grant.id)">
+              <button
+                type="button"
+                class="btn-danger-text"
+                (click)="askRevoke(grant.id)"
+                [disabled]="shareService.isDeleting(grant.id)"
+                [pTooltip]="'SHARE.REVOKE' | translate"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="shareService.isDeleting(grant.id) ? 'pi-spin pi-spinner' : 'pi-times'"
+                ></i>
+              </button>
+            </ng-container>
+            <ng-container *ngIf="isRevokeArmed(grant.id)">
+              <span class="confirm-text">{{ 'SHARE.REVOKE_CONFIRM' | translate }}</span>
+              <button type="button" class="btn-danger-text" (click)="confirmRevoke(grant.id)">
+                {{ 'COMMON.YES' | translate }}
+              </button>
+              <button type="button" class="btn-plain-text" (click)="cancelRevoke()">
+                {{ 'COMMON.NO' | translate }}
+              </button>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="popup-actions share-actions">
+      <button type="button" class="btn-cancel" (click)="close()">
+        {{ 'COMMON.CLOSE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>
