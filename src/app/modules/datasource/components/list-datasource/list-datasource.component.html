@@ -66,16 +66,30 @@
           </ng-template>
 
           <ng-template usGridCell="status" let-db>
+            <!-- status 0 = a stub datasource auto-created by import that still
+                 needs its password set (surface it as a warning chip); 1 =
+                 active; any other falsy = inactive. Open the row's edit action
+                 to set the password → the existing validate flow flips it to
+                 active. -->
             <app-chip
               variant="status"
               size="sm"
-              [tone]="db.status === 1 ? 'success' : 'neutral'"
-              [dot]="'currentColor'"
+              [tone]="
+                db.status === 1
+                  ? 'success'
+                  : db.status === 0
+                    ? 'warning'
+                    : 'neutral'
+              "
+              [icon]="db.status === 0 ? 'pi pi-exclamation-triangle' : undefined"
+              [dot]="db.status === 0 ? undefined : 'currentColor'"
             >
               {{
                 db.status === 1
                   ? ('COMMON.ACTIVE' | translate)
-                  : ('COMMON.INACTIVE' | translate)
+                  : db.status === 0
+                    ? ('MIGRATION.NEEDS_CREDENTIALS' | translate)
+                    : ('COMMON.INACTIVE' | translate)
               }}
             </app-chip>
           </ng-template>
