@@ -3667,6 +3667,20 @@
     "PREVIEW": "Preview",
     "RE_LOGIN_HINT": "Changes apply to other users on their next sign-in."
   },
+  "MIGRATION": {
+    "EXPORT": "Export",
+    "EXPORT_TOOLTIP": "Export to a portable file",
+    "EXPORT_SELECTED": "Export selected ({count})",
+    "SELECT_LOADED_ROWS_HINT": "Selects the currently loaded rows",
+    "IMPORT": "Import",
+    "IMPORTING": "Importing…",
+    "EXPORT_SUCCESS": "Export downloaded",
+    "IMPORT_SUCCESS": "Import complete. A new datasource was created — set its password to run the imported assets.",
+    "IMPORT_FAILED": "Import failed",
+    "INVALID_FILE": "That file isn't a valid DBExec export file.",
+    "FILE_TOO_LARGE": "File is too large (max 10 MB).",
+    "NEEDS_CREDENTIALS": "Needs credentials"
+  },
   "NOTIFICATION": {
     "GROUP_ADDED_TITLE": "Assigned to a Group",
     "GROUP_ADDED_BODY": "You have been assigned to {{groupName}}.",
@@ -4254,6 +4268,77 @@
       "grants": {
         "required": "Select at least one recipient",
         "tooMany": "You can share with at most {{max}} recipients at once"
+      }
+    },
+    "migration": {
+      "localKey": {
+        "required": "Missing local key on a migration item"
+      },
+      "schemaVersion": {
+        "unsupported": "Unsupported migration file version"
+      },
+      "datasources": {
+        "required": "The migration file must include at least one datasource",
+        "tooMany": "Too many datasources in the migration file"
+      },
+      "datasource": {
+        "handle": {
+          "required": "Datasource handle is required"
+        },
+        "name": {
+          "required": "Datasource name is required"
+        },
+        "dbType": {
+          "invalid": "Unsupported database type in the migration file"
+        },
+        "dbName": {
+          "required": "Database name is required"
+        },
+        "username": {
+          "required": "Database username is required"
+        },
+        "unknownField": "The migration file contains an unexpected datasource field"
+      },
+      "asset": {
+        "name": {
+          "required": "Asset name is required"
+        },
+        "datasourceHandle": {
+          "required": "Asset is missing its datasource reference"
+        },
+        "handle": {
+          "required": "Asset is missing its bundle handle"
+        },
+        "datasetHandle": {
+          "required": "Asset is missing its dataset reference"
+        },
+        "sourceAnalysisHandle": {
+          "required": "Dashboard is missing its source-analysis reference"
+        }
+      },
+      "dataset": {
+        "sql": {
+          "required": "Dataset SQL is required"
+        }
+      },
+      "assets": {
+        "required": "The migration file must include at least one asset",
+        "tooMany": "Too many assets in the migration file"
+      },
+      "export": {
+        "items": {
+          "required": "Select at least one asset to export",
+          "tooMany": "Too many assets selected to export at once"
+        },
+        "assetType": {
+          "invalid": "Invalid asset type"
+        },
+        "assetId": {
+          "required": "Asset id is required"
+        },
+        "format": {
+          "invalid": "Unsupported export format"
+        }
       }
     }
   },

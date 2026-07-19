@@ -74,6 +74,19 @@ export interface CustomTableConfig {
   /** Column show/hide chooser. Default false. */
   enableColumnToggle?: boolean;
 
+  /**
+   * Opt-in row selection. Default FALSE — the app deliberately retired
+   * bulk-select as the default list surface, so this stays off unless a
+   * consumer explicitly turns it on (currently only the migration export
+   * lists). When true the table renders a leading checkbox column (header
+   * "select all loaded rows" + per-row) and emits `selectionChange` with the
+   * selected ROW OBJECTS. Selection persists across infinite-scroll appends;
+   * "select all" covers only the currently-loaded rows (the table never holds
+   * the full server set). When false the table renders EXACTLY as before —
+   * zero behavioural change.
+   */
+  selectable?: boolean;
+
   /** Row identity field for trackBy. Default 'id'. */
   rowIdField?: string;
 
@@ -103,6 +116,7 @@ export const CUSTOM_TABLE_DEFAULTS: Required<
   showColumnFilters: false,
   enableExport: false,
   enableColumnToggle: false,
+  selectable: false,
   rowIdField: 'id',
   height: 'flex',
 };

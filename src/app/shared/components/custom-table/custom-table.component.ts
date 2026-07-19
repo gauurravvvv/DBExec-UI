@@ -109,6 +109,14 @@ export class CustomTableComponent
   /** Host owns the actual refresh action (re-fetch). */
   @Output() refresh = new EventEmitter<void>();
 
+  /**
+   * Emits the currently-selected ROW OBJECTS (not just ids) whenever the
+   * selection changes — the consumer gets full rows so it has per-row context
+   * (e.g. assetType/id for a migration export). Only fires when
+   * `config.selectable` is true. Emits `[]` on clear.
+   */
+  @Output() selectionChange = new EventEmitter<Record<string, unknown>[]>();
+
   /** Cell templates keyed by colId (usGridCell). */
   @ContentChildren(UsGridCellDirective)
   private cellDirectives!: QueryList<UsGridCellDirective>;
@@ -130,6 +138,14 @@ export class CustomTableComponent
   columnMenuItems: MenuItem[] = [];
   exportMenuItems: MenuItem[] = [];
   columnFilters: Record<string, unknown> = {};
+
+  /**
+   * Row selection (opt-in via `config.selectable`). Keyed by the row's
+   * `rowIdField` so it PERSISTS across infinite-scroll appends and page-1
+   * re-sorts/filters (a picked row stays picked by id). Holds the row OBJECT
+   * so the consumer gets full context on emit.
+   */
+  private selected = new Map<unknown, Record<string, unknown>>();
 
   /** Accumulated rows across scroll pages (append as each batch arrives). */
   private accumulated: Record<string, unknown>[] = [];
@@ -468,4 +484,77 @@ export class CustomTableComponent
   /** trackBy for rows. */
   trackRow = (_: number, row: Record<string, unknown>): unknown =>
     row[this.cfg.rowIdField] ?? row;
+
+  // ── row selection (opt-in via config.selectable) ──────────────────────────
+
+  /** The row's identity value (used as the selection map key). */
+  private rowId(row: Record<string, unknown>): unknown {
+    return row[this.cfg.rowIdField] ?? row;
+  }
+
+  /** True when the given row is currently selected. */
+  isSelected(row: Record<string, unknown>): boolean {
+    return this.selected.has(this.rowId(row));
+  }
+
+  /** Toggle one row's selection (per-row checkbox). */
+  toggleRow(row: Record<string, unknown>, checked: boolean): void {
+    const id = this.rowId(row);
+    if (checked) this.selected.set(id, row);
+    else this.selected.delete(id);
+    this.emitSelection();
+  }
+
+  /**
+   * True when EVERY currently-loaded row is selected (drives the header
+   * checkbox). False for an empty table. "All" here means the loaded rows
+   * only — the table never holds the full server set (infinite scroll).
+   */
+  get allLoadedSelected(): boolean {
+    return this.rows.length > 0 && this.rows.every(r => this.isSelected(r));
+  }
+
+  /** True when some — but not all — loaded rows are selected. */
+  get someLoadedSelected(): boolean {
+    return this.selected.size > 0 && !this.allLoadedSelected;
+  }
+
+  /**
+   * Header "select all" — selects (or clears) ONLY the currently-loaded rows.
+   * Rows loaded by a later scroll batch are not auto-selected; the user
+   * re-toggles as more load. Honest by design (see the header tooltip).
+   */
+  toggleAllLoaded(checked: boolean): void {
+    if (checked) {
+      for (const r of this.rows) this.selected.set(this.rowId(r), r);
+    } else {
+      // Clear only the loaded rows (any off-screen picks stay — but in
+      // practice all picks come from loaded rows, so this clears everything
+      // the user can currently see).
+      for (const r of this.rows) this.selected.delete(this.rowId(r));
+    }
+    this.emitSelection();
+  }
+
+  /** The selected row objects (stable array snapshot for the consumer). */
+  get selectedRows(): Record<string, unknown>[] {
+    return [...this.selected.values()];
+  }
+
+  /** Number of selected rows (for the toolbar count). */
+  get selectedCount(): number {
+    return this.selected.size;
+  }
+
+  /** Clear the whole selection — called by the host after a bulk action. */
+  clearSelection(): void {
+    if (this.selected.size === 0) return;
+    this.selected.clear();
+    this.emitSelection();
+  }
+
+  private emitSelection(): void {
+    this.selectionChange.emit(this.selectedRows);
+    this.cdr.markForCheck();
+  }
 }

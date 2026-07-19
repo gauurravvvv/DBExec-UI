@@ -3664,6 +3664,20 @@
     "PREVIEW": "Aperçu",
     "RE_LOGIN_HINT": "Les modifications s'appliqueront aux autres utilisateurs à leur prochaine connexion."
   },
+  "MIGRATION": {
+    "EXPORT": "Exporter",
+    "EXPORT_TOOLTIP": "Exporter vers un fichier portable",
+    "EXPORT_SELECTED": "Exporter la sélection ({count})",
+    "SELECT_LOADED_ROWS_HINT": "Sélectionne les lignes actuellement chargées",
+    "IMPORT": "Importer",
+    "IMPORTING": "Importation…",
+    "EXPORT_SUCCESS": "Export téléchargé",
+    "IMPORT_SUCCESS": "Importation terminée. Une nouvelle source de données a été créée — définissez son mot de passe pour exécuter les ressources importées.",
+    "IMPORT_FAILED": "Échec de l'importation",
+    "INVALID_FILE": "Ce fichier n'est pas un fichier d'export DBExec valide.",
+    "FILE_TOO_LARGE": "Le fichier est trop volumineux (max. 10 Mo).",
+    "NEEDS_CREDENTIALS": "Identifiants requis"
+  },
   "NOTIFICATION": {
     "GROUP_ADDED_TITLE": "Affecté à un groupe",
     "GROUP_ADDED_BODY": "Vous avez été affecté à {{groupName}}.",
@@ -4257,6 +4271,77 @@
       "grants": {
         "required": "Sélectionnez au moins un destinataire",
         "tooMany": "Vous pouvez partager avec au maximum {{max}} destinataires à la fois"
+      }
+    },
+    "migration": {
+      "localKey": {
+        "required": "Clé locale manquante sur un élément de migration"
+      },
+      "schemaVersion": {
+        "unsupported": "Version de fichier de migration non prise en charge"
+      },
+      "datasources": {
+        "required": "Le fichier de migration doit inclure au moins une source de données",
+        "tooMany": "Trop de sources de données dans le fichier de migration"
+      },
+      "datasource": {
+        "handle": {
+          "required": "L'identifiant de la source de données est requis"
+        },
+        "name": {
+          "required": "Le nom de la source de données est requis"
+        },
+        "dbType": {
+          "invalid": "Type de base de données non pris en charge dans le fichier de migration"
+        },
+        "dbName": {
+          "required": "Le nom de la base de données est requis"
+        },
+        "username": {
+          "required": "Le nom d'utilisateur de la base de données est requis"
+        },
+        "unknownField": "Le fichier de migration contient un champ de source de données inattendu"
+      },
+      "asset": {
+        "name": {
+          "required": "Le nom de la ressource est requis"
+        },
+        "datasourceHandle": {
+          "required": "La référence de source de données de la ressource est manquante"
+        },
+        "handle": {
+          "required": "L'identifiant de bundle de la ressource est manquant"
+        },
+        "datasetHandle": {
+          "required": "La référence de jeu de données de la ressource est manquante"
+        },
+        "sourceAnalysisHandle": {
+          "required": "La référence d'analyse source du tableau de bord est manquante"
+        }
+      },
+      "dataset": {
+        "sql": {
+          "required": "Le SQL du jeu de données est requis"
+        }
+      },
+      "assets": {
+        "required": "Le fichier de migration doit inclure au moins une ressource",
+        "tooMany": "Trop de ressources dans le fichier de migration"
+      },
+      "export": {
+        "items": {
+          "required": "Sélectionnez au moins une ressource à exporter",
+          "tooMany": "Trop de ressources sélectionnées pour un export unique"
+        },
+        "assetType": {
+          "invalid": "Type de ressource non valide"
+        },
+        "assetId": {
+          "required": "L'id de la ressource est requis"
+        },
+        "format": {
+          "invalid": "Format d'export non pris en charge"
+        }
       }
     }
   },

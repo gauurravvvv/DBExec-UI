@@ -3664,6 +3664,20 @@
     "PREVIEW": "Voorbeeld",
     "RE_LOGIN_HINT": "Wijzigingen worden bij andere gebruikers van kracht bij hun volgende aanmelding."
   },
+  "MIGRATION": {
+    "EXPORT": "Exporteren",
+    "EXPORT_TOOLTIP": "Exporteren naar een overdraagbaar bestand",
+    "EXPORT_SELECTED": "Selectie exporteren ({count})",
+    "SELECT_LOADED_ROWS_HINT": "Selecteert de momenteel geladen rijen",
+    "IMPORT": "Importeren",
+    "IMPORTING": "Bezig met importeren…",
+    "EXPORT_SUCCESS": "Export gedownload",
+    "IMPORT_SUCCESS": "Import voltooid. Er is een nieuwe gegevensbron gemaakt — stel het wachtwoord ervan in om de geïmporteerde items uit te voeren.",
+    "IMPORT_FAILED": "Importeren mislukt",
+    "INVALID_FILE": "Dat bestand is geen geldig DBExec-exportbestand.",
+    "FILE_TOO_LARGE": "Bestand is te groot (max. 10 MB).",
+    "NEEDS_CREDENTIALS": "Inloggegevens vereist"
+  },
   "NOTIFICATION": {
     "GROUP_ADDED_TITLE": "Toegewezen aan een groep",
     "GROUP_ADDED_BODY": "Je bent toegewezen aan {{groupName}}.",
@@ -4257,6 +4271,77 @@
       "grants": {
         "required": "Selecteer ten minste één ontvanger",
         "tooMany": "U kunt met maximaal {{max}} ontvangers tegelijk delen"
+      }
+    },
+    "migration": {
+      "localKey": {
+        "required": "Ontbrekende lokale sleutel op een migratie-item"
+      },
+      "schemaVersion": {
+        "unsupported": "Niet-ondersteunde versie van migratiebestand"
+      },
+      "datasources": {
+        "required": "Het migratiebestand moet ten minste één gegevensbron bevatten",
+        "tooMany": "Te veel gegevensbronnen in het migratiebestand"
+      },
+      "datasource": {
+        "handle": {
+          "required": "Gegevensbron-handle is vereist"
+        },
+        "name": {
+          "required": "Naam van gegevensbron is vereist"
+        },
+        "dbType": {
+          "invalid": "Niet-ondersteund databasetype in het migratiebestand"
+        },
+        "dbName": {
+          "required": "Databasenaam is vereist"
+        },
+        "username": {
+          "required": "Databasegebruikersnaam is vereist"
+        },
+        "unknownField": "Het migratiebestand bevat een onverwacht gegevensbronveld"
+      },
+      "asset": {
+        "name": {
+          "required": "Naam van item is vereist"
+        },
+        "datasourceHandle": {
+          "required": "Het item mist zijn gegevensbronverwijzing"
+        },
+        "handle": {
+          "required": "Het item mist zijn bundelhandle"
+        },
+        "datasetHandle": {
+          "required": "Het item mist zijn gegevenssetverwijzing"
+        },
+        "sourceAnalysisHandle": {
+          "required": "Het dashboard mist zijn bronanalyseverwijzing"
+        }
+      },
+      "dataset": {
+        "sql": {
+          "required": "Gegevensset-SQL is vereist"
+        }
+      },
+      "assets": {
+        "required": "Het migratiebestand moet ten minste één item bevatten",
+        "tooMany": "Te veel items in het migratiebestand"
+      },
+      "export": {
+        "items": {
+          "required": "Selecteer ten minste één item om te exporteren",
+          "tooMany": "Te veel items geselecteerd om tegelijk te exporteren"
+        },
+        "assetType": {
+          "invalid": "Ongeldig itemtype"
+        },
+        "assetId": {
+          "required": "Item-id is vereist"
+        },
+        "format": {
+          "invalid": "Niet-ondersteund exportformaat"
+        }
       }
     }
   },

@@ -3664,6 +3664,20 @@
     "PREVIEW": "Vorschau",
     "RE_LOGIN_HINT": "Änderungen werden für andere Benutzer beim nächsten Anmelden wirksam."
   },
+  "MIGRATION": {
+    "EXPORT": "Exportieren",
+    "EXPORT_TOOLTIP": "In eine portable Datei exportieren",
+    "EXPORT_SELECTED": "Ausgewählte exportieren ({count})",
+    "SELECT_LOADED_ROWS_HINT": "Wählt die aktuell geladenen Zeilen aus",
+    "IMPORT": "Importieren",
+    "IMPORTING": "Wird importiert…",
+    "EXPORT_SUCCESS": "Export heruntergeladen",
+    "IMPORT_SUCCESS": "Import abgeschlossen. Eine neue Datenquelle wurde erstellt — legen Sie ihr Passwort fest, um die importierten Objekte auszuführen.",
+    "IMPORT_FAILED": "Import fehlgeschlagen",
+    "INVALID_FILE": "Diese Datei ist keine gültige DBExec-Exportdatei.",
+    "FILE_TOO_LARGE": "Datei ist zu groß (max. 10 MB).",
+    "NEEDS_CREDENTIALS": "Anmeldedaten erforderlich"
+  },
   "NOTIFICATION": {
     "GROUP_ADDED_TITLE": "Einer Gruppe zugewiesen",
     "GROUP_ADDED_BODY": "Sie wurden {{groupName}} zugewiesen.",
@@ -4257,6 +4271,77 @@
       "grants": {
         "required": "Wählen Sie mindestens einen Empfänger",
         "tooMany": "Sie können mit höchstens {{max}} Empfängern gleichzeitig teilen"
+      }
+    },
+    "migration": {
+      "localKey": {
+        "required": "Fehlender lokaler Schlüssel bei einem Migrationselement"
+      },
+      "schemaVersion": {
+        "unsupported": "Nicht unterstützte Version der Migrationsdatei"
+      },
+      "datasources": {
+        "required": "Die Migrationsdatei muss mindestens eine Datenquelle enthalten",
+        "tooMany": "Zu viele Datenquellen in der Migrationsdatei"
+      },
+      "datasource": {
+        "handle": {
+          "required": "Datenquellen-Handle ist erforderlich"
+        },
+        "name": {
+          "required": "Name der Datenquelle ist erforderlich"
+        },
+        "dbType": {
+          "invalid": "Nicht unterstützter Datenbanktyp in der Migrationsdatei"
+        },
+        "dbName": {
+          "required": "Datenbankname ist erforderlich"
+        },
+        "username": {
+          "required": "Datenbank-Benutzername ist erforderlich"
+        },
+        "unknownField": "Die Migrationsdatei enthält ein unerwartetes Datenquellenfeld"
+      },
+      "asset": {
+        "name": {
+          "required": "Objektname ist erforderlich"
+        },
+        "datasourceHandle": {
+          "required": "Dem Objekt fehlt der Datenquellenverweis"
+        },
+        "handle": {
+          "required": "Dem Objekt fehlt sein Bundle-Handle"
+        },
+        "datasetHandle": {
+          "required": "Dem Objekt fehlt der Datensatzverweis"
+        },
+        "sourceAnalysisHandle": {
+          "required": "Dem Dashboard fehlt der Verweis auf die Quellanalyse"
+        }
+      },
+      "dataset": {
+        "sql": {
+          "required": "Datensatz-SQL ist erforderlich"
+        }
+      },
+      "assets": {
+        "required": "Die Migrationsdatei muss mindestens ein Objekt enthalten",
+        "tooMany": "Zu viele Objekte in der Migrationsdatei"
+      },
+      "export": {
+        "items": {
+          "required": "Wählen Sie mindestens ein Objekt zum Exportieren aus",
+          "tooMany": "Zu viele Objekte gleichzeitig zum Exportieren ausgewählt"
+        },
+        "assetType": {
+          "invalid": "Ungültiger Objekttyp"
+        },
+        "assetId": {
+          "required": "Objekt-ID ist erforderlich"
+        },
+        "format": {
+          "invalid": "Nicht unterstütztes Exportformat"
+        }
       }
     }
   },

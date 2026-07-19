@@ -98,6 +98,18 @@
            filter inputs STAY visible (showHeader accounts for active filters)
            so the user can edit or clear what they typed. -->
       <tr *ngIf="showHeader">
+        <!-- Opt-in leading select-all checkbox column (config.selectable). -->
+        <th
+          *ngIf="cfg.selectable"
+          class="ct-select-col"
+          [pTooltip]="'MIGRATION.SELECT_LOADED_ROWS_HINT' | translate"
+          tooltipPosition="bottom"
+        >
+          <app-custom-binary-checkbox
+            [ngModel]="allLoadedSelected"
+            (onChange)="toggleAllLoaded($event)"
+          ></app-custom-binary-checkbox>
+        </th>
         <th
           *ngFor="let c of visibleColumns"
           [pSortableColumn]="c.sortable !== false ? (c.field || c.colId) : undefined"
@@ -118,6 +130,8 @@
 
       <!-- On-demand per-column filter row — shared inputs (unified look). -->
       <tr class="ct-filter-row" *ngIf="showHeader && showFilters && hasColumnFilters">
+        <!-- Spacer under the select-all column. -->
+        <th *ngIf="cfg.selectable" class="ct-select-col"></th>
         <th *ngFor="let c of visibleColumns" [ngStyle]="colStyle(c)">
           <app-custom-input
             *ngIf="c.filter === 'text' || c.filter === 'numeric'"
@@ -132,7 +146,14 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-row>
-      <tr>
+      <tr [class.ct-row-selected]="cfg.selectable && isSelected(row)">
+        <!-- Opt-in leading per-row checkbox column (config.selectable). -->
+        <td *ngIf="cfg.selectable" class="ct-select-col ct-center">
+          <app-custom-binary-checkbox
+            [ngModel]="isSelected(row)"
+            (onChange)="toggleRow(row, $event)"
+          ></app-custom-binary-checkbox>
+        </td>
         <td
           *ngFor="let c of visibleColumns"
           [ngStyle]="colStyle(c)"
@@ -153,7 +174,7 @@
 
     <ng-template pTemplate="emptymessage">
       <tr class="ct-empty-row">
-        <td [attr.colspan]="visibleColumns.length" class="ct-empty">
+        <td [attr.colspan]="visibleColumns.length + (cfg.selectable ? 1 : 0)" class="ct-empty">
           <!-- Host may project a state-specific empty body (e.g. "pick a
                datasource" / "unsupported") via [tableEmpty]; otherwise the
                default inbox + message shows. -->

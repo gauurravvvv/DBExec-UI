@@ -340,6 +340,28 @@
     &::-webkit-scrollbar { width: 8px; height: 8px; }
     &::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 999px; }
   }
+
+  /* Opt-in selection column (config.selectable) — compact, centred. The
+     shared app-custom-binary-checkbox carries a form-field wrapper meant for
+     stacked forms; inside a dense table cell we strip its gaps + top margin so
+     it sits as a bare checkbox aligned to the row. */
+  .ct-select-col {
+    width: 44px;
+    min-width: 44px;
+    text-align: center;
+
+    ::ng-deep .form-field { gap: 0; }
+    ::ng-deep .form-field .checkbox-row {
+      gap: 0;
+      justify-content: center;
+    }
+    ::ng-deep .p-checkbox { margin-top: 0; }
+  }
+
+  /* Selected-row tint — beats the zebra stripe (written after, !important). */
+  .p-datatable-tbody > tr.ct-row-selected > td {
+    background: var(--primary-color-transparent, rgba(0, 0, 0, 0.04)) !important;
+  }
 }
 
 /* Scroll-mode footer — a quiet count / "loading more" line (no page controls). */

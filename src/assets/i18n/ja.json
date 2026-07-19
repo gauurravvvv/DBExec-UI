@@ -3664,6 +3664,20 @@
     "PREVIEW": "プレビュー",
     "RE_LOGIN_HINT": "変更は他のユーザーの次回サインイン時に適用されます。"
   },
+  "MIGRATION": {
+    "EXPORT": "エクスポート",
+    "EXPORT_TOOLTIP": "ポータブルファイルにエクスポート",
+    "EXPORT_SELECTED": "選択項目をエクスポート ({count})",
+    "SELECT_LOADED_ROWS_HINT": "現在読み込まれている行を選択します",
+    "IMPORT": "インポート",
+    "IMPORTING": "インポート中…",
+    "EXPORT_SUCCESS": "エクスポートをダウンロードしました",
+    "IMPORT_SUCCESS": "インポートが完了しました。新しいデータソースが作成されました。インポートしたアセットを実行するにはパスワードを設定してください。",
+    "IMPORT_FAILED": "インポートに失敗しました",
+    "INVALID_FILE": "そのファイルは有効な DBExec エクスポートファイルではありません。",
+    "FILE_TOO_LARGE": "ファイルが大きすぎます（最大 10 MB）。",
+    "NEEDS_CREDENTIALS": "認証情報が必要です"
+  },
   "NOTIFICATION": {
     "GROUP_ADDED_TITLE": "グループに割り当てられました",
     "GROUP_ADDED_BODY": "{{groupName}} に割り当てられました。",
@@ -4257,6 +4271,77 @@
       "grants": {
         "required": "少なくとも1人の共有先を選択してください",
         "tooMany": "一度に共有できる相手は最大{{max}}件です"
+      }
+    },
+    "migration": {
+      "localKey": {
+        "required": "移行アイテムにローカルキーがありません"
+      },
+      "schemaVersion": {
+        "unsupported": "サポートされていない移行ファイルのバージョンです"
+      },
+      "datasources": {
+        "required": "移行ファイルには少なくとも1つのデータソースが必要です",
+        "tooMany": "移行ファイル内のデータソースが多すぎます"
+      },
+      "datasource": {
+        "handle": {
+          "required": "データソースのハンドルは必須です"
+        },
+        "name": {
+          "required": "データソース名は必須です"
+        },
+        "dbType": {
+          "invalid": "移行ファイルにサポートされていないデータベースタイプが含まれています"
+        },
+        "dbName": {
+          "required": "データベース名は必須です"
+        },
+        "username": {
+          "required": "データベースのユーザー名は必須です"
+        },
+        "unknownField": "移行ファイルに予期しないデータソースフィールドが含まれています"
+      },
+      "asset": {
+        "name": {
+          "required": "アセット名は必須です"
+        },
+        "datasourceHandle": {
+          "required": "アセットにデータソース参照がありません"
+        },
+        "handle": {
+          "required": "アセットにバンドルハンドルがありません"
+        },
+        "datasetHandle": {
+          "required": "アセットにデータセット参照がありません"
+        },
+        "sourceAnalysisHandle": {
+          "required": "ダッシュボードにソース分析の参照がありません"
+        }
+      },
+      "dataset": {
+        "sql": {
+          "required": "データセットの SQL は必須です"
+        }
+      },
+      "assets": {
+        "required": "移行ファイルには少なくとも1つのアセットが必要です",
+        "tooMany": "移行ファイル内のアセットが多すぎます"
+      },
+      "export": {
+        "items": {
+          "required": "エクスポートするアセットを少なくとも1つ選択してください",
+          "tooMany": "一度にエクスポートするために選択されたアセットが多すぎます"
+        },
+        "assetType": {
+          "invalid": "無効なアセットタイプです"
+        },
+        "assetId": {
+          "required": "アセット ID は必須です"
+        },
+        "format": {
+          "invalid": "サポートされていないエクスポート形式です"
+        }
       }
     }
   },

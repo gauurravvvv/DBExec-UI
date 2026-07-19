@@ -3664,6 +3664,20 @@
     "PREVIEW": "预览",
     "RE_LOGIN_HINT": "其他用户下次登录时更改将生效。"
   },
+  "MIGRATION": {
+    "EXPORT": "导出",
+    "EXPORT_TOOLTIP": "导出为可移植文件",
+    "EXPORT_SELECTED": "导出所选 ({count})",
+    "SELECT_LOADED_ROWS_HINT": "选择当前已加载的行",
+    "IMPORT": "导入",
+    "IMPORTING": "正在导入…",
+    "EXPORT_SUCCESS": "导出已下载",
+    "IMPORT_SUCCESS": "导入完成。已创建一个新数据源——请设置其密码以运行导入的资产。",
+    "IMPORT_FAILED": "导入失败",
+    "INVALID_FILE": "该文件不是有效的 DBExec 导出文件。",
+    "FILE_TOO_LARGE": "文件过大（最大 10 MB）。",
+    "NEEDS_CREDENTIALS": "需要凭据"
+  },
   "NOTIFICATION": {
     "GROUP_ADDED_TITLE": "已被分配到组",
     "GROUP_ADDED_BODY": "您已被分配到 {{groupName}}。",
@@ -4257,6 +4271,77 @@
       "grants": {
         "required": "请至少选择一个接收者",
         "tooMany": "一次最多可与 {{max}} 个接收者共享"
+      }
+    },
+    "migration": {
+      "localKey": {
+        "required": "迁移项缺少本地键"
+      },
+      "schemaVersion": {
+        "unsupported": "不支持的迁移文件版本"
+      },
+      "datasources": {
+        "required": "迁移文件必须至少包含一个数据源",
+        "tooMany": "迁移文件中的数据源过多"
+      },
+      "datasource": {
+        "handle": {
+          "required": "数据源句柄为必填项"
+        },
+        "name": {
+          "required": "数据源名称为必填项"
+        },
+        "dbType": {
+          "invalid": "迁移文件中包含不支持的数据库类型"
+        },
+        "dbName": {
+          "required": "数据库名称为必填项"
+        },
+        "username": {
+          "required": "数据库用户名为必填项"
+        },
+        "unknownField": "迁移文件包含意外的数据源字段"
+      },
+      "asset": {
+        "name": {
+          "required": "资产名称为必填项"
+        },
+        "datasourceHandle": {
+          "required": "资产缺少其数据源引用"
+        },
+        "handle": {
+          "required": "资产缺少其捆绑包句柄"
+        },
+        "datasetHandle": {
+          "required": "资产缺少其数据集引用"
+        },
+        "sourceAnalysisHandle": {
+          "required": "仪表板缺少其源分析引用"
+        }
+      },
+      "dataset": {
+        "sql": {
+          "required": "数据集 SQL 为必填项"
+        }
+      },
+      "assets": {
+        "required": "迁移文件必须至少包含一个资产",
+        "tooMany": "迁移文件中的资产过多"
+      },
+      "export": {
+        "items": {
+          "required": "请至少选择一个要导出的资产",
+          "tooMany": "一次选择导出的资产过多"
+        },
+        "assetType": {
+          "invalid": "无效的资产类型"
+        },
+        "assetId": {
+          "required": "资产 ID 为必填项"
+        },
+        "format": {
+          "invalid": "不支持的导出格式"
+        }
       }
     }
   },

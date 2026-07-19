@@ -3664,6 +3664,20 @@
     "PREVIEW": "Anteprima",
     "RE_LOGIN_HINT": "Le modifiche verranno applicate agli altri utenti al loro prossimo accesso."
   },
+  "MIGRATION": {
+    "EXPORT": "Esporta",
+    "EXPORT_TOOLTIP": "Esporta in un file portatile",
+    "EXPORT_SELECTED": "Esporta selezionati ({count})",
+    "SELECT_LOADED_ROWS_HINT": "Seleziona le righe attualmente caricate",
+    "IMPORT": "Importa",
+    "IMPORTING": "Importazione…",
+    "EXPORT_SUCCESS": "Esportazione scaricata",
+    "IMPORT_SUCCESS": "Importazione completata. È stata creata una nuova origine dati: imposta la sua password per eseguire le risorse importate.",
+    "IMPORT_FAILED": "Importazione non riuscita",
+    "INVALID_FILE": "Questo file non è un file di esportazione DBExec valido.",
+    "FILE_TOO_LARGE": "Il file è troppo grande (max 10 MB).",
+    "NEEDS_CREDENTIALS": "Credenziali richieste"
+  },
   "NOTIFICATION": {
     "GROUP_ADDED_TITLE": "Assegnato a un gruppo",
     "GROUP_ADDED_BODY": "Sei stato assegnato a {{groupName}}.",
@@ -4257,6 +4271,77 @@
       "grants": {
         "required": "Seleziona almeno un destinatario",
         "tooMany": "Puoi condividere con un massimo di {{max}} destinatari alla volta"
+      }
+    },
+    "migration": {
+      "localKey": {
+        "required": "Chiave locale mancante in un elemento di migrazione"
+      },
+      "schemaVersion": {
+        "unsupported": "Versione del file di migrazione non supportata"
+      },
+      "datasources": {
+        "required": "Il file di migrazione deve includere almeno un'origine dati",
+        "tooMany": "Troppe origini dati nel file di migrazione"
+      },
+      "datasource": {
+        "handle": {
+          "required": "L'handle dell'origine dati è obbligatorio"
+        },
+        "name": {
+          "required": "Il nome dell'origine dati è obbligatorio"
+        },
+        "dbType": {
+          "invalid": "Tipo di database non supportato nel file di migrazione"
+        },
+        "dbName": {
+          "required": "Il nome del database è obbligatorio"
+        },
+        "username": {
+          "required": "Il nome utente del database è obbligatorio"
+        },
+        "unknownField": "Il file di migrazione contiene un campo origine dati imprevisto"
+      },
+      "asset": {
+        "name": {
+          "required": "Il nome della risorsa è obbligatorio"
+        },
+        "datasourceHandle": {
+          "required": "Alla risorsa manca il riferimento all'origine dati"
+        },
+        "handle": {
+          "required": "Alla risorsa manca l'handle del bundle"
+        },
+        "datasetHandle": {
+          "required": "Alla risorsa manca il riferimento al set di dati"
+        },
+        "sourceAnalysisHandle": {
+          "required": "Alla dashboard manca il riferimento all'analisi di origine"
+        }
+      },
+      "dataset": {
+        "sql": {
+          "required": "L'SQL del set di dati è obbligatorio"
+        }
+      },
+      "assets": {
+        "required": "Il file di migrazione deve includere almeno una risorsa",
+        "tooMany": "Troppe risorse nel file di migrazione"
+      },
+      "export": {
+        "items": {
+          "required": "Seleziona almeno una risorsa da esportare",
+          "tooMany": "Troppe risorse selezionate per l'esportazione simultanea"
+        },
+        "assetType": {
+          "invalid": "Tipo di risorsa non valido"
+        },
+        "assetId": {
+          "required": "L'id della risorsa è obbligatorio"
+        },
+        "format": {
+          "invalid": "Formato di esportazione non supportato"
+        }
       }
     }
   },
