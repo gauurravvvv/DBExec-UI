@@ -53,6 +53,12 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
   showDeleteConfirm = false;
   analysisToDelete: string | null = null;
   deleteJustification = '';
+
+  // Asset-share dialog state.
+  showShareDialog = false;
+  shareAssetId = '';
+  shareAssetName = '';
+
   Math = Math;
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
@@ -285,6 +291,18 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
 
   onEdit(id: string) {
     this.router.navigate([ANALYSES.edit(id)]);
+  }
+
+  onShare(analysis: any): void {
+    this.shareAssetId = analysis?.id ?? '';
+    this.shareAssetName = analysis?.name ?? '';
+    this.showShareDialog = true;
+  }
+
+  onShareClosed(): void {
+    this.showShareDialog = false;
+    this.shareAssetId = '';
+    this.shareAssetName = '';
   }
 
   confirmDelete(id: string) {

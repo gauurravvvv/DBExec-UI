@@ -184,6 +184,21 @@
           <i class="pi pi-share-alt"></i>
         </button>
 
+        <!-- Manage access (explicit grants to users + groups). -->
+        <button
+          *hasPermission="'dashboard'; level: 'write'"
+          type="button"
+          class="header-icon-btn"
+          data-export-ignore
+          (click)="openAssetShare()"
+          [disabled]="!dashboardId"
+          [pTooltip]="'SHARE.TITLE' | translate"
+          tooltipPosition="bottom"
+          [attr.aria-label]="'SHARE.TITLE' | translate"
+        >
+          <i class="pi pi-users"></i>
+        </button>
+
         <!-- Schedule delivery (scheduled email PNG/PDF). -->
         <button
           type="button"
@@ -539,6 +554,16 @@
   [dashboardName]="dashboard?.name || ''"
   (closed)="shareVisible = false"
 ></app-share-dashboard-dialog>
+
+<!-- Asset-share dialog (explicit grants to users + groups). Distinct from the
+     public-embed link dialog above. -->
+<app-asset-share-dialog
+  [visible]="assetShareVisible"
+  assetType="dashboard"
+  [assetId]="dashboardId"
+  [assetName]="dashboard?.name || ''"
+  (closed)="assetShareVisible = false"
+></app-asset-share-dialog>
 
 <!-- Schedule delivery dialog (scheduled email PNG/PDF). -->
 <app-schedule-delivery-dialog

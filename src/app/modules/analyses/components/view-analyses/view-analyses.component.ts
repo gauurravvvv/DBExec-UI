@@ -35,6 +35,7 @@ export class ViewAnalysesComponent implements OnInit, OnDestroy {
   analysisDetails: any = null;
   datasetDetails: any = null;
   analysisFields: any[] = [];
+  showShareDialog = false;
   visuals: any[] = [];
   showDeleteConfirm = false;
   deleteJustification = '';
@@ -204,6 +205,14 @@ export class ViewAnalysesComponent implements OnInit, OnDestroy {
 
   onEdit(): void {
     this.router.navigate([ANALYSES.edit(this.analysisId)]);
+  }
+
+  onShare(): void {
+    this.showShareDialog = true;
+  }
+
+  onShareClosed(): void {
+    this.showShareDialog = false;
   }
 
   onDelete(): void {

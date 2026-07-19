@@ -18,6 +18,15 @@
           {{ 'COMMON.EDIT' | translate }}
         </button>
         <button
+          *hasPermission="'datasetManager'; level: 'write'"
+          class="btn-secondary"
+          type="button"
+          (click)="onShare()"
+        >
+          <i class="pi pi-share-alt"></i>
+          {{ 'SHARE.TITLE' | translate }}
+        </button>
+        <button
           *hasPermission="'datasetManager'; level: 'delete'"
           class="btn-danger"
           type="button"
@@ -586,3 +595,10 @@
     </div>
   </div>
 </div>
+<app-asset-share-dialog
+  [visible]="showShareDialog"
+  assetType="dataset"
+  [assetId]="datasetData?.id || ''"
+  [assetName]="datasetData?.name || ''"
+  (closed)="onShareClosed()"
+></app-asset-share-dialog>

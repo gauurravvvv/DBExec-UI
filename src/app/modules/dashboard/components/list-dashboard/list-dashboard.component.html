@@ -96,6 +96,15 @@
                 <i class="pi pi-eye"></i>
               </button>
               <button
+                *hasPermission="'dashboard'; level: 'write'"
+                class="icon-btn share-btn"
+                (click)="onShare(dashboard)"
+                [pTooltip]="'SHARE.TITLE' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-share-alt"></i>
+              </button>
+              <button
                 *hasPermission="'dashboard'; level: 'delete'"
                 class="icon-btn delete-btn"
                 (click)="confirmDelete(dashboard.id)"
@@ -189,3 +198,11 @@
     </div>
   </div>
 </div>
+
+<app-asset-share-dialog
+  [visible]="showShareDialog"
+  assetType="dashboard"
+  [assetId]="shareAssetId"
+  [assetName]="shareAssetName"
+  (closed)="onShareClosed()"
+></app-asset-share-dialog>

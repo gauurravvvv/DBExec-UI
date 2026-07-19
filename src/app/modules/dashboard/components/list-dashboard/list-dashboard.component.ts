@@ -51,6 +51,12 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
   showDeleteConfirm = false;
   dashboardToDelete: string | null = null;
   deleteJustification = '';
+
+  // Asset-share dialog state.
+  showShareDialog = false;
+  shareAssetId = '';
+  shareAssetName = '';
+
   Math = Math;
   /** Optional datasource narrow carried from a `?datasourceId=` deep-link. */
   selectedDatasource: any = null;
@@ -203,6 +209,18 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
 
   onView(id: string) {
     this.router.navigate([DB_ROUTES.view(id)]);
+  }
+
+  onShare(dashboard: any): void {
+    this.shareAssetId = dashboard?.id ?? '';
+    this.shareAssetName = dashboard?.name ?? '';
+    this.showShareDialog = true;
+  }
+
+  onShareClosed(): void {
+    this.showShareDialog = false;
+    this.shareAssetId = '';
+    this.shareAssetName = '';
   }
 
   confirmDelete(id: string) {

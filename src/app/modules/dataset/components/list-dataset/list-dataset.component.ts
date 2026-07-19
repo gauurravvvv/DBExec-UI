@@ -68,6 +68,11 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   showDuplicateDialog = false;
   datasetToDuplicate: any = null;
   activeDataset: any = null;
+
+  // Asset-share dialog state.
+  showShareDialog = false;
+  shareAssetId = '';
+  shareAssetName = '';
   showQueryBuilderPopup = false;
   queryBuilders: any[] = [];
   loadingQueryBuilders = false;
@@ -454,6 +459,18 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
   onEdit(id: string) {
     this.router.navigate([DATASET.edit(id)]);
+  }
+
+  onShare(dataset: any): void {
+    this.shareAssetId = dataset?.id ?? '';
+    this.shareAssetName = dataset?.name ?? '';
+    this.showShareDialog = true;
+  }
+
+  onShareClosed(): void {
+    this.showShareDialog = false;
+    this.shareAssetId = '';
+    this.shareAssetName = '';
   }
 
   /** The datasource id of the dataset an analysis is being created from —

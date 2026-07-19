@@ -34,6 +34,15 @@
           {{ 'COMMON.EDIT' | translate }}
         </button>
         <button
+          *hasPermission="'analyses'; level: 'write'"
+          class="btn-secondary"
+          type="button"
+          (click)="onShare()"
+        >
+          <i class="pi pi-share-alt"></i>
+          {{ 'SHARE.TITLE' | translate }}
+        </button>
+        <button
           *hasPermission="'analyses'; level: 'delete'"
           class="btn-danger"
           type="button"
@@ -354,3 +363,11 @@
     </div>
   </div>
 </div>
+
+<app-asset-share-dialog
+  [visible]="showShareDialog"
+  assetType="analysis"
+  [assetId]="analysisDetails?.id || ''"
+  [assetName]="analysisDetails?.name || ''"
+  (closed)="onShareClosed()"
+></app-asset-share-dialog>

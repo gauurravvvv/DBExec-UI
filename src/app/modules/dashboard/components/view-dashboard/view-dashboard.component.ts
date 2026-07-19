@@ -254,6 +254,9 @@ export class ViewDashboardComponent
 
   // ── Share + export ───────────────────────────────────────────────
   shareVisible = false;
+  // Explicit-grant sharing (users + groups) — distinct from the public
+  // embed-link dialog toggled by shareVisible.
+  assetShareVisible = false;
   exporting = false;
   exportItems: MenuItem[] = [];
 
@@ -309,6 +312,12 @@ export class ViewDashboardComponent
   openShare(): void {
     if (!this.dashboardId) return;
     this.shareVisible = true;
+  }
+
+  /** Open the explicit-grant (users + groups) access dialog. */
+  openAssetShare(): void {
+    if (!this.dashboardId) return;
+    this.assetShareVisible = true;
   }
 
   private buildExportMenu(): void {

@@ -25,6 +25,7 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
   datasetData: any;
   showDeleteConfirm = false;
   deleteJustification = '';
+  showShareDialog = false;
   showDeleteFieldConfirm = false;
   showEditFieldsDialog = false;
   showEditCustomFieldDialog = false;
@@ -313,6 +314,14 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
 
   goBack() {
     this.router.navigate([DATASET.LIST]);
+  }
+
+  onShare(): void {
+    this.showShareDialog = true;
+  }
+
+  onShareClosed(): void {
+    this.showShareDialog = false;
   }
 
   onEdit() {

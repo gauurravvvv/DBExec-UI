@@ -147,6 +147,15 @@
                 <i class="pi pi-pencil"></i>
               </button>
               <button
+                *hasPermission="'analyses'; level: 'write'"
+                class="icon-btn share-btn"
+                (click)="onShare(analysis)"
+                [pTooltip]="'SHARE.TITLE' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-share-alt"></i>
+              </button>
+              <button
                 *hasPermission="'analyses'; level: 'delete'"
                 class="icon-btn delete-btn"
                 (click)="confirmDelete(analysis.id)"
@@ -243,3 +252,11 @@
     </div>
   </div>
 </div>
+
+<app-asset-share-dialog
+  [visible]="showShareDialog"
+  assetType="analysis"
+  [assetId]="shareAssetId"
+  [assetName]="shareAssetName"
+  (closed)="onShareClosed()"
+></app-asset-share-dialog>

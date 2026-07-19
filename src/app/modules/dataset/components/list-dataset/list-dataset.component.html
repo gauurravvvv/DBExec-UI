@@ -153,6 +153,15 @@
                 <i class="pi pi-pencil"></i>
               </button>
               <button
+                *hasPermission="'datasetManager'; level: 'write'"
+                class="icon-btn share-btn"
+                (click)="onShare(dataset)"
+                [pTooltip]="'SHARE.TITLE' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-share-alt"></i>
+              </button>
+              <button
                 *hasPermission="'datasetManager'; level: 'delete'"
                 class="icon-btn delete-btn"
                 (click)="confirmDelete(dataset.id)"
@@ -423,3 +432,11 @@
     </div>
   </div>
 </div>
+
+<app-asset-share-dialog
+  [visible]="showShareDialog"
+  assetType="dataset"
+  [assetId]="shareAssetId"
+  [assetName]="shareAssetName"
+  (closed)="onShareClosed()"
+></app-asset-share-dialog>
