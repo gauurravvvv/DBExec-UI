@@ -269,6 +269,18 @@ const routes: Routes = [
           import('./modules/profile/profile.module').then(m => m.ProfileModule),
         data: { title: 'PAGE_TITLES.MY_PROFILE' },
       },
+      // Per-user notifications feed — auth-gated only (no permission),
+      // reachable from the bell panel's "See all". System Admin has no
+      // org binding, so the component guards its own visibility, but the
+      // route itself stays open to every authenticated user.
+      {
+        path: 'notifications',
+        loadChildren: () =>
+          import('./modules/notifications/notifications.module').then(
+            m => m.NotificationsModule,
+          ),
+        data: { title: 'PAGE_TITLES.NOTIFICATIONS' },
+      },
       {
         path: 'not-found',
         loadComponent: () =>

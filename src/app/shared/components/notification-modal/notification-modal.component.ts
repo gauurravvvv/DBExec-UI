@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { notificationRoute } from 'src/app/core/constants/routes.constant';
+import { NOTIFICATIONS, notificationRoute } from 'src/app/core/constants/routes.constant';
 import {
   NotificationRow,
   NotificationService,
@@ -19,37 +19,14 @@ import {
   groupByDateBucket,
   NotificationGroup,
 } from 'src/app/shared/helpers/notification-grouping.helper';
+import {
+  notificationAccent,
+  notificationBodyKey,
+  notificationBodyParams,
+  notificationIcon,
+  notificationTitleKey,
+} from 'src/app/shared/helpers/notification-presentation.helper';
 import { NotificationModalService } from 'src/app/shared/services/notification-modal.service';
-
-/** type → PrimeNG icon class for the row leading icon. */
-const TYPE_ICON: Record<string, string> = {
-  group_added: 'pi-user-plus',
-  group_removed: 'pi-user-minus',
-  asset_shared: 'pi-share-alt',
-  asset_unshared: 'pi-ban',
-  alert_fired: 'pi-bell',
-  dashboard_delivered: 'pi-chart-bar',
-};
-
-/** type → i18n title key. Unknown types fall back to a generic key. */
-const TYPE_TITLE_KEY: Record<string, string> = {
-  group_added: 'NOTIFICATION.GROUP_ADDED_TITLE',
-  group_removed: 'NOTIFICATION.GROUP_REMOVED_TITLE',
-  asset_shared: 'NOTIFICATION.ASSET_SHARED_TITLE',
-  asset_unshared: 'NOTIFICATION.ASSET_UNSHARED_TITLE',
-  alert_fired: 'NOTIFICATION.ALERT_FIRED_TITLE',
-  dashboard_delivered: 'NOTIFICATION.DASHBOARD_DELIVERED_TITLE',
-};
-
-/** type → i18n body key (interpolated with `meta`). */
-const TYPE_BODY_KEY: Record<string, string> = {
-  group_added: 'NOTIFICATION.GROUP_ADDED_BODY',
-  group_removed: 'NOTIFICATION.GROUP_REMOVED_BODY',
-  asset_shared: 'NOTIFICATION.ASSET_SHARED_BODY',
-  asset_unshared: 'NOTIFICATION.ASSET_UNSHARED_BODY',
-  alert_fired: 'NOTIFICATION.ALERT_FIRED_BODY',
-  dashboard_delivered: 'NOTIFICATION.DASHBOARD_DELIVERED_BODY',
-};
 
 /**
  * Notification modal — command-palette-style overlay bell panel.
@@ -149,31 +126,31 @@ export class NotificationModalComponent implements OnInit {
   }
 
   iconFor(type: string): string {
-    return TYPE_ICON[type] ?? 'pi-bell';
+    return notificationIcon(type);
+  }
+
+  /** `var(--token)` for the per-type coloured icon chip. */
+  accentFor(type: string): string {
+    return notificationAccent(type);
   }
 
   titleKeyFor(n: NotificationRow): string {
-    return TYPE_TITLE_KEY[n.type] ?? 'NOTIFICATION.GENERIC_TITLE';
+    return notificationTitleKey(n);
   }
 
   bodyKeyFor(n: NotificationRow): string {
-    return TYPE_BODY_KEY[n.type] ?? 'NOTIFICATION.GENERIC_BODY';
+    return notificationBodyKey(n);
   }
 
-  /** Interpolation params for the body i18n template — every meta
-   *  field a body key might reference, defaulted so a missing key
-   *  renders empty rather than "undefined". */
   bodyParams(n: NotificationRow): Record<string, string> {
-    const m = n.meta ?? {};
-    return {
-      groupName: m.groupName ?? '',
-      assetName: m.assetName ?? '',
-      assetType: m.assetType ?? '',
-      alertName: m.alertName ?? '',
-      dashboardName: m.dashboardName ?? '',
-      actorName: m.actorName ?? '',
-      permission: m.permission ?? '',
-    };
+    return notificationBodyParams(n);
+  }
+
+  /** Footer "See all" → the full notifications page. Closes the panel
+   *  first so the overlay doesn't linger over the routed page. */
+  seeAll(): void {
+    this.close();
+    this.router.navigateByUrl(NOTIFICATIONS.LIST);
   }
 
   hasRoute(n: NotificationRow): boolean {

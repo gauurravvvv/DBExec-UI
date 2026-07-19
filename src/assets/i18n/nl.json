@@ -2207,7 +2207,8 @@
     "DB_ROLES": "Databasegebruikers & rollen",
     "DB_PRIVILEGES": "Rechten & toegang",
     "QUERY_RUNNER": "SQL-werkruimte",
-    "EMBED_DASHBOARD": "Dashboard"
+    "EMBED_DASHBOARD": "Dashboard",
+    "NOTIFICATIONS": "Meldingen"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Verbeter uw ervaring met\ngegevensbronbeheer",
@@ -3682,7 +3683,15 @@
     "DASHBOARD_DELIVERED_TITLE": "Dashboard bezorgd",
     "DASHBOARD_DELIVERED_BODY": "{{dashboardName}} is in uw postvak bezorgd.",
     "GENERIC_TITLE": "Notificatie",
-    "GENERIC_BODY": "U hebt een nieuwe notificatie."
+    "GENERIC_BODY": "U hebt een nieuwe notificatie.",
+    "SEE_ALL": "Alle meldingen bekijken",
+    "EMPTY_HINT": "Nieuwe meldingen verschijnen hier.",
+    "EMPTY_UNREAD": "Geen ongelezen meldingen",
+    "FILTER_ALL": "Alle",
+    "FILTER_UNREAD": "Ongelezen",
+    "FILTER_ALL_TYPES": "Alle typen",
+    "MARK_READ": "Markeren als gelezen",
+    "LOAD_MORE": "Meer laden"
   },
   "MENU": {
     "SECURITY_POLICY": "Beveiligingsbeleid",

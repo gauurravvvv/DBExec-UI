@@ -79,9 +79,6 @@
     .row-title {
       color: var(--text-color);
     }
-    .notification-icon i {
-      color: var(--primary-color);
-    }
     // Tiny unread dot in the top-right gutter — softer than a
     // full left-border accent inside a full-width modal row.
     &::after {
@@ -100,18 +97,18 @@
     }
   }
 
+  // Per-type coloured chip — colour + tinted background are bound
+  // inline from notificationAccent(type) so a new type auto-themes.
   .notification-icon {
     flex-shrink: 0;
     width: 34px;
     height: 34px;
     border-radius: var(--radius-md);
-    background: var(--hover-background);
     display: flex;
     align-items: center;
     justify-content: center;
 
     i {
-      color: var(--secondary-color);
       font-size: var(--fs-body);
     }
   }
@@ -192,21 +189,101 @@
   }
 }
 
+// ── Footer (See all) ───────────────────────────────────────────────
+.notification-footer {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding: var(--space-3) var(--space-6);
+  border-top: 1px solid var(--border-color);
+  background: var(--card-background);
+}
+
+.notification-see-all {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: var(--fs-control);
+  font-weight: var(--fw-semibold);
+  color: var(--primary-color);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  transition: background var(--motion-fast) ease;
+
+  i {
+    font-size: var(--fs-label);
+    transition: transform var(--motion-fast) ease;
+  }
+
+  &:hover {
+    background: rgba(var(--primary-color-rgb), 0.08);
+    i {
+      transform: translateX(2px);
+    }
+  }
+}
+
 // ── Empty state ────────────────────────────────────────────────────
 .empty-state {
-  padding: 56px 20px;
+  padding: 56px var(--space-6);
   text-align: center;
   color: var(--secondary-color);
 
-  i {
-    font-size: var(--fs-h1);
-    display: block;
-    opacity: 0.5;
-    margin-bottom: 12px;
+  .empty-state-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto var(--space-4);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(var(--primary-color-rgb), 0.08);
+
+    i {
+      font-size: var(--fs-h1);
+      color: var(--success-color);
+    }
   }
 
-  p {
+  .empty-state-title {
     margin: 0;
     font-size: var(--fs-body);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+  }
+
+  .empty-state-hint {
+    margin: var(--space-1) 0 0;
+    font-size: var(--fs-control);
+    color: var(--secondary-color);
+  }
+}
+
+// ── Smooth reveal — rows fade + rise slightly as the panel opens. ───
+.notification-row {
+  animation: notif-row-in var(--motion-medium, 220ms) ease both;
+}
+
+@keyframes notif-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notification-row {
+    animation: none;
+  }
+  .notification-see-all i {
+    transition: none;
   }
 }

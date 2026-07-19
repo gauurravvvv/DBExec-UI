@@ -2207,7 +2207,8 @@
     "DB_ROLES": "Usuarios y roles de la base de datos",
     "DB_PRIVILEGES": "Privilegios y acceso",
     "QUERY_RUNNER": "Espacio de trabajo SQL",
-    "EMBED_DASHBOARD": "Dashboard"
+    "EMBED_DASHBOARD": "Dashboard",
+    "NOTIFICATIONS": "Notificaciones"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Mejore su experiencia de\ngestión de fuentes de datos",
@@ -3682,7 +3683,15 @@
     "DASHBOARD_DELIVERED_TITLE": "Panel entregado",
     "DASHBOARD_DELIVERED_BODY": "{{dashboardName}} se ha entregado en tu bandeja de entrada.",
     "GENERIC_TITLE": "Notificación",
-    "GENERIC_BODY": "Tienes una nueva notificación."
+    "GENERIC_BODY": "Tienes una nueva notificación.",
+    "SEE_ALL": "Ver todas las notificaciones",
+    "EMPTY_HINT": "Las nuevas notificaciones aparecerán aquí.",
+    "EMPTY_UNREAD": "No hay notificaciones sin leer",
+    "FILTER_ALL": "Todas",
+    "FILTER_UNREAD": "Sin leer",
+    "FILTER_ALL_TYPES": "Todos los tipos",
+    "MARK_READ": "Marcar como leída",
+    "LOAD_MORE": "Cargar más"
   },
   "MENU": {
     "SECURITY_POLICY": "Política de seguridad",

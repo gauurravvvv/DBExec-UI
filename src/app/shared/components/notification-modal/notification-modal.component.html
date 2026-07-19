@@ -29,7 +29,11 @@
           [class.clickable]="hasRoute(n)"
           (click)="onRowClick(n)"
         >
-          <div class="notification-icon">
+          <div
+            class="notification-icon"
+            [style.color]="accentFor(n.type)"
+            [style.background]="'color-mix(in srgb, ' + accentFor(n.type) + ' 12%, transparent)'"
+          >
             <i class="pi" [ngClass]="iconFor(n.type)" aria-hidden="true"></i>
           </div>
           <div class="notification-content">
@@ -52,12 +56,24 @@
         </li>
       </ul>
     </ng-container>
+
+    <!-- Footer — jump to the dedicated full-page feed (filters, bulk
+         actions, the complete history). -->
+    <div class="notification-footer">
+      <button type="button" class="notification-see-all" (click)="seeAll()">
+        {{ 'NOTIFICATION.SEE_ALL' | translate }}
+        <i class="pi pi-arrow-right" aria-hidden="true"></i>
+      </button>
+    </div>
   </ng-container>
 
   <ng-template #emptyState>
     <div class="empty-state">
-      <i class="pi pi-bell-slash" aria-hidden="true"></i>
-      <p>{{ 'HEADER.ALL_CAUGHT_UP' | translate }}</p>
+      <div class="empty-state-icon">
+        <i class="pi pi-check-circle" aria-hidden="true"></i>
+      </div>
+      <p class="empty-state-title">{{ 'HEADER.ALL_CAUGHT_UP' | translate }}</p>
+      <p class="empty-state-hint">{{ 'NOTIFICATION.EMPTY_HINT' | translate }}</p>
     </div>
   </ng-template>
 </app-command-modal>

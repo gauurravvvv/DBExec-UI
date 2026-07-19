@@ -1,3 +1,7 @@
+// Type-only import — erased at compile time, so the constants file
+// takes no runtime dependency on the service (and no import cycle).
+import type { NotificationMeta } from 'src/app/core/services/notification.service';
+
 // Centralised navigation paths used by routerLink and router.navigate
 // across the app. Paths follow REST conventions:
 //   LIST – list / index page
@@ -146,6 +150,13 @@ export const DASHBOARD = {
 
 export const ANNOUNCEMENT = feature('/app/settings/announcements');
 
+// Per-user notifications feed — the full-page view behind the bell
+// panel's "See all". Auth-gated only (not permission-gated), like the
+// profile screen.
+export const NOTIFICATIONS = {
+  LIST: '/app/notifications',
+};
+
 // Legacy aliases — never wired to a real module.
 export const ENVIRONMENT = {
   ADD: '/app/environment/add',
@@ -173,19 +184,12 @@ export const CREDENTIAL = {
 // should navigate to, using the builders above (never hand-built
 // paths). Returns null when a row isn't navigable (unknown type or
 // missing target id) — the caller then just marks it read without
-// navigating. Shapes mirror the BE NotificationMeta.
+// navigating. `meta` reuses the single exported NotificationMeta type
+// (see notification.service.ts) so the deep-link shape can't drift from
+// the wire shape the service consumes.
 export interface NotificationRouteInput {
   type: string;
-  meta?: {
-    assetType?: string;
-    assetId?: string;
-    analysisId?: string;
-    datasetId?: string;
-    dashboardId?: string;
-    alertId?: string;
-    groupId?: string;
-    [key: string]: unknown;
-  } | null;
+  meta?: NotificationMeta | null;
 }
 
 /** assetType → the matching view-builder for asset_shared/unshared. */

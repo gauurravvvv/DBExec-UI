@@ -2207,7 +2207,8 @@
     "DB_ROLES": "データベースユーザーとロール",
     "DB_PRIVILEGES": "権限とアクセス",
     "QUERY_RUNNER": "SQL ワークスペース",
-    "EMBED_DASHBOARD": "ダッシュボード"
+    "EMBED_DASHBOARD": "ダッシュボード",
+    "NOTIFICATIONS": "通知"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "データソース管理体験を\n向上させましょう",
@@ -3682,7 +3683,15 @@
     "DASHBOARD_DELIVERED_TITLE": "ダッシュボードが配信されました",
     "DASHBOARD_DELIVERED_BODY": "{{dashboardName}} が受信トレイに配信されました。",
     "GENERIC_TITLE": "通知",
-    "GENERIC_BODY": "新しい通知があります。"
+    "GENERIC_BODY": "新しい通知があります。",
+    "SEE_ALL": "すべての通知を表示",
+    "EMPTY_HINT": "新しい通知はここに表示されます。",
+    "EMPTY_UNREAD": "未読の通知はありません",
+    "FILTER_ALL": "すべて",
+    "FILTER_UNREAD": "未読",
+    "FILTER_ALL_TYPES": "すべてのタイプ",
+    "MARK_READ": "既読にする",
+    "LOAD_MORE": "もっと読み込む"
   },
   "MENU": {
     "SECURITY_POLICY": "セキュリティポリシー",

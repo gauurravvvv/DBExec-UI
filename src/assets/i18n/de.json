@@ -2207,7 +2207,8 @@
     "DB_ROLES": "Datenbankbenutzer & Rollen",
     "DB_PRIVILEGES": "Rechte & Zugriff",
     "QUERY_RUNNER": "SQL-Arbeitsbereich",
-    "EMBED_DASHBOARD": "Dashboard"
+    "EMBED_DASHBOARD": "Dashboard",
+    "NOTIFICATIONS": "Benachrichtigungen"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Verbessern Sie Ihr Datenquellen-\nManagement-Erlebnis",
@@ -3682,7 +3683,15 @@
     "DASHBOARD_DELIVERED_TITLE": "Dashboard zugestellt",
     "DASHBOARD_DELIVERED_BODY": "{{dashboardName}} wurde in Ihren Posteingang zugestellt.",
     "GENERIC_TITLE": "Benachrichtigung",
-    "GENERIC_BODY": "Sie haben eine neue Benachrichtigung."
+    "GENERIC_BODY": "Sie haben eine neue Benachrichtigung.",
+    "SEE_ALL": "Alle Benachrichtigungen anzeigen",
+    "EMPTY_HINT": "Neue Benachrichtigungen werden hier angezeigt.",
+    "EMPTY_UNREAD": "Keine ungelesenen Benachrichtigungen",
+    "FILTER_ALL": "Alle",
+    "FILTER_UNREAD": "Ungelesen",
+    "FILTER_ALL_TYPES": "Alle Typen",
+    "MARK_READ": "Als gelesen markieren",
+    "LOAD_MORE": "Mehr laden"
   },
   "MENU": {
     "SECURITY_POLICY": "Sicherheitsrichtlinie",

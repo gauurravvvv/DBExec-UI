@@ -2207,7 +2207,8 @@
     "DB_ROLES": "数据库用户与角色",
     "DB_PRIVILEGES": "权限与访问",
     "QUERY_RUNNER": "SQL 工作区",
-    "EMBED_DASHBOARD": "仪表板"
+    "EMBED_DASHBOARD": "仪表板",
+    "NOTIFICATIONS": "通知"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "提升您的数据源\n管理体验",
@@ -3682,7 +3683,15 @@
     "DASHBOARD_DELIVERED_TITLE": "仪表板已送达",
     "DASHBOARD_DELIVERED_BODY": "{{dashboardName}} 已送达您的收件箱。",
     "GENERIC_TITLE": "通知",
-    "GENERIC_BODY": "您有一条新通知。"
+    "GENERIC_BODY": "您有一条新通知。",
+    "SEE_ALL": "查看所有通知",
+    "EMPTY_HINT": "新通知将显示在此处。",
+    "EMPTY_UNREAD": "没有未读通知",
+    "FILTER_ALL": "全部",
+    "FILTER_UNREAD": "未读",
+    "FILTER_ALL_TYPES": "所有类型",
+    "MARK_READ": "标记为已读",
+    "LOAD_MORE": "加载更多"
   },
   "MENU": {
     "SECURITY_POLICY": "安全策略",

@@ -2210,7 +2210,8 @@
     "SET_PASSWORD": "Set Password",
     "NOT_FOUND": "Page Not Found",
     "RELAY": "Signing in",
-    "EMBED_DASHBOARD": "Dashboard"
+    "EMBED_DASHBOARD": "Dashboard",
+    "NOTIFICATIONS": "Notifications"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Elevate Your Datasource\nManagement Experience",
@@ -3685,7 +3686,15 @@
     "DASHBOARD_DELIVERED_TITLE": "Dashboard delivered",
     "DASHBOARD_DELIVERED_BODY": "{{dashboardName}} was delivered to your inbox.",
     "GENERIC_TITLE": "Notification",
-    "GENERIC_BODY": "You have a new notification."
+    "GENERIC_BODY": "You have a new notification.",
+    "SEE_ALL": "See all notifications",
+    "EMPTY_HINT": "New notifications will appear here.",
+    "EMPTY_UNREAD": "No unread notifications",
+    "FILTER_ALL": "All",
+    "FILTER_UNREAD": "Unread",
+    "FILTER_ALL_TYPES": "All types",
+    "MARK_READ": "Mark as read",
+    "LOAD_MORE": "Load more"
   },
   "MENU": {
     "SECURITY_POLICY": "Security Policy",

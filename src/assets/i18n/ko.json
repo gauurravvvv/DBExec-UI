@@ -2207,7 +2207,8 @@
     "DB_ROLES": "데이터베이스 사용자 및 역할",
     "DB_PRIVILEGES": "권한 및 접근",
     "QUERY_RUNNER": "SQL 작업 공간",
-    "EMBED_DASHBOARD": "대시보드"
+    "EMBED_DASHBOARD": "대시보드",
+    "NOTIFICATIONS": "알림"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "데이터 소스\n관리 경험을 향상시키세요",
@@ -3682,7 +3683,15 @@
     "DASHBOARD_DELIVERED_TITLE": "대시보드 전달됨",
     "DASHBOARD_DELIVERED_BODY": "{{dashboardName}}이(가) 받은 편지함으로 전달되었습니다.",
     "GENERIC_TITLE": "알림",
-    "GENERIC_BODY": "새 알림이 있습니다."
+    "GENERIC_BODY": "새 알림이 있습니다.",
+    "SEE_ALL": "모든 알림 보기",
+    "EMPTY_HINT": "새 알림이 여기에 표시됩니다.",
+    "EMPTY_UNREAD": "읽지 않은 알림이 없습니다",
+    "FILTER_ALL": "전체",
+    "FILTER_UNREAD": "읽지 않음",
+    "FILTER_ALL_TYPES": "모든 유형",
+    "MARK_READ": "읽음으로 표시",
+    "LOAD_MORE": "더 보기"
   },
   "MENU": {
     "SECURITY_POLICY": "보안 정책",
