@@ -170,7 +170,10 @@ export class NotificationService implements OnDestroy {
    *  rides as ?token=; the BE validates it like AuthMiddleware and
    *  scopes the stream to this user. Reconnects with backoff on drop. */
   private openStream(): void {
-    this.closeStream();
+    // Tear down the previous socket WITHOUT tripping the "closed by us"
+    // guard — a (re)open is not a user-initiated stop, so the backoff
+    // reconnect path must stay armed.
+    this.teardownEventSource();
     this.sseClosedByUs = false;
 
     const token = StorageService.get(StorageType.ACCESS_TOKEN);
@@ -245,18 +248,32 @@ export class NotificationService implements OnDestroy {
   }
 
   private scheduleStreamReconnect(): void {
-    this.closeStream();
+    // Transient error → reconnect. Close the dead socket but DON'T set
+    // `sseClosedByUs` — that flag means "the user stopped us" and must
+    // stay false here so the backoff timer below actually arms. (This
+    // was the bug: routing through closeStream() set the guard and the
+    // very next early-return killed every reconnect.)
+    this.teardownEventSource();
     if (!this.started || this.sseClosedByUs) return;
-    if (this.sseReconnectTimer) clearTimeout(this.sseReconnectTimer);
     const delay = this.sseBackoffMs;
     this.sseBackoffMs = Math.min(this.sseBackoffMs * 2, SSE_BACKOFF_MAX_MS);
     this.sseReconnectTimer = setTimeout(() => {
-      if (this.started) this.openStream();
+      if (this.started && !this.sseClosedByUs) this.openStream();
     }, delay);
   }
 
+  /** User-initiated stop: close the socket AND latch the "closed by us"
+   *  guard so no reconnect is scheduled. Called from stop() / logout. */
   private closeStream(): void {
     this.sseClosedByUs = true;
+    this.teardownEventSource();
+  }
+
+  /** Tear down the current EventSource + any pending reconnect timer.
+   *  Does NOT touch `sseClosedByUs` — callers decide whether this is a
+   *  transient reconnect (guard stays false) or a real stop (closeStream
+   *  latches the guard first). */
+  private teardownEventSource(): void {
     if (this.sseReconnectTimer) {
       clearTimeout(this.sseReconnectTimer);
       this.sseReconnectTimer = null;
