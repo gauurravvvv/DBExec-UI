@@ -4252,7 +4252,7 @@
         "invalid": "Ungültiger Empfänger"
       },
       "permission": {
-        "invalid": "Berechtigung muss Bearbeiten oder Anzeigen sein"
+        "invalid": "Freigabe ist schreibgeschützt"
       },
       "grants": {
         "required": "Wählen Sie mindestens einen Empfänger",
@@ -4954,6 +4954,7 @@
     "UPDATED": "Zugriffsebene aktualisiert",
     "UPDATE_FAILED": "Zugriff konnte nicht aktualisiert werden",
     "REVOKED": "Zugriff entfernt",
-    "REVOKE_FAILED": "Zugriff konnte nicht entfernt werden"
+    "REVOKE_FAILED": "Zugriff konnte nicht entfernt werden",
+    "VIEW_ONLY_HINT": "Empfänger erhalten Lesezugriff"
   }
 }

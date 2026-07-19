@@ -4252,7 +4252,7 @@
         "invalid": "Ongeldige ontvanger"
       },
       "permission": {
-        "invalid": "Machtiging moet Bewerken of Bekijken zijn"
+        "invalid": "Delen is alleen-lezen"
       },
       "grants": {
         "required": "Selecteer ten minste één ontvanger",
@@ -4954,6 +4954,7 @@
     "UPDATED": "Toegangsniveau bijgewerkt",
     "UPDATE_FAILED": "Kan toegang niet bijwerken",
     "REVOKED": "Toegang verwijderd",
-    "REVOKE_FAILED": "Kan toegang niet verwijderen"
+    "REVOKE_FAILED": "Kan toegang niet verwijderen",
+    "VIEW_ONLY_HINT": "Ontvangers krijgen leestoegang"
   }
 }

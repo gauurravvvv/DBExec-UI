@@ -4252,7 +4252,7 @@
         "invalid": "Destinataire non valide"
       },
       "permission": {
-        "invalid": "L'autorisation doit être Modifier ou Afficher"
+        "invalid": "Le partage est en lecture seule"
       },
       "grants": {
         "required": "Sélectionnez au moins un destinataire",
@@ -4954,6 +4954,7 @@
     "UPDATED": "Niveau d'accès mis à jour",
     "UPDATE_FAILED": "Échec de la mise à jour de l'accès",
     "REVOKED": "Accès retiré",
-    "REVOKE_FAILED": "Échec du retrait de l'accès"
+    "REVOKE_FAILED": "Échec du retrait de l'accès",
+    "VIEW_ONLY_HINT": "Les destinataires obtiennent un accès en lecture"
   }
 }

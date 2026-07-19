@@ -4252,7 +4252,7 @@
         "invalid": "接收者无效"
       },
       "permission": {
-        "invalid": "权限必须为“编辑”或“查看”"
+        "invalid": "共享为仅查看"
       },
       "grants": {
         "required": "请至少选择一个接收者",
@@ -4954,6 +4954,7 @@
     "UPDATED": "已更新访问级别",
     "UPDATE_FAILED": "更新访问权限失败",
     "REVOKED": "已移除访问权限",
-    "REVOKE_FAILED": "移除访问权限失败"
+    "REVOKE_FAILED": "移除访问权限失败",
+    "VIEW_ONLY_HINT": "接收者获得查看权限"
   }
 }

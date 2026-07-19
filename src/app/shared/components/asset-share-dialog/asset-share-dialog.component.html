@@ -56,16 +56,12 @@
         </div>
 
         <div class="share-add-row">
-          <app-custom-dropdown
-            [(ngModel)]="addPermission"
-            [ngModelOptions]="{ standalone: true }"
-            [label]="'SHARE.PERMISSION' | translate"
-            [options]="permissionOptions"
-            optionLabel="label"
-            optionValue="value"
-            [filter]="false"
-            appendTo="body"
-          ></app-custom-dropdown>
+          <!-- Sharing is view-only — no level picker; a short hint sets the
+               expectation, and "Add" grants view. -->
+          <span class="share-view-only-hint">
+            <i class="pi pi-eye" aria-hidden="true"></i>
+            {{ 'SHARE.VIEW_ONLY_HINT' | translate }}
+          </span>
 
           <button
             type="button"
@@ -120,16 +116,8 @@
           </div>
 
           <div class="share-row-actions">
-            <app-custom-dropdown
-              [ngModel]="grant.permission"
-              [ngModelOptions]="{ standalone: true }"
-              (onChangeEvent)="changeLevel(grant, $event)"
-              [options]="permissionOptions"
-              optionLabel="label"
-              optionValue="value"
-              [filter]="false"
-              appendTo="body"
-            ></app-custom-dropdown>
+            <!-- View-only model: a static badge, not a level picker. -->
+            <span class="share-view-badge">{{ 'SHARE.PERMISSION_VIEW' | translate }}</span>
 
             <ng-container *ngIf="!isRevokeArmed(grant.id)">
               <button

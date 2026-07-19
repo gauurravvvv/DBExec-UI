@@ -4252,7 +4252,7 @@
         "invalid": "Destinatario non valido"
       },
       "permission": {
-        "invalid": "L'autorizzazione deve essere Modifica o Visualizza"
+        "invalid": "La condivisione è di sola visualizzazione"
       },
       "grants": {
         "required": "Seleziona almeno un destinatario",
@@ -4954,6 +4954,7 @@
     "UPDATED": "Livello di accesso aggiornato",
     "UPDATE_FAILED": "Impossibile aggiornare l'accesso",
     "REVOKED": "Accesso rimosso",
-    "REVOKE_FAILED": "Impossibile rimuovere l'accesso"
+    "REVOKE_FAILED": "Impossibile rimuovere l'accesso",
+    "VIEW_ONLY_HINT": "I destinatari ottengono l'accesso in visualizzazione"
   }
 }

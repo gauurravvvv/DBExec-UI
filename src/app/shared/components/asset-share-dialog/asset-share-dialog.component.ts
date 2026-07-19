@@ -13,7 +13,6 @@ import { MessageService } from 'primeng/api';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
 import {
-  AssetShareGrant,
   AssetShareGrantInput,
   AssetShareService,
 } from 'src/app/shared/services/asset-shares.service';
@@ -25,13 +24,17 @@ export type ShareableAssetType = 'dataset' | 'analysis' | 'dashboard';
  * AssetShareDialog — a Google-Docs-style share modal for datasets, analyses
  * and dashboards. Reused across all three modules (declared in SharedModule).
  *
+ * Sharing is VIEW-ONLY: a grant confers read + run access and nothing more.
+ * Edit/delete authority stays with the asset's creator or an org admin and is
+ * never conferred by a share — so there is no level picker. Adding a
+ * user/group simply grants view.
+ *
  * Renders as a `.confirmation-popup` overlay (NOT a p-dialog), matching the
  * app dialog convention. Surfaces:
- *   - a recipient picker (users + groups) + an Edit/View level, "Add" grants
- *     them in one bulk call;
- *   - the current-access list: the owner pinned first, then each grant with an
- *     inline Edit/View level dropdown (change) and a Revoke button (inline
- *     two-click confirm).
+ *   - a recipient picker (users + groups); "Add" grants them view in one bulk
+ *     call;
+ *   - the current-access list: the owner pinned first, then each grant with a
+ *     static "View" badge and a Revoke button (inline two-click confirm).
  *
  * All I/O goes through AssetShareService (signals). The parent toggles
  * [visible] and listens to (closed).
@@ -49,18 +52,11 @@ export class AssetShareDialogComponent implements OnChanges {
   @Input() assetName = '';
   @Output() closed = new EventEmitter<void>();
 
-  // Add-recipients form state.
+  // Add-recipients form state. Sharing is view-only, so there is no level
+  // to choose — every grant is 'view'.
   selectedUserIds: string[] = [];
   selectedGroupIds: string[] = [];
-  addPermission: 'edit' | 'view' = 'view';
   adding = false;
-
-  // Labels are translated at open time (resolved in ngOnChanges) so the
-  // dropdown shows localised text without a custom translate-options input.
-  permissionOptions: Array<{ label: string; value: 'edit' | 'view' }> = [
-    { label: 'Can edit', value: 'edit' },
-    { label: 'Can view', value: 'view' },
-  ];
 
   // Inline revoke confirmation: the grant id awaiting a confirming 2nd click.
   private _revokeArmed: string | null = null;
@@ -78,12 +74,7 @@ export class AssetShareDialogComponent implements OnChanges {
     if (changes['visible'] && this.visible && this.assetId) {
       this.selectedUserIds = [];
       this.selectedGroupIds = [];
-      this.addPermission = 'view';
       this._revokeArmed = null;
-      this.permissionOptions = [
-        { label: this.t('SHARE.PERMISSION_EDIT'), value: 'edit' },
-        { label: this.t('SHARE.PERMISSION_VIEW'), value: 'view' },
-      ];
       this.shareService.reset();
       void this.refresh();
     }
@@ -195,16 +186,17 @@ export class AssetShareDialogComponent implements OnChanges {
 
   async add(): Promise<void> {
     if (!this.canAdd) return;
+    // Sharing is view-only — every grant is 'view'.
     const grants: AssetShareGrantInput[] = [
       ...this.selectedUserIds.map(id => ({
         granteeType: 'user' as const,
         granteeId: id,
-        permission: this.addPermission,
+        permission: 'view' as const,
       })),
       ...this.selectedGroupIds.map(id => ({
         granteeType: 'group' as const,
         granteeId: id,
-        permission: this.addPermission,
+        permission: 'view' as const,
       })),
     ];
     this.adding = true;
@@ -231,22 +223,9 @@ export class AssetShareDialogComponent implements OnChanges {
     }
   }
 
-  // ── Per-grant level change + revoke ──────────────────────────────────
-
-  async changeLevel(grant: AssetShareGrant, permission: 'edit' | 'view'): Promise<void> {
-    if (grant.permission === permission) return;
-    try {
-      const res: any = await this.shareService.updateShare(grant.id, permission);
-      if (res?.status) {
-        this.toastSuccess(this.t('SHARE.UPDATED'));
-        await this.refresh();
-      } else {
-        this.toastError(res?.message || this.t('SHARE.UPDATE_FAILED'));
-      }
-    } catch {
-      this.toastError(this.t('SHARE.UPDATE_FAILED'));
-    }
-  }
+  // ── Per-grant revoke ─────────────────────────────────────────────────
+  // Sharing is view-only, so there is no per-grant level to change — the
+  // only per-grant action is revoke.
 
   askRevoke(id: string): void {
     this._revokeArmed = id;

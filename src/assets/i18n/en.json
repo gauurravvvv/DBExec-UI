@@ -4249,7 +4249,7 @@
         "invalid": "Invalid recipient"
       },
       "permission": {
-        "invalid": "Permission must be Edit or View"
+        "invalid": "Sharing is view-only"
       },
       "grants": {
         "required": "Select at least one recipient",
@@ -4951,6 +4951,7 @@
     "UPDATED": "Access level updated",
     "UPDATE_FAILED": "Failed to update access",
     "REVOKED": "Access removed",
-    "REVOKE_FAILED": "Failed to remove access"
+    "REVOKE_FAILED": "Failed to remove access",
+    "VIEW_ONLY_HINT": "Recipients get view access"
   }
 }

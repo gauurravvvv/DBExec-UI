@@ -29,8 +29,14 @@ export type AssetShareAssetType = (typeof ASSET_SHARE_ASSET_TYPES)[number];
 export const ASSET_SHARE_GRANTEE_TYPES = ['user', 'group'] as const;
 export type AssetShareGranteeType = (typeof ASSET_SHARE_GRANTEE_TYPES)[number];
 
-/** Two levels. view = read + run only. edit = modify + run + manage grants. */
-export const ASSET_SHARE_PERMISSIONS = ['edit', 'view'] as const;
+/**
+ * Sharing is VIEW-ONLY. A share grant confers read + run access and nothing
+ * more. Edit/delete authority belongs to the asset's creator or an org admin
+ * (never conferred by a share) — a shared-with user who wants to change an
+ * asset duplicates it. 'view' is retained as the single level so the grant
+ * payload keeps a stable shape (rather than dropping the field entirely).
+ */
+export const ASSET_SHARE_PERMISSIONS = ['view'] as const;
 export type AssetSharePermission = (typeof ASSET_SHARE_PERMISSIONS)[number];
 
 export const ASSET_SHARE_LIMITS = {
