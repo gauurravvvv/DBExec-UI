@@ -167,3 +167,63 @@ export const CREDENTIAL = {
   EDIT: '/app/secrets/edit',
   VIEW: '/app/secrets/view',
 };
+
+// ── Notification deep-link map ──────────────────────────────────────
+// Maps a notification's `type` + `meta` to the routerLink a click
+// should navigate to, using the builders above (never hand-built
+// paths). Returns null when a row isn't navigable (unknown type or
+// missing target id) — the caller then just marks it read without
+// navigating. Shapes mirror the BE NotificationMeta.
+export interface NotificationRouteInput {
+  type: string;
+  meta?: {
+    assetType?: string;
+    assetId?: string;
+    analysisId?: string;
+    datasetId?: string;
+    dashboardId?: string;
+    alertId?: string;
+    groupId?: string;
+    [key: string]: unknown;
+  } | null;
+}
+
+/** assetType → the matching view-builder for asset_shared/unshared. */
+function assetView(assetType: string | undefined, assetId: string): string | null {
+  switch (assetType) {
+    case 'dataset':
+      return DATASET.view(assetId);
+    case 'analysis':
+      return ANALYSES.view(assetId);
+    case 'dashboard':
+      return DASHBOARD.view(assetId);
+    default:
+      return null;
+  }
+}
+
+export function notificationRoute(n: NotificationRouteInput): string | null {
+  const meta = n.meta ?? {};
+  switch (n.type) {
+    case 'asset_shared':
+    case 'asset_unshared': {
+      if (!meta.assetId) return null;
+      return assetView(meta.assetType, meta.assetId);
+    }
+    case 'alert_fired': {
+      // Prefer the alert rule view; fall back to the source analysis.
+      if (meta.alertId) return ALERT.view(meta.alertId);
+      if (meta.analysisId) return ANALYSES.view(meta.analysisId);
+      return null;
+    }
+    case 'dashboard_delivered': {
+      return meta.dashboardId ? DASHBOARD.view(meta.dashboardId) : null;
+    }
+    case 'group_added':
+    case 'group_removed': {
+      return meta.groupId ? GROUP.view(meta.groupId) : null;
+    }
+    default:
+      return null;
+  }
+}

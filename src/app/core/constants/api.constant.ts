@@ -582,6 +582,15 @@ export const NOTIFICATION = {
   UNREAD_COUNT: '/notifications/unread-count',
   // POST — mark every unread row read for the logged-in user
   READ_ALL: '/notifications/read-all',
+  // GET (SSE) — real-time stream. EventSource can't set headers, so the JWT
+  // rides as ?token=<jwt>; the BE validates it exactly like AuthMiddleware.
+  STREAM: '/notifications/stream',
+  // PATCH — mark ONE row read (id appended: `${READ_ONE(id)}`)
+  readOne: (id: string) => `/notifications/${id}/read`,
+  // DELETE — soft-delete ONE row
+  remove: (id: string) => `/notifications/${id}`,
+  // DELETE — clear all READ rows
+  CLEAR: '/notifications',
 };
 
 /**
