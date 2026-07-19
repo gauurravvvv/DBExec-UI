@@ -5,6 +5,40 @@
       <div class="header-content">
         <h2>{{ 'DASHBOARD.TITLE' | translate }}</h2>
       </div>
+
+      <div class="header-actions">
+        <!-- Export selected (N) — appears only when ≥1 row is checked. -->
+        <app-button
+          *ngIf="selectedRows.length"
+          variant="secondary"
+          icon="pi pi-download"
+          [loading]="exporting()"
+          (clicked)="onExportSelected()"
+        >
+          {{
+            'MIGRATION.EXPORT_SELECTED'
+              | translate: { count: selectedRows.length }
+          }}
+        </app-button>
+
+        <!-- Import a .dbexec.json bundle. -->
+        <app-button
+          *hasPermission="'dashboard'; level: 'write'"
+          variant="secondary"
+          icon="pi pi-upload"
+          [loading]="importing()"
+          (clicked)="onImportClick()"
+        >
+          {{ 'MIGRATION.IMPORT' | translate }}
+        </app-button>
+        <input
+          #importInput
+          type="file"
+          accept=".json,.dbexec,.dbexec.json"
+          (change)="onImportFile($event)"
+          hidden
+        />
+      </div>
     </div>
 
     <!-- Unified simple table. Infinite scroll, global search + on-demand
@@ -20,6 +54,7 @@
           [config]="tableConfig"
           [hasProjectedEmpty]="true"
           (refresh)="refreshList()"
+          (selectionChange)="onSelectionChange($event)"
         >
           <!-- Empty body — always projected so only one empty state shows. -->
           <div tableEmpty class="ct-empty-body">
@@ -103,6 +138,15 @@
                 tooltipPosition="bottom"
               >
                 <i class="pi pi-share-alt"></i>
+              </button>
+              <button
+                class="icon-btn export-btn"
+                (click)="onExportRow(dashboard)"
+                [pTooltip]="'MIGRATION.EXPORT_TOOLTIP' | translate"
+                tooltipPosition="bottom"
+                [disabled]="exporting()"
+              >
+                <i class="pi pi-download"></i>
               </button>
               <button
                 *hasPermission="'dashboard'; level: 'delete'"

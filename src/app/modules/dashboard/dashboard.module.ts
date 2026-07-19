@@ -5,6 +5,7 @@ import { CustomTableComponent } from 'src/app/shared/components/custom-table/cus
 import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-table/custom-table-empty.directive';
 import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedChartsModule } from 'src/app/shared/modules/shared-charts.module';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -42,6 +43,8 @@ import { DashboardRoutingModule } from './dashboard-routing.module';
     ScheduleDeliveryDialogComponent,
     // Canonical shared chip / status-pill / count / tag / filter element.
     ChipComponent,
+    // Canonical shared button (migration Import / Export-selected toolbar).
+    ButtonComponent,
   ],
 })
 export class DashboardModule {}

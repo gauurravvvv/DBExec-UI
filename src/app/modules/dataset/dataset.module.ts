@@ -8,6 +8,7 @@ import { CustomTableComponent } from 'src/app/shared/components/custom-table/cus
 import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-table/custom-table-empty.directive';
 import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AddDatasetComponent } from './components/add-dataset/add-dataset.component';
 import { DatasetParamsPanelComponent } from './components/dataset-params-panel/dataset-params-panel.component';
@@ -46,6 +47,8 @@ import { addDatasetReducer, ADD_DATASET_FEATURE_KEY } from './store';
     UsGridCellDirective,
     // Canonical shared chip / status-pill / count / tag element.
     ChipComponent,
+    // Canonical shared button (migration Import / Export-selected toolbar).
+    ButtonComponent,
     // Standalone {{name}} query-parameters panel (embedded in add/edit).
     DatasetParamsPanelComponent,
     // NgRx Feature Store

@@ -3,10 +3,19 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
+  ElementRef,
   inject,
   OnDestroy,
   OnInit,
+  ViewChild,
 } from '@angular/core';
+import { CustomTableComponent } from 'src/app/shared/components/custom-table/custom-table.component';
+import { MigrationService } from 'src/app/modules/migration/services/migration.service';
+import {
+  MigrationFileError,
+  parseBundleFile,
+} from 'src/app/modules/migration/utils/migration-file.util';
+import type { MigrationAssetType } from 'src/app/shared/validators/migration';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -46,6 +55,20 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
+  /** Hidden file input for Import. */
+  @ViewChild('importInput') importInput?: ElementRef<HTMLInputElement>;
+  /** The unified table — used to clear selection after a bulk export. */
+  @ViewChild(CustomTableComponent) table?: CustomTableComponent;
+
+  /* ── migration (export / import) ─────────────────────── */
+
+  /** The list's asset family for the migration export request. */
+  private readonly migrationAssetType: MigrationAssetType = 'dashboard';
+  /** Row objects selected via the table's opt-in checkboxes. */
+  selectedRows: any[] = [];
+  exporting = this.migrationService.exporting;
+  importing = this.migrationService.importing;
+
   /* ── page state — preserved from the p-table version ─── */
 
   showDeleteConfirm = false;
@@ -79,6 +102,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
     showColumnFilters: true,
     enableExport: true,
+    selectable: true, // migration bulk-export selection surface
     gridKey: 'dashboards-list',
     height: 'flex',
     rowIdField: 'id',
@@ -110,6 +134,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private translate: TranslateService,
     private favouritesService: FavouritesService,
+    private migrationService: MigrationService,
   ) {}
 
   ngOnInit() {
@@ -221,6 +246,88 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     this.showShareDialog = false;
     this.shareAssetId = '';
     this.shareAssetName = '';
+  }
+
+  /* ── migration: export / import ──────────────────────── */
+
+  /** Table selection changed (opt-in checkboxes). */
+  onSelectionChange(rows: any[]): void {
+    this.selectedRows = rows;
+    this.cdr.markForCheck();
+  }
+
+  /** Export a single row to a downloaded `.dbexec.json`. */
+  async onExportRow(row: any): Promise<void> {
+    if (!row?.id) return;
+    try {
+      await this.migrationService.exportAssets([
+        { assetType: this.migrationAssetType, assetId: row.id },
+      ]);
+    } catch (err: any) {
+      this.globalService.handleErrorService({
+        status: false,
+        message: this.resolveError(err),
+      });
+    }
+    this.cdr.markForCheck();
+  }
+
+  /** Export every currently-selected row as ONE bundle, then clear selection. */
+  async onExportSelected(): Promise<void> {
+    if (!this.selectedRows.length) return;
+    const items = this.selectedRows
+      .filter(r => r?.id)
+      .map(r => ({ assetType: this.migrationAssetType, assetId: r.id }));
+    if (!items.length) return;
+    try {
+      await this.migrationService.exportAssets(items);
+      this.table?.clearSelection();
+      this.selectedRows = [];
+    } catch (err: any) {
+      this.globalService.handleErrorService({
+        status: false,
+        message: this.resolveError(err),
+      });
+    }
+    this.cdr.markForCheck();
+  }
+
+  /** Open the hidden file picker for Import. */
+  onImportClick(): void {
+    this.importInput?.nativeElement.click();
+  }
+
+  /** A file was picked — parse, validate, import, refresh. */
+  async onImportFile(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    input.value = '';
+    if (!file) return;
+    try {
+      const bundle = await parseBundleFile(file);
+      await this.migrationService.importBundle(bundle);
+      this.globalService.showInfo(
+        this.translate.instant('MIGRATION.IMPORT_SUCCESS'),
+        this.translate.instant('MIGRATION.IMPORT'),
+      );
+      this.refreshList();
+    } catch (err: any) {
+      this.globalService.handleErrorService({
+        status: false,
+        message: this.resolveError(err),
+      });
+    }
+    this.cdr.markForCheck();
+  }
+
+  /** Resolve an error to a display string — MigrationFileError + thrown
+   *  Error messages are i18n keys; anything else is shown verbatim. */
+  private resolveError(err: any): string {
+    const key =
+      err instanceof MigrationFileError
+        ? err.messageKey
+        : (err?.message ?? 'MIGRATION.IMPORT_FAILED');
+    return this.translate.instant(key);
   }
 
   confirmDelete(id: string) {
