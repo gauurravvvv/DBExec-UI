@@ -407,6 +407,8 @@ export const AUDIT = {
   // Single-row detail (drawer enrichment): GET /audit-logs/:id — append the id.
   DETAIL: '/audit-logs/', // GET /audit-logs/:id
   LOGIN_ACTIVITY: '/audit-logs/login-activity',
+  // Single login-activity row (drawer detail): GET /audit-logs/login-activity/:id.
+  LOGIN_ACTIVITY_DETAIL: '/audit-logs/login-activity/', // + id
   EXPORT_LOGS: '/audit-logs/export',
   EXPORT_LOGIN_ACTIVITY: '/audit-logs/login-activity/export',
 };

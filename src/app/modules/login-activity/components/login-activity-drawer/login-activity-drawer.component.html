@@ -1,0 +1,106 @@
+<p-sidebar
+  [visible]="visible"
+  (visibleChange)="onVisibleChange($event)"
+  position="right"
+  [modal]="true"
+  [dismissible]="true"
+  [showCloseIcon]="false"
+  [blockScroll]="true"
+  appendTo="body"
+  styleClass="login-drawer-panel"
+  [ariaCloseLabel]="'COMMON.CLOSE' | translate"
+>
+  <ng-container *ngIf="log as row">
+    <!-- Header -->
+    <div class="drawer-head">
+      <div class="head-main">
+        <span class="ev-icon" [ngClass]="eventClass(row.eventType)">
+          <i [ngClass]="eventIcon(row.eventType)"></i>
+        </span>
+        <div class="head-text">
+          <h3>{{ eventLabel(row.eventType) }}</h3>
+          <div class="head-sub">
+            <span class="actor-name">{{ actorDisplay(row) }}</span>
+          </div>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="drawer-close"
+        (click)="onClose()"
+        [attr.aria-label]="'COMMON.CLOSE' | translate"
+        [pTooltip]="'COMMON.CLOSE' | translate"
+        tooltipPosition="bottom"
+      >
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="drawer-body">
+      <dl class="qgrid">
+        <dt>{{ 'AUDIT.WHO' | translate }}</dt>
+        <dd>
+          <span class="actor">
+            <span class="avatar" [attr.aria-hidden]="true">{{ initials(row) }}</span>
+            <span class="em">{{ actorDisplay(row) }}</span>
+          </span>
+        </dd>
+
+        <dt>{{ 'LOGIN_ACTIVITY.EVENT' | translate }}</dt>
+        <dd>{{ eventLabel(row.eventType) }}</dd>
+
+        <dt>{{ 'AUDIT.WHEN' | translate }}</dt>
+        <dd>
+          {{ row.createdOn | date: 'dd MMM yyyy, HH:mm:ss' }}
+          <span class="rel">· {{ row.createdOn | relativeTime }}</span>
+        </dd>
+
+        <dt>{{ 'AUDIT.WHERE' | translate }}</dt>
+        <dd>
+          <code *ngIf="row.ipAddress; else noIp">{{ row.ipAddress }}</code>
+          <ng-template #noIp><span class="muted">—</span></ng-template>
+        </dd>
+
+        <dt>{{ 'AUDIT.OUTCOME' | translate }}</dt>
+        <dd>
+          <span class="outcome" [class.ok]="row.success" [class.fail]="!row.success">
+            <i class="pi" [ngClass]="row.success ? 'pi-check-circle' : 'pi-times-circle'"></i>
+            {{ row.success ? ('LOGIN_ACTIVITY.SUCCESS' | translate) : ('LOGIN_ACTIVITY.FAILED' | translate) }}
+          </span>
+        </dd>
+
+        <ng-container *ngIf="row.failureReason">
+          <dt>{{ 'LOGIN_ACTIVITY.FAILURE_REASON' | translate }}</dt>
+          <dd>
+            <span class="reason">{{ row.failureReason | replaceUnderscores }}</span>
+          </dd>
+        </ng-container>
+      </dl>
+
+      <!-- Device / session context -->
+      <div class="section">
+        <div class="section-label">{{ 'LOGIN_ACTIVITY.DEVICE_CONTEXT' | translate }}</div>
+        <dl class="meta-list">
+          <dt>{{ 'LOGIN_ACTIVITY.IP_ADDRESS' | translate }}</dt>
+          <dd>
+            <code *ngIf="row.ipAddress; else noIp2">{{ row.ipAddress }}</code>
+            <ng-template #noIp2><span class="muted">—</span></ng-template>
+          </dd>
+
+          <dt>{{ 'LOGIN_ACTIVITY.USER_AGENT' | translate }}</dt>
+          <dd>
+            <span class="mono ua" *ngIf="row.userAgent; else noUa" [title]="row.userAgent">{{ row.userAgent }}</span>
+            <ng-template #noUa><span class="muted">—</span></ng-template>
+          </dd>
+
+          <dt>{{ 'LOGIN_ACTIVITY.ORGANISATION' | translate }}</dt>
+          <dd>
+            <span *ngIf="row.organisationName; else noOrg">{{ row.organisationName }}</span>
+            <ng-template #noOrg><span class="muted">—</span></ng-template>
+          </dd>
+        </dl>
+      </div>
+    </div>
+  </ng-container>
+</p-sidebar>

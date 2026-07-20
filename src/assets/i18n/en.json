@@ -3115,7 +3115,25 @@
     "TOKEN_REFRESH": "Token Refresh",
     "PASSWORD_RESET": "Password Reset",
     "OTP_GENERATED": "OTP Generated",
-    "SEARCH_PLACEHOLDER": "Search by user or IP address"
+    "SEARCH_PLACEHOLDER": "Search by user or IP address",
+    "UNKNOWN_USER": "Unknown user",
+    "ORGANISATION": "Organisation",
+    "DEVICE_CONTEXT": "Device & session",
+    "EVENT_LABEL": {
+      "GENERIC": "Event",
+      "LOGIN_SUCCESS": "Login success",
+      "LOGIN_FAILED": "Login failed",
+      "LOGOUT": "Logout",
+      "TOKEN_REFRESH": "Token refresh",
+      "PASSWORD_RESET": "Password reset",
+      "PASSWORD_SET": "Password set",
+      "SETUP_LINK_RESENT": "Setup link resent",
+      "OTP_GENERATED": "OTP generated",
+      "SESSION_EXPIRED": "Session expired",
+      "ACCOUNT_LOCKED": "Account locked",
+      "ACCOUNT_UNLOCKED": "Account unlocked",
+      "SESSION_BOOTSTRAP_FAILED": "Session bootstrap failed"
+    }
   },
   "UNSAVED_CHANGES": {
     "TITLE": "Unsaved Changes",

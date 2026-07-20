@@ -1,3 +1,9 @@
+// ============================================================
+// Login-activity list. Page frame + bespoke cells (event badge, actor
+// avatar, outcome, origin) reach through ::ng-deep into the shared table's
+// projected cell markup. Same idiom + tokens as the audit list.
+// ============================================================
+
 :host {
   display: block;
   height: 100%;
@@ -35,21 +41,16 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-
-  .header-content {
-    h2 {
-      // Title carries the header on its own (no subtitle). Clamp
-      // sits between 1.25rem and 1.375rem — lands ~22px at typical
-      // desktop widths.
-      font-size: clamp(1.25rem, 1.05rem + 0.4vw, 1.375rem);
-      font-weight: var(--fw-semibold);
-      color: var(--text-color);
-      letter-spacing: -0.025em;
-      margin: 0;
-    }
-  }
   flex-wrap: wrap;
   gap: var(--space-6);
+
+  .header-content h2 {
+    font-size: clamp(1.25rem, 1.05rem + 0.4vw, 1.375rem);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+    letter-spacing: -0.025em;
+    margin: 0;
+  }
 
   .header-actions {
     display: flex;
@@ -60,8 +61,6 @@
 }
 
 .content-card {
-  // Flat surface — no outline, no shadow, no border. Table sits directly
-  // on the page background.
   background: transparent;
   border: none;
   border-radius: 0;
@@ -73,44 +72,6 @@
   min-height: 0;
   overflow: hidden;
 
-  .card-toolbar {
-    padding: 0 0 var(--space-5);
-    border-bottom: none;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--space-6);
-    background: transparent;
-
-    .toolbar-left,
-    .toolbar-right {
-      display: flex;
-      align-items: center;
-      gap: var(--space-6);
-    }
-
-    .dropdown-field {
-      // Fixed width — `min-width` alone let the trigger grow when a
-      // long value was selected, recreating the jitter bug fixed
-      // globally in styles.scss.
-      flex: 0 0 200px;
-      width: 200px;
-    }
-
-    .modern-button {
-      border-radius: var(--radius-sm) !important;
-      font-weight: var(--fw-semibold);
-      padding: 0.65rem 1.25rem;
-
-      &.p-button-outlined.p-button-danger {
-        border-color: var(--error-color);
-        color: var(--error-color);
-        background: transparent;
-      }
-    }
-  }
-
   .table-wrapper {
     flex: 1;
     overflow: hidden;
@@ -119,58 +80,131 @@
     flex-direction: column;
     min-width: 0;
     width: 100%;
-    overflow: hidden;
-
-    // The event-badge is a bespoke login-event chip (success / failed /
-    // logout / refresh / warning) the shared table does not define. It renders
-    // on projected usGridCell content, so it must reach through ::ng-deep into
-    // the shared component's emitted markup.
-    ::ng-deep .event-badge {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: var(--radius-xs);
-      font-size: var(--fs-label);
-      font-weight: var(--fw-semibold);
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      white-space: nowrap;
-
-      &.event-success {
-        background: var(--success-bg);
-        color: var(--success-color);
-      }
-      &.event-failed {
-        background: var(--error-bg);
-        color: var(--error-color);
-      }
-      &.event-logout {
-        background: var(--primary-color-transparent);
-        color: var(--primary-color);
-      }
-      &.event-refresh {
-        background: var(--primary-color-transparent);
-        color: var(--primary-color);
-      }
-      &.event-warning {
-        background: var(--warning-bg);
-        color: var(--warning-hover);
-      }
-      &.event-default {
-        background: var(--hover-background);
-        color: var(--secondary-color);
-      }
-    }
-
-    // User-agent cell is width-capped so long UA strings ellipsis-truncate
-    // rather than stretch the column. The shared .description-text supplies
-    // colour/overflow; this only bounds the width.
-    ::ng-deep .user-agent-text {
-      max-width: 220px;
-    }
   }
 }
 
-/* ── projected empty body (centred; not a row) ─────────────────────────── */
+/* ── filter cluster (custom-table toolbar-left slot) ─────────────────────── */
+.login-filters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  min-width: 0;
+
+  ::ng-deep {
+    app-custom-dropdown,
+    app-custom-daterange,
+    app-custom-input {
+      display: block;
+    }
+  }
+
+  .f-event ::ng-deep { width: 12rem; }
+  .f-actor ::ng-deep { width: 12rem; }
+  .f-date ::ng-deep { width: 14rem; }
+  .f-failures { flex: none; }
+}
+
+/* ── bespoke login cells (reach into projected cell markup) ──────────────── */
+::ng-deep {
+  .ev-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    text-align: left;
+    color: inherit;
+    font: inherit;
+    min-width: 0;
+    width: 100%;
+
+    .mi {
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-sm);
+      display: grid;
+      place-items: center;
+      flex: none;
+      background: var(--hover-background);
+      color: var(--text-color-secondary);
+      i { font-size: var(--fs-control); }
+
+      &.ev-success { color: var(--success-color); background: var(--success-bg); }
+      &.ev-failed { color: var(--error-color); background: var(--error-bg); }
+      &.ev-warning { color: var(--warning-color); background: var(--warning-bg); }
+      &.ev-logout { color: var(--text-color-secondary); background: var(--hover-background); }
+      &.ev-refresh { color: var(--primary-color); background: var(--primary-color-transparent); }
+    }
+
+    .ev-name {
+      font-weight: var(--fw-medium);
+      color: var(--text-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    &:hover .ev-name { color: var(--primary-color); }
+  }
+
+  .actor-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-width: 0;
+
+    .avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: var(--fs-micro);
+      font-weight: var(--fw-semibold);
+      color: var(--primary-text, #fff);
+      background: var(--primary-color);
+      flex: none;
+    }
+    .actor-name {
+      color: var(--text-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .reason-text {
+    max-width: 220px;
+    &.muted { color: var(--text-muted); }
+  }
+
+  .ts { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  .ip-text {
+    font-family: var(--font-mono);
+    font-size: var(--fs-micro);
+    color: var(--text-color-secondary);
+  }
+
+  .outcome-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-semibold);
+    white-space: nowrap;
+
+    &.ok { color: var(--success-color); }
+    &.fail { color: var(--error-color); }
+    i { font-size: var(--fs-control); }
+    .caret { color: var(--text-muted); margin-left: var(--space-2); font-size: var(--fs-label); }
+  }
+}
+
+/* ── projected empty body ────────────────────────────────────────────────── */
 .ct-empty-body {
   display: flex;
   flex-direction: column;

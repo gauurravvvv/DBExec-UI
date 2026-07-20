@@ -100,6 +100,17 @@ export class AuditService {
     );
   }
 
+  /** Fetch one login-activity row for the drawer. Returns the mapped row
+   *  (names only) or null. */
+  async getLoginActivity(id: string): Promise<any | null> {
+    const res: any = await lastValueFrom(
+      this.http.apiGet(`${AUDIT.LOGIN_ACTIVITY_DETAIL}${id}`, {
+        skipLoader: true,
+      }),
+    );
+    return res?.status ? res.data : null;
+  }
+
   /** Export the login-activity set as a file blob. */
   exportLoginActivity(params: Record<string, unknown>): Observable<Blob> {
     return this.http.apiGet<Blob>(AUDIT.EXPORT_LOGIN_ACTIVITY, {

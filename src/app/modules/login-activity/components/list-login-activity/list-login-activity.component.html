@@ -1,32 +1,26 @@
 <div class="dataset-page-wrapper">
   <div class="dataset-content-container">
-    <!-- Header Section -->
+    <!-- Header -->
     <div class="page-header-section">
       <div class="header-content">
         <h2>{{ 'LOGIN_ACTIVITY.TITLE' | translate }}</h2>
       </div>
 
       <div class="header-actions">
-        <button
-          pButton
+        <app-button
+          variant="secondary"
           [icon]="isExporting ? 'pi pi-spin pi-spinner' : 'pi pi-file-pdf'"
-          [pTooltip]="'COMMON.EXPORT_PDF' | translate"
-          tooltipPosition="top"
-          (click)="exportActivity('pdf')"
-          [disabled]="isExporting || totalItems === 0"
-          class="p-button-outlined p-button-danger modern-button"
-        ></button>
+          [disabled]="isExporting || totalCount === 0"
+          [title]="'COMMON.EXPORT_PDF' | translate"
+          (clicked)="exportActivity('pdf')"
+        >
+          {{ 'COMMON.EXPORT' | translate }}
+        </app-button>
       </div>
     </div>
 
-    <!-- Content Card -->
+    <!-- Content card -->
     <div class="content-card">
-      <!-- Unified simple table. Read-only activity log: infinite scroll,
-           global search + on-demand per-column filters (shared inputs), no
-           row selection, no row actions, no bulk-delete. Per-cell DOM via
-           <ng-template usGridCell> so the visual look — username link, event
-           badge, failure-reason text, relative timestamp, ip / user-agent
-           text — matches the previous layout. -->
       <div class="table-wrapper" *ngIf="adapter">
         <app-custom-table
           [columns]="cols"
@@ -35,62 +29,126 @@
           [hasProjectedEmpty]="true"
           (refresh)="refreshList()"
         >
-          <!-- Empty body — always projected so only one empty state shows. -->
-          <div tableEmpty class="ct-empty-body">
-            <i class="pi pi-inbox"></i>
-            <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
+          <!-- Filter cluster -->
+          <div tableToolbarStart class="login-filters">
+            <app-custom-dropdown
+              class="f-event"
+              [(ngModel)]="selectedEvent"
+              [options]="eventOptions"
+              optionLabel="label"
+              optionValue="value"
+              [filter]="false"
+              [showClear]="true"
+              [autoDisplayFirst]="false"
+              [floatingLabel]="true"
+              [label]="'LOGIN_ACTIVITY.EVENT' | translate"
+              icon="pi-bolt"
+              (onChangeEvent)="onEventChange($event)"
+            ></app-custom-dropdown>
+
+            <app-custom-input
+              class="f-actor"
+              [ngModel]="actorSearch"
+              (ngModelChange)="onActorSearch($event)"
+              icon="pi-user"
+              [placeholder]="'LOGIN_ACTIVITY.SEARCH_USERNAME' | translate"
+            ></app-custom-input>
+
+            <app-custom-daterange
+              class="f-date"
+              [(ngModel)]="dateRange"
+              [floatingLabel]="true"
+              [label]="'AUDIT.FILTER_DATE' | translate"
+              [maxDate]="null"
+              (onChangeEvent)="onDateRangeChange($event)"
+            ></app-custom-daterange>
+
+            <app-custom-toggle
+              class="f-failures"
+              [ngModel]="failuresOnly"
+              [showStatusLabel]="true"
+              [trueLabel]="'AUDIT.FAILURES_ONLY' | translate"
+              [falseLabel]="'AUDIT.FAILURES_ONLY' | translate"
+              (onChange)="onFailuresToggle($event)"
+            ></app-custom-toggle>
+
+            <app-button
+              *ngIf="hasActiveFilters"
+              variant="ghost"
+              size="sm"
+              icon="pi pi-filter-slash"
+              [title]="'COMMON.CLEAR' | translate"
+              (clicked)="clearFilters()"
+            >
+              {{ 'COMMON.CLEAR' | translate }}
+            </app-button>
           </div>
 
-          <ng-template usGridCell="username" let-activity>
-            <a class="dataset-name-link" [title]="activity.username">
-              {{ activity.username || '-' }}
-            </a>
+          <!-- Empty state -->
+          <div tableEmpty class="ct-empty-body">
+            <i class="pi pi-inbox"></i>
+            <span>{{ 'LOGIN_ACTIVITY.NO_ACTIVITY_FOUND' | translate }}</span>
+          </div>
+
+          <!-- Event -->
+          <ng-template usGridCell="event" let-activity>
+            <button type="button" class="ev-cell" (click)="openDetail(activity)">
+              <span class="mi" [ngClass]="eventClass(activity.eventType)">
+                <i [ngClass]="eventIcon(activity.eventType)"></i>
+              </span>
+              <span class="ev-name">{{ eventLabel(activity.eventType) }}</span>
+            </button>
           </ng-template>
 
-          <ng-template usGridCell="eventType" let-activity>
-            <span
-              class="event-badge"
-              [ngClass]="getEventClass(activity.eventType)"
-            >
-              {{ activity.eventType | replaceUnderscores }}
+          <!-- Performed by -->
+          <ng-template usGridCell="actor" let-activity>
+            <span class="actor-cell">
+              <span class="avatar">{{ initials(activity) }}</span>
+              <span class="actor-name" [title]="actorDisplay(activity)">{{ actorDisplay(activity) }}</span>
             </span>
           </ng-template>
 
-          <ng-template usGridCell="failureReason" let-activity>
+          <!-- Failure reason -->
+          <ng-template usGridCell="reason" let-activity>
             <span
-              class="description-text"
-              *ngIf="activity.failureReason"
-              [title]="activity.failureReason"
-            >
-              {{ activity.failureReason | replaceUnderscores }}
-            </span>
-            <span class="description-text" *ngIf="!activity.failureReason"
-              >-</span
-            >
+              class="description-text reason-text"
+              *ngIf="activity.failureReason; else noReason"
+              [title]="activity.failureReason | replaceUnderscores"
+            >{{ activity.failureReason | replaceUnderscores }}</span>
+            <ng-template #noReason><span class="description-text muted">—</span></ng-template>
           </ng-template>
 
-          <ng-template usGridCell="createdOn" let-activity>
+          <!-- When -->
+          <ng-template usGridCell="when" let-activity>
             <span
-              class="date-text"
+              class="date-text ts"
               [pTooltip]="(activity.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
               tooltipPosition="top"
-              >{{ activity.createdOn | relativeTime }}</span
-            >
+            >{{ activity.createdOn | relativeTime }}</span>
           </ng-template>
 
-          <ng-template usGridCell="ipAddress" let-activity>
-            <span class="description-text">{{ activity.ipAddress || '-' }}</span>
+          <!-- Origin -->
+          <ng-template usGridCell="origin" let-activity>
+            <span class="ip-text">{{ activity.ipAddress || '—' }}</span>
           </ng-template>
 
-          <ng-template usGridCell="userAgent" let-activity>
-            <span
-              class="description-text user-agent-text"
-              [title]="activity.userAgent"
-              >{{ activity.userAgent || '-' }}</span
-            >
+          <!-- Outcome -->
+          <ng-template usGridCell="outcome" let-activity>
+            <span class="outcome-cell" [class.ok]="activity.success" [class.fail]="!activity.success">
+              <i class="pi" [ngClass]="activity.success ? 'pi-check-circle' : 'pi-times-circle'"></i>
+              {{ activity.success ? ('LOGIN_ACTIVITY.SUCCESS' | translate) : ('LOGIN_ACTIVITY.FAILED' | translate) }}
+              <i class="pi pi-chevron-right caret"></i>
+            </span>
           </ng-template>
         </app-custom-table>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Right-side detail drawer -->
+<app-login-activity-drawer
+  [log]="selectedLog"
+  [visible]="drawerVisible"
+  (closed)="onDrawerClosed()"
+></app-login-activity-drawer>

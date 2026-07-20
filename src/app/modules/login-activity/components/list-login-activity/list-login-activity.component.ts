@@ -19,19 +19,29 @@ import type {
   CustomTableColumn,
   CustomTableConfig,
 } from 'src/app/shared/components/custom-table/custom-table.types';
+import {
+  EVENT_FALLBACK,
+  EVENT_FILTER_OPTIONS,
+  EVENT_META,
+} from '../../login-activity-meta.constant';
+import { LoginActivity } from '../../models/login-activity.model';
+
+interface FilterOption {
+  value: string;
+  label: string;
+}
 
 /**
- * Login activity listing — renders through the shared `<app-custom-table>`
- * (the app's unified list table) driven by a `UsServerListAdapter` on the BE
- * `/audit-logs/login-activity` list call. Read-only activity log: infinite
- * scroll (no page controls), a single global search plus on-demand per-column
- * filters (shared inputs). No bulk selection and no row actions — there is
- * nothing to add, edit, or delete.
+ * Login-activity listing — the auth-event trail, rendered through the shared
+ * `<app-custom-table>` driven by a `UsServerListAdapter` on the BE
+ * `/audit-logs/login-activity` list call. Same polish as the audit list:
+ * event badge, actor avatar, outcome + origin columns, a filter toolbar
+ * (event dropdown, actor search, daterange, failures-only toggle, export),
+ * and a right-side detail drawer opened by clicking a row.
  *
- * The page header retains its BE-driven PDF export button; per-cell DOM is
- * supplied via `<ng-template usGridCell>` so the visual look — username link,
- * event badge, failure-reason text, relative timestamp, ip / user-agent text —
- * is unchanged.
+ * NAMES ONLY — the BE `mapLoginActivityRow` already drops internal ids;
+ * `username` renders with an "Unknown user" fallback. Read-only (nothing to
+ * add / edit / delete).
  */
 @Component({
   selector: 'app-list-login-activity',
@@ -43,31 +53,39 @@ export class ListLoginActivityComponent implements OnInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
-  /* ── page state ────────────────────────────────────────── */
-
   today = new Date();
   isExporting = false;
+  totalCount = 0;
 
-  /* ── custom-table wiring (unified simple table; server-driven) ──────── */
+  /* ── filter model ─────────────────────────────────────── */
 
-  /** Unified-table columns. Cell DOM is supplied by `<ng-template usGridCell>`
-   *  in the HTML; `filter` flags enable the on-demand per-column filter row. */
+  selectedEvent: string | null = null;
+  actorSearch = '';
+  dateRange: Date[] | null = null;
+  failuresOnly = false;
+  eventOptions: FilterOption[] = [];
+
+  /* ── drawer state ─────────────────────────────────────── */
+
+  drawerVisible = false;
+  selectedLog: LoginActivity | null = null;
+
+  /* ── custom-table wiring ──────────────────────────────── */
+
   cols: CustomTableColumn[] = [];
 
   tableConfig: CustomTableConfig = {
-    pageSize: 50, // rows fetched per scroll page
+    pageSize: 50,
     globalSearch: true,
-    globalSearchKey: 'search', // BE login-activity matches a `search` filter key
-    globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
-    showColumnFilters: true,
-    enableExport: true,
+    globalSearchKey: 'search',
+    globalSearchPlaceholder: undefined,
+    showColumnFilters: false,
+    enableExport: false,
     gridKey: 'login-activity-list',
     height: 'flex',
     rowIdField: 'id',
   };
 
-  /** Server-side adapter — bound synchronously in ngOnInit; no datasource
-   *  gate for login activity (org-wide). */
   adapter: UsServerListAdapter<any> | null = null;
 
   constructor(
@@ -78,7 +96,10 @@ export class ListLoginActivityComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.cols = this.buildColumns();
-    // Field-specific search placeholder so the user knows what's matched.
+    this.eventOptions = EVENT_FILTER_OPTIONS.map(o => ({
+      value: o.value,
+      label: this.translate.instant(o.labelKey),
+    }));
     this.tableConfig = {
       ...this.tableConfig,
       globalSearchPlaceholder: this.translate.instant(
@@ -89,99 +110,193 @@ export class ListLoginActivityComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Abort in-flight reads if the user navigates away.
     this.auditService.cancelReads();
     this.adapter?.destroy();
+  }
+
+  /* ── columns ──────────────────────────────────────────── */
+
+  private buildColumns(): CustomTableColumn[] {
+    const t = (k: string) => this.translate.instant(k);
+    return [
+      { colId: 'event', field: 'eventType', header: t('LOGIN_ACTIVITY.EVENT'), width: '224px', frozen: true, sortable: false },
+      { colId: 'actor', field: 'username', header: t('COMMON.USERNAME'), width: '208px', sortable: false },
+      { colId: 'reason', field: 'failureReason', header: t('LOGIN_ACTIVITY.FAILURE_REASON'), width: '224px', sortable: false },
+      { colId: 'when', field: 'createdOn', header: t('LOGIN_ACTIVITY.TIMESTAMP'), width: '188px' },
+      { colId: 'origin', field: 'ipAddress', header: t('LOGIN_ACTIVITY.IP_ADDRESS'), width: '140px', sortable: false },
+      { colId: 'outcome', field: 'success', header: t('AUDIT.OUTCOME'), width: '132px', sortable: false },
+    ];
+  }
+
+  /* ── cell presentation helpers ────────────────────────── */
+
+  eventIcon(eventType: string | null | undefined): string {
+    return (eventType && EVENT_META[eventType]?.icon) || EVENT_FALLBACK.icon;
+  }
+
+  eventClass(eventType: string | null | undefined): string {
+    return (eventType && EVENT_META[eventType]?.cssClass) || EVENT_FALLBACK.cssClass;
+  }
+
+  eventLabel(eventType: string | null | undefined): string {
+    const key = (eventType && EVENT_META[eventType]?.labelKey) || EVENT_FALLBACK.labelKey;
+    return this.translate.instant(key);
+  }
+
+  actorDisplay(log: LoginActivity): string {
+    return log.username?.trim() || this.translate.instant('LOGIN_ACTIVITY.UNKNOWN_USER');
+  }
+
+  initials(log: LoginActivity): string {
+    const name = log.username?.trim();
+    if (!name) return '?';
+    const parts = name.split(/[\s._-]+/).filter(Boolean);
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return name.slice(0, 2).toUpperCase();
+  }
+
+  /* ── adapter wiring ───────────────────────────────────── */
+
+  private buildFilter(): Record<string, unknown> {
+    const filter: Record<string, unknown> = {};
+    if (this.selectedEvent) filter['eventType'] = this.selectedEvent;
+    if (this.actorSearch.trim()) filter['username'] = this.actorSearch.trim();
+    if (this.failuresOnly) filter['outcome'] = 'failure';
+    if (this.dateRange && this.dateRange.length) {
+      const [from, to] = this.dateRange;
+      if (from) filter['dateFrom'] = this.toIso(from, false);
+      if (to) filter['dateTo'] = this.toIso(to, true);
+    }
+    return filter;
+  }
+
+  private toIso(d: Date, endOfDay: boolean): string {
+    const x = new Date(d);
+    if (endOfDay) x.setHours(23, 59, 59, 999);
+    else x.setHours(0, 0, 0, 0);
+    return x.toISOString();
+  }
+
+  private bindAdapter() {
+    this.adapter?.destroy();
+    this.adapter = new UsServerListAdapter<any>({
+      load: (params: UsListLoadParams) => {
+        let tableFilter: Record<string, unknown> = {};
+        if (params.filter) {
+          try {
+            tableFilter = JSON.parse(params.filter);
+          } catch {
+            tableFilter = {};
+          }
+        }
+        const merged = { ...this.buildFilter(), ...tableFilter };
+        const req: Record<string, unknown> = {
+          page: params.page,
+          limit: params.limit,
+        };
+        if (params.sort) req['sort'] = params.sort;
+        if (Object.keys(merged).length) req['filter'] = JSON.stringify(merged);
+        return this.auditService.listLoginActivity(req);
+      },
+      unwrap: (res: any) => {
+        const rows = (res?.data?.activities ?? []) as LoginActivity[];
+        const total = res?.data?.count ?? 0;
+        this.totalCount = total;
+        Promise.resolve().then(() => this.cdr.markForCheck());
+        return { rows, total };
+      },
+      initial: { page: 1, limit: 50 },
+    });
+    this.cdr.markForCheck();
+  }
+
+  private applyFilter(): void {
+    this.bindAdapter();
   }
 
   get totalItems(): number {
     return this.adapter ? this.adapter.total() : 0;
   }
 
-  /* ── column definitions ──────────────────────────────── */
+  /* ── toolbar handlers ─────────────────────────────────── */
 
-  private buildColumns(): CustomTableColumn[] {
-    const t = (k: string) => this.translate.instant(k);
-    return [
-      { colId: 'username', field: 'username', header: t('COMMON.USERNAME'), width: '192px', frozen: true, filter: 'text' },
-      { colId: 'eventType', field: 'eventType', header: t('LOGIN_ACTIVITY.EVENT'), width: '176px', filter: 'text' },
-      { colId: 'failureReason', field: 'failureReason', header: t('LOGIN_ACTIVITY.FAILURE_REASON'), width: '224px', sortable: false },
-      { colId: 'createdOn', field: 'createdOn', header: t('LOGIN_ACTIVITY.TIMESTAMP'), width: '224px' },
-      { colId: 'ipAddress', field: 'ipAddress', header: t('LOGIN_ACTIVITY.IP_ADDRESS'), width: '160px', filter: 'text' },
-      { colId: 'userAgent', field: 'userAgent', header: t('LOGIN_ACTIVITY.USER_AGENT'), width: '256px', sortable: false },
-    ];
+  onEventChange(value: string | null): void {
+    this.selectedEvent = value;
+    this.applyFilter();
   }
 
-  /* ── adapter wiring ─────────────────────────────────── */
-
-  /**
-   * Construct the server-side adapter. Called once from ngOnInit —
-   * no datasource gating needed for login activity.
-   */
-  private bindAdapter() {
-    this.adapter?.destroy();
-    this.adapter = new UsServerListAdapter<any>({
-      load: (params: UsListLoadParams) =>
-        this.auditService.listLoginActivity({
-          page: params.page,
-          limit: params.limit,
-          ...(params.sort ? { sort: params.sort } : {}),
-          ...(params.filter ? { filter: params.filter } : {}),
-        }),
-      // Custom unwrap — the BE returns `{ activities: [], count }`.
-      unwrap: (res: any) => ({
-        rows: res?.data?.activities ?? [],
-        total: res?.data?.count ?? 0,
-      }),
-      // custom-table sends PLAIN filter values (global `search` + per-column
-      // username/eventType/ipAddress), so the adapter's identity mapping
-      // passes them straight through — no AG-Grid cell unwrapping needed.
-      initial: { page: 1, limit: 50 },
-    });
-    this.cdr.markForCheck();
+  onActorSearch(value: string): void {
+    this.actorSearch = value ?? '';
+    this.applyFilter();
   }
 
-  /* ── handlers ────────────────────────────────────────── */
+  onDateRangeChange(range: Date[] | null): void {
+    this.dateRange = range;
+    if (!range || range.length === 0 || (range[0] && range[1]) || range[0] === null) {
+      this.applyFilter();
+    }
+  }
+
+  onFailuresToggle(evt: { checked: boolean }): void {
+    this.failuresOnly = !!evt?.checked;
+    this.applyFilter();
+  }
+
+  clearFilters(): void {
+    this.selectedEvent = null;
+    this.actorSearch = '';
+    this.dateRange = null;
+    this.failuresOnly = false;
+    this.applyFilter();
+  }
+
+  get hasActiveFilters(): boolean {
+    return (
+      !!this.selectedEvent ||
+      !!this.actorSearch.trim() ||
+      !!(this.dateRange && this.dateRange.length) ||
+      this.failuresOnly
+    );
+  }
 
   refreshList() {
     this.adapter?.reload();
   }
 
-  /* ── presentation helpers — preserved from p-table version ── */
+  /* ── drawer ───────────────────────────────────────────── */
 
-  getEventClass(eventType: string): string {
-    switch (eventType) {
-      case 'LOGIN_SUCCESS':
-        return 'event-success';
-      case 'LOGIN_FAILED':
-        return 'event-failed';
-      case 'LOGOUT':
-        return 'event-logout';
-      case 'TOKEN_REFRESH':
-        return 'event-refresh';
-      case 'PASSWORD_RESET':
-        return 'event-warning';
-      default:
-        return 'event-default';
+  openDetail(log: LoginActivity): void {
+    this.selectedLog = log;
+    this.drawerVisible = true;
+    this.cdr.markForCheck();
+
+    if (log?.id) {
+      this.auditService
+        .getLoginActivity(log.id)
+        .then(full => {
+          if (full && this.drawerVisible && this.selectedLog?.id === full.id) {
+            this.selectedLog = full;
+            this.cdr.markForCheck();
+          }
+        })
+        .catch(() => {
+          /* keep the list row already shown; interceptor toasts errors */
+        });
     }
   }
 
-  /* ── BE-driven PDF export — preserved ─────────────────── */
+  onDrawerClosed(): void {
+    this.drawerVisible = false;
+    this.selectedLog = null;
+    this.cdr.markForCheck();
+  }
+
+  /* ── export ───────────────────────────────────────────── */
 
   exportActivity(format: 'pdf') {
-    // Reuse the live filter model so the export mirrors what the user
-    // is seeing. custom-table stores PLAIN filter values keyed by colId,
-    // so the blob is assembled directly — no cell unwrapping needed.
-    const filter: Record<string, unknown> = {};
-    const filterModel = this.adapter?.filterModel() ?? {};
-    for (const [colId, cell] of Object.entries(filterModel)) {
-      if (cell === null || cell === undefined || cell === '') continue;
-      filter[colId] = cell;
-    }
-    const params: any = { format };
-    if (Object.keys(filter).length > 0) {
-      params.filter = JSON.stringify(filter);
-    }
+    const filter = this.buildFilter();
+    const params: Record<string, unknown> = { format };
+    if (Object.keys(filter).length > 0) params['filter'] = JSON.stringify(filter);
 
     this.isExporting = true;
     this.cdr.markForCheck();
@@ -192,7 +307,6 @@ export class ListLoginActivityComponent implements OnInit, OnDestroy {
         next: (blob: Blob) => {
           const dateStr = new Date().toISOString().slice(0, 10);
           const fileName = `Login_Activity_${dateStr}.pdf`;
-
           const url = window.URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
@@ -206,7 +320,7 @@ export class ListLoginActivityComponent implements OnInit, OnDestroy {
           this.globalService.handleSuccessService({
             status: false,
             code: 500,
-            message: 'Failed to export login activity',
+            message: this.translate.instant('LOGIN_ACTIVITY.EXPORT_FAILED'),
           });
           this.isExporting = false;
           this.cdr.markForCheck();

@@ -3112,7 +3112,25 @@
     "TOKEN_REFRESH": "Token Refresh",
     "PASSWORD_RESET": "Password Reset",
     "OTP_GENERATED": "OTP Generated",
-    "SEARCH_PLACEHOLDER": "按用户或IP地址搜索"
+    "SEARCH_PLACEHOLDER": "按用户或IP地址搜索",
+    "UNKNOWN_USER": "未知用户",
+    "ORGANISATION": "组织",
+    "DEVICE_CONTEXT": "设备与会话",
+    "EVENT_LABEL": {
+      "GENERIC": "Event",
+      "LOGIN_SUCCESS": "Login success",
+      "LOGIN_FAILED": "Login failed",
+      "LOGOUT": "Logout",
+      "TOKEN_REFRESH": "Token refresh",
+      "PASSWORD_RESET": "Password reset",
+      "PASSWORD_SET": "Password set",
+      "SETUP_LINK_RESENT": "Setup link resent",
+      "OTP_GENERATED": "OTP generated",
+      "SESSION_EXPIRED": "Session expired",
+      "ACCOUNT_LOCKED": "Account locked",
+      "ACCOUNT_UNLOCKED": "Account unlocked",
+      "SESSION_BOOTSTRAP_FAILED": "Session bootstrap failed"
+    }
   },
   "UNSAVED_CHANGES": {
     "TITLE": "未保存的更改",
