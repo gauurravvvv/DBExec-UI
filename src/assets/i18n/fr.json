@@ -3086,7 +3086,12 @@
       "FAVOURITE": "Favourite",
       "ASSET_SHARE": "Asset Share",
       "MIGRATION": "Migration"
-    }
+    },
+    "INTEGRITY_CHECKING": "Vérification de l'intégrité…",
+    "INTEGRITY_VERIFIED": "Intégrité vérifiée",
+    "INTEGRITY_VERIFIED_HINT": "La piste d'audit est inviolable et intacte. Cliquez pour revérifier.",
+    "INTEGRITY_BROKEN": "Intégrité rompue",
+    "INTEGRITY_BROKEN_HINT": "La chaîne de hachage ne se vérifie pas — un enregistrement a pu être modifié. Cliquez pour revérifier."
   },
   "LOGIN_ACTIVITY": {
     "TITLE": "Login Activity",

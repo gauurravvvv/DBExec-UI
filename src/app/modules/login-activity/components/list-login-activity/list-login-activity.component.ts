@@ -24,6 +24,7 @@ import {
   EVENT_FILTER_OPTIONS,
   EVENT_META,
 } from '../../login-activity-meta.constant';
+import { ChainVerifyResult } from 'src/app/modules/audit-logs/models/audit-log.model';
 import { LoginActivity } from '../../models/login-activity.model';
 
 interface FilterOption {
@@ -56,6 +57,11 @@ export class ListLoginActivityComponent implements OnInit, OnDestroy {
   today = new Date();
   isExporting = false;
   totalCount = 0;
+
+  /* ── tamper-evidence (hash chain) ─────────────────────── */
+
+  integrity: ChainVerifyResult | null = null;
+  integrityChecking = false;
 
   /* ── filter model ─────────────────────────────────────── */
 
@@ -107,6 +113,7 @@ export class ListLoginActivityComponent implements OnInit, OnDestroy {
       ),
     };
     this.bindAdapter();
+    this.verifyIntegrity();
   }
 
   ngOnDestroy() {
@@ -261,6 +268,27 @@ export class ListLoginActivityComponent implements OnInit, OnDestroy {
 
   refreshList() {
     this.adapter?.reload();
+  }
+
+  /* ── tamper-evidence badge ────────────────────────────── */
+
+  /** Verify the org's login-activity hash chain and drive the badge. */
+  verifyIntegrity(): void {
+    this.integrityChecking = true;
+    this.integrity = null;
+    this.cdr.markForCheck();
+    this.auditService
+      .verifyLoginActivityChain()
+      .then(res => {
+        this.integrity = res;
+      })
+      .catch(() => {
+        this.integrity = null;
+      })
+      .finally(() => {
+        this.integrityChecking = false;
+        this.cdr.markForCheck();
+      });
   }
 
   /* ── drawer ───────────────────────────────────────────── */

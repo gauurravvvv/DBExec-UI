@@ -3089,7 +3089,12 @@
       "FAVOURITE": "Favourite",
       "ASSET_SHARE": "Asset Share",
       "MIGRATION": "Migration"
-    }
+    },
+    "INTEGRITY_CHECKING": "Verifying integrity…",
+    "INTEGRITY_VERIFIED": "Integrity verified",
+    "INTEGRITY_VERIFIED_HINT": "The audit trail is tamper-evident and intact. Click to re-verify.",
+    "INTEGRITY_BROKEN": "Integrity broken",
+    "INTEGRITY_BROKEN_HINT": "The hash chain does not verify — a record may have been altered. Click to re-check."
   },
   "LOGIN_ACTIVITY": {
     "TITLE": "Login Activity",

@@ -3086,7 +3086,12 @@
       "FAVOURITE": "Favourite",
       "ASSET_SHARE": "Asset Share",
       "MIGRATION": "Migration"
-    }
+    },
+    "INTEGRITY_CHECKING": "Integriteit controleren…",
+    "INTEGRITY_VERIFIED": "Integriteit geverifieerd",
+    "INTEGRITY_VERIFIED_HINT": "Het auditspoor is manipulatiebestendig en intact. Klik om opnieuw te verifiëren.",
+    "INTEGRITY_BROKEN": "Integriteit geschonden",
+    "INTEGRITY_BROKEN_HINT": "De hashketen verifieert niet — een record is mogelijk gewijzigd. Klik om opnieuw te controleren."
   },
   "LOGIN_ACTIVITY": {
     "TITLE": "Login Activity",

@@ -27,7 +27,7 @@ import {
   MODULE_FILTER_OPTIONS,
   MODULE_META,
 } from '../../audit-meta.constant';
-import { AuditLog } from '../../models/audit-log.model';
+import { AuditLog, ChainVerifyResult } from '../../models/audit-log.model';
 import { AuditService } from '../../services/audit.service';
 
 interface FilterOption {
@@ -63,6 +63,11 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
 
   totalCount = 0;
+
+  /* ── tamper-evidence (hash chain) ─────────────────────── */
+
+  integrity: ChainVerifyResult | null = null;
+  integrityChecking = false;
 
   /** Route-supplied module scope (User-Mgmt Activity view). Empty = global. */
   moduleScope: string[] = [];
@@ -132,6 +137,7 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
       globalSearchPlaceholder: this.translate.instant('AUDIT.SEARCH_PLACEHOLDER'),
     };
     this.bindAdapter();
+    this.verifyIntegrity();
   }
 
   ngOnDestroy(): void {
@@ -327,6 +333,27 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
 
   refreshList(): void {
     this.adapter?.reload();
+  }
+
+  /* ── tamper-evidence badge ────────────────────────────── */
+
+  /** Verify the org's audit hash chain and drive the integrity badge. */
+  verifyIntegrity(): void {
+    this.integrityChecking = true;
+    this.integrity = null;
+    this.cdr.markForCheck();
+    this.auditService
+      .verifyAuditChain()
+      .then(res => {
+        this.integrity = res;
+      })
+      .catch(() => {
+        this.integrity = null;
+      })
+      .finally(() => {
+        this.integrityChecking = false;
+        this.cdr.markForCheck();
+      });
   }
 
   /* ── drawer ───────────────────────────────────────────── */

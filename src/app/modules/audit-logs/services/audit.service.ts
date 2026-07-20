@@ -2,7 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { EmptyError, Observable, Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { AUDIT } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
-import { AuditLog } from '../models/audit-log.model';
+import { AuditLog, ChainVerifyResult } from '../models/audit-log.model';
 
 /**
  * Audit-log data access — signal-based state on top of the name-denormalized
@@ -117,6 +117,25 @@ export class AuditService {
       params,
       responseType: 'blob',
     });
+  }
+
+  /**
+   * Verify the org's audit hash chain (tamper-evidence). Returns the BE result
+   * `{ ok, verifiedCount, brokenAt, reason }` or null on failure.
+   */
+  async verifyAuditChain(): Promise<ChainVerifyResult | null> {
+    const res: any = await lastValueFrom(
+      this.http.apiGet(AUDIT.VERIFY, { skipLoader: true }),
+    );
+    return res?.status ? (res.data as ChainVerifyResult) : null;
+  }
+
+  /** Verify the org's login-activity hash chain. */
+  async verifyLoginActivityChain(): Promise<ChainVerifyResult | null> {
+    const res: any = await lastValueFrom(
+      this.http.apiGet(AUDIT.VERIFY_LOGIN_ACTIVITY, { skipLoader: true }),
+    );
+    return res?.status ? (res.data as ChainVerifyResult) : null;
   }
 
   /**

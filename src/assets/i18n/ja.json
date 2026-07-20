@@ -3086,7 +3086,12 @@
       "FAVOURITE": "Favourite",
       "ASSET_SHARE": "Asset Share",
       "MIGRATION": "Migration"
-    }
+    },
+    "INTEGRITY_CHECKING": "整合性を検証中…",
+    "INTEGRITY_VERIFIED": "整合性を検証済み",
+    "INTEGRITY_VERIFIED_HINT": "監査証跡は改ざん防止済みで整合しています。クリックで再検証します。",
+    "INTEGRITY_BROKEN": "整合性エラー",
+    "INTEGRITY_BROKEN_HINT": "ハッシュチェーンが検証できません。レコードが改ざんされた可能性があります。クリックで再確認します。"
   },
   "LOGIN_ACTIVITY": {
     "TITLE": "Login Activity",

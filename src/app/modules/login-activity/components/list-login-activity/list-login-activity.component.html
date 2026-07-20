@@ -3,7 +3,36 @@
     <!-- Header -->
     <div class="page-header-section">
       <div class="header-content">
-        <h2>{{ 'LOGIN_ACTIVITY.TITLE' | translate }}</h2>
+        <div class="title-row">
+          <h2>{{ 'LOGIN_ACTIVITY.TITLE' | translate }}</h2>
+
+          <!-- Tamper-evidence badge -->
+          <app-chip
+            *ngIf="integrityChecking"
+            variant="status"
+            tone="neutral"
+            icon="pi pi-spin pi-spinner"
+            [title]="'AUDIT.INTEGRITY_CHECKING' | translate"
+          >{{ 'AUDIT.INTEGRITY_CHECKING' | translate }}</app-chip>
+          <app-chip
+            *ngIf="!integrityChecking && integrity?.ok"
+            variant="status"
+            tone="success"
+            icon="pi pi-verified"
+            [clickable]="true"
+            (clicked)="verifyIntegrity()"
+            [title]="'AUDIT.INTEGRITY_VERIFIED_HINT' | translate"
+          >{{ 'AUDIT.INTEGRITY_VERIFIED' | translate }}</app-chip>
+          <app-chip
+            *ngIf="!integrityChecking && integrity && !integrity.ok"
+            variant="status"
+            tone="error"
+            icon="pi pi-exclamation-triangle"
+            [clickable]="true"
+            (clicked)="verifyIntegrity()"
+            [title]="'AUDIT.INTEGRITY_BROKEN_HINT' | translate"
+          >{{ 'AUDIT.INTEGRITY_BROKEN' | translate }}</app-chip>
+        </div>
       </div>
 
       <div class="header-actions">

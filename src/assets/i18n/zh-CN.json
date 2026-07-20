@@ -3086,7 +3086,12 @@
       "FAVOURITE": "Favourite",
       "ASSET_SHARE": "Asset Share",
       "MIGRATION": "Migration"
-    }
+    },
+    "INTEGRITY_CHECKING": "正在验证完整性…",
+    "INTEGRITY_VERIFIED": "完整性已验证",
+    "INTEGRITY_VERIFIED_HINT": "审计记录防篡改且完整。点击重新验证。",
+    "INTEGRITY_BROKEN": "完整性已破坏",
+    "INTEGRITY_BROKEN_HINT": "哈希链验证失败——某条记录可能被篡改。点击重新检查。"
   },
   "LOGIN_ACTIVITY": {
     "TITLE": "Login Activity",

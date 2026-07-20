@@ -411,6 +411,9 @@ export const AUDIT = {
   LOGIN_ACTIVITY_DETAIL: '/audit-logs/login-activity/', // + id
   EXPORT_LOGS: '/audit-logs/export',
   EXPORT_LOGIN_ACTIVITY: '/audit-logs/login-activity/export',
+  // Tamper-evidence: verify the org's HMAC hash chain.
+  VERIFY: '/audit-logs/verify',
+  VERIFY_LOGIN_ACTIVITY: '/audit-logs/login-activity/verify',
 };
 
 export const PROFILE = {

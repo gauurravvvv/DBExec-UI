@@ -3086,7 +3086,12 @@
       "FAVOURITE": "Favourite",
       "ASSET_SHARE": "Asset Share",
       "MIGRATION": "Migration"
-    }
+    },
+    "INTEGRITY_CHECKING": "Integrität wird geprüft…",
+    "INTEGRITY_VERIFIED": "Integrität bestätigt",
+    "INTEGRITY_VERIFIED_HINT": "Der Audit-Trail ist manipulationssicher und intakt. Zum erneuten Prüfen klicken.",
+    "INTEGRITY_BROKEN": "Integrität verletzt",
+    "INTEGRITY_BROKEN_HINT": "Die Hash-Kette ist ungültig — ein Datensatz wurde möglicherweise geändert. Zum erneuten Prüfen klicken."
   },
   "LOGIN_ACTIVITY": {
     "TITLE": "Login Activity",

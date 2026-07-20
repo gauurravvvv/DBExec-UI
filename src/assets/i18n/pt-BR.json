@@ -3086,7 +3086,12 @@
       "FAVOURITE": "Favourite",
       "ASSET_SHARE": "Asset Share",
       "MIGRATION": "Migration"
-    }
+    },
+    "INTEGRITY_CHECKING": "Verificando integridade…",
+    "INTEGRITY_VERIFIED": "Integridade verificada",
+    "INTEGRITY_VERIFIED_HINT": "A trilha de auditoria é à prova de adulteração e está intacta. Clique para verificar novamente.",
+    "INTEGRITY_BROKEN": "Integridade comprometida",
+    "INTEGRITY_BROKEN_HINT": "A cadeia de hash não é verificada — um registro pode ter sido alterado. Clique para verificar de novo."
   },
   "LOGIN_ACTIVITY": {
     "TITLE": "Login Activity",

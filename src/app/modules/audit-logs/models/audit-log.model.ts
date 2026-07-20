@@ -15,6 +15,18 @@ export interface AuditChangedField {
   to: unknown;
 }
 
+/**
+ * Result of a tamper-evidence hash-chain verification (BE `GET
+ * /audit-logs/verify` + `/login-activity/verify`). `ok` true = the whole
+ * walked chain is intact; otherwise `brokenAt` names the first tampered row.
+ */
+export interface ChainVerifyResult {
+  ok: boolean;
+  verifiedCount: number;
+  brokenAt: { id: string; createdOn: string } | null;
+  reason: string | null;
+}
+
 export type AuditActorType = 'user' | 'system-admin' | 'system';
 
 export interface AuditLog {
