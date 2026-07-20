@@ -522,7 +522,13 @@
     "EDIT_DB_WARNING_TITLE": "Modifiche al database principale",
     "EDIT_DB_WARNING_BODY_1": "La modifica di queste credenziali riguarda tutti gli utenti di questa organizzazione. Autenticazione, dashboard e query verranno reindirizzati alla nuova connessione al salvataggio.",
     "EDIT_DB_WARNING_BODY_2": "Se si modifica lo schema, le tabelle della piattaforma verranno create nel nuovo schema. Le tabelle dello schema precedente rimarranno nel database senza modifiche, ma non saranno più utilizzate da DBExec.",
-    "EDIT_DB_WARNING_BODY_3": "I dettagli di connessione (host, porta, database, schema o nome utente) non possono essere modificati senza fornire anche la password corrente o quella nuova."
+    "EDIT_DB_WARNING_BODY_3": "I dettagli di connessione (host, porta, database, schema o nome utente) non possono essere modificati senza fornire anche la password corrente o quella nuova.",
+    "ADMIN_FIRST_NAME": "Nome",
+    "ADMIN_FIRST_NAME_PLACEHOLDER": "Inserisci il nome",
+    "ADMIN_LAST_NAME": "Cognome",
+    "ADMIN_LAST_NAME_PLACEHOLDER": "Inserisci il cognome",
+    "ADMIN_USERNAME": "Nome utente",
+    "ADMIN_USERNAME_PLACEHOLDER": "Inserisci il nome utente"
   },
   "ROLE": {
     "TITLE": "Ruoli",
@@ -649,7 +655,8 @@
     "BULK_ADD_PROCEED": "Procedi",
     "BULK_ADD_CREATED_SUCCESS": "utenti creati con successo",
     "BULK_ADD_CREATED_FAILED": "utenti non hanno potuto essere creati",
-    "BULK_ADD_RACE_FAILURES": "Errori durante la creazione"
+    "BULK_ADD_RACE_FAILURES": "Errori durante la creazione",
+    "CANNOT_MODIFY_SELF_HINT": "Non puoi modificare il tuo stesso accesso"
   },
   "DATASOURCE": {
     "TITLE": "Sorgenti dati",
@@ -3931,6 +3938,22 @@
       },
       "dbCredentials": {
         "partial": "Quando si aggiorna la password del database, è necessario fornire host, porta, nome del database e nome utente affinché le nuove credenziali possano essere verificate"
+      },
+      "adminFirstName": {
+        "required": "Il nome dell'amministratore è obbligatorio",
+        "tooLong": "Il nome dell'amministratore non deve superare i 64 caratteri",
+        "invalid": "Il nome deve iniziare con una lettera e può contenere solo lettere, spazi, punti, apostrofi o trattini"
+      },
+      "adminLastName": {
+        "required": "Il cognome dell'amministratore è obbligatorio",
+        "tooLong": "Il cognome dell'amministratore non deve superare i 64 caratteri",
+        "invalid": "Il cognome deve iniziare con una lettera e può contenere solo lettere, spazi, punti, apostrofi o trattini"
+      },
+      "adminUsername": {
+        "required": "Il nome utente dell'amministratore è obbligatorio",
+        "tooShort": "Il nome utente dell'amministratore deve contenere almeno 3 caratteri",
+        "tooLong": "Il nome utente dell'amministratore non deve superare i 64 caratteri",
+        "invalid": "Il nome utente deve iniziare e terminare con una lettera o un numero e può contenere solo lettere, numeri, punti, trattini bassi o trattini"
       }
     },
     "common": {

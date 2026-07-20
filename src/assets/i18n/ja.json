@@ -522,7 +522,13 @@
     "EDIT_DB_WARNING_TITLE": "マスターデータベースの変更",
     "EDIT_DB_WARNING_BODY_1": "この認証情報を変更すると、この組織のすべてのユーザーに影響します。保存時に、認証・ダッシュボード・クエリが新しい接続に切り替わります。",
     "EDIT_DB_WARNING_BODY_2": "スキーマを変更すると、プラットフォームのテーブルが新しいスキーマに作成されます。以前のスキーマのテーブルはデータベースにそのまま残りますが、DBExec では使用されなくなります。",
-    "EDIT_DB_WARNING_BODY_3": "接続情報（ホスト、ポート、データベース、スキーマ、またはユーザー名）を変更する場合は、現在または新しいパスワードも必ず入力してください。"
+    "EDIT_DB_WARNING_BODY_3": "接続情報（ホスト、ポート、データベース、スキーマ、またはユーザー名）を変更する場合は、現在または新しいパスワードも必ず入力してください。",
+    "ADMIN_FIRST_NAME": "名",
+    "ADMIN_FIRST_NAME_PLACEHOLDER": "名を入力",
+    "ADMIN_LAST_NAME": "姓",
+    "ADMIN_LAST_NAME_PLACEHOLDER": "姓を入力",
+    "ADMIN_USERNAME": "ユーザー名",
+    "ADMIN_USERNAME_PLACEHOLDER": "ユーザー名を入力"
   },
   "ROLE": {
     "TITLE": "役割",
@@ -649,7 +655,8 @@
     "BULK_ADD_PROCEED": "続行",
     "BULK_ADD_CREATED_SUCCESS": "件のユーザーが正常に作成されました",
     "BULK_ADD_CREATED_FAILED": "件のユーザーを作成できませんでした",
-    "BULK_ADD_RACE_FAILURES": "作成中のエラー"
+    "BULK_ADD_RACE_FAILURES": "作成中のエラー",
+    "CANNOT_MODIFY_SELF_HINT": "自分自身のアクセス権は変更できません"
   },
   "DATASOURCE": {
     "TITLE": "データソース",
@@ -3931,6 +3938,22 @@
       },
       "dbCredentials": {
         "partial": "データベースパスワードを更新する際は、新しい認証情報を検証できるように、ホスト、ポート、データベース名、ユーザー名のすべてを指定する必要があります"
+      },
+      "adminFirstName": {
+        "required": "管理者の名は必須です",
+        "tooLong": "管理者の名は64文字以内で入力してください",
+        "invalid": "名は文字で始まり、文字、スペース、ドット、アポストロフィ、ハイフンのみを含めることができます"
+      },
+      "adminLastName": {
+        "required": "管理者の姓は必須です",
+        "tooLong": "管理者の姓は64文字以内で入力してください",
+        "invalid": "姓は文字で始まり、文字、スペース、ドット、アポストロフィ、ハイフンのみを含めることができます"
+      },
+      "adminUsername": {
+        "required": "管理者のユーザー名は必須です",
+        "tooShort": "管理者のユーザー名は3文字以上で入力してください",
+        "tooLong": "管理者のユーザー名は64文字以内で入力してください",
+        "invalid": "ユーザー名は英字または数字で始まり、英字または数字で終わり、英字、数字、ドット、アンダースコア、ハイフンのみを含めることができます"
       }
     },
     "common": {

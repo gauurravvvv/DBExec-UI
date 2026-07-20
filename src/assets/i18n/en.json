@@ -522,7 +522,13 @@
     "EDIT_DB_WARNING_BODY_2": "If you change the schema, the platform's tables will be created in the new schema. Tables in the previous schema remain in your database untouched but will no longer be used by DBExec.",
     "EDIT_DB_WARNING_BODY_3": "Connection details (host, port, database, schema, or username) cannot be changed without also providing the current or new password.",
     "NOT_TESTED_HINT": "Test the connection before saving",
-    "SEARCH_PLACEHOLDER": "Search organisations by name"
+    "SEARCH_PLACEHOLDER": "Search organisations by name",
+    "ADMIN_FIRST_NAME": "First Name",
+    "ADMIN_FIRST_NAME_PLACEHOLDER": "Enter first name",
+    "ADMIN_LAST_NAME": "Last Name",
+    "ADMIN_LAST_NAME_PLACEHOLDER": "Enter last name",
+    "ADMIN_USERNAME": "Username",
+    "ADMIN_USERNAME_PLACEHOLDER": "Enter username"
   },
   "ROLE": {
     "TITLE": "Roles",
@@ -655,7 +661,8 @@
     "CANNOT_DELETE_SELF": "You cannot delete yourself",
     "CANNOT_UNLOCK_DEFAULT": "The default user cannot be unlocked from here",
     "CANNOT_UNLOCK_SELF": "You cannot unlock your own account from here",
-    "SEARCH_PLACEHOLDER": "Search by username, name or email"
+    "SEARCH_PLACEHOLDER": "Search by username, name or email",
+    "CANNOT_MODIFY_SELF_HINT": "You can't change your own access"
   },
   "DATASOURCE": {
     "TITLE": "Datasources",
@@ -3928,6 +3935,22 @@
       },
       "dbCredentials": {
         "partial": "When updating the database password, host, port, database name, and username must all be provided so the new credentials can be verified"
+      },
+      "adminFirstName": {
+        "required": "Administrator first name is required",
+        "tooLong": "Administrator first name must not exceed 64 characters",
+        "invalid": "First name must start with a letter and contain only letters, spaces, dots, apostrophes, or hyphens"
+      },
+      "adminLastName": {
+        "required": "Administrator last name is required",
+        "tooLong": "Administrator last name must not exceed 64 characters",
+        "invalid": "Last name must start with a letter and contain only letters, spaces, dots, apostrophes, or hyphens"
+      },
+      "adminUsername": {
+        "required": "Administrator username is required",
+        "tooShort": "Administrator username must be at least 3 characters",
+        "tooLong": "Administrator username must not exceed 64 characters",
+        "invalid": "Username must start and end with a letter or digit and contain only letters, digits, dots, underscores, or hyphens"
       }
     },
     "common": {

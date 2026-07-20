@@ -12,9 +12,6 @@
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>{{ 'GROUP.EDIT_TITLE' | translate }}</h2>
-        <span *ngIf="isDefaultGroup" class="default-badge">{{
-          'GROUP.DEFAULT' | translate
-        }}</span>
       </div>
       <div class="action-buttons">
         <button
@@ -64,7 +61,6 @@
           [placeholder]="'COMMON.ENTER_NAME' | translate"
           icon="pi-id-card"
           [required]="true"
-          [inputDisabled]="isDefaultGroup"
           [showError]="
             !!(groupForm.get('name')?.invalid && groupForm.get('name')?.touched)
           "
@@ -78,7 +74,6 @@
           [label]="'COMMON.DESCRIPTION' | translate"
           [placeholder]="'COMMON.ENTER_DESCRIPTION' | translate"
           icon="pi-align-left"
-          [inputDisabled]="isDefaultGroup"
         >
         </app-custom-input>
 
@@ -93,14 +88,12 @@
         >
         </app-custom-input>
 
-        <!-- Locked members — shown ABOVE the multiselect as
-             read-only chips. Two cases produce a lock:
-               • Bootstrap admin (Primary Admin) — required to
-                 remain in the default Administrator group.
-               • Logged-in user (You) — admin can't accidentally
-                 remove themselves and lose mid-edit access.
+        <!-- Locked member — the self-guard. The logged-in user is
+             pinned to any group they belong to so an admin can't
+             evict themselves mid-edit and lose the access they need
+             to finish the change (matches USER.CANNOT_MODIFY_SELF).
              The picker handles the manageable subset; on save we
-             merge these locked IDs back into the payload so the
+             merge the locked self ID back into the payload so the
              BE sees the complete membership list. -->
         <div class="locked-members" *ngIf="lockedMembers.length">
           <label>{{ 'GROUP.LOCKED_MEMBERS' | translate }}</label>
@@ -108,24 +101,13 @@
             <span
               *ngFor="let m of lockedMembers"
               class="locked-chip"
-              [pTooltip]="
-                m.isPrimaryAdmin && m.isSelf
-                  ? ('GROUP.LOCKED_SELF_PRIMARY' | translate)
-                  : m.isPrimaryAdmin
-                  ? ('GROUP.LOCKED_PRIMARY_ADMIN' | translate)
-                  : ('GROUP.LOCKED_SELF' | translate)
-              "
+              [pTooltip]="'GROUP.LOCKED_SELF' | translate"
               tooltipPosition="top"
             >
               <i class="pi pi-lock"></i>
               <span class="locked-chip__name">{{ m.username }}</span>
               <span
-                class="locked-chip__badge"
-                *ngIf="m.isPrimaryAdmin"
-              >{{ 'GROUP.PRIMARY_ADMIN' | translate }}</span>
-              <span
                 class="locked-chip__badge locked-chip__badge--self"
-                *ngIf="m.isSelf && !m.isPrimaryAdmin"
               >{{ 'GROUP.YOU' | translate }}</span>
             </span>
           </div>
@@ -152,8 +134,8 @@
         >
         </app-custom-multiselect>
 
-        <!-- Status (hidden for default groups) -->
-        <div *ngIf="!isDefaultGroup">
+        <!-- Status -->
+        <div>
           <app-custom-toggle
             formControlName="status"
             [label]="'COMMON.STATUS' | translate"

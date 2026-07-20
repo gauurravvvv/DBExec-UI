@@ -47,13 +47,6 @@
               >
                 {{ role.name }}
               </a>
-              <!-- Default-role badge — brand-tinted, signals
-                   the row is seeded and immutable. Same
-                   convention as users / system-admin lists. -->
-              <span
-                *ngIf="role.isDefault === 1"
-                class="row-badge row-badge--default"
-              >{{ 'COMMON.DEFAULT_BADGE' | translate }}</span>
             </span>
           </ng-template>
 
@@ -97,13 +90,8 @@
                 class="icon-btn edit-btn"
                 (click)="onEdit(role.id)"
                 [attr.aria-label]="'COMMON.EDIT' | translate"
-                [pTooltip]="
-                  !role.canEdit
-                    ? ('ROLE.CANNOT_EDIT_DEFAULT' | translate)
-                    : ('COMMON.EDIT' | translate)
-                "
+                [pTooltip]="'COMMON.EDIT' | translate"
                 tooltipPosition="bottom"
-                [disabled]="!role.canEdit"
               >
                 <i class="pi pi-pencil"></i>
               </button>
@@ -112,13 +100,9 @@
                 class="icon-btn delete-btn"
                 (click)="confirmDelete(role.id)"
                 [attr.aria-label]="'COMMON.DELETE' | translate"
-                [pTooltip]="
-                  !role.canDelete
-                    ? ('ROLE.CANNOT_DELETE_DEFAULT' | translate)
-                    : ('COMMON.DELETE' | translate)
-                "
+                [pTooltip]="'COMMON.DELETE' | translate"
                 tooltipPosition="bottom"
-                [disabled]="!role.canDelete || isDeleting(role.id)"
+                [disabled]="isDeleting(role.id)"
               >
                 <i
                   class="pi"

@@ -522,7 +522,13 @@
     "EDIT_DB_WARNING_TITLE": "Cambios en la base de datos maestra",
     "EDIT_DB_WARNING_BODY_1": "Cambiar estas credenciales afecta a todos los usuarios de esta organización. La autenticación, los paneles y las consultas se redirigirán a la nueva conexión al guardar.",
     "EDIT_DB_WARNING_BODY_2": "Si cambia el esquema, las tablas de la plataforma se crearán en el nuevo esquema. Las tablas del esquema anterior permanecerán en su base de datos sin cambios, pero DBExec dejará de utilizarlas.",
-    "EDIT_DB_WARNING_BODY_3": "Los detalles de conexión (host, puerto, base de datos, esquema o nombre de usuario) no pueden modificarse sin proporcionar también la contraseña actual o la nueva."
+    "EDIT_DB_WARNING_BODY_3": "Los detalles de conexión (host, puerto, base de datos, esquema o nombre de usuario) no pueden modificarse sin proporcionar también la contraseña actual o la nueva.",
+    "ADMIN_FIRST_NAME": "Nombre",
+    "ADMIN_FIRST_NAME_PLACEHOLDER": "Ingrese el nombre",
+    "ADMIN_LAST_NAME": "Apellido",
+    "ADMIN_LAST_NAME_PLACEHOLDER": "Ingrese el apellido",
+    "ADMIN_USERNAME": "Nombre de usuario",
+    "ADMIN_USERNAME_PLACEHOLDER": "Ingrese el nombre de usuario"
   },
   "ROLE": {
     "TITLE": "Roles",
@@ -649,7 +655,8 @@
     "BULK_ADD_PROCEED": "Continuar",
     "BULK_ADD_CREATED_SUCCESS": "usuarios creados correctamente",
     "BULK_ADD_CREATED_FAILED": "usuarios no pudieron crearse",
-    "BULK_ADD_RACE_FAILURES": "Errores durante la creación"
+    "BULK_ADD_RACE_FAILURES": "Errores durante la creación",
+    "CANNOT_MODIFY_SELF_HINT": "No puedes cambiar tu propio acceso"
   },
   "DATASOURCE": {
     "TITLE": "Fuentes de datos",
@@ -3931,6 +3938,22 @@
       },
       "dbCredentials": {
         "partial": "Al actualizar la contraseña de la base de datos, el host, el puerto, el nombre de la base de datos y el nombre de usuario deben proporcionarse para que se puedan verificar las nuevas credenciales"
+      },
+      "adminFirstName": {
+        "required": "El nombre del administrador es obligatorio",
+        "tooLong": "El nombre del administrador no debe superar los 64 caracteres",
+        "invalid": "El nombre debe comenzar con una letra y solo puede contener letras, espacios, puntos, apóstrofes o guiones"
+      },
+      "adminLastName": {
+        "required": "El apellido del administrador es obligatorio",
+        "tooLong": "El apellido del administrador no debe superar los 64 caracteres",
+        "invalid": "El apellido debe comenzar con una letra y solo puede contener letras, espacios, puntos, apóstrofes o guiones"
+      },
+      "adminUsername": {
+        "required": "El nombre de usuario del administrador es obligatorio",
+        "tooShort": "El nombre de usuario del administrador debe tener al menos 3 caracteres",
+        "tooLong": "El nombre de usuario del administrador no debe superar los 64 caracteres",
+        "invalid": "El nombre de usuario debe comenzar y terminar con una letra o un dígito y solo puede contener letras, dígitos, puntos, guiones bajos o guiones"
       }
     },
     "common": {

@@ -522,7 +522,13 @@
     "EDIT_DB_WARNING_TITLE": "主数据库更改",
     "EDIT_DB_WARNING_BODY_1": "更改这些凭据会影响该组织的所有用户。保存后，身份验证、仪表板和查询将切换到新连接。",
     "EDIT_DB_WARNING_BODY_2": "如果更改架构，平台表格将在新架构中创建。旧架构中的表格将保留在您的数据库中，但 DBExec 将不再使用它们。",
-    "EDIT_DB_WARNING_BODY_3": "连接详情（主机、端口、数据库、架构或用户名）不能在未同时提供当前或新密码的情况下更改。"
+    "EDIT_DB_WARNING_BODY_3": "连接详情（主机、端口、数据库、架构或用户名）不能在未同时提供当前或新密码的情况下更改。",
+    "ADMIN_FIRST_NAME": "名",
+    "ADMIN_FIRST_NAME_PLACEHOLDER": "请输入名",
+    "ADMIN_LAST_NAME": "姓",
+    "ADMIN_LAST_NAME_PLACEHOLDER": "请输入姓",
+    "ADMIN_USERNAME": "用户名",
+    "ADMIN_USERNAME_PLACEHOLDER": "请输入用户名"
   },
   "ROLE": {
     "TITLE": "角色",
@@ -649,7 +655,8 @@
     "BULK_ADD_PROCEED": "继续",
     "BULK_ADD_CREATED_SUCCESS": "个用户创建成功",
     "BULK_ADD_CREATED_FAILED": "个用户创建失败",
-    "BULK_ADD_RACE_FAILURES": "创建过程中的失败"
+    "BULK_ADD_RACE_FAILURES": "创建过程中的失败",
+    "CANNOT_MODIFY_SELF_HINT": "您无法更改自己的访问权限"
   },
   "DATASOURCE": {
     "TITLE": "数据源",
@@ -3931,6 +3938,22 @@
       },
       "dbCredentials": {
         "partial": "更新数据库密码时，必须同时提供主机、端口、数据库名称和用户名，以便验证新凭据"
+      },
+      "adminFirstName": {
+        "required": "管理员名为必填项",
+        "tooLong": "管理员名不得超过 64 个字符",
+        "invalid": "名必须以字母开头，且只能包含字母、空格、点、撇号或连字符"
+      },
+      "adminLastName": {
+        "required": "管理员姓为必填项",
+        "tooLong": "管理员姓不得超过 64 个字符",
+        "invalid": "姓必须以字母开头，且只能包含字母、空格、点、撇号或连字符"
+      },
+      "adminUsername": {
+        "required": "管理员用户名为必填项",
+        "tooShort": "管理员用户名至少需要 3 个字符",
+        "tooLong": "管理员用户名不得超过 64 个字符",
+        "invalid": "用户名必须以字母或数字开头和结尾，且只能包含字母、数字、点、下划线或连字符"
       }
     },
     "common": {

@@ -12,9 +12,6 @@
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>{{ 'GROUP.VIEW_TITLE' | translate }}</h2>
-        <span *ngIf="groupData?.isDefault === 1" class="default-badge">{{
-          'GROUP.DEFAULT' | translate
-        }}</span>
       </div>
       <div class="header-actions" *ngIf="groupData">
         <button
@@ -23,15 +20,10 @@
           (click)="onEdit()"
         >
           <i class="pi pi-pencil"></i>
-          {{
-            groupData?.isDefault === 1
-              ? ('GROUP.MANAGE_USERS' | translate)
-              : ('COMMON.EDIT' | translate)
-          }}
+          {{ 'COMMON.EDIT' | translate }}
         </button>
         <ng-container *hasPermission="'groupManagement'; level: 'delete'">
           <button
-            *ngIf="groupData?.isDefault !== 1"
             class="btn-danger"
             type="button"
             [disabled]="isDeleting(groupData.id)"

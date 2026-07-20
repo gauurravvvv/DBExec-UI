@@ -522,7 +522,13 @@
     "EDIT_DB_WARNING_TITLE": "Änderungen an der Master-Datenbank",
     "EDIT_DB_WARNING_BODY_1": "Das Ändern dieser Zugangsdaten betrifft alle Benutzer dieser Organisation. Authentifizierung, Dashboards und Abfragen werden beim Speichern auf die neue Verbindung umgeleitet.",
     "EDIT_DB_WARNING_BODY_2": "Wenn Sie das Schema ändern, werden die Tabellen der Plattform im neuen Schema erstellt. Tabellen im vorherigen Schema verbleiben unverändert in Ihrer Datenbank, werden jedoch von DBExec nicht mehr verwendet.",
-    "EDIT_DB_WARNING_BODY_3": "Verbindungsdetails (Host, Port, Datenbank, Schema oder Benutzername) können nicht geändert werden, ohne auch das aktuelle oder neue Passwort anzugeben."
+    "EDIT_DB_WARNING_BODY_3": "Verbindungsdetails (Host, Port, Datenbank, Schema oder Benutzername) können nicht geändert werden, ohne auch das aktuelle oder neue Passwort anzugeben.",
+    "ADMIN_FIRST_NAME": "Vorname",
+    "ADMIN_FIRST_NAME_PLACEHOLDER": "Vorname eingeben",
+    "ADMIN_LAST_NAME": "Nachname",
+    "ADMIN_LAST_NAME_PLACEHOLDER": "Nachname eingeben",
+    "ADMIN_USERNAME": "Benutzername",
+    "ADMIN_USERNAME_PLACEHOLDER": "Benutzername eingeben"
   },
   "ROLE": {
     "TITLE": "Rollen",
@@ -649,7 +655,8 @@
     "BULK_ADD_PROCEED": "Fortfahren",
     "BULK_ADD_CREATED_SUCCESS": "Benutzer erfolgreich erstellt",
     "BULK_ADD_CREATED_FAILED": "Benutzer konnten nicht erstellt werden",
-    "BULK_ADD_RACE_FAILURES": "Fehler beim Erstellen"
+    "BULK_ADD_RACE_FAILURES": "Fehler beim Erstellen",
+    "CANNOT_MODIFY_SELF_HINT": "Sie können Ihren eigenen Zugriff nicht ändern"
   },
   "DATASOURCE": {
     "TITLE": "Datenquellen",
@@ -3931,6 +3938,22 @@
       },
       "dbCredentials": {
         "partial": "Beim Aktualisieren des Datenbank-Passworts müssen Host, Port, Datenbankname und Benutzername angegeben werden, damit die neuen Zugangsdaten überprüft werden können"
+      },
+      "adminFirstName": {
+        "required": "Vorname des Administrators ist erforderlich",
+        "tooLong": "Vorname des Administrators darf 64 Zeichen nicht überschreiten",
+        "invalid": "Vorname muss mit einem Buchstaben beginnen und darf nur Buchstaben, Leerzeichen, Punkte, Apostrophe oder Bindestriche enthalten"
+      },
+      "adminLastName": {
+        "required": "Nachname des Administrators ist erforderlich",
+        "tooLong": "Nachname des Administrators darf 64 Zeichen nicht überschreiten",
+        "invalid": "Nachname muss mit einem Buchstaben beginnen und darf nur Buchstaben, Leerzeichen, Punkte, Apostrophe oder Bindestriche enthalten"
+      },
+      "adminUsername": {
+        "required": "Benutzername des Administrators ist erforderlich",
+        "tooShort": "Benutzername des Administrators muss mindestens 3 Zeichen lang sein",
+        "tooLong": "Benutzername des Administrators darf 64 Zeichen nicht überschreiten",
+        "invalid": "Benutzername muss mit einem Buchstaben oder einer Ziffer beginnen und enden und darf nur Buchstaben, Ziffern, Punkte, Unterstriche oder Bindestriche enthalten"
       }
     },
     "common": {

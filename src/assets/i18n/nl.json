@@ -522,7 +522,13 @@
     "EDIT_DB_WARNING_TITLE": "Wijzigingen masterdatabase",
     "EDIT_DB_WARNING_BODY_1": "Het wijzigen van deze gegevens heeft gevolgen voor alle gebruikers van deze organisatie. Verificatie, dashboards en query's worden bij het opslaan omgeleid naar de nieuwe verbinding.",
     "EDIT_DB_WARNING_BODY_2": "Als u het schema wijzigt, worden de tabellen van het platform aangemaakt in het nieuwe schema. Tabellen in het vorige schema blijven onaangetast in uw database, maar worden niet meer gebruikt door DBExec.",
-    "EDIT_DB_WARNING_BODY_3": "Verbindingsdetails (host, poort, database, schema of gebruikersnaam) kunnen niet worden gewijzigd zonder ook het huidige of nieuwe wachtwoord op te geven."
+    "EDIT_DB_WARNING_BODY_3": "Verbindingsdetails (host, poort, database, schema of gebruikersnaam) kunnen niet worden gewijzigd zonder ook het huidige of nieuwe wachtwoord op te geven.",
+    "ADMIN_FIRST_NAME": "Voornaam",
+    "ADMIN_FIRST_NAME_PLACEHOLDER": "Voer voornaam in",
+    "ADMIN_LAST_NAME": "Achternaam",
+    "ADMIN_LAST_NAME_PLACEHOLDER": "Voer achternaam in",
+    "ADMIN_USERNAME": "Gebruikersnaam",
+    "ADMIN_USERNAME_PLACEHOLDER": "Voer gebruikersnaam in"
   },
   "ROLE": {
     "TITLE": "Rollen",
@@ -649,7 +655,8 @@
     "BULK_ADD_PROCEED": "Doorgaan",
     "BULK_ADD_CREATED_SUCCESS": "gebruikers succesvol aangemaakt",
     "BULK_ADD_CREATED_FAILED": "gebruikers konden niet worden aangemaakt",
-    "BULK_ADD_RACE_FAILURES": "Fouten tijdens aanmaken"
+    "BULK_ADD_RACE_FAILURES": "Fouten tijdens aanmaken",
+    "CANNOT_MODIFY_SELF_HINT": "U kunt uw eigen toegang niet wijzigen"
   },
   "DATASOURCE": {
     "TITLE": "Databronnen",
@@ -3931,6 +3938,22 @@
       },
       "dbCredentials": {
         "partial": "Bij het bijwerken van het database-wachtwoord moeten host, poort, databasenaam en gebruikersnaam allemaal worden opgegeven, zodat de nieuwe inloggegevens kunnen worden geverifieerd"
+      },
+      "adminFirstName": {
+        "required": "Voornaam van beheerder is vereist",
+        "tooLong": "Voornaam van beheerder mag niet langer zijn dan 64 tekens",
+        "invalid": "Voornaam moet beginnen met een letter en mag alleen letters, spaties, punten, apostrofs of streepjes bevatten"
+      },
+      "adminLastName": {
+        "required": "Achternaam van beheerder is vereist",
+        "tooLong": "Achternaam van beheerder mag niet langer zijn dan 64 tekens",
+        "invalid": "Achternaam moet beginnen met een letter en mag alleen letters, spaties, punten, apostrofs of streepjes bevatten"
+      },
+      "adminUsername": {
+        "required": "Gebruikersnaam van beheerder is vereist",
+        "tooShort": "Gebruikersnaam van beheerder moet minstens 3 tekens bevatten",
+        "tooLong": "Gebruikersnaam van beheerder mag niet langer zijn dan 64 tekens",
+        "invalid": "Gebruikersnaam moet beginnen en eindigen met een letter of cijfer en mag alleen letters, cijfers, punten, underscores of streepjes bevatten"
       }
     },
     "common": {

@@ -210,6 +210,48 @@ export const adminEmailSchema = z.preprocess(
 );
 
 /**
+ * Bootstrap admin identity. The org's first administrator is created during
+ * onboarding; these fields give that user a real name + username instead of
+ * a hardcoded placeholder. First / last names allow letters, spaces, and the
+ * usual name punctuation; username follows the same rule the User module uses.
+ */
+export const PERSON_NAME_PATTERN = /^[A-Za-z][A-Za-z .'-]*$/;
+export const USERNAME_PATTERN = /^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$/;
+
+export const adminFirstNameSchema = z.preprocess(
+  trimOrUndefined,
+  z
+    .string({ message: 'validation.organisation.adminFirstName.required' })
+    .min(1, { message: 'validation.organisation.adminFirstName.required' })
+    .max(64, { message: 'validation.organisation.adminFirstName.tooLong' })
+    .regex(PERSON_NAME_PATTERN, {
+      message: 'validation.organisation.adminFirstName.invalid',
+    }),
+);
+
+export const adminLastNameSchema = z.preprocess(
+  trimOrUndefined,
+  z
+    .string({ message: 'validation.organisation.adminLastName.required' })
+    .min(1, { message: 'validation.organisation.adminLastName.required' })
+    .max(64, { message: 'validation.organisation.adminLastName.tooLong' })
+    .regex(PERSON_NAME_PATTERN, {
+      message: 'validation.organisation.adminLastName.invalid',
+    }),
+);
+
+export const adminUsernameSchema = z.preprocess(
+  trimOrUndefined,
+  z
+    .string({ message: 'validation.organisation.adminUsername.required' })
+    .min(3, { message: 'validation.organisation.adminUsername.tooShort' })
+    .max(64, { message: 'validation.organisation.adminUsername.tooLong' })
+    .regex(USERNAME_PATTERN, {
+      message: 'validation.organisation.adminUsername.invalid',
+    }),
+);
+
+/**
  * Supported locale codes — keep in sync with shared/utility/i18n.ts on
  * BE and assets/i18n/*.json on FE.
  */
@@ -245,6 +287,9 @@ export const addOrganisationSchema = z.object({
   dbUsername: dbUsernameSchema,
   dbPassword: dbPasswordSchema,
   adminEmail: adminEmailSchema,
+  adminFirstName: adminFirstNameSchema,
+  adminLastName: adminLastNameSchema,
+  adminUsername: adminUsernameSchema,
   adminLocale: adminLocaleSchema,
 });
 

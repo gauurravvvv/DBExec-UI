@@ -14,7 +14,7 @@
         </button>
         <h2>{{ 'ROLE.VIEW_TITLE' | translate }}</h2>
       </div>
-      <div class="header-actions" *ngIf="roleData && roleData?.isDefault !== 1">
+      <div class="header-actions" *ngIf="roleData">
         <button
           *hasPermission="'roleManagement'; level: 'write'"
           class="btn-primary"
@@ -37,9 +37,6 @@
               <i class="pi pi-shield"></i>
             </div>
             <h3 class="role-name">{{ roleData.name }}</h3>
-            <span *ngIf="roleData.isDefault === 1" class="default-badge">{{
-              'ROLE.DEFAULT' | translate
-            }}</span>
           </div>
 
           <div class="detail-group">

@@ -134,6 +134,54 @@
             </div>
 
             <app-custom-input
+              formControlName="adminFirstName"
+              [label]="'ORG.ADMIN_FIRST_NAME' | translate"
+              [placeholder]="'ORG.ADMIN_FIRST_NAME_PLACEHOLDER' | translate"
+              icon="pi-user"
+              [required]="true"
+              [showError]="
+                !!(
+                  orgForm.get('adminFirstName')?.invalid &&
+                  orgForm.get('adminFirstName')?.touched
+                )
+              "
+              [errorMessage]="getDbFieldError('adminFirstName')"
+            >
+            </app-custom-input>
+
+            <app-custom-input
+              formControlName="adminLastName"
+              [label]="'ORG.ADMIN_LAST_NAME' | translate"
+              [placeholder]="'ORG.ADMIN_LAST_NAME_PLACEHOLDER' | translate"
+              icon="pi-user"
+              [required]="true"
+              [showError]="
+                !!(
+                  orgForm.get('adminLastName')?.invalid &&
+                  orgForm.get('adminLastName')?.touched
+                )
+              "
+              [errorMessage]="getDbFieldError('adminLastName')"
+            >
+            </app-custom-input>
+
+            <app-custom-input
+              formControlName="adminUsername"
+              [label]="'ORG.ADMIN_USERNAME' | translate"
+              [placeholder]="'ORG.ADMIN_USERNAME_PLACEHOLDER' | translate"
+              icon="pi-at"
+              [required]="true"
+              [showError]="
+                !!(
+                  orgForm.get('adminUsername')?.invalid &&
+                  orgForm.get('adminUsername')?.touched
+                )
+              "
+              [errorMessage]="getDbFieldError('adminUsername')"
+            >
+            </app-custom-input>
+
+            <app-custom-input
               formControlName="adminEmail"
               [label]="'ORG.ADMIN_EMAIL' | translate"
               [placeholder]="'ORG.ADMIN_EMAIL_PLACEHOLDER' | translate"

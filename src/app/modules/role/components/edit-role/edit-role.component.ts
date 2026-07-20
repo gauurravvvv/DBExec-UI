@@ -24,13 +24,16 @@ import {
 import { RoleService } from '../../services/role.service';
 
 /**
- * Edit Role — same permission-grid UX as Add Role, with three diffs:
- *   - Name is disabled (BE doesn't support rename — keeping the field
- *     visible but locked is less confusing than hiding it).
+ * Edit Role — same permission-grid UX as Add Role, with two diffs:
  *   - Initial radio state comes from `leaf.level` returned by
  *     GET /permissions?roleId=. A leaf with level 0 means no current
  *     grant — the "None" radio is pre-selected.
  *   - A status toggle (Active / Inactive) is bound to the form.
+ *
+ * Every role is fully editable, including the seeded Administrator —
+ * there is no default-role special-casing. The BE returns
+ * `canEdit: true` for all roles; the only user-account guard elsewhere
+ * is self-protection, which does not apply to roles.
  *
  * The PUT is wholesale-replace on the BE side, so we always send the
  * complete `selectedPermissions` set even when nothing in the grid
@@ -90,10 +93,7 @@ export class EditRoleComponent implements OnInit, OnDestroy, HasUnsavedChanges {
     // Field validators sourced from the SHARED Zod schema.
     this.roleForm = this.fb.group({
       id: [''],
-      name: [
-        { value: '', disabled: true },
-        [zodValidator(roleNameSchema)],
-      ],
+      name: ['', [zodValidator(roleNameSchema)]],
       description: ['', [zodValidator(roleDescriptionSchema)]],
       status: [1],
     });
@@ -128,11 +128,6 @@ export class EditRoleComponent implements OnInit, OnDestroy, HasUnsavedChanges {
           },
           { emitEvent: false },
         );
-        // Default roles stay fully locked. Non-default roles lock
-        // only the name — rename isn't supported BE-side.
-        if (role.isDefault === 1) {
-          this.roleForm.disable({ emitEvent: false });
-        }
       }
 
       this.accessLevels = [...(levels || [])].sort(
@@ -183,7 +178,6 @@ export class EditRoleComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   }
 
   onLevelChange(permissionId: string, level: number) {
-    if (this.isDefault) return; // Default roles are read-only.
     this.levelByPermissionId = {
       ...this.levelByPermissionId,
       [permissionId]: level,
@@ -240,12 +234,6 @@ export class EditRoleComponent implements OnInit, OnDestroy, HasUnsavedChanges {
       })
       .finally(() => {
         this.roleForm.enable({ emitEvent: false });
-        // Name field stays locked — rename isn't BE-supported.
-        this.roleForm.get('name')?.disable({ emitEvent: false });
-        if (this.isDefault) {
-          this.roleForm.get('description')?.disable({ emitEvent: false });
-          this.roleForm.get('status')?.disable({ emitEvent: false });
-        }
       });
   }
 
@@ -262,10 +250,6 @@ export class EditRoleComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   onCancel() {
     this.loadAll();
     this.roleForm.markAsPristine();
-  }
-
-  get isDefault(): boolean {
-    return this.roleData?.isDefault === 1;
   }
 
   trackByModuleId(_: number, item: PermissionModule): string {

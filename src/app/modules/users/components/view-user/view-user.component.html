@@ -15,8 +15,9 @@
       </div>
       <div class="header-actions">
         <!-- Edit / Delete gated on BE-returned flags so deep-link
-             reloads get the right state. Tooltip distinguishes the
-             default-user lock from the self-action lock. -->
+             reloads get the right state. The sole guard is
+             self-protection — the caller can't edit/delete their own
+             account (canEdit / canDelete are false only for self). -->
         <button
           *hasPermission="'userManagement'; level: 'write'"
           class="btn-primary"
@@ -24,9 +25,7 @@
           [disabled]="!userData?.canEdit"
           [pTooltip]="
             !userData?.canEdit
-              ? (userData?.isDefault === 1
-                  ? ('USER.CANNOT_EDIT_DEFAULT' | translate)
-                  : ('USER.CANNOT_EDIT_SELF' | translate))
+              ? ('USER.CANNOT_MODIFY_SELF_HINT' | translate)
               : ('COMMON.EDIT' | translate)
           "
           tooltipPosition="bottom"
@@ -41,9 +40,7 @@
           [disabled]="!userData?.canDelete || isDeleting(userId)"
           [pTooltip]="
             !userData?.canDelete
-              ? (userData?.isDefault === 1
-                  ? ('USER.CANNOT_DELETE_DEFAULT' | translate)
-                  : ('USER.CANNOT_DELETE_SELF' | translate))
+              ? ('USER.CANNOT_MODIFY_SELF_HINT' | translate)
               : ('COMMON.DELETE' | translate)
           "
           tooltipPosition="bottom"

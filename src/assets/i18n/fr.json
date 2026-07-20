@@ -522,7 +522,13 @@
     "EDIT_DB_WARNING_TITLE": "Modifications de la base de données maître",
     "EDIT_DB_WARNING_BODY_1": "La modification de ces identifiants affecte tous les utilisateurs de cette organisation. L'authentification, les tableaux de bord et les requêtes seront redirigés vers la nouvelle connexion lors de l'enregistrement.",
     "EDIT_DB_WARNING_BODY_2": "Si vous modifiez le schéma, les tables de la plateforme seront créées dans le nouveau schéma. Les tables de l'ancien schéma resteront intactes dans votre base de données, mais ne seront plus utilisées par DBExec.",
-    "EDIT_DB_WARNING_BODY_3": "Les détails de connexion (hôte, port, base de données, schéma ou nom d'utilisateur) ne peuvent pas être modifiés sans fournir également le mot de passe actuel ou le nouveau."
+    "EDIT_DB_WARNING_BODY_3": "Les détails de connexion (hôte, port, base de données, schéma ou nom d'utilisateur) ne peuvent pas être modifiés sans fournir également le mot de passe actuel ou le nouveau.",
+    "ADMIN_FIRST_NAME": "Prénom",
+    "ADMIN_FIRST_NAME_PLACEHOLDER": "Saisir le prénom",
+    "ADMIN_LAST_NAME": "Nom",
+    "ADMIN_LAST_NAME_PLACEHOLDER": "Saisir le nom",
+    "ADMIN_USERNAME": "Nom d'utilisateur",
+    "ADMIN_USERNAME_PLACEHOLDER": "Saisir le nom d'utilisateur"
   },
   "ROLE": {
     "TITLE": "Rôles",
@@ -649,7 +655,8 @@
     "BULK_ADD_PROCEED": "Continuer",
     "BULK_ADD_CREATED_SUCCESS": "utilisateurs créés avec succès",
     "BULK_ADD_CREATED_FAILED": "utilisateurs n'ont pas pu être créés",
-    "BULK_ADD_RACE_FAILURES": "Échecs lors de la création"
+    "BULK_ADD_RACE_FAILURES": "Échecs lors de la création",
+    "CANNOT_MODIFY_SELF_HINT": "Vous ne pouvez pas modifier votre propre accès"
   },
   "DATASOURCE": {
     "TITLE": "Sources de données",
@@ -3931,6 +3938,22 @@
       },
       "dbCredentials": {
         "partial": "Lors de la mise à jour du mot de passe de la base de données, l'hôte, le port, le nom de la base de données et le nom d'utilisateur doivent tous être fournis afin que les nouvelles informations d'identification puissent être vérifiées"
+      },
+      "adminFirstName": {
+        "required": "Le prénom de l'administrateur est obligatoire",
+        "tooLong": "Le prénom de l'administrateur ne doit pas dépasser 64 caractères",
+        "invalid": "Le prénom doit commencer par une lettre et ne peut contenir que des lettres, espaces, points, apostrophes ou tirets"
+      },
+      "adminLastName": {
+        "required": "Le nom de l'administrateur est obligatoire",
+        "tooLong": "Le nom de l'administrateur ne doit pas dépasser 64 caractères",
+        "invalid": "Le nom de famille doit commencer par une lettre et ne peut contenir que des lettres, espaces, points, apostrophes ou tirets"
+      },
+      "adminUsername": {
+        "required": "Le nom d'utilisateur de l'administrateur est obligatoire",
+        "tooShort": "Le nom d'utilisateur de l'administrateur doit comporter au moins 3 caractères",
+        "tooLong": "Le nom d'utilisateur de l'administrateur ne doit pas dépasser 64 caractères",
+        "invalid": "Le nom d'utilisateur doit commencer et se terminer par une lettre ou un chiffre et ne peut contenir que des lettres, chiffres, points, tirets bas ou tirets"
       }
     },
     "common": {

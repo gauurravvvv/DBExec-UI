@@ -12,9 +12,6 @@
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>{{ 'ROLE.EDIT_TITLE' | translate }}</h2>
-        <span *ngIf="isDefault" class="default-badge">{{
-          'ROLE.DEFAULT' | translate
-        }}</span>
       </div>
       <div class="action-buttons">
         <button
@@ -48,19 +45,18 @@
     <!-- Form Section -->
     <form autocomplete="off" *ngIf="roleData" [formGroup]="roleForm" class="admin-form">
       <div class="basic-info-section">
-        <!-- Role Name (always locked — BE doesn't support rename) -->
+        <!-- Role Name — editable for every role, including the
+             seeded Administrator (no default special-casing). -->
         <app-custom-input
           formControlName="name"
           [label]="'COMMON.NAME' | translate"
           [placeholder]="'ROLE.ENTER_NAME' | translate"
           icon="pi-id-card"
           [required]="true"
-          [inputDisabled]="true"
           [showError]="
             !!(roleForm.get('name')?.invalid && roleForm.get('name')?.touched)
           "
           [errorMessage]="getNameError()"
-          [hint]="'ROLE.NAME_IMMUTABLE' | translate"
         >
         </app-custom-input>
 
@@ -70,12 +66,11 @@
           [label]="'ROLE.DESCRIPTION' | translate"
           [placeholder]="'ROLE.ENTER_DESCRIPTION' | translate"
           icon="pi-align-left"
-          [inputDisabled]="isDefault"
         >
         </app-custom-input>
 
         <!-- Status -->
-        <div *ngIf="!isDefault">
+        <div>
           <app-custom-toggle
             formControlName="status"
             [label]="'COMMON.STATUS' | translate"
@@ -159,7 +154,6 @@
                   >
                     <app-custom-radio
                       class="level-radio-group"
-                      [class.is-readonly]="isDefault"
                       [options]="accessLevels"
                       [columns]="accessLevels.length"
                       optionLabel="hidden"

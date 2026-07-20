@@ -50,24 +50,20 @@ export class EditGroupComponent
   categoryId!: string;
   selectedRoleName = '';
   originalFormValue: any;
-  isDefaultGroup = false;
 
-  // Members locked out of the multiselect:
-  //  - the bootstrap admin (user.isDefault === 1) when this is the
-  //    default Administrator group (BE invariant requires them to
-  //    stay in that group)
-  //  - the logged-in user themselves (prevent self-eviction from
-  //    Administrator and other accidental scope changes)
+  // Member locked out of the multiselect: the logged-in user
+  // themselves. Self-protection is the sole guard now — an admin
+  // can't evict themselves from a group mid-edit and lose the
+  // access they need to finish the change. The seeded groups carry
+  // no special protection.
   //
-  // Stored as full {id, username, isPrimaryAdmin, isSelf} objects
-  // so the template can render the right tooltip and the save flow
-  // can reassemble the full payload. Always kept OUT of the form
-  // control's `users` array; reassembled on save.
+  // Stored as {id, username} objects so the template can render the
+  // chip and the save flow can reassemble the full payload. Always
+  // kept OUT of the form control's `users` array; reassembled on
+  // save.
   lockedMembers: Array<{
     id: string;
     username: string;
-    isPrimaryAdmin: boolean;
-    isSelf: boolean;
   }> = [];
 
   saving = this.groupService.saving;
@@ -128,35 +124,26 @@ export class EditGroupComponent
     if (!groupData) return;
 
     this.selectedRoleName = groupData.roleName || '';
-    this.isDefaultGroup = groupData.isDefault === 1;
 
-    // Partition the loaded members into locked vs manageable. Two
-    // rules drive locking:
-    //   1. Bootstrap admin (user.isDefault === 1) — only relevant
-    //      to the default Administrator group, where the BE
-    //      invariant requires them to remain. For non-default
-    //      groups the BE rejects them outright, so they shouldn't
-    //      be in userGroups to begin with.
-    //   2. Logged-in user — locked everywhere so an admin can't
-    //      eject themselves from a group mid-edit and lose access
-    //      to permissions they need to finish the change.
+    // Partition the loaded members into locked vs manageable. The
+    // only lock is the logged-in user themselves — locked in every
+    // group they belong to so an admin can't eject themselves
+    // mid-edit and lose access to permissions they need to finish
+    // the change. There is no bootstrap-admin / default-group
+    // special-casing.
     const loggedInUserId: string =
-      this.globalService.getTokenDetails('id') || '';
+      this.globalService.getTokenDetails('userId') || '';
 
     const lockedIds = new Set<string>();
     this.lockedMembers = [];
     for (const mapping of groupData.userGroups || []) {
       const u = mapping.user;
       if (!u) continue;
-      const isPrimaryAdmin = u.isDefault === 1;
-      const isSelf = u.id === loggedInUserId;
-      if (isPrimaryAdmin || isSelf) {
+      if (u.id === loggedInUserId) {
         lockedIds.add(u.id);
         this.lockedMembers.push({
           id: u.id,
           username: u.username,
-          isPrimaryAdmin,
-          isSelf,
         });
       }
     }
@@ -167,12 +154,11 @@ export class EditGroupComponent
       .map((mapping: any) => mapping.userId)
       .filter((id: string) => !lockedIds.has(id));
 
-    // Kick the initial picker page now that we know whether we're
-    // on the default group (controls excludeDefault).
+    // Kick the initial picker page. The logged-in user is excluded
+    // from the picker (they're shown via the locked chip instead).
     this.loadUsers({
       page: DEFAULT_PAGE,
       limit: 10,
-      excludeDefault: !this.isDefaultGroup,
       excludeSelf: true,
     });
 
@@ -185,12 +171,6 @@ export class EditGroupComponent
       status: groupData.status,
     });
 
-    if (this.isDefaultGroup) {
-      this.groupForm.get('name')?.disable();
-      this.groupForm.get('description')?.disable();
-      this.groupForm.get('status')?.disable();
-    }
-
     this.originalFormValue = this.groupForm.getRawValue();
     this.isFormDirty = false;
     this.groupForm.markAsPristine();
@@ -202,11 +182,9 @@ export class EditGroupComponent
    * Fetcher for server-mode users multiselect.
    *
    * Always excludes the logged-in user (paired with the locked-
-   * self badge above the picker). Excludes the bootstrap admin
-   * for non-default groups (their membership is structurally
-   * forbidden by the BE invariant); the default group lets them
-   * through the query but they're shown via the locked badge, not
-   * via the picker.
+   * self chip above the picker) so they can't remove themselves
+   * from the group. Every other user is selectable — there is no
+   * bootstrap-admin exclusion any more.
    */
   loadUsersPage = async ({
     search,
@@ -220,7 +198,6 @@ export class EditGroupComponent
     const params: any = {
       page,
       limit,
-      excludeDefault: !this.isDefaultGroup,
       excludeSelf: true,
     };
     if (search) params.filter = JSON.stringify({ username: search });
@@ -281,12 +258,11 @@ export class EditGroupComponent
 
   async proceedSave(): Promise<void> {
     if (this.saveJustification.trim()) {
-      // Reassemble the full member set: locked members (bootstrap
-      // admin and/or logged-in user) PLUS whatever the manageable
-      // picker currently holds. The BE expects the complete
-      // membership list per save and treats anyone missing from
-      // it as removed — without this merge, locked members would
-      // silently disappear.
+      // Reassemble the full member set: the locked self member PLUS
+      // whatever the manageable picker currently holds. The BE
+      // expects the complete membership list per save and treats
+      // anyone missing from it as removed — without this merge, the
+      // locked self member would silently disappear.
       const manageable: string[] =
         this.groupForm.get('users')?.value || [];
       const usersPayload = [
@@ -316,15 +292,9 @@ export class EditGroupComponent
         }
       } finally {
         this.groupForm.enable({ emitEvent: false });
-        // Re-apply the per-page locks: roleId is always disabled
-        // (cannot change a group's role on edit), and default
-        // groups have name/description/status locked too.
+        // Re-apply the standing lock: roleId is always disabled
+        // (a group's role can't change on edit).
         this.groupForm.get('roleId')?.disable({ emitEvent: false });
-        if (this.isDefaultGroup) {
-          this.groupForm.get('name')?.disable({ emitEvent: false });
-          this.groupForm.get('description')?.disable({ emitEvent: false });
-          this.groupForm.get('status')?.disable({ emitEvent: false });
-        }
       }
     }
   }

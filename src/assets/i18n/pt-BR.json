@@ -522,7 +522,13 @@
     "EDIT_DB_WARNING_TITLE": "Alterações no banco de dados mestre",
     "EDIT_DB_WARNING_BODY_1": "Alterar essas credenciais afeta todos os usuários desta organização. A autenticação, os painéis e as consultas serão redirecionados para a nova conexão ao salvar.",
     "EDIT_DB_WARNING_BODY_2": "Se você alterar o esquema, as tabelas da plataforma serão criadas no novo esquema. As tabelas do esquema anterior permanecerão intactas no seu banco de dados, mas não serão mais usadas pelo DBExec.",
-    "EDIT_DB_WARNING_BODY_3": "Os detalhes de conexão (host, porta, banco de dados, esquema ou nome de usuário) não podem ser alterados sem também fornecer a senha atual ou a nova."
+    "EDIT_DB_WARNING_BODY_3": "Os detalhes de conexão (host, porta, banco de dados, esquema ou nome de usuário) não podem ser alterados sem também fornecer a senha atual ou a nova.",
+    "ADMIN_FIRST_NAME": "Nome",
+    "ADMIN_FIRST_NAME_PLACEHOLDER": "Informe o nome",
+    "ADMIN_LAST_NAME": "Sobrenome",
+    "ADMIN_LAST_NAME_PLACEHOLDER": "Informe o sobrenome",
+    "ADMIN_USERNAME": "Nome de usuário",
+    "ADMIN_USERNAME_PLACEHOLDER": "Informe o nome de usuário"
   },
   "ROLE": {
     "TITLE": "Funções",
@@ -649,7 +655,8 @@
     "BULK_ADD_PROCEED": "Prosseguir",
     "BULK_ADD_CREATED_SUCCESS": "usuários criados com sucesso",
     "BULK_ADD_CREATED_FAILED": "usuários não puderam ser criados",
-    "BULK_ADD_RACE_FAILURES": "Falhas durante a criação"
+    "BULK_ADD_RACE_FAILURES": "Falhas durante a criação",
+    "CANNOT_MODIFY_SELF_HINT": "Você não pode alterar seu próprio acesso"
   },
   "DATASOURCE": {
     "TITLE": "Fontes de dados",
@@ -3931,6 +3938,22 @@
       },
       "dbCredentials": {
         "partial": "Ao atualizar a senha do banco de dados, host, porta, nome do banco de dados e nome de usuário devem ser todos fornecidos para que as novas credenciais possam ser verificadas"
+      },
+      "adminFirstName": {
+        "required": "O nome do administrador é obrigatório",
+        "tooLong": "O nome do administrador não deve exceder 64 caracteres",
+        "invalid": "O nome deve começar com uma letra e pode conter apenas letras, espaços, pontos, apóstrofos ou hífens"
+      },
+      "adminLastName": {
+        "required": "O sobrenome do administrador é obrigatório",
+        "tooLong": "O sobrenome do administrador não deve exceder 64 caracteres",
+        "invalid": "O sobrenome deve começar com uma letra e pode conter apenas letras, espaços, pontos, apóstrofos ou hífens"
+      },
+      "adminUsername": {
+        "required": "O nome de usuário do administrador é obrigatório",
+        "tooShort": "O nome de usuário do administrador deve ter pelo menos 3 caracteres",
+        "tooLong": "O nome de usuário do administrador não deve exceder 64 caracteres",
+        "invalid": "O nome de usuário deve começar e terminar com uma letra ou dígito e pode conter apenas letras, dígitos, pontos, sublinhados ou hífens"
       }
     },
     "common": {

@@ -116,13 +116,17 @@ export class OrganisationService {
         dbUsername,
         dbPassword,
         adminEmail,
+        adminFirstName,
+        adminLastName,
+        adminUsername,
         adminLocale,
       } = orgForm.value;
 
       // Security + email config are owned by the per-org OrgPolicy
       // entity and configured by the Org Admin under App Settings —
       // the System Admin's "Add Organisation" form no longer collects
-      // them.
+      // them. The bootstrap admin's identity (first/last name, username)
+      // is collected here and passed to the seeded-admin create.
       const payload: any = {
         name,
         description,
@@ -133,6 +137,9 @@ export class OrganisationService {
         dbUsername,
         dbPassword,
         adminEmail,
+        adminFirstName,
+        adminLastName,
+        adminUsername,
         adminLocale,
       };
 
@@ -249,13 +256,17 @@ export class OrganisationService {
       dbUsername,
       dbPassword,
       adminEmail,
+      adminFirstName,
+      adminLastName,
+      adminUsername,
       adminLocale,
     } = orgForm.value;
 
     // Encryption: per-org key generated server-side; the FE doesn't
     // send anything related to algorithm or pepper. Security + email
     // policy are owned by per-org OrgPolicy (managed by Org Admin)
-    // and are not sent from the System Admin's create-org form.
+    // and are not sent from the System Admin's create-org form. The
+    // bootstrap admin's identity (first/last name, username) IS sent.
     const payload: any = {
       name,
       description,
@@ -266,6 +277,9 @@ export class OrganisationService {
       dbUsername,
       dbPassword,
       adminEmail,
+      adminFirstName,
+      adminLastName,
+      adminUsername,
       adminLocale,
     };
 

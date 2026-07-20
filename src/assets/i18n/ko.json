@@ -522,7 +522,13 @@
     "EDIT_DB_WARNING_TITLE": "마스터 데이터베이스 변경",
     "EDIT_DB_WARNING_BODY_1": "이 자격 증명을 변경하면 이 조직의 모든 사용자에게 영향을 미칩니다. 저장 시 인증, 대시보드 및 쿼리가 새 연결로 전환됩니다.",
     "EDIT_DB_WARNING_BODY_2": "스키마를 변경하면 플랫폼 테이블이 새 스키마에 생성됩니다. 이전 스키마의 테이블은 데이터베이스에 그대로 남아 있지만 DBExec에서 더 이상 사용되지 않습니다.",
-    "EDIT_DB_WARNING_BODY_3": "연결 세부 정보(호스트, 포트, 데이터베이스, 스키마 또는 사용자 이름)는 현재 또는 새 비밀번호를 함께 제공하지 않으면 변경할 수 없습니다."
+    "EDIT_DB_WARNING_BODY_3": "연결 세부 정보(호스트, 포트, 데이터베이스, 스키마 또는 사용자 이름)는 현재 또는 새 비밀번호를 함께 제공하지 않으면 변경할 수 없습니다.",
+    "ADMIN_FIRST_NAME": "이름",
+    "ADMIN_FIRST_NAME_PLACEHOLDER": "이름을 입력하세요",
+    "ADMIN_LAST_NAME": "성",
+    "ADMIN_LAST_NAME_PLACEHOLDER": "성을 입력하세요",
+    "ADMIN_USERNAME": "사용자명",
+    "ADMIN_USERNAME_PLACEHOLDER": "사용자명을 입력하세요"
   },
   "ROLE": {
     "TITLE": "역할",
@@ -649,7 +655,8 @@
     "BULK_ADD_PROCEED": "진행",
     "BULK_ADD_CREATED_SUCCESS": "명의 사용자가 성공적으로 생성되었습니다",
     "BULK_ADD_CREATED_FAILED": "명의 사용자를 생성하지 못했습니다",
-    "BULK_ADD_RACE_FAILURES": "생성 중 오류"
+    "BULK_ADD_RACE_FAILURES": "생성 중 오류",
+    "CANNOT_MODIFY_SELF_HINT": "본인의 접근 권한은 변경할 수 없습니다"
   },
   "DATASOURCE": {
     "TITLE": "데이터소스",
@@ -3931,6 +3938,22 @@
       },
       "dbCredentials": {
         "partial": "데이터베이스 비밀번호를 업데이트할 때 새 자격 증명을 확인할 수 있도록 호스트, 포트, 데이터베이스 이름 및 사용자 이름을 모두 제공해야 합니다"
+      },
+      "adminFirstName": {
+        "required": "관리자 이름은 필수입니다",
+        "tooLong": "관리자 이름은 64자를 초과할 수 없습니다",
+        "invalid": "이름은 문자로 시작해야 하며 문자, 공백, 점, 아포스트로피 또는 하이픈만 포함할 수 있습니다"
+      },
+      "adminLastName": {
+        "required": "관리자 성은 필수입니다",
+        "tooLong": "관리자 성은 64자를 초과할 수 없습니다",
+        "invalid": "성은 문자로 시작해야 하며 문자, 공백, 점, 아포스트로피 또는 하이픈만 포함할 수 있습니다"
+      },
+      "adminUsername": {
+        "required": "관리자 사용자 이름은 필수입니다",
+        "tooShort": "관리자 사용자 이름은 3자 이상이어야 합니다",
+        "tooLong": "관리자 사용자 이름은 64자를 초과할 수 없습니다",
+        "invalid": "사용자 이름은 문자 또는 숫자로 시작하고 끝나야 하며 문자, 숫자, 점, 밑줄 또는 하이픈만 포함할 수 있습니다"
       }
     },
     "common": {

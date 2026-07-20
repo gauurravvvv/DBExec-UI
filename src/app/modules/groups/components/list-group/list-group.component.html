@@ -70,12 +70,6 @@
               >
                 {{ group.name }}
               </a>
-              <!-- Default-group badge — brand-tinted. Same
-                   convention as users / roles / system-admin. -->
-              <span
-                *ngIf="group.isDefault === 1"
-                class="row-badge row-badge--default"
-              >{{ 'COMMON.DEFAULT_BADGE' | translate }}</span>
             </span>
           </ng-template>
 
@@ -128,16 +122,8 @@
                 *hasPermission="'groupManagement'; level: 'write'"
                 class="icon-btn edit-btn"
                 (click)="onEdit(group.id)"
-                [attr.aria-label]="
-                  group.isDefault === 1
-                    ? ('GROUP.MANAGE_USERS' | translate)
-                    : ('COMMON.EDIT' | translate)
-                "
-                [pTooltip]="
-                  group.isDefault === 1
-                    ? ('GROUP.MANAGE_USERS' | translate)
-                    : ('COMMON.EDIT' | translate)
-                "
+                [attr.aria-label]="'COMMON.EDIT' | translate"
+                [pTooltip]="'COMMON.EDIT' | translate"
                 tooltipPosition="bottom"
               >
                 <i class="pi pi-pencil"></i>
@@ -147,13 +133,9 @@
                 class="icon-btn delete-btn"
                 (click)="confirmDelete(group.id)"
                 [attr.aria-label]="'COMMON.DELETE' | translate"
-                [pTooltip]="
-                  group.isDefault === 1
-                    ? ('GROUP.CANNOT_DELETE_DEFAULT' | translate)
-                    : ('COMMON.DELETE' | translate)
-                "
+                [pTooltip]="'COMMON.DELETE' | translate"
                 tooltipPosition="bottom"
-                [disabled]="group.isDefault === 1 || isDeleting(group.id)"
+                [disabled]="isDeleting(group.id)"
               >
                 <i
                   class="pi"

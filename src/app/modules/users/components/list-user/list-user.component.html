@@ -90,13 +90,9 @@
               >
                 {{ user.username }}
               </a>
-              <!-- Identity badges — mirror the system-admin
-                   list convention so the row's default/self
-                   state is visible at a glance. -->
-              <span
-                *ngIf="user.isDefault === 1"
-                class="row-badge row-badge--default"
-              >{{ 'COMMON.DEFAULT_BADGE' | translate }}</span>
+              <!-- Self badge — the only identity marker now. The
+                   seeded admin is an ordinary user; the sole guard
+                   is self-protection, surfaced by this "You" chip. -->
               <span
                 *ngIf="user.id === loggedInUserId"
                 class="row-badge row-badge--self"
@@ -181,10 +177,9 @@
 
           <ng-template usGridCell="actions" let-user>
             <div class="row-actions">
-              <!-- Unlock — gated on canUnlock from BE. Default
-                   user lock state is managed via onboarding /
-                   break-glass; self-unlock is impossible (locked
-                   account is logged out) but kept symmetric. -->
+              <!-- Unlock — gated on canUnlock from BE (false only for
+                   the caller's own row). Self-protection is the sole
+                   guard now; there is no default-user special case. -->
               <button
                 *ngIf="user.isLocked"
                 class="icon-btn unlock-btn"
@@ -193,9 +188,7 @@
                 [attr.aria-label]="'COMMON.UNLOCK_ACCOUNT' | translate"
                 [pTooltip]="
                   !user.canUnlock
-                    ? (user.isDefault === 1
-                        ? ('USER.CANNOT_UNLOCK_DEFAULT' | translate)
-                        : ('USER.CANNOT_UNLOCK_SELF' | translate))
+                    ? ('USER.CANNOT_MODIFY_SELF_HINT' | translate)
                     : ('COMMON.UNLOCK_ACCOUNT' | translate)
                 "
                 tooltipPosition="bottom"
@@ -209,9 +202,8 @@
                   "
                 ></i>
               </button>
-              <!-- Edit — gated on canEdit (not default, not
-                   self). Self changes go through /profile;
-                   default user is immutable. -->
+              <!-- Edit — gated on canEdit (false only for the caller's
+                   own row). Self changes go through /profile. -->
               <button
                 *hasPermission="'userManagement'; level: 'write'"
                 class="icon-btn edit-btn"
@@ -220,9 +212,7 @@
                 [attr.aria-label]="'COMMON.EDIT' | translate"
                 [pTooltip]="
                   !user.canEdit
-                    ? (user.isDefault === 1
-                        ? ('USER.CANNOT_EDIT_DEFAULT' | translate)
-                        : ('USER.CANNOT_EDIT_SELF' | translate))
+                    ? ('USER.CANNOT_MODIFY_SELF_HINT' | translate)
                     : ('COMMON.EDIT' | translate)
                 "
                 tooltipPosition="bottom"
@@ -236,9 +226,7 @@
                 [attr.aria-label]="'COMMON.DELETE' | translate"
                 [pTooltip]="
                   !user.canDelete
-                    ? (user.isDefault === 1
-                        ? ('USER.CANNOT_DELETE_DEFAULT' | translate)
-                        : ('USER.CANNOT_DELETE_SELF' | translate))
+                    ? ('USER.CANNOT_MODIFY_SELF_HINT' | translate)
                     : ('COMMON.DELETE' | translate)
                 "
                 tooltipPosition="bottom"

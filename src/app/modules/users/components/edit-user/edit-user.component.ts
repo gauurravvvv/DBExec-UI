@@ -155,10 +155,10 @@ export class EditUserComponent
     if (!data) return;
 
     // Deep-link guard: if the BE marks the record uneditable
-    // (default user OR self), bounce back to the view page rather
-    // than render a form that would 400 on save. The list / view
-    // buttons already gate on canEdit; this catches direct URL
-    // access and stale link reloads.
+    // (self — the sole self-protection guard), bounce back to the
+    // view page rather than render a form that would 400 on save.
+    // The list / view buttons already gate on canEdit; this catches
+    // direct URL access and stale link reloads.
     if (data.canEdit === false) {
       this.router.navigate(['/app/users', this.userId]);
       return;

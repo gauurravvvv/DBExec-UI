@@ -124,13 +124,9 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
    * control. Filters to active users only — matches legacy
    * behavior.
    *
-   * `excludeDefault=true` — the bootstrap admin (user.isDefault=1)
-   *   is structurally locked to the Administrator group. Hiding
-   *   them from this picker prevents the BE invariant rejection
-   *   that would otherwise fire on save.
-   * `excludeSelf=true` — admins can't accidentally place themselves
-   *   into a new group at create-time; same reasoning applies to
-   *   the edit flow.
+   * `excludeSelf=true` — self-protection: admins can't place
+   *   themselves into a new group at create-time. Every other user
+   *   (including the seeded bootstrap admin) is selectable.
    */
   loadUsersPage = async ({
     search,
@@ -144,7 +140,6 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
     const params: any = {
       page,
       limit,
-      excludeDefault: true,
       excludeSelf: true,
     };
     if (search) params.filter = JSON.stringify({ username: search });
@@ -167,7 +162,6 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
       .listUser({
         page: DEFAULT_PAGE,
         limit: 10,
-        excludeDefault: true,
         excludeSelf: true,
       })
       .then(response => {
