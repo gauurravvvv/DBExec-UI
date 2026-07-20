@@ -140,9 +140,23 @@
     &.ct-center .ct-th { justify-content: center; }
   }
   /* Sticky-header rows must stay shaded too (global sets these to
-     card-background !important with higher specificity). */
-  &.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr:first-child > th {
+     card-background !important with higher specificity).
+     z-index: the FROZEN body cell (.ct-frozen td) is z-index 2 so it paints
+     over the horizontally-scrolling body columns. But a NON-frozen sticky
+     header cell (e.g. "Username") only had PrimeNG's default z-index (1), so
+     on VERTICAL scroll the tall frozen body cell (z 2) slid up OVER that
+     header — the overlap in the screenshot. Lift every sticky label-row cell
+     above the frozen body cell (3 > 2); the frozen header corner stays on top
+     at z-index 5 below. */
+  &.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr:first-child > th,
+  .p-datatable-thead > tr:first-child > th {
     background: var(--table-header-bg) !important;
+    z-index: 3;
+  }
+  /* The filter (2nd) row is also sticky and must clear the frozen body cell. */
+  &.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr:nth-child(2) > th,
+  .p-datatable-thead > tr:nth-child(2) > th {
+    z-index: 3;
   }
   /* The filter row (2nd thead) is a form surface, not a header — keep it on the
      card background so its inputs read as inputs, not part of the shaded head. */

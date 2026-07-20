@@ -166,18 +166,6 @@
             <span class="outcome-cell" [class.ok]="activity.success" [class.fail]="!activity.success">
               <i class="pi" [ngClass]="activity.success ? 'pi-check-circle' : 'pi-times-circle'"></i>
               {{ activity.success ? ('LOGIN_ACTIVITY.SUCCESS' | translate) : ('LOGIN_ACTIVITY.FAILED' | translate) }}
-              <!-- Chevron opens the detail drawer (it looked clickable but had
-                   no handler). Now a real button that calls openDetail. -->
-              <button
-                type="button"
-                class="caret-btn"
-                (click)="openDetail(activity)"
-                [attr.aria-label]="'COMMON.VIEW' | translate"
-                [pTooltip]="'COMMON.VIEW' | translate"
-                tooltipPosition="left"
-              >
-                <i class="pi pi-chevron-right caret"></i>
-              </button>
             </span>
           </ng-template>
         </app-custom-table>
