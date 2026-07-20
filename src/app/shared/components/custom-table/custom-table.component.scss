@@ -333,10 +333,26 @@
       linear-gradient(var(--table-row-hover), var(--table-row-hover)),
       var(--card-background) !important;
   }
-  /* Header frozen cell — opaque header bg, stacked above the sticky header row. */
+  /* Header frozen cell — opaque header bg, stacked above the sticky header
+     row. Must out-specify the sticky-header rules above (the
+     `&.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr > th`
+     background/position rules are high-specificity), or the frozen header
+     inherits their stacking context and the scrolling header labels slide over
+     it. Match that scope + add the .ct-frozen class so this wins, and force
+     both z-index and an opaque fill. Covers BOTH the label row and the filter
+     row's frozen cell so the whole pinned header column stays solid. */
+  &.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr > th.ct-frozen,
+  &.modern-table .p-datatable-thead > tr > th.ct-frozen,
   .p-datatable-thead > tr > th.ct-frozen {
-    z-index: 4;
+    z-index: 5 !important;
     background: var(--table-header-bg) !important;
+    border-right: 1px solid var(--border-color);
+  }
+  /* The frozen cell of the filter (2nd) row sits on the card surface like the
+     rest of that row, but must stay opaque + pinned. */
+  &.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr:nth-child(2) > th.ct-frozen,
+  .p-datatable-thead > tr:nth-child(2) > th.ct-frozen {
+    background: var(--card-background) !important;
   }
 
   /* Empty state — a clean centred block, NOT a table row. The empty row/cell
