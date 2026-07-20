@@ -1,34 +1,31 @@
 <div class="dataset-page-wrapper">
   <div class="dataset-content-container">
-    <!-- Header Section -->
+    <!-- Header -->
     <div class="page-header-section">
       <div class="header-content">
-        <h2>{{ 'AUDIT.TITLE' | translate }}</h2>
+        <div class="title-row">
+          <h2>{{ (isScoped ? 'AUDIT.ACTIVITY_TITLE' : 'AUDIT.TITLE') | translate }}</h2>
+          <app-chip variant="tag" tone="info" *ngIf="isScoped">
+            {{ 'AUDIT.SCOPE_USER_MGMT' | translate }}
+          </app-chip>
+        </div>
       </div>
 
       <div class="header-actions">
-        <!-- Page-level PDF export — exports the FULL filtered set
-             from the BE, distinct from the table's CSV/XLSX which
-             only export the current page. -->
-        <button
-          pButton
+        <app-button
+          variant="secondary"
           icon="pi pi-file-pdf"
-          [pTooltip]="'COMMON.EXPORT_PDF' | translate"
-          tooltipPosition="top"
-          (click)="exportLogs('pdf')"
           [disabled]="totalCount === 0"
-          class="p-button-outlined p-button-danger modern-button"
-        ></button>
+          [title]="'COMMON.EXPORT_PDF' | translate"
+          (clicked)="exportLogs('pdf')"
+        >
+          {{ 'COMMON.EXPORT' | translate }}
+        </app-button>
       </div>
     </div>
 
-    <!-- Unified Content Card -->
+    <!-- Content card -->
     <div class="content-card">
-      <!-- Unified simple table. Infinite scroll, global search + on-demand
-           per-column filters (shared inputs), read-only rows. Per-cell DOM
-           via <ng-template usGridCell> so the visual look — name link,
-           description, action badge, version badge, status pill, date text —
-           matches the previous layout exactly. -->
       <div class="table-wrapper" *ngIf="adapter">
         <app-custom-table
           [columns]="cols"
@@ -37,63 +34,122 @@
           [hasProjectedEmpty]="true"
           (refresh)="refreshList()"
         >
-          <!-- Empty body — always projected so only one empty state shows. -->
-          <div tableEmpty class="ct-empty-body">
-            <i class="pi pi-inbox"></i>
-            <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
+          <!-- Filter cluster (toolbar-left). The table's own global search
+               sits on the toolbar-right. -->
+          <div tableToolbarStart class="audit-filters">
+            <app-custom-multiselect
+              *ngIf="!isScoped"
+              class="f-module"
+              [ngModel]="selectedModules"
+              (ngModelChange)="onModulesChange($event)"
+              [options]="moduleOptions"
+              optionLabel="label"
+              optionValue="value"
+              [filter]="true"
+              filterBy="label"
+              [floatingLabel]="true"
+              [label]="'AUDIT.FILTER_MODULE' | translate"
+              display="chip"
+              [maxSelectedLabels]="2"
+              icon="pi-box"
+            ></app-custom-multiselect>
+
+            <app-custom-dropdown
+              class="f-action"
+              [(ngModel)]="selectedAction"
+              [options]="actionOptions"
+              optionLabel="label"
+              optionValue="value"
+              [filter]="false"
+              [showClear]="true"
+              [autoDisplayFirst]="false"
+              [floatingLabel]="true"
+              [label]="'AUDIT.FILTER_ACTION' | translate"
+              icon="pi-bolt"
+              (onChangeEvent)="onActionChange($event)"
+            ></app-custom-dropdown>
+
+            <app-custom-input
+              class="f-actor"
+              [ngModel]="actorSearch"
+              (ngModelChange)="onActorSearch($event)"
+              icon="pi-user"
+              [placeholder]="'AUDIT.FILTER_ACTOR' | translate"
+            ></app-custom-input>
+
+            <app-custom-daterange
+              class="f-date"
+              [(ngModel)]="dateRange"
+              [floatingLabel]="true"
+              [label]="'AUDIT.FILTER_DATE' | translate"
+              [maxDate]="null"
+              (onChangeEvent)="onDateRangeChange($event)"
+            ></app-custom-daterange>
+
+            <app-custom-toggle
+              class="f-failures"
+              [ngModel]="failuresOnly"
+              [showStatusLabel]="true"
+              [trueLabel]="'AUDIT.FAILURES_ONLY' | translate"
+              [falseLabel]="'AUDIT.FAILURES_ONLY' | translate"
+              (onChange)="onFailuresToggle($event)"
+            ></app-custom-toggle>
+
+            <app-button
+              *ngIf="hasActiveFilters"
+              variant="ghost"
+              size="sm"
+              icon="pi pi-filter-slash"
+              [title]="'COMMON.CLEAR' | translate"
+              (clicked)="clearFilters()"
+            >
+              {{ 'COMMON.CLEAR' | translate }}
+            </app-button>
           </div>
 
-          <ng-template usGridCell="entityName" let-log>
-            <a
-              class="dataset-name-link"
-              (click)="showDetail(log)"
-              [title]="log.entityName"
-            >
-              {{ log.entityName || '-' }}
-            </a>
-          </ng-template>
+          <!-- Empty state -->
+          <div tableEmpty class="ct-empty-body">
+            <i class="pi pi-inbox"></i>
+            <span>{{ 'AUDIT.NO_LOGS_FOUND' | translate }}</span>
+          </div>
 
-          <ng-template usGridCell="username" let-log>
-            <span class="description-text" [title]="log.username">
-              {{ log.username || '-' }}
-            </span>
-          </ng-template>
-
-          <ng-template usGridCell="action" let-log>
-            <span
-              class="action-badge"
-              [ngClass]="getActionClass(log.action)"
-            >
-              {{ log.action }}
-            </span>
-          </ng-template>
-
-          <ng-template usGridCell="version" let-log>
-            <span class="version-badge">v{{ log.version || 1 }}</span>
-          </ng-template>
-
-          <ng-template usGridCell="status" let-log>
-            <span
-              class="status-pill"
-              [ngClass]="{
-                active: log.responseSuccess,
-                inactive: !log.responseSuccess,
-              }"
-            >
-              <span class="dot"></span>
-              <span class="label">
-                {{
-                  log.responseSuccess
-                    ? ('AUDIT.SUCCESS' | translate)
-                    : ('AUDIT.FAILED' | translate)
-                }}
+          <!-- Module & entity -->
+          <ng-template usGridCell="module" let-log>
+            <button type="button" class="mod-cell" (click)="openDetail(log)">
+              <span class="mi" [ngClass]="actionClass(log.action)">
+                <i [ngClass]="moduleIcon(log.module)"></i>
               </span>
+              <span class="mod-text">
+                <span class="mod-name">{{ moduleLabel(log.module) }}</span>
+                <span class="mod-sub" [title]="entityLabel(log)">{{ entityLabel(log) }}</span>
+              </span>
+            </button>
+          </ng-template>
+
+          <!-- Action badge -->
+          <ng-template usGridCell="action" let-log>
+            <span class="action-badge" [ngClass]="actionClass(log.action)">
+              {{ actionLabel(log.action) }}
             </span>
           </ng-template>
 
-          <ng-template usGridCell="createdOn" let-log>
+          <!-- Entity -->
+          <ng-template usGridCell="entity" let-log>
+            <span class="description-text" [title]="entityLabel(log)">{{ entityLabel(log) }}</span>
+          </ng-template>
+
+          <!-- Performed by (avatar + name; never a uuid) -->
+          <ng-template usGridCell="actor" let-log>
+            <span class="actor-cell">
+              <span class="avatar" [class.sys]="isSystemActor(log)">{{ initials(log) }}</span>
+              <span class="actor-name" [title]="actorDisplay(log)">{{ actorDisplay(log) }}</span>
+            </span>
+          </ng-template>
+
+          <!-- When -->
+          <ng-template usGridCell="when" let-log>
             <span
-              class="date-text"
+              class="date-text ts"
               [pTooltip]="(log.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
               tooltipPosition="top"
             >
@@ -101,16 +157,18 @@
             </span>
           </ng-template>
 
-          <ng-template usGridCell="ipAddress" let-log>
-            <span class="description-text">{{ log.ipAddress || '-' }}</span>
+          <!-- Origin (IP, monospace) -->
+          <ng-template usGridCell="origin" let-log>
+            <span class="ip-text">{{ log.ipAddress || '—' }}</span>
           </ng-template>
 
-          <ng-template usGridCell="justification" let-log>
-            <span
-              class="description-text justification-text"
-              [title]="log.justification || ''"
-              >{{ log.justification || '-' }}</span
-            >
+          <!-- Outcome -->
+          <ng-template usGridCell="outcome" let-log>
+            <span class="outcome-cell" [class.ok]="log.responseSuccess" [class.fail]="!log.responseSuccess">
+              <i class="pi" [ngClass]="log.responseSuccess ? 'pi-check-circle' : 'pi-times-circle'"></i>
+              {{ log.responseSuccess ? ('AUDIT.SUCCESS' | translate) : ('AUDIT.FAILED' | translate) }}
+              <i class="pi pi-chevron-right caret"></i>
+            </span>
           </ng-template>
         </app-custom-table>
       </div>
@@ -118,164 +176,9 @@
   </div>
 </div>
 
-<!-- Detail Popup -->
-<div
-  class="detail-popup"
-  *ngIf="showDetailDialog"
-  (click)="showDetailDialog = false"
->
-  <div
-    class="popup-content"
-    *ngIf="selectedLog"
-    (click)="$event.stopPropagation()"
-  >
-    <!-- Header -->
-    <div class="popup-header">
-      <div class="popup-title-area">
-        <div class="popup-icon" [ngClass]="getActionClass(selectedLog.action)">
-          <i
-            class="pi"
-            [ngClass]="{
-              'pi-plus-circle': selectedLog.action === 'CREATE',
-              'pi-pencil': selectedLog.action === 'UPDATE',
-              'pi-trash': selectedLog.action === 'DELETE',
-              'pi-sign-in':
-                selectedLog.action === 'LOGIN' ||
-                selectedLog.action === 'LOGOUT',
-              'pi-key': selectedLog.action === 'RESET_PASSWORD',
-              'pi-file': ![
-                'CREATE',
-                'UPDATE',
-                'DELETE',
-                'LOGIN',
-                'LOGOUT',
-                'RESET_PASSWORD',
-              ].includes(selectedLog.action),
-            }"
-          ></i>
-        </div>
-        <div class="popup-title-text">
-          <h3>{{ selectedLog.entityName || '-' }}</h3>
-          <div class="popup-badges">
-            <span
-              class="action-badge"
-              [ngClass]="getActionClass(selectedLog.action)"
-              >{{ selectedLog.action }}</span
-            >
-            <span class="version-badge">v{{ selectedLog.version || 1 }}</span>
-            <span class="module-badge">{{ selectedLog.module }}</span>
-          </div>
-        </div>
-      </div>
-      <button class="popup-close" (click)="showDetailDialog = false">
-        <i class="pi pi-times"></i>
-      </button>
-    </div>
-
-    <!-- Key info -->
-    <div class="popup-info-grid">
-      <div class="info-item">
-        <span class="info-label">{{ 'AUDIT.PERFORMED_BY' | translate }}</span>
-        <span class="info-value">{{ selectedLog.username || '-' }}</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">{{ 'AUDIT.ROLE' | translate }}</span>
-        <span class="info-value capitalize">{{
-          selectedLog.userRole || '-'
-        }}</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">{{ 'AUDIT.TIMESTAMP' | translate }}</span>
-        <span class="info-value">{{
-          selectedLog.createdOn | relativeTime
-        }}</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">{{ 'COMMON.STATUS' | translate }}</span>
-        <span
-          class="info-value"
-          [class.val-success]="selectedLog.responseSuccess"
-          [class.val-error]="!selectedLog.responseSuccess"
-        >
-          <span
-            class="status-dot"
-            [class.success]="selectedLog.responseSuccess"
-            [class.failed]="!selectedLog.responseSuccess"
-          ></span>
-          {{
-            selectedLog.responseSuccess
-              ? ('AUDIT.SUCCESS' | translate)
-              : ('AUDIT.FAILED' | translate)
-          }}
-        </span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">{{ 'AUDIT.IP_ADDRESS' | translate }}</span>
-        <span class="info-value mono">{{ selectedLog.ipAddress || '-' }}</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">{{ 'AUDIT.VERSION' | translate }}</span>
-        <span class="info-value">v{{ selectedLog.version || 1 }}</span>
-      </div>
-    </div>
-
-    <!-- Justification -->
-    <div class="popup-section" *ngIf="selectedLog.justification">
-      <div class="section-header">
-        <i class="pi pi-align-left"></i>
-        <span class="section-title">{{
-          'AUDIT.JUSTIFICATION' | translate
-        }}</span>
-      </div>
-      <p class="justification-detail">{{ selectedLog.justification }}</p>
-    </div>
-
-    <!-- Changes table (UPDATE actions with oldValues/newValues) -->
-    <div class="popup-section" *ngIf="hasChangeComparison()">
-      <div class="section-header">
-        <i class="pi pi-arrows-h"></i>
-        <span class="section-title">{{ 'AUDIT.CHANGES' | translate }}</span>
-      </div>
-      <table class="changes-table">
-        <thead>
-          <tr>
-            <th>{{ 'AUDIT.FIELD' | translate }}</th>
-            <th>{{ 'AUDIT.OLD_VALUE' | translate }}</th>
-            <th>{{ 'AUDIT.NEW_VALUE' | translate }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            *ngFor="let row of getChangeRows(); trackBy: trackByIndex"
-            [class.changed]="row.changed"
-          >
-            <td class="field-cell">{{ row.field }}</td>
-            <td class="old-cell">{{ row.oldVal }}</td>
-            <td class="new-cell">{{ row.newVal }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Entity details (CREATE / DELETE — flat kv list) -->
-    <div
-      class="popup-section"
-      *ngIf="!hasChangeComparison() && getEntityDetails().length"
-    >
-      <div class="section-header">
-        <i class="pi pi-list"></i>
-        <span class="section-title">{{
-          'AUDIT.ENTITY_DETAILS' | translate
-        }}</span>
-      </div>
-      <table class="details-table">
-        <tbody>
-          <tr *ngFor="let item of getEntityDetails(); trackBy: trackByIndex">
-            <td class="dt-label">{{ item.key }}</td>
-            <td class="dt-value">{{ item.value }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
+<!-- Right-side detail drawer -->
+<app-audit-detail-drawer
+  [log]="selectedLog"
+  [visible]="drawerVisible"
+  (closed)="onDrawerClosed()"
+></app-audit-detail-drawer>

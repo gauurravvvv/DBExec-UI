@@ -7,6 +7,17 @@
       </div>
 
       <div class="header-actions">
+        <!-- Activity — the audit trail scoped to user/group/role. Gated on
+             the audit permission so only reviewers see it. -->
+        <button
+          *hasPermission="'auditLogs'; level: 'read'"
+          pButton
+          [label]="'AUDIT.ACTIVITY_TITLE' | translate"
+          icon="pi pi-history"
+          (click)="onOpenActivity()"
+          class="p-button-text modern-button"
+        ></button>
+
         <!-- Bulk Add Button — routes to the bulk-add page -->
         <button
           *hasPermission="'userManagement'; level: 'write'"

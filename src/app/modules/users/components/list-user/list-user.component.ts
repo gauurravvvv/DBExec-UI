@@ -241,6 +241,10 @@ export class ListUserComponent implements OnInit, OnDestroy {
     this.router.navigate([USER.BULK_ADD]);
   }
 
+  onOpenActivity() {
+    this.router.navigate([USER.ACTIVITY]);
+  }
+
   onUnlock(id: string) {
     this.userService.unlock(id).then((res: any) => {
       if (this.globalService.handleSuccessService(res)) {

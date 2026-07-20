@@ -8,6 +8,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import {
@@ -18,18 +19,37 @@ import type {
   CustomTableColumn,
   CustomTableConfig,
 } from 'src/app/shared/components/custom-table/custom-table.types';
+import {
+  ACTION_CLASS,
+  ACTION_FILTER_OPTIONS,
+  ACTION_LABEL_KEY,
+  MODULE_FALLBACK,
+  MODULE_FILTER_OPTIONS,
+  MODULE_META,
+} from '../../audit-meta.constant';
+import { AuditLog } from '../../models/audit-log.model';
 import { AuditService } from '../../services/audit.service';
 
+interface FilterOption {
+  value: string;
+  label: string;
+}
+
 /**
- * Audit-logs listing — renders through the shared `<app-custom-table>`
- * (the app's unified list table) driven by a `UsServerListAdapter` on the
- * BE `/audit-logs` list call. Infinite scroll (no page controls), a single
- * global search plus on-demand per-column filters (shared inputs). Lists
- * logs at the org level, so the adapter binds directly in ngOnInit — there
- * is no datasource dropdown on this page.
+ * Audit-logs listing — the app's audit & activity trail rendered through the
+ * shared `<app-custom-table>` driven by a `UsServerListAdapter` on the BE
+ * `/audit-logs` list call. Infinite scroll, a rich filter toolbar (module
+ * multiselect, action dropdown, actor search, daterange, failures-only
+ * toggle, export), and a right-side detail drawer opened by clicking a row.
  *
- * Read-only — no row selection, no bulk delete, no row actions beyond the
- * "view detail" popup triggered by clicking the name.
+ * NAMES ONLY — every column renders `actorName` / `entityName` (with
+ * "Unknown user" / "System Admin" fallbacks); no raw actorId / entityId is
+ * ever shown.
+ *
+ * ONE component, TWO entry points: the global Audit screen (unscoped) and the
+ * User-Management → Activity view. The latter passes
+ * `data.moduleScope = ['user','group','role']` on its route; when present the
+ * module filter is LOCKED to that scope and the module control is hidden.
  */
 @Component({
   selector: 'app-list-audit-logs',
@@ -40,29 +60,43 @@ import { AuditService } from '../../services/audit.service';
 export class ListAuditLogsComponent implements OnInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
+  private route = inject(ActivatedRoute);
 
-  Math = Math;
-  today = new Date();
   totalCount = 0;
 
-  /* ── detail popup state — UNCHANGED ──────────────────── */
+  /** Route-supplied module scope (User-Mgmt Activity view). Empty = global. */
+  moduleScope: string[] = [];
+  get isScoped(): boolean {
+    return this.moduleScope.length > 0;
+  }
 
-  showDetailDialog = false;
-  selectedLog: any = null;
+  /* ── filter model ─────────────────────────────────────── */
 
-  /* ── custom-table wiring (unified simple table; server-driven) ──────── */
+  selectedModules: string[] = [];
+  selectedAction: string | null = null;
+  actorSearch = '';
+  dateRange: Date[] | null = null;
+  failuresOnly = false;
 
-  /** Unified-table columns. Cell DOM is supplied by `<ng-template usGridCell>`
-   *  in the HTML; `filter` flags enable the on-demand per-column filter row. */
+  moduleOptions: FilterOption[] = [];
+  actionOptions: FilterOption[] = [];
+
+  /* ── drawer state ─────────────────────────────────────── */
+
+  drawerVisible = false;
+  selectedLog: AuditLog | null = null;
+
+  /* ── custom-table wiring ──────────────────────────────── */
+
   cols: CustomTableColumn[] = [];
 
   tableConfig: CustomTableConfig = {
-    pageSize: 50, // rows fetched per scroll page
+    pageSize: 50,
     globalSearch: true,
-    globalSearchKey: 'search', // BE audit list matches a `search` filter key
+    globalSearchKey: 'search',
     globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
-    showColumnFilters: true,
-    enableExport: true,
+    showColumnFilters: false,
+    enableExport: false, // page-level export lives in the toolbar
     gridKey: 'audit-logs-list',
     height: 'flex',
     rowIdField: 'id',
@@ -77,8 +111,22 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // Route data may scope this instance to User-Management modules. With the
+    // default 'emptyOnly' inheritance the lazy module's empty-path child
+    // inherits the parent route's data, so moduleScope arrives here.
+    const scope = this.route.snapshot.data?.['moduleScope'];
+    this.moduleScope = Array.isArray(scope) ? scope : [];
+
     this.cols = this.buildColumns();
-    // Field-specific search placeholder so the user knows what's matched.
+    this.moduleOptions = MODULE_FILTER_OPTIONS.map(o => ({
+      value: o.value,
+      label: this.translate.instant(o.labelKey),
+    }));
+    this.actionOptions = ACTION_FILTER_OPTIONS.map(o => ({
+      value: o.value,
+      label: this.translate.instant(o.labelKey),
+    }));
+
     this.tableConfig = {
       ...this.tableConfig,
       globalSearchPlaceholder: this.translate.instant('AUDIT.SEARCH_PLACEHOLDER'),
@@ -86,253 +134,238 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
     this.bindAdapter();
   }
 
-  ngOnDestroy() {
-    // Abort in-flight reads if the user navigates away.
+  ngOnDestroy(): void {
     this.auditService.cancelReads();
     this.adapter?.destroy();
   }
 
-  /* ── column definitions ──────────────────────────────── */
+  /* ── columns ──────────────────────────────────────────── */
 
   private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
-      { colId: 'entityName', field: 'entityName', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text', sortable: false },
-      { colId: 'username', field: 'username', header: t('AUDIT.PERFORMED_BY'), width: '192px', filter: 'text', sortable: false },
-      { colId: 'action', field: 'action', header: t('AUDIT.ACTION'), width: '144px', filter: 'text' },
-      { colId: 'version', field: 'version', header: t('AUDIT.VERSION'), width: '96px', sortable: false },
-      { colId: 'status', field: 'responseSuccess', header: t('COMMON.STATUS'), width: '144px', sortable: false },
-      { colId: 'createdOn', field: 'createdOn', header: t('AUDIT.TIMESTAMP'), width: '224px' },
-      { colId: 'ipAddress', field: 'ipAddress', header: t('AUDIT.IP_ADDRESS'), width: '160px', filter: 'text', sortable: false },
-      { colId: 'justification', field: 'justification', header: t('AUDIT.JUSTIFICATION'), width: '256px', filter: 'text', sortable: false },
+      { colId: 'module', field: 'module', header: t('AUDIT.COL_MODULE'), width: '260px', frozen: true, sortable: false },
+      { colId: 'action', field: 'action', header: t('AUDIT.ACTION'), width: '132px', sortable: false },
+      { colId: 'entity', field: 'entityName', header: t('AUDIT.COL_ENTITY'), width: '200px', sortable: false },
+      { colId: 'actor', field: 'actorName', header: t('AUDIT.PERFORMED_BY'), width: '208px', sortable: false },
+      { colId: 'when', field: 'createdOn', header: t('AUDIT.COL_WHEN'), width: '188px' },
+      { colId: 'origin', field: 'ipAddress', header: t('AUDIT.COL_ORIGIN'), width: '140px', sortable: false },
+      { colId: 'outcome', field: 'responseSuccess', header: t('AUDIT.OUTCOME'), width: '132px', sortable: false },
     ];
   }
 
-  /* ── adapter wiring ─────────────────────────────────── */
+  /* ── cell presentation helpers ────────────────────────── */
 
-  private bindAdapter() {
-    this.adapter?.destroy();
-    this.adapter = new UsServerListAdapter<any>({
-      load: (params: UsListLoadParams) =>
-        this.auditService.listAuditLogs({
-          page: params.page,
-          limit: params.limit,
-          ...(params.sort ? { sort: params.sort } : {}),
-          ...(params.filter ? { filter: params.filter } : {}),
-        }),
-      // Custom unwrap — the BE returns `{ logs: [], count }`.
-      unwrap: (res: any) => {
-        const rows = res?.data?.logs ?? [];
-        const total = res?.data?.count ?? 0;
-        this.totalCount = total;
-        // Push count into Page-level Export gating outside CD cycle.
-        Promise.resolve().then(() => this.cdr.markForCheck());
-        return { rows, total };
-      },
-      // custom-table sends PLAIN filter values (global `search` + per-column
-      // entityName/username/action/status/ipAddress/justification), so the
-      // adapter's identity mapping passes them straight through — no AG-Grid
-      // cell unwrapping needed.
-      initial: { page: 1, limit: 50 },
-    });
-    this.cdr.markForCheck();
+  moduleIcon(module: string | null | undefined): string {
+    return (module && MODULE_META[module]?.icon) || MODULE_FALLBACK.icon;
   }
 
-  /* ── handlers re-pointed at the adapter ──────────────── */
-
-  refreshList() {
-    this.adapter?.reload();
+  moduleLabel(module: string | null | undefined): string {
+    const key = (module && MODULE_META[module]?.labelKey) || MODULE_FALLBACK.labelKey;
+    return this.translate.instant(key);
   }
 
-  /* ── detail popup helpers — UNCHANGED ──────────────────── */
-
-  getActionClass(action: string): string {
-    switch (action) {
-      case 'CREATE':
-        return 'action-create';
-      case 'UPDATE':
-        return 'action-update';
-      case 'DELETE':
-        return 'action-delete';
-      case 'LOGIN':
-      case 'LOGOUT':
-        return 'action-auth';
-      case 'RESET_PASSWORD':
-        return 'action-warning';
-      default:
-        return 'action-default';
-    }
+  actionClass(action: string | null | undefined): string {
+    return (action && ACTION_CLASS[action]) || 'act-default';
   }
 
-  showDetail(log: any) {
-    this.selectedLog = log;
-    this.showDetailDialog = true;
+  actionLabel(action: string | null | undefined): string {
+    if (!action) return '';
+    const key = ACTION_LABEL_KEY[action];
+    return key ? this.translate.instant(key) : action;
   }
 
-  hasChangeComparison(): boolean {
-    const m = this.selectedLog?.metadata;
-    return m && m.oldValues && m.newValues;
+  actorDisplay(log: AuditLog): string {
+    if (log.actorName && log.actorName.trim()) return log.actorName;
+    return this.translate.instant('AUDIT.UNKNOWN_USER');
   }
 
-  getChangeRows(): {
-    field: string;
-    oldVal: any;
-    newVal: any;
-    changed: boolean;
-  }[] {
-    const m = this.selectedLog?.metadata;
-    if (!m?.oldValues || !m?.newValues) return [];
-
-    const keys = Object.keys(m.oldValues);
-    return keys.map(k => ({
-      field: this.formatKey(k),
-      oldVal: m.oldValues[k] ?? '-',
-      newVal: m.newValues[k] ?? '-',
-      changed: String(m.oldValues[k]) !== String(m.newValues[k]),
-    }));
+  isSystemActor(log: AuditLog): boolean {
+    return log.actorType === 'system-admin' || log.actorType === 'system';
   }
 
-  getEntityDetails(): { key: string; value: any }[] {
-    const m = this.selectedLog?.metadata;
-    if (!m) return [];
+  initials(log: AuditLog): string {
+    const name = log.actorName?.trim();
+    if (!name) return '?';
+    if (log.actorType === 'system-admin') return 'SA';
+    if (log.actorType === 'system') return 'SY';
+    const parts = name.split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return name.slice(0, 2).toUpperCase();
+  }
 
-    const items: { key: string; value: any }[] = [];
+  entityLabel(log: AuditLog): string {
+    return log.entityName?.trim() || '—';
+  }
 
-    // Entity snapshot (CREATE / DELETE / RESET_PASSWORD)
-    const detailObj = m.entity;
-    if (detailObj && typeof detailObj === 'object') {
-      for (const k of Object.keys(detailObj)) {
-        items.push({ key: this.formatKey(k), value: detailObj[k] ?? '-' });
-      }
+  /* ── adapter wiring ───────────────────────────────────── */
+
+  /** Assemble the BE `filter` object from the toolbar model + scope. */
+  private buildFilter(): Record<string, unknown> {
+    const filter: Record<string, unknown> = {};
+
+    // Module scope (locked) OR user-selected modules.
+    if (this.isScoped) {
+      filter['module'] = this.moduleScope;
+    } else if (this.selectedModules.length > 0) {
+      filter['module'] = this.selectedModules;
     }
 
-    // Extra context fields (visualCount, userCount, columnCount, etc.)
-    for (const [k, v] of Object.entries(m)) {
-      if (
-        k === 'entity' ||
-        k === 'oldValues' ||
-        k === 'newValues' ||
-        k === 'justification'
-      )
-        continue;
-      if (v !== null && typeof v === 'object' && !Array.isArray(v)) continue;
-      items.push({
-        key: this.formatKey(k),
-        value: Array.isArray(v) ? v.join(', ') : (v ?? '-'),
-      });
-    }
+    if (this.selectedAction) filter['action'] = this.selectedAction;
+    if (this.actorSearch.trim()) filter['actor'] = this.actorSearch.trim();
+    if (this.failuresOnly) filter['outcome'] = 'failure';
 
-    return items;
-  }
-
-  // Field label map matching backend FIELD_LABELS
-  private readonly fieldLabels: Record<string, string> = {
-    firstName: 'First Name',
-    lastName: 'Last Name',
-    email: 'Email',
-    role: 'Role',
-    status: 'Status',
-    isDefault: 'Default User',
-    name: 'Name',
-    description: 'Description',
-    datasourceName: 'Datasource',
-    dbUsername: 'DB Username',
-    dbType: 'DB Type',
-    hostname: 'Hostname',
-    port: 'Port',
-    isMasterDB: 'Master Datasource',
-    sql: 'SQL Query',
-    type: 'Type',
-    datasetName: 'Dataset',
-    columnCount: 'Column Count',
-    columns: 'Columns',
-    queryBuilderName: 'Query Builder',
-    relatedAnalysesCount: 'Related Analyses',
-    columnToUse: 'Column (Use)',
-    columnToView: 'Column (View)',
-    customLogic: 'Custom Logic',
-    isCfUsed: 'Custom Field Used',
-    sequence: 'Sequence',
-    analysisName: 'Analysis',
-    visualCount: 'Visual Count',
-    promptCount: 'Prompt Count',
-    tabCount: 'Tab Count',
-    tabName: 'Tab',
-    sectionName: 'Section',
-    mandatory: 'Mandatory',
-    prompt_schema: 'Schema',
-    prompt_table: 'Table',
-    prompt_column: 'Column',
-    prompt_join: 'Join',
-    prompt_where: 'Where',
-    prompt_sql: 'SQL',
-    prompt_values_sql: 'Values SQL',
-    schema: 'Schema',
-    tables: 'Tables',
-    hasJoin: 'Has Join',
-    hasWhere: 'Has Where',
-    valueCount: 'Value Count',
-    valuesAdded: 'Values Added',
-    valuesDeleted: 'Values Deleted',
-    appearance: 'Appearance',
-    config: 'Configuration',
-    usersAdded: 'Users Added',
-    usersRemoved: 'Users Removed',
-    groupsAdded: 'Groups Added',
-    groupsRemoved: 'Groups Removed',
-    userCount: 'User Count',
-    userIds: 'User IDs',
-    visibility: 'Visibility',
-  };
-
-  trackByIndex(index: number): number {
-    return index;
-  }
-
-  formatKey(key: string): string {
-    if (this.fieldLabels[key]) return this.fieldLabels[key];
-    return key
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, s => s.toUpperCase())
-      .trim();
-  }
-
-  /* ── BE PDF export — preserved (full filtered set) ──── */
-
-  /**
-   * Build the BE-shape filter payload from the adapter's current
-   * filterModel. custom-table stores PLAIN filter values, so the slice
-   * passed to the BE export is a straight pass-through of the model.
-   */
-  private getExportFilterParams(): any {
-    if (!this.adapter) return {};
-    const model = this.adapter.filterModel();
-    const filter: any = {};
-
-    if (model['entityName']) filter.entityName = model['entityName'];
-    if (model['username']) filter.username = model['username'];
-    if (model['action']) filter.action = model['action'];
-    if (model['ipAddress']) filter.ipAddress = model['ipAddress'];
-    if (model['justification']) filter.justification = model['justification'];
-    if (model['search']) filter.search = model['search'];
-
-    if (model['status'] !== undefined && model['status'] !== null) {
-      const v = model['status'];
-      if (v !== '' && v !== null && v !== undefined) {
-        filter.status =
-          typeof v === 'boolean' ? v : String(v).toLowerCase() === 'true';
-      }
+    if (this.dateRange && this.dateRange.length) {
+      const [from, to] = this.dateRange;
+      if (from) filter['dateFrom'] = this.toIso(from, false);
+      if (to) filter['dateTo'] = this.toIso(to, true);
     }
 
     return filter;
   }
 
-  exportLogs(format: 'pdf') {
-    const filter = this.getExportFilterParams();
-    const params: any = { format };
-    if (Object.keys(filter).length > 0) {
-      params.filter = JSON.stringify(filter);
+  /** Normalise a picked date to an ISO string (end-of-day for the upper bound). */
+  private toIso(d: Date, endOfDay: boolean): string {
+    const x = new Date(d);
+    if (endOfDay) x.setHours(23, 59, 59, 999);
+    else x.setHours(0, 0, 0, 0);
+    return x.toISOString();
+  }
+
+  private bindAdapter(): void {
+    this.adapter?.destroy();
+    this.adapter = new UsServerListAdapter<any>({
+      load: (params: UsListLoadParams) => {
+        // Merge the toolbar filter with the table's own global-search filter.
+        // The adapter serialises its filterModel to a JSON STRING in
+        // `params.filter` (the table writes global `search` there), so parse
+        // it before merging. The toolbar owns module/action/actor/date/
+        // outcome; the table owns the global `search` key.
+        let tableFilter: Record<string, unknown> = {};
+        if (params.filter) {
+          try {
+            tableFilter = JSON.parse(params.filter);
+          } catch {
+            tableFilter = {};
+          }
+        }
+        const merged = { ...this.buildFilter(), ...tableFilter };
+        const req: Record<string, unknown> = {
+          page: params.page,
+          limit: params.limit,
+        };
+        if (params.sort) req['sort'] = params.sort;
+        if (Object.keys(merged).length) req['filter'] = JSON.stringify(merged);
+        return this.auditService.listAuditLogs(req);
+      },
+      // BE returns `{ data: { logs: [], count } }`.
+      unwrap: (res: any) => {
+        const rows = (res?.data?.logs ?? []) as AuditLog[];
+        const total = res?.data?.count ?? 0;
+        this.totalCount = total;
+        Promise.resolve().then(() => this.cdr.markForCheck());
+        return { rows, total };
+      },
+      initial: { page: 1, limit: 50 },
+    });
+    this.cdr.markForCheck();
+  }
+
+  /** Re-apply the toolbar filter — rebuild so the load closure captures it. */
+  private applyFilter(): void {
+    this.bindAdapter();
+  }
+
+  /* ── toolbar handlers ─────────────────────────────────── */
+
+  onModulesChange(values: string[]): void {
+    this.selectedModules = values ?? [];
+    this.applyFilter();
+  }
+
+  onActionChange(value: string | null): void {
+    this.selectedAction = value;
+    this.applyFilter();
+  }
+
+  onActorSearch(value: string): void {
+    this.actorSearch = value ?? '';
+    this.applyFilter();
+  }
+
+  onDateRangeChange(range: Date[] | null): void {
+    this.dateRange = range;
+    // Only re-query once a full range (or a clear) is picked.
+    if (!range || range.length === 0 || (range[0] && range[1]) || range[0] === null) {
+      this.applyFilter();
     }
+  }
+
+  onFailuresToggle(evt: { checked: boolean }): void {
+    this.failuresOnly = !!evt?.checked;
+    this.applyFilter();
+  }
+
+  clearFilters(): void {
+    this.selectedModules = [];
+    this.selectedAction = null;
+    this.actorSearch = '';
+    this.dateRange = null;
+    this.failuresOnly = false;
+    this.applyFilter();
+  }
+
+  get hasActiveFilters(): boolean {
+    return (
+      (!this.isScoped && this.selectedModules.length > 0) ||
+      !!this.selectedAction ||
+      !!this.actorSearch.trim() ||
+      !!(this.dateRange && this.dateRange.length) ||
+      this.failuresOnly
+    );
+  }
+
+  refreshList(): void {
+    this.adapter?.reload();
+  }
+
+  /* ── drawer ───────────────────────────────────────────── */
+
+  openDetail(log: AuditLog): void {
+    // Show immediately from the list row (it already carries before/after),
+    // then lazily refresh the full detail so the drawer is always complete.
+    this.selectedLog = log;
+    this.drawerVisible = true;
+    this.auditService.setSelected(log);
+    this.cdr.markForCheck();
+
+    if (log?.id) {
+      this.auditService
+        .getAuditLog(log.id)
+        .then(full => {
+          if (full && this.drawerVisible && this.selectedLog?.id === full.id) {
+            this.selectedLog = full;
+            this.cdr.markForCheck();
+          }
+        })
+        .catch(() => {
+          /* keep the list row already shown; interceptor toasts errors */
+        });
+    }
+  }
+
+  onDrawerClosed(): void {
+    this.drawerVisible = false;
+    this.selectedLog = null;
+    this.cdr.markForCheck();
+  }
+
+  /* ── export ───────────────────────────────────────────── */
+
+  exportLogs(format: 'pdf'): void {
+    const filter = this.buildFilter();
+    const params: Record<string, unknown> = { format };
+    if (Object.keys(filter).length > 0) params['filter'] = JSON.stringify(filter);
 
     this.auditService
       .exportAuditLogs(params)
@@ -341,7 +374,6 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
         next: (blob: Blob) => {
           const dateStr = new Date().toISOString().slice(0, 10);
           const fileName = `Audit_Logs_${dateStr}.pdf`;
-
           const url = window.URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
@@ -353,7 +385,7 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
           this.globalService.handleSuccessService({
             status: false,
             code: 500,
-            message: 'Failed to export audit logs',
+            message: this.translate.instant('AUDIT.EXPORT_FAILED'),
           });
         },
       });

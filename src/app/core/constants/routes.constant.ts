@@ -63,6 +63,8 @@ export const GROUP = feature('/app/groups');
 export const USER = {
   ...feature('/app/users'),
   BULK_ADD: '/app/users/bulk-add',
+  // User-Management → Activity: the audit trail scoped to user/group/role.
+  ACTIVITY: '/app/users/activity',
 };
 
 export const DATASOURCE = feature('/app/datasources');

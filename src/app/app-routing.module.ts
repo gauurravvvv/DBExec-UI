@@ -54,6 +54,23 @@ const routes: Routes = [
         },
       },
       {
+        // User-Management → Activity: the SAME audit list, pre-scoped to the
+        // user/group/role modules via route data. Registered BEFORE `users`
+        // so the full path wins over UsersModule's `:id` route. Gated on the
+        // audit permission — a user without it can't reach the scoped view.
+        path: 'users/activity',
+        loadChildren: () =>
+          import('./modules/audit-logs/audit-logs.module').then(
+            m => m.AuditLogsModule,
+          ),
+        canActivate: [roleGuard],
+        data: {
+          permission: PERMISSIONS.AUDIT_LOGS,
+          moduleScope: ['user', 'group', 'role'],
+          title: 'PAGE_TITLES.USER_ACTIVITY',
+        },
+      },
+      {
         path: 'users',
         loadChildren: () =>
           import('./modules/users/users.module').then(m => m.UsersModule),

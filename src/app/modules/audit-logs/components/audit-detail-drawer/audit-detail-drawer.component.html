@@ -1,0 +1,153 @@
+<p-sidebar
+  [visible]="visible"
+  (visibleChange)="onVisibleChange($event)"
+  position="right"
+  [modal]="true"
+  [dismissible]="true"
+  [showCloseIcon]="false"
+  [blockScroll]="true"
+  appendTo="body"
+  styleClass="audit-drawer-panel"
+  [ariaCloseLabel]="'COMMON.CLOSE' | translate"
+>
+  <ng-container *ngIf="log as row">
+    <!-- ── Header ── -->
+    <div class="drawer-head">
+      <div class="head-main">
+        <span class="mod-icon" [ngClass]="actionClass(row.action)">
+          <i [ngClass]="moduleIcon(row.module)"></i>
+        </span>
+        <div class="head-text">
+          <h3>{{ actionLabel(row.action) }} · {{ moduleLabel(row.module) }}</h3>
+          <div class="head-sub">
+            <span class="entity-name" *ngIf="row.entityName">{{ row.entityName }}</span>
+            <span class="entity-name muted" *ngIf="!row.entityName">{{ moduleLabel(row.module) }}</span>
+          </div>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="drawer-close"
+        (click)="onClose()"
+        [attr.aria-label]="'COMMON.CLOSE' | translate"
+        [pTooltip]="'COMMON.CLOSE' | translate"
+        tooltipPosition="bottom"
+      >
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- ── Body ── -->
+    <div class="drawer-body">
+      <!-- The six questions -->
+      <dl class="qgrid">
+        <dt>{{ 'AUDIT.WHO' | translate }}</dt>
+        <dd>
+          <span class="actor">
+            <span
+              class="avatar"
+              [class.sys]="isSystemActor(row)"
+              [attr.aria-hidden]="true"
+            >{{ initials(row) }}</span>
+            <span class="actor-text">
+              <span class="em">{{ actorDisplay(row) }}</span>
+              <span class="actor-type">{{ actorTypeLabel(row.actorType) }}</span>
+            </span>
+          </span>
+        </dd>
+
+        <dt>{{ 'AUDIT.WHAT' | translate }}</dt>
+        <dd>{{ whatSummary(row) }}</dd>
+
+        <dt>{{ 'AUDIT.WHEN' | translate }}</dt>
+        <dd>
+          {{ row.createdOn | date: 'dd MMM yyyy, HH:mm:ss' }}
+          <span class="rel">· {{ row.createdOn | relativeTime }}</span>
+        </dd>
+
+        <dt>{{ 'AUDIT.WHERE' | translate }}</dt>
+        <dd>
+          <code *ngIf="whereSummary(row); else noWhere">{{ whereSummary(row) }}</code>
+          <ng-template #noWhere><span class="muted">—</span></ng-template>
+        </dd>
+
+        <dt>{{ 'AUDIT.WHY' | translate }}</dt>
+        <dd>
+          <span *ngIf="row.justification; else noWhy">{{ row.justification }}</span>
+          <ng-template #noWhy><span class="muted">—</span></ng-template>
+        </dd>
+
+        <dt>{{ 'AUDIT.OUTCOME' | translate }}</dt>
+        <dd>
+          <span class="outcome" [class.ok]="row.responseSuccess" [class.fail]="!row.responseSuccess">
+            <i class="pi" [ngClass]="row.responseSuccess ? 'pi-check-circle' : 'pi-times-circle'"></i>
+            {{ row.responseSuccess ? ('AUDIT.SUCCESS' | translate) : ('AUDIT.FAILED' | translate) }}
+          </span>
+        </dd>
+      </dl>
+
+      <!-- Before → After diff (precomputed changedFields; values are names) -->
+      <div class="section" *ngIf="hasDiff(row)">
+        <div class="section-label">{{ 'AUDIT.CHANGED_BEFORE_AFTER' | translate }}</div>
+        <div class="difftable">
+          <div class="dt-head">
+            <div>{{ 'AUDIT.FIELD' | translate }}</div>
+            <div>{{ 'AUDIT.FROM' | translate }}</div>
+            <div>{{ 'AUDIT.TO' | translate }}</div>
+          </div>
+          <div class="dt-row" *ngFor="let d of diffRows(row); trackBy: trackByIndex">
+            <div class="fld">{{ d.label || d.field }}</div>
+            <div class="from" [class.empty]="isEmptyValue(d.from)">
+              {{ isEmptyValue(d.from) ? ('AUDIT.NONE' | translate) : displayValue(d.from) }}
+            </div>
+            <div class="to" [class.empty]="isEmptyValue(d.to)">
+              {{ isEmptyValue(d.to) ? ('AUDIT.NONE' | translate) : displayValue(d.to) }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flat snapshot fallback (CREATE → after, DELETE → before) -->
+      <div class="section" *ngIf="hasSnapshot(row)">
+        <div class="section-label">{{ snapshotLabelKey(row) | translate }}</div>
+        <dl class="kv-list">
+          <ng-container *ngFor="let item of snapshotRows(row); trackBy: trackByIndex">
+            <dt>{{ item.key }}</dt>
+            <dd>
+              <span *ngIf="item.value; else emptyKv">{{ item.value }}</span>
+              <ng-template #emptyKv><span class="muted">—</span></ng-template>
+            </dd>
+          </ng-container>
+        </dl>
+      </div>
+
+      <!-- Request context -->
+      <div class="section">
+        <div class="section-label">{{ 'AUDIT.REQUEST_CONTEXT' | translate }}</div>
+        <dl class="meta-list">
+          <dt>{{ 'AUDIT.IP_ADDRESS' | translate }}</dt>
+          <dd>
+            <code *ngIf="row.ipAddress; else noIp">{{ row.ipAddress }}</code>
+            <ng-template #noIp><span class="muted">—</span></ng-template>
+          </dd>
+
+          <dt>{{ 'AUDIT.USER_AGENT' | translate }}</dt>
+          <dd>
+            <span class="mono ua" *ngIf="row.userAgent; else noUa" [title]="row.userAgent">{{ row.userAgent }}</span>
+            <ng-template #noUa><span class="muted">—</span></ng-template>
+          </dd>
+
+          <dt>{{ 'AUDIT.CORRELATION' | translate }}</dt>
+          <dd>
+            <span class="corr" *ngIf="row.correlationId; else standalone">
+              <i class="pi pi-link"></i> {{ 'AUDIT.GROUPED_OPERATION' | translate }}
+            </span>
+            <ng-template #standalone>
+              <span class="muted">{{ 'AUDIT.STANDALONE_EVENT' | translate }}</span>
+            </ng-template>
+          </dd>
+        </dl>
+      </div>
+    </div>
+  </ng-container>
+</p-sidebar>
