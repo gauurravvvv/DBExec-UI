@@ -404,6 +404,8 @@ export const ANNOUNCEMENT = {
 
 export const AUDIT = {
   LIST: '/audit-logs',
+  // Single-row detail (drawer enrichment): GET /audit-logs/:id — append the id.
+  DETAIL: '/audit-logs/', // GET /audit-logs/:id
   LOGIN_ACTIVITY: '/audit-logs/login-activity',
   EXPORT_LOGS: '/audit-logs/export',
   EXPORT_LOGIN_ACTIVITY: '/audit-logs/login-activity/export',

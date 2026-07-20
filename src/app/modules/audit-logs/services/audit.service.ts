@@ -2,56 +2,55 @@ import { Injectable, signal } from '@angular/core';
 import { EmptyError, Observable, Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { AUDIT } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
+import { AuditLog } from '../models/audit-log.model';
 
+/**
+ * Audit-log data access — signal-based state on top of the name-denormalized
+ * `/audit-logs` contract. The list screen drives an `app-custom-table` through
+ * `UsServerListAdapter` via the raw `listAuditLogs()` call (the adapter owns its
+ * own loading state); `loadAuditLogs()` is the signal-driven variant kept for
+ * any consumer that wants to read straight off the exposed signals.
+ *
+ * NO raw ids are ever surfaced for display — the BE already denormalizes
+ * `actorName` / `entityName` onto each row, so this layer just passes rows
+ * through untouched.
+ */
 @Injectable({ providedIn: 'root' })
 export class AuditService {
-  private _logs = signal<any[]>([]);
-  private _activity = signal<any[]>([]);
-  private _logsTotal = signal(0);
-  private _activityTotal = signal(0);
-  private _logsLoading = signal(false);
-  private _activityLoading = signal(false);
+  private _logs = signal<AuditLog[]>([]);
+  private _count = signal(0);
+  private _loading = signal(false);
+  private _selected = signal<AuditLog | null>(null);
 
-  // Reads pipe through this Subject so callers (audit-logs ngOnDestroy)
-  // can cancel in-flight GETs when the user navigates away.
+  // Reads pipe through this Subject so the list component's ngOnDestroy can
+  // cancel in-flight GETs when the user navigates away.
   private _cancelReads$ = new Subject<void>();
 
   readonly logs = this._logs.asReadonly();
-  readonly activity = this._activity.asReadonly();
-  readonly logsTotal = this._logsTotal.asReadonly();
-  readonly activityTotal = this._activityTotal.asReadonly();
-  readonly logsLoading = this._logsLoading.asReadonly();
-  readonly activityLoading = this._activityLoading.asReadonly();
+  readonly count = this._count.asReadonly();
+  readonly loading = this._loading.asReadonly();
+  readonly selected = this._selected.asReadonly();
 
   constructor(private http: HttpClientService) {}
 
   /**
-   * Raw list call — returns the unwrapped BE response so callers
-   * (e.g. `<us-data-grid>` via `UsServerListAdapter`) can pull rows +
-   * count straight off `res.data`. Skips the signal-driven `loadAuditLogs()`
-   * flow so the grid owns its own loading state.
+   * Raw list call — returns the unwrapped BE response so the
+   * `UsServerListAdapter` can pull `{ logs, count }` straight off `res.data`.
+   * Skips the signal-driven `loadAuditLogs()` flow so the table owns its own
+   * loading state.
    */
-  listAuditLogs(params: any) {
+  listAuditLogs(params: Record<string, unknown>) {
     return lastValueFrom(
       this.http.apiGet(AUDIT.LIST, { params, skipLoader: true }),
     );
   }
 
   /**
-   * Raw login-activity list call — mirror of `listAuditLogs` for the
-   * `<us-data-grid>` migration of login-activity. Returns the
-   * unwrapped BE response so the adapter can pull `activities` +
-   * `count` straight off `res.data`. Skips `loadLoginActivity()`'s
-   * signal-driven flow so the grid owns its own loading state.
+   * Signal-driven list — sets `logs`/`count`/`loading` for any consumer that
+   * prefers reactive reads over the adapter. Cancelled by `cancelReads()`.
    */
-  listLoginActivity(params: any) {
-    return lastValueFrom(
-      this.http.apiGet(AUDIT.LOGIN_ACTIVITY, { params, skipLoader: true }),
-    );
-  }
-
-  async loadAuditLogs(params: any) {
-    this._logsLoading.set(true);
+  async loadAuditLogs(params: Record<string, unknown>) {
+    this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
         this.http
@@ -59,54 +58,71 @@ export class AuditService {
           .pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) {
-        this._logs.set(res.data.logs ?? []);
-        this._logsTotal.set(res.data.count ?? 0);
+        this._logs.set(res.data?.logs ?? []);
+        this._count.set(res.data?.count ?? 0);
       }
     } catch (err) {
-      // EmptyError is thrown when the observable completes without
-      // emitting (i.e. we cancelled it). Re-throw real errors.
+      // EmptyError is thrown when the observable completes without emitting
+      // (i.e. we cancelled it). Re-throw real errors.
       if (!(err instanceof EmptyError)) throw err;
     } finally {
-      this._logsLoading.set(false);
-    }
-  }
-
-  async loadLoginActivity(params: any) {
-    this._activityLoading.set(true);
-    try {
-      const res: any = await lastValueFrom(
-        this.http
-          .apiGet(AUDIT.LOGIN_ACTIVITY, { params })
-          .pipe(takeUntil(this._cancelReads$)),
-      );
-      if (res?.status) {
-        this._activity.set(res.data.activities ?? []);
-        this._activityTotal.set(res.data.count ?? 0);
-      }
-    } catch (err) {
-      if (!(err instanceof EmptyError)) throw err;
-    } finally {
-      this._activityLoading.set(false);
+      this._loading.set(false);
     }
   }
 
   /**
-   * Cancel any in-flight read GETs. Components call this from
+   * Fetch one row's full detail for the drawer. The list already carries the
+   * heavy before/after payload, but this lazy call guarantees the drawer has a
+   * complete, fresh row even if a caller trimmed the list projection. Returns
+   * the mapped row (names only) or null.
+   */
+  async getAuditLog(id: string): Promise<AuditLog | null> {
+    const res: any = await lastValueFrom(
+      this.http.apiGet(`${AUDIT.DETAIL}${id}`, { skipLoader: true }),
+    );
+    return res?.status ? (res.data as AuditLog) : null;
+  }
+
+  setSelected(log: AuditLog | null) {
+    this._selected.set(log);
+  }
+
+  /* ── login-activity sibling (separate screen; left intact) ───────────── */
+
+  /**
+   * Raw login-activity list call — the sibling Login Activity screen drives
+   * its own `app-custom-table` adapter off `res.data.{activities,count}`.
+   * Kept on this service so both audit views share one HTTP surface.
+   */
+  listLoginActivity(params: Record<string, unknown>) {
+    return lastValueFrom(
+      this.http.apiGet(AUDIT.LOGIN_ACTIVITY, { params, skipLoader: true }),
+    );
+  }
+
+  /** Export the login-activity set as a file blob. */
+  exportLoginActivity(params: Record<string, unknown>): Observable<Blob> {
+    return this.http.apiGet<Blob>(AUDIT.EXPORT_LOGIN_ACTIVITY, {
+      params,
+      responseType: 'blob',
+    });
+  }
+
+  /**
+   * Cancel any in-flight read GETs. The list component calls this from
    * ngOnDestroy so the XHR is aborted when the user navigates away.
    */
   cancelReads() {
     this._cancelReads$.next();
   }
 
-  exportAuditLogs(params: any): Observable<Blob> {
+  /**
+   * Export the full filtered set as a file blob. The http interceptor only
+   * unwraps 440/501/503 JSON blobs, so a genuine file download passes through
+   * untouched.
+   */
+  exportAuditLogs(params: Record<string, unknown>): Observable<Blob> {
     return this.http.apiGet<Blob>(AUDIT.EXPORT_LOGS, {
-      params,
-      responseType: 'blob',
-    });
-  }
-
-  exportLoginActivity(params: any): Observable<Blob> {
-    return this.http.apiGet<Blob>(AUDIT.EXPORT_LOGIN_ACTIVITY, {
       params,
       responseType: 'blob',
     });
