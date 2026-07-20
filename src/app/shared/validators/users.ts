@@ -69,7 +69,14 @@ export const emailSchema = z.preprocess(
   z
     .string({ message: 'validation.users.email.required' })
     .max(254, { message: 'validation.users.email.tooLong' })
-    .regex(EMAIL_PATTERN, { message: 'validation.users.email.invalid' }),
+    .regex(EMAIL_PATTERN, { message: 'validation.users.email.invalid' })
+    // Canonicalise to lowercase so email uniqueness + the email-based
+    // password-reset lookup are consistent. Email addresses are effectively
+    // case-insensitive for delivery; storing a single canonical case prevents
+    // "A@x.com" and "a@x.com" coexisting in one org and prevents a case
+    // mismatch from breaking the forgot-password lookup. (Username stays
+    // case-sensitive by design — see user.entity.ts.)
+    .transform((v) => v.toLowerCase()),
 );
 
 export const usernameSchema = z.preprocess(
