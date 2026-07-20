@@ -65,9 +65,8 @@ export class LoginActivityDrawerComponent {
     this.closed.emit();
   }
 
-  onVisibleChange(v: boolean): void {
-    this.visible = v;
-    this.visibleChange.emit(v);
-    if (!v) this.closed.emit();
+  /** Backdrop click closes; the panel stops propagation (see template). */
+  onBackdrop(_event: MouseEvent): void {
+    this.onClose();
   }
 }

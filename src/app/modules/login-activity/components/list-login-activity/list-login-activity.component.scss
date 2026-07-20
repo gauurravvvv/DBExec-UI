@@ -209,7 +209,27 @@
     &.ok { color: var(--success-color); }
     &.fail { color: var(--error-color); }
     i { font-size: var(--fs-control); }
-    .caret { color: var(--text-muted); margin-left: var(--space-2); font-size: var(--fs-label); }
+
+    // Chevron is now a real button that opens the detail drawer (it looked
+    // clickable before but had no handler). Reset the button chrome; keep the
+    // muted caret look; nudge on hover so it reads as the "open" affordance.
+    .caret-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: var(--space-2);
+      padding: 0;
+      border: 0;
+      background: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: color var(--motion-fast) ease, transform var(--motion-fast) ease;
+
+      .caret { font-size: var(--fs-label); }
+
+      &:hover { color: var(--text-color); transform: translateX(2px); }
+      &:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; border-radius: var(--radius-xs); }
+    }
   }
 }
 

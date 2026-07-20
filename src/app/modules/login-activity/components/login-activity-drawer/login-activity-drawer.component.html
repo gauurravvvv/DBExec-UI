@@ -1,16 +1,21 @@
-<p-sidebar
-  [visible]="visible"
-  (visibleChange)="onVisibleChange($event)"
-  position="right"
-  [modal]="true"
-  [dismissible]="true"
-  [showCloseIcon]="false"
-  [blockScroll]="true"
-  appendTo="body"
-  styleClass="login-drawer-panel"
-  [ariaCloseLabel]="'COMMON.CLOSE' | translate"
+<!-- Self-owned slide-over — NO PrimeNG p-sidebar (same fix as the audit
+     drawer). Backdrop + panel are component-owned and unmount via *ngIf on
+     close, so no modal mask lingers on <body> (the old p-sidebar left the app
+     greyed out). Backdrop click + Esc close. -->
+<div
+  class="drawer-scrim"
+  *ngIf="visible && log as row"
+  (click)="onBackdrop($event)"
+  (keydown.escape)="onClose()"
+  tabindex="-1"
 >
-  <ng-container *ngIf="log as row">
+  <aside
+    class="drawer-panel"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="eventLabel(row.eventType)"
+    (click)="$event.stopPropagation()"
+  >
     <!-- Header -->
     <div class="drawer-head">
       <div class="head-main">
@@ -102,5 +107,5 @@
         </dl>
       </div>
     </div>
-  </ng-container>
-</p-sidebar>
+  </aside>
+</div>
