@@ -658,6 +658,29 @@ app-custom-table {
   // z-index: 1 by default).
   .p-datatable-thead > tr > th.p-frozen-column {
     z-index: 3;
+    background: var(--card-background) !important;
+  }
+
+  // Body frozen cells: PrimeNG makes them sticky but leaves them
+  // TRANSPARENT, so the non-frozen columns slide visibly through the
+  // pinned column on horizontal scroll — worst on zebra (even) rows and
+  // on hover, where the tint is painted on the sibling cells only. Give
+  // the body frozen cell an opaque base, then re-layer the zebra / hover
+  // tint over it so the pinned column matches the row and stays opaque.
+  .p-datatable-tbody > tr > td.p-frozen-column {
+    z-index: 2;
+    background: var(--card-background) !important;
+    border-right: 1px solid var(--border-color);
+  }
+  .p-datatable-tbody > tr:nth-child(even) > td.p-frozen-column {
+    background:
+      linear-gradient(var(--table-stripe, rgba(0, 0, 0, 0.025)), var(--table-stripe, rgba(0, 0, 0, 0.025))),
+      var(--card-background) !important;
+  }
+  .p-datatable-tbody > tr:hover > td.p-frozen-column {
+    background:
+      linear-gradient(var(--table-row-hover), var(--table-row-hover)),
+      var(--card-background) !important;
   }
 }
 

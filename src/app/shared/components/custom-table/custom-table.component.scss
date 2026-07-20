@@ -300,14 +300,44 @@
     app-custom-input { display: block; width: 100%; }
   }
 
-  /* Frozen first column. */
+  /* Frozen first column.
+     The frozen cell must be OPAQUE, otherwise the non-frozen columns slide
+     visibly through it on horizontal scroll. It can't use `background: inherit`
+     because the row tints (zebra / hover / selected) are painted on the sibling
+     <td>s with !important — never on the <tr> — so an inheriting frozen cell
+     resolves to transparent (the overlap you see on even rows + on hover).
+     So: paint an explicit opaque base here, then re-assert each row tint on the
+     frozen cell by LAYERING the translucent tint token over that opaque base,
+     with !important to beat the sibling-cell rules. Token-driven → correct in
+     light and dark. z-index sits the frozen body cell above scrolling body
+     cells, and the frozen header cell above everything. */
   .ct-frozen {
     position: sticky;
     left: 0;
-    z-index: 1;
-    background: inherit;
+    z-index: 2;
+    background: var(--card-background);
+    /* Divider so the pinned boundary reads clearly while columns scroll under it. */
+    border-right: 1px solid var(--border-color);
   }
-  .p-datatable-thead > tr > th.ct-frozen { background: var(--table-header-bg); }
+  /* Zebra (even rows) — layer the stripe token over the opaque card base. */
+  &.modern-table .p-datatable-tbody > tr:nth-child(even):not(.ct-empty-row) > td.ct-frozen,
+  .p-datatable-tbody > tr:nth-child(even):not(.ct-empty-row) > td.ct-frozen {
+    background:
+      linear-gradient(var(--table-stripe, rgba(0, 0, 0, 0.025)), var(--table-stripe, rgba(0, 0, 0, 0.025))),
+      var(--card-background) !important;
+  }
+  /* Hover — layer the hover token over the opaque base; wins over zebra. */
+  &.modern-table .p-datatable-tbody > tr:hover > td.ct-frozen,
+  .p-datatable-tbody > tr:hover > td.ct-frozen {
+    background:
+      linear-gradient(var(--table-row-hover), var(--table-row-hover)),
+      var(--card-background) !important;
+  }
+  /* Header frozen cell — opaque header bg, stacked above the sticky header row. */
+  .p-datatable-thead > tr > th.ct-frozen {
+    z-index: 4;
+    background: var(--table-header-bg) !important;
+  }
 
   /* Empty state — a clean centred block, NOT a table row. The empty row/cell
      must not carry the body-row divider or hover, or it reads as a blank
