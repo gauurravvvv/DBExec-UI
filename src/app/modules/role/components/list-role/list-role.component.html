@@ -47,6 +47,14 @@
               >
                 {{ role.name }}
               </a>
+              <span
+                *ngIf="role.isDefault === 1"
+                class="default-badge"
+                [pTooltip]="'ROLE.CANNOT_EDIT_DEFAULT' | translate"
+                tooltipPosition="top"
+              >
+                {{ 'ROLE.DEFAULT' | translate }}
+              </span>
             </span>
           </ng-template>
 
@@ -90,8 +98,14 @@
                 class="icon-btn edit-btn"
                 (click)="onEdit(role.id)"
                 [attr.aria-label]="'COMMON.EDIT' | translate"
-                [pTooltip]="'COMMON.EDIT' | translate"
+                [pTooltip]="
+                  (role.canEdit === false
+                    ? 'ROLE.CANNOT_EDIT_DEFAULT'
+                    : 'COMMON.EDIT'
+                  ) | translate
+                "
                 tooltipPosition="bottom"
+                [disabled]="role.canEdit === false"
               >
                 <i class="pi pi-pencil"></i>
               </button>
@@ -100,9 +114,14 @@
                 class="icon-btn delete-btn"
                 (click)="confirmDelete(role.id)"
                 [attr.aria-label]="'COMMON.DELETE' | translate"
-                [pTooltip]="'COMMON.DELETE' | translate"
+                [pTooltip]="
+                  (role.canDelete === false
+                    ? 'ROLE.CANNOT_DELETE_DEFAULT'
+                    : 'COMMON.DELETE'
+                  ) | translate
+                "
                 tooltipPosition="bottom"
-                [disabled]="isDeleting(role.id)"
+                [disabled]="role.canDelete === false || isDeleting(role.id)"
               >
                 <i
                   class="pi"

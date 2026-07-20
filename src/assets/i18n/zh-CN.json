@@ -563,7 +563,8 @@
     "STATUS_INACTIVE": "非活跃",
     "NAME_IMMUTABLE": "角色名称创建后无法更改。",
     "LEVEL_TOOLTIP_PREFIX": "",
-    "SEARCH_PLACEHOLDER": "按名称或描述搜索角色"
+    "SEARCH_PLACEHOLDER": "按名称或描述搜索角色",
+    "DEFAULT_LOCKED_HINT": "这是默认管理员角色。它已锁定，无法编辑。"
   },
   "GROUP": {
     "TITLE": "用户组",
@@ -592,7 +593,9 @@
     "LOCKED_SELF_PRIMARY": "您是主管理员，无法从此组中移除。",
     "PRIMARY_ADMIN": "主管理员",
     "YOU": "你",
-    "SEARCH_PLACEHOLDER": "按名称或描述搜索组"
+    "SEARCH_PLACEHOLDER": "按名称或描述搜索组",
+    "CANNOT_EDIT_DEFAULT": "无法编辑默认组",
+    "DEFAULT_LOCKED_HINT": "这是默认管理员组。它已锁定，无法编辑。"
   },
   "USER": {
     "TITLE": "用户",

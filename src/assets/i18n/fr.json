@@ -563,7 +563,8 @@
     "STATUS_INACTIVE": "Inactif",
     "NAME_IMMUTABLE": "Le nom du rôle ne peut pas être modifié après sa création.",
     "LEVEL_TOOLTIP_PREFIX": "",
-    "SEARCH_PLACEHOLDER": "Rechercher des rôles par nom ou description"
+    "SEARCH_PLACEHOLDER": "Rechercher des rôles par nom ou description",
+    "DEFAULT_LOCKED_HINT": "Il s'agit du rôle Administrateur par défaut. Il est verrouillé et ne peut pas être modifié."
   },
   "GROUP": {
     "TITLE": "Groupes",
@@ -592,7 +593,9 @@
     "LOCKED_SELF_PRIMARY": "Vous êtes l'administrateur principal et ne pouvez pas être retiré de ce groupe.",
     "PRIMARY_ADMIN": "Admin principal",
     "YOU": "Vous",
-    "SEARCH_PLACEHOLDER": "Rechercher des groupes par nom ou description"
+    "SEARCH_PLACEHOLDER": "Rechercher des groupes par nom ou description",
+    "CANNOT_EDIT_DEFAULT": "Impossible de modifier le groupe par défaut",
+    "DEFAULT_LOCKED_HINT": "Il s'agit du groupe Administrateurs par défaut. Il est verrouillé et ne peut pas être modifié."
   },
   "USER": {
     "TITLE": "Utilisateurs",

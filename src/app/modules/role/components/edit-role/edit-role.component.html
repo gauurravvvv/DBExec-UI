@@ -44,6 +44,11 @@
 
     <!-- Form Section -->
     <form autocomplete="off" *ngIf="roleData" [formGroup]="roleForm" class="admin-form">
+      <!-- Default Administrator role is locked — read-only, cannot be saved. -->
+      <div class="locked-banner" *ngIf="isLocked">
+        <i class="pi pi-lock"></i>
+        <span>{{ 'ROLE.DEFAULT_LOCKED_HINT' | translate }}</span>
+      </div>
       <div class="basic-info-section">
         <!-- Role Name — editable for every role, including the
              seeded Administrator (no default special-casing). -->
@@ -161,6 +166,7 @@
                       gap="small"
                       [ngModel]="levelByPermissionId[leaf.id]"
                       [ngModelOptions]="{ standalone: true }"
+                      [disabled]="isLocked"
                       (ngModelChange)="onLevelChange(leaf.id, $event ?? 0)"
                     ></app-custom-radio>
                   </div>

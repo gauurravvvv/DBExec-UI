@@ -128,6 +128,11 @@ export class EditRoleComponent implements OnInit, OnDestroy, HasUnsavedChanges {
           },
           { emitEvent: false },
         );
+        // The seeded default Administrator role is fully locked — the BE
+        // rejects any update. Render the form read-only so the UI matches.
+        if (this.isLocked) {
+          this.roleForm.disable({ emitEvent: false });
+        }
       }
 
       this.accessLevels = [...(levels || [])].sort(
@@ -163,8 +168,14 @@ export class EditRoleComponent implements OnInit, OnDestroy, HasUnsavedChanges {
     return Object.values(this.levelByPermissionId).some(v => v >= 1);
   }
 
+  /** True for the seeded default Administrator role — fully non-editable. */
+  get isLocked(): boolean {
+    return this.roleData?.isDefault === 1 || this.roleData?.canEdit === false;
+  }
+
   get canSave(): boolean {
     return (
+      !this.isLocked &&
       this.roleForm.valid &&
       this.hasAnyGrant &&
       this.isFormDirty &&

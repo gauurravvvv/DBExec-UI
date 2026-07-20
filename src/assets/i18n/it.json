@@ -563,7 +563,8 @@
     "STATUS_INACTIVE": "Inattivo",
     "NAME_IMMUTABLE": "Il nome del ruolo non può essere modificato dopo la creazione.",
     "LEVEL_TOOLTIP_PREFIX": "",
-    "SEARCH_PLACEHOLDER": "Cerca ruoli per nome o descrizione"
+    "SEARCH_PLACEHOLDER": "Cerca ruoli per nome o descrizione",
+    "DEFAULT_LOCKED_HINT": "Questo è il ruolo Amministratore predefinito. È bloccato e non può essere modificato."
   },
   "GROUP": {
     "TITLE": "Gruppi",
@@ -592,7 +593,9 @@
     "LOCKED_SELF_PRIMARY": "Sei l'amministratore principale e non puoi essere rimosso da questo gruppo.",
     "PRIMARY_ADMIN": "Admin principale",
     "YOU": "Tu",
-    "SEARCH_PLACEHOLDER": "Cerca gruppi per nome o descrizione"
+    "SEARCH_PLACEHOLDER": "Cerca gruppi per nome o descrizione",
+    "CANNOT_EDIT_DEFAULT": "Impossibile modificare il gruppo predefinito",
+    "DEFAULT_LOCKED_HINT": "Questo è il gruppo Amministratori predefinito. È bloccato e non può essere modificato."
   },
   "USER": {
     "TITLE": "Utenti",

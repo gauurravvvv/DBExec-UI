@@ -51,6 +51,11 @@ export class EditGroupComponent
   selectedRoleName = '';
   originalFormValue: any;
 
+  // The seeded default Administrators group is fully locked — the BE
+  // rejects any update. When true the form renders read-only and Save
+  // is disabled (matches the same guard on the role edit screen).
+  isLocked = false;
+
   // Member locked out of the multiselect: the logged-in user
   // themselves. Self-protection is the sole guard now — an admin
   // can't evict themselves from a group mid-edit and lose the
@@ -174,6 +179,14 @@ export class EditGroupComponent
     this.originalFormValue = this.groupForm.getRawValue();
     this.isFormDirty = false;
     this.groupForm.markAsPristine();
+
+    // Lock the whole form for the seeded default Administrators group.
+    this.isLocked =
+      groupData.isDefault === 1 || groupData.canEdit === false;
+    if (this.isLocked) {
+      this.groupForm.disable({ emitEvent: false });
+    }
+
     this.groupLoaded = true;
     this.cdr.markForCheck();
   }
@@ -242,7 +255,7 @@ export class EditGroupComponent
   }
 
   canSubmit(): boolean {
-    return this.groupForm.valid && this.isFormDirty;
+    return !this.isLocked && this.groupForm.valid && this.isFormDirty;
   }
 
   onSubmit(): void {

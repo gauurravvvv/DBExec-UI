@@ -563,7 +563,8 @@
     "STATUS_INACTIVE": "Inactive",
     "NAME_IMMUTABLE": "Role name cannot be changed after creation.",
     "LEVEL_TOOLTIP_PREFIX": "",
-    "SEARCH_PLACEHOLDER": "Search roles by name or description"
+    "SEARCH_PLACEHOLDER": "Search roles by name or description",
+    "DEFAULT_LOCKED_HINT": "This is the default Administrator role. It is locked and cannot be edited."
   },
   "PERMISSIONS": {
     "TITLE": "Permissions"
@@ -598,7 +599,9 @@
     "LOCKED_SELF_PRIMARY": "You are the primary admin and cannot be removed from this group.",
     "PRIMARY_ADMIN": "Primary admin",
     "YOU": "You",
-    "SEARCH_PLACEHOLDER": "Search groups by name or description"
+    "SEARCH_PLACEHOLDER": "Search groups by name or description",
+    "CANNOT_EDIT_DEFAULT": "Cannot edit default group",
+    "DEFAULT_LOCKED_HINT": "This is the default Administrators group. It is locked and cannot be edited."
   },
   "USER": {
     "TITLE": "Users",

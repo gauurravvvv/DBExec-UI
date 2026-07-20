@@ -18,6 +18,13 @@
           *hasPermission="'groupManagement'; level: 'write'"
           class="btn-primary"
           (click)="onEdit()"
+          [disabled]="groupData.canEdit === false"
+          [pTooltip]="
+            groupData.canEdit === false
+              ? ('GROUP.CANNOT_EDIT_DEFAULT' | translate)
+              : null
+          "
+          tooltipPosition="bottom"
         >
           <i class="pi pi-pencil"></i>
           {{ 'COMMON.EDIT' | translate }}
@@ -26,7 +33,13 @@
           <button
             class="btn-danger"
             type="button"
-            [disabled]="isDeleting(groupData.id)"
+            [disabled]="groupData.canDelete === false || isDeleting(groupData.id)"
+            [pTooltip]="
+              groupData.canDelete === false
+                ? ('GROUP.CANNOT_DELETE_DEFAULT' | translate)
+                : null
+            "
+            tooltipPosition="bottom"
             (click)="confirmDelete()"
           >
             <i
@@ -56,7 +69,15 @@
           <div class="info-grid">
             <div class="info-item">
               <label>{{ 'COMMON.NAME' | translate }}</label>
-              <p>{{ groupData.name }}</p>
+              <p>
+                {{ groupData.name }}
+                <span
+                  *ngIf="groupData.isDefault === 1"
+                  class="default-badge"
+                >
+                  {{ 'GROUP.DEFAULT' | translate }}
+                </span>
+              </p>
             </div>
             <div class="info-item">
               <label>{{ 'COMMON.DESCRIPTION' | translate }}</label>

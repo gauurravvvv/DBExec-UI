@@ -404,6 +404,26 @@
   align-items: center;
   gap: 6px;
   flex-wrap: wrap;
+
+  .default-badge {
+    font-size: 10px;
+    font-weight: var(--fw-semibold, 600);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 1px 6px;
+    border-radius: 4px;
+    line-height: 1.4;
+    user-select: none;
+    background: rgba(var(--primary-color-rgb, 33, 150, 243), 0.12);
+    color: var(--primary-color);
+  }
+}
+
+// Disabled row-action buttons (locked default role) read as inert.
+.icon-btn[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .row-badge {

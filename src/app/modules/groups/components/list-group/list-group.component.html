@@ -70,6 +70,14 @@
               >
                 {{ group.name }}
               </a>
+              <span
+                *ngIf="group.isDefault === 1"
+                class="default-badge"
+                [pTooltip]="'GROUP.CANNOT_EDIT_DEFAULT' | translate"
+                tooltipPosition="top"
+              >
+                {{ 'GROUP.DEFAULT' | translate }}
+              </span>
             </span>
           </ng-template>
 
@@ -123,8 +131,14 @@
                 class="icon-btn edit-btn"
                 (click)="onEdit(group.id)"
                 [attr.aria-label]="'COMMON.EDIT' | translate"
-                [pTooltip]="'COMMON.EDIT' | translate"
+                [pTooltip]="
+                  (group.canEdit === false
+                    ? 'GROUP.CANNOT_EDIT_DEFAULT'
+                    : 'COMMON.EDIT'
+                  ) | translate
+                "
                 tooltipPosition="bottom"
+                [disabled]="group.canEdit === false"
               >
                 <i class="pi pi-pencil"></i>
               </button>
@@ -133,9 +147,14 @@
                 class="icon-btn delete-btn"
                 (click)="confirmDelete(group.id)"
                 [attr.aria-label]="'COMMON.DELETE' | translate"
-                [pTooltip]="'COMMON.DELETE' | translate"
+                [pTooltip]="
+                  (group.canDelete === false
+                    ? 'GROUP.CANNOT_DELETE_DEFAULT'
+                    : 'COMMON.DELETE'
+                  ) | translate
+                "
                 tooltipPosition="bottom"
-                [disabled]="isDeleting(group.id)"
+                [disabled]="group.canDelete === false || isDeleting(group.id)"
               >
                 <i
                   class="pi"

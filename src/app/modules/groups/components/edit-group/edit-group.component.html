@@ -50,6 +50,11 @@
       class="admin-form"
       *ngIf="groupForm && groupLoaded"
     >
+      <!-- Default Administrators group is locked — read-only, cannot save. -->
+      <div class="locked-banner" *ngIf="isLocked">
+        <i class="pi pi-lock"></i>
+        <span>{{ 'GROUP.DEFAULT_LOCKED_HINT' | translate }}</span>
+      </div>
       <div class="form-grid">
         <!-- Hidden ID Field -->
         <input type="hidden" formControlName="id" />

@@ -563,7 +563,8 @@
     "STATUS_INACTIVE": "Inativo",
     "NAME_IMMUTABLE": "O nome da função não pode ser alterado após a criação.",
     "LEVEL_TOOLTIP_PREFIX": "",
-    "SEARCH_PLACEHOLDER": "Pesquisar funções por nome ou descrição"
+    "SEARCH_PLACEHOLDER": "Pesquisar funções por nome ou descrição",
+    "DEFAULT_LOCKED_HINT": "Esta é a função de Administrador padrão. Ela está bloqueada e não pode ser editada."
   },
   "GROUP": {
     "TITLE": "Grupos",
@@ -592,7 +593,9 @@
     "LOCKED_SELF_PRIMARY": "Você é o administrador principal e não pode ser removido deste grupo.",
     "PRIMARY_ADMIN": "Admin principal",
     "YOU": "Você",
-    "SEARCH_PLACEHOLDER": "Pesquisar grupos por nome ou descrição"
+    "SEARCH_PLACEHOLDER": "Pesquisar grupos por nome ou descrição",
+    "CANNOT_EDIT_DEFAULT": "Não é possível editar o grupo padrão",
+    "DEFAULT_LOCKED_HINT": "Este é o grupo de Administradores padrão. Ele está bloqueado e não pode ser editado."
   },
   "USER": {
     "TITLE": "Usuários",

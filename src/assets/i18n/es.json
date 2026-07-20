@@ -563,7 +563,8 @@
     "STATUS_INACTIVE": "Inactivo",
     "NAME_IMMUTABLE": "El nombre del rol no se puede cambiar después de su creación.",
     "LEVEL_TOOLTIP_PREFIX": "",
-    "SEARCH_PLACEHOLDER": "Buscar roles por nombre o descripción"
+    "SEARCH_PLACEHOLDER": "Buscar roles por nombre o descripción",
+    "DEFAULT_LOCKED_HINT": "Este es el rol de Administrador predeterminado. Está bloqueado y no se puede editar."
   },
   "GROUP": {
     "TITLE": "Grupos",
@@ -592,7 +593,9 @@
     "LOCKED_SELF_PRIMARY": "Eres el administrador principal y no puedes ser eliminado de este grupo.",
     "PRIMARY_ADMIN": "Admin principal",
     "YOU": "Tú",
-    "SEARCH_PLACEHOLDER": "Buscar grupos por nombre o descripción"
+    "SEARCH_PLACEHOLDER": "Buscar grupos por nombre o descripción",
+    "CANNOT_EDIT_DEFAULT": "No se puede editar el grupo predeterminado",
+    "DEFAULT_LOCKED_HINT": "Este es el grupo de Administradores predeterminado. Está bloqueado y no se puede editar."
   },
   "USER": {
     "TITLE": "Usuarios",

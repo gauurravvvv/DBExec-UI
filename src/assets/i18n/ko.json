@@ -563,7 +563,8 @@
     "STATUS_INACTIVE": "비활성",
     "NAME_IMMUTABLE": "생성 후에는 역할 이름을 변경할 수 없습니다.",
     "LEVEL_TOOLTIP_PREFIX": "",
-    "SEARCH_PLACEHOLDER": "이름 또는 설명으로 역할 검색"
+    "SEARCH_PLACEHOLDER": "이름 또는 설명으로 역할 검색",
+    "DEFAULT_LOCKED_HINT": "기본 관리자 역할입니다. 잠겨 있어 편집할 수 없습니다."
   },
   "GROUP": {
     "TITLE": "그룹",
@@ -592,7 +593,9 @@
     "LOCKED_SELF_PRIMARY": "기본 관리자이므로 이 그룹에서 제거할 수 없습니다.",
     "PRIMARY_ADMIN": "기본 관리자",
     "YOU": "본인",
-    "SEARCH_PLACEHOLDER": "이름 또는 설명으로 그룹 검색"
+    "SEARCH_PLACEHOLDER": "이름 또는 설명으로 그룹 검색",
+    "CANNOT_EDIT_DEFAULT": "기본 그룹은 편집할 수 없습니다",
+    "DEFAULT_LOCKED_HINT": "기본 관리자 그룹입니다. 잠겨 있어 편집할 수 없습니다."
   },
   "USER": {
     "TITLE": "사용자",

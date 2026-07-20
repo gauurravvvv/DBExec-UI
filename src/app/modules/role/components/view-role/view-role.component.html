@@ -20,6 +20,13 @@
           class="btn-primary"
           type="button"
           (click)="onEdit()"
+          [disabled]="roleData.canEdit === false"
+          [pTooltip]="
+            roleData.canEdit === false
+              ? ('ROLE.CANNOT_EDIT_DEFAULT' | translate)
+              : null
+          "
+          tooltipPosition="bottom"
         >
           <i class="pi pi-pencil"></i> {{ 'COMMON.EDIT' | translate }}
         </button>
@@ -37,6 +44,9 @@
               <i class="pi pi-shield"></i>
             </div>
             <h3 class="role-name">{{ roleData.name }}</h3>
+            <span *ngIf="roleData.isDefault === 1" class="default-badge">
+              {{ 'ROLE.DEFAULT' | translate }}
+            </span>
           </div>
 
           <div class="detail-group">

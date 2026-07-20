@@ -563,7 +563,8 @@
     "STATUS_INACTIVE": "無効",
     "NAME_IMMUTABLE": "作成後にロール名を変更することはできません。",
     "LEVEL_TOOLTIP_PREFIX": "",
-    "SEARCH_PLACEHOLDER": "名前または説明でロールを検索"
+    "SEARCH_PLACEHOLDER": "名前または説明でロールを検索",
+    "DEFAULT_LOCKED_HINT": "これはデフォルトの管理者ロールです。ロックされており編集できません。"
   },
   "GROUP": {
     "TITLE": "グループ",
@@ -592,7 +593,9 @@
     "LOCKED_SELF_PRIMARY": "あなたはプライマリ管理者であり、このグループから削除できません。",
     "PRIMARY_ADMIN": "プライマリ管理者",
     "YOU": "自分",
-    "SEARCH_PLACEHOLDER": "名前または説明でグループを検索"
+    "SEARCH_PLACEHOLDER": "名前または説明でグループを検索",
+    "CANNOT_EDIT_DEFAULT": "デフォルトグループは編集できません",
+    "DEFAULT_LOCKED_HINT": "これはデフォルトの管理者グループです。ロックされており編集できません。"
   },
   "USER": {
     "TITLE": "ユーザー",

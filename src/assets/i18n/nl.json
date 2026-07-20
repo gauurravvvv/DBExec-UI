@@ -563,7 +563,8 @@
     "STATUS_INACTIVE": "Inactief",
     "NAME_IMMUTABLE": "De rolnaam kan na het aanmaken niet meer worden gewijzigd.",
     "LEVEL_TOOLTIP_PREFIX": "",
-    "SEARCH_PLACEHOLDER": "Zoek rollen op naam of beschrijving"
+    "SEARCH_PLACEHOLDER": "Zoek rollen op naam of beschrijving",
+    "DEFAULT_LOCKED_HINT": "Dit is de standaard Administrator-rol. Deze is vergrendeld en kan niet worden bewerkt."
   },
   "GROUP": {
     "TITLE": "Groepen",
@@ -592,7 +593,9 @@
     "LOCKED_SELF_PRIMARY": "Je bent de primaire beheerder en kunt niet uit deze groep worden verwijderd.",
     "PRIMARY_ADMIN": "Primaire beheerder",
     "YOU": "Jij",
-    "SEARCH_PLACEHOLDER": "Zoek groepen op naam of beschrijving"
+    "SEARCH_PLACEHOLDER": "Zoek groepen op naam of beschrijving",
+    "CANNOT_EDIT_DEFAULT": "Standaardgroep kan niet worden bewerkt",
+    "DEFAULT_LOCKED_HINT": "Dit is de standaardgroep Administrators. Deze is vergrendeld en kan niet worden bewerkt."
   },
   "USER": {
     "TITLE": "Gebruikers",

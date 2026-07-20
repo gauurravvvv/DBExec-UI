@@ -563,7 +563,8 @@
     "STATUS_INACTIVE": "Inaktiv",
     "NAME_IMMUTABLE": "Der Rollenname kann nach der Erstellung nicht geändert werden.",
     "LEVEL_TOOLTIP_PREFIX": "",
-    "SEARCH_PLACEHOLDER": "Rollen nach Name oder Beschreibung suchen"
+    "SEARCH_PLACEHOLDER": "Rollen nach Name oder Beschreibung suchen",
+    "DEFAULT_LOCKED_HINT": "Dies ist die Standard-Administratorrolle. Sie ist gesperrt und kann nicht bearbeitet werden."
   },
   "GROUP": {
     "TITLE": "Gruppen",
@@ -592,7 +593,9 @@
     "LOCKED_SELF_PRIMARY": "Sie sind der primäre Administrator und können nicht aus dieser Gruppe entfernt werden.",
     "PRIMARY_ADMIN": "Primärer Admin",
     "YOU": "Sie",
-    "SEARCH_PLACEHOLDER": "Gruppen nach Name oder Beschreibung suchen"
+    "SEARCH_PLACEHOLDER": "Gruppen nach Name oder Beschreibung suchen",
+    "CANNOT_EDIT_DEFAULT": "Standardgruppe kann nicht bearbeitet werden",
+    "DEFAULT_LOCKED_HINT": "Dies ist die Standardgruppe „Administratoren“. Sie ist gesperrt und kann nicht bearbeitet werden."
   },
   "USER": {
     "TITLE": "Benutzer",

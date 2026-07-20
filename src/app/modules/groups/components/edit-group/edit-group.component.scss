@@ -130,6 +130,34 @@
       padding-right: 10px;
       display: flex;
       justify-content: left;
+      flex-direction: column;
+
+      .locked-banner {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3, 8px);
+        padding: var(--space-4, 10px) var(--space-5, 12px);
+        margin-bottom: var(--space-5, 12px);
+        border-radius: var(--radius-sm, 6px);
+        background: var(--primary-color-transparent);
+        color: var(--primary-color);
+        font-size: var(--fs-control);
+        font-weight: var(--fw-medium, 500);
+        width: 50%;
+        box-sizing: border-box;
+
+        @media (max-width: 992px) {
+          width: 75%;
+        }
+
+        @media (max-width: 768px) {
+          width: 100%;
+        }
+
+        i {
+          font-size: 1rem;
+        }
+      }
 
       &::-webkit-scrollbar {
         width: 8px;
