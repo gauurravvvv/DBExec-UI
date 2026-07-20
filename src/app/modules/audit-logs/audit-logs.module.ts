@@ -14,6 +14,11 @@ import { ListAuditLogsComponent } from './components/list-audit-logs/list-audit-
 
 @NgModule({
   declarations: [ListAuditLogsComponent, AuditDetailDrawerComponent],
+  // Export the detail drawer so it's reusable outside this module (e.g. a
+  // "Recent activity" panel on the home page can render the SAME polished
+  // slide-over). It's a purely presentational component — @Input log/visible,
+  // @Output closed/viewHistory — with no routing of its own.
+  exports: [AuditDetailDrawerComponent],
   imports: [
     CommonModule,
     FormsModule,

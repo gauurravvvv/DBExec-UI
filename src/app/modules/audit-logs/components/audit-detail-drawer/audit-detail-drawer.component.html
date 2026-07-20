@@ -1,16 +1,22 @@
-<p-sidebar
-  [visible]="visible"
-  (visibleChange)="onVisibleChange($event)"
-  position="right"
-  [modal]="true"
-  [dismissible]="true"
-  [showCloseIcon]="false"
-  [blockScroll]="true"
-  appendTo="body"
-  styleClass="audit-drawer-panel"
-  [ariaCloseLabel]="'COMMON.CLOSE' | translate"
+<!-- Self-owned slide-over — NO PrimeNG p-sidebar. p-sidebar appended a modal
+     mask to <body> that leaked (grey overlay lingered after close) and added
+     stray header chrome. This backdrop + panel are component-owned: when
+     `visible` flips false the whole thing unmounts (*ngIf) so nothing lingers.
+     The backdrop click and Esc both close. -->
+<div
+  class="drawer-scrim"
+  *ngIf="visible && log as row"
+  (click)="onBackdrop($event)"
+  (keydown.escape)="onClose()"
+  tabindex="-1"
 >
-  <ng-container *ngIf="log as row">
+  <aside
+    class="drawer-panel"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="whatSummary(row)"
+    (click)="$event.stopPropagation()"
+  >
     <!-- ── Header ── -->
     <div class="drawer-head">
       <div class="head-main">
@@ -163,5 +169,5 @@
         </dl>
       </div>
     </div>
-  </ng-container>
-</p-sidebar>
+  </aside>
+</div>

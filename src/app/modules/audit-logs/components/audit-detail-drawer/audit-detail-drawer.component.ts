@@ -218,10 +218,9 @@ export class AuditDetailDrawerComponent {
     this.closed.emit();
   }
 
-  /** p-sidebar visibleChange → keep local state + notify parent. */
-  onVisibleChange(v: boolean): void {
-    this.visible = v;
-    this.visibleChange.emit(v);
-    if (!v) this.closed.emit();
+  /** Backdrop click closes. The panel itself stops propagation (see template)
+   *  so clicks inside never bubble here. */
+  onBackdrop(_event: MouseEvent): void {
+    this.onClose();
   }
 }
