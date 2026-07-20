@@ -20,6 +20,12 @@ import { zodValidator } from 'src/app/shared/validators/zod-validator';
 // Specific server-side reasons (lockout, downtime, etc.) still pass through.
 const GENERIC_AUTH_ERROR = 'The credentials you entered are incorrect.';
 
+// HTTP status the BE returns for a user whose password was never set
+// (account created but the set-password link hasn't been used yet). Its
+// message is safe + actionable, so we surface it verbatim instead of
+// collapsing it into the generic credentials error.
+const PASSWORD_NOT_SET_CODE = 403;
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -97,12 +103,15 @@ export class LoginComponent implements OnInit {
         // (deep-link preservation is a follow-up if needed).
         this.router.navigateByUrl('/relay', { replaceUrl: true });
       } else {
-        this.loginError.set(this.normaliseAuthError(res?.message));
+        this.loginError.set(this.resolveAuthError(res?.code, res?.message));
       }
     } catch (err: any) {
-      this.loginError.set(
-        this.normaliseAuthError(err?.message) || GENERIC_AUTH_ERROR,
-      );
+      // An HttpErrorResponse carries the API envelope on `err.error`
+      // ({ status, code, message }); the top-level `err.message` is the
+      // raw HTTP status text, not our message. Read the envelope first.
+      const code = err?.error?.code ?? err?.status;
+      const message = err?.error?.message ?? err?.message;
+      this.loginError.set(this.resolveAuthError(code, message));
     } finally {
       this.loading.set(false);
       this.loginForm.enable({ emitEvent: false });
@@ -149,6 +158,19 @@ export class LoginComponent implements OnInit {
       default:
         return 'This field is required';
     }
+  }
+
+  // Decide what to show for a failed login. The password-not-set case is a
+  // 403 from the BE with a helpful, already-localised message ("Your account
+  // has not been activated yet. Please check your email for the setup link…").
+  // That is NOT a leak (the account exists but was never activated — the user
+  // must act), so it is surfaced verbatim. Every other failure goes through
+  // the anti-enumeration normaliser below.
+  private resolveAuthError(code?: number, message?: string): string {
+    if (code === PASSWORD_NOT_SET_CODE && message) {
+      return message;
+    }
+    return this.normaliseAuthError(message) || GENERIC_AUTH_ERROR;
   }
 
   // Heuristic: collapse any "username/password" style message into one
