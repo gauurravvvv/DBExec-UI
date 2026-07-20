@@ -137,10 +137,25 @@ export class AuditDetailDrawerComponent {
     return log.entityName?.trim() || '—';
   }
 
-  /** "Where" — "{method} {path}". */
+  /**
+   * "Where" — a readable endpoint, not the raw developer URL. Keeps the HTTP
+   * method + resource path but strips the trailing id segment (uuid / numeric)
+   * and any query string, so it reads e.g. "DELETE /api/v1/users" instead of
+   * "DELETE /api/v1/users/f0b6e3a8-…?foo=bar". Rendered as plain text (no code
+   * chip) so the row matches the others.
+   */
   whereSummary(log: AuditLog): string {
     const method = log.requestMethod ?? '';
-    const path = log.requestPath ?? '';
+    let path = log.requestPath ?? '';
+    if (path) {
+      // Drop query string.
+      path = path.split('?')[0];
+      // Drop a trailing id segment (uuid or numeric) — the noisy part.
+      path = path.replace(
+        /\/(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+)\/?$/i,
+        '',
+      );
+    }
     return `${method} ${path}`.trim();
   }
 

@@ -87,7 +87,11 @@
 
         <dt>{{ 'AUDIT.WHERE' | translate }}</dt>
         <dd>
-          <code *ngIf="whereSummary(row); else noWhere">{{ whereSummary(row) }}</code>
+          <!-- Plain text (no code chip) so this row keeps the same rhythm as
+               Who/What/When/Why/Outcome. The value is the readable endpoint —
+               method + resource path with the raw id/query stripped — not the
+               full developer URL. -->
+          <span *ngIf="whereSummary(row); else noWhere">{{ whereSummary(row) }}</span>
           <ng-template #noWhere><span class="muted">—</span></ng-template>
         </dd>
 
