@@ -357,21 +357,49 @@
 
   /* Empty state — a clean centred block, NOT a table row. The empty row/cell
      must not carry the body-row divider or hover, or it reads as a blank
-     record. */
+     record.
+
+     Vertical centring: when the table is empty the flex-scrollable body (a
+     bounded, full-height box — see .ct-p-table rules above) contains only the
+     empty <table>. We stretch that empty table's row to the full body height
+     so the single empty <td> owns the whole area, then centre "No records
+     found" both ways inside it. This keeps the message in the MIDDLE of the
+     listing area rather than pinned to the top. Populated tables are
+     unaffected (this only targets tbody rows tagged .ct-empty-row). */
+  .p-datatable-wrapper:has(.ct-empty-row) .p-datatable-table {
+    height: 100%;
+  }
+  .p-datatable-tbody:has(> tr.ct-empty-row) {
+    height: 100%;
+  }
   .p-datatable-tbody > tr.ct-empty-row,
   .p-datatable-tbody > tr.ct-empty-row:hover {
     background: transparent;
+    height: 100%;
   }
   .p-datatable-tbody > tr.ct-empty-row > td,
   .p-datatable-tbody > tr.ct-empty-row:hover > td {
     border: none;
     background: transparent;
-  }
-  .ct-empty {
+    /* The <td> stays a real table cell — full-height + middle vertical-align
+       so its inner block sits in the MIDDLE of the listing area (not pinned
+       to the top). colspan width is preserved because the cell isn't a flex
+       container. */
+    height: 100%;
+    vertical-align: middle;
     text-align: center;
-    padding: var(--space-9) var(--space-6);
+    padding: var(--space-6);
     color: var(--text-muted);
-    i { display: block; font-size: var(--icon-lg); margin-bottom: var(--space-4); opacity: 0.6; }
+  }
+  .ct-empty-inner {
+    /* Icon + "No records found" as a centred column block. min-height keeps it
+       comfortably centred even when the container is short. */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    i { font-size: var(--icon-lg); margin-bottom: var(--space-4); opacity: 0.6; }
   }
 
   /* Loading mask — quiet. */

@@ -175,14 +175,18 @@
     <ng-template pTemplate="emptymessage">
       <tr class="ct-empty-row">
         <td [attr.colspan]="visibleColumns.length + (cfg.selectable ? 1 : 0)" class="ct-empty">
-          <!-- Host may project a state-specific empty body (e.g. "pick a
-               datasource" / "unsupported") via [tableEmpty]; otherwise the
-               default inbox + message shows. -->
-          <ng-content select="[tableEmpty]"></ng-content>
-          <ng-container *ngIf="!hasProjectedEmpty">
-            <i class="pi pi-inbox"></i>
-            <span>{{ cfg.emptyMessage || ('COMMON.NO_RECORDS' | translate) }}</span>
-          </ng-container>
+          <!-- Inner wrapper is the flex-centred block; the <td> stays a real
+               table cell (vertical-align: middle) so colspan width is honoured
+               across browsers. Host may project a state-specific empty body
+               (e.g. "pick a datasource" / "unsupported") via [tableEmpty];
+               otherwise the default inbox + message shows. -->
+          <div class="ct-empty-inner">
+            <ng-content select="[tableEmpty]"></ng-content>
+            <ng-container *ngIf="!hasProjectedEmpty">
+              <i class="pi pi-inbox"></i>
+              <span>{{ cfg.emptyMessage || ('COMMON.NO_RECORDS' | translate) }}</span>
+            </ng-container>
+          </div>
         </td>
       </tr>
     </ng-template>
