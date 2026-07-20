@@ -10,6 +10,8 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { GlobalService } from 'src/app/core/services/global.service';
 import {
   UsServerListAdapter,
@@ -80,11 +82,31 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
   selectedModules: string[] = [];
   selectedAction: string | null = null;
   actorSearch = '';
+  entitySearch = '';
   dateRange: Date[] | null = null;
   failuresOnly = false;
 
   moduleOptions: FilterOption[] = [];
   actionOptions: FilterOption[] = [];
+
+  /* ── asset-history scope (the fast "one asset's timeline" mode) ────
+   * When a rootId is active the list is scoped to ONE asset's complete
+   * history — its parent event plus every child event that shares the same
+   * rootId (e.g. a dataset + all its calc-field changes). While scoped we
+   * order by assetVersion so the stream reads as a clean v1→vN timeline and
+   * show a removable context header. rootId is a filter value only — never
+   * rendered as text. */
+  rootId: string | null = null;
+  rootType: string | null = null;
+  rootEntityName: string | null = null;
+
+  /** Debounces the entity-name text search so each keystroke doesn't rebind
+   *  the adapter / re-hit the BE. */
+  private entitySearch$ = new Subject<string>();
+
+  get isRootScoped(): boolean {
+    return !!this.rootId;
+  }
 
   /* ── drawer state ─────────────────────────────────────── */
 
@@ -136,6 +158,12 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
       ...this.tableConfig,
       globalSearchPlaceholder: this.translate.instant('AUDIT.SEARCH_PLACEHOLDER'),
     };
+
+    // Debounced entity-name search → single re-query after the user pauses.
+    this.entitySearch$
+      .pipe(debounceTime(350), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.applyFilter());
+
     this.bindAdapter();
     this.verifyIntegrity();
   }
@@ -151,12 +179,14 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
     const t = (k: string) => this.translate.instant(k);
     return [
       { colId: 'module', field: 'module', header: t('AUDIT.COL_MODULE'), width: '260px', frozen: true, sortable: false },
-      { colId: 'action', field: 'action', header: t('AUDIT.ACTION'), width: '132px', sortable: false },
-      { colId: 'entity', field: 'entityName', header: t('AUDIT.COL_ENTITY'), width: '200px', sortable: false },
-      { colId: 'actor', field: 'actorName', header: t('AUDIT.PERFORMED_BY'), width: '208px', sortable: false },
-      { colId: 'when', field: 'createdOn', header: t('AUDIT.COL_WHEN'), width: '188px' },
-      { colId: 'origin', field: 'ipAddress', header: t('AUDIT.COL_ORIGIN'), width: '140px', sortable: false },
-      { colId: 'outcome', field: 'responseSuccess', header: t('AUDIT.OUTCOME'), width: '132px', sortable: false },
+      { colId: 'action', field: 'action', header: t('AUDIT.ACTION'), width: '124px', sortable: false },
+      { colId: 'version', field: 'assetVersion', header: t('AUDIT.VERSION'), width: '84px', align: 'center', sortable: false },
+      { colId: 'entity', field: 'entityName', header: t('AUDIT.COL_ENTITY'), width: '188px', sortable: false },
+      { colId: 'actor', field: 'actorName', header: t('AUDIT.PERFORMED_BY'), width: '200px', sortable: false },
+      { colId: 'when', field: 'createdOn', header: t('AUDIT.COL_WHEN'), width: '180px' },
+      { colId: 'origin', field: 'ipAddress', header: t('AUDIT.COL_ORIGIN'), width: '132px', sortable: false },
+      { colId: 'outcome', field: 'responseSuccess', header: t('AUDIT.OUTCOME'), width: '124px', sortable: false },
+      { colId: 'history', field: 'id', header: '', width: '52px', align: 'center', sortable: false },
     ];
   }
 
@@ -204,11 +234,31 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
     return log.entityName?.trim() || '—';
   }
 
+  /** Version badge text, e.g. "v4". Empty when the row carries no version. */
+  versionLabel(log: AuditLog): string {
+    return log.assetVersion != null
+      ? `${this.translate.instant('AUDIT.VERSION_PREFIX')}${log.assetVersion}`
+      : '';
+  }
+
+  /** A row can jump to an asset timeline only if it carries a rootId. */
+  canJump(log: AuditLog | null | undefined): boolean {
+    return !!log?.rootId;
+  }
+
   /* ── adapter wiring ───────────────────────────────────── */
 
   /** Assemble the BE `filter` object from the toolbar model + scope. */
   private buildFilter(): Record<string, unknown> {
     const filter: Record<string, unknown> = {};
+
+    // Asset-history scope wins: pin to one rootId (whole-asset timeline).
+    // The module/entity/actor/date facets still layer on top so a user can
+    // narrow within an asset's history if they want.
+    if (this.isRootScoped) {
+      filter['rootId'] = this.rootId;
+      if (this.rootType) filter['rootType'] = this.rootType;
+    }
 
     // Module scope (locked) OR user-selected modules.
     if (this.isScoped) {
@@ -219,6 +269,7 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
 
     if (this.selectedAction) filter['action'] = this.selectedAction;
     if (this.actorSearch.trim()) filter['actor'] = this.actorSearch.trim();
+    if (this.entitySearch.trim()) filter['entityName'] = this.entitySearch.trim();
     if (this.failuresOnly) filter['outcome'] = 'failure';
 
     if (this.dateRange && this.dateRange.length) {
@@ -228,6 +279,18 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
     }
 
     return filter;
+  }
+
+  /**
+   * Sort payload sent to the BE. In the default list the table owns sort
+   * (createdOn DESC). While scoped to one asset we override to
+   * assetVersion ASC so the timeline reads v1→vN top-to-bottom.
+   */
+  private buildSort(): string | undefined {
+    if (this.isRootScoped) {
+      return JSON.stringify([{ field: 'assetVersion', order: 'asc' }]);
+    }
+    return undefined;
   }
 
   /** Normalise a picked date to an ISO string (end-of-day for the upper bound). */
@@ -260,7 +323,12 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
           page: params.page,
           limit: params.limit,
         };
-        if (params.sort) req['sort'] = params.sort;
+        // When scoped to one asset, force assetVersion-ASC ordering so the
+        // stream reads as a v1→vN timeline; otherwise honour the table's own
+        // sort (default createdOn DESC).
+        const scopedSort = this.buildSort();
+        if (scopedSort) req['sort'] = scopedSort;
+        else if (params.sort) req['sort'] = params.sort;
         if (Object.keys(merged).length) req['filter'] = JSON.stringify(merged);
         return this.auditService.listAuditLogs(req);
       },
@@ -299,6 +367,11 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
     this.applyFilter();
   }
 
+  onEntitySearch(value: string): void {
+    this.entitySearch = value ?? '';
+    this.entitySearch$.next(this.entitySearch);
+  }
+
   onDateRangeChange(range: Date[] | null): void {
     this.dateRange = range;
     // Only re-query once a full range (or a clear) is picked.
@@ -316,6 +389,7 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
     this.selectedModules = [];
     this.selectedAction = null;
     this.actorSearch = '';
+    this.entitySearch = '';
     this.dateRange = null;
     this.failuresOnly = false;
     this.applyFilter();
@@ -326,6 +400,7 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
       (!this.isScoped && this.selectedModules.length > 0) ||
       !!this.selectedAction ||
       !!this.actorSearch.trim() ||
+      !!this.entitySearch.trim() ||
       !!(this.dateRange && this.dateRange.length) ||
       this.failuresOnly
     );
@@ -333,6 +408,48 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
 
   refreshList(): void {
     this.adapter?.reload();
+  }
+
+  /* ── asset-history scope (the core findability flow) ──────────────────
+   * One click on a row's "View asset history" control (list row or drawer)
+   * re-filters the list to that asset's rootId — surfacing its COMPLETE
+   * timeline (v1..vN, child field events folded in) ordered v1→vN. A
+   * removable context header ("History of: <entityName>") tells the user
+   * they're scoped and lets them clear back to the full list. */
+
+  jumpToAssetHistory(log: AuditLog | null | undefined): void {
+    if (!log?.rootId) return;
+    this.rootId = log.rootId;
+    this.rootType = log.rootType ?? null;
+    // Prefer the entity name of the row clicked; the header just needs a
+    // human label for the asset (NEVER the rootId itself).
+    this.rootEntityName = log.entityName?.trim() || null;
+    // Close the drawer if it was the launch point, then reload scoped.
+    this.drawerVisible = false;
+    this.selectedLog = null;
+    this.applyFilter();
+    this.cdr.markForCheck();
+  }
+
+  /** Human label for the scope header — falls back to the root's type/module
+   *  label; never exposes the rootId. */
+  rootScopeLabel(): string {
+    if (this.rootEntityName) return this.rootEntityName;
+    const type = this.rootType;
+    if (type) {
+      const key =
+        MODULE_META[type]?.labelKey ?? MODULE_FALLBACK.labelKey;
+      return this.translate.instant(key);
+    }
+    return this.translate.instant('AUDIT.THIS_ASSET');
+  }
+
+  clearRootScope(): void {
+    this.rootId = null;
+    this.rootType = null;
+    this.rootEntityName = null;
+    this.applyFilter();
+    this.cdr.markForCheck();
   }
 
   /* ── tamper-evidence badge ────────────────────────────── */

@@ -118,9 +118,59 @@ $auth-bg: rgba(91, 100, 112, 0.12);
 
   .f-module ::ng-deep { width: 13rem; max-width: 32vw; }
   .f-action ::ng-deep { width: 11rem; }
+  .f-entity ::ng-deep { width: 12rem; }
   .f-actor ::ng-deep { width: 12rem; }
   .f-date ::ng-deep { width: 14rem; }
   .f-failures { flex: none; }
+}
+
+/* ── asset-history scope banner ──────────────────────────────────────────── */
+.scope-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--primary-color-transparent);
+  border: 1px solid var(--primary-color);
+  color: var(--text-color);
+  margin-top: calc(-1 * var(--space-4));
+
+  .scope-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    display: grid;
+    place-items: center;
+    flex: none;
+    background: var(--primary-color);
+    color: var(--primary-text, #fff);
+    i { font-size: var(--fs-control); }
+  }
+
+  .scope-text {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    min-width: 0;
+    font-size: var(--fs-body);
+
+    strong {
+      font-weight: var(--fw-semibold);
+      color: var(--primary-color);
+      max-width: 40vw;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .scope-hint {
+      font-size: var(--fs-label);
+      color: var(--text-muted);
+    }
+  }
+
+  app-chip { margin-left: auto; }
 }
 
 /* ── bespoke audit cells (reach into projected cell markup) ──────────────── */
@@ -247,6 +297,45 @@ $auth-bg: rgba(91, 100, 112, 0.12);
 
   .ts { white-space: nowrap; font-variant-numeric: tabular-nums; }
 
+  // Version badge — monospace, tabular, so v-numbers align down the column.
+  .ver-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-xs);
+    font-family: var(--font-mono);
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-semibold);
+    font-variant-numeric: tabular-nums;
+    color: var(--text-color-secondary);
+    background: var(--hover-background);
+  }
+
+  // Per-row "view asset history" jump.
+  .history-jump {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    display: inline-grid;
+    place-items: center;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text-muted);
+    transition:
+      color 0.15s ease,
+      background 0.15s ease;
+
+    i { font-size: var(--fs-control); }
+
+    &:hover {
+      color: var(--primary-color);
+      background: var(--primary-color-transparent);
+    }
+  }
+
   .ip-text {
     font-family: var(--font-mono);
     font-size: var(--fs-micro);
@@ -265,7 +354,6 @@ $auth-bg: rgba(91, 100, 112, 0.12);
     &.ok { color: var(--success-color); }
     &.fail { color: var(--error-color); }
     i { font-size: var(--fs-control); }
-    .caret { color: var(--text-muted); margin-left: var(--space-2); font-size: var(--fs-label); }
   }
 }
 

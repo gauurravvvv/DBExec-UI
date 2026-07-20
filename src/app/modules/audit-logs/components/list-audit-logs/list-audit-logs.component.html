@@ -51,6 +51,24 @@
       </div>
     </div>
 
+    <!-- Asset-history scope banner: removable, so the user always knows they
+         are looking at ONE asset's complete timeline and can clear back. -->
+    <div class="scope-banner" *ngIf="isRootScoped">
+      <span class="scope-icon"><i class="pi pi-history"></i></span>
+      <span class="scope-text">
+        {{ 'AUDIT.HISTORY_OF' | translate }}
+        <strong [title]="rootScopeLabel()">{{ rootScopeLabel() }}</strong>
+        <span class="scope-hint">{{ 'AUDIT.HISTORY_SCOPE_HINT' | translate }}</span>
+      </span>
+      <app-chip
+        variant="tag"
+        tone="info"
+        [removable]="true"
+        (removed)="clearRootScope()"
+        [title]="'AUDIT.CLEAR_HISTORY_SCOPE' | translate"
+      >{{ 'AUDIT.SHOWING_FULL_HISTORY' | translate }}</app-chip>
+    </div>
+
     <!-- Content card -->
     <div class="content-card">
       <div class="table-wrapper" *ngIf="adapter">
@@ -95,6 +113,14 @@
               icon="pi-bolt"
               (onChangeEvent)="onActionChange($event)"
             ></app-custom-dropdown>
+
+            <app-custom-input
+              class="f-entity"
+              [ngModel]="entitySearch"
+              (ngModelChange)="onEntitySearch($event)"
+              icon="pi-tag"
+              [placeholder]="'AUDIT.FILTER_ENTITY' | translate"
+            ></app-custom-input>
 
             <app-custom-input
               class="f-actor"
@@ -160,6 +186,15 @@
             </span>
           </ng-template>
 
+          <!-- Version badge (assetVersion) — makes the sequence visible; the
+               timeline reads v1→vN once scoped to one asset. -->
+          <ng-template usGridCell="version" let-log>
+            <span class="ver-badge" *ngIf="log.assetVersion != null; else noVer">
+              {{ versionLabel(log) }}
+            </span>
+            <ng-template #noVer><span class="muted">—</span></ng-template>
+          </ng-template>
+
           <!-- Entity -->
           <ng-template usGridCell="entity" let-log>
             <span class="description-text" [title]="entityLabel(log)">{{ entityLabel(log) }}</span>
@@ -194,8 +229,24 @@
             <span class="outcome-cell" [class.ok]="log.responseSuccess" [class.fail]="!log.responseSuccess">
               <i class="pi" [ngClass]="log.responseSuccess ? 'pi-check-circle' : 'pi-times-circle'"></i>
               {{ log.responseSuccess ? ('AUDIT.SUCCESS' | translate) : ('AUDIT.FAILED' | translate) }}
-              <i class="pi pi-chevron-right caret"></i>
             </span>
+          </ng-template>
+
+          <!-- View asset history — one click scopes the list to THIS asset's
+               complete version timeline (rootId). rootId is used as the
+               filter value only; it is never shown. -->
+          <ng-template usGridCell="history" let-log>
+            <button
+              *ngIf="canJump(log)"
+              type="button"
+              class="history-jump"
+              (click)="jumpToAssetHistory(log)"
+              [pTooltip]="'AUDIT.VIEW_ASSET_HISTORY' | translate"
+              tooltipPosition="left"
+              [attr.aria-label]="'AUDIT.VIEW_ASSET_HISTORY' | translate"
+            >
+              <i class="pi pi-history"></i>
+            </button>
           </ng-template>
         </app-custom-table>
       </div>
@@ -208,4 +259,5 @@
   [log]="selectedLog"
   [visible]="drawerVisible"
   (closed)="onDrawerClosed()"
+  (viewHistory)="jumpToAssetHistory($event)"
 ></app-audit-detail-drawer>

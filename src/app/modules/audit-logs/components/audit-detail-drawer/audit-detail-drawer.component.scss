@@ -77,10 +77,27 @@ $auth-bg: rgba(91, 100, 112, 0.12);
       .head-sub {
         font-size: var(--fs-label);
         color: var(--text-color-secondary);
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-3);
 
         .entity-name {
           font-weight: var(--fw-medium);
           &.muted { font-weight: var(--fw-regular); opacity: 0.8; }
+        }
+
+        .ver-badge {
+          display: inline-flex;
+          align-items: center;
+          padding: 1px var(--space-2);
+          border-radius: var(--radius-xs);
+          font-family: var(--font-mono);
+          font-size: var(--fs-micro);
+          font-weight: var(--fw-semibold);
+          font-variant-numeric: tabular-nums;
+          color: var(--primary-color);
+          background: var(--primary-color-transparent);
         }
       }
     }
@@ -111,6 +128,30 @@ $auth-bg: rgba(91, 100, 112, 0.12);
     flex-direction: column;
     gap: var(--space-7);
     flex: 1;
+  }
+
+  // "View asset history" CTA — the fast jump to this asset's whole timeline.
+  .history-cta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--primary-color);
+    background: var(--primary-color-transparent);
+    color: var(--primary-color);
+    font-size: var(--fs-body);
+    font-weight: var(--fw-medium);
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s ease;
+
+    i { font-size: var(--fs-control); }
+    span { flex: 1; }
+    .cta-caret { font-size: var(--fs-label); }
+
+    &:hover { background: var(--primary-color); color: var(--primary-text, #fff); }
   }
 
   // six-question grid

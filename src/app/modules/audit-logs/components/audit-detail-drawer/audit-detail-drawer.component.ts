@@ -40,8 +40,29 @@ export class AuditDetailDrawerComponent {
   @Output() visibleChange = new EventEmitter<boolean>();
   /** Emitted when the user closes the drawer (close button / backdrop / Esc). */
   @Output() closed = new EventEmitter<void>();
+  /** Emitted when the user asks to see this asset's full version history —
+   *  the parent scopes the list to the row's rootId. */
+  @Output() viewHistory = new EventEmitter<AuditLog>();
 
   constructor(private translate: TranslateService) {}
+
+  /* ── asset-history jump ───────────────────────────────── */
+
+  /** A row can jump to its asset timeline only when it carries a rootId. */
+  canJump(log: AuditLog | null | undefined): boolean {
+    return !!log?.rootId;
+  }
+
+  /** Version badge text, e.g. "v4". Empty when no version on the row. */
+  versionLabel(log: AuditLog): string {
+    return log.assetVersion != null
+      ? `${this.translate.instant('AUDIT.VERSION_PREFIX')}${log.assetVersion}`
+      : '';
+  }
+
+  onViewHistory(): void {
+    if (this.log?.rootId) this.viewHistory.emit(this.log);
+  }
 
   /* ── presentation helpers ─────────────────────────────── */
 

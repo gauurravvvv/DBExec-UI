@@ -22,6 +22,7 @@
           <div class="head-sub">
             <span class="entity-name" *ngIf="row.entityName">{{ row.entityName }}</span>
             <span class="entity-name muted" *ngIf="!row.entityName">{{ moduleLabel(row.module) }}</span>
+            <span class="ver-badge" *ngIf="row.assetVersion != null">{{ versionLabel(row) }}</span>
           </div>
         </div>
       </div>
@@ -39,6 +40,19 @@
 
     <!-- ── Body ── -->
     <div class="drawer-body">
+      <!-- Jump to this asset's complete version history (rootId scope). The
+           fast "show me everything that happened to THIS thing" path. -->
+      <button
+        *ngIf="canJump(row)"
+        type="button"
+        class="history-cta"
+        (click)="onViewHistory()"
+      >
+        <i class="pi pi-history"></i>
+        <span>{{ 'AUDIT.VIEW_ASSET_HISTORY' | translate }}</span>
+        <i class="pi pi-arrow-right cta-caret"></i>
+      </button>
+
       <!-- The six questions -->
       <dl class="qgrid">
         <dt>{{ 'AUDIT.WHO' | translate }}</dt>

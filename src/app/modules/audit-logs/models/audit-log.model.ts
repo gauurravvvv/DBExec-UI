@@ -55,4 +55,19 @@ export interface AuditLog {
   justification: string | null;
   correlationId: string | null;
   createdOn: string;
+
+  /**
+   * Version-timeline fields (BE `mapAuditRow`). `assetVersion` is the
+   * monotonically-increasing version of the asset AT this event (v1, v2, …),
+   * rendered as a badge/column so the sequence is visible. `rootId` folds a
+   * whole asset's history — the parent PLUS its child events (a dataset and
+   * all its calc-field / custom-field changes share one `rootId`) — into a
+   * single stream; it is used ONLY as a filter value / row key and is NEVER
+   * displayed as text. `rootType` (e.g. 'dataset','db-datasource') narrows the
+   * jump when a row's own module differs from the root's.
+   */
+  assetVersion: number | null;
+  /** Internal only — NEVER displayed as text; used to scope the timeline. */
+  rootId: string | null;
+  rootType: string | null;
 }
