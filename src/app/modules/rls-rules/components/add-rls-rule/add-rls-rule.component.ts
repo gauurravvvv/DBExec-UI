@@ -307,7 +307,7 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     };
     if (scope === 'user') {
       this.userService
-        .listUser({ ...params, excludeDefault: true })
+        .listUser({ ...params })
         .then((res: any) => {
           if (this.globalService.handleSuccessService(res, false)) {
             done(
