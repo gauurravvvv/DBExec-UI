@@ -39,13 +39,20 @@ export const PERMISSIONS = {
   AUDIT_LOGS: 'auditLogs',
   LOGIN_ACTIVITY: 'loginActivity',
 
-  // App Settings
+  // App Settings — org look & feel (one tabbed hub, gated on APP_SETTINGS;
+  // the child values remain for the role-editor grid + back-compat).
   APP_SETTINGS: 'appSettings',
-  ANNOUNCEMENT_MANAGEMENT: 'announcementManagement',
   THEME_MANAGEMENT: 'themeManagement',
   BRANDING_MANAGEMENT: 'brandingManagement',
-  SECURITY_POLICY: 'securityPolicy',
+  ANNOUNCEMENT_MANAGEMENT: 'announcementManagement',
+
+  // System Settings — platform/security config (one tabbed hub, gated on
+  // SYSTEM_SETTINGS; child values for the role-editor grid + back-compat).
+  SYSTEM_SETTINGS: 'systemSettings',
+  SSO_CONFIGURATION: 'ssoConfiguration',
   EMAIL_CONFIGURATION: 'emailConfiguration',
+  SECURITY_POLICY: 'securityPolicy',
+  AI_FEATURES: 'aiFeatures',
 } as const;
 
 export type PermissionValue = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

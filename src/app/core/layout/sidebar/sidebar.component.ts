@@ -47,6 +47,17 @@ interface MenuItem {
 }
 
 /**
+ * Settings "hub" module values. These modules keep their children in the
+ * permission tree (role editor + "parent grants all tabs" model), but the
+ * sidebar renders each as a SINGLE clickable hub link — the children are
+ * TABS inside the hub screen, not sidebar sub-rows.
+ */
+const SETTINGS_HUB_VALUES = new Set<string>([
+  PERMISSIONS.APP_SETTINGS,
+  PERMISSIONS.SYSTEM_SETTINGS,
+]);
+
+/**
  * BE PermissionNode shape from buildSessionBootstrap.
  * Modules have no `level`; only leaf permissions do. We only render
  * a node as a clickable nav item when level >= 1 (or when the node
@@ -198,11 +209,28 @@ export class SidebarComponent implements OnInit {
 
     const result: MenuItem[] = [];
     for (const node of items) {
-      const children = node.children ?? node.subPermissions ?? [];
+      // Settings hubs (App Settings / System Settings) keep their children
+      // in the permission tree (needed for the role-editor grid + the
+      // "parent grants all tabs" model), but the sidebar renders them as a
+      // SINGLE clickable hub link — the children are TABS inside the hub,
+      // not sidebar sub-rows. So don't descend into their children here.
+      const isLeafHub = SETTINGS_HUB_VALUES.has(node.value);
+
+      const children = isLeafHub
+        ? []
+        : (node.children ?? node.subPermissions ?? []);
       const processedChildren = this.processMenuItems(children, depth + 1);
       const hasGrant = typeof node.level === 'number' && node.level >= 1;
 
-      if (!hasGrant && processedChildren.length === 0) continue;
+      // A hub is shown when the user holds the parent grant OR holds any of
+      // its (tab) children — mirror the "parent grants all" intent by
+      // surfacing the hub if any child grant is present.
+      const hasChildGrant = isLeafHub
+        ? this.anyDescendantGranted(node)
+        : false;
+
+      if (!hasGrant && !hasChildGrant && processedChildren.length === 0)
+        continue;
 
       result.push({
         label: node.name ?? node.value,
@@ -217,6 +245,15 @@ export class SidebarComponent implements OnInit {
       });
     }
     return result;
+  }
+
+  /** True if the node itself, or any descendant, carries a grant (level >= 1).
+   *  Used so a settings hub renders when the admin holds either the parent
+   *  grant or any of its tab-child grants. */
+  private anyDescendantGranted(node: PermissionNode): boolean {
+    if (typeof node.level === 'number' && node.level >= 1) return true;
+    const kids = node.children ?? node.subPermissions ?? [];
+    return kids.some(k => this.anyDescendantGranted(k));
   }
 
   appendRouteToMenu(node: PermissionNode | MenuItem): string {

@@ -44,7 +44,8 @@
     "brandingManagement": "ブランディング",
     "securityPolicy": "セキュリティポリシー",
     "emailConfiguration": "メール設定",
-    "alertManagement": "アラート"
+    "alertManagement": "アラート",
+    "systemSettings": "システム設定"
   },
   "COMMON": {
     "ACTIVE": "有効",

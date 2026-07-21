@@ -44,7 +44,8 @@
     "brandingManagement": "Identidade",
     "securityPolicy": "Política de segurança",
     "emailConfiguration": "Configuração de e-mail",
-    "alertManagement": "Alertas"
+    "alertManagement": "Alertas",
+    "systemSettings": "Configurações do sistema"
   },
   "COMMON": {
     "ACTIVE": "Ativo",

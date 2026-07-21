@@ -44,7 +44,8 @@
     "brandingManagement": "브랜딩",
     "securityPolicy": "보안 정책",
     "emailConfiguration": "이메일 구성",
-    "alertManagement": "알림"
+    "alertManagement": "알림",
+    "systemSettings": "시스템 설정"
   },
   "COMMON": {
     "ACTIVE": "활성",

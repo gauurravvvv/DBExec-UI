@@ -268,6 +268,10 @@ const routes: Routes = [
         },
       },
       {
+        // Settings hosts TWO hubs (App / System) gated on DIFFERENT
+        // permissions, so the per-hub gate lives on the child routes inside
+        // the module (see app-settings-routing.module.ts). The parent only
+        // enforces "logged in" via roleGuard (no permission → login check only).
         path: 'settings',
         loadChildren: () =>
           import('./modules/app-settings/app-settings.module').then(
@@ -275,7 +279,6 @@ const routes: Routes = [
           ),
         canActivate: [roleGuard],
         data: {
-          permission: PERMISSIONS.ANNOUNCEMENT_MANAGEMENT,
           title: 'PAGE_TITLES.APP_SETTINGS',
         },
       },

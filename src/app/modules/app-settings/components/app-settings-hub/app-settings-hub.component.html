@@ -1,0 +1,22 @@
+<!-- App Settings hub — Theme / Branding / Announcements as tabs. Each child
+     component renders its own page header + form, so the tab strip is a thin
+     shell around them (same idiom as the Alerts view tabs). -->
+<div class="settings-hub">
+  <p-tabView
+    [(activeIndex)]="activeTab"
+    (onChange)="onTabChange($event.index)"
+    [scrollable]="true"
+  >
+    <p-tabPanel [header]="'SIDEBAR.themeManagement' | translate">
+      <app-theme-settings *ngIf="activeTab === 0"></app-theme-settings>
+    </p-tabPanel>
+
+    <p-tabPanel [header]="'SIDEBAR.brandingManagement' | translate">
+      <app-branding-settings *ngIf="activeTab === 1"></app-branding-settings>
+    </p-tabPanel>
+
+    <p-tabPanel [header]="'SIDEBAR.announcementManagement' | translate">
+      <app-list-announcements *ngIf="activeTab === 2"></app-list-announcements>
+    </p-tabPanel>
+  </p-tabView>
+</div>

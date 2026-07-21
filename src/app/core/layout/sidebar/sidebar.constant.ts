@@ -37,11 +37,14 @@ export const SIDEBAR_ITEMS_ROUTES = [
   { value: 'dashboard', route: '/app/dashboards' },
   { value: 'rlsRules', route: '/app/rls-rules' },
   { value: 'alertManagement', route: '/app/alerts' },
-  { value: 'announcementManagement', route: '/app/settings/announcements' },
-  { value: 'themeManagement', route: '/app/settings/theme' },
-  { value: 'brandingManagement', route: '/app/settings/branding' },
-  { value: 'securityPolicy', route: '/app/settings/security-policy' },
-  { value: 'emailConfiguration', route: '/app/settings/email-configuration' },
+  // Settings is two tabbed hubs, each ONE route behind ONE permission.
+  // The former per-screen entries (announcementManagement, themeManagement,
+  // brandingManagement, securityPolicy, emailConfiguration) are now TABS
+  // inside these hubs, not standalone sidebar rows — so they are not mapped
+  // here. Holding the parent permission (appSettings / systemSettings) shows
+  // the hub with every tab.
+  { value: 'appSettings', route: '/app/settings/app' },
+  { value: 'systemSettings', route: '/app/settings/system' },
 ];
 
 export const HOME_ROUTES = {

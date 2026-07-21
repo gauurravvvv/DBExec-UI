@@ -44,7 +44,8 @@
     "brandingManagement": "品牌",
     "securityPolicy": "安全策略",
     "emailConfiguration": "邮件配置",
-    "alertManagement": "警报"
+    "alertManagement": "警报",
+    "systemSettings": "系统设置"
   },
   "COMMON": {
     "ACTIVE": "活跃",
