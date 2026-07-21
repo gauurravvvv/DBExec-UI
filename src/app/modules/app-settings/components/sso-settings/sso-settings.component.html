@@ -1,0 +1,69 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <div class="page-header">
+      <div class="left-section">
+        <h2>{{ 'APP_SETTINGS.SSO.TITLE' | translate }}</h2>
+      </div>
+      <div class="action-buttons">
+        <app-button
+          *hasPermission="'ssoConfiguration'; level: 'write'"
+          variant="primary"
+          type="button"
+          icon="pi pi-save"
+          [loading]="saving()"
+          [disabled]="!isFormDirty || saving()"
+          (clicked)="onSave()"
+        >
+          {{ 'APP_SETTINGS.SSO.SAVE' | translate }}
+        </app-button>
+      </div>
+    </div>
+
+    <p class="page-subtitle">
+      {{ 'APP_SETTINGS.SSO.SUBTITLE' | translate }}
+    </p>
+
+    <app-content-loader
+      *ngIf="loading() && ssoForm.pristine"
+    ></app-content-loader>
+
+    <form autocomplete="off" [formGroup]="ssoForm" class="admin-form mt-4">
+      <div class="form-column">
+        <app-custom-toggle
+          formControlName="ssoEnabled"
+          [label]="'APP_SETTINGS.SSO.ENABLED' | translate"
+          [trueLabel]="'COMMON.ENABLED' | translate"
+          [falseLabel]="'COMMON.DISABLED' | translate"
+        ></app-custom-toggle>
+
+        <app-custom-input
+          formControlName="ssoIssuer"
+          [label]="'APP_SETTINGS.SSO.ISSUER' | translate"
+          icon="pi-id-card"
+          [placeholder]="'APP_SETTINGS.SSO.ISSUER_PLACEHOLDER' | translate"
+        ></app-custom-input>
+
+        <app-custom-input
+          formControlName="ssoEntryPoint"
+          type="url"
+          [label]="'APP_SETTINGS.SSO.ENTRY_POINT' | translate"
+          icon="pi-link"
+          [placeholder]="'APP_SETTINGS.SSO.ENTRY_POINT_PLACEHOLDER' | translate"
+        ></app-custom-input>
+
+        <div class="secret-field">
+          <app-custom-textarea
+            formControlName="ssoCertificate"
+            [label]="'APP_SETTINGS.SSO.CERTIFICATE' | translate"
+            [rows]="6"
+            [placeholder]="'APP_SETTINGS.SSO.CERTIFICATE_PLACEHOLDER' | translate"
+          ></app-custom-textarea>
+          <span class="configured-badge" *ngIf="certConfigured">
+            <i class="pi pi-check-circle"></i>
+            {{ 'APP_SETTINGS.SSO.CONFIGURED' | translate }}
+          </span>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

@@ -26,6 +26,13 @@ export interface OrgPolicyPayload {
   sesAccessKeyId: string | null;
   sesFrom: string | null;
   sesSecretAccessKeyConfigured: boolean;
+  // SSO (SAML). issuer + entry point are public IdP metadata; the cert
+  // never leaves the server — ssoCertificateConfigured drives the masked
+  // placeholder in the form.
+  ssoEnabled: boolean;
+  ssoIssuer: string | null;
+  ssoEntryPoint: string | null;
+  ssoCertificateConfigured: boolean;
 }
 
 export interface SecurityPolicyPayload {
@@ -46,6 +53,20 @@ export interface EmailConfigPayload {
   sesAccessKeyId?: string | null;
   sesSecretAccessKey?: string | null;
   sesFrom?: string | null;
+}
+
+/**
+ * SSO (SAML) patch payload — mirrors PUT /api/v1/org-policy/sso.
+ * ssoEnabled / ssoIssuer / ssoEntryPoint are always sent; an empty
+ * string clears issuer/entryPoint. ssoCertificate is OMITTED when the
+ * admin left the masked placeholder untouched (keeps the stored cert),
+ * an empty string clears it, a new value replaces it.
+ */
+export interface SsoConfigPayload {
+  ssoEnabled?: boolean;
+  ssoIssuer?: string;
+  ssoEntryPoint?: string;
+  ssoCertificate?: string;
 }
 
 /**
@@ -112,6 +133,26 @@ export class OrgPolicyService {
           skipLoader: true,
         }),
       );
+      if (res?.status && res?.data) {
+        const cur = this._current();
+        this._current.set({ ...(cur as any), ...res.data });
+      }
+      return res;
+    } finally {
+      this._saving.set(false);
+    }
+  }
+
+  async updateSso(payload: SsoConfigPayload): Promise<any> {
+    this._saving.set(true);
+    try {
+      const res: any = await lastValueFrom(
+        this.http.apiPut(ORG_POLICY.UPDATE_SSO, payload, {
+          skipLoader: true,
+        }),
+      );
+      // The SSO endpoint returns no data body, but merge defensively in
+      // case that changes — same idiom as updateSecurity / updateEmail.
       if (res?.status && res?.data) {
         const cur = this._current();
         this._current.set({ ...(cur as any), ...res.data });

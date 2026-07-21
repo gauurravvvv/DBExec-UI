@@ -30,7 +30,7 @@
       ></app-custom-input>
     </div>
 
-    <div class="auth-form__field">
+    <div class="auth-form__field" *ngIf="!isSSOLogin()">
       <label class="auth-visually-hidden" for="auth-username">Username</label>
       <app-custom-input
         inputId="auth-username"
@@ -51,6 +51,7 @@
 
     <div
       class="auth-form__field"
+      *ngIf="!isSSOLogin()"
       (focusin)="onPasswordFocus()"
       (focusout)="onPasswordBlur()"
     >
@@ -94,7 +95,9 @@
       </ng-container>
     </div>
 
+    <!-- Credential login submit -->
     <button
+      *ngIf="!isSSOLogin()"
       pButton
       type="submit"
       class="auth-form__submit"
@@ -103,11 +106,38 @@
       [loading]="loading()"
     ></button>
 
+    <!-- SSO login submit — only the Organisation field is required -->
+    <button
+      *ngIf="isSSOLogin()"
+      pButton
+      type="button"
+      class="auth-form__submit"
+      [label]="
+        loading()
+          ? ('AUTH.SSO.REDIRECTING' | translate)
+          : ('AUTH.SSO.SIGN_IN_WITH_SSO' | translate)
+      "
+      [disabled]="loginForm.get('organisation')?.invalid || loading()"
+      [loading]="loading()"
+      (click)="loginWithSso()"
+    ></button>
+
     <div class="auth-form__footer-row">
       <a class="auth-form__link" [routerLink]="['/forgot-password']">
         Forgot password?
       </a>
-      <span class="auth-form__hint">We'll email a reset link</span>
+      <button
+        type="button"
+        class="auth-form__link auth-form__link-btn"
+        (click)="toggleLoginMode()"
+      >
+        {{
+          (isSSOLogin()
+            ? 'AUTH.SSO.SIGN_IN_WITH_CREDENTIALS'
+            : 'AUTH.SSO.USE_SSO'
+          ) | translate
+        }}
+      </button>
     </div>
   </form>
 </app-auth-shell>

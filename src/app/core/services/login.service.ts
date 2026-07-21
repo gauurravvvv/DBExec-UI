@@ -95,32 +95,82 @@ export class LoginService implements OnDestroy {
       ),
     );
     if (result.status) {
-      // Tokens — needed for the phase-2 /auth/session call.
-      this.setAccessToken(result.data.accessToken);
-      this.setRefreshToken(result.data.refreshToken);
+      this.stashLoginResponse(result.data, organisation);
+    }
+    return result;
+  }
 
-      // Org name is still needed for the refresh-token endpoint
-      // (which is unauthenticated and uses org+refreshToken as the
-      // bootstrap pair). The user typed it on the form.
-      StorageService.set(StorageType.ORGANISATION, organisation);
+  /**
+   * Single chokepoint that persists a phase-1 login response and preps
+   * the relay screen. Shared by BOTH password login and SAML SSO
+   * (completeSamlLogin) so an SSO session is byte-for-byte identical to
+   * a password session downstream — same tokens, same org, same
+   * relay-only fields, same immediate locale apply. Phase 2
+   * (/auth/session) then hydrates permissions / theme / branding for
+   * either path unchanged.
+   */
+  private stashLoginResponse(data: any, organisation: string): void {
+    // Tokens — needed for the phase-2 /auth/session call.
+    this.setAccessToken(data.accessToken);
+    this.setRefreshToken(data.refreshToken);
 
-      // Relay-only fields — read once by the relay component and
-      // cleared when phase 2 completes. Kept out of the main user
-      // blob to make their short lifecycle obvious.
-      const u = result.data.user || {};
-      StorageService.set(StorageType.RELAY_FIRST_NAME, u.firstName || '');
-      StorageService.set(StorageType.RELAY_LAST_NAME, u.lastName || '');
-      StorageService.set(
-        StorageType.RELAY_IS_FIRST_LOGIN,
-        u.isFirstLogin ? 'true' : 'false',
-      );
+    // Org name is still needed for the refresh-token endpoint
+    // (which is unauthenticated and uses org+refreshToken as the
+    // bootstrap pair).
+    StorageService.set(StorageType.ORGANISATION, organisation);
 
-      // Apply the user's saved locale immediately so the relay's
-      // greeting and status copy render in the right language from
-      // the first paint, before phase 2 returns. Theme + branding
-      // arrive in phase 2 — pass null here so the helper signature
-      // stays uniform.
-      this.applyAuthArtefacts(null, null, u.locale);
+    // Relay-only fields — read once by the relay component and
+    // cleared when phase 2 completes. Kept out of the main user
+    // blob to make their short lifecycle obvious.
+    const u = data.user || {};
+    StorageService.set(StorageType.RELAY_FIRST_NAME, u.firstName || '');
+    StorageService.set(StorageType.RELAY_LAST_NAME, u.lastName || '');
+    StorageService.set(
+      StorageType.RELAY_IS_FIRST_LOGIN,
+      u.isFirstLogin ? 'true' : 'false',
+    );
+
+    // Apply the user's saved locale immediately so the relay's
+    // greeting and status copy render in the right language from
+    // the first paint, before phase 2 returns. Theme + branding
+    // arrive in phase 2 — pass null here so the helper signature
+    // stays uniform.
+    this.applyAuthArtefacts(null, null, u.locale);
+  }
+
+  // ── SAML SSO ────────────────────────────────────────────────────
+
+  /**
+   * Step 1 of SSO — ask the BE where the IdP login URL is. The caller
+   * `window.location.href = res.data.loginUrl` to kick off the
+   * round-trip. Returns the raw envelope so the login screen can
+   * surface BE-supplied error messages (sso_disabled, etc.).
+   */
+  getSamlLoginUrl(account: string): Promise<any> {
+    return lastValueFrom(
+      this.http.apiGet(AUTH.SAML_URL, {
+        params: { account: (account || '').trim() },
+        skipLoader: true,
+      }),
+    );
+  }
+
+  /**
+   * Step 3 of SSO — hand the SAMLResponse back to the BE for validation
+   * + JWT mint. Same envelope as password login; reuses
+   * stashLoginResponse so tokens / org / relay fields / locale all
+   * follow the identical path a password login takes.
+   */
+  async completeSamlLogin(account: string, SAMLResponse: string): Promise<any> {
+    const result: any = await lastValueFrom(
+      this.http.apiPost(
+        AUTH.SAML_LOGIN,
+        { account, SAMLResponse },
+        { skipLoader: true },
+      ),
+    );
+    if (result?.status && result?.data) {
+      this.stashLoginResponse(result.data, account);
     }
     return result;
   }

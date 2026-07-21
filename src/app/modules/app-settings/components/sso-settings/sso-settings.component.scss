@@ -1,0 +1,82 @@
+// SSO settings — same chrome family as the Security Policy / Email
+// Configuration pages (both live as tabs in the System Settings hub).
+// Tokens only; no hardcoded colours / sizes.
+
+.admin-form {
+  .form-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    width: 50%;
+    padding-bottom: var(--space-8);
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+
+  .secret-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+
+    .configured-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      align-self: flex-start;
+      color: var(--primary-color);
+      font-size: var(--fs-label);
+      font-weight: var(--fw-medium);
+
+      i {
+        font-size: var(--fs-body);
+      }
+    }
+  }
+}
+
+.page-subtitle {
+  margin: var(--space-0) var(--space-0) var(--space-4);
+  color: var(--text-muted);
+  font-size: var(--fs-control);
+}
+
+.add-admin-wrapper {
+  height: 100%;
+
+  .add-admin-container {
+    background: var(--card-background);
+    border-radius: var(--radius-md);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-8);
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-2);
+
+      .left-section {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+
+        h2 {
+          margin: 0;
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
+          color: var(--text-color);
+        }
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: var(--space-5);
+        align-items: center;
+      }
+    }
+  }
+}

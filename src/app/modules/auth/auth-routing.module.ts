@@ -5,6 +5,7 @@ import { LoginComponent } from './components/login/login.component';
 import { RelayComponent } from './components/relay/relay.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { SetPasswordComponent } from './components/set-password/set-password.component';
+import { SsoRelayComponent } from './components/sso-relay/sso-relay.component';
 
 export const AUTH_ROUTES: Routes = [
   {
@@ -40,5 +41,18 @@ export const AUTH_ROUTES: Routes = [
     component: RelayComponent,
     canActivate: [authGuard],
     data: { title: 'PAGE_TITLES.RELAY' },
+  },
+  {
+    // SAML SSO landing surface. PUBLIC — no guard: the browser arrives
+    // here via the BE 302 mid-authentication with no app token yet, so
+    // authGuard (which redirects the unauthenticated to /login) would
+    // break the flow. The component reads SAMLResponse + RelayState from
+    // the query string, POSTs them to /auth/saml/login, then hands off
+    // to /relay for the standard phase-2 bootstrap. The BE callback
+    // redirects to `${FE_URL}/auth/sso-relay`, so the path is nested
+    // under `auth/` to match.
+    path: 'auth/sso-relay',
+    component: SsoRelayComponent,
+    data: { title: 'PAGE_TITLES.LOGIN' },
   },
 ];

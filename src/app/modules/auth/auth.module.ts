@@ -15,6 +15,7 @@ import { LoginComponent } from './components/login/login.component';
 import { RelayComponent } from './components/relay/relay.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { SetPasswordComponent } from './components/set-password/set-password.component';
+import { SsoRelayComponent } from './components/sso-relay/sso-relay.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { SetPasswordComponent } from './components/set-password/set-password.com
     ForgotPasswordComponent,
     ResetPasswordComponent,
     SetPasswordComponent,
+    SsoRelayComponent,
   ],
   imports: [
     CommonModule,

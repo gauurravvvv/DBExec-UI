@@ -552,6 +552,16 @@
     }
   }
 
+  // Link-styled button (SSO ⇄ credentials mode toggle). Strips the native
+  // button chrome so it reads as a plain text link but stays a real,
+  // keyboard-focusable <button>.
+  .auth-card .auth-form__link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+
   .auth-card .auth-form__hint {
     color: var(--text-subtle);
     font-family: var(--font-ui);

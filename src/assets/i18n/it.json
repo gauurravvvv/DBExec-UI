@@ -45,7 +45,9 @@
     "securityPolicy": "Politica di sicurezza",
     "emailConfiguration": "Configurazione e-mail",
     "alertManagement": "Avvisi",
-    "systemSettings": "Impostazioni di sistema"
+    "systemSettings": "Impostazioni di sistema",
+    "ssoConfiguration": "Configurazione SSO",
+    "aiFeatures": "Funzionalità IA"
   },
   "COMMON": {
     "ACTIVE": "Attivo",
@@ -2298,6 +2300,19 @@
       "TIMEOUT_DETAIL": "Richiesta scaduta",
       "MALFORMED_DETAIL": "Dati di sessione non validi",
       "ESC_CONFIRM": "Premi Esc di nuovo per annullare"
+    },
+    "SSO": {
+      "SIGN_IN_WITH_SSO": "Accedi con SSO",
+      "SIGN_IN_WITH_CREDENTIALS": "Accedi con le credenziali",
+      "USE_SSO": "Usa Single Sign-On",
+      "REDIRECTING": "Reindirizzamento al tuo provider di identità…",
+      "COMPLETING": "Completamento del Single Sign-On…",
+      "VERIFYING": "Verifica della risposta Single Sign-On…",
+      "FAILED": "Single Sign-On non riuscito. Riprova.",
+      "NO_RESPONSE": "Risposta Single Sign-On mancante. Riprova dalla schermata di accesso.",
+      "BACK_TO_LOGIN": "Torna all'accesso",
+      "CARD_TITLE": "Accesso tramite SSO",
+      "CARD_SUBTITLE": "Quasi fatto — ci vuole solo un momento."
     }
   },
   "PASSWORD": {
@@ -3882,6 +3897,25 @@
       "LEAVE_BLANK": "Lasciare vuoto per mantenere il valore attuale",
       "SAVE": "Salva modifiche",
       "SAVED": "Configurazione e-mail aggiornata"
+    },
+    "SSO": {
+      "TITLE": "Configurazione SSO",
+      "SUBTITLE": "Configura il Single Sign-On SAML in modo che questa organizzazione possa accedere tramite il proprio provider di identità.",
+      "ENABLED": "Abilita Single Sign-On",
+      "ISSUER": "Emittente / ID entità",
+      "ISSUER_PLACEHOLDER": "es. https://your-app.example.com/saml/metadata",
+      "ENTRY_POINT": "URL di accesso IdP",
+      "ENTRY_POINT_PLACEHOLDER": "es. https://idp.example.com/sso/saml",
+      "CERTIFICATE": "Certificato IdP (PEM)",
+      "CERTIFICATE_PLACEHOLDER": "Incolla il certificato di firma del provider di identità (PEM)",
+      "CONFIGURED": "Configurato",
+      "SAVE": "Salva modifiche",
+      "SAVED": "Configurazione Single Sign-On aggiornata"
+    },
+    "AI_FEATURES": {
+      "COMING_SOON": "Le funzionalità IA arriveranno presto",
+      "BLURB": "Query in linguaggio naturale, analisi automatizzate e suggerimenti intelligenti arriveranno in una versione futura.",
+      "BADGE": "In arrivo"
     }
   },
   "PERMISSIONS": {

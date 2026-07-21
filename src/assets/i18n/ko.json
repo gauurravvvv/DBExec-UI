@@ -45,7 +45,9 @@
     "securityPolicy": "보안 정책",
     "emailConfiguration": "이메일 구성",
     "alertManagement": "알림",
-    "systemSettings": "시스템 설정"
+    "systemSettings": "시스템 설정",
+    "ssoConfiguration": "SSO 구성",
+    "aiFeatures": "AI 기능"
   },
   "COMMON": {
     "ACTIVE": "활성",
@@ -2298,6 +2300,19 @@
       "TIMEOUT_DETAIL": "요청 시간이 초과되었습니다",
       "MALFORMED_DETAIL": "잘못된 세션 데이터",
       "ESC_CONFIRM": "Esc를 다시 누르면 취소됩니다"
+    },
+    "SSO": {
+      "SIGN_IN_WITH_SSO": "SSO로 로그인",
+      "SIGN_IN_WITH_CREDENTIALS": "자격 증명으로 로그인",
+      "USE_SSO": "싱글 사인온 사용",
+      "REDIRECTING": "ID 공급자로 리디렉션 중…",
+      "COMPLETING": "싱글 사인온을 완료하는 중…",
+      "VERIFYING": "싱글 사인온 응답을 확인하는 중…",
+      "FAILED": "싱글 사인온에 실패했습니다. 다시 시도해 주세요.",
+      "NO_RESPONSE": "싱글 사인온 응답이 없습니다. 로그인 화면에서 다시 시도해 주세요.",
+      "BACK_TO_LOGIN": "로그인으로 돌아가기",
+      "CARD_TITLE": "SSO로 로그인 중",
+      "CARD_SUBTITLE": "거의 완료되었습니다 — 잠시만 기다려 주세요."
     }
   },
   "PASSWORD": {
@@ -3882,6 +3897,25 @@
       "LEAVE_BLANK": "현재 값을 유지하려면 비워 두세요",
       "SAVE": "변경 사항 저장",
       "SAVED": "이메일 구성이 업데이트되었습니다"
+    },
+    "SSO": {
+      "TITLE": "SSO 구성",
+      "SUBTITLE": "이 조직이 자체 ID 공급자를 통해 로그인할 수 있도록 SAML 싱글 사인온을 구성하세요.",
+      "ENABLED": "싱글 사인온 활성화",
+      "ISSUER": "발급자 / 엔터티 ID",
+      "ISSUER_PLACEHOLDER": "예: https://your-app.example.com/saml/metadata",
+      "ENTRY_POINT": "IdP 로그인 URL",
+      "ENTRY_POINT_PLACEHOLDER": "예: https://idp.example.com/sso/saml",
+      "CERTIFICATE": "IdP 인증서 (PEM)",
+      "CERTIFICATE_PLACEHOLDER": "ID 공급자의 서명 인증서(PEM)를 붙여넣으세요",
+      "CONFIGURED": "구성됨",
+      "SAVE": "변경 사항 저장",
+      "SAVED": "싱글 사인온 구성이 업데이트되었습니다"
+    },
+    "AI_FEATURES": {
+      "COMING_SOON": "AI 기능이 곧 제공됩니다",
+      "BLURB": "자연어 쿼리, 자동 인사이트, 스마트 제안 기능이 향후 릴리스에서 제공될 예정입니다.",
+      "BADGE": "출시 예정"
     }
   },
   "PERMISSIONS": {

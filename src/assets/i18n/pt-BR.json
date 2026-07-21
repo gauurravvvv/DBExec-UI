@@ -45,7 +45,9 @@
     "securityPolicy": "Política de segurança",
     "emailConfiguration": "Configuração de e-mail",
     "alertManagement": "Alertas",
-    "systemSettings": "Configurações do sistema"
+    "systemSettings": "Configurações do sistema",
+    "ssoConfiguration": "Configuração de SSO",
+    "aiFeatures": "Recursos de IA"
   },
   "COMMON": {
     "ACTIVE": "Ativo",
@@ -2298,6 +2300,19 @@
       "TIMEOUT_DETAIL": "Tempo limite excedido",
       "MALFORMED_DETAIL": "Dados de sessão inválidos",
       "ESC_CONFIRM": "Pressione Esc novamente para cancelar"
+    },
+    "SSO": {
+      "SIGN_IN_WITH_SSO": "Entrar com SSO",
+      "SIGN_IN_WITH_CREDENTIALS": "Entrar com credenciais",
+      "USE_SSO": "Usar logon único",
+      "REDIRECTING": "Redirecionando para o seu provedor de identidade…",
+      "COMPLETING": "Concluindo o logon único…",
+      "VERIFYING": "Verificando sua resposta de logon único…",
+      "FAILED": "Falha no logon único. Por favor, tente novamente.",
+      "NO_RESPONSE": "Resposta de logon único ausente. Tente novamente na tela de login.",
+      "BACK_TO_LOGIN": "Voltar ao login",
+      "CARD_TITLE": "Entrando via SSO",
+      "CARD_SUBTITLE": "Finalizando — isso leva só um momento."
     }
   },
   "PASSWORD": {
@@ -3882,6 +3897,25 @@
       "LEAVE_BLANK": "Deixe em branco para manter o valor atual",
       "SAVE": "Salvar alterações",
       "SAVED": "Configuração de e-mail atualizada"
+    },
+    "SSO": {
+      "TITLE": "Configuração de SSO",
+      "SUBTITLE": "Configure o logon único SAML para que esta organização possa entrar por meio de seu provedor de identidade.",
+      "ENABLED": "Habilitar logon único",
+      "ISSUER": "Emissor / ID da entidade",
+      "ISSUER_PLACEHOLDER": "ex. https://your-app.example.com/saml/metadata",
+      "ENTRY_POINT": "URL de login do IdP",
+      "ENTRY_POINT_PLACEHOLDER": "ex. https://idp.example.com/sso/saml",
+      "CERTIFICATE": "Certificado do IdP (PEM)",
+      "CERTIFICATE_PLACEHOLDER": "Cole o certificado de assinatura do provedor de identidade (PEM)",
+      "CONFIGURED": "Configurado",
+      "SAVE": "Salvar alterações",
+      "SAVED": "Configuração de logon único atualizada"
+    },
+    "AI_FEATURES": {
+      "COMING_SOON": "Os recursos de IA chegarão em breve",
+      "BLURB": "Consultas em linguagem natural, insights automatizados e sugestões inteligentes chegarão em uma versão futura.",
+      "BADGE": "Em breve"
     }
   },
   "PERMISSIONS": {

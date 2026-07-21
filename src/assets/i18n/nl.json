@@ -45,7 +45,9 @@
     "securityPolicy": "Beveiligingsbeleid",
     "emailConfiguration": "E-mailconfiguratie",
     "alertManagement": "Waarschuwingen",
-    "systemSettings": "Systeeminstellingen"
+    "systemSettings": "Systeeminstellingen",
+    "ssoConfiguration": "SSO-configuratie",
+    "aiFeatures": "AI-functies"
   },
   "COMMON": {
     "ACTIVE": "Actief",
@@ -2298,6 +2300,19 @@
       "TIMEOUT_DETAIL": "Time-out van verzoek",
       "MALFORMED_DETAIL": "Ongeldige sessiegegevens",
       "ESC_CONFIRM": "Druk nogmaals op Esc om te annuleren"
+    },
+    "SSO": {
+      "SIGN_IN_WITH_SSO": "Inloggen met SSO",
+      "SIGN_IN_WITH_CREDENTIALS": "Inloggen met inloggegevens",
+      "USE_SSO": "Single sign-on gebruiken",
+      "REDIRECTING": "Doorverwijzen naar uw identiteitsprovider…",
+      "COMPLETING": "Single sign-on voltooien…",
+      "VERIFYING": "Uw single sign-on-antwoord verifiëren…",
+      "FAILED": "Single sign-on is mislukt. Probeer het opnieuw.",
+      "NO_RESPONSE": "Single sign-on-antwoord ontbreekt. Probeer het opnieuw vanaf het inlogscherm.",
+      "BACK_TO_LOGIN": "Terug naar inloggen",
+      "CARD_TITLE": "U wordt aangemeld via SSO",
+      "CARD_SUBTITLE": "Bijna klaar — dit duurt maar even."
     }
   },
   "PASSWORD": {
@@ -3882,6 +3897,25 @@
       "LEAVE_BLANK": "Laat leeg om de huidige waarde te behouden",
       "SAVE": "Wijzigingen opslaan",
       "SAVED": "E-mailconfiguratie bijgewerkt"
+    },
+    "SSO": {
+      "TITLE": "SSO-configuratie",
+      "SUBTITLE": "Configureer SAML single sign-on zodat deze organisatie kan inloggen via haar identiteitsprovider.",
+      "ENABLED": "Single sign-on inschakelen",
+      "ISSUER": "Uitgever / Entiteits-ID",
+      "ISSUER_PLACEHOLDER": "bijv. https://your-app.example.com/saml/metadata",
+      "ENTRY_POINT": "IdP-inlog-URL",
+      "ENTRY_POINT_PLACEHOLDER": "bijv. https://idp.example.com/sso/saml",
+      "CERTIFICATE": "IdP-certificaat (PEM)",
+      "CERTIFICATE_PLACEHOLDER": "Plak het ondertekeningscertificaat van de identiteitsprovider (PEM)",
+      "CONFIGURED": "Geconfigureerd",
+      "SAVE": "Wijzigingen opslaan",
+      "SAVED": "Single sign-on-configuratie bijgewerkt"
+    },
+    "AI_FEATURES": {
+      "COMING_SOON": "AI-functies komen binnenkort",
+      "BLURB": "Zoekopdrachten in natuurlijke taal, geautomatiseerde inzichten en slimme suggesties komen in een toekomstige release.",
+      "BADGE": "Binnenkort"
     }
   },
   "PERMISSIONS": {

@@ -45,7 +45,9 @@
     "securityPolicy": "Sicherheitsrichtlinie",
     "emailConfiguration": "E-Mail-Konfiguration",
     "alertManagement": "Warnungen",
-    "systemSettings": "Systemeinstellungen"
+    "systemSettings": "Systemeinstellungen",
+    "ssoConfiguration": "SSO-Konfiguration",
+    "aiFeatures": "KI-Funktionen"
   },
   "COMMON": {
     "ACTIVE": "Aktiv",
@@ -2298,6 +2300,19 @@
       "TIMEOUT_DETAIL": "Zeitüberschreitung bei der Anfrage",
       "MALFORMED_DETAIL": "Ungültige Sitzungsdaten",
       "ESC_CONFIRM": "Esc erneut drücken zum Abbrechen"
+    },
+    "SSO": {
+      "SIGN_IN_WITH_SSO": "Mit SSO anmelden",
+      "SIGN_IN_WITH_CREDENTIALS": "Mit Anmeldedaten anmelden",
+      "USE_SSO": "Single Sign-On verwenden",
+      "REDIRECTING": "Weiterleitung zu Ihrem Identitätsanbieter…",
+      "COMPLETING": "Single Sign-On wird abgeschlossen…",
+      "VERIFYING": "Ihre Single-Sign-On-Antwort wird überprüft…",
+      "FAILED": "Single Sign-On fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "NO_RESPONSE": "Single-Sign-On-Antwort fehlt. Bitte versuchen Sie es erneut über den Anmeldebildschirm.",
+      "BACK_TO_LOGIN": "Zurück zur Anmeldung",
+      "CARD_TITLE": "Anmeldung über SSO",
+      "CARD_SUBTITLE": "Fast fertig — das dauert nur einen Moment."
     }
   },
   "PASSWORD": {
@@ -3882,6 +3897,25 @@
       "LEAVE_BLANK": "Leer lassen, um den aktuellen Wert beizubehalten",
       "SAVE": "Änderungen speichern",
       "SAVED": "E-Mail-Konfiguration aktualisiert"
+    },
+    "SSO": {
+      "TITLE": "SSO-Konfiguration",
+      "SUBTITLE": "Konfigurieren Sie SAML Single Sign-On, damit sich diese Organisation über ihren Identitätsanbieter anmelden kann.",
+      "ENABLED": "Single Sign-On aktivieren",
+      "ISSUER": "Aussteller / Entitäts-ID",
+      "ISSUER_PLACEHOLDER": "z. B. https://your-app.example.com/saml/metadata",
+      "ENTRY_POINT": "IdP-Anmelde-URL",
+      "ENTRY_POINT_PLACEHOLDER": "z. B. https://idp.example.com/sso/saml",
+      "CERTIFICATE": "IdP-Zertifikat (PEM)",
+      "CERTIFICATE_PLACEHOLDER": "Fügen Sie das Signaturzertifikat des Identitätsanbieters (PEM) ein",
+      "CONFIGURED": "Konfiguriert",
+      "SAVE": "Änderungen speichern",
+      "SAVED": "Single-Sign-On-Konfiguration aktualisiert"
+    },
+    "AI_FEATURES": {
+      "COMING_SOON": "KI-Funktionen kommen bald",
+      "BLURB": "Abfragen in natürlicher Sprache, automatisierte Erkenntnisse und intelligente Vorschläge folgen in einer künftigen Version.",
+      "BADGE": "Demnächst"
     }
   },
   "PERMISSIONS": {

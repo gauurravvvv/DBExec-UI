@@ -1,0 +1,28 @@
+<!-- System Settings hub — SSO / Email / Security Policy / AI Features as
+     tabs. Each child renders its own page header + form, so the tab strip
+     is a thin shell (same idiom as the App Settings hub). -->
+<div class="settings-hub">
+  <p-tabView
+    [(activeIndex)]="activeTab"
+    (onChange)="onTabChange($event.index)"
+    [scrollable]="true"
+  >
+    <p-tabPanel [header]="'SIDEBAR.ssoConfiguration' | translate">
+      <app-sso-settings *ngIf="activeTab === 0"></app-sso-settings>
+    </p-tabPanel>
+
+    <p-tabPanel [header]="'SIDEBAR.emailConfiguration' | translate">
+      <app-email-configuration
+        *ngIf="activeTab === 1"
+      ></app-email-configuration>
+    </p-tabPanel>
+
+    <p-tabPanel [header]="'SIDEBAR.securityPolicy' | translate">
+      <app-security-policy *ngIf="activeTab === 2"></app-security-policy>
+    </p-tabPanel>
+
+    <p-tabPanel [header]="'SIDEBAR.aiFeatures' | translate">
+      <app-ai-features *ngIf="activeTab === 3"></app-ai-features>
+    </p-tabPanel>
+  </p-tabView>
+</div>

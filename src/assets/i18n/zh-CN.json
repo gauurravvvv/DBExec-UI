@@ -45,7 +45,9 @@
     "securityPolicy": "安全策略",
     "emailConfiguration": "邮件配置",
     "alertManagement": "警报",
-    "systemSettings": "系统设置"
+    "systemSettings": "系统设置",
+    "ssoConfiguration": "SSO 配置",
+    "aiFeatures": "AI 功能"
   },
   "COMMON": {
     "ACTIVE": "活跃",
@@ -2298,6 +2300,19 @@
       "TIMEOUT_DETAIL": "请求超时",
       "MALFORMED_DETAIL": "会话数据无效",
       "ESC_CONFIRM": "再次按 Esc 取消"
+    },
+    "SSO": {
+      "SIGN_IN_WITH_SSO": "使用 SSO 登录",
+      "SIGN_IN_WITH_CREDENTIALS": "使用凭据登录",
+      "USE_SSO": "使用单点登录",
+      "REDIRECTING": "正在重定向到您的身份提供商…",
+      "COMPLETING": "正在完成单点登录…",
+      "VERIFYING": "正在验证您的单点登录响应…",
+      "FAILED": "单点登录失败，请重试。",
+      "NO_RESPONSE": "缺少单点登录响应，请从登录界面重试。",
+      "BACK_TO_LOGIN": "返回登录",
+      "CARD_TITLE": "正在通过 SSO 登录",
+      "CARD_SUBTITLE": "即将完成 — 只需片刻。"
     }
   },
   "PASSWORD": {
@@ -3882,6 +3897,25 @@
       "LEAVE_BLANK": "留空以保留当前值",
       "SAVE": "保存更改",
       "SAVED": "邮件配置已更新"
+    },
+    "SSO": {
+      "TITLE": "SSO 配置",
+      "SUBTITLE": "配置 SAML 单点登录，使该组织能够通过其身份提供商登录。",
+      "ENABLED": "启用单点登录",
+      "ISSUER": "颁发者 / 实体 ID",
+      "ISSUER_PLACEHOLDER": "例如 https://your-app.example.com/saml/metadata",
+      "ENTRY_POINT": "IdP 登录 URL",
+      "ENTRY_POINT_PLACEHOLDER": "例如 https://idp.example.com/sso/saml",
+      "CERTIFICATE": "IdP 证书 (PEM)",
+      "CERTIFICATE_PLACEHOLDER": "粘贴身份提供商的签名证书 (PEM)",
+      "CONFIGURED": "已配置",
+      "SAVE": "保存更改",
+      "SAVED": "单点登录配置已更新"
+    },
+    "AI_FEATURES": {
+      "COMING_SOON": "AI 功能即将推出",
+      "BLURB": "自然语言查询、自动洞察和智能建议将在未来版本中推出。",
+      "BADGE": "即将推出"
     }
   },
   "PERMISSIONS": {

@@ -36,6 +36,10 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   loading = signal(false);
   loginError = signal('');
+  // SSO mode toggle. When true the form hides username + password and
+  // shows only Organisation + a "Sign in with SSO" button; a link flips
+  // back to credential login. Reuses the existing `organisation` control.
+  isSSOLogin = signal(false);
   // True once the user has tried to submit at least once — gates field-level
   // error visibility so the form doesn't shout at users mid-typing.
   submitAttempted = signal(false);
@@ -115,6 +119,53 @@ export class LoginComponent implements OnInit {
     } finally {
       this.loading.set(false);
       this.loginForm.enable({ emitEvent: false });
+    }
+  }
+
+  /** Flip between credential login and SSO login. Clears any inline
+   *  error so a leftover message from one mode doesn't bleed into the
+   *  other. */
+  toggleLoginMode(): void {
+    if (this.loading()) return;
+    this.isSSOLogin.update(v => !v);
+    this.loginError.set('');
+    this.submitAttempted.set(false);
+  }
+
+  /** SSO entry point — ask the BE for the org's IdP login URL, then
+   *  hand the browser over to the IdP. Only the Organisation field is
+   *  required in this mode. */
+  async loginWithSso(): Promise<void> {
+    if (this.loading()) return;
+    this.submitAttempted.set(true);
+    const orgControl = this.loginForm.get('organisation');
+    if (orgControl?.invalid) {
+      orgControl.markAsTouched();
+      return;
+    }
+    const organisation = (orgControl?.value ?? '').toString().trim();
+    if (!organisation) {
+      orgControl?.markAsTouched();
+      return;
+    }
+    this.loginError.set('');
+    this.loading.set(true);
+    try {
+      const res: any = await this.loginService.getSamlLoginUrl(organisation);
+      if (res?.status && res?.data?.loginUrl) {
+        // Hand off to the IdP. No further FE work until the IdP POSTs
+        // back to the BE callback, which 302s to /auth/sso-relay.
+        window.location.href = res.data.loginUrl;
+        return;
+      }
+      this.loginError.set(this.resolveAuthError(res?.code, res?.message));
+    } catch (err: any) {
+      const code = err?.error?.code ?? err?.status;
+      const message = err?.error?.message ?? err?.message;
+      this.loginError.set(this.resolveAuthError(code, message));
+    } finally {
+      // On success we've already navigated away; on failure re-enable.
+      this.loading.set(false);
     }
   }
 

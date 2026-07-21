@@ -6,6 +6,7 @@ import { PERMISSIONS } from 'src/app/core/constants/permissions.constant';
 import { AddAnnouncementComponent } from './components/add-announcement/add-announcement.component';
 import { AppSettingsHubComponent } from './components/app-settings-hub/app-settings-hub.component';
 import { EditAnnouncementComponent } from './components/edit-announcement/edit-announcement.component';
+import { SystemSettingsHubComponent } from './components/system-settings-hub/system-settings-hub.component';
 import { ViewAnnouncementComponent } from './components/view-announcement/view-announcement.component';
 
 // Settings is now two tabbed hubs:
@@ -22,6 +23,23 @@ const routes: Routes = [
     component: AppSettingsHubComponent,
     canActivate: [roleGuard],
     data: { permission: PERMISSIONS.APP_SETTINGS, title: 'App Settings' },
+  },
+  {
+    // System Settings hub — SSO / Email / Security Policy / AI Features.
+    // Gated on SSO_CONFIGURATION (a child LEAF), NOT SYSTEM_SETTINGS (the
+    // module header): PermissionService.canRead matches the node whose
+    // `value` equals the argument and returns THAT node's `level`. Module
+    // headers carry no `level`, so canRead('systemSettings') is always
+    // false — even for an admin holding every child leaf. Gating on the
+    // ssoConfiguration leaf (which the org admin holds) makes the guard
+    // pass; the org-policy BE route already gates writes on the same leaf.
+    path: 'system',
+    component: SystemSettingsHubComponent,
+    canActivate: [roleGuard],
+    data: {
+      permission: PERMISSIONS.SSO_CONFIGURATION,
+      title: 'System Settings',
+    },
   },
   {
     path: 'announcements/new',

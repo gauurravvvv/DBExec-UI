@@ -45,7 +45,9 @@
     "securityPolicy": "Security Policy",
     "emailConfiguration": "Email Configuration",
     "alertManagement": "Alerts",
-    "systemSettings": "System Settings"
+    "systemSettings": "System Settings",
+    "ssoConfiguration": "SSO Configuration",
+    "aiFeatures": "AI Features"
   },
   "COMMON": {
     "ACTIVE": "Active",
@@ -2301,6 +2303,19 @@
       "TIMEOUT_DETAIL": "Request timed out",
       "MALFORMED_DETAIL": "Malformed session payload",
       "ESC_CONFIRM": "Press Esc again to cancel"
+    },
+    "SSO": {
+      "SIGN_IN_WITH_SSO": "Sign in with SSO",
+      "SIGN_IN_WITH_CREDENTIALS": "Sign in with credentials",
+      "USE_SSO": "Use single sign-on",
+      "REDIRECTING": "Redirecting to your identity provider…",
+      "COMPLETING": "Completing single sign-on…",
+      "VERIFYING": "Verifying your single sign-on response…",
+      "FAILED": "Single sign-on failed. Please try again.",
+      "NO_RESPONSE": "Missing single sign-on response. Please retry from the login screen.",
+      "BACK_TO_LOGIN": "Back to login",
+      "CARD_TITLE": "Signing you in via SSO",
+      "CARD_SUBTITLE": "Finishing up — this only takes a moment."
     }
   },
   "PASSWORD": {
@@ -3885,6 +3900,25 @@
       "LEAVE_BLANK": "Leave blank to keep current value",
       "SAVE": "Save changes",
       "SAVED": "Email configuration updated"
+    },
+    "SSO": {
+      "TITLE": "SSO Configuration",
+      "SUBTITLE": "Configure SAML single sign-on so this organisation can sign in through its identity provider.",
+      "ENABLED": "Enable single sign-on",
+      "ISSUER": "Issuer / Entity ID",
+      "ISSUER_PLACEHOLDER": "e.g. https://your-app.example.com/saml/metadata",
+      "ENTRY_POINT": "IdP Login URL",
+      "ENTRY_POINT_PLACEHOLDER": "e.g. https://idp.example.com/sso/saml",
+      "CERTIFICATE": "IdP Certificate (PEM)",
+      "CERTIFICATE_PLACEHOLDER": "Paste the identity provider's signing certificate (PEM)",
+      "CONFIGURED": "Configured",
+      "SAVE": "Save changes",
+      "SAVED": "Single sign-on configuration updated"
+    },
+    "AI_FEATURES": {
+      "COMING_SOON": "AI Features are coming soon",
+      "BLURB": "Natural-language querying, automated insights, and smart suggestions will arrive in a future release.",
+      "BADGE": "Coming soon"
     }
   },
   "validation": {

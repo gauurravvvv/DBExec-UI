@@ -45,7 +45,9 @@
     "securityPolicy": "Politique de sécurité",
     "emailConfiguration": "Configuration de la messagerie",
     "alertManagement": "Alertes",
-    "systemSettings": "Paramètres système"
+    "systemSettings": "Paramètres système",
+    "ssoConfiguration": "Configuration SSO",
+    "aiFeatures": "Fonctionnalités IA"
   },
   "COMMON": {
     "ACTIVE": "Actif",
@@ -2298,6 +2300,19 @@
       "TIMEOUT_DETAIL": "Délai d'attente dépassé",
       "MALFORMED_DETAIL": "Données de session invalides",
       "ESC_CONFIRM": "Appuyez à nouveau sur Échap pour annuler"
+    },
+    "SSO": {
+      "SIGN_IN_WITH_SSO": "Se connecter avec SSO",
+      "SIGN_IN_WITH_CREDENTIALS": "Se connecter avec des identifiants",
+      "USE_SSO": "Utiliser l'authentification unique",
+      "REDIRECTING": "Redirection vers votre fournisseur d'identité…",
+      "COMPLETING": "Finalisation de l'authentification unique…",
+      "VERIFYING": "Vérification de votre réponse d'authentification unique…",
+      "FAILED": "L'authentification unique a échoué. Veuillez réessayer.",
+      "NO_RESPONSE": "Réponse d'authentification unique manquante. Veuillez réessayer depuis l'écran de connexion.",
+      "BACK_TO_LOGIN": "Retour à la connexion",
+      "CARD_TITLE": "Connexion via SSO",
+      "CARD_SUBTITLE": "Finalisation — cela ne prend qu'un instant."
     }
   },
   "PASSWORD": {
@@ -3882,6 +3897,25 @@
       "LEAVE_BLANK": "Laisser vide pour conserver la valeur actuelle",
       "SAVE": "Enregistrer les modifications",
       "SAVED": "Configuration de la messagerie mise à jour"
+    },
+    "SSO": {
+      "TITLE": "Configuration SSO",
+      "SUBTITLE": "Configurez l'authentification unique SAML pour que cette organisation puisse se connecter via son fournisseur d'identité.",
+      "ENABLED": "Activer l'authentification unique",
+      "ISSUER": "Émetteur / ID d'entité",
+      "ISSUER_PLACEHOLDER": "ex. https://your-app.example.com/saml/metadata",
+      "ENTRY_POINT": "URL de connexion de l'IdP",
+      "ENTRY_POINT_PLACEHOLDER": "ex. https://idp.example.com/sso/saml",
+      "CERTIFICATE": "Certificat de l'IdP (PEM)",
+      "CERTIFICATE_PLACEHOLDER": "Collez le certificat de signature du fournisseur d'identité (PEM)",
+      "CONFIGURED": "Configuré",
+      "SAVE": "Enregistrer les modifications",
+      "SAVED": "Configuration de l'authentification unique mise à jour"
+    },
+    "AI_FEATURES": {
+      "COMING_SOON": "Les fonctionnalités IA arrivent bientôt",
+      "BLURB": "Les requêtes en langage naturel, les analyses automatisées et les suggestions intelligentes arriveront dans une prochaine version.",
+      "BADGE": "Bientôt disponible"
     }
   },
   "PERMISSIONS": {

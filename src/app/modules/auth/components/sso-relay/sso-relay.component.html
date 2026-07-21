@@ -1,0 +1,26 @@
+<app-auth-shell
+  [cardTitle]="'AUTH.SSO.CARD_TITLE' | translate"
+  [cardSubtitle]="'AUTH.SSO.CARD_SUBTITLE' | translate"
+  [showFeatures]="false"
+>
+  <div class="sso-relay" [attr.data-state]="state()">
+    <ng-container *ngIf="state() === 'loading'">
+      <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+      <p>{{ 'AUTH.SSO.VERIFYING' | translate }}</p>
+    </ng-container>
+
+    <ng-container *ngIf="state() === 'error'">
+      <i class="pi pi-times-circle sso-relay__error-icon" aria-hidden="true"></i>
+      <p class="sso-relay__error" role="alert">
+        {{ errorMessage() | translate }}
+      </p>
+      <button
+        pButton
+        type="button"
+        class="auth-form__submit"
+        [label]="'AUTH.SSO.BACK_TO_LOGIN' | translate"
+        (click)="backToLogin()"
+      ></button>
+    </ng-container>
+  </div>
+</app-auth-shell>

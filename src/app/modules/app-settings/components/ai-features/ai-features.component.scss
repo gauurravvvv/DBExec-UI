@@ -1,0 +1,63 @@
+// AI Features placeholder — a centred "coming soon" card. Tokens only.
+.ai-features-wrapper {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+}
+
+.coming-soon-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-4);
+  max-width: 480px;
+  padding: var(--space-10) var(--space-8);
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+
+  .icon-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-pill);
+    background: var(--primary-color-transparent);
+    color: var(--primary-color);
+
+    i {
+      font-size: var(--fs-h1);
+    }
+  }
+
+  h2 {
+    margin: 0;
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--fs-body);
+    line-height: 1.5;
+  }
+
+  .soon-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-4);
+    border-radius: var(--radius-pill);
+    background: var(--primary-color-transparent);
+    color: var(--primary-color);
+    font-size: var(--fs-label);
+    font-weight: var(--fw-semibold);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+}

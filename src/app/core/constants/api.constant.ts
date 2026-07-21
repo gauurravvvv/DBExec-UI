@@ -27,6 +27,12 @@ export const AUTH = {
   SET_PASSWORD: '/auth/set-password',
   VERIFY_SETUP_TOKEN: '/auth/verify-setup-token',
   RESEND_SETUP_LINK: '/auth/resend-setup-link',
+  // SAML SSO. Paths are relative to environment.apiServer (which
+  // already ends in /api/v1) — the HTTP interceptor prepends it — so
+  // they follow the sibling `/auth/*` convention above, NOT a literal
+  // `/api/v1/...` (that would double the prefix).
+  SAML_URL: '/auth/saml/url',
+  SAML_LOGIN: '/auth/saml/login',
 };
 
 export const HOME = {
@@ -556,6 +562,8 @@ export const ORG_POLICY = {
   GET: '/api/v1/org-policy',
   UPDATE_SECURITY: '/api/v1/org-policy/security',
   UPDATE_EMAIL: '/api/v1/org-policy/email',
+  UPDATE_SSO: '/api/v1/org-policy/sso',
+  BACKFILL_SETTINGS: '/api/v1/org-policy/backfill-settings',
 };
 
 /**

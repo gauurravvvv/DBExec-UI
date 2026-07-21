@@ -45,7 +45,9 @@
     "securityPolicy": "セキュリティポリシー",
     "emailConfiguration": "メール設定",
     "alertManagement": "アラート",
-    "systemSettings": "システム設定"
+    "systemSettings": "システム設定",
+    "ssoConfiguration": "SSO設定",
+    "aiFeatures": "AI機能"
   },
   "COMMON": {
     "ACTIVE": "有効",
@@ -2298,6 +2300,19 @@
       "TIMEOUT_DETAIL": "リクエストがタイムアウトしました",
       "MALFORMED_DETAIL": "セッションデータが不正です",
       "ESC_CONFIRM": "もう一度 Esc を押すとキャンセルします"
+    },
+    "SSO": {
+      "SIGN_IN_WITH_SSO": "SSOでサインイン",
+      "SIGN_IN_WITH_CREDENTIALS": "認証情報でサインイン",
+      "USE_SSO": "シングルサインオンを使用",
+      "REDIRECTING": "アイデンティティプロバイダーにリダイレクトしています…",
+      "COMPLETING": "シングルサインオンを完了しています…",
+      "VERIFYING": "シングルサインオンの応答を検証しています…",
+      "FAILED": "シングルサインオンに失敗しました。もう一度お試しください。",
+      "NO_RESPONSE": "シングルサインオンの応答がありません。ログイン画面からやり直してください。",
+      "BACK_TO_LOGIN": "ログインに戻る",
+      "CARD_TITLE": "SSOでサインインしています",
+      "CARD_SUBTITLE": "まもなく完了します — 少々お待ちください。"
     }
   },
   "PASSWORD": {
@@ -3882,6 +3897,25 @@
       "LEAVE_BLANK": "現在の値を維持するには空のままにします",
       "SAVE": "変更を保存",
       "SAVED": "メール設定を更新しました"
+    },
+    "SSO": {
+      "TITLE": "SSO設定",
+      "SUBTITLE": "SAMLシングルサインオンを設定して、この組織がアイデンティティプロバイダー経由でサインインできるようにします。",
+      "ENABLED": "シングルサインオンを有効にする",
+      "ISSUER": "発行者 / エンティティID",
+      "ISSUER_PLACEHOLDER": "例: https://your-app.example.com/saml/metadata",
+      "ENTRY_POINT": "IdPログインURL",
+      "ENTRY_POINT_PLACEHOLDER": "例: https://idp.example.com/sso/saml",
+      "CERTIFICATE": "IdP証明書 (PEM)",
+      "CERTIFICATE_PLACEHOLDER": "アイデンティティプロバイダーの署名証明書 (PEM) を貼り付けてください",
+      "CONFIGURED": "設定済み",
+      "SAVE": "変更を保存",
+      "SAVED": "シングルサインオン設定を更新しました"
+    },
+    "AI_FEATURES": {
+      "COMING_SOON": "AI機能は近日公開予定です",
+      "BLURB": "自然言語クエリ、自動インサイト、スマートな提案は今後のリリースで提供される予定です。",
+      "BADGE": "近日公開"
     }
   },
   "PERMISSIONS": {
