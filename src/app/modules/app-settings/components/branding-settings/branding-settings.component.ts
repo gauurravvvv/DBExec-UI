@@ -9,6 +9,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { BrandingSettingsService } from '../../services/branding-settings.service';
+import { SettingsTabForm } from '../../settings-tab-form';
 
 const HEX_PATTERN = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 const MIN_TEXT = 3;
@@ -34,7 +35,7 @@ const MAX_TEXT = 30;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BrandingSettingsComponent
-  implements OnInit, OnDestroy, HasUnsavedChanges
+  implements OnInit, OnDestroy, HasUnsavedChanges, SettingsTabForm
 {
   brandingForm!: FormGroup;
   readonly minTextLength = MIN_TEXT;
@@ -63,6 +64,14 @@ export class BrandingSettingsComponent
   }
   hasUnsavedChanges(): boolean {
     return this.isFormDirty;
+  }
+
+  // SettingsTabForm — lets the hub's single Save button drive this tab.
+  get dirty(): boolean {
+    return this.isFormDirty;
+  }
+  get busy(): boolean {
+    return this.saving();
   }
 
   ngOnInit(): void {

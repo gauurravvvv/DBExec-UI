@@ -143,6 +143,20 @@ export const QUERY_RUNNER = {
   SAVED_QUERY: '/query-runner/saved-queries/', // + :id
 };
 
+export const AI_WORKSPACE = {
+  // Persistent WebSocket chat transport (primary). ws(s)://host/api/v1/ai/ws?token=
+  WS: '/ai/ws',
+  // POST /ai/chat  → SSE fallback stream (used only if the WS can't connect)
+  CHAT: '/ai/chat',
+  // GET/PUT /ai/config  → provider config (key masked on GET)
+  CONFIG: '/ai/config',
+  // GET /ai/health  → { enabled, configured } — gates the launcher
+  HEALTH: '/ai/health',
+  // GET /ai/conversations(/:id)  → owner-private history
+  CONVERSATIONS: '/ai/conversations',
+  CONVERSATION: '/ai/conversations/', // + :id
+};
+
 export const GROUP = {
   LIST: '/groups',
   ADD: '/groups',
@@ -558,12 +572,15 @@ export const REFERENCE_DATA = {
   FAMILY: '/reference-data/', // GET /reference-data/:family
 };
 
+// Paths are relative to environment.apiServer (which already ends in
+// /api/v1); the http interceptor prepends it. Do NOT include /api/v1 here or
+// the URL doubles to /api/v1/api/v1/... and 404s.
 export const ORG_POLICY = {
-  GET: '/api/v1/org-policy',
-  UPDATE_SECURITY: '/api/v1/org-policy/security',
-  UPDATE_EMAIL: '/api/v1/org-policy/email',
-  UPDATE_SSO: '/api/v1/org-policy/sso',
-  BACKFILL_SETTINGS: '/api/v1/org-policy/backfill-settings',
+  GET: '/org-policy',
+  UPDATE_SECURITY: '/org-policy/security',
+  UPDATE_EMAIL: '/org-policy/email',
+  UPDATE_SSO: '/org-policy/sso',
+  BACKFILL_SETTINGS: '/org-policy/backfill-settings',
 };
 
 /**

@@ -1,63 +1,74 @@
-// AI Features placeholder — a centred "coming soon" card. Tokens only.
-.ai-features-wrapper {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-8);
+// AI Features config form. Mirrors the SSO settings tab layout: a
+// single vertical form column at ~50% width, tokenised throughout.
+.add-admin-wrapper {
+  display: block;
 }
 
-.coming-soon-card {
+.add-admin-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
   gap: var(--space-4);
-  max-width: 480px;
-  padding: var(--space-10) var(--space-8);
-  background: var(--card-background);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+}
 
-  .icon-badge {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 56px;
-    height: 56px;
-    border-radius: var(--radius-pill);
-    background: var(--primary-color-transparent);
-    color: var(--primary-color);
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
 
-    i {
-      font-size: var(--fs-h1);
-    }
-  }
-
-  h2 {
+  .left-section h2 {
     margin: 0;
     font-size: var(--fs-h2);
     font-weight: var(--fw-semibold);
     color: var(--text-color);
   }
+}
 
-  p {
-    margin: 0;
-    color: var(--text-muted);
-    font-size: var(--fs-body);
-    line-height: 1.5;
+.page-subtitle {
+  margin: 0;
+  font-size: var(--fs-control);
+  color: var(--text-muted);
+}
+
+.admin-form {
+  .form-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    max-width: 560px;
   }
+}
 
-  .soon-badge {
+.section-label {
+  margin: var(--space-2) 0 0;
+  font-size: var(--fs-label);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.field-hint {
+  margin: calc(var(--space-2) * -1) 0 0;
+  font-size: var(--fs-micro);
+  color: var(--text-muted);
+}
+
+.secret-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  .configured-badge {
     display: inline-flex;
     align-items: center;
-    padding: var(--space-1) var(--space-4);
-    border-radius: var(--radius-pill);
-    background: var(--primary-color-transparent);
+    gap: var(--space-2);
+    align-self: flex-start;
+    font-size: var(--fs-micro);
     color: var(--primary-color);
-    font-size: var(--fs-label);
-    font-weight: var(--fw-semibold);
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
+
+    i {
+      font-size: var(--fs-control);
+    }
   }
 }

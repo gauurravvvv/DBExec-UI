@@ -1,9 +1,8 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnInit,
-} from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { SettingsTabForm } from '../../settings-tab-form';
+import { ThemeSettingsComponent } from '../theme-settings/theme-settings.component';
+import { BrandingSettingsComponent } from '../branding-settings/branding-settings.component';
 
 /**
  * App Settings hub — a single tabbed screen (p-tabView) that hosts the
@@ -11,20 +10,36 @@ import { ActivatedRoute, Router } from '@angular/router';
  * three former standalone sidebar routes. Gated on the parent `appSettings`
  * permission; holding it shows every tab (no per-tab gating).
  *
+ * Theme and Branding are savable forms; a single "Save" button in the hub
+ * header (UltraSignal style) delegates to whichever is active. Announcements
+ * is a list screen with its own add/edit/view flow — no Save — so the hub
+ * Save button hides on that tab (activeForm() returns undefined).
+ *
  * The active tab is mirrored to a `?tab=` query param so a deep link / a
  * refresh lands on the same tab. Announcement add/edit/view still live at
  * their own child routes under this module and open as normal pages.
+ *
+ * Default change detection (not OnPush): the header Save button binds to
+ * `activeForm()?.dirty/busy`, which flips on keystrokes inside the child
+ * form. An OnPush hub wouldn't re-evaluate that on child input; default CD
+ * re-reads the getter each tick so the button enables the moment the active
+ * tab becomes dirty. Thin container, no perf-sensitive bindings.
  */
 @Component({
   selector: 'app-app-settings-hub',
   templateUrl: './app-settings-hub.component.html',
   styleUrls: ['./app-settings-hub.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppSettingsHubComponent implements OnInit {
   /** Tab order — index maps to the query-param slug. */
   readonly tabs = ['theme', 'branding', 'announcements'] as const;
   activeTab = 0;
+
+  // Only the active tab is instantiated (*ngIf); the announcements tab has no
+  // savable form so neither ViewChild resolves there → activeForm() undefined.
+  @ViewChild(ThemeSettingsComponent) private theme?: ThemeSettingsComponent;
+  @ViewChild(BrandingSettingsComponent)
+  private branding?: BrandingSettingsComponent;
 
   constructor(
     private route: ActivatedRoute,
@@ -45,5 +60,19 @@ export class AppSettingsHubComponent implements OnInit {
       queryParamsHandling: 'merge',
       replaceUrl: true,
     });
+  }
+
+  /**
+   * The currently-rendered savable tab, or undefined on Announcements (which
+   * is a list, not a form). The hub Save button binds to this being defined.
+   */
+  activeForm(): SettingsTabForm | undefined {
+    return this.theme ?? this.branding;
+  }
+
+  /** Save the active tab through its own API. */
+  save(): void {
+    const form = this.activeForm();
+    if (form && form.dirty && !form.busy) form.onSave();
   }
 }

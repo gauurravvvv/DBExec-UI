@@ -1,31 +1,45 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { SettingsTabForm } from '../../settings-tab-form';
+import { SsoSettingsComponent } from '../sso-settings/sso-settings.component';
+import { EmailConfigurationComponent } from '../email-configuration/email-configuration.component';
+import { SecurityPolicyComponent } from '../security-policy/security-policy.component';
+import { AiFeaturesComponent } from '../ai-features/ai-features.component';
 
 /**
- * System Settings hub — a single tabbed screen (p-tabView) hosting the
- * platform/security configuration: SSO, Email, Security Policy, and AI
- * Features (placeholder). Sibling of the App Settings hub; reached from
- * the sidebar's System Settings entry at /app/settings/system.
+ * System Settings hub — a single tabbed screen hosting SSO, Email, Security
+ * Policy, and AI Features. One "Save" button lives in the hub header
+ * (UltraSignal style) and delegates to the ACTIVE tab's own save/API — no
+ * per-tab Save button. Each tab implements SettingsTabForm so the hub can
+ * read `dirty`/`busy` and call `onSave()` on whichever child is rendered.
  *
- * The route gates on the `ssoConfiguration` LEAF permission rather than
- * the `systemSettings` module header — the header carries no `level` in
- * the permission tree, so canRead(header) resolves to false even for an
- * admin who holds every child leaf (see the routing module for the full
- * rationale). Holding it shows every tab (no per-tab gating).
+ * The route gates on the `ssoConfiguration` LEAF permission (the
+ * `systemSettings` module header carries no `level`). The active tab is
+ * mirrored to a `?tab=` query param for deep links / refresh.
  *
- * The active tab is mirrored to a `?tab=` query param so a deep link / a
- * refresh lands on the same tab.
+ * Default change detection (not OnPush): the header Save button's
+ * disabled/loading state binds to `activeForm()?.dirty/busy`, which flips on
+ * keystrokes inside the *child* form. An OnPush hub wouldn't re-evaluate that
+ * on child input; default CD re-reads the getter on every tick so the button
+ * enables the moment the active tab becomes dirty. This is a thin container
+ * with no perf-sensitive bindings, so default CD is the right trade.
  */
 @Component({
   selector: 'app-system-settings-hub',
   templateUrl: './system-settings-hub.component.html',
   styleUrls: ['./system-settings-hub.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SystemSettingsHubComponent implements OnInit {
-  /** Tab order — index maps to the query-param slug. */
   readonly tabs = ['sso', 'email', 'security', 'ai'] as const;
   activeTab = 0;
+
+  // Only the active tab is instantiated (*ngIf), so at most one of these is
+  // defined at a time — activeForm() returns whichever it is.
+  @ViewChild(SsoSettingsComponent) private sso?: SsoSettingsComponent;
+  @ViewChild(EmailConfigurationComponent)
+  private email?: EmailConfigurationComponent;
+  @ViewChild(SecurityPolicyComponent) private security?: SecurityPolicyComponent;
+  @ViewChild(AiFeaturesComponent) private ai?: AiFeaturesComponent;
 
   constructor(
     private route: ActivatedRoute,
@@ -46,5 +60,16 @@ export class SystemSettingsHubComponent implements OnInit {
       queryParamsHandling: 'merge',
       replaceUrl: true,
     });
+  }
+
+  /** The currently-rendered tab (every System tab is a savable form). */
+  activeForm(): SettingsTabForm | undefined {
+    return this.sso ?? this.email ?? this.security ?? this.ai;
+  }
+
+  /** Save the active tab through its own API. */
+  save(): void {
+    const form = this.activeForm();
+    if (form && form.dirty && !form.busy) form.onSave();
   }
 }

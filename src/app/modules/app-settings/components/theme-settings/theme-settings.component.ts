@@ -13,6 +13,7 @@ import {
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ThemeSettingsService } from '../../services/theme-settings.service';
+import { SettingsTabForm } from '../../settings-tab-form';
 
 const HEX_PATTERN = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 
@@ -23,7 +24,7 @@ const HEX_PATTERN = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ThemeSettingsComponent
-  implements OnInit, OnDestroy, HasUnsavedChanges
+  implements OnInit, OnDestroy, HasUnsavedChanges, SettingsTabForm
 {
   themeForm!: FormGroup;
   // Tracks whether the persisted row is the BE-synthesised default —
@@ -50,6 +51,14 @@ export class ThemeSettingsComponent
   }
   hasUnsavedChanges(): boolean {
     return this.isFormDirty;
+  }
+
+  // SettingsTabForm — lets the hub's single Save button drive this tab.
+  get dirty(): boolean {
+    return this.isFormDirty;
+  }
+  get busy(): boolean {
+    return this.saving();
   }
 
   ngOnInit(): void {

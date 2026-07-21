@@ -19,10 +19,17 @@ import { ViewAnnouncementComponent } from './components/view-announcement/view-a
 const routes: Routes = [
   { path: '', redirectTo: 'app', pathMatch: 'full' },
   {
+    // App Settings hub — Theme / Branding / Announcements. Gated on the
+    // themeManagement LEAF, not APP_SETTINGS (the module header): the
+    // permission tree gives `level` only to leaves, so canRead('appSettings')
+    // is always false even for an admin holding every child — the guard would
+    // block the page (this was the "can't open App Settings" bug). Gating on
+    // a child leaf the org admin holds makes the guard pass, mirroring the
+    // System Settings hub below (gated on ssoConfiguration).
     path: 'app',
     component: AppSettingsHubComponent,
     canActivate: [roleGuard],
-    data: { permission: PERMISSIONS.APP_SETTINGS, title: 'App Settings' },
+    data: { permission: PERMISSIONS.THEME_MANAGEMENT, title: 'App Settings' },
   },
   {
     // System Settings hub — SSO / Email / Security Policy / AI Features.

@@ -47,7 +47,8 @@
     "alertManagement": "Waarschuwingen",
     "systemSettings": "Systeeminstellingen",
     "ssoConfiguration": "SSO-configuratie",
-    "aiFeatures": "AI-functies"
+    "aiFeatures": "AI-functies",
+    "aiWorkspace": "AI-assistent"
   },
   "COMMON": {
     "ACTIVE": "Actief",
@@ -2222,7 +2223,8 @@
     "QUERY_RUNNER": "SQL-werkruimte",
     "EMBED_DASHBOARD": "Dashboard",
     "NOTIFICATIONS": "Meldingen",
-    "USER_ACTIVITY": "Activiteit"
+    "USER_ACTIVITY": "Activiteit",
+    "AI_WORKSPACE": "AI-assistent"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Verbeter uw ervaring met\ngegevensbronbeheer",
@@ -2302,17 +2304,17 @@
       "ESC_CONFIRM": "Druk nogmaals op Esc om te annuleren"
     },
     "SSO": {
-      "SIGN_IN_WITH_SSO": "Inloggen met SSO",
-      "SIGN_IN_WITH_CREDENTIALS": "Inloggen met inloggegevens",
+      "SIGN_IN_WITH_SSO": "Doorgaan met SSO",
+      "SIGN_IN_WITH_CREDENTIALS": "Aanmelden met wachtwoord",
       "USE_SSO": "Single sign-on gebruiken",
-      "REDIRECTING": "Doorverwijzen naar uw identiteitsprovider…",
-      "COMPLETING": "Single sign-on voltooien…",
-      "VERIFYING": "Uw single sign-on-antwoord verifiëren…",
-      "FAILED": "Single sign-on is mislukt. Probeer het opnieuw.",
-      "NO_RESPONSE": "Single sign-on-antwoord ontbreekt. Probeer het opnieuw vanaf het inlogscherm.",
-      "BACK_TO_LOGIN": "Terug naar inloggen",
-      "CARD_TITLE": "U wordt aangemeld via SSO",
-      "CARD_SUBTITLE": "Bijna klaar — dit duurt maar even."
+      "REDIRECTING": "Doorverwijzen…",
+      "COMPLETING": "Je wordt aangemeld…",
+      "VERIFYING": "Je identiteit wordt geverifieerd…",
+      "FAILED": "Aanmelden is mislukt. Probeer het opnieuw.",
+      "NO_RESPONSE": "Je aanmeldlink is verlopen of ongeldig. Begin opnieuw.",
+      "BACK_TO_LOGIN": "Terug naar aanmelden",
+      "CARD_TITLE": "Je wordt aangemeld",
+      "CARD_SUBTITLE": "Een moment, we ronden het aanmelden af."
     }
   },
   "PASSWORD": {
@@ -3903,11 +3905,12 @@
       "SUBTITLE": "Configureer SAML single sign-on zodat deze organisatie kan inloggen via haar identiteitsprovider.",
       "ENABLED": "Single sign-on inschakelen",
       "ISSUER": "Uitgever / Entiteits-ID",
-      "ISSUER_PLACEHOLDER": "bijv. https://your-app.example.com/saml/metadata",
+      "ISSUER_PLACEHOLDER": "bijv. UAN-DEV-API",
       "ENTRY_POINT": "IdP-inlog-URL",
-      "ENTRY_POINT_PLACEHOLDER": "bijv. https://idp.example.com/sso/saml",
+      "ENTRY_POINT_PLACEHOLDER": "bijv. https://login.microsoftonline.com/<tenant-id>/saml2",
       "CERTIFICATE": "IdP-certificaat (PEM)",
-      "CERTIFICATE_PLACEHOLDER": "Plak het ondertekeningscertificaat van de identiteitsprovider (PEM)",
+      "CERTIFICATE_PLACEHOLDER": "Plak het Base64-certificaat op één regel (geen spaties, geen regeleinden)",
+      "CERTIFICATE_NOTE": "Plak het certificaat op één regel — geen spaties, geen regeleinden. Kopieer de volledige Base64-waarde van uw identiteitsprovider.",
       "CONFIGURED": "Geconfigureerd",
       "SAVE": "Wijzigingen opslaan",
       "SAVED": "Single sign-on-configuratie bijgewerkt"
@@ -3915,7 +3918,26 @@
     "AI_FEATURES": {
       "COMING_SOON": "AI-functies komen binnenkort",
       "BLURB": "Zoekopdrachten in natuurlijke taal, geautomatiseerde inzichten en slimme suggesties komen in een toekomstige release.",
-      "BADGE": "Binnenkort"
+      "BADGE": "Binnenkort",
+      "TITLE": "AI-functies",
+      "SUBTITLE": "Verbind een AI-provider om de ingebouwde assistent te laten werken.",
+      "SECTION_MODEL": "Model",
+      "ENABLED": "AI-assistent inschakelen",
+      "PROVIDER": "Provider",
+      "PROVIDER_PLACEHOLDER": "bijv. OpenAI",
+      "BASE_URL": "Basis-URL",
+      "BASE_URL_PLACEHOLDER": "https://api.openai.com/v1",
+      "MODEL": "Model",
+      "MODEL_PLACEHOLDER": "bijv. gpt-4o-mini",
+      "ACCURACY": "Nauwkeurigheid",
+      "ACCURACY_HINT": "Lager is preciezer en beter reproduceerbaar; hoger is creatiever.",
+      "API_KEY": "API-sleutel",
+      "API_KEY_PLACEHOLDER": "Voer de API-sleutel van de provider in",
+      "CONFIGURED": "Er is een sleutel geconfigureerd",
+      "SAVE": "Opslaan",
+      "REQUIRED": "Dit veld is verplicht",
+      "BASE_URL_INVALID": "Voer een geldige URL in die begint met http:// of https://",
+      "ACCURACY_INVALID": "Voer een waarde tussen 0 en 1 in"
     }
   },
   "PERMISSIONS": {
@@ -5231,5 +5253,85 @@
     "REVOKED": "Toegang verwijderd",
     "REVOKE_FAILED": "Kan toegang niet verwijderen",
     "VIEW_ONLY_HINT": "Ontvangers krijgen leestoegang"
+  },
+  "AI_WORKSPACE": {
+    "NEW_CHAT": "Nieuwe chat",
+    "UNTITLED_CHAT": "Naamloze chat",
+    "CONTEXT": "Context",
+    "CURRENT_SCREEN": "Huidig scherm",
+    "COMPOSER_PLACEHOLDER": "Stel een vraag over je gegevens of vraag me om iets te maken…",
+    "SEND": "Verzenden",
+    "STOP": "Stoppen",
+    "COPY": "Kopiëren",
+    "COPIED": "Gekopieerd",
+    "OPEN_IN_SQL_WORKSPACE": "Openen in SQL-werkruimte",
+    "ROWS": "{{count}} rijen",
+    "TRUNCATED": "Resultaten afgekapt",
+    "ITEMS": "{{count}} items",
+    "DEFAULT": "Standaard",
+    "NOT_RUNNABLE": "Niet uitvoerbaar",
+    "EXISTING_DATASET": "Bestaande dataset",
+    "SAVE_AS_DATASET": "Opslaan als dataset",
+    "ADD_TO_ANALYSIS": "Toevoegen aan analyse",
+    "X_AXIS": "X-as",
+    "Y_AXIS": "Y-as",
+    "CONFIRM": "Bevestigen",
+    "DISMISS": "Negeren",
+    "DISMISSED": "Genegeerd",
+    "CONFIRM_INERT_NOTE": "Dit voorstel komt uit een eerder bericht. Vraag het opnieuw om het uit te voeren.",
+    "STARTERS": {
+      "LIST_CONNECTIONS": "Mijn verbindingen weergeven",
+      "EXPLAIN_SCHEMA": "Dit schema uitleggen",
+      "WRITE_QUERY": "Een query voor mij schrijven",
+      "BUILD_DATASET": "Een dataset maken",
+      "TOP_ROWS": "De bovenste rijen weergeven",
+      "ADD_BAR_CHART": "Een staafdiagram toevoegen",
+      "SUMMARISE_DATASET": "Deze dataset samenvatten",
+      "CREATE_USER": "Een gebruiker aanmaken",
+      "LIST_USERS": "Gebruikers weergeven"
+    },
+    "APPLY": {
+      "DONE_TITLE": "Klaar",
+      "CONFIRMED": "Bevestigd: {{summary}}",
+      "DATASET_SAVED_TITLE": "Dataset opgeslagen",
+      "DATASET_SAVED": "Dataset \"{{name}}\" opgeslagen.",
+      "ANALYSIS_HANDOFF": "Dataset \"{{name}}\" opgeslagen — deze wordt geopend zodat je de analyse kunt maken.",
+      "FAILED_TITLE": "Kan niet worden voltooid",
+      "FAILED": "De actie kon niet worden voltooid. Probeer het opnieuw.",
+      "NO_CONNECTION_TITLE": "Geen verbinding",
+      "NO_CONNECTION": "Deze SQL heeft geen verbinding om te openen."
+    },
+    "CARD_COMPACT": {
+      "SCHEMA": "Schema",
+      "CONNECTIONS": "{{count}} verbindingen",
+      "VISUAL": "{{type}}-diagram"
+    },
+    "LAUNCHER": {
+      "OPEN": "AI vragen",
+      "TITLE": "AI-assistent",
+      "OPEN_FULL": "Volledige werkruimte openen",
+      "VIEW_FULL": "Weergeven in werkruimte",
+      "EMPTY": "Stel een vraag over je gegevens of vraag me om iets te maken. Ik kan alleen doen wat je toegangsrechten toestaan.",
+      "MODE_OVERLAY": "Openen als overlay",
+      "MODE_PANEL": "Aan zijkant vastzetten",
+      "NOT_CONFIGURED": "De AI-assistent is nog niet ingesteld voor uw organisatie.",
+      "CONFIGURE": "AI configureren",
+      "NAME": "Dex",
+      "TAGLINE": "Je datacopiloot",
+      "WELCOME_TITLE": "Hoi, ik ben Dex",
+      "WELCOME_BODY": "Stel een vraag over je gegevens of laat me iets bouwen — een query, een dataset, een grafiek. Ik doe alleen wat jouw rechten toestaan.",
+      "NOT_CONFIGURED_TITLE": "Dex is nog niet ingesteld",
+      "NOT_CONFIGURED_BODY": "Een beheerder moet een AI-provider koppelen voordat Dex kan helpen.",
+      "TRY": "Probeer te vragen",
+      "STARTER_SCHEMA": "Leg mijn databaseschema uit",
+      "STARTER_QUERY": "Schrijf een SQL-query",
+      "STARTER_DATASET": "Vat een dataset samen"
+    },
+    "PAGE_SUBTITLE": "Stel vragen over je gegevens of bouw queries, datasets en visuals — binnen je toegang.",
+    "HISTORY": "Recente chats",
+    "NO_HISTORY": "Nog geen gesprekken",
+    "WELCOME_TITLE": "Waarmee kan ik helpen?",
+    "WELCOME_SUBTITLE": "Stel vragen over je gegevens, genereer SQL, bouw een dataset of grafiek. Ik kan alleen doen wat je toegang toestaat.",
+    "CONTEXT_HINT": "De assistent weet op welk scherm je bent om relevantere antwoorden te geven."
   }
 }

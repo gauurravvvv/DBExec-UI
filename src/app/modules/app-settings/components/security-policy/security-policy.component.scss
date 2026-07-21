@@ -2,16 +2,17 @@
 // pages so all three feel like one settings family.
 
 .admin-form {
+  // One control per row (vertical stack), matching the canonical add/edit
+  // form layout used across the other modules — not a multi-column grid.
   .form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: var(--space-6);
-    width: 70%;
-    padding-bottom: 24px;
+    width: 50%;
+    padding-bottom: var(--space-6);
 
-    @media (max-width: 768px) {
+    @media (max-width: 992px) {
       width: 100%;
-      grid-template-columns: 1fr;
     }
   }
 }

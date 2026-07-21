@@ -47,7 +47,8 @@
     "alertManagement": "警报",
     "systemSettings": "系统设置",
     "ssoConfiguration": "SSO 配置",
-    "aiFeatures": "AI 功能"
+    "aiFeatures": "AI 功能",
+    "aiWorkspace": "AI 助手"
   },
   "COMMON": {
     "ACTIVE": "活跃",
@@ -2222,7 +2223,8 @@
     "QUERY_RUNNER": "SQL 工作区",
     "EMBED_DASHBOARD": "仪表板",
     "NOTIFICATIONS": "通知",
-    "USER_ACTIVITY": "活动"
+    "USER_ACTIVITY": "活动",
+    "AI_WORKSPACE": "AI 助手"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "提升您的数据源\n管理体验",
@@ -2302,17 +2304,17 @@
       "ESC_CONFIRM": "再次按 Esc 取消"
     },
     "SSO": {
-      "SIGN_IN_WITH_SSO": "使用 SSO 登录",
-      "SIGN_IN_WITH_CREDENTIALS": "使用凭据登录",
+      "SIGN_IN_WITH_SSO": "使用 SSO 继续",
+      "SIGN_IN_WITH_CREDENTIALS": "使用密码登录",
       "USE_SSO": "使用单点登录",
-      "REDIRECTING": "正在重定向到您的身份提供商…",
-      "COMPLETING": "正在完成单点登录…",
-      "VERIFYING": "正在验证您的单点登录响应…",
-      "FAILED": "单点登录失败，请重试。",
-      "NO_RESPONSE": "缺少单点登录响应，请从登录界面重试。",
+      "REDIRECTING": "正在跳转…",
+      "COMPLETING": "正在为您登录…",
+      "VERIFYING": "正在验证您的身份…",
+      "FAILED": "无法登录，请重试。",
+      "NO_RESPONSE": "您的登录链接已过期或无效，请重新开始。",
       "BACK_TO_LOGIN": "返回登录",
-      "CARD_TITLE": "正在通过 SSO 登录",
-      "CARD_SUBTITLE": "即将完成 — 只需片刻。"
+      "CARD_TITLE": "正在为您登录",
+      "CARD_SUBTITLE": "请稍候，正在完成登录。"
     }
   },
   "PASSWORD": {
@@ -3903,11 +3905,12 @@
       "SUBTITLE": "配置 SAML 单点登录，使该组织能够通过其身份提供商登录。",
       "ENABLED": "启用单点登录",
       "ISSUER": "颁发者 / 实体 ID",
-      "ISSUER_PLACEHOLDER": "例如 https://your-app.example.com/saml/metadata",
+      "ISSUER_PLACEHOLDER": "例如： UAN-DEV-API",
       "ENTRY_POINT": "IdP 登录 URL",
-      "ENTRY_POINT_PLACEHOLDER": "例如 https://idp.example.com/sso/saml",
+      "ENTRY_POINT_PLACEHOLDER": "例如： https://login.microsoftonline.com/<tenant-id>/saml2",
       "CERTIFICATE": "IdP 证书 (PEM)",
-      "CERTIFICATE_PLACEHOLDER": "粘贴身份提供商的签名证书 (PEM)",
+      "CERTIFICATE_PLACEHOLDER": "将 Base64 证书粘贴为单行（无空格、无换行）",
+      "CERTIFICATE_NOTE": "请将证书粘贴为单行——不要有空格或换行。请从您的身份提供商复制完整的 Base64 值。",
       "CONFIGURED": "已配置",
       "SAVE": "保存更改",
       "SAVED": "单点登录配置已更新"
@@ -3915,7 +3918,26 @@
     "AI_FEATURES": {
       "COMING_SOON": "AI 功能即将推出",
       "BLURB": "自然语言查询、自动洞察和智能建议将在未来版本中推出。",
-      "BADGE": "即将推出"
+      "BADGE": "即将推出",
+      "TITLE": "AI 功能",
+      "SUBTITLE": "连接 AI 提供商以启用应用内助手。",
+      "SECTION_MODEL": "模型",
+      "ENABLED": "启用 AI 助手",
+      "PROVIDER": "提供商",
+      "PROVIDER_PLACEHOLDER": "例如 OpenAI",
+      "BASE_URL": "基础 URL",
+      "BASE_URL_PLACEHOLDER": "https://api.openai.com/v1",
+      "MODEL": "模型",
+      "MODEL_PLACEHOLDER": "例如 gpt-4o-mini",
+      "ACCURACY": "精度",
+      "ACCURACY_HINT": "越低越精确、可重复；越高越有创意。",
+      "API_KEY": "API 密钥",
+      "API_KEY_PLACEHOLDER": "输入提供商 API 密钥",
+      "CONFIGURED": "已配置密钥",
+      "SAVE": "保存",
+      "REQUIRED": "此字段为必填项",
+      "BASE_URL_INVALID": "请输入以 http:// 或 https:// 开头的有效 URL",
+      "ACCURACY_INVALID": "请输入 0 到 1 之间的值"
     }
   },
   "PERMISSIONS": {
@@ -5231,5 +5253,85 @@
     "REVOKED": "已移除访问权限",
     "REVOKE_FAILED": "移除访问权限失败",
     "VIEW_ONLY_HINT": "接收者获得查看权限"
+  },
+  "AI_WORKSPACE": {
+    "NEW_CHAT": "新建聊天",
+    "UNTITLED_CHAT": "未命名聊天",
+    "CONTEXT": "上下文",
+    "CURRENT_SCREEN": "当前屏幕",
+    "COMPOSER_PLACEHOLDER": "询问有关数据的问题，或让我为你构建内容…",
+    "SEND": "发送",
+    "STOP": "停止",
+    "COPY": "复制",
+    "COPIED": "已复制",
+    "OPEN_IN_SQL_WORKSPACE": "在 SQL 工作区中打开",
+    "ROWS": "{{count}} 行",
+    "TRUNCATED": "结果已截断",
+    "ITEMS": "{{count}} 项",
+    "DEFAULT": "默认",
+    "NOT_RUNNABLE": "无法运行",
+    "EXISTING_DATASET": "现有数据集",
+    "SAVE_AS_DATASET": "另存为数据集",
+    "ADD_TO_ANALYSIS": "添加到分析",
+    "X_AXIS": "X 轴",
+    "Y_AXIS": "Y 轴",
+    "CONFIRM": "确认",
+    "DISMISS": "忽略",
+    "DISMISSED": "已忽略",
+    "CONFIRM_INERT_NOTE": "此建议来自较早的消息。请再次询问以运行它。",
+    "STARTERS": {
+      "LIST_CONNECTIONS": "列出我的连接",
+      "EXPLAIN_SCHEMA": "解释此架构",
+      "WRITE_QUERY": "为我编写查询",
+      "BUILD_DATASET": "构建数据集",
+      "TOP_ROWS": "显示前几行",
+      "ADD_BAR_CHART": "添加柱状图",
+      "SUMMARISE_DATASET": "汇总此数据集",
+      "CREATE_USER": "创建用户",
+      "LIST_USERS": "列出用户"
+    },
+    "APPLY": {
+      "DONE_TITLE": "完成",
+      "CONFIRMED": "已确认：{{summary}}",
+      "DATASET_SAVED_TITLE": "数据集已保存",
+      "DATASET_SAVED": "已保存数据集“{{name}}”。",
+      "ANALYSIS_HANDOFF": "已保存数据集“{{name}}”——正在打开它，以便你构建分析。",
+      "FAILED_TITLE": "无法完成",
+      "FAILED": "无法完成该操作。请重试。",
+      "NO_CONNECTION_TITLE": "无连接",
+      "NO_CONNECTION": "此 SQL 没有可打开的连接。"
+    },
+    "CARD_COMPACT": {
+      "SCHEMA": "架构",
+      "CONNECTIONS": "{{count}} 个连接",
+      "VISUAL": "{{type}}图表"
+    },
+    "LAUNCHER": {
+      "OPEN": "询问 AI",
+      "TITLE": "AI 助手",
+      "OPEN_FULL": "打开完整工作区",
+      "VIEW_FULL": "在工作区中查看",
+      "EMPTY": "询问有关数据的问题，或让我为你构建内容。我只能执行你的访问权限所允许的操作。",
+      "MODE_OVERLAY": "以浮层打开",
+      "MODE_PANEL": "停靠到侧边",
+      "NOT_CONFIGURED": "AI 助手尚未为您的组织设置。",
+      "CONFIGURE": "配置 AI",
+      "NAME": "Dex",
+      "TAGLINE": "您的数据副驾驶",
+      "WELCOME_TITLE": "你好，我是 Dex",
+      "WELCOME_BODY": "询问有关数据的问题，或让我构建内容——查询、数据集或图表。我只会执行您的权限允许的操作。",
+      "NOT_CONFIGURED_TITLE": "Dex 尚未设置",
+      "NOT_CONFIGURED_BODY": "管理员需要先连接 AI 提供商，Dex 才能提供帮助。",
+      "TRY": "试试提问",
+      "STARTER_SCHEMA": "解释我的数据库架构",
+      "STARTER_QUERY": "编写 SQL 查询",
+      "STARTER_DATASET": "总结一个数据集"
+    },
+    "PAGE_SUBTITLE": "询问您的数据，或构建查询、数据集和可视化 — 在您的权限范围内。",
+    "HISTORY": "最近的对话",
+    "NO_HISTORY": "尚无对话",
+    "WELCOME_TITLE": "我能帮您做什么？",
+    "WELCOME_SUBTITLE": "询问您的数据、生成 SQL、构建数据集或图表。我只能执行您的权限允许的操作。",
+    "CONTEXT_HINT": "助手知道您所在的页面，以给出更相关的回答。"
   }
 }

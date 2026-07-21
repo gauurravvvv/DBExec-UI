@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   forwardRef,
   Input,
@@ -26,6 +27,9 @@ export class CustomTextareaComponent implements ControlValueAccessor {
   @Input() errorMessage = '';
   @Input() showError = false;
   @Input() rows = 4;
+  /** CSS resize behavior. Default 'vertical' preserves existing usage;
+   *  pass 'none' for a fixed-size box that scrolls internally. */
+  @Input() resize: 'vertical' | 'none' | 'both' | 'horizontal' = 'vertical';
 
   value = '';
   disabled = false;
@@ -33,8 +37,16 @@ export class CustomTextareaComponent implements ControlValueAccessor {
   private onChange: (value: string) => void = () => {};
   private onTouched: () => void = () => {};
 
+  constructor(private cdr: ChangeDetectorRef) {}
+
   writeValue(value: string): void {
     this.value = value || '';
+    // OnPush: a programmatic form write (patchValue/setValue) does not by
+    // itself schedule a change-detection pass, so the <textarea> keeps
+    // showing the old value until the user focuses it. markForCheck makes
+    // programmatic updates — e.g. prefilling the masked SSO cert on load —
+    // render immediately. (Mirrors CustomInputComponent.writeValue.)
+    this.cdr.markForCheck();
   }
 
   registerOnChange(fn: (value: string) => void): void {

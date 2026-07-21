@@ -37,6 +37,10 @@ export const SIDEBAR_ITEMS_ROUTES = [
   { value: 'dashboard', route: '/app/dashboards' },
   { value: 'rlsRules', route: '/app/rls-rules' },
   { value: 'alertManagement', route: '/app/alerts' },
+  // AI Assistant has NO sidebar row — it's reached solely via the floating
+  // launcher bubble (shared app-ai-launcher). The /app/ai-workspace route
+  // still exists (the launcher's "Open full workspace" link navigates to it),
+  // it's just not a nav item.
   // Settings is two tabbed hubs, each ONE route behind ONE permission.
   // The former per-screen entries (announcementManagement, themeManagement,
   // brandingManagement, securityPolicy, emailConfiguration) are now TABS

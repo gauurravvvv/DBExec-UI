@@ -3,28 +3,11 @@
     <div class="page-header">
       <div class="left-section">
         <h2>{{ 'APP_SETTINGS.SECURITY_POLICY.TITLE' | translate }}</h2>
-      </div>
-      <div class="action-buttons">
-        <button
-          *hasPermission="'securityPolicy'; level: 'write'"
-          pButton
-          class="p-button-primary btn-save"
-          type="submit"
-          [label]="'APP_SETTINGS.SECURITY_POLICY.SAVE' | translate"
-          [disabled]="securityForm.invalid || !isFormDirty || saving()"
-          (click)="onSave()"
-        >
-          <i
-            class="pi mr-2"
-            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
-          ></i>
-        </button>
+        <p class="page-subtitle">
+          {{ 'APP_SETTINGS.SECURITY_POLICY.SUBTITLE' | translate }}
+        </p>
       </div>
     </div>
-
-    <p class="page-subtitle">
-      {{ 'APP_SETTINGS.SECURITY_POLICY.SUBTITLE' | translate }}
-    </p>
 
     <app-content-loader
       *ngIf="loading() && securityForm.pristine"

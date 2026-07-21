@@ -34,6 +34,7 @@ export const PERMISSIONS = {
   DASHBOARD: 'dashboard',
   RLS_RULES: 'rlsRules',
   ALERTS: 'alertManagement',
+  AI_WORKSPACE: 'aiWorkspace',
 
   // Audit & Activity
   AUDIT_LOGS: 'auditLogs',

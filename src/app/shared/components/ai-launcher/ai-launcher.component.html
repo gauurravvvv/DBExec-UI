@@ -1,0 +1,273 @@
+<!-- Dex is only surfaced when the org has AI enabled AND configured (the
+     health probe, run at shell load). If AI is off, nothing renders — no
+     bubble, no panel. Admins configure it from System Settings → AI Features,
+     not from here. The aiWorkspace permission still gates who can see it. -->
+<ng-container *hasPermission="'aiWorkspace'; level: 'read'">
+  <ng-container *ngIf="configured()">
+  <button
+    *ngIf="!launcher.isOpen()"
+    type="button"
+    class="ai-fab"
+    [attr.aria-label]="'AI_WORKSPACE.LAUNCHER.OPEN' | translate"
+    [title]="'AI_WORKSPACE.LAUNCHER.OPEN' | translate"
+    (click)="toggle()"
+  >
+    <i class="pi pi-sparkles"></i>
+  </button>
+
+  <!-- Backdrop — only for overlay mode; click to dismiss. -->
+  <div
+    *ngIf="launcher.isOpen() && launcher.mode() === 'overlay'"
+    class="ai-backdrop"
+    (click)="close()"
+  ></div>
+
+  <!-- Docked assistant — two presentation modes: right-sidebar panel or
+       centered overlay. -->
+  <div
+    class="ai-dock"
+    [class.ai-dock--open]="launcher.isOpen()"
+    [class.ai-dock--panel]="launcher.mode() === 'panel'"
+    [class.ai-dock--overlay]="launcher.mode() === 'overlay'"
+    role="dialog"
+    [attr.aria-modal]="launcher.mode() === 'overlay'"
+    [attr.aria-label]="'AI_WORKSPACE.LAUNCHER.TITLE' | translate"
+  >
+    <header class="ai-dock__header">
+      <div class="ai-dock__title">
+        <span class="ai-dock__title-badge">
+          <i class="pi pi-sparkles"></i>
+        </span>
+        <span class="ai-dock__title-meta">
+          <span class="ai-dock__title-text">
+            {{ 'AI_WORKSPACE.LAUNCHER.NAME' | translate }}
+            <span
+              *ngIf="chat.routedAgent()"
+              class="ai-dock__agent"
+              >{{ chat.routedAgent() }}</span
+            >
+          </span>
+          <span class="ai-dock__title-sub">
+            <span
+              class="ai-dock__status-dot"
+              [class.ai-dock__status-dot--on]="configured()"
+              [class.ai-dock__status-dot--off]="!configured()"
+            ></span>
+            {{ 'AI_WORKSPACE.LAUNCHER.TAGLINE' | translate }}
+          </span>
+        </span>
+      </div>
+      <div class="ai-dock__header-actions">
+        <button
+          type="button"
+          class="ai-dock__icon-btn"
+          [title]="
+            (launcher.mode() === 'panel'
+              ? 'AI_WORKSPACE.LAUNCHER.MODE_OVERLAY'
+              : 'AI_WORKSPACE.LAUNCHER.MODE_PANEL'
+            ) | translate
+          "
+          (click)="toggleMode()"
+        >
+          <i
+            class="pi"
+            [class.pi-window-maximize]="launcher.mode() === 'panel'"
+            [class.pi-arrow-right]="launcher.mode() === 'overlay'"
+          ></i>
+        </button>
+        <button
+          type="button"
+          class="ai-dock__icon-btn"
+          [title]="'AI_WORKSPACE.NEW_CHAT' | translate"
+          (click)="newChat()"
+        >
+          <i class="pi pi-plus"></i>
+        </button>
+        <button
+          type="button"
+          class="ai-dock__icon-btn"
+          [title]="'COMMON.CLOSE' | translate"
+          (click)="close()"
+        >
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Transcript -->
+    <div class="ai-dock__thread">
+      <!-- No messages yet — welcome + starter prompts. (Dex only mounts when
+           configured, so there is no not-configured state to handle here.) -->
+      <div
+        *ngIf="chat.isEmpty()"
+        class="ai-hero"
+      >
+        <span class="ai-hero__mark">
+          <i class="pi pi-sparkles"></i>
+        </span>
+        <h3 class="ai-hero__title">
+          {{ 'AI_WORKSPACE.LAUNCHER.WELCOME_TITLE' | translate }}
+        </h3>
+        <p class="ai-hero__body">
+          {{ 'AI_WORKSPACE.LAUNCHER.WELCOME_BODY' | translate }}
+        </p>
+
+        <div class="ai-hero__starters">
+          <span class="ai-hero__starters-label">
+            {{ 'AI_WORKSPACE.LAUNCHER.TRY' | translate }}
+          </span>
+          <button
+            type="button"
+            class="ai-starter"
+            *ngFor="let s of starters"
+            (click)="useStarter(s)"
+          >
+            <i class="pi" [ngClass]="s.icon"></i>
+            <span>{{ s.key | translate }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div
+        class="ai-msg"
+        *ngFor="let m of messages(); trackBy: trackMessage"
+        [class.ai-msg--user]="m.role === 'user'"
+        [class.ai-msg--assistant]="m.role === 'assistant'"
+      >
+        <p class="ai-msg__text" *ngIf="m.text">{{ m.text }}</p>
+
+        <!-- Progress chips while tools run -->
+        <div class="ai-msg__progress" *ngIf="m.progress?.length">
+          <span class="ai-msg__progress-item" *ngFor="let p of m.progress">
+            <i class="pi pi-spin pi-spinner"></i> {{ p }}
+          </span>
+        </div>
+
+        <!-- Compact card views -->
+        <div class="ai-msg__cards" *ngIf="m.cards.length">
+          <ng-container *ngFor="let c of m.cards; trackBy: trackCard">
+            <!-- SQL: copy + open in workspace -->
+            <div class="ai-mini-card ai-mini-card--sql" *ngIf="isSql(c)">
+              <pre class="ai-mini-card__sql">{{ asSql(c).sql }}</pre>
+              <div class="ai-mini-card__actions">
+                <button
+                  type="button"
+                  class="ai-mini-card__btn"
+                  (click)="copySql(asSql(c))"
+                >
+                  {{ 'AI_WORKSPACE.COPY' | translate }}
+                </button>
+                <button
+                  type="button"
+                  class="ai-mini-card__btn"
+                  (click)="openSql(asSql(c))"
+                >
+                  {{ 'AI_WORKSPACE.OPEN_IN_SQL_WORKSPACE' | translate }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Confirm: the write gate -->
+            <div
+              class="ai-mini-card ai-mini-card--confirm"
+              *ngIf="isConfirm(c)"
+            >
+              <p class="ai-mini-card__summary">{{ asConfirm(c).summary }}</p>
+              <p class="ai-mini-card__endpoint">
+                {{ asConfirm(c).method }} {{ asConfirm(c).endpoint }}
+              </p>
+              <p
+                *ngIf="confirmInert(asConfirm(c))"
+                class="ai-mini-card__note"
+              >
+                {{ 'AI_WORKSPACE.CONFIRM_INERT_NOTE' | translate }}
+              </p>
+              <div class="ai-mini-card__actions" *ngIf="!confirmInert(asConfirm(c))">
+                <button
+                  type="button"
+                  class="ai-mini-card__btn ai-mini-card__btn--primary"
+                  (click)="confirm(asConfirm(c))"
+                >
+                  {{ 'AI_WORKSPACE.CONFIRM' | translate }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Dataset draft: save -->
+            <div
+              class="ai-mini-card ai-mini-card--dataset"
+              *ngIf="isDatasetDraft(c)"
+            >
+              <p class="ai-mini-card__summary">{{ asDatasetDraft(c).name }}</p>
+              <pre class="ai-mini-card__sql">{{ asDatasetDraft(c).sql }}</pre>
+              <div
+                class="ai-mini-card__actions"
+                *ngIf="!asDatasetDraft(c).readOnly"
+              >
+                <button
+                  type="button"
+                  class="ai-mini-card__btn ai-mini-card__btn--primary"
+                  (click)="saveDataset(asDatasetDraft(c))"
+                >
+                  {{ 'AI_WORKSPACE.SAVE_AS_DATASET' | translate }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Error -->
+            <div class="ai-mini-card ai-mini-card--error" *ngIf="isError(c)">
+              <i class="pi pi-exclamation-circle"></i>
+              <span>{{ $any(c).message }}</span>
+            </div>
+
+            <!-- Data-heavy cards (grid / schema / chart): compact summary
+                 label. The panel is the only AI surface, so these show a
+                 lean summary rather than a full render (keeps the shell
+                 bundle light). -->
+            <div
+              class="ai-mini-card ai-mini-card--rich"
+              *ngIf="isRichCard(c)"
+            >
+              <i class="pi pi-table ai-mini-card__rich-icon"></i>
+              <span class="ai-mini-card__rich-label">{{ cardLabel(c) }}</span>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compact composer -->
+    <form class="ai-dock__composer" (ngSubmit)="composerSubmit()" autocomplete="off">
+      <textarea
+        class="ai-dock__input"
+        [(ngModel)]="draft"
+        name="ai-launcher-input"
+        rows="1"
+        autocomplete="off"
+        [placeholder]="'AI_WORKSPACE.COMPOSER_PLACEHOLDER' | translate"
+        [disabled]="chat.streaming()"
+        (keydown.enter)="onEnter($event)"
+      ></textarea>
+      <button
+        *ngIf="!chat.streaming()"
+        type="submit"
+        class="ai-dock__send"
+        [disabled]="!draft.trim()"
+        [attr.aria-label]="'AI_WORKSPACE.SEND' | translate"
+        [title]="'AI_WORKSPACE.SEND' | translate"
+      >
+        <i class="pi pi-arrow-up"></i>
+      </button>
+      <button
+        *ngIf="chat.streaming()"
+        type="button"
+        class="ai-dock__send ai-dock__send--stop"
+        [title]="'AI_WORKSPACE.STOP' | translate"
+        (click)="chat.cancel()"
+      >
+        <i class="pi pi-stop-circle"></i>
+      </button>
+    </form>
+  </div>
+  </ng-container>
+</ng-container>

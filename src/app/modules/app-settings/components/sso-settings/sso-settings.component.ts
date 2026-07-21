@@ -5,13 +5,14 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import {
   OrgPolicyService,
   SsoConfigPayload,
 } from '../../services/org-policy.service';
+import { SettingsTabForm } from '../../settings-tab-form';
 
 /**
  * SSO Settings page — Org Admin only. Configures the org's SAML 2.0
@@ -37,7 +38,7 @@ const CERT_MASK = '••••••••••••••••••••�
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SsoSettingsComponent
-  implements OnInit, OnDestroy, HasUnsavedChanges
+  implements OnInit, OnDestroy, HasUnsavedChanges, SettingsTabForm
 {
   ssoForm!: FormGroup;
   loading = this.orgPolicyService.loading;
@@ -57,6 +58,34 @@ export class SsoSettingsComponent
     private cdr: ChangeDetectorRef,
   ) {
     this.initForm();
+    // Issuer / entry point / certificate are only meaningful when SSO is
+    // ON, so their required-ness follows the toggle (same pattern as
+    // branding-settings). When SSO is off the admin can save freely; when
+    // on, all three must be present (matches the BE, which reports
+    // sso-incomplete if enabled with any missing).
+    this.ssoForm
+      .get('ssoEnabled')!
+      .valueChanges.subscribe((enabled) => {
+        this.syncRequiredValidators(!!enabled);
+        // Turning SSO off clears the IdP fields — a disabled config keeps
+        // no issuer / entry point / certificate. (Only fires on a real user
+        // toggle; load patches with emitEvent:false so it never clears on
+        // load.) On save the empty cert string clears the stored ciphertext.
+        if (!enabled) this.clearIdpFields();
+      });
+  }
+
+  /** Blank the three IdP fields + reset the configured badge. */
+  private clearIdpFields(): void {
+    this.ssoForm.patchValue(
+      { ssoIssuer: '', ssoEntryPoint: '', ssoCertificate: '' },
+      { emitEvent: false },
+    );
+    this.certConfigured = false;
+    this.ssoForm.get('ssoIssuer')!.markAsDirty();
+    this.ssoForm.get('ssoEntryPoint')!.markAsDirty();
+    this.ssoForm.get('ssoCertificate')!.markAsDirty();
+    this.cdr.markForCheck();
   }
 
   get isFormDirty(): boolean {
@@ -64,6 +93,14 @@ export class SsoSettingsComponent
   }
   hasUnsavedChanges(): boolean {
     return this.isFormDirty;
+  }
+
+  // SettingsTabForm — lets the hub's single Save button drive this tab.
+  get dirty(): boolean {
+    return this.isFormDirty;
+  }
+  get busy(): boolean {
+    return this.saving();
   }
 
   ngOnInit(): void {
@@ -78,9 +115,40 @@ export class SsoSettingsComponent
     this.ssoForm = this.fb.group({
       ssoEnabled: [false],
       ssoIssuer: [''],
-      ssoEntryPoint: [''],
+      // Entry point is always URL-shaped when present (Azure gives a
+      // https://login.microsoftonline.com/<tenant>/saml2 URL). Required-ness
+      // is layered on by syncRequiredValidators when SSO is enabled.
+      ssoEntryPoint: ['', [Validators.pattern(/^https?:\/\/.+/i)]],
       ssoCertificate: [''],
     });
+  }
+
+  /**
+   * Add / remove the `required` validator on the three IdP fields as the
+   * SSO toggle flips. Issuer is a free-form identifier (e.g. "UAN-DEV-API"),
+   * entry point keeps its URL-shape check plus required, certificate is the
+   * PEM (or the stored mask). emitEvent:false so re-validating doesn't loop
+   * back through the toggle subscription.
+   */
+  private syncRequiredValidators(enabled: boolean): void {
+    const issuer = this.ssoForm.get('ssoIssuer')!;
+    const entry = this.ssoForm.get('ssoEntryPoint')!;
+    const cert = this.ssoForm.get('ssoCertificate')!;
+    if (enabled) {
+      issuer.setValidators([Validators.required]);
+      entry.setValidators([
+        Validators.required,
+        Validators.pattern(/^https?:\/\/.+/i),
+      ]);
+      cert.setValidators([Validators.required]);
+    } else {
+      issuer.clearValidators();
+      entry.setValidators([Validators.pattern(/^https?:\/\/.+/i)]);
+      cert.clearValidators();
+    }
+    issuer.updateValueAndValidity({ emitEvent: false });
+    entry.updateValueAndValidity({ emitEvent: false });
+    cert.updateValueAndValidity({ emitEvent: false });
   }
 
   private async loadPolicy(): Promise<void> {
@@ -104,6 +172,9 @@ export class SsoSettingsComponent
       },
       { emitEvent: false },
     );
+    // patchValue with emitEvent:false skips the toggle subscription, so
+    // apply the required-validators to match the loaded enabled state.
+    this.syncRequiredValidators(!!data.ssoEnabled);
     this.ssoForm.markAsPristine();
     this.cdr.markForCheck();
   }

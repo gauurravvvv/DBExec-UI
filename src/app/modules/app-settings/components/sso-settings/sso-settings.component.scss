@@ -15,6 +15,18 @@
     }
   }
 
+  // Certificate box: fixed height, scroll INSIDE — never let the user drag
+  // it taller/wider (the PEM is long; a scroll keeps the form layout stable).
+  .cert-textarea ::ng-deep textarea {
+    height: 160px;
+    max-height: 160px;
+    overflow: auto;
+    resize: none;
+    font-family: var(--font-mono, monospace);
+    font-size: var(--fs-label);
+    white-space: pre;
+  }
+
   .secret-field {
     display: flex;
     flex-direction: column;
@@ -31,6 +43,24 @@
 
       i {
         font-size: var(--fs-body);
+      }
+    }
+
+    // Guidance under the certificate box: paste as a single line, no
+    // spaces / newlines. A single-line paste can't be clipped by
+    // line-break mangling — the common cause of an invalid stored cert.
+    .cert-note {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-2);
+      color: var(--text-muted);
+      font-size: var(--fs-label);
+      line-height: 1.4;
+
+      i {
+        margin-top: 1px;
+        color: var(--primary-color);
+        font-size: var(--fs-control);
       }
     }
   }

@@ -1,28 +1,242 @@
-// System Settings hub — thin tab shell (identical to the App Settings
-// hub). Each child owns its own page padding, so the panel body gets
-// none here to avoid double spacing. Tokens only.
-.settings-hub {
+// System Settings hub — one parent card: heading, a polished tab strip, then
+// the active tab's content. The children are standalone pages, so we flatten
+// them into the tab: strip their card chrome, drop their redundant page-title
+// (the tab already names the section), and let the tab-panel own ONE
+// consistent padding so nothing double-pads. Mirrors the App Settings hub.
+:host {
+  display: block;
   height: 100%;
+}
+
+.settings-page-wrapper {
   display: flex;
   flex-direction: column;
+  height: 100%;
   min-height: 0;
+}
 
+.settings-content-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.content-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+
+  // Hub page heading — inside the card, above the tabs.
+  .page-header-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 0 0 auto;
+    padding: var(--space-5) var(--space-7);
+
+    h2 {
+      margin: 0;
+      font-size: var(--fs-h2);
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
+    }
+  }
+
+  // ── Polished tab strip ────────────────────────────────────────────
   ::ng-deep .p-tabview {
-    height: 100%;
+    flex: 1;
     display: flex;
     flex-direction: column;
     min-height: 0;
+
+    .p-tabview-nav-container {
+      flex: 0 0 auto;
+    }
+
+    .p-tabview-nav {
+      padding: 0 var(--space-7);
+      gap: var(--space-1);
+      border-bottom: 1px solid var(--border-color);
+      background: transparent;
+
+      li .p-tabview-nav-link {
+        margin: 0;
+        padding: var(--space-4) var(--space-4);
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        color: var(--text-muted);
+        font-size: var(--fs-control);
+        font-weight: var(--fw-medium);
+        transition:
+          color var(--motion-fast) ease,
+          border-color var(--motion-fast) ease;
+
+        &:not(.p-disabled):focus {
+          box-shadow: none;
+        }
+
+        &:hover {
+          color: var(--text-color);
+        }
+      }
+
+      li.p-highlight .p-tabview-nav-link {
+        color: var(--primary-color);
+        border-bottom-color: var(--primary-color);
+        font-weight: var(--fw-semibold);
+      }
+    }
 
     .p-tabview-panels {
       flex: 1;
       min-height: 0;
       overflow: auto;
-      padding: 0;
+      // ONE source of padding for every tab's content.
+      padding: var(--space-7);
       background: transparent;
     }
 
     .p-tabview-panel {
       height: 100%;
+    }
+  }
+
+  // ── Flatten each child page into the tab (no card-in-card, no double
+  //    padding, no redundant page title) ─────────────────────────────
+  ::ng-deep .add-admin-wrapper,
+  ::ng-deep .dataset-page-wrapper {
+    height: 100%;
+    padding: 0;
+  }
+
+  ::ng-deep .add-admin-container,
+  ::ng-deep .dataset-content-container {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+    height: 100%;
+  }
+
+  // The child's own page-title <h2> is redundant here — the tab already
+  // labels the section. Hide the title but KEEP the header row so any
+  // tab-local actions and the child's descriptive subtitle stay visible.
+  // (The single Save now lives in the hub header, not per-tab.)
+  ::ng-deep .add-admin-container .page-header,
+  ::ng-deep .dataset-content-container .page-header-section {
+    padding: 0;
+    min-height: 0;
+
+    > .left-section > h2,
+    > .header-content > h2 {
+      display: none;
+    }
+
+    // Subtitle carries the section description under the tab strip.
+    .page-subtitle {
+      margin: 0 0 var(--space-5);
+      font-size: var(--fs-control);
+      color: var(--text-muted);
+    }
+  }
+
+  // Header rows that still show something (subtitle and/or actions) get
+  // breathing room below; a header whose only child was the now-hidden title
+  // must NOT leave a phantom gap, so margin is applied to the visible pieces.
+  ::ng-deep .add-admin-container .page-header:has(> .action-buttons),
+  ::ng-deep
+    .dataset-content-container
+    .page-header-section:has(> .header-actions) {
+    margin-bottom: var(--space-5);
+  }
+
+  // A child with nothing left to show collapses cleanly.
+  ::ng-deep .dataset-content-container .page-header-section:empty,
+  ::ng-deep .add-admin-container .page-header:empty {
+    display: none;
+    margin: 0;
+  }
+
+  // ── Unified settings-form polish ──────────────────────────────────
+  // Every tab's form reads identically from ONE source: a calm vertical
+  // rhythm, one control per row at a comfortable reading width, clean
+  // section grouping, and consistent secret-field / configured chrome.
+  // (The individual tab SCSS files still define their component-specific
+  // bits — colour swatches, provider toggle — this only unifies the shared
+  // scaffolding so no tab looks hand-rolled.)
+  ::ng-deep .admin-form {
+    // Drop the top margin some children add (mt-4) — the header/subtitle
+    // above already spaces the form.
+    margin-top: 0;
+
+    // One control per row, comfortable width. Overrides each child's own
+    // grid/column so SSO, Email, Security, AI, Theme, Branding all match.
+    .form-grid,
+    .form-column {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+      width: 100%;
+      max-width: 520px;
+      padding-bottom: 0;
+    }
+
+    // Sectioned tabs (Email) — group blocks get even vertical rhythm and a
+    // hairline-led section label so the form scans as distinct steps.
+    .form-group-section {
+      margin-bottom: var(--space-7);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .group-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid var(--border-color);
+      font-size: var(--fs-control);
+      font-weight: var(--fw-semibold);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+
+      i {
+        color: var(--primary-color);
+        font-size: var(--fs-body);
+      }
+    }
+
+    // Section labels used by AI Features (h3.section-label) get the same
+    // treatment as .group-header so the tabs are visually consistent.
+    .section-label {
+      margin: var(--space-6) 0 var(--space-4);
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid var(--border-color);
+      font-size: var(--fs-control);
+      font-weight: var(--fw-semibold);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    // A hint line under a field (AI accuracy, etc.).
+    .field-hint {
+      margin: calc(var(--space-3) * -1 + 2px) 0 0;
+      font-size: var(--fs-label);
+      color: var(--text-muted);
     }
   }
 }

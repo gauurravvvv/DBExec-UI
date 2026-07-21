@@ -24,6 +24,10 @@ export enum StorageType {
   RELAY_FIRST_NAME = 'relay-first-name',
   RELAY_LAST_NAME = 'relay-last-name',
   RELAY_IS_FIRST_LOGIN = 'relay-is-first-login',
+  // Whether the org's AI assistant (Dex) is fully configured, from the login
+  // response. Lets the launcher gate at session build without a separate
+  // /ai/health round-trip. 'true' | 'false'.
+  AI_CONFIGURED = 'ai-configured',
 }
 
 export enum SessionStorageType {

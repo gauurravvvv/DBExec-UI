@@ -129,6 +129,13 @@ export class LoginService implements OnDestroy {
       StorageType.RELAY_IS_FIRST_LOGIN,
       u.isFirstLogin ? 'true' : 'false',
     );
+    // Whether Dex (AI assistant) is fully configured for this org — decided
+    // server-side at session build so the launcher can gate itself without a
+    // separate /ai/health round-trip.
+    StorageService.set(
+      StorageType.AI_CONFIGURED,
+      u.aiConfigured ? 'true' : 'false',
+    );
 
     // Apply the user's saved locale immediately so the relay's
     // greeting and status copy render in the right language from

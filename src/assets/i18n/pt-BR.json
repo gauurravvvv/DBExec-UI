@@ -47,7 +47,8 @@
     "alertManagement": "Alertas",
     "systemSettings": "Configurações do sistema",
     "ssoConfiguration": "Configuração de SSO",
-    "aiFeatures": "Recursos de IA"
+    "aiFeatures": "Recursos de IA",
+    "aiWorkspace": "Assistente de IA"
   },
   "COMMON": {
     "ACTIVE": "Ativo",
@@ -2222,7 +2223,8 @@
     "QUERY_RUNNER": "Espaço de trabalho SQL",
     "EMBED_DASHBOARD": "Dashboard",
     "NOTIFICATIONS": "Notificações",
-    "USER_ACTIVITY": "Atividade"
+    "USER_ACTIVITY": "Atividade",
+    "AI_WORKSPACE": "Assistente de IA"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Eleve sua experiência de\ngerenciamento de fontes de dados",
@@ -2302,17 +2304,17 @@
       "ESC_CONFIRM": "Pressione Esc novamente para cancelar"
     },
     "SSO": {
-      "SIGN_IN_WITH_SSO": "Entrar com SSO",
-      "SIGN_IN_WITH_CREDENTIALS": "Entrar com credenciais",
+      "SIGN_IN_WITH_SSO": "Continuar com SSO",
+      "SIGN_IN_WITH_CREDENTIALS": "Entrar com senha",
       "USE_SSO": "Usar logon único",
-      "REDIRECTING": "Redirecionando para o seu provedor de identidade…",
-      "COMPLETING": "Concluindo o logon único…",
-      "VERIFYING": "Verificando sua resposta de logon único…",
-      "FAILED": "Falha no logon único. Por favor, tente novamente.",
-      "NO_RESPONSE": "Resposta de logon único ausente. Tente novamente na tela de login.",
-      "BACK_TO_LOGIN": "Voltar ao login",
-      "CARD_TITLE": "Entrando via SSO",
-      "CARD_SUBTITLE": "Finalizando — isso leva só um momento."
+      "REDIRECTING": "Redirecionando…",
+      "COMPLETING": "Conectando você…",
+      "VERIFYING": "Verificando sua identidade…",
+      "FAILED": "Não foi possível conectar você. Tente novamente.",
+      "NO_RESPONSE": "Seu link de acesso expirou ou é inválido. Comece novamente.",
+      "BACK_TO_LOGIN": "Voltar para o login",
+      "CARD_TITLE": "Conectando você",
+      "CARD_SUBTITLE": "Só um momento enquanto concluímos o acesso."
     }
   },
   "PASSWORD": {
@@ -3903,11 +3905,12 @@
       "SUBTITLE": "Configure o logon único SAML para que esta organização possa entrar por meio de seu provedor de identidade.",
       "ENABLED": "Habilitar logon único",
       "ISSUER": "Emissor / ID da entidade",
-      "ISSUER_PLACEHOLDER": "ex. https://your-app.example.com/saml/metadata",
+      "ISSUER_PLACEHOLDER": "ex.: UAN-DEV-API",
       "ENTRY_POINT": "URL de login do IdP",
-      "ENTRY_POINT_PLACEHOLDER": "ex. https://idp.example.com/sso/saml",
+      "ENTRY_POINT_PLACEHOLDER": "ex.: https://login.microsoftonline.com/<tenant-id>/saml2",
       "CERTIFICATE": "Certificado do IdP (PEM)",
-      "CERTIFICATE_PLACEHOLDER": "Cole o certificado de assinatura do provedor de identidade (PEM)",
+      "CERTIFICATE_PLACEHOLDER": "Cole o certificado Base64 em uma única linha (sem espaços nem quebras de linha)",
+      "CERTIFICATE_NOTE": "Cole o certificado em uma única linha — sem espaços nem quebras de linha. Copie o valor Base64 completo do seu provedor de identidade.",
       "CONFIGURED": "Configurado",
       "SAVE": "Salvar alterações",
       "SAVED": "Configuração de logon único atualizada"
@@ -3915,7 +3918,26 @@
     "AI_FEATURES": {
       "COMING_SOON": "Os recursos de IA chegarão em breve",
       "BLURB": "Consultas em linguagem natural, insights automatizados e sugestões inteligentes chegarão em uma versão futura.",
-      "BADGE": "Em breve"
+      "BADGE": "Em breve",
+      "TITLE": "Recursos de IA",
+      "SUBTITLE": "Conecte um provedor de IA para ativar o assistente integrado.",
+      "SECTION_MODEL": "Modelo",
+      "ENABLED": "Ativar assistente de IA",
+      "PROVIDER": "Provedor",
+      "PROVIDER_PLACEHOLDER": "ex.: OpenAI",
+      "BASE_URL": "URL base",
+      "BASE_URL_PLACEHOLDER": "https://api.openai.com/v1",
+      "MODEL": "Modelo",
+      "MODEL_PLACEHOLDER": "ex.: gpt-4o-mini",
+      "ACCURACY": "Precisão",
+      "ACCURACY_HINT": "Quanto menor, mais preciso e reproduzível; quanto maior, mais criativo.",
+      "API_KEY": "Chave de API",
+      "API_KEY_PLACEHOLDER": "Insira a chave de API do provedor",
+      "CONFIGURED": "Uma chave está configurada",
+      "SAVE": "Salvar",
+      "REQUIRED": "Este campo é obrigatório",
+      "BASE_URL_INVALID": "Insira uma URL válida começando com http:// ou https://",
+      "ACCURACY_INVALID": "Insira um valor entre 0 e 1"
     }
   },
   "PERMISSIONS": {
@@ -5231,5 +5253,85 @@
     "REVOKED": "Acesso removido",
     "REVOKE_FAILED": "Falha ao remover o acesso",
     "VIEW_ONLY_HINT": "Os destinatários recebem acesso de visualização"
+  },
+  "AI_WORKSPACE": {
+    "NEW_CHAT": "Novo chat",
+    "UNTITLED_CHAT": "Chat sem título",
+    "CONTEXT": "Contexto",
+    "CURRENT_SCREEN": "Tela atual",
+    "COMPOSER_PLACEHOLDER": "Pergunte sobre seus dados ou peça para eu criar algo…",
+    "SEND": "Enviar",
+    "STOP": "Parar",
+    "COPY": "Copiar",
+    "COPIED": "Copiado",
+    "OPEN_IN_SQL_WORKSPACE": "Abrir no espaço de trabalho SQL",
+    "ROWS": "{{count}} linhas",
+    "TRUNCATED": "Resultados truncados",
+    "ITEMS": "{{count}} itens",
+    "DEFAULT": "Padrão",
+    "NOT_RUNNABLE": "Não executável",
+    "EXISTING_DATASET": "Conjunto de dados existente",
+    "SAVE_AS_DATASET": "Salvar como conjunto de dados",
+    "ADD_TO_ANALYSIS": "Adicionar à análise",
+    "X_AXIS": "Eixo X",
+    "Y_AXIS": "Eixo Y",
+    "CONFIRM": "Confirmar",
+    "DISMISS": "Dispensar",
+    "DISMISSED": "Dispensado",
+    "CONFIRM_INERT_NOTE": "Esta proposta é de uma mensagem anterior. Pergunte novamente para executá-la.",
+    "STARTERS": {
+      "LIST_CONNECTIONS": "Listar minhas conexões",
+      "EXPLAIN_SCHEMA": "Explicar este esquema",
+      "WRITE_QUERY": "Escrever uma consulta para mim",
+      "BUILD_DATASET": "Criar um conjunto de dados",
+      "TOP_ROWS": "Mostrar as primeiras linhas",
+      "ADD_BAR_CHART": "Adicionar um gráfico de barras",
+      "SUMMARISE_DATASET": "Resumir este conjunto de dados",
+      "CREATE_USER": "Criar um usuário",
+      "LIST_USERS": "Listar usuários"
+    },
+    "APPLY": {
+      "DONE_TITLE": "Concluído",
+      "CONFIRMED": "Confirmado: {{summary}}",
+      "DATASET_SAVED_TITLE": "Conjunto de dados salvo",
+      "DATASET_SAVED": "Conjunto de dados \"{{name}}\" salvo.",
+      "ANALYSIS_HANDOFF": "Conjunto de dados \"{{name}}\" salvo — abrindo-o para que você possa criar a análise.",
+      "FAILED_TITLE": "Não foi possível concluir",
+      "FAILED": "Não foi possível concluir a ação. Tente novamente.",
+      "NO_CONNECTION_TITLE": "Sem conexão",
+      "NO_CONNECTION": "Este SQL não tem nenhuma conexão para abrir."
+    },
+    "CARD_COMPACT": {
+      "SCHEMA": "Esquema",
+      "CONNECTIONS": "{{count}} conexões",
+      "VISUAL": "Gráfico {{type}}"
+    },
+    "LAUNCHER": {
+      "OPEN": "Perguntar à IA",
+      "TITLE": "Assistente de IA",
+      "OPEN_FULL": "Abrir o espaço de trabalho completo",
+      "VIEW_FULL": "Ver no espaço de trabalho",
+      "EMPTY": "Pergunte sobre seus dados ou peça para eu criar algo. Só posso fazer o que suas permissões de acesso permitem.",
+      "MODE_OVERLAY": "Abrir como sobreposição",
+      "MODE_PANEL": "Fixar na lateral",
+      "NOT_CONFIGURED": "O assistente de IA ainda não está configurado para a sua organização.",
+      "CONFIGURE": "Configurar IA",
+      "NAME": "Dex",
+      "TAGLINE": "Seu copiloto de dados",
+      "WELCOME_TITLE": "Oi, eu sou o Dex",
+      "WELCOME_BODY": "Pergunte sobre seus dados ou peça para eu criar algo — uma consulta, um conjunto de dados, um gráfico. Só faço o que suas permissões permitem.",
+      "NOT_CONFIGURED_TITLE": "O Dex ainda não está configurado",
+      "NOT_CONFIGURED_BODY": "Um administrador precisa conectar um provedor de IA antes que o Dex possa ajudar.",
+      "TRY": "Experimente perguntar",
+      "STARTER_SCHEMA": "Explique o esquema do meu banco de dados",
+      "STARTER_QUERY": "Escreva uma consulta SQL",
+      "STARTER_DATASET": "Resuma um conjunto de dados"
+    },
+    "PAGE_SUBTITLE": "Pergunte sobre seus dados ou crie consultas, conjuntos de dados e visuais — dentro do seu acesso.",
+    "HISTORY": "Conversas recentes",
+    "NO_HISTORY": "Ainda não há conversas",
+    "WELCOME_TITLE": "Como posso ajudar?",
+    "WELCOME_SUBTITLE": "Pergunte sobre seus dados, gere SQL, crie um conjunto de dados ou um gráfico. Só posso fazer o que seu acesso permite.",
+    "CONTEXT_HINT": "O assistente sabe em qual tela você está para dar respostas mais relevantes."
   }
 }

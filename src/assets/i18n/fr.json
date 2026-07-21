@@ -47,7 +47,8 @@
     "alertManagement": "Alertes",
     "systemSettings": "Paramètres système",
     "ssoConfiguration": "Configuration SSO",
-    "aiFeatures": "Fonctionnalités IA"
+    "aiFeatures": "Fonctionnalités IA",
+    "aiWorkspace": "Assistant IA"
   },
   "COMMON": {
     "ACTIVE": "Actif",
@@ -2222,7 +2223,8 @@
     "QUERY_RUNNER": "Espace de travail SQL",
     "EMBED_DASHBOARD": "Tableau de bord",
     "NOTIFICATIONS": "Notifications",
-    "USER_ACTIVITY": "Activité"
+    "USER_ACTIVITY": "Activité",
+    "AI_WORKSPACE": "Assistant IA"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Améliorez votre expérience\nde gestion de sources de données",
@@ -2302,17 +2304,17 @@
       "ESC_CONFIRM": "Appuyez à nouveau sur Échap pour annuler"
     },
     "SSO": {
-      "SIGN_IN_WITH_SSO": "Se connecter avec SSO",
-      "SIGN_IN_WITH_CREDENTIALS": "Se connecter avec des identifiants",
+      "SIGN_IN_WITH_SSO": "Continuer avec le SSO",
+      "SIGN_IN_WITH_CREDENTIALS": "Se connecter avec un mot de passe",
       "USE_SSO": "Utiliser l'authentification unique",
-      "REDIRECTING": "Redirection vers votre fournisseur d'identité…",
-      "COMPLETING": "Finalisation de l'authentification unique…",
-      "VERIFYING": "Vérification de votre réponse d'authentification unique…",
-      "FAILED": "L'authentification unique a échoué. Veuillez réessayer.",
-      "NO_RESPONSE": "Réponse d'authentification unique manquante. Veuillez réessayer depuis l'écran de connexion.",
+      "REDIRECTING": "Redirection…",
+      "COMPLETING": "Connexion en cours…",
+      "VERIFYING": "Vérification de votre identité…",
+      "FAILED": "La connexion a échoué. Veuillez réessayer.",
+      "NO_RESPONSE": "Votre lien de connexion a expiré ou n'est pas valide. Veuillez recommencer.",
       "BACK_TO_LOGIN": "Retour à la connexion",
-      "CARD_TITLE": "Connexion via SSO",
-      "CARD_SUBTITLE": "Finalisation — cela ne prend qu'un instant."
+      "CARD_TITLE": "Connexion en cours",
+      "CARD_SUBTITLE": "Un instant, nous finalisons la connexion."
     }
   },
   "PASSWORD": {
@@ -3903,11 +3905,12 @@
       "SUBTITLE": "Configurez l'authentification unique SAML pour que cette organisation puisse se connecter via son fournisseur d'identité.",
       "ENABLED": "Activer l'authentification unique",
       "ISSUER": "Émetteur / ID d'entité",
-      "ISSUER_PLACEHOLDER": "ex. https://your-app.example.com/saml/metadata",
+      "ISSUER_PLACEHOLDER": "p. ex. UAN-DEV-API",
       "ENTRY_POINT": "URL de connexion de l'IdP",
-      "ENTRY_POINT_PLACEHOLDER": "ex. https://idp.example.com/sso/saml",
+      "ENTRY_POINT_PLACEHOLDER": "p. ex. https://login.microsoftonline.com/<tenant-id>/saml2",
       "CERTIFICATE": "Certificat de l'IdP (PEM)",
-      "CERTIFICATE_PLACEHOLDER": "Collez le certificat de signature du fournisseur d'identité (PEM)",
+      "CERTIFICATE_PLACEHOLDER": "Collez le certificat Base64 sur une seule ligne (sans espaces ni sauts de ligne)",
+      "CERTIFICATE_NOTE": "Collez le certificat sur une seule ligne, sans espaces ni sauts de ligne. Copiez la valeur Base64 complète depuis votre fournisseur d’identité.",
       "CONFIGURED": "Configuré",
       "SAVE": "Enregistrer les modifications",
       "SAVED": "Configuration de l'authentification unique mise à jour"
@@ -3915,7 +3918,26 @@
     "AI_FEATURES": {
       "COMING_SOON": "Les fonctionnalités IA arrivent bientôt",
       "BLURB": "Les requêtes en langage naturel, les analyses automatisées et les suggestions intelligentes arriveront dans une prochaine version.",
-      "BADGE": "Bientôt disponible"
+      "BADGE": "Bientôt disponible",
+      "TITLE": "Fonctionnalités IA",
+      "SUBTITLE": "Connectez un fournisseur d'IA pour alimenter l'assistant intégré.",
+      "SECTION_MODEL": "Modèle",
+      "ENABLED": "Activer l'assistant IA",
+      "PROVIDER": "Fournisseur",
+      "PROVIDER_PLACEHOLDER": "p. ex. OpenAI",
+      "BASE_URL": "URL de base",
+      "BASE_URL_PLACEHOLDER": "https://api.openai.com/v1",
+      "MODEL": "Modèle",
+      "MODEL_PLACEHOLDER": "p. ex. gpt-4o-mini",
+      "ACCURACY": "Précision",
+      "ACCURACY_HINT": "Plus la valeur est basse, plus le résultat est précis et reproductible ; plus elle est élevée, plus il est créatif.",
+      "API_KEY": "Clé API",
+      "API_KEY_PLACEHOLDER": "Saisissez la clé API du fournisseur",
+      "CONFIGURED": "Une clé est configurée",
+      "SAVE": "Enregistrer",
+      "REQUIRED": "Ce champ est obligatoire",
+      "BASE_URL_INVALID": "Saisissez une URL valide commençant par http:// ou https://",
+      "ACCURACY_INVALID": "Saisissez une valeur entre 0 et 1"
     }
   },
   "PERMISSIONS": {
@@ -5231,5 +5253,85 @@
     "REVOKED": "Accès retiré",
     "REVOKE_FAILED": "Échec du retrait de l'accès",
     "VIEW_ONLY_HINT": "Les destinataires obtiennent un accès en lecture"
+  },
+  "AI_WORKSPACE": {
+    "NEW_CHAT": "Nouvelle discussion",
+    "UNTITLED_CHAT": "Discussion sans titre",
+    "CONTEXT": "Contexte",
+    "CURRENT_SCREEN": "Écran actuel",
+    "COMPOSER_PLACEHOLDER": "Posez une question sur vos données ou demandez-moi de créer quelque chose…",
+    "SEND": "Envoyer",
+    "STOP": "Arrêter",
+    "COPY": "Copier",
+    "COPIED": "Copié",
+    "OPEN_IN_SQL_WORKSPACE": "Ouvrir dans l'espace de travail SQL",
+    "ROWS": "{{count}} lignes",
+    "TRUNCATED": "Résultats tronqués",
+    "ITEMS": "{{count}} éléments",
+    "DEFAULT": "Par défaut",
+    "NOT_RUNNABLE": "Non exécutable",
+    "EXISTING_DATASET": "Jeu de données existant",
+    "SAVE_AS_DATASET": "Enregistrer comme jeu de données",
+    "ADD_TO_ANALYSIS": "Ajouter à l'analyse",
+    "X_AXIS": "Axe X",
+    "Y_AXIS": "Axe Y",
+    "CONFIRM": "Confirmer",
+    "DISMISS": "Ignorer",
+    "DISMISSED": "Ignoré",
+    "CONFIRM_INERT_NOTE": "Cette proposition provient d'un message précédent. Redemandez pour l'exécuter.",
+    "STARTERS": {
+      "LIST_CONNECTIONS": "Lister mes connexions",
+      "EXPLAIN_SCHEMA": "Expliquer ce schéma",
+      "WRITE_QUERY": "Écrire une requête pour moi",
+      "BUILD_DATASET": "Créer un jeu de données",
+      "TOP_ROWS": "Afficher les premières lignes",
+      "ADD_BAR_CHART": "Ajouter un graphique à barres",
+      "SUMMARISE_DATASET": "Résumer ce jeu de données",
+      "CREATE_USER": "Créer un utilisateur",
+      "LIST_USERS": "Lister les utilisateurs"
+    },
+    "APPLY": {
+      "DONE_TITLE": "Terminé",
+      "CONFIRMED": "Confirmé : {{summary}}",
+      "DATASET_SAVED_TITLE": "Jeu de données enregistré",
+      "DATASET_SAVED": "Jeu de données \"{{name}}\" enregistré.",
+      "ANALYSIS_HANDOFF": "Jeu de données \"{{name}}\" enregistré — ouverture en cours pour que vous puissiez créer l'analyse.",
+      "FAILED_TITLE": "Impossible de terminer",
+      "FAILED": "L'action n'a pas pu être terminée. Veuillez réessayer.",
+      "NO_CONNECTION_TITLE": "Aucune connexion",
+      "NO_CONNECTION": "Ce SQL n'a aucune connexion à ouvrir."
+    },
+    "CARD_COMPACT": {
+      "SCHEMA": "Schéma",
+      "CONNECTIONS": "{{count}} connexions",
+      "VISUAL": "Graphique {{type}}"
+    },
+    "LAUNCHER": {
+      "OPEN": "Demander à l'IA",
+      "TITLE": "Assistant IA",
+      "OPEN_FULL": "Ouvrir l'espace de travail complet",
+      "VIEW_FULL": "Afficher dans l'espace de travail",
+      "EMPTY": "Posez une question sur vos données ou demandez-moi de créer quelque chose. Je ne peux faire que ce que vos droits d'accès autorisent.",
+      "MODE_OVERLAY": "Ouvrir en superposition",
+      "MODE_PANEL": "Ancrer sur le côté",
+      "NOT_CONFIGURED": "L'assistant IA n'est pas encore configuré pour votre organisation.",
+      "CONFIGURE": "Configurer l'IA",
+      "NAME": "Dex",
+      "TAGLINE": "Votre copilote de données",
+      "WELCOME_TITLE": "Bonjour, je suis Dex",
+      "WELCOME_BODY": "Posez une question sur vos données ou demandez-moi de créer quelque chose : une requête, un jeu de données, un graphique. Je ne fais que ce que vos droits autorisent.",
+      "NOT_CONFIGURED_TITLE": "Dex n’est pas encore configuré",
+      "NOT_CONFIGURED_BODY": "Un administrateur doit connecter un fournisseur d’IA avant que Dex puisse vous aider.",
+      "TRY": "Essayez de demander",
+      "STARTER_SCHEMA": "Explique le schéma de ma base de données",
+      "STARTER_QUERY": "Écris une requête SQL",
+      "STARTER_DATASET": "Résume un jeu de données"
+    },
+    "PAGE_SUBTITLE": "Posez des questions sur vos données ou créez des requêtes, jeux de données et visuels — dans la limite de vos accès.",
+    "HISTORY": "Discussions récentes",
+    "NO_HISTORY": "Aucune conversation pour le moment",
+    "WELCOME_TITLE": "Comment puis-je aider ?",
+    "WELCOME_SUBTITLE": "Posez des questions sur vos données, générez du SQL, créez un jeu de données ou un graphique. Je ne peux faire que ce que vos accès autorisent.",
+    "CONTEXT_HINT": "L'assistant sait sur quel écran vous êtes pour donner des réponses plus pertinentes."
   }
 }

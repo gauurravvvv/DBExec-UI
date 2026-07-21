@@ -27,6 +27,7 @@ import { CustomToggleComponent } from './components/custom-toggle/custom-toggle.
 import { CommandModalComponent } from './components/command-modal/command-modal.component';
 import { GlobalSearchComponent } from './components/global-search/global-search.component';
 import { NotificationModalComponent } from './components/notification-modal/notification-modal.component';
+import { AiLauncherComponent } from './components/ai-launcher/ai-launcher.component';
 import { AppPrimeNGModule } from './modules/app-primeng.module';
 import { FileSizePipe } from './pipes/file-size.pipe';
 import {
@@ -59,6 +60,7 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     CommandModalComponent,
     GlobalSearchComponent,
     NotificationModalComponent,
+    AiLauncherComponent,
     AddCustomFieldDialogComponent,
     CalculatedFieldsDialogComponent,
     SaveAnalysesDialogComponent,
@@ -103,6 +105,7 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     CommandModalComponent,
     GlobalSearchComponent,
     NotificationModalComponent,
+    AiLauncherComponent,
     AddCustomFieldDialogComponent,
     CalculatedFieldsDialogComponent,
     SaveAnalysesDialogComponent,

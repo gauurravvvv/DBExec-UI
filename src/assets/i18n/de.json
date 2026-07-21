@@ -47,7 +47,8 @@
     "alertManagement": "Warnungen",
     "systemSettings": "Systemeinstellungen",
     "ssoConfiguration": "SSO-Konfiguration",
-    "aiFeatures": "KI-Funktionen"
+    "aiFeatures": "KI-Funktionen",
+    "aiWorkspace": "KI-Assistent"
   },
   "COMMON": {
     "ACTIVE": "Aktiv",
@@ -2222,7 +2223,8 @@
     "QUERY_RUNNER": "SQL-Arbeitsbereich",
     "EMBED_DASHBOARD": "Dashboard",
     "NOTIFICATIONS": "Benachrichtigungen",
-    "USER_ACTIVITY": "Aktivität"
+    "USER_ACTIVITY": "Aktivität",
+    "AI_WORKSPACE": "KI-Assistent"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Verbessern Sie Ihr Datenquellen-\nManagement-Erlebnis",
@@ -2302,17 +2304,17 @@
       "ESC_CONFIRM": "Esc erneut drücken zum Abbrechen"
     },
     "SSO": {
-      "SIGN_IN_WITH_SSO": "Mit SSO anmelden",
-      "SIGN_IN_WITH_CREDENTIALS": "Mit Anmeldedaten anmelden",
+      "SIGN_IN_WITH_SSO": "Mit SSO fortfahren",
+      "SIGN_IN_WITH_CREDENTIALS": "Mit Passwort anmelden",
       "USE_SSO": "Single Sign-On verwenden",
-      "REDIRECTING": "Weiterleitung zu Ihrem Identitätsanbieter…",
-      "COMPLETING": "Single Sign-On wird abgeschlossen…",
-      "VERIFYING": "Ihre Single-Sign-On-Antwort wird überprüft…",
-      "FAILED": "Single Sign-On fehlgeschlagen. Bitte versuchen Sie es erneut.",
-      "NO_RESPONSE": "Single-Sign-On-Antwort fehlt. Bitte versuchen Sie es erneut über den Anmeldebildschirm.",
+      "REDIRECTING": "Weiterleitung…",
+      "COMPLETING": "Sie werden angemeldet…",
+      "VERIFYING": "Ihre Identität wird überprüft…",
+      "FAILED": "Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "NO_RESPONSE": "Ihr Anmeldelink ist abgelaufen oder ungültig. Bitte erneut starten.",
       "BACK_TO_LOGIN": "Zurück zur Anmeldung",
-      "CARD_TITLE": "Anmeldung über SSO",
-      "CARD_SUBTITLE": "Fast fertig — das dauert nur einen Moment."
+      "CARD_TITLE": "Sie werden angemeldet",
+      "CARD_SUBTITLE": "Einen Moment, wir schließen die Anmeldung ab."
     }
   },
   "PASSWORD": {
@@ -3903,11 +3905,12 @@
       "SUBTITLE": "Konfigurieren Sie SAML Single Sign-On, damit sich diese Organisation über ihren Identitätsanbieter anmelden kann.",
       "ENABLED": "Single Sign-On aktivieren",
       "ISSUER": "Aussteller / Entitäts-ID",
-      "ISSUER_PLACEHOLDER": "z. B. https://your-app.example.com/saml/metadata",
+      "ISSUER_PLACEHOLDER": "z. B. UAN-DEV-API",
       "ENTRY_POINT": "IdP-Anmelde-URL",
-      "ENTRY_POINT_PLACEHOLDER": "z. B. https://idp.example.com/sso/saml",
+      "ENTRY_POINT_PLACEHOLDER": "z. B. https://login.microsoftonline.com/<tenant-id>/saml2",
       "CERTIFICATE": "IdP-Zertifikat (PEM)",
-      "CERTIFICATE_PLACEHOLDER": "Fügen Sie das Signaturzertifikat des Identitätsanbieters (PEM) ein",
+      "CERTIFICATE_PLACEHOLDER": "Fügen Sie das Base64-Zertifikat in einer einzigen Zeile ein (keine Leerzeichen, keine Zeilenumbrüche)",
+      "CERTIFICATE_NOTE": "Fügen Sie das Zertifikat als eine einzige Zeile ein – keine Leerzeichen, keine Zeilenumbrüche. Kopieren Sie den vollständigen Base64-Wert von Ihrem Identitätsanbieter.",
       "CONFIGURED": "Konfiguriert",
       "SAVE": "Änderungen speichern",
       "SAVED": "Single-Sign-On-Konfiguration aktualisiert"
@@ -3915,7 +3918,26 @@
     "AI_FEATURES": {
       "COMING_SOON": "KI-Funktionen kommen bald",
       "BLURB": "Abfragen in natürlicher Sprache, automatisierte Erkenntnisse und intelligente Vorschläge folgen in einer künftigen Version.",
-      "BADGE": "Demnächst"
+      "BADGE": "Demnächst",
+      "TITLE": "KI-Funktionen",
+      "SUBTITLE": "Verbinden Sie einen KI-Anbieter, um den integrierten Assistenten zu betreiben.",
+      "SECTION_MODEL": "Modell",
+      "ENABLED": "KI-Assistent aktivieren",
+      "PROVIDER": "Anbieter",
+      "PROVIDER_PLACEHOLDER": "z. B. OpenAI",
+      "BASE_URL": "Basis-URL",
+      "BASE_URL_PLACEHOLDER": "https://api.openai.com/v1",
+      "MODEL": "Modell",
+      "MODEL_PLACEHOLDER": "z. B. gpt-4o-mini",
+      "ACCURACY": "Genauigkeit",
+      "ACCURACY_HINT": "Niedriger ist präziser und reproduzierbarer; höher ist kreativer.",
+      "API_KEY": "API-Schlüssel",
+      "API_KEY_PLACEHOLDER": "API-Schlüssel des Anbieters eingeben",
+      "CONFIGURED": "Ein Schlüssel ist konfiguriert",
+      "SAVE": "Speichern",
+      "REQUIRED": "Dieses Feld ist erforderlich",
+      "BASE_URL_INVALID": "Geben Sie eine gültige URL ein, die mit http:// oder https:// beginnt",
+      "ACCURACY_INVALID": "Geben Sie einen Wert zwischen 0 und 1 ein"
     }
   },
   "PERMISSIONS": {
@@ -5231,5 +5253,85 @@
     "REVOKED": "Zugriff entfernt",
     "REVOKE_FAILED": "Zugriff konnte nicht entfernt werden",
     "VIEW_ONLY_HINT": "Empfänger erhalten Lesezugriff"
+  },
+  "AI_WORKSPACE": {
+    "NEW_CHAT": "Neuer Chat",
+    "UNTITLED_CHAT": "Unbenannter Chat",
+    "CONTEXT": "Kontext",
+    "CURRENT_SCREEN": "Aktueller Bildschirm",
+    "COMPOSER_PLACEHOLDER": "Fragen Sie zu Ihren Daten oder bitten Sie mich, etwas zu erstellen …",
+    "SEND": "Senden",
+    "STOP": "Stopp",
+    "COPY": "Kopieren",
+    "COPIED": "Kopiert",
+    "OPEN_IN_SQL_WORKSPACE": "In SQL-Arbeitsbereich öffnen",
+    "ROWS": "{{count}} Zeilen",
+    "TRUNCATED": "Ergebnisse gekürzt",
+    "ITEMS": "{{count}} Elemente",
+    "DEFAULT": "Standard",
+    "NOT_RUNNABLE": "Nicht ausführbar",
+    "EXISTING_DATASET": "Vorhandener Datensatz",
+    "SAVE_AS_DATASET": "Als Datensatz speichern",
+    "ADD_TO_ANALYSIS": "Zur Analyse hinzufügen",
+    "X_AXIS": "X-Achse",
+    "Y_AXIS": "Y-Achse",
+    "CONFIRM": "Bestätigen",
+    "DISMISS": "Verwerfen",
+    "DISMISSED": "Verworfen",
+    "CONFIRM_INERT_NOTE": "Dieser Vorschlag stammt aus einer früheren Nachricht. Fragen Sie erneut, um ihn auszuführen.",
+    "STARTERS": {
+      "LIST_CONNECTIONS": "Meine Verbindungen auflisten",
+      "EXPLAIN_SCHEMA": "Dieses Schema erklären",
+      "WRITE_QUERY": "Eine Abfrage für mich schreiben",
+      "BUILD_DATASET": "Einen Datensatz erstellen",
+      "TOP_ROWS": "Die obersten Zeilen anzeigen",
+      "ADD_BAR_CHART": "Ein Balkendiagramm hinzufügen",
+      "SUMMARISE_DATASET": "Diesen Datensatz zusammenfassen",
+      "CREATE_USER": "Einen Benutzer erstellen",
+      "LIST_USERS": "Benutzer auflisten"
+    },
+    "APPLY": {
+      "DONE_TITLE": "Fertig",
+      "CONFIRMED": "Bestätigt: {{summary}}",
+      "DATASET_SAVED_TITLE": "Datensatz gespeichert",
+      "DATASET_SAVED": "Datensatz \"{{name}}\" gespeichert.",
+      "ANALYSIS_HANDOFF": "Datensatz \"{{name}}\" gespeichert – er wird geöffnet, damit Sie die Analyse erstellen können.",
+      "FAILED_TITLE": "Konnte nicht abgeschlossen werden",
+      "FAILED": "Die Aktion konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut.",
+      "NO_CONNECTION_TITLE": "Keine Verbindung",
+      "NO_CONNECTION": "Für dieses SQL gibt es keine Verbindung zum Öffnen."
+    },
+    "CARD_COMPACT": {
+      "SCHEMA": "Schema",
+      "CONNECTIONS": "{{count}} Verbindungen",
+      "VISUAL": "{{type}}-Diagramm"
+    },
+    "LAUNCHER": {
+      "OPEN": "KI fragen",
+      "TITLE": "KI-Assistent",
+      "OPEN_FULL": "Vollständigen Arbeitsbereich öffnen",
+      "VIEW_FULL": "Im Arbeitsbereich anzeigen",
+      "EMPTY": "Fragen Sie zu Ihren Daten oder bitten Sie mich, etwas zu erstellen. Ich kann nur das tun, was Ihre Zugriffsrechte zulassen.",
+      "MODE_OVERLAY": "Als Overlay öffnen",
+      "MODE_PANEL": "Seitlich andocken",
+      "NOT_CONFIGURED": "Der KI-Assistent ist für Ihre Organisation noch nicht eingerichtet.",
+      "CONFIGURE": "KI konfigurieren",
+      "NAME": "Dex",
+      "TAGLINE": "Ihr Daten-Copilot",
+      "WELCOME_TITLE": "Hallo, ich bin Dex",
+      "WELCOME_BODY": "Fragen Sie zu Ihren Daten oder lassen Sie mich etwas erstellen – eine Abfrage, ein Dataset, ein Diagramm. Ich tue nur, was Ihre Berechtigungen erlauben.",
+      "NOT_CONFIGURED_TITLE": "Dex ist noch nicht eingerichtet",
+      "NOT_CONFIGURED_BODY": "Ein Administrator muss einen KI-Anbieter verbinden, bevor Dex helfen kann.",
+      "TRY": "Fragen Sie z. B.",
+      "STARTER_SCHEMA": "Erkläre mein Datenbankschema",
+      "STARTER_QUERY": "Schreibe eine SQL-Abfrage",
+      "STARTER_DATASET": "Fasse ein Dataset zusammen"
+    },
+    "PAGE_SUBTITLE": "Fragen Sie zu Ihren Daten oder erstellen Sie Abfragen, Datensätze und Visualisierungen — im Rahmen Ihrer Berechtigungen.",
+    "HISTORY": "Letzte Chats",
+    "NO_HISTORY": "Noch keine Unterhaltungen",
+    "WELCOME_TITLE": "Wie kann ich helfen?",
+    "WELCOME_SUBTITLE": "Fragen Sie zu Ihren Daten, generieren Sie SQL, erstellen Sie einen Datensatz oder ein Diagramm. Ich kann nur das tun, was Ihre Berechtigungen erlauben.",
+    "CONTEXT_HINT": "Der Assistent weiß, auf welchem Bildschirm Sie sind, um relevantere Antworten zu geben."
   }
 }

@@ -1,0 +1,660 @@
+// AI launcher — floating trigger + right-docked slide-over panel.
+// Token-driven throughout; overlays every in-app page from the shell root.
+
+// ── Floating action button ─────────────────────────────────────────
+.ai-fab {
+  position: fixed;
+  right: var(--space-6);
+  bottom: var(--space-6);
+  z-index: var(--z-overlay);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--primary-color);
+  color: #fff;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  transition:
+    transform var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease;
+
+  i {
+    font-size: 20px;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+}
+
+// ── Backdrop (overlay mode only) ───────────────────────────────────
+.ai-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  background: var(--overlay-background, rgba(0, 0, 0, 0.4));
+  animation: ai-backdrop-in var(--motion-fast, 160ms) ease;
+}
+
+@keyframes ai-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// ── Docked assistant — shared shell + two presentation modes ───────
+.ai-dock {
+  position: fixed;
+  z-index: calc(var(--z-modal) + 1);
+  display: flex;
+  flex-direction: column;
+  background: var(--card-background);
+  pointer-events: none;
+
+  // PANEL mode: right-edge slide-over.
+  &--panel {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 420px;
+    max-width: 92vw;
+    border-left: 1px solid var(--border-color);
+    box-shadow: var(--shadow-overlay);
+    transform: translateX(100%);
+    transition: transform var(--motion-medium, 240ms) ease;
+
+    &.ai-dock--open {
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+  }
+
+  // OVERLAY mode: centered modal card.
+  &--overlay {
+    top: 50%;
+    left: 50%;
+    width: 720px;
+    max-width: 92vw;
+    height: 80vh;
+    max-height: 860px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    transform: translate(-50%, -48%) scale(0.98);
+    opacity: 0;
+    transition:
+      transform var(--motion-medium, 240ms) ease,
+      opacity var(--motion-medium, 240ms) ease;
+
+    &.ai-dock--open {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+}
+
+.ai-dock__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.ai-dock__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  color: var(--text-color);
+}
+
+.ai-dock__title-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    rgba(var(--primary-color-rgb), 0.65)
+  );
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(var(--primary-color-rgb), 0.3);
+
+  i {
+    font-size: var(--fs-control);
+  }
+}
+
+// Two-line title lock-up: name on top, status + tagline beneath.
+.ai-dock__title-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.ai-dock__title-text {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  line-height: 1.2;
+  color: var(--text-color);
+}
+
+.ai-dock__title-sub {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-regular, 400);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.ai-dock__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+
+  &--on {
+    background: var(--success-color, #16a34a);
+    box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.18);
+  }
+  &--off {
+    background: var(--warning-color, #d97706);
+    box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.18);
+  }
+}
+
+.ai-dock__agent {
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-medium);
+  color: var(--text-muted);
+  text-transform: capitalize;
+  padding: 2px var(--space-2);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-pill);
+}
+
+.ai-dock__header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.ai-dock__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  color: var(--secondary-color);
+  cursor: pointer;
+  transition:
+    color var(--motion-fast) ease,
+    background var(--motion-fast) ease;
+
+  &:hover {
+    color: var(--text-color);
+    background: var(--hover-background);
+  }
+
+  i {
+    font-size: var(--fs-control);
+  }
+}
+
+// ── Thread ─────────────────────────────────────────────────────────
+.ai-dock__thread {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+// ── Empty / welcome / not-configured hero ─────────────────────────
+// One centered empty-state used for both "welcome" and "not configured",
+// so the panel never reads as a barren white void.
+.ai-hero {
+  margin: auto;
+  max-width: 320px;
+  padding: var(--space-6) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-3);
+
+  &__mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      rgba(var(--primary-color-rgb), 0.7)
+    );
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(var(--primary-color-rgb), 0.35);
+
+    i {
+      font-size: 24px;
+    }
+
+    // Not-configured: quieter, no colour pull.
+    &--muted {
+      background: var(--surface-hover);
+      color: var(--text-muted);
+      box-shadow: none;
+    }
+  }
+
+  &__title {
+    margin: var(--space-1) 0 0;
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+  }
+
+  &__body {
+    margin: 0;
+    font-size: var(--fs-control);
+    line-height: 1.55;
+    color: var(--text-muted);
+  }
+
+  &__cta {
+    margin-top: var(--space-2);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-5);
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--primary-color);
+    color: #fff;
+    font-size: var(--fs-control);
+    font-weight: var(--fw-medium);
+    cursor: pointer;
+    transition:
+      background var(--motion-fast) ease,
+      transform var(--motion-fast) ease;
+
+    &:hover {
+      background: var(--primary-color-hover, var(--primary-color));
+      transform: translateY(-1px);
+    }
+  }
+
+  &__starters {
+    margin-top: var(--space-3);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  &__starters-label {
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align: left;
+  }
+}
+
+// Starter-prompt chips: full-width rows that read as tappable suggestions.
+.ai-starter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--card-background);
+  color: var(--text-color);
+  font-size: var(--fs-control);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--motion-fast) ease,
+    background var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+
+  i {
+    color: var(--primary-color);
+    font-size: var(--fs-body);
+    flex: 0 0 auto;
+  }
+
+  span {
+    flex: 1;
+  }
+
+  &:hover {
+    border-color: var(--primary-color);
+    background: rgba(var(--primary-color-rgb), 0.05);
+    transform: translateY(-1px);
+  }
+}
+
+.ai-msg {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  &--user {
+    align-items: flex-end;
+
+    .ai-msg__text {
+      background: rgba(var(--primary-color-rgb), 0.08);
+      border-radius: var(--radius-lg);
+      padding: var(--space-2) var(--space-3);
+      max-width: 90%;
+    }
+  }
+
+  &--assistant {
+    align-items: flex-start;
+  }
+}
+
+.ai-msg__text {
+  margin: 0;
+  font-size: var(--fs-control);
+  line-height: 1.5;
+  color: var(--text-color);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.ai-msg__progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.ai-msg__progress-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--fs-micro);
+  color: var(--text-muted);
+
+  i {
+    font-size: var(--fs-micro);
+  }
+}
+
+.ai-msg__cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+// ── Compact card views ─────────────────────────────────────────────
+.ai-mini-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  background: var(--surface-1, var(--card-background));
+  font-size: var(--fs-control);
+
+  &--error {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    border-color: rgba(var(--danger-color-rgb, 220, 53, 69), 0.4);
+    color: var(--danger-color, #dc3545);
+  }
+
+  &--rich {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+}
+
+.ai-mini-card__summary {
+  margin: 0 0 var(--space-2);
+  font-weight: var(--fw-semibold);
+  color: var(--text-color);
+}
+
+.ai-mini-card__sql {
+  margin: 0;
+  padding: var(--space-2);
+  background: var(--overlay-background, rgba(0, 0, 0, 0.04));
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--fs-micro);
+  line-height: 1.5;
+  max-height: 160px;
+  overflow: auto;
+  white-space: pre;
+}
+
+.ai-mini-card__endpoint {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--fs-micro);
+  color: var(--text-muted);
+}
+
+.ai-mini-card__note {
+  margin: var(--space-2) 0 0;
+  font-size: var(--fs-micro);
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.ai-mini-card__rich-label {
+  color: var(--text-color);
+}
+
+.ai-mini-card__actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.ai-mini-card__btn {
+  border: 1px solid var(--border-color);
+  background: var(--card-background);
+  color: var(--text-color);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  transition:
+    background var(--motion-fast) ease,
+    border-color var(--motion-fast) ease;
+
+  &:hover {
+    background: var(--hover-background);
+  }
+
+  &--primary {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+
+    &:hover {
+      filter: brightness(0.95);
+      background: var(--primary-color);
+    }
+  }
+}
+
+// ── Composer ───────────────────────────────────────────────────────
+// One unified input surface: the composer row owns the border + focus ring
+// and holds a borderless textarea plus a docked circular send button — the
+// same intuitive chat-composer shape as the full-page ai-composer.
+.ai-dock__composer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-3) var(--space-4) var(--space-4);
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  background: var(--card-background);
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease;
+
+  &:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.18);
+  }
+}
+
+.ai-dock__input {
+  flex: 1;
+  resize: none;
+  max-height: 120px;
+  min-height: 32px; // matches the send button so the row centres cleanly
+  padding: var(--space-2) 0;
+  border: none;
+  background: transparent;
+  color: var(--text-color);
+  font-family: var(--font-ui);
+  font-size: var(--fs-control);
+  line-height: 1.4;
+
+  &:focus {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: var(--text-color);
+    opacity: 0.5;
+  }
+}
+
+.ai-dock__send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: #fff;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-fast) ease,
+    transform var(--motion-fast) ease,
+    opacity var(--motion-fast) ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    background: var(--primary-color-hover, var(--primary-color));
+  }
+
+  /* Empty composer → muted, clearly not-yet-actionable. */
+  &:disabled {
+    background: var(--surface-hover);
+    color: var(--text-color);
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  &--stop {
+    background: var(--surface-hover);
+    color: var(--error-color, var(--danger-color, #dc3545));
+
+    &:hover:not(:disabled) {
+      background: var(--error-color-transparent, var(--surface-hover));
+    }
+  }
+
+  i {
+    font-size: 15px;
+    line-height: 1;
+  }
+}
+
+// ── "AI not configured" notice (in-panel) ─────────────────────────
+.ai-dock__notice {
+  margin: auto;
+  max-width: 280px;
+  text-align: center;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+
+  i {
+    font-size: 24px;
+    color: var(--primary-color);
+    opacity: 0.7;
+  }
+
+  p {
+    margin: 0;
+    font-size: var(--fs-control);
+    line-height: 1.5;
+  }
+}
+
+.ai-dock__notice-link {
+  margin-top: var(--space-1);
+  border: 1px solid var(--primary-color);
+  background: transparent;
+  color: var(--primary-color);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--fs-control);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  transition: background var(--motion-fast) ease;
+
+  &:hover {
+    background: rgba(var(--primary-color-rgb), 0.08);
+  }
+}

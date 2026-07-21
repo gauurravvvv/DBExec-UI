@@ -14,6 +14,8 @@
       <div class="action-buttons">
         <!-- Reset opens a confirmation popup. Hidden while the row is
              already the default — nothing to reset. -->
+        <!-- Reset is a tab-local action (not Save), so it stays here; the
+             single Save lives in the hub header. -->
         <button
           *ngIf="!isDefault"
           pButton
@@ -26,20 +28,6 @@
           <i
             class="pi mr-2"
             [ngClass]="resetting() ? 'pi-spin pi-spinner' : 'pi-refresh'"
-          ></i>
-        </button>
-        <button
-          *hasPermission="'themeManagement'; level: 'write'"
-          pButton
-          class="p-button-primary btn-save"
-          type="submit"
-          [label]="'COMMON.SAVE' | translate"
-          [disabled]="themeForm.invalid || !isFormDirty || saving()"
-          (click)="onSave()"
-        >
-          <i
-            class="pi mr-2"
-            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
           ></i>
         </button>
       </div>

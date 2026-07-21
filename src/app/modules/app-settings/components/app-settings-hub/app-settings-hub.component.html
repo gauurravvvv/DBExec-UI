@@ -1,22 +1,45 @@
-<!-- App Settings hub — Theme / Branding / Announcements as tabs. Each child
-     component renders its own page header + form, so the tab strip is a thin
-     shell around them (same idiom as the Alerts view tabs). -->
-<div class="settings-hub">
-  <p-tabView
-    [(activeIndex)]="activeTab"
-    (onChange)="onTabChange($event.index)"
-    [scrollable]="true"
-  >
-    <p-tabPanel [header]="'SIDEBAR.themeManagement' | translate">
-      <app-theme-settings *ngIf="activeTab === 0"></app-theme-settings>
-    </p-tabPanel>
+<!-- App Settings hub — canonical page chrome: a page heading on top, then the
+     tab strip, then ONE full-height parent card holding the active tab. Each
+     child (Theme / Branding / Announcements) renders its own sub-heading +
+     form; the hub neutralises the child's own card so it sits flush inside
+     this one (no card-in-card). -->
+<div class="settings-page-wrapper">
+  <div class="settings-content-container">
+    <div class="content-card">
+      <div class="page-header-section">
+        <div class="header-content">
+          <h2>{{ 'SIDEBAR.appSettings' | translate }}</h2>
+        </div>
+        <div class="header-actions" *ngIf="activeForm() as form">
+          <app-button
+            variant="primary"
+            icon="pi pi-save"
+            [loading]="!!form.busy"
+            [disabled]="!form.dirty || !!form.busy"
+            (clicked)="save()"
+          >
+            {{ 'COMMON.SAVE' | translate }}
+          </app-button>
+        </div>
+      </div>
 
-    <p-tabPanel [header]="'SIDEBAR.brandingManagement' | translate">
-      <app-branding-settings *ngIf="activeTab === 1"></app-branding-settings>
-    </p-tabPanel>
+      <p-tabView
+        [(activeIndex)]="activeTab"
+        (onChange)="onTabChange($event.index)"
+        [scrollable]="true"
+      >
+        <p-tabPanel [header]="'SIDEBAR.themeManagement' | translate">
+          <app-theme-settings *ngIf="activeTab === 0"></app-theme-settings>
+        </p-tabPanel>
 
-    <p-tabPanel [header]="'SIDEBAR.announcementManagement' | translate">
-      <app-list-announcements *ngIf="activeTab === 2"></app-list-announcements>
-    </p-tabPanel>
-  </p-tabView>
+        <p-tabPanel [header]="'SIDEBAR.brandingManagement' | translate">
+          <app-branding-settings *ngIf="activeTab === 1"></app-branding-settings>
+        </p-tabPanel>
+
+        <p-tabPanel [header]="'SIDEBAR.announcementManagement' | translate">
+          <app-list-announcements *ngIf="activeTab === 2"></app-list-announcements>
+        </p-tabPanel>
+      </p-tabView>
+    </div>
+  </div>
 </div>

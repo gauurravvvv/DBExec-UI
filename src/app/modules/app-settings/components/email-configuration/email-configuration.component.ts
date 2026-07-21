@@ -10,6 +10,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrgPolicyService } from '../../services/org-policy.service';
+import { SettingsTabForm } from '../../settings-tab-form';
 
 type EmailProvider = 'NONE' | 'SMTP' | 'SES';
 
@@ -30,7 +31,7 @@ type EmailProvider = 'NONE' | 'SMTP' | 'SES';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EmailConfigurationComponent
-  implements OnInit, OnDestroy, HasUnsavedChanges
+  implements OnInit, OnDestroy, HasUnsavedChanges, SettingsTabForm
 {
   emailForm!: FormGroup;
   loading = this.orgPolicyService.loading;
@@ -60,6 +61,14 @@ export class EmailConfigurationComponent
   }
   hasUnsavedChanges(): boolean {
     return this.isFormDirty;
+  }
+
+  // SettingsTabForm — lets the hub's single Save button drive this tab.
+  get dirty(): boolean {
+    return this.isFormDirty;
+  }
+  get busy(): boolean {
+    return this.saving();
   }
 
   get selectedProvider(): EmailProvider {

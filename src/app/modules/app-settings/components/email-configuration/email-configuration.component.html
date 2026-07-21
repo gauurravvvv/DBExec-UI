@@ -3,28 +3,11 @@
     <div class="page-header">
       <div class="left-section">
         <h2>{{ 'APP_SETTINGS.EMAIL_CONFIG.TITLE' | translate }}</h2>
-      </div>
-      <div class="action-buttons">
-        <button
-          *hasPermission="'emailConfiguration'; level: 'write'"
-          pButton
-          class="p-button-primary btn-save"
-          type="submit"
-          [label]="'APP_SETTINGS.EMAIL_CONFIG.SAVE' | translate"
-          [disabled]="emailForm.invalid || !isFormDirty || saving()"
-          (click)="onSave()"
-        >
-          <i
-            class="pi mr-2"
-            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
-          ></i>
-        </button>
+        <p class="page-subtitle">
+          {{ 'APP_SETTINGS.EMAIL_CONFIG.SUBTITLE' | translate }}
+        </p>
       </div>
     </div>
-
-    <p class="page-subtitle">
-      {{ 'APP_SETTINGS.EMAIL_CONFIG.SUBTITLE' | translate }}
-    </p>
 
     <app-content-loader
       *ngIf="loading() && emailForm.pristine"

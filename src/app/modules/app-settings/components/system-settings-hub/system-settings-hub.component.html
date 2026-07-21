@@ -1,28 +1,51 @@
-<!-- System Settings hub — SSO / Email / Security Policy / AI Features as
-     tabs. Each child renders its own page header + form, so the tab strip
-     is a thin shell (same idiom as the App Settings hub). -->
-<div class="settings-hub">
-  <p-tabView
-    [(activeIndex)]="activeTab"
-    (onChange)="onTabChange($event.index)"
-    [scrollable]="true"
-  >
-    <p-tabPanel [header]="'SIDEBAR.ssoConfiguration' | translate">
-      <app-sso-settings *ngIf="activeTab === 0"></app-sso-settings>
-    </p-tabPanel>
+<!-- System Settings hub — canonical page chrome: a page heading on top, then
+     the tab strip, then ONE full-height parent card holding the active tab.
+     Each child (SSO / Email / Security / AI) renders its own sub-heading +
+     form; the hub neutralises the child's own card so it sits flush inside
+     this one (no card-in-card). -->
+<div class="settings-page-wrapper">
+  <div class="settings-content-container">
+    <div class="content-card">
+      <div class="page-header-section">
+        <div class="header-content">
+          <h2>{{ 'SIDEBAR.systemSettings' | translate }}</h2>
+        </div>
+        <div class="header-actions">
+          <app-button
+            variant="primary"
+            icon="pi pi-save"
+            [loading]="!!activeForm()?.busy"
+            [disabled]="!activeForm()?.dirty || !!activeForm()?.busy"
+            (clicked)="save()"
+          >
+            {{ 'COMMON.SAVE' | translate }}
+          </app-button>
+        </div>
+      </div>
 
-    <p-tabPanel [header]="'SIDEBAR.emailConfiguration' | translate">
-      <app-email-configuration
-        *ngIf="activeTab === 1"
-      ></app-email-configuration>
-    </p-tabPanel>
+      <p-tabView
+        [(activeIndex)]="activeTab"
+        (onChange)="onTabChange($event.index)"
+        [scrollable]="true"
+      >
+        <p-tabPanel [header]="'SIDEBAR.ssoConfiguration' | translate">
+          <app-sso-settings *ngIf="activeTab === 0"></app-sso-settings>
+        </p-tabPanel>
 
-    <p-tabPanel [header]="'SIDEBAR.securityPolicy' | translate">
-      <app-security-policy *ngIf="activeTab === 2"></app-security-policy>
-    </p-tabPanel>
+        <p-tabPanel [header]="'SIDEBAR.emailConfiguration' | translate">
+          <app-email-configuration
+            *ngIf="activeTab === 1"
+          ></app-email-configuration>
+        </p-tabPanel>
 
-    <p-tabPanel [header]="'SIDEBAR.aiFeatures' | translate">
-      <app-ai-features *ngIf="activeTab === 3"></app-ai-features>
-    </p-tabPanel>
-  </p-tabView>
+        <p-tabPanel [header]="'SIDEBAR.securityPolicy' | translate">
+          <app-security-policy *ngIf="activeTab === 2"></app-security-policy>
+        </p-tabPanel>
+
+        <p-tabPanel [header]="'SIDEBAR.aiFeatures' | translate">
+          <app-ai-features *ngIf="activeTab === 3"></app-ai-features>
+        </p-tabPanel>
+      </p-tabView>
+    </div>
+  </div>
 </div>

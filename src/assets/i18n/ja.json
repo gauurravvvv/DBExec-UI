@@ -47,7 +47,8 @@
     "alertManagement": "アラート",
     "systemSettings": "システム設定",
     "ssoConfiguration": "SSO設定",
-    "aiFeatures": "AI機能"
+    "aiFeatures": "AI機能",
+    "aiWorkspace": "AIアシスタント"
   },
   "COMMON": {
     "ACTIVE": "有効",
@@ -2222,7 +2223,8 @@
     "QUERY_RUNNER": "SQL ワークスペース",
     "EMBED_DASHBOARD": "ダッシュボード",
     "NOTIFICATIONS": "通知",
-    "USER_ACTIVITY": "アクティビティ"
+    "USER_ACTIVITY": "アクティビティ",
+    "AI_WORKSPACE": "AIアシスタント"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "データソース管理体験を\n向上させましょう",
@@ -2302,17 +2304,17 @@
       "ESC_CONFIRM": "もう一度 Esc を押すとキャンセルします"
     },
     "SSO": {
-      "SIGN_IN_WITH_SSO": "SSOでサインイン",
-      "SIGN_IN_WITH_CREDENTIALS": "認証情報でサインイン",
+      "SIGN_IN_WITH_SSO": "SSO で続行",
+      "SIGN_IN_WITH_CREDENTIALS": "パスワードでサインイン",
       "USE_SSO": "シングルサインオンを使用",
-      "REDIRECTING": "アイデンティティプロバイダーにリダイレクトしています…",
-      "COMPLETING": "シングルサインオンを完了しています…",
-      "VERIFYING": "シングルサインオンの応答を検証しています…",
-      "FAILED": "シングルサインオンに失敗しました。もう一度お試しください。",
-      "NO_RESPONSE": "シングルサインオンの応答がありません。ログイン画面からやり直してください。",
-      "BACK_TO_LOGIN": "ログインに戻る",
-      "CARD_TITLE": "SSOでサインインしています",
-      "CARD_SUBTITLE": "まもなく完了します — 少々お待ちください。"
+      "REDIRECTING": "リダイレクトしています…",
+      "COMPLETING": "サインインしています…",
+      "VERIFYING": "本人確認をしています…",
+      "FAILED": "サインインできませんでした。もう一度お試しください。",
+      "NO_RESPONSE": "サインインリンクの有効期限が切れているか無効です。最初からやり直してください。",
+      "BACK_TO_LOGIN": "サインインに戻る",
+      "CARD_TITLE": "サインインしています",
+      "CARD_SUBTITLE": "サインインを完了しています。少々お待ちください。"
     }
   },
   "PASSWORD": {
@@ -3903,11 +3905,12 @@
       "SUBTITLE": "SAMLシングルサインオンを設定して、この組織がアイデンティティプロバイダー経由でサインインできるようにします。",
       "ENABLED": "シングルサインオンを有効にする",
       "ISSUER": "発行者 / エンティティID",
-      "ISSUER_PLACEHOLDER": "例: https://your-app.example.com/saml/metadata",
+      "ISSUER_PLACEHOLDER": "例: UAN-DEV-API",
       "ENTRY_POINT": "IdPログインURL",
-      "ENTRY_POINT_PLACEHOLDER": "例: https://idp.example.com/sso/saml",
+      "ENTRY_POINT_PLACEHOLDER": "例: https://login.microsoftonline.com/<tenant-id>/saml2",
       "CERTIFICATE": "IdP証明書 (PEM)",
-      "CERTIFICATE_PLACEHOLDER": "アイデンティティプロバイダーの署名証明書 (PEM) を貼り付けてください",
+      "CERTIFICATE_PLACEHOLDER": "Base64 証明書を 1 行で貼り付けてください（スペース・改行なし）",
+      "CERTIFICATE_NOTE": "証明書は 1 行で貼り付けてください。スペースや改行は入れないでください。ID プロバイダーから完全な Base64 値をコピーしてください。",
       "CONFIGURED": "設定済み",
       "SAVE": "変更を保存",
       "SAVED": "シングルサインオン設定を更新しました"
@@ -3915,7 +3918,26 @@
     "AI_FEATURES": {
       "COMING_SOON": "AI機能は近日公開予定です",
       "BLURB": "自然言語クエリ、自動インサイト、スマートな提案は今後のリリースで提供される予定です。",
-      "BADGE": "近日公開"
+      "BADGE": "近日公開",
+      "TITLE": "AI機能",
+      "SUBTITLE": "AIプロバイダーを接続して、アプリ内アシスタントを利用できるようにします。",
+      "SECTION_MODEL": "モデル",
+      "ENABLED": "AIアシスタントを有効にする",
+      "PROVIDER": "プロバイダー",
+      "PROVIDER_PLACEHOLDER": "例: OpenAI",
+      "BASE_URL": "ベースURL",
+      "BASE_URL_PLACEHOLDER": "https://api.openai.com/v1",
+      "MODEL": "モデル",
+      "MODEL_PLACEHOLDER": "例: gpt-4o-mini",
+      "ACCURACY": "精度",
+      "ACCURACY_HINT": "低いほど正確で再現性が高く、高いほど創造的になります。",
+      "API_KEY": "APIキー",
+      "API_KEY_PLACEHOLDER": "プロバイダーのAPIキーを入力",
+      "CONFIGURED": "キーが設定されています",
+      "SAVE": "保存",
+      "REQUIRED": "この項目は必須です",
+      "BASE_URL_INVALID": "http:// または https:// で始まる有効な URL を入力してください",
+      "ACCURACY_INVALID": "0〜1 の値を入力してください"
     }
   },
   "PERMISSIONS": {
@@ -5231,5 +5253,85 @@
     "REVOKED": "アクセスを削除しました",
     "REVOKE_FAILED": "アクセスの削除に失敗しました",
     "VIEW_ONLY_HINT": "受信者に閲覧アクセスが付与されます"
+  },
+  "AI_WORKSPACE": {
+    "NEW_CHAT": "新しいチャット",
+    "UNTITLED_CHAT": "無題のチャット",
+    "CONTEXT": "コンテキスト",
+    "CURRENT_SCREEN": "現在の画面",
+    "COMPOSER_PLACEHOLDER": "データについて質問するか、何かを作成するように依頼してください…",
+    "SEND": "送信",
+    "STOP": "停止",
+    "COPY": "コピー",
+    "COPIED": "コピーしました",
+    "OPEN_IN_SQL_WORKSPACE": "SQLワークスペースで開く",
+    "ROWS": "{{count}} 行",
+    "TRUNCATED": "結果が切り捨てられました",
+    "ITEMS": "{{count}} 件",
+    "DEFAULT": "デフォルト",
+    "NOT_RUNNABLE": "実行できません",
+    "EXISTING_DATASET": "既存のデータセット",
+    "SAVE_AS_DATASET": "データセットとして保存",
+    "ADD_TO_ANALYSIS": "分析に追加",
+    "X_AXIS": "X軸",
+    "Y_AXIS": "Y軸",
+    "CONFIRM": "確認",
+    "DISMISS": "却下",
+    "DISMISSED": "却下しました",
+    "CONFIRM_INERT_NOTE": "この提案は以前のメッセージからのものです。実行するにはもう一度依頼してください。",
+    "STARTERS": {
+      "LIST_CONNECTIONS": "接続を一覧表示",
+      "EXPLAIN_SCHEMA": "このスキーマを説明",
+      "WRITE_QUERY": "クエリを書いてもらう",
+      "BUILD_DATASET": "データセットを作成",
+      "TOP_ROWS": "上位の行を表示",
+      "ADD_BAR_CHART": "棒グラフを追加",
+      "SUMMARISE_DATASET": "このデータセットを要約",
+      "CREATE_USER": "ユーザーを作成",
+      "LIST_USERS": "ユーザーを一覧表示"
+    },
+    "APPLY": {
+      "DONE_TITLE": "完了",
+      "CONFIRMED": "確認済み: {{summary}}",
+      "DATASET_SAVED_TITLE": "データセットを保存しました",
+      "DATASET_SAVED": "データセット「{{name}}」を保存しました。",
+      "ANALYSIS_HANDOFF": "データセット「{{name}}」を保存しました。分析を作成できるように開いています。",
+      "FAILED_TITLE": "完了できませんでした",
+      "FAILED": "操作を完了できませんでした。もう一度お試しください。",
+      "NO_CONNECTION_TITLE": "接続なし",
+      "NO_CONNECTION": "このSQLには開く接続がありません。"
+    },
+    "CARD_COMPACT": {
+      "SCHEMA": "スキーマ",
+      "CONNECTIONS": "{{count}} 接続",
+      "VISUAL": "{{type}} チャート"
+    },
+    "LAUNCHER": {
+      "OPEN": "AIに質問",
+      "TITLE": "AIアシスタント",
+      "OPEN_FULL": "完全なワークスペースを開く",
+      "VIEW_FULL": "ワークスペースで表示",
+      "EMPTY": "データについて質問するか、何かを作成するように依頼してください。アクセス権限で許可されていることのみ実行できます。",
+      "MODE_OVERLAY": "オーバーレイで開く",
+      "MODE_PANEL": "サイドにドッキング",
+      "NOT_CONFIGURED": "AI アシスタントはまだ組織向けに設定されていません。",
+      "CONFIGURE": "AI を設定",
+      "NAME": "Dex",
+      "TAGLINE": "あなたのデータ副操縦士",
+      "WELCOME_TITLE": "こんにちは、Dex です",
+      "WELCOME_BODY": "データについて質問するか、作成を依頼してください（クエリ、データセット、グラフ）。あなたの権限で許可された操作のみ行います。",
+      "NOT_CONFIGURED_TITLE": "Dex はまだ設定されていません",
+      "NOT_CONFIGURED_BODY": "Dex を利用するには、管理者が AI プロバイダーを接続する必要があります。",
+      "TRY": "質問してみましょう",
+      "STARTER_SCHEMA": "データベーススキーマを説明して",
+      "STARTER_QUERY": "SQL クエリを書いて",
+      "STARTER_DATASET": "データセットを要約して"
+    },
+    "PAGE_SUBTITLE": "データについて質問したり、クエリ・データセット・ビジュアルを作成したりできます — アクセス権の範囲内で。",
+    "HISTORY": "最近のチャット",
+    "NO_HISTORY": "まだ会話はありません",
+    "WELCOME_TITLE": "ご用件は？",
+    "WELCOME_SUBTITLE": "データについて質問し、SQL を生成し、データセットやグラフを作成できます。アクセス権が許可することのみ実行できます。",
+    "CONTEXT_HINT": "アシスタントは現在の画面を把握し、より関連性の高い回答を返します。"
   }
 }

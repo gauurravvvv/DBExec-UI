@@ -47,7 +47,8 @@
     "alertManagement": "Alerts",
     "systemSettings": "System Settings",
     "ssoConfiguration": "SSO Configuration",
-    "aiFeatures": "AI Features"
+    "aiFeatures": "AI Features",
+    "aiWorkspace": "AI Assistant"
   },
   "COMMON": {
     "ACTIVE": "Active",
@@ -2225,7 +2226,8 @@
     "RELAY": "Signing in",
     "EMBED_DASHBOARD": "Dashboard",
     "NOTIFICATIONS": "Notifications",
-    "USER_ACTIVITY": "Activity"
+    "USER_ACTIVITY": "Activity",
+    "AI_WORKSPACE": "AI Assistant"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Elevate Your Datasource\nManagement Experience",
@@ -2305,17 +2307,17 @@
       "ESC_CONFIRM": "Press Esc again to cancel"
     },
     "SSO": {
-      "SIGN_IN_WITH_SSO": "Sign in with SSO",
-      "SIGN_IN_WITH_CREDENTIALS": "Sign in with credentials",
+      "SIGN_IN_WITH_SSO": "Continue with SSO",
+      "SIGN_IN_WITH_CREDENTIALS": "Sign in with password",
       "USE_SSO": "Use single sign-on",
-      "REDIRECTING": "Redirecting to your identity provider…",
-      "COMPLETING": "Completing single sign-on…",
-      "VERIFYING": "Verifying your single sign-on response…",
-      "FAILED": "Single sign-on failed. Please try again.",
-      "NO_RESPONSE": "Missing single sign-on response. Please retry from the login screen.",
-      "BACK_TO_LOGIN": "Back to login",
-      "CARD_TITLE": "Signing you in via SSO",
-      "CARD_SUBTITLE": "Finishing up — this only takes a moment."
+      "REDIRECTING": "Redirecting…",
+      "COMPLETING": "Signing you in…",
+      "VERIFYING": "Verifying your identity…",
+      "FAILED": "We couldn't sign you in. Please try again.",
+      "NO_RESPONSE": "Your sign-in link expired or is invalid. Please start again.",
+      "BACK_TO_LOGIN": "Back to sign in",
+      "CARD_TITLE": "Signing you in",
+      "CARD_SUBTITLE": "Just a moment while we complete sign-in."
     }
   },
   "PASSWORD": {
@@ -3906,11 +3908,12 @@
       "SUBTITLE": "Configure SAML single sign-on so this organisation can sign in through its identity provider.",
       "ENABLED": "Enable single sign-on",
       "ISSUER": "Issuer / Entity ID",
-      "ISSUER_PLACEHOLDER": "e.g. https://your-app.example.com/saml/metadata",
+      "ISSUER_PLACEHOLDER": "e.g. UAN-DEV-API",
       "ENTRY_POINT": "IdP Login URL",
-      "ENTRY_POINT_PLACEHOLDER": "e.g. https://idp.example.com/sso/saml",
+      "ENTRY_POINT_PLACEHOLDER": "e.g. https://login.microsoftonline.com/<tenant-id>/saml2",
       "CERTIFICATE": "IdP Certificate (PEM)",
-      "CERTIFICATE_PLACEHOLDER": "Paste the identity provider's signing certificate (PEM)",
+      "CERTIFICATE_PLACEHOLDER": "Paste the Base64 certificate on a single line (no spaces, no line breaks)",
+      "CERTIFICATE_NOTE": "Paste the certificate as a single line — no spaces, no line breaks. Copy the full Base64 value from your identity provider.",
       "CONFIGURED": "Configured",
       "SAVE": "Save changes",
       "SAVED": "Single sign-on configuration updated"
@@ -3918,7 +3921,26 @@
     "AI_FEATURES": {
       "COMING_SOON": "AI Features are coming soon",
       "BLURB": "Natural-language querying, automated insights, and smart suggestions will arrive in a future release.",
-      "BADGE": "Coming soon"
+      "BADGE": "Coming soon",
+      "TITLE": "AI Features",
+      "SUBTITLE": "Connect an AI provider to power the in-app assistant.",
+      "SECTION_MODEL": "Model",
+      "ENABLED": "Enable AI assistant",
+      "PROVIDER": "Provider",
+      "PROVIDER_PLACEHOLDER": "e.g. OpenAI",
+      "BASE_URL": "Base URL",
+      "BASE_URL_PLACEHOLDER": "https://api.openai.com/v1",
+      "MODEL": "Model",
+      "MODEL_PLACEHOLDER": "e.g. gpt-4o-mini",
+      "ACCURACY": "Accuracy",
+      "ACCURACY_HINT": "Lower is more precise and repeatable; higher is more creative.",
+      "API_KEY": "API key",
+      "API_KEY_PLACEHOLDER": "Enter the provider API key",
+      "CONFIGURED": "A key is configured",
+      "SAVE": "Save",
+      "REQUIRED": "This field is required",
+      "BASE_URL_INVALID": "Enter a valid URL starting with http:// or https://",
+      "ACCURACY_INVALID": "Enter a value between 0 and 1"
     }
   },
   "validation": {
@@ -5228,5 +5250,85 @@
     "REVOKED": "Access removed",
     "REVOKE_FAILED": "Failed to remove access",
     "VIEW_ONLY_HINT": "Recipients get view access"
+  },
+  "AI_WORKSPACE": {
+    "NEW_CHAT": "New chat",
+    "UNTITLED_CHAT": "Untitled chat",
+    "CONTEXT": "Context",
+    "CURRENT_SCREEN": "Current screen",
+    "COMPOSER_PLACEHOLDER": "Ask about your data, or ask me to build something…",
+    "SEND": "Send",
+    "STOP": "Stop",
+    "COPY": "Copy",
+    "COPIED": "Copied",
+    "OPEN_IN_SQL_WORKSPACE": "Open in SQL Workspace",
+    "ROWS": "{{count}} rows",
+    "TRUNCATED": "Results truncated",
+    "ITEMS": "{{count}} items",
+    "DEFAULT": "Default",
+    "NOT_RUNNABLE": "Not runnable",
+    "EXISTING_DATASET": "Existing dataset",
+    "SAVE_AS_DATASET": "Save as dataset",
+    "ADD_TO_ANALYSIS": "Add to analysis",
+    "X_AXIS": "X axis",
+    "Y_AXIS": "Y axis",
+    "CONFIRM": "Confirm",
+    "DISMISS": "Dismiss",
+    "DISMISSED": "Dismissed",
+    "CONFIRM_INERT_NOTE": "This proposal is from an earlier message. Ask again to run it.",
+    "STARTERS": {
+      "LIST_CONNECTIONS": "List my connections",
+      "EXPLAIN_SCHEMA": "Explain this schema",
+      "WRITE_QUERY": "Write a query for me",
+      "BUILD_DATASET": "Build a dataset",
+      "TOP_ROWS": "Show the top rows",
+      "ADD_BAR_CHART": "Add a bar chart",
+      "SUMMARISE_DATASET": "Summarise this dataset",
+      "CREATE_USER": "Create a user",
+      "LIST_USERS": "List users"
+    },
+    "APPLY": {
+      "DONE_TITLE": "Done",
+      "CONFIRMED": "Confirmed: {{summary}}",
+      "DATASET_SAVED_TITLE": "Dataset saved",
+      "DATASET_SAVED": "Saved dataset \"{{name}}\".",
+      "ANALYSIS_HANDOFF": "Saved dataset \"{{name}}\" — opening it so you can build the analysis.",
+      "FAILED_TITLE": "Could not complete",
+      "FAILED": "The action could not be completed. Please try again.",
+      "NO_CONNECTION_TITLE": "No connection",
+      "NO_CONNECTION": "This SQL has no connection to open."
+    },
+    "CARD_COMPACT": {
+      "SCHEMA": "Schema",
+      "CONNECTIONS": "{{count}} connections",
+      "VISUAL": "{{type}} chart"
+    },
+    "LAUNCHER": {
+      "OPEN": "Ask AI",
+      "TITLE": "AI Assistant",
+      "OPEN_FULL": "Open full workspace",
+      "VIEW_FULL": "View in workspace",
+      "EMPTY": "Ask about your data or ask me to build something. I can only do what your access allows.",
+      "MODE_OVERLAY": "Open as overlay",
+      "MODE_PANEL": "Dock to side",
+      "NOT_CONFIGURED": "The AI assistant is not set up for your organisation yet.",
+      "CONFIGURE": "Configure AI",
+      "NAME": "Dex",
+      "TAGLINE": "Your data copilot",
+      "WELCOME_TITLE": "Hi, I’m Dex",
+      "WELCOME_BODY": "Ask about your data or tell me to build something — a query, a dataset, a chart. I only do what your access allows.",
+      "NOT_CONFIGURED_TITLE": "Dex isn’t set up yet",
+      "NOT_CONFIGURED_BODY": "An administrator needs to connect an AI provider before Dex can help.",
+      "TRY": "Try asking",
+      "STARTER_SCHEMA": "Explain my database schema",
+      "STARTER_QUERY": "Write a SQL query",
+      "STARTER_DATASET": "Summarise a dataset"
+    },
+    "PAGE_SUBTITLE": "Ask about your data or build queries, datasets and visuals — within your access.",
+    "HISTORY": "Recent chats",
+    "NO_HISTORY": "No conversations yet",
+    "WELCOME_TITLE": "How can I help?",
+    "WELCOME_SUBTITLE": "Ask about your data, generate SQL, build a dataset or a chart. I can only do what your access allows.",
+    "CONTEXT_HINT": "The assistant knows which screen you are on to give more relevant answers."
   }
 }
