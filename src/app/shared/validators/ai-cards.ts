@@ -106,11 +106,15 @@ export const visualPreviewCardSchema = z.object({
 });
 
 /**
- * A write proposal. The FE renders `summary` + `fields` and, on Confirm,
- * calls `endpoint` with `method` + `payload` through the normal HTTP
- * client (so the user's own JWT + the endpoint's own permission
- * middleware apply). The engine builds this card and stops — it never
- * calls the endpoint itself.
+ * A write proposal. The engine builds this card and STOPS — it never
+ * mutates. On Confirm the FE posts { endpoint, method, payload } to
+ * `POST /ai/confirm`, which re-validates the payload against the
+ * proposing tool's schema, re-checks the acting user's RBAC for the
+ * action, executes the real guarded endpoint in-process, and audit-logs
+ * it (source:'ai'). `destructive` drives the mandatory confirm/typed-
+ * confirmation UX for delete/publish/role-grant; `proposalId` lets the
+ * FE (and a future server-side proposal cache) tie the executed call
+ * back to exactly what was proposed.
  */
 export const confirmCardSchema = z.object({
   kind: z.literal('confirm'),
@@ -121,6 +125,14 @@ export const confirmCardSchema = z.object({
   method: z.enum(['POST', 'PUT', 'DELETE']),
   payload: jsonRecord,
   fields: z.array(z.object({ label: z.string(), value: z.string() })),
+  // True for delete / publish / role-grant style actions — the FE gates
+  // these behind a mandatory confirm (and may require typed confirmation).
+  // Absent is treated as false (non-destructive) by both ends.
+  destructive: z.boolean().optional(),
+  // Opaque id for this proposal, minted by the proposing tool. Echoed by
+  // the FE on Confirm so the executed action is provably the proposed one
+  // (and so a short-TTL server-side proposal cache can key on it later).
+  proposalId: z.string().optional(),
   // Set true when a confirm card is rehydrated from history — the FE
   // renders it read-only (a stale proposal must not be replayed; the user
   // re-asks to act). Stamped by getConversation on reload.

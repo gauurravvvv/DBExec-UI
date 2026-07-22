@@ -3937,7 +3937,8 @@
       "SAVE": "Guardar",
       "REQUIRED": "Este campo es obligatorio",
       "BASE_URL_INVALID": "Introduzca una URL válida que empiece por http:// o https://",
-      "ACCURACY_INVALID": "Introduzca un valor entre 0 y 1"
+      "ACCURACY_INVALID": "Introduzca un valor entre 0 y 1",
+      "MODEL_HINT": "Para acciones agénticas completas (crear, editar, eliminar), use un modelo de llamada a herramientas de vanguardia, de clase OpenAI o Claude. Los modelos locales pequeños sirven para el chat y las preguntas de solo lectura, pero no son fiables en acciones de varios pasos."
     }
   },
   "PERMISSIONS": {
@@ -5279,6 +5280,16 @@
     "DISMISS": "Descartar",
     "DISMISSED": "Descartado",
     "CONFIRM_INERT_NOTE": "Esta propuesta proviene de un mensaje anterior. Vuelve a preguntar para ejecutarla.",
+    "SUBAGENTS": {
+      "TITLE": "Pasos",
+      "ONE": "Paso",
+      "RUNNING": "En ejecución",
+      "DONE": "Listo",
+      "FAILED": "Error",
+      "RETRY": "Reintentar",
+      "ELAPSED": "{{s}} s",
+      "STEP_OF": "{{i}}/{{n}}"
+    },
     "STARTERS": {
       "LIST_CONNECTIONS": "Listar mis conexiones",
       "EXPLAIN_SCHEMA": "Explicar este esquema",
@@ -5332,6 +5343,21 @@
     "NO_HISTORY": "Aún no hay conversaciones",
     "WELCOME_TITLE": "¿En qué puedo ayudarte?",
     "WELCOME_SUBTITLE": "Pregunta sobre tus datos, genera SQL, crea un conjunto de datos o un gráfico. Solo puedo hacer lo que tu acceso permite.",
-    "CONTEXT_HINT": "El asistente sabe en qué pantalla estás para dar respuestas más relevantes."
+    "CONTEXT_HINT": "El asistente sabe en qué pantalla estás para dar respuestas más relevantes.",
+    "DESTRUCTIVE": {
+      "REVIEW": "Revisar",
+      "CONFIRM": "Confirmar eliminación",
+      "WARNING": "Esta acción es permanente y no se puede deshacer. Confirme para continuar."
+    },
+    "EDIT": {
+      "ACTION": "Editar",
+      "APPLY": "Aplicar cambios"
+    },
+    "UNDO": {
+      "ACTION": "Deshacer",
+      "DONE_TITLE": "Deshecho",
+      "FAILED_TITLE": "No se pudo deshacer",
+      "FAILED": "No se pudo deshacer la acción. Puede eliminarla manualmente."
+    }
   }
 }

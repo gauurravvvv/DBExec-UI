@@ -150,6 +150,10 @@ export const AI_WORKSPACE = {
   CHAT: '/ai/chat',
   // GET/PUT /ai/config  → provider config (key masked on GET)
   CONFIG: '/ai/config',
+  // POST /ai/confirm  → guarded execute of a write proposal. Re-validates the
+  // payload against the proposing tool's schema, re-checks RBAC for the acting
+  // user, runs the real guarded endpoint in-process, and audit-logs (source:'ai').
+  CONFIRM: '/ai/confirm',
   // GET /ai/health  → { enabled, configured } — gates the launcher
   HEALTH: '/ai/health',
   // GET /ai/conversations(/:id)  → owner-private history

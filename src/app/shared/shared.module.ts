@@ -28,6 +28,8 @@ import { CommandModalComponent } from './components/command-modal/command-modal.
 import { GlobalSearchComponent } from './components/global-search/global-search.component';
 import { NotificationModalComponent } from './components/notification-modal/notification-modal.component';
 import { AiLauncherComponent } from './components/ai-launcher/ai-launcher.component';
+import { AiToolStepComponent } from './components/ai-tool-step/ai-tool-step.component';
+import { AiSubagentsComponent } from './components/ai-subagents/ai-subagents.component';
 import { AppPrimeNGModule } from './modules/app-primeng.module';
 import { FileSizePipe } from './pipes/file-size.pipe';
 import {
@@ -61,6 +63,8 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     GlobalSearchComponent,
     NotificationModalComponent,
     AiLauncherComponent,
+    AiToolStepComponent,
+    AiSubagentsComponent,
     AddCustomFieldDialogComponent,
     CalculatedFieldsDialogComponent,
     SaveAnalysesDialogComponent,
@@ -106,6 +110,8 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     GlobalSearchComponent,
     NotificationModalComponent,
     AiLauncherComponent,
+    AiToolStepComponent,
+    AiSubagentsComponent,
     AddCustomFieldDialogComponent,
     CalculatedFieldsDialogComponent,
     SaveAnalysesDialogComponent,

@@ -3937,7 +3937,8 @@
       "SAVE": "保存",
       "REQUIRED": "この項目は必須です",
       "BASE_URL_INVALID": "http:// または https:// で始まる有効な URL を入力してください",
-      "ACCURACY_INVALID": "0〜1 の値を入力してください"
+      "ACCURACY_INVALID": "0〜1 の値を入力してください",
+      "MODEL_HINT": "作成・編集・削除などの完全なエージェント操作には、OpenAI や Claude クラスの高性能なツール呼び出しモデルを使用してください。小規模なローカルモデルはチャットや読み取り専用の質問には適していますが、複数ステップの操作では信頼性が低くなります。"
     }
   },
   "PERMISSIONS": {
@@ -5279,6 +5280,16 @@
     "DISMISS": "却下",
     "DISMISSED": "却下しました",
     "CONFIRM_INERT_NOTE": "この提案は以前のメッセージからのものです。実行するにはもう一度依頼してください。",
+    "SUBAGENTS": {
+      "TITLE": "ステップ",
+      "ONE": "ステップ",
+      "RUNNING": "実行中",
+      "DONE": "完了",
+      "FAILED": "失敗",
+      "RETRY": "再試行",
+      "ELAPSED": "{{s}} 秒",
+      "STEP_OF": "{{i}}/{{n}}"
+    },
     "STARTERS": {
       "LIST_CONNECTIONS": "接続を一覧表示",
       "EXPLAIN_SCHEMA": "このスキーマを説明",
@@ -5332,6 +5343,21 @@
     "NO_HISTORY": "まだ会話はありません",
     "WELCOME_TITLE": "ご用件は？",
     "WELCOME_SUBTITLE": "データについて質問し、SQL を生成し、データセットやグラフを作成できます。アクセス権が許可することのみ実行できます。",
-    "CONTEXT_HINT": "アシスタントは現在の画面を把握し、より関連性の高い回答を返します。"
+    "CONTEXT_HINT": "アシスタントは現在の画面を把握し、より関連性の高い回答を返します。",
+    "DESTRUCTIVE": {
+      "REVIEW": "確認する",
+      "CONFIRM": "削除を確定",
+      "WARNING": "この操作は元に戻せません。続行するには確定してください。"
+    },
+    "EDIT": {
+      "ACTION": "編集",
+      "APPLY": "変更を適用"
+    },
+    "UNDO": {
+      "ACTION": "元に戻す",
+      "DONE_TITLE": "元に戻しました",
+      "FAILED_TITLE": "元に戻せませんでした",
+      "FAILED": "操作を元に戻せませんでした。手動で削除できます。"
+    }
   }
 }

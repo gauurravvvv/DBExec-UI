@@ -3937,7 +3937,8 @@
       "SAVE": "저장",
       "REQUIRED": "필수 항목입니다",
       "BASE_URL_INVALID": "http:// 또는 https://로 시작하는 유효한 URL을 입력하세요",
-      "ACCURACY_INVALID": "0과 1 사이의 값을 입력하세요"
+      "ACCURACY_INVALID": "0과 1 사이의 값을 입력하세요",
+      "MODEL_HINT": "생성, 편집, 삭제와 같은 완전한 에이전트 작업에는 OpenAI 또는 Claude급의 최신 도구 호출 모델을 사용하세요. 소형 로컬 모델은 채팅과 읽기 전용 질문에는 적합하지만 여러 단계 작업에서는 신뢰성이 떨어집니다."
     }
   },
   "PERMISSIONS": {
@@ -5279,6 +5280,16 @@
     "DISMISS": "닫기",
     "DISMISSED": "닫힘",
     "CONFIRM_INERT_NOTE": "이 제안은 이전 메시지에서 가져온 것입니다. 실행하려면 다시 요청하세요.",
+    "SUBAGENTS": {
+      "TITLE": "단계",
+      "ONE": "단계",
+      "RUNNING": "실행 중",
+      "DONE": "완료",
+      "FAILED": "실패",
+      "RETRY": "다시 시도",
+      "ELAPSED": "{{s}}초",
+      "STEP_OF": "{{i}}/{{n}}"
+    },
     "STARTERS": {
       "LIST_CONNECTIONS": "내 연결 목록 보기",
       "EXPLAIN_SCHEMA": "이 스키마 설명",
@@ -5332,6 +5343,21 @@
     "NO_HISTORY": "아직 대화가 없습니다",
     "WELCOME_TITLE": "무엇을 도와드릴까요?",
     "WELCOME_SUBTITLE": "데이터에 대해 질문하고, SQL을 생성하고, 데이터셋이나 차트를 만들 수 있습니다. 접근 권한이 허용하는 작업만 수행합니다.",
-    "CONTEXT_HINT": "도우미는 현재 화면을 파악하여 더 관련성 높은 답변을 제공합니다."
+    "CONTEXT_HINT": "도우미는 현재 화면을 파악하여 더 관련성 높은 답변을 제공합니다.",
+    "DESTRUCTIVE": {
+      "REVIEW": "검토",
+      "CONFIRM": "삭제 확인",
+      "WARNING": "이 작업은 영구적이며 되돌릴 수 없습니다. 계속하려면 확인하세요."
+    },
+    "EDIT": {
+      "ACTION": "편집",
+      "APPLY": "변경 사항 적용"
+    },
+    "UNDO": {
+      "ACTION": "실행 취소",
+      "DONE_TITLE": "실행 취소됨",
+      "FAILED_TITLE": "실행 취소할 수 없음",
+      "FAILED": "작업을 실행 취소할 수 없습니다. 수동으로 제거할 수 있습니다."
+    }
   }
 }

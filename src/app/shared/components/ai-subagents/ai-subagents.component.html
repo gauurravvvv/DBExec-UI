@@ -1,0 +1,86 @@
+<!-- The "SUB-AGENTS" section beneath a delegate step: a section label + one
+     collapsible "SUB-AGENT · <label>" row per specialist run, each body
+     recursively rendering the sub-agent's own tool steps + streamed text. -->
+<div class="ai-subagents" *ngIf="subAgents.length">
+  <span class="ai-subagents__label">
+    {{ 'AI_WORKSPACE.SUBAGENTS.TITLE' | translate }}
+  </span>
+
+  <div
+    class="ai-subagent"
+    *ngFor="let sub of subAgents; let i = index; trackBy: trackSub"
+    [class.ai-subagent--running]="sub.status === 'running'"
+    [class.ai-subagent--done]="sub.status === 'done'"
+    [class.ai-subagent--error]="sub.status === 'error'"
+  >
+    <!-- Sub-agent header: status · "SUB-AGENT · <label>" · index/total ·
+         elapsed/duration · chevron -->
+    <button
+      type="button"
+      class="ai-subagent__head"
+      (click)="toggle(sub, i)"
+      [attr.aria-expanded]="isExpanded(sub, i)"
+    >
+      <span
+        class="ai-subagent__status"
+        [attr.aria-label]="statusLabel(sub.status)"
+        [title]="statusLabel(sub.status)"
+      >
+        <i [class]="statusIcon(sub.status)"></i>
+      </span>
+
+      <span class="ai-subagent__title">
+        {{ 'AI_WORKSPACE.SUBAGENTS.ONE' | translate }}
+        <span class="ai-subagent__sep">·</span>
+        <span class="ai-subagent__name">{{ sub.label || sub.agent }}</span>
+      </span>
+
+      <!-- "1/2" fan-out progress chip. -->
+      <span
+        *ngIf="sub.total && sub.total > 1 && sub.index"
+        class="ai-subagent__step-of"
+      >
+        {{
+          'AI_WORKSPACE.SUBAGENTS.STEP_OF'
+            | translate: { i: sub.index, n: sub.total }
+        }}
+      </span>
+
+      <span
+        *ngIf="sub.status === 'running'"
+        class="ai-subagent__timer"
+        [title]="
+          'AI_WORKSPACE.SUBAGENTS.ELAPSED'
+            | translate: { s: elapsedSeconds(sub) }
+        "
+      >
+        {{
+          'AI_WORKSPACE.SUBAGENTS.ELAPSED' | translate: { s: elapsedSeconds(sub) }
+        }}
+      </span>
+      <span
+        *ngIf="sub.status !== 'running' && durationLabel(sub)"
+        class="ai-subagent__duration"
+      >
+        {{ durationLabel(sub) }}
+      </span>
+
+      <i
+        class="ai-subagent__chevron pi"
+        [class.pi-chevron-down]="isExpanded(sub, i)"
+        [class.pi-chevron-right]="!isExpanded(sub, i)"
+      ></i>
+    </button>
+
+    <!-- Sub-agent body: its own tool steps (recursive) + streamed text. -->
+    <div class="ai-subagent__body" *ngIf="isExpanded(sub, i)" @expandBody>
+      <app-ai-tool-step
+        *ngFor="let st of sub.steps; trackBy: trackStep"
+        [step]="st"
+        [depth]="depth"
+      ></app-ai-tool-step>
+
+      <p class="ai-subagent__text" *ngIf="sub.text">{{ sub.text }}</p>
+    </div>
+  </div>
+</div>

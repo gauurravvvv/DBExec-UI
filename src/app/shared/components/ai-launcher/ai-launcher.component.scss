@@ -192,16 +192,6 @@
   }
 }
 
-.ai-dock__agent {
-  font-size: var(--fs-micro);
-  font-weight: var(--fw-medium);
-  color: var(--text-muted);
-  text-transform: capitalize;
-  padding: 2px var(--space-2);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-pill);
-}
-
 .ai-dock__header-actions {
   display: flex;
   align-items: center;
@@ -423,6 +413,14 @@
   }
 }
 
+// Live-computation tree (delegate + tool steps).
+.ai-msg__steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
 .ai-msg__cards {
   display: flex;
   flex-direction: column;
@@ -523,6 +521,117 @@
       filter: brightness(0.95);
       background: var(--primary-color);
     }
+  }
+
+  // Destructive approve — the delete/publish/role-change confirm button.
+  &--danger {
+    background: var(--error-color);
+    border-color: var(--error-color);
+    color: #fff;
+
+    &:hover {
+      filter: brightness(0.95);
+      background: var(--error-color);
+    }
+  }
+
+  // Undo the just-executed create — quiet, warning-toned outline.
+  &--undo {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    border-color: var(--warning-color);
+    color: var(--warning-color);
+
+    &:hover {
+      background: var(--warning-color-bg);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// ── Confirm card — destructive treatment, fields, inline editor ─────
+// Destructive proposals (delete / publish / role change) get a warning
+// tint + accent so a risky action never reads like a routine one.
+.ai-mini-card--destructive {
+  border-color: var(--warning-color);
+  background: var(--warning-color-bg);
+}
+
+.ai-mini-card__warn-icon {
+  margin-right: var(--space-1);
+  color: var(--warning-color);
+}
+
+.ai-mini-card__warn-line {
+  margin: var(--space-2) 0 0;
+  font-size: var(--fs-micro);
+  color: var(--warning-color);
+  font-weight: var(--fw-medium);
+}
+
+// The proposal's fields, as a compact definition list.
+.ai-mini-card__fields {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-1) var(--space-3);
+  margin: var(--space-2) 0 0;
+}
+
+.ai-mini-card__field-label {
+  margin: 0;
+  font-size: var(--fs-micro);
+  color: var(--text-muted);
+}
+
+.ai-mini-card__field-value {
+  margin: 0;
+  font-size: var(--fs-micro);
+  color: var(--text-color);
+  word-break: break-word;
+}
+
+// Inline key/value editor for fixing simple fields before approve.
+.ai-mini-card__editor {
+  margin-top: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ai-mini-card__edit-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.ai-mini-card__edit-key {
+  font-size: var(--fs-micro);
+  color: var(--text-muted);
+  font-family: var(--font-mono, monospace);
+}
+
+.ai-mini-card__edit-input {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--fs-micro);
+  color: var(--text-color);
+  background: var(--card-background);
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.18);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 }
 

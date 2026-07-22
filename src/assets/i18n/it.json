@@ -3937,7 +3937,8 @@
       "SAVE": "Salva",
       "REQUIRED": "Questo campo è obbligatorio",
       "BASE_URL_INVALID": "Inserisci un URL valido che inizi con http:// o https://",
-      "ACCURACY_INVALID": "Inserisci un valore tra 0 e 1"
+      "ACCURACY_INVALID": "Inserisci un valore tra 0 e 1",
+      "MODEL_HINT": "Per azioni agentiche complete (crea, modifica, elimina), usa un modello di tool-calling di frontiera, di classe OpenAI o Claude. I piccoli modelli locali vanno bene per la chat e le domande in sola lettura, ma non sono affidabili nelle azioni a più passaggi."
     }
   },
   "PERMISSIONS": {
@@ -5279,6 +5280,16 @@
     "DISMISS": "Ignora",
     "DISMISSED": "Ignorato",
     "CONFIRM_INERT_NOTE": "Questa proposta proviene da un messaggio precedente. Chiedi di nuovo per eseguirla.",
+    "SUBAGENTS": {
+      "TITLE": "Passaggi",
+      "ONE": "Passaggio",
+      "RUNNING": "In esecuzione",
+      "DONE": "Completato",
+      "FAILED": "Non riuscito",
+      "RETRY": "Riprova",
+      "ELAPSED": "{{s}} s",
+      "STEP_OF": "{{i}}/{{n}}"
+    },
     "STARTERS": {
       "LIST_CONNECTIONS": "Elenca le mie connessioni",
       "EXPLAIN_SCHEMA": "Spiega questo schema",
@@ -5332,6 +5343,21 @@
     "NO_HISTORY": "Ancora nessuna conversazione",
     "WELCOME_TITLE": "Come posso aiutarti?",
     "WELCOME_SUBTITLE": "Chiedi sui tuoi dati, genera SQL, crea un dataset o un grafico. Posso fare solo ciò che i tuoi accessi consentono.",
-    "CONTEXT_HINT": "L'assistente sa in quale schermata ti trovi per dare risposte più pertinenti."
+    "CONTEXT_HINT": "L'assistente sa in quale schermata ti trovi per dare risposte più pertinenti.",
+    "DESTRUCTIVE": {
+      "REVIEW": "Rivedi",
+      "CONFIRM": "Conferma eliminazione",
+      "WARNING": "Questa azione è permanente e non può essere annullata. Conferma per procedere."
+    },
+    "EDIT": {
+      "ACTION": "Modifica",
+      "APPLY": "Applica modifiche"
+    },
+    "UNDO": {
+      "ACTION": "Annulla",
+      "DONE_TITLE": "Annullato",
+      "FAILED_TITLE": "Impossibile annullare",
+      "FAILED": "Non è stato possibile annullare l'azione. Puoi rimuoverla manualmente."
+    }
   }
 }

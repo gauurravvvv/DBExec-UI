@@ -41,11 +41,6 @@
         <span class="ai-dock__title-meta">
           <span class="ai-dock__title-text">
             {{ 'AI_WORKSPACE.LAUNCHER.NAME' | translate }}
-            <span
-              *ngIf="chat.routedAgent()"
-              class="ai-dock__agent"
-              >{{ chat.routedAgent() }}</span
-            >
           </span>
           <span class="ai-dock__title-sub">
             <span
@@ -136,11 +131,14 @@
       >
         <p class="ai-msg__text" *ngIf="m.text">{{ m.text }}</p>
 
-        <!-- Progress chips while tools run -->
-        <div class="ai-msg__progress" *ngIf="m.progress?.length">
-          <span class="ai-msg__progress-item" *ngFor="let p of m.progress">
-            <i class="pi pi-spin pi-spinner"></i> {{ p }}
-          </span>
+        <!-- Live-computation tree: the tool steps Dex ran to compute this
+             answer. Dex's prose renders in the bubble above; these steps show
+             HOW it was computed (each is one tool call, expandable). -->
+        <div class="ai-msg__steps" *ngIf="m.steps?.length">
+          <app-ai-tool-step
+            *ngFor="let st of m.steps; trackBy: trackStep"
+            [step]="st"
+          ></app-ai-tool-step>
         </div>
 
         <!-- Compact card views -->
@@ -167,28 +165,151 @@
               </div>
             </div>
 
-            <!-- Confirm: the write gate -->
+            <!-- Confirm: the write gate. Approve runs it through the guarded
+                 /ai/confirm execute path (re-validate + re-RBAC + audit) —
+                 never the target endpoint directly. Destructive proposals are
+                 armed-then-confirmed with a warning treatment; any proposal
+                 can be edited inline before approving. -->
             <div
               class="ai-mini-card ai-mini-card--confirm"
+              [class.ai-mini-card--destructive]="asConfirm(c).destructive"
               *ngIf="isConfirm(c)"
             >
-              <p class="ai-mini-card__summary">{{ asConfirm(c).summary }}</p>
+              <p class="ai-mini-card__summary">
+                <i
+                  *ngIf="asConfirm(c).destructive"
+                  class="pi pi-exclamation-triangle ai-mini-card__warn-icon"
+                ></i>
+                {{ asConfirm(c).summary }}
+              </p>
               <p class="ai-mini-card__endpoint">
                 {{ asConfirm(c).method }} {{ asConfirm(c).endpoint }}
               </p>
-              <p
-                *ngIf="confirmInert(asConfirm(c))"
-                class="ai-mini-card__note"
+
+              <!-- Proposal fields (from the card) — hidden while editing. -->
+              <dl
+                class="ai-mini-card__fields"
+                *ngIf="
+                  asConfirm(c).fields?.length && !isEditing(asConfirm(c))
+                "
               >
-                {{ 'AI_WORKSPACE.CONFIRM_INERT_NOTE' | translate }}
+                <ng-container *ngFor="let f of asConfirm(c).fields">
+                  <dt class="ai-mini-card__field-label">{{ f.label }}</dt>
+                  <dd class="ai-mini-card__field-value">{{ f.value }}</dd>
+                </ng-container>
+              </dl>
+
+              <!-- Inline key/value editor: fix simple fields before approve. -->
+              <div
+                class="ai-mini-card__editor"
+                *ngIf="isEditing(asConfirm(c))"
+              >
+                <div
+                  class="ai-mini-card__edit-row"
+                  *ngFor="let row of editRows(asConfirm(c))"
+                >
+                  <label class="ai-mini-card__edit-key">{{ row.key }}</label>
+                  <input
+                    class="ai-mini-card__edit-input"
+                    type="text"
+                    autocomplete="off"
+                    [(ngModel)]="row.value"
+                    [disabled]="!row.editable || isBusy(asConfirm(c))"
+                    [attr.aria-label]="row.key"
+                  />
+                </div>
+                <div class="ai-mini-card__actions">
+                  <button
+                    type="button"
+                    class="ai-mini-card__btn ai-mini-card__btn--primary"
+                    (click)="commitEdit(asConfirm(c))"
+                  >
+                    {{ 'AI_WORKSPACE.EDIT.APPLY' | translate }}
+                  </button>
+                  <button
+                    type="button"
+                    class="ai-mini-card__btn"
+                    (click)="cancelEdit(asConfirm(c))"
+                  >
+                    {{ 'COMMON.CANCEL' | translate }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- Destructive arming warning line. -->
+              <p
+                *ngIf="
+                  asConfirm(c).destructive &&
+                  isArmed(asConfirm(c)) &&
+                  !confirmInert(asConfirm(c))
+                "
+                class="ai-mini-card__warn-line"
+              >
+                {{ 'AI_WORKSPACE.DESTRUCTIVE.WARNING' | translate }}
               </p>
-              <div class="ai-mini-card__actions" *ngIf="!confirmInert(asConfirm(c))">
+
+              <!-- Stale (rehydrated) proposal note. -->
+              <p *ngIf="confirmInert(asConfirm(c))" class="ai-mini-card__note">
+                <span *ngIf="!hasUndo(asConfirm(c))">
+                  {{ 'AI_WORKSPACE.CONFIRM_INERT_NOTE' | translate }}
+                </span>
+                <span *ngIf="hasUndo(asConfirm(c))">
+                  {{ 'AI_WORKSPACE.APPLY.DONE_TITLE' | translate }}
+                </span>
+              </p>
+
+              <!-- Undo (only for a reversible create that just succeeded). -->
+              <div
+                class="ai-mini-card__actions"
+                *ngIf="hasUndo(asConfirm(c))"
+              >
                 <button
                   type="button"
-                  class="ai-mini-card__btn ai-mini-card__btn--primary"
+                  class="ai-mini-card__btn ai-mini-card__btn--undo"
+                  [disabled]="isBusy(asConfirm(c))"
+                  (click)="runUndo(asConfirm(c))"
+                >
+                  <i class="pi pi-undo"></i>
+                  {{ 'AI_WORKSPACE.UNDO.ACTION' | translate }}
+                </button>
+              </div>
+
+              <!-- Approve / Edit / Cancel row (live proposals only). -->
+              <div
+                class="ai-mini-card__actions"
+                *ngIf="
+                  !confirmInert(asConfirm(c)) && !isEditing(asConfirm(c))
+                "
+              >
+                <button
+                  type="button"
+                  class="ai-mini-card__btn"
+                  [class.ai-mini-card__btn--primary]="!asConfirm(c).destructive"
+                  [class.ai-mini-card__btn--danger]="asConfirm(c).destructive"
+                  [disabled]="isBusy(asConfirm(c))"
                   (click)="confirm(asConfirm(c))"
                 >
-                  {{ 'AI_WORKSPACE.CONFIRM' | translate }}
+                  <i
+                    *ngIf="isBusy(asConfirm(c))"
+                    class="pi pi-spin pi-spinner"
+                  ></i>
+                  <span *ngIf="!asConfirm(c).destructive">
+                    {{ 'AI_WORKSPACE.CONFIRM' | translate }}
+                  </span>
+                  <span *ngIf="asConfirm(c).destructive && !isArmed(asConfirm(c))">
+                    {{ 'AI_WORKSPACE.DESTRUCTIVE.REVIEW' | translate }}
+                  </span>
+                  <span *ngIf="asConfirm(c).destructive && isArmed(asConfirm(c))">
+                    {{ 'AI_WORKSPACE.DESTRUCTIVE.CONFIRM' | translate }}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  class="ai-mini-card__btn"
+                  [disabled]="isBusy(asConfirm(c))"
+                  (click)="startEdit(asConfirm(c))"
+                >
+                  {{ 'AI_WORKSPACE.EDIT.ACTION' | translate }}
                 </button>
               </div>
             </div>

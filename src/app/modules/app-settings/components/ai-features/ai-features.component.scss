@@ -52,6 +52,20 @@
   margin: calc(var(--space-2) * -1) 0 0;
   font-size: var(--fs-micro);
   color: var(--text-muted);
+
+  // The model-recommendation hint carries a leading info icon; align it to
+  // the first line of wrapped text.
+  &--model {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+
+    i {
+      margin-top: 1px;
+      color: var(--primary-color);
+      font-size: var(--fs-label);
+    }
+  }
 }
 
 .secret-field {

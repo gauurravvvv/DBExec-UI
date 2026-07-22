@@ -5,27 +5,127 @@ import { StorageType } from 'src/app/core/constants/storage-type.constant';
 import { AI_WORKSPACE } from 'src/app/core/constants/api.constant';
 import { environment } from 'src/environments/environment';
 import type { AiCard } from 'src/app/shared/validators/ai-cards';
-import { ScreenContextService } from './screen-context.service';
+
+/**
+ * A sub-agent's own streamed event, nested inside a `subagent_event`
+ * envelope. Mirror of the BE `SubAgentEvent` union (engine/types.ts): the
+ * top-level stream MINUS the framing a sub-agent can't emit (no `routing`,
+ * `done`, or the delegate_* / subagent_event trio — a sub-agent never
+ * delegates further). The join key is `toolCallId` on the enclosing
+ * `subagent_event`.
+ */
+type SubAgentEvent =
+  | { type: 'message_delta'; text: string }
+  | { type: 'tool_start'; toolCallId: string; name: string; label: string }
+  | {
+      type: 'tool_end';
+      toolCallId: string;
+      name: string;
+      card?: AiCard;
+      resultPreview?: string;
+      isError?: boolean;
+    }
+  | { type: 'card'; card: AiCard }
+  | { type: 'error'; message: string; kind: string };
+
+/**
+ * An AgentEvent as received off the socket (mirror of the BE union in
+ * engine/types.ts). Tool + delegate events carry a `toolCallId` join key
+ * plus `startedAt`/`endedAt` epoch-ms timestamps for the live elapsed
+ * timer + done-state duration badge. Delegation streams a `delegate_start`
+ * → 1..N `subagent_event` (same `toolCallId`) → `delegate_end`.
+ */
+type AgentEvent =
+  | { type: 'ready' }
+  | { type: 'routing'; agent: string }
+  | { type: 'message_delta'; text: string }
+  | {
+      type: 'tool_start';
+      toolCallId: string;
+      name: string;
+      label: string;
+      startedAt: number;
+    }
+  | {
+      type: 'tool_end';
+      toolCallId: string;
+      name: string;
+      card?: AiCard;
+      resultPreview?: string;
+      isError?: boolean;
+      endedAt: number;
+    }
+  | {
+      type: 'delegate_start';
+      toolCallId: string;
+      agent: string;
+      label: string;
+      index: number;
+      total: number;
+      startedAt: number;
+    }
+  | { type: 'subagent_event'; toolCallId: string; agent: string; event: SubAgentEvent }
+  | {
+      type: 'delegate_end';
+      toolCallId: string;
+      agent: string;
+      isError?: boolean;
+      endedAt: number;
+    }
+  | { type: 'card'; card: AiCard }
+  | { type: 'done'; conversationId: string; messageId: string }
+  | { type: 'error'; message: string; kind: string };
+
+/** Live-computation step status. */
+export type AiStepStatus = 'running' | 'done' | 'error';
+
+/**
+ * One node in a message's live-computation tree (design §F). A plain tool
+ * call is a leaf; a delegate call carries `subAgents` — each of which has
+ * its OWN `steps` (the sub-agent's tool calls), recursively. Nesting is
+ * bounded to one level (supervisor → specialist) by the engine.
+ */
+export interface ToolStep {
+  toolCallId: string;
+  name: string;
+  label: string;
+  status: AiStepStatus;
+  startedAt: number;
+  endedAt?: number;
+  /** Short scrubbed JSON snippet — the collapsed `{}` chip. */
+  resultPreview?: string;
+  card?: AiCard;
+  /** Present when this step is a delegate; each is one specialist run. */
+  subAgents?: SubAgentStep[];
+  expanded?: boolean;
+}
+
+/** One delegated specialist run nested under a delegate `ToolStep`. */
+export interface SubAgentStep {
+  agent: string;
+  label: string;
+  index?: number;
+  total?: number;
+  status: AiStepStatus;
+  startedAt?: number;
+  endedAt?: number;
+  /** The sub-agent's own tool steps. */
+  steps: ToolStep[];
+  /** The sub-agent's streamed text. */
+  text: string;
+  expanded?: boolean;
+}
 
 /** One message rendered in the thread. */
 export interface AiThreadMessage {
   role: 'user' | 'assistant';
   text: string;
   cards: AiCard[];
+  /** The nested live-computation tree (delegate + tool steps). */
+  steps: ToolStep[];
   routedAgent?: string;
   progress?: string[];
 }
-
-/** An AgentEvent as received off the socket (mirror of BE union). */
-type AgentEvent =
-  | { type: 'ready' }
-  | { type: 'routing'; agent: string }
-  | { type: 'message_delta'; text: string }
-  | { type: 'tool_start'; name: string; label: string }
-  | { type: 'tool_end'; name: string; card?: AiCard }
-  | { type: 'card'; card: AiCard }
-  | { type: 'done'; conversationId: string; messageId: string }
-  | { type: 'error'; message: string; kind: string };
 
 export interface AiConversationSummary {
   id: string;
@@ -42,6 +142,12 @@ export type AiSocketState = 'idle' | 'connecting' | 'open' | 'closed';
  * the socket auto-connects on first send and auto-reconnects with backoff
  * after an unexpected drop. AgentEvents stream back over the same socket
  * and update signals live so the thread paints incrementally.
+ *
+ * The reducer builds a nested step tree keyed by `toolCallId`: supervisor
+ * tool calls are leaf `ToolStep`s; `delegate_*` opens a delegate step whose
+ * `subagent_event`s stream a specialist's own transcript into its
+ * `SubAgentStep`. There is NO screen context — agents pull domain context
+ * via tools, so the outbound frame never carries a screen snapshot.
  *
  * Conversation history (list + reopen) still uses plain REST — those are
  * one-shot reads, not the hot streaming path.
@@ -73,10 +179,7 @@ export class AiChatService {
   /** Intentional close (newConversation / destroy) suppresses reconnect. */
   private closingIntentionally = false;
 
-  constructor(
-    private http: HttpClientService,
-    private screenCtx: ScreenContextService,
-  ) {}
+  constructor(private http: HttpClientService) {}
 
   /** Start a fresh conversation (clears the transcript; keeps the socket). */
   newConversation(): void {
@@ -96,7 +199,7 @@ export class AiChatService {
     if (!text) return;
     this._messages.update((m) => [
       ...m,
-      { role: 'assistant', text, cards: [] },
+      { role: 'assistant', text, cards: [], steps: [] },
     ]);
   }
 
@@ -108,8 +211,8 @@ export class AiChatService {
     // Append the user message + an empty assistant bubble to fill in.
     this._messages.update((m) => [
       ...m,
-      { role: 'user', text, cards: [] },
-      { role: 'assistant', text: '', cards: [], progress: [] },
+      { role: 'user', text, cards: [], steps: [] },
+      { role: 'assistant', text: '', cards: [], steps: [], progress: [] },
     ]);
     this.streamingIdx = this._messages().length - 1;
     this._streaming.set(true);
@@ -217,7 +320,11 @@ export class AiChatService {
     this.reconnectTimer = setTimeout(() => this.connect(), delay);
   }
 
-  /** Send a chat frame over the open socket. */
+  /**
+   * Send a chat frame over the open socket. The frame carries only the
+   * message + optional conversation id — no screen context. Agents pull
+   * domain context (schema, session, datetime) via tools instead.
+   */
   private transmit(message: string): void {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
     try {
@@ -226,7 +333,6 @@ export class AiChatService {
           type: 'chat',
           message,
           conversationId: this._conversationId() ?? undefined,
-          screenContext: this.screenCtx.snapshot(),
         }),
       );
     } catch {
@@ -236,6 +342,8 @@ export class AiChatService {
       this._streaming.set(false);
     }
   }
+
+  // ── Event reducer (nested step tree, keyed by toolCallId) ──────────
 
   /** Apply one AgentEvent to the streaming assistant message. */
   private applyEvent(event: AgentEvent): void {
@@ -248,14 +356,76 @@ export class AiChatService {
         this.patchAssistant(idx, (m) => (m.routedAgent = event.agent));
         break;
       case 'message_delta':
+        // Top-level supervisor text.
         this.patchAssistant(idx, (m) => (m.text += event.text));
         break;
       case 'tool_start':
-        this.patchAssistant(idx, (m) => (m.progress = [...(m.progress ?? []), event.label]));
+        this.patchAssistant(idx, (m) => {
+          m.progress = [...(m.progress ?? []), event.label];
+          m.steps.push({
+            toolCallId: event.toolCallId,
+            name: event.name,
+            label: event.label,
+            status: 'running',
+            startedAt: event.startedAt,
+          });
+        });
         break;
       case 'tool_end':
         this.patchAssistant(idx, (m) => {
+          const step = this.findStep(m.steps, event.toolCallId);
+          if (step) {
+            step.status = event.isError ? 'error' : 'done';
+            step.endedAt = event.endedAt;
+            if (event.resultPreview !== undefined) step.resultPreview = event.resultPreview;
+            if (event.card) step.card = event.card;
+          }
           if (event.card) m.cards.push(event.card);
+        });
+        break;
+      case 'delegate_start':
+        this.patchAssistant(idx, (m) => {
+          m.progress = [...(m.progress ?? []), event.label];
+          m.steps.push({
+            toolCallId: event.toolCallId,
+            name: event.agent,
+            label: event.label,
+            status: 'running',
+            startedAt: event.startedAt,
+            subAgents: [
+              {
+                agent: event.agent,
+                label: event.label,
+                index: event.index,
+                total: event.total,
+                status: 'running',
+                startedAt: event.startedAt,
+                steps: [],
+                text: '',
+              },
+            ],
+          });
+        });
+        break;
+      case 'subagent_event':
+        this.patchAssistant(idx, (m) => {
+          const parent = this.findStep(m.steps, event.toolCallId);
+          const sub = parent?.subAgents?.[0];
+          if (sub) this.applySubEvent(sub, event.event);
+        });
+        break;
+      case 'delegate_end':
+        this.patchAssistant(idx, (m) => {
+          const parent = this.findStep(m.steps, event.toolCallId);
+          if (!parent) return;
+          const status: AiStepStatus = event.isError ? 'error' : 'done';
+          parent.status = status;
+          parent.endedAt = event.endedAt;
+          const sub = parent.subAgents?.[0];
+          if (sub) {
+            sub.status = status;
+            sub.endedAt = event.endedAt;
+          }
         });
         break;
       case 'card':
@@ -276,17 +446,77 @@ export class AiChatService {
     }
   }
 
-  /** Immutably patch the assistant message at `idx` (OnPush-safe). */
+  /** Route one sub-agent event into its SubAgentStep (mutates in place). */
+  private applySubEvent(sub: SubAgentStep, ev: SubAgentEvent): void {
+    switch (ev.type) {
+      case 'message_delta':
+        sub.text += ev.text;
+        break;
+      case 'tool_start':
+        sub.steps.push({
+          toolCallId: ev.toolCallId,
+          name: ev.name,
+          label: ev.label,
+          status: 'running',
+          startedAt: Date.now(),
+        });
+        break;
+      case 'tool_end': {
+        const step = this.findStep(sub.steps, ev.toolCallId);
+        if (step) {
+          step.status = ev.isError ? 'error' : 'done';
+          step.endedAt = Date.now();
+          if (ev.resultPreview !== undefined) step.resultPreview = ev.resultPreview;
+          if (ev.card) step.card = ev.card;
+        }
+        break;
+      }
+      case 'card':
+        // Attach to the sub-agent's most recent step, else its last step.
+        if (sub.steps.length) sub.steps[sub.steps.length - 1].card = ev.card;
+        break;
+      case 'error':
+        sub.status = 'error';
+        break;
+    }
+  }
+
+  /** Find a step by toolCallId within a step list (one shallow level). */
+  private findStep(steps: ToolStep[], toolCallId: string): ToolStep | undefined {
+    return steps.find((s) => s.toolCallId === toolCallId);
+  }
+
+  /**
+   * Immutably patch the assistant message at `idx` (OnPush-safe). Clones
+   * the message + its `cards`/`steps` arrays; the reducer mutates the
+   * freshly-cloned nodes, then the new message replaces the old in a new
+   * list so signals fire and OnPush repaints.
+   */
   private patchAssistant(idx: number, fn: (m: AiThreadMessage) => void): void {
     if (idx < 0) return;
     this._messages.update((list) => {
       if (idx >= list.length) return list;
       const next = list.slice();
-      const msg = { ...next[idx], cards: next[idx].cards.slice() };
+      const msg = {
+        ...next[idx],
+        cards: next[idx].cards.slice(),
+        steps: this.cloneSteps(next[idx].steps),
+      };
       fn(msg);
       next[idx] = msg;
       return next;
     });
+  }
+
+  /** Deep-clone the step tree so in-place reducer mutation stays OnPush-safe. */
+  private cloneSteps(steps: ToolStep[]): ToolStep[] {
+    return steps.map((s) => ({
+      ...s,
+      subAgents: s.subAgents?.map((sa) => ({
+        ...sa,
+        steps: this.cloneSteps(sa.steps),
+      })),
+    }));
   }
 
   // ── Conversation history (plain REST — cold reads) ─────────────────
@@ -327,6 +557,7 @@ export class AiChatService {
                 role: m.role as 'user' | 'assistant',
                 text: m.content ?? '',
                 cards: m.cards ?? [],
+                steps: [],
                 routedAgent: m.routedAgent ?? undefined,
               })),
           );

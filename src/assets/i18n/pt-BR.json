@@ -3937,7 +3937,8 @@
       "SAVE": "Salvar",
       "REQUIRED": "Este campo é obrigatório",
       "BASE_URL_INVALID": "Insira uma URL válida começando com http:// ou https://",
-      "ACCURACY_INVALID": "Insira um valor entre 0 e 1"
+      "ACCURACY_INVALID": "Insira um valor entre 0 e 1",
+      "MODEL_HINT": "Para ações agênticas completas (criar, editar, excluir), use um modelo de chamada de ferramentas de ponta, da classe OpenAI ou Claude. Modelos locais pequenos servem para chat e perguntas somente leitura, mas não são confiáveis em ações de várias etapas."
     }
   },
   "PERMISSIONS": {
@@ -5279,6 +5280,16 @@
     "DISMISS": "Dispensar",
     "DISMISSED": "Dispensado",
     "CONFIRM_INERT_NOTE": "Esta proposta é de uma mensagem anterior. Pergunte novamente para executá-la.",
+    "SUBAGENTS": {
+      "TITLE": "Etapas",
+      "ONE": "Etapa",
+      "RUNNING": "Em execução",
+      "DONE": "Concluído",
+      "FAILED": "Falhou",
+      "RETRY": "Tentar novamente",
+      "ELAPSED": "{{s}} s",
+      "STEP_OF": "{{i}}/{{n}}"
+    },
     "STARTERS": {
       "LIST_CONNECTIONS": "Listar minhas conexões",
       "EXPLAIN_SCHEMA": "Explicar este esquema",
@@ -5332,6 +5343,21 @@
     "NO_HISTORY": "Ainda não há conversas",
     "WELCOME_TITLE": "Como posso ajudar?",
     "WELCOME_SUBTITLE": "Pergunte sobre seus dados, gere SQL, crie um conjunto de dados ou um gráfico. Só posso fazer o que seu acesso permite.",
-    "CONTEXT_HINT": "O assistente sabe em qual tela você está para dar respostas mais relevantes."
+    "CONTEXT_HINT": "O assistente sabe em qual tela você está para dar respostas mais relevantes.",
+    "DESTRUCTIVE": {
+      "REVIEW": "Revisar",
+      "CONFIRM": "Confirmar exclusão",
+      "WARNING": "Esta ação é permanente e não pode ser desfeita. Confirme para continuar."
+    },
+    "EDIT": {
+      "ACTION": "Editar",
+      "APPLY": "Aplicar alterações"
+    },
+    "UNDO": {
+      "ACTION": "Desfazer",
+      "DONE_TITLE": "Desfeito",
+      "FAILED_TITLE": "Não foi possível desfazer",
+      "FAILED": "A ação não pôde ser desfeita. Você pode removê-la manualmente."
+    }
   }
 }

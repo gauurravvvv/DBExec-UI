@@ -1,0 +1,151 @@
+// app-ai-subagents — the "SUB-AGENTS" section under a delegate step.
+// Token-driven; recursion is bounded to one level by the engine.
+
+.ai-subagents {
+  margin-top: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px dashed var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ai-subagents__label {
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.ai-subagent {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--card-background);
+  overflow: hidden;
+
+  &--running {
+    border-color: rgba(var(--primary-color-rgb), 0.35);
+  }
+  &--error {
+    border-color: rgba(var(--danger-color-rgb, 220, 53, 69), 0.4);
+  }
+}
+
+// ── Sub-agent header ───────────────────────────────────────────────
+.ai-subagent__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  background: transparent;
+  color: var(--text-color);
+  font-family: var(--font-ui);
+  font-size: var(--fs-control);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--motion-fast) ease;
+
+  &:hover {
+    background: var(--hover-background);
+  }
+}
+
+.ai-subagent__status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+
+  i {
+    font-size: var(--fs-control);
+  }
+
+  .ai-subagent--running & i {
+    color: var(--primary-color);
+  }
+  .ai-subagent--done & i {
+    color: var(--success-color, #16a34a);
+  }
+  .ai-subagent--error & i {
+    color: var(--danger-color, #dc3545);
+  }
+}
+
+.ai-subagent__title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.ai-subagent__sep {
+  color: var(--text-muted);
+}
+
+.ai-subagent__name {
+  color: var(--text-color);
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: var(--fw-semibold);
+}
+
+.ai-subagent__step-of {
+  flex: 0 0 auto;
+  font-size: var(--fs-micro);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-color);
+  background: rgba(var(--primary-color-rgb), 0.1);
+  border-radius: var(--radius-pill);
+  padding: 0 var(--space-2);
+}
+
+.ai-subagent__timer,
+.ai-subagent__duration {
+  flex: 0 0 auto;
+  margin-left: auto;
+  font-size: var(--fs-micro);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+.ai-subagent__timer {
+  color: var(--primary-color);
+}
+
+.ai-subagent__chevron {
+  flex: 0 0 auto;
+  font-size: var(--fs-micro);
+  color: var(--secondary-color);
+}
+
+// ── Sub-agent body ─────────────────────────────────────────────────
+.ai-subagent__body {
+  padding: 0 var(--space-3) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  overflow: hidden;
+}
+
+.ai-subagent__text {
+  margin: 0;
+  font-size: var(--fs-control);
+  line-height: 1.5;
+  color: var(--text-color);
+  white-space: pre-wrap;
+  word-break: break-word;
+}

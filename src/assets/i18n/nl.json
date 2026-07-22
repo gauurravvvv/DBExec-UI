@@ -3937,7 +3937,8 @@
       "SAVE": "Opslaan",
       "REQUIRED": "Dit veld is verplicht",
       "BASE_URL_INVALID": "Voer een geldige URL in die begint met http:// of https://",
-      "ACCURACY_INVALID": "Voer een waarde tussen 0 en 1 in"
+      "ACCURACY_INVALID": "Voer een waarde tussen 0 en 1 in",
+      "MODEL_HINT": "Gebruik voor volledige agentische acties (aanmaken, bewerken, verwijderen) een geavanceerd tool-calling-model van OpenAI- of Claude-klasse. Kleine lokale modellen zijn prima voor chat en alleen-lezen vragen, maar onbetrouwbaar bij acties met meerdere stappen."
     }
   },
   "PERMISSIONS": {
@@ -5279,6 +5280,16 @@
     "DISMISS": "Negeren",
     "DISMISSED": "Genegeerd",
     "CONFIRM_INERT_NOTE": "Dit voorstel komt uit een eerder bericht. Vraag het opnieuw om het uit te voeren.",
+    "SUBAGENTS": {
+      "TITLE": "Stappen",
+      "ONE": "Stap",
+      "RUNNING": "Wordt uitgevoerd",
+      "DONE": "Klaar",
+      "FAILED": "Mislukt",
+      "RETRY": "Opnieuw",
+      "ELAPSED": "{{s}} s",
+      "STEP_OF": "{{i}}/{{n}}"
+    },
     "STARTERS": {
       "LIST_CONNECTIONS": "Mijn verbindingen weergeven",
       "EXPLAIN_SCHEMA": "Dit schema uitleggen",
@@ -5332,6 +5343,21 @@
     "NO_HISTORY": "Nog geen gesprekken",
     "WELCOME_TITLE": "Waarmee kan ik helpen?",
     "WELCOME_SUBTITLE": "Stel vragen over je gegevens, genereer SQL, bouw een dataset of grafiek. Ik kan alleen doen wat je toegang toestaat.",
-    "CONTEXT_HINT": "De assistent weet op welk scherm je bent om relevantere antwoorden te geven."
+    "CONTEXT_HINT": "De assistent weet op welk scherm je bent om relevantere antwoorden te geven.",
+    "DESTRUCTIVE": {
+      "REVIEW": "Controleren",
+      "CONFIRM": "Verwijderen bevestigen",
+      "WARNING": "Deze actie is permanent en kan niet ongedaan worden gemaakt. Bevestig om door te gaan."
+    },
+    "EDIT": {
+      "ACTION": "Bewerken",
+      "APPLY": "Wijzigingen toepassen"
+    },
+    "UNDO": {
+      "ACTION": "Ongedaan maken",
+      "DONE_TITLE": "Ongedaan gemaakt",
+      "FAILED_TITLE": "Kan niet ongedaan maken",
+      "FAILED": "De actie kon niet ongedaan worden gemaakt. U kunt deze handmatig verwijderen."
+    }
   }
 }

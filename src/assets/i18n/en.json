@@ -3940,7 +3940,8 @@
       "SAVE": "Save",
       "REQUIRED": "This field is required",
       "BASE_URL_INVALID": "Enter a valid URL starting with http:// or https://",
-      "ACCURACY_INVALID": "Enter a value between 0 and 1"
+      "ACCURACY_INVALID": "Enter a value between 0 and 1",
+      "MODEL_HINT": "For full agentic actions (create, edit, delete), use a frontier tool-calling model such as an OpenAI- or Claude-class model. Small local models are fine for chat and read-only questions but are unreliable at multi-step actions."
     }
   },
   "validation": {
@@ -5276,6 +5277,16 @@
     "DISMISS": "Dismiss",
     "DISMISSED": "Dismissed",
     "CONFIRM_INERT_NOTE": "This proposal is from an earlier message. Ask again to run it.",
+    "SUBAGENTS": {
+      "TITLE": "Steps",
+      "ONE": "Step",
+      "RUNNING": "Running",
+      "DONE": "Done",
+      "FAILED": "Failed",
+      "RETRY": "Retry",
+      "ELAPSED": "{{s}}s",
+      "STEP_OF": "{{i}}/{{n}}"
+    },
     "STARTERS": {
       "LIST_CONNECTIONS": "List my connections",
       "EXPLAIN_SCHEMA": "Explain this schema",
@@ -5329,6 +5340,21 @@
     "NO_HISTORY": "No conversations yet",
     "WELCOME_TITLE": "How can I help?",
     "WELCOME_SUBTITLE": "Ask about your data, generate SQL, build a dataset or a chart. I can only do what your access allows.",
-    "CONTEXT_HINT": "The assistant knows which screen you are on to give more relevant answers."
+    "CONTEXT_HINT": "The assistant knows which screen you are on to give more relevant answers.",
+    "DESTRUCTIVE": {
+      "REVIEW": "Review",
+      "CONFIRM": "Confirm delete",
+      "WARNING": "This action is permanent and cannot be undone. Confirm to proceed."
+    },
+    "EDIT": {
+      "ACTION": "Edit",
+      "APPLY": "Apply changes"
+    },
+    "UNDO": {
+      "ACTION": "Undo",
+      "DONE_TITLE": "Undone",
+      "FAILED_TITLE": "Could not undo",
+      "FAILED": "The action could not be undone. You can remove it manually."
+    }
   }
 }

@@ -1,0 +1,155 @@
+<!-- One live-computation node: a collapsible row + (when expanded) its rich
+     card and, for delegates, its nested sub-agents block. Token-driven,
+     OnPush; the reducer in AiChatService owns the model. -->
+<div
+  class="ai-step"
+  [class.ai-step--running]="step.status === 'running'"
+  [class.ai-step--done]="step.status === 'done'"
+  [class.ai-step--error]="step.status === 'error'"
+  [class.ai-step--delegate]="isDelegate()"
+>
+  <!-- Header row: status icon · label · elapsed/duration · {} chip · chevron -->
+  <button
+    type="button"
+    class="ai-step__head"
+    (click)="toggle()"
+    [attr.aria-expanded]="isExpanded()"
+  >
+    <span
+      class="ai-step__status"
+      [attr.aria-label]="statusLabel"
+      [title]="statusLabel"
+    >
+      <i [class]="statusIcon"></i>
+    </span>
+
+    <span class="ai-step__label">{{ step.label || step.name }}</span>
+
+    <!-- Live elapsed while running; frozen duration badge once done. -->
+    <span
+      *ngIf="step.status === 'running'"
+      class="ai-step__timer"
+      [title]="'AI_WORKSPACE.SUBAGENTS.ELAPSED' | translate: { s: elapsedSeconds() }"
+    >
+      {{ 'AI_WORKSPACE.SUBAGENTS.ELAPSED' | translate: { s: elapsedSeconds() } }}
+    </span>
+    <span
+      *ngIf="step.status !== 'running' && durationLabel()"
+      class="ai-step__duration"
+    >
+      {{ durationLabel() }}
+    </span>
+
+    <!-- The muted {} JSON snippet (collapsed preview) + copy affordance. -->
+    <span
+      *ngIf="!isExpanded() && step.resultPreview"
+      class="ai-step__preview"
+    >
+      <code class="ai-step__preview-code">{{ step.resultPreview }}</code>
+      <span
+        class="ai-step__copy"
+        role="button"
+        tabindex="0"
+        [attr.aria-label]="'AI_WORKSPACE.COPY' | translate"
+        [title]="'AI_WORKSPACE.COPY' | translate"
+        (click)="copyResult($event)"
+        (keydown.enter)="copyResult($event)"
+      >
+        <i class="pi pi-copy"></i>
+      </span>
+    </span>
+
+    <i
+      class="ai-step__chevron pi"
+      [class.pi-chevron-down]="isExpanded()"
+      [class.pi-chevron-right]="!isExpanded()"
+    ></i>
+  </button>
+
+  <!-- Expanded body: full JSON, the rich card, and the nested sub-agents. -->
+  <div class="ai-step__body" *ngIf="isExpanded()" @expandBody>
+    <!-- Full result JSON with a copy button (delegates rarely have one). -->
+    <div class="ai-step__json" *ngIf="step.resultPreview">
+      <pre class="ai-step__json-pre">{{ step.resultPreview }}</pre>
+      <button
+        type="button"
+        class="ai-step__json-copy"
+        (click)="copyResult($event)"
+        [attr.aria-label]="'AI_WORKSPACE.COPY' | translate"
+        [title]="'AI_WORKSPACE.COPY' | translate"
+      >
+        <i class="pi pi-copy"></i>
+      </button>
+    </div>
+
+    <!-- The rich card, if this step resolved to one. Compact renderers,
+         mirroring the launcher's mini-card views. -->
+    <ng-container *ngIf="card as c">
+      <!-- SQL -->
+      <div class="ai-step-card ai-step-card--sql" *ngIf="c.kind === 'sql'">
+        <pre class="ai-step-card__sql">{{ $any(c).sql }}</pre>
+      </div>
+
+      <!-- Confirm — write proposal (read-only view here; action lives in the
+           thread's confirm card so the write gate stays in one place). -->
+      <div class="ai-step-card ai-step-card--confirm" *ngIf="c.kind === 'confirm'">
+        <p class="ai-step-card__summary">{{ $any(c).summary }}</p>
+        <p class="ai-step-card__endpoint">
+          {{ $any(c).method }} {{ $any(c).endpoint }}
+        </p>
+      </div>
+
+      <!-- Dataset draft -->
+      <div
+        class="ai-step-card ai-step-card--dataset"
+        *ngIf="c.kind === 'dataset_draft'"
+      >
+        <p class="ai-step-card__summary">{{ $any(c).name }}</p>
+        <pre class="ai-step-card__sql">{{ $any(c).sql }}</pre>
+      </div>
+
+      <!-- Error -->
+      <div class="ai-step-card ai-step-card--error" *ngIf="c.kind === 'error'">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ $any(c).message }}</span>
+      </div>
+
+      <!-- Data-heavy cards (grid / schema / connections / table / chart):
+           a compact summary chip — full render lives on their own surfaces. -->
+      <div
+        class="ai-step-card ai-step-card--rich"
+        *ngIf="
+          c.kind === 'result_grid' ||
+          c.kind === 'schema' ||
+          c.kind === 'connections' ||
+          c.kind === 'table' ||
+          c.kind === 'visual_preview'
+        "
+      >
+        <i class="pi pi-table"></i>
+        <span *ngIf="c.kind === 'result_grid'">{{
+          'AI_WORKSPACE.ROWS' | translate: { count: $any(c).rowCount }
+        }}</span>
+        <span *ngIf="c.kind === 'schema'">{{
+          'AI_WORKSPACE.CARD_COMPACT.SCHEMA' | translate
+        }}</span>
+        <span *ngIf="c.kind === 'connections'">{{
+          'AI_WORKSPACE.CARD_COMPACT.CONNECTIONS'
+            | translate: { count: $any(c).items.length }
+        }}</span>
+        <span *ngIf="c.kind === 'table'">{{ $any(c).title }}</span>
+        <span *ngIf="c.kind === 'visual_preview'">{{
+          'AI_WORKSPACE.CARD_COMPACT.VISUAL'
+            | translate: { type: $any(c).chartType }
+        }}</span>
+      </div>
+    </ng-container>
+
+    <!-- Nested sub-agents (delegates only). -->
+    <app-ai-subagents
+      *ngIf="isDelegate()"
+      [subAgents]="step.subAgents!"
+      [depth]="depth + 1"
+    ></app-ai-subagents>
+  </div>
+</div>

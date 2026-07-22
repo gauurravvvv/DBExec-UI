@@ -3937,7 +3937,8 @@
       "SAVE": "保存",
       "REQUIRED": "此字段为必填项",
       "BASE_URL_INVALID": "请输入以 http:// 或 https:// 开头的有效 URL",
-      "ACCURACY_INVALID": "请输入 0 到 1 之间的值"
+      "ACCURACY_INVALID": "请输入 0 到 1 之间的值",
+      "MODEL_HINT": "要执行完整的智能体操作（创建、编辑、删除），请使用 OpenAI 或 Claude 级别的前沿工具调用模型。小型本地模型适合聊天和只读问题，但在多步骤操作中不够可靠。"
     }
   },
   "PERMISSIONS": {
@@ -5279,6 +5280,16 @@
     "DISMISS": "忽略",
     "DISMISSED": "已忽略",
     "CONFIRM_INERT_NOTE": "此建议来自较早的消息。请再次询问以运行它。",
+    "SUBAGENTS": {
+      "TITLE": "步骤",
+      "ONE": "步骤",
+      "RUNNING": "运行中",
+      "DONE": "完成",
+      "FAILED": "失败",
+      "RETRY": "重试",
+      "ELAPSED": "{{s}} 秒",
+      "STEP_OF": "{{i}}/{{n}}"
+    },
     "STARTERS": {
       "LIST_CONNECTIONS": "列出我的连接",
       "EXPLAIN_SCHEMA": "解释此架构",
@@ -5332,6 +5343,21 @@
     "NO_HISTORY": "尚无对话",
     "WELCOME_TITLE": "我能帮您做什么？",
     "WELCOME_SUBTITLE": "询问您的数据、生成 SQL、构建数据集或图表。我只能执行您的权限允许的操作。",
-    "CONTEXT_HINT": "助手知道您所在的页面，以给出更相关的回答。"
+    "CONTEXT_HINT": "助手知道您所在的页面，以给出更相关的回答。",
+    "DESTRUCTIVE": {
+      "REVIEW": "查看",
+      "CONFIRM": "确认删除",
+      "WARNING": "此操作是永久性的，无法撤销。确认后继续。"
+    },
+    "EDIT": {
+      "ACTION": "编辑",
+      "APPLY": "应用更改"
+    },
+    "UNDO": {
+      "ACTION": "撤销",
+      "DONE_TITLE": "已撤销",
+      "FAILED_TITLE": "无法撤销",
+      "FAILED": "无法撤销该操作。您可以手动删除。"
+    }
   }
 }

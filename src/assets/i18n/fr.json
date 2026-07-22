@@ -3937,7 +3937,8 @@
       "SAVE": "Enregistrer",
       "REQUIRED": "Ce champ est obligatoire",
       "BASE_URL_INVALID": "Saisissez une URL valide commençant par http:// ou https://",
-      "ACCURACY_INVALID": "Saisissez une valeur entre 0 et 1"
+      "ACCURACY_INVALID": "Saisissez une valeur entre 0 et 1",
+      "MODEL_HINT": "Pour des actions agentiques complètes (créer, modifier, supprimer), utilisez un modèle d'appel d'outils de pointe, de classe OpenAI ou Claude. Les petits modèles locaux conviennent au chat et aux questions en lecture seule, mais sont peu fiables pour les actions en plusieurs étapes."
     }
   },
   "PERMISSIONS": {
@@ -5279,6 +5280,16 @@
     "DISMISS": "Ignorer",
     "DISMISSED": "Ignoré",
     "CONFIRM_INERT_NOTE": "Cette proposition provient d'un message précédent. Redemandez pour l'exécuter.",
+    "SUBAGENTS": {
+      "TITLE": "Étapes",
+      "ONE": "Étape",
+      "RUNNING": "En cours",
+      "DONE": "Terminé",
+      "FAILED": "Échec",
+      "RETRY": "Réessayer",
+      "ELAPSED": "{{s}} s",
+      "STEP_OF": "{{i}}/{{n}}"
+    },
     "STARTERS": {
       "LIST_CONNECTIONS": "Lister mes connexions",
       "EXPLAIN_SCHEMA": "Expliquer ce schéma",
@@ -5332,6 +5343,21 @@
     "NO_HISTORY": "Aucune conversation pour le moment",
     "WELCOME_TITLE": "Comment puis-je aider ?",
     "WELCOME_SUBTITLE": "Posez des questions sur vos données, générez du SQL, créez un jeu de données ou un graphique. Je ne peux faire que ce que vos accès autorisent.",
-    "CONTEXT_HINT": "L'assistant sait sur quel écran vous êtes pour donner des réponses plus pertinentes."
+    "CONTEXT_HINT": "L'assistant sait sur quel écran vous êtes pour donner des réponses plus pertinentes.",
+    "DESTRUCTIVE": {
+      "REVIEW": "Examiner",
+      "CONFIRM": "Confirmer la suppression",
+      "WARNING": "Cette action est définitive et irréversible. Confirmez pour continuer."
+    },
+    "EDIT": {
+      "ACTION": "Modifier",
+      "APPLY": "Appliquer les modifications"
+    },
+    "UNDO": {
+      "ACTION": "Annuler",
+      "DONE_TITLE": "Annulé",
+      "FAILED_TITLE": "Impossible d'annuler",
+      "FAILED": "L'action n'a pas pu être annulée. Vous pouvez la supprimer manuellement."
+    }
   }
 }

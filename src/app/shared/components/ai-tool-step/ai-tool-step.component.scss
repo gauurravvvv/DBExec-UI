@@ -1,0 +1,262 @@
+// app-ai-tool-step — one collapsible node of the live-computation tree.
+// Token-driven throughout; the "computation" aesthetic (spinner → check,
+// {} JSON chip, chevron) mirrors the UltraSignal tool-panel look.
+
+.ai-step {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--surface-1, var(--card-background));
+  overflow: hidden;
+
+  & + & {
+    margin-top: var(--space-2);
+  }
+
+  // Delegates carry a subtle primary accent to read as "an agent, not a tool".
+  &--delegate {
+    border-color: rgba(var(--primary-color-rgb), 0.35);
+    background: linear-gradient(
+      180deg,
+      rgba(var(--primary-color-rgb), 0.04),
+      transparent 40%
+    );
+  }
+
+  &--error {
+    border-color: rgba(var(--danger-color-rgb, 220, 53, 69), 0.4);
+  }
+}
+
+// ── Header row ─────────────────────────────────────────────────────
+.ai-step__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  background: transparent;
+  color: var(--text-color);
+  font-family: var(--font-ui);
+  font-size: var(--fs-control);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--motion-fast) ease;
+
+  &:hover {
+    background: var(--hover-background);
+  }
+}
+
+.ai-step__status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+
+  i {
+    font-size: var(--fs-control);
+  }
+
+  .ai-step--running & i {
+    color: var(--primary-color);
+  }
+  .ai-step--done & i {
+    color: var(--success-color, #16a34a);
+  }
+  .ai-step--error & i {
+    color: var(--danger-color, #dc3545);
+  }
+}
+
+.ai-step__label {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: var(--fw-medium);
+
+  .ai-step--delegate & {
+    font-weight: var(--fw-semibold);
+  }
+}
+
+.ai-step__timer,
+.ai-step__duration {
+  flex: 0 0 auto;
+  font-size: var(--fs-micro);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+.ai-step__timer {
+  color: var(--primary-color);
+}
+
+// The muted {} JSON chip shown while collapsed.
+.ai-step__preview {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: flex-end;
+  overflow: hidden;
+}
+
+.ai-step__preview-code {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--fs-micro);
+  color: var(--text-muted);
+  background: var(--overlay-background, rgba(0, 0, 0, 0.04));
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.ai-step__copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+  color: var(--secondary-color);
+  cursor: pointer;
+  transition:
+    color var(--motion-fast) ease,
+    background var(--motion-fast) ease;
+
+  &:hover {
+    color: var(--text-color);
+    background: var(--hover-background);
+  }
+
+  i {
+    font-size: var(--fs-micro);
+  }
+}
+
+.ai-step__chevron {
+  flex: 0 0 auto;
+  margin-left: var(--space-1);
+  font-size: var(--fs-micro);
+  color: var(--secondary-color);
+}
+
+// ── Expanded body ──────────────────────────────────────────────────
+.ai-step__body {
+  padding: 0 var(--space-3) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  overflow: hidden;
+}
+
+.ai-step__json {
+  position: relative;
+}
+
+.ai-step__json-pre {
+  margin: 0;
+  padding: var(--space-2);
+  background: var(--overlay-background, rgba(0, 0, 0, 0.04));
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--fs-micro);
+  line-height: 1.5;
+  max-height: 200px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text-muted);
+}
+
+.ai-step__json-copy {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--card-background);
+  color: var(--secondary-color);
+  cursor: pointer;
+  transition:
+    color var(--motion-fast) ease,
+    background var(--motion-fast) ease;
+
+  &:hover {
+    color: var(--text-color);
+    background: var(--hover-background);
+  }
+
+  i {
+    font-size: var(--fs-micro);
+  }
+}
+
+// ── Cards inside a step (compact renderers) ────────────────────────
+.ai-step-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  background: var(--card-background);
+  font-size: var(--fs-control);
+
+  &--error {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    border-color: rgba(var(--danger-color-rgb, 220, 53, 69), 0.4);
+    color: var(--danger-color, #dc3545);
+  }
+
+  &--rich {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-color);
+
+    i {
+      color: var(--primary-color);
+    }
+  }
+}
+
+.ai-step-card__summary {
+  margin: 0 0 var(--space-1);
+  font-weight: var(--fw-semibold);
+  color: var(--text-color);
+}
+
+.ai-step-card__endpoint {
+  margin: 0;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--fs-micro);
+  color: var(--text-muted);
+}
+
+.ai-step-card__sql {
+  margin: 0;
+  padding: var(--space-2);
+  background: var(--overlay-background, rgba(0, 0, 0, 0.04));
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--fs-micro);
+  line-height: 1.5;
+  max-height: 160px;
+  overflow: auto;
+  white-space: pre;
+}

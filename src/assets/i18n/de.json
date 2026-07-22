@@ -3937,7 +3937,8 @@
       "SAVE": "Speichern",
       "REQUIRED": "Dieses Feld ist erforderlich",
       "BASE_URL_INVALID": "Geben Sie eine gültige URL ein, die mit http:// oder https:// beginnt",
-      "ACCURACY_INVALID": "Geben Sie einen Wert zwischen 0 und 1 ein"
+      "ACCURACY_INVALID": "Geben Sie einen Wert zwischen 0 und 1 ein",
+      "MODEL_HINT": "Für vollständige agentische Aktionen (erstellen, bearbeiten, löschen) verwenden Sie ein leistungsstarkes Tool-Calling-Modell der OpenAI- oder Claude-Klasse. Kleine lokale Modelle eignen sich für Chat und rein lesende Fragen, sind aber bei mehrstufigen Aktionen unzuverlässig."
     }
   },
   "PERMISSIONS": {
@@ -5279,6 +5280,16 @@
     "DISMISS": "Verwerfen",
     "DISMISSED": "Verworfen",
     "CONFIRM_INERT_NOTE": "Dieser Vorschlag stammt aus einer früheren Nachricht. Fragen Sie erneut, um ihn auszuführen.",
+    "SUBAGENTS": {
+      "TITLE": "Schritte",
+      "ONE": "Schritt",
+      "RUNNING": "Läuft",
+      "DONE": "Fertig",
+      "FAILED": "Fehlgeschlagen",
+      "RETRY": "Wiederholen",
+      "ELAPSED": "{{s}} s",
+      "STEP_OF": "{{i}}/{{n}}"
+    },
     "STARTERS": {
       "LIST_CONNECTIONS": "Meine Verbindungen auflisten",
       "EXPLAIN_SCHEMA": "Dieses Schema erklären",
@@ -5332,6 +5343,21 @@
     "NO_HISTORY": "Noch keine Unterhaltungen",
     "WELCOME_TITLE": "Wie kann ich helfen?",
     "WELCOME_SUBTITLE": "Fragen Sie zu Ihren Daten, generieren Sie SQL, erstellen Sie einen Datensatz oder ein Diagramm. Ich kann nur das tun, was Ihre Berechtigungen erlauben.",
-    "CONTEXT_HINT": "Der Assistent weiß, auf welchem Bildschirm Sie sind, um relevantere Antworten zu geben."
+    "CONTEXT_HINT": "Der Assistent weiß, auf welchem Bildschirm Sie sind, um relevantere Antworten zu geben.",
+    "DESTRUCTIVE": {
+      "REVIEW": "Prüfen",
+      "CONFIRM": "Löschen bestätigen",
+      "WARNING": "Diese Aktion ist dauerhaft und kann nicht rückgängig gemacht werden. Zum Fortfahren bestätigen."
+    },
+    "EDIT": {
+      "ACTION": "Bearbeiten",
+      "APPLY": "Änderungen übernehmen"
+    },
+    "UNDO": {
+      "ACTION": "Rückgängig",
+      "DONE_TITLE": "Rückgängig gemacht",
+      "FAILED_TITLE": "Rückgängig machen fehlgeschlagen",
+      "FAILED": "Die Aktion konnte nicht rückgängig gemacht werden. Sie können sie manuell entfernen."
+    }
   }
 }
